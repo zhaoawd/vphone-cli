@@ -1,5 +1,11 @@
 #import "vphoned_protocol.h"
+#include <pthread.h>
 #include <unistd.h>
+
+static pthread_mutex_t g_writer_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void vp_writer_lock(void)   { pthread_mutex_lock(&g_writer_mutex); }
+void vp_writer_unlock(void) { pthread_mutex_unlock(&g_writer_mutex); }
 
 BOOL vp_read_fully(int fd, void *buf, size_t count) {
     size_t offset = 0;
@@ -46,7 +52,7 @@ NSDictionary *vp_read_message(int fd) {
     return obj;
 }
 
-BOOL vp_write_message(int fd, NSDictionary *dict) {
+BOOL vp_write_message_locked(int fd, NSDictionary *dict) {
     NSError *err = nil;
     NSData *json = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&err];
     if (!json) return NO;
@@ -55,6 +61,23 @@ BOOL vp_write_message(int fd, NSDictionary *dict) {
     if (!vp_write_fully(fd, &header, 4)) return NO;
     if (!vp_write_fully(fd, json.bytes, json.length)) return NO;
     return YES;
+}
+
+BOOL vp_write_message(int fd, NSDictionary *dict) {
+    vp_writer_lock();
+    BOOL ok = vp_write_message_locked(fd, dict);
+    vp_writer_unlock();
+    return ok;
+}
+
+BOOL vp_write_with_payload(int fd, NSDictionary *dict, const void *payload, size_t payloadLen) {
+    vp_writer_lock();
+    BOOL ok = vp_write_message_locked(fd, dict);
+    if (ok && payload && payloadLen > 0) {
+        ok = vp_write_fully(fd, payload, payloadLen);
+    }
+    vp_writer_unlock();
+    return ok;
 }
 
 NSMutableDictionary *vp_make_response(NSString *type, id reqId) {

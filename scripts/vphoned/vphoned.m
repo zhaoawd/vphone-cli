@@ -16,6 +16,7 @@
 #include <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
 #include <arpa/inet.h>
+#include <stdatomic.h>
 #include <ifaddrs.h>
 #include <mach-o/dyld.h>
 #include <net/if.h>
@@ -51,6 +52,14 @@
 
 static BOOL gClipboardAvailable = NO;
 static BOOL gAppsAvailable = NO;
+
+/// Concurrent worker pool for slow commands without inline payload.
+/// Each handle_client invocation owns a private dispatch_group + a unique
+/// monotonic session id. Workers capture that id and refuse to write if
+/// the session has been invalidated (set when the reader loop exits),
+/// preventing a stale async write from landing on a recycled fd.
+static dispatch_queue_t gWorkerQueue;
+static _Atomic uint64_t gCurrentSession = 0;
 
 #define INSTALL_PATH "/usr/bin/vphoned"
 #define CACHE_PATH "/var/root/Library/Caches/vphoned"
@@ -269,11 +278,81 @@ static NSDictionary *handle_command(NSDictionary *msg) {
   return r;
 }
 
+// MARK: - Dispatch Routing
+
+/// Allowlist of slow commands without inline request/response payload that
+/// are safe to dispatch to the worker pool. ANY unrecognized command must
+/// stay synchronous, because a new payload-carrying command added later
+/// would otherwise leak raw bytes onto the reader thread and corrupt the
+/// stream. Add new entries here only after auditing them.
+///
+/// Deliberately excluded (sync only):
+///   - update / file_put / clipboard_set image — request inline payload.
+///   - file_get / clipboard_get image — streamed response payload.
+///   - hid / ping / version / location* — fast, no dispatch benefit.
+static BOOL is_async_eligible(NSString *t) {
+  if (!t) return NO;
+  if ([t hasPrefix:@"app_"]) return YES;
+  if ([t hasPrefix:@"settings_"]) return YES;
+  if ([t hasPrefix:@"keychain_"]) return YES;
+  if ([t isEqualToString:@"open_url"]) return YES;
+  if ([t isEqualToString:@"accessibility_tree"]) return YES;
+  if ([t isEqualToString:@"low_power_mode"]) return YES;
+  if ([t isEqualToString:@"devmode"]) return YES;
+  if ([t isEqualToString:@"ipa_install"]) return YES;
+  return NO;
+}
+
+/// Route one message to the right handler and write its response (if any).
+/// `mySession` is the session id this work belongs to. When the worker
+/// finally reaches the write step we recheck against `gCurrentSession`
+/// under the writer lock — if it has advanced, the original client is
+/// gone, the fd may be recycled, and we MUST skip the write.
+static void process_message(int fd, NSDictionary *msg, uint64_t mySession) {
+  NSString *t = msg[@"t"];
+  NSDictionary *resp = nil;
+
+  if ([t hasPrefix:@"file_"]) {
+    resp = vp_handle_file_command(fd, msg);
+  } else if ([t hasPrefix:@"keychain_"]) {
+    resp = vp_handle_keychain_command(msg);
+  } else if ([t hasPrefix:@"clipboard_"]) {
+    resp = vp_handle_clipboard_command(fd, msg);
+  } else if ([t hasPrefix:@"app_"]) {
+    resp = vp_handle_apps_command(msg);
+  } else if ([t isEqualToString:@"open_url"]) {
+    resp = vp_handle_url_command(msg);
+  } else if ([t hasPrefix:@"settings_"]) {
+    resp = vp_handle_settings_command(msg);
+  } else if ([t isEqualToString:@"accessibility_tree"]) {
+    resp = vp_handle_accessibility_command(msg);
+  } else if ([t isEqualToString:@"low_power_mode"]) {
+    resp = vp_handle_notify_command(msg);
+  } else {
+    resp = handle_command(msg);
+  }
+
+  if (!resp) return;
+
+  // Session-gated write: holding the writer lock pairs with the bump in
+  // handle_client's teardown so a stale worker cannot slip a write in
+  // between session invalidation and close(fd).
+  vp_writer_lock();
+  if (atomic_load(&gCurrentSession) == mySession) {
+    vp_write_message_locked(fd, resp);
+  }
+  vp_writer_unlock();
+}
+
 // MARK: - Client Session
 
 /// Returns YES if daemon should exit for restart (after update).
 static BOOL handle_client(int fd) {
   BOOL should_restart = NO;
+  // Claim a unique id for this session. Workers spawned below capture it
+  // and re-check before writing, so they self-cancel after teardown.
+  uint64_t mySession = atomic_fetch_add(&gCurrentSession, 1) + 1;
+  dispatch_group_t group = dispatch_group_create();
   @autoreleasepool {
     NSDictionary *hello = vp_read_message(fd);
     if (!hello) {
@@ -374,79 +453,42 @@ static BOOL handle_client(int fd) {
           continue;
         }
 
-        // File operations (need fd for inline binary transfer)
-        if ([t hasPrefix:@"file_"]) {
-          NSDictionary *resp = vp_handle_file_command(fd, msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
+        // Slow commands with no inline request payload run on the worker
+        // pool. The reader thread keeps reading, so independent requests
+        // (e.g. ping) aren't blocked behind a long-running app_launch or
+        // ipa_install. Writes are mutex-serialized via vp_write_message.
+        if (is_async_eligible(t)) {
+          NSDictionary *msgCapture = msg;
+          dispatch_group_async(group, gWorkerQueue, ^{
+            @autoreleasepool {
+              process_message(fd, msgCapture, mySession);
+            }
+          });
           continue;
         }
 
-        // Keychain operations
-        if ([t hasPrefix:@"keychain_"]) {
-          NSDictionary *resp = vp_handle_keychain_command(msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        // Clipboard operations (need fd for inline binary transfer)
-        if ([t hasPrefix:@"clipboard_"]) {
-          NSDictionary *resp = vp_handle_clipboard_command(fd, msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        // App management operations
-        if ([t hasPrefix:@"app_"]) {
-          NSDictionary *resp = vp_handle_apps_command(msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        // URL opening
-        if ([t isEqualToString:@"open_url"]) {
-          NSDictionary *resp = vp_handle_url_command(msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        // Settings operations
-        if ([t hasPrefix:@"settings_"]) {
-          NSDictionary *resp = vp_handle_settings_command(msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        // Accessibility tree
-        if ([t isEqualToString:@"accessibility_tree"]) {
-          NSDictionary *resp = vp_handle_accessibility_command(msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        // Low power mode sync
-        if ([t isEqualToString:@"low_power_mode"]) {
-          NSDictionary *resp = vp_handle_notify_command(msg);
-          if (resp && !vp_write_message(fd, resp))
-            break;
-          continue;
-        }
-
-        NSDictionary *resp = handle_command(msg);
-        if (resp && !vp_write_message(fd, resp))
-          break;
+        // Sync path: reader-bound commands (payload reads, streamed
+        // responses) and fast commands not worth dispatch overhead.
+        process_message(fd, msg, mySession);
       }
     }
 
+    // Teardown:
+    //   1. Under the writer lock, invalidate this session and close fd.
+    //      Workers already holding the lock finish cleanly on the still-
+    //      open fd; later workers see the session mismatch and skip.
+    //   2. Best-effort drain so most workers complete naturally. Bounded
+    //      timeout prevents a hung handler (XPC, ipa_install) from
+    //      blocking accept(2) of the next client.
+    vp_writer_lock();
+    atomic_fetch_add(&gCurrentSession, 1);
+    close(fd);
+    vp_writer_unlock();
+    dispatch_group_wait(group,
+                        dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+
     NSLog(@"vphoned: client disconnected%s",
           should_restart ? " (restarting for update)" : "");
-    close(fd);
   }
   return should_restart;
 }
@@ -470,6 +512,9 @@ int main(int argc, char *argv[]) {
       unlink(CACHE_PATH);
     }
 #endif
+
+    gWorkerQueue = dispatch_queue_create("com.vphone.vphoned.workers",
+                                         DISPATCH_QUEUE_CONCURRENT);
 
     if (!vp_hid_load())
       return 1;

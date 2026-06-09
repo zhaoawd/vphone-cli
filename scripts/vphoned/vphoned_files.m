@@ -93,24 +93,25 @@ NSDictionary *vp_handle_file_command(int fd, NSDictionary *msg) {
             return r;
         }
 
-        // Send header with file size
+        // Send header + streamed payload as one atomic writer-lock region,
+        // so concurrent workers can't interleave bytes mid-stream.
         NSMutableDictionary *header = vp_make_response(@"file_data", reqId);
         header[@"size"] = @((unsigned long long)st.st_size);
-        if (!vp_write_message(fd, header)) {
-            close(fileFd);
-            return nil;
-        }
 
-        // Stream file data in chunks
-        uint8_t buf[32768];
-        ssize_t n;
-        while ((n = read(fileFd, buf, sizeof(buf))) > 0) {
-            if (!vp_write_fully(fd, buf, (size_t)n)) {
-                NSLog(@"vphoned: file_get write failed for %@", path);
-                close(fileFd);
-                return nil;
+        vp_writer_lock();
+        BOOL ok = vp_write_message_locked(fd, header);
+        if (ok) {
+            uint8_t buf[32768];
+            ssize_t n;
+            while ((n = read(fileFd, buf, sizeof(buf))) > 0) {
+                if (!vp_write_fully(fd, buf, (size_t)n)) {
+                    NSLog(@"vphoned: file_get write failed for %@", path);
+                    ok = NO;
+                    break;
+                }
             }
         }
+        vp_writer_unlock();
         close(fileFd);
         return nil;  // Response already written inline
     }

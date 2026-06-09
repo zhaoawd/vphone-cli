@@ -95,10 +95,8 @@ NSDictionary *vp_handle_clipboard_command(int fd, NSDictionary *msg) {
       r[@"has_image"] = @YES;
       r[@"image_size"] = @(pngData.length);
 
-      // Write JSON header, then binary PNG data
-      if (!vp_write_message(fd, r))
-        return nil;
-      vp_write_fully(fd, pngData.bytes, pngData.length);
+      // Single atomic writer-lock region for header + PNG payload.
+      vp_write_with_payload(fd, r, pngData.bytes, pngData.length);
       return nil; // Already written inline
     } else {
       r[@"has_image"] = @NO;
