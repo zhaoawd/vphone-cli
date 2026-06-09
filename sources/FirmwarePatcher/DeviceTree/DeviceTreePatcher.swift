@@ -481,6 +481,20 @@ public final class DeviceTreePatcher: Patcher {
         return node
     }
 
+    private func resolveNodeForPatch(_ root: DTNode, patch: PropertyPatch) throws -> DTNode {
+        do {
+            return try resolveNode(root, path: patch.nodePath)
+        } catch {
+            guard
+                patch.patchID == "devicetree.product.gestalt_variants_rename",
+                patch.nodePath == ["device-tree", "product", "vphone600-gestalt-variants"]
+            else {
+                throw error
+            }
+            return try resolveNode(root, path: ["device-tree", "product", "d47-gestalt-variants"])
+        }
+    }
+
     /// Find a property by name within a node.
     private func findProperty(_ node: DTNode, name: String) throws -> DTProperty {
         for prop in node.properties {
@@ -550,7 +564,7 @@ public final class DeviceTreePatcher: Patcher {
             patchesToApply.append(contentsOf: Self.identityPropertyPatches)
         }
         for patch in patchesToApply {
-            let node = try resolveNode(root, path: patch.nodePath)
+            let node = try resolveNodeForPatch(root, patch: patch)
             let prop = try findProperty(node, name: patch.property)
 
             let originalBytes = Data(prop.value.prefix(patch.length))

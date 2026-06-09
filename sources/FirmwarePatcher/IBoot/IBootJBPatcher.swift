@@ -62,6 +62,52 @@ public final class IBootJBPatcher: IBootPatcher {
                     continue
                 }
 
+                // i1 must be: mov w0, #0
+                guard i1.mnemonic == "mov", i1.operandString == "w0, #0" else {
+                    scan += 4
+                    continue
+                }
+
+                // i2 must be bl
+                guard i2.mnemonic == "bl" else {
+                    scan += 4
+                    continue
+                }
+
+                if i0.mnemonic == "b" {
+                    guard
+                        let target = ARM64Encoder.decodeBranchTarget(
+                            insn: buffer.readU32(at: scan),
+                            pc: UInt64(scan)
+                        ),
+                        Int(target) > scan + 8
+                    else {
+                        scan += 4
+                        continue
+                    }
+
+                    let originalBytes = buffer.readBytes(at: scan, count: 4)
+                    let beforeStr = "\(i0.mnemonic) \(i0.operandString)"
+                    let record = PatchRecord(
+                        patchID: "ibss_jb.skip_generate_nonce",
+                        component: component,
+                        fileOffset: scan,
+                        virtualAddress: nil,
+                        originalBytes: originalBytes,
+                        patchedBytes: originalBytes,
+                        beforeDisasm: beforeStr,
+                        afterDisasm: beforeStr,
+                        description: "JB: skip generate_nonce (already applied)"
+                    )
+                    patches.append(record)
+
+                    if verbose {
+                        print(String(format: "  0x%06X: %@ → %@  [ibss_jb.skip_generate_nonce already applied]",
+                                     scan, beforeStr, beforeStr))
+                    }
+                    return true
+                }
+
                 // i0 must be tbz or tbnz
                 guard i0.mnemonic == "tbz" || i0.mnemonic == "tbnz" else {
                     scan += 4
@@ -77,18 +123,6 @@ public final class IBootJBPatcher: IBootPatcher {
                     detail0.operands[1].type == AARCH64_OP_IMM,
                     detail0.operands[1].imm == 0
                 else {
-                    scan += 4
-                    continue
-                }
-
-                // i1 must be: mov w0, #0
-                guard i1.mnemonic == "mov", i1.operandString == "w0, #0" else {
-                    scan += 4
-                    continue
-                }
-
-                // i2 must be bl
-                guard i2.mnemonic == "bl" else {
                     scan += 4
                     continue
                 }

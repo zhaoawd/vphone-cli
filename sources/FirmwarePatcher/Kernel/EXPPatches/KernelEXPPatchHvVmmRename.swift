@@ -106,8 +106,15 @@ extension KernelEXPPatcher {
         let patchedHits = buffer.findAll(patched)
 
         if originalHits.isEmpty, patchedHits.count == 1 {
+            let cstringStart = patchedHits[0] + 1
             log("  [.] Part A: OID name already renamed at foff 0x"
-                + String(format: "%X", patchedHits[0] + 1))
+                + String(format: "%X", cstringStart))
+            emit(cstringStart,
+                 Data([0x58]),
+                 patchID: "kernelcache_exp.hv_vmm_oid_rename",
+                 virtualAddress: fileOffsetToVA(cstringStart),
+                 description: "Part A: OID name already renamed "
+                    + "('hv_vmm_present' -> 'Xv_vmm_present')")
             return false
         }
 
@@ -224,6 +231,27 @@ extension KernelEXPPatcher {
 
             log("  [.] Part B (\(site.label)): \(originalHits.count) "
                 + "original, \(patchedHits.count) already-mangled")
+
+            for needleOff in patchedHits {
+                let mangleOffset = needleOff + site.mangleDelta
+                let byteHere = buffer.data[mangleOffset]
+                guard byteHere == 0x58 else {
+                    log("  [-] Part B (\(site.label)): already-mangled hit at 0x"
+                        + String(format: "%X", mangleOffset)
+                        + " has byte 0x\(String(format: "%02X", byteHere)), "
+                        + "expected 0x58 'X' — skipping no-op record")
+                    continue
+                }
+
+                emit(mangleOffset,
+                     Data([0x58]),
+                     patchID: "kernelcache_exp.hv_vmm_internal_caller_mangle",
+                     virtualAddress: fileOffsetToVA(mangleOffset),
+                     description: "Part B (\(site.label)): byte-5 mangle already applied "
+                        + "at foff 0x"
+                        + String(format: "%X", mangleOffset)
+                        + " ('kern.hv_vmm_present' -> 'kern.Xv_vmm_present')")
+            }
 
             for needleOff in originalHits {
                 let mangleOffset = needleOff + site.mangleDelta
