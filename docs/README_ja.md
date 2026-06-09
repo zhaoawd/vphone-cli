@@ -74,7 +74,7 @@ Apple の Virtualization.framework と PCC の研究用 VM インフラを使用
   ```bash
   # amfidont の場合:
   xcrun python3 -m pip install amfidont
-  sudo amfidont --path [PATH_TO_VPHONE_DIR]
+  sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon --path [PATH_TO_VPHONE_DIR] --spoof-apple
   
   # または amfree の場合:
   brew install retX0/tap/amfree
@@ -83,8 +83,9 @@ Apple の Virtualization.framework と PCC の研究用 VM インフラを使用
 
   このリポジトリでは、`make amfidont_allow_vphone` を実行すると
   `amfidont` 用のエンコード済みパスと CDHash の許可設定をまとめて行えます。
+  `xcrun python3` のユーザーインストール先が `PATH` にない場合も helper が検出します。
 
-> Patchless バリアントでは、方法 1 か、`-S` フラグ付きの amfidont（`sudo amfidont -S --path [PATH_TO_VPHONE_DIR]`）が必要です。
+> Patchless バリアントでは、方法 1 か、`--spoof-apple` / `-S` フラグ付きの amfidont（`sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon -S --path [PATH_TO_VPHONE_DIR]`）が必要です。
 
 **依存関係のインストール:**
 

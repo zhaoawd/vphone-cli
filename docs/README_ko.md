@@ -74,7 +74,7 @@ PCC 리서치 VM 인프라와 Apple의 Virtualization.framework를 사용하여 
   ```bash
   # amfidont 사용:
   xcrun python3 -m pip install amfidont
-  sudo amfidont --path [PATH_TO_VPHONE_DIR]
+  sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon --path [PATH_TO_VPHONE_DIR] --spoof-apple
   
   # 또는 amfree 사용:
   brew install retX0/tap/amfree
@@ -82,9 +82,10 @@ PCC 리서치 VM 인프라와 Apple의 Virtualization.framework를 사용하여 
   ```
 
   이 저장소에서는 `make amfidont_allow_vphone`으로 `amfidont`에 필요한
-  인코딩 경로와 CDHash 허용 설정을 한 번에 적용할 수 있습니다.
+  인코딩 경로와 CDHash 허용 설정을 한 번에 적용할 수 있습니다. `xcrun python3`
+  사용자 설치 디렉터리가 `PATH`에 없어도 helper가 찾아냅니다.
 
-> Patchless 변형은 방법 1 또는 `-S` 플래그를 포함한 amfidont(`sudo amfidont -S --path [PATH_TO_VPHONE_DIR]`)가 필요합니다.
+> Patchless 변형은 방법 1 또는 `--spoof-apple` / `-S` 플래그를 포함한 amfidont(`sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon -S --path [PATH_TO_VPHONE_DIR]`)가 필요합니다.
 
 **의존성(Dependencies) 설치:**
 

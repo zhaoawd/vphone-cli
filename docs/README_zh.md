@@ -74,7 +74,7 @@
   ```bash
   # 使用 amfidont：
   xcrun python3 -m pip install amfidont
-  sudo amfidont --path [PATH_TO_VPHONE_DIR]
+  sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon --path [PATH_TO_VPHONE_DIR] --spoof-apple
   
   # 或使用 amfree：
   brew install retX0/tap/amfree
@@ -82,9 +82,10 @@
   ```
 
   在本仓库中，可以运行 `make amfidont_allow_vphone` 一次性配置
-  `amfidont` 所需的编码路径与 CDHash 允许项。
+  `amfidont` 所需的编码路径与 CDHash 允许项；如果 `xcrun python3`
+  的用户安装目录不在 `PATH` 中，脚本也会自动查找。
 
-> Patchless 变体要求使用方式 1，或带 `-S` 参数的 amfidont（`sudo amfidont -S --path [PATH_TO_VPHONE_DIR]`）。
+> Patchless 变体要求使用方式 1，或带 `--spoof-apple` / `-S` 参数的 amfidont（`sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon -S --path [PATH_TO_VPHONE_DIR]`）。
 
 **安装依赖：**
 

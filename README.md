@@ -74,7 +74,7 @@ Boot into Recovery (long press power button), open Terminal, then choose one set
   ```bash
   # Using amfidont:
   xcrun python3 -m pip install amfidont
-  sudo amfidont --path [PATH_TO_VPHONE_DIR]
+  sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon --path [PATH_TO_VPHONE_DIR] --spoof-apple
   
   # OR Using amfree:
   brew install retX0/tap/amfree
@@ -88,9 +88,11 @@ Boot into Recovery (long press power button), open Terminal, then choose one set
   ```
 
   This helper computes the current signed `vphone-cli` CDHash and uses the
-  URL-encoded project path form observed by `AMFIPathValidator`.
+  URL-encoded project path form observed by `AMFIPathValidator`. It also finds
+  `amfidont` in the `xcrun python3` user install directory when that directory
+  is not on `PATH`.
 
-> The Patchless variant requires either the use of option 1 or amfidont with the `-S` flag (`sudo amfidont -S --path [PATH_TO_VPHONE_DIR]`)
+> The Patchless variant requires either the use of option 1 or amfidont with the `--spoof-apple` / `-S` flag (`sudo "$(xcrun python3 -m site --user-base)/bin/amfidont" daemon -S --path [PATH_TO_VPHONE_DIR]`)
 
 **Install dependencies:**
 
