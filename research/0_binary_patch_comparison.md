@@ -589,7 +589,7 @@ cache rebuild.
 - Swift pipeline follow-up fixes completed after CLI bring-up:
   - `findFile()` now supports glob patterns such as `AVPBooter*.bin` instead of treating them as literal paths.
   - JB variant sequencing now runs base iBSS/kernel patchers first, then the JB extension patchers.
-  - Sequential pipeline application now merges each patcher's `PatchRecord` writes onto the shared output buffer while keeping later patcher searches anchored to the original payload, matching the standalone Swift/Python validation model.
+  - Sequential pipeline application now feeds each patcher's patched output buffer into the next patcher for the same component, so later extension patchers see partially-patched VM trees correctly while still emitting normal `PatchRecord` output.
   - `apply()` now reuses an already-populated `patches` array instead of re-running `findAll()`, so `patch-firmware` / `patch-component` no longer double-scan or double-print the same component diagnostics on a single invocation.
   - unaligned integer reads across the firmware patcher now go through a shared safe `Data.loadLE(...)` helper, fixing the JB IM4P crash (`Swift/UnsafeRawPointer.swift:449` misaligned raw pointer load).
   - `TXMPatcher` now preserves pristine Python parity by preferring the legacy trustcache binary-search site when present, and only falls back to the selector24 hash-flags call chain (`ldr x1, [x20,#0x38]` -> `add x2, sp, #4` -> `bl` -> `ldp x0, x1, [x20,#0x30]` -> `add x2, sp, #8` -> `bl`) when rerunning on a VM tree that already carries the dev/JB selector24 early-return patch.
