@@ -413,7 +413,7 @@ static BOOL handle_client(int fd) {
       [caps addObject:@"apps"];
     [caps addObject:@"url"];
     [caps addObject:@"settings"];
-    if (access("/bin/sh", X_OK) == 0)
+    if (vp_shell_path() != NULL)
       [caps addObject:@"shell"];
 
     NSMutableDictionary *helloResp = [@{

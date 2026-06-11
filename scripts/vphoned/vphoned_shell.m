@@ -22,7 +22,14 @@
 
 extern char **environ;
 
-#define VP_SHELL_PATH "/bin/sh"
+const char *vp_shell_path(void) {
+  static const char *const candidates[] = {"/bin/sh", "/var/jb/bin/sh"};
+  for (size_t i = 0; i < sizeof(candidates) / sizeof(candidates[0]); i++) {
+    if (access(candidates[i], X_OK) == 0) return candidates[i];
+  }
+  return NULL;
+}
+
 #define VP_SHELL_MAX_OUTPUT (1 * 1024 * 1024)  // per stream
 #define VP_SHELL_DEFAULT_TIMEOUT_MS 30000
 #define VP_SHELL_MAX_TIMEOUT_MS 120000
@@ -89,6 +96,13 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
     return r;
   }
 
+  const char *shellPath = vp_shell_path();
+  if (!shellPath) {
+    NSMutableDictionary *r = vp_make_response(@"err", reqId);
+    r[@"msg"] = @"no shell binary on guest";
+    return r;
+  }
+
   NSString *cwd = [msg[@"cwd"] isKindOfClass:[NSString class]] ? msg[@"cwd"] : nil;
 
   NSInteger timeoutMs = VP_SHELL_DEFAULT_TIMEOUT_MS;
@@ -131,10 +145,10 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
   posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETPGROUP);
   posix_spawnattr_setpgroup(&attr, 0);
 
-  char *argv[] = {(char *)VP_SHELL_PATH, "-c", (char *)shellCmd.UTF8String, NULL};
+  char *argv[] = {(char *)shellPath, "-c", (char *)shellCmd.UTF8String, NULL};
   pid_t pid = -1;
   int spawnErr =
-      posix_spawn(&pid, VP_SHELL_PATH, &actions, &attr, argv, environ);
+      posix_spawn(&pid, shellPath, &actions, &attr, argv, environ);
 
   posix_spawn_file_actions_destroy(&actions);
   posix_spawnattr_destroy(&attr);
@@ -146,7 +160,7 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
     close(outPipe[0]);
     close(errPipe[0]);
     NSMutableDictionary *r = vp_make_response(@"err", reqId);
-    r[@"msg"] = [NSString stringWithFormat:@"spawn %s failed: %s", VP_SHELL_PATH,
+    r[@"msg"] = [NSString stringWithFormat:@"spawn %s failed: %s", shellPath,
                                            strerror(spawnErr)];
     return r;
   }

@@ -15,3 +15,8 @@
 ///   timeout_ms — kill the command after this many ms (optional, default 30000)
 /// Returns a response dict with `out`, `err`, `code`, and `timed_out`.
 NSDictionary *vp_handle_shell_command(NSDictionary *msg);
+
+/// Path of the shell binary to use, or NULL when no shell is present.
+/// Prefers /bin/sh, falling back to the rootless-jailbreak path — sealed
+/// system volumes never have /bin/sh, only /var/jb/bin/sh.
+const char *vp_shell_path(void);
