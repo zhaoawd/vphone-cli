@@ -11,9 +11,11 @@
 
 /// Handle a `shell` command. Recognized fields:
 ///   cmd        — command string passed to `/bin/sh -c` (required)
-///   cwd        — working directory (optional)
+///   cwd        — working directory (optional; must exist, else a structured
+///                error is returned rather than exit code 127)
 ///   timeout_ms — kill the command after this many ms (optional, default 30000)
 /// Returns a response dict with `out`, `err`, `code`, and `timed_out`.
+/// Every command and its outcome is NSLog'd for auditing (daemon runs as root).
 NSDictionary *vp_handle_shell_command(NSDictionary *msg);
 
 /// Path of the shell binary to use, or NULL when no shell is present.

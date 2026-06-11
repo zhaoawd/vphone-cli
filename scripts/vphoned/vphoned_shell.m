@@ -17,6 +17,7 @@
 #include <poll.h>
 #include <signal.h>
 #include <spawn.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -105,6 +106,19 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
 
   NSString *cwd = [msg[@"cwd"] isKindOfClass:[NSString class]] ? msg[@"cwd"] : nil;
 
+  // Validate cwd up front so a missing directory is a structured error
+  // instead of exit code 127, which collides with the shell's own
+  // command-not-found status. The `|| exit 127` fold below stays only as a
+  // backstop against the validate→spawn race.
+  if (cwd.length > 0) {
+    struct stat st;
+    if (stat(cwd.UTF8String, &st) != 0 || !S_ISDIR(st.st_mode)) {
+      NSMutableDictionary *r = vp_make_response(@"err", reqId);
+      r[@"msg"] = [NSString stringWithFormat:@"cwd is not a directory: %@", cwd];
+      return r;
+    }
+  }
+
   NSInteger timeoutMs = VP_SHELL_DEFAULT_TIMEOUT_MS;
   if ([msg[@"timeout_ms"] isKindOfClass:[NSNumber class]]) {
     timeoutMs = [msg[@"timeout_ms"] integerValue];
@@ -144,6 +158,14 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
   posix_spawnattr_init(&attr);
   posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETPGROUP);
   posix_spawnattr_setpgroup(&attr, 0);
+
+  // Audit trail: the daemon runs commands as unrestricted root, so every
+  // command (truncated) and its outcome must land in the syslog.
+  NSString *cmdForLog =
+      cmd.length > 200 ? [[cmd substringToIndex:200] stringByAppendingString:@"…"] : cmd;
+  NSLog(@"[shell] run cmd=%@ cwd=%@ timeout_ms=%ld", cmdForLog, cwd ?: @"-",
+        (long)timeoutMs);
+  NSDate *startedAt = [NSDate date];
 
   char *argv[] = {(char *)shellPath, "-c", (char *)shellCmd.UTF8String, NULL};
   pid_t pid = -1;
@@ -242,6 +264,10 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
   } else {
     exitCode = -1;
   }
+
+  NSLog(@"[shell] done pid=%d code=%d timed_out=%d out=%lub err=%lub dur=%.2fs",
+        pid, exitCode, timedOut, (unsigned long)outData.length,
+        (unsigned long)errData.length, -[startedAt timeIntervalSinceNow]);
 
   NSMutableDictionary *r = vp_make_response(@"shell", reqId);
   r[@"out"] = vp_shell_string(outData);
