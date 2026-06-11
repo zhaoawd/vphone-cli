@@ -18,10 +18,14 @@ import ImageIO
 ///   {"t":"swipe","x1":645,"y1":2600,"x2":645,"y2":1400,"ms":300}  → swipe
 ///   {"t":"key","name":"home"}                   → hardware key (home/power/volup/voldown)
 ///   {"t":"type","text":"Hello"}                 → set guest clipboard
+///   {"t":"shell","cmd":"uname -a"}              → run command on guest via /bin/sh -c
+///         optional: "cwd", "timeout_ms"; response carries stdout/stderr/code/timed_out
 ///
-/// All commands except "screenshot" wait briefly then capture a compact screen
-/// image returned as `"image":"<base64>"` in the response.  Pass `"screen":false`
-/// to skip the capture.
+/// The UI commands ("tap", "swipe", "key", "type") wait briefly then capture a
+/// compact screen image returned as `"image":"<base64>"` in the response; pass
+/// `"screen":false` to skip it. "screenshot" always returns an image. "shell"
+/// is not a UI action, so it defaults to no image — pass `"screen":true` to
+/// attach one.
 @MainActor
 class VPhoneHostControl {
     private let socketPath: String
@@ -38,6 +42,15 @@ class VPhoneHostControl {
         var error: String?
         var ok = false
         var imageBase64: String?
+    }
+
+    /// Thread-safe box for guest shell output passed back from the main actor.
+    private final class ShellBox: @unchecked Sendable {
+        var stdout = ""
+        var stderr = ""
+        var exitCode = -1
+        var timedOut = false
+        var truncated = false
     }
 
     /// Screen pixel dimensions for coordinate mapping.
@@ -406,6 +419,55 @@ class VPhoneHostControl {
             semaphore.wait()
             writeResponse(fd, ok: result.ok, error: result.error, image: result.imageBase64)
 
+        case "shell":
+            guard let cmd = json["cmd"] as? String, !cmd.isEmpty else {
+                writeResponse(fd, ok: false, error: "shell requires cmd")
+                return
+            }
+            let cwd = json["cwd"] as? String
+            let timeoutMs = json["timeout_ms"] as? Int
+            // Shell is not a UI action — don't capture a screenshot unless asked.
+            let wantShellScreen = json["screen"] as? Bool ?? false
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let shellBox = ShellBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    let res = try await ctl.runShell(command: cmd, cwd: cwd, timeoutMs: timeoutMs)
+                    shellBox.stdout = res.stdout
+                    shellBox.stderr = res.stderr
+                    shellBox.exitCode = res.exitCode
+                    shellBox.timedOut = res.timedOut
+                    shellBox.truncated = res.truncated
+                    result.ok = true
+                    if wantShellScreen {
+                        result.imageBase64 = await controller.captureCompactScreenshot()
+                    }
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            if result.ok {
+                let extra: [String: Any] = [
+                    "stdout": shellBox.stdout,
+                    "stderr": shellBox.stderr,
+                    "code": shellBox.exitCode,
+                    "timed_out": shellBox.timedOut,
+                    "truncated": shellBox.truncated,
+                ]
+                writeResponse(fd, ok: true, image: result.imageBase64, extra: extra)
+            } else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+            }
+
         default:
             writeResponse(fd, ok: false, error: "unknown command: \(type)")
         }
@@ -431,12 +493,14 @@ class VPhoneHostControl {
     }
 
     private nonisolated static func writeResponse(
-        _ fd: Int32, ok: Bool, path: String? = nil, error: String? = nil, image: String? = nil
+        _ fd: Int32, ok: Bool, path: String? = nil, error: String? = nil, image: String? = nil,
+        extra: [String: Any]? = nil
     ) {
         var dict: [String: Any] = ["ok": ok]
         if let path { dict["path"] = path }
         if let error { dict["error"] = error }
         if let image { dict["image"] = image }
+        if let extra { dict.merge(extra) { _, new in new } }
 
         guard let data = try? JSONSerialization.data(withJSONObject: dict),
               var json = String(data: data, encoding: .utf8)

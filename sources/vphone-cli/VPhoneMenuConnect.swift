@@ -37,6 +37,11 @@ extension VPhoneMenuController {
         connectGuestVersionItem = guestVersion
         menu.addItem(guestVersion)
 
+        let shell = makeItem("Run Shell Command...", action: #selector(runShellCommand))
+        shell.isEnabled = false
+        connectShellItem = shell
+        menu.addItem(shell)
+
         menu.addItem(NSMenuItem.separator())
 
         let clipGet = makeItem("Get Clipboard", action: #selector(getClipboard))
@@ -131,6 +136,75 @@ extension VPhoneMenuController {
     func updateClipboardAvailability(available: Bool) {
         clipboardGetItem?.isEnabled = available
         clipboardSetItem?.isEnabled = available
+    }
+
+    func updateShellAvailability(available: Bool) {
+        connectShellItem?.isEnabled = available
+    }
+
+    // MARK: - Shell
+
+    @objc func runShellCommand() {
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 460, height: 150),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = "Run Shell Command"
+        panel.center()
+
+        let lbl = NSTextField(labelWithString: "Command (run via /bin/sh -c on the guest, as root):")
+        lbl.frame = NSRect(x: 20, y: 110, width: 420, height: 20)
+
+        let field = NSTextField(frame: NSRect(x: 20, y: 50, width: 420, height: 50))
+        field.placeholderString = "uname -a"
+        field.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+
+        let ok = NSButton(frame: NSRect(x: 350, y: 12, width: 90, height: 28))
+        ok.title = "Run"
+        ok.bezelStyle = .rounded
+        ok.keyEquivalent = "\r"
+        ok.target = self
+        ok.action = #selector(VPhoneMenuController.confirmModal)
+
+        let cancel = NSButton(frame: NSRect(x: 250, y: 12, width: 90, height: 28))
+        cancel.title = "Cancel"
+        cancel.bezelStyle = .rounded
+        cancel.keyEquivalent = "\u{1b}"
+        cancel.target = NSApp
+        cancel.action = #selector(NSApplication.abortModal)
+
+        panel.contentView?.addSubview(lbl)
+        panel.contentView?.addSubview(field)
+        panel.contentView?.addSubview(ok)
+        panel.contentView?.addSubview(cancel)
+
+        let response = NSApp.runModal(for: panel)
+        panel.orderOut(nil)
+
+        guard response == .OK else { return }
+        let command = field.stringValue
+        guard !command.isEmpty else { return }
+
+        Task {
+            do {
+                let result = try await control.runShell(command: command)
+                var output = ""
+                if !result.stdout.isEmpty { output += result.stdout }
+                if !result.stderr.isEmpty {
+                    if !output.isEmpty, !output.hasSuffix("\n") { output += "\n" }
+                    output += result.stderr
+                }
+                if output.isEmpty { output = "(no output)" }
+                var status = "exit code: \(result.exitCode)"
+                if result.timedOut { status += " — timed out" }
+                if result.truncated { status += " — output truncated" }
+                showScrollableOutput(title: "$ \(command)", header: status, body: output)
+            } catch {
+                showAlert(title: "Shell", message: "\(error)", style: .warning)
+            }
+        }
     }
 
     // MARK: - Clipboard
@@ -370,6 +444,55 @@ extension VPhoneMenuController {
                 showAlert(title: "Write Setting", message: "\(error)", style: .warning)
             }
         }
+    }
+
+    // MARK: - Scrollable Output
+
+    /// Modal panel with a monospaced, scrollable, selectable text view. Used
+    /// for command output that can exceed the few lines `showAlert` allows.
+    func showScrollableOutput(title: String, header: String, body: String) {
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 620, height: 440),
+            styleMask: [.titled, .closable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = title
+        panel.center()
+
+        let headerLabel = NSTextField(labelWithString: header)
+        headerLabel.frame = NSRect(x: 20, y: 404, width: 580, height: 18)
+        headerLabel.font = .monospacedSystemFont(ofSize: 11, weight: .semibold)
+        headerLabel.autoresizingMask = [.width, .minYMargin]
+
+        let scroll = NSScrollView(frame: NSRect(x: 20, y: 56, width: 580, height: 338))
+        scroll.hasVerticalScroller = true
+        scroll.borderType = .bezelBorder
+        scroll.autoresizingMask = [.width, .height]
+
+        let textView = NSTextView(frame: scroll.bounds)
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        textView.string = body
+        textView.autoresizingMask = [.width]
+        textView.textContainer?.widthTracksTextView = true
+        scroll.documentView = textView
+
+        let ok = NSButton(frame: NSRect(x: 510, y: 14, width: 90, height: 28))
+        ok.title = "Close"
+        ok.bezelStyle = .rounded
+        ok.keyEquivalent = "\r"
+        ok.target = NSApp
+        ok.action = #selector(NSApplication.stopModal(withCode:))
+        ok.autoresizingMask = [.minXMargin, .maxYMargin]
+
+        panel.contentView?.addSubview(headerLabel)
+        panel.contentView?.addSubview(scroll)
+        panel.contentView?.addSubview(ok)
+
+        NSApp.runModal(for: panel)
+        panel.orderOut(nil)
     }
 
     // MARK: - Alert

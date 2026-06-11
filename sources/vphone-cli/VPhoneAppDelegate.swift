@@ -160,6 +160,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.updateURLAvailability(available: caps.contains("url"))
                 mc?.updateClipboardAvailability(available: caps.contains("clipboard"))
                 mc?.updateSettingsAvailability(available: true)
+                mc?.updateShellAvailability(available: caps.contains("shell"))
                 if caps.contains("location") {
                     mc?.updateLocationCapability(available: true)
                     // Auto-resume if user had toggle on
@@ -182,6 +183,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.updateURLAvailability(available: false)
                 mc?.updateClipboardAvailability(available: false)
                 mc?.updateSettingsAvailability(available: false)
+                mc?.updateShellAvailability(available: false)
                 provider?.stopReplay()
                 provider?.stopForwarding()
                 mc?.updateLocationCapability(available: false)

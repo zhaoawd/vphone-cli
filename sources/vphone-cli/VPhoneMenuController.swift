@@ -17,6 +17,7 @@ class VPhoneMenuController {
     var connectDevModeStatusItem: NSMenuItem?
     var connectPingItem: NSMenuItem?
     var connectGuestVersionItem: NSMenuItem?
+    var connectShellItem: NSMenuItem?
     var installPackageItem: NSMenuItem?
     var clipboardGetItem: NSMenuItem?
     var clipboardSetItem: NSMenuItem?

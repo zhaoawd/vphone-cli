@@ -756,6 +756,38 @@ class VPhoneControl {
         }
     }
 
+    // MARK: - Shell
+
+    struct ShellResult {
+        let stdout: String
+        let stderr: String
+        let exitCode: Int
+        let timedOut: Bool
+        let truncated: Bool
+    }
+
+    /// Run a command on the guest via `/bin/sh -c`. Requires the `shell`
+    /// capability (guest must have `/bin/sh`). `timeoutMs`, when set, bounds
+    /// the command on the guest side; it is clamped there to 120s.
+    func runShell(command: String, cwd: String? = nil, timeoutMs: Int? = nil) async throws
+        -> ShellResult
+    {
+        guard guestCaps.contains("shell") else {
+            throw ControlError.unsupportedCapability("shell")
+        }
+        var req: [String: Any] = ["t": "shell", "cmd": command]
+        if let cwd { req["cwd"] = cwd }
+        if let timeoutMs { req["timeout_ms"] = timeoutMs }
+        let (resp, _) = try await sendRequest(req)
+        return ShellResult(
+            stdout: resp["out"] as? String ?? "",
+            stderr: resp["err"] as? String ?? "",
+            exitCode: resp["code"] as? Int ?? -1,
+            timedOut: resp["timed_out"] as? Bool ?? false,
+            truncated: resp["truncated"] as? Bool ?? false
+        )
+    }
+
     // MARK: - Settings
 
     func settingsGet(domain: String, key: String? = nil) async throws -> Any? {
@@ -1014,6 +1046,8 @@ class VPhoneControl {
     private static func timeoutForRequest(type: String) -> TimeInterval {
         switch type {
         case "file_get", "file_put", "ipa_install":
+            transferRequestTimeout
+        case "shell":
             transferRequestTimeout
         case "devmode", "file_list", "file_delete", "file_rename", "file_mkdir", "keychain_list",
              "app_list", "app_launch", "open_url", "accessibility_tree":

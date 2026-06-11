@@ -37,6 +37,7 @@
 #import "vphoned_notify.h"
 #import "vphoned_protocol.h"
 #import "vphoned_settings.h"
+#import "vphoned_shell.h"
 #import "vphoned_url.h"
 
 #ifndef AF_VSOCK
@@ -296,6 +297,7 @@ static BOOL is_async_eligible(NSString *t) {
   if ([t hasPrefix:@"settings_"]) return YES;
   if ([t hasPrefix:@"keychain_"]) return YES;
   if ([t isEqualToString:@"open_url"]) return YES;
+  if ([t isEqualToString:@"shell"]) return YES;
   if ([t isEqualToString:@"accessibility_tree"]) return YES;
   if ([t isEqualToString:@"low_power_mode"]) return YES;
   if ([t isEqualToString:@"devmode"]) return YES;
@@ -322,6 +324,8 @@ static void process_message(int fd, NSDictionary *msg, uint64_t mySession) {
     resp = vp_handle_apps_command(msg);
   } else if ([t isEqualToString:@"open_url"]) {
     resp = vp_handle_url_command(msg);
+  } else if ([t isEqualToString:@"shell"]) {
+    resp = vp_handle_shell_command(msg);
   } else if ([t hasPrefix:@"settings_"]) {
     resp = vp_handle_settings_command(msg);
   } else if ([t isEqualToString:@"accessibility_tree"]) {
@@ -409,6 +413,8 @@ static BOOL handle_client(int fd) {
       [caps addObject:@"apps"];
     [caps addObject:@"url"];
     [caps addObject:@"settings"];
+    if (access("/bin/sh", X_OK) == 0)
+      [caps addObject:@"shell"];
 
     NSMutableDictionary *helloResp = [@{
       @"v" : @PROTOCOL_VERSION,
