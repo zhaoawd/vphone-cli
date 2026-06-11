@@ -20,12 +20,25 @@ import ImageIO
 ///   {"t":"type","text":"Hello"}                 → set guest clipboard
 ///   {"t":"shell","cmd":"uname -a"}              → run command on guest via /bin/sh -c
 ///         optional: "cwd", "timeout_ms"; response carries stdout/stderr/code/timed_out
+///   {"t":"file_get","path":"/var/...","save":"/tmp/x"}  → pull guest file; "save" writes
+///         to a host path, otherwise response carries base64 "data" (+ "size")
+///   {"t":"file_put","path":"/var/...","data_b64":...}   → push file; or "load" reads a
+///         host path; optional "perm" (default "644")
+///   {"t":"app_launch","bundle_id":"com.x.y"}    → launch app (optional "url"); returns pid
+///   {"t":"app_terminate","bundle_id":"com.x.y"} → kill app
+///   {"t":"app_list","filter":"all"}             → installed apps ("apps" array)
+///   {"t":"app_foreground"}                      → frontmost app (bundle_id/name/pid)
+///   {"t":"open_url","url":"https://..."}        → open URL on guest
 ///
-/// The UI commands ("tap", "swipe", "key", "type") wait briefly then capture a
-/// compact screen image returned as `"image":"<base64>"` in the response; pass
-/// `"screen":false` to skip it. "screenshot" always returns an image. "shell"
-/// is not a UI action, so it defaults to no image — pass `"screen":true` to
-/// attach one.
+/// The UI commands ("tap", "swipe", "key", "type", "app_launch",
+/// "app_terminate", "open_url") wait briefly then capture a compact screen
+/// image returned as `"image":"<base64>"` in the response; pass
+/// `"screen":false` to skip it. "screenshot" always returns an image. The
+/// non-UI commands ("shell", "file_*", "app_list", "app_foreground") never
+/// attach one (for "shell", pass `"screen":true` to opt in).
+///
+/// Connections are handled concurrently — a long-running command does not
+/// block other clients.
 @MainActor
 class VPhoneHostControl {
     private let socketPath: String
@@ -51,6 +64,13 @@ class VPhoneHostControl {
         var exitCode = -1
         var timedOut = false
         var truncated = false
+    }
+
+    /// Thread-safe box for structured extra fields + raw payloads from the
+    /// proxied guest-capability commands (file_*, app_*, open_url).
+    private final class ExtraBox: @unchecked Sendable {
+        var extra: [String: Any] = [:]
+        var data: Data?
     }
 
     /// Screen pixel dimensions for coordinate mapping.
@@ -234,7 +254,13 @@ class VPhoneHostControl {
         while true {
             let clientFD = accept(listenFD, nil, nil)
             guard clientFD >= 0 else { break }
-            handleClient(clientFD, controller: controller)
+            // Handle each client on its own worker: commands that block for a
+            // while (a long guest shell, a large file_get) must not freeze the
+            // rest of the socket surface. Per-command ordering on the guest is
+            // still enforced by the vsock request pipeline.
+            DispatchQueue.global(qos: .userInitiated).async { [weak controller] in
+                handleClient(clientFD, controller: controller)
+            }
         }
     }
 
@@ -467,6 +493,264 @@ class VPhoneHostControl {
             } else {
                 writeResponse(fd, ok: false, error: result.error ?? "unknown error")
             }
+
+        case "file_get":
+            guard let path = json["path"] as? String, !path.isEmpty else {
+                writeResponse(fd, ok: false, error: "file_get requires path")
+                return
+            }
+            // "save": write the bytes to a host-side path instead of inlining
+            // base64 — the sane mode for large payloads like screen recordings.
+            let savePath = json["save"] as? String
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    box.data = try await ctl.downloadFile(path: path)
+                    result.ok = true
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            guard result.ok, let fileData = box.data else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+                return
+            }
+            if let savePath {
+                do {
+                    try fileData.write(to: URL(fileURLWithPath: savePath))
+                    writeResponse(fd, ok: true, path: savePath,
+                                  extra: ["size": fileData.count])
+                } catch {
+                    writeResponse(fd, ok: false, error: "write \(savePath): \(error)")
+                }
+            } else {
+                writeResponse(fd, ok: true, extra: [
+                    "size": fileData.count,
+                    "data": fileData.base64EncodedString(),
+                ])
+            }
+
+        case "file_put":
+            guard let path = json["path"] as? String, !path.isEmpty else {
+                writeResponse(fd, ok: false, error: "file_put requires path")
+                return
+            }
+            // Content comes either inline ("data_b64") or from a host-side
+            // file ("load"); decode/read here on the client worker, off the
+            // main actor.
+            let payload: Data
+            if let b64 = json["data_b64"] as? String {
+                guard let decoded = Data(base64Encoded: b64) else {
+                    writeResponse(fd, ok: false, error: "data_b64 is not valid base64")
+                    return
+                }
+                payload = decoded
+            } else if let loadPath = json["load"] as? String {
+                guard let read = FileManager.default.contents(atPath: loadPath) else {
+                    writeResponse(fd, ok: false, error: "cannot read host file: \(loadPath)")
+                    return
+                }
+                payload = read
+            } else {
+                writeResponse(fd, ok: false, error: "file_put requires data_b64 or load")
+                return
+            }
+            let perm = json["perm"] as? String ?? "644"
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    try await ctl.uploadFile(path: path, data: payload, permissions: perm)
+                    result.ok = true
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            if result.ok {
+                writeResponse(fd, ok: true, extra: ["size": payload.count])
+            } else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+            }
+
+        case "app_launch":
+            guard let bundleId = json["bundle_id"] as? String, !bundleId.isEmpty else {
+                writeResponse(fd, ok: false, error: "app_launch requires bundle_id")
+                return
+            }
+            let url = json["url"] as? String
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    let pid = try await ctl.appLaunch(bundleId: bundleId, url: url)
+                    box.extra["pid"] = pid
+                    result.ok = true
+                    if wantScreen {
+                        try? await Task.sleep(nanoseconds: UInt64(screenDelay) * 1_000_000)
+                        result.imageBase64 = await controller.captureCompactScreenshot()
+                    }
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            if result.ok {
+                writeResponse(fd, ok: true, image: result.imageBase64, extra: box.extra)
+            } else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+            }
+
+        case "app_terminate":
+            guard let bundleId = json["bundle_id"] as? String, !bundleId.isEmpty else {
+                writeResponse(fd, ok: false, error: "app_terminate requires bundle_id")
+                return
+            }
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    try await ctl.appTerminate(bundleId: bundleId)
+                    result.ok = true
+                    if wantScreen {
+                        try? await Task.sleep(nanoseconds: UInt64(screenDelay) * 1_000_000)
+                        result.imageBase64 = await controller.captureCompactScreenshot()
+                    }
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            writeResponse(fd, ok: result.ok, error: result.error, image: result.imageBase64)
+
+        case "app_list":
+            let filter = json["filter"] as? String ?? "all"
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    let apps = try await ctl.appList(filter: filter)
+                    box.extra["apps"] = apps.map { app -> [String: Any] in
+                        [
+                            "bundle_id": app.bundleId,
+                            "name": app.name,
+                            "version": app.version,
+                            "type": app.type,
+                            "state": app.state,
+                            "pid": app.pid,
+                            "path": app.path,
+                            "data_container": app.dataContainer,
+                        ]
+                    }
+                    result.ok = true
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            if result.ok {
+                writeResponse(fd, ok: true, extra: box.extra)
+            } else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+            }
+
+        case "app_foreground":
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    let fg = try await ctl.appForeground()
+                    box.extra["bundle_id"] = fg.bundleId
+                    box.extra["name"] = fg.name
+                    box.extra["pid"] = fg.pid
+                    result.ok = true
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            if result.ok {
+                writeResponse(fd, ok: true, extra: box.extra)
+            } else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+            }
+
+        case "open_url":
+            guard let url = json["url"] as? String, !url.isEmpty else {
+                writeResponse(fd, ok: false, error: "open_url requires url")
+                return
+            }
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                do {
+                    try await ctl.openURL(url)
+                    result.ok = true
+                    if wantScreen {
+                        try? await Task.sleep(nanoseconds: UInt64(screenDelay) * 1_000_000)
+                        result.imageBase64 = await controller.captureCompactScreenshot()
+                    }
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            writeResponse(fd, ok: result.ok, error: result.error, image: result.imageBase64)
 
         default:
             writeResponse(fd, ok: false, error: "unknown command: \(type)")
