@@ -13,3 +13,10 @@ BOOL vp_apps_load(void);
 
 /// Handle an app command. Returns a response dict.
 NSDictionary *vp_handle_apps_command(NSDictionary *msg);
+
+/// Launch an app / open a URL through the entitled `uiopen` CLI. Pass a non-nil
+/// `url` to open a URL, otherwise `bundleID` to launch by bundle identifier.
+/// Returns uiopen's exit code (0 = success), or -1 if uiopen is unavailable.
+/// The in-process LSApplicationWorkspace open path is rejected from the daemon
+/// context, so URL/app open is delegated to uiopen.
+int vp_open_via_uiopen(NSString *url, NSString *bundleID);

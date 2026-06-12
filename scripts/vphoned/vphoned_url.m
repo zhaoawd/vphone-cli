@@ -1,19 +1,16 @@
 /*
- * vphoned_url — URL opening via LSApplicationWorkspace.
+ * vphoned_url — URL opening via the entitled uiopen CLI.
  *
- * Uses LSApplicationWorkspace (CoreServices) to open URLs.
- * Does not require UIKit — works from daemon context.
+ * The in-process LSApplicationWorkspace openURL/openSensitiveURL path returns
+ * NO from the daemon context (vphoned isn't entitled for the SpringBoard
+ * open-sensitive-url service), so URL open is delegated to uiopen, which is a
+ * properly entitled platform binary. See the uiopen bridge note in
+ * vphoned_apps.m.
  */
 
 #import "vphoned_url.h"
+#import "vphoned_apps.h"
 #import "vphoned_protocol.h"
-#include <objc/message.h>
-
-@interface LSApplicationWorkspace : NSObject
-+ (instancetype)defaultWorkspace;
-- (BOOL)openURL:(NSURL *)url withOptions:(NSDictionary *)options;
-- (BOOL)openSensitiveURL:(NSURL *)url withOptions:(NSDictionary *)options;
-@end
 
 NSDictionary *vp_handle_url_command(NSDictionary *msg) {
   id reqId = msg[@"id"];
@@ -32,28 +29,13 @@ NSDictionary *vp_handle_url_command(NSDictionary *msg) {
     return r;
   }
 
-  LSApplicationWorkspace *ws = [LSApplicationWorkspace defaultWorkspace];
-  BOOL ok = NO;
-
-  // Try openURL:withOptions: first
-  SEL openURLSel = sel_registerName("openURL:withOptions:");
-  if ([ws respondsToSelector:openURLSel]) {
-    ok = ((BOOL (*)(id, SEL, id, id))objc_msgSend)(ws, openURLSel, url, nil);
-  }
-
-  if (!ok) {
-    // Fallback: try openSensitiveURL:withOptions: (requires entitlement)
-    SEL sensitiveSel = sel_registerName("openSensitiveURL:withOptions:");
-    if ([ws respondsToSelector:sensitiveSel]) {
-      ok =
-          ((BOOL (*)(id, SEL, id, id))objc_msgSend)(ws, sensitiveSel, url, nil);
-    }
-  }
-
+  int rc = vp_open_via_uiopen(urlStr, nil);
   NSMutableDictionary *r = vp_make_response(@"open_url", reqId);
-  r[@"ok"] = @(ok);
-  if (!ok) {
-    r[@"msg"] = [NSString stringWithFormat:@"failed to open url: %@", urlStr];
+  r[@"ok"] = @(rc == 0);
+  if (rc != 0) {
+    r[@"msg"] = rc < 0
+                    ? [NSString stringWithFormat:@"uiopen unavailable for url: %@", urlStr]
+                    : [NSString stringWithFormat:@"uiopen exit %d for url: %@", rc, urlStr];
   }
   return r;
 }

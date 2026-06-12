@@ -729,11 +729,23 @@ class VPhoneControl {
         var req: [String: Any] = ["t": "app_launch", "bundle_id": bundleId]
         if let url { req["url"] = url }
         let (resp, _) = try await sendRequest(req)
+        // The guest fails closed (ok=false + msg) when the launch did not
+        // materialize; propagate that instead of reporting a phantom success.
+        let ok = resp["ok"] as? Bool ?? false
+        if !ok {
+            throw ControlError.guestError(resp["msg"] as? String ?? "failed to launch \(bundleId)")
+        }
         return resp["pid"] as? Int ?? 0
     }
 
     func appTerminate(bundleId: String) async throws {
-        _ = try await sendRequest(["t": "app_terminate", "bundle_id": bundleId])
+        let (resp, _) = try await sendRequest(["t": "app_terminate", "bundle_id": bundleId])
+        // The guest verifies the process is gone and returns ok=false if it is
+        // still running; don't swallow that into an unconditional success.
+        let ok = resp["ok"] as? Bool ?? false
+        if !ok {
+            throw ControlError.guestError(resp["msg"] as? String ?? "failed to terminate \(bundleId)")
+        }
     }
 
     func appForeground() async throws -> (bundleId: String, name: String, pid: Int) {
