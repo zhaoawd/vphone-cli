@@ -14,6 +14,7 @@
 #import "vphoned_protocol.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <os/log.h>
 #include <poll.h>
 #include <signal.h>
 #include <spawn.h>
@@ -160,11 +161,13 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
   posix_spawnattr_setpgroup(&attr, 0);
 
   // Audit trail: the daemon runs commands as unrestricted root, so every
-  // command (truncated) and its outcome must land in the syslog.
+  // command (truncated) and its outcome must land in the syslog. os_log with
+  // %{public} — NSLog's dynamic strings get redacted to <private> in the
+  // unified log, which defeats the audit.
   NSString *cmdForLog =
       cmd.length > 200 ? [[cmd substringToIndex:200] stringByAppendingString:@"…"] : cmd;
-  NSLog(@"[shell] run cmd=%@ cwd=%@ timeout_ms=%ld", cmdForLog, cwd ?: @"-",
-        (long)timeoutMs);
+  os_log(OS_LOG_DEFAULT, "[shell] run cmd=%{public}s cwd=%{public}s timeout_ms=%ld",
+         cmdForLog.UTF8String, (cwd ?: @"-").UTF8String, (long)timeoutMs);
   NSDate *startedAt = [NSDate date];
 
   char *argv[] = {(char *)shellPath, "-c", (char *)shellCmd.UTF8String, NULL};
@@ -265,9 +268,10 @@ NSDictionary *vp_handle_shell_command(NSDictionary *msg) {
     exitCode = -1;
   }
 
-  NSLog(@"[shell] done pid=%d code=%d timed_out=%d out=%lub err=%lub dur=%.2fs",
-        pid, exitCode, timedOut, (unsigned long)outData.length,
-        (unsigned long)errData.length, -[startedAt timeIntervalSinceNow]);
+  os_log(OS_LOG_DEFAULT,
+         "[shell] done pid=%d code=%d timed_out=%d out=%lub err=%lub dur=%.2fs",
+         pid, exitCode, timedOut, (unsigned long)outData.length,
+         (unsigned long)errData.length, -[startedAt timeIntervalSinceNow]);
 
   NSMutableDictionary *r = vp_make_response(@"shell", reqId);
   r[@"out"] = vp_shell_string(outData);
