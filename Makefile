@@ -235,7 +235,7 @@ vphoned:
 # VM management
 # ═══════════════════════════════════════════════════════════════════
 
-.PHONY: vm_new vm_backup vm_restore vm_switch vm_list amfidont_allow_vphone boot_host_preflight boot boot_less boot_dfu boot_binary_check
+.PHONY: vm_new vm_backup vm_restore vm_switch vm_list amfidont_allow_vphone boot_host_preflight boot boot_all boot_less boot_dfu boot_binary_check
 
 vm_new:
 	CPU="$(CPU)" MEMORY="$(MEMORY)" \
@@ -310,6 +310,8 @@ boot_binary_check: $(BINARY)
 boot: bundle vphoned boot_binary_check
 	cd $(VM_DIR) && "$(CURDIR)/$(BUNDLE_BIN)" \
 		--config ./config.plist
+
+boot_all: amfidont_allow_vphone boot
 
 boot_less: bundle vphoned boot_binary_check_less
 	cd $(VM_DIR) && "$(CURDIR)/$(BUNDLE_BIN)" \
