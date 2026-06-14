@@ -158,8 +158,14 @@ class VPhoneHostControl {
 
     // MARK: - Compact Screenshot
 
-    /// Capture current screen as a small grayscale JPEG, returned as base64.
-    private func captureCompactScreenshot() async -> String? {
+    /// Capture current screen as a small JPEG, returned as base64.
+    ///
+    /// Defaults to a compact grayscale JPEG (the AI path: small + fast). Pass
+    /// `color: true` (the `"color":true` socket flag) for an sRGB JPEG at higher
+    /// quality — used by the live dashboard so its stream matches the on-screen
+    /// vphone-cli window. The underlying capture is always color (32BGRA); only
+    /// the encode differs.
+    private func captureCompactScreenshot(color: Bool = false) async -> String? {
         guard let recorder = screenRecorder, let view = captureView, view.window != nil else {
             return nil
         }
@@ -172,28 +178,40 @@ class VPhoneHostControl {
         let dstW = cgImage.width / Self.compactScale
         let dstH = cgImage.height / Self.compactScale
 
-        // Draw into grayscale context
-        let gray = CGColorSpaceCreateDeviceGray()
-        guard let ctx = CGContext(
-            data: nil, width: dstW, height: dstH,
-            bitsPerComponent: 8, bytesPerRow: dstW,
-            space: gray, bitmapInfo: CGImageAlphaInfo.none.rawValue
-        ) else { return nil }
+        let ctx: CGContext?
+        if color {
+            // sRGB context, premultiplied alpha (BGRA-compatible).
+            ctx = CGContext(
+                data: nil, width: dstW, height: dstH,
+                bitsPerComponent: 8, bytesPerRow: dstW * 4,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            )
+        } else {
+            // Grayscale context (compact, high-contrast — the AI default).
+            ctx = CGContext(
+                data: nil, width: dstW, height: dstH,
+                bitsPerComponent: 8, bytesPerRow: dstW,
+                space: CGColorSpaceCreateDeviceGray(),
+                bitmapInfo: CGImageAlphaInfo.none.rawValue
+            )
+        }
+        guard let ctx else { return nil }
 
-        // High contrast: bump brightness
         ctx.setShouldAntialias(true)
         ctx.interpolationQuality = .high
         ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: dstW, height: dstH))
 
-        guard let grayImage = ctx.makeImage() else { return nil }
+        guard let outImage = ctx.makeImage() else { return nil }
 
-        // Encode as low-quality JPEG
+        // Color: a touch more quality since it's for human viewing; gray stays lean.
         let data = NSMutableData()
         guard let dest = CGImageDestinationCreateWithData(data, "public.jpeg" as CFString, 1, nil) else {
             return nil
         }
-        let options: [CFString: Any] = [kCGImageDestinationLossyCompressionQuality: 0.35]
-        CGImageDestinationAddImage(dest, grayImage, options as CFDictionary)
+        let quality: CGFloat = color ? 0.6 : 0.35
+        let options: [CFString: Any] = [kCGImageDestinationLossyCompressionQuality: quality]
+        CGImageDestinationAddImage(dest, outImage, options as CFDictionary)
         guard CGImageDestinationFinalize(dest) else { return nil }
 
         return (data as Data).base64EncodedString()
@@ -281,6 +299,9 @@ class VPhoneHostControl {
         let wantScreen = json["screen"] as? Bool ?? true
         // Delay before screenshot (ms) — lets animations settle
         let screenDelay = json["delay"] as? Int ?? 500
+        // Return a color (sRGB) image instead of the compact grayscale default.
+        // Opt-in so the AI action paths stay lean; the live dashboard sets it.
+        let wantColor = json["color"] as? Bool ?? false
 
         switch type {
         case "screenshot":
@@ -304,7 +325,7 @@ class VPhoneHostControl {
                         result.path = url.path
                     }
                     // Always include compact image for screenshot command
-                    result.imageBase64 = await controller.captureCompactScreenshot()
+                    result.imageBase64 = await controller.captureCompactScreenshot(color: wantColor)
                     result.ok = true
                 } catch {
                     result.error = "\(error)"
