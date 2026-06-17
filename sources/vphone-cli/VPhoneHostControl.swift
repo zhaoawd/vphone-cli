@@ -773,6 +773,49 @@ class VPhoneHostControl {
             semaphore.wait()
             writeResponse(fd, ok: result.ok, error: result.error, image: result.imageBase64)
 
+        case "ipa_install":
+            // Install an IPA already present on the guest filesystem, using
+            // vphoned's built-in installer. The host streams nothing here — the
+            // caller (e.g. autophone) has already placed the .ipa at `path` on
+            // the guest, so we just relay the request over the control channel
+            // and surface the guest's response verbatim.
+            guard let path = json["path"] as? String, !path.isEmpty else {
+                writeResponse(fd, ok: false, error: "ipa_install requires path")
+                return
+            }
+            let registration = json["registration"] as? String ?? "User"
+            let certPath = json["cert_path"] as? String
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                var req: [String: Any] = [
+                    "t": "ipa_install", "path": path, "registration": registration,
+                ]
+                if let certPath { req["cert_path"] = certPath }
+                do {
+                    let (resp, _) = try await ctl.sendRequest(req)
+                    if let msg = resp["msg"] as? String { box.extra["msg"] = msg }
+                    if let bundleId = resp["bundle_id"] as? String { box.extra["bundle_id"] = bundleId }
+                    result.ok = true
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+
+            semaphore.wait()
+            if result.ok {
+                writeResponse(fd, ok: true, extra: box.extra)
+            } else {
+                writeResponse(fd, ok: false, error: result.error ?? "unknown error")
+            }
+
         default:
             writeResponse(fd, ok: false, error: "unknown command: \(type)")
         }
