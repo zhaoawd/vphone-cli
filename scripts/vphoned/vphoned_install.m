@@ -325,6 +325,12 @@ static int vp_sign_app(NSString *appPath, NSString *certPath, NSString *ldidPath
         return 174;
     }
 
+    // Phase 1: collect the entitlements each bundle should be signed with, read
+    // from the ORIGINAL signatures — BEFORE any re-signing strips them. We can't
+    // dump-and-sign inline here because the recursive pass below (Phase 2) would
+    // wipe whatever we just applied; instead we stash (path, entitlements) and
+    // re-apply in Phase 3.
+    NSMutableArray<NSArray *> *entitledBinaries = [NSMutableArray array];
     NSURL *fileURL = nil;
     NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager]
         enumeratorAtURL:[NSURL fileURLWithPath:appPath]
@@ -386,20 +392,36 @@ static int vp_sign_app(NSString *appPath, NSString *certPath, NSString *ldidPath
         }
         entitlementsToUse[@"jb.pmap_cs_custom_trust"] = @"PMAP_CS_APP_STORE";
 
-        NSString *signOutput = @"";
-        int ret = vp_sign_binary(bundleMainExecutablePath, entitlementsToUse, certPath, ldidPath, &signOutput);
-        if (ret != 0) {
-            if (errorOutput) *errorOutput = signOutput;
-            return 173;
-        }
+        [entitledBinaries addObject:@[bundleMainExecutablePath, entitlementsToUse]];
     }
 
+    // Phase 2: recursively sign all nested mach-o (frameworks/dylibs/plugins)
+    // with no entitlements. A recursive `ldid -S` without an entitlements file
+    // strips the entitlement blob from every binary it touches (verified
+    // on-device: `-S<file>` embeds entitlements, a subsequent bare `-S` blanks
+    // them). This is why the original "dump+sign in the loop, then recursive
+    // sign" order silently wiped the application-identifier /
+    // keychain-access-groups from the main executable — entitled apps (e.g. RN
+    // apps that read the keychain at launch) then crashed with EXC_BREAKPOINT
+    // right after becoming active. The cert-signed (`-K`) menu path happened to
+    // preserve them, which is why only the cert-less UDS install path was hit.
     NSString *recursiveOutput = @"";
     int recursiveRet = vp_sign_binary(appPath, nil, certPath, ldidPath, &recursiveOutput);
     if (recursiveRet != 0) {
         if (errorOutput) *errorOutput = recursiveOutput;
         return 173;
     }
+
+    // Phase 3: re-apply the entitled signatures LAST so they survive Phase 2.
+    for (NSArray *entry in entitledBinaries) {
+        NSString *signOutput = @"";
+        int ret = vp_sign_binary(entry[0], entry[1], certPath, ldidPath, &signOutput);
+        if (ret != 0) {
+            if (errorOutput) *errorOutput = signOutput;
+            return 173;
+        }
+    }
+
     return 0;
 }
 
