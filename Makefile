@@ -78,6 +78,10 @@ help:
 	@echo "  make vm_backup NAME=<name>   Save current VM as a named backup"
 	@echo "  make vm_restore NAME=<name>  Restore a named backup into vm/"
 	@echo "  make vm_switch NAME=<name>   Save current + restore target (one step)"
+	@echo "  make vm_package              Package booted VM + launcher into a portable archive"
+	@echo "    Options: PKG_NAME=<name>   Friendly package name (default: VM .vm_name)"
+	@echo "             PKG_OUT=<file>    Output tar path (default: dist/vphone-<name>-<date>.tar)"
+	@echo "             PKG_ARGS='--include-restore'  Extra flags for scripts/vm_package.sh"
 	@echo "  make vm_list                 List available backups"
 	@echo "    Options: BACKUP_INCLUDE_IPSW=1  Include *_Restore* IPSW dirs in backup"
 	@echo "             FORCE=1                Skip overwrite prompt on restore"
@@ -235,11 +239,17 @@ vphoned:
 # VM management
 # ═══════════════════════════════════════════════════════════════════
 
-.PHONY: vm_new vm_backup vm_restore vm_switch vm_list amfidont_allow_vphone boot_host_preflight boot boot_all boot_less boot_dfu boot_binary_check
+.PHONY: vm_new vm_backup vm_restore vm_switch vm_list vm_package amfidont_allow_vphone boot_host_preflight boot boot_all boot_less boot_dfu boot_binary_check
 
 vm_new:
 	CPU="$(CPU)" MEMORY="$(MEMORY)" \
 	zsh $(SCRIPTS)/vm_create.sh --dir $(VM_DIR) --disk-size $(DISK_SIZE)
+
+# Package booted VM + launcher into a single portable archive (boots on another host
+# without recompiling). Requires the bundle (auto-built here via `make bundle`).
+vm_package: bundle
+	VM_DIR="$(VM_DIR)" BUNDLE="$(BUNDLE)" ENTITLEMENTS="$(ENTITLEMENTS)" PKG_NAME="$(PKG_NAME)" \
+	zsh $(SCRIPTS)/vm_package.sh $(if $(PKG_OUT),--out $(PKG_OUT),) $(PKG_ARGS)
 
 vm_backup:
 	VM_DIR="$(VM_DIR)" BACKUPS_DIR="$(BACKUPS_DIR)" NAME="$(NAME)" BACKUP_INCLUDE_IPSW="$(BACKUP_INCLUDE_IPSW)" \
