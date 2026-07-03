@@ -39,6 +39,7 @@
 #import "vphoned_settings.h"
 #import "vphoned_shell.h"
 #import "vphoned_url.h"
+#import "vphoned_vcam.h"
 
 #ifndef AF_VSOCK
 #define AF_VSOCK 40
@@ -530,6 +531,7 @@ int main(int argc, char *argv[]) {
 
     gClipboardAvailable = vp_clipboard_load();
     gAppsAvailable = vp_apps_load();
+    vp_vcam_start();
 
     int sock = socket(AF_VSOCK, SOCK_STREAM, 0);
     if (sock < 0) {
