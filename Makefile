@@ -18,6 +18,8 @@ FORCE       ?= 0
 RESTORE_UDID ?=           # UDID for restore operations
 RESTORE_ECID ?=           # ECID for restore operations
 IRECOVERY_ECID ?=         # ECID for ramdisk send operations
+SSH_FORWARD ?= auto       # usbmux->TCP SSH forward on `make boot`: auto (JB only, via marker), 1 (force), 0 (off)
+SSH_FWD_PORT ?= 2222      # Local port forwarded to guest:22
 
 # ─── Build info ──────────────────────────────────────────────────
 GIT_HASH    := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -91,7 +93,10 @@ help:
 	@echo "             FORCE=1                Skip overwrite prompt on restore"
 	@echo "  make amfidont_allow_vphone   Start amfidont for the signed vphone-cli binary"
 	@echo "  make boot_host_preflight     Diagnose whether host can launch signed PV=3 binary"
-	@echo "  make boot                    Boot VM (reads from config.plist)"
+	@echo "  make boot                    Boot VM (reads from config.plist; auto SSH forward on JB)"
+	@echo "    Options: SSH_FORWARD=auto         auto: forward only on JB (marker); 1 force; 0 off"
+	@echo "             SSH_FWD_PORT=2222         Local port forwarded to guest:22"
+	@echo "  make ssh_forward             Start host usbmux->guest:22 forward only (JB)"
 	@echo "  make boot_less               Boot VM in vphoned patchless compatibility"
 	@echo "    Options: NO_VPHONED=1              Excludes vphoned from being installed"
 	@echo "  make boot_dfu                Boot VM in DFU mode (reads from config.plist)"
@@ -330,8 +335,33 @@ boot_binary_check: $(BINARY)
 	$(call BOOT_BINARY_CHECK,--assert-bootable)
 
 boot: bundle vphoned boot_binary_check
-	cd $(VM_DIR) && "$(CURDIR)/$(BUNDLE_BIN)" \
-		--config ./config.plist
+	@cd $(VM_DIR) && { \
+		FWD_PID=""; \
+		do_fwd=0; \
+		case "$(strip $(SSH_FORWARD))" in \
+			1) do_fwd=1 ;; \
+			0) do_fwd=0 ;; \
+			*) [ -f "$(CURDIR)/$(VM_DIR)/.ssh_forward" ] && do_fwd=1 ;; \
+		esac; \
+		if [ "$$do_fwd" = "1" ]; then \
+			FWD_SERIAL=""; \
+			if [ -f "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" ]; then \
+				FWD_SERIAL=$$(grep '^UDID=' "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" | head -1 | cut -d= -f2); \
+			fi; \
+			PMD3_PYTHON="$(PYTHON)" SSH_FWD_SERIAL="$$FWD_SERIAL" zsh "$(CURDIR)/$(SCRIPTS)/ssh_forward.sh" $(strip $(SSH_FWD_PORT)) & \
+			FWD_PID=$$!; \
+			trap 'kill $$FWD_PID 2>/dev/null || true' EXIT INT TERM; \
+		fi; \
+		"$(CURDIR)/$(BUNDLE_BIN)" --config ./config.plist; \
+	}
+
+# Standalone host-side usbmux -> guest:22 forward (JB sshd runs in-VM via LaunchDaemon)
+ssh_forward:
+	@FWD_SERIAL=""; \
+	if [ -f "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" ]; then \
+		FWD_SERIAL=$$(grep '^UDID=' "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" | head -1 | cut -d= -f2); \
+	fi; \
+	PMD3_PYTHON="$(PYTHON)" SSH_FWD_SERIAL="$$FWD_SERIAL" zsh "$(CURDIR)/$(SCRIPTS)/ssh_forward.sh" $(strip $(SSH_FWD_PORT))
 
 boot_all: amfidont_allow_vphone boot
 

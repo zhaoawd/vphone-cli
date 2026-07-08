@@ -246,11 +246,31 @@ shutdown -h now
 make boot
 ```
 
-In a separate terminal, start usbmux forward tunnels:
+On the **JB and EXP variants**, `make boot` automatically starts the
+`localhost:2222 -> guest:22` SSH forward, and the guest runs `sshd` on `:22` itself via
+the `com.vphone.sshd` LaunchDaemon (host keys self-heal on boot). Once `openssh-server` is
+installed from Sileo, SSH works on the next boot with no host-side bring-up step — just
+`ssh -p 2222 root@localhost`.
+
+The auto-forward is **variant-aware**: it only runs when `cfw_install_jb`/`cfw_install_exp`
+have written the `vm/.ssh_forward` marker (i.e. the guest actually runs sshd on `:22`).
+Regular/dev VMs use dropbear on `:22222` and are left untouched, so the auto-forward never
+grabs port `2222` out from under the documented `2222 -> 22222` workflow. Controls:
+
+- `SSH_FORWARD=auto` (default) — forward only on JB/EXP (marker present)
+- `SSH_FORWARD=1` — force the forward regardless of variant
+- `SSH_FORWARD=0` — never forward
+- `SSH_FWD_PORT=` — change the local port
+
+When a UDID is known (`vm/udid-prediction.txt`), the forward is pinned to that device via
+`--serial`, so it won't bind to a stray physical device or another VM.
+
+To run only the forward without (re)booting: `make ssh_forward`.
+
+For other tunnels, start usbmux forwards in a separate terminal:
 
 ```bash
 python3 -m pymobiledevice3 usbmux forward 2222 22222    # SSH (dropbear)
-python3 -m pymobiledevice3 usbmux forward 2222 22       # SSH (JB: if you install openssh-server from Sileo)
 python3 -m pymobiledevice3 usbmux forward 5901 5901     # VNC
 python3 -m pymobiledevice3 usbmux forward 5910 5910     # RPC
 ```
@@ -319,7 +339,11 @@ Install `openssh-server` from Sileo (available on the jailbreak variant after fi
 
 **Q: SSH doesn't work after installing openssh-server.**
 
-Reboot the VM. The SSH server will start automatically on the next boot.
+Reboot the VM. On the JB/EXP variants the `com.vphone.sshd` LaunchDaemon starts `sshd` on
+`:22` (generating host keys if missing) on every boot, and `make boot` brings up the
+`2222 -> 22` forward automatically. No host-side `ssh_bringup` step is needed. On
+regular/dev VMs, SSH stays on dropbear `:22222` — forward it manually with
+`python3 -m pymobiledevice3 usbmux forward 2222 22222`.
 
 **Q: Can I install `.tipa` files?**
 

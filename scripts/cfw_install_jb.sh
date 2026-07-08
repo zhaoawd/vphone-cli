@@ -405,6 +405,42 @@ with open(sys.argv[1], 'wb') as f:
     echo "  [+] com.vphone.jb-setup.plist injected into launchd.plist"
 fi
 
+# Deploy persistent sshd bring-up script + LaunchDaemon (every boot).
+# Self-heals host keys and runs OpenSSH sshd on :22 — replaces host-side ssh_bringup.
+SSHD_SCRIPT="$SCRIPT_DIR/vphone_sshd.sh"
+SSHD_PLIST="$SCRIPT_DIR/vphone_sshd.plist"
+if [[ -f "$SSHD_SCRIPT" ]]; then
+    scp_to "$SSHD_SCRIPT" "/mnt1/cores/vphone_sshd.sh"
+    ssh_cmd "/bin/chmod 0755 /mnt1/cores/vphone_sshd.sh"
+    echo "  [+] vphone_sshd.sh -> /cores/"
+fi
+if [[ -f "$SSHD_PLIST" ]]; then
+    scp_to "$SSHD_PLIST" "/mnt1/System/Library/LaunchDaemons/com.vphone.sshd.plist"
+    ssh_cmd "/bin/chmod 0644 /mnt1/System/Library/LaunchDaemons/com.vphone.sshd.plist"
+
+    # Inject into launchd.plist so launchd starts it at boot
+    echo "  Injecting com.vphone.sshd into launchd.plist..."
+    scp_from "/mnt1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
+    "$PYTHON3" -c "
+import plistlib, sys
+with open(sys.argv[1], 'rb') as f:
+    target = plistlib.load(f)
+with open(sys.argv[2], 'rb') as f:
+    daemon = plistlib.load(f)
+target.setdefault('LaunchDaemons', {})['/System/Library/LaunchDaemons/com.vphone.sshd.plist'] = daemon
+with open(sys.argv[1], 'wb') as f:
+    plistlib.dump(target, f, sort_keys=False)
+" "$TEMP_DIR/launchd.plist" "$SSHD_PLIST"
+    scp_to "$TEMP_DIR/launchd.plist" "/mnt1/System/Library/xpc/launchd.plist"
+    ssh_cmd "/bin/chmod 0644 /mnt1/System/Library/xpc/launchd.plist"
+    echo "  [+] com.vphone.sshd.plist injected into launchd.plist"
+
+    # Host-side marker: tells `make boot` (SSH_FORWARD=auto) this VM runs guest
+    # sshd on :22, so the 2222->22 usbmux forward is safe to auto-start.
+    : > "$VM_DIR/.ssh_forward"
+    echo "  [+] wrote $VM_DIR/.ssh_forward (enables auto SSH forward on boot)"
+fi
+
 # ═══════════ CLEANUP ═════════════════════════════════════════
 echo ""
 echo "[*] Unmounting device filesystems..."
@@ -419,6 +455,8 @@ rm -f "$TEMP_DIR/launchd" \
 echo ""
 echo "[+] CFW + JB installation complete!"
 echo "    Reboot the device for changes to take effect."
-echo "    After boot, SSH will be available on port 22222 (password: alpine)"
+echo "    Guest sshd runs on :22 (com.vphone.sshd). After installing openssh-server"
+echo "    from Sileo, 'make boot' auto-forwards localhost:2222 -> guest:22."
+echo "    Connect: ssh -p 2222 root@127.0.0.1 (password: alpine)"
 
 ssh_cmd "/sbin/halt" || true
