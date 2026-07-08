@@ -3,6 +3,12 @@
  *
  * Handles app_list, app_launch, app_terminate, app_foreground using
  * private APIs: LSApplicationWorkspace, FBSSystemService, SpringBoardServices.
+ *
+ * app_foreground: iOS 26.4+ broke SBS frontmost APIs (both
+ * SBSCopyFrontmostApplicationDisplayIdentifier and
+ * SBSCopyApplicationDisplayIdentifiers return NULL). TODO: implement via
+ * RunningBoardServices RBSProcessMonitor to restore precise foreground
+ * detection. Current stub returns empty (degraded mode in autophone).
  */
 
 #pragma once

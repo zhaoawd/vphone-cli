@@ -304,6 +304,28 @@ NSDictionary *vp_handle_apps_command(NSDictionary *msg) {
     return r;
   }
 
+  // -- app_foreground --
+  if ([type isEqualToString:@"app_foreground"]) {
+    // TODO: Implement frontmost app resolution on iOS 26. SpringBoardServices
+    // SBSCopyFrontmostApplicationDisplayIdentifier() and
+    // SBSCopyApplicationDisplayIdentifiers() both return NULL on iOS 26.4+
+    // (Apple locked down frontmost queries). The viable path is
+    // RunningBoardServices (RBSProcessMonitor enumerating process states for
+    // the one marked foreground/visible). Until implemented, autophone's
+    // ForegroundKeeper runs in degraded mode (app_list + uiopen, no precise
+    // foreground detection).
+    //
+    // For now, return ok=true + empty bundle (semantically "home screen") so
+    // the host doesn't interpret this as "command unknown" and stays in
+    // degraded mode rather than erroring out.
+    NSMutableDictionary *r = vp_make_response(@"app_foreground", reqId);
+    r[@"ok"] = @YES;
+    r[@"bundle_id"] = @"";
+    r[@"name"] = @"";
+    r[@"pid"] = @0;
+    return r;
+  }
+
   NSMutableDictionary *r = vp_make_response(@"err", reqId);
   r[@"msg"] = [NSString stringWithFormat:@"unknown apps command: %@", type];
   return r;
