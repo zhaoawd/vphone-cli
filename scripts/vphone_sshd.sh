@@ -11,14 +11,16 @@
 #
 # Notes:
 #   - OpenSSH (openssh-server) is installed by the user from Sileo after first
-#     boot. Until then sshd does not exist; this script exits 0 cleanly and is
-#     picked up automatically on the next boot once openssh-server is present.
+#     boot. Until then sshd does not exist; this script waits briefly for the
+#     jailbreak environment to settle, then exits 0 cleanly. It is picked up
+#     automatically on the next boot once openssh-server is present.
 #   - Idempotent. Logs to /var/log/vphone_sshd.log.
 
 set -uo pipefail
 
 LOG="/var/log/vphone_sshd.log"
 log() { echo "[$(date '+%H:%M:%S')] $*" | tee -a "$LOG"; }
+SSHD_WAIT_SECONDS="${SSHD_WAIT_SECONDS:-90}"
 
 exec >> "$LOG" 2>&1
 log "=== vphone_sshd.sh starting ==="
@@ -35,18 +37,30 @@ export PATH="${P#:}:$PATH"
 
 # ── Locate sshd ─────────────────────────────────────────────────
 SSHD=""
-for cand in \
-    /var/jb/usr/sbin/sshd \
-    /var/jb/usr/local/sbin/sshd \
-    /usr/sbin/sshd \
-    "$(command -v sshd 2>/dev/null || true)"; do
-    if [ -n "$cand" ] && [ -x "$cand" ]; then SSHD="$cand"; break; fi
-done
+locate_sshd() {
+    SSHD=""
+    for cand in \
+        /var/jb/usr/sbin/sshd \
+        /var/jb/usr/local/sbin/sshd \
+        /usr/sbin/sshd \
+        "$(command -v sshd 2>/dev/null || true)"; do
+        if [ -n "$cand" ] && [ -x "$cand" ]; then
+            SSHD="$cand"
+            return 0
+        fi
+    done
+    return 1
+}
 
-if [ -z "$SSHD" ]; then
-    log "sshd not found — openssh-server not installed yet. Exiting 0 (will retry next boot)."
-    exit 0
-fi
+deadline=$((SECONDS + SSHD_WAIT_SECONDS))
+while ! locate_sshd; do
+    if (( SECONDS >= deadline )); then
+        log "sshd not found after ${SSHD_WAIT_SECONDS}s — openssh-server may not be installed yet. Exiting 0 (will retry next boot)."
+        exit 0
+    fi
+    log "sshd not found yet — waiting for jailbreak/procursus paths to settle..."
+    sleep 5
+done
 log "sshd: $SSHD"
 
 # ── Derive prefix / sysconfdir from the sshd path ───────────────

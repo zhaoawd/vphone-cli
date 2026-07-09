@@ -277,7 +277,7 @@ python3 -m pymobiledevice3 usbmux forward 5910 5910     # RPC
 
 Connect via:
 
-- **SSH (JB):** `ssh -p 2222 mobile@127.0.0.1` (password: `alpine`)
+- **SSH (JB/EXP):** `ssh -p 2222 root@127.0.0.1` (password: `alpine`)
 - **SSH (Regular/Dev):** `ssh -p 2222 root@127.0.0.1` (password: `alpine`)
 - **VNC:** `vnc://127.0.0.1:5901`
 - [**RPC:**](http://github.com/doronz88/rpc-project) `rpcclient -p 5910 127.0.0.1`

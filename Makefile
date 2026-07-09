@@ -256,7 +256,7 @@ vphoned:
 # VM management
 # ═══════════════════════════════════════════════════════════════════
 
-.PHONY: vm_new vm_backup vm_restore vm_switch vm_list vm_package amfidont_allow_vphone boot_host_preflight boot boot_all boot_less boot_dfu boot_binary_check
+.PHONY: vm_new vm_backup vm_restore vm_switch vm_list vm_package amfidont_allow_vphone boot_host_preflight boot boot_all boot_less boot_dfu boot_binary_check ssh_forward
 
 vm_new:
 	CPU="$(CPU)" MEMORY="$(MEMORY)" \
@@ -341,12 +341,12 @@ boot: bundle vphoned boot_binary_check
 		case "$(strip $(SSH_FORWARD))" in \
 			1) do_fwd=1 ;; \
 			0) do_fwd=0 ;; \
-			*) [ -f "$(CURDIR)/$(VM_DIR)/.ssh_forward" ] && do_fwd=1 ;; \
+			*) [ -f "$(VM_DIR_ABS)/.ssh_forward" ] && do_fwd=1 ;; \
 		esac; \
 		if [ "$$do_fwd" = "1" ]; then \
 			FWD_SERIAL=""; \
-			if [ -f "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" ]; then \
-				FWD_SERIAL=$$(grep '^UDID=' "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" | head -1 | cut -d= -f2); \
+			if [ -f "$(VM_DIR_ABS)/udid-prediction.txt" ]; then \
+				FWD_SERIAL=$$(grep '^UDID=' "$(VM_DIR_ABS)/udid-prediction.txt" | head -1 | cut -d= -f2); \
 			fi; \
 			PMD3_PYTHON="$(PYTHON)" SSH_FWD_SERIAL="$$FWD_SERIAL" zsh "$(CURDIR)/$(SCRIPTS)/ssh_forward.sh" $(strip $(SSH_FWD_PORT)) & \
 			FWD_PID=$$!; \
@@ -358,8 +358,8 @@ boot: bundle vphoned boot_binary_check
 # Standalone host-side usbmux -> guest:22 forward (JB sshd runs in-VM via LaunchDaemon)
 ssh_forward:
 	@FWD_SERIAL=""; \
-	if [ -f "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" ]; then \
-		FWD_SERIAL=$$(grep '^UDID=' "$(CURDIR)/$(VM_DIR)/udid-prediction.txt" | head -1 | cut -d= -f2); \
+	if [ -f "$(VM_DIR_ABS)/udid-prediction.txt" ]; then \
+		FWD_SERIAL=$$(grep '^UDID=' "$(VM_DIR_ABS)/udid-prediction.txt" | head -1 | cut -d= -f2); \
 	fi; \
 	PMD3_PYTHON="$(PYTHON)" SSH_FWD_SERIAL="$$FWD_SERIAL" zsh "$(CURDIR)/$(SCRIPTS)/ssh_forward.sh" $(strip $(SSH_FWD_PORT))
 
