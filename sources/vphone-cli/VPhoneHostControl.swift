@@ -27,7 +27,8 @@ import ImageIO
 ///   {"t":"app_launch","bundle_id":"com.x.y"}    → launch app (optional "url"); returns pid
 ///   {"t":"app_terminate","bundle_id":"com.x.y"} → kill app
 ///   {"t":"app_list","filter":"all"}             → installed apps ("apps" array)
-///   {"t":"app_foreground"}                      → frontmost app (bundle_id/name/pid)
+///   {"t":"app_foreground"}                      → frontmost app (bundle_id/name/pid/source);
+///                                                  source="sbs" trustworthy, "unknown" = could not determine
 ///   {"t":"open_url","url":"https://..."}        → open URL on guest
 ///
 /// The UI commands ("tap", "swipe", "key", "type", "app_launch",
@@ -731,6 +732,7 @@ class VPhoneHostControl {
                     box.extra["bundle_id"] = fg.bundleId
                     box.extra["name"] = fg.name
                     box.extra["pid"] = fg.pid
+                    if !fg.source.isEmpty { box.extra["source"] = fg.source }
                     result.ok = true
                 } catch {
                     result.error = "\(error)"

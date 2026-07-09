@@ -369,46 +369,38 @@ NSDictionary *vp_handle_apps_command(NSDictionary *msg) {
       seteuid(orig_euid);
     }
 
-    // Method 3: Walk running apps, pick the one with highest PID (most
-    // recently launched) that isn't SpringBoard — rough heuristic fallback
-    if ((!frontApp || frontApp.length == 0) && gFBSSystemServiceClass) {
+    // `source` tells the caller whether bundle_id is a real SpringBoard read
+    // ("sbs") or that we genuinely could not determine the frontmost app
+    // ("unknown"). We must NEVER fabricate: an earlier build fell back to
+    // "walk running apps, pick the highest pid that isn't SpringBoard", which
+    // on iOS 26 (where the SBS methods above return empty) reported whatever
+    // system app happened to have the largest pid — e.g. com.apple.Spotlight —
+    // as the frontmost. A client that trusts that will thrash uiopen against a
+    // target it wrongly believes is backgrounded. When SBS gives us nothing,
+    // say so honestly and let the caller decide (poll pids, degrade, etc.).
+    NSString *source;
+    if (frontApp && frontApp.length > 0) {
+      source = @"sbs";
+      pid = pid_for_app(frontApp);
       LSApplicationWorkspace *ws = [LSApplicationWorkspace defaultWorkspace];
-      pid_t bestPid = 0;
-      NSString *bestApp = nil;
       for (LSApplicationProxy *proxy in [ws allInstalledApplications]) {
-        pid_t p = pid_for_app(proxy.bundleIdentifier);
-        if (p > 0 &&
-            ![proxy.bundleIdentifier isEqualToString:@"com.apple.springboard"])
-        {
-          if (p > bestPid) {
-            bestPid = p;
-            bestApp = proxy.bundleIdentifier;
-          }
+        if ([proxy.bundleIdentifier isEqualToString:frontApp]) {
+          name = proxy.localizedName ?: @"";
+          break;
         }
       }
-      if (bestApp)
-        frontApp = bestApp;
-    }
-
-    if (!frontApp || frontApp.length == 0) {
-      frontApp = @"com.apple.springboard";
-    }
-
-    pid = pid_for_app(frontApp);
-
-    // Try to get the display name
-    LSApplicationWorkspace *ws = [LSApplicationWorkspace defaultWorkspace];
-    for (LSApplicationProxy *proxy in [ws allInstalledApplications]) {
-      if ([proxy.bundleIdentifier isEqualToString:frontApp]) {
-        name = proxy.localizedName ?: @"";
-        break;
-      }
+    } else {
+      // SBS frontmost query unavailable/empty (iOS 26). Report unknown rather
+      // than guessing; needs an RBS/FBS-based frontmost path upstream to fix.
+      source = @"unknown";
+      frontApp = @"";
     }
 
     NSMutableDictionary *r = vp_make_response(@"app_foreground", reqId);
     r[@"bundle_id"] = frontApp;
     r[@"name"] = name;
     r[@"pid"] = @(pid > 0 ? pid : 0);
+    r[@"source"] = source;
     return r;
   }
 

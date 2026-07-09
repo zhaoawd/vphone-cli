@@ -748,12 +748,14 @@ class VPhoneControl {
         }
     }
 
-    func appForeground() async throws -> (bundleId: String, name: String, pid: Int) {
+    func appForeground() async throws -> (bundleId: String, name: String, pid: Int, source: String) {
         let (resp, _) = try await sendRequest(["t": "app_foreground"])
         return (
             bundleId: resp["bundle_id"] as? String ?? "",
             name: resp["name"] as? String ?? "",
-            pid: resp["pid"] as? Int ?? 0
+            pid: resp["pid"] as? Int ?? 0,
+            // Older guests omit `source`; absent means "trust bundle_id as before".
+            source: resp["source"] as? String ?? ""
         )
     }
 
