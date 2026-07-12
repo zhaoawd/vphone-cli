@@ -298,6 +298,99 @@ struct BinaryBufferTests {
     }
 }
 
+final class BytePatchPatcher: Patcher {
+    let component = "test"
+    let verbose = false
+    let data: Data
+    let offset: Int
+    let byte: UInt8
+    let id: String
+
+    init(data: Data, offset: Int, byte: UInt8, id: String) {
+        self.data = data
+        self.offset = offset
+        self.byte = byte
+        self.id = id
+    }
+
+    func findAll() throws -> [PatchRecord] {
+        [
+            PatchRecord(
+                patchID: id,
+                component: component,
+                fileOffset: offset,
+                originalBytes: Data([data[offset]]),
+                patchedBytes: Data([byte]),
+                description: id
+            ),
+        ]
+    }
+
+    func apply() throws -> Int { 1 }
+}
+
+struct FirmwarePipelineDataFlowTests {
+    @Test func chainedPatchersReceivePreviousPatchedBytes() throws {
+        let pipeline = FirmwarePipeline(
+            vmDirectory: URL(fileURLWithPath: NSTemporaryDirectory()),
+            verbose: false
+        )
+        var secondInput = Data()
+
+        let (patched, records) = try pipeline.patchData(
+            Data([0x00, 0x00]),
+            componentName: "test",
+            patcherFactories: [
+                { data, _ in
+                    BytePatchPatcher(data: data, offset: 0, byte: 0xAA, id: "first")
+                },
+                { data, _ in
+                    secondInput = data
+                    return BytePatchPatcher(data: data, offset: 1, byte: 0xBB, id: "second")
+                },
+            ]
+        )
+
+        #expect(secondInput == Data([0xAA, 0x00]))
+        #expect(patched == Data([0xAA, 0xBB]))
+        #expect(records.map(\.patchID) == ["first", "second"])
+    }
+}
+
+struct IBootPatcherIdempotencyTests {
+    @Test func serialLabelsPatchTwoBannerRunsWhenLabelAbsent() {
+        let banner = String(repeating: "=", count: 32)
+        let payload = Data("prefix \(banner) middle \(banner) suffix".utf8)
+        let patcher = IBootPatcher(data: payload, mode: .ibss, verbose: false)
+
+        patcher.patchSerialLabels()
+
+        #expect(patcher.patches.count == 2)
+        #expect(patcher.patches.allSatisfy {
+            String(data: $0.patchedBytes, encoding: .ascii) == "Loaded iBSS"
+        })
+    }
+
+    @Test func serialLabelsSkipWhenLabelAlreadyPresent() {
+        let payload = Data("Loaded iBSS\0 middle Loaded iBSS\0 suffix".utf8)
+        let patcher = IBootPatcher(data: payload, mode: .ibss, verbose: false)
+
+        patcher.patchSerialLabels()
+
+        #expect(patcher.patches.isEmpty)
+    }
+
+    @Test func serialLabelsDoNotSkipForUnrelatedSingleLabel() {
+        let banner = String(repeating: "=", count: 32)
+        let payload = Data("Loaded iBSS\0 prefix \(banner) middle \(banner) suffix".utf8)
+        let patcher = IBootPatcher(data: payload, mode: .ibss, verbose: false)
+
+        patcher.patchSerialLabels()
+
+        #expect(patcher.patches.count == 2)
+    }
+}
+
 struct IM4PPayloadParityTests {
     @Test func ibssIM4PPayloadMatchesRawAndJBPatcherFindsNoncePatch() throws {
         let baseDir = URL(fileURLWithPath: #filePath)

@@ -9,13 +9,17 @@
 ## 测试环境
 
 | 主机          | iPhone 系统           | CloudOS         |
-| ------------- | --------------------- | --------------- |
-| Mac16,12 26.3 | `17,3_26.1_23B85`     | `26.1-23B85`    |
-| Mac16,12 26.3 | `17,3_26.3_23D127`    | `26.1-23B85`    |
-| Mac16,12 26.3 | `17,3_26.3_23D127`    | `26.3-23D128`   |
-| Mac16,12 26.3 | `17,3_26.3.1_23D8133` | `26.3-23D128`   |
-| Mac16,11 26.2 | `17,3_26.4_23E246`    | `26.4-23E5207q` |
-| Mac16,11 26.2 | `17,3_26.5_23F77`     | `26.4-23E5207q` |
+| --------------- | --------------------- | --------------- |
+| Mac16,8 26.5.1  | `17,3_26.0_23A341`    | `26.1-23B85`    |
+| Mac16,8 26.5.1  | `17,3_26.0.1_23A355`  | `26.1-23B85`    |
+| Mac16,8 26.5.1  | `17,3_26.1_23B85`     | `26.1-23B85`    |
+| Mac16,12 26.3   | `17,3_26.1_23B85`     | `26.1-23B85`    |
+| Mac16,12 26.3   | `17,3_26.3_23D127`    | `26.1-23B85`    |
+| Mac16,12 26.3   | `17,3_26.3_23D127`    | `26.3-23D128`   |
+| Mac16,12 26.3   | `17,3_26.3.1_23D8133` | `26.3-23D128`   |
+| Mac16,11 26.2   | `17,3_26.4_23E246`    | `26.4-23E5207q` |
+| Mac16,11 26.2   | `17,3_26.5_23F77`     | `26.4-23E5207q` |
+| Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
 
 ## 固件变体
 
@@ -104,7 +108,7 @@ git clone --recurse-submodules https://github.com/Lakr233/vphone-cli.git
 ## 快速开始
 
 ```bash
-make setup_machine            # 完全自动化完成"首次启动"流程（包含 restore/ramdisk/CFW）
+make setup_machine            # 完全自动化完成"首次启动"流程（包含 restore/CFW）
 # 选项：NON_INTERACTIVE=1 SUDO_PASSWORD=...
 # LESS=1 patchless 变体（- AMFI、SSV、Img4、TXM 绕过）
 # DEV=1 开发变体（+ TXM 权限/调试绕过）
@@ -171,29 +175,12 @@ make restore                  # 通过 pymobiledevice3 restore 后端刷写固�
 
 ## 安装自定义固件
 
-在终端 1 中停止 DFU 引导（Ctrl+C），然后再次进入 DFU，用于 ramdisk：
+恢复完成后，在终端 1 中停止 DFU 引导（Ctrl+C），使 VM 完全关机。安装程序会在主机上挂载 VM 的 `Disk.img`，放置所有 CFW 文件，并离线切换启动快照（无需 DFU / ramdisk / SSH），因此需要对磁盘的独占访问。
 
 ```bash
-# 终端 1
-make boot_dfu                 # 保持运行
-```
-
-```bash
-# 终端 2
-sudo make ramdisk_build       # 构建签名的 SSH ramdisk
-make ramdisk_send             # 发送到设备
-```
-
-当 ramdisk 运行后（输出中应显示 `Running server`），打开**第三个终端**运行 usbmux 隧道，然后在终端 2 安装 CFW：
-
-```bash
-# 终端 3 —— 保持运行
-python3 -m pymobiledevice3 usbmux forward 2222 22
-```
-
-```bash
-# 终端 2
+# 终端 2（会自动通过 sudo 重新执行）
 make cfw_install
+# 或：make cfw_install_dev       # 开发变体
 # 或：make cfw_install_jb        # 越狱变体
 # 或：make cfw_install_exp       # 实验变体（越狱 + 研究补丁栈）
 # 或：SPOOF_BUILD=23F77 make cfw_install_exp   # 同时改写 ProductBuildVersion
@@ -201,7 +188,7 @@ make cfw_install
 
 ## 首次启动
 
-在终端 1 中停止 DFU 引导（Ctrl+C），然后：
+停止 DFU 引导并完成 CFW 安装后，正常启动 VM：
 
 ```bash
 make boot

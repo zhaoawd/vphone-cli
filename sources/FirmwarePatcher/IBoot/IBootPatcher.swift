@@ -223,6 +223,16 @@ public class IBootPatcher: Patcher {
         }
 
         if eqRuns.count < 2 {
+            var labelCount = 0
+            var searchStart = raw.startIndex
+            while let range = raw.range(of: labelBytes, in: searchStart ..< raw.endIndex) {
+                labelCount += 1
+                searchStart = range.upperBound
+            }
+            if labelCount >= 2 {
+                if verbose { print("  [*] serial labels: already present, skipping") }
+                return
+            }
             if verbose { print("  [-] serial labels: <2 banner runs found") }
             return
         }

@@ -8,14 +8,21 @@ Boot a virtual iPhone (iOS 26) via Apple's Virtualization.framework using PCC re
 
 ## Tested Environments
 
-| Host          | iPhone                | CloudOS         |
-| ------------- | --------------------- | --------------- |
-| Mac16,12 26.3 | `17,3_26.1_23B85`     | `26.1-23B85`    |
-| Mac16,12 26.3 | `17,3_26.3_23D127`    | `26.1-23B85`    |
-| Mac16,12 26.3 | `17,3_26.3_23D127`    | `26.3-23D128`   |
-| Mac16,12 26.3 | `17,3_26.3.1_23D8133` | `26.3-23D128`   |
-| Mac16,11 26.2 | `17,3_26.4_23E246`    | `26.4-23E5207q` |
-| Mac16,11 26.2 | `17,3_26.5_23F77`     | `26.4-23E5207q` |
+| Host            | iPhone                | CloudOS         |
+| --------------- | --------------------- | --------------- |
+| Mac16,8 26.5.1  | `17,3_26.0_23A341`    | `26.1-23B85`    |
+| Mac16,8 26.5.1  | `17,3_26.0.1_23A355`  | `26.1-23B85`    |
+| Mac16,8 26.5.1  | `17,3_26.1_23B85`     | `26.1-23B85`    |
+| Mac16,12 26.3   | `17,3_26.1_23B85`     | `26.1-23B85`    |
+| Mac16,12 26.3   | `17,3_26.3_23D127`    | `26.1-23B85`    |
+| Mac16,12 26.3   | `17,3_26.3_23D127`    | `26.3-23D128`   |
+| Mac16,12 26.3   | `17,3_26.3.1_23D8133` | `26.3-23D128`   |
+| Mac16,11 26.2   | `17,3_26.4_23E246`    | `26.4-23E5207q` |
+| Mac16,11 26.2   | `17,3_26.5_23F77`     | `26.4-23E5207q` |
+| Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
+
+iOS 26.0 and 26.0.1 use the 26.1 PCC vphone600 stack plus the CFW-time
+`IOMobileFramebuffer` SwapEnd payload-size patch.
 
 ## Firmware Variants
 
@@ -117,7 +124,7 @@ git clone --recurse-submodules https://github.com/Lakr233/vphone-cli.git
 ## Quick Start
 
 ```bash
-make setup_machine            # full automation through "First Boot" (includes restore/ramdisk/CFW)
+make setup_machine            # full automation through "First Boot" (includes restore/CFW)
 # options: NON_INTERACTIVE=1 SUDO_PASSWORD=...
 # LESS=1 for patchless variant (- AMFI, SSV, Img4, TXM bypasses) 
 # DEV=1 for dev variant (+ TXM entitlement/debug bypasses)
@@ -184,29 +191,15 @@ make restore                  # flash firmware via pymobiledevice3 restore backe
 
 ## Install Custom Firmware
 
-Stop the DFU boot in terminal 1 (Ctrl+C), then boot into DFU again for the ramdisk:
+Once the restore completes, stop the DFU boot in terminal 1 (Ctrl+C) so the VM is
+fully powered off. The installer mounts the VM's `Disk.img` on the host, places
+all CFW files, and flips the boot snapshot offline — no DFU, ramdisk, or SSH — so
+it needs exclusive access to the disk.
 
 ```bash
-# terminal 1
-make boot_dfu                 # keep running
-```
-
-```bash
-# terminal 2
-sudo make ramdisk_build       # build signed SSH ramdisk
-make ramdisk_send             # send to device
-```
-
-Once the ramdisk is running (you should see `Running server` in the output), open a **third terminal** for the usbmux tunnel, then install CFW from terminal 2:
-
-```bash
-# terminal 3 — keep running
-python3 -m pymobiledevice3 usbmux forward 2222 22
-```
-
-```bash
-# terminal 2
+# terminal 2 (re-execs under sudo automatically)
 make cfw_install
+# or: make cfw_install_dev       # development variant
 # or: make cfw_install_jb        # jailbreak variant
 # or: make cfw_install_exp       # experimental variant (JB + research stack)
 # or: SPOOF_BUILD=23F77 make cfw_install_exp   # additionally rewrite ProductBuildVersion
@@ -214,7 +207,7 @@ make cfw_install
 
 ## First Boot
 
-Stop the DFU boot in terminal 1 (Ctrl+C), then:
+With the DFU boot stopped and CFW installed, boot the VM normally:
 
 ```bash
 make boot
