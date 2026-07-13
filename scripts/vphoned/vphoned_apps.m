@@ -347,18 +347,24 @@ NSDictionary *vp_handle_apps_command(NSDictionary *msg) {
       }
     }
 
+    NSLog(@"vphoned: app_foreground orig_euid=%d switched=%d now_euid=%d",
+          orig_euid, switched, geteuid());
+
     // Method 1: High-level SBSCopyFrontmostApplicationDisplayIdentifier
     if (pSBSCopyFrontmost) {
       frontApp = pSBSCopyFrontmost();
+      NSLog(@"vphoned: app_foreground M1 -> %@", frontApp ?: @"(nil)");
     }
 
     // Method 2: Low-level SBFrontmostApplicationDisplayIdentifier(port, buf)
     if ((!frontApp || frontApp.length == 0) && pSBSSpringBoardServerPort &&
         pSBFrontmostApplicationDisplayIdentifier) {
       mach_port_t port = pSBSSpringBoardServerPort();
+      NSLog(@"vphoned: app_foreground M2 serverPort=0x%x", port);
       if (port != MACH_PORT_NULL) {
         char buf[256] = {0};
         pSBFrontmostApplicationDisplayIdentifier(port, buf);
+        NSLog(@"vphoned: app_foreground M2 buf='%s'", buf);
         if (buf[0] != '\0') {
           frontApp = [NSString stringWithUTF8String:buf];
         }
@@ -368,6 +374,7 @@ NSDictionary *vp_handle_apps_command(NSDictionary *msg) {
     if (switched) {
       seteuid(orig_euid);
     }
+    NSLog(@"vphoned: app_foreground after M1/M2 frontApp=%@", frontApp ?: @"(nil)");
 
     // `source` tells the caller whether bundle_id is a real SpringBoard read
     // ("sbs") or that we genuinely could not determine the frontmost app

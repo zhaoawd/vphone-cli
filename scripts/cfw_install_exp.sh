@@ -232,12 +232,10 @@ build_libvcamcaptured() {
     echo "$out"
 }
 
-# Builds the libcamfix.dylib substrate plugin. Loaded into every process
-# that links AVFoundation via TweakLoader's Filter.Frameworks key —
-# Camera.app, third-party apps, anywhere the
-# documented capture interface is used. Implements the photo-delivery
-# path through CAMCaptureEngine + the preview/state guards that keep
-# the viewfinder live on the virtual camera.
+# Builds the libcamfix.dylib substrate plugin. Its companion plist keeps the
+# deployment allowlist explicit (Camera + the certified KFCKnight scanner),
+# while the dylib's dyld callback still waits for AVFCapture before installing
+# hooks. Implements photo, preview, state and QR metadata delivery for vcam.
 build_libcamfix() {
     local src="$SCRIPT_DIR/camfix/libcamfix.m"
     local out="$TEMP_DIR/libcamfix.dylib"

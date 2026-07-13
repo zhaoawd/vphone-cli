@@ -510,6 +510,31 @@ Page-hash re-attestation keeps the cryptex's CodeDirectory slots
 consistent with the modified pages so `amfid` / TXM accepts the DSC at
 next boot.
 
+### Virtual-camera QR metadata output (EXP userspace)
+
+The synthetic `cameracaptured` device supplies preview frames but has no
+hardware metadata analyzer. Consequently `AVCaptureMetadataOutput` reports an
+empty `availableMetadataObjectTypes` list and throws when scanner clients set
+`AVMetadataObjectTypeQRCode`, even after the vcam input itself is accepted.
+
+`scripts/camfix/libcamfix.m`, restricted by its TweakLoader plist to the
+`Camera` and `KFCKnight` executables, completes this client-side vcam contract
+for outputs bound to `vphone:vcam:0`:
+
+- advertise and retain the requested QR metadata type without changing real
+  camera outputs;
+- decode the same shared-memory BGRA frames used by the preview pump with
+  CoreImage's QR detector;
+- deliver a machine-readable object through the standard
+  `captureOutput:didOutputMetadataObjects:fromConnection:` delegate and its
+  configured queue.
+
+This is a camera-pipeline compatibility shim, not an application hook: it does
+not reference scanner view controllers, private business selectors, or QR
+payload formats. The negative baseline was a KFCKnight crash at
+`-[AVCaptureMetadataOutput setMetadataObjectTypes:]`; the acceptance probe is
+an observation-only delegate hook matching a unique rendered nonce.
+
 ### DeviceTree identity properties at fw_patch time (EXP only)
 
 `DeviceTreePatcher` carries two property-patch lists: `basePropertyPatches`
