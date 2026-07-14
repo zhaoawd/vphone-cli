@@ -211,6 +211,14 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     return vp_make_response(@"ok", reqId);
   }
 
+  if ([type isEqualToString:@"touch"]) {
+    int phase = [msg[@"phase"] intValue];
+    double x = [msg[@"x"] doubleValue];
+    double y = [msg[@"y"] doubleValue];
+    vp_hid_touch(phase, x, y);
+    return vp_make_response(@"ok", reqId);
+  }
+
   if ([type isEqualToString:@"devmode"]) {
     if (!vp_devmode_available()) {
       NSMutableDictionary *r = vp_make_response(@"err", reqId);
@@ -416,6 +424,7 @@ static BOOL handle_client(int fd) {
     [caps addObject:@"settings"];
     if (vp_shell_path() != NULL)
       [caps addObject:@"shell"];
+    [caps addObject:@"touch"];
 
     NSMutableDictionary *helloResp = [@{
       @"v" : @PROTOCOL_VERSION,
@@ -423,6 +432,11 @@ static BOOL handle_client(int fd) {
       @"name" : @"vphoned",
       @"caps" : caps,
     } mutableCopy];
+    NSOperatingSystemVersion osv =
+        [[NSProcessInfo processInfo] operatingSystemVersion];
+    helloResp[@"ios"] =
+        [NSString stringWithFormat:@"%ld.%ld.%ld", (long)osv.majorVersion,
+                                   (long)osv.minorVersion, (long)osv.patchVersion];
     NSString *ip = primary_ipv4_address();
     if (ip)
       helloResp[@"ip"] = ip;
