@@ -1,6 +1,14 @@
 import CoreGraphics
 import Foundation
+import Synchronization
 import Virtualization
+
+/// Sendable holder for the generation fence counter. `Atomic` is non-copyable,
+/// so it can't be bound into the producer-queue closure directly; capturing this
+/// reference lets both the MainActor timer and the send queue read it in place.
+private final class VPhoneGenerationFence: Sendable {
+    let token = Atomic<UInt64>(0)
+}
 
 /// Host-side virtual-camera server.
 ///
@@ -24,6 +32,7 @@ final class VPhoneCameraServer {
         case off
         case testPattern
         case videoFile  // .mov / .mp4 / .m4v via AVAssetReader
+        case image      // .png / .jpeg still (QR / neutral) via VPhoneStillImageProducer
     }
 
     nonisolated static let vsockPort: UInt32 = 1338
@@ -34,6 +43,16 @@ final class VPhoneCameraServer {
 
     private(set) var sourceKind: SourceKind = .off
     private(set) var isConnected = false
+
+    // Protocol v2 generation/role (§8.3). `currentGeneration` binds the wire
+    // frames to one QrArtifact/neutral request; `generationToken` fences the
+    // producer queue so a frame scheduled before a source switch is dropped
+    // instead of leaking a stale QR into the next generation.
+    private(set) var currentGeneration: String = ""
+    private(set) var currentRole: String = "neutral"
+    private var fps: Double = VPhoneCameraServer.defaultFPS
+    private var wireFrameIndex: UInt64 = 0
+    private let fence = VPhoneGenerationFence()
 
     private var device: VZVirtioSocketDevice?
     private var connection: VZVirtioSocketConnection?
@@ -101,10 +120,74 @@ final class VPhoneCameraServer {
                 producer = nil
                 sourceKind = .off
             }
+        case .image:
+            // The still/QR source is driven by present(imagePath:…), which sets
+            // the producer directly; the menu setSource path can't build one
+            // without a path, so treat it as a no-op source.
+            producer = nil
+            sourceKind = .off
         }
         if wasStreaming, producer != nil {
             startStreaming()
         }
+    }
+
+    // MARK: - Automation face (§8.1): present / stop / status
+
+    /// Present a still image under a fresh generation/role at a given FPS.
+    ///
+    /// Returns whether the host source was established and streaming (re)started.
+    /// It does NOT prove the guest consumed the frame — the two-level transport
+    /// receipt (vphoned published + libvcamcaptured observed) is assembled by the
+    /// host-control layer via the guest 1337 `vcam_status` channel, and only that
+    /// may report `ok=true` to the caller (invariant #7).
+    func present(imagePath: String, generation: String, role: String, fps: Double) -> Bool {
+        let producer: VPhoneFrameProducer
+        do {
+            producer = try VPhoneStillImageProducer(
+                url: URL(fileURLWithPath: imagePath),
+                width: Self.defaultWidth, height: Self.defaultHeight)
+        } catch {
+            print("[camera] present: failed to load \(imagePath): \(error)")
+            return false
+        }
+        stopStreaming()
+        self.producer = producer
+        self.sourceKind = .image
+        self.currentGeneration = generation
+        self.currentRole = role
+        self.fps = min(30.0, max(1.0, fps))
+        self.wireFrameIndex = 0
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        if isConnected { startStreaming() }
+        print("[camera] present gen=\(generation) role=\(role) fps=\(self.fps)")
+        return isConnected
+    }
+
+    /// Stop only if `generation` owns the current source; otherwise a conflict.
+    func stop(generation: String) -> Bool {
+        guard currentGeneration == generation else { return false }
+        stopStreaming()
+        producer = nil
+        sourceKind = .off
+        currentGeneration = ""
+        currentRole = "neutral"
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        return true
+    }
+
+    /// Host-side publish snapshot for one generation (§8.1). The guest-observed
+    /// half is added by the host-control layer from the 1337 `vcam_status` reply.
+    func hostStatus(generation: String) -> [String: Any] {
+        [
+            "source": sourceKind.rawValue,
+            "role": currentRole,
+            "generation": currentGeneration,
+            "streaming": timer != nil,
+            "connected": isConnected,
+            "host_published_frame_index": Int(wireFrameIndex),
+            "matches_requested": currentGeneration == generation,
+        ]
     }
 
     // MARK: - Streaming
@@ -112,7 +195,7 @@ final class VPhoneCameraServer {
     func startStreaming() {
         guard producer != nil, isConnected else { return }
         if timer != nil { return }
-        let interval = 1.0 / Self.defaultFPS
+        let interval = 1.0 / fps
         // Timer fires on the main queue so MainActor-isolated state
         // (producer, connectionFD) can be read directly without tripping
         // Swift 6's strict-concurrency isolation check. The frame
@@ -125,10 +208,21 @@ final class VPhoneCameraServer {
             guard let producer = self.producer else { return }
             let fd = self.connectionFD
             guard fd >= 0 else { return }
+            self.wireFrameIndex &+= 1
+            let fi = self.wireFrameIndex
+            let gen = self.currentGeneration
+            let role = self.currentRole
+            let fence = self.fence
+            let tokenSnapshot = fence.token.load(ordering: .relaxed)
             let q = self.producerQueue
             q.async {
+                // Generation fence (§8.3): if a source/generation switch landed
+                // after this tick was scheduled, drop the stale frame rather
+                // than send an old QR under a new generation.
+                if fence.token.load(ordering: .relaxed) != tokenSnapshot { return }
                 guard let frame = producer.nextFrame() else { return }
-                let ok = Self.send(fd: fd, frame: frame)
+                let ok = Self.send(fd: fd, frame: frame,
+                                   generation: gen, role: role, frameIndex: fi)
                 if !ok {
                     Task { @MainActor [weak self] in
                         guard let self else { return }
@@ -207,14 +301,22 @@ final class VPhoneCameraServer {
     // MARK: - Wire
 
     @discardableResult
-    nonisolated private static func send(fd: Int32, frame: VPhoneCameraFrame) -> Bool {
-        // header
+    nonisolated private static func send(
+        fd: Int32, frame: VPhoneCameraFrame,
+        generation: String = "", role: String = "test", frameIndex: UInt64 = 0
+    ) -> Bool {
+        // header — protocol v2 adds pv/gen/role/fi (§8.3). The guest reader
+        // ignores unknown keys, so a v1 receiver stays compatible.
         let headerDict: [String: Any] = [
             "w": frame.width,
             "h": frame.height,
             "bpr": frame.bytesPerRow,
             "fmt": Self.pixelFormat,
             "ts": frame.timestampNS,
+            "pv": 2,
+            "gen": generation,
+            "role": role,
+            "fi": frameIndex,
         ]
         guard
             let headerData = try? JSONSerialization.data(withJSONObject: headerDict, options: [])

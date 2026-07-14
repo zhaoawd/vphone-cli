@@ -1253,7 +1253,7 @@ static void cfx_install_moment_capture_hooks(void) {
   }
 }
 
-// MARK: - AVCaptureSession state guards
+// MARK: - AVCaptureSession state guards (Camera.app only)
 //
 // After ~4-5s of no real sample buffer flow on the AVCaptureSession's
 // preview connection, Camera.app's session transitions to
@@ -1261,12 +1261,22 @@ static void cfx_install_moment_capture_hooks(void) {
 // daemon's preview pipeline (we feed CALayer.contents directly), so
 // no sample buffers ever flow.
 //
-// Two guards on AVCaptureSession for our vcam-bound sessions:
+// These are Camera.app UI workarounds, not general AVFoundation fixes.  In a
+// third-party scanner, forcing -isRunning to YES before the real session has
+// started makes -startRunning short-circuit before it asks cameracaptured to
+// build the graph.  Keep all session-state overrides out of those processes.
+//
+// Two guards on AVCaptureSession for Camera.app vcam-bound sessions:
 //   1. -[AVCaptureSession _setRunning:NO]   → swallow (stay running)
 //   2. -[AVCaptureSession _setInterrupted:YES withReason:interruptor:] → swallow
 
 static IMP cfx_orig_setRunning = NULL;
 static IMP cfx_orig_setInterrupted = NULL;
+
+static BOOL cfx_process_is_camera_app(void) {
+  NSString *bundleID = NSBundle.mainBundle.bundleIdentifier;
+  return [bundleID isEqualToString:@"com.apple.camera"];
+}
 
 static BOOL cfx_session_uses_vcam(id session) {
   @try {
@@ -1393,8 +1403,13 @@ static void cfx_install_all_hooks(void) {
     cfx_install_setActiveFormat_hook();
     cfx_install_capturePhoto_hook();
     cfx_install_moment_capture_hooks();
-    cfx_install_session_guards();
-    cfx_install_session_state_lies();
+    if (cfx_process_is_camera_app()) {
+      cfx_install_session_guards();
+      cfx_install_session_state_lies();
+    } else {
+      cfxlog(@"skipping Camera.app-only AVCaptureSession state overrides "
+             "(bundle=%@)", NSBundle.mainBundle.bundleIdentifier ?: @"?");
+    }
     cfx_install_preview_layer_hooks();
     cfx_install_photo_representation_hooks();
     cfx_install_capturerequest_stubs();

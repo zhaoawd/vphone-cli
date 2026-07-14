@@ -3,6 +3,7 @@ import CoreGraphics
 import CoreImage
 import CoreVideo
 import Foundation
+import ImageIO
 
 /// A single BGRA frame produced by a frame source.
 struct VPhoneCameraFrame: Sendable {
@@ -245,5 +246,87 @@ final class VPhoneVideoFileProducer: VPhoneFrameProducer, @unchecked Sendable {
             bytesPerRow: bytesPerRow,
             timestampNS: UInt64(ProcessInfo.processInfo.systemUptime * 1e9),
             pixels: out)
+    }
+}
+
+// MARK: - Still image (.png / .jpeg)
+
+/// Presents a single decoded still image, repeated every frame with an
+/// advancing timestamp/index (§8.2). Used for the QR and neutral sources: a
+/// static QR needs no 30 FPS, so the camera server drives this at 5–10 FPS.
+///
+/// The source image is letterboxed onto a white 1280×720 BGRA canvas with
+/// nearest-neighbor integer scaling so QR modules stay crisp — a bilinear
+/// stretch would blur module edges and break metadata decoding. The BGRA
+/// buffer is computed once at init; `nextFrame()` only bumps the counter.
+final class VPhoneStillImageProducer: VPhoneFrameProducer, @unchecked Sendable {
+    private let width: Int
+    private let height: Int
+    private let bytesPerRow: Int
+    private let pixels: Data
+    private var frameIndex: UInt64 = 0
+
+    init(url: URL, width: Int, height: Int) throws {
+        self.width = width
+        self.height = height
+        self.bytesPerRow = ((width * 4) + 15) & ~15
+
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let cg = CGImageSourceCreateImageAtIndex(src, 0, nil)
+        else {
+            throw NSError(
+                domain: "VPhoneStillImageProducer", code: 1,
+                userInfo: [NSLocalizedDescriptionKey:
+                    "\(url.lastPathComponent): not a decodable PNG/JPEG"])
+        }
+        self.pixels = try Self.letterbox(
+            cg, width: width, height: height, bytesPerRow: bytesPerRow)
+    }
+
+    /// White-background letterbox with integer nearest-neighbor scale.
+    private static func letterbox(
+        _ image: CGImage, width: Int, height: Int, bytesPerRow: Int
+    ) throws -> Data {
+        let bitmapInfo = CGImageAlphaInfo.premultipliedFirst.rawValue
+            | CGBitmapInfo.byteOrder32Little.rawValue  // -> BGRA on little-endian
+        guard let ctx = CGContext(
+            data: nil, width: width, height: height,
+            bitsPerComponent: 8, bytesPerRow: bytesPerRow,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: bitmapInfo)
+        else {
+            throw NSError(
+                domain: "VPhoneStillImageProducer", code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "failed to create BGRA context"])
+        }
+        ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
+        ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        ctx.interpolationQuality = .none  // crisp QR modules
+
+        let sw = image.width, sh = image.height
+        // Largest integer scale that still fits; fall back to fractional fit
+        // for images already larger than the canvas.
+        let intScale = min(width / max(1, sw), height / max(1, sh))
+        let scale: CGFloat = intScale >= 1
+            ? CGFloat(intScale)
+            : min(CGFloat(width) / CGFloat(sw), CGFloat(height) / CGFloat(sh))
+        let dw = CGFloat(sw) * scale, dh = CGFloat(sh) * scale
+        let ox = (CGFloat(width) - dw) / 2, oy = (CGFloat(height) - dh) / 2
+        ctx.draw(image, in: CGRect(x: ox, y: oy, width: dw, height: dh))
+
+        guard let base = ctx.data else {
+            throw NSError(
+                domain: "VPhoneStillImageProducer", code: 3,
+                userInfo: [NSLocalizedDescriptionKey: "context has no backing data"])
+        }
+        return Data(bytes: base, count: bytesPerRow * height)
+    }
+
+    func nextFrame() -> VPhoneCameraFrame? {
+        frameIndex &+= 1
+        let ts = UInt64(ProcessInfo.processInfo.systemUptime * 1e9)
+        return VPhoneCameraFrame(
+            width: width, height: height,
+            bytesPerRow: bytesPerRow,
+            timestampNS: ts, pixels: pixels)
     }
 }

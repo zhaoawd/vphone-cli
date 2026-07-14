@@ -2,6 +2,7 @@
 
 SRCS := $(wildcard *.m)
 OUT  := libvcamcaptured.dylib
+LDID ?= ldid
 
 .PHONY: all clean
 
@@ -17,6 +18,7 @@ $(OUT): $(SRCS) $(wildcard *.h)
 		-framework Foundation \
 		-framework CoreMedia \
 		-framework CoreVideo
+	$(LDID) -S $@
 	@echo "  built OK ($$(stat -f%z $(OUT)) bytes)"
 
 clean:

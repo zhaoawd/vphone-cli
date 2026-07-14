@@ -56,6 +56,7 @@
 #include <stdarg.h>
 #include <stdatomic.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -669,6 +670,66 @@ static void *vcc_dlsym_fn(const char *name) {
 
 // MARK: - synthetic source construction
 
+// AVFoundation camera inputs do not infer their ports from the source media
+// type.  FigCaptureSourceBacking publishes the concrete stream IDs first;
+// BWFigCaptureDeviceVendor subsequently resolves those IDs into
+// BWFigCaptureStream instances.  Keeping the IDs stable is important: a
+// metadata output is connected to the metadata-object port by identity, not
+// by the video stream's position.
+static NSString *const kVccVideoStreamUniqueID =
+    @"vphone:vcam:device:0:stream:video";
+static NSString *const kVccMetadataStreamUniqueID =
+    @"vphone:vcam:device:0:stream:metadata-object";
+// Canonical Fig stream-format dictionaries shared by the published source
+// backing and the daemon-side BWFigCaptureStream.  Both layers describe the
+// same physical stream; letting the latter report an empty format list makes
+// BWFigVideoCaptureStream reject it with -12783 before graph construction.
+static NSArray *vcc_synth_stream_format_dicts = nil;
+static NSDictionary *vcc_output_spec = nil;
+static IMP vcc_output_spec_subscript_orig = NULL;
+
+static id vcc_output_spec_subscript_hook(id self, SEL _cmd, id key) {
+  id value = ((id (*)(id, SEL, id))vcc_output_spec_subscript_orig)(
+      self, _cmd, key);
+  if (self == vcc_output_spec) {
+    vcc_log(@"  [OutputSpec objectForKeyedSubscript:%@] -> %@", key,
+            value ?: @"(nil)");
+  }
+  return value;
+}
+
+static void vcc_install_output_spec_observation(void) {
+  if (!vcc_output_spec) return;
+  Class cls = object_getClass(vcc_output_spec);
+  Method method = class_getInstanceMethod(
+      cls, @selector(objectForKeyedSubscript:));
+  if (!method) {
+    vcc_log(@"  OutputSpec observation: selector missing on %@",
+            NSStringFromClass(cls));
+    return;
+  }
+  vcc_output_spec_subscript_orig = method_setImplementation(
+      method, (IMP)vcc_output_spec_subscript_hook);
+  vcc_log(@"  OutputSpec observation installed class=%@ object=%p orig=%p",
+          NSStringFromClass(cls), vcc_output_spec,
+          vcc_output_spec_subscript_orig);
+}
+
+static NSString *vcc_port_type_for_stream_unique_id(NSString *uniqueID) {
+  if ([uniqueID isEqualToString:kVccMetadataStreamUniqueID]) {
+    // Candidate Fig/BW token for the separate metadata-object port.  The
+    // daemon observation hooks below must still confirm that iOS 26 accepts
+    // it and produces an AVMediaTypeMetadataObject input port before QR
+    // capability is considered delivered.
+    return @"Metadata";
+  }
+  // BWActiveDeviceTypeFromPortType accepts the concrete Fig camera port
+  // constants (PortTypeBack, PortTypeFront, ...), not the abbreviated AVF
+  // position label.  An unknown token raises while BWFigVideoCaptureDevice is
+  // being initialized, before any source or sink pipeline can materialize.
+  return @"PortTypeBack";
+}
+
 static id vcc_build_backing(void) {
   Class backingClass = NSClassFromString(@"FigCaptureSourceBacking");
   if (!backingClass) {
@@ -743,10 +804,26 @@ static id vcc_build_backing(void) {
   attrs[figKeyN("kFigCaptureSourceAttributeKey_TimeOfFlightAssistedAutoFocusSupported")] = @NO;
   attrs[figKeyN("kFigCaptureSourceAttributeKey_StructuredLightAssistedAutoFocusSupported")] = @NO;
 
+  // AVCaptureMetadataOutput derives availableMetadataObjectTypes from this
+  // source attribute.  The outer dictionary is keyed by the capture metadata
+  // group; its values are QuickTime metadata identifiers.  Publishing the
+  // AVMetadataObjectType strings (org.iso.QRCode, etc.) directly is invalid
+  // and makes AVFCapture abort while building the supported-type cache.
+  // Keep the MVP surface aligned with KFCKnight's requested scanner types.
+  attrs[@"AvailableMetadataKeyGroups"] = @{
+    @"MetadataGroup-MRC" : @[
+      @"mdta/com.apple.quicktime.detected-machine-readable-code.QR",
+      @"mdta/com.apple.quicktime.detected-machine-readable-code.EAN13",
+      @"mdta/com.apple.quicktime.detected-machine-readable-code.EAN8",
+      @"mdta/com.apple.quicktime.detected-machine-readable-code.Code128",
+    ],
+  };
+
   // Construct a FigCaptureSourceVideoFormat via its private init taking a
   // stream format dictionary. Required keys recovered by reversing
   // `-[FigCaptureSourceFormat formatDescription]` + `-format` + `-dimensions`:
   //   "Name"            (NSString)  -- required by base init's cbz guard
+  //   "Index"           (NSNumber)  -- formatIndex; absent explicitly means -1
   //   "Width"           (NSNumber)  -- becomes dimensions.width
   //   "Height"          (NSNumber)  -- becomes dimensions.height
   //   "PixelFormatType" (NSNumber)  -- 4cc fed to CMVideoFormatDescriptionCreate
@@ -772,6 +849,18 @@ static id vcc_build_backing(void) {
     // see one; clients that pick the canonical ISP pixel format (AVF's
     // _preferredFormatForPreset: matcher for AVCaptureSessionPresetHigh)
     // pick the 420v one. Same preset list + frame-rate range on both.
+    vcc_output_spec = @{
+      // BWMultiStreamCameraSourceNode derives the source output's concrete
+      // format bounds from these per-output dimensions.  Without them the
+      // output advertises 420v but leaves width/height as "any", so the very
+      // first BWNodeConnection cannot resolve a common buffer format.
+      @"NativeWidth" : @(1280),
+      @"NativeHeight" : @(720),
+      @"SupportedPixelFormats" : @[
+        @(0x34323076u),  // '420v'
+        @(0x42475241u),  // 'BGRA'
+      ],
+    };
     NSDictionary *commonKeys = @{
       @"DefaultActiveFormat" : @NO,  // overridden on the active one
       figKey("kFigSupportedFormat_VideoMinFrameRate") : @(1),
@@ -785,6 +874,14 @@ static id vcc_build_backing(void) {
       // throwing "out-of-range [1, activeFormat.videoMaxZoomFactor]" when
       // Camera.app sets a default zoom > 1.0.
       @"VideoStabilizationTypeOverrideForStandard" : @(3),
+      // Metadata-object detection is fed from the camera node's intermediate
+      // video tap.  BWFigVideoCaptureStream copies SupportedOutputs from the
+      // active format; without this entry BWMultiStreamCameraSourceNode's
+      // output-selection helper rejects the graph with -12780 before the
+      // metadata sink can be built.
+      @"SupportedOutputs" : @{
+        @"IntermediateTap" : vcc_output_spec,
+      },
       // Without AVCaptureSessionPresets, -[AVCaptureDevice
       // supportsAVCaptureSessionPreset:] returns NO for every preset
       // (canAddInput=False everywhere except InputPriority). Camera.app
@@ -801,6 +898,7 @@ static id vcc_build_backing(void) {
     };
     NSMutableDictionary *bgra_fmt = [@{
       @"Name"            : @"vphone-vcam-720p-bgra",
+      @"Index"           : @0,
       @"Width"           : @1280,
       @"Height"          : @720,
       @"PixelFormatType" : @(0x42475241u),  // 'BGRA'
@@ -809,6 +907,7 @@ static id vcc_build_backing(void) {
 
     NSMutableDictionary *y420v_fmt = [@{
       @"Name"            : @"vphone-vcam-720p-420v",
+      @"Index"           : @1,
       @"Width"           : @1280,
       @"Height"          : @720,
       @"PixelFormatType" : @(0x34323076u),  // '420v'
@@ -819,10 +918,12 @@ static id vcc_build_backing(void) {
     [y420v_fmt addEntriesFromDictionary:commonKeys];
     y420v_fmt[@"DefaultActiveFormat"] = @YES;  // re-set after the merge
 
+    vcc_synth_stream_format_dicts = @[ [bgra_fmt copy], [y420v_fmt copy] ];
+
     SEL fmtInitSel = NSSelectorFromString(
         @"initWithFigCaptureStreamFormatDictionary:");
     NSMutableArray *formatObjs = [NSMutableArray array];
-    for (NSDictionary *fmtDict in @[ bgra_fmt, y420v_fmt ]) {
+    for (NSDictionary *fmtDict in vcc_synth_stream_format_dicts) {
       id fmtAlloc = ((id (*)(Class, SEL))objc_msgSend)(fmtClass,
                                                          @selector(alloc));
       id fmtObj = nil;
@@ -847,12 +948,21 @@ static id vcc_build_backing(void) {
                                                     @selector(alloc));
   if (!alloced) return nil;
   uint32_t mediaTypeVideo = 0x76696465;  // 'vide'
+  // A camera input needs both ports published up-front.  Previously both
+  // arrays were empty, so AVFoundation could create a device input but it
+  // had no metadata-object input port; consequently
+  // availableMetadataObjectTypes was always empty before any QR frame could
+  // reach the detector.
+  NSArray *synchronizedStreamIDs = @[
+    kVccVideoStreamUniqueID,
+    kVccMetadataStreamUniqueID,
+  ];
   id backing = ((id (*)(id, SEL, uint32_t, id, id, id, id, id, id))objc_msgSend)(
       alloced, initSel, mediaTypeVideo, attrs,
-      [NSMutableDictionary dictionary], formats, @[], @[], @[]);
-  vcc_log(@"  backing = %p (attrs.count=%lu formats.count=%lu)",
+      [NSMutableDictionary dictionary], formats, @[], synchronizedStreamIDs, @[]);
+  vcc_log(@"  backing = %p (attrs.count=%lu formats.count=%lu streamIDs=%@)",
           backing, (unsigned long)attrs.count,
-          (unsigned long)formats.count);
+          (unsigned long)formats.count, synchronizedStreamIDs);
   return backing;
 }
 
@@ -1427,6 +1537,24 @@ static void vcc_dump_class(const char *name) {
   free(clist);
 }
 
+static void vcc_dump_metadata_classes(void) {
+  int count = objc_getClassList(NULL, 0);
+  if (count <= 0) return;
+  Class __unsafe_unretained *classes =
+      (Class __unsafe_unretained *)calloc((size_t)count, sizeof(Class));
+  if (!classes) return;
+  count = objc_getClassList(classes, count);
+  for (int i = 0; i < count; i++) {
+    const char *name = class_getName(classes[i]);
+    if (!name || !strstr(name, "Metadata")) continue;
+    if (!strstr(name, "Sink") && !strstr(name, "MachineReadable") &&
+        !strstr(name, "Object")) continue;
+    vcc_log(@"  [DEBUG-m0a-graph] metadata class candidate=%s", name);
+    vcc_dump_class(name);
+  }
+  free(classes);
+}
+
 static void vcc_dump_sink_node_methods(void) {
   vcc_log(@"---- sink-node method dump ----");
   vcc_dump_class("BWSinkNode");
@@ -1447,7 +1575,248 @@ static void vcc_dump_sink_node_methods(void) {
   vcc_dump_class("BWFigCaptureStillImageRequest");
   vcc_dump_class("FigCaptureCameraSourcePipeline");
   vcc_dump_class("FigCaptureSourcePipeline");
+  vcc_dump_class("FigCaptureMetadataSinkPipeline");
+  vcc_dump_class("FigCaptureRemoteQueueSinkPipeline");
+  vcc_dump_class("FigCaptureSinkPipeline");
+  vcc_dump_class("FigCapturePipeline");
+  vcc_dump_class("FigCaptureSessionPipelines");
+  vcc_dump_class("FigCaptureSessionParsedConfiguration");
+  vcc_dump_metadata_classes();
   vcc_log(@"---- end sink-node method dump ----");
+}
+
+// Observe the common pipeline constructors. Metadata/source pipeline classes
+// do not override these methods on this iOS build, so swizzling the base
+// implementations tells us whether graph materialization reached them while
+// preserving the original construction path.
+static void vcc_swizzle_method(Class cls, SEL sel, IMP newImp, IMP *outOrig);
+static IMP vcc_sink_pipeline_init_orig = NULL;
+static IMP vcc_source_pipeline_init_orig = NULL;
+typedef id (*VccPipelineInitFn)(id, SEL, id, id, id);
+
+__attribute__((ns_returns_retained))
+static id vcc_sink_pipeline_init_hook(id self, SEL _cmd, id graph, id name,
+                                      id sinkID) {
+  vcc_log(@"  [Pipeline sink init] class=%@ self=%p graph=%p name=%@ sinkID=%@",
+          NSStringFromClass([self class]), self, graph, name, sinkID);
+  id ret = ((VccPipelineInitFn)vcc_sink_pipeline_init_orig)(
+      self, _cmd, graph, name, sinkID);
+  vcc_log(@"  [Pipeline sink init] class=%@ -> %p",
+          NSStringFromClass([ret class]), ret);
+  return ret;
+}
+
+__attribute__((ns_returns_retained))
+static id vcc_source_pipeline_init_hook(id self, SEL _cmd, id graph, id name,
+                                        id sourceID) {
+  vcc_log(@"  [Pipeline source init] class=%@ self=%p graph=%p name=%@ sourceID=%@",
+          NSStringFromClass([self class]), self, graph, name, sourceID);
+  id ret = ((VccPipelineInitFn)vcc_source_pipeline_init_orig)(
+      self, _cmd, graph, name, sourceID);
+  vcc_log(@"  [Pipeline source init] class=%@ -> %p",
+          NSStringFromClass([ret class]), ret);
+  return ret;
+}
+
+static void vcc_install_pipeline_observation(void) {
+  Class sink = NSClassFromString(@"FigCaptureSinkPipeline");
+  Class source = NSClassFromString(@"FigCaptureSourcePipeline");
+  if (sink) {
+    vcc_swizzle_method(sink, @selector(initWithGraph:name:sinkID:),
+                       (IMP)vcc_sink_pipeline_init_hook,
+                       &vcc_sink_pipeline_init_orig);
+  }
+  if (source) {
+    vcc_swizzle_method(source, @selector(initWithGraph:name:sourceID:),
+                       (IMP)vcc_source_pipeline_init_hook,
+                       &vcc_source_pipeline_init_orig);
+  }
+}
+
+static IMP vcc_pipeline_add_node_orig = NULL;
+typedef BOOL (*VccPipelineAddNodeFn)(id, SEL, id, id *);
+
+static BOOL vcc_pipeline_add_node_hook(id self, SEL _cmd, id node,
+                                        id *errorOut) {
+  BOOL ok = ((VccPipelineAddNodeFn)vcc_pipeline_add_node_orig)(
+      self, _cmd, node, errorOut);
+  vcc_log(@"  [Pipeline addNode] pipeline=%p(%@) node=%p(%@) %@ -> %d error=%@",
+          self, NSStringFromClass([self class]), node,
+          NSStringFromClass([node class]), node, ok,
+          errorOut ? (*errorOut ?: @"(nil)") : @"(no out param)");
+  return ok;
+}
+
+static void vcc_install_pipeline_add_node_observation(void) {
+  Class cls = NSClassFromString(@"FigCapturePipeline");
+  Method method = cls ? class_getInstanceMethod(
+      cls, NSSelectorFromString(@"addNode:error:")) : NULL;
+  if (!method) {
+    vcc_log(@"  Pipeline addNode observation: selector missing");
+    return;
+  }
+  vcc_pipeline_add_node_orig = method_setImplementation(
+      method, (IMP)vcc_pipeline_add_node_hook);
+  vcc_log(@"  Pipeline addNode observation installed orig=%p",
+          vcc_pipeline_add_node_orig);
+}
+
+// Observe graph edge creation and the two format/commit boundaries.  All
+// hooks are pass-through: the goal is to identify the first edge or graph
+// phase that produces the session's -666 without changing graph behavior.
+static IMP vcc_graph_safe_connect_orig = NULL;
+static IMP vcc_graph_safe_connect_deferred_orig = NULL;
+static IMP vcc_graph_connect_orig = NULL;
+static IMP vcc_graph_connect_deferred_orig = NULL;
+static IMP vcc_graph_resolve_formats_orig = NULL;
+static IMP vcc_graph_commit_orig = NULL;
+static IMP vcc_connection_resolve_format_orig = NULL;
+
+typedef int (*VccGraphSafeConnectFn)(id, SEL, id, id, id);
+typedef int (*VccGraphSafeConnectDeferredFn)(id, SEL, id, id, id, BOOL);
+typedef BOOL (*VccGraphConnectFn)(id, SEL, id, id, id);
+typedef BOOL (*VccGraphConnectDeferredFn)(id, SEL, id, id, id, BOOL);
+typedef BOOL (*VccGraphResolveFormatsFn)(id, SEL, id *);
+typedef BOOL (*VccGraphCommitFn)(id, SEL, int64_t, id *);
+typedef BOOL (*VccConnectionResolveFormatFn)(id, SEL);
+
+static id vcc_object_value(id object, SEL selector) {
+  if (!object || ![object respondsToSelector:selector]) return nil;
+  return ((id (*)(id, SEL))objc_msgSend)(object, selector);
+}
+
+static BOOL vcc_connection_resolve_format_hook(id self, SEL _cmd) {
+  id output = vcc_object_value(self, @selector(output));
+  id input = vcc_object_value(self, @selector(input));
+  id outFormatBefore = vcc_object_value(output, @selector(format));
+  id inFormatBefore = vcc_object_value(input, @selector(format));
+  id outReq = vcc_object_value(output, @selector(formatRequirements));
+  id inReq = vcc_object_value(input, @selector(formatRequirements));
+  BOOL ok = ((VccConnectionResolveFormatFn)
+                 vcc_connection_resolve_format_orig)(self, _cmd);
+  vcc_log(@"  [BWConnection resolve] %@ -> %@ ok=%d "
+          "out.format=%@ in.format=%@ out.req=%@ in.req=%@ "
+          "resolved.out=%@ resolved.in=%@",
+          output, input, ok, outFormatBefore, inFormatBefore, outReq, inReq,
+          vcc_object_value(output, @selector(format)),
+          vcc_object_value(input, @selector(format)));
+  return ok;
+}
+
+static int vcc_graph_safe_connect_hook(id self, SEL _cmd, id output,
+                                       id input, id stage) {
+  int status = ((VccGraphSafeConnectFn)vcc_graph_safe_connect_orig)(
+      self, _cmd, output, input, stage);
+  vcc_log(@"  [BWGraph safelyConnect] %@ (%@) -> %@ (%@) stage=%@ status=%d",
+          output, NSStringFromClass([output class]), input,
+          NSStringFromClass([input class]), stage, status);
+  return status;
+}
+
+static int vcc_graph_safe_connect_deferred_hook(id self, SEL _cmd, id output,
+                                                id input, id stage,
+                                                BOOL deferred) {
+  int status = ((VccGraphSafeConnectDeferredFn)
+                    vcc_graph_safe_connect_deferred_orig)(
+      self, _cmd, output, input, stage, deferred);
+  vcc_log(@"  [BWGraph safelyConnect deferred] %@ (%@) -> %@ (%@) "
+          "stage=%@ deferred=%d status=%d",
+          output, NSStringFromClass([output class]), input,
+          NSStringFromClass([input class]), stage, deferred, status);
+  return status;
+}
+
+static BOOL vcc_graph_connect_hook(id self, SEL _cmd, id output, id input,
+                                   id stage) {
+  BOOL ok = ((VccGraphConnectFn)vcc_graph_connect_orig)(
+      self, _cmd, output, input, stage);
+  vcc_log(@"  [BWGraph connect] %@ (%@) -> %@ (%@) stage=%@ ok=%d error=%d",
+          output, NSStringFromClass([output class]), input,
+          NSStringFromClass([input class]), stage, ok,
+          ((int (*)(id, SEL))objc_msgSend)(self, @selector(errorStatus)));
+  return ok;
+}
+
+static BOOL vcc_graph_connect_deferred_hook(id self, SEL _cmd, id output,
+                                            id input, id stage,
+                                            BOOL deferred) {
+  BOOL ok = ((VccGraphConnectDeferredFn)vcc_graph_connect_deferred_orig)(
+      self, _cmd, output, input, stage, deferred);
+  vcc_log(@"  [BWGraph connect deferred] %@ (%@) -> %@ (%@) stage=%@ "
+          "deferred=%d ok=%d error=%d",
+          output, NSStringFromClass([output class]), input,
+          NSStringFromClass([input class]), stage, deferred, ok,
+          ((int (*)(id, SEL))objc_msgSend)(self, @selector(errorStatus)));
+  return ok;
+}
+
+static BOOL vcc_graph_resolve_formats_hook(id self, SEL _cmd, id *errorOut) {
+  @try {
+    id connections = [self valueForKey:@"_connections"];
+    vcc_log(@"  [BWGraph resolveFormats] connections.before=%@", connections);
+  } @catch (NSException *exception) {
+    vcc_log(@"  [BWGraph resolveFormats] connections KVC failed: %@",
+            exception.name);
+  }
+  BOOL ok = ((VccGraphResolveFormatsFn)vcc_graph_resolve_formats_orig)(
+      self, _cmd, errorOut);
+  vcc_log(@"  [BWGraph resolveFormats] ok=%d errorStatus=%d error=%@", ok,
+          ((int (*)(id, SEL))objc_msgSend)(self, @selector(errorStatus)),
+          errorOut ? (*errorOut ?: @"(nil)") : @"(no out param)");
+  return ok;
+}
+
+static BOOL vcc_graph_commit_hook(id self, SEL _cmd, int64_t configurationID,
+                                  id *errorOut) {
+  BOOL ok = ((VccGraphCommitFn)vcc_graph_commit_orig)(
+      self, _cmd, configurationID, errorOut);
+  vcc_log(@"  [BWGraph commit] id=%lld ok=%d errorStatus=%d error=%@",
+          (long long)configurationID, ok,
+          ((int (*)(id, SEL))objc_msgSend)(self, @selector(errorStatus)),
+          errorOut ? (*errorOut ?: @"(nil)") : @"(no out param)");
+  return ok;
+}
+
+static void vcc_install_graph_observation(void) {
+  Class cls = NSClassFromString(@"BWGraph");
+  if (!cls) {
+    vcc_log(@"  BWGraph observation: class missing");
+    return;
+  }
+  vcc_swizzle_method(cls,
+      NSSelectorFromString(@"safelyConnectOutput:toInput:pipelineStage:"),
+      (IMP)vcc_graph_safe_connect_hook, &vcc_graph_safe_connect_orig);
+  vcc_swizzle_method(cls,
+      NSSelectorFromString(
+          @"safelyConnectOutput:toInput:pipelineStage:deferredAttach:"),
+      (IMP)vcc_graph_safe_connect_deferred_hook,
+      &vcc_graph_safe_connect_deferred_orig);
+  vcc_swizzle_method(cls,
+      NSSelectorFromString(@"connectOutput:toInput:pipelineStage:"),
+      (IMP)vcc_graph_connect_hook, &vcc_graph_connect_orig);
+  vcc_swizzle_method(cls,
+      NSSelectorFromString(
+          @"connectOutput:toInput:pipelineStage:deferredAttach:"),
+      (IMP)vcc_graph_connect_deferred_hook,
+      &vcc_graph_connect_deferred_orig);
+  vcc_swizzle_method(cls, NSSelectorFromString(@"_resolveFormats:"),
+                     (IMP)vcc_graph_resolve_formats_hook,
+                     &vcc_graph_resolve_formats_orig);
+  vcc_swizzle_method(cls,
+      NSSelectorFromString(@"commitConfigurationWithID:error:"),
+      (IMP)vcc_graph_commit_hook, &vcc_graph_commit_orig);
+  Class connection = NSClassFromString(@"BWNodeConnection");
+  vcc_swizzle_method(connection,
+      NSSelectorFromString(@"resolveCommonBufferFormat"),
+      (IMP)vcc_connection_resolve_format_hook,
+      &vcc_connection_resolve_format_orig);
+  vcc_log(@"  BWGraph observation installed safe=%p safeDeferred=%p "
+          "connect=%p connectDeferred=%p resolve=%p commit=%p "
+          "connectionResolve=%p",
+          vcc_graph_safe_connect_orig, vcc_graph_safe_connect_deferred_orig,
+          vcc_graph_connect_orig, vcc_graph_connect_deferred_orig,
+          vcc_graph_resolve_formats_orig, vcc_graph_commit_orig,
+          vcc_connection_resolve_format_orig);
 }
 
 // MARK: - sink observation hooks
@@ -1515,6 +1884,32 @@ static id vcc_rqsn_init_hook(
   vcc_rqsn_init_count++;
   vcc_log(@"  [RQSN init] -> %p mediaType=0x%x sinkID=%@ count=%lu",
           ret, mediaType, sinkID, vcc_rqsn_init_count);
+  // M0a-2 Phase 1 observation: fully dump cameraInfoByPortType so we can
+  // see whether the AVF client ever asks for a metadata port from our synth
+  // device (key=portType, value=per-port camera info). Read-only.
+  if ([cameraInfoByPortType isKindOfClass:[NSDictionary class]]) {
+    NSDictionary *info = (NSDictionary *)cameraInfoByPortType;
+    vcc_log(@"  [RQSN init] cameraInfoByPortType keys=%lu",
+            (unsigned long)info.count);
+    for (id key in info) {
+      id val = info[key];
+      vcc_log(@"    port[%@] (keyCls=%@) valCls=%@",
+              key, NSStringFromClass([key class]),
+              NSStringFromClass([val class]));
+      if ([val isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *pd = (NSDictionary *)val;
+        for (id pk in pd) {
+          vcc_log(@"        %@ = %@ (cls=%@)", pk, pd[pk],
+                  NSStringFromClass([pd[pk] class]));
+        }
+      } else {
+        vcc_log(@"      value = %@", val);
+      }
+    }
+  } else {
+    vcc_log(@"  [RQSN init] cameraInfoByPortType cls=%@ (not a dict)",
+            NSStringFromClass([cameraInfoByPortType class]));
+  }
   if (ret) {
     if (!vcc_captured_sinks)
       vcc_captured_sinks = [NSMutableArray array];
@@ -1588,6 +1983,11 @@ static void vcc_init_synth_device_class(void);
 __attribute__((ns_returns_retained))
 static id   vcc_make_synth_device(NSString *deviceID);
 
+// The swizzled selector begins with `copy`, so its caller consumes a +1
+// result.  A plain C function has no selector-family inference under ARC;
+// spell out the ownership contract or ARC will autorelease the object before
+// the capture worker has finished with it.
+__attribute__((ns_returns_retained))
 static id vcc_copy_device_hook(id self, SEL _cmd, NSString *deviceID,
                                int clientPID, BOOL informClient, int *err) {
   vcc_log(@"  [copyDeviceWithID] deviceID=%@ clientPID=%d inform=%d",
@@ -1657,6 +2057,19 @@ static ptrdiff_t vcc_resolve_ivar(Class cls, const char *what,
 // Cached CF constants — resolved lazily from CMCaptureCore / CMCaptureDevice.
 static CFStringRef vcc_cf_kClock              = NULL;
 static CFStringRef vcc_cf_kUnitInfo           = NULL;
+static char vcc_synth_device_properties_key;
+
+static NSMutableDictionary *vcc_synth_device_properties(id self,
+                                                         BOOL create) {
+  NSMutableDictionary *properties = objc_getAssociatedObject(
+      self, &vcc_synth_device_properties_key);
+  if (!properties && create) {
+    properties = [NSMutableDictionary dictionary];
+    objc_setAssociatedObject(self, &vcc_synth_device_properties_key,
+                             properties, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  }
+  return properties;
+}
 
 static void vcc_load_synth_cfconsts(void) {
   if (!vcc_cf_kClock) vcc_cf_kClock = vcc_cfconst("kFigCaptureDeviceProperty_Clock");
@@ -1692,6 +2105,11 @@ static id vcc_synth_copy_property(id self, SEL _cmd, id property, int *err) {
     CFRetain(clk);
     return (__bridge_transfer id)clk;  // +1 retained, ns_returns_retained
   }
+  id stored = vcc_synth_device_properties(self, NO)[property];
+  if (stored) {
+    if (err) *err = 0;
+    return [stored copy];
+  }
   if (err) *err = -12787;
   vcc_log(@"  [SynthDev copyProperty:%@] -> nil (err=-12787)", propStr);
   return nil;
@@ -1706,11 +2124,32 @@ static id vcc_synth_copy_property_if_supported(id self, SEL _cmd,
   return nil;
 }
 
-static int vcc_synth_get_property(id self, SEL _cmd, id property, int *err) {
+static id vcc_synth_get_property(id self, SEL _cmd, id property, int *err) {
   NSString *propStr = [property description];
-  if (err) *err = -12787;
-  vcc_log(@"  [SynthDev getProperty:%@] -> 0 (err=-12787)", propStr);
+  id stored = vcc_synth_device_properties(self, NO)[property];
+  if (err) *err = stored ? 0 : -12787;
+  vcc_log(@"  [SynthDev getProperty:%@] -> %@", propStr,
+          stored ? @"stored" : @"nil (err=-12787)");
+  return stored;
+}
+
+static int vcc_synth_set_property(id self, SEL _cmd, id property, id value) {
+  if (property) {
+    NSMutableDictionary *properties = vcc_synth_device_properties(self, YES);
+    if (value) properties[property] = value;
+    else [properties removeObjectForKey:property];
+  }
+  vcc_log(@"  [SynthDev %@:%@] stored=%@", NSStringFromSelector(_cmd),
+          [property description],
+          value ? NSStringFromClass([value class]) : @"(nil)");
   return 0;
+}
+
+static int vcc_synth_underscore_set_property(id self, SEL _cmd, id property,
+                                              id value,
+                                              BOOL requireSupported) {
+  return vcc_synth_set_property(self, @selector(setProperty:value:),
+                                property, value);
 }
 
 static id vcc_synth_supported_properties(id self, SEL _cmd) {
@@ -1773,7 +2212,15 @@ static void vcc_init_synth_device_class(void) {
   class_addMethod(cls, @selector(copyPropertyIfSupported:error:),
                   (IMP)vcc_synth_copy_property_if_supported, "@@:@^i");
   class_addMethod(cls, @selector(getProperty:error:),
-                  (IMP)vcc_synth_get_property, "i@:@^i");
+                  (IMP)vcc_synth_get_property, "@@:@^i");
+  class_addMethod(cls, @selector(setProperty:value:),
+                  (IMP)vcc_synth_set_property, "i@:@@");
+  class_addMethod(cls, @selector(setPropertyIfSupported:value:),
+                  (IMP)vcc_synth_set_property, "i@:@@");
+  class_addMethod(cls,
+                  NSSelectorFromString(
+                      @"_setProperty:value:requireSupported:"),
+                  (IMP)vcc_synth_underscore_set_property, "i@:@@B");
   class_addMethod(cls, @selector(supportedProperties),
                   (IMP)vcc_synth_supported_properties, "@@:");
   class_addMethod(cls, @selector(uniqueID),
@@ -1803,7 +2250,8 @@ static void vcc_init_synth_device_class(void) {
 //             objectForKeyedSubscript:key] unconditionally, and the
 //             unrecognized-selector crashed cameracaptured. Leave NULL
 //             so the lookup short-circuits to nil.
-//   streaming         : BOOL — set to 1 so -streaming returns YES.
+//   streaming         : BOOL — starts at 0; our -start/-stop overrides own
+//                       the transition because there is no Fig backend.
 
 static Class vcc_synth_stream_class = Nil;
 // Resolved at synth-class init. portType/uniqueID are required (-1 -> abort
@@ -1813,6 +2261,66 @@ static ptrdiff_t kBWFigCaptureStream_uniqueID_Offset  = -1;
 static ptrdiff_t kBWFigCaptureStream_streaming_Offset = -1;
 
 static CFStringRef vcc_cf_kSupportedFormatsArray = NULL;
+static char vcc_synth_stream_properties_key;
+static void vcc_synth_drive_start_if_needed(void);
+
+enum {
+  VCC_BLOCK_HAS_COPY_DISPOSE = (1 << 25),
+  VCC_BLOCK_HAS_SIGNATURE = (1 << 30),
+};
+
+typedef struct {
+  void *isa;
+  int flags;
+  int reserved;
+  void *invoke;
+  void *descriptor;
+} vcc_block_literal_t;
+
+static const char *vcc_block_signature(id block) {
+  if (!block) return NULL;
+  const vcc_block_literal_t *literal = (__bridge const void *)block;
+  if (!(literal->flags & VCC_BLOCK_HAS_SIGNATURE) || !literal->descriptor) {
+    return NULL;
+  }
+  const uint8_t *cursor = literal->descriptor;
+  cursor += sizeof(unsigned long int) * 2;
+  if (literal->flags & VCC_BLOCK_HAS_COPY_DISPOSE) {
+    cursor += sizeof(void *) * 2;
+  }
+  return *(const char *const *)cursor;
+}
+
+static void vcc_log_video_output_handlers(NSDictionary *handlers) {
+  for (id outputID in handlers) {
+    NSDictionary *outputHandlers = [handlers[outputID]
+        isKindOfClass:NSDictionary.class] ? handlers[outputID] : nil;
+    for (id handlerName in outputHandlers) {
+      id block = outputHandlers[handlerName];
+      const vcc_block_literal_t *literal = block && block != NSNull.null
+          ? (__bridge const void *)block : NULL;
+      const char *signature = literal ? vcc_block_signature(block) : NULL;
+      vcc_log(@"  [SynthStream handler] output=%@ name=%@ block=%p "
+              "invoke=%p flags=0x%x signature=%s",
+              outputID, handlerName, block,
+              literal ? literal->invoke : NULL,
+              literal ? literal->flags : 0,
+              signature ?: "(none)");
+    }
+  }
+}
+
+static NSMutableDictionary *vcc_synth_stream_properties(id self,
+                                                         BOOL create) {
+  NSMutableDictionary *properties = objc_getAssociatedObject(
+      self, &vcc_synth_stream_properties_key);
+  if (!properties && create) {
+    properties = [NSMutableDictionary dictionary];
+    objc_setAssociatedObject(self, &vcc_synth_stream_properties_key,
+                             properties, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  }
+  return properties;
+}
 
 __attribute__((ns_returns_retained))
 static id vcc_synth_stream_copy_property(id self, SEL _cmd, id property,
@@ -1823,15 +2331,24 @@ static id vcc_synth_stream_copy_property(id self, SEL _cmd, id property,
   }
   if (vcc_cf_kSupportedFormatsArray &&
       [(__bridge id)vcc_cf_kSupportedFormatsArray isEqual:property]) {
+    NSArray *formats = vcc_synth_stream_format_dicts ?: @[];
+    id result = [formats copy];
+    // Write the out-status last. This method is called through an IMP whose
+    // caller branches on the stack slot immediately after return.
     if (err) *err = 0;
-    // Empirically: empty SupportedFormatsArray returns +1-retained per
-    // ns_returns_retained convention. Non-empty arrays (objects or dicts)
-    // trip a daemon-side validation that we don't satisfy → isRunning=0.
-    // The AVCaptureDevice.formats list is populated separately via
-    // -[FigCaptureSourceBacking initWith…formats:…], so the AVF client
-    // still sees both formats and selects activeFormat.
-    vcc_log(@"  [SynthStream copyProperty:SupportedFormatsArray] -> empty array");
-    return [[NSArray alloc] init];
+    vcc_log(@"  [SynthStream copyProperty:SupportedFormatsArray] -> %lu formats",
+            (unsigned long)formats.count);
+    vcc_log(@"  [SynthStream copyProperty:SupportedFormatsArray] result=%p "
+            "err=%d", result, err ? *err : 0);
+    return result;
+  }
+  id stored = vcc_synth_stream_properties(self, NO)[property];
+  if (stored) {
+    if (err) *err = 0;
+    id result = [stored copy];
+    vcc_log(@"  [SynthStream copyProperty:%@] -> stored %@",
+            [property description], NSStringFromClass([stored class]));
+    return result;
   }
   if (err) *err = -12787;
   vcc_log(@"  [SynthStream copyProperty:%@] -> nil (err=-12787)",
@@ -1842,31 +2359,36 @@ static id vcc_synth_stream_copy_property(id self, SEL _cmd, id property,
 __attribute__((ns_returns_retained))
 static id vcc_synth_stream_copy_property_if_supported(id self, SEL _cmd,
                                                        id property, int *err) {
+  id stored = vcc_synth_stream_properties(self, NO)[property];
   if (err) *err = 0;
-  vcc_log(@"  [SynthStream copyPropertyIfSupported:%@] -> nil",
-          [property description]);
-  return nil;
+  id result = stored ? [stored copy] : nil;
+  vcc_log(@"  [SynthStream copyPropertyIfSupported:%@] -> %@",
+          [property description], stored ? @"stored" : @"nil");
+  return result;
 }
 
-static int vcc_synth_stream_get_property(id self, SEL _cmd, id property,
-                                          int *err) {
+static id vcc_synth_stream_get_property(id self, SEL _cmd, id property,
+                                         int *err) {
   NSString *propStr = [property description];
-  // The daemon's session-start path queries PixelSize on the stream and
-  // treats err=-12787 as fatal — propagates up to AVCaptureSessionRuntimeError
-  // and stops the session. Return 0 with err=0 (supported, zero value) so
-  // the check passes. Same defensive default for any other property we
-  // haven't otherwise explicitly handled.
+  // All four BWFigCaptureStream property selectors return Objective-C
+  // objects on this build.  Returning a C int here happened to put nil in
+  // x0; PixelSize then decoded as 0.0 and the video-stream initializer
+  // rejected it with -12783. A normal phone-camera pixel pitch is safely
+  // inside its explicit (0, 100] validation range.
+  id value = vcc_synth_stream_properties(self, NO)[property];
+  if (!value && [propStr isEqualToString:@"PixelSize"]) value = @(1.4f);
   if (err) *err = 0;
-  vcc_log(@"  [SynthStream getProperty:%@] -> 0 err=0", propStr);
-  return 0;
+  vcc_log(@"  [SynthStream getProperty:%@] -> %@ err=0", propStr, value);
+  return value;
 }
 
-static int vcc_synth_stream_get_property_if_supported(id self, SEL _cmd,
-                                                      id property, int *err) {
+static id vcc_synth_stream_get_property_if_supported(id self, SEL _cmd,
+                                                       id property, int *err) {
+  id value = vcc_synth_stream_properties(self, NO)[property];
   if (err) *err = 0;
-  vcc_log(@"  [SynthStream getPropertyIfSupported:%@] -> 0 err=0",
-          [property description]);
-  return 0;
+  vcc_log(@"  [SynthStream getPropertyIfSupported:%@] -> %@ err=0",
+          [property description], value);
+  return value;
 }
 
 // Catches the private _copyProperty:requireSupported:error: path. Same
@@ -1886,7 +2408,61 @@ static id vcc_synth_stream_supported_properties(id self, SEL _cmd) {
 
 static int vcc_synth_stream_set_property(id self, SEL _cmd, id property,
                                           id value) {
-  vcc_log(@"  [SynthStream setProperty:%@] (ignored)", [property description]);
+  @synchronized (self) {
+    if (property) {
+      NSMutableDictionary *properties = vcc_synth_stream_properties(self, YES);
+      if (value) properties[property] = value;
+      else [properties removeObjectForKey:property];
+    }
+  }
+  vcc_log(@"  [SynthStream %@:%@] stored=%@",
+          NSStringFromSelector(_cmd), [property description],
+          value ? NSStringFromClass([value class]) : @"(nil)");
+  NSString *propertyName = [property description];
+  if ([propertyName isEqualToString:@"VideoOutputHandlers"] ||
+      [propertyName isEqualToString:@"VideoOutputConfigurations"] ||
+      [propertyName isEqualToString:@"VideoOutputsEnabled"]) {
+    vcc_log(@"  [SynthStream %@] value=%@", propertyName, value);
+  }
+  if ([propertyName isEqualToString:@"VideoOutputHandlers"] &&
+      [value isKindOfClass:NSDictionary.class]) {
+    vcc_log_video_output_handlers(value);
+    vcc_synth_drive_start_if_needed();
+  }
+  return 0;
+}
+
+static int vcc_synth_stream_start_stop(id self, SEL _cmd) {
+  BOOL starting = sel_isEqual(_cmd, @selector(start));
+  if (kBWFigCaptureStream_streaming_Offset >= 0) {
+    void *p = (__bridge void *)self;
+    *(uint8_t *)((char *)p + kBWFigCaptureStream_streaming_Offset) =
+        starting ? 1 : 0;
+  }
+  vcc_log(@"  [SynthStream %@] -> 0", NSStringFromSelector(_cmd));
+  // A real FigCaptureStream completes start/stop asynchronously through its
+  // startStopDelegate. The BW wrapper uses these callbacks to set
+  // CaptureInitiatedOnce and to stop privacy-blackening source frames.
+  // Calling on the next queue turn also matches the backend's non-reentrant
+  // completion semantics.
+  id delegate = nil;
+  SEL delegateGetter = NSSelectorFromString(@"startStopDelegate");
+  if ([self respondsToSelector:delegateGetter]) {
+    delegate = ((id (*)(id, SEL))objc_msgSend)(self, delegateGetter);
+  }
+  SEL callback = NSSelectorFromString(
+      starting ? @"captureStreamDidStart" : @"captureStreamDidStop");
+  if (delegate && [delegate respondsToSelector:callback]) {
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+      vcc_log(@"  [SynthStream %@] notifying delegate=%p %@",
+              NSStringFromSelector(_cmd), delegate,
+              NSStringFromSelector(callback));
+      ((void (*)(id, SEL))objc_msgSend)(delegate, callback);
+    });
+  } else {
+    vcc_log(@"  [SynthStream %@] no startStopDelegate callback target",
+            NSStringFromSelector(_cmd));
+  }
   return 0;
 }
 
@@ -1938,9 +2514,9 @@ static void vcc_init_synth_stream_class(void) {
   class_addMethod(cls, @selector(copyPropertyIfSupported:error:),
                   (IMP)vcc_synth_stream_copy_property_if_supported, "@@:@^i");
   class_addMethod(cls, @selector(getProperty:error:),
-                  (IMP)vcc_synth_stream_get_property, "i@:@^i");
+                  (IMP)vcc_synth_stream_get_property, "@@:@^i");
   class_addMethod(cls, @selector(getPropertyIfSupported:error:),
-                  (IMP)vcc_synth_stream_get_property_if_supported, "i@:@^i");
+                  (IMP)vcc_synth_stream_get_property_if_supported, "@@:@^i");
   // Also override the underlying _copyProperty:requireSupported:error:
   // so any inherited call path that bypasses the public wrappers (e.g.
   // -getPropertyIfSupported: in older code paths) still lands here
@@ -1952,6 +2528,19 @@ static void vcc_init_synth_stream_class(void) {
                   (IMP)vcc_synth_stream_supported_properties, "@@:");
   class_addMethod(cls, @selector(setProperty:value:),
                   (IMP)vcc_synth_stream_set_property, "i@:@@");
+  // BWFigVideoCaptureStream uses this selector for optional controls such as
+  // HighlightRecoverySuspended.  Leaving it inherited enters the parent's
+  // private _setProperty path and dereferences the absent Fig stream backend.
+  class_addMethod(cls, @selector(setPropertyIfSupported:value:),
+                  (IMP)vcc_synth_stream_set_property, "i@:@@");
+  // The parent lifecycle methods dispatch into the opaque FigCaptureStream
+  // backend.  Synth streams have no such backend, so they must own start/stop
+  // (including teardown after a later graph-build error) instead of
+  // dereferencing NULL and masking the original failure.
+  class_addMethod(cls, @selector(start),
+                  (IMP)vcc_synth_stream_start_stop, "i@:");
+  class_addMethod(cls, @selector(stop),
+                  (IMP)vcc_synth_stream_start_stop, "i@:");
   class_addMethod(cls, NSSelectorFromString(@"dealloc"),
                   (IMP)vcc_synth_stream_dealloc, "v@:");
   objc_registerClassPair(cls);
@@ -1988,10 +2577,11 @@ static id vcc_make_synth_stream(NSString *uniqueID, NSString *deviceID,
   // unrecognized-selector. The deviceID isn't read off the stream by
   // inherited code anyway (only a per-stream BOOL comparison result is).
   (void)deviceID;
-  // streaming BOOL — set to 1 so -streaming returns YES. Optional:
-  // skip if the ivar isn't present on this build.
+  // streaming BOOL — remain stopped until BWFigCaptureDevice starts the
+  // stream. Pre-setting YES suppresses -start entirely, leaving the source
+  // node's CaptureInitiatedOnce false and blackening every emitted frame.
   if (kBWFigCaptureStream_streaming_Offset >= 0) {
-    *(uint8_t *)((char *)p + kBWFigCaptureStream_streaming_Offset) = 1;
+    *(uint8_t *)((char *)p + kBWFigCaptureStream_streaming_Offset) = 0;
   }
 
   // Pin so dealloc never runs — diagnostic to isolate the autorelease-
@@ -2017,6 +2607,7 @@ static IMP vcc_copy_streams_orig = NULL;
 typedef id (*VccCopyStreamsFn)(id self, SEL _cmd, NSArray *uniqueIDs,
                                 id forDevice, int priority, int *err);
 
+__attribute__((ns_returns_retained))
 static id vcc_copy_streams_hook(id self, SEL _cmd, NSArray *uniqueIDs,
                                  id forDevice, int priority, int *err) {
   if (forDevice && object_getClass(forDevice) == vcc_synth_device_class) {
@@ -2025,7 +2616,8 @@ static id vcc_copy_streams_hook(id self, SEL _cmd, NSArray *uniqueIDs,
     void *p = (__bridge void *)forDevice;
     NSString *devID = (__bridge NSString *)(*(void **)((char *)p + kBWFigCaptureDevice_deviceID_Offset));
     for (NSString *uid in uniqueIDs) {
-      id s = vcc_make_synth_stream(uid, devID, @"Back");
+      id s = vcc_make_synth_stream(uid, devID,
+                                   vcc_port_type_for_stream_unique_id(uid));
       if (s) [out addObject:s];
     }
     if (err) *err = 0;
@@ -2058,6 +2650,7 @@ typedef id (*VccCopyStreamsFromFn)(id self, SEL _cmd, id fromDevice,
                                     NSArray *positions, NSArray *deviceTypes,
                                     int prio, BOOL allowsLoss, int *err);
 
+__attribute__((ns_returns_retained))
 static id vcc_copy_streams_from_hook(id self, SEL _cmd, id fromDevice,
                                       NSArray *positions, NSArray *deviceTypes,
                                       int prio, BOOL allowsLoss, int *err) {
@@ -2069,9 +2662,13 @@ static id vcc_copy_streams_from_hook(id self, SEL _cmd, id fromDevice,
     NSString *devID = (__bridge NSString *)(*(void **)((char *)p + kBWFigCaptureDevice_deviceID_Offset));
     NSUInteger count = positions.count;
     for (NSUInteger i = 0; i < count; i++) {
-      NSString *uid = [NSString stringWithFormat:@"%@:stream:%lu",
-                                                  devID, (unsigned long)i];
-      id s = vcc_make_synth_stream(uid, devID, @"Back");
+      // This selector lacks explicit unique IDs, but the published backing
+      // order is retained by the device vendor: video first, then the
+      // metadata-object port.  Returning matching IDs preserves that
+      // identity for AVFoundation's automatic metadata connection.
+      NSString *uid = i == 1 ? kVccMetadataStreamUniqueID : kVccVideoStreamUniqueID;
+      id s = vcc_make_synth_stream(uid, devID,
+                                   vcc_port_type_for_stream_unique_id(uid));
       if (s) [out addObject:s];
     }
     if (err) *err = 0;
@@ -2098,6 +2695,200 @@ static void vcc_install_copy_streams_from_hook(void) {
                                                          (IMP)vcc_copy_streams_from_hook);
   vcc_log(@"  swizzled -[BWFigCaptureDeviceVendor copyStreamsFromDevice:...] orig=%p",
           vcc_copy_streams_from_orig);
+}
+
+// Observe the first daemon object that consumes VccSynthStream.  The graph
+// currently returns -12783 immediately after querying PixelSize, before any
+// source/sink pipeline constructor runs.  This constructor owns that seam;
+// logging its explicit error out-parameter identifies whether the failure is
+// stream validation or a later graph gate without changing the result.
+static IMP vcc_video_stream_init_orig = NULL;
+typedef id (*VccVideoStreamInitFn)(id, SEL, id, id, id, id, id, id,
+                                    audit_token_t, id, id, int *);
+
+__attribute__((ns_returns_retained))
+static id vcc_video_stream_init_hook(id self, SEL _cmd, id captureStream,
+                                      id parentDevice, id attributes,
+                                      id sensorIDDictionary,
+                                      id synchronizedStreamsGroup,
+                                      id applicationID,
+                                      audit_token_t clientAuditToken,
+                                      id tccIdentity, id mediaEnvironment,
+                                      int *errorOut) {
+  vcc_log(@"  [VideoStream init] self=%p captureStream=%p(%@) device=%p(%@) "
+          "attrs=%@ app=%@ err.in=%d", self, captureStream,
+          NSStringFromClass([captureStream class]), parentDevice,
+          NSStringFromClass([parentDevice class]), attributes, applicationID,
+          errorOut ? *errorOut : 0);
+  VccVideoStreamInitFn orig = (VccVideoStreamInitFn)vcc_video_stream_init_orig;
+  id ret = orig(self, _cmd, captureStream, parentDevice, attributes,
+                sensorIDDictionary, synchronizedStreamsGroup, applicationID,
+                clientAuditToken, tccIdentity, mediaEnvironment, errorOut);
+  vcc_log(@"  [VideoStream init] -> %p(%@) err.out=%d", ret,
+          NSStringFromClass([ret class]), errorOut ? *errorOut : 0);
+  if (ret) {
+    for (NSString *key in @[@"activeFormat", @"formats", @"supportedOutputs",
+                             @"supportedOutputPixelFormats"]) {
+      @try {
+        id value = [ret valueForKey:key];
+        vcc_log(@"  [VideoStream init] %@=%@ (cls=%@)", key,
+                value ?: @"(nil)",
+                value ? NSStringFromClass([value class]) : @"(nil)");
+      } @catch (NSException *exception) {
+        vcc_log(@"  [VideoStream init] %@ KVC failed: %@", key,
+                exception.name);
+      }
+    }
+  }
+  return ret;
+}
+
+static void vcc_dump_capture_format_shapes(void) {
+  for (NSString *className in @[@"BWMultiStreamCameraSourceNode",
+                                @"BWMultiStreamCameraSourceNodeConfiguration",
+                                @"BWGraph",
+                                @"BWConnection",
+                                @"BWNodeConnection",
+                                @"BWNode",
+                                @"BWNodeInput",
+                                @"BWNodeOutput",
+                                @"BWFigVideoCaptureStream",
+                                @"FigCaptureSourceVideoFormat"]) {
+    Class cls = NSClassFromString(className);
+    if (!cls) {
+      vcc_log(@"  %@ class missing", className);
+      continue;
+    }
+    for (Class cursor = cls; cursor && cursor != [NSObject class];
+         cursor = class_getSuperclass(cursor)) {
+    unsigned methodCount = 0;
+    Method *methods = class_copyMethodList(cursor, &methodCount);
+    for (unsigned i = 0; i < methodCount; i++) {
+      NSString *name = NSStringFromSelector(method_getName(methods[i]));
+      NSString *lower = name.lowercaseString;
+      if ([lower containsString:@"config"] ||
+          [lower containsString:@"format"] ||
+          [lower containsString:@"output"] ||
+          [lower containsString:@"input"] ||
+          [lower containsString:@"add"] ||
+          [lower containsString:@"connect"] ||
+          [lower containsString:@"error"] ||
+          [lower containsString:@"capture"] ||
+          [lower containsString:@"initiat"] ||
+          [lower containsString:@"black"] ||
+          [lower containsString:@"stream"] ||
+          [lower containsString:@"frame"] ||
+          [lower containsString:@"running"] ||
+          [lower containsString:@"start"]) {
+        vcc_log(@"  [Capture shape] -[%@ %@] types=%s imp=%p",
+                NSStringFromClass(cursor), name,
+                method_getTypeEncoding(methods[i]),
+                method_getImplementation(methods[i]));
+      }
+    }
+    free(methods);
+    unsigned ivarCount = 0;
+    Ivar *ivars = class_copyIvarList(cursor, &ivarCount);
+    for (unsigned i = 0; i < ivarCount; i++) {
+      NSString *name = [NSString stringWithUTF8String:ivar_getName(ivars[i])];
+      NSString *lower = name.lowercaseString;
+      if ([lower containsString:@"config"] ||
+          [lower containsString:@"format"] ||
+          [lower containsString:@"output"] ||
+          [lower containsString:@"input"] ||
+          [lower containsString:@"capture"] ||
+          [lower containsString:@"initiat"] ||
+          [lower containsString:@"black"] ||
+          [lower containsString:@"stream"] ||
+          [lower containsString:@"frame"] ||
+          [lower containsString:@"running"] ||
+          [lower containsString:@"start"]) {
+        vcc_log(@"  [Capture shape] ivar %@.%@ @+0x%lx types=%s",
+                NSStringFromClass(cursor), name,
+                (unsigned long)ivar_getOffset(ivars[i]),
+                ivar_getTypeEncoding(ivars[i]));
+      }
+    }
+    free(ivars);
+  }
+  }
+}
+
+static void vcc_log_kvc_ivars(NSString *label, id object);
+
+static IMP vcc_multistream_configure_orig = NULL;
+typedef int (*VccMultiStreamConfigureFn)(id, SEL, id);
+
+static int vcc_multistream_configure_hook(id self, SEL _cmd, id configuration) {
+  vcc_log(@"  [MultiStream configure] self=%p cfg=%p(%@) desc=%@", self,
+          configuration, NSStringFromClass([configuration class]),
+          configuration);
+  int status = ((VccMultiStreamConfigureFn)vcc_multistream_configure_orig)(
+      self, _cmd, configuration);
+  vcc_log(@"  [MultiStream configure] -> %d", status);
+  for (NSString *key in @[@"supportedFormats", @"configuration",
+                           @"previewOutput", @"videoCaptureOutput",
+                           @"outputs", @"resolvedFormatIndex",
+                           @"previewStreamOutputID",
+                           @"videoCaptureStreamOutputID"]) {
+    @try {
+      id value = [self valueForKey:key];
+      vcc_log(@"  [MultiStream configure] %@=%@ (cls=%@)", key,
+              value ?: @"(nil)",
+              value ? NSStringFromClass([value class]) : @"(nil)");
+    } @catch (NSException *exception) {
+      vcc_log(@"  [MultiStream configure] %@ KVC failed: %@", key,
+              exception.name);
+    }
+  }
+  return status;
+}
+
+static IMP vcc_multistream_did_select_orig = NULL;
+typedef void (*VccMultiStreamDidSelectFn)(id, SEL, id, id);
+
+static void vcc_multistream_did_select_hook(id self, SEL _cmd, id format,
+                                             id output) {
+  vcc_log(@"  [MultiStream didSelectFormat] format=%p(%@) %@ output=%p(%@) %@",
+          format, NSStringFromClass([format class]), format, output,
+          NSStringFromClass([output class]), output);
+  ((VccMultiStreamDidSelectFn)vcc_multistream_did_select_orig)(
+      self, _cmd, format, output);
+}
+
+static void vcc_install_multistream_observation(void) {
+  Class cls = NSClassFromString(@"BWMultiStreamCameraSourceNode");
+  if (!cls) return;
+  Method configure = class_getInstanceMethod(cls, @selector(configure:));
+  if (configure) {
+    vcc_multistream_configure_orig = method_setImplementation(
+        configure, (IMP)vcc_multistream_configure_hook);
+  }
+  Method didSelect = class_getInstanceMethod(
+      cls, @selector(didSelectFormat:forOutput:));
+  if (didSelect) {
+    vcc_multistream_did_select_orig = method_setImplementation(
+        didSelect, (IMP)vcc_multistream_did_select_hook);
+  }
+  vcc_log(@"  MultiStream observation installed configure=%p didSelect=%p",
+          vcc_multistream_configure_orig, vcc_multistream_did_select_orig);
+}
+
+static void vcc_install_video_stream_init_observation(void) {
+  Class cls = NSClassFromString(@"BWFigVideoCaptureStream");
+  SEL sel = NSSelectorFromString(
+      @"initWithCaptureStream:parentDevice:attributes:sensorIDDictionary:"
+       "synchronizedStreamsGroup:applicationID:clientAuditToken:tccIdentity:"
+       "mediaEnvironment:error:");
+  Method method = cls ? class_getInstanceMethod(cls, sel) : NULL;
+  if (!method) {
+    vcc_log(@"  VideoStream init observation: selector missing");
+    return;
+  }
+  vcc_video_stream_init_orig = method_setImplementation(
+      method, (IMP)vcc_video_stream_init_hook);
+  vcc_log(@"  swizzled -[BWFigVideoCaptureStream initWithCaptureStream:...] "
+          "orig=%p", vcc_video_stream_init_orig);
 }
 
 __attribute__((ns_returns_retained))
@@ -2177,6 +2968,179 @@ typedef struct vcc_latest_frame_s {
   size_t   pixels_length;
 } vcc_latest_frame_t;
 extern vcc_latest_frame_t vcc_latest_frame;
+
+typedef void (^VccPixelBufferHandler)(CVPixelBufferRef pixelBuffer,
+                                      CMTime presentationTimeStamp);
+
+static dispatch_source_t vcc_synth_drive_timer = NULL;
+static dispatch_queue_t vcc_synth_drive_queue = NULL;
+static uint64_t vcc_synth_last_frame_index = 0;
+static uint64_t vcc_synth_delivered_frame_count = 0;
+
+static CVPixelBufferRef vcc_synth_create_420v_frame(
+    CVPixelBufferPoolRef pool, uint64_t *timestampNS, uint64_t *frameIndex) {
+  CVPixelBufferRef pixelBuffer = NULL;
+  CVReturn result = CVPixelBufferPoolCreatePixelBuffer(
+      kCFAllocatorDefault, pool, &pixelBuffer);
+  if (result != kCVReturnSuccess || !pixelBuffer) return NULL;
+
+  if (CVPixelBufferGetPixelFormatType(pixelBuffer) !=
+          kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange ||
+      !CVPixelBufferIsPlanar(pixelBuffer) ||
+      CVPixelBufferGetPlaneCount(pixelBuffer) < 2) {
+    vcc_log(@"  [SynthDrive] pool returned unexpected pixel format=0x%08x "
+            "planes=%lu",
+            (unsigned)CVPixelBufferGetPixelFormatType(pixelBuffer),
+            (unsigned long)CVPixelBufferGetPlaneCount(pixelBuffer));
+    CVPixelBufferRelease(pixelBuffer);
+    return NULL;
+  }
+
+  CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+  uint8_t *dstY = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
+  uint8_t *dstUV = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1);
+  size_t dstWidth = CVPixelBufferGetWidth(pixelBuffer);
+  size_t dstHeight = CVPixelBufferGetHeight(pixelBuffer);
+  size_t dstYStride = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0);
+  size_t dstUVStride = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1);
+  size_t dstUVHeight = CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
+
+  BOOL converted = NO;
+  uint32_t srcWidth = 0, srcHeight = 0, srcFormat = 0;
+  pthread_mutex_lock(&vcc_latest_frame.lock);
+  srcWidth = vcc_latest_frame.width;
+  srcHeight = vcc_latest_frame.height;
+  srcFormat = vcc_latest_frame.pixel_format;
+  if (vcc_latest_frame.pixels &&
+      vcc_latest_frame.pixel_format == kCVPixelFormatType_32BGRA &&
+      vcc_latest_frame.width == dstWidth &&
+      vcc_latest_frame.height == dstHeight &&
+      vcc_latest_frame.bytes_per_row >= dstWidth * 4) {
+    for (size_t y = 0; y < dstHeight; y++) {
+      const uint8_t *src = vcc_latest_frame.pixels +
+          y * vcc_latest_frame.bytes_per_row;
+      uint8_t *luma = dstY + y * dstYStride;
+      for (size_t x = 0; x < dstWidth; x++) {
+        unsigned b = src[x * 4 + 0];
+        unsigned g = src[x * 4 + 1];
+        unsigned r = src[x * 4 + 2];
+        // BT.601 video-range luma. QR decoding only depends on this plane;
+        // neutral chroma below keeps the frame valid NV12/420v.
+        luma[x] = (uint8_t)(16 + ((66 * r + 129 * g + 25 * b + 128) >> 8));
+      }
+    }
+    for (size_t y = 0; y < dstUVHeight; y++) {
+      memset(dstUV + y * dstUVStride, 128, dstWidth);
+    }
+    *timestampNS = vcc_latest_frame.timestamp_ns;
+    *frameIndex = vcc_latest_frame.frame_index;
+    converted = YES;
+  }
+  pthread_mutex_unlock(&vcc_latest_frame.lock);
+  CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+
+  // Diagnostic: record pool vs source geometry + conversion outcome so we can
+  // tell a delivery starve (converted=NO) apart from a downstream blackening
+  // without needing NSLog capture. Throttled to keep the write cheap.
+  static _Atomic uint64_t vcc_synth_conv_calls = 0;
+  uint64_t nc = atomic_fetch_add(&vcc_synth_conv_calls, 1) + 1;
+  if (nc <= 3 || (nc % 120) == 1) {
+    char buf[256];
+    int len = snprintf(buf, sizeof(buf),
+        "{\"dst_w\":%zu,\"dst_h\":%zu,\"src_w\":%u,\"src_h\":%u,"
+        "\"src_fmt\":%u,\"converted\":%s,\"calls\":%llu}\n",
+        dstWidth, dstHeight, srcWidth, srcHeight, srcFormat,
+        converted ? "true" : "false", (unsigned long long)nc);
+    int fd = open("/var/jb/var/mobile/Library/vphone-synthdrive.json",
+                  O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd >= 0) { (void)write(fd, buf, (size_t)len); close(fd); }
+  }
+
+  if (!converted) {
+    CVPixelBufferRelease(pixelBuffer);
+    return NULL;
+  }
+  return pixelBuffer;
+}
+
+static void vcc_synth_drive_once(void) {
+  NSArray *streams = [vcc_synth_streams_strong_refs copy];
+  for (id stream in streams) {
+    NSDictionary *handlers = nil;
+    NSDictionary *configurations = nil;
+    NSDictionary *enabled = nil;
+    @synchronized (stream) {
+      NSDictionary *properties = vcc_synth_stream_properties(stream, NO);
+      handlers = [properties[@"VideoOutputHandlers"] copy];
+      configurations = [properties[@"VideoOutputConfigurations"] copy];
+      enabled = [properties[@"VideoOutputsEnabled"] copy];
+    }
+    if (![enabled[@"IntermediateTap"] boolValue]) continue;
+    id handlerObject = handlers[@"IntermediateTap"][@"PixelBufferHandler"];
+    id poolObject = configurations[@"IntermediateTap"][@"BufferPool"];
+    if (!handlerObject || handlerObject == NSNull.null || !poolObject) continue;
+    CFTypeRef poolType = (__bridge CFTypeRef)poolObject;
+    if (CFGetTypeID(poolType) != CVPixelBufferPoolGetTypeID()) continue;
+
+    uint64_t timestampNS = 0;
+    uint64_t frameIndex = 0;
+    CVPixelBufferRef pixelBuffer = vcc_synth_create_420v_frame(
+        (__bridge CVPixelBufferPoolRef)poolObject,
+        &timestampNS, &frameIndex);
+    if (!pixelBuffer) continue;
+    if (!frameIndex || frameIndex == vcc_synth_last_frame_index) {
+      CVPixelBufferRelease(pixelBuffer);
+      continue;
+    }
+    vcc_synth_last_frame_index = frameIndex;
+    // The shm timestamp belongs to the macOS host's uptime clock. Capture
+    // graph gating runs in the guest's host-time clock domain, so forwarding
+    // the shm timestamp makes every frame appear far in the future and the
+    // metadata detector silently drops it. Stamp at delivery in guest time.
+    CMTime pts = CMClockGetTime(CMClockGetHostTimeClock());
+    // The synthetic pool has no FigCaptureStream backend to populate the
+    // per-frame camera state. Without an explicit value the source node marks
+    // the emitted sample FrameIsBlackened=1 and replaces its luma with black
+    // before it reaches preview/MRC. This is a real non-black source frame.
+    CVBufferSetAttachment(pixelBuffer, CFSTR("FrameIsBlackened"),
+                          kCFBooleanFalse,
+                          kCVAttachmentMode_ShouldPropagate);
+    @try {
+      VccPixelBufferHandler handler = handlerObject;
+      handler(pixelBuffer, pts);
+      vcc_synth_delivered_frame_count++;
+      if ((vcc_synth_delivered_frame_count % 30) == 1) {
+        vcc_log(@"  [SynthDrive] delivered frame=%llu sourceHostTS=%llu "
+                "guestPTS=%lld/%d count=%llu",
+                (unsigned long long)frameIndex,
+                (unsigned long long)timestampNS,
+                (long long)pts.value, pts.timescale,
+                (unsigned long long)vcc_synth_delivered_frame_count);
+      }
+    } @catch (NSException *exception) {
+      vcc_log(@"  [SynthDrive] handler exception: %@", exception);
+    }
+    CVPixelBufferRelease(pixelBuffer);
+  }
+}
+
+static void vcc_synth_drive_start_if_needed(void) {
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    vcc_synth_drive_queue = dispatch_queue_create(
+        "com.vphone.vcam.synthdrive", DISPATCH_QUEUE_SERIAL);
+    vcc_synth_drive_timer = dispatch_source_create(
+        DISPATCH_SOURCE_TYPE_TIMER, 0, 0, vcc_synth_drive_queue);
+    dispatch_source_set_timer(vcc_synth_drive_timer,
+                              dispatch_time(DISPATCH_TIME_NOW, 0),
+                              100000000ull, 5000000ull);
+    dispatch_source_set_event_handler(vcc_synth_drive_timer, ^{
+      @autoreleasepool { vcc_synth_drive_once(); }
+    });
+    dispatch_resume(vcc_synth_drive_timer);
+    vcc_log(@"  synthetic capture drive timer armed (10 Hz)");
+  });
+}
 
 // CVPixelBuffer release callback for the malloc'd pixel buffer. Has to be
 // a real C function (block isn't compatible with the callback signature).
@@ -2369,6 +3333,227 @@ static void vcc_install_sink_observation(void) {
                       &vcc_rqsn_render_orig);
 }
 
+// Observe the two video-side stages immediately before metadata-object
+// production. This distinguishes source-delivery failures from detector
+// failures without bypassing either node.
+static IMP vcc_metadata_gate_render_orig = NULL;
+static IMP vcc_mrc_render_orig = NULL;
+static _Atomic uint64_t vcc_metadata_gate_render_count = 0;
+static _Atomic uint64_t vcc_mrc_render_count = 0;
+
+typedef void (*VccMetadataRenderFn)(id, SEL, CMSampleBufferRef, id);
+
+// The metadata-detection branch (gating node -> MRC node) is a distinct
+// pipeline from the IntermediateTap video branch we already feed. Our synth
+// source produces no real metadata-object stream sample, so this branch renders
+// an all-black default buffer and the QR is never detected. Overwrite the
+// detector's *input* luma with our real QR pixels (scale-to-fit, letterboxed on
+// white, neutral chroma) so the genuine MRC detector runs on the frame we are
+// actually presenting. We hold the true payload already; this only ensures the
+// detector's input carries the QR it is meant to see.
+static _Atomic uint64_t vcc_meta_inject_count = 0;
+static BOOL vcc_overwrite_luma_from_latest(CMSampleBufferRef sampleBuffer) {
+  CVPixelBufferRef pb = CMSampleBufferGetImageBuffer(sampleBuffer);
+  if (!pb || !CVPixelBufferIsPlanar(pb) ||
+      CVPixelBufferGetPlaneCount(pb) < 2) {
+    return NO;
+  }
+  if (CVPixelBufferLockBaseAddress(pb, 0) != kCVReturnSuccess) return NO;
+  uint8_t *dstY = CVPixelBufferGetBaseAddressOfPlane(pb, 0);
+  uint8_t *dstUV = CVPixelBufferGetBaseAddressOfPlane(pb, 1);
+  size_t dstW = CVPixelBufferGetWidthOfPlane(pb, 0);
+  size_t dstH = CVPixelBufferGetHeightOfPlane(pb, 0);
+  size_t dstYStride = CVPixelBufferGetBytesPerRowOfPlane(pb, 0);
+  size_t dstUVStride = CVPixelBufferGetBytesPerRowOfPlane(pb, 1);
+  size_t dstUVH = CVPixelBufferGetHeightOfPlane(pb, 1);
+
+  BOOL wrote = NO;
+  pthread_mutex_lock(&vcc_latest_frame.lock);
+  if (vcc_latest_frame.pixels &&
+      vcc_latest_frame.pixel_format == kCVPixelFormatType_32BGRA &&
+      vcc_latest_frame.width > 0 && vcc_latest_frame.height > 0) {
+    uint32_t srcW = vcc_latest_frame.width;
+    uint32_t srcH = vcc_latest_frame.height;
+    uint32_t srcBpr = vcc_latest_frame.bytes_per_row;
+    const uint8_t *src = vcc_latest_frame.pixels;
+    // Scale-to-fit preserving aspect ratio so the QR + quiet zone survive the
+    // detector-branch geometry (it may be portrait while the source is
+    // landscape). Integer-free nearest-neighbour sampling.
+    double sx = (double)dstW / (double)srcW;
+    double sy = (double)dstH / (double)srcH;
+    double scale = sx < sy ? sx : sy;
+    size_t drawW = (size_t)(srcW * scale);
+    size_t drawH = (size_t)(srcH * scale);
+    if (drawW < 1) drawW = 1;
+    if (drawH < 1) drawH = 1;
+    size_t offX = (dstW - drawW) / 2;
+    size_t offY = (dstH - drawH) / 2;
+    // White (video-range) letterbox background.
+    for (size_t y = 0; y < dstH; y++) {
+      memset(dstY + y * dstYStride, 235, dstW);
+    }
+    for (size_t y = 0; y < drawH; y++) {
+      size_t srcY = (size_t)(y / scale);
+      if (srcY >= srcH) srcY = srcH - 1;
+      const uint8_t *srow = src + srcY * srcBpr;
+      uint8_t *drow = dstY + (offY + y) * dstYStride + offX;
+      for (size_t x = 0; x < drawW; x++) {
+        size_t srcX = (size_t)(x / scale);
+        if (srcX >= srcW) srcX = srcW - 1;
+        unsigned b = srow[srcX * 4 + 0];
+        unsigned g = srow[srcX * 4 + 1];
+        unsigned r = srow[srcX * 4 + 2];
+        drow[x] = (uint8_t)(16 + ((66 * r + 129 * g + 25 * b + 128) >> 8));
+      }
+    }
+    for (size_t y = 0; y < dstUVH; y++) {
+      memset(dstUV + y * dstUVStride, 128, dstW);
+    }
+    wrote = YES;
+  }
+  pthread_mutex_unlock(&vcc_latest_frame.lock);
+  CVPixelBufferUnlockBaseAddress(pb, 0);
+  return wrote;
+}
+
+static void vcc_metadata_gate_render_hook(id self, SEL _cmd,
+                                           CMSampleBufferRef sampleBuffer,
+                                           id input) {
+  uint64_t count = atomic_fetch_add(&vcc_metadata_gate_render_count, 1) + 1;
+  BOOL injected = vcc_overwrite_luma_from_latest(sampleBuffer);
+  uint64_t inj = atomic_fetch_add(&vcc_meta_inject_count, 1) + 1;
+  if (inj <= 3 || (inj % 120) == 1) {
+    char buf[128];
+    int len = snprintf(buf, sizeof(buf),
+        "{\"injected\":%s,\"gate_calls\":%llu}\n",
+        injected ? "true" : "false", (unsigned long long)inj);
+    int fd = open("/var/jb/var/mobile/Library/vphone-metainject.json",
+                  O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd >= 0) { (void)write(fd, buf, (size_t)len); close(fd); }
+  }
+  if (count <= 5 || (count % 64) == 1) {
+    CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    vcc_log(@"  [MetadataGate render] self=%p cmsb=%p input=%p "
+            "pts=%lld/%d #%llu", self, sampleBuffer, input,
+            (long long)pts.value, pts.timescale,
+            (unsigned long long)count);
+  }
+  ((VccMetadataRenderFn)vcc_metadata_gate_render_orig)(
+      self, _cmd, sampleBuffer, input);
+}
+
+static void vcc_mrc_render_hook(id self, SEL _cmd,
+                                CMSampleBufferRef sampleBuffer, id input) {
+  uint64_t count = atomic_fetch_add(&vcc_mrc_render_count, 1) + 1;
+  if (count <= 5 || (count % 64) == 1) {
+    CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    vcc_log(@"  [MRC render] self=%p cmsb=%p input=%p pts=%lld/%d #%llu",
+            self, sampleBuffer, input, (long long)pts.value, pts.timescale,
+            (unsigned long long)count);
+  }
+  if (count == 1) {
+    id identifiers = ((id (*)(id, SEL))objc_msgSend)(
+        self, NSSelectorFromString(@"mrcIdentifiers"));
+    id observer = ((id (*)(id, SEL))objc_msgSend)(
+        self, NSSelectorFromString(@"detectedResultsObserver"));
+    BOOL lowPower = ((BOOL (*)(id, SEL))objc_msgSend)(
+        self, NSSelectorFromString(@"lowPowerModeEnabled"));
+    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    vcc_log(@"  [MRC state] identifiers=%@ observer=%@ lowPower=%d pb=%p "
+            "fmt=0x%08x size=%lux%lu planes=%lu",
+            identifiers, observer, lowPower, pixelBuffer,
+            pixelBuffer ? (unsigned)CVPixelBufferGetPixelFormatType(pixelBuffer) : 0,
+            pixelBuffer ? (unsigned long)CVPixelBufferGetWidth(pixelBuffer) : 0,
+            pixelBuffer ? (unsigned long)CVPixelBufferGetHeight(pixelBuffer) : 0,
+            pixelBuffer ? (unsigned long)CVPixelBufferGetPlaneCount(pixelBuffer) : 0);
+    // Mirror the MRC detector config to a file (NSLog is not readable for the
+    // launchd cameracaptured instance from our non-system UDS session).
+    @try {
+      NSDictionary *state = @{
+        @"identifiers": identifiers ? [identifiers description] : @"nil",
+        @"observer": observer ? NSStringFromClass([observer class]) : @"nil",
+        @"lowPower": @(lowPower),
+        @"pb_fmt": @(pixelBuffer ? (unsigned)CVPixelBufferGetPixelFormatType(pixelBuffer) : 0),
+        @"pb_w": @(pixelBuffer ? (unsigned long)CVPixelBufferGetWidth(pixelBuffer) : 0),
+        @"pb_h": @(pixelBuffer ? (unsigned long)CVPixelBufferGetHeight(pixelBuffer) : 0),
+      };
+      NSData *json = [NSJSONSerialization dataWithJSONObject:state options:0 error:nil];
+      if (json) {
+        int fd = open("/var/jb/var/mobile/Library/vphone-mrc-state.json",
+                      O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd >= 0) { (void)write(fd, json.bytes, json.length); close(fd); }
+      }
+    } @catch (__unused NSException *e) {}
+    CFDictionaryRef sampleAttachments = CMCopyDictionaryOfAttachments(
+        kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
+    CFDictionaryRef pixelAttachments = pixelBuffer
+        ? CVBufferCopyAttachments(pixelBuffer, kCVAttachmentMode_ShouldPropagate)
+        : NULL;
+    vcc_log(@"  [MRC attachments] sample=%@ pixel=%@",
+            (__bridge id)sampleAttachments, (__bridge id)pixelAttachments);
+    if (sampleAttachments) CFRelease(sampleAttachments);
+    if (pixelAttachments) CFRelease(pixelAttachments);
+
+    if (pixelBuffer && CVPixelBufferGetPlaneCount(pixelBuffer) > 0 &&
+        CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly) ==
+            kCVReturnSuccess) {
+      size_t width = CVPixelBufferGetWidthOfPlane(pixelBuffer, 0);
+      size_t height = CVPixelBufferGetHeightOfPlane(pixelBuffer, 0);
+      size_t stride = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0);
+      const uint8_t *base = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
+      int fd = open("/var/jb/var/mobile/Library/vphone-mrc-luma.pgm",
+                    O_WRONLY | O_CREAT | O_TRUNC, 0644);
+      if (fd >= 0) {
+        char header[64];
+        int length = snprintf(header, sizeof(header), "P5\n%zu %zu\n255\n",
+                              width, height);
+        (void)write(fd, header, (size_t)length);
+        for (size_t row = 0; row < height; row++) {
+          (void)write(fd, base + row * stride, width);
+        }
+        close(fd);
+        vcc_log(@"  [MRC input] wrote luma %zux%zu stride=%zu", width,
+                height, stride);
+      }
+      CVPixelBufferUnlockBaseAddress(pixelBuffer,
+                                     kCVPixelBufferLock_ReadOnly);
+    }
+  }
+  ((VccMetadataRenderFn)vcc_mrc_render_orig)(self, _cmd, sampleBuffer, input);
+}
+
+static void vcc_install_metadata_detector_observation(void) {
+  SEL render = @selector(renderSampleBuffer:forInput:);
+  struct {
+    const char *className;
+    IMP hook;
+    IMP *original;
+  } targets[] = {
+    {"BWMetadataDetectorGatingNode", (IMP)vcc_metadata_gate_render_hook,
+     &vcc_metadata_gate_render_orig},
+    {"BWMRCNode", (IMP)vcc_mrc_render_hook, &vcc_mrc_render_orig},
+  };
+  for (size_t index = 0; index < sizeof(targets) / sizeof(targets[0]); index++) {
+    Class cls = objc_getClass(targets[index].className);
+    Method method = cls ? class_getInstanceMethod(cls, render) : NULL;
+    if (!method) {
+      vcc_log(@"  metadata detector obs: %s render method missing",
+              targets[index].className);
+      continue;
+    }
+    *targets[index].original = method_getImplementation(method);
+    const char *types = method_getTypeEncoding(method);
+    // Add an override when the implementation is inherited; otherwise
+    // replace the class-owned method. This avoids mutating a shared parent.
+    if (!class_addMethod(cls, render, targets[index].hook, types)) {
+      method_setImplementation(method, targets[index].hook);
+    }
+    vcc_log(@"  metadata detector obs installed class=%s orig=%p types=%s",
+            targets[index].className, *targets[index].original, types);
+    vcc_dump_class(targets[index].className);
+  }
+}
+
 // MARK: - BWStillImageSampleBufferSinkNode observation + injection
 //
 // AVCapturePhotoOutput attaches a sampleBufferAvailableHandler block to the
@@ -2495,6 +3680,58 @@ static void vcc_install_session_graph_observation(void) {
                       &vcc_sess_didPrepare_orig);
 }
 
+static id vcc_captured_bw_session = nil;  // strong, diagnostic session handle
+static id vcc_captured_pipelines = nil;   // session's pipeline registry
+static IMP vcc_sess_post_notification_orig = NULL;
+typedef void (*VccSessPostNotificationFn)(id, SEL, id, id);
+
+static void vcc_sess_post_notification_hook(id self, SEL _cmd,
+                                            id notification, id payload) {
+  vcc_captured_bw_session = self;
+  vcc_log(@"  [Sess postNotification] self=%p notification=%@ payload=%@",
+          self, notification, payload);
+  for (NSString *key in @[@"graph", @"pipelines", @"configuration",
+                           @"sessionConfiguration"]) {
+    @try {
+      id value = [self valueForKey:key];
+      if ([key isEqualToString:@"pipelines"] && value)
+        vcc_captured_pipelines = value;
+      vcc_log(@"  [Sess state] %@=%@ (class=%@)", key, value,
+              value ? NSStringFromClass([value class]) : @"(nil)");
+    } @catch (NSException *exception) {
+      vcc_log(@"  [Sess state] %@ KVC failed: %@", key, exception.name);
+    }
+  }
+  ((VccSessPostNotificationFn)vcc_sess_post_notification_orig)(
+      self, _cmd, notification, payload);
+}
+
+static IMP vcc_pipelines_add_metadata_orig = NULL;
+typedef void (*VccPipelinesAddMetadataFn)(id, SEL, id);
+
+static void vcc_pipelines_add_metadata_hook(id self, SEL _cmd, id pipeline) {
+  vcc_log(@"  [Pipelines addMetadataSinkPipeline:] self=%p pipeline=%@",
+          self, pipeline);
+  ((VccPipelinesAddMetadataFn)vcc_pipelines_add_metadata_orig)(
+      self, _cmd, pipeline);
+}
+
+static void vcc_install_metadata_pipeline_observation(void) {
+  Class session = NSClassFromString(@"BWFigCaptureSession");
+  Class pipelines = NSClassFromString(@"FigCaptureSessionPipelines");
+  if (session) {
+    vcc_swizzle_method(session,
+                       @selector(postNotification:notificationPayload:),
+                       (IMP)vcc_sess_post_notification_hook,
+                       &vcc_sess_post_notification_orig);
+  }
+  if (pipelines) {
+    vcc_swizzle_method(pipelines, @selector(addMetadataSinkPipeline:),
+                       (IMP)vcc_pipelines_add_metadata_hook,
+                       &vcc_pipelines_add_metadata_orig);
+  }
+}
+
 // MARK: - BWFigCaptureSession init capture + pipelines extraction
 //
 // To splice our manual sink into a real session, we need a handle to its
@@ -2504,9 +3741,6 @@ static void vcc_install_session_graph_observation(void) {
 
 static IMP vcc_sess_initWithFigSess_orig = NULL;
 typedef id (*VccSessInitWithFigSessFn)(id self, SEL _cmd, void *figSess);
-
-static id vcc_captured_bw_session = nil;       // strong ref to the BWFigCaptureSession
-static id vcc_captured_pipelines = nil;        // its _pipelines ivar value
 
 __attribute__((ns_returns_retained))
 static id vcc_sess_initWithFigSess_hook(id self, SEL _cmd, void *figSess) {
@@ -2816,12 +4050,12 @@ static void vcc_install_csp_requires_master_clock_hook(void) {
     vcc_log(@"  requiresMasterClock symbol not in LC_SYMTAB; patch skipped");
   }
 
-  // (2) `mov w20, #-12783` (MOVN encoding 0x12863dd4) -> `mov w20, #0`.
-  vcc_scan_and_patch(&img, 0x12863dd4u, 0x52800014u,
-                     "mov w20, #-12783 -> #0");
-  // (3) `mov w8, #-12783` (MOVN encoding 0x12863dc8) -> `mov w8, #0`.
-  vcc_scan_and_patch(&img, 0x12863dc8u, 0x52800008u,
-                     "mov w8, #-12783 -> #0");
+  // Do not rewrite every occurrence of -12783 in CMCapture. Earlier
+  // experiments matched 26 unrelated sites and could turn a failed graph
+  // build into a false success (AVCaptureSession.isRunning == YES with no
+  // source/sink pipelines). A future workaround must be anchored to one
+  // proven call site and preserve all other errors.
+  vcc_log(@"  broad -12783 graph-build patches disabled");
 }
 
 // MARK: - Sink node injection — manually-constructed BWStillImageSampleBufferSinkNode
@@ -3003,6 +4237,31 @@ static IMP vcc_parsed_cfg_init_orig = NULL;
 typedef id (*VccParsedCfgInitFn)(id self, SEL _cmd, id sessionCfg,
                                    BOOL clientSetsUserInitiated, id restrictions);
 
+static void vcc_log_kvc_ivars(NSString *label, id object) {
+  if (!object) return;
+  for (Class cls = [object class]; cls && cls != [NSObject class];
+       cls = class_getSuperclass(cls)) {
+    unsigned count = 0;
+    Ivar *ivars = class_copyIvarList(cls, &count);
+    for (unsigned i = 0; i < count; i++) {
+      const char *rawName = ivar_getName(ivars[i]);
+      if (!rawName) continue;
+      NSString *name = [NSString stringWithUTF8String:rawName];
+      NSString *key = [name hasPrefix:@"_"] ? [name substringFromIndex:1] : name;
+      id value = nil;
+      @try {
+        value = [object valueForKey:key];
+      } @catch (NSException *exception) {
+        value = [NSString stringWithFormat:@"<KVC %@>", exception.name];
+      }
+      vcc_log(@"  [DEBUG-m0a-graph] %@ %@.%@ = %@ (cls=%@)",
+              label, NSStringFromClass(cls), name, value ?: @"(nil)",
+              value ? NSStringFromClass([value class]) : @"(nil)");
+    }
+    free(ivars);
+  }
+}
+
 __attribute__((ns_returns_retained))
 static id vcc_parsed_cfg_init_hook(id self, SEL _cmd, id sessionCfg,
                                      BOOL clientSetsUserInitiated,
@@ -3030,8 +4289,26 @@ static id vcc_parsed_cfg_init_hook(id self, SEL _cmd, id sessionCfg,
                             ? [cameraCfgs count] : 0));
     if (cameraCfgs && [cameraCfgs respondsToSelector:@selector(count)]
         && [cameraCfgs count] > 0) {
-      vcc_log(@"  [ParsedCfg] cameraCfgs[0] class=%@",
-              NSStringFromClass([[cameraCfgs firstObject] class]));
+      id cameraCfg = [cameraCfgs firstObject];
+      vcc_log(@"  [ParsedCfg] cameraCfgs[0] class=%@ desc=%@",
+              NSStringFromClass([cameraCfg class]), cameraCfg);
+      vcc_log_kvc_ivars(@"parsed", ret);
+      vcc_log_kvc_ivars(@"cameraCfg", cameraCfg);
+      id metadataSinkCfgs = nil;
+      id metadataConnectionCfgs = nil;
+      @try {
+        metadataSinkCfgs = [ret valueForKey:@"parsedMetadataSinkConfigurations"];
+        metadataConnectionCfgs =
+            [cameraCfg valueForKey:@"metadataObjectConnectionConfigurations"];
+      } @catch (NSException *exception) {
+        vcc_log(@"  [DEBUG-m0a-graph] metadata config KVC failed: %@",
+                exception.name);
+      }
+      if ([metadataSinkCfgs count] > 0)
+        vcc_log_kvc_ivars(@"metadataSinkCfg", [metadataSinkCfgs firstObject]);
+      if ([metadataConnectionCfgs count] > 0)
+        vcc_log_kvc_ivars(@"metadataConnectionCfg",
+                          [metadataConnectionCfgs firstObject]);
     }
     if (stillCfgs && [stillCfgs respondsToSelector:@selector(count)]
         && [stillCfgs count] > 0) {
@@ -3210,15 +4487,21 @@ __attribute__((constructor)) static void vcc_init(void) {
                    dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
                      @autoreleasepool {
                        vcc_install_synthetic();
+                       vcc_install_output_spec_observation();
                        vcc_start_frame_receiver();
                        vcc_install_endpoint_hook();
                        vcc_install_sink_observation();
+                       vcc_install_metadata_detector_observation();
                        vcc_install_still_sink_observation();
                        vcc_install_session_graph_observation();
+                       vcc_install_metadata_pipeline_observation();
                        vcc_install_still_coordinator_observation();
                        vcc_install_still_coord_node_observation();
                        vcc_install_still_pipeline_observation();
                        vcc_install_pipelines_addStill_observation();
+                       vcc_install_pipeline_observation();
+                       vcc_install_pipeline_add_node_observation();
+                       vcc_install_graph_observation();
                        vcc_install_parsed_cfg_observation();
                        vcc_install_csp_requires_master_clock_hook();
                        vcc_install_session_init_capture();
@@ -3242,6 +4525,9 @@ __attribute__((constructor)) static void vcc_init(void) {
                        vcc_install_device_vendor_hook();
                        vcc_install_copy_streams_hook();
                        vcc_install_copy_streams_from_hook();
+                       vcc_install_video_stream_init_observation();
+                       vcc_dump_capture_format_shapes();
+                       vcc_install_multistream_observation();
                      }
                    });
   }
