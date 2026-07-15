@@ -2729,6 +2729,16 @@ static id vcc_video_stream_init_hook(id self, SEL _cmd, id captureStream,
   if (ret) {
     for (NSString *key in @[@"activeFormat", @"formats", @"supportedOutputs",
                              @"supportedOutputPixelFormats"]) {
+      // Do NOT rely on @try/@catch here. In this injected arm64e dylib the ObjC
+      // exception unwind faults (SIGBUS, KERN_PROTECTION_FAILURE) instead of
+      // landing in @catch, so a KVC miss on stream classes that lack one of
+      // these keys crashed cameracaptured on essentially every scanner
+      // camera-open (all recent .ips share this exact frame). Gate on
+      // respondsToSelector: so valueForUndefinedKey: is never raised at all.
+      if (![ret respondsToSelector:NSSelectorFromString(key)]) {
+        vcc_log(@"  [VideoStream init] %@ absent (no getter)", key);
+        continue;
+      }
       @try {
         id value = [ret valueForKey:key];
         vcc_log(@"  [VideoStream init] %@=%@ (cls=%@)", key,
@@ -3376,16 +3386,59 @@ static BOOL vcc_overwrite_luma_from_latest(CMSampleBufferRef sampleBuffer) {
     uint32_t srcH = vcc_latest_frame.height;
     uint32_t srcBpr = vcc_latest_frame.bytes_per_row;
     const uint8_t *src = vcc_latest_frame.pixels;
-    // Scale-to-fit preserving aspect ratio so the QR + quiet zone survive the
-    // detector-branch geometry (it may be portrait while the source is
-    // landscape). Integer-free nearest-neighbour sampling.
-    double sx = (double)dstW / (double)srcW;
-    double sy = (double)dstH / (double)srcH;
-    double scale = sx < sy ? sx : sy;
-    size_t drawW = (size_t)(srcW * scale);
-    size_t drawH = (size_t)(srcH * scale);
+    // The source still frame (render_qr_frame) is a *landscape* 1280x720 white
+    // canvas with a centered square QR that itself only fills ~64% of its own
+    // square (big quiet margin). Letterboxing the whole source, or even its
+    // center square, leaves the QR at ~30-64% of the detector frame -> few
+    // pixels/module for the espresso MRC neural detector. Instead find the QR's
+    // dark-pixel bounding box, square it up, add a quiet-zone margin, and scale
+    // that tight crop to fill the detector frame's shorter dimension, centered.
+    // Maximises pixels-per-module while preserving the required quiet zone.
+    uint32_t minX = srcW, minY = srcH, maxX = 0, maxY = 0;
+    for (uint32_t yy = 0; yy < srcH; yy++) {
+      const uint8_t *srow = src + yy * srcBpr;
+      for (uint32_t xx = 0; xx < srcW; xx++) {
+        unsigned b = srow[xx * 4 + 0];
+        unsigned g = srow[xx * 4 + 1];
+        unsigned r = srow[xx * 4 + 2];
+        unsigned luma = (66 * r + 129 * g + 25 * b + 128) >> 8;
+        if (luma < 96) {
+          if (xx < minX) minX = xx;
+          if (xx > maxX) maxX = xx;
+          if (yy < minY) minY = yy;
+          if (yy > maxY) maxY = yy;
+        }
+      }
+    }
+    uint32_t cropX, cropY, cropSide;
+    uint32_t maxSide = srcW < srcH ? srcW : srcH;
+    if (maxX >= minX && maxY >= minY) {
+      uint32_t bw = maxX - minX + 1, bh = maxY - minY + 1;
+      uint32_t bside = bw > bh ? bw : bh;
+      uint32_t want = bside + (bside / 4);          // ~12.5% quiet zone each side
+      if (want > maxSide) want = maxSide;
+      cropSide = want;
+      uint32_t cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+      int32_t sx = (int32_t)cx - (int32_t)(cropSide / 2);
+      int32_t sy = (int32_t)cy - (int32_t)(cropSide / 2);
+      if (sx < 0) sx = 0;
+      if (sy < 0) sy = 0;
+      if ((uint32_t)sx + cropSide > srcW) sx = (int32_t)(srcW - cropSide);
+      if ((uint32_t)sy + cropSide > srcH) sy = (int32_t)(srcH - cropSide);
+      cropX = (uint32_t)sx;
+      cropY = (uint32_t)sy;
+    } else {
+      cropSide = maxSide;                            // no dark pixels -> center square
+      cropX = (srcW - cropSide) / 2;
+      cropY = (srcH - cropSide) / 2;
+    }
+    double scale = (double)(dstW < dstH ? dstW : dstH) / (double)cropSide;
+    size_t drawW = (size_t)(cropSide * scale);
+    size_t drawH = (size_t)(cropSide * scale);
     if (drawW < 1) drawW = 1;
     if (drawH < 1) drawH = 1;
+    if (drawW > dstW) drawW = dstW;
+    if (drawH > dstH) drawH = dstH;
     size_t offX = (dstW - drawW) / 2;
     size_t offY = (dstH - drawH) / 2;
     // White (video-range) letterbox background.
@@ -3393,12 +3446,12 @@ static BOOL vcc_overwrite_luma_from_latest(CMSampleBufferRef sampleBuffer) {
       memset(dstY + y * dstYStride, 235, dstW);
     }
     for (size_t y = 0; y < drawH; y++) {
-      size_t srcY = (size_t)(y / scale);
+      size_t srcY = cropY + (size_t)(y / scale);
       if (srcY >= srcH) srcY = srcH - 1;
       const uint8_t *srow = src + srcY * srcBpr;
       uint8_t *drow = dstY + (offY + y) * dstYStride + offX;
       for (size_t x = 0; x < drawW; x++) {
-        size_t srcX = (size_t)(x / scale);
+        size_t srcX = cropX + (size_t)(x / scale);
         if (srcX >= srcW) srcX = srcW - 1;
         unsigned b = srow[srcX * 4 + 0];
         unsigned g = srow[srcX * 4 + 1];
