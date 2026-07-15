@@ -341,6 +341,8 @@ static void process_message(int fd, NSDictionary *msg, uint64_t mySession) {
     resp = vp_handle_accessibility_command(msg);
   } else if ([t isEqualToString:@"low_power_mode"]) {
     resp = vp_handle_notify_command(msg);
+  } else if ([t isEqualToString:@"vcam_status"]) {
+    resp = vp_vcam_status(msg);
   } else {
     resp = handle_command(msg);
   }
@@ -425,6 +427,7 @@ static BOOL handle_client(int fd) {
     if (vp_shell_path() != NULL)
       [caps addObject:@"shell"];
     [caps addObject:@"touch"];
+    [caps addObject:@"vcam_status"];
 
     NSMutableDictionary *helloResp = [@{
       @"v" : @PROTOCOL_VERSION,

@@ -62,6 +62,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 // MARK: - shared frame layout (matches vphoned_vcam.h)
@@ -75,11 +76,15 @@
 #define VCC_SHM_PATH                                                           \
   "/var/jb/var/mobile/Library/vphone-vcam-frame.shm"
 #define VCC_NOTIFY_NAME "com.vphone.vcam.frame"
-#define VCC_SHM_HEADER_SIZE 64
+#define VCC_SHM_HEADER_SIZE 256
 #define VCC_SHM_MAX_PIXELS (8 * 1024 * 1024)
 #define VCC_SHM_TOTAL_SIZE                                                     \
   (VCC_SHM_HEADER_SIZE + VCC_SHM_MAX_PIXELS)
+#define VCC_GENERATION_MAX 80
 
+// Mirrors vphoned_vcam_shm_header_t (protocol v2). The publish header now
+// carries the frame's generation + published_at_ns so the observe half can
+// bind an observed frame to the exact generation the host polls for.
 typedef struct __attribute__((packed)) {
   uint64_t seq;
   uint32_t width;
@@ -91,7 +96,23 @@ typedef struct __attribute__((packed)) {
   uint64_t frame_index;
   uint32_t pixels_length;
   uint32_t _pad;
+  uint64_t published_at_ns;
+  char     generation[VCC_GENERATION_MAX];
 } vcc_shm_header_t;
+
+// Observe shm — written here (we own it), read by vphoned to answer the
+// host `vcam_status`. Mirrors vphoned_vcam_observe_header_t.
+#define VCC_OBSERVE_SHM_PATH                                                   \
+  "/var/jb/var/mobile/Library/vphone-vcam-observe.shm"
+#define VCC_OBSERVE_SHM_SIZE 128
+
+typedef struct __attribute__((packed)) {
+  uint64_t seq;
+  uint64_t observed_frame_index;
+  uint64_t observed_at_ns;
+  uint64_t observed_count;
+  char     observed_generation[VCC_GENERATION_MAX];
+} vcc_observe_header_t;
 
 // MARK: - sentinel logging
 
@@ -4419,6 +4440,71 @@ static const uint8_t *vcc_shm_base = NULL;
 static uint64_t vcc_last_seq_seen = 0;
 static uint64_t vcc_frames_received = 0;
 
+// MARK: - observe shm writer
+
+static uint8_t *vcc_observe_base = NULL;
+static uint64_t vcc_observe_count = 0;
+
+static uint64_t vcc_monotonic_ns(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
+  return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
+
+// Lazily create + map the observe shm read-write (we own it). Idempotent.
+static void vcc_observe_map(void) {
+  if (vcc_observe_base) return;
+  int fd = open(VCC_OBSERVE_SHM_PATH, O_RDWR | O_CREAT, 0644);
+  if (fd < 0) {
+    vcc_log(@"  observe open(%s) failed: %s", VCC_OBSERVE_SHM_PATH,
+            strerror(errno));
+    return;
+  }
+  if (ftruncate(fd, VCC_OBSERVE_SHM_SIZE) < 0) {
+    vcc_log(@"  observe ftruncate failed: %s", strerror(errno));
+    close(fd);
+    return;
+  }
+  fchmod(fd, 0644);
+  void *base = mmap(NULL, VCC_OBSERVE_SHM_SIZE, PROT_READ | PROT_WRITE,
+                    MAP_SHARED, fd, 0);
+  close(fd);
+  if (base == MAP_FAILED) {
+    vcc_log(@"  observe mmap failed: %s", strerror(errno));
+    return;
+  }
+  memset(base, 0, VCC_OBSERVE_SHM_SIZE);
+  vcc_observe_base = (uint8_t *)base;
+  vcc_log(@"  observe shm mapped %s -> %p", VCC_OBSERVE_SHM_PATH,
+          vcc_observe_base);
+}
+
+// Publish an observe record for a frame we just copied out of the frame shm.
+// seq even/odd discipline so vphoned reads a stable snapshot.
+static void vcc_observe_write(uint64_t frame_index, const char *generation) {
+  if (!vcc_observe_base) vcc_observe_map();
+  if (!vcc_observe_base) return;
+  vcc_observe_header_t *oh = (vcc_observe_header_t *)vcc_observe_base;
+
+  uint64_t prev = atomic_load_explicit(
+      (_Atomic uint64_t *)&oh->seq, memory_order_acquire);
+  uint64_t writing = (prev | 1ull) + 2ull;
+  atomic_store_explicit((_Atomic uint64_t *)&oh->seq, writing,
+                        memory_order_release);
+
+  oh->observed_frame_index = frame_index;
+  oh->observed_at_ns = vcc_monotonic_ns();
+  oh->observed_count = ++vcc_observe_count;
+  memset(oh->observed_generation, 0, VCC_GENERATION_MAX);
+  if (generation && generation[0]) {
+    size_t glen = strnlen(generation, VCC_GENERATION_MAX - 1);
+    memcpy(oh->observed_generation, generation, glen);
+  }
+
+  atomic_store_explicit((_Atomic uint64_t *)&oh->seq, writing + 1ull,
+                        memory_order_release);
+}
+
 static int vcc_shm_map(void) {
   int fd = open(VCC_SHM_PATH, O_RDONLY);
   if (fd < 0) {
@@ -4461,6 +4547,9 @@ static int vcc_shm_read_latest(void) {
   uint64_t ts  = hdr->timestamp_ns;
   uint64_t idx = hdr->frame_index;
   uint32_t pix_len = hdr->pixels_length;
+  char gen[VCC_GENERATION_MAX];
+  memcpy(gen, hdr->generation, VCC_GENERATION_MAX);
+  gen[VCC_GENERATION_MAX - 1] = '\0';
 
   if (pix_len == 0 || pix_len > VCC_SHM_MAX_PIXELS) return 0;
   if (w == 0 || h == 0 || bpr == 0 || pix_len < (size_t)bpr * h) return 0;
@@ -4494,10 +4583,14 @@ static int vcc_shm_read_latest(void) {
 
   vcc_last_seq_seen = seq_a;
   vcc_frames_received++;
+  // Report the observe half of the two-level transport receipt: this frame
+  // (by monotonic frame_index + its generation) was genuinely consumed out
+  // of the publish shm. vphoned reads this to answer host `vcam_status`.
+  vcc_observe_write(idx, gen);
   if ((vcc_frames_received & 29) == 1) {
-    vcc_log(@"  shm frame #%llu (idx=%llu) w=%u h=%u bpr=%u fmt=0x%08x",
+    vcc_log(@"  shm frame #%llu (idx=%llu gen=%s) w=%u h=%u bpr=%u fmt=0x%08x",
             (unsigned long long)vcc_frames_received,
-            (unsigned long long)idx, w, h, bpr, fmt);
+            (unsigned long long)idx, gen[0] ? gen : "-", w, h, bpr, fmt);
   }
   return 1;
 }
