@@ -41,19 +41,30 @@
 #define SHM_PATH "/var/jb/var/mobile/Library/vphone-vcam-frame.shm"
 #define VCAM_UID @"vphone:vcam:0"
 
-#define CFX_SHM_HEADER_SIZE 64
-typedef struct __attribute__((packed)) {
+// Mirror of vphoned_vcam_shm_header_t in scripts/vphoned/vphoned_vcam.h. The
+// producer (vphoned) writes this file; libvcamcaptured and libcamfix both read
+// it, so the three definitions must stay byte-for-byte identical. This is the
+// v2 256-byte layout: natural alignment (no packing) and pixels start at 256.
+#define CFX_SHM_HEADER_SIZE 256
+#define CFX_SHM_GENERATION_MAX 80
+#define CFX_SHM_ROLE_MAX 16
+typedef struct {
   uint64_t seq;
+  uint64_t timestamp_ns;
+  uint64_t frame_index;
+  uint64_t published_at_ns;
   uint32_t width;
   uint32_t height;
   uint32_t bytes_per_row;
   uint32_t pixel_format;
-  uint32_t _reserved;
-  uint64_t timestamp_ns;
-  uint64_t frame_index;
+  uint32_t protocol_version;
   uint32_t pixels_length;
-  uint32_t _pad;
+  char generation[CFX_SHM_GENERATION_MAX];
+  char role[CFX_SHM_ROLE_MAX];
+  uint8_t _reserved[104];
 } cfx_shm_header_t;
+_Static_assert(sizeof(cfx_shm_header_t) == CFX_SHM_HEADER_SIZE,
+               "cfx shm header size drift vs vphoned_vcam_shm_header_t");
 
 static void cfxlog(NSString *fmt, ...) {
   va_list ap; va_start(ap, fmt);
@@ -823,17 +834,6 @@ static void cfx_drive_metadata_once(void) {
     id connection = nil;
     @try { connection = [[output connections] firstObject]; }
     @catch (NSException *e) {}
-    // [DEBUG-m0a-delegate] Temporary runtime identity probe. Remove after the
-    // observation-only hook is aligned with the delegate actually consuming
-    // the synthetic metadata callback.
-    Class actualClass = object_getClass(delegate);
-    Method actualMethod = class_getInstanceMethod(actualClass, callback);
-    Class fixedClass = NSClassFromString(@"SKScanScheduleVC");
-    Method fixedMethod = fixedClass ? class_getInstanceMethod(fixedClass, callback) : NULL;
-    cfxlog(@"[DEBUG-m0a-delegate] output=%p delegate=%p class=%s actual_imp=%p fixed_imp=%p",
-           output, delegate, class_getName(actualClass),
-           actualMethod ? method_getImplementation(actualMethod) : NULL,
-           fixedMethod ? method_getImplementation(fixedMethod) : NULL);
     // Fence before dispatch: the delegate can synchronously stop/reconfigure
     // its session, while the 5 Hz driver continues observing new shm frames.
     // Marking the window consumed first guarantees at-most-once delivery.

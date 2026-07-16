@@ -551,6 +551,14 @@ half. Host `camera_present` therefore fails closed (and stops the source) until
 both levels acknowledge the requested generation; a mismatched generation
 cannot stop the owner.
 
+`libcamfix` reads the same `vphone-vcam-frame.shm` to synthesize capture
+samples and decode QR for scanner apps, so it is a third consumer of this
+header and mirrors the identical naturally aligned 256-byte layout (pixels at
+offset 256). All three definitions — `vphoned_vcam_shm_header_t`,
+`vcc_shm_header_t`, and `cfx_shm_header_t` — must stay byte-for-byte identical;
+each carries a `_Static_assert` on the 256-byte size to catch drift at compile
+time.
+
 Live validation on vm-2607 (2026-07-14) observed matching publish/observe frame
 indices and `observed_at_ns >= published_at_ns`; an old-generation status query
 returned no receipt, a wrong-owner stop was rejected, and a receipt-backed
