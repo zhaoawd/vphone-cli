@@ -35,6 +35,7 @@
  */
 
 #import <CoreFoundation/CoreFoundation.h>
+#import <CoreGraphics/CoreGraphics.h>
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
 #import <Foundation/Foundation.h>
@@ -3372,6 +3373,17 @@ static IMP vcc_mrc_render_orig = NULL;
 static _Atomic uint64_t vcc_metadata_gate_render_count = 0;
 static _Atomic uint64_t vcc_mrc_render_count = 0;
 
+// Detector-entry + emission counters (dylib-internal swizzle, no frida
+// trampoline): answer definitively whether BWMRCNode's sample-buffer processor
+// actually drives VNMRCDetector, or the frame stops before the detector.
+static IMP vcc_detector_process_orig = NULL;
+static IMP vcc_detector_emit_orig = NULL;
+static _Atomic uint64_t vcc_detector_process_count = 0;
+static _Atomic uint64_t vcc_detector_emit_count = 0;
+static _Atomic uint64_t vcc_detector_emit_nonzero = 0;
+static void vcc_install_detector_counters_once(void);  // defined below MRC hook
+static void vcc_write_detector_status(void);           // defined below MRC hook
+
 typedef void (*VccMetadataRenderFn)(id, SEL, CMSampleBufferRef, id);
 
 // The metadata-detection branch (gating node -> MRC node) is a distinct
@@ -3519,6 +3531,9 @@ static void vcc_metadata_gate_render_hook(id self, SEL _cmd,
 static void vcc_mrc_render_hook(id self, SEL _cmd,
                                 CMSampleBufferRef sampleBuffer, id input) {
   uint64_t count = atomic_fetch_add(&vcc_mrc_render_count, 1) + 1;
+  // The MRC node is rendering, so VNMRCDetector is now loadable: install the
+  // detector-entry counters just-in-time (idempotent, first render only).
+  vcc_install_detector_counters_once();
   if (count <= 5 || (count % 64) == 1) {
     CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
     vcc_log(@"  [MRC render] self=%p cmsb=%p input=%p pts=%lld/%d #%llu",
@@ -3593,7 +3608,134 @@ static void vcc_mrc_render_hook(id self, SEL _cmd,
                                      kCVPixelBufferLock_ReadOnly);
     }
   }
+  // Keep the host-readable snapshot current every render (the install-time
+  // write alone freezes mrc/gate render counts). Cheap ~200B write; this is a
+  // diagnostic build. process/emit hooks also refresh it when they fire.
+  vcc_write_detector_status();
+  // Redump the luma on a later cadence so the host can confirm our QR frame
+  // (streamed during the present window) actually reached the MRC render input
+  // — the count==1 dump is only the first warmup frame.
+  if ((count % 16) == 0) {
+    CVPixelBufferRef pbLate = CMSampleBufferGetImageBuffer(sampleBuffer);
+    if (pbLate && CVPixelBufferGetPlaneCount(pbLate) > 0 &&
+        CVPixelBufferLockBaseAddress(pbLate, kCVPixelBufferLock_ReadOnly) ==
+            kCVReturnSuccess) {
+      size_t w = CVPixelBufferGetWidthOfPlane(pbLate, 0);
+      size_t h = CVPixelBufferGetHeightOfPlane(pbLate, 0);
+      size_t s = CVPixelBufferGetBytesPerRowOfPlane(pbLate, 0);
+      const uint8_t *b = CVPixelBufferGetBaseAddressOfPlane(pbLate, 0);
+      int fd = open("/var/jb/var/mobile/Library/vphone-mrc-luma-late.pgm",
+                    O_WRONLY | O_CREAT | O_TRUNC, 0644);
+      if (fd >= 0) {
+        char hd[64];
+        int l = snprintf(hd, sizeof(hd), "P5\n%zu %zu\n255\n", w, h);
+        (void)write(fd, hd, (size_t)l);
+        for (size_t r = 0; r < h; r++) (void)write(fd, b + r * s, w);
+        close(fd);
+      }
+      CVPixelBufferUnlockBaseAddress(pbLate, kCVPixelBufferLock_ReadOnly);
+    }
+  }
   ((VccMetadataRenderFn)vcc_mrc_render_orig)(self, _cmd, sampleBuffer, input);
+}
+
+// Snapshot the detector counters to a host-readable file (NSLog is not
+// readable for the launchd cameracaptured instance over our UDS session).
+static void vcc_write_detector_status(void) {
+  char buf[224];
+  int len = snprintf(buf, sizeof(buf),
+      "{\"process_calls\":%llu,\"emit_calls\":%llu,\"emit_nonzero\":%llu,"
+      "\"mrc_renders\":%llu,\"gate_renders\":%llu,"
+      "\"process_installed\":%s,\"emit_installed\":%s}\n",
+      (unsigned long long)atomic_load(&vcc_detector_process_count),
+      (unsigned long long)atomic_load(&vcc_detector_emit_count),
+      (unsigned long long)atomic_load(&vcc_detector_emit_nonzero),
+      (unsigned long long)atomic_load(&vcc_mrc_render_count),
+      (unsigned long long)atomic_load(&vcc_metadata_gate_render_count),
+      vcc_detector_process_orig ? "true" : "false",
+      vcc_detector_emit_orig ? "true" : "false");
+  int fd = open("/var/jb/var/mobile/Library/vphone-mrc-detector.json",
+                O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  if (fd >= 0) { (void)write(fd, buf, (size_t)len); close(fd); }
+}
+
+// -[VNMRCDetector processRegionOfInterest:croppedPixelBuffer:options:qosClass:
+//    warningRecorder:error:progressHandler:]
+// Encoding @92@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16 r^{__CVBuffer=}48 @56 I64
+//          @68 ^@76 @?84 : arg2 is a CGRect BY VALUE, so it must be declared as
+// CGRect to honor the arm64 HFA (d0-d3) ABI; every id/pointer arg is void*
+// pass-through to keep ARC off the forwarded arguments (cf. the copyDevice
+// int-vs-id crash note above). This is a pure counter — never mutate args.
+typedef id (*VccProcessROIFn)(id, SEL, CGRect, void *, void *, unsigned int,
+                              void *, void *, void *);
+static id vcc_detector_process_hook(id self, SEL _cmd, CGRect roi,
+                                     void *cropped, void *options,
+                                     unsigned int qos, void *warningRecorder,
+                                     void *error, void *progressHandler) {
+  uint64_t n = atomic_fetch_add(&vcc_detector_process_count, 1) + 1;
+  if (n <= 3 || (n % 32) == 1) {
+    vcc_log(@"  [VNMRC processROI] #%llu roi=%.0f,%.0f %.0fx%.0f pb=%p",
+            (unsigned long long)n, roi.origin.x, roi.origin.y,
+            roi.size.width, roi.size.height, cropped);
+    vcc_write_detector_status();
+  }
+  return ((VccProcessROIFn)vcc_detector_process_orig)(
+      self, _cmd, roi, cropped, options, qos, warningRecorder, error,
+      progressHandler);
+}
+
+// -[BWMetadataDetectorGatingOutputController node:didEmitCodesCount:
+//    emittedIdentifiers:originalPTS:]  Encoding v64@0:8 @16 q24 @32 {CMTime}40.
+typedef void (*VccDidEmitFn)(id, SEL, void *, long long, void *, CMTime);
+static void vcc_detector_emit_hook(id self, SEL _cmd, void *node,
+                                    long long codesCount, void *identifiers,
+                                    CMTime pts) {
+  atomic_fetch_add(&vcc_detector_emit_count, 1);
+  if (codesCount > 0) atomic_fetch_add(&vcc_detector_emit_nonzero, 1);
+  vcc_log(@"  [MRC didEmitCodesCount] count=%lld", codesCount);
+  vcc_write_detector_status();
+  ((VccDidEmitFn)vcc_detector_emit_orig)(self, _cmd, node, codesCount,
+                                          identifiers, pts);
+}
+
+// Add an override when the target method is inherited; otherwise replace the
+// class-owned method (same discipline as the render-hook install, so a shared
+// parent is never mutated).
+static void vcc_override_or_replace(Class cls, SEL sel, IMP hook, IMP *orig) {
+  Method m = cls ? class_getInstanceMethod(cls, sel) : NULL;
+  if (!m) return;
+  *orig = method_getImplementation(m);
+  const char *types = method_getTypeEncoding(m);
+  if (!class_addMethod(cls, sel, hook, types)) method_setImplementation(m, hook);
+}
+
+// Lazily install the detector counters once the graph is live (called from the
+// MRC render hook, where VNMRCDetector / the gating controller are guaranteed
+// loaded). A dylib-internal method_setImplementation swizzle is daemon-safe on
+// these arm64e IMPs where a frida Interceptor trampoline is not (it SIGKILLs
+// cameracaptured the moment the live detector path enters the hooked IMP).
+static void vcc_install_detector_counters_once(void) {
+  static _Atomic bool tried = false;
+  bool expected = false;
+  if (!atomic_compare_exchange_strong(&tried, &expected, true)) return;
+  Class mrc = objc_getClass("VNMRCDetector");
+  SEL proc = NSSelectorFromString(
+      @"processRegionOfInterest:croppedPixelBuffer:options:qosClass:"
+       "warningRecorder:error:progressHandler:");
+  vcc_override_or_replace(mrc, proc, (IMP)vcc_detector_process_hook,
+                          &vcc_detector_process_orig);
+  if (!vcc_detector_process_orig)
+    vcc_log(@"  detector counter: VNMRCDetector processROI missing");
+  Class gate = objc_getClass("BWMetadataDetectorGatingOutputController");
+  SEL emit = NSSelectorFromString(
+      @"node:didEmitCodesCount:emittedIdentifiers:originalPTS:");
+  vcc_override_or_replace(gate, emit, (IMP)vcc_detector_emit_hook,
+                          &vcc_detector_emit_orig);
+  if (!vcc_detector_emit_orig)
+    vcc_log(@"  detector counter: gating didEmitCodesCount missing");
+  vcc_log(@"  detector counters installed process=%p emit=%p",
+          vcc_detector_process_orig, vcc_detector_emit_orig);
+  vcc_write_detector_status();
 }
 
 static void vcc_install_metadata_detector_observation(void) {
