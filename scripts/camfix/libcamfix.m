@@ -1,5 +1,5 @@
 /*
- * libcamfix — substrate-injected into Camera.app (com.apple.camera).
+ * libcamfix — substrate-injected into Camera.app and certified scanner apps.
  *
  * 1. Suppress the -[AVCaptureFigVideoDevice _setActiveFormat:...] crash
  *    when the device is our virtual camera and the format argument is nil.
@@ -670,7 +670,9 @@ static BOOL cfx_output_is_for_vcam(id self) {
 // empty availableMetadataObjectTypes array and throws when a client requests
 // AVMetadataObjectTypeQRCode. Keep the public AVCaptureMetadataOutput contract
 // intact for vcam-bound outputs: advertise QR, retain the requested types and
-// deliver QR objects decoded from the same shared-memory camera frames.
+// deliver QR objects decoded from the same shared-memory camera frames. Each
+// delegate/type configuration is one consumption window and receives at most
+// one QR callback, fencing repeated static frames from duplicate submissions.
 
 @interface AVMetadataObject (VPhonePrivateInit)
 - (instancetype)initWithType:(AVMetadataObjectType)type
@@ -714,6 +716,7 @@ static const void *CFX_METADATA_TYPES_KEY = &CFX_METADATA_TYPES_KEY;
 static const void *CFX_METADATA_DELEGATE_KEY = &CFX_METADATA_DELEGATE_KEY;
 static const void *CFX_METADATA_QUEUE_KEY = &CFX_METADATA_QUEUE_KEY;
 static const void *CFX_METADATA_LAST_FRAME_KEY = &CFX_METADATA_LAST_FRAME_KEY;
+static const void *CFX_METADATA_DELIVERED_KEY = &CFX_METADATA_DELIVERED_KEY;
 static NSHashTable *cfx_metadata_outputs = nil;
 static dispatch_source_t cfx_metadata_timer = NULL;
 static CIDetector *cfx_qr_detector = nil;
@@ -747,6 +750,13 @@ static void cfx_setMetadataTypes_hook(id self, SEL _cmd, NSArray *types) {
   }
   objc_setAssociatedObject(self, CFX_METADATA_TYPES_KEY, accepted,
                            OBJC_ASSOCIATION_COPY_NONATOMIC);
+  // A metadata type configuration starts a new scanner consumption window.
+  // The same static QR is repeated at camera FPS, but AVCapture clients expect
+  // to own the stop/retry lifecycle after the first callback.  Reset here so
+  // a later scan configuration can consume one new frame without allowing the
+  // current window to submit the same duty payload repeatedly.
+  objc_setAssociatedObject(self, CFX_METADATA_DELIVERED_KEY, @NO,
+                           OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   cfxlog(@"[metadata] accepted %lu/%lu requested type(s) for vcam output %p",
          (unsigned long)accepted.count, (unsigned long)types.count, self);
 }
@@ -791,8 +801,9 @@ static void cfx_drive_metadata_once(void) {
     NSArray *types = objc_getAssociatedObject(output, CFX_METADATA_TYPES_KEY);
     id delegate = objc_getAssociatedObject(output, CFX_METADATA_DELEGATE_KEY);
     NSNumber *last = objc_getAssociatedObject(output, CFX_METADATA_LAST_FRAME_KEY);
+    NSNumber *delivered = objc_getAssociatedObject(output, CFX_METADATA_DELIVERED_KEY);
     if (![types containsObject:AVMetadataObjectTypeQRCode] || !delegate ||
-        last.unsignedLongLongValue == frameIndex) continue;
+        delivered.boolValue || last.unsignedLongLongValue == frameIndex) continue;
     objc_setAssociatedObject(output, CFX_METADATA_LAST_FRAME_KEY,
                              @(frameIndex), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [eligible addObject:output];
@@ -812,6 +823,22 @@ static void cfx_drive_metadata_once(void) {
     id connection = nil;
     @try { connection = [[output connections] firstObject]; }
     @catch (NSException *e) {}
+    // [DEBUG-m0a-delegate] Temporary runtime identity probe. Remove after the
+    // observation-only hook is aligned with the delegate actually consuming
+    // the synthetic metadata callback.
+    Class actualClass = object_getClass(delegate);
+    Method actualMethod = class_getInstanceMethod(actualClass, callback);
+    Class fixedClass = NSClassFromString(@"SKScanScheduleVC");
+    Method fixedMethod = fixedClass ? class_getInstanceMethod(fixedClass, callback) : NULL;
+    cfxlog(@"[DEBUG-m0a-delegate] output=%p delegate=%p class=%s actual_imp=%p fixed_imp=%p",
+           output, delegate, class_getName(actualClass),
+           actualMethod ? method_getImplementation(actualMethod) : NULL,
+           fixedMethod ? method_getImplementation(fixedMethod) : NULL);
+    // Fence before dispatch: the delegate can synchronously stop/reconfigure
+    // its session, while the 5 Hz driver continues observing new shm frames.
+    // Marking the window consumed first guarantees at-most-once delivery.
+    objc_setAssociatedObject(output, CFX_METADATA_DELIVERED_KEY, @YES,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     dispatch_async(queue ?: dispatch_get_main_queue(), ^{
       ((void (*)(id, SEL, id, id, id))objc_msgSend)(
           delegate, callback, output, @[metadata], connection);
@@ -845,6 +872,8 @@ static void cfx_setMetadataDelegateQueue_hook(id self, SEL _cmd,
   objc_setAssociatedObject(self, CFX_METADATA_DELEGATE_KEY, delegate,
                            OBJC_ASSOCIATION_ASSIGN);
   objc_setAssociatedObject(self, CFX_METADATA_QUEUE_KEY, queue,
+                           OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject(self, CFX_METADATA_DELIVERED_KEY, @NO,
                            OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   @synchronized(cfx_metadata_outputs) {
     if (delegate) [cfx_metadata_outputs addObject:self];
