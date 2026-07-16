@@ -232,12 +232,10 @@ build_libvcamcaptured() {
     echo "$out"
 }
 
-# Builds the libcamfix.dylib substrate plugin. Loaded into every process
-# that links AVFoundation via TweakLoader's Filter.Frameworks key —
-# Camera.app, third-party apps, anywhere the
-# documented capture interface is used. Implements the photo-delivery
-# path through CAMCaptureEngine + the preview/state guards that keep
-# the viewfinder live on the virtual camera.
+# Builds the libcamfix.dylib substrate plugin. Its companion plist keeps the
+# deployment allowlist explicit (Camera + the certified KFCKnight scanner),
+# while the dylib's dyld callback still waits for AVFCapture before installing
+# hooks. Implements photo, preview, state and QR metadata delivery for vcam.
 build_libcamfix() {
     local src="$SCRIPT_DIR/camfix/libcamfix.m"
     local out="$TEMP_DIR/libcamfix.dylib"
@@ -582,11 +580,10 @@ fi
 echo "  [+] libvcamcaptured installed to procursus/Library/MobileSubstrate/DynamicLibraries/"
 
 # ═══════════ JB-4.2 INSTALL libcamfix ═══════════════════════════════
-# Substrate plugin loaded by TweakLoader into every process that links
-# AVFoundation. The companion plist's Filter.Frameworks = ["AVFoundation"]
-# tells TweakLoader to defer the dlopen until AVFoundation actually
-# appears in the loaded image list (via _dyld_register_func_for_add_image),
-# so processes that don't use AVF don't pay any cost.
+# Compatibility plugin loaded by TweakLoader only into the executable
+# allowlist in libcamfix.plist (Camera + KFCKnight). The dylib itself defers
+# hook installation until AVFCapture appears, so early app startup does not
+# race private-class registration.
 echo ""
 echo "[JB-4.2] Building and installing libcamfix..."
 LIBCAMFIX_OUT="$(build_libcamfix)"

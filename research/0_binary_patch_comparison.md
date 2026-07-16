@@ -512,6 +512,86 @@ Page-hash re-attestation keeps the cryptex's CodeDirectory slots
 consistent with the modified pages so `amfid` / TXM accepts the DSC at
 next boot.
 
+### Virtual-camera QR metadata output (EXP userspace)
+
+The synthetic `cameracaptured` device supplies preview frames but has no
+hardware metadata analyzer. Consequently `AVCaptureMetadataOutput` reports an
+empty `availableMetadataObjectTypes` list and throws when scanner clients set
+`AVMetadataObjectTypeQRCode`, even after the vcam input itself is accepted.
+
+`scripts/camfix/libcamfix.m`, restricted by its TweakLoader plist to the
+`Camera` and `KFCKnight` executables, completes this client-side vcam contract
+for outputs bound to `vphone:vcam:0`:
+
+- advertise and retain the requested QR metadata type without changing real
+  camera outputs;
+- decode the same shared-memory BGRA frames used by the preview pump with
+  CoreImage's QR detector;
+- deliver a machine-readable object through the standard
+  `captureOutput:didOutputMetadataObjects:fromConnection:` delegate and its
+  configured queue;
+- treat each delegate/type configuration as one consumption window and deliver
+  at most one QR callback, so a static frame repeated at camera FPS cannot
+  submit the same duty transition multiple times.
+
+This is a camera-pipeline compatibility shim, not an application hook: it does
+not reference scanner view controllers, private business selectors, or QR
+payload formats. The negative baseline was a KFCKnight crash at
+`-[AVCaptureMetadataOutput setMetadataObjectTypes:]`; the acceptance probe is
+an observation-only delegate hook matching a unique rendered nonce.
+
+### Virtual-camera generation receipt (userspace control plane)
+
+The camera wire carries a generation and frame index for each publication.
+`vphoned` publishes them with the pixels in a packed v2 shared-memory header;
+the declared header region is 256 bytes and pixels begin at offset 256.
+`libvcamcaptured` stages pixels privately, rechecks the publish sequence, and
+only then exposes the stable frame and writes a separate packed observe
+receipt. The 1337 `vcam_status` handler reports six fields: publish/observe
+frame indices, publish/observe monotonic timestamps, observed count, and the
+published generation. Host `camera_present` accepts a transport receipt only
+when both frame indices are nonzero and the returned generation matches the
+request.
+
+`libcamfix` reads the same `vphone-vcam-frame.shm` to synthesize capture
+samples and decode QR for scanner apps, so it is a third consumer of this
+header. Its packed mirror preserves the authoritative vphoned field offsets,
+contains no role or in-header protocol-version fields, pads the structure to
+the full 256-byte header region, and carries a `_Static_assert` so pixel-offset
+drift fails at compile time.
+
+Live validation on vm-2607 (2026-07-14) observed matching publish/observe frame
+indices and `observed_at_ns >= published_at_ns`; an old-generation status query
+returned no receipt, a wrong-owner stop was rejected, and a receipt-backed
+neutral generation was stopped back to `source=off`.
+
+### Detector luma bbox-fill geometry (userspace camera daemon)
+
+`scripts/vcamcaptured/libvcamcaptured.m` keeps the live-qualified QR geometry
+in rebuildable source rather than only in a deployed dylib. In the exact
+`BWMetadataDetectorGatingNode` render seam (upstream of `BWMRCNode`), the hook
+reads the latest protocol-v2 BGRA frame and locates its dark-pixel bounding
+box, expands it by a four-module-equivalent quiet zone (one eighth of the dark
+side per edge), and nearest-neighbor maps that square onto the destination's
+short edge. A 720x1280 detector input therefore carries a centered 720x720
+crop whose dark QR bbox occupies approximately 80% (the live-observed 575px
+target), while the rest of luma is white and chroma is neutral.
+
+The same path handles the QR-free neutral generation: absence of dark pixels
+still overwrites the full destination with white/neutral planes, so an older
+QR cannot survive in detector luma during cleanup. Screenshot/OCR geometry is
+not inferred from the preview path; the transformation is local to each
+actual planar sample buffer. The arm64e iPhoneOS dylib rebuild succeeds with
+only the pre-existing deprecated Objective-C pointer-introspection warning.
+The source was recovered by a zero-conflict three-way merge of the original
+metadata/detector implementation (`a4cef80`) with the current receipt work,
+then rebuilt and ad-hoc signed by `scripts/vcamcaptured/Makefile`. The deployed
+vm-2607 dylib hash is `163ea693...`; a post-restart scanner+neutral smoke kept
+cameracaptured PID 75 stable, returned a matching publish/observe receipt, and
+finished at `streaming=false/source=off`. The native detector branch remains
+dormant in this scanner session, consistent with the established 0/0 result;
+formal QR consumption uses the standard metadata delegate compatibility path.
+
 ### DeviceTree identity properties at fw_patch time (EXP only)
 
 `DeviceTreePatcher` carries two property-patch lists: `basePropertyPatches`
