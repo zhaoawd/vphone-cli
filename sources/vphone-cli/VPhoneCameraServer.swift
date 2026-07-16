@@ -1,6 +1,11 @@
 import CoreGraphics
 import Foundation
+import Synchronization
 import Virtualization
+
+private final class VPhoneGenerationFence: Sendable {
+    let token = Atomic<UInt64>(0)
+}
 
 /// Host-side virtual-camera server.
 ///
@@ -24,6 +29,7 @@ final class VPhoneCameraServer {
         case off
         case testPattern
         case videoFile  // .mov / .mp4 / .m4v via AVAssetReader
+        case image      // .png / .jpeg still image for QR / neutral generations
     }
 
     nonisolated static let vsockPort: UInt32 = 1338
@@ -34,6 +40,12 @@ final class VPhoneCameraServer {
 
     private(set) var sourceKind: SourceKind = .off
     private(set) var isConnected = false
+
+    private(set) var currentGeneration = ""
+    private(set) var currentRole = "neutral"
+    private var fps = VPhoneCameraServer.defaultFPS
+    private var wireFrameIndex: UInt64 = 0
+    private let fence = VPhoneGenerationFence()
 
     private var device: VZVirtioSocketDevice?
     private var connection: VZVirtioSocketConnection?
@@ -101,10 +113,62 @@ final class VPhoneCameraServer {
                 producer = nil
                 sourceKind = .off
             }
+        case .image:
+            // Still images are installed only through present(imagePath:…).
+            producer = nil
+            sourceKind = .off
         }
         if wasStreaming, producer != nil {
             startStreaming()
         }
+    }
+
+    // MARK: - Automation generation lifecycle
+
+    func present(imagePath: String, generation: String, role: String, fps: Double) -> Bool {
+        let still: VPhoneFrameProducer
+        do {
+            still = try VPhoneStillImageProducer(
+                url: URL(fileURLWithPath: imagePath),
+                width: Self.defaultWidth, height: Self.defaultHeight)
+        } catch {
+            print("[camera] present: failed to load \(imagePath): \(error)")
+            return false
+        }
+        stopStreaming()
+        producer = still
+        sourceKind = .image
+        currentGeneration = generation
+        currentRole = role
+        self.fps = min(30.0, max(1.0, fps))
+        wireFrameIndex = 0
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        if isConnected { startStreaming() }
+        print("[camera] present gen=\(generation) role=\(role) fps=\(self.fps)")
+        return isConnected
+    }
+
+    func stop(generation: String) -> Bool {
+        guard currentGeneration == generation else { return false }
+        stopStreaming()
+        producer = nil
+        sourceKind = .off
+        currentGeneration = ""
+        currentRole = "neutral"
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        return true
+    }
+
+    func hostStatus(generation: String) -> [String: Any] {
+        [
+            "source": sourceKind.rawValue,
+            "role": currentRole,
+            "generation": currentGeneration,
+            "streaming": timer != nil,
+            "connected": isConnected,
+            "host_published_frame_index": Int(wireFrameIndex),
+            "matches_requested": currentGeneration == generation,
+        ]
     }
 
     // MARK: - Streaming
@@ -112,7 +176,7 @@ final class VPhoneCameraServer {
     func startStreaming() {
         guard producer != nil, isConnected else { return }
         if timer != nil { return }
-        let interval = 1.0 / Self.defaultFPS
+        let interval = 1.0 / fps
         // Timer fires on the main queue so MainActor-isolated state
         // (producer, connectionFD) can be read directly without tripping
         // Swift 6's strict-concurrency isolation check. The frame
@@ -125,10 +189,19 @@ final class VPhoneCameraServer {
             guard let producer = self.producer else { return }
             let fd = self.connectionFD
             guard fd >= 0 else { return }
+            self.wireFrameIndex &+= 1
+            let frameIndex = self.wireFrameIndex
+            let generation = self.currentGeneration
+            let role = self.currentRole
+            let fence = self.fence
+            let token = fence.token.load(ordering: .relaxed)
             let q = self.producerQueue
             q.async {
+                if fence.token.load(ordering: .relaxed) != token { return }
                 guard let frame = producer.nextFrame() else { return }
-                let ok = Self.send(fd: fd, frame: frame)
+                let ok = Self.send(
+                    fd: fd, frame: frame,
+                    generation: generation, role: role, frameIndex: frameIndex)
                 if !ok {
                     Task { @MainActor [weak self] in
                         guard let self else { return }
@@ -207,14 +280,20 @@ final class VPhoneCameraServer {
     // MARK: - Wire
 
     @discardableResult
-    nonisolated private static func send(fd: Int32, frame: VPhoneCameraFrame) -> Bool {
-        // header
+    nonisolated private static func send(
+        fd: Int32, frame: VPhoneCameraFrame,
+        generation: String = "", role: String = "test", frameIndex: UInt64 = 0
+    ) -> Bool {
         let headerDict: [String: Any] = [
             "w": frame.width,
             "h": frame.height,
             "bpr": frame.bytesPerRow,
             "fmt": Self.pixelFormat,
             "ts": frame.timestampNS,
+            "pv": 2,
+            "gen": generation,
+            "role": role,
+            "fi": frameIndex,
         ]
         guard
             let headerData = try? JSONSerialization.data(withJSONObject: headerDict, options: [])

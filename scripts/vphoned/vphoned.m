@@ -275,6 +275,14 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     return vp_handle_custom_install(msg);
   }
 
+  if ([type isEqualToString:@"vcam_status"]) {
+    NSString *generation = [msg[@"generation"] isKindOfClass:[NSString class]]
+        ? msg[@"generation"] : @"";
+    NSMutableDictionary *r = vp_make_response(@"ok", reqId);
+    [r addEntriesFromDictionary:vp_vcam_status(generation)];
+    return r;
+  }
+
   NSMutableDictionary *r = vp_make_response(@"err", reqId);
   r[@"msg"] = [NSString stringWithFormat:@"unknown type: %@", type];
   return r;

@@ -49,6 +49,7 @@ class VPhoneHostControl {
     private weak var captureView: VPhoneVirtualMachineView?
     private var screenRecorder: VPhoneScreenRecorder?
     private weak var control: VPhoneControl?
+    private weak var cameraServer: VPhoneCameraServer?
 
     /// Thread-safe box for passing results between main actor and accept queue.
     private final class ResultBox: @unchecked Sendable {
@@ -89,12 +90,14 @@ class VPhoneHostControl {
         captureView: VPhoneVirtualMachineView,
         screenRecorder: VPhoneScreenRecorder,
         control: VPhoneControl,
+        cameraServer: VPhoneCameraServer?,
         screenWidth: Int,
         screenHeight: Int
     ) {
         self.captureView = captureView
         self.screenRecorder = screenRecorder
         self.control = control
+        self.cameraServer = cameraServer
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
 
@@ -818,9 +821,153 @@ class VPhoneHostControl {
                 writeResponse(fd, ok: false, error: result.error ?? "unknown error")
             }
 
+        case "camera_present":
+            guard let path = json["path"] as? String, !path.isEmpty else {
+                writeResponse(fd, ok: false, error: "camera_present requires path")
+                return
+            }
+            guard let generation = json["generation"] as? String, !generation.isEmpty else {
+                writeResponse(fd, ok: false, error: "camera_present requires generation")
+                return
+            }
+            let role = json["role"] as? String ?? "qr"
+            guard ["neutral", "qr", "test"].contains(role) else {
+                writeResponse(fd, ok: false, error: "camera_present role must be neutral|qr|test")
+                return
+            }
+            guard FileManager.default.fileExists(atPath: path) else {
+                writeResponse(fd, ok: false, error: "camera_present path not found: \(path)")
+                return
+            }
+            let fps = (json["fps"] as? Double)
+                ?? (json["fps"] as? Int).map(Double.init) ?? 8.0
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let cam = controller.cameraServer else {
+                    result.error = "no camera server"
+                    return
+                }
+                guard cam.present(
+                    imagePath: path, generation: generation, role: role, fps: fps)
+                else {
+                    result.error = "camera vsock not connected or image load failed"
+                    return
+                }
+                box.extra = [
+                    "protocol_version": 2,
+                    "source": "image",
+                    "role": role,
+                    "generation": generation,
+                    "streaming": true,
+                ]
+                if let receipt = await Self.cameraTransportReceipt(
+                    controller: controller, generation: generation, role: role)
+                {
+                    box.extra["transport_receipt"] = receipt
+                    result.ok = true
+                } else {
+                    // Fail-closed must also fail-safe: never leave an unacked QR
+                    // source streaming after returning ok=false.
+                    _ = cam.stop(generation: generation)
+                    box.extra["streaming"] = false
+                    result.error = "two-level transport receipt unavailable for \(generation)"
+                }
+            }
+            semaphore.wait()
+            writeResponse(
+                fd, ok: result.ok,
+                error: result.ok ? nil : (result.error ?? "camera_present failed"),
+                extra: box.extra)
+
+        case "camera_status":
+            guard let generation = json["generation"] as? String else {
+                writeResponse(fd, ok: false, error: "camera_status requires generation")
+                return
+            }
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            let box = ExtraBox()
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let cam = controller.cameraServer else {
+                    result.error = "no camera server"
+                    return
+                }
+                box.extra = cam.hostStatus(generation: generation)
+                if box.extra["matches_requested"] as? Bool == true,
+                   box.extra["streaming"] as? Bool == true,
+                   let role = box.extra["role"] as? String,
+                   let receipt = await Self.cameraTransportReceipt(
+                       controller: controller, generation: generation, role: role)
+                {
+                    box.extra["transport_receipt"] = receipt
+                }
+                result.ok = true
+            }
+            semaphore.wait()
+            writeResponse(fd, ok: result.ok, error: result.error, extra: box.extra)
+
+        case "camera_stop":
+            guard let generation = json["generation"] as? String else {
+                writeResponse(fd, ok: false, error: "camera_stop requires generation")
+                return
+            }
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let cam = controller.cameraServer else {
+                    result.error = "no camera server"
+                    return
+                }
+                if cam.stop(generation: generation) {
+                    result.ok = true
+                } else {
+                    result.error = "generation \(generation) does not own the camera source"
+                }
+            }
+            semaphore.wait()
+            writeResponse(fd, ok: result.ok, error: result.error)
+
         default:
             writeResponse(fd, ok: false, error: "unknown command: \(type)")
         }
+    }
+
+    @MainActor
+    private static func cameraTransportReceipt(
+        controller: VPhoneHostControl, generation: String, role: String
+    ) async -> [String: Any]? {
+        guard let ctl = controller.control, ctl.isConnected else { return nil }
+        for _ in 0..<20 {
+            guard let (response, _) = try? await ctl.sendRequest(
+                ["t": "vcam_status", "generation": generation])
+            else { return nil }
+            if response["protocol_version"] as? Int == 2,
+               response["matches_requested"] as? Bool == true,
+               response["generation"] as? String == generation,
+               response["role"] as? String == role,
+               let published = response["vphoned_published_frame_index"] as? Int,
+               let observed = response["libvcam_observed_frame_index"] as? Int,
+               let publishedAt = response["vphoned_published_at_ns"] as? Int,
+               let observedAt = response["libvcam_observed_at_ns"] as? Int,
+               published > 0, observed == published,
+               publishedAt > 0, observedAt >= publishedAt
+            {
+                return [
+                    "vphoned_published_frame_index": published,
+                    "libvcam_observed_frame_index": observed,
+                    "vphoned_published_at_ns": publishedAt,
+                    "libvcam_observed_at_ns": observedAt,
+                ]
+            }
+            try? await Task.sleep(nanoseconds: 50_000_000)
+        }
+        return nil
     }
 
     // MARK: - Socket I/O

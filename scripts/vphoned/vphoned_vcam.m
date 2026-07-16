@@ -27,6 +27,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 #ifndef AF_VSOCK
@@ -48,6 +49,13 @@ static pthread_once_t s_start_once = PTHREAD_ONCE_INIT;
 static uint8_t       *s_shm_base   = NULL;
 static int            s_notify_token = -1;
 
+_Static_assert(sizeof(vphoned_vcam_shm_header_t) ==
+                   VPHONED_VCAM_SHM_HEADER_SIZE,
+               "vcam shm header size drift");
+_Static_assert(sizeof(vphoned_vcam_observed_t) ==
+                   VPHONED_VCAM_OBSERVED_SIZE,
+               "vcam observed receipt size drift");
+
 #define VVC_LOG_PATH "/var/jb/var/mobile/Library/vphone-vcam.log"
 
 __attribute__((format(printf, 1, 2)))
@@ -60,6 +68,20 @@ static void vvc_logf(const char *fmt, ...) {
   va_end(ap);
   fputc('\n', fp);
   fclose(fp);
+}
+
+static uint64_t monotonic_ns(void) {
+  struct timespec ts = {0};
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
+  return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
+
+static void copy_bounded(char *dst, size_t capacity, const char *src) {
+  if (!dst || capacity == 0) return;
+  memset(dst, 0, capacity);
+  if (!src) return;
+  size_t n = strnlen(src, capacity - 1);
+  memcpy(dst, src, n);
 }
 
 static int open_shm(void) {
@@ -106,6 +128,9 @@ static ssize_t read_full(int fd, void *buf, size_t n) {
 
 static void publish_frame(uint32_t w, uint32_t h, uint32_t bpr,
                           uint32_t fmt, uint64_t ts_ns,
+                          uint32_t protocol_version,
+                          const char *generation, const char *role,
+                          uint64_t wire_frame_index,
                           const uint8_t *pixels, size_t pixel_len) {
   if (!s_shm_base) return;
   if (pixel_len > VPHONED_VCAM_SHM_MAX_PIXELS) {
@@ -126,9 +151,14 @@ static void publish_frame(uint32_t w, uint32_t h, uint32_t bpr,
   hdr->height = h;
   hdr->bytes_per_row = bpr;
   hdr->pixel_format = fmt;
+  hdr->protocol_version = protocol_version;
   hdr->timestamp_ns = ts_ns;
-  hdr->frame_index += 1;
+  hdr->frame_index = wire_frame_index > 0
+      ? wire_frame_index : hdr->frame_index + 1;
+  hdr->published_at_ns = monotonic_ns();
   hdr->pixels_length = (uint32_t)pixel_len;
+  copy_bounded(hdr->generation, sizeof(hdr->generation), generation);
+  copy_bounded(hdr->role, sizeof(hdr->role), role);
   memcpy(dst, pixels, pixel_len);
 
   /* Mark write done (even seq). */
@@ -179,6 +209,12 @@ static void handle_client(int fd) {
     uint32_t bpr = (uint32_t)[hdict[@"bpr"] unsignedIntValue];
     uint32_t fmt = (uint32_t)[hdict[@"fmt"] unsignedIntValue];
     uint64_t ts  = (uint64_t)[hdict[@"ts"]  unsignedLongLongValue];
+    uint32_t pv  = (uint32_t)[hdict[@"pv"]  unsignedIntValue];
+    uint64_t fi  = (uint64_t)[hdict[@"fi"]  unsignedLongLongValue];
+    NSString *gen = [hdict[@"gen"] isKindOfClass:[NSString class]]
+        ? hdict[@"gen"] : @"";
+    NSString *role = [hdict[@"role"] isKindOfClass:[NSString class]]
+        ? hdict[@"role"] : @"test";
     free(header_buf);
 
     if (!hdict || jerr || w == 0 || h == 0 || bpr == 0 ||
@@ -189,7 +225,9 @@ static void handle_client(int fd) {
       free(pixel_buf);
       break;
     }
-    publish_frame(w, h, bpr, fmt, ts, pixel_buf, pixel_len);
+    publish_frame(w, h, bpr, fmt, ts, pv ?: 1,
+                  gen.UTF8String, role.UTF8String, fi,
+                  pixel_buf, pixel_len);
     free(pixel_buf);
 
     frames++;
@@ -269,4 +307,86 @@ static void start_listener_once(void) {
 void vp_vcam_start(void) {
   vvc_logf("vphoned_vcam: vp_vcam_start called (pid=%d)", getpid());
   pthread_once(&s_start_once, start_listener_once);
+}
+
+static BOOL snapshot_published(vphoned_vcam_shm_header_t *out) {
+  if (!s_shm_base || !out) return NO;
+  const vphoned_vcam_shm_header_t *hdr =
+      (const vphoned_vcam_shm_header_t *)s_shm_base;
+  uint64_t seq_a = atomic_load_explicit(
+      (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+  if (seq_a == 0 || (seq_a & 1ull)) return NO;
+  memcpy(out, hdr, sizeof(*out));
+  uint64_t seq_b = atomic_load_explicit(
+      (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+  return seq_a == seq_b && !(seq_b & 1ull);
+}
+
+static BOOL snapshot_observed(vphoned_vcam_observed_t *out) {
+  if (!out) return NO;
+  int fd = open(VPHONED_VCAM_OBSERVED_PATH, O_RDONLY);
+  if (fd < 0) return NO;
+  vphoned_vcam_observed_t first = {0}, second = {0};
+  ssize_t a = pread(fd, &first, sizeof(first), 0);
+  ssize_t b = pread(fd, &second, sizeof(second), 0);
+  close(fd);
+  if (a != sizeof(first) || b != sizeof(second)) return NO;
+  if (first.seq == 0 || (first.seq & 1ull) || first.seq != second.seq) return NO;
+  if (memcmp(&first, &second, sizeof(first)) != 0) return NO;
+  *out = second;
+  return YES;
+}
+
+static NSString *bounded_string(const char *bytes, size_t capacity) {
+  size_t length = strnlen(bytes, capacity);
+  if (length == 0) return @"";
+  NSString *value = [[NSString alloc] initWithBytes:bytes
+                                             length:length
+                                           encoding:NSUTF8StringEncoding];
+  return value ?: @"";
+}
+
+NSDictionary *vp_vcam_status(NSString *requested_generation) {
+  vphoned_vcam_shm_header_t published = {0};
+  if (!snapshot_published(&published)) {
+    return @{
+      @"protocol_version": @VPHONED_VCAM_PROTOCOL_VERSION,
+      @"generation": @"",
+      @"role": @"",
+      @"matches_requested": @NO,
+    };
+  }
+
+  NSString *generation = bounded_string(
+      published.generation, sizeof(published.generation));
+  NSString *role = bounded_string(published.role, sizeof(published.role));
+  BOOL requested_match = requested_generation.length > 0 &&
+      [generation isEqualToString:requested_generation];
+  NSMutableDictionary *status = [@{
+    @"protocol_version": @(published.protocol_version),
+    @"generation": generation,
+    @"role": role,
+    @"matches_requested": @(requested_match),
+    @"vphoned_published_frame_index": @(published.frame_index),
+    @"vphoned_published_at_ns": @(published.published_at_ns),
+  } mutableCopy];
+
+  vphoned_vcam_observed_t observed = {0};
+  if (!requested_match || !snapshot_observed(&observed)) return status;
+  NSString *observed_generation = bounded_string(
+      observed.generation, sizeof(observed.generation));
+  NSString *observed_role = bounded_string(observed.role, sizeof(observed.role));
+  BOOL receipt_matches =
+      observed.protocol_version == published.protocol_version &&
+      observed.protocol_version == VPHONED_VCAM_PROTOCOL_VERSION &&
+      observed.frame_index == published.frame_index &&
+      [observed_generation isEqualToString:generation] &&
+      [observed_role isEqualToString:role] &&
+      observed.observed_at_ns >= published.published_at_ns &&
+      published.published_at_ns > 0;
+  if (receipt_matches) {
+    status[@"libvcam_observed_frame_index"] = @(observed.frame_index);
+    status[@"libvcam_observed_at_ns"] = @(observed.observed_at_ns);
+  }
+  return status;
 }

@@ -3,6 +3,7 @@ import CoreGraphics
 import CoreImage
 import CoreVideo
 import Foundation
+import ImageIO
 
 /// A single BGRA frame produced by a frame source.
 struct VPhoneCameraFrame: Sendable {
@@ -245,5 +246,80 @@ final class VPhoneVideoFileProducer: VPhoneFrameProducer, @unchecked Sendable {
             bytesPerRow: bytesPerRow,
             timestampNS: UInt64(ProcessInfo.processInfo.systemUptime * 1e9),
             pixels: out)
+    }
+}
+
+// MARK: - Still image (.png / .jpeg)
+
+/// Immutable still-image source used for QR and neutral generations. The image
+/// is decoded and rendered once; each frame only receives a fresh timestamp.
+final class VPhoneStillImageProducer: VPhoneFrameProducer, @unchecked Sendable {
+    private let width: Int
+    private let height: Int
+    private let bytesPerRow: Int
+    private let pixels: Data
+
+    init(url: URL, width: Int, height: Int) throws {
+        self.width = width
+        self.height = height
+        self.bytesPerRow = ((width * 4) + 15) & ~15
+
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let cg = CGImageSourceCreateImageAtIndex(src, 0, nil)
+        else {
+            throw NSError(
+                domain: "VPhoneStillImageProducer", code: 1,
+                userInfo: [NSLocalizedDescriptionKey:
+                    "\(url.lastPathComponent): not a decodable PNG/JPEG"])
+        }
+        self.pixels = try Self.letterbox(
+            cg, width: width, height: height, bytesPerRow: bytesPerRow)
+    }
+
+    private static func letterbox(
+        _ image: CGImage, width: Int, height: Int, bytesPerRow: Int
+    ) throws -> Data {
+        let bitmapInfo = CGImageAlphaInfo.premultipliedFirst.rawValue
+            | CGBitmapInfo.byteOrder32Little.rawValue
+        guard let ctx = CGContext(
+            data: nil, width: width, height: height,
+            bitsPerComponent: 8, bytesPerRow: bytesPerRow,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: bitmapInfo)
+        else {
+            throw NSError(
+                domain: "VPhoneStillImageProducer", code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "failed to create BGRA context"])
+        }
+        ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
+        ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        ctx.interpolationQuality = .none
+
+        let sw = image.width
+        let sh = image.height
+        let intScale = min(width / max(1, sw), height / max(1, sh))
+        let scale: CGFloat = intScale >= 1
+            ? CGFloat(intScale)
+            : min(CGFloat(width) / CGFloat(sw), CGFloat(height) / CGFloat(sh))
+        let dw = CGFloat(sw) * scale
+        let dh = CGFloat(sh) * scale
+        ctx.draw(image, in: CGRect(
+            x: (CGFloat(width) - dw) / 2,
+            y: (CGFloat(height) - dh) / 2,
+            width: dw, height: dh))
+
+        guard let base = ctx.data else {
+            throw NSError(
+                domain: "VPhoneStillImageProducer", code: 3,
+                userInfo: [NSLocalizedDescriptionKey: "context has no backing data"])
+        }
+        return Data(bytes: base, count: bytesPerRow * height)
+    }
+
+    func nextFrame() -> VPhoneCameraFrame? {
+        VPhoneCameraFrame(
+            width: width, height: height,
+            bytesPerRow: bytesPerRow,
+            timestampNS: UInt64(ProcessInfo.processInfo.systemUptime * 1e9),
+            pixels: pixels)
     }
 }

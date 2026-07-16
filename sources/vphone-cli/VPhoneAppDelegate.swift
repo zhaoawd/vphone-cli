@@ -160,6 +160,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 captureView: wc.captureView!,
                 screenRecorder: recorder,
                 control: control,
+                cameraServer: cameraServer,
                 screenWidth: options.screenWidth,
                 screenHeight: options.screenHeight
             )
