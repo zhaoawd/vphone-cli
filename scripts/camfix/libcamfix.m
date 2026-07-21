@@ -720,6 +720,20 @@ static BOOL cfx_output_is_for_vcam(id self) {
 - (NSArray *)corners { return @[]; }
 @end
 
+// Zeroing-weak holder for the scanner delegate. The metadata output stores
+// the delegate as an associated object, but the scanner view controller
+// (e.g. SKScanScheduleVC) is torn down and deallocated between scans while
+// our weak-referenced output can briefly outlive it. Storing the delegate
+// with OBJC_ASSOCIATION_ASSIGN leaves a dangling pointer that the 5 Hz timer
+// then feeds to objc_retain → crash inside the timer block. Wrapping it in a
+// __weak ivar makes a post-dealloc load return nil instead, so the driver
+// simply skips a dead window.
+@interface VPhoneWeakRef : NSObject
+@property (nonatomic, weak) id target;
+@end
+@implementation VPhoneWeakRef
+@end
+
 static IMP cfx_orig_availableMetadataTypes = NULL;
 static IMP cfx_orig_metadataTypes = NULL;
 static IMP cfx_orig_setMetadataTypes = NULL;
@@ -811,7 +825,9 @@ static void cfx_drive_metadata_once(void) {
   for (id output in outputs) {
     if (!cfx_output_is_for_vcam(output)) continue;
     NSArray *types = objc_getAssociatedObject(output, CFX_METADATA_TYPES_KEY);
-    id delegate = objc_getAssociatedObject(output, CFX_METADATA_DELEGATE_KEY);
+    VPhoneWeakRef *delegateBox =
+        objc_getAssociatedObject(output, CFX_METADATA_DELEGATE_KEY);
+    id delegate = delegateBox.target;  // zeroing-weak load; nil after dealloc
     NSNumber *last = objc_getAssociatedObject(output, CFX_METADATA_LAST_FRAME_KEY);
     NSNumber *delivered = objc_getAssociatedObject(output, CFX_METADATA_DELIVERED_KEY);
     if (![types containsObject:AVMetadataObjectTypeQRCode] || !delegate ||
@@ -828,7 +844,9 @@ static void cfx_drive_metadata_once(void) {
       [[VPhoneQRMetadataObject alloc] initWithStringValue:payload];
 
   for (id output in eligible) {
-    id delegate = objc_getAssociatedObject(output, CFX_METADATA_DELEGATE_KEY);
+    VPhoneWeakRef *delegateBox =
+        objc_getAssociatedObject(output, CFX_METADATA_DELEGATE_KEY);
+    id delegate = delegateBox.target;  // strong local: pins delegate through delivery
     dispatch_queue_t queue = objc_getAssociatedObject(output, CFX_METADATA_QUEUE_KEY);
     SEL callback = @selector(captureOutput:didOutputMetadataObjects:fromConnection:);
     if (!delegate || ![delegate respondsToSelector:callback]) continue;
@@ -870,8 +888,17 @@ static void cfx_setMetadataDelegateQueue_hook(id self, SEL _cmd,
                                                dispatch_queue_t queue) {
   typedef void (*Fn)(id, SEL, id, dispatch_queue_t);
   ((Fn)cfx_orig_setMetadataDelegateQueue)(self, _cmd, delegate, queue);
-  objc_setAssociatedObject(self, CFX_METADATA_DELEGATE_KEY, delegate,
-                           OBJC_ASSOCIATION_ASSIGN);
+  // Hold the delegate through a zeroing-weak box (see VPhoneWeakRef): the
+  // scanner VC can dealloc between scans, and a raw ASSIGN pointer would
+  // dangle for the timer to retain. The box itself is retained by the
+  // association; box.target reads nil once the delegate is gone.
+  VPhoneWeakRef *delegateBox = nil;
+  if (delegate) {
+    delegateBox = [VPhoneWeakRef new];
+    delegateBox.target = delegate;
+  }
+  objc_setAssociatedObject(self, CFX_METADATA_DELEGATE_KEY, delegateBox,
+                           OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   objc_setAssociatedObject(self, CFX_METADATA_QUEUE_KEY, queue,
                            OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   objc_setAssociatedObject(self, CFX_METADATA_DELIVERED_KEY, @NO,
