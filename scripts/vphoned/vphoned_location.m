@@ -100,10 +100,10 @@ BOOL vp_location_available(void) {
     return gLocationLoaded;
 }
 
-void vp_location_simulate(double lat, double lon, double alt,
+BOOL vp_location_simulate(double lat, double lon, double alt,
                            double hacc, double vacc,
                            double speed, double course) {
-    if (!gLocationLoaded || !gSimManager || !gSetLocationSel) return;
+    if (!gLocationLoaded || !gSimManager || !gSetLocationSel) return NO;
 
     @try {
         typedef struct { double latitude; double longitude; } CLCoord2D;
@@ -129,7 +129,7 @@ void vp_location_simulate(double lat, double lon, double alt,
 #pragma clang diagnostic pop
 
             NSLog(@"vphoned: simulate_location lat=%.6f lon=%.6f (fallback init)", lat, lon);
-            return;
+            return YES;
         }
 
         typedef id (*InitFunc7)(id, SEL, CLCoord2D, double, double, double, double, double, id);
@@ -143,22 +143,30 @@ void vp_location_simulate(double lat, double lon, double alt,
 
         NSLog(@"vphoned: simulate_location lat=%.6f lon=%.6f alt=%.1f spd=%.1f crs=%.1f",
               lat, lon, alt, speed, course);
+        return YES;
     } @catch (NSException *e) {
         NSLog(@"vphoned: simulate_location exception: %@", e);
+        return NO;
     }
 }
 
-void vp_location_clear(void) {
-    if (!gLocationLoaded || !gSimManager) return;
+BOOL vp_location_clear(void) {
+    if (!gLocationLoaded || !gSimManager) return NO;
+    // A clear selector is not required for the "location" capability, so its
+    // absence is a real failure the caller must see (not a silent no-op).
+    if (!gClearLocationsSel) {
+        NSLog(@"vphoned: clear_simulated_location: no clear selector available");
+        return NO;
+    }
     @try {
-        if (gClearLocationsSel) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-            [gSimManager performSelector:gClearLocationsSel];
+        [gSimManager performSelector:gClearLocationsSel];
 #pragma clang diagnostic pop
-            NSLog(@"vphoned: cleared simulated location");
-        }
+        NSLog(@"vphoned: cleared simulated location");
+        return YES;
     } @catch (NSException *e) {
         NSLog(@"vphoned: clear_simulated_location exception: %@", e);
+        return NO;
     }
 }

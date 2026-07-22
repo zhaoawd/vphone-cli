@@ -40,6 +40,13 @@ class VPhoneLocationProvider: NSObject {
     private let control: VPhoneControl
     private var hostModeStarted = false
 
+    /// True once an external controller (the UDS automation surface) has taken
+    /// ownership of the guest location source. While set, reconnect logic must
+    /// NOT auto-resume host forwarding — otherwise the next connect would clobber
+    /// the externally injected fix (headless always forwards on connect; a GUI
+    /// toggle left "on" would too). Cleared when a GUI source is chosen again.
+    private(set) var externallyControlled = false
+
     private var locationManager: CLLocationManager?
     private var delegateProxy: LocationDelegateProxy?
     private var lastLocation: CLLocation?
@@ -67,8 +74,27 @@ class VPhoneLocationProvider: NSObject {
         print("[location] host location forwarding ready")
     }
 
+    /// Take ownership of the guest location source on behalf of an external
+    /// controller (UDS `location`/`location_stop`). Stops host forwarding and
+    /// replay and records ownership so a later reconnect does not auto-resume
+    /// forwarding over the injected fix.
+    ///
+    /// Contract: ownership persists — including across a *failed* injection. A
+    /// UDS `location` command that errors or times out leaves the source stopped
+    /// and owned (the client retries), rather than silently letting forwarding
+    /// resume and clobber the retry. Ownership is released only when a GUI source
+    /// (`startForwarding`/`sendPreset`/`startReplay`) is explicitly chosen again.
+    /// This is also why there is no per-request release: a release keyed to one
+    /// request could clear a *different* concurrent request's ownership.
+    func beginExternalControl() {
+        externallyControlled = true
+        stopReplay()
+        stopForwarding()
+    }
+
     /// Begin sending location to the guest.  Safe to call on every (re)connect.
     func startForwarding() {
+        externallyControlled = false
         stopReplay()
         guard let mgr = locationManager else { return }
         mgr.requestAlwaysAuthorization()
@@ -93,6 +119,7 @@ class VPhoneLocationProvider: NSObject {
 
     /// Send a fixed simulated location to the guest.
     func sendPreset(name: String, latitude: Double, longitude: Double, altitude: Double = 0) {
+        externallyControlled = false
         stopReplay()
         sendSimulatedLocation(
             latitude: latitude,
@@ -118,6 +145,7 @@ class VPhoneLocationProvider: NSObject {
             return
         }
 
+        externallyControlled = false
         stopForwarding()
         stopReplay()
 
@@ -180,6 +208,13 @@ class VPhoneLocationProvider: NSObject {
 
     private func forward(_ location: CLLocation) {
         lastLocation = location
+        // stopUpdatingLocation() can race with delegate callbacks that were
+        // already queued onto the main actor. Keep the latest host fix cached
+        // for a future explicit resume, but never let a stale callback escape
+        // after forwarding was stopped or the UDS surface took ownership.
+        guard hostModeStarted, !externallyControlled else {
+            return
+        }
         guard control.isConnected else {
             print("[location] forward: not connected, cached for later")
             return

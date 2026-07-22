@@ -264,13 +264,21 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     double vacc = [msg[@"vacc"] doubleValue];
     double speed = [msg[@"speed"] doubleValue];
     double course = [msg[@"course"] doubleValue];
-    vp_location_simulate(lat, lon, alt, hacc, vacc, speed, course);
-    return vp_make_response(@"ok", reqId);
+    if (vp_location_simulate(lat, lon, alt, hacc, vacc, speed, course)) {
+      return vp_make_response(@"ok", reqId);
+    }
+    NSMutableDictionary *r = vp_make_response(@"err", reqId);
+    r[@"msg"] = @"location simulation unavailable or failed";
+    return r;
   }
 
   if ([type isEqualToString:@"location_stop"]) {
-    vp_location_clear();
-    return vp_make_response(@"ok", reqId);
+    if (vp_location_clear()) {
+      return vp_make_response(@"ok", reqId);
+    }
+    NSMutableDictionary *r = vp_make_response(@"err", reqId);
+    r[@"msg"] = @"clear simulated location unavailable or failed";
+    return r;
   }
 
   if ([type isEqualToString:@"version"]) {

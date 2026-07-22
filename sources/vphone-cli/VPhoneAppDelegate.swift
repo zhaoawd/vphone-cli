@@ -161,6 +161,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 screenRecorder: recorder,
                 control: control,
                 cameraServer: cameraServer,
+                locationProvider: locationProvider,
                 screenWidth: options.screenWidth,
                 screenHeight: options.screenHeight
             )
@@ -177,8 +178,11 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.updateShellAvailability(available: caps.contains("shell"))
                 if caps.contains("location") {
                     mc?.updateLocationCapability(available: true)
-                    // Auto-resume if user had toggle on
-                    if mc?.locationMenuItem?.state == .on {
+                    // Auto-resume if user had toggle on — unless the UDS surface
+                    // has taken ownership of the location source, in which case
+                    // resuming would clobber the externally injected fix.
+                    if mc?.locationMenuItem?.state == .on,
+                       provider?.externallyControlled != true {
                         provider?.startForwarding()
                     }
                 } else {
@@ -203,10 +207,14 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.updateLocationCapability(available: false)
             }
         } else if !cli.dfu {
-            // Headless mode: auto-start location as before (no menu exists)
+            // Headless mode: auto-start location as before (no menu exists) —
+            // but not once the UDS surface owns the source, else every reconnect
+            // would overwrite the externally injected fix with Mac forwarding.
             control.onConnect = { [weak provider = locationProvider] caps in
                 if caps.contains("location") {
-                    provider?.startForwarding()
+                    if provider?.externallyControlled != true {
+                        provider?.startForwarding()
+                    }
                 } else {
                     print("[location] guest does not support location simulation")
                 }

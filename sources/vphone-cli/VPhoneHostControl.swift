@@ -50,6 +50,7 @@ class VPhoneHostControl {
     private var screenRecorder: VPhoneScreenRecorder?
     private weak var control: VPhoneControl?
     private weak var cameraServer: VPhoneCameraServer?
+    private weak var locationProvider: VPhoneLocationProvider?
 
     /// Thread-safe box for passing results between main actor and accept queue.
     private final class ResultBox: @unchecked Sendable {
@@ -91,6 +92,7 @@ class VPhoneHostControl {
         screenRecorder: VPhoneScreenRecorder,
         control: VPhoneControl,
         cameraServer: VPhoneCameraServer?,
+        locationProvider: VPhoneLocationProvider?,
         screenWidth: Int,
         screenHeight: Int
     ) {
@@ -98,6 +100,7 @@ class VPhoneHostControl {
         self.screenRecorder = screenRecorder
         self.control = control
         self.cameraServer = cameraServer
+        self.locationProvider = locationProvider
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
 
@@ -932,9 +935,128 @@ class VPhoneHostControl {
             semaphore.wait()
             writeResponse(fd, ok: result.ok, error: result.error)
 
+        case "location":
+            // Push a simulated GPS fix into the guest's system-wide
+            // CLSimulationManager (same channel the GUI location menu drives).
+            // Fail-closed on the automation surface: reject out-of-range params,
+            // require the guest to advertise the "location" capability, and wait
+            // for the guest's ack (encode/disconnect/write/timeout all → ok:false).
+            guard let lat = json["lat"] as? Double, let lon = json["lon"] as? Double else {
+                writeResponse(fd, ok: false, error: "location requires lat and lon")
+                return
+            }
+            let alt = json["alt"] as? Double ?? 0
+            let hacc = json["hacc"] as? Double ?? 5
+            let vacc = json["vacc"] as? Double ?? 5
+            let speed = json["speed"] as? Double ?? 0
+            let course = json["course"] as? Double ?? -1
+            if let verr = Self.locationValidationError(
+                lat: lat, lon: lon, alt: alt, hacc: hacc,
+                vacc: vacc, speed: speed, course: course
+            ) {
+                writeResponse(fd, ok: false, error: verr)
+                return
+            }
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                guard ctl.guestCaps.contains("location") else {
+                    result.error = "guest does not support location simulation"
+                    return
+                }
+                // Take ownership of the guest location source: stop any Mac-location
+                // forwarding or route replay so this fixed fix isn't overwritten by
+                // the provider's next update (headless auto-forwards on connect; the
+                // GUI menu may be syncing or replaying a route). Ownership persists
+                // across guest reconnects until a GUI source is chosen again.
+                controller.locationProvider?.beginExternalControl()
+                do {
+                    let (resp, _) = try await ctl.sendRequest([
+                        "t": "location", "lat": lat, "lon": lon, "alt": alt,
+                        "hacc": hacc, "vacc": vacc, "speed": speed, "course": course,
+                    ])
+                    if (resp["t"] as? String) == "ok" {
+                        result.ok = true
+                    } else {
+                        // Ownership persists on failure by contract (see
+                        // beginExternalControl): leave the source stopped+owned so
+                        // a retry wins and a reconnect can't resume forwarding.
+                        result.error = "guest rejected location: "
+                            + (resp["msg"] as? String ?? "\(resp)")
+                    }
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+            semaphore.wait()
+            writeResponse(fd, ok: result.ok, error: result.error)
+
+        case "location_stop":
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let ctl = controller.control, ctl.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                guard ctl.guestCaps.contains("location") else {
+                    result.error = "guest does not support location simulation"
+                    return
+                }
+                // Silence the provider and hold ownership, else a live forwarder
+                // or a reconnect would re-inject a fix right after we clear.
+                controller.locationProvider?.beginExternalControl()
+                do {
+                    let (resp, _) = try await ctl.sendRequest(["t": "location_stop"])
+                    if (resp["t"] as? String) == "ok" {
+                        result.ok = true
+                    } else {
+                        result.error = "guest rejected location_stop: "
+                            + (resp["msg"] as? String ?? "\(resp)")
+                    }
+                } catch {
+                    result.error = "\(error)"
+                }
+            }
+            semaphore.wait()
+            writeResponse(fd, ok: result.ok, error: result.error)
+
         default:
             writeResponse(fd, ok: false, error: "unknown command: \(type)")
         }
+    }
+
+    /// Validate a simulated-location parameter set at the automation boundary.
+    /// Returns an error message when the values could not produce a valid fix,
+    /// or nil when they are acceptable. Kept pure (no I/O) so it is unit-testable
+    /// and so the protocol edge rejects bad input before any guest round-trip.
+    nonisolated static func locationValidationError(
+        lat: Double, lon: Double, alt: Double,
+        hacc: Double, vacc: Double, speed: Double, course: Double
+    ) -> String? {
+        for (name, value) in [
+            ("lat", lat), ("lon", lon), ("alt", alt), ("hacc", hacc),
+            ("vacc", vacc), ("speed", speed), ("course", course),
+        ] where !value.isFinite {
+            return "\(name) must be a finite number"
+        }
+        if lat < -90 || lat > 90 { return "lat out of range [-90, 90]: \(lat)" }
+        if lon < -180 || lon > 180 { return "lon out of range [-180, 180]: \(lon)" }
+        // Negative horizontalAccuracy marks the coordinate itself invalid — we are
+        // asserting a real fix, so reject it. (vacc/speed may be negative: those are
+        // CoreLocation "altitude/speed unknown" sentinels and stay permissive.)
+        if hacc < 0 { return "hacc must be >= 0: \(hacc)" }
+        // course: -1 is the CoreLocation "heading unknown" sentinel; otherwise [0, 360).
+        if course != -1 && (course < 0 || course >= 360) {
+            return "course must be -1 or in [0, 360): \(course)"
+        }
+        return nil
     }
 
     /// Query the guest 1337 `vcam_status` for one generation and return the

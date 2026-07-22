@@ -15,10 +15,12 @@ BOOL vp_location_load(void);
 /// Whether location simulation is available (load succeeded).
 BOOL vp_location_available(void);
 
-/// Simulate a GPS location update.
-void vp_location_simulate(double lat, double lon, double alt,
+/// Simulate a GPS location update. Returns NO when simulation is unavailable
+/// (daemon not loaded / no set-location selector) or the injection threw.
+BOOL vp_location_simulate(double lat, double lon, double alt,
                            double hacc, double vacc,
                            double speed, double course);
 
-/// Clear simulated location.
-void vp_location_clear(void);
+/// Clear simulated location. Returns NO when no clear selector was found
+/// (capability does not require one) or the clear threw.
+BOOL vp_location_clear(void);
