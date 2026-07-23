@@ -15,6 +15,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var hostControl: VPhoneHostControl?
     private var cameraServer: VPhoneCameraServer?
     private var sigintSource: DispatchSourceSignal?
+    private var hostSleepActivity: NSObjectProtocol?
     private var didAttemptAutoInstall = false
 
     init(cli: VPhoneBootCLI) {
@@ -77,6 +78,13 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         self.vm = vm
 
         try await vm.start(forceDFU: cli.dfu)
+        if !cli.allowHostIdleSleep {
+            hostSleepActivity = ProcessInfo.processInfo.beginActivity(
+                options: .idleSystemSleepDisabled,
+                reason: "Keep the vPhone virtual machine running"
+            )
+            print("[vphone] Host idle system sleep disabled while VM is running")
+        }
 
         let control = VPhoneControl(variant: options.variant)
         self.control = control
@@ -267,6 +275,10 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_: Notification) {
         hostControl?.stop()
+        if let hostSleepActivity {
+            ProcessInfo.processInfo.endActivity(hostSleepActivity)
+            self.hostSleepActivity = nil
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {

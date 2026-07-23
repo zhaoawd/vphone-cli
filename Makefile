@@ -19,6 +19,7 @@ RESTORE_UDID ?=           # UDID for restore operations
 RESTORE_ECID ?=           # ECID for restore operations
 SSH_FORWARD ?= auto       # usbmux->TCP SSH forward on `make boot`: auto (JB only, via marker), 1 (force), 0 (off)
 SSH_FWD_PORT ?= 2222      # Local port forwarded to guest:22
+ALLOW_HOST_IDLE_SLEEP ?= 0 # 1 lets macOS idle-sleep while the VM is running
 
 # ─── Build info ──────────────────────────────────────────────────
 GIT_HASH    := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -95,6 +96,7 @@ help:
 	@echo "  make boot                    Boot VM (reads from config.plist; auto SSH forward on JB)"
 	@echo "    Options: SSH_FORWARD=auto         auto: forward only on JB (marker); 1 force; 0 off"
 	@echo "             SSH_FWD_PORT=2222         Local port forwarded to guest:22"
+	@echo "             ALLOW_HOST_IDLE_SLEEP=1   Let macOS idle-sleep while the VM runs (guest may resume locked)"
 	@echo "  make ssh_forward             Start host usbmux->guest:22 forward only (JB)"
 	@echo "  make boot_less               Boot VM in vphoned patchless compatibility"
 	@echo "    Options: NO_VPHONED=1              Excludes vphoned from being installed"
@@ -348,7 +350,8 @@ boot: bundle vphoned boot_binary_check
 			FWD_PID=$$!; \
 			trap 'kill $$FWD_PID 2>/dev/null || true' EXIT INT TERM; \
 		fi; \
-		"$(CURDIR)/$(BUNDLE_BIN)" --config ./config.plist; \
+		"$(CURDIR)/$(BUNDLE_BIN)" --config ./config.plist \
+			$(if $(filter 1 true yes YES TRUE,$(ALLOW_HOST_IDLE_SLEEP)),--allow-host-idle-sleep,); \
 	}
 
 # Standalone host-side usbmux -> guest:22 forward (JB sshd runs in-VM via LaunchDaemon)
@@ -365,12 +368,14 @@ boot_less: bundle vphoned boot_binary_check_less
 	cd $(VM_DIR) && "$(CURDIR)/$(BUNDLE_BIN)" \
 		--config ./config.plist \
 		--variant less \
-		$(if $(filter 1 true yes YES TRUE,$(NO_VPHONED)),--no-vphoned,)
+		$(if $(filter 1 true yes YES TRUE,$(NO_VPHONED)),--no-vphoned,) \
+		$(if $(filter 1 true yes YES TRUE,$(ALLOW_HOST_IDLE_SLEEP)),--allow-host-idle-sleep,)
 
 boot_dfu: build boot_binary_check
 	cd $(VM_DIR) && "$(CURDIR)/$(BINARY)" \
 		--config ./config.plist \
-		--dfu
+		--dfu \
+		$(if $(filter 1 true yes YES TRUE,$(ALLOW_HOST_IDLE_SLEEP)),--allow-host-idle-sleep,)
 
 # ═══════════════════════════════════════════════════════════════════
 # Firmware pipeline

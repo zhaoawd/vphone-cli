@@ -56,6 +56,11 @@ struct VPhoneBootCLI: ParsableCommand {
     @Flag(name: .customLong("no-vphoned"), help: "Exclude vphoned usage (patchless-only).")
     var noVphoned: Bool = false
 
+    @Flag(
+        help: "Allow macOS idle system sleep while the VM is running. Manual and clamshell sleep are always allowed."
+    )
+    var allowHostIdleSleep: Bool = false
+
     /// DFU mode runs headless (no GUI).
     var noGraphics: Bool {
         dfu
