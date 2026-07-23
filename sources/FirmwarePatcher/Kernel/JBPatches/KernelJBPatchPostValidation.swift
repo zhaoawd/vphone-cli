@@ -29,6 +29,7 @@ extension KernelJBPatcher {
         // Collect unique caller function starts.
         var seenFuncs = Set<Int>()
         var hits: [Int] = []
+        var alreadyPatchedHits: [Int] = []
 
         for (adrpOff, _) in refs {
             guard let callerStart = findFunctionStart(adrpOff),
@@ -55,13 +56,16 @@ extension KernelJBPatcher {
                     guard insns.count >= 2 else { continue }
                     let i0 = insns[0], i1 = insns[1]
 
-                    // Must be: cmp w0, #imm  followed by  b.ne
+                    // Must be the original `cmp w0, #imm` or the idempotent
+                    // already-patched `cmp w0, w0`, followed by `b.ne`.
                     guard i0.mnemonic == "cmp", i1.mnemonic == "b.ne" else { continue }
                     guard let detail0 = i0.aarch64, detail0.operands.count >= 2 else { continue }
                     let op0 = detail0.operands[0]
                     let op1 = detail0.operands[1]
                     guard op0.type == AARCH64_OP_REG, op0.reg == AARCH64_REG_W0 else { continue }
-                    guard op1.type == AARCH64_OP_IMM else { continue }
+                    let isOriginal = op1.type == AARCH64_OP_IMM
+                    let isAlreadyPatched = op1.type == AARCH64_OP_REG && op1.reg == AARCH64_REG_W0
+                    guard isOriginal || isAlreadyPatched else { continue }
 
                     // Must be preceded by a BL within 3 instructions.
                     var hasBlBefore = false
@@ -72,15 +76,25 @@ extension KernelJBPatcher {
                         }
                     }
                     guard hasBlBefore else { continue }
-                    hits.append(off)
+                    if isOriginal {
+                        hits.append(off)
+                    } else {
+                        alreadyPatchedHits.append(off)
+                    }
                 }
             }
         }
 
         let uniqueHits = Array(Set(hits)).sorted()
-        guard uniqueHits.count == 1 else {
-            log("  [-] expected 1 postValidation compare site, found \(uniqueHits.count)")
+        let uniqueAlreadyPatchedHits = Array(Set(alreadyPatchedHits)).sorted()
+        guard uniqueHits.count + uniqueAlreadyPatchedHits.count == 1 else {
+            log("  [-] expected 1 postValidation compare site, found \(uniqueHits.count) original + \(uniqueAlreadyPatchedHits.count) already-patched")
             return false
+        }
+
+        if let patchOff = uniqueAlreadyPatchedHits.first {
+            log("  [=] postValidation compare already bypassed at 0x\(String(patchOff, radix: 16, uppercase: true))")
+            return true
         }
 
         let patchOff = uniqueHits[0]

@@ -119,11 +119,20 @@ Neutralize AMFI's SHA256-only post-validation reject gate in vnode signature pro
 
 ## Current Patch Search Logic
 
-- Implemented in `scripts/patchers/kernel_jb_patch_post_validation.py`.
+- Current implementation: `sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchPostValidation.swift`.
+- Legacy reference implementation: `scripts/patchers/kernel_jb_patch_post_validation.py`.
 - Site resolution uses anchor + opcode-shape + control-flow context; ambiguous candidates are rejected.
 - The patch is applied only after a unique candidate is confirmed in-function.
 - anchor: `"AMFI: code signature validation failed"`
 - Uses string anchors + instruction-pattern constraints + structural filters (for example callsite shape, branch form, register/imm checks).
+
+### Idempotent site recognition
+
+- The Swift matcher accepts either the original `cmp w0,#imm ; b.ne` state or the already-patched `cmp w0,w0 ; b.ne` state at the uniquely resolved site.
+- An original match emits `jb.post_validation.cmp_w0_w0` and rewrites the compare through the Keystone-backed `ARM64.cmpW0W0` helper.
+- An already-patched match logs the resolved file offset and returns success without emitting a `PatchRecord` or writing the kernel again. Consequently, a pre-patched input reports one fewer newly applied write; that is not a patch failure.
+- This guarantee is local to `patchPostValidationAdditional()`. It does not make the complete `fw_patch_jb` or `fw_patch_exp` pipeline idempotent.
+- Both states remain subject to the same string reference, caller/callee, adjacent `b.ne`, prior-`bl`, code-range, and unique-candidate checks. A mixed or ambiguous result is rejected.
 
 ## Pseudocode (Before)
 
