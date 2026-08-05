@@ -56,8 +56,10 @@ class VPhoneHostControl {
     private final class ResultBox: @unchecked Sendable {
         var path: String?
         var error: String?
+        var code: String?
         var ok = false
         var imageBase64: String?
+        var extra: [String: Any] = [:]
     }
 
     /// Thread-safe box for guest shell output passed back from the main actor.
@@ -935,6 +937,88 @@ class VPhoneHostControl {
             semaphore.wait()
             writeResponse(fd, ok: result.ok, error: result.error)
 
+        case "location_source_set", "location_stream_start", "location_stream_push",
+             "location_source_control", "location_source_status", "location_source_stop":
+            let semaphore = DispatchSemaphore(value: 0)
+            let result = ResultBox()
+            Task { @MainActor in
+                defer { semaphore.signal() }
+                guard let controller, let provider = controller.locationProvider else {
+                    result.error = "location provider unavailable"
+                    result.code = "location_guest_unavailable"
+                    return
+                }
+                let systemController = provider.systemLocationController
+                do {
+                    let snapshot: [String: Any]
+                    switch type {
+                    case "location_source_set":
+                        guard (json["mode"] as? String) == "fixed" else {
+                            throw SystemLocationControllerError(
+                                code: "invalid_location_source",
+                                message: "location_source_set mode must be fixed")
+                        }
+                        try Self.requireWGS84(json)
+                        if json["persist"] as? Bool == true {
+                            throw SystemLocationControllerError(
+                                code: "invalid_location_source",
+                                message: "persisted fixed sources are not implemented")
+                        }
+                        let owner = json["owner"] as? String ?? ""
+                        let heartbeat = json["heartbeat_s"] as? Double ?? 1.0
+                        let fix = try Self.systemLocationFix(json)
+                        provider.beginExternalControl()
+                        snapshot = try await systemController.setFixed(
+                            owner: owner, fix: fix, heartbeatSeconds: heartbeat,
+                            replace: json["replace"] as? Bool ?? false)
+                    case "location_stream_start":
+                        try Self.requireWGS84(json)
+                        guard (json["on_timeout"] as? String ?? "hold") == "hold" else {
+                            throw SystemLocationControllerError(
+                                code: "invalid_location_source",
+                                message: "on_timeout must be hold")
+                        }
+                        provider.beginExternalControl()
+                        snapshot = try systemController.startStream(
+                            owner: json["owner"] as? String ?? "",
+                            watchdogSeconds: json["watchdog_s"] as? Double ?? 3.0,
+                            replace: json["replace"] as? Bool ?? false)
+                    case "location_stream_push":
+                        let generation = json["generation"] as? String ?? ""
+                        let fix = try Self.systemLocationFix(json)
+                        snapshot = try await systemController.push(
+                            generation: generation, fix: fix)
+                    case "location_source_control":
+                        guard let paused = json["paused"] as? Bool else {
+                            throw SystemLocationControllerError(
+                                code: "invalid_location_source",
+                                message: "only paused control is currently supported")
+                        }
+                        snapshot = try await systemController.setPaused(
+                            paused, generation: json["generation"] as? String ?? "")
+                    case "location_source_status":
+                        snapshot = systemController.snapshot()
+                    case "location_source_stop":
+                        snapshot = try await systemController.stop(
+                            generation: json["generation"] as? String)
+                    default:
+                        preconditionFailure("unreachable location command")
+                    }
+                    result.ok = true
+                    result.extra = snapshot
+                } catch let error as SystemLocationControllerError {
+                    result.code = error.code
+                    result.error = error.message
+                } catch {
+                    result.code = "location_delivery_rejected"
+                    result.error = error.localizedDescription
+                }
+            }
+            semaphore.wait()
+            var extra = result.extra
+            if let code = result.code { extra["code"] = code }
+            writeResponse(fd, ok: result.ok, error: result.error, extra: extra)
+
         case "location":
             // Push a simulated GPS fix into the guest's system-wide
             // CLSimulationManager (same channel the GUI location menu drives).
@@ -961,12 +1045,8 @@ class VPhoneHostControl {
             let result = ResultBox()
             Task { @MainActor in
                 defer { semaphore.signal() }
-                guard let controller, let ctl = controller.control, ctl.isConnected else {
-                    result.error = "guest not connected"
-                    return
-                }
-                guard ctl.guestCaps.contains("location") else {
-                    result.error = "guest does not support location simulation"
+                guard let controller, let provider = controller.locationProvider else {
+                    result.error = "location provider unavailable"
                     return
                 }
                 // Take ownership of the guest location source: stop any Mac-location
@@ -974,21 +1054,19 @@ class VPhoneHostControl {
                 // the provider's next update (headless auto-forwards on connect; the
                 // GUI menu may be syncing or replaying a route). Ownership persists
                 // across guest reconnects until a GUI source is chosen again.
-                controller.locationProvider?.beginExternalControl()
+                provider.beginExternalControl()
+                print("[location] deprecated host command 'location'; use location_source_set or stream")
                 do {
-                    let (resp, _) = try await ctl.sendRequest([
-                        "t": "location", "lat": lat, "lon": lon, "alt": alt,
-                        "hacc": hacc, "vacc": vacc, "speed": speed, "course": course,
-                    ])
-                    if (resp["t"] as? String) == "ok" {
-                        result.ok = true
-                    } else {
-                        // Ownership persists on failure by contract (see
-                        // beginExternalControl): leave the source stopped+owned so
-                        // a retry wins and a reconnect can't resume forwarding.
-                        result.error = "guest rejected location: "
-                            + (resp["msg"] as? String ?? "\(resp)")
-                    }
+                    _ = try await provider.systemLocationController.setFixed(
+                        owner: "legacy-uds",
+                        fix: SystemLocationFix(
+                            producerSequence: 0,
+                            latitude: lat, longitude: lon, altitude: alt,
+                            horizontalAccuracy: hacc, verticalAccuracy: vacc,
+                            speed: speed, course: course,
+                            timestamp: Date().timeIntervalSince1970),
+                        heartbeatSeconds: 1.0)
+                    result.ok = true
                 } catch {
                     result.error = "\(error)"
                 }
@@ -1001,25 +1079,17 @@ class VPhoneHostControl {
             let result = ResultBox()
             Task { @MainActor in
                 defer { semaphore.signal() }
-                guard let controller, let ctl = controller.control, ctl.isConnected else {
-                    result.error = "guest not connected"
-                    return
-                }
-                guard ctl.guestCaps.contains("location") else {
-                    result.error = "guest does not support location simulation"
+                guard let controller, let provider = controller.locationProvider else {
+                    result.error = "location provider unavailable"
                     return
                 }
                 // Silence the provider and hold ownership, else a live forwarder
                 // or a reconnect would re-inject a fix right after we clear.
-                controller.locationProvider?.beginExternalControl()
+                provider.beginExternalControl()
+                print("[location] deprecated host command 'location_stop'; use location_source_stop")
                 do {
-                    let (resp, _) = try await ctl.sendRequest(["t": "location_stop"])
-                    if (resp["t"] as? String) == "ok" {
-                        result.ok = true
-                    } else {
-                        result.error = "guest rejected location_stop: "
-                            + (resp["msg"] as? String ?? "\(resp)")
-                    }
+                    _ = try await provider.systemLocationController.clearLegacyLocation()
+                    result.ok = true
                 } catch {
                     result.error = "\(error)"
                 }
@@ -1036,6 +1106,51 @@ class VPhoneHostControl {
     /// Returns an error message when the values could not produce a valid fix,
     /// or nil when they are acceptable. Kept pure (no I/O) so it is unit-testable
     /// and so the protocol edge rejects bad input before any guest round-trip.
+    private nonisolated static func requireWGS84(_ json: [String: Any]) throws {
+        guard (json["coordinate_system"] as? String)?.lowercased() == "wgs84" else {
+            throw SystemLocationControllerError(
+                code: "invalid_location_source",
+                message: "coordinate_system must be wgs84")
+        }
+    }
+
+    nonisolated static func systemLocationFix(
+        _ json: [String: Any]
+    ) throws -> SystemLocationFix {
+        guard let sequence = json["producer_sequence"] as? Int,
+              let lat = json["lat"] as? Double,
+              let lon = json["lon"] as? Double
+        else {
+            throw SystemLocationControllerError(
+                code: "invalid_location_source",
+                message: "producer_sequence, lat and lon are required")
+        }
+        let timestamp: TimeInterval
+        if let numeric = json["timestamp"] as? Double {
+            timestamp = numeric
+        } else if let text = json["timestamp"] as? String {
+            let fractional = ISO8601DateFormatter()
+            fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let regular = ISO8601DateFormatter()
+            guard let date = fractional.date(from: text) ?? regular.date(from: text) else {
+                throw SystemLocationControllerError(
+                    code: "invalid_location_source", message: "timestamp must be ISO-8601")
+            }
+            timestamp = date.timeIntervalSince1970
+        } else {
+            timestamp = 0
+        }
+        return SystemLocationFix(
+            producerSequence: sequence,
+            latitude: lat, longitude: lon,
+            altitude: json["alt"] as? Double ?? 0,
+            horizontalAccuracy: json["hacc"] as? Double ?? 5,
+            verticalAccuracy: json["vacc"] as? Double ?? 5,
+            speed: json["speed"] as? Double ?? 0,
+            course: json["course"] as? Double ?? -1,
+            timestamp: timestamp)
+    }
+
     nonisolated static func locationValidationError(
         lat: Double, lon: Double, alt: Double,
         hacc: Double, vacc: Double, speed: Double, course: Double

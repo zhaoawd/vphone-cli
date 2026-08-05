@@ -38,6 +38,8 @@ class VPhoneLocationProvider: NSObject {
     }
 
     private let control: VPhoneControl
+    lazy var systemLocationController = VPhoneSystemLocationController(
+        adapter: VPhoneControlLocationGuestAdapter(control: control))
     private var hostModeStarted = false
 
     /// True once an external controller (the UDS automation surface) has taken
@@ -94,6 +96,7 @@ class VPhoneLocationProvider: NSObject {
 
     /// Begin sending location to the guest.  Safe to call on every (re)connect.
     func startForwarding() {
+        systemLocationController.relinquishForGUI()
         externallyControlled = false
         stopReplay()
         guard let mgr = locationManager else { return }
@@ -119,6 +122,7 @@ class VPhoneLocationProvider: NSObject {
 
     /// Send a fixed simulated location to the guest.
     func sendPreset(name: String, latitude: Double, longitude: Double, altitude: Double = 0) {
+        systemLocationController.relinquishForGUI()
         externallyControlled = false
         stopReplay()
         sendSimulatedLocation(
@@ -145,6 +149,7 @@ class VPhoneLocationProvider: NSObject {
             return
         }
 
+        systemLocationController.relinquishForGUI()
         externallyControlled = false
         stopForwarding()
         stopReplay()
