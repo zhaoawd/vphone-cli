@@ -38,6 +38,10 @@ class VPhoneLocationProvider: NSObject {
     }
 
     private let control: VPhoneControl
+    private let locationStateURL: URL
+    lazy var systemLocationController = VPhoneSystemLocationController(
+        adapter: VPhoneControlLocationGuestAdapter(control: control),
+        stateStore: SystemLocationStateStore(url: locationStateURL))
     private var hostModeStarted = false
 
     /// True once an external controller (the UDS automation surface) has taken
@@ -57,9 +61,15 @@ class VPhoneLocationProvider: NSObject {
         replayTask != nil
     }
 
-    init(control: VPhoneControl) {
+    init(control: VPhoneControl, locationStateURL: URL) {
         self.control = control
+        self.locationStateURL = locationStateURL
         super.init()
+
+        if systemLocationController.hasActiveSource {
+            externallyControlled = true
+            print("[location] restored persisted fixed source; waiting for guest")
+        }
 
         let proxy = LocationDelegateProxy { [weak self] location in
             Task { @MainActor in
@@ -94,6 +104,7 @@ class VPhoneLocationProvider: NSObject {
 
     /// Begin sending location to the guest.  Safe to call on every (re)connect.
     func startForwarding() {
+        systemLocationController.relinquishForGUI()
         externallyControlled = false
         stopReplay()
         guard let mgr = locationManager else { return }
@@ -119,6 +130,7 @@ class VPhoneLocationProvider: NSObject {
 
     /// Send a fixed simulated location to the guest.
     func sendPreset(name: String, latitude: Double, longitude: Double, altitude: Double = 0) {
+        systemLocationController.relinquishForGUI()
         externallyControlled = false
         stopReplay()
         sendSimulatedLocation(
@@ -145,6 +157,7 @@ class VPhoneLocationProvider: NSObject {
             return
         }
 
+        systemLocationController.relinquishForGUI()
         externallyControlled = false
         stopForwarding()
         stopReplay()

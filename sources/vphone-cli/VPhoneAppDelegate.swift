@@ -94,7 +94,11 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 control.guestBinaryURL = vphonedURL
             }
 
-            let provider = VPhoneLocationProvider(control: control)
+            let provider = VPhoneLocationProvider(
+                control: control,
+                locationStateURL: options.configURL
+                    .deletingLastPathComponent()
+                    .appendingPathComponent("system-location.json"))
             locationProvider = provider
 
             let camServer = VPhoneCameraServer()
@@ -186,6 +190,11 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 mc?.updateShellAvailability(available: caps.contains("shell"))
                 if caps.contains("location") {
                     mc?.updateLocationCapability(available: true)
+                    if provider?.externallyControlled == true {
+                        Task { @MainActor in
+                            await provider?.systemLocationController.reapplyAfterReconnect()
+                        }
+                    }
                     // Auto-resume if user had toggle on — unless the UDS surface
                     // has taken ownership of the location source, in which case
                     // resuming would clobber the externally injected fix.
@@ -220,6 +229,11 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             // would overwrite the externally injected fix with Mac forwarding.
             control.onConnect = { [weak provider = locationProvider] caps in
                 if caps.contains("location") {
+                    if provider?.externallyControlled == true {
+                        Task { @MainActor in
+                            await provider?.systemLocationController.reapplyAfterReconnect()
+                        }
+                    }
                     if provider?.externallyControlled != true {
                         provider?.startForwarding()
                     }

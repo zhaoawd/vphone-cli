@@ -18,8 +18,9 @@ final class LocationValidationTests: XCTestCase {
         XCTAssertNil(err())
         // course sentinel -1 (heading unknown) must stay valid.
         XCTAssertNil(err(course: -1))
-        // negative vacc / speed are CoreLocation "unknown" sentinels — permissive.
-        XCTAssertNil(err(vacc: -1, speed: -1))
+        XCTAssertNil(err(speed: -1))
+        XCTAssertNotNil(err(speed: -2))
+        XCTAssertNotNil(err(vacc: -1))
     }
 
     func testLatLonRangeRejected() {
@@ -35,7 +36,8 @@ final class LocationValidationTests: XCTestCase {
 
     func testNegativeAccuracyRejected() {
         XCTAssertNotNil(err(hacc: -1))
-        XCTAssertNil(err(hacc: 0))
+        XCTAssertNotNil(err(hacc: 0))
+        XCTAssertNotNil(err(vacc: 0))
     }
 
     func testCourseRangeRejected() {
@@ -51,5 +53,32 @@ final class LocationValidationTests: XCTestCase {
         XCTAssertNotNil(err(lon: .infinity))
         XCTAssertNotNil(err(alt: .nan))
         XCTAssertNotNil(err(hacc: .infinity))
+    }
+
+    func testStreamFixParsesFractionalISO8601Deterministically() throws {
+        let payload: [String: Any] = [
+            "producer_sequence": 3,
+            "lat": 31.2,
+            "lon": 118.8,
+            "timestamp": "2026-08-05T10:00:00.123456+08:00",
+        ]
+        let first = try VPhoneHostControl.systemLocationFix(payload)
+        let retry = try VPhoneHostControl.systemLocationFix(payload)
+        XCTAssertEqual(first, retry)
+        XCTAssertEqual(first.producerSequence, 3)
+        XCTAssertGreaterThan(first.timestamp, 0)
+    }
+
+    func testStreamFixRejectsInvalidTimestamp() {
+        XCTAssertThrowsError(try VPhoneHostControl.systemLocationFix([
+            "producer_sequence": 0,
+            "lat": 31.2,
+            "lon": 118.8,
+            "timestamp": "not-a-time",
+        ])) { error in
+            XCTAssertEqual(
+                (error as? SystemLocationControllerError)?.code,
+                "invalid_location_source")
+        }
     }
 }

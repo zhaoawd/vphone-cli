@@ -195,6 +195,32 @@ static BOOL receive_update(int fd, NSUInteger size) {
 
 // MARK: - Command Dispatch
 
+static NSString *location_protocol_code(VPLocationProtocolResult result) {
+  switch (result) {
+  case VPLocationProtocolInvalid:
+    return @"invalid_location_source";
+  case VPLocationProtocolGenerationConflict:
+    return @"location_generation_conflict";
+  case VPLocationProtocolSequenceConflict:
+    return @"location_sequence_conflict";
+  case VPLocationProtocolUnavailable:
+    return @"location_guest_unavailable";
+  case VPLocationProtocolOK:
+    return nil;
+  }
+}
+
+static NSMutableDictionary *location_protocol_response(
+    VPLocationProtocolResult result, id reqId, NSString *message) {
+  NSMutableDictionary *response =
+      vp_make_response(result == VPLocationProtocolOK ? @"ok" : @"err", reqId);
+  if (result != VPLocationProtocolOK) {
+    response[@"code"] = location_protocol_code(result);
+    response[@"msg"] = message;
+  }
+  return response;
+}
+
 static NSDictionary *handle_command(NSDictionary *msg) {
   NSString *type = msg[@"t"];
   id reqId = msg[@"id"];
@@ -256,6 +282,15 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     return vp_make_response(@"pong", reqId);
   }
 
+  if ([type isEqualToString:@"location_source_begin"]) {
+    NSString *generation = msg[@"generation"];
+    VPLocationProtocolResult result = vp_location_begin(generation);
+    NSMutableDictionary *response = location_protocol_response(
+        result, reqId, @"invalid or unavailable location generation");
+    if (result == VPLocationProtocolOK) response[@"generation"] = generation;
+    return response;
+  }
+
   if ([type isEqualToString:@"location"]) {
     double lat = [msg[@"lat"] doubleValue];
     double lon = [msg[@"lon"] doubleValue];
@@ -264,6 +299,28 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     double vacc = [msg[@"vacc"] doubleValue];
     double speed = [msg[@"speed"] doubleValue];
     double course = [msg[@"course"] doubleValue];
+    NSString *generation = msg[@"generation"];
+    if (generation != nil) {
+      NSNumber *sequence = msg[@"delivery_sequence"];
+      if (![sequence isKindOfClass:[NSNumber class]]) {
+        return location_protocol_response(
+            VPLocationProtocolInvalid, reqId,
+            @"delivery_sequence is required for an owned location source");
+      }
+      BOOL idempotent = NO;
+      VPLocationProtocolResult result = vp_location_simulate_owned(
+          generation, [sequence integerValue],
+          lat, lon, alt, hacc, vacc, speed, course,
+          [msg[@"ts"] doubleValue], &idempotent);
+      NSMutableDictionary *response = location_protocol_response(
+          result, reqId, @"owned location delivery rejected");
+      if (result == VPLocationProtocolOK) {
+        response[@"generation"] = generation;
+        response[@"delivery_sequence"] = sequence;
+        response[@"idempotent"] = @(idempotent);
+      }
+      return response;
+    }
     if (vp_location_simulate(lat, lon, alt, hacc, vacc, speed, course)) {
       return vp_make_response(@"ok", reqId);
     }
@@ -273,6 +330,19 @@ static NSDictionary *handle_command(NSDictionary *msg) {
   }
 
   if ([type isEqualToString:@"location_stop"]) {
+    NSString *generation = msg[@"generation"];
+    if (generation != nil) {
+      BOOL idempotent = NO;
+      VPLocationProtocolResult result =
+          vp_location_clear_owned(generation, &idempotent);
+      NSMutableDictionary *response = location_protocol_response(
+          result, reqId, @"owned location clear rejected");
+      if (result == VPLocationProtocolOK) {
+        response[@"generation"] = generation;
+        response[@"idempotent"] = @(idempotent);
+      }
+      return response;
+    }
     if (vp_location_clear()) {
       return vp_make_response(@"ok", reqId);
     }
