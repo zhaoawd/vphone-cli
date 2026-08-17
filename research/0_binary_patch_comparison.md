@@ -204,9 +204,9 @@ patchers with typed Capstone operands and computed or assembler-backed encoders.
 | `exec_security_policy_kill` | Typed `mov/movz w0,#9; mov/movz w1,#8`, same-register `ldr wN; cbz wN,<forward>` | `ARM64Encoder.encodeB` to the decoded CBZ target | `applyIOS27` | Swift compile, encoder round-trip tests, static guardrail test |
 | `iouc_sandbox_gate` | Failure-string xref; typed `cbnz wN,<deny>` enclosing the xref; typed in-function `b.eq <allow>` | `ARM64Encoder.encodeB` from deny entry to decoded allow target | `applyIOS27` | Swift compile and static guardrail test |
 | `iomfb_swapend_handler_size` | Typed `cmp w2,#0x588; b.ne` with unique-hit requirement | `ARM64Encoder.encodeCmpImmediateW(rn:2,imm12:0x6e0)` | `applyIOS27` | Capstone round-trip encoder test and static guardrail test |
-| `iomfb_swapend_variable_size` | Unique `IOExternalMethodDispatch` table shape in `__DATA_CONST` | Data-field update to `kIOUCVariableStructureSize` | `applyIOS27` | Swift compile; firmware fixture validation unavailable |
+| `iomfb_swapend_variable_size` | Unique `IOExternalMethodDispatch` table shape in `__DATA_CONST` | Data-field update to `kIOUCVariableStructureSize` | `applyIOS27` | Swift compile; compatible cloudOS 26.4 firmware fixture validation unavailable |
 | `container_manager_upcall_force_success` | Failure-string xref; typed adjacent `bl; cbz w0,<backward executable target>` | `ARM64Encoder.encodeB` to the decoded success target | `applyIOS27` | Swift compile and static guardrail test |
-| `di2_*` | C++/AssertMacros string anchors and typed operands; allocation and both bound checks remain all-or-nothing | Central `ARM64.nop` and computed MOVZ encoders | `applyIOS27` | Swift compile and static guardrail test; firmware records unavailable |
+| `di2_*` | C++/AssertMacros string anchors and typed operands; allocation and both bound checks remain all-or-nothing | Central `ARM64.nop` and computed MOVZ encoders | `applyIOS27` | Swift compile and static guardrail test; compatible cloudOS 26.4 firmware records unavailable |
 | `jb.fpfs_scoped_open.*` | Sandbox ops table plus a 20-instruction cave validated through typed Capstone operands and branch targets before either emit | Named `ARM64Encoder` calls and central `ARM64.ret` | `applyIOS27` | 80-byte cave round-trip test verifies both daemon branches, allow return, and real-hook branch |
 | IOMFB DSC force-kern | Named public/`_kern_` symbols and typed `cbz x0; ldr xN,[x0]; cbz xN; br* xN` shape | Keystone `asm_at()` branch | iOS 27 CFW phase | Python positive/negative semantic tests and static guardrail test |
 | diskimagesiod mount gate | Symbol/ObjC metadata IMP lookup; typed prologue classifier accepts known frame setup, detects an existing patch, and rejects unknown input | Central Keystone-backed `MOV_X0_1` and `RET` | iOS 27 CFW phase | Python classification tests cover patched, patchable, unrelated, and truncated prefixes |
@@ -215,16 +215,25 @@ patchers with typed Capstone operands and computed or assembler-backed encoders.
 
 Validation limits:
 
-- Neither `kernelcache.release.vphone600` nor `kernelcache.research.vphone600`
-  was used for address or symbol validation in this integration. The local symbol
-  database entries point to JSON files that are absent from this checkout.
+- The local cloudOS `26.1-23B85` `kernelcache.research.vphone600` was exercised
+  through `patch-component --component kernel-jb --target-os 26.1`. It emitted
+  84 patch records; the iOS-27-only record IDs were absent, which validates the
+  non-27 gate on this fixture. This kernel does not contain the cloudOS 26.4 IOMFB
+  shapes required by the iOS 27 integration.
+- An attempt to obtain the supported cloudOS `26.4-23E5207q`
+  `kernelcache.research.vphone600` through the project test harness failed because
+  the Apple PCC release endpoint returned EOF. The iOS-27-only kernel patches
+  therefore have no compatible local firmware-output validation in this run.
+- The local symbol database entries point to JSON files that are absent from this
+  checkout. No independent symbol-address validation was performed.
 - `research/reference/xnu` is absent. Source and address claims retained from the
   upstream rows above were not independently correlated with a local XNU checkout.
 - `ipsws/patch_refactor_input` firmware fixtures are absent. Swift comparison tests
   that require those files retain their pre-integration missing-file failures.
 - Local validation covers semantic decoding, computed encoding, static guardrails,
-  Python unit tests, Swift unit tests, and the supported signed build. It does not
-  constitute firmware-output or on-device validation.
+  Python unit tests, Swift unit tests, the supported signed build, and the non-27
+  kernel gate on cloudOS 26.1. It does not constitute iOS 27 firmware-output or
+  on-device validation.
 
 ### Installed Components
 
