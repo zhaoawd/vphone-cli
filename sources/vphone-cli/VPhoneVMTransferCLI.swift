@@ -28,13 +28,19 @@ struct VPhoneVMExportCommand: ParsableCommand {
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
     @Option(name: .shortAndLong, help: "output archive path") var out: String
+    @Flag(help: "densest compression (xz -9) instead of the default fast (zstd -3)") var max = false
     @Flag(help: "include the *_Restore* IPSW directory") var includeIpsw = false
 
     func run() throws {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
-        try VPhoneBundleOps.export(
-            bundleNamed: name, to: URL(fileURLWithPath: out), includeIPSW: includeIpsw, in: lib.library)
-        print("exported \(name) → \(out)")
+        let compression: VPhoneBundleOps.ExportCompression = max ? .max : .fast
+        let bar = VPhoneProgressBar(label: "exporting \(name)")
+        let outURL = try VPhoneBundleOps.export(
+            bundleNamed: name, to: URL(fileURLWithPath: out), includeIPSW: includeIpsw,
+            compression: compression, in: lib.library,
+            progress: { done, total in bar.update(done: done, total: total) })
+        bar.finish()
+        print("exported \(name) → \(outURL.path)")
     }
 }
 
@@ -43,12 +49,15 @@ struct VPhoneVMImportCommand: ParsableCommand {
         commandName: "import", abstract: "Import a VM bundle from a .tgz archive")
 
     @OptionGroup var lib: VPhoneLibraryOption
-    @Option(name: [.customShort("i"), .customLong("in")], help: "input archive path") var input: String
+    @Argument(help: "input archive path") var input: String
     @Option(name: .shortAndLong, help: "name for the imported VM (default: the archive's own name)") var name: String?
 
     func run() throws {
+        let bar = VPhoneProgressBar(label: "importing")
         let bundle = try VPhoneBundleOps.importArchive(
-            from: URL(fileURLWithPath: input), name: name, in: lib.library)
+            from: URL(fileURLWithPath: input), name: name, in: lib.library,
+            progress: { done, total in bar.update(done: done, total: total) })
+        bar.finish()
         print("imported → \(bundle.name)")
     }
 }

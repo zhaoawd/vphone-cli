@@ -12,6 +12,7 @@
 
 - Apple Silicon
 - macOS 15+（Sequoia）
+- Xcode + iOS SDK（用于交叉编译访客守护进程）
 - [放宽 SIP/AMFI，以允许未签名二进制使用私有 PV=3 授权](#放宽-sipamfi)
 
 **依赖：**
@@ -60,8 +61,8 @@ vphone-cli vm info myphone                  # 显示某台虚拟机
 vphone-cli vm new myphone                   # 创建一个空 bundle（cpu/内存/磁盘选项）
 vphone-cli vm config myphone --cpu 8 --memory 8192
 vphone-cli vm clone myphone myphone-2       # 快速 APFS 克隆，全新设备标识
-vphone-cli vm export myphone --out myphone.tar.xz   # xz -9；跳过 restore 目录 + 暂存文件
-vphone-cli vm import --in myphone.tar.xz --name restored
+vphone-cli vm export myphone --out myphone.tzst   # zstd fast by default（--max = xz -9）；--out 为目录时自动命名 <vm>.tzst/.txz；跳过 restore 目录 + 暂存文件
+vphone-cli vm import myphone.tzst --name restored
 vphone-cli vm rename myphone iphone16
 vphone-cli vm delete iphone16
 ```

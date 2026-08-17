@@ -12,6 +12,7 @@ PCC 리서치 VM 인프라를 사용하여 Apple의 Virtualization.framework로 
 
 - Apple Silicon
 - macOS 15+ (Sequoia)
+- Xcode + iOS SDK (게스트 데몬 크로스 컴파일용)
 - [서명되지 않은 바이너리로 private PV=3 권한을 허용하기 위한 SIP/AMFI 완화](#sipamfi-완화)
 
 **의존성:**
@@ -60,8 +61,8 @@ vphone-cli vm info myphone                  # VM 하나 표시
 vphone-cli vm new myphone                   # 빈 번들 생성 (cpu/mem/disk 옵션)
 vphone-cli vm config myphone --cpu 8 --memory 8192
 vphone-cli vm clone myphone myphone-2       # 빠른 APFS 복제, 새로운 기기 식별자
-vphone-cli vm export myphone --out myphone.tar.xz   # xz -9; restore 디렉토리 + 스테이징 파일 건너뜀
-vphone-cli vm import --in myphone.tar.xz --name restored
+vphone-cli vm export myphone --out myphone.tzst   # zstd fast by default (--max = xz -9); --out 이 디렉토리면 <vm>.tzst/.txz 자동 명명; restore 디렉토리 + 스테이징 파일 건너뜀
+vphone-cli vm import myphone.tzst --name restored
 vphone-cli vm rename myphone iphone16
 vphone-cli vm delete iphone16
 ```
