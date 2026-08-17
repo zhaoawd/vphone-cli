@@ -2,7 +2,7 @@
 
 # vphone-cli
 
-Apple の Virtualization.framework と PCC の研究用 VM インフラを使用して、仮想 iPhone (iOS 26) を起動するためのツール
+Apple の Virtualization.framework と PCC の研究用 VM インフラを使用して、仮想 iPhone を起動するためのツール
 
 ![poc](./demo.jpeg)
 
@@ -20,6 +20,11 @@ Apple の Virtualization.framework と PCC の研究用 VM インフラを使用
 | Mac16,11 26.2   | `17,3_26.4_23E246`    | `26.4-23E5207q` |
 | Mac16,11 26.2   | `17,3_26.5_23F77`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
+| Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
+
+iOS 27.0 は 26.4 PCC vphone600 スタックに加えて、CFW 時の force-kern `IOMobileFramebuffer` present-path パッチと dyld 共有キャッシュの `maxSlide` 調整を使用します。
 
 **注意:** iOS 18.x では Metal/GPU アクセラレーションは動作しません。18.x の Metal/IOGPU フレームワークに準仮想化 GPU の実装が存在しないため、Metal でレンダリングされるコンテンツ（Web ページ、画像、壁紙）は表示されません。タッチ、ネットワーク、アプリは正常に動作します。
 
@@ -186,6 +191,7 @@ make cfw_install
 # または: make cfw_install_jb        # 脱獄バリアント
 # または: make cfw_install_exp       # 実験バリアント（脱獄 + リサーチパッチスタック）
 # または: SPOOF_BUILD=23F77 make cfw_install_exp   # ProductBuildVersion も書き換え
+# または: FORCE_DSC_MAXSLIDE=1 make cfw_install    # 27 以外のベースで DSC maxSlide=0 を強制（全バリアント対応、27 は自動）
 ```
 
 ## 初回起動

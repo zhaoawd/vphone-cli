@@ -2,7 +2,7 @@
 
 # vphone-cli
 
-PCC 리서치 VM 인프라와 Apple의 Virtualization.framework를 사용하여 가상 iPhone(iOS 26)을 부팅합니다.
+PCC 리서치 VM 인프라와 Apple의 Virtualization.framework를 사용하여 가상 iPhone을 부팅합니다.
 
 ![poc](./demo.jpeg)
 
@@ -20,6 +20,11 @@ PCC 리서치 VM 인프라와 Apple의 Virtualization.framework를 사용하여 
 | Mac16,11 26.2   | `17,3_26.4_23E246`    | `26.4-23E5207q` |
 | Mac16,11 26.2   | `17,3_26.5_23F77`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
+| Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
+
+iOS 27.0은 26.4 PCC vphone600 스택에 더해 CFW 단계의 force-kern `IOMobileFramebuffer` present-path 패치와 dyld 공유 캐시 `maxSlide` 조정을 사용합니다.
 
 **참고:** iOS 18.x에서는 Metal/GPU 가속이 작동하지 않습니다. 18.x의 Metal/IOGPU 프레임워크에 반가상화 GPU 구현이 없기 때문에 Metal로 렌더링되는 콘텐츠(웹 페이지, 이미지, 배경화면)가 표시되지 않습니다. 터치, 네트워크, 앱은 정상적으로 작동합니다.
 
@@ -186,6 +191,7 @@ make cfw_install
 # 또는: make cfw_install_jb        # 탈옥 변형
 # 또는: make cfw_install_exp       # 실험 변형 (탈옥 + 연구 패치 스택)
 # 또는: SPOOF_BUILD=23F77 make cfw_install_exp   # 추가로 ProductBuildVersion 재작성
+# 또는: FORCE_DSC_MAXSLIDE=1 make cfw_install    # 27 이외 베이스에서 DSC maxSlide=0 강제 (모든 변형, 27은 자동)
 ```
 
 ## 첫 부팅

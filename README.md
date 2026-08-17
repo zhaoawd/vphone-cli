@@ -2,7 +2,7 @@
 
 # vphone-cli
 
-Boot a virtual iPhone (iOS 26) via Apple's Virtualization.framework using PCC research VM infrastructure.
+Boot a virtual iPhone via Apple's Virtualization.framework using PCC research VM infrastructure.
 
 ![poc](./docs/demo.jpeg)
 
@@ -20,8 +20,13 @@ Boot a virtual iPhone (iOS 26) via Apple's Virtualization.framework using PCC re
 | Mac16,11 26.2   | `17,3_26.4_23E246`    | `26.4-23E5207q` |
 | Mac16,11 26.2   | `17,3_26.5_23F77`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
+| Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
 
 iOS <= 26.0.1 use the 26.1 PCC vphone600 stack plus the CFW-time `IOMobileFramebuffer` SwapEnd payload-size patch.
+
+iOS 27.0 uses the 26.4 PCC vphone600 stack plus the CFW-time force-kern `IOMobileFramebuffer` present-path patch and the dyld shared-cache `maxSlide` fit.
 
 **Note:** GPU/Metal acceleration does not work on iOS 18.x — the 18.x Metal/IOGPU framework has no paravirtualized GPU implementation, so Metal-rendered content (web pages, images, wallpaper) does not render. Touch, networking, and apps work normally.
 
@@ -132,6 +137,8 @@ make setup_machine            # full automation through "First Boot" (includes r
 # JB=1 for jailbreak variant (+ full security bypass)
 # EXP=1 for experimental variant (JB + research patches: hv_vmm rename, DT identity, post-restore rewrite)
 # SPOOF_BUILD=<id> (EXP only) Rewrite SystemVersion.plist ProductBuildVersion to <id>, e.g. 23F77
+# export FORCE_EXC_GUARD=1 before running to force-enable the EXC_GUARD disable
+# patch on bases that don't need it to boot (see FAQ: EXC_GUARD crash on launch)
 ```
 
 ## Manual Setup
@@ -147,6 +154,9 @@ make fw_patch                 # patch boot chain (regular variant)
 # or: make fw_patch_dev       # dev variant (+ TXM entitlement/debug bypasses)
 # or: make fw_patch_jb        # jailbreak variant (+ full security bypass)
 # or: make fw_patch_exp       # experimental variant (JB + research stack)
+# add FORCE_EXC_GUARD=1 to fw_patch/fw_patch_jb/fw_patch_exp to force-enable the
+# EXC_GUARD (Mach port guard) disable patch on bases that don't need it to boot —
+# see FAQ: "My app crashes on launch with EXC_GUARD / GUARD_TYPE_MACH_PORT"
 ```
 
 ### Cleaning
@@ -204,6 +214,7 @@ make cfw_install
 # or: make cfw_install_jb        # jailbreak variant
 # or: make cfw_install_exp       # experimental variant (JB + research stack)
 # or: SPOOF_BUILD=23F77 make cfw_install_exp   # additionally rewrite ProductBuildVersion
+# or: FORCE_DSC_MAXSLIDE=1 make cfw_install    # force DSC maxSlide=0 on a non-27 base (any variant; 27 does this automatically)
 ```
 
 ## First Boot
@@ -342,6 +353,20 @@ regular/dev VMs, SSH stays on dropbear `:22222` — forward it manually with
 **Q: Can I install `.tipa` files?**
 
 Yes. The install menu supports both `.ipa` and `.tipa` packages. Drag and drop or use the file picker.
+
+**Q: My app crashes on launch with `EXC_GUARD` / `GUARD_TYPE_MACH_PORT` (e.g. `KOBJECT_REPLY_PORT_SEMANTICS`).**
+
+Some third-party apps that bundle a crash-reporting or RASP SDK call `task_swap_exception_ports()` on launch to install their own exception handler. On bases where this isn't required for the VM itself to boot, the research kernel can enforce that as a fatal Mach port guard violation instead of the silent/non-fatal behavior production iOS exhibits for this call pattern (see [issue #291](https://github.com/Lakr233/vphone-cli/issues/291)).
+
+Re-patch with the guard disable force-enabled, then re-flash:
+
+```bash
+make fw_prepare               # reset to pristine firmware first
+make fw_patch_jb FORCE_EXC_GUARD=1   # or fw_patch / fw_patch_exp
+# ... boot_dfu, restore_get_shsh, restore, cfw_install_jb, boot as usual
+```
+
+This is always on automatically for iOS 18 bases (needed there to boot at all) — the flag only matters for other bases where an app hits this specific crash.
 
 **Q: Can I update to a newer iOS version?**
 

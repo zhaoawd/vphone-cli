@@ -2,7 +2,7 @@
 
 # vphone-cli
 
-通过 Apple 的 Virtualization.framework 使用 PCC 研究虚拟机基础设施引导虚拟 iPhone（iOS 26）。
+通过 Apple 的 Virtualization.framework 使用 PCC 研究虚拟机基础设施引导虚拟 iPhone。
 
 ![poc](./demo.jpeg)
 
@@ -20,6 +20,11 @@
 | Mac16,11 26.2   | `17,3_26.4_23E246`    | `26.4-23E5207q` |
 | Mac16,11 26.2   | `17,3_26.5_23F77`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
+| Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
+| Mac16,6 25.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
+
+iOS 27.0 使用 26.4 PCC vphone600 栈，并额外应用 CFW 阶段的 force-kern `IOMobileFramebuffer` present-path 补丁与 dyld 共享缓存 `maxSlide` 适配。
 
 **注意：** iOS 18.x 上 Metal/GPU 加速无法工作——18.x 的 Metal/IOGPU 框架缺少半虚拟化 GPU 实现，因此由 Metal 渲染的内容（网页、图片、壁纸）无法显示。触摸、网络和应用可正常使用。
 
@@ -186,6 +191,7 @@ make cfw_install
 # 或：make cfw_install_jb        # 越狱变体
 # 或：make cfw_install_exp       # 实验变体（越狱 + 研究补丁栈）
 # 或：SPOOF_BUILD=23F77 make cfw_install_exp   # 同时改写 ProductBuildVersion
+# 或：FORCE_DSC_MAXSLIDE=1 make cfw_install    # 在非 27 基础版本上强制 DSC maxSlide=0（所有变体；27 会自动执行）
 ```
 
 ## 首次启动
