@@ -209,46 +209,43 @@ patchers with typed Capstone operands and computed or assembler-backed encoders.
 | `exec_security_policy_kill` | Typed `mov/movz w0,#9; mov/movz w1,#8`, same-register `ldr wN; cbz wN,<forward>` | `ARM64Encoder.encodeB` to the decoded CBZ target | `applyIOS27` | Swift compile, encoder round-trip tests, static guardrail test |
 | `iouc_sandbox_gate` | Failure-string xref; typed `cbnz wN,<deny>` enclosing the xref; typed in-function `b.eq <allow>` | `ARM64Encoder.encodeB` from deny entry to decoded allow target | `applyIOS27` | Swift compile and static guardrail test |
 | `iomfb_swapend_handler_size` | Typed `cmp w2,#0x588; b.ne` with unique-hit requirement | `ARM64Encoder.encodeCmpImmediateW(rn:2,imm12:0x6e0)` | `applyIOS27` | Capstone round-trip encoder test and static guardrail test |
-| `iomfb_swapend_variable_size` | Unique `IOExternalMethodDispatch` table shape in `__DATA_CONST` | Data-field update to `kIOUCVariableStructureSize` | `applyIOS27` | Swift compile; compatible cloudOS 26.4 firmware fixture validation unavailable |
+| `iomfb_swapend_variable_size` | Unique `IOExternalMethodDispatch` table shape in `__DATA_CONST` | Data-field update to `kIOUCVariableStructureSize` | `applyIOS27` | Emitted in the live cloudOS 26.4 / iOS 27.0 24A5408d JB+Frida firmware patch run |
 | `container_manager_upcall_force_success` | Failure-string xref; typed adjacent `bl; cbz w0,<backward executable target>` | `ARM64Encoder.encodeB` to the decoded success target | `applyIOS27` | Swift compile and static guardrail test |
-| `di2_*` | C++/AssertMacros string anchors and typed operands; allocation and both bound checks remain all-or-nothing | Central `ARM64.nop` and computed MOVZ encoders | `applyIOS27` | Swift compile and static guardrail test; compatible cloudOS 26.4 firmware records unavailable |
+| `di2_*` | C++/AssertMacros string anchors and typed operands; allocation and both bound checks remain all-or-nothing | Central `ARM64.nop` and computed MOVZ encoders | `applyIOS27` | Live cloudOS 26.4 run emitted all five required records: both ABI gates, allocation widening, and both notification bound checks |
 | `jb.fpfs_scoped_open.*` | Sandbox ops table plus a 20-instruction cave validated through typed Capstone operands and branch targets before either emit | Named `ARM64Encoder` calls and central `ARM64.ret` | `applyIOS27` | 80-byte cave round-trip test verifies both daemon branches, allow return, and real-hook branch |
 | IOMFB DSC force-kern | Named public/`_kern_` symbols and typed `cbz x0; ldr xN,[x0]; cbz xN; br* xN` shape | Keystone `asm_at()` branch | iOS 27 CFW phase | Python positive/negative semantic tests and static guardrail test |
-| diskimagesiod mount gate | Symbol/ObjC metadata IMP lookup; typed prologue classifier accepts known frame setup, detects an existing patch, and rejects unknown input | Central Keystone-backed `MOV_X0_1` and `RET` | iOS 27 CFW phase | Python classification tests cover patched, patchable, unrelated, and truncated prefixes |
-| DSC maxSlide | Dyld cache header span/maxSlide check or explicit `FORCE_DSC_MAXSLIDE=1` | Header data update; no instruction replacement | iOS 27, or explicit non-27 opt-in | Integrated from upstream; local firmware image validation unavailable |
+| diskimagesiod mount gate | Symbol/ObjC metadata IMP lookup; typed prologue classifier accepts the original immediate `x29/x30` frame and the 24A5408d ARM64e callee-saved-first frame only when stack allocation, bounded spills, frame record, and frame-pointer offsets are consistent; detects an existing patch and rejects unknown input | Central Keystone-backed `MOV_X0_1` and `RET` | iOS 27 CFW phase | Real 24A5408d prefix (`pacibsp; stp x22,x21,[sp,#-0x30]!; ...`) regression fixture plus negative tests for out-of-frame records, non-spill instructions, missing writeback, unrelated, and truncated prefixes; live CFW applied at foff `0x320B4`, then CoreDevice `ddiServices --auto-mount-ddis` returned `contentIsCompatible: true` and `isUsable: true` |
+| libxpc LWCR | Function-local original consistency idiom or strict already-patched flow (`bl`; same-register `ldr`/`cmp #0`; `cset w0,eq`; `nop`; `nop`) | Keystone `cset w0,eq` plus two NOPs | iOS 27 CFW phase | Original/already-patched/wrong-data-flow tests; live re-run recognized edits at `0x1805DD630`, `0x1805DD634`, and `0x1805DD638` without rewriting |
+| lockdown-mode sysctl gate | In-image symbol plus `bl`-preceded `cmn wR,#1`; accepts either the original `b.eq` or an already-patched `nop` | Keystone NOP | iOS 27 CFW phase | Original/already-patched/missing-call tests; live re-run recognized NOP at `0x237D0C2C0` and continued |
+| DSC maxSlide | Dyld cache header span/maxSlide check or explicit `FORCE_DSC_MAXSLIDE=1` | Header data update; no instruction replacement | iOS 27, or explicit non-27 opt-in | Live 24A5408d DSC: span `0x17CE04000`, maxSlide `0x20000000` overflowed the `0x180000000` region and was set to zero; CFW re-run reported the zero-slide cache fits |
 | EXC_GUARD | Existing semantic `_thread_guard_violation` discovery | Central return instruction | iOS 18 automatic; otherwise `--force-exc-guard` | Integrated from upstream; no compatible local firmware fixture was available |
-| Frida thread-set-state | Entitlement string xrefs recover one containing function; typed direct branch targets and typed `mov/movz w6,#0x201` caller anchors | `ARM64Encoder.encodeMovzW` retains `TSSF_TRANSLATE_TO_USER` and clears `TSSF_CHECK_ENTITLEMENT` | Explicit `--frida`, cloudOS 26.4+ in the pipeline | Typed encoder round-trip and static guardrail tests; compatible local kernel fixture unavailable |
-| Frida vm-map-delete | Typed `ldr wF,[xE,#0x38]`, permanent-bit, developer-mode, current-X and shared-target control-flow anchors; exactly two gates or fail closed | `ARM64Encoder.encodeTestBitBranch` changes bit 9 to bit 13 while retaining register, sense and target | Explicit `--frida`, cloudOS 26.4+ in the pipeline | Typed TBZ/TBNZ round-trip and static guardrail tests; compatible local kernel fixture unavailable |
+| Frida thread-set-state | Entitlement string xrefs recover one containing function; typed direct branch targets and typed `mov/movz w6,#0x201` caller anchors | `ARM64Encoder.encodeMovzW` retains `TSSF_TRANSLATE_TO_USER` and clears `TSSF_CHECK_ENTITLEMENT` | Explicit `--frida`, cloudOS 26.4+ in the pipeline | Live cloudOS 26.4 run changed both callers at foff `0x1D95720` and `0x1D9594C` from `w6=#0x201` to `w6=#1` |
+| Frida vm-map-delete | Typed `ldr wF,[xE,#0x38]`, permanent-bit, developer-mode, current-X and shared-target control-flow anchors; exactly two gates or fail closed | `ARM64Encoder.encodeTestBitBranch` changes bit 9 to bit 13 while retaining register, sense and target | Explicit `--frida`, cloudOS 26.4+ in the pipeline | Live cloudOS 26.4 run retargeted both gates: `tbz` at foff `0x1DBE14C` and `tbnz` at foff `0x1DBE828`, bit 9 to bit 13 |
 
 Validation limits:
 
-- The local cloudOS `26.1-23B85` `kernelcache.research.vphone600` was exercised
-  through `patch-component --component kernel-jb --target-os 26.1`. It emitted
-  84 patch records; the iOS-27-only record IDs were absent, which validates the
-  non-27 gate on this fixture. This kernel does not contain the cloudOS 26.4 IOMFB
-  shapes required by the iOS 27 integration.
-- An explicit standalone `--frida` run on the same cloudOS 26.1 research kernel
-  emitted 86 records: the baseline 84 plus two
-  `kernelcache_frida.thread_set_state_entitlement_flag` records. It emitted no
-  `vm_map_delete_immutable_code` records. Production `FirmwarePipeline` skips all
-  Frida kernel patches below cloudOS 26.4; this standalone run verifies matcher
-  execution only, not a supported deployment configuration.
-- An attempt to obtain the supported cloudOS `26.4-23E5207q`
-  `kernelcache.research.vphone600` through the project test harness failed because
-  the Apple PCC release endpoint returned EOF. The iOS-27-only kernel patches
-  therefore have no compatible local firmware-output validation in this run.
-- The local symbol database entries point to JSON files that are absent from this
-  checkout. No independent symbol-address validation was performed.
-- `research/reference/xnu` is absent. Source and address claims retained from the
-  upstream rows above, including the Frida patch descriptions, were not
-  independently correlated with a local XNU checkout.
-- `ipsws/patch_refactor_input` firmware fixtures are absent. Swift comparison tests
-  that require those files retain their pre-integration missing-file failures.
-- Local validation covers semantic decoding, computed encoding, static guardrails,
-  Python unit tests, Swift unit tests, the supported signed build, and the non-27
-  kernel gate on cloudOS 26.1. The upstream Frida address and record-count evidence
-  was retained but was not reproduced locally. This does not constitute iOS 27 or
-  Frida firmware-output or on-device validation.
+- The compatible iOS 27.0 `24A5408d` and cloudOS 26.4 `23E5207q` images were
+  prepared locally. The JB+Frida firmware pipeline completed with 9 components,
+  168 patch records, both Frida matcher pairs, and all five DiskImages2 records.
+- The patched image completed restore, CFW+JB installation, APFS live-snapshot
+  selection, first boot, and a second boot. vphoned reported iOS 27.0.0 on both
+  boots; no launchd panic occurred.
+- CoreDevice DDI auto-mount completed with exit code 0 and reported compatible,
+  usable DDI services. Guest serial output recorded the `Xcode_iOS_DDI` APFS
+  volume mount requested by MobileStorageMounter.
+- First-boot setup installed Sileo 2.5.1 and Frida Server 17.17.0. `vpregister`
+  registered Sileo and TrollStore Lite with zero failures; `uicache -l` returned
+  `org.coolstar.SileoStore`. On the second boot, Frida Server was running and its
+  guest-local TCP port 27042 accepted a connection.
+- A host Frida client instrumentation session was not run. Frida validation in
+  this run covers firmware records, package installation, daemon launch, reported
+  version, and protocol-port availability.
+- The VM was launched headless. Native `VZVirtualMachineView` display output and
+  interactive input were not visually verified in this run.
+- `research/reference/xnu`, repo-exported symbol JSON files, and
+  `ipsws/patch_refactor_input` comparison fixtures remain absent. The final Swift
+  run passed 179 of 193 tests; 13 failures require those missing fixtures and one
+  compares the macOS `/private/var` and `/var` aliases as distinct paths.
 
 ### Installed Components
 

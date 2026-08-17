@@ -46,7 +46,7 @@ cdhash-trust patch.
 import os
 import struct
 
-from capstone.arm64_const import ARM64_OP_REG, ARM64_OP_IMM
+from capstone.arm64_const import ARM64_CC_EQ, ARM64_CC_NE, ARM64_OP_REG, ARM64_OP_IMM
 
 try:
     from .cfw_asm import asm, _cs
@@ -107,13 +107,22 @@ def _rn(insn, idx):
 
 
 def _find_consistency_check(insns):
-    """Locate the LWCR self-consistency idiom and return the (cset, eor, tbz)
-    instructions plus the error_code register.
+    """Locate an unmodified or already-patched LWCR self-consistency idiom.
 
-    Shape:
+    Return the state, three editable instructions, and the error_code register.
+
+    Unmodified shape:
         cset  wC, ne
         eor   wE, w0, wC
         tbz   wE, #0, <abort>
+
+    Already-patched shape is anchored on the matcher result flow:
+        bl    <matcher>
+        ldr   wC, [...]
+        cmp   wC, #0
+        cset  w0, eq
+        nop
+        nop
     """
     for i in range(len(insns) - 1):
         eor = insns[i]
@@ -135,17 +144,33 @@ def _find_consistency_check(insns):
         for j in range(i - 1, max(-1, i - 6), -1):
             cand = insns[j]
             if cand.mnemonic == "cset" and _rn(cand, 0) == wC:
-                cops = cand.operands
-                if len(cops) >= 2 and cops[1].type == ARM64_OP_IMM:
-                    # capstone renders the condition as an operand imm code;
-                    # use op_str to confirm it is `ne`.
-                    pass
-                if cand.op_str.strip().endswith("ne"):
+                if cand.cc == ARM64_CC_NE:
                     cset = cand
                 break
         if cset is None:
             continue
-        return cset, eor, tbz, wC
+        return "unpatched", cset, eor, tbz, wC
+
+    for i in range(3, len(insns) - 2):
+        cset, first_nop, second_nop = insns[i:i + 3]
+        if cset.mnemonic != "cset" or _rn(cset, 0) != "w0" or cset.cc != ARM64_CC_EQ:
+            continue
+        if first_nop.mnemonic != "nop" or second_nop.mnemonic != "nop":
+            continue
+        branch, load, compare = insns[i - 3:i]
+        if branch.mnemonic != "bl" or load.mnemonic != "ldr" or compare.mnemonic != "cmp":
+            continue
+        error_register = _rn(compare, 0)
+        compare_ops = compare.operands
+        if (
+            error_register is None
+            or _rn(load, 0) != error_register
+            or len(compare_ops) < 2
+            or compare_ops[1].type != ARM64_OP_IMM
+            or compare_ops[1].imm != 0
+        ):
+            continue
+        return "already-patched", cset, first_nop, second_nop, error_register
     return None
 
 
@@ -176,17 +201,19 @@ def patch_xpc_lwcr(chunks_dir, *, dry_run=False):
             f"{SYMBOL}: LWCR consistency idiom (cset wC,ne; eor wE,w0,wC; "
             f"tbz wE,#0) not found"
         )
-    cset, eor, tbz, wC = found
+    state, cset, middle, branch, wC = found
+    if state == "already-patched":
+        print("      [=] LWCR consistency check already patched")
     print(f"      [.] cset @ 0x{cset.address:X}: {cset.mnemonic} {cset.op_str}")
-    print(f"      [.] eor  @ 0x{eor.address:X}: {eor.mnemonic} {eor.op_str}")
-    print(f"      [.] tbz  @ 0x{tbz.address:X}: {tbz.mnemonic} {tbz.op_str}")
+    print(f"      [.] edit2 @ 0x{middle.address:X}: {middle.mnemonic} {middle.op_str}")
+    print(f"      [.] edit3 @ 0x{branch.address:X}: {branch.mnemonic} {branch.op_str}")
 
     nop = asm("nop")
     cset_new = asm("cset w0, eq")  # w0 = matched = (error_code == 0)
     edits = [
         (cset.address, cset_new, "cset w0, eq"),
-        (eor.address, nop, "nop"),
-        (tbz.address, nop, "nop"),
+        (middle.address, nop, "nop"),
+        (branch.address, nop, "nop"),
     ]
 
     modified = []

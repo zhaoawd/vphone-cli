@@ -34,6 +34,16 @@ from capstone.arm64_const import (
     ARM64_OP_MEM,
     ARM64_OP_REG,
     ARM64_REG_SP,
+    ARM64_REG_X19,
+    ARM64_REG_X20,
+    ARM64_REG_X21,
+    ARM64_REG_X22,
+    ARM64_REG_X23,
+    ARM64_REG_X24,
+    ARM64_REG_X25,
+    ARM64_REG_X26,
+    ARM64_REG_X27,
+    ARM64_REG_X28,
     ARM64_REG_X29,
     ARM64_REG_X30,
 )
@@ -42,13 +52,26 @@ from .cfw_asm import *
 from .cfw_asm import _cs, _log_asm
 
 _SELECTOR = "isMountCompleteWithExpectedCount:diskTracker:"
+_CALLEE_SAVED_REGISTERS = {
+    ARM64_REG_X19,
+    ARM64_REG_X20,
+    ARM64_REG_X21,
+    ARM64_REG_X22,
+    ARM64_REG_X23,
+    ARM64_REG_X24,
+    ARM64_REG_X25,
+    ARM64_REG_X26,
+    ARM64_REG_X27,
+    ARM64_REG_X28,
+}
 
 
 def _is_frame_setup(insn):
     if insn.mnemonic == "stp" and len(insn.operands) >= 3:
         first, second, memory = insn.operands[:3]
         return (
-            first.type == ARM64_OP_REG
+            insn.writeback
+            and first.type == ARM64_OP_REG
             and first.reg == ARM64_REG_X29
             and second.type == ARM64_OP_REG
             and second.reg == ARM64_REG_X30
@@ -69,17 +92,107 @@ def _is_frame_setup(insn):
     return False
 
 
+def _callee_saved_stack_allocation_size(insn):
+    if insn.mnemonic != "stp" or len(insn.operands) < 3 or not insn.writeback:
+        return None
+    first, second, memory = insn.operands[:3]
+    if not (
+        first.type == ARM64_OP_REG
+        and first.reg in _CALLEE_SAVED_REGISTERS
+        and second.type == ARM64_OP_REG
+        and second.reg in _CALLEE_SAVED_REGISTERS
+        and first.reg != second.reg
+        and memory.type == ARM64_OP_MEM
+        and memory.mem.base == ARM64_REG_SP
+        and memory.mem.disp < 0
+        and memory.mem.disp % 16 == 0
+    ):
+        return None
+    return -memory.mem.disp
+
+
+def _frame_record_offset(insn):
+    if insn.mnemonic != "stp" or len(insn.operands) < 3 or insn.writeback:
+        return None
+    first, second, memory = insn.operands[:3]
+    if not (
+        first.type == ARM64_OP_REG
+        and first.reg == ARM64_REG_X29
+        and second.type == ARM64_OP_REG
+        and second.reg == ARM64_REG_X30
+        and memory.type == ARM64_OP_MEM
+        and memory.mem.base == ARM64_REG_SP
+        and memory.mem.disp >= 0
+        and memory.mem.disp % 8 == 0
+    ):
+        return None
+    return memory.mem.disp
+
+
+def _is_callee_saved_stack_spill(insn, stack_size):
+    if insn.mnemonic != "stp" or len(insn.operands) < 3 or insn.writeback:
+        return False
+    first, second, memory = insn.operands[:3]
+    return (
+        first.type == ARM64_OP_REG
+        and first.reg in _CALLEE_SAVED_REGISTERS
+        and second.type == ARM64_OP_REG
+        and second.reg in _CALLEE_SAVED_REGISTERS
+        and first.reg != second.reg
+        and memory.type == ARM64_OP_MEM
+        and memory.mem.base == ARM64_REG_SP
+        and memory.mem.disp >= 0
+        and memory.mem.disp % 8 == 0
+        and memory.mem.disp + 16 <= stack_size
+    )
+
+
+def _sets_frame_pointer(insn, expected_offset):
+    if insn.mnemonic != "add" or len(insn.operands) < 3:
+        return False
+    destination, source, amount = insn.operands[:3]
+    return (
+        destination.type == ARM64_OP_REG
+        and destination.reg == ARM64_REG_X29
+        and source.type == ARM64_OP_REG
+        and source.reg == ARM64_REG_SP
+        and amount.type == ARM64_OP_IMM
+        and amount.imm == expected_offset
+    )
+
+
 def _classify_imp_prefix(data, offset):
+    """Classify an existing patch or a known function-entry stack-frame shape."""
     if offset < 0 or offset + 8 > len(data):
         return "unexpected"
     prefix = bytes(data[offset:offset + 8])
     if prefix == MOV_X0_1 + RET:
         return "already-patched"
-    insns = list(_cs.disasm(prefix, offset))
-    if len(insns) != 2:
+    window = bytes(data[offset:min(offset + 24, len(data))])
+    insns = list(_cs.disasm(window, offset))
+    if len(insns) < 2:
         return "unexpected"
     if insns[0].mnemonic in ("pacibsp", "paciasp"):
-        return "patchable" if _is_frame_setup(insns[1]) else "unexpected"
+        if _is_frame_setup(insns[1]):
+            return "patchable"
+        stack_size = _callee_saved_stack_allocation_size(insns[1])
+        if stack_size is not None:
+            for index, (frame_record, frame_pointer) in enumerate(
+                zip(insns[2:], insns[3:]),
+                start=2,
+            ):
+                frame_offset = _frame_record_offset(frame_record)
+                if (
+                    frame_offset is not None
+                    and frame_offset + 16 <= stack_size
+                    and all(
+                        _is_callee_saved_stack_spill(spill, stack_size)
+                        for spill in insns[2:index]
+                    )
+                    and _sets_frame_pointer(frame_pointer, frame_offset)
+                ):
+                    return "patchable"
+        return "unexpected"
     return "patchable" if _is_frame_setup(insns[0]) else "unexpected"
 
 

@@ -58,7 +58,7 @@ def _disasm(chunks, vma, n=60):
 
 
 def _find_error_gate(insns):
-    """The `cmn wR, #1; b.eq` sysctl-error idiom, preceded by a bl."""
+    """Find an unmodified or already-NOPed sysctl-error gate after a bl."""
     saw_bl = False
     for i in range(len(insns) - 1):
         if insns[i].mnemonic == "bl":
@@ -66,9 +66,11 @@ def _find_error_gate(insns):
         if not saw_bl:
             continue
         if insns[i].mnemonic == "cmn" and _imm(insns[i], 1) == 1:
-            beq = insns[i + 1]
-            if beq.mnemonic == "b.eq":
-                return beq
+            gate = insns[i + 1]
+            if gate.mnemonic == "b.eq":
+                return "unpatched", gate
+            if gate.mnemonic == "nop":
+                return "already-patched", gate
     return None
 
 
@@ -88,10 +90,18 @@ def patch_lockdown_mode(chunks_dir, *, dry_run=False):
         return 0
     print(f"  [.] {name} @ 0x{fn_vma:X}")
 
-    gate = _find_error_gate(_disasm(chunks, fn_vma))
-    if gate is None:
-        raise ValueError("lockdown_mode: `cmn wR,#1; b.eq <crash>` sysctl-error gate not found")
+    found = _find_error_gate(_disasm(chunks, fn_vma))
+    if found is None:
+        raise ValueError(
+            "lockdown_mode: `cmn wR,#1; b.eq <crash>` or already-NOPed "
+            "sysctl-error gate not found"
+        )
+    state, gate = found
     print(f"      [.] gate @ 0x{gate.address:X}: {gate.mnemonic} {gate.op_str}")
+
+    if state == "already-patched":
+        print("      [=] already patched")
+        return 1
 
     nop = asm("nop")
     cur = chunks.bytes_at_vma(gate.address, 4)
