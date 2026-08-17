@@ -364,7 +364,7 @@ ssh_forward:
 
 boot_all: amfidont_allow_vphone boot
 
-boot_less: bundle vphoned boot_binary_check_less
+boot_less: bundle boot_binary_check_less
 	cd $(VM_DIR) && "$(CURDIR)/$(BUNDLE_BIN)" \
 		--config ./config.plist \
 		--variant less \
