@@ -61,15 +61,11 @@ extension KernelJBPatcher {
             let blOff = adrpOff - 8
             guard blOff >= 0 else { continue }
             guard let cbz = disasAt(cbzOff), cbz.mnemonic == "cbz",
-                  cbz.operandString.hasPrefix("w0"), // upcall status is a 32-bit w0
-                  let bl = disasAt(blOff), bl.mnemonic == "bl" // the container upcall call
+                  disasm.registerName(at: 0, in: cbz) == "w0",
+                  let target = disasm.immediate(at: 1, in: cbz).map(Int.init),
+                  let bl = disasAt(blOff), bl.mnemonic == "bl"
             else { continue }
 
-            // Decode the cbz forward/backward target (imm19 << 2).
-            let word = buffer.readU32(at: cbzOff)
-            let imm19 = Int((word >> 5) & 0x7FFFF)
-            let signed = imm19 >= (1 << 18) ? imm19 - (1 << 19) : imm19
-            let target = cbzOff + signed * 4
             // The success continuation precedes the upcall call site (backward branch),
             // and must land in executable code.
             if target < cbzOff, codeRanges.contains(where: { target >= $0.start && target < $0.end }) {

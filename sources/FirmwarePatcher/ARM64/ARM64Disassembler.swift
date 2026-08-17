@@ -55,6 +55,33 @@ public final class ARM64Disassembler: Sendable {
         cs.registerName(regID)
     }
 
+    /// Return the canonical register name for a typed register operand.
+    public func registerName(at index: Int, in instruction: Instruction) -> String? {
+        guard let operands = instruction.aarch64?.operands,
+              operands.indices.contains(index),
+              operands[index].type == AARCH64_OP_REG
+        else { return nil }
+        return cs.registerName(UInt32(operands[index].reg.rawValue))
+    }
+
+    /// Return the value of a typed immediate operand.
+    public func immediate(at index: Int, in instruction: Instruction) -> Int64? {
+        guard let operands = instruction.aarch64?.operands,
+              operands.indices.contains(index),
+              operands[index].type == AARCH64_OP_IMM
+        else { return nil }
+        return operands[index].imm
+    }
+
+    /// Return the canonical base-register name for a typed memory operand.
+    public func memoryBaseRegisterName(at index: Int, in instruction: Instruction) -> String? {
+        guard let operands = instruction.aarch64?.operands,
+              operands.indices.contains(index),
+              operands[index].type == AARCH64_OP_MEM
+        else { return nil }
+        return cs.registerName(UInt32(operands[index].mem.base.rawValue))
+    }
+
     /// Canonical name of the instruction's first operand when it is a register
     /// (the write target for the moves/loads/branches the patchers match), else nil.
     ///

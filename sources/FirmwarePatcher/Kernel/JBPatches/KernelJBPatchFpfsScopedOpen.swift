@@ -44,42 +44,96 @@ extension KernelJBPatcher {
     // vphone600 struct offsets recovered via the kernel gdb stub; cave bytes verified by
     // capstone round-trip. p_comm[0:8] little-endian: "Resolver" = ResolverService,
     // "fileprov" = fileproviderd.
-    private func buildScopedOpenCave(caveOff: Int, realHookOff: Int) -> Data? {
-        func movkX10(_ hw: [UInt16]) -> [UInt32] {
-            var out: [UInt32] = [0xD280_0000 | (UInt32(hw[0]) << 5) | 10] // movz x10, #hw0
-            for i in 1 ..< 4 { out.append(0xF280_0000 | (UInt32(i) << 21) | (UInt32(hw[i]) << 5) | 10) } // movk lsl #16*i
-            return out
+    func buildScopedOpenCave(caveOff: Int, realHookOff: Int) -> Data? {
+        func encodeWideConstant(_ halfwords: [UInt16]) -> [Data]? {
+            guard halfwords.count == 4,
+                  let low = ARM64Encoder.encodeMovzX(rd: 10, imm16: halfwords[0])
+            else { return nil }
+            var result = [low]
+            for index in 1 ..< halfwords.count {
+                guard let part = ARM64Encoder.encodeMovkX(
+                    rd: 10,
+                    imm16: halfwords[index],
+                    shift: UInt32(index * 16)
+                ) else { return nil }
+                result.append(part)
+            }
+            return result
         }
-        var w: [UInt32] = [
-            0xD538_D088, // mrs x8, tpidr_el1
-            0xF941_F908, // ldr x8, [x8, #0x3F0]   ; uthread
-            0xF940_0D08, // ldr x8, [x8, #0x18]    ; proc
-            0x9115_B108, // add x8, x8, #0x56C     ; &p_comm
-            0xF940_0109, // ldr x9, [x8]           ; p_comm[0:8]
+
+        let enforceOff = caveOff + 19 * 4
+        guard let loadUthread = ARM64Encoder.encodeLdrImmediateX(rt: 8, rn: 8, offset: 0x3F0),
+              let loadProc = ARM64Encoder.encodeLdrImmediateX(rt: 8, rn: 8, offset: 0x18),
+              let addProcessName = ARM64Encoder.encodeAddImm12(rd: 8, rn: 8, imm12: 0x56C),
+              let loadProcessName = ARM64Encoder.encodeLdrImmediateX(rt: 9, rn: 8, offset: 0),
+              let resolver = encodeWideConstant([0x6552, 0x6F73, 0x766C, 0x7265]),
+              let resolverBranch = ARM64Encoder.encodeBCond(.eq, from: caveOff + 10 * 4, to: enforceOff),
+              let fileProvider = encodeWideConstant([0x6966, 0x656C, 0x7270, 0x766F]),
+              let fileProviderBranch = ARM64Encoder.encodeBCond(.eq, from: caveOff + 16 * 4, to: enforceOff),
+              let realHookBranch = ARM64Encoder.encodeB(from: enforceOff, to: realHookOff)
+        else {
+            log("  [-] failed to encode FileProvider-scoped trampoline")
+            return nil
+        }
+
+        var instructions = [
+            ARM64Encoder.encodeMrsTpidrEl1(rd: 8),
+            loadUthread,
+            loadProc,
+            addProcessName,
+            loadProcessName,
         ]
-        w += movkX10([0x6552, 0x6f73, 0x766c, 0x7265]) // x10 = "Resolver"
-        w.append(0xEB0A_013F) // cmp x9, x10
-        let beqA = w.count; w.append(0)
-        w += movkX10([0x6966, 0x656c, 0x7270, 0x766f]) // x10 = "fileprov"
-        w.append(0xEB0A_013F) // cmp x9, x10
-        let beqB = w.count; w.append(0)
-        w.append(0xD280_0000) // mov x0, #0
-        w.append(0xD65F_03C0) // ret
-        let enforce = w.count; w.append(0) // b <realHook>
+        instructions.append(contentsOf: resolver)
+        instructions.append(ARM64Encoder.encodeCmpRegisterX(rn: 9, rm: 10))
+        instructions.append(resolverBranch)
+        instructions.append(contentsOf: fileProvider)
+        instructions.append(ARM64Encoder.encodeCmpRegisterX(rn: 9, rm: 10))
+        instructions.append(fileProviderBranch)
+        instructions.append(ARM64Encoder.encodeMovX(rd: 0, rm: 31))
+        instructions.append(ARM64.ret)
+        instructions.append(realHookBranch)
 
-        func beq(from: Int) -> UInt32 {
-            let imm19 = UInt32(bitPattern: Int32(((enforce - from) * 4) >> 2)) & 0x7FFFF
-            return 0x5400_0000 | (imm19 << 5) // b.eq (cond EQ)
+        guard instructions.count == 20 else {
+            log("  [-] cave length drifted: \(instructions.count)")
+            return nil
         }
-        w[beqA] = beq(from: beqA)
-        w[beqB] = beq(from: beqB)
-        guard let bData = encodeB(from: caveOff + enforce * 4, to: realHookOff) else { return nil }
-        w[enforce] = bData.withUnsafeBytes { $0.load(as: UInt32.self) }.littleEndian
-
-        guard w.count == 20 else { log("  [-] cave length drifted: \(w.count)"); return nil }
-        var data = Data(capacity: 80)
-        for x in w { withUnsafeBytes(of: x.littleEndian) { data.append(contentsOf: $0) } }
+        let data = instructions.reduce(into: Data()) { $0.append($1) }
+        guard validateScopedOpenCave(data, caveOff: caveOff, realHookOff: realHookOff) else {
+            log("  [-] FileProvider-scoped trampoline failed Capstone validation")
+            return nil
+        }
         return data
+    }
+
+    private func validateScopedOpenCave(_ data: Data, caveOff: Int, realHookOff: Int) -> Bool {
+        let instructions = disasm.disassemble(data, at: UInt64(caveOff))
+        guard data.count == 80, instructions.count == 20,
+              instructions[0].mnemonic == "mrs",
+              disasm.registerName(at: 0, in: instructions[0]) == "x8",
+              instructions[1].mnemonic == "ldr",
+              disasm.memoryBaseRegisterName(at: 1, in: instructions[1]) == "x8",
+              instructions[1].aarch64?.operands[1].mem.disp == 0x3F0,
+              instructions[2].mnemonic == "ldr",
+              instructions[2].aarch64?.operands[1].mem.disp == 0x18,
+              instructions[3].mnemonic == "add",
+              instructions[4].mnemonic == "ldr",
+              instructions[9].mnemonic == "cmp",
+              disasm.registerName(at: 0, in: instructions[9]) == "x9",
+              disasm.registerName(at: 1, in: instructions[9]) == "x10",
+              instructions[10].mnemonic == "b.eq",
+              disasm.immediate(at: 0, in: instructions[10]) == Int64(caveOff + 19 * 4),
+              instructions[15].mnemonic == "cmp",
+              disasm.registerName(at: 0, in: instructions[15]) == "x9",
+              disasm.registerName(at: 1, in: instructions[15]) == "x10",
+              instructions[16].mnemonic == "b.eq",
+              disasm.immediate(at: 0, in: instructions[16]) == Int64(caveOff + 19 * 4),
+              instructions[17].mnemonic == "mov",
+              disasm.registerName(at: 0, in: instructions[17]) == "x0",
+              instructions[18].mnemonic == "ret",
+              instructions[19].mnemonic == "b",
+              disasm.immediate(at: 0, in: instructions[19]) == Int64(realHookOff)
+        else { return false }
+        return true
     }
 
     private func encodeAuthRebaseTarget(origVal: UInt64, targetFoff: Int) -> Data? {

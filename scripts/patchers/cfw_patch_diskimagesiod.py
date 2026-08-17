@@ -29,10 +29,58 @@ No-op-in-effect on version-matched userlands (there the wait completes on its
 own, so returning YES early changes nothing observable).
 """
 
+from capstone.arm64_const import (
+    ARM64_OP_IMM,
+    ARM64_OP_MEM,
+    ARM64_OP_REG,
+    ARM64_REG_SP,
+    ARM64_REG_X29,
+    ARM64_REG_X30,
+)
+
 from .cfw_asm import *
-from .cfw_asm import _log_asm
+from .cfw_asm import _cs, _log_asm
 
 _SELECTOR = "isMountCompleteWithExpectedCount:diskTracker:"
+
+
+def _is_frame_setup(insn):
+    if insn.mnemonic == "stp" and len(insn.operands) >= 3:
+        first, second, memory = insn.operands[:3]
+        return (
+            first.type == ARM64_OP_REG
+            and first.reg == ARM64_REG_X29
+            and second.type == ARM64_OP_REG
+            and second.reg == ARM64_REG_X30
+            and memory.type == ARM64_OP_MEM
+            and memory.mem.base == ARM64_REG_SP
+            and memory.mem.disp < 0
+        )
+    if insn.mnemonic == "sub" and len(insn.operands) >= 3:
+        destination, source, amount = insn.operands[:3]
+        return (
+            destination.type == ARM64_OP_REG
+            and destination.reg == ARM64_REG_SP
+            and source.type == ARM64_OP_REG
+            and source.reg == ARM64_REG_SP
+            and amount.type == ARM64_OP_IMM
+            and amount.imm > 0
+        )
+    return False
+
+
+def _classify_imp_prefix(data, offset):
+    if offset < 0 or offset + 8 > len(data):
+        return "unexpected"
+    prefix = bytes(data[offset:offset + 8])
+    if prefix == MOV_X0_1 + RET:
+        return "already-patched"
+    insns = list(_cs.disasm(prefix, offset))
+    if len(insns) != 2:
+        return "unexpected"
+    if insns[0].mnemonic in ("pacibsp", "paciasp"):
+        return "patchable" if _is_frame_setup(insns[1]) else "unexpected"
+    return "patchable" if _is_frame_setup(insns[0]) else "unexpected"
 
 
 def _find_imp_via_objc_metadata(data):
@@ -136,6 +184,14 @@ def patch_diskimagesiod(filepath):
 
     if imp_foff + 8 > len(data):
         print(f"  [-] IMP offset 0x{imp_foff:X} out of bounds")
+        return False
+
+    state = _classify_imp_prefix(data, imp_foff)
+    if state == "already-patched":
+        print("  [=] isMountComplete already returns YES")
+        return True
+    if state != "patchable":
+        print("  [-] Unexpected IMP prologue; refusing to patch")
         return False
 
     print("  Before:")

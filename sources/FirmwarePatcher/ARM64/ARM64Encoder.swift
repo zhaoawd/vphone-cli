@@ -6,6 +6,11 @@
 import Foundation
 
 public enum ARM64Encoder {
+    public enum Condition: UInt32 {
+        case eq = 0
+        case ne = 1
+    }
+
     // MARK: - Branch Encoding
 
     /// Encode unconditional B (branch) instruction.
@@ -31,6 +36,21 @@ public enum ARM64Encoder {
         let imm26 = delta >> 2
         guard imm26 >= -(1 << 25), imm26 < (1 << 25) else { return nil }
         let insn: UInt32 = 0x9400_0000 | (UInt32(bitPattern: Int32(imm26)) & 0x03FF_FFFF)
+        return ARM64.encodeU32(insn)
+    }
+
+    /// Encode a conditional branch.
+    ///
+    /// Format: `[31:24] = 01010100`, `[23:5] = signed offset / 4`,
+    ///         `[4] = 0`, `[3:0] = condition`
+    /// Range: +/-1 MB
+    public static func encodeBCond(_ condition: Condition, from pc: Int, to target: Int) -> Data? {
+        let delta = target - pc
+        guard delta & 0x3 == 0 else { return nil }
+        let imm19 = delta >> 2
+        guard imm19 >= -(1 << 18), imm19 < (1 << 18) else { return nil }
+        let encodedImmediate = UInt32(bitPattern: Int32(imm19)) & 0x7_FFFF
+        let insn: UInt32 = 0x5400_0000 | (encodedImmediate << 5) | condition.rawValue
         return ARM64.encodeU32(insn)
     }
 
@@ -64,6 +84,28 @@ public enum ARM64Encoder {
         return ARM64.encodeU32(insn)
     }
 
+    /// Encode `CMP Wn, #imm12` (the `SUBS WZR, Wn, #imm12` alias).
+    public static func encodeCmpImmediateW(rn: UInt32, imm12: UInt32) -> Data? {
+        guard imm12 < 4096 else { return nil }
+        let insn: UInt32 = 0x7100_001F | (imm12 << 10) | ((rn & 0x1F) << 5)
+        return ARM64.encodeU32(insn)
+    }
+
+    /// Encode `CMP Xn, Xm` (the `SUBS XZR, Xn, Xm` alias).
+    public static func encodeCmpRegisterX(rn: UInt32, rm: UInt32) -> Data {
+        let insn: UInt32 = 0xEB00_001F | ((rm & 0x1F) << 16) | ((rn & 0x1F) << 5)
+        return ARM64.encodeU32(insn)
+    }
+
+    /// Encode `LDR Xt, [Xn, #offset]` using the unsigned scaled-immediate form.
+    public static func encodeLdrImmediateX(rt: UInt32, rn: UInt32, offset: UInt32) -> Data? {
+        guard offset & 0x7 == 0 else { return nil }
+        let imm12 = offset >> 3
+        guard imm12 < 4096 else { return nil }
+        let insn: UInt32 = 0xF940_0000 | (imm12 << 10) | ((rn & 0x1F) << 5) | (rt & 0x1F)
+        return ARM64.encodeU32(insn)
+    }
+
     /// Encode MOVZ Wd, #imm16 (32-bit).
     ///
     /// Format: `[31] = 0 (sf)`, `[30:29] = 10`, `[28:23] = 100101`,
@@ -81,6 +123,20 @@ public enum ARM64Encoder {
         guard hw <= 3 else { return nil }
         let insn: UInt32 = (0b1_1010_0101 << 23) | (hw << 21) | (UInt32(imm16) << 5) | (rd & 0x1F)
         return ARM64.encodeU32(insn)
+    }
+
+    /// Encode `MOVK Xd, #imm16, LSL #shift`.
+    public static func encodeMovkX(rd: UInt32, imm16: UInt16, shift: UInt32 = 0) -> Data? {
+        guard shift % 16 == 0 else { return nil }
+        let hw = shift / 16
+        guard hw <= 3 else { return nil }
+        let insn: UInt32 = 0xF280_0000 | (hw << 21) | (UInt32(imm16) << 5) | (rd & 0x1F)
+        return ARM64.encodeU32(insn)
+    }
+
+    /// Encode `MRS Xd, TPIDR_EL1`.
+    public static func encodeMrsTpidrEl1(rd: UInt32) -> Data {
+        ARM64.encodeU32(0xD538_D080 | (rd & 0x1F))
     }
 
     /// Encode `MOV Xd, Xm` (the ORR Xd, XZR, Xm alias). With `rm == 31` (XZR) this

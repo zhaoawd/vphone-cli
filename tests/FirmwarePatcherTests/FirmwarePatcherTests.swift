@@ -89,6 +89,69 @@ struct ARM64ConstantTests {
 struct ARM64EncoderTests {
     let disasm = ARM64Disassembler()
 
+    @Test func typedOperandHelpersExposeRegisterAndImmediate() throws {
+        let data = try #require(ARM64Encoder.encodeAddImm12(rd: 0, rn: 1, imm12: 0x100))
+        let insn = try #require(disasm.disassembleOne(data, at: 0x1000))
+
+        #expect(disasm.registerName(at: 0, in: insn) == "x0")
+        #expect(disasm.registerName(at: 1, in: insn) == "x1")
+        #expect(disasm.immediate(at: 2, in: insn) == 0x100)
+        #expect(disasm.registerName(at: 3, in: insn) == nil)
+    }
+
+    @Test func encodeBCondEqForward() throws {
+        let data = try #require(ARM64Encoder.encodeBCond(.eq, from: 0x1000, to: 0x1080))
+        let insn = try #require(disasm.disassembleOne(data, at: 0x1000))
+
+        #expect(insn.mnemonic == "b.eq")
+        #expect(disasm.immediate(at: 0, in: insn) == 0x1080)
+    }
+
+    @Test func encodeCmpImmediateW() throws {
+        let data = try #require(ARM64Encoder.encodeCmpImmediateW(rn: 2, imm12: 0x6E0))
+        let insn = try #require(disasm.disassembleOne(data, at: 0))
+
+        #expect(insn.mnemonic == "cmp")
+        #expect(disasm.registerName(at: 0, in: insn) == "w2")
+        #expect(disasm.immediate(at: 1, in: insn) == 0x6E0)
+    }
+
+    @Test func encodeCmpRegisterX() throws {
+        let data = ARM64Encoder.encodeCmpRegisterX(rn: 9, rm: 10)
+        let insn = try #require(disasm.disassembleOne(data, at: 0))
+
+        #expect(insn.mnemonic == "cmp")
+        #expect(disasm.registerName(at: 0, in: insn) == "x9")
+        #expect(disasm.registerName(at: 1, in: insn) == "x10")
+    }
+
+    @Test func encodeLdrImmediateX() throws {
+        let data = try #require(ARM64Encoder.encodeLdrImmediateX(rt: 8, rn: 8, offset: 0x3F0))
+        let insn = try #require(disasm.disassembleOne(data, at: 0))
+
+        #expect(insn.mnemonic == "ldr")
+        #expect(disasm.registerName(at: 0, in: insn) == "x8")
+        #expect(disasm.memoryBaseRegisterName(at: 1, in: insn) == "x8")
+        #expect(insn.aarch64?.operands[1].mem.disp == 0x3F0)
+    }
+
+    @Test func encodeMovkX() throws {
+        let data = try #require(ARM64Encoder.encodeMovkX(rd: 10, imm16: 0x6F73, shift: 16))
+        let insn = try #require(disasm.disassembleOne(data, at: 0))
+
+        #expect(insn.mnemonic == "movk")
+        #expect(disasm.registerName(at: 0, in: insn) == "x10")
+        #expect(disasm.immediate(at: 1, in: insn) == 0x6F73)
+    }
+
+    @Test func encodeMrsTpidrEl1() throws {
+        let data = ARM64Encoder.encodeMrsTpidrEl1(rd: 8)
+        let insn = try #require(disasm.disassembleOne(data, at: 0))
+
+        #expect(insn.mnemonic == "mrs")
+        #expect(disasm.registerName(at: 0, in: insn) == "x8")
+    }
+
     @Test func encodeBForward() throws {
         // B from 0x1000 to 0x2000 (forward 0x1000 bytes)
         let data = ARM64Encoder.encodeB(from: 0x1000, to: 0x2000)
@@ -155,6 +218,33 @@ struct ARM64EncoderTests {
     @Test func encodeMovXIsRegisterMove() {
         // `mov x0, x20` matches the project's preverified ARM64.movX0X20 constant.
         #expect(ARM64Encoder.encodeMovX(rd: 0, rm: 20) == ARM64.movX0X20)
+    }
+}
+
+struct FpfsScopedOpenCaveTests {
+    let disasm = ARM64Disassembler()
+
+    @Test func caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() throws {
+        let patcher = KernelJBPatcher(data: Data(repeating: 0, count: 0x4000), verbose: false)
+        let cave = try #require(patcher.buildScopedOpenCave(caveOff: 0x1000, realHookOff: 0x3000))
+        let instructions = disasm.disassemble(cave, at: 0x1000)
+
+        #expect(cave.count == 80)
+        #expect(instructions.count == 20)
+        #expect(instructions[0].mnemonic == "mrs")
+        #expect(instructions[9].mnemonic == "cmp")
+        #expect(instructions[10].mnemonic == "b.eq")
+        #expect(instructions[15].mnemonic == "cmp")
+        #expect(instructions[16].mnemonic == "b.eq")
+        #expect(instructions[18].mnemonic == "ret")
+        #expect(instructions[19].mnemonic == "b")
+        #expect(disasm.registerName(at: 0, in: instructions[9]) == "x9")
+        #expect(disasm.registerName(at: 1, in: instructions[9]) == "x10")
+        #expect(disasm.registerName(at: 0, in: instructions[15]) == "x9")
+        #expect(disasm.registerName(at: 1, in: instructions[15]) == "x10")
+        #expect(disasm.immediate(at: 0, in: instructions[10]) == Int64(instructions[19].address))
+        #expect(disasm.immediate(at: 0, in: instructions[16]) == Int64(instructions[19].address))
+        #expect(disasm.immediate(at: 0, in: instructions[19]) == 0x3000)
     }
 }
 

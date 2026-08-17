@@ -44,6 +44,8 @@ import re
 import shutil
 import subprocess
 
+from capstone.arm64_const import ARM64_OP_IMM, ARM64_OP_MEM, ARM64_OP_REG, ARM64_REG_X0
+
 try:
     from .cfw_asm import asm_at, _cs
     from .cfw_dsc_chunks import DSCChunks
@@ -88,14 +90,25 @@ def _is_dispatch_trampoline(chunks, va):
     if len(insns) < 4:
         return False
     i0, i1, i2, i3 = insns[:4]
-    if i0.mnemonic != "cbz" or not i0.op_str.startswith("x0,"):
+    if (i0.mnemonic != "cbz" or len(i0.operands) < 2
+            or i0.operands[0].type != ARM64_OP_REG
+            or i0.operands[0].reg != ARM64_REG_X0
+            or i0.operands[1].type != ARM64_OP_IMM):
         return False
-    if i1.mnemonic != "ldr" or "[x0, #" not in i1.op_str:
+    if (i1.mnemonic != "ldr" or len(i1.operands) < 2
+            or i1.operands[0].type != ARM64_OP_REG
+            or i1.operands[1].type != ARM64_OP_MEM
+            or i1.operands[1].mem.base != ARM64_REG_X0):
         return False
-    reg = i1.op_str.split(",")[0].strip()      # scratch reg the fp is loaded into
-    if i2.mnemonic != "cbz" or not i2.op_str.startswith(reg + ","):
+    scratch_reg = i1.operands[0].reg
+    if (i2.mnemonic != "cbz" or len(i2.operands) < 2
+            or i2.operands[0].type != ARM64_OP_REG
+            or i2.operands[0].reg != scratch_reg
+            or i2.operands[1].type != ARM64_OP_IMM):
         return False
-    if i3.mnemonic not in ("braaz", "braa", "br") or not i3.op_str.startswith(reg):
+    if (i3.mnemonic not in ("braaz", "braa", "br") or not i3.operands
+            or i3.operands[0].type != ARM64_OP_REG
+            or i3.operands[0].reg != scratch_reg):
         return False
     return True
 
@@ -127,9 +140,10 @@ def patch_iomfb_force_kern(chunks_dir, *, dsc_path=None, dry_run=False):
     for suffix, pub_name, pub_va, kern_name, kern_va in candidates:
         first = next(_cs.disasm(chunks.bytes_at_vma(pub_va, 4), pub_va), None)
         # Idempotent: a prior run already rewrote this entrypoint to `b _kern_*`.
-        if first is not None and first.mnemonic == "b":
-            m = re.match(r"#(0x[0-9a-fA-F]+)$", first.op_str.strip())
-            if m and int(m.group(1), 16) == kern_va:
+        if (first is not None and first.mnemonic == "b"
+                and len(first.operands) == 1
+                and first.operands[0].type == ARM64_OP_IMM):
+            if first.operands[0].imm == kern_va:
                 print(f"      [=] {pub_name} already -> b {kern_name} (idempotent)")
                 already.add(suffix)
                 continue
@@ -140,7 +154,7 @@ def patch_iomfb_force_kern(chunks_dir, *, dsc_path=None, dry_run=False):
         if len(b_bytes) != 4:
             raise RuntimeError(f"expected 4 bytes for b, got {len(b_bytes)}")
         print(f"      [+] {pub_name} @ 0x{pub_va:X}: "
-              f"'{first.mnemonic} {first.op_str}' -> 'b {kern_name}' (0x{kern_va:X})")
+              f"'{first.mnemonic}' -> 'b {kern_name}' (0x{kern_va:X})")
         if not dry_run:
             chunks.write_at_vma(pub_va, b_bytes)
         modified.append(pub_va)

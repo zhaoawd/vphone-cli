@@ -52,13 +52,13 @@ extension KernelJBPatcher {
             return false
         }
 
-        // cmp w2,#imm == SUBS wzr,w2,#imm : 0x71000000 | imm12<<10 | Rn(2)<<5 | Rd(31)
-        let cmpW2Old: UInt32 = 0x7100_0000 | (Self.swapEndExpectedSize << 10) | (2 << 5) | 31
-
         var hits: [Int] = []
         var off = ks
         while off + 8 <= ke {
-            if buffer.readU32(at: off) == cmpW2Old {
+            if let cmp = disasAt(off), cmp.mnemonic == "cmp",
+               disasm.registerName(at: 0, in: cmp) == "w2",
+               disasm.immediate(at: 1, in: cmp) == Int64(Self.swapEndExpectedSize)
+            {
                 // Confirm the following instruction is a conditional b.ne (the gate).
                 if let nxt = disasAt(off + 4), nxt.mnemonic == "b.ne" {
                     hits.append(off)
@@ -73,12 +73,10 @@ extension KernelJBPatcher {
         }
 
         let cmpOff = hits[0]
-        // Rewrite only the imm12 field [21:10] to the iOS 27 size.
-        var word = buffer.readU32(at: cmpOff)
-        word = (word & ~(UInt32(0xFFF) << 10)) | (Self.swapEndIOS27Size << 10)
-        var le = word.littleEndian
-        var newBytes = Data(count: 4)
-        withUnsafeBytes(of: &le) { newBytes.replaceSubrange(0..<4, with: $0) }
+        guard let newBytes = ARM64Encoder.encodeCmpImmediateW(rn: 2, imm12: Self.swapEndIOS27Size) else {
+            log("  [-] failed to encode cmp w2,#0x6e0")
+            return false
+        }
 
         let va = fileOffsetToVA(cmpOff)
         emit(

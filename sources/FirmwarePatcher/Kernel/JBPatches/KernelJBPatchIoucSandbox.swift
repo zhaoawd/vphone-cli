@@ -56,9 +56,11 @@ extension KernelJBPatcher {
             var off = funcStart
             while off < adrpOff {
                 defer { off += 4 }
-                let insn = buffer.readU32(at: off)
-                guard isCbnzW(insn) else { continue }
-                guard let denyEntry = cbTarget(insn, at: off) else { continue }
+                guard let cbnz = disasAt(off), cbnz.mnemonic == "cbnz",
+                      let testedRegister = disasm.registerName(at: 0, in: cbnz),
+                      testedRegister.hasPrefix("w"),
+                      let denyEntry = disasm.immediate(at: 1, in: cbnz).map(Int.init)
+                else { continue }
                 // The fail-log ADRP must sit inside the deny block.
                 guard denyEntry <= adrpOff, adrpOff < denyEntry + 0x60,
                       denyEntry > funcStart, denyEntry < funcEnd else { continue }
@@ -67,8 +69,10 @@ extension KernelJBPatcher {
                 // the CBNZ (cmp ; b.eq <ALLOW> ; ldr ; cbnz). Search a small window.
                 var allowTarget = -1
                 for back in stride(from: off - 4, through: off - 0x14, by: -4) where back > funcStart {
-                    let bi = buffer.readU32(at: back)
-                    if let t = bCondEqTarget(bi, at: back), t > funcStart, t < funcEnd {
+                    if let branch = disasAt(back), branch.mnemonic == "b.eq",
+                       let t = disasm.immediate(at: 0, in: branch).map(Int.init),
+                       t > funcStart, t < funcEnd
+                    {
                         allowTarget = t
                         break
                     }
@@ -89,22 +93,5 @@ extension KernelJBPatcher {
 
         log("  [-] narrow IOUC sandbox deny branch not found")
         return false
-    }
-
-    /// CBNZ Wt, <label> (32-bit): high byte 0x35.
-    private func isCbnzW(_ insn: UInt32) -> Bool { ((insn >> 24) & 0xFF) == 0x35 }
-
-    /// Decode CBZ/CBNZ target (imm19, sign-extended, scaled by 4).
-    private func cbTarget(_ insn: UInt32, at pc: Int) -> Int? {
-        let imm19 = (insn >> 5) & 0x7FFFF
-        return pc + Int(Int32(bitPattern: imm19 << 13) >> 13) * 4
-    }
-
-    /// If `insn` is B.EQ <label>, return its target; else nil.
-    /// B.cond: [31:24]=0x54, [4]=0, cond=[3:0]; EQ cond = 0.
-    private func bCondEqTarget(_ insn: UInt32, at pc: Int) -> Int? {
-        guard (insn & 0xFF00_0010) == 0x5400_0000, (insn & 0xF) == 0x0 else { return nil }
-        let imm19 = (insn >> 5) & 0x7FFFF
-        return pc + Int(Int32(bitPattern: imm19 << 13) >> 13) * 4
     }
 }

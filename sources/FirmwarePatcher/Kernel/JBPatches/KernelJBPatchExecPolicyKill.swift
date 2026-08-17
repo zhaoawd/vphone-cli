@@ -40,31 +40,31 @@ extension KernelJBPatcher {
             return false
         }
 
-        let movzW0_9: UInt32 = 0x5280_0120 // movz w0, #9   (OS_REASON_EXEC)
-        let movzW1_8: UInt32 = 0x5280_0101 // movz w1, #8   (EXEC_EXIT_REASON_SECURITY_POLICY)
-
-        var hits: [Int] = []
+        var hits: [(offset: Int, target: Int)] = []
         var off = ks
         while off + 8 <= ke {
-            if buffer.readU32(at: off) == movzW0_9, buffer.readU32(at: off + 4) == movzW1_8 {
+            if let reasonNamespace = disasAt(off),
+               reasonNamespace.mnemonic == "mov" || reasonNamespace.mnemonic == "movz",
+               disasm.registerName(at: 0, in: reasonNamespace) == "w0",
+               disasm.immediate(at: 1, in: reasonNamespace) == 9,
+               let reasonCode = disasAt(off + 4),
+               reasonCode.mnemonic == "mov" || reasonCode.mnemonic == "movz",
+               disasm.registerName(at: 0, in: reasonCode) == "w1",
+               disasm.immediate(at: 1, in: reasonCode) == 8
+            {
                 let cbzOff = off - 4
                 let ldrOff = off - 8
                 if cbzOff >= ks,
                    let cbz = disasAt(cbzOff), cbz.mnemonic == "cbz",
                    let ldr = disasAt(ldrOff), ldr.mnemonic == "ldr",
-                   // W-register cbz == the ip_mac_return site (not the X-register
-                   // subsystem-root sibling).
-                   cbz.operandString.hasPrefix("w"),
-                   ldr.operandString.hasPrefix("w")
+                   let cbzRegister = disasm.registerName(at: 0, in: cbz),
+                   cbzRegister.hasPrefix("w"),
+                   disasm.registerName(at: 0, in: ldr) == cbzRegister,
+                   let target = disasm.immediate(at: 1, in: cbz).map(Int.init)
                 {
-                    // Decode the cbz's forward branch target (imm19 << 2).
-                    let word = buffer.readU32(at: cbzOff)
-                    let imm19 = Int((word >> 5) & 0x7FFFF)
-                    let signed = imm19 >= (1 << 18) ? imm19 - (1 << 19) : imm19
-                    let target = cbzOff + signed * 4
                     // Must be a forward branch that skips the reason-create/kill block.
                     if target > off + 8 {
-                        hits.append(cbzOff)
+                        hits.append((cbzOff, target))
                     }
                 }
             }
@@ -76,12 +76,7 @@ extension KernelJBPatcher {
             return false
         }
 
-        let cbzOff = hits[0]
-        // Re-decode the target for the emitted branch.
-        let word = buffer.readU32(at: cbzOff)
-        let imm19 = Int((word >> 5) & 0x7FFFF)
-        let signed = imm19 >= (1 << 18) ? imm19 - (1 << 19) : imm19
-        let target = cbzOff + signed * 4
+        let (cbzOff, target) = hits[0]
 
         guard let bBytes = ARM64Encoder.encodeB(from: cbzOff, to: target) else {
             log("  [-] failed to encode B to 0x\(String(target, radix: 16))")
