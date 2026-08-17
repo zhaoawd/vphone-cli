@@ -38,6 +38,10 @@ SCRIPT_DIR="${0:a:h}"
 # Resolves to .venv/bin/python3 relative to the project root (parent of
 # scripts/), falling back to the system python3 when the venv is absent.
 _resolve_python3() {
+    if [[ -n "${VPHONE_PYTHON:-}" ]]; then
+        echo "$VPHONE_PYTHON"
+        return
+    fi
     local venv_py="${SCRIPT_DIR:h}/.venv/bin/python3"
     if [[ -x "$venv_py" ]]; then
         echo "$venv_py"
@@ -533,7 +537,7 @@ fi
 # ── Extra debs: download from manifest, then stage the whole cache ──────
 echo "  Fetching extra debs..."
 zsh "$SCRIPT_DIR/fetch_debs.sh" || true
-DEBS_CACHE="${SCRIPT_DIR:h}/debs"
+DEBS_CACHE="${VPHONE_DEBS_DIR:-${SCRIPT_DIR:h}/debs}"
 DEBS_DEST="$MNT5/$BOOT_HASH/debs"
 /bin/rm -rf "$DEBS_DEST"
 deb_count=0
@@ -848,9 +852,8 @@ echo "[*] Unmounting image volumes..."
 /sbin/umount $MNT3 2>/dev/null || true
 /sbin/umount $MNT5 2>/dev/null || true
 
-echo "[*] Cleaning up temp binaries..."
-rm -f "$TEMP_DIR/launchd" \
-    "$TEMP_DIR/bootstrap-iphoneos-arm64.tar"
+echo "[*] Cleaning up temp..."
+rm -rf "$TEMP_DIR"
 
 echo ""
 echo "[+] CFW + JB + EXP installation complete!"
