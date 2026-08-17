@@ -192,6 +192,12 @@ struct PatchFirmwareCLI: ParsableCommand {
     )
     var forceExcGuard: Bool = false
 
+    @Flag(
+        name: .customLong("frida"),
+        help: "Opt in to Frida Stalker kernel relaxations (existing-thread follow + repeated VM_PROT_COPY). jb/exp only."
+    )
+    var frida: Bool = false
+
     mutating func run() throws {
         let pipeline = FirmwarePipeline(
             vmDirectory: vmDirectory,
@@ -199,7 +205,8 @@ struct PatchFirmwareCLI: ParsableCommand {
             verbose: !quiet,
             noBinpack: noBinpack,
             noVphoned: noVphoned,
-            forceExcGuard: forceExcGuard
+            forceExcGuard: forceExcGuard,
+            enableFrida: frida
         )
         let records = try pipeline.patchAll()
 
@@ -264,6 +271,12 @@ struct PatchComponentCLI: ParsableCommand {
     )
     var targetOS: String?
 
+    @Flag(
+        name: .customLong("frida"),
+        help: "kernel-jb only: opt in to the Frida Stalker kernel relaxations."
+    )
+    var frida: Bool = false
+
     mutating func run() throws {
         let payload = try IM4PHandler.load(contentsOf: input).payload
         let count: Int
@@ -293,6 +306,7 @@ struct PatchComponentCLI: ParsableCommand {
             // --target-os, default to applying them so the dev/test tool exercises the
             // full set.
             patcher.applyIOS27 = targetOS.map { $0.hasPrefix("27.") } ?? true
+            patcher.applyFrida = frida
             count = try patcher.apply()
             patchedData = patcher.buffer.data
             records = patcher.patches

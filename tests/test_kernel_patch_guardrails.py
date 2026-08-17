@@ -11,6 +11,8 @@ SWIFT_PATCHERS = (
     "KernelJBPatchContainerUpcall.swift",
     "KernelJBPatchDiskImages2.swift",
     "KernelJBPatchFpfsScopedOpen.swift",
+    "KernelJBPatchThreadSetState.swift",
+    "KernelJBPatchVmMapDelete.swift",
 )
 
 PYTHON_PATCHERS = (
@@ -50,6 +52,12 @@ class KernelPatchGuardrailTests(unittest.TestCase):
         for filename in PYTHON_PATCHERS:
             text = (patch_dir / filename).read_text()
             self.assertNotIn(".op_str", text, filename)
+
+    def test_frida_instruction_matchers_decode_instructions(self):
+        patch_dir = REPO_ROOT / "sources/FirmwarePatcher/Kernel/JBPatches"
+        for filename in ("KernelJBPatchThreadSetState.swift", "KernelJBPatchVmMapDelete.swift"):
+            text = (patch_dir / filename).read_text()
+            self.assertNotIn("buffer.readU32(at:", text, filename)
 
 
 if __name__ == "__main__":
