@@ -1,25 +1,90 @@
 import Foundation
 
-struct SystemLocationFix: Codable, Equatable, Sendable {
-    let producerSequence: Int
-    let latitude: Double
-    let longitude: Double
-    let altitude: Double
-    let horizontalAccuracy: Double
-    let verticalAccuracy: Double
-    let speed: Double
-    let course: Double
-    let timestamp: TimeInterval
+public enum VPhoneSystemLocationValidation {
+    public static func error(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        horizontalAccuracy: Double,
+        verticalAccuracy: Double,
+        speed: Double,
+        course: Double
+    ) -> String? {
+        for (name, value) in [
+            ("lat", latitude), ("lon", longitude), ("alt", altitude),
+            ("hacc", horizontalAccuracy), ("vacc", verticalAccuracy),
+            ("speed", speed), ("course", course),
+        ] where !value.isFinite {
+            return "\(name) must be a finite number"
+        }
+        if latitude < -90 || latitude > 90 {
+            return "lat out of range [-90, 90]: \(latitude)"
+        }
+        if longitude < -180 || longitude > 180 {
+            return "lon out of range [-180, 180]: \(longitude)"
+        }
+        if horizontalAccuracy <= 0 {
+            return "hacc must be > 0: \(horizontalAccuracy)"
+        }
+        if verticalAccuracy <= 0 {
+            return "vacc must be > 0: \(verticalAccuracy)"
+        }
+        if speed != -1 && speed < 0 {
+            return "speed must be -1 or >= 0: \(speed)"
+        }
+        if course != -1 && (course < 0 || course >= 360) {
+            return "course must be -1 or in [0, 360): \(course)"
+        }
+        return nil
+    }
+}
 
-    func validationError() -> String? {
-        VPhoneHostControl.locationValidationError(
-            lat: latitude, lon: longitude, alt: altitude,
-            hacc: horizontalAccuracy, vacc: verticalAccuracy,
-            speed: speed, course: course)
+public struct VPhoneSystemLocationFix: Codable, Equatable, Sendable {
+    public let producerSequence: Int
+    public let latitude: Double
+    public let longitude: Double
+    public let altitude: Double
+    public let horizontalAccuracy: Double
+    public let verticalAccuracy: Double
+    public let speed: Double
+    public let course: Double
+    public let timestamp: TimeInterval
+
+    public init(
+        producerSequence: Int,
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        horizontalAccuracy: Double,
+        verticalAccuracy: Double,
+        speed: Double,
+        course: Double,
+        timestamp: TimeInterval
+    ) {
+        self.producerSequence = producerSequence
+        self.latitude = latitude
+        self.longitude = longitude
+        self.altitude = altitude
+        self.horizontalAccuracy = horizontalAccuracy
+        self.verticalAccuracy = verticalAccuracy
+        self.speed = speed
+        self.course = course
+        self.timestamp = timestamp
     }
 
-    func refreshed(at date: Date, holding: Bool = false) -> SystemLocationFix {
-        SystemLocationFix(
+    func validationError() -> String? {
+        VPhoneSystemLocationValidation.error(
+            latitude: latitude,
+            longitude: longitude,
+            altitude: altitude,
+            horizontalAccuracy: horizontalAccuracy,
+            verticalAccuracy: verticalAccuracy,
+            speed: speed,
+            course: course)
+    }
+
+    func refreshed(at date: Date, holding: Bool = false) -> VPhoneSystemLocationFix {
+        VPhoneSystemLocationFix(
             producerSequence: producerSequence,
             latitude: latitude, longitude: longitude, altitude: altitude,
             horizontalAccuracy: horizontalAccuracy, verticalAccuracy: verticalAccuracy,
@@ -29,106 +94,27 @@ struct SystemLocationFix: Codable, Equatable, Sendable {
     }
 }
 
-struct SystemLocationControllerError: Error, LocalizedError, Equatable {
-    let code: String
-    let message: String
+public struct VPhoneSystemLocationError: Error, LocalizedError, Equatable {
+    public let code: String
+    public let message: String
 
-    var errorDescription: String? { message }
+    public init(code: String, message: String) {
+        self.code = code
+        self.message = message
+    }
+
+    public var errorDescription: String? { message }
 }
 
 @MainActor
-protocol SystemLocationGuestAdapter: AnyObject {
+public protocol VPhoneSystemLocationGuestAdapter: AnyObject {
     func activate(generation: String) async throws
     func deliver(
-        _ fix: SystemLocationFix,
+        _ fix: VPhoneSystemLocationFix,
         generation: String,
         deliverySequence: Int
     ) async throws
     func clear(generation: String?) async throws
-}
-
-@MainActor
-final class VPhoneControlLocationGuestAdapter: SystemLocationGuestAdapter {
-    private weak var control: VPhoneControl?
-
-    init(control: VPhoneControl) {
-        self.control = control
-    }
-
-    func activate(generation: String) async throws {
-        let response = try await request([
-            "t": "location_source_begin",
-            "generation": generation,
-        ])
-        try Self.requireOK(response, fallback: "guest rejected location source")
-    }
-
-    func deliver(
-        _ fix: SystemLocationFix,
-        generation: String,
-        deliverySequence: Int
-    ) async throws {
-        let response = try await request([
-            "t": "location",
-            "generation": generation,
-            "delivery_sequence": deliverySequence,
-            "lat": fix.latitude, "lon": fix.longitude, "alt": fix.altitude,
-            "hacc": fix.horizontalAccuracy, "vacc": fix.verticalAccuracy,
-            "speed": fix.speed, "course": fix.course, "ts": fix.timestamp,
-        ])
-        try Self.requireOK(response, fallback: "guest rejected location")
-    }
-
-    func clear(generation: String?) async throws {
-        var payload: [String: Any] = ["t": "location_stop"]
-        if let generation { payload["generation"] = generation }
-        let response = try await request(payload)
-        try Self.requireOK(response, fallback: "guest rejected location_stop")
-    }
-
-    private func request(_ payload: [String: Any]) async throws -> [String: Any] {
-        guard let control, control.isConnected else {
-            throw SystemLocationControllerError(
-                code: "location_guest_unavailable", message: "guest not connected")
-        }
-        guard control.guestCaps.contains("location") else {
-            throw SystemLocationControllerError(
-                code: "location_guest_unavailable",
-                message: "guest does not support location simulation")
-        }
-        let response: [String: Any]
-        do {
-            (response, _) = try await control.sendRequest(payload)
-        } catch let error as VPhoneControl.ControlError {
-            throw Self.map(error)
-        }
-        return response
-    }
-
-    private static func requireOK(
-        _ response: [String: Any],
-        fallback: String
-    ) throws {
-        guard (response["t"] as? String) == "ok" else {
-            throw SystemLocationControllerError(
-                code: response["code"] as? String ?? "location_delivery_rejected",
-                message: response["msg"] as? String ?? fallback)
-        }
-    }
-
-    private static func map(_ error: VPhoneControl.ControlError) -> SystemLocationControllerError {
-        switch error {
-        case .notConnected, .unsupportedCapability:
-            SystemLocationControllerError(
-                code: "location_guest_unavailable", message: error.description)
-        case .requestTimedOut:
-            SystemLocationControllerError(
-                code: "location_delivery_timeout", message: error.description)
-        default:
-            SystemLocationControllerError(
-                code: "location_delivery_rejected", message: error.description)
-        }
-    }
 }
 
 private struct PersistedSystemLocationState: Codable, Equatable {
@@ -136,10 +122,10 @@ private struct PersistedSystemLocationState: Codable, Equatable {
 
     let schemaVersion: Int
     let owner: String
-    let fix: SystemLocationFix
+    let fix: VPhoneSystemLocationFix
     let heartbeatSeconds: Double
 
-    init(owner: String, fix: SystemLocationFix, heartbeatSeconds: Double) {
+    init(owner: String, fix: VPhoneSystemLocationFix, heartbeatSeconds: Double) {
         schemaVersion = Self.currentSchemaVersion
         self.owner = owner
         self.fix = fix
@@ -147,10 +133,10 @@ private struct PersistedSystemLocationState: Codable, Equatable {
     }
 }
 
-final class SystemLocationStateStore {
+public final class VPhoneSystemLocationStateStore {
     let url: URL
 
-    init(url: URL) {
+    public init(url: URL) {
         self.url = url
     }
 
@@ -160,7 +146,7 @@ final class SystemLocationStateStore {
             PersistedSystemLocationState.self,
             from: Data(contentsOf: url))
         guard state.schemaVersion == PersistedSystemLocationState.currentSchemaVersion else {
-            throw SystemLocationControllerError(
+            throw VPhoneSystemLocationError(
                 code: "location_persistence_version",
                 message: "unsupported system location state schema")
         }
@@ -194,24 +180,24 @@ final class SystemLocationStateStore {
 /// Producer sequence advances only after a guest ACK. Delivery sequence is
 /// independent and covers heartbeat, watchdog and reconnect re-delivery.
 @MainActor
-final class VPhoneSystemLocationController {
+public final class VPhoneSystemLocationController {
     private enum Mode: String { case fixed, stream }
     private enum State: String { case off, applying, running, holding, paused }
     private enum TimeoutAction: String { case hold, stop }
 
-    private let adapter: SystemLocationGuestAdapter
-    private let stateStore: SystemLocationStateStore?
+    private let adapter: VPhoneSystemLocationGuestAdapter
+    private let stateStore: VPhoneSystemLocationStateStore?
     private let now: () -> Date
     private var mode: Mode?
     private var state: State = .off
     private var owner: String?
-    private(set) var generation: String?
-    private var lastProducerFix: SystemLocationFix?
-    private var lastAppliedFix: SystemLocationFix?
+    public private(set) var generation: String?
+    private var lastProducerFix: VPhoneSystemLocationFix?
+    private var lastAppliedFix: VPhoneSystemLocationFix?
     private var lastProducerSequence: Int?
     private var deliverySequence = -1
     private var lastAckAt: Date?
-    private var lastError: SystemLocationControllerError?
+    private var lastError: VPhoneSystemLocationError?
     private var fixedHeartbeatSeconds = 1.0
     private var persistent = false
     private var streamWatchdogSeconds = 3.0
@@ -219,9 +205,9 @@ final class VPhoneSystemLocationController {
     private var heartbeatTask: Task<Void, Never>?
     private var watchdogTask: Task<Void, Never>?
 
-    init(
-        adapter: SystemLocationGuestAdapter,
-        stateStore: SystemLocationStateStore? = nil,
+    public init(
+        adapter: VPhoneSystemLocationGuestAdapter,
+        stateStore: VPhoneSystemLocationStateStore? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         self.adapter = adapter
@@ -230,11 +216,11 @@ final class VPhoneSystemLocationController {
         restorePersistedFixedSource()
     }
 
-    var hasActiveSource: Bool { generation != nil }
+    public var hasActiveSource: Bool { generation != nil }
 
-    func setFixed(
+    public func setFixed(
         owner: String,
-        fix: SystemLocationFix,
+        fix: VPhoneSystemLocationFix,
         heartbeatSeconds: Double,
         replace: Bool = false,
         persist: Bool = false
@@ -283,10 +269,10 @@ final class VPhoneSystemLocationController {
         return snapshot()
     }
 
-    func startStream(
+    public func startStream(
         owner: String,
         watchdogSeconds: Double,
-        onTimeout: String = TimeoutAction.hold.rawValue,
+        onTimeout: String = "hold",
         replace: Bool = false
     ) async throws -> [String: Any] {
         try validateOwner(owner)
@@ -305,9 +291,9 @@ final class VPhoneSystemLocationController {
         return snapshot()
     }
 
-    func push(
+    public func push(
         generation requestedGeneration: String,
-        fix: SystemLocationFix
+        fix: VPhoneSystemLocationFix
     ) async throws -> [String: Any] {
         try requireGeneration(requestedGeneration, mode: .stream)
         try validateFix(fix)
@@ -337,7 +323,10 @@ final class VPhoneSystemLocationController {
         return snapshot()
     }
 
-    func setPaused(_ paused: Bool, generation requestedGeneration: String) async throws -> [String: Any] {
+    public func setPaused(
+        _ paused: Bool,
+        generation requestedGeneration: String
+    ) async throws -> [String: Any] {
         try requireGeneration(requestedGeneration)
         guard let fix = lastProducerFix else {
             throw failure("location_not_running", "no accepted location sample")
@@ -360,7 +349,9 @@ final class VPhoneSystemLocationController {
         return snapshot()
     }
 
-    func stop(generation requestedGeneration: String? = nil) async throws -> [String: Any] {
+    public func stop(
+        generation requestedGeneration: String? = nil
+    ) async throws -> [String: Any] {
         guard let activeGeneration = generation else { return snapshot() }
         if let requestedGeneration, requestedGeneration != activeGeneration {
             throw failure(
@@ -378,14 +369,14 @@ final class VPhoneSystemLocationController {
         return snapshot()
     }
 
-    func clearLegacyLocation() async throws -> [String: Any] {
+    public func clearLegacyLocation() async throws -> [String: Any] {
         try await adapter.clear(generation: generation)
         try clearPersistedState()
         resetState()
         return snapshot()
     }
 
-    func reapplyAfterReconnect() async {
+    public func reapplyAfterReconnect() async {
         guard let generation else { return }
         let wasPaused = state == .paused
         let wasHolding = state == .holding
@@ -409,7 +400,7 @@ final class VPhoneSystemLocationController {
                     scheduleWatchdog(seconds: streamWatchdogSeconds)
                 }
             }
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             lastError = error
             state = .applying
         } catch {
@@ -420,7 +411,7 @@ final class VPhoneSystemLocationController {
 
     /// A GUI source becomes authoritative without clearing the fix it is about
     /// to replace. Pending external heartbeat/watchdog work is cancelled.
-    func relinquishForGUI() {
+    public func relinquishForGUI() {
         do {
             try clearPersistedState()
         } catch {
@@ -430,7 +421,7 @@ final class VPhoneSystemLocationController {
         resetState()
     }
 
-    func snapshot() -> [String: Any] {
+    public func snapshot() -> [String: Any] {
         var desired: [String: Any] = [:]
         if let mode { desired["mode"] = mode.rawValue }
         if let owner { desired["owner"] = owner }
@@ -491,7 +482,7 @@ final class VPhoneSystemLocationController {
         }
         do {
             try await adapter.activate(generation: generation)
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             lastError = error
             throw error
         } catch {
@@ -501,7 +492,7 @@ final class VPhoneSystemLocationController {
         }
     }
 
-    private func deliver(_ fix: SystemLocationFix) async throws {
+    private func deliver(_ fix: VPhoneSystemLocationFix) async throws {
         guard let generation else {
             throw failure("location_not_running", "no active location source")
         }
@@ -509,7 +500,7 @@ final class VPhoneSystemLocationController {
         do {
             try await adapter.deliver(
                 fix, generation: generation, deliverySequence: proposedDeliverySequence)
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             lastError = error
             throw error
         } catch {
@@ -571,7 +562,7 @@ final class VPhoneSystemLocationController {
                 do {
                     try await self.adapter.clear(generation: activeGeneration)
                     self.resetState()
-                } catch let error as SystemLocationControllerError {
+                } catch let error as VPhoneSystemLocationError {
                     self.lastError = error
                     self.state = .applying
                     self.scheduleWatchdog(seconds: seconds)
@@ -649,7 +640,7 @@ final class VPhoneSystemLocationController {
             lastProducerSequence = saved.fix.producerSequence
             fixedHeartbeatSeconds = saved.heartbeatSeconds
             persistent = true
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             lastError = error
             stateStore.quarantine()
         } catch {
@@ -680,7 +671,7 @@ final class VPhoneSystemLocationController {
         }
     }
 
-    private func validateFix(_ fix: SystemLocationFix) throws {
+    private func validateFix(_ fix: VPhoneSystemLocationFix) throws {
         guard fix.producerSequence >= 0 else {
             throw failure("invalid_location_source", "producer_sequence must be non-negative")
         }
@@ -692,11 +683,11 @@ final class VPhoneSystemLocationController {
         }
     }
 
-    private func failure(_ code: String, _ message: String) -> SystemLocationControllerError {
-        SystemLocationControllerError(code: code, message: message)
+    private func failure(_ code: String, _ message: String) -> VPhoneSystemLocationError {
+        VPhoneSystemLocationError(code: code, message: message)
     }
 
-    private func fixDictionary(_ fix: SystemLocationFix) -> [String: Any] {
+    private func fixDictionary(_ fix: VPhoneSystemLocationFix) -> [String: Any] {
         [
             "latitude": fix.latitude, "longitude": fix.longitude,
             "speed_mps": fix.speed, "course_deg": fix.course,

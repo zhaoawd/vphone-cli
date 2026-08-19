@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import ImageIO
+import VPhoneCore
 
 // MARK: - Host Control Socket
 
@@ -954,7 +955,7 @@ class VPhoneHostControl {
                     switch type {
                     case "location_source_set":
                         guard (json["mode"] as? String) == "fixed" else {
-                            throw SystemLocationControllerError(
+                            throw VPhoneSystemLocationError(
                                 code: "invalid_location_source",
                                 message: "location_source_set mode must be fixed")
                         }
@@ -982,7 +983,7 @@ class VPhoneHostControl {
                             generation: generation, fix: fix)
                     case "location_source_control":
                         guard let paused = json["paused"] as? Bool else {
-                            throw SystemLocationControllerError(
+                            throw VPhoneSystemLocationError(
                                 code: "invalid_location_source",
                                 message: "only paused control is currently supported")
                         }
@@ -998,7 +999,7 @@ class VPhoneHostControl {
                     }
                     result.ok = true
                     result.extra = snapshot
-                } catch let error as SystemLocationControllerError {
+                } catch let error as VPhoneSystemLocationError {
                     result.code = error.code
                     result.error = error.message
                 } catch {
@@ -1051,7 +1052,7 @@ class VPhoneHostControl {
                 do {
                     _ = try await provider.systemLocationController.setFixed(
                         owner: "legacy-uds",
-                        fix: SystemLocationFix(
+                        fix: VPhoneSystemLocationFix(
                             producerSequence: 0,
                             latitude: lat, longitude: lon, altitude: alt,
                             horizontalAccuracy: hacc, verticalAccuracy: vacc,
@@ -1100,7 +1101,7 @@ class VPhoneHostControl {
     /// and so the protocol edge rejects bad input before any guest round-trip.
     private nonisolated static func requireWGS84(_ json: [String: Any]) throws {
         guard (json["coordinate_system"] as? String)?.lowercased() == "wgs84" else {
-            throw SystemLocationControllerError(
+            throw VPhoneSystemLocationError(
                 code: "invalid_location_source",
                 message: "coordinate_system must be wgs84")
         }
@@ -1108,12 +1109,12 @@ class VPhoneHostControl {
 
     nonisolated static func systemLocationFix(
         _ json: [String: Any]
-    ) throws -> SystemLocationFix {
+    ) throws -> VPhoneSystemLocationFix {
         guard let sequence = json["producer_sequence"] as? Int,
               let lat = json["lat"] as? Double,
               let lon = json["lon"] as? Double
         else {
-            throw SystemLocationControllerError(
+            throw VPhoneSystemLocationError(
                 code: "invalid_location_source",
                 message: "producer_sequence, lat and lon are required")
         }
@@ -1125,14 +1126,14 @@ class VPhoneHostControl {
             fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             let regular = ISO8601DateFormatter()
             guard let date = fractional.date(from: text) ?? regular.date(from: text) else {
-                throw SystemLocationControllerError(
+                throw VPhoneSystemLocationError(
                     code: "invalid_location_source", message: "timestamp must be ISO-8601")
             }
             timestamp = date.timeIntervalSince1970
         } else {
             timestamp = 0
         }
-        return SystemLocationFix(
+        return VPhoneSystemLocationFix(
             producerSequence: sequence,
             latitude: lat, longitude: lon,
             altitude: json["alt"] as? Double ?? 0,
@@ -1147,23 +1148,14 @@ class VPhoneHostControl {
         lat: Double, lon: Double, alt: Double,
         hacc: Double, vacc: Double, speed: Double, course: Double
     ) -> String? {
-        for (name, value) in [
-            ("lat", lat), ("lon", lon), ("alt", alt), ("hacc", hacc),
-            ("vacc", vacc), ("speed", speed), ("course", course),
-        ] where !value.isFinite {
-            return "\(name) must be a finite number"
-        }
-        if lat < -90 || lat > 90 { return "lat out of range [-90, 90]: \(lat)" }
-        if lon < -180 || lon > 180 { return "lon out of range [-180, 180]: \(lon)" }
-        if hacc <= 0 { return "hacc must be > 0: \(hacc)" }
-        if vacc <= 0 { return "vacc must be > 0: \(vacc)" }
-        // -1 is the only shared-contract sentinel for unknown speed.
-        if speed != -1 && speed < 0 { return "speed must be -1 or >= 0: \(speed)" }
-        // course: -1 is the CoreLocation "heading unknown" sentinel; otherwise [0, 360).
-        if course != -1 && (course < 0 || course >= 360) {
-            return "course must be -1 or in [0, 360): \(course)"
-        }
-        return nil
+        VPhoneSystemLocationValidation.error(
+            latitude: lat,
+            longitude: lon,
+            altitude: alt,
+            horizontalAccuracy: hacc,
+            verticalAccuracy: vacc,
+            speed: speed,
+            course: course)
     }
 
     /// Query the guest 1337 `vcam_status` for one generation and return the

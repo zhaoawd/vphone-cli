@@ -1,10 +1,10 @@
 import XCTest
-@testable import vphone_cli
+@testable import VPhoneCore
 
 @MainActor
-private final class FakeSystemLocationGuestAdapter: SystemLocationGuestAdapter {
+private final class FakeSystemLocationGuestAdapter: VPhoneSystemLocationGuestAdapter {
     struct Delivery: Equatable {
-        let fix: SystemLocationFix
+        let fix: VPhoneSystemLocationFix
         let generation: String
         let sequence: Int
     }
@@ -19,13 +19,13 @@ private final class FakeSystemLocationGuestAdapter: SystemLocationGuestAdapter {
     }
 
     func deliver(
-        _ fix: SystemLocationFix,
+        _ fix: VPhoneSystemLocationFix,
         generation: String,
         deliverySequence: Int
     ) async throws {
         if failuresRemaining > 0 {
             failuresRemaining -= 1
-            throw SystemLocationControllerError(
+            throw VPhoneSystemLocationError(
                 code: "location_delivery_timeout", message: "test timeout")
         }
         deliveries.append(Delivery(
@@ -39,8 +39,8 @@ private final class FakeSystemLocationGuestAdapter: SystemLocationGuestAdapter {
 
 @MainActor
 final class SystemLocationControllerTests: XCTestCase {
-    private func fix(_ sequence: Int, latitude: Double = 31.2) -> SystemLocationFix {
-        SystemLocationFix(
+    private func fix(_ sequence: Int, latitude: Double = 31.2) -> VPhoneSystemLocationFix {
+        VPhoneSystemLocationFix(
             producerSequence: sequence,
             latitude: latitude, longitude: 118.8, altitude: 0,
             horizontalAccuracy: 5, verticalAccuracy: 8,
@@ -76,7 +76,7 @@ final class SystemLocationControllerTests: XCTestCase {
         do {
             _ = try await controller.push(generation: generation, fix: fix(0))
             XCTFail("first delivery should fail")
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             XCTAssertEqual(error.code, "location_delivery_timeout")
         }
         _ = try await controller.push(generation: generation, fix: fix(0))
@@ -102,7 +102,7 @@ final class SystemLocationControllerTests: XCTestCase {
             do {
                 _ = try await operation()
                 XCTFail("old generation should be rejected")
-            } catch let error as SystemLocationControllerError {
+            } catch let error as VPhoneSystemLocationError {
                 XCTAssertEqual(error.code, "location_generation_conflict")
             }
         }
@@ -149,7 +149,7 @@ final class SystemLocationControllerTests: XCTestCase {
             _ = try await controller.startStream(
                 owner: "route-2", watchdogSeconds: 60)
             XCTFail("other owner should require replace")
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             XCTAssertEqual(error.code, "location_owner_conflict")
         }
         _ = try await controller.startStream(
@@ -234,7 +234,7 @@ final class SystemLocationControllerTests: XCTestCase {
             .appendingPathComponent("vphone-location-\(UUID().uuidString)")
         let stateURL = directory.appendingPathComponent("system-location.json")
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = SystemLocationStateStore(url: stateURL)
+        let store = VPhoneSystemLocationStateStore(url: stateURL)
 
         do {
             let guest = FakeSystemLocationGuestAdapter()
@@ -278,7 +278,7 @@ final class SystemLocationControllerTests: XCTestCase {
                 watchdogSeconds: 3,
                 onTimeout: "continue")
             XCTFail("invalid timeout action should fail")
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             XCTAssertEqual(error.code, "invalid_location_source")
         }
         XCTAssertTrue(guest.activations.isEmpty)
@@ -294,7 +294,7 @@ final class SystemLocationControllerTests: XCTestCase {
                 fix: fix(1),
                 heartbeatSeconds: 1)
             XCTFail("fixed source should require sequence zero")
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             XCTAssertEqual(error.code, "location_sequence_conflict")
         }
         do {
@@ -304,7 +304,7 @@ final class SystemLocationControllerTests: XCTestCase {
                 heartbeatSeconds: 1,
                 persist: true)
             XCTFail("persistence should require a state store")
-        } catch let error as SystemLocationControllerError {
+        } catch let error as VPhoneSystemLocationError {
             XCTAssertEqual(error.code, "location_persistence_unavailable")
         }
         XCTAssertTrue(guest.activations.isEmpty)

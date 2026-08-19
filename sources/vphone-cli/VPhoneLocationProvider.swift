@@ -1,5 +1,6 @@
 import CoreLocation
 import Foundation
+import VPhoneCore
 
 /// Forwards the host Mac's location to the guest VM via vsock.
 ///
@@ -41,7 +42,7 @@ class VPhoneLocationProvider: NSObject {
     private let locationStateURL: URL
     lazy var systemLocationController = VPhoneSystemLocationController(
         adapter: VPhoneControlLocationGuestAdapter(control: control),
-        stateStore: SystemLocationStateStore(url: locationStateURL))
+        stateStore: VPhoneSystemLocationStateStore(url: locationStateURL))
     private var hostModeStarted = false
 
     /// True once an external controller (the UDS automation surface) has taken
