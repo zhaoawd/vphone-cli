@@ -241,7 +241,8 @@ bundle: $(BINARY) $(INFO_PLIST)
 	@cp -f $(BINARY) $(BUNDLE_BIN)
 	@cp -f $(INFO_PLIST) $(BUNDLE)/Contents/Info.plist
 	@cp -f sources/AppIcon.icns $(BUNDLE)/Contents/Resources/AppIcon.icns
-	@cp -f $(SCRIPTS)/vphoned/signcert.p12 $(BUNDLE)/Contents/Resources/signcert.p12
+	@mkdir -p $(BUNDLE)/Contents/Resources/scripts/vphoned
+	@cp -f $(SCRIPTS)/vphoned/signcert.p12 $(BUNDLE)/Contents/Resources/scripts/vphoned/signcert.p12
 	@if [ -f $(VPHONED_SIGNED) ]; then cp -f $(VPHONED_SIGNED) $(BUNDLE)/Contents/Resources/vphoned.signed; fi
 	@cp -f $$(command -v ldid) $(BUNDLE)/Contents/MacOS/ldid
 	@codesign --force --sign - $(BUNDLE)/Contents/MacOS/ldid
