@@ -34,6 +34,7 @@ BINARY      := .build/release/vphone-cli
 PATCHER_BINARY := .build/debug/vphone-cli
 BUNDLE      := .build/vphone-cli.app
 BUNDLE_BIN  := $(BUNDLE)/Contents/MacOS/vphone-cli
+VPHONED_SIGNED := .build/vphoned.signed
 INFO_PLIST  := sources/Info.plist
 ENTITLEMENTS := sources/vphone.entitlements
 VENV        := .venv
@@ -241,6 +242,7 @@ bundle: $(BINARY) $(INFO_PLIST)
 	@cp -f $(INFO_PLIST) $(BUNDLE)/Contents/Info.plist
 	@cp -f sources/AppIcon.icns $(BUNDLE)/Contents/Resources/AppIcon.icns
 	@cp -f $(SCRIPTS)/vphoned/signcert.p12 $(BUNDLE)/Contents/Resources/signcert.p12
+	@if [ -f $(VPHONED_SIGNED) ]; then cp -f $(VPHONED_SIGNED) $(BUNDLE)/Contents/Resources/vphoned.signed; fi
 	@cp -f $$(command -v ldid) $(BUNDLE)/Contents/MacOS/ldid
 	@codesign --force --sign - $(BUNDLE)/Contents/MacOS/ldid
 	@codesign --force --sign - --entitlements $(ENTITLEMENTS) $(BUNDLE_BIN)
@@ -253,12 +255,13 @@ vphoned:
 		|| (echo "Error: ldid not found. Run: brew install ldid-procursus" && exit 1)
 	$(MAKE) -C $(SCRIPTS)/vphoned GIT_HASH=$(GIT_HASH)
 	@echo "=== Signing vphoned ==="
-	cp $(SCRIPTS)/vphoned/vphoned $(VM_DIR)/.vphoned.signed
+	@mkdir -p $(dir $(VPHONED_SIGNED))
+	cp $(SCRIPTS)/vphoned/vphoned $(VPHONED_SIGNED)
 	ldid \
 		-S$(SCRIPTS)/vphoned/entitlements.plist \
 		-M "-K$(SCRIPTS)/vphoned/signcert.p12" \
-		$(VM_DIR)/.vphoned.signed
-	@echo "  signed → $(VM_DIR)/.vphoned.signed"
+		$(VPHONED_SIGNED)
+	@echo "  signed → $(VPHONED_SIGNED)"
 
 # ═══════════════════════════════════════════════════════════════════
 # VM management
