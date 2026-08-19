@@ -72,7 +72,7 @@ help:
 	@echo "  make setup_tools             Install all tools (brew, trustcache, insert_dylib, venv+pymobiledevice3)"
 	@echo ""
 	@echo "Build:"
-	@echo "  make build                   Build + sign vphone-cli"
+	@echo "  make build                   Build + sign vphone-cli.app"
 	@echo "  make vphoned                 Cross-compile + sign vphoned for iOS"
 	@echo "  make clean                   Remove build/tooling artifacts only"
 	@echo "    Options: CLEAN_VM=1        Also remove VM_DIR=$(VM_DIR) after confirmation"
@@ -215,7 +215,7 @@ clean:
 
 .PHONY: build patcher_build bundle
 
-build: $(BINARY)
+build: bundle
 
 patcher_build: $(PATCHER_BINARY)
 
@@ -235,7 +235,7 @@ $(BINARY): $(SWIFT_SOURCES) Package.swift $(ENTITLEMENTS)
 	codesign --force --sign - --entitlements $(ENTITLEMENTS) $@
 	@echo "  signed OK"
 
-bundle: build $(INFO_PLIST)
+bundle: $(BINARY) $(INFO_PLIST)
 	@mkdir -p $(BUNDLE)/Contents/MacOS $(BUNDLE)/Contents/Resources
 	@cp -f $(BINARY) $(BUNDLE_BIN)
 	@cp -f $(INFO_PLIST) $(BUNDLE)/Contents/Info.plist
