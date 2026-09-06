@@ -2,7 +2,12 @@
 import Foundation
 import Testing
 
-struct ResourcesTests {
+// Nested under the shared `.serialized` parent (see LibraryTests.swift): several
+// tests here mutate the process-global VPHONE_ROOT / VPHONE_VENV_DIR, which also
+// collide with LibraryTests. The common serialized parent makes both suites
+// mutually exclusive so their setenv/unsetenv never interleave.
+extension EnvMutatingSuites {
+    struct ResourcesTests {
     @Test func bundledLayoutResolvesToContentsResources() {
         let exe = "/Applications/vphone-cli.app/Contents/MacOS/vphone-cli"
         let r = VPhoneResources.resolve(executablePath: exe)
@@ -85,5 +90,6 @@ struct ResourcesTests {
         if FileManager.default.isExecutableFile(atPath: devVenv.path) {
             #expect(r.pythonIsUsable(devVenv) == true)
         }
+    }
     }
 }

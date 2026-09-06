@@ -2,11 +2,21 @@
 import Foundation
 import Testing
 
-// Serialized: defaultRootHonorsEnvOverride / defaultRootIsShellSafe mutate the
-// process-global VPHONE_LIBRARY_ROOT; run in parallel they race (a set/unset
-// from one can land inside the other's assertion).
+// Shared serialization scope for suites that mutate the process-global
+// VPHONE_* environment variables (VPHONE_ROOT, VPHONE_LIBRARY_ROOT,
+// VPHONE_VENV_DIR). Swift Testing's `.serialized` serializes a suite's ENTIRE
+// subtree, so nesting each env-mutating suite here makes them mutually exclusive
+// ACROSS suites. A plain per-suite `.serialized` only serializes tests WITHIN
+// one suite, which still let LibraryTests and ResourcesTests race on their
+// concurrent setenv/unsetenv of the same globals.
 @Suite(.serialized)
-struct LibraryTests {
+struct EnvMutatingSuites {}
+
+extension EnvMutatingSuites {
+    // Serialized via the parent: defaultRootHonorsEnvOverride / defaultRootIsShellSafe
+    // mutate the process-global VPHONE_LIBRARY_ROOT / VPHONE_ROOT; run in parallel
+    // they race (a set/unset from one can land inside the other's assertion).
+    struct LibraryTests {
     private func makeRoot() throws -> URL {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
@@ -77,5 +87,6 @@ struct LibraryTests {
         let result = try VPhoneLibrary(root: root).scan()
         #expect(result.bundles.map(\.name) == ["good"])
         #expect(result.skipped.map(\.name) == ["bad"])
+    }
     }
 }
