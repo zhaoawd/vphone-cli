@@ -2,13 +2,18 @@
 import Foundation
 import Testing
 
+// Firmware kernelcache fixture lives under ipsws/patch_refactor_input and is
+// intentionally absent from a clean checkout. Gate so the test skips when missing.
+private let baseDir = URL(fileURLWithPath: #filePath)
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .appendingPathComponent("ipsws/patch_refactor_input")
+
+private let fixturesAvailable = FileManager.default.fileExists(atPath: baseDir.path)
+
 struct VerboseJBDebug {
-    @Test func debugFailingPatches() throws {
-        let baseDir = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("ipsws/patch_refactor_input")
+    @Test(.enabled(if: fixturesAvailable)) func debugFailingPatches() throws {
         let data = try Data(contentsOf: baseDir.appendingPathComponent("raw_payloads/kernelcache.bin"))
         let patcher = KernelJBPatcher(data: data, verbose: true)
 

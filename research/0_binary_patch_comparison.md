@@ -242,10 +242,17 @@ Validation limits:
   version, and protocol-port availability.
 - The VM was launched headless. Native `VZVirtualMachineView` display output and
   interactive input were not visually verified in this run.
-- `research/reference/xnu`, repo-exported symbol JSON files, and
-  `ipsws/patch_refactor_input` comparison fixtures remain absent. The final Swift
-  run passed 179 of 193 tests; 13 failures require those missing fixtures and one
-  compares the macOS `/private/var` and `/var` aliases as distinct paths.
+- The `ipsws/patch_refactor_input` comparison fixtures remain absent. These are
+  the only inputs the 13 firmware-comparison tests read (`raw_payloads/*.bin`,
+  `Firmware/**/*.im4p`, and `reference_patches/*.json`). Those 13 tests are now
+  gated with the Swift Testing `.enabled(if:)` trait keyed on the fixture
+  directory's presence, so they are skipped rather than failing when the fixtures
+  are absent. The `/private/var` vs `/var` alias assertion is fixed by
+  canonicalizing both sides with `resolvingSymlinksInPath()`. The final Swift run
+  reported 196 tests: 183 passed, 0 failed, 13 skipped.
+- `research/reference/xnu` and the repo-exported symbol JSON files are also absent.
+  They support the separately-noted upstream source and address cross-checks; they
+  are not inputs to the 13 firmware-comparison tests above.
 
 ### Installed Components
 

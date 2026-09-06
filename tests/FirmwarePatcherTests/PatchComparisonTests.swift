@@ -30,6 +30,11 @@ private let baseDir = URL(fileURLWithPath: #filePath)
     .deletingLastPathComponent()
     .appendingPathComponent("ipsws/patch_refactor_input")
 
+// The comparison fixtures (raw_payloads, Firmware IM4Ps, reference_patches JSON)
+// are large firmware artifacts intentionally absent from a clean checkout. Gate the
+// comparison tests so they skip rather than fail when the fixture dir is missing.
+private let fixturesAvailable = FileManager.default.fileExists(atPath: baseDir.path)
+
 private func loadRawPayload(_ name: String) throws -> Data {
     let url = baseDir.appendingPathComponent("raw_payloads/\(name)")
     return try Data(contentsOf: url)
@@ -94,7 +99,7 @@ private func comparePatchRecords(
 // MARK: - AVPBooter Tests
 
 struct AVPBooterComparisonTests {
-    @Test func compareAVPBooter() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareAVPBooter() throws {
         let data = try loadRawPayload("avpbooter.bin")
         let patcher = AVPBooterPatcher(data: data, verbose: false)
         let swiftPatches = try patcher.findAll()
@@ -106,7 +111,7 @@ struct AVPBooterComparisonTests {
 // MARK: - iBoot Tests
 
 struct IBSSComparisonTests {
-    @Test func compareIBSS() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareIBSS() throws {
         let data = try loadRawPayload("ibss.bin")
         let patcher = IBootPatcher(data: data, mode: .ibss, verbose: false)
         let swiftPatches = try patcher.findAll()
@@ -116,7 +121,7 @@ struct IBSSComparisonTests {
 }
 
 struct IBECComparisonTests {
-    @Test func compareIBEC() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareIBEC() throws {
         let data = try loadRawPayload("ibec.bin")
         let patcher = IBootPatcher(data: data, mode: .ibec, verbose: false)
         let swiftPatches = try patcher.findAll()
@@ -126,7 +131,7 @@ struct IBECComparisonTests {
 }
 
 struct LLBComparisonTests {
-    @Test func compareLLB() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareLLB() throws {
         let data = try loadRawPayload("llb.bin")
         let patcher = IBootPatcher(data: data, mode: .llb, verbose: false)
         let swiftPatches = try patcher.findAll()
@@ -138,7 +143,7 @@ struct LLBComparisonTests {
 // MARK: - TXM Tests
 
 struct TXMComparisonTests {
-    @Test func compareTXM() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareTXM() throws {
         let data = try loadRawPayload("txm.bin")
         let patcher = TXMPatcher(data: data, verbose: false)
         let swiftPatches = try patcher.findAll()
@@ -148,7 +153,7 @@ struct TXMComparisonTests {
 }
 
 struct TXMDevComparisonTests {
-    @Test func compareTXMDev() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareTXMDev() throws {
         let url = baseDir.appendingPathComponent("reference_patches/txm_dev.json")
         let jsonData = try Data(contentsOf: url)
         let ref = try JSONDecoder().decode(TXMDevReference.self, from: jsonData)
@@ -166,7 +171,7 @@ struct TXMDevComparisonTests {
 // MARK: - Kernel Tests
 
 struct KernelcacheComparisonTests {
-    @Test func compareKernelcache() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareKernelcache() throws {
         let data = try loadRawPayload("kernelcache.bin")
         let patcher = KernelPatcher(data: data, verbose: false)
         let swiftPatches = try patcher.findAll()
@@ -178,7 +183,7 @@ struct KernelcacheComparisonTests {
 // MARK: - JB Tests
 
 struct IBSSJBComparisonTests {
-    @Test func compareIBSSJB() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareIBSSJB() throws {
         let data = try loadRawPayload("ibss.bin")
         let patcher = IBootJBPatcher(data: data, mode: .ibss, verbose: false)
         // IBootJBPatcher only adds JB-specific patches on top of base
@@ -191,7 +196,7 @@ struct IBSSJBComparisonTests {
 }
 
 struct KernelcacheJBComparisonTests {
-    @Test func compareKernelcacheJB() throws {
+    @Test(.enabled(if: fixturesAvailable)) func compareKernelcacheJB() throws {
         let data = try loadRawPayload("kernelcache.bin")
         let patcher = KernelJBPatcher(data: data, verbose: false)
         let swiftPatches = try patcher.findAll()

@@ -517,13 +517,22 @@ struct IBootPatcherIdempotencyTests {
     }
 }
 
+// Firmware comparison fixtures (large IM4P artifacts) live under
+// ipsws/patch_refactor_input and are intentionally absent from a clean checkout.
+// Gate the suite so it is skipped rather than failing when they are missing.
+private let im4pParityFixturesDir = URL(fileURLWithPath: #filePath)
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .appendingPathComponent("ipsws/patch_refactor_input")
+
+private let im4pParityFixturesAvailable =
+    FileManager.default.fileExists(atPath: im4pParityFixturesDir.path)
+
+@Suite(.enabled(if: im4pParityFixturesAvailable))
 struct IM4PPayloadParityTests {
     @Test func ibssIM4PPayloadMatchesRawAndJBPatcherFindsNoncePatch() throws {
-        let baseDir = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("ipsws/patch_refactor_input")
+        let baseDir = im4pParityFixturesDir
 
         let rawIBSS = try Data(contentsOf: baseDir.appendingPathComponent("raw_payloads/ibss.bin"))
         let (im4pPayload, _) = try IM4PHandler.load(contentsOf: baseDir.appendingPathComponent("Firmware/dfu/iBSS.vresearch101.RELEASE.im4p"))
@@ -536,11 +545,7 @@ struct IM4PPayloadParityTests {
     }
 
     @Test func savingIBSSIM4PRoundTripsPayload() throws {
-        let baseDir = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("ipsws/patch_refactor_input")
+        let baseDir = im4pParityFixturesDir
 
         let sourceURL = baseDir.appendingPathComponent("Firmware/dfu/iBSS.vresearch101.RELEASE.im4p")
         let originalFile = try Data(contentsOf: sourceURL)
@@ -559,11 +564,7 @@ struct IM4PPayloadParityTests {
     }
 
     @Test func savingTXMIM4PPreservesPAYPTrailer() throws {
-        let baseDir = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("ipsws/patch_refactor_input")
+        let baseDir = im4pParityFixturesDir
 
         let sourceURL = baseDir.appendingPathComponent("Firmware/txm.iphoneos.research.im4p")
         let originalFile = try Data(contentsOf: sourceURL)
@@ -599,7 +600,11 @@ struct FirmwarePipelineTests {
         let pipeline = FirmwarePipeline(vmDirectory: tempDir, variant: .regular, verbose: false)
         let found = try pipeline.findFile(in: tempDir, patterns: ["AVPBooter*.bin"], label: "AVPBooter")
 
-        #expect(found == target)
+        // macOS aliases /var -> /private/var, so NSTemporaryDirectory() yields a
+        // /var path while findFile returns the symlink-resolved /private/var path.
+        // Compare canonicalized paths so the assertion checks identity of the same
+        // file rather than the textual prefix.
+        #expect(found.resolvingSymlinksInPath() == target.resolvingSymlinksInPath())
     }
 }
 
