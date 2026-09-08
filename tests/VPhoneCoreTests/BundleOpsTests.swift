@@ -367,15 +367,28 @@ struct BundleOpsTests {
     private static let zstdMagic: [UInt8] = [0x28, 0xB5, 0x2F, 0xFD]
     private static let xzMagic: [UInt8] = [0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00]
 
+    private func removeTemporary(_ url: URL) {
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            Issue.record("Temporary artifact cleanup failed: \(url.path): \(error)")
+        }
+    }
+
     private func magic(_ url: URL, _ n: Int) throws -> [UInt8] {
         Array(try Data(contentsOf: url).prefix(n))
     }
 
     private func exportAndImport(
-        _ compression: VPhoneBundleOps.ExportCompression?
-    ) throws -> (archive: URL, imported: VPhoneBundle) {
+        _ compression: VPhoneBundleOps.ExportCompression?,
+        verify: (URL, VPhoneBundle) throws -> Void
+    ) throws {
         let root = try makeRoot()
-        let rom = try fakeROM(); let seprom = try fakeROM()
+        defer { removeTemporary(root) }
+        let rom = try fakeROM()
+        defer { removeTemporary(rom) }
+        let seprom = try fakeROM()
+        defer { removeTemporary(seprom) }
         let lib = VPhoneLibrary(root: root)
         _ = try VPhoneBundleOps.create(
             .init(name: "orig", cpuCount: 6, memoryMB: 2048, diskSizeGB: 1,
@@ -388,37 +401,49 @@ struct BundleOpsTests {
             try VPhoneBundleOps.export(bundleNamed: "orig", to: archive, includeIPSW: false, in: lib)
         }
         let dstRoot = try makeRoot()
+        defer { removeTemporary(dstRoot) }
         let imported = try VPhoneBundleOps.importArchive(
             from: archive, name: "copy", in: VPhoneLibrary(root: dstRoot))
-        return (archive, imported)
+        try verify(archive, imported)
     }
 
     @Test func exportDefaultsToFastZstd() throws {
-        let (archive, imported) = try exportAndImport(nil)
-        #expect(try magic(archive, 4) == Self.zstdMagic)
-        #expect(imported.manifest.cpuCount == 6)
+        try exportAndImport(nil) { archive, imported in
+            let header = try magic(archive, 4)
+            #expect(header == Self.zstdMagic)
+            #expect(imported.manifest.cpuCount == 6)
+        }
     }
 
     @Test func exportFastProducesZstdAndRoundTrips() throws {
-        let (archive, imported) = try exportAndImport(.fast)
-        #expect(try magic(archive, 4) == Self.zstdMagic)
-        #expect(imported.manifest.cpuCount == 6)
+        try exportAndImport(.fast) { archive, imported in
+            let header = try magic(archive, 4)
+            #expect(header == Self.zstdMagic)
+            #expect(imported.manifest.cpuCount == 6)
+        }
     }
 
     @Test func exportMaxProducesXzAndRoundTrips() throws {
-        let (archive, imported) = try exportAndImport(.max)
-        #expect(try magic(archive, 6) == Self.xzMagic)
-        #expect(imported.manifest.cpuCount == 6)
+        try exportAndImport(.max) { archive, imported in
+            let header = try magic(archive, 6)
+            #expect(header == Self.xzMagic)
+            #expect(imported.manifest.cpuCount == 6)
+        }
     }
 
     @Test func exportToDirectoryAutoNamesWithExtension() throws {
         let root = try makeRoot()
-        let rom = try fakeROM(); let seprom = try fakeROM()
+        defer { removeTemporary(root) }
+        let rom = try fakeROM()
+        defer { removeTemporary(rom) }
+        let seprom = try fakeROM()
+        defer { removeTemporary(seprom) }
         let lib = VPhoneLibrary(root: root)
         _ = try VPhoneBundleOps.create(
             .init(name: "orig", cpuCount: 6, memoryMB: 2048, diskSizeGB: 1,
                   romSource: rom, sepromSource: seprom), in: lib)
         let outDir = try makeRoot()
+        defer { removeTemporary(outDir) }
         let zstdOut = try VPhoneBundleOps.export(
             bundleNamed: "orig", to: outDir, includeIPSW: false, in: lib)
         #expect(zstdOut == outDir.appendingPathComponent("orig.tzst"))
@@ -436,8 +461,11 @@ struct BundleOpsTests {
             func add(_ done: Int64, _ total: Int64) { dones.append(done); self.total = total }
         }
         let root = try makeRoot()
-        defer { try? FileManager.default.removeItem(at: root) }
-        let rom = try fakeROM(); let seprom = try fakeROM()
+        defer { removeTemporary(root) }
+        let rom = try fakeROM()
+        defer { removeTemporary(rom) }
+        let seprom = try fakeROM()
+        defer { removeTemporary(seprom) }
         let lib = VPhoneLibrary(root: root)
         _ = try VPhoneBundleOps.create(
             .init(name: "orig", cpuCount: 6, memoryMB: 2048, diskSizeGB: 1,
@@ -455,7 +483,7 @@ struct BundleOpsTests {
 
         let imp = Collector()
         let dstRoot = try makeRoot()
-        defer { try? FileManager.default.removeItem(at: dstRoot) }
+        defer { removeTemporary(dstRoot) }
         _ = try VPhoneBundleOps.importArchive(from: archive, name: "copy", in: VPhoneLibrary(root: dstRoot)) {
             imp.add($0, $1)
         }
