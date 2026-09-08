@@ -154,8 +154,8 @@ check_prereqs() {
 
 # ── Cleanup trap (unmount DMGs on error) ───────────────────────
 cleanup_on_exit() {
-    safe_detach "$TEMP_DIR/mnt_sysos"
-    safe_detach "$TEMP_DIR/mnt_appos"
+    safe_detach "$CFW_HOST_MNT/mnt_sysos"
+    safe_detach "$CFW_HOST_MNT/mnt_appos"
 }
 trap cleanup_on_exit EXIT
 
@@ -163,7 +163,7 @@ trap cleanup_on_exit EXIT
 # volumes are mounted here and every file is placed with plain cp/chmod/etc.
 # (the VM is off — nothing runs "on the device").
 : "${CFW_HOST_CONTAINER:?CFW_HOST_CONTAINER unset — run via cfw_install_host.sh}"
-HOST_MNT="${CFW_HOST_MNT:-/private/tmp/cfwhost}"
+HOST_MNT="${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
 MNT1="$HOST_MNT/mnt1"   # disk1s1 (System / rootfs)
 MNT3="$HOST_MNT/mnt3"   # disk1s3
 TAR="$(command -v gtar 2>/dev/null || echo /opt/homebrew/bin/gtar)"  # macOS bsdtar lacks GNU tar flags
@@ -173,9 +173,9 @@ mkdir -p "$HOST_MNT"
 mount_vol() {  # mount_vol <slice, e.g. s1> <mountpoint> [opts]
     local dev="/dev/${CFW_HOST_CONTAINER}$1" mnt="$2" opts="${3:-rw}"
     /bin/mkdir -p "$mnt"
-    /sbin/mount | /usr/bin/grep -q " on $mnt " && return 0
+    /sbin/mount | /usr/bin/grep -Fq " on $mnt " && return 0
     /sbin/mount_apfs -o "$opts" "$dev" "$mnt" 2>/dev/null || true
-    /sbin/mount | /usr/bin/grep -q " on $mnt " || die "mount failed: $dev -> $mnt"
+    /sbin/mount | /usr/bin/grep -Fq " on $mnt " || die "mount failed: $dev -> $mnt"
 }
 
 # ════════════════════════════════════════════════════════════════
@@ -211,8 +211,8 @@ echo "[1/7] Installing Cryptex (SystemOS + AppOS)..."
 
 SYSOS_DMG="$TEMP_DIR/CryptexSystemOS.dmg"
 APPOS_DMG="$TEMP_DIR/CryptexAppOS.dmg"
-MNT_SYSOS="$TEMP_DIR/mnt_sysos"
-MNT_APPOS="$TEMP_DIR/mnt_appos"
+MNT_SYSOS="$CFW_HOST_MNT/mnt_sysos"
+MNT_APPOS="$CFW_HOST_MNT/mnt_appos"
 
 # Validate and publish SystemOS cache only after successful copy/decryption.
 "$PYTHON3" "$SCRIPT_DIR/cache_systemos.py" "$RESTORE_DIR/$CRYPTEX_SYSOS" "$SYSOS_DMG"

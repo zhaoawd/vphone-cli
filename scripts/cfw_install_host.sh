@@ -40,7 +40,7 @@ if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
 fi
 unset SUDO_ASKPASS   # already root: host_hdiutil/pre-step use plain sudo/hdiutil
 
-VM_DIR="${VM_DIR:a}"
+VM_DIR="$(cd "$VM_DIR" && pwd -P)"
 IMG="$VM_DIR/Disk.img"
 [[ -f "$IMG" ]] || { echo "[-] no Disk.img at $IMG" >&2; exit 1; }
 
@@ -59,21 +59,80 @@ if lsof "$IMG" >/dev/null 2>&1; then
   echo "[-] $IMG is in use — stop the VM first." >&2; exit 1
 fi
 
-echo "[*] host-mode CFW install: variant=$VARIANT vm=$VM_DIR"
-AO=$(hdiutil attach -nomount -imagekey diskimage-class=CRawDiskImage "$IMG" 2>/dev/null)
-BASEDISK=$(awk 'NR == 1 { print $1; exit }' <<< "$AO")
-CONT=$(diskutil info -plist "${BASEDISK}s1" | /usr/bin/plutil -extract APFSContainerReference raw -o - - 2>/dev/null || true)
-SYS=$(diskutil apfs list "$CONT" 2>/dev/null | awk '/APFS Volume Disk \(Role\):/{for(i=1;i<=NF;i++) if($i ~ /^disk[0-9]+s[0-9]+$/) dev=$i} /Name:.*System \(Case-sensitive\)/{print dev; exit}')
-[[ -n "$CONT" && -n "$SYS" ]] || { echo "[-] System volume not found in $IMG" >&2; hdiutil detach "$BASEDISK" 2>/dev/null; exit 1; }
-echo "[*] attached: container=$CONT system=$SYS"
+# One private directory per invocation, including temporary Cryptex mounts.
+# Keep it beneath the VM directory so installer path checks remain applicable.
+CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
+export CFW_HOST_MNT
+BASEDISK=""
 
 cleanup() {
-  for m in /private/tmp/cfwhost/mnt1 /private/tmp/cfwhost/mnt3 /private/tmp/cfwhost/mnt5; do
-    umount "$m" 2>/dev/null || true
+  local failed=0 line dev mnt
+  # hdiutil may report an attached disk and then fail or receive a signal.
+  # Recover that device from invocation-local output even before discovery.
+  if [[ -z "$BASEDISK" && -f "$CFW_HOST_MNT/attach.log" ]]; then
+    BASEDISK=$(awk 'NR == 1 { print $1; exit }' "$CFW_HOST_MNT/attach.log")
+    [[ "$BASEDISK" == /dev/disk<-> ]] || BASEDISK=""
+  fi
+  # Query actual mounts; never unmount a shared or previous invocation's path.
+  local mounts
+  mounts=$(/sbin/mount) || return 1
+  for line in "${(@f)mounts}"; do
+    dev="${line%% on *}"
+    mnt="${line#* on }"
+    mnt="${mnt% \(*}"
+    [[ "$mnt" == "$CFW_HOST_MNT/"* ]] || continue
+    print -r -- "[*] cleanup mount: $dev -> $mnt"
+    case "$mnt" in
+      "$CFW_HOST_MNT"/mnt_sysos*)
+        hdiutil detach "$mnt" || failed=1 ;;
+      "$CFW_HOST_MNT"/mnt_appos)
+        hdiutil detach "$mnt" || failed=1 ;;
+      *) umount "$mnt" || failed=1 ;;
+    esac
   done
-  hdiutil detach "$BASEDISK" 2>/dev/null || diskutil eject "$BASEDISK" 2>/dev/null || true
+  if [[ -n "$BASEDISK" ]]; then
+    if hdiutil detach "$BASEDISK" || diskutil eject "$BASEDISK"; then
+      BASEDISK=""
+      rm -f "$CFW_HOST_MNT/attach.log" || failed=1
+    else
+      failed=1
+    fi
+  fi
+  if (( failed == 0 )); then
+    # Only empty mountpoint directories are removed. Never recurse into a
+    # filesystem that failed to unmount or delete unrelated installer data.
+    rm -f "$CFW_HOST_MNT/attach.log" || failed=1
+    local dir
+    for dir in "$CFW_HOST_MNT"/*(N/); do
+      rmdir "$dir" || failed=1
+    done
+    (( failed )) || rmdir "$CFW_HOST_MNT" || failed=1
+  fi
+  (( failed == 0 )) || print -u2 -- "[-] cleanup incomplete; retained $CFW_HOST_MNT"
+  return "$failed"
 }
-trap cleanup EXIT
+finish() {
+  local original=$?
+  trap - EXIT INT TERM HUP
+  if ! cleanup; then
+    (( original != 0 )) || original=1
+  fi
+  exit "$original"
+}
+trap finish EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
+
+echo "[*] host-mode CFW install: variant=$VARIANT vm=$VM_DIR mounts=$CFW_HOST_MNT"
+hdiutil attach -nomount -imagekey diskimage-class=CRawDiskImage "$IMG" > "$CFW_HOST_MNT/attach.log"
+BASEDISK=$(awk 'NR == 1 { print $1; exit }' "$CFW_HOST_MNT/attach.log")
+[[ "$BASEDISK" == /dev/disk<-> ]] || { echo "[-] invalid attached disk: $BASEDISK" >&2; BASEDISK=""; exit 1; }
+echo "[*] attached image: $BASEDISK"
+CONT=$(diskutil info -plist "${BASEDISK}s1" | /usr/bin/plutil -extract APFSContainerReference raw -o - - 2>/dev/null || true)
+SYS=$(diskutil apfs list "$CONT" 2>/dev/null | awk '/APFS Volume Disk \(Role\):/{for(i=1;i<=NF;i++) if($i ~ /^disk[0-9]+s[0-9]+$/) dev=$i} /Name:.*System \(Case-sensitive\)/{print dev; exit}')
+[[ -n "$CONT" && -n "$SYS" ]] || { echo "[-] System volume not found in $IMG" >&2; exit 1; }
+echo "[*] attached: container=$CONT system=$SYS"
 
 echo "[*] running $INSTALLER (files placed on host mounts)..."
 # via env: an expansion-produced ${VAR:+NAME=val} isn't parsed as a shell assignment.
@@ -84,7 +143,7 @@ echo "[*] running $INSTALLER (files placed on host mounts)..."
     zsh "$SCRIPT_DIR/$INSTALLER" . )
 
 cleanup
-trap - EXIT
+trap - EXIT INT TERM HUP
 
 echo "[*] flipping boot snapshot offline (com.apple.os.update -> live volume)..."
 "$PY" "$PROJ/tools/apfs_snap_rename.py" "$IMG"

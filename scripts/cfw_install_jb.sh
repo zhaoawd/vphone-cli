@@ -179,7 +179,7 @@ apply_dev_overlay() {
 # volumes are mounted here and every file is placed with plain cp/chmod/etc.
 # (the VM is off — nothing runs "on the device").
 : "${CFW_HOST_CONTAINER:?CFW_HOST_CONTAINER unset — run via cfw_install_host.sh}"
-HOST_MNT="${CFW_HOST_MNT:-/private/tmp/cfwhost}"
+HOST_MNT="${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
 MNT1="$HOST_MNT/mnt1"   # disk1s1 (System / rootfs)
 MNT3="$HOST_MNT/mnt3"   # disk1s3
 MNT5="$HOST_MNT/mnt5"   # disk1s5 (per-boot-manifest OS dir / procursus bootstrap)
@@ -190,9 +190,9 @@ mkdir -p "$HOST_MNT"
 mount_vol() {  # mount_vol <slice, e.g. s1> <mountpoint> [opts]
     local dev="/dev/${CFW_HOST_CONTAINER}$1" mnt="$2" opts="${3:-rw}"
     /bin/mkdir -p "$mnt"
-    /sbin/mount | /usr/bin/grep -q " on $mnt " && return 0
+    /sbin/mount | /usr/bin/grep -Fq " on $mnt " && return 0
     /sbin/mount_apfs -o "$opts" "$dev" "$mnt" 2>/dev/null || true
-    /sbin/mount | /usr/bin/grep -q " on $mnt " || die "mount failed: $dev -> $mnt"
+    /sbin/mount | /usr/bin/grep -Fq " on $mnt " || die "mount failed: $dev -> $mnt"
 }
 
 # ── Check JB prerequisites ────────────────────────────────────

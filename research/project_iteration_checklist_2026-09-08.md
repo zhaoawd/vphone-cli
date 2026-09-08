@@ -6,7 +6,7 @@
 
 目标：先建立可验证、可恢复的 VM 与固件流程，再完善无 GUI 自动化和多 VM 使用能力。
 
-本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；其他 26 项待执行。结果见[A1 测试基线](/Users/qcz3840/github/vphone-cli/research/test_baseline_2026-09-08.md)与[A2 验证记录](/Users/qcz3840/github/vphone-cli/research/systemos_cache_validation_2026-09-08.md)。
+本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；其他 25 项待执行。结果见[A1 测试基线](/Users/qcz3840/github/vphone-cli/research/test_baseline_2026-09-08.md)与[A2 验证记录](/Users/qcz3840/github/vphone-cli/research/systemos_cache_validation_2026-09-08.md)。
 
 ## 一、建议现在开始的工作
 
@@ -86,15 +86,17 @@
 
 ## 四、B：保证磁盘与 VM 生命周期操作一致
 
-### B1 — 隔离 CFW 挂载目录与清理范围【P0；依赖 A2】
+### B1 — 隔离 CFW 挂载目录与清理范围【实现与验证完成；2026-09-08】
 
 涉及：`scripts/cfw_install_host.sh`、四个 `cfw_install*.sh`。
 
-- [ ] 每次安装创建独立任务目录，通过 `CFW_HOST_MNT` 传入各变体；移除驱动中写死 `/private/tmp/cfwhost` 的清理路径。
-- [ ] 记录本任务实际挂载的目录和设备；退出、失败、SIGINT 清理只作用于本任务资源，原始失败码不得被清理覆盖。
-- [ ] 先用 hdiutil/diskutil/mount 替身测试两任务并发及中途失败，再用专用镜像副本验证真实挂载和退出。
+- [x] 每次安装创建独立任务目录，通过 `CFW_HOST_MNT` 传入各变体；移除驱动中写死 `/private/tmp/cfwhost` 的清理路径。
+- [x] 记录本任务实际挂载的目录和设备；退出、失败、SIGINT 清理只作用于本任务资源，原始失败码不得被清理覆盖。
+- [x] 先用 hdiutil/diskutil/mount 替身测试两任务并发及中途失败，再用专用镜像副本验证真实挂载和退出。
 
 验收：两个安装任务无目录冲突；一个任务结束不会卸载另一个任务的卷。同一磁盘的跨入口排他保护由 B2/B4 补齐。
+
+结果：`make test` 237 项通过，6 项主机隔离专项回归与专用 APFS 镜像实验通过。B1 与本记录一并独立提交。实际安装与验证限制见[B1 验证记录](/Users/qcz3840/github/vphone-cli/research/cfw_mount_isolation_2026-09-08.md)。A2 提交为 `2ac6c51`。
 
 ### B2 — 建立跨入口的 VM 排他锁与运行记录【P0；依赖 A1】
 
