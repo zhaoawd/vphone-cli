@@ -826,6 +826,33 @@ class VPhoneControl {
         )
     }
 
+    // MARK: - Power off
+
+    /// Whether the guest OS can be asked to power itself off over this
+    /// connection (needs vphoned's `shell`, i.e. a `/bin/sh` in the guest).
+    var canHaltGuest: Bool { isConnected && guestCaps.contains("shell") }
+
+    /// Ask the guest OS to power itself off.
+    ///
+    /// Returns false only when the guest reports it has no power-off binary.
+    /// A transport error counts as delivered: the vsock connection normally
+    /// dies while the guest is powering off, so the request may well have run.
+    func haltGuest() async -> Bool {
+        guard canHaltGuest else { return false }
+        do {
+            let result = try await runShell(
+                command: VPhoneShutdownPolicy.guestHaltCommand, timeoutMs: 5000)
+            if result.exitCode == VPhoneShutdownPolicy.guestHaltUnsupportedExitCode {
+                print("[vphone] guest has no power-off command")
+                return false
+            }
+            return true
+        } catch {
+            print("[vphone] guest power-off request ended with: \(error)")
+            return true
+        }
+    }
+
     // MARK: - Settings
 
     func settingsGet(domain: String, key: String? = nil) async throws -> Any? {

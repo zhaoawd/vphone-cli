@@ -3,6 +3,27 @@ import Foundation
 import Virtualization
 import VPhoneCore
 
+// MARK: - Exit status
+
+/// Status the process exits with once `applicationWillTerminate` has run its
+/// cleanup. Exit paths terminate through AppKit (so the host bridge socket and
+/// the host sleep activity are released) and record a non-zero status here
+/// instead of calling `exit` directly.
+@MainActor
+enum VPhoneExitStatus {
+    static var pending: Int32 = EXIT_SUCCESS
+
+    /// Terminate the app from a `nonisolated` context (VM delegate callbacks).
+    nonisolated static func terminate(status: Int32) {
+        DispatchQueue.main.async {
+            MainActor.assumeIsolated {
+                pending = status
+                NSApp.terminate(nil)
+            }
+        }
+    }
+}
+
 class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var vmLock: VPhoneVMLock?
     private let cli: VPhoneBootCLI
@@ -19,6 +40,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var sigintSource: DispatchSourceSignal?
     private var hostSleepActivity: NSObjectProtocol?
     private var didAttemptAutoInstall = false
+    private var shutdownPlan = VPhoneShutdownPlan()
+    private var shutdownTimeoutTask: Task<Void, Never>?
 
     init(cli: VPhoneBootCLI) {
         self.cli = cli
@@ -30,9 +53,9 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
         signal(SIGINT, SIG_IGN)
         let src = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
-        src.setEventHandler {
+        src.setEventHandler { [weak self] in
             print("\n[vphone] SIGINT — shutting down")
-            NSApp.terminate(nil)
+            self?.handleInterrupt()
         }
         src.activate()
         sigintSource = src
@@ -295,12 +318,99 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    // MARK: - Shutdown
+
+    /// SIGINT: ask the guest to power off, wait a bounded time for
+    /// `guestDidStop`, then force-stop the VM through the framework so the
+    /// teardown is the framework's and not this process dying.
+    @MainActor
+    private func handleInterrupt() {
+        guard let vm else {
+            NSApp.terminate(nil)
+            return
+        }
+        if shutdownPlan.didStart {
+            // Second SIGINT while waiting — skip the rest of the wait.
+            print("[vphone] second SIGINT — stopping now")
+            forceStopAndExit(action: shutdownPlan.abortWait())
+            return
+        }
+
+        let action = shutdownPlan.start(VPhoneShutdownPlan.Conditions(
+            vmRunning: vm.isRunning,
+            guestShellAvailable: control?.canHaltGuest ?? false,
+            canRequestStop: vm.canRequestStop))
+
+        switch action {
+        case .exitImmediately:
+            print("[vphone] VM is not running — exiting")
+            NSApp.terminate(nil)
+        case .guestCommand:
+            print("[vphone] graceful shutdown via guest power-off command over vsock")
+            startGracefulTimeout()
+            Task { @MainActor in
+                if await self.control?.haltGuest() != true {
+                    self.fallBackFromGuestCommand(vm: vm)
+                }
+            }
+        case .requestStop:
+            print("[vphone] graceful shutdown via VZVirtualMachine.requestStop()")
+            startGracefulTimeout()
+            if !vm.requestGuestStop() {
+                forceStopAndExit(action: shutdownPlan.gracefulAttemptFailed())
+            }
+        case .forceStop:
+            print("[vphone] no graceful shutdown path available; stopping")
+            forceStopAndExit(action: action)
+        }
+    }
+
+    /// The guest reported it has no power-off command: try the framework stop
+    /// request, else force-stop. The graceful timer is already running.
+    @MainActor
+    private func fallBackFromGuestCommand(vm: VPhoneVirtualMachine) {
+        if vm.canRequestStop {
+            print("[vphone] graceful shutdown via VZVirtualMachine.requestStop()")
+            if vm.requestGuestStop() { return }
+        }
+        forceStopAndExit(action: shutdownPlan.gracefulAttemptFailed())
+    }
+
+    @MainActor
+    private func startGracefulTimeout() {
+        shutdownTimeoutTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(VPhoneShutdownPolicy.gracefulTimeout))
+            guard !Task.isCancelled else { return }
+            print("[vphone] graceful shutdown timed out; stopping")
+            self.forceStopAndExit(action: self.shutdownPlan.abortWait())
+        }
+    }
+
+    @MainActor
+    private func forceStopAndExit(action: VPhoneShutdownPlan.Action) {
+        guard action == .forceStop else { return }
+        shutdownTimeoutTask?.cancel()
+        shutdownTimeoutTask = nil
+        guard let vm else {
+            NSApp.terminate(nil)
+            return
+        }
+        Task { @MainActor in
+            await vm.forceStop()
+            print("[vphone] VM stopped")
+            NSApp.terminate(nil)
+        }
+    }
+
     func applicationWillTerminate(_: Notification) {
         hostControl?.stop()
         if let hostSleepActivity {
             ProcessInfo.processInfo.endActivity(hostSleepActivity)
             self.hostSleepActivity = nil
         }
+        // The VM delegate records a failure status before terminating; AppKit
+        // would otherwise always exit 0.
+        exit(VPhoneExitStatus.pending)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {

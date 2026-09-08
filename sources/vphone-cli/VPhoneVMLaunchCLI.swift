@@ -102,7 +102,17 @@ struct VPhoneVMStopCommand: ParsableCommand {
 
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
-    @Option(name: .shortAndLong, help: "Seconds to wait for graceful shutdown before SIGKILL") var timeout: Int = 20
+    /// Default comes from `VPhoneShutdownPolicy`: the boot process answers
+    /// SIGINT by asking the guest to power off, waits
+    /// `VPhoneShutdownPolicy.gracefulTimeout` for it, then force-stops the VM
+    /// through the framework and exits. This timeout must stay above that
+    /// wait plus the force-stop margin, otherwise the SIGKILL below would land
+    /// mid-teardown and produce exactly the abrupt exit the graceful path
+    /// exists to avoid.
+    @Option(name: .shortAndLong, help: "Seconds to wait for graceful shutdown before SIGKILL")
+    var timeout: Int = VPhoneShutdownPolicy.defaultStopTimeout
+    @Flag(help: "Skip the graceful shutdown request and SIGKILL the boot process immediately")
+    var force = false
 
     /// PIDs of vphone-cli processes booted against this bundle's config.
     ///
@@ -146,6 +156,13 @@ struct VPhoneVMStopCommand: ParsableCommand {
             FileHandle.standardError.write(Data(
                 "error: \(name): bundle lock is held but \(detail) — not signalling anything\n".utf8))
             throw ExitCode(1)
+        }
+
+        if force {
+            print("\(name): force-killing \(targets.map(String.init).joined(separator: ", "))")
+            for pid in targets { kill(pid, SIGKILL) }
+            print("\(name): stopped")
+            return
         }
 
         print("\(name): sending SIGINT to \(targets.map(String.init).joined(separator: ", "))")

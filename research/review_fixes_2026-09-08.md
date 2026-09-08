@@ -203,3 +203,164 @@ VM `rig-baseline`（iPhone17,3，iOS 26.6.1，exp 变体），`screenConfig` 为
 停止方式为 `vm stop rig-baseline`，两次都输出 `sending SIGINT to <pid>` 后 `stopped`，随后 `vm stop` 报 `not running`，`pgrep` 无残留 vphone-cli 进程。修复前会话遗留的 `com.apple.Virtualization.EventTap`（pid 80619）本次仍存在，未处理。
 
 本次截图、启动器日志与判定脚本保存在被 Git 忽略的 `research/artifacts/touch-native-vs-guest-2026-09-09/`，其他 checkout 不保证具有这些文件。
+
+## `com.apple.Virtualization.EventTap`（pid 80619）核查
+
+上一节记录的「修复前会话遗留」判断经本次核查不成立。以下区分事实、推断与未查明项。
+
+### 服务定位与功能（事实）
+
+`/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.EventTap.xpc` 是 Virtualization.framework 附带的 XPC 服务，`CFBundleVersion` 为 259.6.4。其 `Info.plist` 只声明 `XPCService.ServiceType = User` 与 `XPCService._ProcessType = Interactive`，没有 `RunLoopType`、`_AdditionalProperties` 或任何空闲退出相关键。`ServiceType = User` 表示每个用户一个共享实例。
+
+该二进制的未定义符号包含 `_CGEventTapCreate`、`_CGEventTapEnable`、`_CGEventCreateKeyboardEvent`、`_CGEventCreateCopy`、`_CGEventGetFlags`、`_CGEventGetIntegerValueField`、`_CGEventSetIntegerValueField`、`_CFMachPortCreateRunLoopSource`、`_IOSurfaceLookupFromXPCObject`、`__LSCopyFrontApplication`。启动时它向 `tccd.system` 请求 `kTCCServiceListenEvent` 与 `kTCCServicePostEvent`，两次回复均为 `auth_value=2`（已授权）。因此它在主机侧创建 CGEventTap，用于监听并合成键盘事件。
+
+推断（未直接验证）：本仓库触发该连接的位置是 `VZVirtualMachineView.capturesSystemKeys = true`（`sources/vphone-cli/VPhoneWindowController.swift:29`）。依据是连接由 vphone-cli 进程自身发起，且时间点与窗口创建相近；未做开关对照实验。
+
+### 生命周期证据（事实）
+
+pid 80619 由 launchd 在 2026-09-08 21:43:29 按需拉起，客户端是 vphone-cli 进程本身：
+
+| 时间 | 记录 |
+| --- | --- |
+| 21:43:29.641 | `vphone-cli[80612]` `activating connection: ... name=com.apple.Virtualization.EventTap` |
+| 21:43:29.649 | `launchd[1]` `Successfully spawned EventTap[80619] because ipc (mach)` |
+| 23:23:57.149 | `invalidated because the client process (pid 80612) either cancelled the connection or exited` |
+
+23:23:57 是异常停止的时刻，连接失效，但进程未退出。此后的每一次启动都复用同一个 pid 80619，没有产生新实例：
+
+| 客户端 pid | 连接建立 | 连接失效 |
+| --- | --- | --- |
+| 92059 | 23:42:29.183 | 23:46:29.565 |
+| 92398 | 23:47:21.655 | 2026-09-09 00:01:18.040 |
+| 95429 | 00:19:47.333 | 00:20:59.586 |
+
+由此得到两点事实：
+
+1. pid 80619 不是异常退出产生的孤儿进程，而是当前用户唯一的常驻 EventTap 实例。正常停止之所以没有留下「额外的」EventTap 进程，是因为系统本来就只维持一个实例并复用它，不是因为正常路径回收了资源。
+2. 该服务在最后一个客户端断开后不自行退出。00:01:18.040 到 00:19:47.333 之间 18 分 29 秒无任何 peer 连接，进程存活；00:20:59.586 之后同样无客户端，核查结束时（累计运行 2 小时 39 分）仍存活。
+
+### 异常路径与正常路径的对比（事实）
+
+两条路径上 EventTap 连接都在宿主进程退出的同一毫秒级时刻失效，没有可观测差异：
+
+- 异常路径：launchd 在 23:23:57.144 记录 `pid/80614` 域内 `com.apple.Virtualization.VirtualMachine.70C4CBF7-…[80616]` `exited due to exit(0)`；EventTap 连接在 23:23:57.149 失效。
+- 正常路径：launchd 在 23:46:29.563 记录 `service inactive: com.apple.xpc.launchd.unmanaged.vphone-cli.92059`；EventTap 连接在 23:46:29.565 失效。
+
+因此 `virtualMachine(_:didStopWithError:)` 中的 `exit(EXIT_FAILURE)`（`sources/vphone-cli/VPhoneVirtualMachine.swift:388`）与 SIGINT 处理中的 `NSApp.terminate(nil)`（`sources/vphone-cli/VPhoneAppDelegate.swift:35`）对 EventTap 连接的回收没有差别。原假设「异常 `exit()` 跳过视图拆解从而遗留 EventTap」不成立。
+
+### 原因未查明
+
+该服务在无客户端时不退出的具体机制未查明。可能与它持有 CGEventTap 的 `CFMachPort` run loop source 有关，也可能是 launchd 对 `ServiceType = User` 的驻留策略，本次未验证，两者都属于待验证假设。`launchctl procinfo` 需要 root，未执行。
+
+### 资源占用与影响（事实）
+
+`%CPU` 0.0，RSS 4752 KB，3 个线程，状态 `S`。`lsof -p 80619` 只列出自身可执行文件、`/usr/lib/dyld`、`/usr/share/icu/icudt78l.dat`、日志配置缓存和三个指向 `/dev/null` 的标准描述符，没有 socket，没有 `~/.vphone` 或仓库内的文件。未观测到它对主机键盘输入或新建 VM 窗口造成干扰；相反，00:19:47 至 00:20:59 期间它正为运行中的 `rig-baseline`（vphone-cli pid 95429）提供服务。
+
+### 代码结论
+
+不建议为 EventTap 增加清理代码：该进程不是本仓库代码泄漏的资源，是系统按需拉起并复用的 per-user XPC 服务，异常与正常两条停止路径对它无差异。
+
+本次核查中发现一项与 EventTap 无关的独立问题，未修改：`guestDidStop` 的 `exit(EXIT_SUCCESS)`（`sources/vphone-cli/VPhoneVirtualMachine.swift:381`–`:383`）与 `virtualMachine(_:didStopWithError:)` 的 `exit(EXIT_FAILURE)`（同文件 `:386`–`:388`）都绕过 `applicationWillTerminate`（`sources/vphone-cli/VPhoneAppDelegate.swift:298`–`:304`），因此在来宾自行关机或 VM 报错停止时不会执行 `hostControl?.stop()` 与 `ProcessInfo.processInfo.endActivity(hostSleepActivity)`。改为 `NSApp.terminate(nil)` 可让这两个清理动作执行。本次证据不显示该问题与 EventTap 有关，仅作记录。
+
+### 处理结果
+
+未终止 pid 80619。原计划的 `kill 80619` 以「遗留孤儿进程」为前提，该前提经上述证据不成立：它是会被下一次启动复用的常驻共享服务，且核查期间另一会话正在反复启停 `rig-baseline`，终止存在与新连接竞争的风险。若仍需清理，在没有 vphone-cli 运行时 `kill 80619` 是可逆的，launchd 会在下一次连接时按需重新拉起。
+
+### 复现命令
+
+```sh
+ps -axo pid,ppid,pgid,sess,etime,lstart,%cpu,rss,command -p 80619
+lsof -p 80619
+launchctl print pid/80619
+plutil -p /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.EventTap.xpc/Contents/Info.plist
+nm -u /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.EventTap.xpc/Contents/MacOS/com.apple.Virtualization.EventTap
+/usr/bin/log show --start '2026-09-08 21:40:00' --end '2026-09-09 00:40:00' \
+  --predicate 'process == "com.apple.Virtualization.EventTap" OR eventMessage CONTAINS "EventTap" OR eventMessage CONTAINS "event-tap"' \
+  --info --debug --style compact
+```
+
+注：`log` 在 zsh 中是内建命令，须使用 `/usr/bin/log` 绝对路径。
+
+## SIGINT 优雅关机（2026-09-09）
+
+### 变更内容
+
+`vm stop` 与 Ctrl+C 通过 SIGINT 通知启动进程。原实现的 SIGINT 处理只打印一行并调用 `NSApp.terminate(nil)`，`VZVirtualMachine` 不被停止，进程退出后由 Virtualization.framework 辅助进程随之消失，来宾没有关机流程，也没有文件系统卸载。
+
+现在启动进程收到 SIGINT 后按以下顺序处理，判定逻辑集中在 [`VPhoneShutdownPolicy`/`VPhoneShutdownPlan`](../sources/VPhoneCore/VPhoneShutdownPolicy.swift)：
+
+1. VM 未运行：直接终止。
+2. vphoned 已连接且通告 `shell` 能力：通过 vsock 下发来宾关机命令，日志 `[vphone] graceful shutdown via guest power-off command over vsock`。
+3. 否则 `VZVirtualMachine.canRequestStop` 为真：调用 `requestStop()`，日志 `[vphone] graceful shutdown via VZVirtualMachine.requestStop()`。
+4. 两者都不可用：日志 `[vphone] no graceful shutdown path available; stopping`，直接强制停止。
+
+进入第 2 或第 3 步后等待 `guestDidStop`，上限 `VPhoneShutdownPolicy.gracefulTimeout = 10` 秒。超时打印 `[vphone] graceful shutdown timed out; stopping`，改为调用 `VZVirtualMachine.stop(completionHandler:)`，由框架完成拆解后退出。等待期间再收到一次 SIGINT，打印 `[vphone] second SIGINT — stopping now` 并跳过剩余等待。
+
+`vm stop --timeout` 的默认值改为 `VPhoneShutdownPolicy.defaultStopTimeout`（`gracefulTimeout` 10 秒 + `stopMargin` 10 秒 = 20 秒），保证 SIGKILL 不会落在启动进程仍在拆解的窗口内；数值关系由 `ShutdownPolicyTests` 断言。同时新增 `vm stop --force`，跳过 SIGINT 直接发送 SIGKILL。
+
+`guestDidStop` 与 `virtualMachine(_:didStopWithError:)` 原先直接调用 `exit()`，绕过 `applicationWillTerminate`（本文档上一节记录的独立问题）。现在两者改为记录退出状态后经 `NSApp.terminate(nil)` 退出，`applicationWillTerminate` 执行 `hostControl?.stop()` 与 `endActivity(hostSleepActivity)`，并在最后 `exit(VPhoneExitStatus.pending)` 保留成功/失败状态区分。
+
+涉及文件：[`VPhoneShutdownPolicy.swift`](../sources/VPhoneCore/VPhoneShutdownPolicy.swift)（新增）、[`VPhoneAppDelegate.swift`](../sources/vphone-cli/VPhoneAppDelegate.swift)、[`VPhoneVirtualMachine.swift`](../sources/vphone-cli/VPhoneVirtualMachine.swift)、[`VPhoneControl.swift`](../sources/vphone-cli/VPhoneControl.swift)、[`VPhoneVMLaunchCLI.swift`](../sources/vphone-cli/VPhoneVMLaunchCLI.swift)、[`ShutdownPolicyTests.swift`](../tests/VPhoneCoreTests/ShutdownPolicyTests.swift)（新增）。
+
+### 生效的来宾关机命令
+
+命令为 `for h in /var/jb/sbin/halt /sbin/halt /usr/sbin/halt; do [ -x "$h" ] && exec "$h"; done; exit 127`，经 vphoned 的 `shell`（`/bin/sh -c`，实际为 `/var/jb/bin/sh`，`id` 显示 `uid=0(root)`）执行。
+
+在 `rig-baseline`（iOS 26.6.1，exp 变体，已越狱）上实测的路径存在情况：
+
+| 路径 | 结果 |
+| --- | --- |
+| `/var/jb/sbin/halt` | 存在，为 `/var/jb/sbin/reboot` 的符号链接（procursus） |
+| `/var/jb/sbin/shutdown` | 存在（procursus） |
+| `/var/jb/usr/bin/launchctl` | 存在（procursus） |
+| `/sbin/halt`、`/sbin/shutdown`、`/sbin/reboot`、`/bin/launchctl`、`/usr/bin/launchctl`、`/usr/sbin/halt` | 均不存在 |
+
+因此该命令在带 procursus 的 jb/exp 变体上通过 `/var/jb/sbin/halt` 生效；基础 iOS 系统内不存在上述任何一个路径，命令返回 127，启动进程回退到 `requestStop()`。regular/dev 变体上的 127 回退本次未实测（这些变体的 `shell` 能力本身依赖 `/var/jb/bin/sh`）。`launchctl reboot halt` 未测试，因为 `halt` 已生效。
+
+命令生效的证据取自来宾串口日志：
+
+```
+[vphone] SIGINT — shutting down
+[vphone] graceful shutdown via guest power-off command over vsock
+System shutdown initiated by: reboot[507]<-vphoned[69]
+shutdown UNINITIALIZED -> COMMITTED
+...
+apfs_vfsop_unmount:3710: all done.  going home.  (numMountedAPFSVolumes 0)
+"AppleSEPKeyStore":pid:0,:4079: Ready for System Shutdown
+ApplePSCI - system off
+[vphone] Guest stopped
+```
+
+`System shutdown initiated by: reboot[507]<-vphoned[69]` 表明关机由 vphoned 派生的 `reboot`（即 `halt`）触发；`numMountedAPFSVolumes 0` 表明卷已卸载。
+
+### 测量结果
+
+| 场景 | 命令 | 耗时 | 走过的路径 |
+| --- | --- | --- | --- |
+| vphoned 已连接（headless） | `vm stop rig-baseline` | 4.12 s | 来宾关机命令 → `guestDidStop` → 退出 0 |
+| vphoned 已连接（带窗口） | `vm stop rig-baseline` | 4.13 s | 同上 |
+| `--no-vphoned` 启动 | `vm stop rig-baseline` | 11.15 s | `requestStop()` → 10 s 超时 → 强制停止 → `[vphone] VM stopped` |
+| `--no-vphoned` 启动，2 s 后第二次 SIGINT | `kill -INT` ×2 | t0 后 3 s 退出 | `requestStop()` → 第二次 SIGINT → 强制停止 |
+
+`vm stop` 的耗时包含其 1 秒粒度的存活轮询，因此来宾关机路径的实际耗时约 3–4 秒。`gracefulTimeout` 取 10 秒即为该测量值的约 2.5 倍余量，同时使超时回退在交互式 Ctrl+C 下仍可接受。
+
+`canRequestStop` 在该 iOS 来宾上为真，但 `requestStop()` 后来宾在 10 秒内没有关机，最终由强制停止结束。来宾不响应该请求的原因未查明（推断 iOS 侧没有对应的电源请求处理，属待验证假设）。
+
+### 验证
+
+- `make build` 通过。`swift test --filter 'ShutdownPolicyTests|LaunchLayoutTests|VMLockTests'`：3 个 suite、28 个测试全部通过。未修改 vphoned，未重新构建。
+- 正常路径两次运行日志中均出现 `[vphone] Guest stopped`，没有 `[vphone] Stopped with error`；退出后 `ps` 中没有 `vphone-cli --config` 进程，也没有 `com.apple.Virtualization.VirtualMachine` 辅助进程；再次执行 `vm stop rig-baseline` 输出 `rig-baseline: not running`。
+- 带窗口运行停止后 `~/.vphone/VMs/rig-baseline/vphone.sock` 被删除，说明 `applicationWillTerminate` 已执行；对照：更早一次用改动前的二进制、由来宾自行关机结束的运行留下了该 socket 文件。
+- 本次多轮启停期间没有新增 `com.apple.Virtualization.EventTap` 进程，全程仍是同一个 pid 80619 实例（与上一节结论一致）。
+- 已连接时的来宾关机请求在主机侧以 `[vphone] guest power-off request ended with: not connected to vphoned` 结束，随后来宾仍完成关机。这说明该错误是等待响应期间连接被来宾关机切断所致，不能作为“命令未送达”的判据；实现因此把传输错误视为已送达并继续等待 `guestDidStop`。
+
+### 未验证项
+
+- regular/dev/less 变体上的 127 回退与 `requestStop` 行为。
+- 关闭 VM 窗口（非 SIGINT）退出路径。
+- 强制停止失败时 `stop(completionHandler:)` 返回错误的分支。
+- `vm stop --force` 未实测。
+
+### 构建陷阱（本次踩到，非代码问题）
+
+裸 `swift build -c release` 会重新链接 `.build/release/vphone-cli`，签名退化为 `adhoc,linker-signed` 且 entitlements 丢失；此后 `make build` 因产物比源文件新而跳过签名步骤，二进制保持无 entitlements 状态。表现为启动进程报 `[vphone] Fatal: PV=3 hardware model not supported`，而 `--help` 仍返回 0（AMFI 不再看到受限 entitlements，故不 SIGKILL），`boot_host_preflight.sh` 的 `=== Entitlements ===` 段为空。判定方法：`codesign -d -vvv .build/release/vphone-cli` 出现 `flags=0x20002(adhoc,linker-signed)`。恢复方法：删除产物后重新 `make build`（`codesign -d --entitlements -` 应列出 5 个键）。amfidont 无需重启，其 `--path` 前缀规则同时覆盖签名校验与 `isApple`（见 `amfidont/bypass_runtime.py`），与重建后的 cdhash 无关。

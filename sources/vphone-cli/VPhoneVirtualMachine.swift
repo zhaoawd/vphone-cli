@@ -376,16 +376,51 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
         }
     }
 
+    // MARK: - Stop
+
+    var isRunning: Bool { virtualMachine.state == .running }
+
+    var canRequestStop: Bool { virtualMachine.canRequestStop }
+
+    /// Ask the guest to power off through the framework's stop request.
+    /// Returns false when the framework refuses it; the caller then force-stops.
+    func requestGuestStop() -> Bool {
+        guard virtualMachine.canRequestStop else { return false }
+        do {
+            try virtualMachine.requestStop()
+            return true
+        } catch {
+            print("[vphone] requestStop failed: \(error)")
+            return false
+        }
+    }
+
+    /// Force stop through the framework so devices and the helper process are
+    /// torn down before this process exits, instead of by process death.
+    func forceStop() async {
+        guard virtualMachine.canStop else { return }
+        nonisolated(unsafe) let vm = virtualMachine
+        await withCheckedContinuation { continuation in
+            vm.stop { error in
+                if let error { print("[vphone] force stop failed: \(error)") }
+                continuation.resume()
+            }
+        }
+    }
+
     // MARK: - Delegate
 
+    // Both stop callbacks terminate through AppKit rather than calling `exit`
+    // directly, so `applicationWillTerminate` still releases the host bridge
+    // socket and the host sleep activity. The exit status is preserved there.
     nonisolated func guestDidStop(_: VZVirtualMachine) {
         print("[vphone] Guest stopped")
-        exit(EXIT_SUCCESS)
+        VPhoneExitStatus.terminate(status: EXIT_SUCCESS)
     }
 
     nonisolated func virtualMachine(_: VZVirtualMachine, didStopWithError error: Error) {
         print("[vphone] Stopped with error: \(error)")
-        exit(EXIT_FAILURE)
+        VPhoneExitStatus.terminate(status: EXIT_FAILURE)
     }
 
     nonisolated func virtualMachine(
