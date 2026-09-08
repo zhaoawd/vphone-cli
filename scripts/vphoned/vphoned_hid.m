@@ -129,17 +129,36 @@ static void dispatch_digitizer(double x, double y, boolean_t range,
     CFRelease(parent);
 }
 
+// Touch commands and session teardown run on the connection reader thread.
+// The HID queue preserves event dispatch order across a session reset.
+static BOOL gTouchActive;
+static double gTouchX, gTouchY;
+
+void vp_hid_touch_reset(void) {
+    if (!gTouchActive) return;
+    dispatch_digitizer(gTouchX, gTouchY, 0, 0, VP_DIG_TOUCH | VP_DIG_IDENTITY);
+    gTouchActive = NO;
+}
+
 void vp_hid_touch(int phase, double x, double y) {
     switch (phase) {
-    case 0: // down
+    case 0:
+        vp_hid_touch_reset();
+        gTouchActive = YES;
+        gTouchX = x; gTouchY = y;
         dispatch_digitizer(x, y, 1, 1, VP_DIG_TOUCH | VP_DIG_IDENTITY);
         break;
-    case 1: // move
+    case 1:
+        if (!gTouchActive) return;
+        gTouchX = x; gTouchY = y;
         dispatch_digitizer(x, y, 1, 1, VP_DIG_POSITION);
         break;
-    case 3: // up
+    case 3:
+        if (!gTouchActive) return;
+        gTouchX = x; gTouchY = y;
+        vp_hid_touch_reset();
+        break;
     default:
-        dispatch_digitizer(x, y, 0, 0, VP_DIG_TOUCH | VP_DIG_IDENTITY);
         break;
     }
 }

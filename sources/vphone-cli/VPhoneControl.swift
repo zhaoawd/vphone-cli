@@ -30,8 +30,6 @@ class VPhoneControl {
     private(set) var guestName = ""
     private(set) var guestCaps: [String] = []
     private(set) var guestIP: String?
-    /// Guest userland iOS version reported at handshake (e.g. "18.6.2"), if known.
-    private(set) var guestIOSVersion: String?
 
     /// Whether touches should be injected guest-side via vphoned rather than the
     /// VZ USB touchscreen. Prefer the guest path whenever vphoned reports the
@@ -40,6 +38,10 @@ class VPhoneControl {
     var useGuestTouchInjection: Bool {
         isConnected && guestCaps.contains("touch")
     }
+    var touchSession: UInt64? {
+        useGuestTouchInjection ? connectionAttemptToken : nil
+    }
+
     /// Path to the signed vphoned binary. When set, enables auto-update.
     var guestBinaryURL: URL?
 
@@ -290,7 +292,6 @@ class VPhoneControl {
                 self.guestName = name
                 self.guestCaps = caps
                 self.guestIP = ip
-                self.guestIOSVersion = iosVersion
                 self.isConnected = true
                 let ipSuffix = ip.map { " (\($0))" } ?? ""
                 let iosSuffix = iosVersion.map { " iOS \($0)" } ?? ""

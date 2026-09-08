@@ -42,7 +42,7 @@ def main(argv):
         info = os.fstat(fd)
         record = dict(bundleIdentifier=f'{info.st_dev}:{info.st_ino}', bundlePath=str(directory),
                       pid=os.getpid(), instanceID=str(uuid.uuid4()),
-                      startedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds'), operation=argv[1])
+                      startedAt=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), operation=argv[1])
         # The record is diagnostic; stale records never block acquisition.
         name = None
         try:
@@ -52,9 +52,14 @@ def main(argv):
                 json.dump(record, output, indent=2)
                 output.write('\n')
             os.replace(name, directory / '.vphone-runtime.json')
+        except OSError as error:
+            print(f"Warning: runtime record could not be written: {error}", file=sys.stderr)
         finally:
             if name and os.path.exists(name):
-                os.unlink(name)
+                try:
+                    os.unlink(name)
+                except OSError as error:
+                    print(f"Warning: runtime record temporary file retained: {error}", file=sys.stderr)
         # Explicit operation-tree inheritance: exec preserves the recorded PID.
         # Descendants still writing after shell death keep the lock until exit.
         os.set_inheritable(fd, True)

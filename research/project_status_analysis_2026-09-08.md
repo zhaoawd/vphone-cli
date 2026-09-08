@@ -2,7 +2,7 @@
 
 分析日期：2026-09-08。分析对象：本地分支 `codex/autophone-location-multivm-integration`，HEAD `4dcbdb8`，包含分析开始时已有的未提交修改。
 
-后续更新：同日 A1 已完成测试环境恢复，新增统一入口并通过 222 项无固件测试。详见[测试基线执行记录](/Users/qcz3840/github/vphone-cli/research/test_baseline_2026-09-08.md)。本文原有测试阻塞描述保留为分析开始时的记录。
+后续更新：同日 A1 已完成测试环境恢复，新增统一入口并通过 222 项无固件测试。详见[测试基线执行记录](../research/test_baseline_2026-09-08.md)。本文原有测试阻塞描述保留为分析开始时的记录。
 
 ## 1. 核心判断
 
@@ -44,7 +44,7 @@
 
 较大的实现文件包括：`VPhoneControl.swift` 1,243 行、`VPhoneHostControl.swift` 1,236 行、`DeviceTreePatcher.swift` 1,062 行、`CryptexFilesystemPatcher.swift` 1,028 行、`VPhoneCreateOrchestrator.swift` 630 行，以及 `libvcamcaptured.m` 4,822 行。建议按职责、状态所有权和测试接口拆分，避免仅根据行数拆文件。
 
-来源：[Package.swift](/Users/qcz3840/github/vphone-cli/Package.swift)。
+来源：[Package.swift](../Package.swift)。
 
 ### 3.2 近期提交反映的工作方向
 
@@ -97,7 +97,7 @@ flowchart TD
 
 `VPhoneCore` 已承担可复用的核心逻辑，但仍链接 Virtualization.framework。它不是独立的跨平台库。`FirmwarePatcher` 依赖 `VPhoneCore`；创建编排留在可执行目标中，当前代码说明这样可以避免形成包依赖环。
 
-来源：[VPhoneCreateOrchestrator.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneCreateOrchestrator.swift)、[VPhoneAppDelegate.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift)。
+来源：[VPhoneCreateOrchestrator.swift](../sources/vphone-cli/VPhoneCreateOrchestrator.swift)、[VPhoneAppDelegate.swift](../sources/vphone-cli/VPhoneAppDelegate.swift)。
 
 ### 4.2 命令入口
 
@@ -105,7 +105,7 @@ flowchart TD
 
 `main.swift` 将启动操作交给 NSApplication 和 AppDelegate；其他命令直接执行。VM 创建逻辑已由 Swift 编排，但固件下载、部分恢复和 CFW 安装仍调用脚本或 Python。这是当前的多语言分工。
 
-来源：[main.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/main.swift)、[VPhoneCLI.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneCLI.swift)。
+来源：[main.swift](../sources/vphone-cli/main.swift)、[VPhoneCLI.swift](../sources/vphone-cli/VPhoneCLI.swift)。
 
 ### 4.3 宿主机 VM 与 GUI
 
@@ -115,7 +115,7 @@ GUI 采用 AppKit 与 SwiftUI 混合结构。私有 API 通过 Dynamic 或 Objec
 
 当前系统已有 `--headless`，但 `VPhoneHostControl` 的创建位于 `if !cli.noGraphics` 分支，且 `start()` 要求传入具体 VM 视图。**因此当前 headless 启动路径不会创建该宿主机控制 socket。** 定位和客户机连接仍可在 headless 分支启动。
 
-来源：[VPhoneVirtualMachine.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVirtualMachine.swift)、[VPhoneAppDelegate.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:130)、[VPhoneHostControl.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneHostControl.swift:93)。
+来源：[VPhoneVirtualMachine.swift](../sources/vphone-cli/VPhoneVirtualMachine.swift)、[VPhoneAppDelegate.swift](../sources/vphone-cli/VPhoneAppDelegate.swift)、[VPhoneHostControl.swift](../sources/vphone-cli/VPhoneHostControl.swift)。
 
 ### 4.4 数据与状态
 
@@ -133,7 +133,7 @@ VM 克隆优先使用 APFS CoW，失败后回退普通复制；随后清除 NVRA
 
 导入使用独立暂存目录，检查后再移入库；创建空 VM 失败会清理部分目录。这些是已有的恢复措施。完整 `vm create` 尚未提供贯穿所有阶段的持久检查点和续跑接口。
 
-来源：[VPhoneBundleOps.swift](/Users/qcz3840/github/vphone-cli/sources/VPhoneCore/VPhoneBundleOps.swift)、[VPhoneLibrary.swift](/Users/qcz3840/github/vphone-cli/sources/VPhoneCore/VPhoneLibrary.swift)、[VPhoneSystemLocationController.swift](/Users/qcz3840/github/vphone-cli/sources/VPhoneCore/VPhoneSystemLocationController.swift)。
+来源：[VPhoneBundleOps.swift](../sources/VPhoneCore/VPhoneBundleOps.swift)、[VPhoneLibrary.swift](../sources/VPhoneCore/VPhoneLibrary.swift)、[VPhoneSystemLocationController.swift](../sources/VPhoneCore/VPhoneSystemLocationController.swift)。
 
 ## 5. 固件与部署流程
 
@@ -167,7 +167,7 @@ flowchart LR
 
 版本判断需要同时区分 **iPhone 用户态版本** 和 **cloudOS 内核版本**。例如 iOS 27 的兼容补丁由 iPhone 基础版本门控；Frida 的部分内核扩展还要求显式开关和 cloudOS 版本条件。不能只用一个 “iOS 版本” 字段描述完整兼容性。
 
-来源：[FirmwarePipeline.swift](/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift)、[KernelJBPatcher.swift](/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/Kernel/KernelJBPatcher.swift)。
+来源：[FirmwarePipeline.swift](../sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift)、[KernelJBPatcher.swift](../sources/FirmwarePatcher/Kernel/KernelJBPatcher.swift)。
 
 ### 5.3 补丁实现与验证
 
@@ -181,7 +181,7 @@ Python 继续处理 CFW 和 DSC：包括 Mach-O 代码签名、缓存分块、�
 
 另外，流水线逐项保存产物。后续项目失败时，先前项目已经写入；当前流程没有统一的事务提交和回滚。
 
-来源：[PatchRecord.swift](/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/Core/PatchRecord.swift)、[ARM64Encoder.swift](/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/ARM64/ARM64Encoder.swift)、[ARM64Constants.swift](/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/ARM64/ARM64Constants.swift)、[test_firmware_patches.sh](/Users/qcz3840/github/vphone-cli/tests/test_firmware_patches.sh)。
+来源：[PatchRecord.swift](../sources/FirmwarePatcher/Core/PatchRecord.swift)、[ARM64Encoder.swift](../sources/FirmwarePatcher/ARM64/ARM64Encoder.swift)、[ARM64Constants.swift](../sources/FirmwarePatcher/ARM64/ARM64Constants.swift)、[test_firmware_patches.sh](../tests/test_firmware_patches.sh)。
 
 ## 6. 运行时能力与自动化
 
@@ -210,7 +210,7 @@ Python 继续处理 CFW 和 DSC：包括 Mach-O 代码签名、缓存分块、�
 3. **相机回执注释与判定不一致。** `cameraTransportReceipt()` 注释要求 published/observed 帧索引匹配；实现检查 generation 相同且两个索引均大于零，没有检查两个索引相等。应先定义回执是表示“同一流已有数据”还是“指定帧已消费”，再选择判定条件。
 4. **相机数据量需要测量。** 以代码默认的 1280×720、BGRA、30 FPS 计算，原始像素量约为 105.5 MiB/s，未计协议与复制开销。这是理论输入量，不是已测得吞吐或 CPU 占用。后续优化应基于丢帧、延迟和内存复制数据。
 
-来源：[VPhoneControl.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneControl.swift)、[vphoned_protocol.m](/Users/qcz3840/github/vphone-cli/scripts/vphoned/vphoned_protocol.m)、[VPhoneHostControl.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneHostControl.swift:1166)、[VPhoneCameraServer.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneCameraServer.swift)。
+来源：[VPhoneControl.swift](../sources/vphone-cli/VPhoneControl.swift)、[vphoned_protocol.m](../scripts/vphoned/vphoned_protocol.m)、[VPhoneHostControl.swift](../sources/vphone-cli/VPhoneHostControl.swift)、[VPhoneCameraServer.swift](../sources/vphone-cli/VPhoneCameraServer.swift)。
 
 ## 7. 构建、分发和依赖
 
@@ -230,7 +230,7 @@ Python requirements 大多没有固定版本；托管虚拟环境可在运行时
 
 项目依赖专用宿主机配置、私有权限、固件来源和特定 SDK。产品化时应将预检结果、资源完整性和已验证环境作为明确输入。不能从 `.app` 可分发推导为普通 macOS 环境可直接运行。
 
-来源：[Makefile](/Users/qcz3840/github/vphone-cli/Makefile:214)、[build.sh](/Users/qcz3840/github/vphone-cli/scripts/build.sh)、[release.yml](/Users/qcz3840/github/vphone-cli/.github/workflows/release.yml)、[VPhoneResources.swift](/Users/qcz3840/github/vphone-cli/sources/VPhoneCore/VPhoneResources.swift)、[requirements.txt](/Users/qcz3840/github/vphone-cli/requirements.txt)。
+来源：[Makefile](../Makefile)、[build.sh](../scripts/build.sh)、[release.yml](../.github/workflows/release.yml)、[VPhoneResources.swift](../sources/VPhoneCore/VPhoneResources.swift)、[requirements.txt](../requirements.txt)。
 
 ## 8. 问题、影响与建议优先级
 
@@ -250,7 +250,7 @@ Python requirements 大多没有固定版本；托管虚拟环境可在运行时
 | P1 | 文档、测试矩阵和补丁计数缺少统一来源 | 无法可靠判断支持范围及期望产物 | 机器可读兼容性清单，自动生成文档表格和测试输入 |
 | P2 | 相机注入实现较大，尚无本次性能数据 | 重构和优化方向缺少量化依据 | 先增加 generation、帧延迟、丢帧和资源占用观测，再决定优化 |
 
-相关来源：[cfw_install_host.sh](/Users/qcz3840/github/vphone-cli/scripts/cfw_install_host.sh)、[cfw_install.sh](/Users/qcz3840/github/vphone-cli/scripts/cfw_install.sh:180)、[VPhoneVMLaunchCLI.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVMLaunchCLI.swift:108)、[VPhoneVMCLI.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVMCLI.swift)、[VPhoneVMTransferCLI.swift](/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneVMTransferCLI.swift)。
+相关来源：[cfw_install_host.sh](../scripts/cfw_install_host.sh)、[cfw_install.sh](../scripts/cfw_install.sh)、[VPhoneVMLaunchCLI.swift](../sources/vphone-cli/VPhoneVMLaunchCLI.swift)、[VPhoneVMCLI.swift](../sources/vphone-cli/VPhoneVMCLI.swift)、[VPhoneVMTransferCLI.swift](../sources/vphone-cli/VPhoneVMTransferCLI.swift)。
 
 ### 8.1 文档不一致的具体证据
 
@@ -265,7 +265,7 @@ Python requirements 大多没有固定版本；托管虚拟环境可在运行时
 
 AGENTS.md 中的目录图还包含当前已不存在的 `VPhoneIPAInstaller.swift`、`VPhoneSigner.swift`、`VPhoneMenuType.swift` 等旧文件；实际已经增加 VPhoneCore、FirmwarePatcher、应用/钥匙串浏览器和自动化模块。相机研究摘要仍有“实际帧交付待完成”的历史说明，而当前已有宿主机与客户机实现；这只能确认文档需要按阶段标注，不能直接认定所有应用的相机功能已验证。
 
-来源：[AGENTS.md](/Users/qcz3840/github/vphone-cli/AGENTS.md)、[README.md](/Users/qcz3840/github/vphone-cli/README.md)、[补丁比较文档](/Users/qcz3840/github/vphone-cli/research/0_binary_patch_comparison.md:820)。
+来源：[AGENTS.md](../AGENTS.md)、[README.md](../README.md)、[补丁比较文档](../research/0_binary_patch_comparison.md)。
 
 ## 9. 质量与验证现状
 
@@ -303,7 +303,7 @@ AGENTS.md 中的目录图还包含当前已不存在的 `VPhoneIPAInstaller.swif
 
 **以上是历史文档中的实验结果，不是本次测试结果，也不能覆盖当前未提交触控修改。**
 
-来源：[历史集成验证记录](/Users/qcz3840/github/vphone-cli/research/0_binary_patch_comparison.md:199)、[PatchComparisonTests.swift](/Users/qcz3840/github/vphone-cli/tests/FirmwareIntegrationTests/PatchComparisonTests.swift)、[test_kernel_patch_guardrails.py](/Users/qcz3840/github/vphone-cli/tests/test_kernel_patch_guardrails.py)。
+来源：[历史集成验证记录](../research/0_binary_patch_comparison.md)、[PatchComparisonTests.swift](../tests/FirmwareIntegrationTests/PatchComparisonTests.swift)、[test_kernel_patch_guardrails.py](../tests/test_kernel_patch_guardrails.py)。
 
 ## 10. 可选迭代方向
 

@@ -58,6 +58,8 @@ PY="${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}"
 # Acquire after sudo, which may close inherited descriptors. The re-executed
 # operation tree must prove possession of the directory descriptor.
 if ! "$PY" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR"; then
+  [[ -z "${VPHONE_CFW_LOCK_REEXEC:-}" ]] || { echo "[-] inherited CFW lock validation failed" >&2; exit 1; }
+  export VPHONE_CFW_LOCK_REEXEC=1
   exec "$PY" "$SCRIPT_DIR/vm_lock.py" "$VM_DIR" cfw -- /bin/zsh "$0" --variant "$VARIANT" "$VM_DIR"
 fi
 
@@ -65,19 +67,59 @@ if lsof "$IMG" >/dev/null 2>&1; then
   echo "[-] $IMG is in use — stop the VM first." >&2; exit 1
 fi
 
+# A previous invocation may have left mounted volumes. Do not change owners or
+# begin another installation until those volumes have been inspected/unmounted.
+assert_no_vm_mounts() {
+  local line mnt mounts
+  mounts=$(/sbin/mount) || return 1
+  for line in "${(@f)mounts}"; do
+    mnt="${line#* on }"; mnt="${mnt% \(*}"
+    if [[ "$mnt" == "$VM_DIR/"* ]]; then
+      print -u2 -- "[-] mounted filesystem beneath VM directory: $mnt; unmount it before retrying CFW"
+      return 1
+    fi
+  done
+}
+assert_no_vm_mounts
+
 # One private directory per invocation, including temporary Cryptex mounts.
 # Keep it beneath the VM directory so installer path checks remain applicable.
 CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
 export CFW_HOST_MNT
 BASEDISK=""
 
+attached_disk() {
+  "$PY" -c 'import plistlib,re,sys
+with open(sys.argv[1], "rb") as stream:
+    info = plistlib.load(stream)
+entities = info["system-entities"]
+bases = {entry.get("dev-entry", "") for entry in entities
+         if re.fullmatch(r"/dev/disk[0-9]+", entry.get("dev-entry", ""))}
+# APFS also lists a synthesized container as /dev/diskN. Prefer the
+# device carrying the partition map, not the synthesized container.
+physical = {entry.get("dev-entry") for entry in entities
+            if entry.get("content-hint") in ("GUID_partition_scheme", "FDisk_partition_scheme", "Apple_partition_scheme")}
+if physical: bases &= physical
+if len(bases) != 1: raise ValueError("no unique base disk in attach output")
+print(bases.pop())' "$CFW_HOST_MNT/attach.log"
+}
+
+unmount_volume() {
+  local attempt
+  for attempt in 1 2 3; do
+    "$@" && return 0
+    (( attempt == 3 )) || sleep 1
+  done
+  return 1
+}
+
 cleanup() {
   local failed=0 line dev mnt
   # hdiutil may report an attached disk and then fail or receive a signal.
   # Recover that device from invocation-local output even before discovery.
   if [[ -z "$BASEDISK" && -f "$CFW_HOST_MNT/attach.log" ]]; then
-    BASEDISK=$(awk 'NR == 1 { print $1; exit }' "$CFW_HOST_MNT/attach.log")
-    [[ "$BASEDISK" == /dev/disk<-> ]] || BASEDISK=""
+    BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || true
+    [[ "$BASEDISK" == /dev/disk<-> ]] || { BASEDISK=""; failed=1; }
   fi
   # Query actual mounts; never unmount a shared or previous invocation's path.
   local mounts
@@ -90,13 +132,13 @@ cleanup() {
     print -r -- "[*] cleanup mount: $dev -> $mnt"
     case "$mnt" in
       "$CFW_HOST_MNT"/mnt_sysos*)
-        hdiutil detach "$mnt" || failed=1 ;;
+        unmount_volume hdiutil detach "$mnt" || failed=1 ;;
       "$CFW_HOST_MNT"/mnt_appos)
-        hdiutil detach "$mnt" || failed=1 ;;
-      *) umount "$mnt" || failed=1 ;;
+        unmount_volume hdiutil detach "$mnt" || failed=1 ;;
+      *) unmount_volume umount "$mnt" || failed=1 ;;
     esac
   done
-  if [[ -n "$BASEDISK" ]]; then
+  if (( failed == 0 )) && [[ -n "$BASEDISK" ]]; then
     if hdiutil detach "$BASEDISK" || diskutil eject "$BASEDISK"; then
       BASEDISK=""
       rm -f "$CFW_HOST_MNT/attach.log" || failed=1
@@ -131,9 +173,8 @@ trap 'exit 143' TERM
 trap 'exit 129' HUP
 
 echo "[*] host-mode CFW install: variant=$VARIANT vm=$VM_DIR mounts=$CFW_HOST_MNT"
-hdiutil attach -nomount -imagekey diskimage-class=CRawDiskImage "$IMG" > "$CFW_HOST_MNT/attach.log"
-BASEDISK=$(awk 'NR == 1 { print $1; exit }' "$CFW_HOST_MNT/attach.log")
-[[ "$BASEDISK" == /dev/disk<-> ]] || { echo "[-] invalid attached disk: $BASEDISK" >&2; BASEDISK=""; exit 1; }
+hdiutil attach -plist -nomount -imagekey diskimage-class=CRawDiskImage "$IMG" > "$CFW_HOST_MNT/attach.log"
+BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify attached disk; retaining attach.log" >&2; BASEDISK=""; exit 1; }
 echo "[*] attached image: $BASEDISK"
 CONT=$(diskutil info -plist "${BASEDISK}s1" | /usr/bin/plutil -extract APFSContainerReference raw -o - - 2>/dev/null || true)
 SYS=$(diskutil apfs list "$CONT" 2>/dev/null | awk '/APFS Volume Disk \(Role\):/{for(i=1;i<=NF;i++) if($i ~ /^disk[0-9]+s[0-9]+$/) dev=$i} /Name:.*System \(Case-sensitive\)/{print dev; exit}')
@@ -148,7 +189,12 @@ echo "[*] running $INSTALLER (files placed on host mounts)..."
     ${VPHONE_FRIDA:+VPHONE_FRIDA="$VPHONE_FRIDA"} \
     zsh "$SCRIPT_DIR/$INSTALLER" . )
 
-cleanup
+if ! cleanup; then
+  trap - EXIT INT TERM HUP
+  echo "[-] CFW cleanup failed; snapshot not changed. System and data volumes may contain partial installation changes." >&2
+  echo "[-] Inspect retained mounts and attach.log, unmount normally, then rerun the same CFW variant. Do not boot a partially installed VM." >&2
+  exit 1
+fi
 trap - EXIT INT TERM HUP
 
 echo "[*] flipping boot snapshot offline (com.apple.os.update -> live volume)..."
@@ -165,7 +211,11 @@ fi
 # subsequent user-run steps (make boot / setup_machine first boot, which rewrite
 # vm/.vphoned.signed) don't hit "Permission denied".
 if [[ -n "${SUDO_USER:-}" ]]; then
-  chown -R "$SUDO_USER" "$VM_DIR" 2>/dev/null || true
+  assert_no_vm_mounts
+  for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input; do
+    [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
+    chown -Rx "$SUDO_USER" "$VM_DIR/$artifact"
+  done
   [[ -e "$PROJ/scripts/vphoned/vphoned" ]] && chown "$SUDO_USER" "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
   echo "[*] restored ownership of host-side artifacts to $SUDO_USER"
 fi

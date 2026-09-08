@@ -33,6 +33,10 @@ with open(os.environ['A2_CALLS'], 'a') as f:
 if name == 'hdiutil':
     if args[0] != 'imageinfo':
         sys.exit(71)  # Never attach a real disk during installer integration tests.
+    if os.environ.get('A2_FAIL') == 'imageinfo':
+        print('imageinfo service unavailable', file=sys.stderr); sys.exit(23)
+    if os.environ.get('A2_FAIL') == 'schema':
+        plistlib.dump({'unexpected': True}, sys.stdout.buffer); sys.exit(0)
     if args[-1].endswith('.aea'): sys.exit(1)  # hdiutil dispatches by extension.
     data = pathlib.Path(args[-1]).read_bytes()
     known = data.startswith(b'DMG!')
@@ -56,7 +60,8 @@ elif name in ('aea', 'cp'):
     if os.environ.get('A2_PAUSE') == name:
         pathlib.Path(os.environ['A2_READY']).touch()
         time.sleep(30)
-    if os.environ.get('A2_FAIL') == name: sys.exit(31)
+    if os.environ.get('A2_FAIL') == name:
+        print('command failed test-key-do-not-log', file=sys.stderr); sys.exit(31)
     if os.environ.get('A2_FAIL') == 'invalid-output': target.write_bytes(b'bad!')
 elif name == 'sudo':
     if args[0] == '-n': sys.exit(1)
@@ -118,10 +123,25 @@ elif name == 'python-stub':
                 self.source.write_bytes(DMG if failure == "cp" else b"AEA1encrypted")
                 result = self.run_cache(A2_FAIL=failure)
                 self.assertNotEqual(result.returncode, 0)
+                if failure == "aea":
+                    self.assertIn("command failed <redacted>", result.stderr)
+                    self.assertNotIn("test-key-do-not-log", result.stderr)
                 self.assertFalse(self.cache.exists())
                 self.assertEqual(list(self.base.glob(".systemos-*")), [])
                 self.assertEqual(self.run_cache().returncode, 0)
                 self.assertEqual(self.cache.read_bytes(), DMG)
+
+    def test_uncertain_validation_preserves_modified_cache(self):
+        self.source.write_bytes(DMG)
+        modified = DMG[:100] + b'EXP' + DMG[103:]
+        for failure in ('imageinfo', 'schema'):
+            self.cache.write_bytes(modified)
+            result = self.run_cache(A2_FAIL=failure)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(self.cache.read_bytes(), modified)
+            self.assertEqual(len(self.calls('cp')), 0)
+            if failure == 'imageinfo':
+                self.assertIn('imageinfo service unavailable', result.stderr)
 
     def test_incomplete_cache_is_rebuilt(self):
         self.source.write_bytes(DMG)

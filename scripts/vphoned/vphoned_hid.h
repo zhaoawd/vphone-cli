@@ -22,3 +22,6 @@ void vp_hid_key(uint32_t page, uint32_t usage, BOOL down);
 /// origin at the top-left. Used when the host selects guest-side touch
 /// injection instead of the private VZ USB touchscreen path.
 void vp_hid_touch(int phase, double x, double y);
+
+/// Release an active touch at the last coordinate when the client session ends.
+void vp_hid_touch_reset(void);

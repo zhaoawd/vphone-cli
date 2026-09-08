@@ -6,6 +6,7 @@ key lookup is replaced: locally encrypted AEA images do not have Apple's FCS key
 This is intentionally not part of firmware-free unittest discovery.
 """
 
+import argparse
 import base64
 import hashlib
 import os
@@ -24,6 +25,21 @@ def digest(file):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--firmware-source", type=Path,
+                        help="Decrypt/copy a real SystemOS source into a disposable cache")
+    args = parser.parse_args()
+    if args.firmware_source:
+        with tempfile.TemporaryDirectory(prefix="vphone-systemos-firmware-") as temp:
+            output = Path(temp) / "SystemOS.dmg"
+            subprocess.run([sys.executable, str(ROOT / "scripts/cache_systemos.py"),
+                            str(args.firmware_source.resolve()), str(output)], check=True)
+            with output.open("rb") as stream:
+                sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
+            info = plistlib.loads(subprocess.check_output(["hdiutil", "imageinfo", "-plist", str(output)]))
+            print(f"PASS: real SystemOS source; bytes={output.stat().st_size}; sha256={sha256}")
+            print(info["partitions"])
+        return
     with tempfile.TemporaryDirectory(prefix="vphone-a2-native-") as tmp:
         base = Path(tmp)
         image = base / "apfs.dmg"
@@ -61,9 +77,14 @@ def main():
         print("PASS: decrypted .aea filename; byte-exact copy; cache reuse")
 
         output.write_bytes(b"partial cache")
+        result = subprocess.run([sys.executable, str(ROOT / "scripts/cache_systemos.py"),
+                                 str(raw), str(output)], capture_output=True, text=True)
+        assert result.returncode != 0
+        assert output.read_bytes() == b"partial cache"
+        output.unlink()  # Explicitly discard this disposable, known-invalid fixture.
         cache(raw, output)
         assert digest(output) == expected
-        print("PASS: incomplete cache rebuilt")
+        print("PASS: unrecognized cache preserved on tool failure; explicit removal permits rebuild")
 
         encrypted = base / "encrypted.dmg.aea"
         result = subprocess.run(["aea", "encrypt", "-profile", "1", "-i", str(raw),

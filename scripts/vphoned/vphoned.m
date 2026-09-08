@@ -575,6 +575,8 @@ static BOOL handle_client(int fd) {
       }
     }
 
+    vp_hid_touch_reset();
+
     // Teardown:
     //   1. Under the writer lock, invalidate this session and close fd.
     //      Workers already holding the lock finish cleanly on the still-

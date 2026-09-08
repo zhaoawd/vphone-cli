@@ -30,6 +30,19 @@ struct RestoreInfoTests {
         try write("BuildManifest.plist", cloudVersion, cloudBuild)
     }
 
+    @Test func optionalCleanupSkipsBusyBundleAndCanRetry() throws {
+        let bundle = try makeBundle()
+        defer { try? FileManager.default.removeItem(at: bundle.url) }
+        try makeRestoreDir(in: bundle, iosVersion: "26.1", iosBuild: "23B85", cloudVersion: "26.1", cloudBuild: "23B85")
+        var lock: VPhoneVMLock? = try VPhoneVMLock(directory: bundle.url, operation: "boot")
+        #expect(VPhoneRestoreInfo.removeBuiltFirmwareIfIdle(fromBundle: bundle) == nil)
+        #expect(VPhoneRestoreInfo.findRestoreDirectory(inBundle: bundle) != nil)
+        withExtendedLifetime(lock) {}
+        lock = nil
+        #expect(VPhoneRestoreInfo.removeBuiltFirmwareIfIdle(fromBundle: bundle) != nil)
+        #expect(VPhoneRestoreInfo.findRestoreDirectory(inBundle: bundle) == nil)
+    }
+
     @Test func derivesBothVersionsFromPlists() throws {
         let b = try makeBundle()
         defer { try? FileManager.default.removeItem(at: b.url) }

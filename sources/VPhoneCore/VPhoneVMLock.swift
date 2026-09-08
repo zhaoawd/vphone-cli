@@ -32,7 +32,12 @@ public final class VPhoneVMLock {
             let record = VPhoneVMRuntimeState(
                 bundleIdentifier: "\(info.st_dev):\(info.st_ino)", bundlePath: directory.path,
                 pid: getpid(), instanceID: UUID().uuidString, startedAt: Date(), operation: operation)
-            try record.write(in: directory)
+            do {
+                try record.write(in: directory)
+            } catch {
+                let message = "[vphone] Warning: runtime record could not be written: \(error)\n"
+                FileHandle.standardError.write(Data(message.utf8))
+            }
             descriptor = fd
             state = record
         } catch {

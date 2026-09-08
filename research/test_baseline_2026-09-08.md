@@ -1,6 +1,6 @@
 # A1 测试基线执行记录
 
-日期：2026-09-08。对应[迭代清单 A1](/Users/qcz3840/github/vphone-cli/research/project_iteration_checklist_2026-09-08.md)。
+日期：2026-09-08。对应[迭代清单 A1](../research/project_iteration_checklist_2026-09-08.md)。
 
 ## 结果与范围
 
@@ -34,7 +34,7 @@ make test
 VPHONE_TEST_FIXTURES=/absolute/path/to/patch_refactor_input make test_firmware
 ```
 
-需要 6 个 raw payload、9 个参考 JSON 和 2 个 IM4P 文件，完整路径见 [run_tests.py](/Users/qcz3840/github/vphone-cli/scripts/run_tests.py)。输入检查只确认文件存在且非空；格式、语义和字节一致性由后续 Swift 测试验证。输入目录应包含对应的同一组固件和参考结果。
+需要 6 个 raw payload、9 个参考 JSON 和 2 个 IM4P 文件，完整路径见 [run_tests.py](../scripts/run_tests.py)。输入检查只确认文件存在且非空；格式、语义和字节一致性由后续 Swift 测试验证。输入目录应包含对应的同一组固件和参考结果。
 
 `FirmwareIntegrationTests` 包含 9 个补丁比较测试、3 个 IM4P 测试和原有的 1 个 `VerboseJBDebug` 诊断测试。后者主要打印定位结果，没有完整的补丁成功断言，不能单独证明补丁正确。新增需要真实固件的 Swift 测试应放入这个目标，并在需要新输入时更新文件清单。直接执行不带过滤的 `swift test` 仍会运行此目标。
 
@@ -68,7 +68,7 @@ Swift 缓存与模块缓存默认位于 `.build/test-cache`、`.build/test-modul
 | pymobiledevice3 | 11.9.2 |
 | ipsw-parser | 1.7.5 |
 
-全部 102 个 Python distribution 版本、Swift 依赖提交和子模块提交见[依赖快照](/Users/qcz3840/github/vphone-cli/research/test_baseline_dependencies_2026-09-08.json)。`.venv/bin/python3 -m pip check` 返回 `No broken requirements found.`。
+全部 102 个 Python distribution 版本、Swift 依赖提交和子模块提交见[依赖快照](../research/test_baseline_dependencies_2026-09-08.json)。`.venv/bin/python3 -m pip check` 返回 `No broken requirements found.`。
 
 此快照记录本次实际解析结果，不是依赖锁文件。`requirements.txt` 保持原有约束；未来重新安装可能解析出不同版本。依赖固定与跨环境验证由 D2 继续处理。
 
@@ -87,7 +87,7 @@ Swift 缓存与模块缓存默认位于 `.build/test-cache`、`.build/test-modul
 
 构建时通过 `CLANG_MODULE_CACHE_PATH`、`SWIFT_MODULECACHE_PATH` 将模块缓存指向项目 `.build/test-module-cache`，使用项目规定的 `make build` 完成编译和签名。
 
-本地原始日志：[完整测试](/Users/qcz3840/github/vphone-cli/research/artifacts/a1-2026-09-08/test.log)、[环境安装](/Users/qcz3840/github/vphone-cli/research/artifacts/a1-2026-09-08/setup.log)、[签名构建](/Users/qcz3840/github/vphone-cli/research/artifacts/a1-2026-09-08/build.log)、[缺失样本检查](/Users/qcz3840/github/vphone-cli/research/artifacts/a1-2026-09-08/missing-fixtures.log)。日志位于已忽略的 `research/artifacts`，不会随源码提交自动分发。
+本地原始日志：[完整测试](../research/artifacts/a1-2026-09-08/test.log)、[环境安装](../research/artifacts/a1-2026-09-08/setup.log)、[签名构建](../research/artifacts/a1-2026-09-08/build.log)、[缺失样本检查](../research/artifacts/a1-2026-09-08/missing-fixtures.log)。日志位于已忽略的 `research/artifacts`，不会随源码提交自动分发。
 
 首次 Swift 编译输出第三方依赖的兼容性与弃用警告；沙箱内还输出用户级 SwiftPM 配置目录不可写的警告。最终测试未出现失败。这些结果只证明当前环境下的无固件测试和上述文件签名校验通过，不代表完整分发资源、固件兼容矩阵或 VM 运行验证通过。
 

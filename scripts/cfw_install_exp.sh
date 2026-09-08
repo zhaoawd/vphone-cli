@@ -99,7 +99,6 @@ if [[ -f "$JB_SYSOS_DMG" ]]; then
     # refuses pre-patched function entries unless --force is passed).
     echo "[*] DSC patches: mounting cached SystemOS DMG..."
     mkdir -p "$JB_MNT_SYSOS"
-    sudo ${SUDO_ASKPASS:+-A} hdiutil detach "$JB_MNT_SYSOS" -force 2>/dev/null || true
     sudo ${SUDO_ASKPASS:+-A} hdiutil attach -mountpoint "$JB_MNT_SYSOS" "$JB_SYSOS_DMG" -nobrowse -owners off
 
     JB_DSC_CHUNKS_DIR="$JB_MNT_SYSOS/System/Library/Caches/com.apple.dyld"

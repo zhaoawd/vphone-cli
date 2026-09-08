@@ -232,10 +232,8 @@ public struct VPhoneCreateOrchestrator {
         // CFW install is the last consumer of the built restore tree (it copies
         // the SystemOS/AppOS cryptexes from it onto Disk.img); reclaim it now.
         if !options.keepArtifacts {
-            let lock = try VPhoneVMLock(directory: bundleURL, operation: "cleanup-firmware")
-            defer { withExtendedLifetime(lock) {} }
             if let bundle = try? VPhoneBundle.load(at: bundleURL),
-               let removed = try? VPhoneRestoreInfo.removeBuiltFirmware(fromBundle: bundle) {
+               let removed = VPhoneRestoreInfo.removeBuiltFirmwareIfIdle(fromBundle: bundle) {
                 print("[+] Removed built firmware \(removed)/ to save space (--keep-artifacts to keep)")
             }
         }

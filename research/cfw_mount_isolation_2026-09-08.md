@@ -15,9 +15,9 @@ A1 已提交为 `b7d0382`，A2 已提交为 `2ac6c51`。B1 修改主机安装驱
 
 ## 验证方法
 
-命令替身测试：[test_cfw_host_isolation.py](/Users/qcz3840/github/vphone-cli/tests/test_cfw_host_isolation.py)。运行驱动副本，仅替换提权判断；磁盘命令和挂载表使用替身，安装负载使用测试脚本。覆盖两个任务并发、第三方挂载排除、设备发现失败、attach 部分失败、清理失败阻止快照修改、安装失败码保留和 SIGINT。
+命令替身测试：[test_cfw_host_isolation.py](../tests/test_cfw_host_isolation.py)。运行驱动副本，仅替换提权判断；磁盘命令和挂载表使用替身，安装负载使用测试脚本。覆盖两个任务并发、第三方挂载排除、设备发现失败、attach 部分失败、清理失败阻止快照修改、安装失败码保留和 SIGINT。
 
-原生测试：[cfw_host_mount_native.py](/Users/qcz3840/github/vphone-cli/tests/cfw_host_mount_native.py)。创建两份专用 32 MiB APFS 镜像，使用真实 `hdiutil attach` 挂载；从生产驱动提取原样的清理函数和退出处理运行。检查第一个任务卸载后第二个任务仍挂载且文件可读，并验证退出码 37。测试结束清理专用镜像。
+原生测试：[cfw_host_mount_native.py](../tests/cfw_host_mount_native.py)。创建两份专用 32 MiB APFS 镜像，使用真实 `hdiutil attach` 挂载；从生产驱动提取原样的清理函数和退出处理运行。检查第一个任务卸载后第二个任务仍挂载且文件可读，并验证退出码 37。测试结束清理专用镜像。
 
 ```sh
 make test

@@ -11,24 +11,45 @@ import os
 import sys
 
 
+class InvalidImage(ValueError):
+    """Recognized metadata proves that the image is unusable."""
+
+
+def run_tool(command, secrets=()):
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        stdout, stderr = process.communicate()
+    except BaseException:
+        process.kill()
+        process.communicate()
+        raise
+    result = subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+    if result.returncode:
+        detail = result.stderr.decode(errors="replace").strip()
+        for secret in secrets:
+            detail = detail.replace(secret, "<redacted>")
+        # Never include argv: AEA receives the key as a command-line argument.
+        raise RuntimeError(f"{Path(command[0]).name} exited {result.returncode}: {detail}")
+    return result
+
+
 def validate_image(image):
     if not image.is_file() or image.stat().st_size == 0:
-        raise ValueError(f"Missing or empty disk image: {image}")
-    result = subprocess.run(["hdiutil", "imageinfo", "-plist", str(image)],
-                            capture_output=True, check=True)
+        raise InvalidImage(f"Missing or empty disk image: {image}")
+    result = run_tool(["hdiutil", "imageinfo", "-plist", str(image)])
     info = plistlib.loads(result.stdout)
     if info.get("Properties", {}).get("Encrypted", False):
-        raise ValueError(f"Disk image is still encrypted: {image}")
+        raise InvalidImage(f"Disk image is still encrypted: {image}")
     layout = info["partitions"]
     block_size = layout["block-size"]
     total = info["Size Information"]["Total Bytes"]
     if block_size <= 0 or total <= 0:
-        raise ValueError(f"Invalid disk image size: {image}")
+        raise InvalidImage(f"Invalid disk image size: {image}")
     recognized = False
     for partition in layout["partitions"]:
         start, length = partition["partition-start"], partition["partition-length"]
         if start < 0 or length < 0 or (start + length) * block_size > total:
-            raise ValueError(f"Disk image partition exceeds image size: {image}")
+            raise InvalidImage(f"Disk image partition exceeds image size: {image}")
         filesystems = partition.get("partition-filesystems", {})
         if (length > 0 and partition.get("partition-hint") in ("Apple_APFS", "Apple_HFS")
                 and any(name in filesystems for name in ("APFS", "HFS+", "HFSX", "HFS"))):
@@ -36,7 +57,7 @@ def validate_image(image):
     # hdiutil accepts arbitrary sector-aligned bytes as CRawDiskImage. Its exit
     # status alone therefore cannot distinguish an image from invalid input.
     if not recognized:
-        raise ValueError(f"No recognized APFS/HFS partition in disk image: {image}")
+        raise InvalidImage(f"No recognized APFS/HFS partition in disk image: {image}")
 
 
 def cache_systemos(source, cache):
@@ -45,10 +66,10 @@ def cache_systemos(source, cache):
     if cache.exists():
         try:
             validate_image(cache)
-        except (ValueError, KeyError, TypeError, subprocess.CalledProcessError):
-            print(f"Rebuilding invalid SystemOS cache: {cache}", flush=True)
+        except InvalidImage as error:
+            print(f"Rebuilding invalid SystemOS cache: {error}", flush=True)
         else:
-            print(f"Using validated SystemOS cache: {cache}", flush=True)
+            print(f"Using SystemOS cache with recognized filesystem metadata (source identity not checked): {cache}", flush=True)
             return
     if not source.is_file():
         raise ValueError(f"Missing SystemOS input: {source}")
@@ -61,18 +82,17 @@ def cache_systemos(source, cache):
         staged = Path(temp) / "SystemOS.dmg"
         if encrypted:
             print("Decrypting AEA SystemOS into temporary cache...", flush=True)
-            key = subprocess.run(["ipsw", "fw", "aea", "--key", str(source)],
-                                 capture_output=True, text=True, check=True).stdout.strip()
+            key = run_tool(["ipsw", "fw", "aea", "--key", str(source)]).stdout.decode().strip()
             if not key:
                 raise ValueError("ipsw returned an empty AEA key")
             # Avoid printing either the key or a CalledProcessError containing it.
-            subprocess.run(["aea", "decrypt", "-i", str(source), "-o", str(staged),
-                            "-key-value", key], capture_output=True, check=True)
+            run_tool(["aea", "decrypt", "-i", str(source), "-o", str(staged),
+                      "-key-value", key], secrets=(key,))
         else:
             # hdiutil uses the extension when selecting a decoder: a decrypted
             # APFS image still named *.aea must first be staged under *.dmg.
             print("Copying decrypted SystemOS into temporary cache...", flush=True)
-            subprocess.run(["cp", str(source), str(staged)], check=True)
+            run_tool(["cp", str(source), str(staged)])
         validate_image(staged)
         os.replace(staged, cache)
     print(f"SystemOS cache ready: {cache}", flush=True)
@@ -85,7 +105,7 @@ def main():
     args = parser.parse_args()
 
     def interrupted(signum, _frame):
-        raise InterruptedError(f"Interrupted by signal {signum}")
+        raise RuntimeError(f"Interrupted by signal {signum}")
 
     signal.signal(signal.SIGTERM, interrupted)
     try:
@@ -94,7 +114,7 @@ def main():
         print(f"SystemOS cache failed: {Path(error.cmd[0]).name} exited {error.returncode}",
               file=sys.stderr)
         return 1
-    except (OSError, ValueError, KeyError, TypeError, KeyboardInterrupt) as error:
+    except (OSError, ValueError, KeyError, TypeError, RuntimeError, plistlib.InvalidFileException, KeyboardInterrupt) as error:
         print(f"SystemOS cache failed: {error}", file=sys.stderr)
         return 1
     return 0

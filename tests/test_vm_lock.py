@@ -40,6 +40,20 @@ class VMLockTests(unittest.TestCase):
             time.sleep(.02)
         self.fail('runtime record was not published')
 
+    def test_diagnostic_failure_keeps_lock_and_runs_command(self):
+        (self.vm / '.vphone-runtime.json').mkdir()
+        proc = self.launch(['/bin/zsh', '-c', 'print ready; sleep 1'])
+        self.assertEqual(proc.stdout.readline().strip(), b'ready')
+        fd = os.open(self.vm, os.O_RDONLY)
+        try:
+            with self.assertRaises(BlockingIOError):
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        finally:
+            os.close(fd)
+        _, error = proc.communicate(timeout=5)
+        self.assertEqual(proc.returncode, 0, error)
+        self.assertIn(b'runtime record', error)
+
     def test_parallel_launch_and_alias_are_rejected(self):
         first = self.launch()
         state = self.wait_record()

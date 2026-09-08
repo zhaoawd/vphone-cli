@@ -10,6 +10,31 @@ struct VMLockTests {
         return url
     }
 
+    @Test func diagnosticFailureDoesNotReleaseLock() throws {
+        let dir = try directory()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try FileManager.default.createDirectory(at: dir.appendingPathComponent(VPhoneVMRuntimeState.filename), withIntermediateDirectories: true)
+        let lock = try VPhoneVMLock(directory: dir, operation: "export")
+        defer { withExtendedLifetime(lock) {} }
+        #expect(throws: (any Error).self) { try VPhoneVMLock(directory: dir, operation: "boot") }
+    }
+
+    @Test func exportsReadOnlyBundle() throws {
+        let root = try directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let vm = root.appendingPathComponent("vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: true)
+        try VPhoneVirtualMachineManifest(cpuCount: 2, memorySize: 1024 * 1024, romImages: nil)
+            .write(to: vm.appendingPathComponent("config.plist"))
+        try Data("test disk".utf8).write(to: vm.appendingPathComponent("Disk.img"))
+        #expect(chmod(vm.path, 0o555) == 0)
+        defer { chmod(vm.path, 0o755) }
+        let output = root.appendingPathComponent("out.tar")
+        try VPhoneBundleOps.export(bundleNamed: "vm", to: output, includeIPSW: false, in: VPhoneLibrary(root: root))
+        #expect((try Data(contentsOf: output)).count > 0)
+        #expect(!FileManager.default.fileExists(atPath: vm.appendingPathComponent(VPhoneVMRuntimeState.filename).path))
+    }
+
     @Test func excludesAliasesAndSurvivesRecordRemoval() throws {
         let dir = try directory()
         defer { try? FileManager.default.removeItem(at: dir) }

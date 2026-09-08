@@ -48,6 +48,8 @@ PYTHON3="$(_resolve_python3)"
     exit 1
 }
 
+: "${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
+
 # ── Configuration ───────────────────────────────────────────────
 CFW_INPUT="cfw_input"
 CFW_ARCHIVE="cfw_input.tar.zst"

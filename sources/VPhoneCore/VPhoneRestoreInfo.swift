@@ -92,6 +92,20 @@ public struct VPhoneRestoreInfo: Codable, Equatable, Sendable {
         return dir.lastPathComponent
     }
 
+    /// Optional space reclamation: a busy bundle or filesystem failure must
+    /// not turn successful installation into a failed create operation.
+    @discardableResult
+    public static func removeBuiltFirmwareIfIdle(fromBundle bundle: VPhoneBundle) -> String? {
+        do {
+            let lock = try VPhoneVMLock(directory: bundle.url, operation: "cleanup-firmware")
+            defer { withExtendedLifetime(lock) {} }
+            return try removeBuiltFirmware(fromBundle: bundle)
+        } catch {
+            FileHandle.standardError.write(Data("[vphone] Warning: skipped optional firmware cleanup: \(error)\n".utf8))
+            return nil
+        }
+    }
+
     // MARK: - Restore-directory reads
 
     static func findRestoreDirectory(inBundle bundle: VPhoneBundle) -> URL? {

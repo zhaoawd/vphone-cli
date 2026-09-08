@@ -7,6 +7,7 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     var keyHelper: VPhoneKeyHelper?
     weak var control: VPhoneControl?
 
+    private var touchRoute = VPhoneTouchRoute()
     private var currentTouchSwipeAim: Int = 0
     private var isDragHighlightVisible = false
 
@@ -257,9 +258,16 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
 
         // Prefer vphoned's guest-side HID path when available. This avoids
         // relying on private VZ touch delivery after the guest is connected.
-        if let control, control.useGuestTouchInjection {
-            control.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y))
+        switch touchRoute.destination(phase: phase, guestSession: control?.touchSession) {
+        case .guest:
+            control?.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y))
             return true
+        case .discard:
+            // The guest releases the touch when its session ends. Do not send
+            // an orphan move/up through VZ or into a replacement connection.
+            return true
+        case .native:
+            break
         }
 
         guard let device = multiTouchDevice,
