@@ -214,16 +214,8 @@ APPOS_DMG="$TEMP_DIR/CryptexAppOS.dmg"
 MNT_SYSOS="$TEMP_DIR/mnt_sysos"
 MNT_APPOS="$TEMP_DIR/mnt_appos"
 
-# Decrypt SystemOS AEA (cached — skip if already decrypted)
-if [[ ! -f "$SYSOS_DMG" ]]; then
-    echo "  Extracting AEA key..."
-    AEA_KEY=$(ipsw fw aea --key "$RESTORE_DIR/$CRYPTEX_SYSOS")
-    echo "  key: $AEA_KEY"
-    echo "  Decrypting SystemOS..."
-    aea decrypt -i "$RESTORE_DIR/$CRYPTEX_SYSOS" -o "$SYSOS_DMG" -key-value "$AEA_KEY"
-else
-    echo "  Using cached SystemOS DMG"
-fi
+# Validate and publish SystemOS cache only after successful copy/decryption.
+"$PYTHON3" "$SCRIPT_DIR/cache_systemos.py" "$RESTORE_DIR/$CRYPTEX_SYSOS" "$SYSOS_DMG"
 
 # Copy AppOS (unencrypted, cached)
 if [[ ! -f "$APPOS_DMG" ]]; then

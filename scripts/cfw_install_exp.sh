@@ -83,12 +83,9 @@ done
 
 if [[ -z "$JB_RESTORE_DIR" ]]; then
     echo "[!] hv_vmm DSC patch: no restore directory found, skipping"
-elif [[ ! -f "$JB_SYSOS_DMG" ]]; then
-    # Not yet decrypted — decrypt to the cache location cfw_install.sh expects.
-    echo "[*] hv_vmm DSC patch: decrypting SystemOS into cache..."
+else
     JB_CRYPTEX_SYSOS=$("$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" cryptex-paths "$JB_RESTORE_DIR/iPhone-BuildManifest.plist" | head -1)
-    JB_AEA_KEY=$(ipsw fw aea --key "$JB_RESTORE_DIR/$JB_CRYPTEX_SYSOS")
-    aea decrypt -i "$JB_RESTORE_DIR/$JB_CRYPTEX_SYSOS" -o "$JB_SYSOS_DMG" -key-value "$JB_AEA_KEY"
+    "$PYTHON3" "$SCRIPT_DIR/cache_systemos.py" "$JB_RESTORE_DIR/$JB_CRYPTEX_SYSOS" "$JB_SYSOS_DMG"
 fi
 
 if [[ -f "$JB_SYSOS_DMG" ]]; then
