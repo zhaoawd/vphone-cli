@@ -63,6 +63,9 @@ mkdir -p "$CFW_HOST_MNT/mnt1" "$CFW_HOST_MNT/mnt_sysos_hv_vmm"
 print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"
 print -r -- "/dev/disk93s1 on $CFW_HOST_MNT/mnt_sysos_hv_vmm (apfs, local)" >> "$TEST_MOUNTS"
 print -r -- '/dev/disk80s1 on /private/tmp/another-task/mnt1 (apfs, local)' >> "$TEST_MOUNTS"
+mkdir -p "$PWD/.cfw_temp/sub" "$PWD/cfw_input"
+[[ ${STRAY_FILE:-0} == 1 ]] && print stray > "$CFW_HOST_MNT/mnt1/leftover"
+[[ ${LATE_MOUNT:-0} == 1 ]] && print -r -- "/dev/disk85s1 on $PWD/.cfw_temp/sub (apfs, local)" >> "$TEST_MOUNTS"
 print ready > "$PWD/ready"
 sleep ${INSTALL_SLEEP:-0.2}
 exit ${INSTALL_EXIT:-0}
@@ -173,8 +176,31 @@ exit ${INSTALL_EXIT:-0}
         vm, proc = self.start(SUDO_USER='test-user')
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
+        chowns = [l for l in (self.root / 'calls').read_text().splitlines() if l.startswith('chown ')]
+        real = vm.resolve()
+        self.assertEqual(sorted(chowns), [f'chown -Rx test-user {real}/.cfw_temp', f'chown -Rx test-user {real}/cfw_input'])
+        self.assertIn('restored ownership', output)
+
+    def test_late_mount_beneath_vm_only_skips_ownership_restore(self):
+        vm, proc = self.start(SUDO_USER='test-user', LATE_MOUNT='1')
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
         calls = (self.root / 'calls').read_text()
-        self.assertNotIn(f'chown -R test-user {vm}', calls)
+        self.assertIn('apfs_snap_rename.py', calls)
+        self.assertNotIn('chown ', calls)
+        self.assertIn('NOT restored', output)
+
+    def test_stray_file_in_mount_dir_is_retained_without_failing_install(self):
+        vm, proc = self.start(STRAY_FILE='1')
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        calls = (self.root / 'calls').read_text()
+        self.assertIn('hdiutil detach /dev/disk91', calls)
+        self.assertIn('apfs_snap_rename.py', calls)
+        retained = list(vm.glob('.cfw_mount.*/mnt1/leftover'))
+        self.assertEqual(len(retained), 1)
+        self.assertFalse(list(vm.glob('.cfw_mount.*/attach.log')))
+        self.assertIn('unexpected files retained', output)
 
     def test_interrupt_cleans_owned_mounts_and_preserves_signal_status(self):
         vm, proc = self.start(INSTALL_SLEEP='30')

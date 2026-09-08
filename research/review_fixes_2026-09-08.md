@@ -53,11 +53,30 @@ make build
 
 驱动不强制卸载、不删除残留挂载目录内的数据；未知 attach 输出无法确认设备时保留记录并报错。未挂载的旧空目录不会自动清理。
 
+清理的致命条件只包括卷卸载失败和镜像分离失败。所有挂载释放且镜像分离后，目录删除为尽力而为：`.cfw_mount.*` 内出现普通文件时保留该目录并输出 `[!]` 警告，安装继续翻转快照并以退出码 0 结束。安装完成后的属主恢复不再是致命断言：此时 VM 目录下若存在与本次无关的挂载，脚本跳过 `chown` 并输出手动恢复命令，退出码仍为 0。回归：`test_stray_file_in_mount_dir_is_retained_without_failing_install`、`test_late_mount_beneath_vm_only_skips_ownership_restore`；`test_ownership_restoration_never_recurses_over_bundle` 现由假安装器创建 `.cfw_temp` 和 `cfw_input`，断言 `chown -Rx` 只作用于这两个目录。以上三项在修复前脚本上前两项失败。
+
 ## 触控验证边界
 
 路由测试覆盖原生手势中来宾连接、来宾手势中断连及重连、结束后新手势。Objective-C 测试直接编译实际 HID 实现，替换 IOKit 函数边界，确认释放事件使用最后坐标、重复 reset 不产生额外事件、孤立 move/up 被忽略。它不证明 BackBoard 接收或显示触控结果。
 
 来宾新增 `vp_hid_touch_reset`，必须部署新 `vphoned` 才有会话结束释放行为。现有运行中的 `vm-2607` 有健康监控，本次未重启、未部署或注入触控。26.x 真实点击、拖动、边缘手势仍需验证；来宾协议仍不携带 VZ `swipeAim`，不能宣称两条路径等价。
+
+### 26.x 来宾路径实机验证（2026-09-08）
+
+实验设置：VM `rig-baseline`（iPhone17,3，iOS 26.6.1 + cloudOS 26.4，exp 变体），`vm launch rig-baseline -vv`，主机 macOS 26.5 25F71，`amfidont` 已运行。启动后主机按哈希把新构建的 `vphoned`（sha256 `99b4e493…`，含 `vp_hid_touch_reset`）推入来宾；`file_get` 取回 `/var/root/Library/Caches/vphoned` 与主机 `.build/vphoned.signed` 哈希一致，来宾进程 06:43:42 重启，握手 caps 含 `touch`。路由证据：`useGuestTouchInjection` 只取决于连接状态与 `touch` 能力，桥接 `shell` 命令可用即连接成立；启动器 stdout 重定向到文件后被缓冲，验证期间 `guest-side touch injection enabled` 行未出现；`vm stop rig-baseline` 停止 VM 后日志刷出，两次握手（vphoned 推送前后）各记录一行 `[control] guest-side touch injection enabled (iOS 26.6.1)`，第二行紧随含 `touch` 的 caps 握手行。来宾路径生效有日志直接证据。手势通过 `vphone.sock` 的 `tap`/`swipe` 注入，经 `mouseDown`/`mouseDragged`/`mouseUp` 进入同一触控路由；判定依据为 `screenshot` 全分辨率截图。
+
+| 手势 | 输入 | 结果 |
+| --- | --- | --- |
+| 点按（休眠屏幕） | tap (645,1400) | 无反应；截图与 4 分钟前逐字节相同。电源键唤醒后时钟更新。来宾路径的点按不触发轻点唤醒 |
+| 上滑解锁 | swipe (645,2720)→(645,1000) 250ms | 锁屏进入主屏幕 |
+| 点按按钮 | tap 弹窗"以后" | 弹窗关闭 |
+| 点按图标 | tap 设置 | 设置应用打开 |
+| 拖动滚动 | swipe (645,2200)→(645,900) 300ms | 设置列表滚动 |
+| 顶部右侧下滑 | swipe (1150,5)→(1150,1400) 300ms | 控制中心打开 |
+| 底部边缘上滑回主屏 | (645,2790)→(645,1600) 250ms；(645,2795)→(645,1300) 150ms；(645,2795)→(645,1800) 600ms | 第一次只滚动列表，后两次无任何变化，均未回到主屏 |
+| home 键 | key home | 回到主屏幕 |
+
+结论：26.x 来宾路径的点按、拖动、顶部边缘手势已验证；底部边缘回主屏手势未触发，原因未查明。待验证假设：归一化坐标在底部边缘处未落入系统手势识别区；来宾 HID 事件缺少原生路径携带的 `swipeAim` 或边缘属性。原生 VZ 路径在同一来宾上未做对照，不能判断该差异是否为来宾路径独有。 停止方式为 `vm stop` 发送 SIGINT，启动器最后一行为 `Stopped with error: VZErrorDomain Code=1 "The virtual machine stopped unexpectedly."`，日志中未出现 `SIGINT — shutting down` 行；`vm stop` 用 `lsof -t -- Disk.img` 选取目标，本次得到的 pid 80614 不属于 `ps` 列出的两个 vphone-cli 进程（启动器 80577、GUI 80612）；推断 SIGINT 发给了 Virtualization 框架持有磁盘镜像的 VM 辅助进程，GUI 进程因此收到 `didStopWithError` 而非执行自身的 SIGINT 关机路径。该推断待在下次运行时用 `lsof -- Disk.img` 与 `ps -o ppid` 核对。`app_foreground` 在该来宾上始终返回 `source=unknown`，不能作为判定依据。
 
 ## 证据与文档可移植性
 
@@ -65,7 +84,7 @@ make build
 
 ## 已确认的运行限制
 
-`make build` 与 `make vphoned` 成功，主机 release 与 app 的 `codesign --verify --strict` 均通过。但两者执行 `--help` 均返回 `-9`（SIGKILL），stdout 和 stderr 均为空，原因未查明。此前 B2 已记录同类现象，本次未修改系统安全设置或移除生产二进制私有权限来绕过它。26.x 真实触控与完整 CFW 安装仍未完成，因此 B3 保持未开始。
+`make build` 与 `make vphoned` 成功，主机 release 与 app 的 `codesign --verify --strict` 均通过。但两者执行 `--help` 均返回 `-9`（SIGKILL），stdout 和 stderr 均为空。原因已查明：验收会话从内核日志取得 `AMFI: Code has restricted entitlements, but the validation of its code signature failed` 与 `AMFI: hook..execve() killing zsh: Attempt to execute completely unsigned code`；本机 `csrutil status` 为 Custom Configuration，`pgrep amfidont` 为空，即 README Option 2 所需的放行守护进程未运行。ad-hoc 签名无法满足 `com.apple.private.virtualization` 等受限权限，AMFI 在 execve 阶段终止进程，因此没有输出。这不是代码缺陷。2026-09-08 后续会话再次执行 release `--help` 得到退出码 137，`amfidont` 仍未运行；该会话的 `log show` 未检索到上述 AMFI 行，日志原文以验收会话记录为准。放行方式：以 root 运行 `scripts/start_amfidont_for_vphone.sh`（或 `make amfidont_allow_vphone`），守护进程按 `--path` 前缀匹配，不随开机启动。2026-09-08 已获批准并以 root 启动该守护进程（`--path` 项目根，两个 cdhash，`--spoof-apple`），随后 release 与 app 的 `--help` 均返回 0。守护进程重启后失效。此前 B2 已记录同类现象，本次未修改系统安全设置或移除生产二进制私有权限来绕过它。26.x 真实触控与完整 CFW 安装仍未完成，因此 B3 保持未开始。
 
 原生 attach 测试曾发现 APFS plist 同时列出物理磁盘与合成容器。解析现优先选取 `GUID_partition_scheme` 等分区表实体；无分区表时只有唯一基础设备才接受，歧义时保留输出并停止。新增回归覆盖该实际输出形状。测试失败留下的临时设备已通过 `hdiutil info -plist` 确认归属并普通分离；原生测试也已补充异常退出后的镜像清理。
 
@@ -74,6 +93,7 @@ make build
 | 验证 | 结果 |
 | --- | --- |
 | `make test` | 退出 0：Python 53、Swift Testing 196、XCTest 20，共 269 项通过 |
+| `make test_python`（2026-09-08 cleanup/属主修复后） | 退出 0：Python 55 项通过，新增 2 项主机驱动回归；Swift 集未重跑 |
 | 同一 VM Shell 入口及 CFW 回归 | 13 项通过，已包含在 Python 53 项内 |
 | 原生 APFS/AEA | 通过；测试密钥解密、工具失败时保留缓存、错误输出不发布缓存 |
 | 真实已解密 SystemOS | 上表两个专用副本通过；未验证 Apple 密钥获取 |
@@ -83,7 +103,7 @@ make build
 | `make build` | 退出 0，release 与 app 构建完成 |
 | 主机 `codesign --verify --strict` | release 与 app 均退出 0 |
 | 四个修改后安装脚本 `zsh -n`、`git diff --check` | 通过 |
-| 签名主机程序 `--help` | release 与 app 均 SIGKILL，返回 -9，无输出；原因未查明 |
+| 签名主机程序 `--help` | release 与 app 均 SIGKILL，返回 -9，无输出；原因为 AMFI 拒绝受限权限的 ad-hoc 签名且 `amfidont` 未运行，见「已确认的运行限制」 |
 
 构建仍报告既有 `VPhoneMenuRecord.swift` 的 `shouldReveal` 未使用警告；本次未修改该文件。快速测试不包含固件夹具集，不能据此宣称固件补丁验证通过。
 

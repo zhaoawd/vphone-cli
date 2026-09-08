@@ -146,18 +146,19 @@ cleanup() {
       failed=1
     fi
   fi
-  if (( failed == 0 )); then
-    # Only empty mountpoint directories are removed. Never recurse into a
-    # filesystem that failed to unmount or delete unrelated installer data.
-    rm -f "$CFW_HOST_MNT/attach.log" || failed=1
-    local dir
-    for dir in "$CFW_HOST_MNT"/*(N/); do
-      rmdir "$dir" || failed=1
-    done
-    (( failed )) || rmdir "$CFW_HOST_MNT" || failed=1
-  fi
-  (( failed == 0 )) || print -u2 -- "[-] cleanup incomplete; retained $CFW_HOST_MNT"
-  return "$failed"
+  (( failed == 0 )) || { print -u2 -- "[-] cleanup incomplete; retained $CFW_HOST_MNT"; return 1; }
+  # Every mount beneath the directory is released and the image is detached,
+  # which is all the offline snapshot flip requires. Directory removal is
+  # best-effort: only empty mountpoint directories are removed, and stray files
+  # keep the directory in place with a warning rather than failing the install.
+  rm -f "$CFW_HOST_MNT/attach.log" || true
+  local dir retained=0
+  for dir in "$CFW_HOST_MNT"/*(N/); do
+    rmdir "$dir" 2>/dev/null || retained=1
+  done
+  (( retained )) || rmdir "$CFW_HOST_MNT" 2>/dev/null || retained=1
+  (( retained == 0 )) || print -u2 -- "[!] mounts released; unexpected files retained in $CFW_HOST_MNT (inspect and remove manually)"
+  return 0
 }
 finish() {
   local original=$?
@@ -210,14 +211,21 @@ fi
 # cfw_input/cfw_jb_input, the vphoned build) back to the invoking user, so the
 # subsequent user-run steps (make boot / setup_machine first boot, which rewrite
 # vm/.vphoned.signed) don't hit "Permission denied".
+# The install is complete and the snapshot flipped by now; a mount that
+# appeared beneath the VM directory meanwhile (not from this invocation, whose
+# mounts were released by cleanup) only downgrades the ownership step to a
+# warning. Never fail a finished install here, and never chown across it.
 if [[ -n "${SUDO_USER:-}" ]]; then
-  assert_no_vm_mounts
-  for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input; do
-    [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
-    chown -Rx "$SUDO_USER" "$VM_DIR/$artifact"
-  done
-  [[ -e "$PROJ/scripts/vphoned/vphoned" ]] && chown "$SUDO_USER" "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
-  echo "[*] restored ownership of host-side artifacts to $SUDO_USER"
+  if assert_no_vm_mounts; then
+    for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input; do
+      [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
+      chown -Rx "$SUDO_USER" "$VM_DIR/$artifact"
+    done
+    [[ -e "$PROJ/scripts/vphoned/vphoned" ]] && chown "$SUDO_USER" "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
+    echo "[*] restored ownership of host-side artifacts to $SUDO_USER"
+  else
+    echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $SUDO_USER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input}" >&2
+  fi
 fi
 
 echo "[+] host-mode CFW install complete. Boot with: make boot"
