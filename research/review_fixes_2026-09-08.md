@@ -108,3 +108,28 @@ make build
 构建仍报告既有 `VPhoneMenuRecord.swift` 的 `shouldReveal` 未使用警告；本次未修改该文件。快速测试不包含固件夹具集，不能据此宣称固件补丁验证通过。
 
 原始日志保存在当前工作区被 Git 忽略的 `research/artifacts/review-fixes-2026-09-08/`，其他 checkout 不保证具有这些文件。以上结果与样本元数据直接保存在本跟踪文档中，便于跨机器核对。
+
+## `vm stop` 目标进程选取修复（2026-09-08）
+
+问题：`vm stop` 用 `lsof -t -- <bundle>/Disk.img` 选取信号目标。磁盘镜像由 Virtualization 框架的 VM 辅助进程打开，不由 vphone-cli 打开，因此该命令把 SIGINT 发给辅助进程。现象：GUI/引导进程收到 `didStopWithError`，输出 `Stopped with error: VZErrorDomain Code=1 "The virtual machine stopped unexpectedly."` 并以失败退出，其自身 SIGINT 处理路径（打印 `[vphone] SIGINT — shutting down` 后 `NSApp.terminate`）不执行。本节修复该选取方式；上文「26.x 来宾路径实机验证」记录的同一现象与此为同一问题。
+
+修复：
+
+1. 新增 [`VPhoneBootProcessLocator`](../sources/VPhoneCore/VPhoneLaunchLayout.swift)。输入 `ps -axo pid=,command=` 输出与 bundle 的 `config.plist` 路径，输出命令行为 vphone-cli 且含 `--config <该路径>`（或 `--config=<该路径>`）的 pid，去重并排序。可执行文件按路径末段等于 `vphone-cli` 判定，覆盖 `.build/.../vphone-cli` 与 `vPhone.app/Contents/MacOS/vphone-cli`。路径按原样、标准化、符号链接解析三种写法比对；`resolvingSymlinksInPath()` 在末段不存在时不解析，故额外比对「父目录解析后 + 原末段」一种写法。函数为纯字符串到 pid 数组，可单元测试。
+2. 新增 [`VPhoneVMLockProbe.isLockHeld`](../sources/VPhoneCore/VPhoneVMLock.swift)：直接以 `O_RDONLY|O_DIRECTORY` 打开 bundle 目录并尝试 `flock(LOCK_EX|LOCK_NB)`，成功则立即释放并判定未运行。不使用 `VPhoneVMLock` 探测，因为获取该锁会用探测进程改写 `.vphone-runtime.json`。
+3. [`VPhoneVMStopCommand`](../sources/vphone-cli/VPhoneVMLaunchCLI.swift) 移除 `lsof` 调用：先用上述 flock 探测判定运行状态，未持锁时输出 `<name>: not running`；持锁时用 `ps` 定位目标。运行记录 `.vphone-runtime.json` 只作为佐证：其 `pid` 仅在 `operation` 为 `boot`/`dfu`、`kill(pid, 0)` 成活且 `ps` 同样确认该 pid 为本 bundle 的 `--config` 进程时才算目标，此条件下该 pid 已在 `ps` 结果内，故记录不新增目标，仅用于「持锁但无目标」时说明持锁方（例如 export 等其他操作），此时输出错误并以非零码退出，不发送任何信号。目标存在时发送 SIGINT，按 `--timeout` 秒轮询 `kill(pid, 0)`（`ESRCH` 视为已退出），超时后对存活者发送 SIGKILL。输出格式不变。
+4. `boot`/`dfu` 两个 operation 字符串改为 [`VPhoneVMRuntimeState`](../sources/VPhoneCore/VPhoneVMRuntimeState.swift) 常量，并新增 `isBootOperation` 与只读的 `read(in:)`；`VPhoneAppDelegate` 取锁处改用同一常量。SIGINT 处理本身未修改。
+
+`VPhoneLsof` 保留（其单元测试仍在），当前无调用方。
+
+验证：
+
+| 验证 | 结果 |
+| --- | --- |
+| `make build` | 退出 0，release 与 app 构建并签名完成 |
+| `swift test --filter LaunchLayoutTests` | 12 项通过（新增 5 项定位器用例：命中 `--config`、忽略其他 bundle 与仅提及路径的进程、忽略 `vm launch` 启动器行、`.app` 内二进制与 `--config=` 形式、去重排序与畸形行、符号链接路径） |
+| `swift test --filter VMLockTests` | 10 项通过 |
+
+实机验证（主机 macOS 26.5 25F71，`amfidont` 运行中 pid 79216，VM `rig-baseline`）：`vm launch rig-baseline --headless -vv` 输出重定向到文件。`ps` 显示启动器 pid 90083、引导进程 pid 90117（`.build/arm64-apple-macosx/release/vphone-cli --config /Users/kolar/.vphone/VMs/rig-baseline/config.plist --headless`）；`lsof -t -- Disk.img` 得到 pid 90118，其命令行为 `/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine`。这直接证实磁盘镜像持有者是框架辅助进程而非 vphone-cli，上文「待核对」的推断由此确认。`.vphone-runtime.json` 记录 `pid 90117`、`operation "boot"`。`vm stop rig-baseline` 输出 `rig-baseline: sending SIGINT to 90117` 与 `rig-baseline: stopped`，退出 0；未出现 force-killing。停止后日志最后的框架行为 `[vphone] SIGINT — shutting down`，日志中无 `Stopped with error`；启动器与引导进程均已退出，`lsof -- Disk.img` 无输出，`Virtualization.VirtualMachine` 辅助进程消失；再次执行 `vm stop rig-baseline` 输出 `rig-baseline: not running`。
+
+未验证项：`--timeout` 超时后的 SIGKILL 分支、`dfu` 引导的停止、`.app` 内二进制的实机停止、「持锁但无引导目标」的错误分支均只有单元或代码级依据，未实机触发。本次运行前已存在的 `com.apple.Virtualization.EventTap` 进程（pid 80619，属于修复前那次会话）在本次停止后仍存在，本次未处理；其残留原因未查明。引导进程 stdout 重定向到文件时为块缓冲，`[vphone] VM started` 等 `print` 行只在进程退出后刷出，验证期间只能用 `ps` 与 `FileHandle` 直写的 `[vphone] VM lock acquired` 判断进度。

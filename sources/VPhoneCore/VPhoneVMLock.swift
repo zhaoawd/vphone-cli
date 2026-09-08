@@ -12,6 +12,29 @@ public enum VPhoneVMLockError: Error, CustomStringConvertible {
     }
 }
 
+// MARK: - VPhoneVMLockProbe
+
+/// Non-destructive liveness probe for a VM bundle.
+///
+/// `VPhoneVMLock` cannot serve as a probe: acquiring it rewrites
+/// `.vphone-runtime.json` with the probing process. This takes the same
+/// directory flock directly and releases it immediately, leaving the record of
+/// the real holder intact.
+public enum VPhoneVMLockProbe {
+    /// True when some process holds the bundle directory's exclusive flock.
+    public static func isLockHeld(directory: URL) -> Bool {
+        let directory = directory.resolvingSymlinksInPath().standardizedFileURL
+        let fd = open(directory.path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
+        guard fd >= 0 else { return false }
+        defer { close(fd) }
+        guard flock(fd, LOCK_EX | LOCK_NB) == 0 else { return true }
+        _ = flock(fd, LOCK_UN)
+        return false
+    }
+}
+
+// MARK: - VPhoneVMLock
+
 /// Locks the directory inode; deleting a diagnostic/lock file cannot bypass it.
 /// Hold this object for the entire operation. Child boot processes acquire their
 /// own lock; ordinary subprocesses must not inherit this descriptor.

@@ -104,29 +104,59 @@ struct VPhoneVMStopCommand: ParsableCommand {
     @Argument(help: "VM name") var name: String?
     @Option(name: .shortAndLong, help: "Seconds to wait for graceful shutdown before SIGKILL") var timeout: Int = 20
 
+    /// PIDs of vphone-cli processes booted against this bundle's config.
+    ///
+    /// Deliberately NOT `lsof Disk.img`: the disk image is held open by the
+    /// Virtualization.framework helper process, so signalling the file holder
+    /// tears the VM out from under vphone-cli (`VZErrorDomain Code=1`) instead
+    /// of letting its SIGINT handler shut down.
+    private static func bootPIDs(configURL: URL) -> [Int32] {
+        guard let ps = try? VPhoneProcessRunner.runCapturing(
+            URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="]) else { return [] }
+        return VPhoneBootProcessLocator.parsePIDs(ps.stdout, configURL: configURL)
+    }
+
+    private static func isAlive(_ pid: Int32) -> Bool {
+        // ESRCH is the only "gone" answer; EPERM still means the pid exists.
+        kill(pid, 0) == 0 || errno != ESRCH
+    }
+
     func run() throws {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
-        let disk = bundle.url.appendingPathComponent(bundle.manifest.diskImage)
 
-        func runningPIDs() -> [Int32] {
-            guard let r = try? VPhoneProcessRunner.runCapturing(
-                URL(fileURLWithPath: "/usr/sbin/lsof"), ["-t", "--", disk.path]) else { return [] }
-            return VPhoneLsof.parsePIDs(r.stdout)
+        // The kernel flock on the bundle directory is the authoritative liveness
+        // signal; the runtime record is only a hint.
+        guard VPhoneVMLockProbe.isLockHeld(directory: bundle.url) else {
+            print("\(name): not running")
+            return
         }
 
-        let pids = runningPIDs()
-        guard !pids.isEmpty else { print("\(name): not running"); return }
+        let targets = Self.bootPIDs(configURL: bundle.configURL)
+        // The runtime record is only corroborating evidence: a recorded boot pid
+        // counts as a target solely when ps confirms it is a vphone-cli --config
+        // process for THIS bundle (a stale record may name a reused pid), and
+        // such a pid is already in `targets`. So the record never adds a target;
+        // below it only explains who holds the lock when no target was found.
+        guard !targets.isEmpty else {
+            var detail = "no vphone-cli boot process is running for it"
+            if let record = VPhoneVMRuntimeState.read(in: bundle.url), Self.isAlive(record.pid) {
+                detail = "it is held by pid \(record.pid) running operation \"\(record.operation)\""
+            }
+            FileHandle.standardError.write(Data(
+                "error: \(name): bundle lock is held but \(detail) — not signalling anything\n".utf8))
+            throw ExitCode(1)
+        }
 
-        print("\(name): sending SIGINT to \(pids.map(String.init).joined(separator: ", "))")
-        for pid in pids { kill(pid, SIGINT) }
+        print("\(name): sending SIGINT to \(targets.map(String.init).joined(separator: ", "))")
+        for pid in targets { kill(pid, SIGINT) }
 
         var waited = 0
-        while waited < timeout, !runningPIDs().isEmpty {
+        while waited < timeout, targets.contains(where: Self.isAlive) {
             Thread.sleep(forTimeInterval: 1)
             waited += 1
         }
-        let survivors = runningPIDs()
+        let survivors = targets.filter(Self.isAlive)
         if !survivors.isEmpty {
             print("\(name): force-killing \(survivors.map(String.init).joined(separator: ", "))")
             for pid in survivors { kill(pid, SIGKILL) }

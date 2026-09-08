@@ -27,6 +27,72 @@ struct LaunchLayoutTests {
         #expect(VPhoneLsof.parsePIDs("") == [])
     }
 
+    // MARK: - Boot process locator
+
+    @Test func locatesBootProcessByConfigArgument() {
+        let ps = """
+        80577 /repo/.build/release/vphone-cli vm launch rig-baseline --headless -vv
+        80612 /repo/.build/release/vphone-cli --config /Users/u/.vphone/VMs/rig-baseline/config.plist --headless
+        80614 /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine
+        """
+        #expect(VPhoneBootProcessLocator.parsePIDs(
+            ps, configPaths: ["/Users/u/.vphone/VMs/rig-baseline/config.plist"]) == [80612])
+    }
+
+    @Test func ignoresOtherBundlesAndUnrelatedProcesses() {
+        let ps = """
+        101 /repo/.build/release/vphone-cli --config /Users/u/.vphone/VMs/other/config.plist --headless
+        102 /usr/bin/tail -f /Users/u/.vphone/VMs/rig-baseline/config.plist
+        103 /bin/cat /Users/u/.vphone/VMs/rig-baseline/config.plist
+        104 /repo/.build/release/vphone-cli vm config rig-baseline --show /Users/u/.vphone/VMs/rig-baseline/config.plist
+        105 /repo/.build/release/vphone-cli vm stop rig-baseline
+        """
+        #expect(VPhoneBootProcessLocator.parsePIDs(
+            ps, configPaths: ["/Users/u/.vphone/VMs/rig-baseline/config.plist"]).isEmpty)
+    }
+
+    @Test func matchesBundledAppBinaryAndEqualsForm() {
+        let ps = """
+        201 /Applications/vPhone.app/Contents/MacOS/vphone-cli --config /vms/a/config.plist
+        202 /Applications/vPhone.app/Contents/MacOS/vphone-cli --config=/vms/a/config.plist --dfu
+        """
+        #expect(VPhoneBootProcessLocator.parsePIDs(ps, configPaths: ["/vms/a/config.plist"]) == [201, 202])
+    }
+
+    @Test func dedupsSortsAndSkipsMalformedLines() {
+        let ps = """
+        \(String(repeating: " ", count: 4))300 vphone-cli --config /vms/a/config.plist
+        200 vphone-cli --config /vms/a/config.plist
+        200 vphone-cli --config /vms/a/config.plist
+        notapid vphone-cli --config /vms/a/config.plist
+        400
+        vphone-cli --config /vms/a/config.plist
+        """
+        #expect(VPhoneBootProcessLocator.parsePIDs(ps, configPaths: ["/vms/a/config.plist"]) == [200, 300])
+        #expect(VPhoneBootProcessLocator.parsePIDs("", configPaths: ["/vms/a/config.plist"]).isEmpty)
+        #expect(VPhoneBootProcessLocator.parsePIDs("200 vphone-cli --config /vms/a/config.plist",
+                                                   configPaths: []).isEmpty)
+    }
+
+    @Test func matchesEitherRawOrResolvedConfigPath() throws {
+        // A symlinked library root: the boot process may carry either spelling.
+        let real = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString).resolvingSymlinksInPath()
+        let bundleDir = real.appendingPathComponent("rig")
+        try FileManager.default.createDirectory(at: bundleDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: real) }
+        let link = real.appendingPathComponent("link")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: bundleDir)
+
+        let viaLink = link.appendingPathComponent("config.plist")
+        let variants = VPhoneBootProcessLocator.configPathVariants(for: viaLink)
+        #expect(variants.contains(viaLink.path))
+        #expect(variants.contains(bundleDir.appendingPathComponent("config.plist").path))
+        #expect(VPhoneBootProcessLocator.parsePIDs(
+            "700 vphone-cli --config \(bundleDir.appendingPathComponent("config.plist").path)",
+            configURL: viaLink) == [700])
+    }
+
     @Test func stageVphonedCopiesWhenSourceExists() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(
