@@ -133,3 +133,73 @@ make build
 实机验证（主机 macOS 26.5 25F71，`amfidont` 运行中 pid 79216，VM `rig-baseline`）：`vm launch rig-baseline --headless -vv` 输出重定向到文件。`ps` 显示启动器 pid 90083、引导进程 pid 90117（`.build/arm64-apple-macosx/release/vphone-cli --config /Users/kolar/.vphone/VMs/rig-baseline/config.plist --headless`）；`lsof -t -- Disk.img` 得到 pid 90118，其命令行为 `/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine`。这直接证实磁盘镜像持有者是框架辅助进程而非 vphone-cli，上文「待核对」的推断由此确认。`.vphone-runtime.json` 记录 `pid 90117`、`operation "boot"`。`vm stop rig-baseline` 输出 `rig-baseline: sending SIGINT to 90117` 与 `rig-baseline: stopped`，退出 0；未出现 force-killing。停止后日志最后的框架行为 `[vphone] SIGINT — shutting down`，日志中无 `Stopped with error`；启动器与引导进程均已退出，`lsof -- Disk.img` 无输出，`Virtualization.VirtualMachine` 辅助进程消失；再次执行 `vm stop rig-baseline` 输出 `rig-baseline: not running`。
 
 未验证项：`--timeout` 超时后的 SIGKILL 分支、`dfu` 引导的停止、`.app` 内二进制的实机停止、「持锁但无引导目标」的错误分支均只有单元或代码级依据，未实机触发。本次运行前已存在的 `com.apple.Virtualization.EventTap` 进程（pid 80619，属于修复前那次会话）在本次停止后仍存在，本次未处理；其残留原因未查明。引导进程 stdout 重定向到文件时为块缓冲，`[vphone] VM started` 等 `print` 行只在进程退出后刷出，验证期间只能用 `ps` 与 `FileHandle` 直写的 `[vphone] VM lock acquired` 判断进度。
+
+## 底部边缘回主屏手势：原生 VZ 路径与来宾路径对照（2026-09-09）
+
+本节回答上文「26.x 来宾路径实机验证」留下的问题：底部边缘上滑回主屏失败是否为来宾 HID 注入路径独有。结论是不独有：两条路径在同一来宾上都不触发该手势。原因仍未查明。
+
+### 实验设置
+
+VM `rig-baseline`（iPhone17,3，iOS 26.6.1，exp 变体），`screenConfig` 为 `width=1290`、`height=2796`、`scale=3`，即 `VZVirtualMachineView` 的 `bounds` 为 430x932 点。主机 `amfidont` 运行中。全部手势通过 `~/.vphone/VMs/rig-baseline/vphone.sock` 的 `tap`/`swipe` 注入，判定依据为 `screenshot` 写出的全分辨率 PNG 文件。
+
+两次启动：
+
+1. `vm launch rig-baseline --no-vphoned -vv`。已确认：该模式下桥接 socket 仍然监听（`[hostctl] listening on …/vphone.sock`），`tap`/`swipe`/`screenshot` 可用且走原生路径；`key`、`type`、`shell`、`file_*`、`app_*` 不可用，因为 `--no-vphoned` 不配置 vsock 设备（`sources/vphone-cli/VPhoneVirtualMachine.swift:244`），`VPhoneHostControl` 的这些分支要求 `control.isConnected`（`sources/vphone-cli/VPhoneHostControl.swift:435`、`494`、`542`）。该次启动未取得有效手势数据：来宾到达锁屏后显示休眠，三次截图逐字节相同（sha256 `8f62d607…`），锁屏时钟停在 08:42 而来宾日志已到 08:43:39，可判定为陈旧帧；该模式下无法用 `key power` 唤醒，`osascript` 向 VM 窗口发送按键被系统拒绝（“osascript 不允许发送按键”，未授予辅助功能权限）。
+2. `vm launch rig-baseline -vv`（正常启动）。用 `key power` 唤醒、来宾路径解锁并打开「设置」后，通过来宾 `shell` 启动后台循环 `killall -9 vphoned`（间隔 0.2 s，两段共约 250 s），使 `VPhoneControl.isConnected` 为假。此时 `touchSession` 为 nil（`sources/vphone-cli/VPhoneControl.swift:41`），`VPhoneTouchRoute` 在手势起点把该手势固定到 `.native`（`sources/vphone-cli/VPhoneTouchRoute.swift:11`），因此同一 bridge 的 `tap`/`swipe` 走 `_VZTouch` 原生路径。循环期间 `shell` 与 `key` 返回 `guest not connected`，与 `touchSession` 的判定条件同源，可作为路径切换的直接证据。循环结束后 launchd 恢复 vphoned，来宾路径恢复，日志共记录 3 行 `[control] guest-side touch injection enabled (iOS 26.6.1)`，握手 caps 含 `touch`。
+
+启动器 stdout 重定向到文件时为块缓冲，`[control]`、`[vphone]` 行只在进程退出后刷出；验证期间的路径判定依据为 socket 响应，日志用于事后核对。
+
+### 结果
+
+应用为「设置」，起点 x=645；「回主屏」指截图变为主屏幕。
+
+| 手势参数 | 来宾路径 | 原生 VZ 路径 | 原生路径 `swipeAim` |
+| --- | --- | --- | --- |
+| (645,2790)→(645,1600) 250 ms | 未回主屏 | 未回主屏 | 2（底部） |
+| (645,2795)→(645,1300) 150 ms | 未回主屏 | 未回主屏 | 2（底部） |
+| (645,2795)→(645,1800) 600 ms | 未回主屏 | 未回主屏 | 2（底部） |
+| (645,2600)→(645,1000) 100 ms | 未回主屏 | 未回主屏 | 0 |
+| (645,2700)→(645,300) 400 ms | 未回主屏 | 未回主屏 | 0 |
+| (645,2795)→(645,2000) 400 ms | 未测 | 未回主屏 | 2（底部） |
+| (645,2796)→(645,1600) 250 ms | 未回主屏 | 未回主屏 | 2（底部） |
+| `key home` | 回主屏 | 不可用（需 vsock） | — |
+
+`swipeAim` 列为按代码计算的值，不是运行时观测值：`pixelToLocal` 把像素 y 映射为视图点（`sources/vphone-cli/VPhoneVirtualMachineView.swift:171`），`hitTestEdge` 的边缘阈值为 32 点（同文件 `:324`），底部边缘码为 2（同文件 `:341`）。按 scale=3：y=2796→距底 0 点、2795→0.33 点、2790→2.0 点、2750→15.3 点、2700→32.0 点、2600→65.3 点；阈值判定为严格小于 32，故 y=2700 与 y=2600 得 0。
+
+同时测得的对照数据（灰度缩放到 48x104 后逐像素平均绝对差，数值越大表示画面变化越大）。列表先用两次 (645,1000)→(645,2400) 300 ms 滑到顶端并静置 1.5 s，两条路径使用同一协议：
+
+| 手势 | 来宾路径 | 原生 VZ 路径 |
+| --- | --- | --- |
+| 中部上滑 (645,2000)→(645,800/1200) 250–300 ms | 12.41（列表滚动） | 12.03（列表滚动） |
+| 边缘上滑 (645,2790)→(645,1600) 250 ms | 0.53 | 0.49 |
+| 边缘上滑 (645,2750)→(645,1550) 250 ms | 0.56 | 0.53 |
+
+两条路径的中部上滑都使列表滚动，两条路径的底部边缘上滑都既不回主屏也不滚动列表，数值差异在同一量级。
+
+另一项已验证事实：来宾路径的锁屏上滑解锁 (645,2790)→(645,1600) 250 ms 成功进入主屏幕。同一坐标带的上滑在锁屏上完成，在应用内不触发回主屏手势。原生路径未在锁屏上做对照（第 1 次启动因显示休眠失败）。
+
+### 代码差异（按当前分支）
+
+已验证的事实：
+
+1. 两条路径使用同一归一化结果。`sendTouchEvent` 先算 `normalizeCoordinate(localPoint)`，再选择路径（`sources/vphone-cli/VPhoneVirtualMachineView.swift:256`–`:296`）：来宾分支传该值（同文件 `:263`），原生分支把同一值放入 `_VZTouch`（同文件 `:281`）。`normalizeCoordinate` 先夹到 0..1 再翻转 y（同文件 `:300`–`:318`）。因此底部边缘的坐标取值在两条路径上相同，不存在只影响其中一条的取整或夹取差异。
+2. 主机侧两条路径唯一的字段差异是 `swipeAim`：原生分支传 `currentTouchSwipeAim`（同文件 `:282`），该值在 `mouseDown` 时由 `hitTestEdge` 计算一次（同文件 `:55`），`mouseDragged`/`mouseUp` 不重算；来宾协议的 `touch` 消息只含 `v`、`t`、`id`、`phase`、`x`、`y`（`sources/vphone-cli/VPhoneControl.swift:392`–`:399`），不含边缘码，也不含时间戳。
+3. 上表显示带 `swipeAim=2` 的原生手势同样不回主屏。因此「来宾 HID 事件缺少 `swipeAim` 或边缘属性」不足以解释该失败：补上等价属性不能由本次数据预期修复。
+4. 来宾侧事件构造（`scripts/vphoned/vphoned_hid.m:105`–`:130`、`:143`–`:164`）：父事件为 `kIOHIDDigitizerTransducerTypeHand`，子事件为一个 finger（identifier=1），两者都置 `kIOHIDEventFieldDigitizerIsDisplayIntegrated=1`（`:113`、`:118`），sender ID 固定 `0x8000000817319372`（`:126`），经 `IOHIDEventSystemClientDispatchEvent` 派发。掩码：按下为 `TOUCH|IDENTITY`，range=1、touch=1（`:149`）；移动为 `POSITION`，range=1、touch=1（`:154`）；抬起为 `TOUCH|IDENTITY`，range=0、touch=0（`:139`）。
+5. 原生路径经 `_VZTouch` + `_VZMultiTouchEvent` + `_multiTouchDevice sendMultiTouchEvents:`（同上视图文件 `:277`–`:294`）到 `_VZUSBTouchScreenConfiguration`（`sources/vphone-cli/VPhoneVirtualMachine.swift:233`）。已从 dyld 共享缓存导出 `Virtualization` 并确认存在符号 `-[_VZTouch initWithView:index:phase:location:swipeAim:timestamp:]`、`-[_VZTouch swipeAim]`、`-[_VZMultiTouchDevice sendMultiTouchEvents:]`。
+
+推断与待验证假设（本次未验证）：
+
+1. `swipeAim` 在 VZ 内部映射到哪个 USB HID 报告字段或 IOHIDEvent 字段：未追踪，含义待确认。它是否真正到达来宾同样未验证。
+2. 与 WebKit `HIDEventGenerator` 单指路径相比，来宾实现的移动事件掩码不含 `kIOHIDDigitizerEventAttribute`，finger 事件的主半径与压力为 0，父 hand 事件携带手指坐标而非 0。这些差异是否影响手势识别未验证，本次不据此改代码。
+3. 由于底部边缘上滑在两条路径上都不滚动列表（对照表 0.49–0.56，与中部上滑的 12 量级明显不同），推断该区域的触点被系统层拦截而未交给应用，但回主屏手势未完成。拦截方与未完成的原因未查明。
+
+### 结论与未完成项
+
+底部边缘回主屏手势在原生 VZ 路径与来宾 HID 路径上都不触发，失败不是来宾路径独有，原因未查明。因此本次未修改 `vphoned` 或主机归一化代码：没有证据支持任何具体改动。已排除的假设：底部边缘归一化坐标取值差异（两条路径同值，且 y=2796 即归一化 1.0 也失败）；来宾缺少 `swipeAim`（原生带 `swipeAim=2` 同样失败）。
+
+自动化上仍可用 `key home` 回主屏。
+
+停止方式为 `vm stop rig-baseline`，两次都输出 `sending SIGINT to <pid>` 后 `stopped`，随后 `vm stop` 报 `not running`，`pgrep` 无残留 vphone-cli 进程。修复前会话遗留的 `com.apple.Virtualization.EventTap`（pid 80619）本次仍存在，未处理。
+
+本次截图、启动器日志与判定脚本保存在被 Git 忽略的 `research/artifacts/touch-native-vs-guest-2026-09-09/`，其他 checkout 不保证具有这些文件。
