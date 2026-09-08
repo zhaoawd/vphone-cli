@@ -1,8 +1,10 @@
 import AppKit
 import Foundation
 import Virtualization
+import VPhoneCore
 
 class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
+    private var vmLock: VPhoneVMLock?
     private let cli: VPhoneBootCLI
     private var vm: VPhoneVirtualMachine?
     private var control: VPhoneControl?
@@ -47,6 +49,10 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private func startVirtualMachine() async throws {
+        // Acquire before reading or mutating the manifest and opening VM storage.
+        vmLock = try VPhoneVMLock(directory: cli.config.resolvingSymlinksInPath().deletingLastPathComponent(),
+                                  operation: cli.dfu ? "dfu" : "boot")
+        FileHandle.standardOutput.write(Data("[vphone] VM lock acquired\n".utf8))
         let options = try cli.resolveOptions()
 
         guard options.romURL == nil || FileManager.default.fileExists(atPath: options.romURL!.path) else {

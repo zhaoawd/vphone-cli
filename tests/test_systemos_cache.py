@@ -175,7 +175,7 @@ elif name == 'python-stub':
         # commands are shell functions; hdiutil attach is a failing double.
         scripts = self.base / "scripts"
         scripts.mkdir()
-        for name in ("cfw_install.sh", "cfw_install_dev.sh", "cfw_install_jb.sh", "cfw_install_exp.sh", "cache_systemos.py"):
+        for name in ("cfw_install.sh", "cfw_install_dev.sh", "cfw_install_jb.sh", "cfw_install_exp.sh", "cache_systemos.py", "vm_lock.py"):
             shutil.copyfile(ROOT / "scripts" / name, scripts / name)
         overlay = scripts / "resources/cfw_dev"
         overlay.mkdir(parents=True)
@@ -202,7 +202,7 @@ function mount() { return 0; }
                     env = dict(self.env, ZDOTDIR=str(zdot), _VPHONE_PATH=self.env["PATH"],
                                VPHONE_PYTHON=str(self.bin / "python-stub"),
                                CFW_HOST_CONTAINER="test-only", CFW_HOST_MNT=str(vm / "mounts"))
-                    result = subprocess.run(["/bin/zsh", str(scripts / f"cfw_install{variant}.sh"), str(vm)],
+                    result = subprocess.run([sys.executable, str(scripts / "vm_lock.py"), str(vm), "test", "--", "/bin/zsh", str(scripts / f"cfw_install{variant}.sh"), str(vm)],
                                             env=env, capture_output=True, text=True)
                     self.assertNotEqual(result.returncode, 0)  # stopped by the attach double
                     cache = vm / ".cfw_temp/CryptexSystemOS.dmg"

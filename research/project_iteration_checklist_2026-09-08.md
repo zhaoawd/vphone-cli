@@ -6,7 +6,7 @@
 
 目标：先建立可验证、可恢复的 VM 与固件流程，再完善无 GUI 自动化和多 VM 使用能力。
 
-本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；其他 25 项待执行。结果见[A1 测试基线](/Users/qcz3840/github/vphone-cli/research/test_baseline_2026-09-08.md)与[A2 验证记录](/Users/qcz3840/github/vphone-cli/research/systemos_cache_validation_2026-09-08.md)。
+本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交；其他 24 项待执行。结果见[A1 测试基线](/Users/qcz3840/github/vphone-cli/research/test_baseline_2026-09-08.md)与[A2 验证记录](/Users/qcz3840/github/vphone-cli/research/systemos_cache_validation_2026-09-08.md)。
 
 ## 一、建议现在开始的工作
 
@@ -98,15 +98,17 @@
 
 结果：`make test` 237 项通过，6 项主机隔离专项回归与专用 APFS 镜像实验通过。B1 与本记录一并独立提交。实际安装与验证限制见[B1 验证记录](/Users/qcz3840/github/vphone-cli/research/cfw_mount_isolation_2026-09-08.md)。A2 提交为 `2ac6c51`。
 
-### B2 — 建立跨入口的 VM 排他锁与运行记录【P0；依赖 A1】
+### B2 — 建立跨入口的 VM 排他锁与运行记录【已完成；2026-09-08】
 
 涉及：拟新增 `sources/VPhoneCore/VPhoneVMLock.swift`、`VPhoneVMRuntimeState.swift`；启动 CLI、AppDelegate、创建编排和 Shell 入口。
 
-- [ ] 选定 Swift 与 zsh 调用链能够共同遵守的锁机制；明确锁文件稳定位置、所有者和释放规则，避免锁在等待子进程期间丢失或误继承。
-- [ ] 将锁接入直接 `boot`、`vm launch`、创建中的 DFU/首启以及离线磁盘操作；运行记录包含 bundle 标识、PID、启动实例标识和启动时间，避免仅靠 PID 文件。
-- [ ] 测试重复启动、并发启动、正常退出、异常退出、过期记录、路径别名、子进程继承与两个不同 VM 的互不影响。
+- [x] 选定 Swift 与 zsh 调用链能够共同遵守的锁机制；明确锁文件稳定位置、所有者和释放规则，避免锁在等待子进程期间丢失或误继承。
+- [x] 将锁接入直接 `boot`、`vm launch`、创建中的 DFU/首启以及离线磁盘操作；运行记录包含 bundle 标识、PID、启动实例标识和启动时间，避免仅靠 PID 文件。
+- [x] 测试重复启动、并发启动、正常退出、异常退出、过期记录、路径别名、子进程继承与两个不同 VM 的互不影响。
 
 验收：同一 VM 不能被两个入口同时占用；异常退出后可恢复使用；不同 VM 不被错误串行化。不能通过 unlink 一个仍被持有的锁文件绕过锁。
+
+结果：目录 inode 上的 `flock` 已由 Swift 与 Shell 共用，运行记录不作为占用依据。251 项完整回归通过，最终配置调整后 38 项专项测试通过，构建与签名校验通过。生产签名程序被 SIGKILL，原因未查明；无私有权限临时副本的启动锁检查通过。详细接入范围、旧入口和实际 VM 验证限制见[B2 验证记录](/Users/qcz3840/github/vphone-cli/research/vm_lock_validation_2026-09-08.md)。B1 提交为 `32d1a5f`，B2 与本记录一并独立提交。
 
 ### B3 — 使停止操作只作用于目标 VM 进程【P0；依赖 B2】
 

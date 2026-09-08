@@ -55,6 +55,12 @@ fi
 export PATH="$P"
 PY="${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}"
 
+# Acquire after sudo, which may close inherited descriptors. The re-executed
+# operation tree must prove possession of the directory descriptor.
+if ! "$PY" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR"; then
+  exec "$PY" "$SCRIPT_DIR/vm_lock.py" "$VM_DIR" cfw -- /bin/zsh "$0" --variant "$VARIANT" "$VM_DIR"
+fi
+
 if lsof "$IMG" >/dev/null 2>&1; then
   echo "[-] $IMG is in use — stop the VM first." >&2; exit 1
 fi

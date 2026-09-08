@@ -92,6 +92,9 @@ public enum VPhoneBundleOps {
         networkMode: VPhoneVirtualMachineManifest.NetworkConfig.NetworkMode? = nil,
         bridgeInterface: String? = nil
     ) throws -> VPhoneBundle {
+        let directory = try library.bundle(named: name).url
+        let lock = try VPhoneVMLock(directory: directory, operation: "config")
+        defer { withExtendedLifetime(lock) {} }
         let bundle = try library.bundle(named: name)
         let editsNetwork = networkMode != nil || bridgeInterface != nil
         let network = editsNetwork
@@ -115,6 +118,8 @@ public enum VPhoneBundleOps {
     ) throws -> VPhoneBundle {
         try requireValidName(newName)
         let src = try library.bundle(named: name).url
+        let lock = try VPhoneVMLock(directory: src, operation: "bundle-change")
+        defer { withExtendedLifetime(lock) {} }
         let dst = library.url(forName: newName)
         if FileManager.default.fileExists(atPath: dst.path) {
             throw VPhoneLibraryError.alreadyExists(name: newName)
@@ -125,6 +130,8 @@ public enum VPhoneBundleOps {
 
     public static func delete(bundleNamed name: String, in library: VPhoneLibrary) throws {
         let url = try library.bundle(named: name).url
+        let lock = try VPhoneVMLock(directory: url, operation: "delete")
+        defer { withExtendedLifetime(lock) {} }
         try FileManager.default.removeItem(at: url)
     }
 
@@ -139,6 +146,8 @@ public enum VPhoneBundleOps {
     ) throws -> VPhoneBundle {
         try requireValidName(newName)
         let src = try library.bundle(named: name).url
+        let lock = try VPhoneVMLock(directory: src, operation: "bundle-change")
+        defer { withExtendedLifetime(lock) {} }
         let dst = library.url(forName: newName)
         let fm = FileManager.default
         if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: newName) }
@@ -154,7 +163,7 @@ public enum VPhoneBundleOps {
 
     private static func resetIdentity(inBundleAt dir: URL) throws {
         let fm = FileManager.default
-        for name in ["nvram.bin", "udid-prediction.txt"] {
+        for name in ["nvram.bin", "udid-prediction.txt", VPhoneVMRuntimeState.filename] {
             let u = dir.appendingPathComponent(name)
             if fm.fileExists(atPath: u.path) { try fm.removeItem(at: u) }
         }
@@ -192,7 +201,7 @@ public enum VPhoneBundleOps {
     /// `.vphoned.signed` is re-staged on the next launch, and the CFW install
     /// inputs/temp are consumed at install time (the result already lives in
     /// `Disk.img`). Always excluded.
-    static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*"]
+    static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*", "*.vphone-runtime.json"]
 
     /// When `to` is an existing directory, the archive is written inside it as
     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.
@@ -207,7 +216,9 @@ public enum VPhoneBundleOps {
         compression: ExportCompression = .fast, in library: VPhoneLibrary,
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> URL {
-        _ = try library.bundle(named: name)  // validate it exists
+        let bundle = try library.bundle(named: name)
+        let lock = try VPhoneVMLock(directory: bundle.url, operation: "export")
+        defer { withExtendedLifetime(lock) {} }
         var isDir: ObjCBool = false
         let outFile = FileManager.default.fileExists(atPath: outFile.path, isDirectory: &isDir) && isDir.boolValue
             ? outFile.appendingPathComponent("\(name).\(compression.fileExtension)")

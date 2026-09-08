@@ -1,6 +1,8 @@
 """Run the host driver with disposable installers and disk-command doubles."""
 import os
 from pathlib import Path
+import shutil
+import sys
 import signal
 import time
 import subprocess
@@ -17,6 +19,7 @@ class HostIsolationTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         scripts = self.root / 'scripts'
         scripts.mkdir()
+        shutil.copyfile(ROOT / "scripts/vm_lock.py", scripts / "vm_lock.py")
         driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()
         # Only bypass privilege escalation; no real disk commands are permitted.
         guard = 'if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then'
@@ -33,7 +36,7 @@ case "${0:t}:$1" in
  diskutil:info) [[ ${FAIL_DISCOVERY:-0} == 1 ]] && exit 9; print '<?xml version="1.0"?><plist version="1.0"><dict><key>APFSContainerReference</key><string>disk92</string></dict></plist>'; exit 0;;
  diskutil:apfs) print 'APFS Volume Disk (Role): disk92s1 (System)'; print 'Name: System (Case-sensitive)'; exit 0;;
  hdiutil:detach|diskutil:eject) exit ${FAIL_CLEANUP:-0};;
- python:*) exit 0;;
+ python:*) if [[ "$1" == */vm_lock.py ]]; then exec "$TEST_PYTHON" "$@"; fi; exit 0;;
 esac
 exit 0
 ''')
@@ -41,7 +44,7 @@ exit 0
         for name in ('lsof', 'hdiutil', 'diskutil', 'umount', 'python'):
             (bins / name).symlink_to(stub)
         self.env = dict(os.environ, TEST_LOG=str(self.root / 'calls'),
-                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1')
+                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable)
         self.env.pop('SUDO_USER', None)
         zdot = self.root / 'zdot'
         zdot.mkdir()
@@ -67,11 +70,17 @@ exit ${INSTALL_EXIT:-0}
         (vm / 'Disk.img').touch()
         proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', 'exp', str(vm)],
                                     env=dict(self.env, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
-        self.addCleanup(lambda: proc.poll() is None and proc.kill())
+        def stop():
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            proc.communicate(timeout=10)
+        self.addCleanup(stop)
         return vm, proc
 
     def finish(self, proc):
-        out, err = proc.communicate(timeout=10)
+        out, err = proc.communicate(timeout=30)
         return proc.returncode, (out + err).decode()
 
     def test_concurrent_runs_use_distinct_directories_and_remove_them(self):
@@ -93,7 +102,7 @@ exit ${INSTALL_EXIT:-0}
 
     def test_interrupt_cleans_owned_mounts_and_preserves_signal_status(self):
         vm, proc = self.start(INSTALL_SLEEP='30')
-        deadline = time.monotonic() + 5
+        deadline = time.monotonic() + 15
         while not (vm / 'ready').exists() and time.monotonic() < deadline:
             time.sleep(0.02)
         self.assertTrue((vm / 'ready').exists())

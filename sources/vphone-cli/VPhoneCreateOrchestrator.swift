@@ -16,6 +16,7 @@ private enum VPhoneCreateError: Error, CustomStringConvertible {
     case invalidUDID(String)
     case invalidECID(String)
     case udidECIDMismatch(udid: String, ecid: String)
+    case bootLockNotAcquired
     case recoveryTimeout
     case restoreGetSHSHFailed(Int32)
     case restoreUpdateFailed(Int32)
@@ -46,6 +47,8 @@ private enum VPhoneCreateError: Error, CustomStringConvertible {
             "invalid ECID in udid-prediction.txt: '\(v)'"
         case let .udidECIDMismatch(udid, ecid):
             "UDID/ECID mismatch in udid-prediction.txt: \(udid) vs 0x\(ecid)"
+        case .bootLockNotAcquired:
+            "DFU child did not acquire the VM lock; restore was not started"
         case .recoveryTimeout:
             "timed out waiting for the recovery/DFU endpoint"
         case let .restoreGetSHSHFailed(code):
@@ -228,9 +231,13 @@ public struct VPhoneCreateOrchestrator {
 
         // CFW install is the last consumer of the built restore tree (it copies
         // the SystemOS/AppOS cryptexes from it onto Disk.img); reclaim it now.
-        if !options.keepArtifacts, let bundle = try? VPhoneBundle.load(at: bundleURL),
-           let removed = try? VPhoneRestoreInfo.removeBuiltFirmware(fromBundle: bundle) {
-            print("[+] Removed built firmware \(removed)/ to save space (--keep-artifacts to keep)")
+        if !options.keepArtifacts {
+            let lock = try VPhoneVMLock(directory: bundleURL, operation: "cleanup-firmware")
+            defer { withExtendedLifetime(lock) {} }
+            if let bundle = try? VPhoneBundle.load(at: bundleURL),
+               let removed = try? VPhoneRestoreInfo.removeBuiltFirmware(fromBundle: bundle) {
+                print("[+] Removed built firmware \(removed)/ to save space (--keep-artifacts to keep)")
+            }
         }
 
         print("\n=== First boot ===")
@@ -324,7 +331,9 @@ public struct VPhoneCreateOrchestrator {
         trace("spawn /bin/bash \(resources.fwPrepareScript.path) (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR)", v)
         // Always streamed — silence during a multi-GB download reads as a hang.
         let code = try VPhoneProcessRunner.runStreaming(
-            URL(fileURLWithPath: "/bin/bash"), [resources.fwPrepareScript.path], cwd: bundleURL, env: env,
+            try resources.pythonExecutable(),
+            [resources.fwPrepareScript.deletingLastPathComponent().appendingPathComponent("vm_lock.py").path,
+             bundleURL.path, "fw-prepare", "--", "/bin/bash", resources.fwPrepareScript.path], cwd: bundleURL, env: env,
             echo: true)
         guard code == 0 else { throw VPhoneCreateError.fwPrepareFailed(code) }
         print("[+] Firmware prepared (iPhone + cloudOS merged into bundle).")
@@ -334,6 +343,8 @@ public struct VPhoneCreateOrchestrator {
         variant: PatchFirmwareCLI.VariantOption, isLess: Bool, enableFrida: Bool,
         bundleURL: URL, verbosity v: VPhoneVerbosity
     ) throws {
+        let lock = try VPhoneVMLock(directory: bundleURL, operation: "fw-patch")
+        defer { withExtendedLifetime(lock) {} }
         // Mirrors the Makefile's `ifeq ($(UID),0)` gate on `fw_patch_less` —
         // only the `less` variant requires root.
         if isLess, getuid() != 0 {
@@ -367,6 +378,9 @@ public struct VPhoneCreateOrchestrator {
             selfExecutable, ["--config", configURL.path, "--dfu"], cwd: bundleURL, echo: false)
         try dfu.start()
         defer { dfu.terminate() }
+        guard case .matched = dfu.waitForOutput(matching: "VM lock acquired", timeout: 30) else {
+            throw VPhoneCreateError.bootLockNotAcquired
+        }
 
         let (udid, ecid) = try loadDeviceIdentity(bundleURL: bundleURL)
         print("[+] Device identity loaded: UDID=\(udid) ECID=0x\(ecid)")

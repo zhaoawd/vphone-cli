@@ -48,6 +48,10 @@ _resolve_python3() {
     fi
 }
 PYTHON3="$(_resolve_python3)"
+"$PYTHON3" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR" || {
+    echo "[-] VM lock missing — run via cfw_install_host.sh" >&2
+    exit 1
+}
 
 # ── Configuration ───────────────────────────────────────────────
 CFW_INPUT="cfw_input"
