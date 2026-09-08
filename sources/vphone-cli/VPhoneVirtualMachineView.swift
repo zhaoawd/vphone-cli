@@ -255,9 +255,8 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     private func sendTouchEvent(phase: Int, localPoint: NSPoint, timestamp: TimeInterval) -> Bool {
         let normalizedPoint = normalizeCoordinate(localPoint)
 
-        // iOS 18 bases: the VZ USB touchscreen dext emits no digitizer events on
-        // the 26.x kernel, so route touches through vphoned's guest-side HID
-        // injection. 26.x bases fall through to the native VZ multitouch path.
+        // Prefer vphoned's guest-side HID path when available. This avoids
+        // relying on private VZ touch delivery after the guest is connected.
         if let control, control.useGuestTouchInjection {
             control.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y))
             return true

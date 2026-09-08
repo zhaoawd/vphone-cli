@@ -34,14 +34,11 @@ class VPhoneControl {
     private(set) var guestIOSVersion: String?
 
     /// Whether touches should be injected guest-side via vphoned rather than the
-    /// VZ USB touchscreen. True for iOS 18 bases: on the 26.x kernel their USB
-    /// touchscreen dext receives reports but emits no digitizer events, so the
-    /// UI never sees touches. 26.x bases keep the native VZ multitouch path.
+    /// VZ USB touchscreen. Prefer the guest path whenever vphoned reports the
+    /// capability: it is independent of host-private VZ touch event behavior and
+    /// also covers guests whose USB touchscreen reports do not reach BackBoard.
     var useGuestTouchInjection: Bool {
-        guard isConnected, guestCaps.contains("touch"),
-              let major = guestIOSVersion.flatMap({ Int($0.split(separator: ".").first ?? "") })
-        else { return false }
-        return major < 26
+        isConnected && guestCaps.contains("touch")
     }
     /// Path to the signed vphoned binary. When set, enables auto-update.
     var guestBinaryURL: URL?
