@@ -24,11 +24,7 @@ private struct TXMDevReference: Decodable {
 
 // MARK: - Test helpers
 
-private let baseDir = URL(fileURLWithPath: #filePath)
-    .deletingLastPathComponent()
-    .deletingLastPathComponent()
-    .deletingLastPathComponent()
-    .appendingPathComponent("ipsws/patch_refactor_input")
+private let baseDir = firmwareFixtureDirectory
 
 private func loadRawPayload(_ name: String) throws -> Data {
     let url = baseDir.appendingPathComponent("raw_payloads/\(name)")

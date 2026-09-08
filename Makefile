@@ -130,6 +130,11 @@ help:
 	@echo "             FRIDA=1                  Opt in to the Frida Stalker kernel relaxations"
 	@echo ""
 	@echo "Testing:"
+	@echo "  make test                    Run all firmware-free Python and Swift tests (requires make setup_venv)"
+	@echo "  make test_python / test_swift Run one firmware-free language suite"
+	@echo "  make test_fixtures           Check comparison fixture presence; does not run tests"
+	@echo "  make test_firmware           Run Swift firmware comparisons; fails if fixtures are missing"
+	@echo "    VPHONE_TEST_FIXTURES=/path  Override ipsws/patch_refactor_input"
 	@echo "  make test_jb_patches         Run all JB kernel patches (incl. Sandbox) over every supported cloudOS kernel"
 	@echo "    Options: QUICK=1           Only the local/newest kernel (fast dev loop)"
 	@echo "  make test_fw_patches         Run the FULL patch-firmware pipeline (boot chain + base kernel + JB + EXP) over"
@@ -155,7 +160,27 @@ help:
 # Setup
 # ═══════════════════════════════════════════════════════════════════
 
-.PHONY: setup_machine setup_tools
+.PHONY: setup_machine setup_tools setup_venv
+
+setup_venv:
+	zsh $(SCRIPTS)/setup_venv.sh
+
+.PHONY: test test_python test_swift test_firmware test_fixtures
+
+test:
+	python3 $(SCRIPTS)/run_tests.py fast
+
+test_python:
+	python3 $(SCRIPTS)/run_tests.py python
+
+test_swift:
+	python3 $(SCRIPTS)/run_tests.py swift
+
+test_firmware:
+	python3 $(SCRIPTS)/run_tests.py firmware
+
+test_fixtures:
+	python3 $(SCRIPTS)/run_tests.py fixtures
 
 setup_machine:
 	@if count=0; \

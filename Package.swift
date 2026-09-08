@@ -56,6 +56,11 @@ let package = Package(
             path: "tests/FirmwarePatcherTests"
         ),
         .testTarget(
+            name: "FirmwareIntegrationTests",
+            dependencies: ["FirmwarePatcher"],
+            path: "tests/FirmwareIntegrationTests"
+        ),
+        .testTarget(
             name: "VPhoneCLITests",
             dependencies: ["vphone-cli"],
             path: "tests/VPhoneCLITests"

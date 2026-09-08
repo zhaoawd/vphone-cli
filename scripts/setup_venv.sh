@@ -13,6 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 VENV_DIR="${PROJECT_ROOT}/.venv"
 REQUIREMENTS="${PROJECT_ROOT}/requirements.txt"
+export PIP_CACHE_DIR="${PIP_CACHE_DIR:-${PROJECT_ROOT}/.build/pip-cache}"
 
 # Use system Python3
 PYTHON="$(readlink -f "$(which python3)")"
@@ -68,17 +69,8 @@ echo "  dylib built OK"
 
 # --- Verify ---
 echo ""
-echo "=== Verifying imports ==="
-python3 -c "
-from capstone import Cs, CS_ARCH_ARM64, CS_MODE_LITTLE_ENDIAN
-from keystone import Ks, KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN
-from pyimg4 import IM4P
-import pymobiledevice3
-print('  capstone  OK')
-print('  keystone  OK')
-print('  pyimg4    OK')
-print('  pmd3      OK')
-"
+echo "=== Verifying Python runtime ==="
+python3 "${SCRIPT_DIR}/check_python_runtime.py"
 
 echo ""
 echo "=== venv ready ==="

@@ -4,11 +4,7 @@ import Testing
 
 struct VerboseJBDebug {
     @Test func debugFailingPatches() throws {
-        let baseDir = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("ipsws/patch_refactor_input")
+        let baseDir = firmwareFixtureDirectory
         let data = try Data(contentsOf: baseDir.appendingPathComponent("raw_payloads/kernelcache.bin"))
         let patcher = KernelJBPatcher(data: data, verbose: true)
 
