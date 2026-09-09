@@ -548,3 +548,402 @@ struct FridaGatingTests {
         #expect(!FirmwarePipeline.productVersionAtLeast(nil, 26, 4))
     }
 }
+
+// MARK: - C2: Structured patch results, requirements, and ablation
+
+/// A minimal `StructuredPatcher` for exercising the structured result model without
+/// real firmware. Built from `(PatchID, PatchRequirement, RawStepResult)` triples;
+/// `matched`/`idempotent` steps append one record (idempotent records have equal
+/// original/patched bytes), others append none.
+final class SyntheticStructuredPatcher: StructuredPatcher {
+    let componentName: String
+    let verbose = false
+    let steps: [(id: PatchID, requirement: PatchRequirement, raw: RawStepResult)]
+    var patches: [PatchRecord] = []
+
+    var component: String { componentName }
+
+    init(component: String, steps: [(id: PatchID, requirement: PatchRequirement, raw: RawStepResult)]) {
+        componentName = component
+        self.steps = steps
+    }
+
+    private func record(for id: PatchID, idempotent: Bool) -> PatchRecord {
+        PatchRecord(
+            patchID: id.description,
+            component: componentName,
+            fileOffset: 0,
+            originalBytes: Data([0x00]),
+            patchedBytes: Data([idempotent ? 0x00 : 0xAA]),
+            description: id.method
+        )
+    }
+
+    func findAll() throws -> [PatchRecord] { patches }
+    func apply() throws -> Int { patches.count }
+
+    func buildSteps() -> [PatchStep] {
+        steps.map { entry in
+            PatchStep(id: entry.id, requirement: entry.requirement, run: { [self] in
+                switch entry.raw {
+                case .matched: patches.append(record(for: entry.id, idempotent: false))
+                case .idempotent: patches.append(record(for: entry.id, idempotent: true))
+                case .noMatch, .ambiguous, .encodeFail: break
+                }
+                return entry.raw
+            })
+        }
+    }
+
+    var emittedRecords: [PatchRecord] { patches }
+    func commit(_: [PatchRecord]) {}
+    var patchedData: Data { Data() }
+}
+
+struct StructuredPatchResultTests {
+    static func gates(iosBaseIs27: Bool = false, applyFrida: Bool = false) -> PatchGateSnapshot {
+        PatchGateSnapshot(
+            variant: "test", iosBaseIs18: false, iosBaseIs27: iosBaseIs27,
+            cloudOSIsFridaCapable: applyFrida, forceExcGuard: false, enableFrida: applyFrida,
+            excGuardActive: false, applyIOS27: iosBaseIs27, applyFrida: applyFrida
+        )
+    }
+
+    static func id(_ method: String, patcher: String = "SyntheticStructuredPatcher", component: String = "synthetic") -> PatchID {
+        PatchID(component: component, patcher: patcher, method: method)
+    }
+
+    private static func pipeline() -> FirmwarePipeline {
+        FirmwarePipeline(vmDirectory: URL(fileURLWithPath: NSTemporaryDirectory()), verbose: false)
+    }
+
+    /// Drive a single synthetic patcher through the structured pipeline path.
+    private func runComponent(
+        _ steps: [(id: PatchID, requirement: PatchRequirement, raw: RawStepResult)],
+        gates: PatchGateSnapshot,
+        ablate: Set<String> = []
+    ) throws -> ComponentReport {
+        let pipeline = Self.pipeline()
+        let (_, reports) = try pipeline.patchDataStructured(
+            Data([0x00, 0x00, 0x00, 0x00]),
+            componentName: "synthetic",
+            patcherFactories: [{ _, _ in SyntheticStructuredPatcher(component: "synthetic", steps: steps) }],
+            gates: gates,
+            ablate: ablate
+        )
+        #expect(reports.count == 1)
+        return reports[0]
+    }
+
+    // 1. Required missing → failed; component fails.
+    @Test func requiredMissingFailsComponent() throws {
+        let report = try runComponent(
+            [(Self.id("patchRequired"), .required, .noMatch)],
+            gates: Self.gates()
+        )
+        #expect(report.results[0].outcome == .failed)
+        #expect(report.results[0].reason == "anchor not found")
+        #expect(report.hasRequiredFailure)
+    }
+
+    // 2. Rule-driven notApplicable vs failed on the same step under different gates.
+    @Test func conditionalRuleControlsNotApplicableVsFailed() throws {
+        let step: [(id: PatchID, requirement: PatchRequirement, raw: RawStepResult)] =
+            [(Self.id("patchIOS27Only"), .conditional(.iosBaseIs27), .noMatch)]
+
+        let ruleFalse = try runComponent(step, gates: Self.gates(iosBaseIs27: false))
+        #expect(ruleFalse.results[0].outcome == .notApplicable)
+        #expect(!ruleFalse.hasRequiredFailure)
+
+        let ruleTrue = try runComponent(step, gates: Self.gates(iosBaseIs27: true))
+        #expect(ruleTrue.results[0].outcome == .failed)
+        #expect(ruleTrue.hasRequiredFailure)
+    }
+
+    // 3. Idempotent → alreadyApplied; no failure.
+    @Test func idempotentBecomesAlreadyApplied() throws {
+        let report = try runComponent(
+            [(Self.id("patchNonce"), .required, .idempotent)],
+            gates: Self.gates()
+        )
+        #expect(report.results[0].outcome == .alreadyApplied)
+        #expect(report.records.count == 1)
+        #expect(!report.hasRequiredFailure)
+    }
+
+    // 4. Ambiguous → failed even when optional.
+    @Test func ambiguousFailsEvenWhenOptional() throws {
+        let report = try runComponent(
+            [(Self.id("patchAmbiguous"), .optional, .ambiguous(count: 2))],
+            gates: Self.gates()
+        )
+        #expect(report.results[0].outcome == .failed)
+        #expect(report.results[0].reason == "expected 1 match, found 2")
+        #expect(!report.hasRequiredFailure) // optional does not fail the component
+    }
+
+    // 5. Partial success within a component.
+    @Test func partialSuccessKeepsAppliedResults() throws {
+        let failing = try runComponent(
+            [
+                (Self.id("a"), .required, .matched),
+                (Self.id("b"), .required, .matched),
+                (Self.id("c"), .required, .noMatch),
+            ],
+            gates: Self.gates()
+        )
+        #expect(failing.hasRequiredFailure)
+        #expect(failing.results.filter { $0.outcome == .applied }.count == 2)
+        #expect(failing.records.count == 2)
+
+        let optionalFail = try runComponent(
+            [
+                (Self.id("a"), .required, .matched),
+                (Self.id("b"), .optional, .noMatch),
+            ],
+            gates: Self.gates()
+        )
+        #expect(!optionalFail.hasRequiredFailure)
+    }
+
+    // 6. Patch group requiring multiple records, one missing → group/component fails.
+    @Test func patchGroupMissingOneRecordFails() throws {
+        let report = try runComponent(
+            [
+                (Self.id("group_a"), .required, .matched),
+                (Self.id("group_b"), .required, .noMatch),
+            ],
+            gates: Self.gates()
+        )
+        #expect(report.hasRequiredFailure)
+        #expect(report.results.map(\.outcome) == [.applied, .failed])
+    }
+
+    // 7. Ablating a required step → ablated; component not failed.
+    @Test func ablatingRequiredStepDoesNotFailComponent() throws {
+        let full = Self.id("patchRequired").description
+        let report = try runComponent(
+            [(Self.id("patchRequired"), .required, .matched)],
+            gates: Self.gates(),
+            ablate: [full]
+        )
+        #expect(report.results[0].outcome == .ablated)
+        #expect(report.records.isEmpty)      // run intercepted before any bytes written
+        #expect(!report.hasRequiredFailure)
+    }
+
+    // 8. Unknown ablation id → error before anything runs.
+    @Test func unknownAblationIdThrows() throws {
+        let pipeline = FirmwarePipeline(
+            vmDirectory: URL(fileURLWithPath: NSTemporaryDirectory()), variant: .jb, verbose: false)
+        #expect(throws: PatcherError.self) {
+            _ = try pipeline.patchAllStructured(ablate: ["does.not.exist"], allowOutput: false)
+        }
+        // A known component id passes validation and instead fails later (no restore dir).
+        do {
+            _ = try pipeline.patchAllStructured(ablate: ["avpbooter"], allowOutput: false)
+            Issue.record("expected a throw")
+        } catch let PatcherError.invalidFormat(msg) {
+            Issue.record("known id 'avpbooter' wrongly rejected: \(msg)")
+        } catch {
+            // Expected: fileNotFound (no *Restore* dir in the temp directory).
+        }
+    }
+
+    // knownAblationTargets exposes the migrated patchers at all three granularities.
+    @Test func knownAblationTargetsCoverMigratedPatchers() {
+        let pipeline = FirmwarePipeline(
+            vmDirectory: URL(fileURLWithPath: NSTemporaryDirectory()), variant: .jb, verbose: false)
+        let targets = pipeline.knownAblationTargets(pipeline.buildComponentList())
+        #expect(targets.contains("avpbooter"))
+        #expect(targets.contains("avpbooter.AVPBooterPatcher"))
+        #expect(targets.contains("avpbooter.AVPBooterPatcher.patchDGSTBypass"))
+        #expect(targets.contains("ibss.IBootJBPatcher.patchSkipGenerateNonce"))
+        #expect(!targets.contains("does.not.exist"))
+    }
+
+    // Report JSON round-trips (PatchID encodes as a dotted string; --report-out path).
+    @Test func patchRunReportRoundTripsThroughJSON() throws {
+        let gates = Self.gates(iosBaseIs27: true)
+        let id = Self.id("patchMacMount", patcher: "KernelJBPatcher", component: "kernelcache")
+        let result = PatchResult(
+            id: id, requirement: .conditional, rule: .iosBaseIs27,
+            outcome: .ablated, reason: "--ablate", recordIndices: [], gates: gates)
+        let report = PatchRunReport(
+            variant: "jb", gates: gates,
+            components: [ComponentReport(component: "kernelcache", coverage: .structured, results: [result], records: [])],
+            ablation: [id])
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let data = try encoder.encode(report)
+        let json = String(decoding: data, as: UTF8.self)
+        #expect(json.contains("\"kernelcache.KernelJBPatcher.patchMacMount\"")) // PatchID as dotted string
+        let back = try JSONDecoder().decode(PatchRunReport.self, from: data)
+        #expect(back == report)
+        #expect(back.isAblationRun)
+        #expect(back.failedRequired.isEmpty)
+    }
+
+    // 10. Un-migrated (legacy) patcher → coverage legacy; empty ⇒ failed, non-empty ⇒ applied.
+    @Test func legacyPatcherCoverageAndSemantics() throws {
+        let pipeline = Self.pipeline()
+
+        let (_, emptyReports) = try pipeline.patchDataStructured(
+            Data([0x00]), componentName: "legacycomp",
+            patcherFactories: [{ data, _ in EmptyLegacyPatcher(data: data) }],
+            gates: Self.gates(), ablate: []
+        )
+        #expect(emptyReports[0].coverage == .legacy)
+        #expect(emptyReports[0].results[0].outcome == .failed)
+        #expect(emptyReports[0].hasRequiredFailure)
+
+        let (_, okReports) = try pipeline.patchDataStructured(
+            Data([0x00, 0x00]), componentName: "test",
+            patcherFactories: [{ data, _ in BytePatchPatcher(data: data, offset: 0, byte: 0xAA, id: "legacy") }],
+            gates: Self.gates(), ablate: []
+        )
+        #expect(okReports[0].coverage == .legacy)
+        #expect(okReports[0].results[0].outcome == .applied)
+        #expect(!okReports[0].hasRequiredFailure)
+        #expect(okReports[0].records.map(\.patchID) == ["legacy"])
+    }
+}
+
+/// A legacy patcher that finds nothing (exercises the "empty ⇒ failed" legacy path).
+final class EmptyLegacyPatcher: Patcher {
+    let component = "legacycomp"
+    let verbose = false
+    init(data _: Data) {}
+    func findAll() throws -> [PatchRecord] { [] }
+    func apply() throws -> Int { 0 }
+}
+
+/// Records `save` calls so a dry ablation run can be shown to write nothing.
+final class SpyLoader: FirmwarePipeline.FirmwareLoader, @unchecked Sendable {
+    let inner: any FirmwarePipeline.FirmwareLoader
+    private(set) var saveCount = 0
+    init(_ inner: any FirmwarePipeline.FirmwareLoader) { self.inner = inner }
+    func load(from url: URL) throws -> Data { try inner.load(from: url) }
+    func save(_ data: Data, to url: URL) throws {
+        saveCount += 1
+        try inner.save(data, to: url)
+    }
+}
+
+/// C1 alignment: a migrated patcher's declared step methods must line up with the
+/// `methods[].name` set for its component in research/firmware_compatibility.json.
+struct C1AlignmentTests {
+    static func repoRoot() -> URL {
+        var dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        for _ in 0 ..< 12 {
+            if FileManager.default.fileExists(
+                atPath: dir.appendingPathComponent("research/firmware_compatibility.json").path) {
+                return dir
+            }
+            dir = dir.deletingLastPathComponent()
+        }
+        fatalError("could not locate research/firmware_compatibility.json above \(#filePath)")
+    }
+
+    /// For the jb configuration, map JSON component name → (methods set, patchers list).
+    static func jbComponents() throws -> [String: (methods: [(name: String, required: Bool)], patchers: [String])] {
+        let url = repoRoot().appendingPathComponent("research/firmware_compatibility.json")
+        let json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
+        let configs = json["patch_configurations"] as! [[String: Any]]
+        let jb = configs.first { $0["variant"] as? String == "jb" }!
+        var out: [String: (methods: [(name: String, required: Bool)], patchers: [String])] = [:]
+        for comp in jb["components"] as! [[String: Any]] {
+            let name = comp["component"] as! String
+            let methods = (comp["methods"] as! [[String: Any]]).map {
+                (name: $0["name"] as! String, required: $0["required"] as? Bool ?? false)
+            }
+            let patchers = (comp["patchers"] as? [String]) ?? []
+            out[name] = (methods, patchers)
+        }
+        return out
+    }
+
+    @Test func avpBooterStepsEqualManifestMethods() throws {
+        let comps = try Self.jbComponents()
+        let avp = try #require(comps["AVPBooter"])
+        let steps = AVPBooterPatcher(data: Data(), verbose: false).buildSteps()
+        let stepMethods = Set(steps.map(\.id.method))
+        let manifestMethods = Set(avp.methods.map(\.name))
+        // AVPBooter is a single-patcher component: exact equality.
+        #expect(avp.patchers == ["AVPBooterPatcher"])
+        #expect(stepMethods == manifestMethods)
+        // Requirement alignment: patchDGSTBypass is required in the manifest.
+        #expect(avp.methods.first { $0.name == "patchDGSTBypass" }?.required == true)
+        #expect(steps.first { $0.id.method == "patchDGSTBypass" }?.requirement == .required)
+    }
+
+    @Test func iBootJBStepsSubsetOfManifestMethods() throws {
+        let comps = try Self.jbComponents()
+        let ibss = try #require(comps["iBSS"])
+        let steps = IBootJBPatcher(data: Data(), mode: .ibss, verbose: false).buildSteps()
+        let stepMethods = Set(steps.map(\.id.method))
+        let manifestMethods = Set(ibss.methods.map(\.name))
+        // iBSS is a multi-patcher component (IBootPatcher + IBootJBPatcher). The
+        // migrated IBootJBPatcher owns exactly the methods it declares, which must be
+        // a subset of the component's manifest methods.
+        #expect(stepMethods.isSubset(of: manifestMethods))
+        #expect(stepMethods == ["patchSkipGenerateNonce"])
+        #expect(ibss.methods.first { $0.name == "patchSkipGenerateNonce" }?.required == true)
+        #expect(steps.first { $0.id.method == "patchSkipGenerateNonce" }?.requirement == .required)
+    }
+}
+
+/// Unit-level byte parity for the migrated patchers: the pre-C2 `findAll()` and the
+/// new structured step path must emit identical `[PatchRecord]` on the same input.
+///
+/// The signed release binary is SIGKILL'd by the host amfidont daemon, so full
+/// CLI-level parity (`patch-firmware --records-out` diff) is not runnable here; this
+/// unit-level record equality is the achieved parity proof. When
+/// `VPHONE_TEST_AVPBOOTER` / `VPHONE_TEST_IBSS` point at real (already-patched or
+/// stock) payloads, parity is checked on real bytes too.
+struct MigratedPatcherParityTests {
+    @Test func avpBooterFindAllEqualsStepPath_syntheticNoMatch() throws {
+        // Garbage input: no DGST constant → both paths yield no records.
+        let data = Data(repeating: 0, count: 0x400)
+        let oldRecords = (try? AVPBooterPatcher(data: data, verbose: false).findAll()) ?? []
+        let new = AVPBooterPatcher(data: data, verbose: false)
+        let raw = new.buildSteps()[0].run()
+        #expect(raw == .noMatch)
+        #expect(oldRecords == new.emittedRecords)
+        #expect(new.emittedRecords.isEmpty)
+    }
+
+    @Test func avpBooterFindAllEqualsStepPath_realData() throws {
+        guard let path = ProcessInfo.processInfo.environment["VPHONE_TEST_AVPBOOTER"],
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { return }
+        let oldRecords = try AVPBooterPatcher(data: data, verbose: false).findAll()
+        let new = AVPBooterPatcher(data: data, verbose: false)
+        _ = new.buildSteps()[0].run()
+        #expect(oldRecords == new.emittedRecords)
+        #expect(!new.emittedRecords.isEmpty)
+    }
+
+    @Test func iBootJBFindAllEqualsStepPath_realData() throws {
+        guard let path = ProcessInfo.processInfo.environment["VPHONE_TEST_IBSS"],
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else { return }
+        let oldRecords = try IBootJBPatcher(data: data, mode: .ibss, verbose: false).findAll()
+        let new = IBootJBPatcher(data: data, mode: .ibss, verbose: false)
+        _ = new.buildSteps()[0].run()
+        #expect(oldRecords == new.emittedRecords)
+    }
+
+    /// Dry ablation run writes nothing. Requires a prepared VM directory via
+    /// `VPHONE_TEST_VMDIR` (skipped otherwise so the fast suite stays green).
+    @Test func dryAblationRunDoesNotSave() throws {
+        guard let dir = ProcessInfo.processInfo.environment["VPHONE_TEST_VMDIR"] else { return }
+        let spy = SpyLoader(FirmwarePipeline.ContainerFirmwareLoader())
+        let pipeline = FirmwarePipeline(
+            vmDirectory: URL(fileURLWithPath: dir), variant: .jb, verbose: false, loader: spy)
+        let report = try pipeline.patchAllStructured(ablate: ["avpbooter"], allowOutput: false)
+        #expect(report.isAblationRun)
+        #expect(!report.ablation.isEmpty)
+        #expect(report.failedRequired.isEmpty)   // nothing failed → skip was due to dry
+        #expect(spy.saveCount == 0)               // dry run wrote nothing
+    }
+}

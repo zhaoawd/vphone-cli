@@ -6,7 +6,7 @@
 
 目标：先建立可验证、可恢复的 VM 与固件流程，再完善无 GUI 自动化和多 VM 使用能力。
 
-本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）；B4 已完成并提交（`20cf892` Swift、`ff423c2` Shell）；C1 已完成（机器可读兼容性清单 + 双向校验测试 + 文档）。已完成 7 项（A1、A2、B1、B2、B3、B4、C1），其余 21 项待执行。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)、[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)、[B4 离线操作占用保护](../research/offline_op_guard_2026-09-09.md)与[固件兼容性清单](../research/firmware_compatibility.md)。
+本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）；B4 已完成并提交（`20cf892` Swift、`ff423c2` Shell）；C1 已完成（机器可读兼容性清单 + 双向校验测试 + 文档）；C2 已完成（结构化补丁结果 + 必要性规则 + 消融 CLI + 两个示例迁移）。已完成 8 项（A1、A2、B1、B2、B3、B4、C1、C2），其余 20 项待执行。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)、[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)、[B4 离线操作占用保护](../research/offline_op_guard_2026-09-09.md)、[固件兼容性清单](../research/firmware_compatibility.md)与[结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。
 
 ## 一、建议现在开始的工作
 
@@ -146,17 +146,19 @@
 
 验收：清单能解释同一变体在不同输入下的记录差异；未知组合明确显示为未验证。
 
-结果：新增 `research/firmware_compatibility.json`（`schema_version: 1`）、Python 格式校验 `tests/test_firmware_compatibility.py`（14 项，`make test` 自动发现）、Swift 一致性测试 `tests/VPhoneCoreTests/FirmwareCompatibilityManifestTests.swift`（2 项，与 `VPhoneFirmwareCatalog` 交叉校验）、说明文档 `research/firmware_compatibility.md`。清单含 5 个补丁配置（less/regular/dev/jb/exp，按流水线组件顺序列方法、gate 与预期不适用项）、23 条 catalog iOS 配对（构建号从 IPSW URL 解析；`c1_inventory.md` 记的「24 条」经复核实为 23）、4 个 cloudOS 镜像与 30 条组合。阶段分布：23 条 `code_selectable`（每条覆盖 5 变体，cloudOS 构建号 `null`）、3 条 `patch_verified`（26.1/26.3 regular/dev/jb 字节 parity、26.5 jb 83 records byte-identical）、4 条 `capability_verified`（27.0 24A5408d jb+frida、24A5380h jb、24A5390f jb、26.6.1 exp rig-baseline）。计数分列 method（JB 内核 59）与 record（84@26.x / 83@26.5 / 95@27.0），并登记 CLAUDE.md 52/66/127/141 & 10/12/14/18 与 `0_binary_patch_comparison.md` 56/70/132/163 及 method/record 三套口径的差异（CLAUDE.md 数字标记待确认，未修改 CLAUDE.md）。校验命令：`python3 -m unittest tests.test_firmware_compatibility -v` 全过；`make test` 全过；`swift build` 成功。限制：regular/dev 无完整真机 boot 证据、cloudOS 构建号多数缺失、内核类型维度含义待确认——均记入 `open_questions`。未应用新二进制补丁，`0_binary_patch_comparison.md` 未改。提交号待提交后补记。
+结果：新增 `research/firmware_compatibility.json`（`schema_version: 1`）、Python 格式校验 `tests/test_firmware_compatibility.py`（14 项，`make test` 自动发现）、Swift 一致性测试 `tests/VPhoneCoreTests/FirmwareCompatibilityManifestTests.swift`（2 项，与 `VPhoneFirmwareCatalog` 交叉校验）、说明文档 `research/firmware_compatibility.md`。清单含 5 个补丁配置（less/regular/dev/jb/exp，按流水线组件顺序列方法、gate 与预期不适用项）、23 条 catalog iOS 配对（构建号从 IPSW URL 解析；`c1_inventory.md` 记的「24 条」经复核实为 23）、4 个 cloudOS 镜像与 30 条组合。阶段分布：23 条 `code_selectable`（每条覆盖 5 变体，cloudOS 构建号 `null`）、3 条 `patch_verified`（26.1/26.3 regular/dev/jb 字节 parity、26.5 jb 83 records byte-identical）、4 条 `capability_verified`（27.0 24A5408d jb+frida、24A5380h jb、24A5390f jb、26.6.1 exp rig-baseline）。计数分列 method（JB 内核 59）与 record（84@26.x / 83@26.5 / 95@27.0），并登记 CLAUDE.md 52/66/127/141 & 10/12/14/18 与 `0_binary_patch_comparison.md` 56/70/132/163 及 method/record 三套口径的差异（CLAUDE.md 数字标记待确认，未修改 CLAUDE.md）。校验命令：`python3 -m unittest tests.test_firmware_compatibility -v` 全过；`make test` 全过；`swift build` 成功。限制：regular/dev 无完整真机 boot 证据、cloudOS 构建号多数缺失、内核类型维度含义待确认——均记入 `open_questions`。未应用新二进制补丁，`0_binary_patch_comparison.md` 未改。提交 `d03d838`。
 
-### C2 — 定义结构化补丁结果【P0；依赖 C1】
+### C2 — 定义结构化补丁结果【已完成；2026-09-09】
 
 涉及：`Core/PatcherProtocol.swift`、`PatchRecord.swift`、拟新增补丁结果类型及 `Pipeline/FirmwarePipeline.swift`。
 
-- [ ] 定义 applied、already-applied、not-applicable、failed 四种结果；必要性由明确的版本/功能规则决定，禁止将无匹配默认视为不适用。
-- [ ] 将 PatchRecord 保留为实际字节变更记录；结果记录关联补丁标识、适用规则、原因和关联记录。
-- [ ] 用合成补丁器验证必要失败、允许跳过、已应用、不确定匹配、同组件部分成功，以及补丁组要求多条记录的情况。
+- [x] 定义 applied、already-applied、not-applicable、failed 四种结果；必要性由明确的版本/功能规则决定，禁止将无匹配默认视为不适用。
+- [x] 将 PatchRecord 保留为实际字节变更记录；结果记录关联补丁标识、适用规则、原因和关联记录。
+- [x] 用合成补丁器验证必要失败、允许跳过、已应用、不确定匹配、同组件部分成功，以及补丁组要求多条记录的情况。
 
 验收：必要项失败时流水线返回失败；既有其他成功记录不能掩盖该失败。尚未迁移的补丁器明确标记状态覆盖范围。
+
+结果：新增 `sources/FirmwarePatcher/Core/` 五个文件——`PatchOutcome.swift`（`PatchOutcome`/`RawStepResult`/`OutcomeKind` + 映射）、`PatchRequirement.swift`（`PatchRequirement`/`PatchRule`/`RequirementKind`）、`PatchIdentifier.swift`（`PatchID`，点分单串 Codable）、`PatchResult.swift`（`PatchResult`/`PatchGateSnapshot`/`ComponentReport`/`Coverage`/`PatchRunReport`）、`StructuredPatcher.swift`（`StructuredPatcher` 协议 + `PatchStep` + `StructuredExecution` 执行器 + `LegacyPatcherAdapter`）；`PatchRecord` 未改。`Pipeline/FirmwarePipeline.swift` 新增 `patchAllStructured(ablate:allowOutput:)`、internal `patchDataStructured(...)`、`knownAblationTargets(...)` 与门控快照构造 `prepare()`，`patchAll()` 改为薄封装。迁移 `AVPBooterPatcher.patchDGSTBypass`（required，applied/failed 路径）与 `IBootJBPatcher.patchSkipGenerateNonce`（required，alreadyApplied 路径）为 `StructuredPatcher`，方法体与 emit 的 record 逐字节不变。CLI 入口 `patch-firmware`/`fw patch` 改走结构化路径，新增 `--ablate`/`--allow-ablation-output`/`--report-out`（并镜像到 `patch-component`）；未知 ablation id 前置校验、消融运行默认 dry（不写回）。输出映射：`notApplicable` 只由 conditional rule 判 false 时产生，无匹配默认 `failed`，`ambiguous`/`encodeFail` 一律 failed。失败判定：组件失败 ⇔ 有效必要且 failed；任一有效必要 failed → CLI 非零，成功不掩盖失败；`ablated` 不使组件失败但计入 `PatchRunReport.ablation`。测试：`tests/FirmwarePatcherTests/FirmwarePatcherTests.swift` 新增 `SyntheticStructuredPatcher` 与十个合成用例（`StructuredPatchResultTests`）、C1 对齐测试（`C1AlignmentTests`，step method 集合 vs `firmware_compatibility.json` 的 `methods[].name`）、迁移补丁器 parity 测试（`MigratedPatcherParityTests`）。校验命令：`swift build` 成功；`make test` 258 项全过；`make build`（签名分发包）成功；`swift test --filter MigratedPatcherParityTests`（设 `VPHONE_TEST_AVPBOOTER`/`VPHONE_TEST_IBSS` 指向 `vm-2607` 只读派生 payload）4 项全过。parity 结果：达到单元级 record 相等（真实固件字节）——迁移前 `findAll()` 与新 step 路径产出的 `[PatchRecord]` 逐条相等（AVPBooter 非空、iBSS 幂等均相等）。限制：CLI 级 `--records-out` 前后 diff 未执行（签名二进制被 amfidont SIGKILL，退出码 137）；全流水线 dry-run sha256 对比未执行（`vm-2607` 的 iBSS 命名 `d47` 与流水线搜索 `vresearch101` 不符，离线无匹配命名 VM）；内核多方法补丁器与 DeviceTree/Manifest/Filesystem 仍为 legacy（`coverage: legacy` 明确标记），留待 C3。详见 [结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。未应用新二进制补丁，`0_binary_patch_comparison.md` 未改。提交号待提交后补记。
 
 ### C3 — 分组迁移现有补丁并使用结果作为测试判据【P0；依赖 C2、固件样本】
 

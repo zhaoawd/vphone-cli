@@ -152,3 +152,37 @@ public final class AVPBooterPatcher: Patcher {
         }
     }
 }
+
+// MARK: - StructuredPatcher (C2)
+
+extension AVPBooterPatcher: StructuredPatcher {
+    public func buildSteps() -> [PatchStep] {
+        [
+            PatchStep(
+                id: PatchID(component: component, patcher: "AVPBooterPatcher", method: "patchDGSTBypass"),
+                requirement: .required,
+                run: { [self] in
+                    let before = patches.count
+                    do {
+                        try patchDGSTBypass()
+                    } catch let PatcherError.multipleMatchesFound(_, count) {
+                        return .ambiguous(count: count)
+                    } catch PatcherError.patchSiteNotFound {
+                        return .noMatch
+                    } catch {
+                        return .encodeFail(reason: "\(error)")
+                    }
+                    return patches.count > before ? .matched : .noMatch
+                }
+            ),
+        ]
+    }
+
+    public var emittedRecords: [PatchRecord] { patches }
+
+    public func commit(_ records: [PatchRecord]) {
+        for record in records {
+            buffer.writeBytes(at: record.fileOffset, bytes: record.patchedBytes)
+        }
+    }
+}

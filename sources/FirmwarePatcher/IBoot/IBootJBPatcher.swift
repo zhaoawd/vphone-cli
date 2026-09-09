@@ -270,3 +270,35 @@ public final class IBootJBPatcher: IBootPatcher {
         return refs
     }
 }
+
+// MARK: - StructuredPatcher (C2)
+
+extension IBootJBPatcher: StructuredPatcher {
+    public func buildSteps() -> [PatchStep] {
+        // The pipeline only constructs IBootJBPatcher for iBSS; other modes declare
+        // no steps (matching the mode gate in `findAll`).
+        guard mode == .ibss else { return [] }
+        return [
+            PatchStep(
+                id: PatchID(component: component, patcher: "IBootJBPatcher", method: "patchSkipGenerateNonce"),
+                requirement: .required,
+                run: { [self] in
+                    let before = patches.count
+                    let ok = patchSkipGenerateNonce()
+                    guard ok, patches.count > before else { return .noMatch }
+                    // The idempotent branch emits a no-op record (originalBytes == patchedBytes).
+                    let record = patches[before]
+                    return record.originalBytes == record.patchedBytes ? .idempotent : .matched
+                }
+            ),
+        ]
+    }
+
+    public var emittedRecords: [PatchRecord] { patches }
+
+    public func commit(_ records: [PatchRecord]) {
+        for record in records {
+            buffer.writeBytes(at: record.fileOffset, bytes: record.patchedBytes)
+        }
+    }
+}

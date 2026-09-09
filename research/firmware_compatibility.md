@@ -40,7 +40,7 @@
 
 不使用单一总数判断兼容，分列两种口径（`policy.count_semantics`）：
 
-- `method_count`：补丁方法（如 `patchSandbox`）数量。一个方法可 emit 0 至多条 record，无匹配时静默 `return`（不 emit、不抛错）。仅当**整个组件**返回空数组时流水线才失败（`FirmwarePipeline.swift:203-205`）。
+- `method_count`：补丁方法（如 `patchSandbox`）数量。一个方法可 emit 0 至多条 record，无匹配时静默 `return`（不 emit、不抛错）。仅当**整个组件**返回空数组时流水线才失败（`FirmwarePipeline.swift:203-205`）。C2 起，已迁移为 `StructuredPatcher` 的补丁器改用「有效必要且 failed → 组件失败」判据，其方法的稳定标识为 `patch_id = <component>.<patcher>.<method>`，leaf 段 `method` 与本清单 `methods[].name` 一致（对齐由 `C1AlignmentTests` 断言）。已迁移：`avpbooter.AVPBooterPatcher.patchDGSTBypass`、`ibss.IBootJBPatcher.patchSkipGenerateNonce`；其余补丁器仍为 legacy。详见 [结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。
 - `record_count`：实际写入的 `PatchRecord` 条数，按输入分键：
   - `"<iPhone构建>/<cloudOS构建>"`：特定输入的实测计数（如 `23B85/23B85`）。
   - `"unknown"`：该位置构建号缺失。

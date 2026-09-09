@@ -104,11 +104,21 @@ struct VPhoneFWPatchCommand: ParsableCommand {
     @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp | less") var variant: PatchFirmwareCLI.VariantOption = .regular
     @Flag(name: .customLong("force-exc-guard"), help: "Force the EXC_GUARD disable patch") var forceExcGuard = false
     @Flag(name: .customLong("frida"), help: "Opt in to Frida Stalker kernel relaxations (jb/exp only)") var frida = false
+    @Option(name: .customLong("ablate"), parsing: .upToNextOption,
+            help: ArgumentHelp("Disable patch steps by id (repeatable, comma-separated): component / "
+                + "component.Patcher / full id. An ablation run does NOT write firmware unless "
+                + "--allow-ablation-output is given."))
+    var ablate: [String] = []
+    @Flag(name: .customLong("allow-ablation-output"), help: "Write firmware back even on an ablation run.")
+    var allowAblationOutput = false
+    @Option(name: .customLong("report-out"), help: "Optional path to write the structured PatchRunReport JSON.")
+    var reportOut: String?
     @Flag(name: .shortAndLong, help: "Suppress per-component progress") var quiet = false
 
     func run() throws {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
+        let ablateIDs = PatchFirmwareCLI.parseAblation(ablate)
 
         // In-process pipeline (no subprocess) — CryptexFilesystemPatcher's
         // apfs_sealvolume read honors VPHONE_SEAL_DIR from *this* process's
@@ -119,7 +129,7 @@ struct VPhoneFWPatchCommand: ParsableCommand {
 
         // Patching rewrites the bundle's boot chain in place — never while the
         // VM (or another offline operation) holds the bundle.
-        let records = try VPhoneBundleGuard.withBundleLock(
+        let report = try VPhoneBundleGuard.withBundleLock(
             directory: bundle.url, operation: VPhoneVMOperation.fwPatch
         ) { _ in
             try FirmwarePipeline(
@@ -129,8 +139,29 @@ struct VPhoneFWPatchCommand: ParsableCommand {
                 noBinpack: false,
                 noVphoned: false,
                 forceExcGuard: forceExcGuard,
-                enableFrida: frida).patchAll()
+                enableFrida: frida).patchAllStructured(ablate: ablateIDs, allowOutput: allowAblationOutput)
         }
-        print("[fw patch] applied \(records.count) patches for \(variant.rawValue)")
+
+        if let reportOut {
+            let url = URL(fileURLWithPath: reportOut)
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            try encoder.encode(report).write(to: url)
+            print("[fw patch] wrote patch run report to \(url.path)")
+        }
+
+        if report.isAblationRun {
+            let mode = allowAblationOutput
+                ? "firmware written (--allow-ablation-output)"
+                : "firmware NOT written (pass --allow-ablation-output to write)"
+            print("[fw patch] ABLATION RUN\(allowAblationOutput ? "" : " (dry)"): \(report.ablation.count) step(s) ablated; \(mode)")
+        }
+        print("[fw patch] applied \(report.allRecords.count) patches for \(variant.rawValue)")
+
+        if !report.failedRequired.isEmpty {
+            throw PatcherError.patchSiteNotFound(
+                "required patches failed: "
+                    + report.failedRequired.map(\.description).joined(separator: ", "))
+        }
     }
 }

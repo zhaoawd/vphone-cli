@@ -124,8 +124,24 @@ public final class FirmwarePipeline {
     /// Run the full patching pipeline.
     ///
     /// Returns combined ``PatchRecord`` arrays from every component, in order.
-    /// Throws on the first component that fails to patch.
+    /// Throws on any required patch failure.
+    ///
+    /// Thin wrapper over ``patchAllStructured(ablate:allowOutput:)`` with no ablation
+    /// so byte behavior is identical to the pre-C2 path; the structured report is
+    /// discarded and only the flat records are returned.
     public func patchAll() throws -> [PatchRecord] {
+        let report = try patchAllStructured(ablate: [], allowOutput: true)
+        if !report.failedRequired.isEmpty {
+            throw PatcherError.patchSiteNotFound(
+                "required patches failed: "
+                    + report.failedRequired.map(\.description).joined(separator: ", "))
+        }
+        return report.allRecords
+    }
+
+    /// Read the manifests, set the gate flags, log the run header, and return the
+    /// restore directory plus the gate snapshot used for necessity-rule evaluation.
+    private func prepare() throws -> (restoreDir: URL, gates: PatchGateSnapshot) {
         let restoreDir = try findRestoreDirectory()
 
         log("[*] VM directory:      \(vmDirectory.path)")
@@ -152,10 +168,56 @@ public final class FirmwarePipeline {
                     : "  (< 26.4 — Frida kernel patches skipped)"))
         }
 
-        let components = buildComponentList()
-        log("[*] Patching \(components.count) boot-chain components ...")
+        let gates = PatchGateSnapshot(
+            variant: variant.rawValue,
+            iosBaseIs18: iosBaseIs18,
+            iosBaseIs27: iosBaseIs27,
+            cloudOSIsFridaCapable: cloudOSIsFridaCapable,
+            forceExcGuard: forceExcGuard,
+            enableFrida: enableFrida,
+            excGuardActive: iosBaseIs18 || forceExcGuard,
+            applyIOS27: iosBaseIs27,
+            applyFrida: enableFrida && cloudOSIsFridaCapable
+        )
+        return (restoreDir, gates)
+    }
 
-        var allRecords: [PatchRecord] = []
+    /// Run the full pipeline and return a structured ``PatchRunReport``.
+    ///
+    /// - `ablate`: component / patcher / full-id values to disable (see ``PatchID``).
+    ///   Each value is intercepted before its step runs, so no bytes are written for
+    ///   an ablated step. Unknown values throw before any component is loaded.
+    /// - `allowOutput`: when false (the default for an ablation run), patched firmware
+    ///   is NOT written back — the report is still produced. A non-ablation run always
+    ///   writes.
+    ///
+    /// This method does not throw on required failures; callers inspect
+    /// ``PatchRunReport/failedRequired``. It throws only on hard I/O / format errors
+    /// (missing files, unreadable payloads, unknown ablation ids).
+    public func patchAllStructured(ablate ablateValues: [String] = [], allowOutput: Bool = true) throws -> PatchRunReport {
+        // Validate ablation ids up front — before any component is loaded — so a
+        // mistyped id fails fast instead of silently running as an unablated success.
+        // The declared step-id set is gate-independent, so it is computed here without
+        // reading the manifests.
+        let ablate = Set(ablateValues)
+        if !ablate.isEmpty {
+            let known = knownAblationTargets(buildComponentList())
+            let unknown = ablate.filter { !known.contains($0) }.sorted()
+            if !unknown.isEmpty {
+                throw PatcherError.invalidFormat(
+                    "unknown ablation id(s): \(unknown.joined(separator: ", ")); "
+                        + "known: \(known.sorted().joined(separator: ", "))")
+            }
+        }
+
+        let (restoreDir, gates) = try prepare()
+        let components = buildComponentList()
+
+        let isDry = !ablate.isEmpty && !allowOutput
+        log("[*] Patching \(components.count) boot-chain components ..."
+            + (isDry ? "  (ABLATION dry-run: firmware NOT written)" : ""))
+
+        var componentReports: [ComponentReport] = []
 
         for component in components {
             let baseDir = component.inRestoreDir ? restoreDir : vmDirectory
@@ -165,27 +227,102 @@ public final class FirmwarePipeline {
             log("  \(component.name): \(fileURL.path)")
             log(String(repeating: "=", count: 60))
 
-            // Load
             let rawData = try loader.load(from: fileURL)
             log("  format: \(rawData.count) bytes")
 
-            let (currentData, componentRecords) = try patchData(
+            let (currentData, reports) = try patchDataStructured(
                 rawData,
                 componentName: component.name,
-                patcherFactories: component.patcherFactories
+                patcherFactories: component.patcherFactories,
+                gates: gates,
+                ablate: ablate
             )
+            componentReports.append(contentsOf: reports)
+            logStructuredReports(reports)
 
-            try loader.save(currentData, to: fileURL)
-            log("  [+] saved")
-
-            allRecords.append(contentsOf: componentRecords)
+            let componentFailed = reports.contains { $0.hasRequiredFailure }
+            if componentFailed {
+                log("  [x] required failure — not saved")
+            } else if isDry {
+                log("  [.] ablation dry-run — not saved")
+            } else {
+                try loader.save(currentData, to: fileURL)
+                log("  [+] saved")
+            }
         }
 
+        let ablatedIDs = componentReports
+            .flatMap { $0.results }
+            .filter { $0.outcome == .ablated }
+            .map { $0.id }
+
+        let report = PatchRunReport(
+            variant: variant.rawValue, gates: gates,
+            components: componentReports, ablation: ablatedIDs
+        )
+
         log("\n\(String(repeating: "=", count: 60))")
-        log("  All \(components.count) components patched successfully! (\(allRecords.count) total patches)")
+        if report.failedRequired.isEmpty {
+            log("  \(components.count) components processed"
+                + (report.isAblationRun ? " (ablation run: \(ablatedIDs.count) step(s) ablated)" : "")
+                + " (\(report.allRecords.count) total patches)")
+        } else {
+            log("  REQUIRED FAILURES: \(report.failedRequired.map(\.description).joined(separator: ", "))")
+        }
         log(String(repeating: "=", count: 60))
 
-        return allRecords
+        return report
+    }
+
+    /// Emit the stable structured log lines for one component's reports.
+    private func logStructuredReports(_ reports: [ComponentReport]) {
+        guard verbose else { return }
+        for report in reports where report.coverage == .legacy {
+            let result = report.results.first
+            let mark = switch result?.outcome {
+            case .ablated: "[A]"
+            case .failed: "[x]"
+            default: "[L]"
+            }
+            print("  \(mark) \(report.component) (legacy)  \(result?.outcome.rawValue ?? "n/a")  (\(report.records.count) records)")
+        }
+        for report in reports where report.coverage == .structured {
+            for result in report.results {
+                let mark = switch result.outcome {
+                case .applied, .alreadyApplied: "[=]"
+                case .notApplicable: "[~]"
+                case .failed: "[x]"
+                case .ablated: "[A]"
+                }
+                let detail = result.reason.map { "  \($0)" } ?? "  (\(result.recordIndices.count) records)"
+                print("  \(mark) \(result.id)  \(result.outcome.rawValue)\(detail)")
+            }
+        }
+    }
+
+    /// Build the set of valid ablation targets (component / patcher / full-id) for the
+    /// current variant + gates, so unknown `--ablate` values can be rejected up front.
+    func knownAblationTargets(_ components: [ComponentDescriptor]) -> Set<String> {
+        var targets = Set<String>()
+        for component in components {
+            let canonical = component.name.lowercased()
+            targets.insert(canonical)
+            // Filesystem/Manifest factories construct with restore-dir side effects and
+            // never contain structured patchers, so they are not dry-instantiated here.
+            if component.name == "Filesystem" || component.name == "Manifest" { continue }
+            for makePatcher in component.patcherFactories {
+                let patcher = makePatcher(Data(), false)
+                targets.insert("\(canonical).\(String(describing: type(of: patcher)))")
+                if let structured = patcher as? any StructuredPatcher {
+                    for step in structured.buildSteps() {
+                        targets.insert(step.id.componentTarget)
+                        targets.insert(step.id.patcherTarget)
+                        targets.insert(step.id.description)
+                    }
+                }
+            }
+        }
+        return targets
     }
 
     func patchData(
@@ -212,6 +349,52 @@ public final class FirmwarePipeline {
         }
 
         return (currentData, componentRecords)
+    }
+
+    /// Structured counterpart of ``patchData(_:componentName:patcherFactories:)``.
+    ///
+    /// Runs each patcher factory against the chained data. A ``StructuredPatcher`` runs
+    /// its declared steps (honoring `ablate`); any other patcher is wrapped by
+    /// ``LegacyPatcherAdapter`` (preserving the "no patches found ⇒ failed" semantics).
+    /// Produces one ``ComponentReport`` per patcher factory.
+    func patchDataStructured(
+        _ rawData: Data,
+        componentName: String,
+        patcherFactories: [(Data, Bool) -> any Patcher],
+        gates: PatchGateSnapshot,
+        ablate: Set<String>
+    ) throws -> (Data, [ComponentReport]) {
+        var currentData = rawData
+        var reports: [ComponentReport] = []
+
+        for makePatcher in patcherFactories {
+            let patcher = makePatcher(currentData, verbose)
+            let input = currentData
+            if let structured = patcher as? any StructuredPatcher {
+                let (report, data) = StructuredExecution.run(
+                    patcher: structured,
+                    componentName: componentName,
+                    gates: gates,
+                    ablate: ablate,
+                    fallback: input
+                )
+                reports.append(report)
+                currentData = data
+            } else {
+                let (report, data) = try LegacyPatcherAdapter.run(
+                    patcher: patcher,
+                    componentName: componentName,
+                    gates: gates,
+                    ablate: ablate,
+                    fallback: input,
+                    extract: { p, recs in self.extractPatchedData(from: p, fallback: input, records: recs) }
+                )
+                reports.append(report)
+                currentData = data
+            }
+        }
+
+        return (currentData, reports)
     }
 
     // MARK: - Component List Builder
