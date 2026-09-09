@@ -16,7 +16,7 @@ import Foundation
 /// encoders, code-cave finder, string-anchored function finders, etc.) from
 /// `KernelJBPatcherBase` so EXP-specific patches can use the same helpers
 /// as JB ones without duplicating them.
-public final class KernelEXPPatcher: KernelJBPatcherBase, Patcher {
+public final class KernelEXPPatcher: KernelJBPatcherBase, StructuredPatcher {
     public let component = "kernelcache_exp"
 
     public func findAll() throws -> [PatchRecord] {
@@ -30,6 +30,15 @@ public final class KernelEXPPatcher: KernelJBPatcherBase, Patcher {
         patchHvVmmRename()
 
         return patches
+    }
+
+    public func buildSteps() -> [PatchStep] {
+        [PatchStep(id: PatchID(component: "kernelcache", patcher: "KernelEXPPatcher", method: "patchHvVmmRename"),
+                   requirement: .required) { [self] in
+            parseMachO()
+            let before = patches.count
+            return structuredMethodResult(completed: patchHvVmmRename(), since: before)
+        }]
     }
 
     public func apply() throws -> Int {

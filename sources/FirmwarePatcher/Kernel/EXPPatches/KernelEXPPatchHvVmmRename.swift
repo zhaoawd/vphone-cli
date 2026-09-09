@@ -82,9 +82,9 @@ extension KernelEXPPatcher {
     @discardableResult
     func patchHvVmmRename() -> Bool {
         log("\n[EXP] hv_vmm_present sysctl: OID rename + kernel-internal caller mangle")
-        let aChanged = renameOidNameCstring()
-        let bChanged = mangleKernelInternalCallers()
-        return aChanged || bChanged
+        let oidComplete = renameOidNameCstring()
+        let callersComplete = mangleKernelInternalCallers()
+        return oidComplete && callersComplete
     }
 
     // MARK: - Part A: rename the OID's name cstring
@@ -115,7 +115,7 @@ extension KernelEXPPatcher {
                  virtualAddress: fileOffsetToVA(cstringStart),
                  description: "Part A: OID name already renamed "
                     + "('hv_vmm_present' -> 'Xv_vmm_present')")
-            return false
+            return true
         }
 
         guard !originalHits.isEmpty else {
@@ -219,6 +219,7 @@ extension KernelEXPPatcher {
             (tlvOriginalNeedle, tlvPatchedNeedle, 5, "sandbox-profile token"),
         ]
 
+        let recordStart = patches.count
         var totalOriginal = 0
         var totalPatched = 0
         var totalWritten = 0
@@ -295,13 +296,13 @@ extension KernelEXPPatcher {
                 log("  [.] Part B: all \(totalPatched) kernel-internal "
                     + "occurrence(s) already mangled — nothing to do")
             }
-            return false
+            return totalKnown > 0 && patches.count - recordStart == totalKnown
         }
 
         if totalWritten > 0 {
             log("  [+] Part B: mangled \(totalWritten) kernel-internal "
                 + "occurrence(s) (cstring + sandbox-profile combined)")
         }
-        return totalWritten > 0
+        return totalKnown > 0 && patches.count - recordStart == totalKnown
     }
 }
