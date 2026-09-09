@@ -660,6 +660,17 @@ struct StructuredPatchResultTests {
         #expect(ruleTrue.hasRequiredFailure)
     }
 
+    // 2b. C3 mapping refinement: optional + noMatch → notApplicable (not failed).
+    @Test func optionalMissingBecomesNotApplicableNotFailed() throws {
+        let report = try runComponent(
+            [(Self.id("patchOptional"), .optional, .noMatch)],
+            gates: Self.gates()
+        )
+        #expect(report.results[0].outcome == .notApplicable)
+        #expect(report.results[0].reason == "optional, no anchor")
+        #expect(!report.hasRequiredFailure)
+    }
+
     // 3. Idempotent → alreadyApplied; no failure.
     @Test func idempotentBecomesAlreadyApplied() throws {
         let report = try runComponent(
@@ -846,14 +857,16 @@ struct C1AlignmentTests {
         fatalError("could not locate research/firmware_compatibility.json above \(#filePath)")
     }
 
-    /// For the jb configuration, map JSON component name → (methods set, patchers list).
-    static func jbComponents() throws -> [String: (methods: [(name: String, required: Bool)], patchers: [String])] {
+    /// For the given variant configuration, map JSON component name → (methods, patchers).
+    static func components(variant: String) throws
+        -> [String: (methods: [(name: String, required: Bool)], patchers: [String])]
+    {
         let url = repoRoot().appendingPathComponent("research/firmware_compatibility.json")
         let json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
         let configs = json["patch_configurations"] as! [[String: Any]]
-        let jb = configs.first { $0["variant"] as? String == "jb" }!
+        let cfg = configs.first { $0["variant"] as? String == variant }!
         var out: [String: (methods: [(name: String, required: Bool)], patchers: [String])] = [:]
-        for comp in jb["components"] as! [[String: Any]] {
+        for comp in cfg["components"] as! [[String: Any]] {
             let name = comp["component"] as! String
             let methods = (comp["methods"] as! [[String: Any]]).map {
                 (name: $0["name"] as! String, required: $0["required"] as? Bool ?? false)
@@ -862,6 +875,11 @@ struct C1AlignmentTests {
             out[name] = (methods, patchers)
         }
         return out
+    }
+
+    /// For the jb configuration, map JSON component name → (methods set, patchers list).
+    static func jbComponents() throws -> [String: (methods: [(name: String, required: Bool)], patchers: [String])] {
+        try components(variant: "jb")
     }
 
     @Test func avpBooterStepsEqualManifestMethods() throws {
@@ -891,6 +909,77 @@ struct C1AlignmentTests {
         #expect(stepMethods == ["patchSkipGenerateNonce"])
         #expect(ibss.methods.first { $0.name == "patchSkipGenerateNonce" }?.required == true)
         #expect(steps.first { $0.id.method == "patchSkipGenerateNonce" }?.requirement == .required)
+    }
+
+    // MARK: - C3 base boot chain
+
+    @Test func iBootBaseIBSSStepsSubsetOfManifestMethods() throws {
+        let comps = try Self.jbComponents()
+        let ibss = try #require(comps["iBSS"])
+        let steps = IBootPatcher(data: Data(), mode: .ibss, verbose: false).buildSteps()
+        let stepMethods = Set(steps.map(\.id.method))
+        // iBSS is multi-patcher (IBootPatcher + IBootJBPatcher); the base patcher owns a
+        // subset of the component's manifest methods.
+        #expect(stepMethods.isSubset(of: Set(ibss.methods.map(\.name))))
+        #expect(stepMethods == ["patchSerialLabels", "patchImage4Callback"])
+        // image4 callback is required (the core img4 bypass anchor); serial labels optional.
+        #expect(ibss.methods.first { $0.name == "patchImage4Callback" }?.required == true)
+        #expect(steps.first { $0.id.method == "patchImage4Callback" }?.requirement == .required)
+        #expect(steps.first { $0.id.method == "patchSerialLabels" }?.requirement == .optional)
+    }
+
+    @Test func iBECStepsEqualManifestMethods() throws {
+        let comps = try Self.jbComponents()
+        let ibec = try #require(comps["iBEC"])
+        let steps = IBootPatcher(data: Data(), mode: .ibec, verbose: false).buildSteps()
+        let stepMethods = Set(steps.map(\.id.method))
+        // iBEC is a single-patcher component: exact equality.
+        #expect(stepMethods == Set(ibec.methods.map(\.name)))
+        #expect(stepMethods == ["patchSerialLabels", "patchImage4Callback", "patchBootArgs", "patchBootxPrecondition"])
+        #expect(steps.first { $0.id.method == "patchImage4Callback" }?.requirement == .required)
+    }
+
+    @Test func llbStepsEqualManifestMethods() throws {
+        let comps = try Self.jbComponents()
+        let llb = try #require(comps["LLB"])
+        let steps = IBootPatcher(data: Data(), mode: .llb, verbose: false).buildSteps()
+        let stepMethods = Set(steps.map(\.id.method))
+        #expect(stepMethods == Set(llb.methods.map(\.name)))
+        #expect(stepMethods == [
+            "patchSerialLabels", "patchImage4Callback", "patchBootArgs",
+            "patchRootfssBypass", "patchPanicBypass",
+        ])
+        #expect(steps.first { $0.id.method == "patchImage4Callback" }?.requirement == .required)
+    }
+
+    @Test func txmRegularStepsEqualManifestMethods() throws {
+        let comps = try Self.components(variant: "regular")
+        let txm = try #require(comps["TXM"])
+        let steps = TXMPatcher(data: Data(), verbose: false).buildSteps()
+        #expect(txm.patchers == ["TXMPatcher"])
+        #expect(Set(steps.map(\.id.method)) == Set(txm.methods.map(\.name)))
+        #expect(Set(steps.map(\.id.method)) == ["patchTrustcacheBypass"])
+        #expect(steps.first { $0.id.method == "patchTrustcacheBypass" }?.requirement == .required)
+        #expect(steps.first?.id.patcher == "TXMPatcher")
+    }
+
+    @Test func txmDevStepsEqualManifestMethods() throws {
+        let comps = try Self.jbComponents()
+        let txm = try #require(comps["TXM"])
+        let steps = TXMDevPatcher(data: Data(), verbose: false).buildSteps()
+        // jb/exp/dev TXM is a single-patcher (TXMDevPatcher) component: exact equality.
+        #expect(txm.patchers == ["TXMDevPatcher"])
+        #expect(Set(steps.map(\.id.method)) == Set(txm.methods.map(\.name)))
+        #expect(Set(steps.map(\.id.method)) == [
+            "patchTrustcacheBypass", "patchSelector24ForcePass", "patchGetTaskAllowForceTrue",
+            "patchSelector42_29Shellcode", "patchDebuggerEntitlementForceTrue", "patchDeveloperModeBypass",
+        ])
+        // All six dev methods are required in both code and manifest.
+        #expect(steps.allSatisfy { $0.requirement == .required })
+        let allRequired = txm.methods.allSatisfy(\.required)
+        #expect(allRequired)
+        // Steps report the concrete subclass as the patcher segment.
+        #expect(steps.allSatisfy { $0.id.patcher == "TXMDevPatcher" })
     }
 }
 
@@ -931,6 +1020,59 @@ struct MigratedPatcherParityTests {
         let new = IBootJBPatcher(data: data, mode: .ibss, verbose: false)
         _ = new.buildSteps()[0].run()
         #expect(oldRecords == new.emittedRecords)
+    }
+
+    // MARK: - C3 base boot chain parity (real firmware, env-gated)
+    //
+    // The iBoot/TXM inputs on disk are IM4P containers; the patchers operate on the raw
+    // ARM64 payload. `VPHONE_TEST_{IBSS,IBEC,LLB,TXM}_IM4P` point at the `.im4p` files
+    // (e.g. under ./vm-2607/iPhone17,3_26.1_23B85_Restore/Firmware); the payload is
+    // decompressed in-test via `IM4PHandler`. Unset ⇒ skipped so the fast suite stays
+    // green. Each test asserts the pre-C3 `findAll()` and the new step path emit
+    // byte-identical `[PatchRecord]`.
+
+    private static func im4pPayload(_ env: String) -> Data? {
+        guard let path = ProcessInfo.processInfo.environment[env] else { return nil }
+        return try? IM4PHandler.load(contentsOf: URL(fileURLWithPath: path)).payload
+    }
+
+    private func assertIBootParity(_ env: String, mode: IBootPatcher.Mode) throws {
+        guard let payload = Self.im4pPayload(env) else { return }
+        let oldRecords = try IBootPatcher(data: payload, mode: mode, verbose: false).findAll()
+        let new = IBootPatcher(data: payload, mode: mode, verbose: false)
+        for step in new.buildSteps() { _ = step.run() }
+        #expect(oldRecords == new.emittedRecords)
+        #expect(!new.emittedRecords.isEmpty, "\(mode) parity input produced no records")
+    }
+
+    @Test func iBSSBaseFindAllEqualsStepPath_realData() throws {
+        try assertIBootParity("VPHONE_TEST_IBSS_IM4P", mode: .ibss)
+    }
+
+    @Test func iBECFindAllEqualsStepPath_realData() throws {
+        try assertIBootParity("VPHONE_TEST_IBEC_IM4P", mode: .ibec)
+    }
+
+    @Test func llbFindAllEqualsStepPath_realData() throws {
+        try assertIBootParity("VPHONE_TEST_LLB_IM4P", mode: .llb)
+    }
+
+    @Test func txmFindAllEqualsStepPath_realData() throws {
+        guard let payload = Self.im4pPayload("VPHONE_TEST_TXM_IM4P") else { return }
+        let oldRecords = try TXMPatcher(data: payload, verbose: false).findAll()
+        let new = TXMPatcher(data: payload, verbose: false)
+        for step in new.buildSteps() { _ = step.run() }
+        #expect(oldRecords == new.emittedRecords)
+        #expect(!new.emittedRecords.isEmpty, "TXM parity input produced no records")
+    }
+
+    @Test func txmDevFindAllEqualsStepPath_realData() throws {
+        guard let payload = Self.im4pPayload("VPHONE_TEST_TXM_IM4P") else { return }
+        let oldRecords = try TXMDevPatcher(data: payload, verbose: false).findAll()
+        let new = TXMDevPatcher(data: payload, verbose: false)
+        for step in new.buildSteps() { _ = step.run() }
+        #expect(oldRecords == new.emittedRecords)
+        #expect(!new.emittedRecords.isEmpty, "TXM dev parity input produced no records")
     }
 
     /// Dry ablation run writes nothing. Requires a prepared VM directory via

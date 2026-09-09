@@ -12,6 +12,15 @@ import Foundation
 ///   3. selector42|29 shellcode hook + manifest flag force
 ///   4. debugger entitlement BL → mov w0, #1
 ///   5. developer-mode guard → nop
+/// Raw signal from a dev TXM patch method whose byte output stays unchanged; only a
+/// return value is added so the structured step can distinguish full/partial/no-match
+/// for multi-record methods. Translated to `RawStepResult` in `buildSteps`.
+enum TXMDevStepSignal: Equatable {
+    case matched
+    case noAnchor
+    case partial(String)
+}
+
 public final class TXMDevPatcher: TXMPatcher {
     override public func findAll() throws -> [PatchRecord] {
         patches = []
@@ -22,6 +31,53 @@ public final class TXMDevPatcher: TXMPatcher {
         patchDebuggerEntitlementForceTrue()
         patchDeveloperModeBypass()
         return patches
+    }
+
+    // MARK: - StructuredPatcher (C3)
+
+    /// Overrides the base single-step `buildSteps()` with the full dev method set, in
+    /// `findAll()` order. Does NOT compose `super` (base `findAll()` is not called by
+    /// dev `findAll()` either). All six methods are `.required`, matching the manifest's
+    /// txm dev/jb/exp entries. `emittedRecords`/`commit(_:)` are inherited.
+    override public func buildSteps() -> [PatchStep] {
+        [
+            trustcacheBypassStep(),
+            devStep("patchSelector24ForcePass") { [self] in rawResult(patchSelector24ForcePass()) },
+            devDeltaStep("patchGetTaskAllowForceTrue") { [self] in patchGetTaskAllowForceTrue() },
+            devStep("patchSelector42_29Shellcode") { [self] in rawResult(patchSelector42_29Shellcode()) },
+            devDeltaStep("patchDebuggerEntitlementForceTrue") { [self] in patchDebuggerEntitlementForceTrue() },
+            devDeltaStep("patchDeveloperModeBypass") { [self] in patchDeveloperModeBypass() },
+        ]
+    }
+
+    private func rawResult(_ signal: TXMDevStepSignal) -> RawStepResult {
+        switch signal {
+        case .matched: .matched
+        case .noAnchor: .noMatch
+        case let .partial(reason): .encodeFail(reason: reason)
+        }
+    }
+
+    private func devStep(_ method: String, run: @escaping () -> RawStepResult) -> PatchStep {
+        PatchStep(
+            id: PatchID(component: component, patcher: patcherName, method: method),
+            requirement: .required,
+            run: run
+        )
+    }
+
+    /// A required step for a single-record method: emits 0 or 1 record with no partial
+    /// risk, so the record-count delta alone decides matched vs no-match.
+    private func devDeltaStep(_ method: String, body: @escaping () -> Void) -> PatchStep {
+        PatchStep(
+            id: PatchID(component: component, patcher: patcherName, method: method),
+            requirement: .required,
+            run: { [self] in
+                let before = patches.count
+                body()
+                return patches.count > before ? .matched : .noMatch
+            }
+        )
     }
 
     // MARK: - Flat-binary ADRP+ADD string reference search
@@ -207,7 +263,8 @@ public final class TXMDevPatcher: TXMPatcher {
     ///
     /// Inserts `mov w0, #0xa1 ; b <epilogue>` right after the prologue,
     /// skipping validation while preserving the stack frame.
-    func patchSelector24ForcePass() {
+    @discardableResult
+    func patchSelector24ForcePass() -> TXMDevStepSignal {
         let size = buffer.count
 
         // Scan for any `mov w0, #0xa1` in the binary
@@ -262,7 +319,7 @@ public final class TXMDevPatcher: TXMPatcher {
 
             guard let body = bodyStart else {
                 log("  [-] TXM: selector24 prologue end not found")
-                return
+                return .noAnchor
             }
 
             // Find epilogue: scan forward from `off` for retab/ret,
@@ -290,7 +347,7 @@ public final class TXMDevPatcher: TXMPatcher {
 
             guard let epilogueOff = epilogue else {
                 log("  [-] TXM: selector24 epilogue not found")
-                return
+                return .noAnchor
             }
 
             emit(body, ARM64.movW0_0xA1,
@@ -298,16 +355,18 @@ public final class TXMDevPatcher: TXMPatcher {
                  description: "selector24 bypass: mov w0, #0xa1 (PASS)")
 
             guard let bInsn = ARM64Encoder.encodeB(from: body + 4, to: epilogueOff) else {
+                // The mov was already emitted; a missing branch leaves a partial patch.
                 log("  [-] TXM: selector24 branch encoding failed")
-                return
+                return .partial("selector24 branch encoding failed")
             }
             emit(body + 4, bInsn,
                  patchID: "txm_dev.selector24_bypass_b",
                  description: "selector24 bypass: b epilogue")
-            return
+            return .matched
         }
 
         log("  [-] TXM: selector24 handler not found")
+        return .noAnchor
     }
 
     /// Force get-task-allow entitlement check to return true (BL → mov x0, #1).
@@ -356,10 +415,11 @@ public final class TXMDevPatcher: TXMPatcher {
     ///   strb w0, [x20, #0x30]
     ///   mov x0, x20
     ///   b   <stub_off + 4>     (return to original flow)
-    func patchSelector42_29Shellcode() {
+    @discardableResult
+    func patchSelector42_29Shellcode() -> TXMDevStepSignal {
         guard let fn = findDebuggerGateFuncStart() else {
             log("  [-] TXM: debugger-gate function not found (selector42|29)")
-            return
+            return .noAnchor
         }
 
         // Find the stub: bti j; mov x0,x20; bl <fn>; mov x1,x21; mov x2,x22; bl <fn>; b ...
@@ -398,19 +458,19 @@ public final class TXMDevPatcher: TXMPatcher {
 
         guard stubs.count == 1 else {
             log("  [-] TXM: selector42|29 stub expected 1, found \(stubs.count)")
-            return
+            return .noAnchor
         }
         let stubOff = stubs[0]
 
         guard let cave = findUdfCave(minInsns: 6, nearOff: stubOff) else {
             log("  [-] TXM: no UDF cave found for selector42|29 shellcode")
-            return
+            return .noAnchor
         }
 
         // Redirect stub entry to shellcode cave
         guard let branchToShellcode = ARM64Encoder.encodeB(from: stubOff, to: cave) else {
             log("  [-] TXM: selector42|29 branch-to-cave encoding failed")
-            return
+            return .noAnchor
         }
         emit(stubOff, branchToShellcode,
              patchID: "txm_dev.sel42_29_branch",
@@ -424,12 +484,15 @@ public final class TXMDevPatcher: TXMPatcher {
 
         // Branch back to stub_off + 4 (skip the redirected first instruction)
         guard let branchBack = ARM64Encoder.encodeB(from: cave + 16, to: stubOff + 4) else {
+            // Five records already emitted (stub redirect + 4 shellcode words); a missing
+            // branch-back leaves the shellcode without a return path → partial.
             log("  [-] TXM: selector42|29 branch-back encoding failed")
-            return
+            return .partial("selector42|29 branch-back encoding failed")
         }
         emit(cave + 16, branchBack,
              patchID: "txm_dev.sel42_29_shell_ret",
              description: "selector42|29 shellcode: branch back")
+        return .matched
     }
 
     /// Force debugger entitlement check to return true (BL → mov w0, #1).

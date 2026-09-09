@@ -11,8 +11,23 @@
 import Capstone
 import Foundation
 
+/// Raw signal returned by an iBoot patch method so its structured step can report the
+/// exact outcome without inspecting the record list. Byte output is unchanged; only a
+/// return value is added. Translated to `RawStepResult` in `buildSteps`.
+enum IBootStepSignal: Equatable {
+    /// Anchor found and all expected records emitted.
+    case matched
+    /// No anchor found (or an idempotent/decorative branch that emits nothing).
+    case noAnchor
+    /// Some but not all records of a multi-record group were emitted (encode failure
+    /// partway through a group). Maps to `.encodeFail` → failed.
+    case partial(String)
+    /// More than one candidate where exactly one was expected.
+    case ambiguous(Int)
+}
+
 /// Patcher for iBoot components (iBSS, iBEC, LLB).
-public class IBootPatcher: Patcher {
+public class IBootPatcher: Patcher, StructuredPatcher {
     // MARK: - Types
 
     public enum Mode: String, Sendable {
@@ -99,6 +114,94 @@ public class IBootPatcher: Patcher {
     /// Get the patched data.
     public var patchedData: Data {
         buffer.data
+    }
+
+    // MARK: - StructuredPatcher (C3)
+
+    /// Declares the same per-mode method set and order as `findAll()`. Requirement
+    /// decisions (see research/patch_results_c3_bootchain_2026-09-09.md):
+    ///   - `patchImage4Callback` is `.required` in every mode — it is the core img4
+    ///     bypass and the one anchor each iBoot component must hit; without a required
+    ///     step a component whose only steps are optional could pass with zero records,
+    ///     weaker than the legacy "empty ⇒ failed" contract.
+    ///   - the remaining methods are `.optional` (no iBoot-version PatchRule exists to
+    ///     express them as `.conditional`; ambiguity still fails via the outcome mapping).
+    ///
+    /// Declared in the class body (not an extension) so `IBootJBPatcher` can override
+    /// `buildSteps()` with dynamic dispatch.
+    public func buildSteps() -> [PatchStep] {
+        var steps: [PatchStep] = [serialLabelsStep(), image4CallbackStep()]
+
+        if mode == .ibec {
+            steps.append(bootArgsStep())
+            steps.append(bootxPreconditionStep())
+        }
+
+        if mode == .llb {
+            steps.append(bootArgsStep())
+            steps.append(rootfssBypassStep())
+            steps.append(panicBypassStep())
+        }
+
+        return steps
+    }
+
+    public var emittedRecords: [PatchRecord] { patches }
+
+    public func commit(_ records: [PatchRecord]) {
+        for record in records {
+            buffer.writeBytes(at: record.fileOffset, bytes: record.patchedBytes)
+        }
+    }
+
+    /// Translate an `IBootStepSignal` into the structured `RawStepResult`.
+    private func rawResult(_ signal: IBootStepSignal) -> RawStepResult {
+        switch signal {
+        case .matched: .matched
+        case .noAnchor: .noMatch
+        case let .partial(reason): .encodeFail(reason: reason)
+        case let .ambiguous(count): .ambiguous(count: count)
+        }
+    }
+
+    private func step(_ method: String, _ requirement: PatchRequirement, run: @escaping () -> RawStepResult) -> PatchStep {
+        PatchStep(
+            id: PatchID(component: component, patcher: "IBootPatcher", method: method),
+            requirement: requirement,
+            run: run
+        )
+    }
+
+    private func serialLabelsStep() -> PatchStep {
+        step("patchSerialLabels", .optional) { [self] in rawResult(patchSerialLabels()) }
+    }
+
+    private func image4CallbackStep() -> PatchStep {
+        step("patchImage4Callback", .required) { [self] in
+            let before = patches.count
+            patchImage4Callback()
+            return patches.count > before ? .matched : .noMatch
+        }
+    }
+
+    private func bootArgsStep() -> PatchStep {
+        step("patchBootArgs", .optional) { [self] in rawResult(patchBootArgs()) }
+    }
+
+    private func bootxPreconditionStep() -> PatchStep {
+        step("patchBootxPrecondition", .optional) { [self] in rawResult(patchBootxPrecondition()) }
+    }
+
+    private func rootfssBypassStep() -> PatchStep {
+        step("patchRootfssBypass", .optional) { [self] in rawResult(patchRootfssBypass()) }
+    }
+
+    private func panicBypassStep() -> PatchStep {
+        step("patchPanicBypass", .optional) { [self] in
+            let before = patches.count
+            patchPanicBypass()
+            return patches.count > before ? .matched : .noMatch
+        }
     }
 
     // MARK: - Emit Helpers
@@ -202,13 +305,14 @@ public class IBootPatcher: Patcher {
 
     /// Find the two long '====...' banner runs and write the mode label into each.
     /// Python: `patch_serial_labels()`
-    func patchSerialLabels() {
+    @discardableResult
+    func patchSerialLabels() -> IBootStepSignal {
         let labelStr = switch mode {
         case .ibss: "Loaded iBSS"
         case .ibec: "Loaded iBEC"
         case .llb: "Loaded LLB"
         }
-        guard let labelBytes = labelStr.data(using: .ascii) else { return }
+        guard let labelBytes = labelStr.data(using: .ascii) else { return .noAnchor }
 
         // Collect all runs of '=' (>=20 chars) — same logic as Python.
         let raw = buffer.original
@@ -239,16 +343,19 @@ public class IBootPatcher: Patcher {
             }
             if labelCount >= 2 {
                 if verbose { print("  [*] serial labels: already present, skipping") }
-                return
+                // Idempotent decorative branch: emits nothing. As an optional step this
+                // maps to notApplicable, so it never fails the component.
+                return .noAnchor
             }
             if verbose { print("  [-] serial labels: <2 banner runs found") }
-            return
+            return .noAnchor
         }
 
         for runStart in eqRuns.prefix(2) {
             let writeOff = runStart + 1 // Python: run_start + 1
             emitString(writeOff, labelBytes, id: "\(component).serial_label", description: "serial label")
         }
+        return .matched
     }
 
     // MARK: - 2. image4_validate_property_callback
@@ -322,32 +429,35 @@ public class IBootPatcher: Patcher {
 
     /// Redirect ADRP+ADD x2 to a custom boot-args string.
     /// Python: `patch_boot_args()`
-    func patchBootArgs(newArgs: String? = nil) {
+    @discardableResult
+    func patchBootArgs(newArgs: String? = nil) -> IBootStepSignal {
         let newArgs = newArgs ?? effectiveBootArgs
-        guard let newArgsData = newArgs.data(using: .ascii) else { return }
+        guard let newArgsData = newArgs.data(using: .ascii) else { return .noAnchor }
 
         guard let fmtOff = findBootArgsFmt() else {
             if verbose { print("  [-] boot-args: format string not found") }
-            return
+            return .noAnchor
         }
 
         guard let (adrpOff, addOff) = findBootArgsAdrp(fmtOff: fmtOff) else {
             if verbose { print("  [-] boot-args: ADRP+ADD x2 not found") }
-            return
+            return .noAnchor
         }
 
         guard let newOff = findStringSlot(length: newArgsData.count) else {
             if verbose { print("  [-] boot-args: no NUL slot") }
-            return
+            return .noAnchor
         }
 
         // Write the string itself
         emitString(newOff, newArgsData, id: "\(component).boot_args_string", description: "boot-args string")
 
-        // Re-encode ADRP x2 → new page
+        // Re-encode ADRP x2 → new page. Past the first emit the group is a partial: the
+        // string was written but the pointer was not repointed, so this is a broken
+        // (encode-fail) result, not a clean "no anchor".
         guard let newAdrp = ARM64Encoder.encodeADRP(rd: 2, pc: UInt64(adrpOff), target: UInt64(newOff)) else {
             if verbose { print("  [-] boot-args: ADRP encoding out of range") }
-            return
+            return .partial("boot-args ADRP encoding out of range")
         }
         emit(adrpOff, newAdrp, id: "\(component).boot_args_adrp", description: "boot-args: adrp x2 → new string page")
 
@@ -355,9 +465,10 @@ public class IBootPatcher: Patcher {
         let imm12 = UInt32(newOff & 0xFFF)
         guard let newAdd = ARM64Encoder.encodeAddImm12(rd: 2, rn: 2, imm12: imm12) else {
             if verbose { print("  [-] boot-args: ADD encoding out of range") }
-            return
+            return .partial("boot-args ADD encoding out of range")
         }
         emit(addOff, newAdd, id: "\(component).boot_args_add", description: "boot-args: add x2 → new string offset")
+        return .matched
     }
 
     /// Find the standalone "%s" format string near "rd=md0" or "BootArgs".
@@ -453,7 +564,13 @@ public class IBootPatcher: Patcher {
 
     /// Apply all five rootfs bypass patches.
     /// Python: `patch_rootfs_bypass()`
-    func patchRootfssBypass() {
+    /// - Note: whether the rootfs signature/size bypass is a hard requirement for
+    ///   booting an LLB against a modified rootfs is 待验证 (not yet verified by a boot
+    ///   experiment); it is modeled `.optional` for now. See
+    ///   research/patch_results_c3_bootchain_2026-09-09.md.
+    @discardableResult
+    func patchRootfssBypass() -> IBootStepSignal {
+        let before = patches.count
         // 4a: cbz/cbnz before error code 0x3B7 → unconditional b
         patchCbzBeforeError(errorCode: 0x3B7, description: "rootfs: skip sig check (0x3B7)")
         // 4b: NOP b.hs after cmp x8, #0x400
@@ -464,6 +581,15 @@ public class IBootPatcher: Patcher {
         patchNullCheck0x78()
         // 4e: cbz/cbnz before error code 0x110 → unconditional b
         patchCbzBeforeError(errorCode: 0x110, description: "rootfs: skip size verify (0x110)")
+
+        // Group of 5 independent sub-patches. All 5 present → matched; none → no anchor;
+        // 1–4 → partial (a subset of the rootfs gates was left in place).
+        let emitted = patches.count - before
+        switch emitted {
+        case 0: return .noAnchor
+        case 5: return .matched
+        default: return .partial("rootfs bypass emitted \(emitted)/5 sub-patches")
+        }
     }
 
     /// Find unique `mov w8, #<errorCode>` and convert the cbz/cbnz 4 bytes before
@@ -631,7 +757,8 @@ public class IBootPatcher: Patcher {
     /// hash-getter/MOVZ-line/BL-log triple, is the distinctive shape.
     ///
     /// Refuses to patch on ambiguity (multiple matches).
-    func patchBootxPrecondition() {
+    @discardableResult
+    func patchBootxPrecondition() -> IBootStepSignal {
         let hashGetters = enumerateHashGetters()
         let bitGetters  = enumerateBitGetters()
 
@@ -639,13 +766,13 @@ public class IBootPatcher: Patcher {
             if verbose {
                 print("  [-] bootx precondition: hash-getter or bit-getter pattern absent")
             }
-            return
+            return .noAnchor
         }
 
         let panicBlocks = enumeratePanicBlocks(hashGetters: hashGetters)
         if panicBlocks.isEmpty {
             if verbose { print("  [-] bootx precondition: no panic-shaped call blocks") }
-            return
+            return .noAnchor
         }
 
         var gates = Set<Int>()
@@ -681,20 +808,23 @@ public class IBootPatcher: Patcher {
         }
 
         if gates.isEmpty {
-            // 26.4+ construct; genuinely absent on previous iBoot versions.
+            // 26.4+ construct; genuinely absent on previous iBoot versions. There is no
+            // iBoot-version PatchRule to express this as conditional, so it is reported
+            // as an optional no-anchor (→ notApplicable), never a failure.
             if verbose { print("  [.] bootx precondition: construct not present (pre-26.4 iBoot) — skipping") }
-            return
+            return .noAnchor
         }
         if gates.count > 1 {
             if verbose {
                 print("  [-] bootx precondition: ambiguous (\(gates.count) candidates)")
                 for g in gates.sorted() { print(String(format: "      0x%X", g)) }
             }
-            return
+            return .ambiguous(gates.count)
         }
         let gate = gates.first!
         emit(gate, ARM64.nop, id: "\(component).bootx_precondition",
              description: "bootx precondition: NOP gate TBZ")
+        return .matched
     }
 
     /// Enumerate 5-insn `MOVZ + 3×MOVK + RET` functions assembling a 64-bit

@@ -12,7 +12,7 @@ import Foundation
 ///   1. Trustcache binary-search BL → mov x0, #0
 ///      (in the AMFI cert verification function identified by the
 ///       unique constant 0x2446 loaded into w19)
-public class TXMPatcher: Patcher {
+public class TXMPatcher: Patcher, StructuredPatcher {
     public let component = "txm"
     public let verbose: Bool
 
@@ -48,6 +48,47 @@ public class TXMPatcher: Patcher {
     public var patchedData: Data {
         buffer.data
     }
+
+    // MARK: - StructuredPatcher (C3)
+
+    /// Single required step: the trustcache bypass. `patchTrustcacheBypass` throws
+    /// `patchSiteNotFound` when no anchor is found, mapped to `.noMatch` (mirrors
+    /// `AVPBooterPatcher`). Declared in the class body so `TXMDevPatcher` can override
+    /// `buildSteps()` via dynamic dispatch.
+    public func buildSteps() -> [PatchStep] {
+        [trustcacheBypassStep()]
+    }
+
+    public var emittedRecords: [PatchRecord] { patches }
+
+    public func commit(_ records: [PatchRecord]) {
+        for record in records {
+            buffer.writeBytes(at: record.fileOffset, bytes: record.patchedBytes)
+        }
+    }
+
+    /// The trustcache bypass step, reused by `TXMDevPatcher.buildSteps()`.
+    func trustcacheBypassStep() -> PatchStep {
+        PatchStep(
+            id: PatchID(component: component, patcher: patcherName, method: "patchTrustcacheBypass"),
+            requirement: .required,
+            run: { [self] in
+                let before = patches.count
+                do {
+                    try patchTrustcacheBypass()
+                } catch PatcherError.patchSiteNotFound {
+                    return .noMatch
+                } catch {
+                    return .encodeFail(reason: "\(error)")
+                }
+                return patches.count > before ? .matched : .noMatch
+            }
+        )
+    }
+
+    /// The concrete patcher's simple type name, used as the `PatchID.patcher` segment
+    /// so `TXMPatcher` and `TXMDevPatcher` report their own type.
+    var patcherName: String { String(describing: type(of: self)) }
 
     // MARK: - Emit
 

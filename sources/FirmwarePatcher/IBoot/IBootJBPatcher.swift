@@ -19,6 +19,32 @@ public final class IBootJBPatcher: IBootPatcher {
         return patches
     }
 
+    // MARK: - StructuredPatcher (C2/C3)
+
+    /// Overrides the base steps: the pipeline constructs `IBootJBPatcher` only for the
+    /// iBSS component and it must contribute ONLY the nonce step (base serial/image4
+    /// steps come from the separate `IBootPatcher(.ibss)` factory in the same
+    /// component). Declared as a class-body override — not an extension conformance —
+    /// so dynamic dispatch selects it over the base `buildSteps()`. `emittedRecords`
+    /// and `commit(_:)` are inherited unchanged from `IBootPatcher`.
+    override public func buildSteps() -> [PatchStep] {
+        guard mode == .ibss else { return [] }
+        return [
+            PatchStep(
+                id: PatchID(component: component, patcher: "IBootJBPatcher", method: "patchSkipGenerateNonce"),
+                requirement: .required,
+                run: { [self] in
+                    let before = patches.count
+                    let ok = patchSkipGenerateNonce()
+                    guard ok, patches.count > before else { return .noMatch }
+                    // The idempotent branch emits a no-op record (originalBytes == patchedBytes).
+                    let record = patches[before]
+                    return record.originalBytes == record.patchedBytes ? .idempotent : .matched
+                }
+            ),
+        ]
+    }
+
     // MARK: - JB Patches
 
     @discardableResult
@@ -268,37 +294,5 @@ public final class IBootJBPatcher: IBootPatcher {
         }
 
         return refs
-    }
-}
-
-// MARK: - StructuredPatcher (C2)
-
-extension IBootJBPatcher: StructuredPatcher {
-    public func buildSteps() -> [PatchStep] {
-        // The pipeline only constructs IBootJBPatcher for iBSS; other modes declare
-        // no steps (matching the mode gate in `findAll`).
-        guard mode == .ibss else { return [] }
-        return [
-            PatchStep(
-                id: PatchID(component: component, patcher: "IBootJBPatcher", method: "patchSkipGenerateNonce"),
-                requirement: .required,
-                run: { [self] in
-                    let before = patches.count
-                    let ok = patchSkipGenerateNonce()
-                    guard ok, patches.count > before else { return .noMatch }
-                    // The idempotent branch emits a no-op record (originalBytes == patchedBytes).
-                    let record = patches[before]
-                    return record.originalBytes == record.patchedBytes ? .idempotent : .matched
-                }
-            ),
-        ]
-    }
-
-    public var emittedRecords: [PatchRecord] { patches }
-
-    public func commit(_ records: [PatchRecord]) {
-        for record in records {
-            buffer.writeBytes(at: record.fileOffset, bytes: record.patchedBytes)
-        }
     }
 }

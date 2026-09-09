@@ -67,9 +67,17 @@ public enum PatchOutcomeMapping {
     ///
     /// - `matched` → applied; `idempotent` → alreadyApplied.
     /// - `ambiguous`/`encodeFail` → failed even when the requirement is optional.
-    /// - `noMatch` → `notApplicable` ONLY when the requirement is conditional and its
-    ///   rule is false for `gates`; otherwise `failed` (required, optional, and
-    ///   rule-true conditionals all fail on a missing anchor).
+    /// - `noMatch` → `notApplicable` when the requirement is `.optional` (a missing
+    ///   optional anchor never fails the component), or when it is `.conditional` and
+    ///   its rule is false for `gates`; otherwise `failed` (required and rule-true
+    ///   conditionals fail on a missing anchor).
+    ///
+    /// C3 mapping refinement: previously `.optional` + `noMatch` mapped to `failed`
+    /// (harmless only because optional failures do not set `hasRequiredFailure`). That
+    /// mislabels a legitimately-absent optional anchor (e.g. iBoot serial labels or a
+    /// pre-26.4 bootx precondition construct) as a failure in the report. It now maps
+    /// to `notApplicable`, so only `.required` (and rule-true `.conditional`) treat a
+    /// missing anchor as a failure. See research/patch_results_c3_bootchain_2026-09-09.md.
     public static func outcome(
         for raw: RawStepResult,
         requirement: PatchRequirement,
@@ -90,10 +98,14 @@ public enum PatchOutcomeMapping {
         case let .encodeFail(reason):
             return .failed(reason: "encode failed: \(reason)")
         case .noMatch:
-            if case let .conditional(rule) = requirement, !rule.evaluate(gates) {
+            switch requirement {
+            case .optional:
+                return .notApplicable(reason: "optional, no anchor")
+            case let .conditional(rule) where !rule.evaluate(gates):
                 return .notApplicable(reason: "rule \(rule.rawValue) false for this input: \(gates.summary)")
+            case .required, .conditional:
+                return .failed(reason: "anchor not found")
             }
-            return .failed(reason: "anchor not found")
         }
     }
 }
