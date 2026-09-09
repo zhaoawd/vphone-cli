@@ -1081,3 +1081,7 @@ record totals above do not establish completeness for a new input.
 JB 33 个、EXP 1 个方法及 DeviceTree/Manifest/Filesystem 操作接入结构化结果。JB 的凭证标签更新与扩展 Sandbox、EXP 的 OID/调用者改名增加完整性判据；本次没有重新定位指令或改变替换字节。Manifest 记录使用实际输入/输出字节。
 
 26.1、26.4 已运行用例的迁移前后记录与 payload 比较相等；26.4 dev 的 EXC_GUARD 与 JB 的 vm_map_protect 必要项失败，顺序组合也如实失败。未恢复已停用的 vm_map_protect Shape B，未扩大支持范围。输入哈希、验证结果、历史证据与未完成项见 [C3 内核记录](patch_results_c3_kernel_2026-09-09.md)、[EXP 记录](patch_results_c3_exp_2026-09-09.md)、[产物记录](patch_results_c3_artifacts_2026-09-09.md)。
+
+### C3 26.4 内核重新定位（2026-09-09）
+
+EXC_GUARD 从 entitlement 引用恢复调用关系，兼容 26.1 两层 BL 和 26.4 包装函数尾调用；核对 code/subcode 保存和 AST bit 更新后，只将目标入口替换为 RET。vm_map_protect 从主函数认证回调指针恢复 26.4 的 BIC/CMP/CCMP 执行权限 gate，仅改写 B.NE 为同目标 B；COW WRITE mask 保持不变。地址不参与运行时定位，必要性规则未改变。26.1/26.4 的目标地址、唯一写入、重复应用及异常锚点拒绝测试通过；26.4 必要集合与包含 Frida 的顺序组合通过，组合为 133 条记录。尚未进行修正后的 VM 实机测试。实现和验证见 [重新定位记录](c3_kernel_retarget_2026-09-09.md)，详细 reveal 见 [诊断记录](c3_acceptance_diagnosis_2026-09-09.md)。
