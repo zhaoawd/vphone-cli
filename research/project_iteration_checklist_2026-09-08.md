@@ -6,7 +6,7 @@
 
 目标：先建立可验证、可恢复的 VM 与固件流程，再完善无 GUI 自动化和多 VM 使用能力。
 
-本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）。其余 23 项待执行。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)与[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)。
+本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）；B4 已完成并提交（`20cf892` Swift、`ff423c2` Shell）；C1 已完成（机器可读兼容性清单 + 双向校验测试 + 文档）。已完成 7 项（A1、A2、B1、B2、B3、B4、C1），其余 21 项待执行。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)、[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)、[B4 离线操作占用保护](../research/offline_op_guard_2026-09-09.md)与[固件兼容性清单](../research/firmware_compatibility.md)。
 
 ## 一、建议现在开始的工作
 
@@ -122,27 +122,31 @@
 
 结果：目标由 `(pid, startedAt)` 对标识，`startedAt` 取 `kinfo_proc.kp_proc.p_starttime`；SIGKILL 之前重新列举进程并与快照求交集，`startedAt` 变化、记录缺失或已成僵尸的 pid 一律按已退出处理，不再收到信号。SIGKILL 与 `--force` 之后按 0.5 秒粒度、最长 3 秒确认目标消失且 bundle 锁释放，未确认时输出 `stop failed` 并以非零码退出。判定与信号逻辑移入新增的 `VPhoneVMStopper`，`lsof` 只用于「持锁但无引导目标」分支列出 Disk.img 持有者。新增 13 项 `VMStopTests`（含符号链接替身引导进程、Disk.img 持有者、`trap '' INT`、Python `flock` 持锁方、注入的 pid 复用与失败路径）；`swift test --filter 'VMStopTests|LaunchLayoutTests|VMLockTests|ShutdownPolicyTests'` 41 项通过，`make test` 295 项通过，`make build` 与 7 项 entitlements 校验通过。2026-09-09 在 VM `rig-baseline`（iOS 26.6.1，exp 变体）上完成实机验证：优雅回归（`vm stop`，4.193 s，退出码 0，无 `force-killing`）、SIGKILL 分支（`--timeout 1`，1.685 s，先 `sending SIGINT` 后 `force-killing`，退出码 0）、`--force`（0.603 s，无 SIGINT，退出码 0）、未运行（`not running`，退出码 0）与「持锁但无引导目标」（Python `flock` 持锁方，退出码 1，未发送任何信号，持锁进程存活）五类场景，每次停止后 `pgrep vphone-cli`、`lsof Disk.img`、`com.apple.Virtualization.VirtualMachine` 均为空，二次 `vm stop` 输出 `not running`；两次强杀后 VM 仍能正常引导并完成优雅关机。`dfu` 引导、`.app` 内二进制停止和 `.failed` 分支仍未实机触发。详见[修复记录](review_fixes_2026-09-08.md)「B3 停止目标身份复核（2026-09-09）」。
 
-### B4 — 统一所有离线操作的占用保护【P0；依赖 B1、B2、B3】
+### B4 — 统一所有离线操作的占用保护【已完成；2026-09-09】
 
 涉及：`VPhoneBundleOps.swift`、VM 管理/传输 CLI、restore、CFW host 安装、旧 Make/Shell 入口。
 
-- [ ] 为删除、重命名、克隆、导出、恢复、CFW 安装和修改配置定义明确的运行中策略；首版拒绝在线克隆/导出，除非另有经验证的一致快照实现。
-- [ ] 检查与实际操作处于同一锁生命周期内；`--force` 只跳过交互确认，不绕过磁盘占用检查。
-- [ ] 验证 CLI 与脚本入口、外部进程占用、检查后立即启动的竞争、路径别名和操作异常。
+- [x] 为删除、重命名、克隆、导出、恢复、CFW 安装和修改配置定义明确的运行中策略；首版拒绝在线克隆/导出，除非另有经验证的一致快照实现。
+- [x] 检查与实际操作处于同一锁生命周期内；`--force` 只跳过交互确认，不绕过磁盘占用检查。
+- [x] 验证 CLI 与脚本入口、外部进程占用、检查后立即启动的竞争、路径别名和操作异常。
 
 验收：所有列出的操作使用统一保护规则，不能从旧入口绕过；失败不破坏原 VM。
 
+结果：新增 `VPhoneBundleGuard`（`withBundleLock` / `withLibraryLock` / `requireDFUOwner`）与 `VPhoneLibraryLock`，统一每个离线 bundle 操作的占用保护入口，两侧（Swift、Shell/Makefile）共用对目录 inode 的同一把 `flock`。三层模型：bundle 锁（config/rename/delete/clone/export/stage-vphoned/cfw-record/cleanup-firmware/fw-prepare/fw-patch/restore-decrypt，跨整个「检查—写入」窗口）、library-root 锁（create/import，把名字存在性检查与放置合并为同一锁生命周期以修 TOCTOU）、协作式 DFU 校验（restore 校验当前 DFU 持有者而非再取锁）。runtime 记录只作拒绝原因佐证，不参与是否允许判定。`recordVariant`/`removeBuiltFirmware` 改为要求 `holding: VPhoneVMLock`，使 cfw-record 锁成为编译期约束。Shell 侧：`setup_machine.sh` 去掉 `lsof/pgrep → kill -9` 预检并改为调用 `vphone-cli vm stop`（非零退出即终止，无强杀回退）；`vm_backup/vm_restore/vm_switch/vm_package/vm_create` 经 `scripts/vm_lock.py` 自包裹；`Makefile fw_prepare` 以 `vm_lock.py` 包裹。回归覆盖操作词表、嵌套锁拒绝、delete 不改字节、inode（非路径）键、create/import 同名竞争（`afterNameCheck` seam）、全部 `requireDFUOwner` 路径。验证：`swift test` B4 套件通过；`make build` 签名成功；`make test` 240 项 / 32 套件通过；所有改动脚本 `zsh -n` 通过。设计与范围见 [B4 离线操作占用保护](offline_op_guard_2026-09-09.md)。提交：`20cf892`（Swift）、`ff423c2`（Shell）。
+
 ## 五、C：补丁完整性与产物恢复
 
-### C1 — 建立机器可读的兼容性清单【P0；依赖 A1】
+### C1 — 建立机器可读的兼容性清单【已完成；2026-09-09】
 
 涉及：拟新增 `research/firmware_compatibility.json` 与格式校验；现有 firmware 测试脚本和固件选择报告。
 
-- [ ] 分别记录 iPhone 版本/构建、cloudOS 版本/构建、内核类型、变体、选项、验证阶段和对应证据。
-- [ ] 先录入能找到证据的精确组合；区分代码可选择、补丁验证通过、启动通过和特定能力通过。
-- [ ] 为每个补丁配置登记必要方法/补丁组和预期不适用项；计数分别记录方法数与写入记录数，不用单一总数判断兼容。
+- [x] 分别记录 iPhone 版本/构建、cloudOS 版本/构建、内核类型、变体、选项、验证阶段和对应证据。
+- [x] 先录入能找到证据的精确组合；区分代码可选择、补丁验证通过、启动通过和特定能力通过。
+- [x] 为每个补丁配置登记必要方法/补丁组和预期不适用项；计数分别记录方法数与写入记录数，不用单一总数判断兼容。
 
 验收：清单能解释同一变体在不同输入下的记录差异；未知组合明确显示为未验证。
+
+结果：新增 `research/firmware_compatibility.json`（`schema_version: 1`）、Python 格式校验 `tests/test_firmware_compatibility.py`（14 项，`make test` 自动发现）、Swift 一致性测试 `tests/VPhoneCoreTests/FirmwareCompatibilityManifestTests.swift`（2 项，与 `VPhoneFirmwareCatalog` 交叉校验）、说明文档 `research/firmware_compatibility.md`。清单含 5 个补丁配置（less/regular/dev/jb/exp，按流水线组件顺序列方法、gate 与预期不适用项）、23 条 catalog iOS 配对（构建号从 IPSW URL 解析；`c1_inventory.md` 记的「24 条」经复核实为 23）、4 个 cloudOS 镜像与 30 条组合。阶段分布：23 条 `code_selectable`（每条覆盖 5 变体，cloudOS 构建号 `null`）、3 条 `patch_verified`（26.1/26.3 regular/dev/jb 字节 parity、26.5 jb 83 records byte-identical）、4 条 `capability_verified`（27.0 24A5408d jb+frida、24A5380h jb、24A5390f jb、26.6.1 exp rig-baseline）。计数分列 method（JB 内核 59）与 record（84@26.x / 83@26.5 / 95@27.0），并登记 CLAUDE.md 52/66/127/141 & 10/12/14/18 与 `0_binary_patch_comparison.md` 56/70/132/163 及 method/record 三套口径的差异（CLAUDE.md 数字标记待确认，未修改 CLAUDE.md）。校验命令：`python3 -m unittest tests.test_firmware_compatibility -v` 全过；`make test` 全过；`swift build` 成功。限制：regular/dev 无完整真机 boot 证据、cloudOS 构建号多数缺失、内核类型维度含义待确认——均记入 `open_questions`。未应用新二进制补丁，`0_binary_patch_comparison.md` 未改。提交号待提交后补记。
 
 ### C2 — 定义结构化补丁结果【P0；依赖 C1】
 

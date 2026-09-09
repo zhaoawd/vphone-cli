@@ -1,0 +1,3264 @@
+{
+  "schema_version": 1,
+  "updated": "2026-09-09",
+  "policy": {
+    "unlisted_combination_stage": "unverified",
+    "stages": [
+      "code_selectable",
+      "patch_verified",
+      "boot_verified",
+      "capability_verified"
+    ],
+    "stage_semantics": {
+      "code_selectable": "该组合可由代码/catalog 选择并进入流水线，但未做任何补丁或启动验证。",
+      "patch_verified": "补丁在该组合上产出预期的字节/record 结果（如字节 parity 或 record 计数），无需真机启动。",
+      "boot_verified": "该组合已在真机完成启动（至少一次），有带日期的证据。",
+      "capability_verified": "该组合在真机验证了具体能力（触控/相机/定位/JB/vphoned 等），capabilities 非空。"
+    },
+    "count_semantics": {
+      "method_count": "补丁方法（如 patchSandbox）数量；一个方法可 emit 0 至多条 record，无匹配时静默跳过（FirmwarePipeline 组件级空数组才失败，:203-205）。",
+      "record_count": "实际写入的 PatchRecord 条数；键 '<iPhone构建>/<cloudOS构建>' 表示特定输入的实测计数，'unknown' 标记缺失的构建号，'summary(...)' 表示研究文档 Summary 表的通用（非特定构建）计数。同一变体在不同 iOS-27/--frida 门控下 record 数不同。"
+    }
+  },
+  "dimensions": {
+    "device": [
+      "iPhone17,3"
+    ],
+    "variants": [
+      "less",
+      "regular",
+      "dev",
+      "jb",
+      "exp"
+    ],
+    "kernel_types": [
+      {
+        "id": "research",
+        "kernel_file": "kernelcache.research.vphone600",
+        "note": "固件补丁选择的内核文件名恒为 kernelcache.research.vphone600（FirmwarePipeline.swift:343）；release/development/kasan 无对应代码输入，含义待确认。dev 是补丁变体（KernelPatcher isDev），非内核映像类型。"
+      }
+    ],
+    "options": [
+      {
+        "id": "force-exc-guard",
+        "flag": "--force-exc-guard",
+        "effect": "在 regular/jb/exp 上强制启用 EXC_GUARD(Mach port guard) 禁用补丁；iOS 18 基线恒开与此无关。",
+        "source": "sources/vphone-cli/VPhoneCLI.swift:189-193"
+      },
+      {
+        "id": "frida",
+        "flag": "--frida",
+        "effect": "启用 Frida Stalker 内核放松补丁（JB-23b/JB-25c），门控 cloudOS 26.4+；jb/exp only。",
+        "source": "sources/vphone-cli/VPhoneCLI.swift:195-199"
+      },
+      {
+        "id": "no-binpack",
+        "flag": "--no-binpack",
+        "effect": "排除 SSH/VNC 等二进制安装（patchless-only）。",
+        "source": "sources/vphone-cli/VPhoneCLI.swift:181-186"
+      },
+      {
+        "id": "no-vphoned",
+        "flag": "--no-vphoned",
+        "effect": "排除 vphoned 安装（patchless-only）。",
+        "source": "sources/vphone-cli/VPhoneCLI.swift:181-186"
+      }
+    ],
+    "auto_gates": [
+      {
+        "id": "iosBaseIs18",
+        "effect": "iPhone 基础版本以 18. 开头：EXC_GUARD 常开 + 18.x skywalk-netagent boot-arg(if_attach_nx=0x3)。",
+        "source": "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift:138"
+      },
+      {
+        "id": "iosBaseIs27",
+        "effect": "以 27. 开头：启用 iOS-27-only JB 内核补丁（applyIOS27）。",
+        "source": "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift:139"
+      },
+      {
+        "id": "cloudOSIsFridaCapable",
+        "effect": "cloudOS ProductVersion ≥ 26.4：门控 Frida 内核补丁（配合 --frida）。",
+        "source": "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift:148"
+      }
+    ]
+  },
+  "firmware": {
+    "ios": [
+      {
+        "version": "18.6.2",
+        "build": "22G100",
+        "cloudos_name": "cloudOS 26.1",
+        "source": "catalog"
+      },
+      {
+        "version": "26.0",
+        "build": "23A341",
+        "cloudos_name": "cloudOS 26.1",
+        "source": "catalog"
+      },
+      {
+        "version": "26.0.1",
+        "build": "23A355",
+        "cloudos_name": "cloudOS 26.1",
+        "source": "catalog"
+      },
+      {
+        "version": "26.1",
+        "build": "23B85",
+        "cloudos_name": "cloudOS 26.1",
+        "source": "catalog"
+      },
+      {
+        "version": "26.2",
+        "build": "23C55",
+        "cloudos_name": "cloudOS 26.2",
+        "source": "catalog"
+      },
+      {
+        "version": "26.2.1",
+        "build": "23C71",
+        "cloudos_name": "cloudOS 26.2",
+        "source": "catalog"
+      },
+      {
+        "version": "26.3",
+        "build": "23D127",
+        "cloudos_name": "cloudOS 26.3",
+        "source": "catalog"
+      },
+      {
+        "version": "26.3.1",
+        "build": "23D8133",
+        "cloudos_name": "cloudOS 26.3",
+        "source": "catalog"
+      },
+      {
+        "version": "26.4",
+        "build": "23E246",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "26.4.1",
+        "build": "23E254",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "26.4.2",
+        "build": "23E261",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "26.5",
+        "build": "23F77",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "26.5.2",
+        "build": "23F84",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "26.6",
+        "build": "23G71",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "26.6.1",
+        "build": "23G83",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5355q",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5370h",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5380h",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5390f",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5408d",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5418b",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5424a",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A5430a",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      }
+    ],
+    "cloudos": [
+      {
+        "version": "26.1",
+        "build": "23B85",
+        "image": "cloud261",
+        "build_known": true,
+        "source": "research/0_binary_patch_comparison.md:854"
+      },
+      {
+        "version": "26.2",
+        "build": null,
+        "image": "cloud262",
+        "build_known": false,
+        "source": "sources/VPhoneCore/VPhoneFirmwareCatalog.swift:39"
+      },
+      {
+        "version": "26.3",
+        "build": "23D128",
+        "image": "cloud263",
+        "build_known": true,
+        "source": "research/0_binary_patch_comparison.md:855"
+      },
+      {
+        "version": "26.4",
+        "build": "23E5207q",
+        "image": "cloud264",
+        "build_known": true,
+        "source": "research/0_binary_patch_comparison.md:227"
+      }
+    ]
+  },
+  "patch_configurations": [
+    {
+      "variant": "less",
+      "note": "patchless 变体：不打引导链/内核补丁，走 img4 签名以外的文件系统/Manifest 路径。iBEC/LLB 仍运行以保留串口日志（FirmwarePipeline.swift:305,317）。",
+      "components": [
+        {
+          "component": "AVPBooter",
+          "patchers": [
+            "(skip)"
+          ],
+          "runs_on": "不运行（less 跳过，FirmwarePipeline.swift:256）",
+          "fail_if_component_empty": true,
+          "methods": [],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          }
+        },
+        {
+          "component": "iBSS",
+          "patchers": [
+            "(skip)"
+          ],
+          "runs_on": "不运行（less 跳过）",
+          "fail_if_component_empty": true,
+          "methods": [],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          }
+        },
+        {
+          "component": "iBEC",
+          "patchers": [
+            "IBootPatcher(.ibec)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 4（research/0_binary_patch_comparison.md:824），Migration parity 记 ibec 7/7（:864）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "LLB",
+          "patchers": [
+            "IBootPatcher(.llb)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 6（research/0_binary_patch_comparison.md:825），Migration parity 记 llb 13/13（:865）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "TXM",
+          "patchers": [
+            "(skip)"
+          ],
+          "runs_on": "不运行（less 跳过，FirmwarePipeline.swift:329-346）",
+          "fail_if_component_empty": true,
+          "methods": [],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          }
+        },
+        {
+          "component": "kernelcache",
+          "patchers": [
+            "(skip)"
+          ],
+          "runs_on": "不运行（less 跳过，FirmwarePipeline.swift:348-393）",
+          "fail_if_component_empty": true,
+          "methods": [],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          }
+        },
+        {
+          "component": "DeviceTree",
+          "patchers": [
+            "DeviceTreePatcher(base)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "serial_number",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "home_button_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "artwork_device_subtype",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "island_notch_location",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 4
+            }
+          }
+        },
+        {
+          "component": "Filesystem",
+          "patchers": [
+            "CryptexFilesystemPatcher"
+          ],
+          "runs_on": "仅 less 变体运行（FirmwarePipeline.swift:418-433）",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchCryptexFilesystem",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          }
+        },
+        {
+          "component": "Manifest",
+          "patchers": [
+            "ManifestHashPatcher"
+          ],
+          "runs_on": "仅 less 变体运行（FirmwarePipeline.swift:435-449）",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchManifestHash",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          }
+        }
+      ]
+    },
+    {
+      "variant": "regular",
+      "note": "base 引导链 + base 内核补丁。",
+      "components": [
+        {
+          "component": "AVPBooter",
+          "patchers": [
+            "AVPBooterPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchDGSTBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 1,
+              "23B85/23B85(parity 2026-03-10, research/0_binary_patch_comparison.md:861-869)": 1
+            }
+          }
+        },
+        {
+          "component": "iBSS",
+          "patchers": [
+            "IBootPatcher(.ibss)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 2
+            }
+          },
+          "note": "record 计数口径不一致：Summary 表记 iBSS base 2 / +jb 3（research/0_binary_patch_comparison.md:822），Migration parity 记 ibss 4/4、ibss_jb 1/1（:863,867）。含义待确认。"
+        },
+        {
+          "component": "iBEC",
+          "patchers": [
+            "IBootPatcher(.ibec)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 4（research/0_binary_patch_comparison.md:824），Migration parity 记 ibec 7/7（:864）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "LLB",
+          "patchers": [
+            "IBootPatcher(.llb)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 6（research/0_binary_patch_comparison.md:825），Migration parity 记 llb 13/13（:865）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "TXM",
+          "patchers": [
+            "TXMPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchTrustcacheBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 1,
+              "23B85/23B85(parity 2026-03-10, research/0_binary_patch_comparison.md:861-869)": 1
+            }
+          }
+        },
+        {
+          "component": "kernelcache",
+          "patchers": [
+            "KernelPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchApfsRootSnapshot",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsSealBroken",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBsdInitRootvp",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchLaunchConstraints",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebugger",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationNOP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationCMP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDyldPolicy",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsGraft",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsMount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSandbox",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchExcGuardBehavior",
+              "required": false,
+              "gate": "applyExcGuard",
+              "expected_not_applicable": [
+                "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
+              ]
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 28,
+              "23B85/23B85(parity 2026-03-10, research/0_binary_patch_comparison.md:861-869)": 28
+            }
+          }
+        },
+        {
+          "component": "DeviceTree",
+          "patchers": [
+            "DeviceTreePatcher(base)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "serial_number",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "home_button_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "artwork_device_subtype",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "island_notch_location",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "variant": "dev",
+      "note": "regular + TXMDevPatcher + KernelPatcher(isDev)（EXC_GUARD 行为方法 dev 恒开）。",
+      "components": [
+        {
+          "component": "AVPBooter",
+          "patchers": [
+            "AVPBooterPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchDGSTBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 1
+            }
+          }
+        },
+        {
+          "component": "iBSS",
+          "patchers": [
+            "IBootPatcher(.ibss)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 2
+            }
+          },
+          "note": "record 计数口径不一致：Summary 表记 iBSS base 2 / +jb 3（research/0_binary_patch_comparison.md:822），Migration parity 记 ibss 4/4、ibss_jb 1/1（:863,867）。含义待确认。"
+        },
+        {
+          "component": "iBEC",
+          "patchers": [
+            "IBootPatcher(.ibec)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 4（research/0_binary_patch_comparison.md:824），Migration parity 记 ibec 7/7（:864）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "LLB",
+          "patchers": [
+            "IBootPatcher(.llb)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 6（research/0_binary_patch_comparison.md:825），Migration parity 记 llb 13/13（:865）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "TXM",
+          "patchers": [
+            "TXMDevPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchTrustcacheBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchGetTaskAllowForceTrue",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebuggerEntitlementForceTrue",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDeveloperModeBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSelector24Shellcode",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSelector42_29Shellcode",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 12,
+              "23B85/23B85(txm_dev parity, :866)": 12
+            }
+          }
+        },
+        {
+          "component": "kernelcache",
+          "patchers": [
+            "KernelPatcher(isDev)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchApfsRootSnapshot",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsSealBroken",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBsdInitRootvp",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchLaunchConstraints",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebugger",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationNOP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationCMP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDyldPolicy",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsGraft",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsMount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSandbox",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchExcGuardBehavior",
+              "required": false,
+              "gate": "applyExcGuard",
+              "expected_not_applicable": [
+                "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
+              ]
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 29
+            }
+          }
+        },
+        {
+          "component": "DeviceTree",
+          "patchers": [
+            "DeviceTreePatcher(base)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "serial_number",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "home_button_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "artwork_device_subtype",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "island_notch_location",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "variant": "jb",
+      "note": "regular + IBootJBPatcher(.ibss) + TXMDevPatcher + KernelJBPatcher。iOS-27 门控与 --frida 门控见各方法 gate 字段。",
+      "components": [
+        {
+          "component": "AVPBooter",
+          "patchers": [
+            "AVPBooterPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchDGSTBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 1
+            }
+          }
+        },
+        {
+          "component": "iBSS",
+          "patchers": [
+            "IBootPatcher(.ibss)",
+            "IBootJBPatcher(.ibss)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSkipGenerateNonce",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": [
+                "已写入 nonce skip 的 iBSS 复跑时 emit 幂等 no-op record（0_binary_patch_comparison.md:895）"
+              ]
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 3,
+              "23B85/23B85(ibss_jb parity, :867)": 1
+            }
+          },
+          "note": "record 计数口径不一致：Summary 表记 iBSS base 2 / +jb 3（research/0_binary_patch_comparison.md:822），Migration parity 记 ibss 4/4、ibss_jb 1/1（:863,867）。含义待确认。"
+        },
+        {
+          "component": "iBEC",
+          "patchers": [
+            "IBootPatcher(.ibec)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 4（research/0_binary_patch_comparison.md:824），Migration parity 记 ibec 7/7（:864）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "LLB",
+          "patchers": [
+            "IBootPatcher(.llb)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 6（research/0_binary_patch_comparison.md:825），Migration parity 记 llb 13/13（:865）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "TXM",
+          "patchers": [
+            "TXMDevPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchTrustcacheBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchGetTaskAllowForceTrue",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebuggerEntitlementForceTrue",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDeveloperModeBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSelector24Shellcode",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSelector42_29Shellcode",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 12
+            }
+          }
+        },
+        {
+          "component": "kernelcache",
+          "patchers": [
+            "KernelPatcher",
+            "KernelJBPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchApfsRootSnapshot",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsSealBroken",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBsdInitRootvp",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchLaunchConstraints",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebugger",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationNOP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationCMP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDyldPolicy",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsGraft",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsMount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSandbox",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchExcGuardBehavior",
+              "required": false,
+              "gate": "applyExcGuard",
+              "expected_not_applicable": [
+                "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
+              ]
+            },
+            {
+              "name": "patch_amfi_cdhash_in_trustcache",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_amfi_execve_kill_path",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "JB 变体改用 C21，本方法仅 standalone（JB-02，JB Enabled=N）"
+              ]
+            },
+            {
+              "name": "patch_exec_security_policy_kill",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_container_manager_upcall",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_cred_label_update_execve",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "JB Enabled=N：待启动验证（JB-03）"
+              ]
+            },
+            {
+              "name": "patch_hook_cred_label_update_execve",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_kcall10",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_post_validation_additional",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_syscallmask_apply_to_proc",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_task_conversion_eval_internal",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_sandbox_hooks_extended",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": [
+                "ops[124]/ops[267] 分支仅 iosBaseIs27 时加入（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_iouc_failed_macf",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_iouc_failed_sandbox",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_proc_security_policy",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_proc_pidinfo",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_convert_port_to_map",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_bsd_init_auth",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_dounmount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_io_secure_bsd_root",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_load_dylinker",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_mac_mount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_nvram_verify_permission",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_shared_region_map",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_spawn_validate_persona",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_task_for_pid",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_thid_should_crash",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchThreadSetStateEntitlementFlag",
+              "required": false,
+              "gate": "applyFrida",
+              "expected_not_applicable": [
+                "--frida 未启用",
+                "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
+              ]
+            },
+            {
+              "name": "patch_vm_fault_enter_prepare",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_vm_map_protect",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "Shape A(26.1-26.4) 生效；Shape B(26.5) 已停用（0_binary_patch_comparison.md:157，JB-25）"
+              ]
+            },
+            {
+              "name": "patchVmMapDeleteImmutableCode",
+              "required": false,
+              "gate": "applyFrida",
+              "expected_not_applicable": [
+                "--frida 未启用",
+                "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
+              ]
+            },
+            {
+              "name": "patch_iomfb_swapend_variable_size",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_iomfb_swapend_handler_size",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_disk_images2_client_abi",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_fpfs_scoped_vnode_open",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            }
+          ],
+          "known": {
+            "method_count": 59,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 28,
+              "23B85/23B85(parity 2026-03-10, research/0_binary_patch_comparison.md:861-869)": 28,
+              "23B85/23B85(kernelcache_jb parity, :868)": 84,
+              "23D127/23D128(kernelcache_jb parity, :868/855)": 84,
+              "23F77/unknown(26.5 base synthetic, :125)": 83,
+              "27.0-base/c0ecdb4b-26.4(:125)": 95
+            }
+          },
+          "note": "Kernel base(28) + KernelJBPatcher。method_count 59 为 KernelJBPatcher 方法口径（Summary 表 'Kernel (JB methods) 59'，research/0_binary_patch_comparison.md:830；Cross-Version snapshot KERNEL_JB=59，:849-856）；record 数随 iOS-27/--frida 门控变化（84 @26.x / 83 @26.5 / 95 @27.0）。"
+        },
+        {
+          "component": "DeviceTree",
+          "patchers": [
+            "DeviceTreePatcher(base)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "serial_number",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "home_button_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "artwork_device_subtype",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "island_notch_location",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "variant": "exp",
+      "note": "JB 超集 + KernelEXPPatcher(hv_vmm rename) + DeviceTreePatcher identity 补丁（仅 exp）。",
+      "components": [
+        {
+          "component": "AVPBooter",
+          "patchers": [
+            "AVPBooterPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchDGSTBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 1
+            }
+          }
+        },
+        {
+          "component": "iBSS",
+          "patchers": [
+            "IBootPatcher(.ibss)",
+            "IBootJBPatcher(.ibss)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSkipGenerateNonce",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 3
+            }
+          },
+          "note": "record 计数口径不一致：Summary 表记 iBSS base 2 / +jb 3（research/0_binary_patch_comparison.md:822），Migration parity 记 ibss 4/4、ibss_jb 1/1（:863,867）。含义待确认。"
+        },
+        {
+          "component": "iBEC",
+          "patchers": [
+            "IBootPatcher(.ibec)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 4（research/0_binary_patch_comparison.md:824），Migration parity 记 ibec 7/7（:864）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "LLB",
+          "patchers": [
+            "IBootPatcher(.llb)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchSerialLabels",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBootArgs",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "extraBootArgs 内容由 pipeline 注入：iOS18 基线为 if_attach_nx=0x3，否则空（FirmwarePipeline.swift:247）"
+              ]
+            },
+            {
+              "name": "patchBootxPrecondition",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchRootfssBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPanicBypass",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {}
+          },
+          "note": "record 计数口径不一致：Summary 表记 6（research/0_binary_patch_comparison.md:825），Migration parity 记 llb 13/13（:865）。含义待确认，暂记 null。"
+        },
+        {
+          "component": "TXM",
+          "patchers": [
+            "TXMDevPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchTrustcacheBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchGetTaskAllowForceTrue",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebuggerEntitlementForceTrue",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDeveloperModeBypass",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSelector24Shellcode",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSelector42_29Shellcode",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 12
+            }
+          }
+        },
+        {
+          "component": "kernelcache",
+          "patchers": [
+            "KernelPatcher",
+            "KernelJBPatcher",
+            "KernelEXPPatcher"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "patchApfsRootSnapshot",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsSealBroken",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchBsdInitRootvp",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchLaunchConstraints",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDebugger",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationNOP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchPostValidationCMP",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchDyldPolicy",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsGraft",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchApfsMount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchSandbox",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchExcGuardBehavior",
+              "required": false,
+              "gate": "applyExcGuard",
+              "expected_not_applicable": [
+                "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
+              ]
+            },
+            {
+              "name": "patch_amfi_cdhash_in_trustcache",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_amfi_execve_kill_path",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "JB 变体改用 C21，本方法仅 standalone（JB-02，JB Enabled=N）"
+              ]
+            },
+            {
+              "name": "patch_exec_security_policy_kill",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_container_manager_upcall",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_cred_label_update_execve",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "JB Enabled=N：待启动验证（JB-03）"
+              ]
+            },
+            {
+              "name": "patch_hook_cred_label_update_execve",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_kcall10",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_post_validation_additional",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_syscallmask_apply_to_proc",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_task_conversion_eval_internal",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_sandbox_hooks_extended",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": [
+                "ops[124]/ops[267] 分支仅 iosBaseIs27 时加入（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_iouc_failed_macf",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_iouc_failed_sandbox",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_proc_security_policy",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_proc_pidinfo",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_convert_port_to_map",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_bsd_init_auth",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_dounmount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_io_secure_bsd_root",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_load_dylinker",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_mac_mount",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_nvram_verify_permission",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_shared_region_map",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_spawn_validate_persona",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_task_for_pid",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_thid_should_crash",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patchThreadSetStateEntitlementFlag",
+              "required": false,
+              "gate": "applyFrida",
+              "expected_not_applicable": [
+                "--frida 未启用",
+                "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
+              ]
+            },
+            {
+              "name": "patch_vm_fault_enter_prepare",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "patch_vm_map_protect",
+              "required": false,
+              "gate": null,
+              "expected_not_applicable": [
+                "Shape A(26.1-26.4) 生效；Shape B(26.5) 已停用（0_binary_patch_comparison.md:157，JB-25）"
+              ]
+            },
+            {
+              "name": "patchVmMapDeleteImmutableCode",
+              "required": false,
+              "gate": "applyFrida",
+              "expected_not_applicable": [
+                "--frida 未启用",
+                "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
+              ]
+            },
+            {
+              "name": "patch_iomfb_swapend_variable_size",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_iomfb_swapend_handler_size",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_disk_images2_client_abi",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patch_fpfs_scoped_vnode_open",
+              "required": false,
+              "gate": "iosBaseIs27",
+              "expected_not_applicable": [
+                "iPhone base 非 27.x：18.x/26.x 基线不运行（0_binary_patch_comparison.md:125）"
+              ]
+            },
+            {
+              "name": "patchHvVmmRename",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": [
+                "已重命名/已 mangle 的 EXP kernelcache 复跑时 emit 幂等 no-op record（0_binary_patch_comparison.md:895-896）"
+              ]
+            }
+          ],
+          "known": {
+            "method_count": 60,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)": 6,
+              "note-jb": "JB 内核 record 见 jb 变体；EXP 追加 6（Summary 'Kernel (EXP methods) 6'，:831）"
+            }
+          },
+          "note": "EXP kernelcache = base + JB + EXP。EXP-only 方法 1（patchHvVmmRename），Summary 记 EXP records 6（research/0_binary_patch_comparison.md:831）。method_count 60 = 59 JB + 1 EXP。"
+        },
+        {
+          "component": "DeviceTree",
+          "patchers": [
+            "DeviceTreePatcher(base)",
+            "DeviceTreePatcher(identity)"
+          ],
+          "runs_on": "该变体运行",
+          "fail_if_component_empty": true,
+          "methods": [
+            {
+              "name": "serial_number",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "home_button_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "artwork_device_subtype",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "island_notch_location",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "identity_and_camera_nodes",
+              "required": false,
+              "gate": "includeIdentityPatches(exp)",
+              "expected_not_applicable": [
+                "仅 exp 变体运行 includeIdentityPatches（FirmwarePipeline.swift:395-416）；含 target_sub_type/compatible_secondary/product 身份/arm-io/gestalt-variants rename/camera/facetime/audio/iopm/isp/ispRtb/smc 桩与 /product/camera 节点"
+              ]
+            }
+          ],
+          "known": {
+            "method_count": null,
+            "record_count": {
+              "summary(research/0_binary_patch_comparison.md:823-838)-base": 4,
+              "summary(research/0_binary_patch_comparison.md:823-838)-exp-identity": 8,
+              "summary(research/0_binary_patch_comparison.md:823-838)-exp-node": 1
+            }
+          },
+          "note": "base 4 属性 + EXP identity 8 + EXP node 1（/product/camera）（research/0_binary_patch_comparison.md:833-834）。"
+        }
+      ]
+    }
+  ],
+  "combinations": [
+    {
+      "id": "cs-22G100",
+      "ios": {
+        "version": "18.6.2",
+        "build": "22G100"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23A341",
+      "ios": {
+        "version": "26.0",
+        "build": "23A341"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23A355",
+      "ios": {
+        "version": "26.0.1",
+        "build": "23A355"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23B85",
+      "ios": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23C55",
+      "ios": {
+        "version": "26.2",
+        "build": "23C55"
+      },
+      "cloudos": {
+        "version": "26.2",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23C71",
+      "ios": {
+        "version": "26.2.1",
+        "build": "23C71"
+      },
+      "cloudos": {
+        "version": "26.2",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23D127",
+      "ios": {
+        "version": "26.3",
+        "build": "23D127"
+      },
+      "cloudos": {
+        "version": "26.3",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23D8133",
+      "ios": {
+        "version": "26.3.1",
+        "build": "23D8133"
+      },
+      "cloudos": {
+        "version": "26.3",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23E246",
+      "ios": {
+        "version": "26.4",
+        "build": "23E246"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23E254",
+      "ios": {
+        "version": "26.4.1",
+        "build": "23E254"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23E261",
+      "ios": {
+        "version": "26.4.2",
+        "build": "23E261"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23F77",
+      "ios": {
+        "version": "26.5",
+        "build": "23F77"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23F84",
+      "ios": {
+        "version": "26.5.2",
+        "build": "23F84"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23G71",
+      "ios": {
+        "version": "26.6",
+        "build": "23G71"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-23G83",
+      "ios": {
+        "version": "26.6.1",
+        "build": "23G83"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5355q",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5355q"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5370h",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5370h"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5380h",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5380h"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5390f",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5390f"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5408d",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5408d"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5418b",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5418b"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5424a",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5424a"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A5430a",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5430a"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "pv-261-parity",
+      "ios": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "evidence": [
+        {
+          "date": "2026-03-10",
+          "source": "research/0_binary_patch_comparison.md:869",
+          "summary": "Swift↔Python 字节 parity 在 26.1 的 regular/dev/jb 全部一致；组件 record 计数 kernelcache 28/28、txm_dev 12/12、kernelcache_jb 84/84、ibss_jb 1/1（:861-868）。Cross-Version snapshot iOS 26.1(23B85) TXM_JB=14/KERNEL_JB=59（:854）。"
+        }
+      ],
+      "limitations": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb"
+      ]
+    },
+    {
+      "id": "pv-263-parity",
+      "ios": {
+        "version": "26.3",
+        "build": "23D127"
+      },
+      "cloudos": {
+        "version": "26.3",
+        "build": "23D128"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "evidence": [
+        {
+          "date": "2026-03-10",
+          "source": "research/0_binary_patch_comparison.md:869",
+          "summary": "Swift↔Python 字节 parity 在 26.3 的 regular/dev/jb 全部一致。Cross-Version snapshot PCC 26.3(23D128)/iOS 26.3(23D127) TXM_JB=14/KERNEL_JB=59（:855-856）。"
+        }
+      ],
+      "limitations": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb"
+      ]
+    },
+    {
+      "id": "pv-265-jb",
+      "ios": {
+        "version": "26.5",
+        "build": "23F77"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "evidence": [
+        {
+          "date": "2026-07-20",
+          "source": "research/0_binary_patch_comparison.md:125",
+          "summary": "26.5 基线 kernel-jb 产出 83 records，且与 pre-branch main 输出 byte-identical（cmp clean；JB-29 后 sha256 不变）。"
+        }
+      ],
+      "limitations": [
+        "26.5 基线为 patch-component --target-os 26.5 的合成 kernel-jb 组件测试，未启动整机；cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variant": "jb"
+    },
+    {
+      "id": "cap-270-24A5408d-jb-frida",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5408d"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": "23E5207q"
+      },
+      "options": [
+        "frida"
+      ],
+      "stage": "capability_verified",
+      "capabilities": [
+        {
+          "id": "vphoned",
+          "result": "passed",
+          "note": "两次启动 vphoned 均报 iOS 27.0.0"
+        },
+        {
+          "id": "ddi-mount",
+          "result": "passed",
+          "note": "CoreDevice DDI auto-mount 退出码 0，compatible/usable；Xcode_iOS_DDI APFS 卷挂载"
+        },
+        {
+          "id": "jb-setup",
+          "result": "passed",
+          "note": "首启装 Sileo 2.5.1 + Frida Server 17.17.0；vpregister 注册 Sileo/TrollStore Lite 0 失败；uicache -l 返回 org.coolstar.SileoStore"
+        },
+        {
+          "id": "frida-server",
+          "result": "partial",
+          "note": "第二启 Frida Server 运行、guest TCP 27042 可连；未运行 host Frida client instrumentation"
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2026-08-17",
+          "source": "research/0_binary_patch_comparison.md:199",
+          "summary": "Upstream iOS 27 integration validation：JB+Frida 流水线完成 9 组件、168 patch records、两组 Frida 匹配、全部 5 条 DiskImages2 record；完成 restore、CFW+JB 安装、APFS live-snapshot、首启+二启，无 launchd panic（:227-241）。"
+        }
+      ],
+      "limitations": [
+        "未运行 host Frida client instrumentation（0_binary_patch_comparison.md:242）",
+        "headless 启动，未目视验证原生 VZ 视图显示与交互输入（:244）"
+      ],
+      "variant": "jb",
+      "record_counts": {
+        "total": 168,
+        "diskimages2": 5,
+        "frida": 4
+      }
+    },
+    {
+      "id": "cap-270-24A5380h-jb",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5380h"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "capability_verified",
+      "capabilities": [
+        {
+          "id": "display",
+          "result": "passed",
+          "note": "force-kern：iOS 27 userland 在原生 VZ 视图渲染并可交互，无 kIOReturnBadArgument/panic（2026-07-15）"
+        },
+        {
+          "id": "ddi-mount",
+          "result": "passed",
+          "note": "JB-09 ops[124] DDI auto-mount 在 c0ecdb4b 26.4 实测（DDI auto-mounts）"
+        },
+        {
+          "id": "vphoned",
+          "result": "passed",
+          "note": "lsd embedded-reg：Sileo 注册；vphoned 端到端装 IPA com.vphone.vptest（2026-07-17，:193）"
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2026-07-15",
+          "source": "research/0_binary_patch_comparison.md:192",
+          "summary": "force-kern（item 11）VALIDATED：31 entrypoints 重定向，iOS 27 渲染且 VZ 视图可交互，clean boot。JB-10b/JB-02d 亦于 2026-07-15 确认（:143,:130）。"
+        },
+        {
+          "date": "2026-07-17",
+          "source": "research/0_binary_patch_comparison.md:193",
+          "summary": "lsd embedded-reg 修复后 Sileo 注册，vphoned 端到端安装 IPA com.vphone.vptest 成功。"
+        }
+      ],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）（真机记录以 cloudOS 26.4 c0ecdb4b 哈希标识）"
+      ],
+      "variant": "jb"
+    },
+    {
+      "id": "cap-270-24A5390f-jb",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5390f"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "capability_verified",
+      "capabilities": [
+        {
+          "id": "display",
+          "result": "passed",
+          "note": "Campo 壁纸渲染稳定，无 crash-loop（2026-07-21，:195）"
+        },
+        {
+          "id": "jb-setup",
+          "result": "passed",
+          "note": "JB-29 fpfs-scoped-open：respring 停止，Sileo/TrollStore Lite 图标渲染（2026-07-23，setup_machine deploy）"
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2026-07-21",
+          "source": "research/0_binary_patch_comparison.md:195",
+          "summary": "Campo（CFW 步骤 JB-3b）VALIDATED：Campo 启动并稳定，无 BKSDisplayServicesStart/HID trap。"
+        },
+        {
+          "date": "2026-07-23",
+          "source": "research/0_binary_patch_comparison.md:159",
+          "summary": "JB-29 VALIDATED on-device（setup_machine deploy）：respring 停止；Sileo/TrollStoreLite 图标渲染。"
+        },
+        {
+          "date": "2026-07-22",
+          "source": "research/0_binary_patch_comparison.md:197",
+          "summary": "libxpc LWCR 补丁 host-mount deploy 实测：四个 LWCR crash-looper 消失，launchd 越过首解锁。"
+        }
+      ],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）（真机记录以 cloudOS 26.4 c0ecdb4b 哈希标识）"
+      ],
+      "variant": "jb"
+    },
+    {
+      "id": "cap-2661-exp-rigbaseline",
+      "ios": {
+        "version": "26.6.1",
+        "build": "23G83"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "capability_verified",
+      "capabilities": [
+        {
+          "id": "touch",
+          "result": "passed",
+          "note": "来宾路径触控注入：握手 caps 含 touch，日志 'guest-side touch injection enabled (iOS 26.6.1)'；tap/swipe 经 vphone.sock 注入、screenshot 判定"
+        },
+        {
+          "id": "touch",
+          "result": "partial",
+          "note": "--no-vphoned 原生路径该次仅取得陈旧帧（无法用 key power 唤醒），未取得有效手势数据（review_fixes:147）"
+        },
+        {
+          "id": "vm-stop",
+          "result": "passed",
+          "note": "五场景实测：优雅 4.193s 退出码0；SIGKILL(--timeout 1) 1.685s 退出码0；--force 0.603s 退出码0；未运行 not running；持锁无引导目标退出码1 不发信号（review_fixes:460-465）"
+        }
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-08",
+          "source": "research/review_fixes_2026-09-08.md:66",
+          "summary": "rig-baseline（iOS 26.6.1，exp）来宾触控注入实测：新构建 vphoned（sha256 99b4e493…）推入，caps 含 touch，tap/swipe 注入并以 screenshot 判定。"
+        },
+        {
+          "date": "2026-09-09",
+          "source": "research/review_fixes_2026-09-08.md:460",
+          "summary": "B3 vm stop 五场景实测退出码/耗时；每次停止后 pgrep/lsof/Virtualization 辅助进程均空，二次 stop 报 not running。"
+        }
+      ],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）（rig-baseline 全程只记 iOS 26.6.1 与 cloudOS 26.4）",
+        "相机『应用已使用』层级、host Frida client、regular/dev 真机 boot 未在本组合覆盖"
+      ],
+      "variant": "exp"
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "kernel-type-dimension",
+      "statement": "release/development/kasan 内核类型在当前代码中无独立可选择输入；唯一内核为 vphone600 research，dev 为补丁变体。含义待确认，需与 owner 对齐（c1_inventory A.6）。"
+    },
+    {
+      "id": "cloudos-build-missing",
+      "statement": "cloudOS 构建号在 catalog 与多数真机记录中缺失，仅版本名（catalog cloudOS 全无构建；rig-baseline 26.6.1 未记 cloudOS 构建）。"
+    },
+    {
+      "id": "count-discrepancy",
+      "statement": "CLAUDE.md 的 52/66/127/141(patches) 与 10/12/14/18(phases)、0_binary_patch_comparison.md Summary 的 56/70/132/163(record)、以及 method(JB 59)/record(84~95) 三套口径互不一致；CFW 脚本用 N/7 阶段。CLAUDE.md 数字待确认，不在本任务修改。"
+    },
+    {
+      "id": "regular-dev-no-boot",
+      "statement": "regular/dev 变体缺完整真机 boot 证据；真机 boot 集中于 JB(27.x) 与 exp(26.6.1 rig-baseline)。"
+    },
+    {
+      "id": "skip-vs-fail-structuralization",
+      "statement": "方法级无匹配静默跳过、组件级空数组才失败（FirmwarePipeline.swift:203-205）；现有固件测试靠 grep '[-]'，结构化结果判据待 C2/C3 完成。"
+    },
+    {
+      "id": "fixtures-absent",
+      "statement": "ipsws/patch_refactor_input fixtures 目录当前不存在，固件对比与 test_fw_patches/test_jb_patches 需本地固件或网络才能运行（c1_inventory D.2）。"
+    }
+  ]
+}
