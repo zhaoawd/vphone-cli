@@ -114,70 +114,45 @@ struct VPhoneVMStopCommand: ParsableCommand {
     @Flag(help: "Skip the graceful shutdown request and SIGKILL the boot process immediately")
     var force = false
 
-    /// PIDs of vphone-cli processes booted against this bundle's config.
-    ///
-    /// Deliberately NOT `lsof Disk.img`: the disk image is held open by the
-    /// Virtualization.framework helper process, so signalling the file holder
-    /// tears the VM out from under vphone-cli (`VZErrorDomain Code=1`) instead
-    /// of letting its SIGINT handler shut down.
-    private static func bootPIDs(configURL: URL) -> [Int32] {
-        guard let ps = try? VPhoneProcessRunner.runCapturing(
-            URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="]) else { return [] }
-        return VPhoneBootProcessLocator.parsePIDs(ps.stdout, configURL: configURL)
-    }
-
-    private static func isAlive(_ pid: Int32) -> Bool {
-        // ESRCH is the only "gone" answer; EPERM still means the pid exists.
-        kill(pid, 0) == 0 || errno != ESRCH
-    }
-
     func run() throws {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
 
-        // The kernel flock on the bundle directory is the authoritative liveness
-        // signal; the runtime record is only a hint.
-        guard VPhoneVMLockProbe.isLockHeld(directory: bundle.url) else {
-            print("\(name): not running")
-            return
-        }
+        // All target selection, signalling and confirmation lives in
+        // VPhoneVMStopper; this command only formats its progress and outcome.
+        let stopper = VPhoneVMStopper(
+            bundleDirectory: bundle.url, configURL: bundle.configURL,
+            diskURL: bundle.url.appendingPathComponent(bundle.manifest.diskImage),
+            report: { event in
+                switch event {
+                case let .bootInstance(id):
+                    print("\(name): boot instance \(id)")
+                case let .signalling(pids):
+                    print("\(name): sending SIGINT to \(Self.list(pids))")
+                case let .forceKilling(pids):
+                    print("\(name): force-killing \(Self.list(pids))")
+                }
+            })
 
-        let targets = Self.bootPIDs(configURL: bundle.configURL)
-        // The runtime record is only corroborating evidence: a recorded boot pid
-        // counts as a target solely when ps confirms it is a vphone-cli --config
-        // process for THIS bundle (a stale record may name a reused pid), and
-        // such a pid is already in `targets`. So the record never adds a target;
-        // below it only explains who holds the lock when no target was found.
-        guard !targets.isEmpty else {
-            var detail = "no vphone-cli boot process is running for it"
-            if let record = VPhoneVMRuntimeState.read(in: bundle.url), Self.isAlive(record.pid) {
-                detail = "it is held by pid \(record.pid) running operation \"\(record.operation)\""
-            }
+        let outcome = stopper.stop(timeout: TimeInterval(timeout), force: force)
+        switch outcome {
+        case .notRunning:
+            print("\(name): not running")
+
+        case let .noBootTarget(detail):
             FileHandle.standardError.write(Data(
                 "error: \(name): bundle lock is held but \(detail) — not signalling anything\n".utf8))
-            throw ExitCode(1)
-        }
 
-        if force {
-            print("\(name): force-killing \(targets.map(String.init).joined(separator: ", "))")
-            for pid in targets { kill(pid, SIGKILL) }
+        case .stopped:
             print("\(name): stopped")
-            return
-        }
 
-        print("\(name): sending SIGINT to \(targets.map(String.init).joined(separator: ", "))")
-        for pid in targets { kill(pid, SIGINT) }
+        case let .failed(_, reason):
+            FileHandle.standardError.write(Data("error: \(name): stop failed: \(reason)\n".utf8))
+        }
+        if outcome.exitCode != 0 { throw ExitCode(outcome.exitCode) }
+    }
 
-        var waited = 0
-        while waited < timeout, targets.contains(where: Self.isAlive) {
-            Thread.sleep(forTimeInterval: 1)
-            waited += 1
-        }
-        let survivors = targets.filter(Self.isAlive)
-        if !survivors.isEmpty {
-            print("\(name): force-killing \(survivors.map(String.init).joined(separator: ", "))")
-            for pid in survivors { kill(pid, SIGKILL) }
-        }
-        print("\(name): stopped")
+    private static func list(_ pids: [Int32]) -> String {
+        pids.map(String.init).joined(separator: ", ")
     }
 }

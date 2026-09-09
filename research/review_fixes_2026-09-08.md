@@ -2,7 +2,7 @@
 
 ## 范围与执行顺序
 
-依据两轮评审及用户确认，在当前分支修复，不开始 B3。保持目录 inode `flock` 协议，不修改二进制补丁。
+依据两轮评审及用户确认，在当前分支修复。本节所列 1–5 项执行时 B3 尚未开始；B3 已于 2026-09-09 实现，记录见文末「B3 停止目标身份复核（2026-09-09）」。保持目录 inode `flock` 协议，不修改二进制补丁。
 
 1. CFW：限制属主恢复范围；启动与恢复属主前检查 VM 目录内的挂载；使用 attach plist 识别基础设备；解析失败保留原始记录；普通卸载最多尝试三次，失败时不分离基础设备、不翻转快照。
 2. 缓存：区分已确认的无效元数据与工具、解析错误；后者保留缓存并停止；输出不含 AEA 密钥的错误；验证真实 SystemOS 专用副本。
@@ -84,7 +84,7 @@ make build
 
 ## 已确认的运行限制
 
-`make build` 与 `make vphoned` 成功，主机 release 与 app 的 `codesign --verify --strict` 均通过。但两者执行 `--help` 均返回 `-9`（SIGKILL），stdout 和 stderr 均为空。原因已查明：验收会话从内核日志取得 `AMFI: Code has restricted entitlements, but the validation of its code signature failed` 与 `AMFI: hook..execve() killing zsh: Attempt to execute completely unsigned code`；本机 `csrutil status` 为 Custom Configuration，`pgrep amfidont` 为空，即 README Option 2 所需的放行守护进程未运行。ad-hoc 签名无法满足 `com.apple.private.virtualization` 等受限权限，AMFI 在 execve 阶段终止进程，因此没有输出。这不是代码缺陷。2026-09-08 后续会话再次执行 release `--help` 得到退出码 137，`amfidont` 仍未运行；该会话的 `log show` 未检索到上述 AMFI 行，日志原文以验收会话记录为准。放行方式：以 root 运行 `scripts/start_amfidont_for_vphone.sh`（或 `make amfidont_allow_vphone`），守护进程按 `--path` 前缀匹配，不随开机启动。2026-09-08 已获批准并以 root 启动该守护进程（`--path` 项目根，两个 cdhash，`--spoof-apple`），随后 release 与 app 的 `--help` 均返回 0。守护进程重启后失效。此前 B2 已记录同类现象，本次未修改系统安全设置或移除生产二进制私有权限来绕过它。26.x 真实触控与完整 CFW 安装仍未完成，因此 B3 保持未开始。
+`make build` 与 `make vphoned` 成功，主机 release 与 app 的 `codesign --verify --strict` 均通过。但两者执行 `--help` 均返回 `-9`（SIGKILL），stdout 和 stderr 均为空。原因已查明：验收会话从内核日志取得 `AMFI: Code has restricted entitlements, but the validation of its code signature failed` 与 `AMFI: hook..execve() killing zsh: Attempt to execute completely unsigned code`；本机 `csrutil status` 为 Custom Configuration，`pgrep amfidont` 为空，即 README Option 2 所需的放行守护进程未运行。ad-hoc 签名无法满足 `com.apple.private.virtualization` 等受限权限，AMFI 在 execve 阶段终止进程，因此没有输出。这不是代码缺陷。2026-09-08 后续会话再次执行 release `--help` 得到退出码 137，`amfidont` 仍未运行；该会话的 `log show` 未检索到上述 AMFI 行，日志原文以验收会话记录为准。放行方式：以 root 运行 `scripts/start_amfidont_for_vphone.sh`（或 `make amfidont_allow_vphone`），守护进程按 `--path` 前缀匹配，不随开机启动。2026-09-08 已获批准并以 root 启动该守护进程（`--path` 项目根，两个 cdhash，`--spoof-apple`），随后 release 与 app 的 `--help` 均返回 0。守护进程重启后失效。此前 B2 已记录同类现象，本次未修改系统安全设置或移除生产二进制私有权限来绕过它。26.x 真实触控与完整 CFW 安装在本节记录时仍未完成；B3 已于 2026-09-09 实现（见文末「B3 停止目标身份复核（2026-09-09）」），其实机验证已部分完成（同节「实机验证（2026-09-09）」）。
 
 原生 attach 测试曾发现 APFS plist 同时列出物理磁盘与合成容器。解析现优先选取 `GUID_partition_scheme` 等分区表实体；无分区表时只有唯一基础设备才接受，歧义时保留输出并停止。新增回归覆盖该实际输出形状。测试失败留下的临时设备已通过 `hdiutil info -plist` 确认归属并普通分离；原生测试也已补充异常退出后的镜像清理。
 
@@ -361,6 +361,122 @@ ApplePSCI - system off
 - 强制停止失败时 `stop(completionHandler:)` 返回错误的分支。
 - `vm stop --force` 未实测。
 
-### 构建陷阱（本次踩到，非代码问题）
+### 构建陷阱（本次遇到，非代码问题）
 
 裸 `swift build -c release` 会重新链接 `.build/release/vphone-cli`，签名退化为 `adhoc,linker-signed` 且 entitlements 丢失；此后 `make build` 因产物比源文件新而跳过签名步骤，二进制保持无 entitlements 状态。表现为启动进程报 `[vphone] Fatal: PV=3 hardware model not supported`，而 `--help` 仍返回 0（AMFI 不再看到受限 entitlements，故不 SIGKILL），`boot_host_preflight.sh` 的 `=== Entitlements ===` 段为空。判定方法：`codesign -d -vvv .build/release/vphone-cli` 出现 `flags=0x20002(adhoc,linker-signed)`。恢复方法：删除产物后重新 `make build`（`codesign -d --entitlements -` 应列出 5 个键）。amfidont 无需重启，其 `--path` 前缀规则同时覆盖签名校验与 `isApple`（见 `amfidont/bypass_runtime.py`），与重建后的 cdhash 无关。
+
+## B3 停止目标身份复核（2026-09-09）
+
+对应清单 B3。上文「`vm stop` 目标进程选取修复」解决的是「信号发给哪个进程」；本节解决「升级信号前该 pid 是否还是同一个进程」和「停止是否确认成功」。
+
+### 问题（基线 `0b52b5f`，代码级事实）
+
+1. SIGINT 之后最长等待 `--timeout` 秒（默认 20）再对存活者发送 SIGKILL，期间不重新确认目标身份。pid 号可在该窗口内被内核分配给其他进程。
+2. 存活判定为 `kill(pid, 0)`，只能判断 pid 号是否存在，不能区分原进程与复用同一号码的新进程。
+3. SIGKILL 之后以及 `--force` 路径都不检查目标是否消失、bundle 锁是否释放，仍无条件输出 `<name>: stopped`。
+4. 运行记录 `.vphone-runtime.json` 只用于「持锁但无引导目标」分支的错误文本，`isBootOperation` 无调用方。该记录在正常退出时不删除（锁由内核随进程退出释放），因此每次 VM 退出后都是过期记录，不能作为判据。
+
+### 变更
+
+1. 新增 [`VPhoneProcessIdentity`](../sources/VPhoneCore/VPhoneProcessIdentity.swift)：`(pid, startedAt, uid, isZombie)`。`VPhoneProcessInfo.identity(of:)` 通过 `sysctl(CTL_KERN, KERN_PROC, KERN_PROC_PID, pid)` 读取 `kinfo_proc`，`startedAt` 取 `kp_proc.p_starttime`（秒，含微秒小数）。pid 不存在时返回 nil：本机实测 `sysctl` 对不存在的 pid 返回 0 且 `size` 为 0，返回 -1（`ENOENT`/`ESRCH`）同样按不存在处理。`p_stat == SZOMB` 记为 `isZombie`——僵尸进程仍有内核记录，但不再运行，也不再持有文件和锁，停止逻辑按已退出处理。
+2. 新增 [`VPhoneVMStopper`](../sources/VPhoneCore/VPhoneVMStopper.swift)：目标判定、信号发送和结果确认从 CLI 移出，依赖以闭包注入（`listTargets`、`identity`、`send`、`lockHeld`、`sleep`、`readRecord`、`diskHolders`、`report`）。生产装配仍是 `ps` + `VPhoneBootProcessLocator` 选目标、`VPhoneVMLockProbe` 判占用、`lsof` 仅列 Disk.img 持有者。结果为 `.notRunning`、`.noBootTarget(detail:)`、`.stopped(signalled:forceKilled:)`、`.failed(survivors:reason:)`。
+3. 流程：
+   - 未持锁直接返回 `.notRunning`。
+   - 目标快照记录为 `(pid, startedAt)` 对，`identity` 返回 nil 或僵尸的 pid 直接丢弃。
+   - 快照为空且持锁时返回 `.noBootTarget`，不发送任何信号；detail 取运行记录（`operation` 为 boot/dfu 时附 `instanceID`）并附上 `lsof` 得到的 Disk.img 持有者，标注为仅诊断。
+   - 正常路径对快照发送 SIGINT，按 1 秒粒度轮询至 `--timeout`；存活判据是 `identity(pid)?.startedAt` 与快照相同，`startedAt` 不同、记录缺失或已成僵尸一律按已退出处理，不再收到任何信号。
+   - SIGKILL 之前重新执行 `listTargets()` 并按 `(pid, startedAt)` 与快照求交集，只对交集发送 SIGKILL。`--force` 跳过 SIGINT 与等待，其快照即当次列举结果，因此不再重复列举。
+   - 之后按 0.5 秒粒度、最长 3 秒轮询，直到快照内所有身份消失且 `lockHeld()` 为假才返回 `.stopped`；否则返回 `.failed`，reason 列出存活 pid、`send` 的 errno（`EPERM` 与 `ESRCH` 分别以 `strerror` 文本给出）以及锁是否仍被持有。
+4. 运行记录的用法：`isBootOperation` 为真且记录的 pid 确实在本次快照内时，输出该 `instanceID`；记录本身从不新增目标。
+5. [`VPhoneVMStopCommand`](../sources/vphone-cli/VPhoneVMLaunchCLI.swift) 只保留参数解析、输出和退出码，退出码取 `Outcome.exitCode`（`.notRunning`/`.stopped` 为 0，`.noBootTarget`/`.failed` 为 1）。
+6. `VPhoneLsof` 恢复调用方（此前只有测试）。
+
+### 与 `vm launch` 锁生命周期的关系
+
+事实（代码路径）：`vm launch` 的 `stage-vphoned` 锁在其 `if` 作用域内声明，`defer { withExtendedLifetime(stagingLock) {} }` 也在同一作用域，锁在派生引导子进程之前释放；启动器在 VM 运行期间不持锁，只 `waitUntilExit`。引导进程在 `VPhoneAppDelegate.startVirtualMachine()` 自行取锁，描述符为 `O_CLOEXEC`，不被其派生的子进程继承（B2 已记录并测试）。
+
+推断：SIGKILL 之后待释放的只有引导进程自己的 flock，内核在进程退出时释放，启动器的退出时序不影响锁释放。因此 3 秒确认窗口只需覆盖进程退出与回收的延迟。该推断由代码路径与 B2 的锁测试得出，未在实机计时验证。
+
+### 输出
+
+保留原有全部输出串：`not running`、`sending SIGINT to N`、`force-killing N`、`stopped`、`bundle lock is held but ... — not signalling anything`。新增两条：
+
+| 输出 | 条件 |
+| --- | --- |
+| `<name>: boot instance <id>` | 运行记录为 boot/dfu，且其 pid 在本次目标快照内 |
+| `<name>: stop failed: <reason>`（stderr，退出码 1） | 结果为 `.failed` |
+
+进度行经 `report` 回调在等待之前输出，与改前的输出时序一致。
+
+### 验证
+
+| 验证 | 结果 |
+| --- | --- |
+| `swift test --filter 'VMStopTests\|LaunchLayoutTests\|VMLockTests\|ShutdownPolicyTests'` | 4 个 suite、41 项通过（其中 VMStopTests 13 项） |
+| `make test` | Python unittest 55 项、Swift Testing 220 项、XCTest 20 项，共 295 项通过 |
+| `make build` | 退出 0；`codesign -d --entitlements -` 列出 7 个键 |
+| `git diff --check` | 无输出 |
+
+VMStopTests 覆盖的场景：
+
+| 场景 | 手段 | 断言 |
+| --- | --- | --- |
+| 定位器能识别替身引导进程 | `<tmp>/vphone-cli` 指向 `/bin/sh` 的符号链接，参数含 `--config <tmp bundle>/config.plist`，用真实 `ps` 定位 | 定位结果恰为该 pid |
+| 其他程序打开 Disk.img | `/bin/sh` 子进程 `exec 3< Disk.img` 并 `trap '' INT` | 该 pid 收到的信号数为 0，结束时仍存活；仅引导替身收到 SIGINT |
+| 进程不响应 SIGINT | 替身 `trap '' INT`，`--timeout` 2 秒 | 信号序列为 `[SIGINT, SIGKILL]`，结果 `.stopped`，进程已消失 |
+| `--force` | 同上，`force: true` | 信号序列为 `[SIGKILL]`，`signalled` 为空 |
+| 目标已退出且无人持锁 | 先 SIGKILL 替身再执行 | `.notRunning`，零信号 |
+| 持锁方不是引导进程 | Python `flock` 持有者 + 指向它的 boot 运行记录 | `.noBootTarget`，detail 含该 pid 与 instanceID，零信号，退出码 1 |
+| pid 被复用 | 注入 `identity`：快照时 `startedAt` 为 T，等待期间变为 T+100 | 只发送 SIGINT，无 SIGKILL，结果 `.stopped` |
+| 等待期间目标离开进程列表 | 注入 `listTargets` 第二次返回空 | 只发送 SIGINT，无 SIGKILL |
+| 停止失败 | 注入身份恒定、锁恒被持有 | `.failed`，survivors 含该 pid，reason 含存活与锁两项，退出码 1 |
+| 信号返回 `EPERM` | 注入 `send` 恒返回 `EPERM` | reason 含 `Operation not permitted`，不含 `No such process` |
+| 进程身份 API | 真实 `/bin/sleep` 子进程 | 存活时 `startedAt` 在 `now-60 ≤ t ≤ now` 内、`uid == getuid()`；回收后返回 nil |
+| 结果到退出码映射 | 纯函数 | `.notRunning`/`.stopped` 为 0，`.noBootTarget`/`.failed` 为 1 |
+
+替身引导进程的实现约束（本次确认的两点事实）：
+
+1. 把 `/bin/sh` 复制到临时目录再执行会被 AMFI 终止（本机实测退出码 137），因此替身改用指向 `/bin/sh` 的符号链接，`execve` 解析到系统二进制，而 `ps` 中的 argv[0] 仍是符号链接路径，满足定位器「末段等于 `vphone-cli`」的条件。
+2. `/bin/sh` 只有在其前台子进程也死于 SIGINT 时才终止脚本，因此需要优雅退出的替身显式写 `trap 'exit 0' INT`，与真实引导进程自装 SIGINT 处理的行为一致。
+
+管道输出时 `ps -axo pid=,command=` 未截断（实测单行 325 字符完整输出），因此长临时路径不影响定位。
+
+### 实机验证（2026-09-09）
+
+环境：主机 macOS 26.5 25F71，`amfidont` 运行中（pid 79216）；VM `rig-baseline`（iOS 26.6.1，exp 变体，已越狱，bundle 内有 `.vphoned.signed`）。二进制为 `.build/arm64-apple-macosx/release/vphone-cli`，本次未重新构建、未修改源文件。每个场景独立启动一次 `vphone-cli vm launch rig-baseline --headless -vv`，stdout/stderr 重定向到文件。
+
+观测条件（事实）：
+
+- `--headless` 不创建 `vphone.sock`。`VPhoneHostControl` 的创建与 `start` 位于 `if !cli.noGraphics` 分支内（`sources/vphone-cli/VPhoneAppDelegate.swift:144`、`:200`–`:211`），因此 headless 下没有可用来实时探测 vphoned 连接状态的主机接口。实测 300 秒内该 socket 始终不存在。
+- 引导进程 stdout 重定向到文件时为块缓冲，`[control] connected to vphoned …`、`[vphone] …` 行只在进程正常退出（`NSApp.terminate` 路径）时刷出；`[vphone] VM lock acquired` 由 `FileHandle` 直写，实时可见。来宾串口输出实时写入同一文件。
+- 因此场景 1、2、5 用「`VM lock acquired` 之后再等 370–400 秒」作为「vphoned 已连接」的操作判据（上一节记录的 90 秒下限之上取余量）。该判据是假设，不是观测；事后确认见下。
+
+判据的事后确认：场景 1 与 5 的刷出日志含 `[control] connected to vphoned v1 (…) iOS 26.6.1, caps: ["hid", …, "shell", "touch", …]`，假设成立。场景 2 因 SIGKILL 未刷出 stdout，改由来宾串口的 `System shutdown initiated by: reboot[1987]<-vphoned[69]` 确认——该行只能由 vphoned 派生的 halt 产生，说明 SIGINT 到达时 vphoned 已连接且来宾关机命令已送达。
+
+「停止后状态」四项检查：`pgrep -fl vphone-cli` 无输出、`lsof -t -- ~/.vphone/VMs/rig-baseline/Disk.img` 无输出、`pgrep -fl com.apple.Virtualization.VirtualMachine` 无输出、再次执行 `vm stop rig-baseline` 输出 `rig-baseline: not running` 且退出码 0。
+
+| 场景 | 命令 | 输出 | 退出码 | `time` 实耗 | 停止后状态 |
+| --- | --- | --- | --- | --- | --- |
+| 1 优雅回归 | `vm stop rig-baseline` | `boot instance 6090B33D-…`／`sending SIGINT to 26036`／`stopped` | 0 | 4.193 s | 四项均符合 |
+| 2 SIGKILL 分支 | `vm stop rig-baseline --timeout 1` | `boot instance F405BC40-…`／`sending SIGINT to 26414`／`force-killing 26414`／`stopped` | 0 | 1.685 s | 四项均符合 |
+| 3 `--force` | `vm stop rig-baseline --force` | `boot instance 590F2EAF-…`／`force-killing 26593`／`stopped` | 0 | 0.603 s | 四项均符合 |
+| 4a 未运行 | `vm stop rig-baseline` | `rig-baseline: not running` | 0 | 0.011 s | — |
+| 4b 持锁但无引导目标 | `vm stop rig-baseline`（Python `flock` 持有 bundle 目录） | stderr `error: rig-baseline: bundle lock is held but no vphone-cli boot process is running for it — not signalling anything` | 1 | 0.227 s | 持锁进程仍存活 |
+| 5 两次强杀后复检 | `vm stop rig-baseline` | `boot instance 1A626636-…`／`sending SIGINT to 26714`／`stopped` | 0 | 4.214 s | 四项均符合 |
+
+逐场景观测：
+
+1. 场景 1：`ps` 中启动器 pid 26001、引导进程 pid 26036；`.vphone-runtime.json` 的 `pid` 与 `instanceID` 与输出的 `boot instance` 一致。未出现 `force-killing`。刷出日志依次为 `[vphone] SIGINT — shutting down`、`[vphone] graceful shutdown via guest power-off command over vsock`、`[control] read loop ended`、`[vphone] guest power-off request ended with: not connected to vphoned`、`[vphone] Guest stopped`；全文无 `Stopped with error`。这与上一节「SIGINT 优雅关机」记录的 4.12 s 与路径一致，B3 的目标身份改动未改变优雅路径的行为。
+2. 场景 2：`--timeout 1` 触发 SIGKILL 分支。来宾串口停在 `shutdown UNPEND_REQUESTS -> DOMAIN_DEACTIVATE`，没有 `apfs_vfsop_unmount … going home` 与 `ApplePSCI - system off`，即来宾关机被中途终止（本次接受该结果）。SIGKILL 使 stdout 缓冲丢失，文件中只剩 `[vphone] VM lock acquired` 一条主机行。总耗时 1.685 s 由 1 秒 SIGINT 等待加确认轮询组成，据此推算确认窗口约 0.6 s（0.5 秒粒度的一跳），远小于 3 秒上限；锁由内核在引导进程退出时释放，未出现 `stop failed`。
+3. 场景 3：`--force` 在 `VM lock acquired` 后约 28 秒执行（不等待 vphoned）。输出无 `sending SIGINT`，日志全文 `grep -c SIGINT` 为 0，与「`--force` 跳过 SIGINT 与等待」的实现一致。0.603 s 内完成确认。
+4. 场景 4b：持锁方为 `python3 -c "… fcntl.flock(f, LOCK_EX|LOCK_NB); time.sleep(120)"`，对象为 bundle 目录 `~/.vphone/VMs/rig-baseline`（与 `VMLockTests` 同一写法）。`vm stop` 未发送任何信号，持锁进程在命令返回后仍存活，随后由本次验证显式终止。错误文本未附带 `instanceID` 与 Disk.img 持有者：此时 `.vphone-runtime.json` 是场景 3 留下的过期记录（其 pid 已不存在），`lsof` 也无持有者，符合「记录只作佐证、不新增目标」的实现。
+5. 场景 5：经场景 2、3 两次 SIGKILL 后，VM 仍能正常引导（来宾走 `fsck` 引导任务，`nx_mount` 检查点搜索正常）。优雅停止完整走完卸载序列直到 `apfs_vfsop_unmount:3710: all done.  going home.  (numMountedAPFSVolumes 0)` 与 `ApplePSCI - system off`，日志无 `Stopped with error`。
+
+其他观测：全程 `com.apple.Virtualization.EventTap` 始终只有既有的 pid 80619，未新增；本次未处理该进程。所有场景结束后主机上无 vphone-cli 进程、无 Virtualization 辅助进程、无 Disk.img 持有者。
+
+### 未验证项
+
+- `dfu` 引导的停止、`.app` 内二进制的实机停止、`.failed` 分支（`stop failed: …`、退出码 1）在实机未触发，其结论仍来自单元测试与代码路径。SIGKILL 分支与 `--force` 已于 2026-09-09 在 `rig-baseline` 上实测（见上一小节）。
+- pid 复用只用注入的身份序列模拟，未在真实 pid 回绕条件下验证。
+- 「所有目标已退出但 bundle 锁在 3 秒内未释放」判为 `.failed` 属保守判定：若另一入口恰在此刻取得该 bundle 的锁，也会判为失败。该情形未在实机观察到，属待验证假设。
+- `ResourcesTests` 在并行执行下因 `VPHONE_ROOT` 的 `setenv`/`unsetenv` 竞争间歇失败，为既有问题，与本项无关：单独执行 `swift test --filter ResourcesTests` 6 次中 5 次失败，失败断言全部位于 `ResourcesTests.swift`。本次未修改该文件。

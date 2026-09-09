@@ -6,7 +6,7 @@
 
 目标：先建立可验证、可恢复的 VM 与固件流程，再完善无 GUI 自动化和多 VM 使用能力。
 
-本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交；其他 24 项待执行。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)与[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)。
+本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）。其余 23 项待执行。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)与[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)。
 
 ## 一、建议现在开始的工作
 
@@ -110,15 +110,17 @@
 
 结果：目录 inode 上的 `flock` 已由 Swift 与 Shell 共用，运行记录不作为占用依据。251 项完整回归通过，最终配置调整后 38 项专项测试通过，构建与签名校验通过。生产签名程序被 SIGKILL，原因未查明；无私有权限临时副本的启动锁检查通过。详细接入范围、旧入口和实际 VM 验证限制见[B2 验证记录](../research/vm_lock_validation_2026-09-08.md)。B1 提交为 `32d1a5f`，B2 与本记录一并独立提交。
 
-### B3 — 使停止操作只作用于目标 VM 进程【P0；依赖 B2】
+### B3 — 使停止操作只作用于目标 VM 进程【已完成；2026-09-09；实机验证部分完成】
 
 涉及：`VPhoneVMLaunchCLI.swift`、B2 的运行状态模块、进程测试。
 
-- [ ] 使用经过实例校验的 VM 进程记录决定信号目标，lsof 仅用于占用诊断。
-- [ ] 保留 SIGINT、等待、必要时 SIGKILL 的顺序；每次升级信号前重新确认进程身份，退出后确认实际状态。
-- [ ] 用受控子进程测试：其他程序打开 Disk.img、PID 失效或被复用、进程不响应 SIGINT、目标已退出。
+- [x] 使用经过实例校验的 VM 进程记录决定信号目标，lsof 仅用于占用诊断。
+- [x] 保留 SIGINT、等待、必要时 SIGKILL 的顺序；每次升级信号前重新确认进程身份，退出后确认实际状态。
+- [x] 用受控子进程测试：其他程序打开 Disk.img、PID 失效或被复用、进程不响应 SIGINT、目标已退出。
 
 验收：不向其他磁盘使用者发送终止信号；未停止成功时不会输出成功结论。
+
+结果：目标由 `(pid, startedAt)` 对标识，`startedAt` 取 `kinfo_proc.kp_proc.p_starttime`；SIGKILL 之前重新列举进程并与快照求交集，`startedAt` 变化、记录缺失或已成僵尸的 pid 一律按已退出处理，不再收到信号。SIGKILL 与 `--force` 之后按 0.5 秒粒度、最长 3 秒确认目标消失且 bundle 锁释放，未确认时输出 `stop failed` 并以非零码退出。判定与信号逻辑移入新增的 `VPhoneVMStopper`，`lsof` 只用于「持锁但无引导目标」分支列出 Disk.img 持有者。新增 13 项 `VMStopTests`（含符号链接替身引导进程、Disk.img 持有者、`trap '' INT`、Python `flock` 持锁方、注入的 pid 复用与失败路径）；`swift test --filter 'VMStopTests|LaunchLayoutTests|VMLockTests|ShutdownPolicyTests'` 41 项通过，`make test` 295 项通过，`make build` 与 7 项 entitlements 校验通过。2026-09-09 在 VM `rig-baseline`（iOS 26.6.1，exp 变体）上完成实机验证：优雅回归（`vm stop`，4.193 s，退出码 0，无 `force-killing`）、SIGKILL 分支（`--timeout 1`，1.685 s，先 `sending SIGINT` 后 `force-killing`，退出码 0）、`--force`（0.603 s，无 SIGINT，退出码 0）、未运行（`not running`，退出码 0）与「持锁但无引导目标」（Python `flock` 持锁方，退出码 1，未发送任何信号，持锁进程存活）五类场景，每次停止后 `pgrep vphone-cli`、`lsof Disk.img`、`com.apple.Virtualization.VirtualMachine` 均为空，二次 `vm stop` 输出 `not running`；两次强杀后 VM 仍能正常引导并完成优雅关机。`dfu` 引导、`.app` 内二进制停止和 `.failed` 分支仍未实机触发。详见[修复记录](review_fixes_2026-09-08.md)「B3 停止目标身份复核（2026-09-09）」。
 
 ### B4 — 统一所有离线操作的占用保护【P0；依赖 B1、B2、B3】
 
@@ -355,4 +357,4 @@
 
 ## 评审修复进展
 
-A2/B1/B2 与触控评审修复及验证见[修复记录](review_fixes_2026-09-08.md)。真实已解密 SystemOS 校验通过；A3 来宾交互与完整 CFW 安装仍待验证，B3 未开始。
+A2/B1/B2/B3 与触控评审修复及验证见[修复记录](review_fixes_2026-09-08.md)。真实已解密 SystemOS 校验通过；A3 来宾交互与完整 CFW 安装仍待验证。B3 已实现并通过单元测试；实机 VM 验证已覆盖优雅停止、SIGKILL 分支、`--force`、未运行与「持锁但无引导目标」，`dfu`、`.app` 内二进制与 `.failed` 分支待做。
