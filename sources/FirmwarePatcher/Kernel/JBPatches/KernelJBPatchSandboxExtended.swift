@@ -90,14 +90,16 @@ extension KernelJBPatcher {
         }
 
         var patched = 0
+        var complete = true
         for (hookName, idx) in hookIndices {
             let entryOff = opsTable + idx * 8
-            guard entryOff + 8 <= buffer.count else { continue }
+            guard entryOff + 8 <= buffer.count else { complete = false; continue }
 
             let entryRaw = buffer.readU64(at: entryOff)
             guard entryRaw != 0 else { continue }
 
             guard let newEntry = encodeAuthRebaseLike(origVal: entryRaw, targetOff: allowStub) else {
+                complete = false
                 continue
             }
 
@@ -116,7 +118,7 @@ extension KernelJBPatcher {
             log("  [-] no extended sandbox hooks retargeted")
             return false
         }
-        return true
+        return complete
     }
 
     // MARK: - Sandbox ops table discovery

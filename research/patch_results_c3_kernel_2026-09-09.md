@@ -36,3 +36,52 @@
 输入 IM4P SHA-256：`7e9bd5c31b7649bd8e2bfb54a067b8585b039eb76b945f0fd08615ee09b6076b`。基础内核实现与本地比较已完成；原始样本完整性验收尚未完成。
 
 C3 尚未整体完成，不扩大已有兼容性声明。
+
+## JB 内核：实现与判据
+
+基础内核提交：`dcc7268`。JB 声明 33 个结构化方法，按旧 `findAll()` 顺序执行。24 个方法始终必要，7 个受 `iosBaseIs27` 控制，2 个受 Frida 开关控制。门控关闭在执行器中产生 notApplicable，不调用方法。
+
+`patchCredLabelUpdateExecve` 增加 Bool 返回值，只有完成所有 trampoline 和所有跳转写入才返回 true；中途退出保留已有记录并报告失败。原定位、分配和写入序列不变。扩展 Sandbox 对已声明且非 NULL 的回调全部要求编码成功；超出表范围或任一非 NULL 回调编码失败时，方法返回 false。NULL 表项表示未安装回调，保持原来的跳过行为。
+
+`patchPostValidationAdditional` 与 `patchBsdInitAuth` 的原实现会在明确识别已修改分支后返回 true、且不写记录；结构化包装对此返回 alreadyApplied。没有增加幂等记录，因此记录列表不变。其他方法 true + 零记录不据此推断为已应用。
+
+兼容性清单内 JB 方法从旧 Python 名称对齐到 Swift 名称；删除当前 `findAll()` 未调用的 `patch_amfi_execve_kill_path`。该方法的实现未删除，也未加入调度。此修正描述当前 Swift 流程，不新增补丁。
+
+单组件 `patch-component` 改为执行结构化路径，支持方法级消融。必要失败时先写诊断报告、返回非零并保留已有输出文件；消融默认不写 payload。此前该入口仍使用旧路径并聚合为 legacy 报告。
+
+JB 现有 VM 样本：26.x 门控 49 条记录、27.x 门控 56 条记录，旧路径与结构化路径的记录和最终 payload 相等。原始 cloudOS 26.1 样本：基础 regular/dev 为 28/29 条记录，JB 26.x 门控为 84 条；这些路径必要项全部通过，记录和最终 payload 均相等。
+
+额外运行 cloudOS 26.1 + iOS 27 门控，记录为 91 条且字节比较相等，但 `patchIomfbSwapEndVariableSize`、`patchIomfbSwapEndHandlerSize` 失败。本次最初对该组合施加“全部必要项成功”断言，测试如实失败。该组合不作为支持范围；项目 catalog 为 iOS 27 选择 cloudOS 26.4，后续在对应原始样本上独立验证。没有放宽这两个方法的必要性，也没有为通过断言修改补丁字节。
+
+原始 cloudOS 26.1 内核 IM4P SHA-256：`b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac`。来源为 `VPhoneFirmwareCatalog.cloud261` 中的 Apple URL。`ipsw dl pcc --info` 因 release leaf missing metadata 失败；`ipsw extract` 长时间未返回，已结束本次进程。实际使用 HTTP Range 读取同一 ZIP 的中央目录和目标成员，未下载完整 IPSW。
+
+## 原始 cloudOS 26.4：结果与未完成验收
+
+26.4 / 23E5207q 的旧路径与结构化路径在全部已运行用例中记录、payload 相等：regular 28 条，dev 28 条，JB 26.x 83 条，JB 27.x 95 条，JB 27.x + Frida 99 条。regular 必要集合通过；dev 的 `patchExcGuardBehavior` 失败；三种 JB 设置均有 `patchVmMapProtect` 失败。严格完整性测试因此出现 4 条失败断言，不能把字节一致性通过表述为完整性通过。
+
+顺序组合 base → JB → EXP（iOS 27 + Frida）产生 132 条记录，旧路径与结构化路径的记录和 payload 相等；必要集合仍因 `patchVmMapProtect` 失败。EXP 层自身通过。
+
+`KernelGateDiagnosisTests` 通过显式 `VPHONE_DIAG_KERNEL_IM4P` 启用，直接调用这两个实际步骤；26.4 上 2 项均失败，总耗时约 7.4 秒。单步骤 CLI 消融其他方法后重复得到相同结果。该 suite 是当前缺陷的失败复现，默认跳过，不属于已通过的原始固件验收。
+
+已验证的历史证据：提交 `81b0cd8` 明确停用 `vm_map_protect` Shape B，因为其命中 COW 写权限剥离而非预期 RWX gate，并记录了 SPTM 崩溃与隔离实验。提交说明写的是“26.5+ 停用、26.1–26.4 Shape A 保留”；这不足以解释当前 26.4 原始内核缺少 Shape A 的结果。版本范围与原始内核实现之间的对应关系待确认。EXC_GUARD 输出 `thread_guard_violation not found via anchor chain`，原因未查明。
+
+本次不恢复 Shape B、不把方法改为 optional，也不根据匹配失败推断 notApplicable。后续须分别核实原始内核中的函数/调用链与适用范围，再独立提交定位或规则修正。新补丁定位前必须记录语义锚点、XNU 对应关系和验证步骤。C3 保持进行中。
+
+## 可重复验证命令
+
+以下环境变量的路径均指向只读原始 IM4P。未设置输入变量时，真实样本 suite 显式跳过；设置后文件缺失或解码失败会使测试失败。
+
+```sh
+export CLANG_MODULE_CACHE_PATH="$PWD/.build/test-module-cache"
+export SWIFT_MODULECACHE_PATH="$PWD/.build/test-module-cache"
+
+# 26.4 / 23E5207q：regular、dev、JB（26.x/27.x）、Frida、EXP。
+VPHONE_TEST_KERNEL_IM4P="$PWD/research/artifacts/c3-kernel-2026-09-09/stock-264-ranged/kernelcache.research.vphone600" VPHONE_REQUIRE_COMPLETE=1 VPHONE_TEST_FRIDA=1 swift test --disable-sandbox --cache-path .build/test-cache   --filter 'KernelStructuredParity|ExpStructuredParity'
+
+# 顺序组合：base → JB → EXP，包含 iOS 27 与 Frida。
+VPHONE_TEST_KERNEL_IM4P="$PWD/research/artifacts/c3-kernel-2026-09-09/stock-264-ranged/kernelcache.research.vphone600" VPHONE_TEST_KERNEL_CHAIN=1 VPHONE_TEST_CHAIN_IOS27=1 VPHONE_TEST_FRIDA=1 swift test -c release --disable-sandbox --cache-path .build/test-cache   --filter KernelPipelineParityTests
+```
+
+对 26.1 / 23B85 的额外 iOS 27 负例，设置 `VPHONE_EXPECT_IOS27_FAILURES=patchIomfbSwapEndVariableSize,patchIomfbSwapEndHandlerSize`，精确断言这两个失败；未设置时 `VPHONE_REQUIRE_COMPLETE=1` 要求全部必要项成功。该变量只控制测试期望，不影响补丁器或流水线。
+
+两个构建号已从对应 ZIP 的 `BuildManifest.plist` 核实。原始 cloudOS 26.4 内核 IM4P SHA-256：`c853504319f27bfb3283253d8a5f36c3d0166ea7f4b178fca26fe6352b4de951`。输入与日志位于 Git 忽略的 `research/artifacts/c3-kernel-2026-09-09/`。

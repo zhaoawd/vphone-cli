@@ -62,6 +62,22 @@ struct KernelStructuredTests {
         #expect(p.patches.isEmpty)
         #expect(steps.last?.requirement == .conditional(.excGuardActive))
     }
+    @Test func jbMethodsMatchManifestAndMissingActiveMethodsFail() throws {
+        let p = KernelJBPatcher(data: data, verbose: false)
+        let steps = p.buildSteps()
+        let base = KernelPatcher(data: data, verbose: false).buildSteps()
+        let methods = try #require(C1AlignmentTests.components(variant: "jb")["kernelcache"]?.methods)
+        #expect(Set((steps + base).map { $0.id.method }) == Set(methods.map(\.name)))
+        #expect(steps.count == 33)
+        let result = StructuredExecution.run(patcher: p, componentName: "kernelcache",
+            gates: StructuredPatchResultTests.gates(), ablate: [], fallback: data)
+        #expect(result.report.results.filter { $0.outcome == .notApplicable }.count == 9)
+        #expect(result.report.results.filter { $0.outcome == .failed }.count == 24)
+        #expect(result.report.hasRequiredFailure)
+        #expect(result.data == data)
+    }
+
+
 }
 
 private final class WriteThroughKernel: KernelPatcherBase, StructuredPatcher {
@@ -96,6 +112,46 @@ struct KernelStructuredParityTests {
         #expect(!records.isEmpty)
         #expect(records == result.report.records)
         #expect(old.patchedData == result.data)
+        if ProcessInfo.processInfo.environment["VPHONE_REQUIRE_COMPLETE"] == "1" {
+            let failedMethods = result.report.results.filter { $0.outcome == .failed }.map { $0.id.method }
+            #expect(failedMethods.isEmpty)
+        }
         print("C3 base parity dev=\(isDev): \(records.count) records; failures=\(result.report.results.filter { $0.outcome == .failed }.map { $0.id.method })")
     }
+    @Test(arguments: [false, true])
+    func jbKernelRecordsAndPayloadMatch(ios27: Bool) throws {
+        try assertJBParity(ios27: ios27, frida: false)
+    }
+
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_TEST_FRIDA"] == "1"))
+    func fridaKernelRecordsAndPayloadMatch() throws {
+        try assertJBParity(ios27: true, frida: true)
+    }
+
+    private func assertJBParity(ios27: Bool, frida: Bool) throws {
+        let path = try #require(ProcessInfo.processInfo.environment["VPHONE_TEST_KERNEL_IM4P"])
+        let payload = try IM4PHandler.load(contentsOf: URL(fileURLWithPath: path)).payload
+        let old = KernelJBPatcher(data: payload, verbose: false)
+        old.applyIOS27 = ios27
+        old.applyFrida = frida
+        let records = try old.findAll()
+        _ = try old.apply()
+        let new = KernelJBPatcher(data: payload, verbose: false)
+        new.applyIOS27 = ios27
+        new.applyFrida = frida
+        let result = StructuredExecution.run(patcher: new, componentName: "kernelcache",
+            gates: StructuredPatchResultTests.gates(iosBaseIs27: ios27, applyFrida: frida), ablate: [], fallback: payload)
+        #expect(!records.isEmpty)
+        #expect(records == result.report.records)
+        #expect(old.patchedData == result.data)
+        if ProcessInfo.processInfo.environment["VPHONE_REQUIRE_COMPLETE"] == "1" {
+            let failedMethods = Set(result.report.results.filter { $0.outcome == .failed }.map { $0.id.method })
+            let expectedFailures = ios27 ? Set((ProcessInfo.processInfo.environment["VPHONE_EXPECT_IOS27_FAILURES"] ?? "")
+                .split(separator: ",").map(String.init)) : []
+            #expect(failedMethods == expectedFailures)
+        }
+        print("C3 JB parity ios27=\(ios27) frida=\(frida): \(records.count) records; failures=\(result.report.results.filter { $0.outcome == .failed }.map { $0.id.method })")
+    }
+
+
 }

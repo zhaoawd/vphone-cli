@@ -11,7 +11,7 @@ import Foundation
 /// Group A: Core gate-bypass methods
 /// Group B: Pattern/string anchored methods
 /// Group C: Shellcode/trampoline heavy methods
-public final class KernelJBPatcher: KernelJBPatcherBase, Patcher {
+public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
     public let component = "kernelcache_jb"
 
     /// Gates the iOS-27-only kernel patches. These target an iOS-27 userland running
@@ -110,6 +110,76 @@ public final class KernelJBPatcher: KernelJBPatcherBase, Patcher {
         }
 
         return patches
+    }
+
+    // MARK: - StructuredPatcher
+
+    private var structuredPrepared = false
+
+    private func prepareStructured() {
+        guard !structuredPrepared else { return }
+        structuredPrepared = true
+        parseMachO()
+        buildADRPIndex()
+        buildBLIndex()
+        buildSymbolTable()
+        findPanic()
+    }
+
+    public func buildSteps() -> [PatchStep] {
+        [
+            step("patchAmfiCdhashInTrustcache", run: patchAmfiCdhashInTrustcache),
+            step("patchTaskConversionEvalInternal", run: patchTaskConversionEvalInternal),
+            step("patchSandboxHooksExtended", run: patchSandboxHooksExtended),
+            step("patchIoucFailedMacf", run: patchIoucFailedMacf),
+            step("patchIoucFailedSandbox", requirement: .conditional(.iosBaseIs27), run: patchIoucFailedSandbox),
+            step("patchDiskImages2ClientAbi", requirement: .conditional(.iosBaseIs27), run: patchDiskImages2ClientAbi),
+            step("patchPostValidationAdditional", verifiesExistingWithoutRecord: true, run: patchPostValidationAdditional),
+            step("patchProcSecurityPolicy", run: patchProcSecurityPolicy),
+            step("patchProcPidinfo", run: patchProcPidinfo),
+            step("patchConvertPortToMap", run: patchConvertPortToMap),
+            step("patchBsdInitAuth", verifiesExistingWithoutRecord: true, run: patchBsdInitAuth),
+            step("patchDounmount", run: patchDounmount),
+            step("patchIoSecureBsdRoot", run: patchIoSecureBsdRoot),
+            step("patchLoadDylinker", run: patchLoadDylinker),
+            step("patchMacMount", run: patchMacMount),
+            step("patchNvramVerifyPermission", run: patchNvramVerifyPermission),
+            step("patchSharedRegionMap", run: patchSharedRegionMap),
+            step("patchSpawnValidatePersona", run: patchSpawnValidatePersona),
+            step("patchTaskForPid", run: patchTaskForPid),
+            step("patchThidShouldCrash", run: patchThidShouldCrash),
+            step("patchVmFaultEnterPrepare", run: patchVmFaultEnterPrepare),
+            step("patchVmMapProtect", run: patchVmMapProtect),
+            step("patchThreadSetStateEntitlementFlag", requirement: .conditional(.cloudOSFridaCapable), run: patchThreadSetStateEntitlementFlag),
+            step("patchVmMapDeleteImmutableCode", requirement: .conditional(.cloudOSFridaCapable), run: patchVmMapDeleteImmutableCode),
+            step("patchCredLabelUpdateExecve", run: patchCredLabelUpdateExecve),
+            step("patchHookCredLabelUpdateExecve", run: patchHookCredLabelUpdateExecve),
+            step("patchKcall10", run: patchKcall10),
+            step("patchSyscallmaskApplyToProc", run: patchSyscallmaskApplyToProc),
+            step("patchExecSecurityPolicyKill", requirement: .conditional(.iosBaseIs27), run: patchExecSecurityPolicyKill),
+            step("patchContainerManagerUpcall", requirement: .conditional(.iosBaseIs27), run: patchContainerManagerUpcall),
+            step("patchIomfbSwapEndVariableSize", requirement: .conditional(.iosBaseIs27), run: patchIomfbSwapEndVariableSize),
+            step("patchIomfbSwapEndHandlerSize", requirement: .conditional(.iosBaseIs27), run: patchIomfbSwapEndHandlerSize),
+            step("patchFpfsScopedVnodeOpen", requirement: .conditional(.iosBaseIs27), run: patchFpfsScopedVnodeOpen),
+        ]
+    }
+
+    private func step(
+        _ method: String, requirement: PatchRequirement = .required,
+        verifiesExistingWithoutRecord: Bool = false, run: @escaping () -> Bool
+    ) -> PatchStep {
+        PatchStep(id: PatchID(component: "kernelcache", patcher: "KernelJBPatcher", method: method),
+                  requirement: requirement) { [self] in
+            prepareStructured()
+            let before = patches.count
+            let completed = run()
+            // These two methods explicitly recognize the existing patched gate;
+            // their legacy API deliberately emits no record on that verified path.
+            if completed, verifiesExistingWithoutRecord, patches.count == before {
+                return .idempotent
+            }
+            return structuredMethodResult(completed: completed, since: before)
+        }
     }
 
     public func apply() throws -> Int {

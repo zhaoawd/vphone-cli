@@ -1055,9 +1055,7 @@
               "name": "patchExcGuardBehavior",
               "required": false,
               "gate": "applyExcGuard",
-              "expected_not_applicable": [
-                "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
-              ]
+              "expected_not_applicable": []
             }
           ],
           "known": {
@@ -1398,21 +1396,13 @@
               ]
             },
             {
-              "name": "patch_amfi_cdhash_in_trustcache",
+              "name": "patchAmfiCdhashInTrustcache",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_amfi_execve_kill_path",
-              "required": false,
-              "gate": null,
-              "expected_not_applicable": [
-                "JB 变体改用 C21，本方法仅 standalone（JB-02，JB Enabled=N）"
-              ]
-            },
-            {
-              "name": "patch_exec_security_policy_kill",
+              "name": "patchExecSecurityPolicyKill",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1420,7 +1410,7 @@
               ]
             },
             {
-              "name": "patch_container_manager_upcall",
+              "name": "patchContainerManagerUpcall",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1428,7 +1418,7 @@
               ]
             },
             {
-              "name": "patch_cred_label_update_execve",
+              "name": "patchCredLabelUpdateExecve",
               "required": false,
               "gate": null,
               "expected_not_applicable": [
@@ -1436,37 +1426,37 @@
               ]
             },
             {
-              "name": "patch_hook_cred_label_update_execve",
+              "name": "patchHookCredLabelUpdateExecve",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_kcall10",
+              "name": "patchKcall10",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_post_validation_additional",
+              "name": "patchPostValidationAdditional",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_syscallmask_apply_to_proc",
+              "name": "patchSyscallmaskApplyToProc",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_task_conversion_eval_internal",
+              "name": "patchTaskConversionEvalInternal",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_sandbox_hooks_extended",
+              "name": "patchSandboxHooksExtended",
               "required": true,
               "gate": null,
               "expected_not_applicable": [
@@ -1474,13 +1464,13 @@
               ]
             },
             {
-              "name": "patch_iouc_failed_macf",
+              "name": "patchIoucFailedMacf",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_iouc_failed_sandbox",
+              "name": "patchIoucFailedSandbox",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1488,79 +1478,79 @@
               ]
             },
             {
-              "name": "patch_proc_security_policy",
+              "name": "patchProcSecurityPolicy",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_proc_pidinfo",
+              "name": "patchProcPidinfo",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_convert_port_to_map",
+              "name": "patchConvertPortToMap",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_bsd_init_auth",
+              "name": "patchBsdInitAuth",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_dounmount",
+              "name": "patchDounmount",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_io_secure_bsd_root",
+              "name": "patchIoSecureBsdRoot",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_load_dylinker",
+              "name": "patchLoadDylinker",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_mac_mount",
+              "name": "patchMacMount",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_nvram_verify_permission",
+              "name": "patchNvramVerifyPermission",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_shared_region_map",
+              "name": "patchSharedRegionMap",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_spawn_validate_persona",
+              "name": "patchSpawnValidatePersona",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_task_for_pid",
+              "name": "patchTaskForPid",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_thid_should_crash",
+              "name": "patchThidShouldCrash",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
@@ -1575,13 +1565,13 @@
               ]
             },
             {
-              "name": "patch_vm_fault_enter_prepare",
+              "name": "patchVmFaultEnterPrepare",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_vm_map_protect",
+              "name": "patchVmMapProtect",
               "required": false,
               "gate": null,
               "expected_not_applicable": [
@@ -1598,7 +1588,7 @@
               ]
             },
             {
-              "name": "patch_iomfb_swapend_variable_size",
+              "name": "patchIomfbSwapEndVariableSize",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1606,7 +1596,7 @@
               ]
             },
             {
-              "name": "patch_iomfb_swapend_handler_size",
+              "name": "patchIomfbSwapEndHandlerSize",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1614,7 +1604,7 @@
               ]
             },
             {
-              "name": "patch_disk_images2_client_abi",
+              "name": "patchDiskImages2ClientAbi",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1622,7 +1612,7 @@
               ]
             },
             {
-              "name": "patch_fpfs_scoped_vnode_open",
+              "name": "patchFpfsScopedVnodeOpen",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1972,21 +1962,13 @@
               ]
             },
             {
-              "name": "patch_amfi_cdhash_in_trustcache",
+              "name": "patchAmfiCdhashInTrustcache",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_amfi_execve_kill_path",
-              "required": false,
-              "gate": null,
-              "expected_not_applicable": [
-                "JB 变体改用 C21，本方法仅 standalone（JB-02，JB Enabled=N）"
-              ]
-            },
-            {
-              "name": "patch_exec_security_policy_kill",
+              "name": "patchExecSecurityPolicyKill",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -1994,7 +1976,7 @@
               ]
             },
             {
-              "name": "patch_container_manager_upcall",
+              "name": "patchContainerManagerUpcall",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -2002,7 +1984,7 @@
               ]
             },
             {
-              "name": "patch_cred_label_update_execve",
+              "name": "patchCredLabelUpdateExecve",
               "required": false,
               "gate": null,
               "expected_not_applicable": [
@@ -2010,37 +1992,37 @@
               ]
             },
             {
-              "name": "patch_hook_cred_label_update_execve",
+              "name": "patchHookCredLabelUpdateExecve",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_kcall10",
+              "name": "patchKcall10",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_post_validation_additional",
+              "name": "patchPostValidationAdditional",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_syscallmask_apply_to_proc",
+              "name": "patchSyscallmaskApplyToProc",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_task_conversion_eval_internal",
+              "name": "patchTaskConversionEvalInternal",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_sandbox_hooks_extended",
+              "name": "patchSandboxHooksExtended",
               "required": true,
               "gate": null,
               "expected_not_applicable": [
@@ -2048,13 +2030,13 @@
               ]
             },
             {
-              "name": "patch_iouc_failed_macf",
+              "name": "patchIoucFailedMacf",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_iouc_failed_sandbox",
+              "name": "patchIoucFailedSandbox",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -2062,79 +2044,79 @@
               ]
             },
             {
-              "name": "patch_proc_security_policy",
+              "name": "patchProcSecurityPolicy",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_proc_pidinfo",
+              "name": "patchProcPidinfo",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_convert_port_to_map",
+              "name": "patchConvertPortToMap",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_bsd_init_auth",
+              "name": "patchBsdInitAuth",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_dounmount",
+              "name": "patchDounmount",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_io_secure_bsd_root",
+              "name": "patchIoSecureBsdRoot",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_load_dylinker",
+              "name": "patchLoadDylinker",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_mac_mount",
+              "name": "patchMacMount",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_nvram_verify_permission",
+              "name": "patchNvramVerifyPermission",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_shared_region_map",
+              "name": "patchSharedRegionMap",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_spawn_validate_persona",
+              "name": "patchSpawnValidatePersona",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_task_for_pid",
+              "name": "patchTaskForPid",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_thid_should_crash",
+              "name": "patchThidShouldCrash",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
@@ -2149,13 +2131,13 @@
               ]
             },
             {
-              "name": "patch_vm_fault_enter_prepare",
+              "name": "patchVmFaultEnterPrepare",
               "required": true,
               "gate": null,
               "expected_not_applicable": []
             },
             {
-              "name": "patch_vm_map_protect",
+              "name": "patchVmMapProtect",
               "required": false,
               "gate": null,
               "expected_not_applicable": [
@@ -2172,7 +2154,7 @@
               ]
             },
             {
-              "name": "patch_iomfb_swapend_variable_size",
+              "name": "patchIomfbSwapEndVariableSize",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -2180,7 +2162,7 @@
               ]
             },
             {
-              "name": "patch_iomfb_swapend_handler_size",
+              "name": "patchIomfbSwapEndHandlerSize",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -2188,7 +2170,7 @@
               ]
             },
             {
-              "name": "patch_disk_images2_client_abi",
+              "name": "patchDiskImages2ClientAbi",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [
@@ -2196,7 +2178,7 @@
               ]
             },
             {
-              "name": "patch_fpfs_scoped_vnode_open",
+              "name": "patchFpfsScopedVnodeOpen",
               "required": false,
               "gate": "iosBaseIs27",
               "expected_not_applicable": [

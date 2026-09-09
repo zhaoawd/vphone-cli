@@ -337,8 +337,8 @@ struct PatchComponentCLI: ParsableCommand {
     @Option(
         name: .customLong("ablate"),
         parsing: .upToNextOption,
-        help: ArgumentHelp("Disable this component/patcher by id (repeatable, comma-separated): the "
-            + "component canonical name (e.g. kernelcache) or `<component>.<PatcherType>`. "
+        help: ArgumentHelp("Disable this component, patcher, or method by id (repeatable, comma-separated): the "
+            + "component canonical name (e.g. kernelcache) or `<component>.<PatcherType>[.<method>]`. "
             + "An ablation run does NOT write the payload unless --allow-ablation-output is given.")
     )
     var ablate: [String] = []
@@ -370,130 +370,74 @@ struct PatchComponentCLI: ParsableCommand {
         }
     }
 
+    private func makePatcher(_ payload: Data) -> any StructuredPatcher {
+        switch component {
+        case .txm:
+            return TXMPatcher(data: payload, verbose: !quiet)
+        case .kernelBase:
+            return KernelPatcher(data: payload, verbose: !quiet)
+        case .kernelJB:
+            let patcher = KernelJBPatcher(data: payload, verbose: !quiet)
+            patcher.applyIOS27 = targetOS.map { $0.hasPrefix("27.") } ?? true
+            patcher.applyFrida = frida
+            return patcher
+        }
+    }
+
     mutating func run() throws {
         let ablateIDs = Set(PatchFirmwareCLI.parseAblation(ablate))
         let (canonical, patcherType) = ablationTargets
         if !ablateIDs.isEmpty {
-            let known: Set<String> = [canonical, "\(canonical).\(patcherType)"]
+            let steps = makePatcher(Data()).buildSteps()
+            let known = Set([canonical, "\(canonical).\(patcherType)"] + steps.map { $0.id.description })
             let unknown = ablateIDs.subtracting(known).sorted()
-            if !unknown.isEmpty {
-                throw PatcherError.invalidFormat(
-                    "unknown ablation id(s): \(unknown.joined(separator: ", ")); "
-                        + "known: \(known.sorted().joined(separator: ", "))")
+            guard unknown.isEmpty else {
+                throw PatcherError.invalidFormat("unknown ablation id(s): \(unknown.joined(separator: ", ")); "
+                    + "known: \(known.sorted().joined(separator: ", "))")
             }
         }
-        let ablated = ablateIDs.contains(canonical) || ablateIDs.contains("\(canonical).\(patcherType)")
-
         let payload = try IM4PHandler.load(contentsOf: input).payload
-
-        // Diagnostic gate snapshot for the single-component report.
         let gates = PatchGateSnapshot(
-            variant: "component",
-            iosBaseIs18: false,
+            variant: "component", iosBaseIs18: false,
             iosBaseIs27: targetOS?.hasPrefix("27.") ?? (component == .kernelJB),
-            cloudOSIsFridaCapable: frida,
-            forceExcGuard: false,
-            enableFrida: frida,
+            cloudOSIsFridaCapable: frida, forceExcGuard: false, enableFrida: frida,
             excGuardActive: false,
             applyIOS27: targetOS?.hasPrefix("27.") ?? (component == .kernelJB),
             applyFrida: frida
         )
-        let legacyID = PatchID(component: canonical, patcher: patcherType, method: "*")
-
-        if ablated {
-            let result = PatchResult(
-                id: legacyID, requirement: .required, rule: nil,
-                outcome: .ablated, reason: "--ablate", recordIndices: [], gates: gates
-            )
-            let report = PatchRunReport(
-                variant: "component", gates: gates,
-                components: [ComponentReport(component: canonical, coverage: .legacy, results: [result], records: [])],
-                ablation: [legacyID]
-            )
-            if allowAblationOutput {
-                let outputDir = output.deletingLastPathComponent()
-                try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
-                try payload.write(to: output)
-            }
-            try Self.writeReport(report, to: reportOut)
-            if !quiet {
-                let mode = allowAblationOutput ? "wrote unpatched payload" : "dry-run, payload NOT written"
-                print("[patch-component] ABLATION RUN: \(canonical) ablated; \(mode)")
-            }
-            return
-        }
-
-        let count: Int
-        let patchedData: Data
-        var records: [PatchRecord] = []
-
-        switch component {
-        case .txm:
-            let patcher = TXMPatcher(data: payload, verbose: !quiet)
-            count = try patcher.apply()
-            patchedData = patcher.patchedData
-
-        case .kernelBase:
-            let patcher = KernelPatcher(data: payload, verbose: !quiet)
-            count = try patcher.apply()
-            patchedData = patcher.buffer.data
-            records = patcher.patches
-
-        case .kernelJB:
-            // Mirrors the pipeline's jb kernel layer. In FirmwarePipeline each kernel
-            // patcher runs on the *original* payload independently, so running
-            // KernelJBPatcher standalone faithfully reproduces JB hook behavior
-            // without the base patcher or the rest of the boot chain.
-            let patcher = KernelJBPatcher(data: payload, verbose: !quiet)
-            // Mirror the pipeline's per-base gating: apply the iOS-27-only patches when
-            // --target-os is 27.x, skip them for an explicit non-27 target. With no
-            // --target-os, default to applying them so the dev/test tool exercises the
-            // full set.
-            patcher.applyIOS27 = targetOS.map { $0.hasPrefix("27.") } ?? true
-            patcher.applyFrida = frida
-            count = try patcher.apply()
-            patchedData = patcher.buffer.data
-            records = patcher.patches
-        }
-
-        let outputDir = output.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
-        try patchedData.write(to: output)
-
+        let result = StructuredExecution.run(patcher: makePatcher(payload), componentName: canonical,
+            gates: gates, ablate: ablateIDs, fallback: payload)
+        let report = PatchRunReport(variant: "component", gates: gates,
+            components: [result.report],
+            ablation: result.report.results.filter { $0.outcome == .ablated }.map(\.id))
+        try Self.writeReport(report, to: reportOut)
         if let recordsOut {
-            let url = URL(fileURLWithPath: recordsOut)
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            try encoder.encode(records).write(to: url)
-            if !quiet {
-                print("[patch-component] wrote \(records.count) patch records to \(url.path)")
-            }
+            let url = URL(fileURLWithPath: recordsOut)
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try encoder.encode(result.report.records).write(to: url)
         }
-
-        if reportOut != nil {
-            let result = PatchResult(
-                id: legacyID, requirement: .required, rule: nil,
-                outcome: records.isEmpty && count == 0 ? .failed : .applied,
-                reason: records.isEmpty && count == 0 ? "legacy: no patches found" : nil,
-                recordIndices: Array(records.indices), gates: gates
-            )
-            let report = PatchRunReport(
-                variant: "component", gates: gates,
-                components: [ComponentReport(component: canonical, coverage: .legacy, results: [result], records: records)],
-                ablation: []
-            )
-            try Self.writeReport(report, to: reportOut)
+        guard !result.report.hasRequiredFailure else {
+            throw PatcherError.patchVerificationFailed("required patch failure(s): "
+                + report.failedRequired.map(\.description).joined(separator: ", "))
         }
-
+        let dry = !ablateIDs.isEmpty && !allowAblationOutput
+        if !dry {
+            try FileManager.default.createDirectory(at: output.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try result.data.write(to: output)
+        }
         if !quiet {
-            print("[patch-component] applied \(count) patches for \(component.rawValue)")
-            print("[patch-component] wrote patched payload to \(output.path)")
+            print("[patch-component] applied \(result.report.records.count) patches for \(component.rawValue)")
+            print(dry ? "[patch-component] ABLATION dry-run: payload NOT written"
+                : "[patch-component] wrote patched payload to \(output.path)")
         }
     }
 
     static func writeReport(_ report: PatchRunReport, to path: String?) throws {
         guard let path else { return }
         let url = URL(fileURLWithPath: path)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(report).write(to: url)

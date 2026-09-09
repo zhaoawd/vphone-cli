@@ -28,20 +28,21 @@ extension KernelJBPatcher {
     // MARK: - Entry Point
 
     /// C21-v3 split exits + helper bits for _cred_label_update_execve.
-    func patchCredLabelUpdateExecve() {
+    @discardableResult
+    func patchCredLabelUpdateExecve() -> Bool {
         log("\n[JB] _cred_label_update_execve: C21-v3 split exits + helper bits")
 
         // 1. Locate the function.
         guard let funcOff = locateCredLabelExecveFunc() else {
             log("  [-] function not found, skipping shellcode patch")
-            return
+            return false
         }
         log("  [+] func at 0x\(String(format: "%X", funcOff))")
 
         // 2. Find canonical epilogue: last `ldp x29, x30, [sp, ...]` before ret.
         guard let epilogueOff = findCredLabelEpilogue(funcOff: funcOff) else {
             log("  [-] epilogue not found")
-            return
+            return false
         }
         log("  [+] epilogue at 0x\(String(format: "%X", epilogueOff))")
 
@@ -57,20 +58,20 @@ extension KernelJBPatcher {
             }
         } else {
             log("  [-] shared deny return not found")
-            return
+            return false
         }
 
         // 4. Find success exits: B epilogue with preceding MOV W0,#0.
         let successExits = findCredLabelSuccessExits(funcOff: funcOff, epilogueOff: epilogueOff)
         guard !successExits.isEmpty else {
             log("  [-] success exits not found")
-            return
+            return false
         }
 
         // 5. Recover csflags stack reload instruction bytes.
         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
-            return
+            return false
         }
 
         // 6. Allocate code caves.
@@ -79,7 +80,7 @@ extension KernelJBPatcher {
             denyCaveOff = findCodeCave(size: 8)
             guard denyCaveOff != nil else {
                 log("  [-] no code cave for C21-v3 deny trampoline")
-                return
+                return false
             }
         }
 
@@ -88,14 +89,14 @@ extension KernelJBPatcher {
               successCaveOff != denyCaveOff
         else {
             log("  [-] no code cave for C21-v3 success trampoline")
-            return
+            return false
         }
 
         // 7. Build deny shellcode (8 bytes): MOV W0,#0 + B epilogue.
         if !denyAlreadyAllowed, let dOff = denyOff, let dCaveOff = denyCaveOff {
             guard let branchBack = encodeB(from: dCaveOff + 4, to: epilogueOff) else {
                 log("  [-] deny trampoline → epilogue branch out of range")
-                return
+                return false
             }
             let denyShellcode = ARM64.movW0_0 + branchBack
 
@@ -110,7 +111,7 @@ extension KernelJBPatcher {
             // Redirect deny site → deny cave
             guard let branchToCave = encodeB(from: dOff, to: dCaveOff) else {
                 log("  [-] branch from deny site 0x\(String(format: "%X", dOff)) to cave out of range")
-                return
+                return false
             }
             emit(dOff, branchToCave,
                  patchID: "jb.cred_label_update_execve.deny_redirect",
@@ -128,7 +129,7 @@ extension KernelJBPatcher {
         //   b epilogue
         guard let successBranchBack = encodeB(from: successCaveOff + 28, to: epilogueOff) else {
             log("  [-] success trampoline → epilogue branch out of range")
-            return
+            return false
         }
 
         var successShellcode = Data()
@@ -143,7 +144,7 @@ extension KernelJBPatcher {
 
         guard successShellcode.count == 32 else {
             log("  [-] success shellcode size mismatch: \(successShellcode.count) != 32")
-            return
+            return false
         }
 
         for i in stride(from: 0, to: successShellcode.count, by: 4) {
@@ -157,12 +158,13 @@ extension KernelJBPatcher {
         for exitOff in successExits {
             guard let branchToCave = encodeB(from: exitOff, to: successCaveOff) else {
                 log("  [-] branch from success exit 0x\(String(format: "%X", exitOff)) to cave out of range")
-                return
+                return false
             }
             emit(exitOff, branchToCave,
                  patchID: "jb.cred_label_update_execve.success_redirect",
                  description: "b success cave [_cred_label_update_execve C21-v3 exit @ 0x\(String(format: "%X", exitOff))]")
         }
+        return true
     }
 
     // MARK: - Function Locators
