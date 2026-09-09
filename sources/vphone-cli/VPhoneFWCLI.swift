@@ -78,9 +78,17 @@ struct VPhoneFWPrepareCommand: ParsableCommand {
         if v.tracesInternals {
             print("[trace] spawning: /bin/bash \(resources.fwPrepareScript.path) (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR)")
         }
-        let code = try VPhoneProcessRunner.runStreaming(
-            URL(fileURLWithPath: "/bin/bash"), [resources.fwPrepareScript.path], cwd: bundle.url, env: env,
-            echo: v.showsToolDetail)
+        // `vm create` runs the same script under scripts/vm_lock.py because the
+        // lock must survive into a shell process tree it execs. Here the Swift
+        // process outlives the script, so it holds the lock itself for the whole
+        // download/merge; the child does not inherit the O_CLOEXEC descriptor.
+        let code = try VPhoneBundleGuard.withBundleLock(
+            directory: bundle.url, operation: VPhoneVMOperation.fwPrepare
+        ) { _ in
+            try VPhoneProcessRunner.runStreaming(
+                URL(fileURLWithPath: "/bin/bash"), [resources.fwPrepareScript.path], cwd: bundle.url, env: env,
+                echo: v.showsToolDetail)
+        }
         throw ExitCode(code)
     }
 }
@@ -109,15 +117,20 @@ struct VPhoneFWPatchCommand: ParsableCommand {
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
         setenv("VPHONE_SEAL_DIR", resources.sealVolumeCacheDir.path, 1)
 
-        let pipeline = FirmwarePipeline(
-            vmDirectory: bundle.url,
-            variant: variant.pipelineVariant,
-            verbose: !quiet,
-            noBinpack: false,
-            noVphoned: false,
-            forceExcGuard: forceExcGuard,
-            enableFrida: frida)
-        let records = try pipeline.patchAll()
+        // Patching rewrites the bundle's boot chain in place — never while the
+        // VM (or another offline operation) holds the bundle.
+        let records = try VPhoneBundleGuard.withBundleLock(
+            directory: bundle.url, operation: VPhoneVMOperation.fwPatch
+        ) { _ in
+            try FirmwarePipeline(
+                vmDirectory: bundle.url,
+                variant: variant.pipelineVariant,
+                verbose: !quiet,
+                noBinpack: false,
+                noVphoned: false,
+                forceExcGuard: forceExcGuard,
+                enableFrida: frida).patchAll()
+        }
         print("[fw patch] applied \(records.count) patches for \(variant.rawValue)")
     }
 }

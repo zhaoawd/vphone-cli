@@ -542,9 +542,18 @@ public struct VPhoneCreateOrchestrator {
         }
         guard code == 0 else { throw VPhoneCreateError.cfwInstallFailed(code) }
         print("[+] CFW installed (\(options.variant)).")
-        if let bundle = try? VPhoneBundle.load(at: bundleURL),
-           let info = try? VPhoneRestoreInfo.recordVariant(options.variant, toBundle: bundle), info.variant != nil {
-            print("[+] Recorded variant \(options.variant), device \(info.device ?? "?")")
+        // The install script released its lock on exit; take a fresh cfw-record
+        // lock to record the variant (see recordVariant's doc). A busy lock only
+        // skips the bookkeeping — the install already succeeded.
+        if let bundle = try? VPhoneBundle.load(at: bundleURL) {
+            try? VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
+            ) { lock in
+                if let info = try? VPhoneRestoreInfo.recordVariant(options.variant, toBundle: bundle, holding: lock),
+                   info.variant != nil {
+                    print("[+] Recorded variant \(options.variant), device \(info.device ?? "?")")
+                }
+            }
         }
     }
 

@@ -112,7 +112,9 @@ struct RestoreInfoTests {
             ios: .init(version: "18.6.2", build: "22G100"),
             cloudOS: .init(version: "26.1", build: "23B85")).write(toBundle: b)
 
-        let merged = try VPhoneRestoreInfo.recordVariant("exp", toBundle: b)
+        let merged = try VPhoneBundleGuard.withBundleLock(
+            directory: b.url, operation: VPhoneVMOperation.cfwRecord
+        ) { lock in try VPhoneRestoreInfo.recordVariant("exp", toBundle: b, holding: lock) }
         #expect(merged?.variant == "exp")
         #expect(merged?.device == "iPhone17,3")
 
@@ -125,7 +127,10 @@ struct RestoreInfoTests {
     @Test func recordVariantNilWithoutVersions() throws {
         let b = try makeBundle()
         defer { try? FileManager.default.removeItem(at: b.url) }
-        #expect(try VPhoneRestoreInfo.recordVariant("jb", toBundle: b) == nil)
+        let merged = try VPhoneBundleGuard.withBundleLock(
+            directory: b.url, operation: VPhoneVMOperation.cfwRecord
+        ) { lock in try VPhoneRestoreInfo.recordVariant("jb", toBundle: b, holding: lock) }
+        #expect(merged == nil)
     }
 
     @Test func bundleReportCarriesUDID() throws {

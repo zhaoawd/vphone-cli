@@ -39,48 +39,72 @@ public enum VPhoneBundleOps {
     }
 
     public static func create(_ spec: NewBundleSpec, in library: VPhoneLibrary) throws -> VPhoneBundle {
+        try create(spec, in: library, afterNameCheck: nil)
+    }
+
+    /// The bundle directory does not exist when the name is checked, so there is
+    /// nothing to take a bundle lock on: `create` runs under the library-root
+    /// lock instead, from the existence check through the last write.
+    ///
+    /// `afterNameCheck` is a testing seam that runs between the check and the
+    /// directory creation, so a test can prove the two are one lock lifetime.
+    static func create(
+        _ spec: NewBundleSpec, in library: VPhoneLibrary, afterNameCheck: (() -> Void)?
+    ) throws -> VPhoneBundle {
         try requireValidName(spec.name)
         let fm = FileManager.default
         let dir = library.url(forName: spec.name)
-        if fm.fileExists(atPath: dir.path) {
-            throw VPhoneLibraryError.alreadyExists(name: spec.name)
-        }
-        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
-        // Roll back the partial bundle on any failure after the dir is created,
-        // so a retry with the same name isn't permanently blocked by the
-        // alreadyExists check.
-        do {
-            // Sparse disk image: create then truncate to size (no bytes written).
-            let disk = dir.appendingPathComponent("Disk.img")
-            fm.createFile(atPath: disk.path, contents: nil)
-            let handle = try FileHandle(forWritingTo: disk)
+        return try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
+            if fm.fileExists(atPath: dir.path) {
+                throw VPhoneLibraryError.alreadyExists(name: spec.name)
+            }
+            afterNameCheck?()
+            // No intermediate directories: creating the bundle directory then
+            // fails on an existing name instead of adopting it, so the rollback
+            // below can only ever remove a directory this call made.
             do {
-                try handle.truncate(atOffset: spec.diskSizeGB * 1024 * 1024 * 1024)
-                try handle.close()
+                try fm.createDirectory(at: dir, withIntermediateDirectories: false)
+            } catch let error as NSError
+                where error.domain == NSCocoaErrorDomain && error.code == NSFileWriteFileExistsError
+            {
+                throw VPhoneLibraryError.alreadyExists(name: spec.name)
+            }
+            // Roll back the partial bundle on any failure after the dir is created,
+            // so a retry with the same name isn't permanently blocked by the
+            // alreadyExists check.
+            do {
+                // Sparse disk image: create then truncate to size (no bytes written).
+                let disk = dir.appendingPathComponent("Disk.img")
+                fm.createFile(atPath: disk.path, contents: nil)
+                let handle = try FileHandle(forWritingTo: disk)
+                do {
+                    try handle.truncate(atOffset: spec.diskSizeGB * 1024 * 1024 * 1024)
+                    try handle.close()
+                } catch {
+                    try? handle.close()
+                    throw error
+                }
+
+                // SEP storage: 512 KB of zeros (real bytes, matches vm_create.sh).
+                try Data(count: 512 * 1024).write(to: dir.appendingPathComponent("SEPStorage"))
+
+                // ROMs.
+                try fm.copyItem(at: spec.romSource, to: dir.appendingPathComponent("AVPBooter.vresearch1.bin"))
+                try fm.copyItem(at: spec.sepromSource, to: dir.appendingPathComponent("AVPSEPBooter.vresearch1.bin"))
+
+                // Manifest.
+                let manifest = VPhoneVirtualMachineManifest(
+                    cpuCount: spec.cpuCount,
+                    memorySize: spec.memoryMB * 1024 * 1024,
+                    romImages: .init(avpBooter: "AVPBooter.vresearch1.bin",
+                                     avpSEPBooter: "AVPSEPBooter.vresearch1.bin"))
+                try manifest.write(to: dir.appendingPathComponent("config.plist"))
+
+                return VPhoneBundle(url: dir, manifest: manifest)
             } catch {
-                try? handle.close()
+                try? fm.removeItem(at: dir)
                 throw error
             }
-
-            // SEP storage: 512 KB of zeros (real bytes, matches vm_create.sh).
-            try Data(count: 512 * 1024).write(to: dir.appendingPathComponent("SEPStorage"))
-
-            // ROMs.
-            try fm.copyItem(at: spec.romSource, to: dir.appendingPathComponent("AVPBooter.vresearch1.bin"))
-            try fm.copyItem(at: spec.sepromSource, to: dir.appendingPathComponent("AVPSEPBooter.vresearch1.bin"))
-
-            // Manifest.
-            let manifest = VPhoneVirtualMachineManifest(
-                cpuCount: spec.cpuCount,
-                memorySize: spec.memoryMB * 1024 * 1024,
-                romImages: .init(avpBooter: "AVPBooter.vresearch1.bin",
-                                 avpSEPBooter: "AVPSEPBooter.vresearch1.bin"))
-            try manifest.write(to: dir.appendingPathComponent("config.plist"))
-
-            return VPhoneBundle(url: dir, manifest: manifest)
-        } catch {
-            try? fm.removeItem(at: dir)
-            throw error
         }
     }
 
@@ -93,22 +117,26 @@ public enum VPhoneBundleOps {
         bridgeInterface: String? = nil
     ) throws -> VPhoneBundle {
         let directory = try library.bundle(named: name).url
-        let lock = try VPhoneVMLock(directory: directory, operation: "config")
-        defer { withExtendedLifetime(lock) {} }
-        let bundle = try library.bundle(named: name)
-        let editsNetwork = networkMode != nil || bridgeInterface != nil
-        let network = editsNetwork
-            ? try VPhoneNetworking.merge(
-                into: bundle.manifest.networkConfig,
-                mode: networkMode, bridgeInterface: bridgeInterface)
-            : nil
-        let updated = bundle.manifest.updating(
-            cpuCount: cpuCount,
-            memorySize: memoryMB.map { $0 * 1024 * 1024 },
-            screenConfig: nil,
-            networkConfig: network)
-        try updated.write(to: bundle.configURL)
-        return VPhoneBundle(url: bundle.url, manifest: updated)
+        // Editing the config of a running VM is refused, not queued: the boot
+        // process read the manifest at start and would not see the change.
+        return try VPhoneBundleGuard.withBundleLock(
+            directory: directory, operation: VPhoneVMOperation.config
+        ) { _ in
+            let bundle = try library.bundle(named: name)
+            let editsNetwork = networkMode != nil || bridgeInterface != nil
+            let network = editsNetwork
+                ? try VPhoneNetworking.merge(
+                    into: bundle.manifest.networkConfig,
+                    mode: networkMode, bridgeInterface: bridgeInterface)
+                : nil
+            let updated = bundle.manifest.updating(
+                cpuCount: cpuCount,
+                memorySize: memoryMB.map { $0 * 1024 * 1024 },
+                screenConfig: nil,
+                networkConfig: network)
+            try updated.write(to: bundle.configURL)
+            return VPhoneBundle(url: bundle.url, manifest: updated)
+        }
     }
 
     // MARK: - Rename / delete
@@ -118,21 +146,35 @@ public enum VPhoneBundleOps {
     ) throws -> VPhoneBundle {
         try requireValidName(newName)
         let src = try library.bundle(named: name).url
-        let lock = try VPhoneVMLock(directory: src, operation: "bundle-change")
-        defer { withExtendedLifetime(lock) {} }
-        let dst = library.url(forName: newName)
-        if FileManager.default.fileExists(atPath: dst.path) {
-            throw VPhoneLibraryError.alreadyExists(name: newName)
+        return try VPhoneBundleGuard.withBundleLock(
+            directory: src, operation: VPhoneVMOperation.rename
+        ) { _ in
+            let dst = library.url(forName: newName)
+            // The destination name is a library-wide resource: the check and the
+            // move are one library-lock lifetime, so a concurrent create/import
+            // of the same name cannot slip in between them.
+            try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
+                if FileManager.default.fileExists(atPath: dst.path) {
+                    throw VPhoneLibraryError.alreadyExists(name: newName)
+                }
+                try FileManager.default.moveItem(at: src, to: dst)
+            }
+            // The record written when this lock was taken travelled with the
+            // directory and still names the old path. It is diagnostic only and
+            // this operation is over, so drop it rather than leave a stale path.
+            try? FileManager.default.removeItem(
+                at: dst.appendingPathComponent(VPhoneVMRuntimeState.filename))
+            return try VPhoneBundle.load(at: dst)
         }
-        try FileManager.default.moveItem(at: src, to: dst)
-        return try VPhoneBundle.load(at: dst)
     }
 
     public static func delete(bundleNamed name: String, in library: VPhoneLibrary) throws {
         let url = try library.bundle(named: name).url
-        let lock = try VPhoneVMLock(directory: url, operation: "delete")
-        defer { withExtendedLifetime(lock) {} }
-        try FileManager.default.removeItem(at: url)
+        try VPhoneBundleGuard.withBundleLock(
+            directory: url, operation: VPhoneVMOperation.delete
+        ) { _ in
+            try FileManager.default.removeItem(at: url)
+        }
     }
 
     // MARK: - Clone
@@ -146,19 +188,26 @@ public enum VPhoneBundleOps {
     ) throws -> VPhoneBundle {
         try requireValidName(newName)
         let src = try library.bundle(named: name).url
-        let lock = try VPhoneVMLock(directory: src, operation: "bundle-change")
-        defer { withExtendedLifetime(lock) {} }
-        let dst = library.url(forName: newName)
-        let fm = FileManager.default
-        if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: newName) }
+        // Cloning a running VM is refused: `Disk.img` would be copied mid-write.
+        // There is no verified consistent-snapshot path, so there is no opt-out.
+        return try VPhoneBundleGuard.withBundleLock(
+            directory: src, operation: VPhoneVMOperation.clone
+        ) { _ in
+            let dst = library.url(forName: newName)
+            let fm = FileManager.default
+            if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: newName) }
 
-        // APFS CoW clone; fall back to a plain recursive copy off-APFS.
-        if clonefile(src.path, dst.path, 0) != 0 {
-            try? fm.removeItem(at: dst)  // clear any partial clonefile output first
-            try fm.copyItem(at: src, to: dst)
+            // APFS CoW clone; fall back to a plain recursive copy off-APFS.
+            if clonefile(src.path, dst.path, 0) != 0 {
+                // EEXIST means the name was taken between the check and here, by
+                // somebody else's bundle — never delete it, report the collision.
+                guard errno != EEXIST else { throw VPhoneLibraryError.alreadyExists(name: newName) }
+                try? fm.removeItem(at: dst)  // clear this call's partial clonefile output
+                try fm.copyItem(at: src, to: dst)
+            }
+            try resetIdentity(inBundleAt: dst)
+            return try VPhoneBundle.load(at: dst)
         }
-        try resetIdentity(inBundleAt: dst)
-        return try VPhoneBundle.load(at: dst)
     }
 
     private static func resetIdentity(inBundleAt dir: URL) throws {
@@ -217,8 +266,22 @@ public enum VPhoneBundleOps {
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> URL {
         let bundle = try library.bundle(named: name)
-        let lock = try VPhoneVMLock(directory: bundle.url, operation: "export")
-        defer { withExtendedLifetime(lock) {} }
+        // Exporting a running VM is refused for the same reason as cloning: the
+        // archive would contain a `Disk.img` captured mid-write.
+        return try VPhoneBundleGuard.withBundleLock(
+            directory: bundle.url, operation: VPhoneVMOperation.export
+        ) { _ in
+            try exportLocked(
+                bundle: bundle, name: name, to: outFile, includeIPSW: includeIPSW,
+                compression: compression, in: library, progress: progress)
+        }
+    }
+
+    private static func exportLocked(
+        bundle: VPhoneBundle, name: String, to outFile: URL, includeIPSW: Bool,
+        compression: ExportCompression, in library: VPhoneLibrary,
+        progress: ((Int64, Int64) -> Void)?
+    ) throws -> URL {
         var isDir: ObjCBool = false
         let outFile = FileManager.default.fileExists(atPath: outFile.path, isDirectory: &isDir) && isDir.boolValue
             ? outFile.appendingPathComponent("\(name).\(compression.fileExtension)")
@@ -274,6 +337,16 @@ public enum VPhoneBundleOps {
         from inFile: URL, name: String?, in library: VPhoneLibrary,
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> VPhoneBundle {
+        try importArchive(from: inFile, name: name, in: library, progress: progress, afterNameCheck: nil)
+    }
+
+    /// `afterNameCheck` is a testing seam: it runs between the destination-name
+    /// check and the move that places the bundle, which must be one
+    /// library-lock lifetime.
+    static func importArchive(
+        from inFile: URL, name: String?, in library: VPhoneLibrary,
+        progress: ((Int64, Int64) -> Void)?, afterNameCheck: (() -> Void)?
+    ) throws -> VPhoneBundle {
         let fm = FileManager.default
         // Fail fast when the destination name is already known (explicit rename).
         if let name {
@@ -305,13 +378,18 @@ public enum VPhoneBundleOps {
         let finalName = name ?? archived
         try requireValidName(finalName)
         let dst = library.url(forName: finalName)
-        if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
         let extracted = staging.appendingPathComponent(archived)
         guard fm.fileExists(atPath: extracted.appendingPathComponent("config.plist").path) else {
             throw VPhoneBundleOpsError.badArchive(
                 "archive did not contain a valid bundle (\(archived)/config.plist)")
         }
-        try fm.moveItem(at: extracted, to: dst)
+        // Extraction ran outside the lock (it only writes into the private
+        // staging dir); the name check and the placement are one lock lifetime.
+        try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
+            if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
+            afterNameCheck?()
+            try fm.moveItem(at: extracted, to: dst)
+        }
         return try VPhoneBundle.load(at: dst)
     }
 

@@ -54,13 +54,15 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         if !dfu && !noVphoned {
             // Staging is separate from the child boot lifetime. The child takes
             // its own lock and fails safely if another launch wins the gap.
-            let stagingLock = try VPhoneVMLock(directory: bundle.url, operation: "stage-vphoned")
-            defer { withExtendedLifetime(stagingLock) {} }
-            do {
-                _ = try layout.stageVphoned(into: bundle)
-            } catch {
-                FileHandle.standardError.write(Data(
-                    "warning: could not stage vphoned into \(bundle.name): \(error)\n".utf8))
+            try VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.stageVphoned
+            ) { _ in
+                do {
+                    _ = try layout.stageVphoned(into: bundle)
+                } catch {
+                    FileHandle.standardError.write(Data(
+                        "warning: could not stage vphoned into \(bundle.name): \(error)\n".utf8))
+                }
             }
         }
 

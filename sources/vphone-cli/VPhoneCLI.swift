@@ -158,7 +158,9 @@ struct PatchFirmwareCLI: ParsableCommand {
 
     static let configuration = CommandConfiguration(
         commandName: "patch-firmware",
-        abstract: "Patch boot-chain firmware in a VM directory using the Swift pipeline"
+        abstract: "Patch boot-chain firmware in a VM directory using the Swift pipeline "
+            + "(diagnostic entry: takes a bare path instead of a VM name; `vphone-cli fw patch` "
+            + "is the normal one). Both take the same VM-directory lock and refuse a busy VM."
     )
 
     @Option(
@@ -199,16 +201,21 @@ struct PatchFirmwareCLI: ParsableCommand {
     var frida: Bool = false
 
     mutating func run() throws {
-        let pipeline = FirmwarePipeline(
-            vmDirectory: vmDirectory,
-            variant: variant.pipelineVariant,
-            verbose: !quiet,
-            noBinpack: noBinpack,
-            noVphoned: noVphoned,
-            forceExcGuard: forceExcGuard,
-            enableFrida: frida
-        )
-        let records = try pipeline.patchAll()
+        // Same protection as `fw patch`: a bare-path diagnostic entry must not
+        // be a way around the VM-directory lock.
+        let records = try VPhoneBundleGuard.withBundleLock(
+            directory: vmDirectory, operation: VPhoneVMOperation.fwPatch
+        ) { _ in
+            try FirmwarePipeline(
+                vmDirectory: vmDirectory,
+                variant: variant.pipelineVariant,
+                verbose: !quiet,
+                noBinpack: noBinpack,
+                noVphoned: noVphoned,
+                forceExcGuard: forceExcGuard,
+                enableFrida: frida
+            ).patchAll()
+        }
 
         if let recordsOut {
             let url = URL(fileURLWithPath: recordsOut)

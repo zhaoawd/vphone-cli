@@ -75,8 +75,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         // Acquire before reading or mutating the manifest and opening VM storage.
         vmLock = try VPhoneVMLock(directory: cli.config.resolvingSymlinksInPath().deletingLastPathComponent(),
                                   operation: cli.dfu
-                                      ? VPhoneVMRuntimeState.dfuOperation
-                                      : VPhoneVMRuntimeState.bootOperation)
+                                      ? VPhoneVMOperation.dfu
+                                      : VPhoneVMOperation.boot)
         FileHandle.standardOutput.write(Data("[vphone] VM lock acquired\n".utf8))
         let options = try cli.resolveOptions()
 

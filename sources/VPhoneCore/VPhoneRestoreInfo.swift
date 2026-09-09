@@ -71,10 +71,16 @@ public struct VPhoneRestoreInfo: Codable, Equatable, Sendable {
 
     /// Set `variant` (and its device) on the bundle's restore-info.json, keeping
     /// the recorded versions. nil if no versions exist yet to preserve.
+    ///
+    /// `holding` is the bundle lock this write runs under. The CFW install
+    /// script releases its own lock when it exits, so the caller must take a
+    /// fresh `cfw-record` lock (via `VPhoneBundleGuard.withBundleLock`) before
+    /// writing — the parameter makes that a compile-time requirement rather
+    /// than a convention.
     @discardableResult
-    public static func recordVariant(_ variant: String, toBundle bundle: VPhoneBundle) throws
-        -> VPhoneRestoreInfo?
-    {
+    public static func recordVariant(
+        _ variant: String, toBundle bundle: VPhoneBundle, holding _: VPhoneVMLock
+    ) throws -> VPhoneRestoreInfo? {
         guard let base = load(fromBundle: bundle) else { return nil }
         let merged = VPhoneRestoreInfo(
             ios: base.ios, cloudOS: base.cloudOS,
@@ -85,8 +91,13 @@ public struct VPhoneRestoreInfo: Codable, Equatable, Sendable {
 
     /// Remove the `iPhone*_Restore/` tree from the bundle; returns its name, or
     /// nil if absent. Record versions (`derive`) first — it reads this directory.
+    ///
+    /// `holding` is the bundle lock this deletion runs under; see
+    /// `recordVariant`. `removeBuiltFirmwareIfIdle` takes that lock itself.
     @discardableResult
-    public static func removeBuiltFirmware(fromBundle bundle: VPhoneBundle) throws -> String? {
+    public static func removeBuiltFirmware(
+        fromBundle bundle: VPhoneBundle, holding _: VPhoneVMLock
+    ) throws -> String? {
         guard let dir = findRestoreDirectory(inBundle: bundle) else { return nil }
         try FileManager.default.removeItem(at: dir)
         return dir.lastPathComponent
@@ -97,9 +108,11 @@ public struct VPhoneRestoreInfo: Codable, Equatable, Sendable {
     @discardableResult
     public static func removeBuiltFirmwareIfIdle(fromBundle bundle: VPhoneBundle) -> String? {
         do {
-            let lock = try VPhoneVMLock(directory: bundle.url, operation: "cleanup-firmware")
-            defer { withExtendedLifetime(lock) {} }
-            return try removeBuiltFirmware(fromBundle: bundle)
+            return try VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.cleanupFirmware
+            ) { lock in
+                try removeBuiltFirmware(fromBundle: bundle, holding: lock)
+            }
         } catch {
             FileHandle.standardError.write(Data("[vphone] Warning: skipped optional firmware cleanup: \(error)\n".utf8))
             return nil

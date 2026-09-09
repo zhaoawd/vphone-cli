@@ -42,7 +42,20 @@ struct VPhoneRestoreCommand: ParsableCommand {
             return try VPhoneProcessRunner.runStreaming(python, args, cwd: bundle.url, echo: v.showsToolDetail)
         }
 
+        // A restore drives a device that only exists while a DFU boot runs, and
+        // that boot holds the bundle lock for its whole session. So this command
+        // cannot take the lock; it verifies the holder instead. Both paths below
+        // talk to the device, so both require the DFU session.
+        func requireDFUSession() throws {
+            let record = try VPhoneBundleGuard.requireDFUOwner(
+                directory: bundle.url, configURL: bundle.configURL)
+            if v.tracesInternals {
+                print("[trace] DFU session confirmed: pid \(record.pid), instance \(record.instanceID)")
+            }
+        }
+
         if getShsh {
+            try requireDFUSession()
             throw ExitCode(try pmd3("restore-get-shsh", extra: []))
         }
 
@@ -58,9 +71,20 @@ struct VPhoneRestoreCommand: ParsableCommand {
                 .first
             guard let restoreDir else { throw VPhoneRestoreError.noRestoreDir }
             print("[restore] decrypting AEA images in \(restoreDir.lastPathComponent)...")
-            try VPhoneRestoreOps.decryptAEAImages(inRestoreDir: restoreDir)
+            // Decryption rewrites files in the bundle, so it is an exclusive
+            // offline operation and takes the lock itself. It therefore has to
+            // finish BEFORE the DFU boot that the restore step cooperates with
+            // is started — a running DFU session holds the lock and this step
+            // refuses.
+            try VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.restoreDecrypt
+            ) { _ in
+                try VPhoneRestoreOps.decryptAEAImages(inRestoreDir: restoreDir)
+            }
+            try requireDFUSession()
             code = try pmd3("restore-update", extra: ["--tss", shsh.path])
         } else {
+            try requireDFUSession()
             code = try pmd3("restore-update", extra: [])
         }
 
@@ -152,11 +176,26 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
                 URL(fileURLWithPath: "/bin/zsh"), args, env: env, echo: v.showsToolDetail)
         }
         if code == 0 {
-            if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle), info.variant != nil {
-                print("[cfw] recorded variant \(variant), device \(info.device ?? "?")")
+            // The CFW install script released its own lock when it exited, so a
+            // fresh cfw-record lock is available. Recording the variant and the
+            // optional cleanup are one lock lifetime (see recordVariant's doc).
+            // A busy lock (VM running) only skips the bookkeeping — the install
+            // already succeeded, so do not abort the process.
+            let recorded: Void? = try? VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
+            ) { lock in
+                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock),
+                   info.variant != nil {
+                    print("[cfw] recorded variant \(variant), device \(info.device ?? "?")")
+                }
+                if !keepArtifacts,
+                   let removed = try? VPhoneRestoreInfo.removeBuiltFirmware(fromBundle: bundle, holding: lock) {
+                    print("[cfw] removed built firmware \(removed)/ to save space (--keep-artifacts to keep)")
+                }
             }
-            if !keepArtifacts, let removed = try? VPhoneRestoreInfo.removeBuiltFirmware(fromBundle: bundle) {
-                print("[cfw] removed built firmware \(removed)/ to save space (--keep-artifacts to keep)")
+            if recorded == nil {
+                FileHandle.standardError.write(Data(
+                    "[cfw] Warning: skipped variant recording — the VM is busy (bundle lock held)\n".utf8))
             }
         }
         throw ExitCode(code)
