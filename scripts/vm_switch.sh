@@ -20,6 +20,10 @@ BACKUPS_DIR="${BACKUPS_DIR:-vm.backups}"
 NAME="${NAME:-}"
 BACKUP_INCLUDE_IPSW="${BACKUP_INCLUDE_IPSW:-0}"
 
+# Preserve the original argv so the bundle-lock self-wrap below can replay it.
+typeset -a _VPHONE_ORIG_ARGS
+_VPHONE_ORIG_ARGS=("$@")
+
 validate_backup_name() {
     local name="$1"
     local label="${2:-NAME}"
@@ -141,11 +145,18 @@ if [[ ! -d "${TARGET}" || ! -f "${TARGET}/config.plist" ]]; then
     exit 1
 fi
 
-# --- Check for running VM ---
-if pgrep -f "vphone-cli.*--config.*${VM_DIR}" >/dev/null 2>&1; then
-    echo "ERROR: vphone-cli appears to be running against ${VM_DIR}."
-    echo "  Stop the VM before switching."
-    exit 1
+# --- Bundle lock (shared with the Swift offline operations) ---
+# Take the same directory flock the Swift side takes, so a switch refuses to run
+# against a VM that is booted or otherwise busy (this replaces the former
+# pgrep-based "running VM" heuristic). Self-wrap through vm_lock.py exactly like
+# cfw_install_host.sh; VPHONE_VM_LOCK_FD marks the re-executed pass so we wrap
+# once. Only lock when the active directory already exists — with none present
+# there is no running VM to conflict with. Note: the final replace_dir_with_tmp
+# step swaps VM_DIR to a new inode, so the flock covers the destructive copy
+# rather than the atomic rename tail; that is sufficient to exclude a boot.
+if [[ -z "${VPHONE_VM_LOCK_FD:-}" && -d "${VM_DIR:A}" ]]; then
+    exec "${VPHONE_PYTHON:-python3}" "${0:a:h}/vm_lock.py" "${VM_DIR:A}" switch -- \
+        /bin/zsh "$0" "${_VPHONE_ORIG_ARGS[@]}"
 fi
 
 mkdir -p "${BACKUPS_DIR}"

@@ -423,7 +423,13 @@ boot_dfu: build boot_binary_check
 .PHONY: fw_prepare fw_patch fw_patch_less fw_patch_dev fw_patch_jb
 
 fw_prepare:
-	cd "$(VM_DIR)" && bash "$(CURDIR)/$(SCRIPTS)/fw_prepare.sh"
+	# Guard fw_prepare like the Swift `fw prepare` path: take the same VM-directory
+	# lock (operation fw-prepare) so a Makefile-driven prepare refuses to run while
+	# the VM is booted or another offline op holds the bundle. Wrap the recipe (not
+	# fw_prepare.sh itself): the Swift command already holds the lock when it spawns
+	# that script, so a self-wrap would double-lock. LOCK_NB means a busy VM fails fast.
+	"$(PYTHON)" "$(CURDIR)/$(SCRIPTS)/vm_lock.py" "$(VM_DIR_ABS)" fw-prepare -- \
+		/bin/bash -c 'cd "$(VM_DIR_ABS)" && exec bash "$(CURDIR)/$(SCRIPTS)/fw_prepare.sh"'
 
 fw_patch: patcher_build
 	"$(CURDIR)/$(PATCHER_BINARY)" patch-firmware --vm-directory "$(VM_DIR_ABS)" --variant regular \

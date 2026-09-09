@@ -26,6 +26,10 @@ SEP_STORAGE_SIZE=$((512 * 1024)) # 512 KB (same as vrevm)
 # Script directory
 SCRIPT_DIR="${0:A:h}"
 
+# Preserve the original argv so the bundle-lock self-wrap below can replay it.
+typeset -a _VPHONE_ORIG_ARGS
+_VPHONE_ORIG_ARGS=("$@")
+
 # Framework-bundled ROMs (vresearch1 / research1 chip)
 FW_ROM_DIR="/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources"
 ROM_SRC="${FW_ROM_DIR}/AVPBooter.vresearch1.bin"
@@ -66,6 +70,20 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# --- Bundle lock (shared with the Swift offline operations) ---
+# When VM_DIR already exists, take the same directory flock the Swift side takes
+# so a re-create refuses to run against a VM that is booted or otherwise busy.
+# Self-wrap through vm_lock.py exactly like cfw_install_host.sh; VPHONE_VM_LOCK_FD
+# marks the re-executed pass so we wrap once. A brand-new VM (directory absent)
+# has no running VM to conflict with, so it is created without a lock. NB: the
+# Swift `vm create` full-pipeline command instead takes the library-root lock
+# (the bundle does not exist yet there); this low-level directory creator guards
+# the more relevant case of re-creating over a live bundle.
+if [[ -z "${VPHONE_VM_LOCK_FD:-}" && -d "${VM_DIR:A}" ]]; then
+    exec "${VPHONE_PYTHON:-python3}" "${SCRIPT_DIR}/vm_lock.py" "${VM_DIR:A}" create -- \
+        /bin/zsh "$0" "${_VPHONE_ORIG_ARGS[@]}"
+fi
 
 DISK_SIZE_BYTES=$((DISK_SIZE_GB * 1024 * 1024 * 1024))
 

@@ -36,6 +36,10 @@ INCLUDE_RESTORE=0       # include *_Restore* IPSW dir (for DFU re-restore on tar
 INCLUDE_RAMDISK=0       # include Ramdisk + cfw/ramdisk inputs (for patch/restore flows)
 SKIP_DISK_CHECKSUM=0    # skip sha256 of Disk.img (faster, but SHA256SUMS won't cover the disk)
 
+# Preserve the original argv so the bundle-lock self-wrap below can replay it.
+typeset -a _VPHONE_ORIG_ARGS
+_VPHONE_ORIG_ARGS=("$@")
+
 usage() {
     cat <<'EOF'
 Usage: vm_package.sh [options]
@@ -67,6 +71,18 @@ while [[ $# -gt 0 ]]; do
 done
 
 cd "$PROJECT_ROOT"
+
+# --- Bundle lock (shared with the Swift offline operations) ---
+# Take the same directory flock the Swift side takes, so packaging refuses to run
+# against a VM that is booted or otherwise busy. Self-wrap through vm_lock.py
+# exactly like cfw_install_host.sh; VPHONE_VM_LOCK_FD marks the re-executed pass
+# so we wrap once. Only lock when the source bundle already exists (validation
+# below reports a missing one). The lsof live-disk check further down remains a
+# best-effort second gate for direct callers.
+if [[ -z "${VPHONE_VM_LOCK_FD:-}" && -d "${VM_DIR:A}" ]]; then
+    exec "${VPHONE_PYTHON:-python3}" "${0:A:h}/vm_lock.py" "${VM_DIR:A}" package -- \
+        /bin/zsh "$0" "${_VPHONE_ORIG_ARGS[@]}"
+fi
 
 # --- Validate inputs ---
 [[ -d "$VM_DIR" ]]               || { echo "ERROR: VM directory not found: $VM_DIR" >&2; exit 1; }

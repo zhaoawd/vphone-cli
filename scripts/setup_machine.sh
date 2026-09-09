@@ -28,7 +28,10 @@ SUDO_ASKPASS_SCRIPT=""
 
 VM_DIR="${VM_DIR:-vm}"
 VM_DIR_ABS="${VM_DIR:A}"
-AUTO_KILL_VM_LOCKS="${AUTO_KILL_VM_LOCKS:-1}"
+# Signed release binary built by `make build`. Used only for `vphone-cli vm stop`
+# (bundle-identity graceful shutdown); it needs no extra entitlement work beyond
+# what the host already grants to boot the VM in this same flow.
+VPHONE_BIN="${VPHONE_BIN:-${PROJECT_ROOT}/.build/release/vphone-cli}"
 POST_RESTORE_KILL_DELAY="${POST_RESTORE_KILL_DELAY:-30}"
 POST_KILL_SETTLE_DELAY="${POST_KILL_SETTLE_DELAY:-5}"
 
@@ -158,64 +161,22 @@ EOF
   fi
 }
 
-collect_vm_lock_pids() {
-  local -a paths pids
-  local path pid
-  typeset -U pids
-
-  paths=(
-    "${VM_DIR_ABS}/nvram.bin"
-    "${VM_DIR_ABS}/machineIdentifier.bin"
-    "${VM_DIR_ABS}/Disk.img"
-    "${VM_DIR_ABS}/SEPStorage"
-  )
-
-  for path in "${paths[@]}"; do
-    [[ -e "$path" ]] || continue
-    while IFS= read -r pid; do
-      [[ "$pid" == <-> ]] || continue
-      [[ "$pid" == "$$" ]] && continue
-      pids+=("$pid")
-    done < <(lsof -t -- "$path" 2>/dev/null || true)
-  done
-
-  (( ${#pids[@]} > 0 )) && print -l -- "${pids[@]}" || true
-}
-
-check_vm_storage_locks() {
-  if ! command -v lsof >/dev/null 2>&1; then
-    echo "[!] lsof not found; skipping VM lock preflight."
-    return
-  fi
-
-  local -a lock_pids
-  lock_pids=(${(@f)$(collect_vm_lock_pids)})
-  (( ${#lock_pids[@]} == 0 )) && return
-
-  echo "[-] VM storage files are currently in use: ${VM_DIR_ABS}"
-  echo "    This usually means another vphone process is still running."
-
-  local pid proc_info
-  for pid in "${lock_pids[@]}"; do
-    [[ -z "$pid" || "$pid" == "$$" ]] && continue
-    proc_info="$(ps -o pid=,ppid=,command= -p "$pid" 2>/dev/null || true)"
-    [[ -n "$proc_info" ]] && echo "    $proc_info" || echo "    pid=$pid"
-  done
-
-  if [[ "$AUTO_KILL_VM_LOCKS" == "1" ]]; then
-    echo "[*] AUTO_KILL_VM_LOCKS=1 set; terminating lock holder processes..."
-    for pid in "${lock_pids[@]}"; do
-      [[ -z "$pid" || "$pid" == "$$" ]] && continue
-      stop_process_tree "$pid"
-    done
-    sleep 1
-
-    lock_pids=(${(@f)$(collect_vm_lock_pids)})
-    (( ${#lock_pids[@]} == 0 )) && { echo "[+] Cleared VM storage locks"; return; }
-    echo "[-] VM storage locks still present after AUTO_KILL_VM_LOCKS attempt."
-  fi
-
-  die "Stop those processes and retry. You can also set AUTO_KILL_VM_LOCKS=1."
+vm_stop_target() {
+  # Graceful preflight: ensure no VM (boot or DFU) holds the bundle lock for
+  # VM_DIR before we launch or hand the bundle to an offline step. Replaces the
+  # former lsof(Disk.img/nvram/...) -> kill -9 force path.
+  #
+  # `vphone-cli vm stop` resolves the bundle by library-root + name, finds the
+  # boot process by bundle identity (not by disk fd), asks the guest to power
+  # off, waits, then force-stops through the framework and confirms termination.
+  # A bundle that is not running reports "not running" and exits 0, so this is
+  # safe to call unconditionally. Any non-zero exit is fatal — there is no
+  # force-kill fallback.
+  [[ -x "$VPHONE_BIN" ]] \
+    || die "vphone-cli binary not found or not executable: $VPHONE_BIN (run: make build)"
+  echo "[*] Ensuring no VM holds ${VM_DIR_ABS} (vphone-cli vm stop)..."
+  "$VPHONE_BIN" vm stop --library-root "${VM_DIR_ABS:h}" "${VM_DIR_ABS:t}" \
+    || die "vphone-cli vm stop failed for '${VM_DIR_ABS:t}'; stop the VM manually and retry."
 }
 
 list_descendants() {
@@ -250,46 +211,6 @@ stop_process_tree() {
   wait "$pid" 2>/dev/null || true
 }
 
-kill_stale_vphone_procs() {
-  local vphone_bin="${PROJECT_ROOT}/.build/release/vphone-cli"
-  local -a stale_pids
-  stale_pids=(${(@f)$(pgrep -f "$vphone_bin" 2>/dev/null || true)})
-  (( ${#stale_pids[@]} == 0 )) && return
-
-  echo "[*] Found stale vphone-cli process(es) (pids: ${stale_pids[*]}); terminating..."
-  for pid in "${stale_pids[@]}"; do
-    [[ "$pid" == "$$" ]] && continue
-    stop_process_tree "$pid"
-  done
-
-  # Wait up to 8s for VZ file locks to clear (flock/fcntl locks may lag behind process exit)
-  local waited=0
-  while (( waited < 8 )); do
-    local -a remaining
-    remaining=(${(@f)$(collect_vm_lock_pids)})
-    (( ${#remaining[@]} == 0 )) && break
-    sleep 1
-    waited=$(( waited + 1 ))
-  done
-  echo "[+] Stale vphone-cli processes cleared"
-}
-
-force_release_vm_locks() {
-  local -a lock_pids
-  local pid
-
-  lock_pids=(${(@f)$(collect_vm_lock_pids)})
-  (( ${#lock_pids[@]} == 0 )) && return
-
-  echo "[*] Releasing lingering VM lock holders..."
-  for pid in "${lock_pids[@]}"; do
-    [[ -z "$pid" || "$pid" == "$$" ]] && continue
-    stop_process_tree "$pid"
-  done
-
-  sleep 1
-}
-
 cleanup() {
   if [[ -n "$BOOT_FIFO_FD" ]]; then
     exec {BOOT_FIFO_FD}>&- || true
@@ -318,7 +239,7 @@ cleanup() {
 }
 
 start_first_boot() {
-  check_vm_storage_locks
+  vm_stop_target
   mkdir -p "$LOG_DIR"
   : > "$BOOT_LOG"
 
@@ -459,7 +380,7 @@ halt_device_ssh() {
 run_boot_analysis() {
   local boot_state
 
-  check_vm_storage_locks
+  vm_stop_target
   mkdir -p "$LOG_DIR"
   : > "$BOOT_LOG"
   (make boot >"$BOOT_LOG" 2>&1) &
@@ -579,8 +500,7 @@ start_boot_dfu() {
     return
   fi
 
-  kill_stale_vphone_procs
-  check_vm_storage_locks
+  vm_stop_target
 
   # Remove stale prediction file so load_device_identity waits for the fresh
   # one written by this boot, avoiding an ECID mismatch race.
@@ -602,12 +522,15 @@ start_boot_dfu() {
 }
 
 stop_boot_dfu() {
+  # Graceful shutdown of the DFU VM by bundle identity (replaces the former
+  # lsof -> kill -9 force_release_vm_locks path), then reap our own background
+  # `make boot_dfu` wrapper if it is still alive.
+  vm_stop_target
   if [[ -n "$DFU_PID" ]] && kill -0 "$DFU_PID" 2>/dev/null; then
-    echo "[*] Stopping background DFU boot (pid=$DFU_PID)..."
+    echo "[*] Reaping background DFU wrapper (pid=$DFU_PID)..."
     stop_process_tree "$DFU_PID"
   fi
   DFU_PID=""
-  force_release_vm_locks
 }
 
 wait_for_post_restore_reboot() {
@@ -793,7 +716,7 @@ main() {
     # (SUDO_ASKPASS from setup_sudo_noninteractive when SUDO_PASSWORD is set).
     echo ""
     echo "=== CFW install (host-mount) ==="
-    check_vm_storage_locks
+    vm_stop_target
     run_make "CFW install" cfw_install_host VARIANT="$cfw_variant" SPOOF_BUILD="${SPOOF_BUILD:-}"
   fi
 
