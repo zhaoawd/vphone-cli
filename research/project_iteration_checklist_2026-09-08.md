@@ -174,7 +174,7 @@
 
 后续推进（2026-09-09）：基础内核 `KernelPatcher` 已迁移为 12 个结构化方法，补齐 Sandbox 五个 hook 的完整性判定、条件与消融的执行前拦截。完整回归、构建和签名校验通过；`vm-2607` 同输入 regular/dev 的记录与 payload 比较通过，但仍有 8 个必要方法失败，因此原始样本完整性验收未完成。详见 [C3 内核迁移记录](patch_results_c3_kernel_2026-09-09.md)。C3 仍为进行中。
 
-本轮提交：基础内核 `dcc7268`、JB `4dc54c9`、EXP `587e02e`。最终 `make test`：Python 73、XCTest 20、Swift Testing 报告 295 项通过；原始样本测试的失败与未执行范围单独记录。
+本轮提交：基础内核 `dcc7268`、JB `4dc54c9`、EXP `587e02e`、产物与验收脚本 `01847be`。最终 `make test`：Python 73、XCTest 20、Swift Testing 报告 295 项通过；原始样本测试的失败与未执行范围单独记录。
 
 本轮补充：JB 33 个、EXP 1 个、DeviceTree 基础 4 个/EXP 23 个，以及 Manifest/Filesystem 各 1 个步骤已迁移；单组件 CLI 与固件测试均使用结构化结果。26.1 原始内核 regular/dev/JB 26.x 必要集合通过。26.4 regular、EXP 与 DeviceTree 必要集合通过；dev 的 `patchExcGuardBehavior`、JB 的 `patchVmMapProtect` 失败。已运行的同输入记录与 payload 比较均相等，包含 base → JB → EXP 顺序组合。两项失败未放宽为可选；less 完整镜像合并未执行，因此 C3 不标记完成，已完成工作项仍为 8/28。详见 [内核记录](patch_results_c3_kernel_2026-09-09.md)、[EXP 记录](patch_results_c3_exp_2026-09-09.md)与[产物及验收脚本记录](patch_results_c3_artifacts_2026-09-09.md)。
 

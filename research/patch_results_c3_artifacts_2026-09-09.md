@@ -41,3 +41,5 @@ Filesystem 使用 `patchCryptexFilesystem` 步骤。原操作完成后才生成 
 原始 cloudOS 26.4 DeviceTree 的基础 4 条、EXP 23 条记录比较与必要项检查通过。输入 IM4P SHA-256：`987a9306d16a9047dc1b46fd1b3cec2aab7738aff6c5c86938ee3ada1a461e3c`。新增的失败后停止与 dev 门控回归、CLI 输出目录回归均通过 release 专项测试。
 
 最终完整回归：`make test` 通过，Python 73 项、XCTest 20 项、Swift Testing 报告 295 项/45 suites。默认未设置原始样本和诊断变量；原始 26.4 的两项失败仍按内核记录保留，不计入这次通过结论。
+
+产物组提交 `01847be` 后执行 `make -W sources/FirmwarePatcher/Kernel/KernelPatcher.swift build` 成功；release 二进制与 app 主程序均通过 `codesign --verify --strict`，两者导出的 7 项 entitlements 与 `sources/vphone.entitlements` 完全相等。最终构建日志归档于 `research/artifacts/c3-kernel-2026-09-09/vphone-c3-signed-build.log`。
