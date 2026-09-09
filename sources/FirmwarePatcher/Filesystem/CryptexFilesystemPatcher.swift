@@ -144,6 +144,9 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         let targetImagePath = tmpDir.appending(path: "disk.dmg")
         do {
             try convertToRawImage(input: osDmgPath, output: targetImagePath)
+            // The converted image is independent; release our decrypted source
+            // before allocating the merged and re-encoded copies.
+            try FileManager.default.removeItem(at: osDmgPath)
             let (targetDevice, targetMount) = try attachImage(path: targetImagePath, forceRW: true)
             defer { try? detachImage(deviceNode: targetDevice) }
             
@@ -185,6 +188,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         print("- Finalizing merged image")
         try shrinkImage(dmg: targetImagePath)
         try convertToUDRWImage(input: targetImagePath, output: newDmgPath)
+        try FileManager.default.removeItem(at: targetImagePath)
         let metadata = try getAeaMetadata(self.restoreDir.appending(path: osPath))
         let key = try getAeaKey(self.restoreDir.appending(path: osPath), metadata: metadata)
         let finalFile = newDmgPath.appendingPathExtension("aea")
@@ -587,7 +591,13 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
             try decryptAeaFile(self.restoreDir.appending(path: try getSystemOsFilesystemPath()))
         }
         let (osDevice, osMount) = try attachImage(path: osPath, readonly: true)
-        defer { try? detachImage(deviceNode: osDevice) }
+        defer {
+            // Delete only the decrypted SystemOS temporary file, and only after
+            // a successful detach. AppOS points at a restore input and is retained.
+            if (try? detachImage(deviceNode: osDevice)) != nil, systemOS {
+                try? FileManager.default.removeItem(at: osPath)
+            }
+        }
         
         let destination = URL.init(filePath: targetMount).appending(path: appOS ? "/System/Cryptexes/App" : "/System/Cryptexes/OS")
         try FileManager.default.removeItem(at: destination)
