@@ -43,3 +43,5 @@ Filesystem 使用 `patchCryptexFilesystem` 步骤。原操作完成后才生成 
 最终完整回归：`make test` 通过，Python 73 项、XCTest 20 项、Swift Testing 报告 295 项/45 suites。默认未设置原始样本和诊断变量；原始 26.4 的两项失败仍按内核记录保留，不计入这次通过结论。
 
 产物组提交 `01847be` 后执行 `make -W sources/FirmwarePatcher/Kernel/KernelPatcher.swift build` 成功；release 二进制与 app 主程序均通过 `codesign --verify --strict`，两者导出的 7 项 entitlements 与 `sources/vphone.entitlements` 完全相等。最终构建日志归档于 `research/artifacts/c3-kernel-2026-09-09/vphone-c3-signed-build.log`。
+
+后续诊断已定位 26.4 两项匹配失败的机制，并核对 less 输入与缺失工具；见 [C3 验收失败诊断](c3_acceptance_diagnosis_2026-09-09.md)。这是诊断结果，不表示修复或验收通过。

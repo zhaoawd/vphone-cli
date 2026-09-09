@@ -85,3 +85,5 @@ VPHONE_TEST_KERNEL_IM4P="$PWD/research/artifacts/c3-kernel-2026-09-09/stock-264-
 对 26.1 / 23B85 的额外 iOS 27 负例，设置 `VPHONE_EXPECT_IOS27_FAILURES=patchIomfbSwapEndVariableSize,patchIomfbSwapEndHandlerSize`，精确断言这两个失败；未设置时 `VPHONE_REQUIRE_COMPLETE=1` 要求全部必要项成功。该变量只控制测试期望，不影响补丁器或流水线。
 
 两个构建号已从对应 ZIP 的 `BuildManifest.plist` 核实。原始 cloudOS 26.4 内核 IM4P SHA-256：`c853504319f27bfb3283253d8a5f36c3d0166ea7f4b178fca26fe6352b4de951`。输入与日志位于 Git 忽略的 `research/artifacts/c3-kernel-2026-09-09/`。
+
+后续诊断已定位 26.4 两项匹配失败的机制，并核对 less 输入与缺失工具；见 [C3 验收失败诊断](c3_acceptance_diagnosis_2026-09-09.md)。这是诊断结果，不表示修复或验收通过。

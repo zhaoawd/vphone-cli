@@ -178,6 +178,8 @@
 
 本轮补充：JB 33 个、EXP 1 个、DeviceTree 基础 4 个/EXP 23 个，以及 Manifest/Filesystem 各 1 个步骤已迁移；单组件 CLI 与固件测试均使用结构化结果。26.1 原始内核 regular/dev/JB 26.x 必要集合通过。26.4 regular、EXP 与 DeviceTree 必要集合通过；dev 的 `patchExcGuardBehavior`、JB 的 `patchVmMapProtect` 失败。已运行的同输入记录与 payload 比较均相等，包含 base → JB → EXP 顺序组合。两项失败未放宽为可选；less 完整镜像合并未执行，因此 C3 不标记完成，已完成工作项仍为 8/28。详见 [内核记录](patch_results_c3_kernel_2026-09-09.md)、[EXP 记录](patch_results_c3_exp_2026-09-09.md)与[产物及验收脚本记录](patch_results_c3_artifacts_2026-09-09.md)。
 
+后续诊断：26.4 EXC_GUARD 的调用链出现内联检查与包装函数尾调用；vm_map_protect 的限制检查迁移到回调并改用 BIC/CMP/CCMP。两项定位失败原因已查明，尚未修改补丁。less 三份镜像输入存在，但缺少 `apfs_sealvolume_26.1`。详见 [C3 验收诊断](c3_acceptance_diagnosis_2026-09-09.md)。
+
 ### C4 — 避免失败留下无法判断的部分修改固件【高；依赖 C3、B4】
 
 涉及：`FirmwarePipeline.swift`、`IM4PHandler.swift`、`CryptexFilesystemPatcher.swift`、`ManifestHashPatcher.swift`、固件 CLI。
