@@ -588,7 +588,7 @@ final class SyntheticStructuredPatcher: StructuredPatcher {
                 switch entry.raw {
                 case .matched: patches.append(record(for: entry.id, idempotent: false))
                 case .idempotent: patches.append(record(for: entry.id, idempotent: true))
-                case .noMatch, .ambiguous, .encodeFail: break
+                case .noMatch, .ambiguous, .encodeFail, .failed: break
                 }
                 return entry.raw
             })

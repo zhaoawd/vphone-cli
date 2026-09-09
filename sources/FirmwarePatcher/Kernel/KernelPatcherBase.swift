@@ -121,6 +121,30 @@ open class KernelPatcherBase {
         return patches.count
     }
 
+    // MARK: - Structured execution
+
+    /// The method's completion signal, rather than the component's total record
+    /// count, decides success. A false signal with records is a partial failure.
+    func structuredMethodResult(completed: Bool, since start: Int) -> RawStepResult {
+        let records = Array(patches.dropFirst(start))
+        guard completed else {
+            return .failed(reason: records.isEmpty
+                ? "method did not complete: anchor missing, ambiguous, or validation failed"
+                : "incomplete patch group: emitted \(records.count) records before failure")
+        }
+        guard !records.isEmpty else { return .noMatch }
+        return records.allSatisfy { $0.originalBytes == $0.patchedBytes } ? .idempotent : .matched
+    }
+
+    public var emittedRecords: [PatchRecord] { patches }
+    public var patchedData: Data { buffer.data }
+
+    public func commit(_ records: [PatchRecord]) {
+        for record in records {
+            buffer.writeBytes(at: record.fileOffset, bytes: record.patchedBytes)
+        }
+    }
+
     // MARK: - Index Building
 
     /// Build ADRP index for O(1) page-address lookups.

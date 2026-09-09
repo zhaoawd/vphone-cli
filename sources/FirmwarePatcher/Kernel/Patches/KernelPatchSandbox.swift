@@ -82,7 +82,7 @@ extension KernelPatcher {
             patchedCount += 1
         }
 
-        return patchedCount > 0
+        return patchedCount == hooks.count
     }
 
     // MARK: - mac_policy_conf / ops table discovery

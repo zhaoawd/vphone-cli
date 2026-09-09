@@ -57,6 +57,8 @@ public enum RawStepResult: Sendable, Equatable {
     case noMatch
     /// More than one match where exactly one was expected.
     case ambiguous(count: Int)
+    /// Discovery or group validation failed; preserves the diagnostic reason.
+    case failed(reason: String)
     /// Instruction encoding or serialization failed.
     case encodeFail(reason: String)
 }
@@ -95,6 +97,8 @@ public enum PatchOutcomeMapping {
             return .alreadyApplied
         case let .ambiguous(count):
             return .failed(reason: "expected 1 match, found \(count)")
+        case let .failed(reason):
+            return .failed(reason: reason)
         case let .encodeFail(reason):
             return .failed(reason: "encode failed: \(reason)")
         case .noMatch:

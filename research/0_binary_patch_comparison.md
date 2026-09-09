@@ -1064,3 +1064,14 @@ cache rebuild.
     rows (chained auth-rebase `sy_call` into __TEXT_EXEC + sane
     `sy_return_type/sy_narg/sy_arg_bytes`). Base @ foff `0x7693B0` (558 rows);
     `sysent[439]` (`SYS_kas_info`) @ foff `0x76BCD8`; cave + 3 entry writes emit.
+
+## Structured kernel results (2026-09-09)
+
+C3 migrates the existing kernel patch schedule to per-method outcomes. Base
+kernel methods now fail on an incomplete group, including any missing member
+of the five-hook Sandbox group. Conditional and ablated steps are intercepted
+before discovery because kernel `emit()` writes through to the working buffer.
+No new patch sites or replacement bytes are introduced. Method coverage and
+record/payload parity evidence are tracked in
+[the C3 kernel migration record](patch_results_c3_kernel_2026-09-09.md); historical
+record totals above do not establish completeness for a new input.

@@ -72,6 +72,16 @@ public enum StructuredExecution {
                 continue
             }
 
+            if case let .conditional(rule) = step.requirement, !rule.evaluate(gates) {
+                results.append(PatchResult(
+                    id: step.id, requirement: step.requirement.kind, rule: rule,
+                    outcome: .notApplicable,
+                    reason: "rule \(rule.rawValue) false for this input: \(gates.summary)",
+                    recordIndices: [], gates: gates
+                ))
+                continue
+            }
+
             let before = patcher.emittedRecords.count
             let raw = step.run()
             let after = patcher.emittedRecords.count

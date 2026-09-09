@@ -9,7 +9,7 @@ import Foundation
 ///
 /// Patches are applied in the same order as the Python reference implementation.
 /// Each patch method is an extension in a separate file under `Kernel/Patches/`.
-public final class KernelPatcher: KernelPatcherBase, Patcher {
+public final class KernelPatcher: KernelPatcherBase, StructuredPatcher {
     public let component = "kernelcache"
 
     /// When true, includes dev-only kernel patches (e.g. EXC_GUARD disable).
@@ -63,6 +63,51 @@ public final class KernelPatcher: KernelPatcherBase, Patcher {
         }
 
         return patches
+    }
+
+    // MARK: - StructuredPatcher
+
+    private var structuredPrepared = false
+
+    private func prepareStructured() {
+        guard !structuredPrepared else { return }
+        structuredPrepared = true
+        parseMachO()
+        buildADRPIndex()
+        buildBLIndex()
+        findPanic()
+    }
+
+    public func buildSteps() -> [PatchStep] {
+        [
+            step("patchApfsRootSnapshot", run: patchApfsRootSnapshot),
+            step("patchApfsSealBroken", run: patchApfsSealBroken),
+            step("patchBsdInitRootvp", run: patchBsdInitRootvp),
+            step("patchLaunchConstraints", run: patchLaunchConstraints),
+            step("patchDebugger", run: patchDebugger),
+            step("patchPostValidationNOP", run: patchPostValidationNOP),
+            step("patchPostValidationCMP", run: patchPostValidationCMP),
+            step("patchDyldPolicy", run: patchDyldPolicy),
+            step("patchApfsGraft", run: patchApfsGraft),
+            step("patchApfsMount", run: patchApfsMount),
+            step("patchSandbox", run: patchSandbox),
+            step("patchExcGuardBehavior", requirement: .conditional(.excGuardActive)) { [self] in
+                guard isDev || applyExcGuard else { return false }
+                return patchExcGuardBehavior()
+            },
+        ]
+    }
+
+    private func step(
+        _ method: String, requirement: PatchRequirement = .required,
+        run: @escaping () -> Bool
+    ) -> PatchStep {
+        PatchStep(id: PatchID(component: component, patcher: "KernelPatcher", method: method),
+                  requirement: requirement) { [self] in
+            prepareStructured()
+            let before = patches.count
+            return structuredMethodResult(completed: run(), since: before)
+        }
     }
 
     @discardableResult
