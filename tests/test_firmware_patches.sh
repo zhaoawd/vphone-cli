@@ -9,15 +9,9 @@
 #   (e.g. iBEC "bootx precondition", LLB "cmp x8,#0x400", kernel
 #   "handle_get_dev_by_role") that the kernel-jb test structurally cannot see.
 #
-#   This harness runs the WHOLE `patch-firmware` pipeline — every component, for
-#   the `jb` and `exp` variants — over each available cloudOS firmware, and fails
-#   if ANY component emits a `[-]` line (a skipped/failed sub-patch).
-#
-# WHY GREP FOR `[-]` (not exit code):
-#   FirmwarePipeline.patchAll() only throws when a whole component finds ZERO
-#   patches. A patcher whose OTHER sub-patches succeed still returns records, so a
-#   single silently-skipped gate never changes the exit code — it only prints a
-#   `[-]` line. So the only reliable signal for a partial skip is that line.
+#   This harness runs the full pipeline and validates PatchRunReport JSON.
+#   Missing required methods, failed outcomes, legacy coverage and ablation fail.
+#   Logs remain available for diagnosis; their wording is not the test oracle.
 #
 # INPUTS (no network needed for the README cloudOS builds):
 #   Sources are the already-extracted cloudOS firmware trees under `ipsws/<hash>/`
@@ -31,7 +25,7 @@
 #   VARIANTS="exp" tests/test_firmware_patches.sh  # only the exp variant
 #   tests/test_firmware_patches.sh --no-build      # skip rebuilding the patcher
 #
-# Exit code: 0 iff EVERY (version, variant) patches with NO `[-]` lines and no crash.
+# Exit code: 0 iff every requested run exits successfully and its structured report validates.
 set -euo pipefail
 
 HERE=${0:a:h}
@@ -148,27 +142,16 @@ run_one() {
   done
 
   local log="$WORK/$build/$variant/run.log"
-  if ! "$BIN" patch-firmware --vm-directory "$vm" --variant "$variant" > "$log" 2>&1; then
+  if ! "$BIN" patch-firmware --vm-directory "$vm" --variant "$variant" --report-out "$WORK/$build/$variant/report.json" > "$log" 2>&1; then
     echo "  ❌ $key — patch-firmware exited nonzero:"; tail -6 "$log" | sed 's/^/      /'
-    RESULT[$key]="CRASH"; overall=1; return
-  fi
-
-  # Partial skips never change the exit code — they only print `[-]` lines.
-  local fails
-  fails=$(grep -nE "\[-\]" "$log" || true)
-  if [[ -n "$fails" ]]; then
-    echo "  ❌ $key — $(print -r -- "$fails" | grep -c .) skipped sub-patch(es):"
-    print -r -- "$fails" | sed 's/^/      /'
     RESULT[$key]="FAIL"; overall=1; return
   fi
 
-  if ! grep -q "components patched successfully" "$log"; then
-    echo "  ❌ $key — pipeline did not report success"; RESULT[$key]="INCOMPLETE"; overall=1; return
+  if ! "$ROOT/.venv/bin/python3" "$ROOT/scripts/check_patch_report.py" "$WORK/$build/$variant/report.json"; then
+    RESULT[$key]="FAIL"; overall=1; return
   fi
+  RESULT[$key]="PASS (structured report)"
 
-  local applied; applied=$(grep -oE "\([0-9]+ total patches\)" "$log" | grep -oE "[0-9]+" | head -1 || echo "?")
-  echo "  ✅ $key — $applied patches, 0 skips"
-  RESULT[$key]="PASS ($applied patches)"
 }
 
 for i in "${IDX[@]}"; do
@@ -192,6 +175,6 @@ echo ""
 if (( overall == 0 )); then
   echo "ALL FIRMWARES PASS — every component patches cleanly (0 skipped sub-patches)."
 else
-  echo "ONE OR MORE FIRMWARES FAILED — a component skipped a sub-patch (see [-] lines above)."
+  echo "ONE OR MORE FIRMWARES FAILED — see the structured reports and diagnostic logs."
 fi
 exit $overall

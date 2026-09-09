@@ -1075,3 +1075,9 @@ No new patch sites or replacement bytes are introduced. Method coverage and
 record/payload parity evidence are tracked in
 [the C3 kernel migration record](patch_results_c3_kernel_2026-09-09.md); historical
 record totals above do not establish completeness for a new input.
+
+### C3 后续结构化迁移（2026-09-09）
+
+JB 33 个、EXP 1 个方法及 DeviceTree/Manifest/Filesystem 操作接入结构化结果。JB 的凭证标签更新与扩展 Sandbox、EXP 的 OID/调用者改名增加完整性判据；本次没有重新定位指令或改变替换字节。Manifest 记录使用实际输入/输出字节。
+
+26.1、26.4 已运行用例的迁移前后记录与 payload 比较相等；26.4 dev 的 EXC_GUARD 与 JB 的 vm_map_protect 必要项失败，顺序组合也如实失败。未恢复已停用的 vm_map_protect Shape B，未扩大支持范围。输入哈希、验证结果、历史证据与未完成项见 [C3 内核记录](patch_results_c3_kernel_2026-09-09.md)、[EXP 记录](patch_results_c3_exp_2026-09-09.md)、[产物记录](patch_results_c3_artifacts_2026-09-09.md)。

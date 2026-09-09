@@ -33,22 +33,8 @@ README="$ROOT/README.md"
 PCC_INFO="$WORK/pcc_info.txt"          # cached `ipsw dl pcc --info` dump
 mkdir -p "$WORK"
 
-# Patch IDs that MUST emit on every supported kernel: the P0 sudo hook plus the
-# eight routines retargeted for 26.5. If any is missing, that hook silently
-# skipped. (The 0-failure gate below additionally catches every OTHER routine —
-# including all the Sandbox ops hooks — since the pipeline counts a routine that
-# emits nothing as a failure.)
-REQUIRED_IDS=(
-  jb.hook_cred_label.c23_cave
-  task_conversion_eval
-  jb.proc_security_policy.mov_x0_0
-  jb.proc_pidinfo.nop_guard_a
-  jb.io_secure_bsd_root.zero_return
-  kernelcache_jb.mac_mount.flag_gate
-  kernelcache_jb.spawn_validate_persona.cbz1
-  kernelcache_jb.vm_map_protect
-  jb.kcall10.sy_call
-)
+# Acceptance uses every declared method result, including hook-group completeness.
+# An empty or legacy report cannot pass merely because a few record IDs exist.
 
 NO_BUILD=0
 QUICK=0
@@ -183,33 +169,18 @@ for build in "${BUILD_LIST[@]}"; do
 
   out="$WORK/$build"; mkdir -p "$out"
   if ! "$BIN" patch-component --component kernel-jb \
-        --input "$kc" --output "$out/kc.patched.bin" --records-out "$out/records.json" \
+        --input "$kc" --output "$out/kc.patched.bin" --records-out "$out/records.json" --report-out "$out/report.json" \
         > "$out/run.log" 2>&1; then
-    echo "  [-] patcher crashed:"; tail -8 "$out/run.log" | sed 's/^/    /'
-    RESULT[$build]="CRASH"; overall=1; continue
+    echo "  [-] patch-component exited nonzero:"; tail -8 "$out/run.log" | sed 's/^/    /'
+    RESULT[$build]="FAIL"; overall=1; continue
   fi
 
-  applied=$(grep -oE "applied [0-9]+ patches" "$out/run.log" | grep -oE "[0-9]+" | head -1 || echo "?")
-  fails=$(grep -cE "\[-\]" "$out/run.log" || true)
-  sandbox=$(grep -oE 'sandbox_ext_[0-9]+' "$out/records.json" 2>/dev/null | sort -u | wc -l | tr -d ' ')
-
-  # Every required patch ID must have emitted.
-  missing=()
-  for id in "${REQUIRED_IDS[@]}"; do
-    grep -q "\"$id\"" "$out/records.json" 2>/dev/null || missing+=("$id")
-  done
-
-  echo "  applied: $applied   failures: $fails   sandbox hooks: $sandbox"
-  if (( fails == 0 )) && (( ${#missing} == 0 )) && (( sandbox >= 1 )); then
-    echo "  ✅ PASS"
-    RESULT[$build]="PASS ($applied applied, $sandbox sandbox)"
+  if "$ROOT/.venv/bin/python3" "$ROOT/scripts/check_patch_report.py" "$out/report.json"; then
+    RESULT[$build]="PASS (structured report)"
   else
-    echo "  ❌ FAIL"
-    (( fails > 0 )) && { echo "    failures:"; grep -E "\[-\]" "$out/run.log" | sed 's/^/      /'; }
-    (( ${#missing} )) && echo "    missing patch IDs: ${missing[*]}"
-    (( sandbox < 1 )) && echo "    no sandbox hooks emitted"
     RESULT[$build]="FAIL"; overall=1
   fi
+
 done
 
 # --- 6. Summary matrix -------------------------------------------------------

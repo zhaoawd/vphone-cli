@@ -1,10 +1,8 @@
 // PatchRequirement.swift — Necessity model for structured patch steps (C2).
 //
 // A patch method's necessity is decided by an explicit rule, never by whether an
-// anchor happened to match. "No match" is only turned into `notApplicable` when a
-// conditional rule evaluates to false for the current gate snapshot; otherwise it
-// is a `failed` result (see `PatchOutcome`). This is the C2 contract that forbids
-// treating a missing anchor as "not applicable" by default.
+// anchor happened to match. Missing required anchors fail; disabled conditional
+// rules and absent optional anchors produce `notApplicable` (see `PatchOutcome`).
 
 import Foundation
 
@@ -15,7 +13,7 @@ public enum PatchRequirement: Sendable, Equatable {
     /// A missing anchor does not fail the pipeline (e.g. iBoot serial labels).
     case optional
     /// An explicit predicate decides whether this input requires the patch. When the
-    /// rule is false and no anchor matches, the outcome is `notApplicable`; when the
+    /// rule is false, execution is skipped as `notApplicable`; when the
     /// rule is true it behaves like `.required`.
     case conditional(PatchRule)
 

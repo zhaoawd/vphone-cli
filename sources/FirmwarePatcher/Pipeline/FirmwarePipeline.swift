@@ -175,7 +175,7 @@ public final class FirmwarePipeline {
             cloudOSIsFridaCapable: cloudOSIsFridaCapable,
             forceExcGuard: forceExcGuard,
             enableFrida: enableFrida,
-            excGuardActive: iosBaseIs18 || forceExcGuard,
+            excGuardActive: variant == .dev || iosBaseIs18 || forceExcGuard,
             applyIOS27: iosBaseIs27,
             applyFrida: enableFrida && cloudOSIsFridaCapable
         )
@@ -210,6 +210,13 @@ public final class FirmwarePipeline {
             }
         }
 
+        // The less filesystem step writes external artifacts. Until C4 provides
+        // staging, a dry run must explicitly ablate this entire operation.
+        if variant == .less, !ablate.isEmpty, !allowOutput,
+           !StructuredExecution.isAblated(CryptexFilesystemPatcher.stepID, ablate) {
+            throw PatcherError.invalidFormat("less dry-run requires --ablate filesystem; filesystem staging is not implemented")
+        }
+
         let (restoreDir, gates) = try prepare()
         let components = buildComponentList()
 
@@ -242,7 +249,8 @@ public final class FirmwarePipeline {
 
             let componentFailed = reports.contains { $0.hasRequiredFailure }
             if componentFailed {
-                log("  [x] required failure — not saved")
+                log("  [x] required failure — not saved; stopping before dependent components")
+                break
             } else if isDry {
                 log("  [.] ablation dry-run — not saved")
             } else {
@@ -307,9 +315,16 @@ public final class FirmwarePipeline {
         for component in components {
             let canonical = component.name.lowercased()
             targets.insert(canonical)
-            // Filesystem/Manifest factories construct with restore-dir side effects and
-            // never contain structured patchers, so they are not dry-instantiated here.
-            if component.name == "Filesystem" || component.name == "Manifest" { continue }
+            // These factories need a real restore directory; enumerate their static
+            // operation IDs without instantiating a patcher or touching the disk.
+            if component.name == "Filesystem" || component.name == "Manifest" {
+                if !component.patcherFactories.isEmpty {
+                    let id = component.name == "Filesystem" ? CryptexFilesystemPatcher.stepID : ManifestHashPatcher.stepID
+                    targets.insert(id.patcherTarget)
+                    targets.insert(id.description)
+                }
+                continue
+            }
             for makePatcher in component.patcherFactories {
                 let patcher = makePatcher(Data(), false)
                 targets.insert("\(canonical).\(String(describing: type(of: patcher)))")

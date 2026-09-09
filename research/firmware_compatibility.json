@@ -16,7 +16,7 @@
       "capability_verified": "该组合在真机验证了具体能力（触控/相机/定位/JB/vphoned 等），capabilities 非空。"
     },
     "count_semantics": {
-      "method_count": "补丁方法（如 patchSandbox）数量；一个方法可 emit 0 至多条 record，无匹配时静默跳过（FirmwarePipeline 组件级空数组才失败，:203-205）。",
+      "method_count": "结构化步骤或补丁方法数量；一个方法可以对应零至多条 PatchRecord。必要项通过逐方法结果判定，不能只依据组件记录非空。历史 Python 方法计数和当前 Swift 结构化方法集合分别保留。",
       "record_count": "实际写入的 PatchRecord 条数；键 '<iPhone构建>/<cloudOS构建>' 表示特定输入的实测计数，'unknown' 标记缺失的构建号，'summary(...)' 表示研究文档 Summary 表的通用（非特定构建）计数。同一变体在不同 iOS-27/--frida 门控下 record 数不同。"
     }
   },
@@ -2237,12 +2237,118 @@
               "expected_not_applicable": []
             },
             {
-              "name": "identity_and_camera_nodes",
-              "required": false,
-              "gate": "includeIdentityPatches(exp)",
-              "expected_not_applicable": [
-                "仅 exp 变体运行 includeIdentityPatches（FirmwarePipeline.swift:395-416）；含 target_sub_type/compatible_secondary/product 身份/arm-io/gestalt-variants rename/camera/facetime/audio/iopm/isp/ispRtb/smc 桩与 /product/camera 节点"
-              ]
+              "name": "target_sub_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "compatible_secondary",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.fdr_product_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.sub_product_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.unique_model",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.device_type",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.soc_generation",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.gestalt_variants_rename",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.front_cam_offset",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.rear_cam_offset",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.camera_node",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.facetime_node",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.audio_node",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "product.iopm_node",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.smc_stub",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.smc.iop_smc_nub_stub",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.smc.smc_ext_charger_camera_driver",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.isp_camera_flags",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
+            },
+            {
+              "name": "arm_io.ispRtb_camera_flags",
+              "required": true,
+              "gate": null,
+              "expected_not_applicable": []
             }
           ],
           "known": {

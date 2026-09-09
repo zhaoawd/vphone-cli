@@ -40,7 +40,7 @@ extension Data {
 }
 
 /// Patcher for the Filesystem payload.
-public final class CryptexFilesystemPatcher: Patcher {
+public final class CryptexFilesystemPatcher: StructuredPatcher {
     public let component = "Filesystem"
     public let restoreDir: URL
     public let verbose: Bool
@@ -109,9 +109,29 @@ public final class CryptexFilesystemPatcher: Patcher {
     
     /// Get the patched data.
     public var patchedData: Data {
-        rebuiltData!
+        rebuiltData ?? buildManiest
     }
     
+    public static let stepID = PatchID(component: "filesystem", patcher: "CryptexFilesystemPatcher", method: "patchCryptexFilesystem")
+
+    public private(set) var emittedRecords: [PatchRecord] = []
+
+    public func buildSteps() -> [PatchStep] {
+        [PatchStep(id: Self.stepID, requirement: .required) { [self] in
+            do {
+                _ = try apply()
+                guard let rebuiltData else { return .failed(reason: "filesystem operation produced no manifest") }
+                emittedRecords = [PatchRecord(patchID: "filesystem.cryptex.merge", component: component,
+                    fileOffset: 0, originalBytes: buildManiest, patchedBytes: rebuiltData,
+                    description: "Manifest references for merged cryptex artifacts")]
+                return .matched
+            } catch { return .failed(reason: String(describing: error)) }
+        }]
+    }
+
+    // apply() has already completed the filesystem operation and built the manifest.
+    public func commit(_ records: [PatchRecord]) {}
+
     // mergeFilesystems merges the main OS filesystem with the Cryptexes filesystems.
     // It returns the path of the merged image (plain and encrypted)
     func mergeFilesystems() throws -> (URL, URL) {

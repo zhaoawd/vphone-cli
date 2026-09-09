@@ -6,10 +6,9 @@ import Foundation
 public enum PatchOutcome: Sendable, Equatable {
     /// Anchor found and bytes written.
     case applied
-    /// Anchor already in patched form (idempotent no-op); an idempotent record is emitted.
+    /// Anchor explicitly verified in patched form (idempotent no-op).
     case alreadyApplied
-    /// A conditional rule evaluated false for this input, so the patch does not apply.
-    /// This is the ONLY path that produces `notApplicable`.
+    /// A conditional rule is false, or an optional anchor is absent.
     case notApplicable(reason: String)
     /// No anchor, ambiguous match, or encoding failure. The default for a missing anchor.
     case failed(reason: String)
@@ -51,7 +50,7 @@ public enum OutcomeKind: String, Codable, Sendable, Equatable {
 public enum RawStepResult: Sendable, Equatable {
     /// Anchor found and record(s) written.
     case matched
-    /// Anchor already patched; an idempotent record was emitted.
+    /// Anchor was explicitly verified as already patched; a record may be omitted.
     case idempotent
     /// No anchor found.
     case noMatch

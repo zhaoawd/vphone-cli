@@ -8,7 +8,7 @@ import CryptoKit
 import Img4tool
 
 /// Patcher for Manifest payloads.
-public final class ManifestHashPatcher: Patcher {
+public final class ManifestHashPatcher: StructuredPatcher {
     public let component = "Manifest"
     public let restoreDir: URL?
     public let verbose: Bool
@@ -35,10 +35,10 @@ public final class ManifestHashPatcher: Patcher {
 
         patches = [PatchRecord(
             patchID: "manifest.hash",
-            component: "",
+            component: component,
             fileOffset: 0,
-            originalBytes: Data(),
-            patchedBytes: Data(),
+            originalBytes: buffer.data,
+            patchedBytes: rebuiltData!,
             description: "Updated the file hashes according to the actual files",
         )]
         return patches
@@ -62,6 +62,24 @@ public final class ManifestHashPatcher: Patcher {
         buffer.data
     }
     
+    public static let stepID = PatchID(component: "manifest", patcher: "ManifestHashPatcher", method: "patchManifestHash")
+
+    public var emittedRecords: [PatchRecord] { patches }
+
+    public func buildSteps() -> [PatchStep] {
+        [PatchStep(id: Self.stepID, requirement: .required) { [self] in
+            do {
+                let original = buffer.data
+                _ = try findAll()
+                return rebuiltData == original ? .idempotent : .matched
+            } catch { return .failed(reason: String(describing: error)) }
+        }]
+    }
+
+    public func commit(_ records: [PatchRecord]) {
+        if let rebuiltData { buffer.data = rebuiltData }
+    }
+
     private func parsePayload(_ blob: Data) throws -> PlistDict {
         guard let buildManifest = try PropertyListSerialization.propertyList(
             from: blob,

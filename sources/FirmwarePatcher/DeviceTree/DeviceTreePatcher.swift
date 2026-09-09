@@ -11,7 +11,7 @@
 import Foundation
 
 /// Patcher for DeviceTree payloads.
-public final class DeviceTreePatcher: Patcher {
+public final class DeviceTreePatcher: StructuredPatcher {
     public let component = "devicetree"
     public let verbose: Bool
 
@@ -719,6 +719,69 @@ public final class DeviceTreePatcher: Patcher {
         rebuiltData ?? buffer.data
     }
 
+    // MARK: - StructuredPatcher
+
+    private var structuredRoot: DTNode?
+
+    private func rootForStructuredStep() throws -> DTNode {
+        if let structuredRoot { return structuredRoot }
+        let root = try parsePayload(buffer.data)
+        structuredRoot = root
+        return root
+    }
+
+    public var emittedRecords: [PatchRecord] { patches }
+
+    public func commit(_ records: [PatchRecord]) {
+        if let structuredRoot {
+            rebuiltData = serializePayload(structuredRoot)
+            buffer.data = rebuiltData!
+        }
+    }
+
+    public func buildSteps() -> [PatchStep] {
+        let properties = Self.basePropertyPatches + (includeIdentityPatches ? Self.identityPropertyPatches : [])
+        var steps = properties.map { patch in
+            PatchStep(id: PatchID(component: component, patcher: "DeviceTreePatcher",
+                                 method: String(patch.patchID.dropFirst("devicetree.".count))),
+                      requirement: .required) { [self] in
+                do {
+                    let same = try applyProperty(root: rootForStructuredStep(), patch: patch)
+                    return same ? .idempotent : .matched
+                } catch { return .failed(reason: String(describing: error)) }
+            }
+        }
+        if includeIdentityPatches {
+            steps += Self.experimentalNodeAdditions.map { patch in
+                PatchStep(id: PatchID(component: component, patcher: "DeviceTreePatcher",
+                                     method: String(patch.patchID.dropFirst("devicetree.".count))),
+                          requirement: .required) { [self] in
+                    do {
+                        let root = try rootForStructuredStep()
+                        let parent = try resolveNode(root, path: patch.parentPath)
+                        if let existing = parent.children.first(where: { nodeName($0) == patch.nodeName }) {
+                            for spec in patch.properties {
+                                let prop = try findProperty(existing, name: spec.name)
+                                let expected: Data = switch spec.value {
+                                case let .string(value): Self.encodeFixedString(value, length: spec.length)
+                                case let .integer(value): try Self.encodeInteger(value, length: spec.length)
+                                case let .bytes(value): Self.encodeFixedBytes(value, length: spec.length)
+                                }
+                                guard prop.length == spec.length, prop.flags == spec.flags, prop.value == expected else {
+                                    return .failed(reason: "existing node \(patch.nodeName) has conflicting property \(spec.name)")
+                                }
+                            }
+                            return .idempotent
+                        }
+                        try applyNodeAddition(root: root, patch: patch)
+                        return .matched
+                    } catch { return .failed(reason: String(describing: error)) }
+                }
+            }
+        }
+        return steps
+    }
+
     // MARK: - Parsing
 
     /// Align a value up to the next 4-byte boundary.
@@ -943,42 +1006,7 @@ public final class DeviceTreePatcher: Patcher {
             patchesToApply.append(contentsOf: Self.identityPropertyPatches)
         }
         for patch in patchesToApply {
-            let node = try resolveNodeForPatch(root, patch: patch)
-            let prop = try findProperty(node, name: patch.property)
-
-            let originalBytes = Data(prop.value.prefix(patch.length))
-
-            let newValue: Data = switch patch.value {
-            case let .string(s):
-                Self.encodeFixedString(s, length: patch.length)
-            case let .integer(v):
-                try Self.encodeInteger(v, length: patch.length)
-            case let .bytes(d):
-                Self.encodeFixedBytes(d, length: patch.length)
-            }
-
-            prop.length = patch.length
-            prop.flags = patch.flags
-            prop.value = newValue
-
-            let record = PatchRecord(
-                patchID: patch.patchID,
-                component: component,
-                fileOffset: prop.valueOffset,
-                virtualAddress: nil,
-                originalBytes: originalBytes,
-                patchedBytes: newValue,
-                description: patch.description
-            )
-            patches.append(record)
-
-            if verbose {
-                print(String(format: "  0x%06X: %@ → %@  [%@]",
-                             prop.valueOffset,
-                             originalBytes.hex,
-                             newValue.hex,
-                             patch.patchID))
-            }
+            try applyProperty(root: root, patch: patch)
         }
 
         if includeIdentityPatches {
@@ -986,6 +1014,48 @@ public final class DeviceTreePatcher: Patcher {
                 try applyNodeAddition(root: root, patch: nodeAdd)
             }
         }
+    }
+
+    @discardableResult
+    private func applyProperty(root: DTNode, patch: PropertyPatch) throws -> Bool {
+        let node = try resolveNodeForPatch(root, patch: patch)
+        let prop = try findProperty(node, name: patch.property)
+
+        let originalBytes = Data(prop.value.prefix(patch.length))
+
+        let newValue: Data = switch patch.value {
+        case let .string(s):
+            Self.encodeFixedString(s, length: patch.length)
+        case let .integer(v):
+            try Self.encodeInteger(v, length: patch.length)
+        case let .bytes(d):
+            Self.encodeFixedBytes(d, length: patch.length)
+        }
+
+        let alreadyApplied = prop.length == patch.length && prop.flags == patch.flags && prop.value == newValue
+        prop.length = patch.length
+        prop.flags = patch.flags
+        prop.value = newValue
+
+        let record = PatchRecord(
+            patchID: patch.patchID,
+            component: component,
+            fileOffset: prop.valueOffset,
+            virtualAddress: nil,
+            originalBytes: originalBytes,
+            patchedBytes: newValue,
+            description: patch.description
+        )
+        patches.append(record)
+
+        if verbose {
+            print(String(format: "  0x%06X: %@ → %@  [%@]",
+                         prop.valueOffset,
+                         originalBytes.hex,
+                         newValue.hex,
+                         patch.patchID))
+        }
+        return alreadyApplied
     }
 
     /// Apply a single `AddChildNodePatch`: construct the new `DTNode`,
