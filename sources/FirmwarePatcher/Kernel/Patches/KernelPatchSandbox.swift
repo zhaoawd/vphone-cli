@@ -27,11 +27,11 @@ extension KernelPatcher {
 
     /// Patches 17-26: stub Sandbox MACF hooks with mov x0,#0; ret.
     @discardableResult
-    func patchSandbox() -> Bool {
+    func patchSandbox() -> KernelStepSignal {
         log("\n[17-26] Sandbox MACF hooks")
 
         guard let opsTableOff = findSandboxOpsTable() else {
-            return false
+            return .noAnchor
         }
 
         let sandboxRange = discoverSandboxTextRange()
@@ -82,7 +82,14 @@ extension KernelPatcher {
             patchedCount += 1
         }
 
-        return patchedCount > 0
+        // 5 hook pairs total: all patched → matched; none → no anchor; a subset → partial.
+        // Byte-equivalent to the legacy `patchedCount > 0` Bool (patched hooks wrote their
+        // bytes regardless of the returned value).
+        switch patchedCount {
+        case 5: return .matched
+        case 0: return .noAnchor
+        default: return .partial("patched \(patchedCount)/5 sandbox hooks")
+        }
     }
 
     // MARK: - mac_policy_conf / ops table discovery

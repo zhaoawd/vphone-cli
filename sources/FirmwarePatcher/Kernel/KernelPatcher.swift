@@ -32,16 +32,35 @@ public final class KernelPatcher: KernelPatcherBase, Patcher {
         self.applyExcGuard = applyExcGuard
     }
 
+    // MARK: - Setup (idempotent)
+
+    /// Set once the heavyweight Mach-O parse + index build has run for this instance.
+    private var didPrepare = false
+
+    /// Idempotent heavyweight setup: parse the Mach-O, build the ADRP/BL indices, and
+    /// locate `_panic`. Runs exactly once per instance (guarded by `didPrepare`), whether
+    /// triggered by `findAll()` or by the first executed structured step.
+    ///
+    /// Kept out of `buildSteps()` so the ablation dry-run (`makePatcher(Data(), false)` →
+    /// `buildSteps()` in `FirmwarePipeline.knownAblationTargets`) stays cheap and safe on
+    /// an empty payload: `buildSteps()` only constructs `PatchStep`s and never parses. Each
+    /// step's `run` closure calls this before running its patch body, so setup happens even
+    /// if the first declared step is ablated. Order matches the former inline setup exactly.
+    func ensurePrepared() {
+        guard !didPrepare else { return }
+        parseMachO()
+        buildADRPIndex()
+        buildBLIndex()
+        findPanic()
+        didPrepare = true
+    }
+
     // MARK: - Find All
 
     public func findAll() throws -> [PatchRecord] {
         patches = []
 
-        // Parse Mach-O structure and build indices
-        parseMachO()
-        buildADRPIndex()
-        buildBLIndex()
-        findPanic()
+        ensurePrepared()
 
         // Apply patches in order (matching Python find_all)
         patchApfsRootSnapshot() // 1

@@ -1075,6 +1075,42 @@ struct MigratedPatcherParityTests {
         #expect(!new.emittedRecords.isEmpty, "TXM dev parity input produced no records")
     }
 
+    // MARK: - C3 group 2: base kernel parity (KernelPatcher)
+
+    /// Synthetic no-match parity: on garbage (non-Mach-O) input, both the legacy
+    /// `findAll()` and the structured step path must yield an identical (empty) record
+    /// list. Runs in the fast suite (no fixture needed) — proves the buildSteps/run/commit
+    /// plumbing and `ensurePrepared()` idempotency without crashing.
+    @Test func kernelFindAllEqualsStepPath_syntheticNoMatch() throws {
+        let data = Data(repeating: 0, count: 0x1000)
+        let oldRecords = try KernelPatcher(data: data, verbose: false, isDev: false, applyExcGuard: true).findAll()
+        let new = KernelPatcher(data: data, verbose: false, isDev: false, applyExcGuard: true)
+        for step in new.buildSteps() { _ = step.run() }
+        #expect(oldRecords == new.emittedRecords)
+        #expect(new.emittedRecords.isEmpty)
+    }
+
+    /// Real-firmware byte parity for the base kernel patcher. Point
+    /// `VPHONE_TEST_KERNELCACHE_IM4P` at a `kernelcache.*.im4p` (decompressed in-test via
+    /// `IM4PHandler`) or `VPHONE_TEST_KERNELCACHE` at a raw decompressed kernelcache. Unset
+    /// ⇒ skipped so the fast suite stays green. Asserts the pre-migration `findAll()` and
+    /// the structured step path emit byte-identical `[PatchRecord]`. `applyExcGuard: true`
+    /// so the conditional excGuard step (12) is exercised in both paths.
+    @Test func kernelFindAllEqualsStepPath_realData() throws {
+        let payload: Data?
+        if let raw = ProcessInfo.processInfo.environment["VPHONE_TEST_KERNELCACHE"] {
+            payload = try? Data(contentsOf: URL(fileURLWithPath: raw))
+        } else {
+            payload = Self.im4pPayload("VPHONE_TEST_KERNELCACHE_IM4P")
+        }
+        guard let data = payload else { return }
+        let oldRecords = try KernelPatcher(data: data, verbose: false, isDev: false, applyExcGuard: true).findAll()
+        let new = KernelPatcher(data: data, verbose: false, isDev: false, applyExcGuard: true)
+        for step in new.buildSteps() { _ = step.run() }
+        #expect(oldRecords == new.emittedRecords)
+        #expect(!new.emittedRecords.isEmpty, "kernel parity input produced no records")
+    }
+
     /// Dry ablation run writes nothing. Requires a prepared VM directory via
     /// `VPHONE_TEST_VMDIR` (skipped otherwise so the fast suite stays green).
     @Test func dryAblationRunDoesNotSave() throws {

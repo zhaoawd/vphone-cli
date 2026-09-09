@@ -66,18 +66,18 @@ extension KernelPatcher {
     /// not in postValidation itself. We find the caller, collect its BL targets,
     /// then look inside each target for `cmp w0, #imm ; b.ne` preceded by a BL.
     @discardableResult
-    func patchPostValidationCMP() -> Bool {
+    func patchPostValidationCMP() -> KernelStepSignal {
         log("\n[9] postValidation: cmp w0,w0 (AMFI code signing)")
 
         guard let strOff = buffer.findString("AMFI: code signature validation failed") else {
             log("  [-] string not found")
-            return false
+            return .noAnchor
         }
 
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty else {
             log("  [-] no code refs")
-            return false
+            return .noAnchor
         }
 
         // Collect unique caller function starts.
@@ -139,7 +139,7 @@ extension KernelPatcher {
         let uniqueHits = Array(Set(hits)).sorted()
         guard uniqueHits.count == 1 else {
             log("  [-] expected 1 postValidation compare site, found \(uniqueHits.count)")
-            return false
+            return uniqueHits.count > 1 ? .ambiguous(uniqueHits.count) : .noAnchor
         }
 
         let patchOff = uniqueHits[0]
@@ -147,7 +147,7 @@ extension KernelPatcher {
              patchID: "kernel.post_validation.cmp_w0_w0",
              virtualAddress: fileOffsetToVA(patchOff),
              description: "cmp w0,w0 (was cmp w0,#imm) [postValidation]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

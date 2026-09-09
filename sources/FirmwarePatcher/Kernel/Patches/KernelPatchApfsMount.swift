@@ -391,12 +391,22 @@ extension KernelPatcher {
     // MARK: - Aggregate entry point
 
     /// Apply all APFS mount patches (13, 14, 15, 16).
+    ///
+    /// The 4 sub-patches emit-on-find independently. The returned signal only reinterprets
+    /// their `Bool` results; no emit/matching logic changes. All 4 → `.matched`; none → no
+    /// anchor; a partial subset → `.partial` (byte-equivalent to legacy `r13&&r14&&r15&&r16`
+    /// returning `false` — the sub-patches that matched already wrote their bytes either way).
     @discardableResult
-    func patchApfsMount() -> Bool {
+    func patchApfsMount() -> KernelStepSignal {
         let r13 = patchApfsVfsopMountCmp()
         let r14 = patchApfsMountUpgradeChecks()
         let r15 = patchHandleFsiocGraft()
         let r16 = patchHandleGetDevByRoleEntitlement()
-        return r13 && r14 && r15 && r16
+        let applied = [r13, r14, r15, r16].filter { $0 }.count
+        switch applied {
+        case 4: return .matched
+        case 0: return .noAnchor
+        default: return .partial("applied \(applied)/4 apfs-mount sub-patches")
+        }
     }
 }
