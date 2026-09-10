@@ -188,6 +188,8 @@
 
 本轮回归：首次 `make test` 的 Python 73 项通过；Swift VMStop 出现 9 条断言失败，同时沙箱拒绝 `ps`，该次 Swift 不记为通过。在允许进程查询的环境重跑 `make test_swift` 退出码为 0，XCTest 20 项、Swift Testing 298 项 / 46 suites 全部通过（25.525 秒）。完整日志见本轮验收文档。C3 状态和已完成工作项计数不变。
 
+2026-09-10 顺序组合补充：26.4 原始内核的 base → JB → EXP 在 iOS 27 gate 开启、Frida 关闭时通过完整记录、payload 和必要集合检查，共 129 条记录（1 test / 1 suite，156.853 秒）。仅 Frida 开启的组合随后通过，共 121 条记录（1 test / 1 suite，95.959 秒）；26.4 的四种 iOS 27 gate / Frida 顺序组合均已有完整记录、payload 和必要集合证据。精确 26.1 / 23B85 四种非 less 引导链生产流水线和必要集合报告随后通过，regular / dev / jb / exp 分别为 29 / 34 / 68 / 88 个声明方法、58 / 70 / 152 / 178 条记录；独立落盘 payload 验证通过（六类二进制记录重放，DeviceTree 序列化 parity）；C1 新增独立 `patch_verified` 组合并保留历史证据。详见 [精确引导链验收](c3_full_pipeline_acceptance_2026-09-10.md)。精确固件全流水线与运行验收仍未完成，C3 保持进行中。详见 [C3 剩余验收](c3_acceptance_remaining_2026-09-10.md)。
+
 ### C4 — 避免失败留下无法判断的部分修改固件【高；依赖 C3、B4】
 
 涉及：`FirmwarePipeline.swift`、`IM4PHandler.swift`、`CryptexFilesystemPatcher.swift`、`ManifestHashPatcher.swift`、固件 CLI。

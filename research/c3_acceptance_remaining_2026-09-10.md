@@ -14,7 +14,7 @@
 | 同一 26.4 内核；JB：iOS 27 gate 关闭、开启、开启且 Frida 开启 | 分别 84 / 96 / 100 条记录，记录及 payload 相等 | 修正后必要集合通过 | gate 设置不能替代精确 iPhone 构建号及其 TXM、用户空间输入 |
 | 同一 26.4 内核；base → JB → EXP，iOS 27 与 Frida gate 开启 | 133 条记录，记录及 payload 相等 | 顺序组合必要集合通过 | 未证明其他顺序组合设置；未启动该内核 |
 | cloudOS 26.1 / 23B85、26.4 / 23E5207q 原始 DeviceTree；base / EXP | 分别 4 / 23 条记录，记录及 payload 相等 | 必要集合通过 | 仅 DeviceTree 组件 |
-| 26.1 库存 iBSS / iBEC / LLB 与 iPhone 26.1 / 23B85 TXM | 既有记录称 9 项 parity 通过 | 覆盖各编排方法的比较 | 库存 IPSW 现已不在本地缓存；不能将方法被调用等同于每项必要检查通过 |
+| 26.1 库存 iBSS / iBEC / LLB 与 iPhone 26.1 / 23B85 TXM | 既有记录称 9 项 parity 通过 | 覆盖各编排方法的比较 | 本轮已重新取得精确原始组件及来源哈希；旧方法级结果不等同于必要集合通过 |
 | iPhone 26.1 / 23B85 restore 克隆；less Filesystem → Manifest，默认安装设置 | 未执行两次完整重建的输出字节比较 | 真实流程 applied；四组件 SHA-384、AEA 解密、内容及独立原始 root hash 检查通过 | 三份源输入与克隆哈希相同，但源来自已有 VM restore，未证明全为原始发行镜像；未覆盖完整 less 引导链或恢复启动 |
 
 内核证据见 [内核迁移](patch_results_c3_kernel_2026-09-09.md)、[重新定位后的结果](c3_kernel_retarget_2026-09-09.md)、[EXP 迁移](patch_results_c3_exp_2026-09-09.md)。DeviceTree 与产物见 [产物迁移](patch_results_c3_artifacts_2026-09-09.md)、[less 验收](c3_less_acceptance_2026-09-09.md)。引导链见 [引导链迁移](patch_results_c3_bootchain_2026-09-09.md)。旧文档中的 26.4 匹配失败和 less 未执行描述属于历史状态，应结合后续修正记录阅读。
@@ -47,17 +47,27 @@
 
 26.4 默认 base → JB → EXP（iOS 27 gate 与 Frida 均关闭）同样为 117 条记录，完整记录及 payload 相等，所有步骤无失败。退出码为 0；Swift Testing 报告 1 test / 1 suite，通过耗时 52.888 秒。日志：`research/artifacts/c3-gate-acceptance-2026-09-10/stock-264-default-chain.log`。
 
+26.4 的 base → JB → EXP 顺序组合补充验收：iOS 27 gate 开启、Frida 关闭时为 129 条记录，完整记录及 payload 相等，所有步骤无失败。Swift Testing 报告 1 test / 1 suite，通过耗时 156.853 秒。日志：`research/artifacts/c3-gate-acceptance-2026-09-10/stock-264-ios27-chain.log`。
+
+26.4 的 iOS 27 gate 关闭、Frida 开启顺序组合也通过：121 条记录，完整记录及 payload 相等，所有步骤无失败；退出码为 0，1 test / 1 suite，95.959 秒。日志：`research/artifacts/c3-gate-acceptance-2026-09-10/stock-264-frida-chain.log`。26.4 的四种 iOS 27 gate / Frida 顺序组合均已有证据：均关闭 117 条、仅 iOS 27 gate 开启 129 条、仅 Frida 开启 121 条、均开启 133 条。
+
+## 精确引导链输入准备
+
+本轮重新取得 iPhone 26.1 / 23B85 与 cloudOS 26.1 / 23B85 的原始组件；来源 URL、归档成员路径、长度和 SHA-256 记录于 `research/artifacts/c3-full-pipeline-2026-09-10/stock/sources.json`。AVPBooter 来自宿主 macOS 26.5.1 / 25F80。regular / dev / jb / exp 非 less 引导链生产流水线及必要集合报告均通过，分别为 29 / 34 / 68 / 88 个声明方法、58 / 70 / 152 / 178 条记录。独立落盘 payload 验证已通过（六类二进制记录重放，DeviceTree 序列化 parity）；此结果不代表完整恢复镜像、less 或运行验收通过。详见 [精确引导链验收](c3_full_pipeline_acceptance_2026-09-10.md)。
+
+生产覆盖规则使用 cloudOS TXM。本次 cloudOS 与 iPhone 的 `Firmware/txm.iphoneos.research.im4p` 均为 161043 字节，SHA-256 均为 `3912f361973d70090b1f15a6e4ec64bd12e457a06d73555ec8880b76c861aa3a`；因此既有使用 iPhone TXM 的测试输入字节与本次 cloudOS TXM 相同。该结论仅适用于此精确输入。
+
 ## C3 补丁产物验收缺口
 
 1. 兼容性清单还包含 26.3 / 23D127 + cloudOS 26.3 / 23D128 的历史 `patch_verified` 组合，本轮没有对应原始样本和结构化必要集合证据。其余 `code_selectable` 项仅表示代码可选择，不表示通过 C3。
 2. 26.1 与 26.4 已补齐非 dev 的 iOS 18 / 强制 EXC_GUARD 门控；26.4 已补齐 JB 的 iOS 27 gate 关闭且 Frida 开启组合。这些组件级设置不能替代对应完整固件组合验收。
-3. EXP 顺序组合已有 26.1 默认、26.4 默认与 26.4 + iOS 27 gate + Frida 的证据。26.4 的 iOS 27 gate 开启且 Frida 关闭、iOS 27 gate 关闭且 Frida 开启两种顺序组合尚缺明确记录。独立补丁器通过不自动证明顺序组合通过。
-4. 引导链需补充精确来源、哈希和结构化必要集合报告。26.4 内核通过不能代替对应 iPhone 构建的 TXM 和完整流水线验收。LLB `patchRootfssBypass` 必要性仍为待验证假设。
+3. EXP 顺序组合已有 26.1 默认和 26.4 四种 iOS 27 gate / Frida 组合证据。该范围的顺序组合缺口已补齐，但不能外推到其他固件输入。
+4. 26.1 / 23B85 四种非 less 引导链已补齐精确来源、哈希和结构化必要集合报告；独立落盘 payload 验证已通过（六类二进制记录重放，DeviceTree 序列化 parity）。26.4 内核通过不能代替对应 iPhone 构建的 TXM 和完整流水线验收。LLB `patchRootfssBypass` 必要性仍为待验证假设。
 5. less 已通过 Filesystem → Manifest 真实产物检查；完整流水线、可选安装开关及其他精确输入组合没有随该结果获得验证。跨文件回滚属于 C4，不能在 C3 结果中声明已具备。
 
 ## 可立即执行的最小验收
 
-继续使用现有只读原始内核补齐缺失的顺序组合。每个用例分别断言完整记录、完整 payload、必要方法结果；保留精确输入 SHA-256 和选项。该轮不需要 VM、镜像挂载或重新生成 less 文件系统。新增测试应以缺失组合为范围，不因已有结果而重复整套耗时验收。
+26.4 缺失的顺序组合已补齐。26.1 / 23B85 四种非 less 引导链也已通过生产流水线与必要集合检查；落盘 payload 已按六类二进制记录重放与 DeviceTree 序列化 parity 分别通过验证。
 
 随后为一个明确 iPhone 构建与 cloudOS 构建建立完整组件输入集，按 less / regular / dev / jb / exp 分别保存必要集合报告。缺失的版本保持未验证；不要把单个 cloudOS 内核在 iOS 27 gate 下通过写成所有 iOS 27 构建全链通过。
 
@@ -109,4 +119,4 @@ env -u VPHONE_TEST_FRIDA -u VPHONE_TEST_CHAIN_IOS27 \
 
 首次 `make test` 的 Python 73 项通过；Swift 的 VMStop 测试出现 9 条断言失败，同一沙箱拒绝执行 `ps`。该次 Swift 运行不记为通过。随后在允许进程查询的环境重跑 `make test_swift`，退出码为 0：XCTest 20 项、Swift Testing 298 项 / 46 suites 全部通过，后者耗时 25.525 秒。日志：`research/artifacts/c3-gate-acceptance-2026-09-10/swift-regression-unsandboxed.log`。
 
-本轮完成新增内核门控、默认 EXP 顺序组合及回归验证；上述缺失组合与运行验收仍未完成，C3 保持进行中。
+本轮完成新增内核门控、26.1 默认及 26.4 四组合的 EXP 顺序验收和回归验证；精确固件全流水线与运行验收仍未完成，C3 保持进行中。

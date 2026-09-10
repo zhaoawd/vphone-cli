@@ -3211,6 +3211,38 @@
         "相机『应用已使用』层级、host Frida client、regular/dev 真机 boot 未在本组合覆盖"
       ],
       "variant": "exp"
+    },
+    {
+      "id": "pv-261-c3-bootchain-20260910",
+      "ios": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_full_pipeline_acceptance_2026-09-10.md",
+          "summary": "四种非 less 引导链生产流水线及必要集合报告通过：regular/dev/jb/exp 为 58/70/152/178 条记录。六类二进制落盘 payload 独立记录重放通过；DeviceTree 落盘完整序列化 payload 与 legacy/structured 结果一致。原始输入哈希与长度未变。"
+        }
+      ],
+      "limitations": [
+        "仅非 less 引导链补丁验收，不包含磁盘镜像有效性、Filesystem/Manifest 修改、restore 或 boot。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未由此获得验证。",
+        "iOS 27、Frida 与强制 EXC_GUARD 选项关闭；dev 按变体启用 EXC_GUARD。"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
     }
   ],
   "open_questions": [

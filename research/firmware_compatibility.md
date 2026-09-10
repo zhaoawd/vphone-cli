@@ -67,20 +67,21 @@ CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶�
 
 此外 iBSS/iBEC/LLB 存在 Summary 表与 Migration parity 两套 record 计数（iBEC 4 vs 7、LLB 6 vs 13、iBSS base 2 vs 4），JSON 中这些组件 `record_count` 保留 `summary` 键并在 `note` 记录差异，`method_count` 记 `null`（含义待确认）。
 
-## 6. 当前覆盖（combinations，共 30 条）
+## 6. 当前覆盖（combinations，共 31 条）
 
 按变体 × 阶段统计的组合条数（`variants: [...]` 数组按其中每个变体分别计入）：
 
 | 变体 \ 阶段 | code_selectable | patch_verified | boot_verified | capability_verified |
 | --- | --: | --: | --: | --: |
 | less | 23 | 0 | 0 | 0 |
-| regular | 23 | 2 | 0 | 0 |
-| dev | 23 | 2 | 0 | 0 |
-| jb | 23 | 3 | 0 | 3 |
-| exp | 23 | 0 | 0 | 1 |
+| regular | 23 | 3 | 0 | 0 |
+| dev | 23 | 3 | 0 | 0 |
+| jb | 23 | 4 | 0 | 3 |
+| exp | 23 | 1 | 0 | 1 |
 
 - `code_selectable`：23 条 bulk 组合，每条 `variants: ["less","regular","dev","jb","exp"]`，cloudOS 构建号 `null`（catalog 仅版本）。
 - `patch_verified`：26.1(`23B85`)/cloudOS 26.1(`23B85`) 与 26.3(`23D127`)/cloudOS 26.3(`23D128`) 的 regular/dev/jb 字节 parity（2026-03-10）；26.5(`23F77`) jb 合成组件 83 records 与 main byte-identical（2026-07-20）。
+- `patch_verified` 新增 `pv-261-c3-bootchain-20260910`：26.1 / 23B85 精确配对的 regular/dev/jb/exp 非 less 引导链生产流水线、必要集合及落盘 payload 验证通过（2026-09-10）；宿主 AVPBooter 为 macOS 26.5.1 / 25F80，不含磁盘镜像有效性、恢复或启动。历史 `pv-261-parity` 条目保留。详见 [精确引导链验收](c3_full_pipeline_acceptance_2026-09-10.md)。
 - `capability_verified`：
   - 27.0(`24A5408d`)/cloudOS 26.4(`23E5207q`) jb `--frida`（2026-08-17）：vphoned、ddi-mount、jb-setup 通过；frida-server 部分（未运行 host client）。
   - 27.0(`24A5380h`) jb（2026-07-15/17）：display、ddi-mount、vphoned。

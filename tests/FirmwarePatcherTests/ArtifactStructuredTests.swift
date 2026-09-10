@@ -178,7 +178,8 @@ struct ArtifactStructuredTests {
     }
 }
 
-@Suite(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_TEST_DT_IM4P"] != nil))
+@Suite(.enabled(if: ["VPHONE_TEST_DT_IM4P", "VPHONE_TEST_DT_BASE_OUTPUT_IM4P", "VPHONE_TEST_DT_EXP_OUTPUT_IM4P"]
+    .contains { ProcessInfo.processInfo.environment[$0] != nil }))
 struct DeviceTreeStructuredParityTests {
     @Test(arguments: [false, true])
     func originalDeviceTreeParity(exp: Bool) throws {
@@ -192,6 +193,16 @@ struct DeviceTreeStructuredParityTests {
         #expect(!result.report.hasRequiredFailure)
         #expect(result.report.records == records)
         #expect(result.data == old.patchedData)
+        let outputVariable = exp ? "VPHONE_TEST_DT_EXP_OUTPUT_IM4P" : "VPHONE_TEST_DT_BASE_OUTPUT_IM4P"
+        if let outputPath = ProcessInfo.processInfo.environment[outputVariable] {
+            let outputURL = URL(fileURLWithPath: outputPath)
+            try #require(FileManager.default.fileExists(atPath: outputURL.path), "Configured DeviceTree output is missing")
+            let output = try IM4PHandler.load(contentsOf: outputURL)
+            try #require(output.im4p != nil, "Configured DeviceTree output must be IM4P")
+            #expect(output.payload == old.patchedData)
+            #expect(output.payload == result.data)
+            print("C3 DeviceTree exp=\(exp): CLI output serialized payload compared: \(outputPath)")
+        }
         print("C3 DeviceTree exp=\(exp): \(records.count) records; parity and completeness passed")
     }
 }

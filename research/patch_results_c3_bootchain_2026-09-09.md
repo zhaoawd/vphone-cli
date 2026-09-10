@@ -73,9 +73,11 @@ C1 对齐测试要求「迁移补丁器的 step 方法叶子集合 == 该组件�
 - 判据：迁移前 `findAll()` 与新 step 路径产出的 `[PatchRecord]` 逐条相等，且非空。
 - 结果：9 项 parity 用例全过。
 
-关于计数与输入选择：`vm-2607` 是已安装/部分改写的 VM 固件，其 llb/txm_dev 部分锚点已被前次改写而不再命中（在该输入上实测 llb=7、txm_dev=3，低于参照）。为覆盖全部方法，验收改用未改写的库存输入：从 cloudOS IPSW `ipsws/399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw` 抽取 `iBSS/iBEC/LLB.vresearch101.RELEASE.im4p`，txm 取自基础 IPSW `ipsws/iPhone17,3_26.1_23B85_Restore.ipsw` 的 `txm.iphoneos.research.im4p`（这些正是 `fw_prepare` cloudOS 合并注入流水线的原始引导链二进制）。用这组库存输入设置 `VPHONE_TEST_*_IM4P` 后 9 项 parity 用例全过，覆盖 iBSS/iBEC/LLB 三模式与 TXMPatcher/TXMDevPatcher 的完整方法集。stock 参照计数为 ibss 4 / ibec 7 / llb 13 / txm 1 / txm_dev 12（`0_binary_patch_comparison.md:863-868`）。parity 判据是「同一输入上 old `findAll()` == new step 路径逐字节相等」，在库存与已安装两类输入上均成立。
+关于计数与输入选择：`vm-2607` 是已安装/部分改写的 VM 固件，其 llb/txm_dev 部分锚点已被前次改写而不再命中（在该输入上实测 llb=7、txm_dev=3，低于参照）。为覆盖全部方法，验收改用未改写的库存输入：从 cloudOS IPSW `ipsws/399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw` 抽取 `iBSS/iBEC/LLB.vresearch101.RELEASE.im4p`，txm 取自基础 IPSW `ipsws/iPhone17,3_26.1_23B85_Restore.ipsw` 的 `txm.iphoneos.research.im4p`（此处保留当时的实际提取来源；生产合并规则中的 TXM 来源及本轮字节核对见下段）。用这组库存输入设置 `VPHONE_TEST_*_IM4P` 后 9 项 parity 用例全过，覆盖 iBSS/iBEC/LLB 三模式与 TXMPatcher/TXMDevPatcher 的完整方法集。stock 参照计数为 ibss 4 / ibec 7 / llb 13 / txm 1 / txm_dev 12（`0_binary_patch_comparison.md:863-868`）。parity 判据是「同一输入上 old `findAll()` == new step 路径逐字节相等」，在库存与已安装两类输入上均成立。
 
 ## 8. 未改动项与验证
+
+2026-09-10 来源补充：生产合并规则以 cloudOS TXM 覆盖 iPhone TXM。本轮对精确 26.1 / 23B85 两份归档重新提取，确认 TXM 均为 161043 字节，SHA-256 均为 `3912f361973d70090b1f15a6e4ec64bd12e457a06d73555ec8880b76c861aa3a`。因此本节历史 iPhone TXM 测试输入与生产使用的 cloudOS TXM 字节一致。其他构建未由此获得验证。来源及生产流水线结果见 [精确引导链验收](c3_full_pipeline_acceptance_2026-09-10.md)。
 
 - `extractPatchedData`/legacy 检测未改：结构化路径用 `patcher.patchedData` 取字节，迁移后 `IBootPatcher`/`TXMPatcher`/`TXMDevPatcher` 被 `patcher as? any StructuredPatcher` 命中并走 `StructuredExecution.run`；`extractPatchedData` 内 `as? IBootPatcher`/`as? TXMPatcher` 分支对结构化路径成为死代码但无害（仍供 legacy `patchData` 与手工 fallback）。
 - 验证命令：`swift build` 成功；`python3 -m unittest tests.test_firmware_compatibility` 14 项全过；`make test`（Python 69、Swift 270）全过；`swift test --filter MigratedPatcherParityTests` 9 项全过；`make build` 签名成功。
