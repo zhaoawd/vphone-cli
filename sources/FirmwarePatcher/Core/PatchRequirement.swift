@@ -64,7 +64,7 @@ public enum PatchRule: String, Sendable, Codable, Equatable {
     case iosBaseIs27
     /// Frida kernel patches are active (`enableFrida && cloudOSIsFridaCapable`).
     case cloudOSFridaCapable
-    /// EXC_GUARD disable is active (`isDev || forceExcGuard`, gate "applyExcGuard").
+    /// EXC_GUARD disable is active (`variant == .dev || iosBaseIs18 || forceExcGuard`).
     case excGuardActive
 
     /// Evaluate the rule against the run's gate snapshot.

@@ -16,6 +16,8 @@
 - `options`：`--force-exc-guard`、`--frida`、`--no-binpack`、`--no-vphoned`（见 JSON `dimensions.options` 的 `source` 行号）。
 - `auto_gates`：从固件读出、非用户选项的自动门控：`iosBaseIs18`、`iosBaseIs27`、`cloudOSIsFridaCapable`（`FirmwarePipeline.swift:138/139/148`）。
 
+`methods[].gate` 使用 `PatchRule` 标识：`excGuardActive = variant == .dev || iosBaseIs18 || forceExcGuard`，`iosBaseIs27`，以及 `cloudOSFridaCapable`（求值读取快照派生字段 `applyFrida = enableFrida && cloudOSIsFridaCapable`）。`KernelPatcher.applyExcGuard` 参数仍表示 `iosBaseIs18 || forceExcGuard`，补丁器另以 `isDev` 启用 dev 行为。规则名称、快照字段及补丁器参数承担不同职责。
+
 ## 2. 固件（firmware）
 
 - `firmware.ios`：23 条 catalog 配对（iPhone17,3，含精确构建号；构建号从 IPSW URL 解析）。每条附推荐 `cloudos_name`。
@@ -40,13 +42,13 @@
 
 不使用单一总数判断兼容，分列两种口径（`policy.count_semantics`）：
 
-- `method_count`：补丁方法（如 `patchSandbox`）数量。一个方法可 emit 0 至多条 record，无匹配时静默 `return`（不 emit、不抛错）。仅当**整个组件**返回空数组时流水线才失败（`FirmwarePipeline.swift:203-205`）。C2 起，已迁移为 `StructuredPatcher` 的补丁器改用「有效必要且 failed → 组件失败」判据，其方法的稳定标识为 `patch_id = <component>.<patcher>.<method>`，leaf 段 `method` 与本清单 `methods[].name` 一致（对齐由 `C1AlignmentTests` 断言）。已迁移：`avpbooter.AVPBooterPatcher.patchDGSTBypass`、`ibss.IBootJBPatcher.patchSkipGenerateNonce`；其余补丁器仍为 legacy。详见 [结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。
+- `method_count`：声明的补丁编排方法数量。一个方法可以产生零条或多条 `PatchRecord`。当前流水线各补丁器均已迁移为 `StructuredPatcher`，按“有效必要且 failed → 组件失败”判定；稳定标识为 `patch_id = <component>.<patcher>.<method>`，`method` 与清单 `methods[].name` 对齐。`C1AlignmentTests` 同时检查方法集合及条件规则名称。详见 [结构化补丁结果与消融](patch_results_ablation_2026-09-09.md)。
 - `record_count`：实际写入的 `PatchRecord` 条数，按输入分键：
   - `"<iPhone构建>/<cloudOS构建>"`：特定输入的实测计数（如 `23B85/23B85`）。
   - `"unknown"`：该位置构建号缺失。
   - `"summary(...)"`：研究文档 Summary 表的通用（非特定构建）计数。
 
-同一变体在不同门控下 record 数不同：JB 内核 `method_count = 59`（`0_binary_patch_comparison.md:830`、Cross-Version snapshot `:849-856`），`record_count` 为 26.x 基线 **84**、26.5 基线 **83**、27.0 基线 **95**（`:125`、`:868`）。
+同一变体在不同门控下 record 数不同。当前 `KernelJBPatcher` 声明 33 个步骤，加基础内核 12 个步骤，jb 的 kernelcache 组件共 45 个步骤。历史研究记录的 JB 内核方法计数为 59（`0_binary_patch_comparison.md:830`、Cross-Version snapshot `:849-856`），`record_count` 为 26.x 基线 **84**、26.5 基线 **83**、27.0 基线 **95**（`:125`、`:868`）。
 
 ## 5. 计数口径差异（需统一）
 
@@ -58,10 +60,10 @@
 | CLAUDE.md phases | 10 | 12 | 14 | 18 | **待确认** |
 | `0_binary_patch_comparison.md:839` Grand total | 56 | 70 | 132 | 163 | record（含 CFW） |
 | `0_binary_patch_comparison.md:836` Boot chain total | 46 | 58 | 117 | 132 | record（仅引导链） |
-| method / record（JB 内核） | — | — | 方法 59 | — | `:830`（method） |
+| 历史 method / record（JB 内核） | — | — | 方法 59 | — | `:830`（method） |
 | record（JB 内核，按基线） | — | — | 84（26.x）/ 83（26.5）/ 95（27.0） | — | `:125`、`:868`（record） |
 
-CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶段），也不等于 10/12/14/18。清单以研究文档的 method（59）与 record（84/83/95）双计数为准；CLAUDE.md 的 52/66/127/141 与 10/12/14/18 标记为 **待确认**。
+CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶段），也不等于 10/12/14/18。清单方法集合以当前代码声明为准；历史 method（59）与 record（84/83/95）保留为历史口径，不代表当前步骤数；CLAUDE.md 的 52/66/127/141 与 10/12/14/18 标记为 **待确认**。
 
 此外 iBSS/iBEC/LLB 存在 Summary 表与 Migration parity 两套 record 计数（iBEC 4 vs 7、LLB 6 vs 13、iBSS base 2 vs 4），JSON 中这些组件 `record_count` 保留 `summary` 键并在 `note` 记录差异，`method_count` 记 `null`（含义待确认）。
 
@@ -100,4 +102,10 @@ CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶�
 
 ## 8. 待澄清项（open_questions）
 
-见 JSON `open_questions`，共 6 项：内核类型维度含义待确认；cloudOS 构建号缺失；三套计数口径不一致（CLAUDE.md 待确认）；regular/dev 无真机 boot 证据；无匹配跳过 vs 组件级失败的结构化判据待 C2/C3；`ipsws/patch_refactor_input` fixtures 目录不存在。
+见 JSON `open_questions`，共 6 项：内核类型维度含义待确认；cloudOS 构建号缺失；三套计数口径不一致（CLAUDE.md 待确认）；regular/dev 无真机 boot 证据；结构化结果实现已完成但完整固件矩阵与运行验收未完成；`ipsws/patch_refactor_input` fixtures 目录不存在。
+
+## 9. 门控一致性修正（2026-09-10）
+
+清单方法的旧 gate 名称 `applyExcGuard`、`applyFrida` 分别迁移为 `PatchRule.rawValue` 的 `excGuardActive`、`cloudOSFridaCapable`。生产门控行为和补丁字节未修改；`KernelPatcher.applyExcGuard` 参数保持原名与含义。
+
+五变体（less、regular、dev、jb、exp）的实际流水线步骤与清单方法集合、条件规则名称对齐测试通过。EXC_GUARD 测试从实际流水线报告获取门控快照，覆盖 regular/dev/jb/exp × iOS 18 开关 × force 开关共 16 个组合，并检查实际内核工厂产生的结构化结果。针对 Swift 测试 18 项、Python 清单校验 14 项通过。本记录不包含本轮真实固件样本或启动验收结果。

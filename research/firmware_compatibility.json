@@ -725,7 +725,7 @@
             {
               "name": "patchExcGuardBehavior",
               "required": false,
-              "gate": "applyExcGuard",
+              "gate": "excGuardActive",
               "expected_not_applicable": [
                 "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
               ]
@@ -1054,7 +1054,7 @@
             {
               "name": "patchExcGuardBehavior",
               "required": false,
-              "gate": "applyExcGuard",
+              "gate": "excGuardActive",
               "expected_not_applicable": []
             }
           ],
@@ -1390,7 +1390,7 @@
             {
               "name": "patchExcGuardBehavior",
               "required": false,
-              "gate": "applyExcGuard",
+              "gate": "excGuardActive",
               "expected_not_applicable": [
                 "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
               ]
@@ -1558,7 +1558,7 @@
             {
               "name": "patchThreadSetStateEntitlementFlag",
               "required": false,
-              "gate": "applyFrida",
+              "gate": "cloudOSFridaCapable",
               "expected_not_applicable": [
                 "--frida 未启用",
                 "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
@@ -1581,7 +1581,7 @@
             {
               "name": "patchVmMapDeleteImmutableCode",
               "required": false,
-              "gate": "applyFrida",
+              "gate": "cloudOSFridaCapable",
               "expected_not_applicable": [
                 "--frida 未启用",
                 "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
@@ -1956,7 +1956,7 @@
             {
               "name": "patchExcGuardBehavior",
               "required": false,
-              "gate": "applyExcGuard",
+              "gate": "excGuardActive",
               "expected_not_applicable": [
                 "iPhone base 非 18.x 且未传 --force-exc-guard（KernelPatcher.swift:60-63）"
               ]
@@ -2124,7 +2124,7 @@
             {
               "name": "patchThreadSetStateEntitlementFlag",
               "required": false,
-              "gate": "applyFrida",
+              "gate": "cloudOSFridaCapable",
               "expected_not_applicable": [
                 "--frida 未启用",
                 "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
@@ -2147,7 +2147,7 @@
             {
               "name": "patchVmMapDeleteImmutableCode",
               "required": false,
-              "gate": "applyFrida",
+              "gate": "cloudOSFridaCapable",
               "expected_not_applicable": [
                 "--frida 未启用",
                 "cloudOS < 26.4（0_binary_patch_comparison.md:127）"
@@ -3224,7 +3224,7 @@
     },
     {
       "id": "count-discrepancy",
-      "statement": "CLAUDE.md 的 52/66/127/141(patches) 与 10/12/14/18(phases)、0_binary_patch_comparison.md Summary 的 56/70/132/163(record)、以及 method(JB 59)/record(84~95) 三套口径互不一致；CFW 脚本用 N/7 阶段。CLAUDE.md 数字待确认，不在本任务修改。"
+      "statement": "CLAUDE.md 的 52/66/127/141(patches) 与 10/12/14/18(phases)、0_binary_patch_comparison.md Summary 的 56/70/132/163(record)、以及历史 method(JB 59)/record(84~95) 三套口径互不一致；CFW 脚本用 N/7 阶段。CLAUDE.md 数字待确认，不在本任务修改。"
     },
     {
       "id": "regular-dev-no-boot",
@@ -3232,7 +3232,7 @@
     },
     {
       "id": "skip-vs-fail-structuralization",
-      "statement": "方法级无匹配静默跳过、组件级空数组才失败（FirmwarePipeline.swift:203-205）；现有固件测试靠 grep '[-]'，结构化结果判据待 C2/C3 完成。"
+      "statement": "C2/C3 已完成当前流水线补丁器的结构化结果实现，按有效必要且 failed 判定失败；完整支持固件矩阵及修正后产物的启动、能力验收仍未完成。"
     },
     {
       "id": "fixtures-absent",

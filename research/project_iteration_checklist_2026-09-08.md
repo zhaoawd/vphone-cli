@@ -182,6 +182,12 @@
 
 内核修正提交 `2b53743`：26.1/26.4 的预期地址、唯一 4 字节写入、重复应用与异常锚点拒绝测试通过；26.4 必要集合和包含 Frida 的 base → JB → EXP 顺序组合通过，组合为 133 条记录。修正后尚未执行 VM 实机测试。less 已补齐 26.1 seal 工具，首次完整运行因临时镜像峰值占用导致 ENOSPC；调整临时副本释放时机后完整重跑通过（1207.272 秒）；四个组件 Manifest 哈希、AEA 解密与内容检查通过，清理校验挂载新增的 `.fseventsd` 后原始 root hash 的导入 digest.db 和不导入两种校验均通过。less 修正与验收提交 `c5bb188`。尚未刷写或引导该产物。见 [内核修正](c3_kernel_retarget_2026-09-09.md)、[less 验收](c3_less_acceptance_2026-09-09.md)。
 
+2026-09-10 收尾进展：C1 的 EXC_GUARD、Frida gate 名称已与 `PatchRule.rawValue` 统一；五变体步骤对齐及 16 个 EXC_GUARD 实际流水线门控组合测试通过。上述 26.4 两项定位失败、less 工具缺失及首次 ENOSPC 为历史状态，后续修正和重跑结果见前段。完整支持矩阵及修正后产物运行验收仍未完成，**C3 仍为进行中**。本轮剩余验收范围见 [C3 验收收尾记录](c3_acceptance_remaining_2026-09-10.md)，门控修改见 [C1 门控一致性修正](firmware_compatibility.md#9-门控一致性修正2026-09-10)。
+
+2026-09-10 补充验收：26.1 / 23B85 与 26.4 / 23E5207q 原始内核 SHA-256 重新核对一致；base 的 regular、dev、iOS 18 gate、强制 EXC_GUARD 四配置在两份输入上分别为 28 / 29 / 29 / 29 条记录。26.4 JB 的 iOS 27 gate / Frida 四组合为 84 / 96 / 88 / 100 条记录；以上完整记录、payload 比较和必要集合检查通过。26.1 与 26.4 的默认 base → JB → EXP 顺序组合均为 117 条记录，完整记录、payload 和必要集合检查通过。组件级门控验证不代表对应 iPhone 构建全链通过；26.3 本轮样本、引导链精确证据、部分 EXP 顺序组合及 VM 运行验收仍缺失，C3 保持进行中。实测日志与剩余范围见 [C3 剩余验收](c3_acceptance_remaining_2026-09-10.md)。
+
+本轮回归：首次 `make test` 的 Python 73 项通过；Swift VMStop 出现 9 条断言失败，同时沙箱拒绝 `ps`，该次 Swift 不记为通过。在允许进程查询的环境重跑 `make test_swift` 退出码为 0，XCTest 20 项、Swift Testing 298 项 / 46 suites 全部通过（25.525 秒）。完整日志见本轮验收文档。C3 状态和已完成工作项计数不变。
+
 ### C4 — 避免失败留下无法判断的部分修改固件【高；依赖 C3、B4】
 
 涉及：`FirmwarePipeline.swift`、`IM4PHandler.swift`、`CryptexFilesystemPatcher.swift`、`ManifestHashPatcher.swift`、固件 CLI。

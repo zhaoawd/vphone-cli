@@ -39,7 +39,7 @@
 - `optional`：缺失不使流水线失败。
 - `conditional(PatchRule)`：由谓词决定本输入是否要求该补丁。
 
-`PatchRule` 与流水线门控 1:1 对齐：`always`、`iosBaseIs18`、`iosBaseIs27`、`cloudOSFridaCapable`（= `enableFrida && cloudOSIsFridaCapable`）、`excGuardActive`（= `isDev || forceExcGuard`）。`PatchGateSnapshot` 记录原始门控与派生门控（`excGuardActive`/`applyIOS27`/`applyFrida`），供离线复核。
+`PatchRule` 与流水线门控 1:1 对齐：`always`、`iosBaseIs18`、`iosBaseIs27`、`cloudOSFridaCapable`（= `enableFrida && cloudOSIsFridaCapable`）、`excGuardActive`（= `variant == .dev || iosBaseIs18 || forceExcGuard`）。`PatchGateSnapshot` 记录原始门控与派生门控（`excGuardActive`/`applyIOS27`/`applyFrida`），供离线复核。
 
 「有效必要」定义：`required`，或 `conditional` 且其 rule 对本次门控快照求值为 true。`PatchResult.isRequiredFailure` = 结果 `failed` 且有效必要。
 

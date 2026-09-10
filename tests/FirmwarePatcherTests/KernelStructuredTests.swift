@@ -95,17 +95,25 @@ private final class WriteThroughKernel: KernelPatcherBase, StructuredPatcher {
 
 @Suite(.serialized, .enabled(if: ProcessInfo.processInfo.environment["VPHONE_TEST_KERNEL_IM4P"] != nil))
 struct KernelStructuredParityTests {
-    @Test(arguments: [false, true])
-    func baseKernelRecordsAndPayloadMatch(isDev: Bool) throws {
+    enum BaseConfiguration: String, CaseIterable, Sendable {
+        case regular, dev, ios18, forceExcGuard
+    }
+
+    @Test(arguments: BaseConfiguration.allCases)
+    func baseKernelRecordsAndPayloadMatch(configuration: BaseConfiguration) throws {
         let path = try #require(ProcessInfo.processInfo.environment["VPHONE_TEST_KERNEL_IM4P"])
         let payload = try IM4PHandler.load(contentsOf: URL(fileURLWithPath: path)).payload
-        let old = KernelPatcher(data: payload, verbose: false, isDev: isDev)
+        let isDev = configuration == .dev
+        let ios18 = configuration == .ios18
+        let forceExcGuard = configuration == .forceExcGuard
+        let applyExcGuard = ios18 || forceExcGuard
+        let old = KernelPatcher(data: payload, verbose: false, isDev: isDev, applyExcGuard: applyExcGuard)
         let records = try old.findAll()
         _ = try old.apply()
-        let new = KernelPatcher(data: payload, verbose: false, isDev: isDev)
+        let new = KernelPatcher(data: payload, verbose: false, isDev: isDev, applyExcGuard: applyExcGuard)
         let gates = PatchGateSnapshot(variant: isDev ? "dev" : "regular",
-            iosBaseIs18: false, iosBaseIs27: false, cloudOSIsFridaCapable: false,
-            forceExcGuard: false, enableFrida: false, excGuardActive: isDev,
+            iosBaseIs18: ios18, iosBaseIs27: false, cloudOSIsFridaCapable: false,
+            forceExcGuard: forceExcGuard, enableFrida: false, excGuardActive: isDev || applyExcGuard,
             applyIOS27: false, applyFrida: false)
         let result = StructuredExecution.run(patcher: new, componentName: "kernelcache",
             gates: gates, ablate: [], fallback: payload)
@@ -116,16 +124,16 @@ struct KernelStructuredParityTests {
             let failedMethods = result.report.results.filter { $0.outcome == .failed }.map { $0.id.method }
             #expect(failedMethods.isEmpty)
         }
-        print("C3 base parity dev=\(isDev): \(records.count) records; failures=\(result.report.results.filter { $0.outcome == .failed }.map { $0.id.method })")
+        print("C3 base parity configuration=\(configuration.rawValue): \(records.count) records; failures=\(result.report.results.filter { $0.outcome == .failed }.map { $0.id.method })")
     }
     @Test(arguments: [false, true])
     func jbKernelRecordsAndPayloadMatch(ios27: Bool) throws {
         try assertJBParity(ios27: ios27, frida: false)
     }
 
-    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_TEST_FRIDA"] == "1"))
-    func fridaKernelRecordsAndPayloadMatch() throws {
-        try assertJBParity(ios27: true, frida: true)
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_TEST_FRIDA"] == "1"), arguments: [false, true])
+    func fridaKernelRecordsAndPayloadMatch(ios27: Bool) throws {
+        try assertJBParity(ios27: ios27, frida: true)
     }
 
     private func assertJBParity(ios27: Bool, frida: Bool) throws {

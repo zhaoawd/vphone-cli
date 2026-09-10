@@ -859,17 +859,17 @@ struct C1AlignmentTests {
 
     /// For the given variant configuration, map JSON component name → (methods, patchers).
     static func components(variant: String) throws
-        -> [String: (methods: [(name: String, required: Bool)], patchers: [String])]
+        -> [String: (methods: [(name: String, required: Bool, gate: String?)], patchers: [String])]
     {
         let url = repoRoot().appendingPathComponent("research/firmware_compatibility.json")
         let json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
         let configs = json["patch_configurations"] as! [[String: Any]]
         let cfg = configs.first { $0["variant"] as? String == variant }!
-        var out: [String: (methods: [(name: String, required: Bool)], patchers: [String])] = [:]
+        var out: [String: (methods: [(name: String, required: Bool, gate: String?)], patchers: [String])] = [:]
         for comp in cfg["components"] as! [[String: Any]] {
             let name = comp["component"] as! String
             let methods = (comp["methods"] as! [[String: Any]]).map {
-                (name: $0["name"] as! String, required: $0["required"] as? Bool ?? false)
+                (name: $0["name"] as! String, required: $0["required"] as? Bool ?? false, gate: $0["gate"] as? String)
             }
             let patchers = (comp["patchers"] as? [String]) ?? []
             out[name] = (methods, patchers)
@@ -878,8 +878,39 @@ struct C1AlignmentTests {
     }
 
     /// For the jb configuration, map JSON component name → (methods set, patchers list).
-    static func jbComponents() throws -> [String: (methods: [(name: String, required: Bool)], patchers: [String])] {
+    static func jbComponents() throws -> [String: (methods: [(name: String, required: Bool, gate: String?)], patchers: [String])] {
         try components(variant: "jb")
+    }
+
+    @Test func allManifestGatesMatchDeclaredRules() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir.appendingPathComponent("FixtureRestore"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        for variant in ["less", "regular", "dev", "jb", "exp"] {
+            let pipeline = FirmwarePipeline(vmDirectory: dir,
+                variant: try #require(FirmwarePipeline.Variant(rawValue: variant)), verbose: false)
+            let manifest = try Self.components(variant: variant)
+            for component in pipeline.buildComponentList() {
+                if component.patcherFactories.isEmpty {
+                    #expect(manifest[component.name]?.methods.isEmpty ?? true)
+                    continue
+                }
+                let methods = try #require(manifest[component.name]?.methods)
+                let steps = try component.patcherFactories.flatMap { factory in
+                    try #require(factory(Data(), false) as? any StructuredPatcher).buildSteps()
+                }
+                #expect(Set(steps.map(\.id.method)) == Set(methods.map(\.name)))
+                for step in steps {
+                    let method = try #require(methods.first { $0.name == step.id.method })
+                    if case let .conditional(rule) = step.requirement {
+                        #expect(method.gate == rule.rawValue)
+                        #expect(method.gate.flatMap(PatchRule.init(rawValue:)) == rule)
+                    } else {
+                        #expect(method.gate == nil)
+                    }
+                }
+            }
+        }
     }
 
     @Test func avpBooterStepsEqualManifestMethods() throws {

@@ -119,6 +119,39 @@ struct ArtifactStructuredTests {
         #expect(results.first?.results.last?.outcome == .failed)
     }
 
+    @Test(arguments: ["regular", "dev", "jb", "exp"], [false, true])
+    func excGuardPipelineTruthTable(variant: String, ios18: Bool) throws {
+        for force in [false, true] {
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            let restore = dir.appendingPathComponent("FixtureRestore")
+            try FileManager.default.createDirectory(at: restore, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: dir) }
+            let manifest = try PropertyListSerialization.data(
+                fromPropertyList: ["ProductVersion": ios18 ? "18.6.2" : "26.1"],
+                format: .xml, options: 0)
+            try manifest.write(to: restore.appendingPathComponent("iPhone-BuildManifest.plist"))
+            let bytes = Data(repeating: 0, count: 0x400)
+            try bytes.write(to: dir.appendingPathComponent("AVPBooter.fixture.bin"))
+            let pipeline = FirmwarePipeline(vmDirectory: dir,
+                variant: try #require(FirmwarePipeline.Variant(rawValue: variant)),
+                verbose: false, forceExcGuard: force)
+            // The first required failure returns a real prepare() snapshot before later I/O.
+            let report = try pipeline.patchAllStructured()
+            let active = variant == "dev" || ios18 || force
+            #expect(report.gates.iosBaseIs18 == ios18)
+            #expect(report.gates.forceExcGuard == force)
+            #expect(report.gates.excGuardActive == active)
+            let kernel = try #require(pipeline.buildComponentList().first { $0.name == "kernelcache" })
+            let (_, reports) = try pipeline.patchDataStructured(bytes, componentName: "kernelcache",
+                patcherFactories: kernel.patcherFactories, gates: report.gates, ablate: [])
+            let result = try #require(reports.flatMap(\.results).first {
+                $0.id.method == "patchExcGuardBehavior"
+            })
+            #expect(result.outcome == (active ? .failed : .notApplicable))
+            #expect(result.rule == .excGuardActive)
+        }
+    }
+
     @Test func artifactStepsMatchManifest() throws {
         for variant in ["less", "regular", "dev", "jb", "exp"] {
             let p = DeviceTreePatcher(data: Data(), verbose: false, includeIdentityPatches: variant == "exp")
