@@ -11,12 +11,12 @@ extension KernelJBPatcher {
     /// so this patch always resolves through the sysctl name string
     /// `thid_should_crash` and the adjacent `sysctl_oid` data.
     @discardableResult
-    func patchThidShouldCrash() -> Bool {
+    func patchThidShouldCrash() -> RawStepResult {
         log("\n[JB] _thid_should_crash: zero out")
 
         guard let strOff = buffer.findString("thid_should_crash") else {
             log("  [-] string not found")
-            return false
+            return .noMatch
         }
         log("  [*] string at foff 0x\(String(format: "%X", strOff))")
 
@@ -51,10 +51,10 @@ extension KernelJBPatcher {
                  patchID: "kernelcache_jb.thid_should_crash",
                  virtualAddress: va,
                  description: "zero [_thid_should_crash]")
-            return true
+            return .matched
         }
 
         log("  [-] variable not found")
-        return false
+        return .noMatch
     }
 }

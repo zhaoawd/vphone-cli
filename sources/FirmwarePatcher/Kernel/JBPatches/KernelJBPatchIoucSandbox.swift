@@ -35,17 +35,18 @@ import Foundation
 
 extension KernelJBPatcher {
     @discardableResult
-    func patchIoucFailedSandbox() -> Bool {
+    func patchIoucFailedSandbox() -> RawStepResult {
         log("\n[JB] IOUC sandbox gate: deny-block → allow redirect")
 
         guard let failStrOff = buffer.findString("IOUC %s failed sandbox in process %s") else {
             log("  [-] IOUC failed-sandbox format string not found")
-            return false
+            return .noMatch
         }
+        var encodingFailed = false
         let refs = findStringRefs(failStrOff)
         guard !refs.isEmpty else {
             log("  [-] no xrefs for IOUC failed-sandbox format string")
-            return false
+            return .noMatch
         }
 
         for (adrpOff, _) in refs {
@@ -79,7 +80,7 @@ extension KernelJBPatcher {
                 }
                 guard allowTarget >= 0 else { continue }
 
-                guard let patchBytes = ARM64Encoder.encodeB(from: denyEntry, to: allowTarget) else { continue }
+                guard let patchBytes = ARM64Encoder.encodeB(from: denyEntry, to: allowTarget) else { encodingFailed = true; continue }
                 let delta = allowTarget - denyEntry
                 let va = fileOffsetToVA(denyEntry)
                 log("  [+] IOUC sandbox gate fn=0x\(String(format: "%X", funcStart)), cbnz=0x\(String(format: "%X", off)), deny=0x\(String(format: "%X", denyEntry)) → allow=0x\(String(format: "%X", allowTarget))")
@@ -87,11 +88,11 @@ extension KernelJBPatcher {
                      patchID: "iouc_sandbox_gate",
                      virtualAddress: va,
                      description: "b #\(delta >= 0 ? "" : "-")0x\(String(format: "%X", abs(delta))) [IOUC sandbox deny → allow]")
-                return true
+                return .matched
             }
         }
 
         log("  [-] narrow IOUC sandbox deny branch not found")
-        return false
+        return encodingFailed ? .encodeFail(reason: "branch encoding failed") : .noMatch
     }
 }

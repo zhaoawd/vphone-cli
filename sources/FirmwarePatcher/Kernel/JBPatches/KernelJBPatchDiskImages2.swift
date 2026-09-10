@@ -38,12 +38,24 @@ import Foundation
 extension KernelJBPatcher {
     /// Apply all DiskImages2 ABI pokes. Wired into KernelJBPatcher.findAll().
     @discardableResult
-    func patchDiskImages2ClientAbi() -> Bool {
-        var ok = true
-        ok = patchDiskImages2CreateDeviceAbi() && ok
-        ok = patchDiskImages2ConnectAbi() && ok
-        ok = patchDiskImages2NotificationPortArray() && ok
-        return ok
+    func patchDiskImages2ClientAbi() -> RawStepResult {
+        // Execute every sub-patch in legacy order, including after a failure.
+        let create = patchDiskImages2CreateDeviceAbi()
+        let connect = patchDiskImages2ConnectAbi()
+        let notification = patchDiskImages2NotificationPortArray()
+        let signals = [create, connect, notification]
+        if create == .matched, connect == .matched,
+           notification == .matched || notification == .noMatch {
+            return .matched
+        }
+        for signal in signals {
+            switch signal {
+            case .ambiguous, .encodeFail: return signal
+            default: break
+            }
+        }
+        if signals.allSatisfy({ $0 == .noMatch }) { return .noMatch }
+        return .encodeFail(reason: "incomplete DiskImages2 ABI patch")
     }
 
     // MARK: - GATE 1 / GATE 2b: ABI-version reject b.ne → NOP
@@ -52,7 +64,7 @@ extension KernelJBPatcher {
     /// (`cmp wN,#9 ; b.ne <reject>`) != 9. NOP the b.ne so the ABI-11 iOS-27 client is
     /// accepted. Function pinned by its unique C++ signature cstring.
     @discardableResult
-    func patchDiskImages2CreateDeviceAbi() -> Bool {
+    func patchDiskImages2CreateDeviceAbi() -> RawStepResult {
         log("\n[JB] DiskImages2 GATE1: CreateDevice controller-ABI b.ne -> nop")
         return nopAbiVersionGate(
             funcSig: "static IOReturn DIDeviceCreatorUserClient::CreateDevice(OSObject *, void *, IOExternalMethodArguments *)",
@@ -64,7 +76,7 @@ extension KernelJBPatcher {
     /// `DIDeviceIOUserClient::Connect` rejects a client whose daemon ABI
     /// (`cmp wN,#9 ; b.ne <reject>`) != 9. NOP the b.ne. Same shape, different function.
     @discardableResult
-    func patchDiskImages2ConnectAbi() -> Bool {
+    func patchDiskImages2ConnectAbi() -> RawStepResult {
         log("\n[JB] DiskImages2 GATE2b: Connect daemon-ABI b.ne -> nop")
         return nopAbiVersionGate(
             funcSig: "static IOReturn DIDeviceIOUserClient::Connect(OSObject *, void *, IOExternalMethodArguments *)",
@@ -75,15 +87,15 @@ extension KernelJBPatcher {
 
     /// Pin the function via its unique signature cstring, then NOP the unique
     /// `cmp wN,#9 ; b.ne` inside it.
-    private func nopAbiVersionGate(funcSig: String, patchID: String, desc: String) -> Bool {
+    private func nopAbiVersionGate(funcSig: String, patchID: String, desc: String) -> RawStepResult {
         guard let sigOff = buffer.findString(funcSig) else {
             log("  [-] signature string not found: \(funcSig.prefix(48))…")
-            return false
+            return .noMatch
         }
         let refs = findStringRefs(sigOff)
         guard let ref = refs.first, let funcStart = findFunctionStart(ref.adrpOff) else {
             log("  [-] no xref/function for signature string")
-            return false
+            return .noMatch
         }
         let funcEnd = findFuncEnd(funcStart, maxSize: 0x2000)
 
@@ -104,11 +116,11 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] expected 1 cmp#9/b.ne gate, found \(hits.count)")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
         let bneOff = hits[0]
         emit(bneOff, ARM64.nop, patchID: patchID, virtualAddress: fileOffsetToVA(bneOff), description: desc)
-        return true
+        return .matched
     }
 
     // MARK: - GATE 2 (a/b/c): notification-ports array + bound checks widen
@@ -125,19 +137,19 @@ extension KernelJBPatcher {
     /// gate is skipped — the version-robust ABI gates (GATE1/GATE2b) are the essential
     /// attach fix.
     @discardableResult
-    func patchDiskImages2NotificationPortArray() -> Bool {
+    func patchDiskImages2NotificationPortArray() -> RawStepResult {
         log("\n[JB] DiskImages2 GATE2: widen notification-ports array + bound checks")
 
         guard let allocSite = findDI2AllocPortsSizeSite() else {
             log("  [~] AllocPortsArray size-shift not present on this kernel — skipping GATE2 (build-specific notif-port codegen; GATE1/GATE2b are the essential fix)")
-            return true
+            return .noMatch
         }
         guard let (rnpStart, rnpEnd) = findDI2RegisterNotifFunc(),
               let f1 = findUniqueFieldLoad(funcStart: rnpStart, funcEnd: rnpEnd, mnemonic: "ldrh", disp: 0xD8, requireWDest: false),
               let f2 = findUniqueFieldLoad(funcStart: rnpStart, funcEnd: rnpEnd, mnemonic: "ldr", disp: 0xE8, requireWDest: true)
         else {
             log("  [~] notification-port bound-check loads not both present — skipping GATE2 (all-or-nothing)")
-            return true
+            return .noMatch
         }
 
         // All three located — apply together.
@@ -146,7 +158,7 @@ extension KernelJBPatcher {
                  desc: "mov wD,#0x800 [DI2 RegisterNotificationPort bound-check field1 @+0xd8]") && ok
         ok = applyFieldLoadMov800(at: f2, patchID: "di2_notif_boundcheck_e8",
                  desc: "mov wD,#0x800 [DI2 RegisterNotificationPort bound-check field2 @+0xe8]") && ok
-        return ok
+        return ok ? .matched : .encodeFail(reason: "incomplete notification-port array patch")
     }
 
     /// Locate the AllocPortsArray allocator size arg `lsl x1, xN, #3` (count << 3 ==

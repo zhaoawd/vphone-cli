@@ -12,18 +12,18 @@ import Foundation
 extension KernelJBPatcher {
     /// Bypass the vm_map_protect W^X downgrade so write+execute protections are honored.
     @discardableResult
-    func patchVmMapProtect() -> Bool {
+    func patchVmMapProtect() -> RawStepResult {
         log("\n[JB] _vm_map_protect: bypass W^X downgrade")
 
         // Recover the function from the in-kernel "vm_map_protect(" panic string.
         guard let strOff = buffer.findString("vm_map_protect(") else {
             log("  [-] kernel-text 'vm_map_protect(' anchor not found")
-            return false
+            return .noMatch
         }
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty, let funcStart = findFunctionStart(refs[0].adrpOff) else {
             log("  [-] kernel-text 'vm_map_protect(' anchor not found")
-            return false
+            return .noMatch
         }
         let funcEnd = findFuncEnd(funcStart, maxSize: 0x2000)
 
@@ -33,19 +33,19 @@ extension KernelJBPatcher {
         if gates.count == 1, let (brOff, target) = gates.first {
             guard let bBytes = encodeB(from: brOff, to: target) else {
                 log("  [-] branch rewrite out of range")
-                return false
+                return .encodeFail(reason: "patchVmMapProtect: branch rewrite out of range")
             }
             let delta = target - brOff
             emit(brOff, bBytes,
                  patchID: "kernelcache_jb.vm_map_protect",
                  virtualAddress: fileOffsetToVA(brOff),
                  description: "b #0x\(String(format: "%X", delta)) [_vm_map_protect skip W^X downgrade]")
-            return true
+            return .matched
         }
 
         // Never fall back to widening the COW WRITE mask.
         log("  [-] expected one vm_map_protect execute gate, found \(gates.count)")
-        return false
+        return gates.count > 1 ? .ambiguous(count: gates.count) : .noMatch
     }
 
     // MARK: - Shape A (26.1 / 26.3): explicit skip-branch gate

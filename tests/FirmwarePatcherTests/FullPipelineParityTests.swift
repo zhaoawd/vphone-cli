@@ -36,6 +36,16 @@ final class FullPipelineParityTests: XCTestCase {
                 componentName: component.name, patcherFactories: component.patcherFactories)
             let saved = try XCTUnwrap(loader.outputs[url])
             XCTAssertEqual(legacyData, saved, "Complete serialized payload: \(component.name)")
+            if let outputPath = env["VPHONE_TEST_PIPELINE_OUTPUT_VM"] {
+                let prefix = pipeline.vmDirectory.standardizedFileURL.path + "/"
+                let inputPath = url.standardizedFileURL.path
+                XCTAssertTrue(inputPath.hasPrefix(prefix))
+                let relative = String(inputPath.dropFirst(prefix.count))
+                let baselineURL = URL(fileURLWithPath: outputPath).appendingPathComponent(relative)
+                let baseline = try FirmwarePipeline.ContainerFirmwareLoader().load(from: baselineURL)
+                XCTAssertEqual(baseline, saved, "Pre-merge CLI complete payload: \(component.name)")
+                print("C3 pre-merge output parity variant=\(variantName) component=\(component.name) bytes=\(baseline.count)")
+            }
             let structuredRecords = report.components.filter { $0.component == component.name }.flatMap(\.records)
             XCTAssertEqual(legacyRecords, structuredRecords, "Complete records: \(component.name)")
             if !component.patcherFactories.isEmpty {

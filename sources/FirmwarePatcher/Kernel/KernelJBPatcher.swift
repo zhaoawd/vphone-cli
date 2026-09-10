@@ -27,12 +27,20 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
     /// JB/EXP firmware is byte-identical when false.
     public var applyFrida = false
 
-    public func findAll() throws -> [PatchRecord] {
-        try parseMachO()
+    private var didPrepare = false
+
+    func ensurePrepared() {
+        guard !didPrepare else { return }
+        parseMachO()
         buildADRPIndex()
         buildBLIndex()
         buildSymbolTable()
         findPanic()
+        didPrepare = true
+    }
+
+    public func findAll() throws -> [PatchRecord] {
+        ensurePrepared()
 
         // Group A
         patchAmfiCdhashInTrustcache()
@@ -114,18 +122,6 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
 
     // MARK: - StructuredPatcher
 
-    private var structuredPrepared = false
-
-    private func prepareStructured() {
-        guard !structuredPrepared else { return }
-        structuredPrepared = true
-        parseMachO()
-        buildADRPIndex()
-        buildBLIndex()
-        buildSymbolTable()
-        findPanic()
-    }
-
     public func buildSteps() -> [PatchStep] {
         [
             step("patchAmfiCdhashInTrustcache", run: patchAmfiCdhashInTrustcache),
@@ -134,11 +130,11 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
             step("patchIoucFailedMacf", run: patchIoucFailedMacf),
             step("patchIoucFailedSandbox", requirement: .conditional(.iosBaseIs27), run: patchIoucFailedSandbox),
             step("patchDiskImages2ClientAbi", requirement: .conditional(.iosBaseIs27), run: patchDiskImages2ClientAbi),
-            step("patchPostValidationAdditional", verifiesExistingWithoutRecord: true, run: patchPostValidationAdditional),
+            step("patchPostValidationAdditional", run: patchPostValidationAdditional),
             step("patchProcSecurityPolicy", run: patchProcSecurityPolicy),
             step("patchProcPidinfo", run: patchProcPidinfo),
             step("patchConvertPortToMap", run: patchConvertPortToMap),
-            step("patchBsdInitAuth", verifiesExistingWithoutRecord: true, run: patchBsdInitAuth),
+            step("patchBsdInitAuth", run: patchBsdInitAuth),
             step("patchDounmount", run: patchDounmount),
             step("patchIoSecureBsdRoot", run: patchIoSecureBsdRoot),
             step("patchLoadDylinker", run: patchLoadDylinker),
@@ -166,19 +162,19 @@ public final class KernelJBPatcher: KernelJBPatcherBase, StructuredPatcher {
 
     private func step(
         _ method: String, requirement: PatchRequirement = .required,
-        verifiesExistingWithoutRecord: Bool = false, run: @escaping () -> Bool
+        run: @escaping () -> RawStepResult
     ) -> PatchStep {
         PatchStep(id: PatchID(component: "kernelcache", patcher: "KernelJBPatcher", method: method),
                   requirement: requirement) { [self] in
-            prepareStructured()
+            ensurePrepared()
             let before = patches.count
-            let completed = run()
-            // These two methods explicitly recognize the existing patched gate;
-            // their legacy API deliberately emits no record on that verified path.
-            if completed, verifiesExistingWithoutRecord, patches.count == before {
+            let result = run()
+            let records = patches.dropFirst(before)
+            if result == .matched, !records.isEmpty,
+               records.allSatisfy({ $0.originalBytes == $0.patchedBytes }) {
                 return .idempotent
             }
-            return structuredMethodResult(completed: completed, since: before)
+            return result
         }
     }
 

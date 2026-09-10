@@ -17,16 +17,16 @@ import Foundation
 extension KernelJBPatcher {
     /// Extended sandbox hooks bypass: retarget ops entries to the allow stub.
     @discardableResult
-    func patchSandboxHooksExtended() -> Bool {
+    func patchSandboxHooksExtended() -> RawStepResult {
         log("\n[JB] Sandbox extended hooks: retarget ops entries to allow stub")
 
         guard let opsTable = findSandboxOpsTableViaConf() else {
-            return false
+            return .noMatch
         }
 
         guard let allowStub = findSandboxAllowStub() else {
             log("  [-] common Sandbox allow stub not found")
-            return false
+            return .noMatch
         }
 
         // Extended hook index table (name → ops slot index). Entries 201..316 are the
@@ -90,16 +90,16 @@ extension KernelJBPatcher {
         }
 
         var patched = 0
-        var complete = true
+        var incomplete = false
         for (hookName, idx) in hookIndices {
             let entryOff = opsTable + idx * 8
-            guard entryOff + 8 <= buffer.count else { complete = false; continue }
+            guard entryOff + 8 <= buffer.count else { incomplete = true; continue }
 
             let entryRaw = buffer.readU64(at: entryOff)
             guard entryRaw != 0 else { continue }
 
             guard let newEntry = encodeAuthRebaseLike(origVal: entryRaw, targetOff: allowStub) else {
-                complete = false
+                incomplete = true
                 continue
             }
 
@@ -114,11 +114,12 @@ extension KernelJBPatcher {
             patched += 1
         }
 
+        if incomplete { return .encodeFail(reason: "incomplete extended sandbox hook retargeting") }
         if patched == 0 {
             log("  [-] no extended sandbox hooks retargeted")
-            return false
+            return .noMatch
         }
-        return complete
+        return .matched
     }
 
     // MARK: - Sandbox ops table discovery

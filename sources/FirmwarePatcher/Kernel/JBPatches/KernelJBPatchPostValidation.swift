@@ -12,18 +12,18 @@ import Foundation
 extension KernelJBPatcher {
     /// Patch: rewrite the SHA256-only reject compare in AMFI's post-validation path.
     @discardableResult
-    func patchPostValidationAdditional() -> Bool {
+    func patchPostValidationAdditional() -> RawStepResult {
         log("\n[JB] postValidation additional: cmp w0,w0")
 
         guard let strOff = buffer.findString("AMFI: code signature validation failed") else {
             log("  [-] string not found")
-            return false
+            return .noMatch
         }
 
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty else {
             log("  [-] no code refs")
-            return false
+            return .noMatch
         }
 
         // Collect unique caller function starts.
@@ -89,12 +89,13 @@ extension KernelJBPatcher {
         let uniqueAlreadyPatchedHits = Array(Set(alreadyPatchedHits)).sorted()
         guard uniqueHits.count + uniqueAlreadyPatchedHits.count == 1 else {
             log("  [-] expected 1 postValidation compare site, found \(uniqueHits.count) original + \(uniqueAlreadyPatchedHits.count) already-patched")
-            return false
+            return uniqueHits.count + uniqueAlreadyPatchedHits.count > 1
+                ? .ambiguous(count: uniqueHits.count + uniqueAlreadyPatchedHits.count) : .noMatch
         }
 
         if let patchOff = uniqueAlreadyPatchedHits.first {
             log("  [=] postValidation compare already bypassed at 0x\(String(patchOff, radix: 16, uppercase: true))")
-            return true
+            return .idempotent
         }
 
         let patchOff = uniqueHits[0]
@@ -102,6 +103,6 @@ extension KernelJBPatcher {
              patchID: "jb.post_validation.cmp_w0_w0",
              virtualAddress: fileOffsetToVA(patchOff),
              description: "cmp w0,w0 [postValidation additional]")
-        return true
+        return .matched
     }
 }

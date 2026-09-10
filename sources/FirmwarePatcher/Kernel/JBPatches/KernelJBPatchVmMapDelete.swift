@@ -19,25 +19,25 @@ extension KernelJBPatcher {
     }
 
     @discardableResult
-    func patchVmMapDeleteImmutableCode() -> Bool {
+    func patchVmMapDeleteImmutableCode() -> RawStepResult {
         log("\n[FRIDA] _vm_map_delete: allow debugger overwrite of RW/max-RWX permanent code")
 
         let gates = findVmMapDeleteImmutableCodeGates()
         if gates.isEmpty {
             // Older kernels predate this compiled CSM/permanent-entry shape.
             log("  [~] immutable-code current-protection gates not present; skipping")
-            return true
+            return .noMatch
         }
         guard gates.count == 2 else {
             log("  [-] expected 2 immutable-code execute gates, found \(gates.count); failing closed")
-            return false
+            return .encodeFail(reason: "expected 2 immutable-code gates, found \(gates.count)")
         }
 
         // Each gate must live inside a recovered function (the compiler may outline
         // the two source paths into separate local helpers).
         for gate in gates where findFunctionStart(gate.offset) == nil {
             log("  [-] could not recover function containing gate at 0x\(String(format: "%X", gate.offset))")
-            return false
+            return .noMatch
         }
 
         var replacements: [(VmMapDeleteGate, Data)] = []
@@ -53,7 +53,7 @@ extension KernelJBPatcher {
             ops[2].type == AARCH64_OP_IMM, Int(ops[2].imm) == gate.target
             else {
                 log("  [-] failed to assemble/verify max-X gate at 0x\(String(format: "%X", gate.offset))")
-                return false
+                return .encodeFail(reason: "patchVmMapDeleteImmutableCode: allocation or encoding failed")
             }
             replacements.append((gate, bytes))
         }
@@ -64,7 +64,7 @@ extension KernelJBPatcher {
                  virtualAddress: fileOffsetToVA(gate.offset),
                  description: "\(gate.nonzero ? "tbnz" : "tbz") entry max_protection.X [vm_map_delete immutable-code \(gate.shape), --frida]")
         }
-        return true
+        return .matched
     }
 
     // MARK: - Semantic matcher

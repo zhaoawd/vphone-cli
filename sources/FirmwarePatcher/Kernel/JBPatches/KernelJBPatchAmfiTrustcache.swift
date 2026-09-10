@@ -20,7 +20,7 @@ import Foundation
 extension KernelJBPatcher {
     /// AMFI trustcache gate bypass: rewrite AMFIIsCDHashInTrustCache to always return 1.
     @discardableResult
-    func patchAmfiCdhashInTrustcache() -> Bool {
+    func patchAmfiCdhashInTrustcache() -> RawStepResult {
         log("\n[JB] AMFIIsCDHashInTrustCache: always allow + store flag")
 
         // Determine the AMFI text range. Fall back to full __TEXT_EXEC if no kext split.
@@ -121,7 +121,7 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] expected 1 AMFI trustcache body hit, found \(hits.count)")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let funcStart = hits[0]
@@ -134,6 +134,6 @@ extension KernelJBPatcher {
         emit(funcStart + 4, ARM64.cbzX2_8, patchID: "amfi_trustcache_2", virtualAddress: va1, description: "cbz x2,+8 [AMFIIsCDHashInTrustCache]")
         emit(funcStart + 8, ARM64.strX0X2, patchID: "amfi_trustcache_3", virtualAddress: va2, description: "str x0,[x2] [AMFIIsCDHashInTrustCache]")
         emit(funcStart + 12, ARM64.ret, patchID: "amfi_trustcache_4", virtualAddress: va3, description: "ret [AMFIIsCDHashInTrustCache]")
-        return true
+        return .matched
     }
 }

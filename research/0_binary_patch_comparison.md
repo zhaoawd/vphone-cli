@@ -819,6 +819,8 @@ cache rebuild.
 
 ## Summary
 
+C3 structured-result migration (2026-09-10): the current Swift `KernelJBPatcher.findAll()` declares 33 orchestration methods. The historical “Kernel (JB methods) = 59” below is not the structured step count. This migration changes result reporting and ablation, with no new binary patch targets; see [C3 JB migration](patch_results_c3_kernel_jb_2026-09-10.md).
+
 | Component                          | Regular | Dev |  JB | EXP |
 | ---------------------------------- | ------: | --: | --: | --: |
 | AVPBooter                          |       1 |   1 |   1 |   1 |
@@ -1085,3 +1087,7 @@ JB 33 个、EXP 1 个方法及 DeviceTree/Manifest/Filesystem 操作接入结构
 ### C3 26.4 内核重新定位（2026-09-09）
 
 EXC_GUARD 从 entitlement 引用恢复调用关系，兼容 26.1 两层 BL 和 26.4 包装函数尾调用；核对 code/subcode 保存和 AST bit 更新后，只将目标入口替换为 RET。vm_map_protect 从主函数认证回调指针恢复 26.4 的 BIC/CMP/CCMP 执行权限 gate，仅改写 B.NE 为同目标 B；COW WRITE mask 保持不变。地址不参与运行时定位，必要性规则未改变。26.1/26.4 的目标地址、唯一写入、重复应用及异常锚点拒绝测试通过；26.4 必要集合与包含 Frida 的顺序组合通过，组合为 133 条记录。尚未进行修正后的 VM 实机测试。实现和验证见 [重新定位记录](c3_kernel_retarget_2026-09-09.md)，详细 reveal 见 [诊断记录](c3_acceptance_diagnosis_2026-09-09.md)。
+
+### C3 远程迁移合并（2026-09-10）
+
+合并保留双方历史记录，采用本地已验收的必要性、门控及匹配算法，接入远程明确的歧义、部分写入和幂等信号，并统一延迟准备过程。`patchVmMapProtect` 与 `patchCredLabelUpdateExecve` 保持 required。本次不新增补丁。主控逐文本核对 35 个变动既有 kernel 文件的 emit 调用块未变；24 个非 less 场景全部通过当前 legacy/structured 完整记录比较，以及合并前 CLI 实际产物的全部 9 个组件 payload 逐字节比较。less 真实产物只读比较通过；Filesystem 实现未变化，本次没有重新构建镜像。完整回归与构建签名通过。结论限于上述场景，不新增恢复或启动证据；取舍和验证见 [合并记录](c3_remote_merge_2026-09-10.md)。

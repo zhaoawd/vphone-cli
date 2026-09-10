@@ -32,16 +32,35 @@ public final class KernelPatcher: KernelPatcherBase, StructuredPatcher {
         self.applyExcGuard = applyExcGuard
     }
 
+    // MARK: - Setup (idempotent)
+
+    /// Set once the heavyweight Mach-O parse + index build has run for this instance.
+    private var didPrepare = false
+
+    /// Idempotent heavyweight setup: parse the Mach-O, build the ADRP/BL indices, and
+    /// locate `_panic`. Runs exactly once per instance (guarded by `didPrepare`), whether
+    /// triggered by `findAll()` or by the first executed structured step.
+    ///
+    /// Kept out of `buildSteps()` so the ablation dry-run (`makePatcher(Data(), false)` →
+    /// `buildSteps()` in `FirmwarePipeline.knownAblationTargets`) stays cheap and safe on
+    /// an empty payload: `buildSteps()` only constructs `PatchStep`s and never parses. Each
+    /// step's `run` closure calls this before running its patch body, so setup happens even
+    /// if the first declared step is ablated. Order matches the former inline setup exactly.
+    func ensurePrepared() {
+        guard !didPrepare else { return }
+        parseMachO()
+        buildADRPIndex()
+        buildBLIndex()
+        findPanic()
+        didPrepare = true
+    }
+
     // MARK: - Find All
 
     public func findAll() throws -> [PatchRecord] {
         patches = []
 
-        // Parse Mach-O structure and build indices
-        parseMachO()
-        buildADRPIndex()
-        buildBLIndex()
-        findPanic()
+        ensurePrepared()
 
         // Apply patches in order (matching Python find_all)
         patchApfsRootSnapshot() // 1
@@ -67,17 +86,6 @@ public final class KernelPatcher: KernelPatcherBase, StructuredPatcher {
 
     // MARK: - StructuredPatcher
 
-    private var structuredPrepared = false
-
-    private func prepareStructured() {
-        guard !structuredPrepared else { return }
-        structuredPrepared = true
-        parseMachO()
-        buildADRPIndex()
-        buildBLIndex()
-        findPanic()
-    }
-
     public func buildSteps() -> [PatchStep] {
         [
             step("patchApfsRootSnapshot", run: patchApfsRootSnapshot),
@@ -86,7 +94,7 @@ public final class KernelPatcher: KernelPatcherBase, StructuredPatcher {
             step("patchLaunchConstraints", run: patchLaunchConstraints),
             step("patchDebugger", run: patchDebugger),
             step("patchPostValidationNOP", run: patchPostValidationNOP),
-            step("patchPostValidationCMP", run: patchPostValidationCMP),
+            rawStep("patchPostValidationCMP", run: patchPostValidationCMP),
             step("patchDyldPolicy", run: patchDyldPolicy),
             step("patchApfsGraft", run: patchApfsGraft),
             step("patchApfsMount", run: patchApfsMount),
@@ -104,9 +112,26 @@ public final class KernelPatcher: KernelPatcherBase, StructuredPatcher {
     ) -> PatchStep {
         PatchStep(id: PatchID(component: component, patcher: "KernelPatcher", method: method),
                   requirement: requirement) { [self] in
-            prepareStructured()
+            ensurePrepared()
             let before = patches.count
             return structuredMethodResult(completed: run(), since: before)
+        }
+    }
+
+    private func rawStep(
+        _ method: String, run: @escaping () -> RawStepResult
+    ) -> PatchStep {
+        PatchStep(id: PatchID(component: component, patcher: "KernelPatcher", method: method),
+                  requirement: .required) { [self] in
+            ensurePrepared()
+            let before = patches.count
+            let result = run()
+            let records = patches.dropFirst(before)
+            if result == .matched, !records.isEmpty,
+               records.allSatisfy({ $0.originalBytes == $0.patchedBytes }) {
+                return .idempotent
+            }
+            return result
         }
     }
 

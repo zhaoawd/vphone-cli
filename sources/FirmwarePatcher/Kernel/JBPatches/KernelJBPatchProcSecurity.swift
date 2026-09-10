@@ -15,12 +15,12 @@ import Foundation
 extension KernelJBPatcher {
     /// Stub _proc_security_policy: mov x0,#0; ret.
     @discardableResult
-    func patchProcSecurityPolicy() -> Bool {
+    func patchProcSecurityPolicy() -> RawStepResult {
         log("\n[JB] _proc_security_policy: mov x0,#0; ret")
 
         guard let policy = findProcSecurityPolicy() else {
             log("  [-] _proc_security_policy not identified (PRIV_GLOBAL_PROC_INFO anchor)")
-            return false
+            return .noMatch
         }
 
         emit(policy, ARM64.movX0_0,
@@ -31,6 +31,6 @@ extension KernelJBPatcher {
              patchID: "jb.proc_security_policy.ret",
              virtualAddress: fileOffsetToVA(policy + 4),
              description: "ret [_proc_security_policy]")
-        return true
+        return .matched
     }
 }

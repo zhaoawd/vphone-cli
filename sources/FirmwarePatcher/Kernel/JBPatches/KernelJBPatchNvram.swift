@@ -11,18 +11,18 @@ extension KernelJBPatcher {
     /// recover the containing function for each ref, then pick the unique
     /// `tbz/tbnz` guard immediately before that key-prefix load sequence.
     @discardableResult
-    func patchNvramVerifyPermission() -> Bool {
+    func patchNvramVerifyPermission() -> RawStepResult {
         log("\n[JB] verifyPermission (NVRAM): NOP")
 
         guard let strOff = buffer.findString("krn.") else {
             log("  [-] 'krn.' string not found")
-            return false
+            return .noMatch
         }
 
         let refs = findStringRefs(strOff)
         if refs.isEmpty {
             log("  [-] no code refs to 'krn.'")
-            return false
+            return .noMatch
         }
 
         var hits: [Int] = []
@@ -51,7 +51,7 @@ extension KernelJBPatcher {
         let unique = Array(Set(hits)).sorted()
         guard unique.count == 1 else {
             log("  [-] expected 1 NVRAM verifyPermission gate, found \(unique.count)")
-            return false
+            return unique.count > 1 ? .ambiguous(count: unique.count) : .noMatch
         }
 
         let patchOff = unique[0]
@@ -60,6 +60,6 @@ extension KernelJBPatcher {
              patchID: "kernelcache_jb.nvram_verify_permission",
              virtualAddress: va,
              description: "NOP [verifyPermission NVRAM]")
-        return true
+        return .matched
     }
 }

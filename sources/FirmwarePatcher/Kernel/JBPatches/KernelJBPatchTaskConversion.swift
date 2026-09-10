@@ -26,11 +26,11 @@ import Foundation
 extension KernelJBPatcher {
     /// Task conversion eval bypass: patch the guard CMP to always be equal.
     @discardableResult
-    func patchTaskConversionEvalInternal() -> Bool {
+    func patchTaskConversionEvalInternal() -> RawStepResult {
         log("\n[JB] task_conversion_eval_internal: cmp xzr,xzr")
 
         guard let range = kernTextRange ?? codeRanges.first.map({ ($0.start, $0.end) }) else {
-            return false
+            return .noMatch
         }
         let (ks, ke) = range
 
@@ -38,7 +38,7 @@ extension KernelJBPatcher {
 
         guard candidates.count == 1 else {
             log("  [-] expected 1 task-conversion guard site, found \(candidates.count)")
-            return false
+            return candidates.count > 1 ? .ambiguous(count: candidates.count) : .noMatch
         }
 
         let site = candidates[0]
@@ -47,7 +47,7 @@ extension KernelJBPatcher {
              patchID: "task_conversion_eval",
              virtualAddress: va,
              description: "cmp xzr,xzr [_task_conversion_eval_internal]")
-        return true
+        return .matched
     }
 
     // MARK: - Private scanner

@@ -20,21 +20,22 @@ import Foundation
 extension KernelJBPatcher {
     /// IOUC MACF gate bypass: replace CBZ W0, <allow> with B <allow>.
     @discardableResult
-    func patchIoucFailedMacf() -> Bool {
+    func patchIoucFailedMacf() -> RawStepResult {
         log("\n[JB] IOUC MACF gate: branch-level deny bypass")
 
         guard let failStrOff = buffer.findString("IOUC %s failed MACF in process %s") else {
             log("  [-] IOUC failed-MACF format string not found")
-            return false
+            return .noMatch
         }
 
+        var encodingFailed = false
         let refs = findStringRefs(failStrOff)
         guard !refs.isEmpty else {
             log("  [-] no xrefs for IOUC failed-MACF format string")
-            return false
+            return .noMatch
         }
 
-        guard let codeRange = codeRanges.first else { return false }
+        guard let codeRange = codeRanges.first else { return .noMatch }
         let _ = codeRange // used implicitly via findFunctionStart / findFuncEnd
 
         for (adrpOff, _) in refs {
@@ -69,7 +70,7 @@ extension KernelJBPatcher {
                 guard failAdrpExpected > off + 4, failAdrpExpected < min(funcEnd, off + 0x80) else { continue }
 
                 // Encode unconditional B to allowTarget.
-                guard let patchBytes = ARM64Encoder.encodeB(from: off + 4, to: allowTarget) else { continue }
+                guard let patchBytes = ARM64Encoder.encodeB(from: off + 4, to: allowTarget) else { encodingFailed = true; continue }
 
                 log("  [+] IOUC MACF gate fn=0x\(String(format: "%X", funcStart)), bl=0x\(String(format: "%X", off)), cbz=0x\(String(format: "%X", off + 4)), allow=0x\(String(format: "%X", allowTarget))")
 
@@ -79,12 +80,12 @@ extension KernelJBPatcher {
                      patchID: "iouc_macf_gate",
                      virtualAddress: va,
                      description: "b #0x\(String(format: "%X", delta)) [IOUC MACF deny → allow]")
-                return true
+                return .matched
             }
         }
 
         log("  [-] narrow IOUC MACF deny branch not found")
-        return false
+        return encodingFailed ? .encodeFail(reason: "branch encoding failed") : .noMatch
     }
 
     // MARK: - Private helpers

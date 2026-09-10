@@ -12,25 +12,25 @@ import Foundation
 extension KernelJBPatcher {
     /// NOP the upstream cleanup call in _dounmount.
     @discardableResult
-    func patchDounmount() -> Bool {
+    func patchDounmount() -> RawStepResult {
         log("\n[JB] _dounmount: upstream cleanup-call NOP")
 
         guard let foff = findFuncByString("dounmount:") else {
             log("  [-] 'dounmount:' anchor not found")
-            return false
+            return .noMatch
         }
 
         let funcEnd = findFuncEnd(foff, maxSize: 0x4000)
         guard let patchOff = findUpstreamCleanupCall(foff, end: funcEnd) else {
             log("  [-] upstream dounmount cleanup call not found")
-            return false
+            return .noMatch
         }
 
         emit(patchOff, ARM64.nop,
              patchID: "jb.dounmount.nop_cleanup_bl",
              virtualAddress: fileOffsetToVA(patchOff),
              description: "NOP [_dounmount upstream cleanup call]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

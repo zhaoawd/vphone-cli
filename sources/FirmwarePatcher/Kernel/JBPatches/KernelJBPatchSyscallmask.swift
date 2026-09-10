@@ -26,39 +26,39 @@ extension KernelJBPatcher {
 
     /// Retargeted C22 patch: syscallmask apply to proc.
     @discardableResult
-    func patchSyscallmaskApplyToProc() -> Bool {
+    func patchSyscallmaskApplyToProc() -> RawStepResult {
         log("\n[JB] _syscallmask_apply_to_proc: retargeted upstream C22")
 
         // 1. Find the low-level apply wrapper.
         guard let funcOff = findSyscallmaskApplyFunc() else {
             log("  [-] syscallmask apply wrapper not found (fail-closed)")
-            return false
+            return .noMatch
         }
 
         // 2. Find the pre-setter helper BL site.
         guard let callOff = findSyscallmaskInjectBL(funcOff: funcOff) else {
             log("  [-] helper BL site not found in syscallmask wrapper")
-            return false
+            return .noMatch
         }
 
         // 3. Find the final tail branch into the setter core.
         guard let (branchOff, setterOff) = findSyscallmaskTailBranch(funcOff: funcOff) else {
             log("  [-] setter tail branch not found in syscallmask wrapper")
-            return false
+            return .noMatch
         }
 
         // 4. Resolve the mutation helper (structural: next function after helper's containing func).
         let helperTarget = jbDecodeBL(at: callOff) ?? -1
         guard let mutatorOff = resolveSyscallmaskMutator(funcOff: funcOff, helperTarget: helperTarget) else {
             log("  [-] syscallmask mutation helper not resolved structurally")
-            return false
+            return .noMatch
         }
 
         // 5. Allocate cave: 0x100 blob + code.
         let caveSize = Self.syscallmaskFFBlobSize + 0x80
         guard let caveOff = findCodeCave(size: caveSize) else {
             log("  [-] no executable code cave found for C22 (\(caveSize) bytes)")
-            return false
+            return .encodeFail(reason: "patchSyscallmaskApplyToProc: allocation or encoding failed")
         }
 
         // 6. Build cave.
@@ -68,13 +68,13 @@ extension KernelJBPatcher {
             setterOff: setterOff
         ) else {
             log("  [-] failed to encode C22 cave branches")
-            return false
+            return .encodeFail(reason: "patchSyscallmaskApplyToProc: allocation or encoding failed")
         }
 
         // 7. Patch: redirect tail branch to cave entry (code section, not blob).
         guard let branchToCave = encodeB(from: branchOff, to: codeOff) else {
             log("  [-] tail branch cannot reach C22 cave")
-            return false
+            return .encodeFail(reason: "patchSyscallmaskApplyToProc: allocation or encoding failed")
         }
 
         // mov x17, x0  (save RO selector that was in x0 before the pre-setter BL)
@@ -91,7 +91,7 @@ extension KernelJBPatcher {
              patchID: "jb.syscallmask.c22_cave",
              description: "syscallmask C22 cave (ff blob 0x\(String(format: "%X", Self.syscallmaskFFBlobSize)) + structural mutator + setter tail)")
 
-        return true
+        return .matched
     }
 
     // MARK: - Function Finders

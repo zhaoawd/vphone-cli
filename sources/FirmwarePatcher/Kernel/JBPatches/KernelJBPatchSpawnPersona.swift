@@ -15,23 +15,23 @@ extension KernelJBPatcher {
     ///    `ldr [arg,#8] ; cbz deny ; ldr [arg,#0xc] ; cbz deny`.
     /// 4. NOP both `cbz` guards.
     @discardableResult
-    func patchSpawnValidatePersona() -> Bool {
+    func patchSpawnValidatePersona() -> RawStepResult {
         log("\n[JB] _spawn_validate_persona: upstream dual-CBZ bypass")
 
         guard let strOff = buffer.findString("com.apple.private.spawn-panic-crash-behavior") else {
             log("  [-] spawn entitlement anchor not found")
-            return false
+            return .noMatch
         }
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty, let anchorFunc = findFunctionStart(refs[0].adrpOff) else {
             log("  [-] spawn entitlement anchor not found")
-            return false
+            return .noMatch
         }
         let anchorEnd = findFuncEnd(anchorFunc, maxSize: 0x4000)
 
         guard let sites = findUpstreamPersonaCbzSites(anchorStart: anchorFunc, anchorEnd: anchorEnd) else {
             log("  [-] upstream persona helper not found from string anchor")
-            return false
+            return .noMatch
         }
 
         let (firstCbz, secondCbz) = sites
@@ -45,7 +45,7 @@ extension KernelJBPatcher {
              patchID: "kernelcache_jb.spawn_validate_persona.cbz2",
              virtualAddress: va2,
              description: "NOP [_spawn_validate_persona persona-slot guard]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

@@ -13,24 +13,24 @@ extension KernelJBPatcher {
     /// contains it, then locate the unique `cmp Xm, Xn; b.eq; str xzr,...`
     /// sequence just before the string reference.
     @discardableResult
-    func patchSharedRegionMap() -> Bool {
+    func patchSharedRegionMap() -> RawStepResult {
         log("\n[JB] _shared_region_map_and_slide_setup: upstream cmp x0,x0")
 
         guard let strOff = buffer.findString("/private/preboot/Cryptexes") else {
             log("  [-] Cryptexes string not found")
-            return false
+            return .noMatch
         }
 
         // Find the function that contains this string reference
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty else {
             log("  [-] no code refs to Cryptexes string")
-            return false
+            return .noMatch
         }
 
         guard let funcStart = findFunctionStart(refs[0].adrpOff) else {
             log("  [-] function not found via Cryptexes anchor")
-            return false
+            return .noMatch
         }
         let funcEnd = findFuncEnd(funcStart, maxSize: 0x2000)
 
@@ -46,7 +46,7 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] upstream root-vs-preboot cmp gate not found uniquely (found \(hits.count))")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let patchOff = hits[0]
@@ -55,7 +55,7 @@ extension KernelJBPatcher {
              patchID: "kernelcache_jb.shared_region_map",
              virtualAddress: va,
              description: "cmp x0,x0 [_shared_region_map_and_slide_setup]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers
