@@ -3230,6 +3230,11 @@
           "date": "2026-09-10",
           "source": "research/c3_full_pipeline_acceptance_2026-09-10.md",
           "summary": "四种非 less 引导链生产流水线及必要集合报告通过：regular/dev/jb/exp 为 58/70/152/178 条记录。六类二进制落盘 payload 独立记录重放通过；DeviceTree 落盘完整序列化 payload 与 legacy/structured 结果一致。原始输入哈希与长度未变。"
+        },
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "parity-02 四场景完整生产配置 legacy/structured payload 与 records 全部相等；完整输入容器未变。"
         }
       ],
       "limitations": [
@@ -3242,6 +3247,229 @@
         "dev",
         "jb",
         "exp"
+      ]
+    },
+    {
+      "id": "pv-263-c3-bootchain-20260910",
+      "ios": {
+        "version": "26.3",
+        "build": "23D127"
+      },
+      "cloudos": {
+        "version": "26.3",
+        "build": "23D129"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "regular/dev/jb/exp 必要集合、完整 legacy/structured payload 和 records、六类二进制落盘重放及 DeviceTree 完整序列化输出检查通过；记录数 58/70/152/178。原始输入不变。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。",
+        "本轮原始 BuildManifest 与 SystemVersion 均为 23D129；历史 23D128 未复验，保留独立历史记录。"
+      ]
+    },
+    {
+      "id": "pv-2661-c3-bootchain-20260910",
+      "ios": {
+        "version": "26.6.1",
+        "build": "23G83"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": "23E5207q"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "regular/dev/jb/exp 必要集合、完整 legacy/structured payload 和 records、六类二进制落盘重放及 DeviceTree 完整序列化输出检查通过；记录数 59/71/153/179。原始输入不变。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。"
+      ]
+    },
+    {
+      "id": "pv-2661-c3-frida-20260910",
+      "ios": {
+        "version": "26.6.1",
+        "build": "23G83"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": "23E5207q"
+      },
+      "options": [
+        "frida"
+      ],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "jb/exp 必要集合、完整 legacy/structured payload 和 records、六类二进制落盘重放及 DeviceTree 完整序列化输出检查通过；记录数 157/183。原始输入不变。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。"
+      ]
+    },
+    {
+      "id": "pv-270b5-c3-bootchain-20260910",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5408d"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": "23E5207q"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "regular/dev/jb/exp 必要集合、完整 legacy/structured payload 和 records、六类二进制落盘重放及 DeviceTree 完整序列化输出检查通过；记录数 59/71/165/191。原始输入不变。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。"
+      ]
+    },
+    {
+      "id": "pv-270b5-c3-frida-20260910",
+      "ios": {
+        "version": "27.0",
+        "build": "24A5408d"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": "23E5207q"
+      },
+      "options": [
+        "frida"
+      ],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "jb/exp 必要集合、完整 legacy/structured payload 和 records、六类二进制落盘重放及 DeviceTree 完整序列化输出检查通过；记录数 169/195。原始输入不变。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。"
+      ]
+    },
+    {
+      "id": "pv-1862-c3-bootchain-20260910",
+      "ios": {
+        "version": "18.6.2",
+        "build": "22G100"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "regular/dev/jb/exp 必要集合、完整 legacy/structured payload 和 records、六类二进制落盘重放及 DeviceTree 完整序列化输出检查通过；记录数 59/70/153/179。原始输入不变。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。"
+      ]
+    },
+    {
+      "id": "pv-261-c3-less-20260910",
+      "ios": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "cloudos": {
+        "version": "26.1",
+        "build": "23B85"
+      },
+      "options": [],
+      "stage": "patch_verified",
+      "capabilities": [],
+      "variant": "less",
+      "evidence": [
+        {
+          "date": "2026-09-10",
+          "source": "research/c3_completion_acceptance_2026-09-10.md",
+          "summary": "完整 less 生产流水线通过：15 个声明方法、26 条记录；21 组件 SHA-384、Filesystem/Manifest 字节链、真实 Manifest 与三个引导组件 legacy/structured 及落盘 payload 比较通过；独立 AEA 解密内容与原始输出 root hash 校验通过，未导入 digest.db。"
+        }
+      ],
+      "limitations": [
+        "仅本轮补丁及产物验收，不包含恢复、启动或能力验收；历史组合不由此升级。",
+        "AVPBooter 来自宿主 macOS 26.5.1 / 25F80；其他宿主 booter 未验证。",
+        "force-exc-guard 关闭，EXC_GUARD 与 iOS 27 条件由生产 Manifest 和变体求值。",
+        "默认 noBinpack=false、noVphoned=false；其他安装选项未验证。",
+        "Filesystem 迁移采用同 apply/helpers 的结构证明及实际字节链和独立产物检查，未执行两次完整 APFS/AEA 镜像逐字节比较。",
+        "无补丁工厂的组件仍经 loader 重封装；payload、fourcc、description 不变不表示容器字节不变。"
       ]
     }
   ],
@@ -3264,7 +3492,7 @@
     },
     {
       "id": "skip-vs-fail-structuralization",
-      "statement": "C2/C3 已完成当前流水线补丁器的结构化结果实现，按有效必要且 failed 判定失败；完整支持固件矩阵及修正后产物的启动、能力验收仍未完成。"
+      "statement": "C3 已完成本轮 24 个非 less 场景与 1 个 less 默认场景的结构化迁移验收，范围见 c3_completion_acceptance_2026-09-10.md；其他 code_selectable 与历史组合不随本项升级。恢复、启动和能力验收归 F1，尚未完成。"
     },
     {
       "id": "fixtures-absent",

@@ -67,17 +67,17 @@ CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶�
 
 此外 iBSS/iBEC/LLB 存在 Summary 表与 Migration parity 两套 record 计数（iBEC 4 vs 7、LLB 6 vs 13、iBSS base 2 vs 4），JSON 中这些组件 `record_count` 保留 `summary` 键并在 `note` 记录差异，`method_count` 记 `null`（含义待确认）。
 
-## 6. 当前覆盖（combinations，共 31 条）
+## 6. 当前覆盖（combinations，共 38 条）
 
 按变体 × 阶段统计的组合条数（`variants: [...]` 数组按其中每个变体分别计入）：
 
 | 变体 \ 阶段 | code_selectable | patch_verified | boot_verified | capability_verified |
 | --- | --: | --: | --: | --: |
-| less | 23 | 0 | 0 | 0 |
-| regular | 23 | 3 | 0 | 0 |
-| dev | 23 | 3 | 0 | 0 |
-| jb | 23 | 4 | 0 | 3 |
-| exp | 23 | 1 | 0 | 1 |
+| less | 23 | 1 | 0 | 0 |
+| regular | 23 | 7 | 0 | 0 |
+| dev | 23 | 7 | 0 | 0 |
+| jb | 23 | 10 | 0 | 3 |
+| exp | 23 | 7 | 0 | 1 |
 
 - `code_selectable`：23 条 bulk 组合，每条 `variants: ["less","regular","dev","jb","exp"]`，cloudOS 构建号 `null`（catalog 仅版本）。
 - `patch_verified`：26.1(`23B85`)/cloudOS 26.1(`23B85`) 与 26.3(`23D127`)/cloudOS 26.3(`23D128`) 的 regular/dev/jb 字节 parity（2026-03-10）；26.5(`23F77`) jb 合成组件 83 records 与 main byte-identical（2026-07-20）。
@@ -103,10 +103,16 @@ CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶�
 
 ## 8. 待澄清项（open_questions）
 
-见 JSON `open_questions`，共 6 项：内核类型维度含义待确认；cloudOS 构建号缺失；三套计数口径不一致（CLAUDE.md 待确认）；regular/dev 无真机 boot 证据；结构化结果实现已完成但完整固件矩阵与运行验收未完成；`ipsws/patch_refactor_input` fixtures 目录不存在。
+见 JSON `open_questions`，共 6 项：内核类型维度含义待确认；cloudOS 构建号缺失；三套计数口径不一致（CLAUDE.md 待确认）；regular/dev 无真机 boot 证据；C3 本轮 24 + 1 场景已完成，其他组合与运行验收未随之完成；`ipsws/patch_refactor_input` fixtures 目录不存在。
 
 ## 9. 门控一致性修正（2026-09-10）
 
 清单方法的旧 gate 名称 `applyExcGuard`、`applyFrida` 分别迁移为 `PatchRule.rawValue` 的 `excGuardActive`、`cloudOSFridaCapable`。生产门控行为和补丁字节未修改；`KernelPatcher.applyExcGuard` 参数保持原名与含义。
 
 五变体（less、regular、dev、jb、exp）的实际流水线步骤与清单方法集合、条件规则名称对齐测试通过。EXC_GUARD 测试从实际流水线报告获取门控快照，覆盖 regular/dev/jb/exp × iOS 18 开关 × force 开关共 16 个组合，并检查实际内核工厂产生的结构化结果。针对 Swift 测试 18 项、Python 清单校验 14 项通过。本记录不包含本轮真实固件样本或启动验收结果。
+
+## 10. C3 本轮验收登记（2026-09-10）
+
+新增七条 patch_verified，261 非 less 既有条目追加完整 parity 证据。24 个非 less 场景与 1 个 less 默认场景全部通过限定范围内的验收，见 [C3 收尾验收](c3_completion_acceptance_2026-09-10.md)。新增 263 的 cloudOS 构建为原始 BuildManifest/SystemVersion 标识的 23D129；历史 23D128 保持独立，未复验。
+
+本轮范围不表示 23 个 catalog 配对的所有变体与选项均受支持。历史 capability 条目不提升，code_selectable 保持可选择语义。Filesystem 采用结构证明及实际字节链/独立产物校验，不宣称两次完整 APFS/AEA 镜像逐字节比较；恢复/启动及 C4 中断恢复未由本轮验证。

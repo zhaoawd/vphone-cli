@@ -6,7 +6,7 @@
 
 目标：先建立可验证、可恢复的 VM 与固件流程，再完善无 GUI 自动化和多 VM 使用能力。
 
-本清单共 28 个工作项。2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）；B4 已完成并提交（`20cf892` Swift、`ff423c2` Shell）；C1 已完成（机器可读兼容性清单 + 双向校验测试 + 文档）；C2 已完成（结构化补丁结果 + 必要性规则 + 消融 CLI + 两个示例迁移，提交 `afe0905`）；C3 进行中（全部补丁器已接入结构化结果；26.4 两项内核定位已修正并通过原始样本检查，less 26.1 的 Filesystem → Manifest 和独立根哈希验收通过，完整支持矩阵验收未完成）。已完成 8 项（A1、A2、B1、B2、B3、B4、C1、C2），其余 20 项待执行（C3 计入进行中，未完成）。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)、[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)、[B4 离线操作占用保护](../research/offline_op_guard_2026-09-09.md)、[固件兼容性清单](../research/firmware_compatibility.md)与[结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。
+本清单共 28 个工作项。**当前状态（2026-09-10）：9 项完成（A1、A2、B1–B4、C1–C3），19 项待执行。C3 结果见 [收尾验收](c3_completion_acceptance_2026-09-10.md)。以下日期进展保留历史状态。** 2026-09-08 更新：A1 已完成；A2 已完成并独立提交；B1 已完成并独立提交；B2 已完成并独立提交。2026-09-09 更新：B3 已完成，实机 VM 验证部分完成（优雅、SIGKILL、`--force`、未运行、持锁无目标五类场景已验证；`dfu`、`.app` 内二进制、`.failed` 分支待做）；B4 已完成并提交（`20cf892` Swift、`ff423c2` Shell）；C1 已完成（机器可读兼容性清单 + 双向校验测试 + 文档）；C2 已完成（结构化补丁结果 + 必要性规则 + 消融 CLI + 两个示例迁移，提交 `afe0905`）；C3 进行中（全部补丁器已接入结构化结果；26.4 两项内核定位已修正并通过原始样本检查，less 26.1 的 Filesystem → Manifest 和独立根哈希验收通过，完整支持矩阵验收未完成）。已完成 8 项（A1、A2、B1、B2、B3、B4、C1、C2），其余 20 项待执行（C3 计入进行中，未完成）。结果见[A1 测试基线](../research/test_baseline_2026-09-08.md)、[A2 验证记录](../research/systemos_cache_validation_2026-09-08.md)、[B4 离线操作占用保护](../research/offline_op_guard_2026-09-09.md)、[固件兼容性清单](../research/firmware_compatibility.md)与[结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。
 
 ## 一、建议现在开始的工作
 
@@ -160,12 +160,12 @@
 
 结果：新增 `sources/FirmwarePatcher/Core/` 五个文件——`PatchOutcome.swift`（`PatchOutcome`/`RawStepResult`/`OutcomeKind` + 映射）、`PatchRequirement.swift`（`PatchRequirement`/`PatchRule`/`RequirementKind`）、`PatchIdentifier.swift`（`PatchID`，点分单串 Codable）、`PatchResult.swift`（`PatchResult`/`PatchGateSnapshot`/`ComponentReport`/`Coverage`/`PatchRunReport`）、`StructuredPatcher.swift`（`StructuredPatcher` 协议 + `PatchStep` + `StructuredExecution` 执行器 + `LegacyPatcherAdapter`）；`PatchRecord` 未改。`Pipeline/FirmwarePipeline.swift` 新增 `patchAllStructured(ablate:allowOutput:)`、internal `patchDataStructured(...)`、`knownAblationTargets(...)` 与门控快照构造 `prepare()`，`patchAll()` 改为薄封装。迁移 `AVPBooterPatcher.patchDGSTBypass`（required，applied/failed 路径）与 `IBootJBPatcher.patchSkipGenerateNonce`（required，alreadyApplied 路径）为 `StructuredPatcher`，方法体与 emit 的 record 逐字节不变。CLI 入口 `patch-firmware`/`fw patch` 改走结构化路径，新增 `--ablate`/`--allow-ablation-output`/`--report-out`（并镜像到 `patch-component`）；未知 ablation id 前置校验、消融运行默认 dry（不写回）。输出映射：`notApplicable` 只由 conditional rule 判 false 时产生，无匹配默认 `failed`，`ambiguous`/`encodeFail` 一律 failed。失败判定：组件失败 ⇔ 有效必要且 failed；任一有效必要 failed → CLI 非零，成功不掩盖失败；`ablated` 不使组件失败但计入 `PatchRunReport.ablation`。测试：`tests/FirmwarePatcherTests/FirmwarePatcherTests.swift` 新增 `SyntheticStructuredPatcher` 与十个合成用例（`StructuredPatchResultTests`）、C1 对齐测试（`C1AlignmentTests`，step method 集合 vs `firmware_compatibility.json` 的 `methods[].name`）、迁移补丁器 parity 测试（`MigratedPatcherParityTests`）。校验命令：`swift build` 成功；`make test` 258 项全过；`make build`（签名分发包）成功；`swift test --filter MigratedPatcherParityTests`（设 `VPHONE_TEST_AVPBOOTER`/`VPHONE_TEST_IBSS` 指向 `vm-2607` 只读派生 payload）4 项全过。parity 结果：达到单元级 record 相等（真实固件字节）——迁移前 `findAll()` 与新 step 路径产出的 `[PatchRecord]` 逐条相等（AVPBooter 非空、iBSS 幂等均相等）。限制：CLI 级 `--records-out` 前后 diff 未执行（签名二进制被 amfidont SIGKILL，退出码 137）；全流水线 dry-run sha256 对比未执行（`vm-2607` 的 iBSS 命名 `d47` 与流水线搜索 `vresearch101` 不符，离线无匹配命名 VM）；内核多方法补丁器与 DeviceTree/Manifest/Filesystem 仍为 legacy（`coverage: legacy` 明确标记），留待 C3。详见 [结构化补丁结果与消融](../research/patch_results_ablation_2026-09-09.md)。未应用新二进制补丁，`0_binary_patch_comparison.md` 未改。提交 `afe0905`。
 
-### C3 — 分组迁移现有补丁并使用结果作为测试判据【进行中；结构化迁移已实现，原始固件验收未完成；2026-09-09】
+### C3 — 分组迁移现有补丁并使用结果作为测试判据【已完成；本轮 24 + 1 场景验收；2026-09-10】
 
 涉及：基础、JB、EXP 内核补丁器，iBoot/TXM/DeviceTree；`tests/test_*patches.sh`。
 
 - [x] 按基础引导链、基础内核、JB、EXP 分组迁移，每组独立提交；对多条写入必须共同出现的补丁实施组级完整性检查。
-- [ ] 比较迁移前后同输入、同选项的字节产物，状态改造本身不得改变补丁语义；未知形态需明确失败原因。
+- [x] 比较迁移前后同输入、同选项的字节产物，状态改造本身不得改变补丁语义；未知形态需明确失败原因。Filesystem 按同一 apply/helpers 结构证明、实际 Manifest 字节链和独立产物校验限定，不宣称两次完整镜像逐字节实测。
 - [x] 将固件测试从扫描 `[-]` 切换到结构化结果；保留日志供诊断，同步更新研究文档。
 
 验收：列入支持范围的组合通过必要集合检查；每个变体都有独立证据。缺失样本的组合不能随本项被标记完成。
@@ -189,6 +189,10 @@
 本轮回归：首次 `make test` 的 Python 73 项通过；Swift VMStop 出现 9 条断言失败，同时沙箱拒绝 `ps`，该次 Swift 不记为通过。在允许进程查询的环境重跑 `make test_swift` 退出码为 0，XCTest 20 项、Swift Testing 298 项 / 46 suites 全部通过（25.525 秒）。完整日志见本轮验收文档。C3 状态和已完成工作项计数不变。
 
 2026-09-10 顺序组合补充：26.4 原始内核的 base → JB → EXP 在 iOS 27 gate 开启、Frida 关闭时通过完整记录、payload 和必要集合检查，共 129 条记录（1 test / 1 suite，156.853 秒）。仅 Frida 开启的组合随后通过，共 121 条记录（1 test / 1 suite，95.959 秒）；26.4 的四种 iOS 27 gate / Frida 顺序组合均已有完整记录、payload 和必要集合证据。精确 26.1 / 23B85 四种非 less 引导链生产流水线和必要集合报告随后通过，regular / dev / jb / exp 分别为 29 / 34 / 68 / 88 个声明方法、58 / 70 / 152 / 178 条记录；独立落盘 payload 验证通过（六类二进制记录重放，DeviceTree 序列化 parity）；C1 新增独立 `patch_verified` 组合并保留历史证据。详见 [精确引导链验收](c3_full_pipeline_acceptance_2026-09-10.md)。精确固件全流水线与运行验收仍未完成，C3 保持进行中。详见 [C3 剩余验收](c3_acceptance_remaining_2026-09-10.md)。
+
+2026-09-10 收尾矩阵扩展（进行中）：准备 261、263（本轮 cloudOS 实际构建为 `23D129`）、2661、270b5、1862 五组精确输入，覆盖 24 个非 less 场景及 1 个 less 默认场景。生产报告、落盘验证与完整 legacy/structured parity 分别验收；历史 `23D128` 不由本轮替代。Filesystem 采用迁移差分证明、实际 Manifest 字节链与独立产物校验分别记录，不能表述为已执行两次完整镜像 byte parity。恢复/启动按原工作项归入 F1，多文件中断恢复归入 C4，相关能力仍未验证。运行尚未结束，C3 状态与已完成计数不变。详见 [C3 收尾验收记录](c3_completion_acceptance_2026-09-10.md)。
+
+2026-09-10 最终验收：上述 24 个非 less 场景全部通过完整 legacy/structured payload 与 records 比较、必要集合、落盘重放和 DeviceTree 序列化检查；less 默认完整流水线、真实 Manifest/三个引导组件 parity、21 组件摘要、独立解密内容及无 digest.db 的原始 root hash 校验通过。C3 已完成，累计 **9/28**，剩余 19 项。历史 cloudOS 23D128 和其他 catalog 可选组合不随本轮升级；恢复/启动归 F1，多文件中断恢复归 C4。完整限定与证据见 [C3 收尾验收](c3_completion_acceptance_2026-09-10.md)。此前段落保留为历史进度。
 
 ### C4 — 避免失败留下无法判断的部分修改固件【高；依赖 C3、B4】
 

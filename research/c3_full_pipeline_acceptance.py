@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch/stage the fixed 26.1 C3 non-less boot-chain acceptance inputs.
+"""Fetch/stage fixed C3 non-less boot-chain acceptance pairs.
 
 This does not run the patcher, build a complete restore image, mount disks, or
 access existing VMs. Run `fetch`, then `stage NEW_RUN_NAME`; fetch is exclusive
@@ -22,6 +22,16 @@ import zlib
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "research/artifacts/c3-full-pipeline-2026-09-10"
+PAIRS = {
+    "261": ("iOS 26.1", "26.1", "23B85", "261", "26.1", "23B85"),
+    # Current catalog archive identifies itself as 23D129 in both plists.
+    # Historical 23D128 validation remains a separate, unverified input identity.
+    "263": ("iOS 26.3", "26.3", "23D127", "263", "26.3", "23D129"),
+    "2661": ("iOS 26.6.1", "26.6.1", "23G83", "264", "26.4", "23E5207q"),
+    "270b5": ("iOS 27 beta 5", "27.0", "24A5408d", "264", "26.4", "23E5207q"),
+    "1862": ("iOS 18.6.2", "18.6.2", "22G100", "261", "26.1", "23B85"),
+}
+PAIR = "261"
 CATALOG = ROOT / "sources/VPhoneCore/VPhoneFirmwareCatalog.swift"
 BOOTER = pathlib.Path("/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources/AVPBooter.vresearch1.bin")
 TXM = "Firmware/txm.iphoneos.research.im4p"
@@ -114,21 +124,38 @@ def extract(archive, member, destination, url):
             "sha256": sha(data), "path": str(destination.relative_to(OUTPUT))}
 
 
-def verify_version(path):
+def pair_config():
+    name, ios, build, cloud_key, cloud, cloud_build = PAIRS[PAIR]
+    return {"ios_name": name, "ios": ios, "build": build, "cloud_key": cloud_key,
+            "cloud": cloud, "cloud_build": cloud_build,
+            "restore_name": f"iPhone17,3_{ios}_{build}_Restore"}
+
+
+def scenarios():
+    result = {variant: {"variant": variant, "frida": False} for variant in VARIANTS}
+    if pair_config()["cloud_key"] == "264":
+        result.update({variant + "-frida": {"variant": variant, "frida": True} for variant in ("jb", "exp")})
+    return result
+
+
+def verify_version(path, source):
     value = plistlib.loads(path.read_bytes())
     actual = (value.get("ProductVersion"), value.get("ProductBuildVersion"))
-    if actual != ("26.1", "23B85"):
+    config = pair_config()
+    expected = (config["ios"], config["build"]) if source == "iphone" else (config["cloud"], config["cloud_build"])
+    if actual != expected:
         raise ValueError(f"Unexpected firmware identity in {path}: {actual}")
 
 
 def fetch():
     catalog = CATALOG.read_text()
-    cloud = re.search(r'static let cloud261 = "([^"]+)"', catalog)
-    iphone = re.search(r'iosName: "iOS 26\.1", iosURL: "([^"]+)", cloudosName: "cloudOS 26\.1", cloudosURL: cloud261', catalog)
+    config = pair_config()
+    cloud = re.search(r'static let cloud' + config["cloud_key"] + r' = "([^"]+)"', catalog)
+    iphone = re.search(r'iosName: "' + re.escape(config["ios_name"]) + r'", iosURL: "([^"]+)", cloudosName: "cloudOS ' + re.escape(config["cloud"]) + r'", cloudosURL: cloud' + config["cloud_key"], catalog)
     if not cloud or not iphone:
-        raise ValueError("Fixed 26.1 pairing is missing from catalog")
+        raise ValueError(f"Fixed {PAIR} pairing is missing from catalog")
     urls = {"cloudos": cloud[1], "iphone": iphone[1]}
-    if not urls["iphone"].endswith("/iPhone17,3_26.1_23B85_Restore.ipsw"):
+    if not urls["iphone"].endswith("/" + config["restore_name"] + ".ipsw"):
         raise ValueError("Unexpected iPhone archive")
     for url in urls.values():
         if not url.startswith("https://updates.cdn-apple.com/"):
@@ -139,27 +166,35 @@ def fetch():
     stock.mkdir(parents=True, exist_ok=False)
     records = []
     cloud_has_txm = False
+    iphone_has_txm = False
     for source, url in urls.items():
         with RemoteZIP(url) as remote, zipfile.ZipFile(remote) as archive:
-            members = CLOUD_MEMBERS.copy() if source == "cloudos" else ["BuildManifest.plist", TXM]
+            members = CLOUD_MEMBERS.copy() if source == "cloudos" else ["BuildManifest.plist"]
             if source == "cloudos":
                 cloud_has_txm = TXM in archive.namelist()
                 if cloud_has_txm:
                     members.append(TXM)
+            else:
+                iphone_has_txm = TXM in archive.namelist()
+                if iphone_has_txm:
+                    members.append(TXM)
+                elif not cloud_has_txm:
+                    raise ValueError("Neither archive contains research TXM")
             for member in members:
                 records.append(extract(archive, member, stock / source / member, url))
-        verify_version(stock / source / "BuildManifest.plist")
-    verify_version(stock / "cloudos/SystemVersion.plist")
+        verify_version(stock / source / "BuildManifest.plist", source)
+    verify_version(stock / "cloudos/SystemVersion.plist", "cloudos")
     booter_data = BOOTER.read_bytes()
     with (stock / BOOTER.name).open("xb") as stream:
         stream.write(booter_data)
     records.append({"source_path": str(BOOTER), "bytes": len(booter_data),
                     "sha256": sha(booter_data), "path": f"stock/{BOOTER.name}"})
     txm_source = "cloudos" if cloud_has_txm else "iphone"
-    txm_equal = (sha((stock / "cloudos" / TXM).read_bytes()) == sha((stock / "iphone" / TXM).read_bytes())) if cloud_has_txm else None
+    txm_equal = (sha((stock / "cloudos" / TXM).read_bytes()) == sha((stock / "iphone" / TXM).read_bytes())) if cloud_has_txm and iphone_has_txm else None
     write_json(stock / "sources.json", {
         "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "scope": "26.1/23B85 pair; non-less boot-chain pipeline only; no full restore-image validity claim",
+        "scope": f"iPhone {config['ios']}/{config['build']} + cloudOS {config['cloud']}/{config['cloud_build']}; non-less boot-chain pipeline only; no full restore-image validity claim",
+        "pair": PAIR, "config": config, "iphone_txm_present": iphone_has_txm,
         "catalog_sha256": sha(CATALOG.read_bytes()), "urls": urls,
         "host_sw_vers": subprocess.check_output(["/usr/bin/sw_vers"], text=True),
         "txm_source": txm_source, "cloudos_txm_present": cloud_has_txm,
@@ -174,6 +209,11 @@ def stage(name):
     if stock.resolve() != stock or (OUTPUT / "runs").resolve() != OUTPUT / "runs":
         raise ValueError("Stock and runs paths must not contain symlinks")
     provenance = json.loads((stock / "sources.json").read_text())
+    if provenance.get("pair", "261") != PAIR:
+        raise ValueError("Stock pairing mismatch")
+    verify_version(stock / "iphone/BuildManifest.plist", "iphone")
+    verify_version(stock / "cloudos/BuildManifest.plist", "cloudos")
+    verify_version(stock / "cloudos/SystemVersion.plist", "cloudos")
     for record in provenance["files"]:
         source = OUTPUT / record["path"]
         if not source.resolve().is_relative_to(stock.resolve()):
@@ -185,9 +225,9 @@ def stage(name):
         raise ValueError("Invalid TXM source")
     run = OUTPUT / "runs" / name
     run.mkdir(parents=True, exist_ok=False)
-    for variant in VARIANTS:
-        vm = run / variant / "vm"
-        restore = vm / "iPhone17,3_26.1_23B85_Restore"
+    for scenario in scenarios():
+        vm = run / scenario / "vm"
+        restore = vm / pair_config()["restore_name"]
         restore.mkdir(parents=True)
         for member in CLOUD_MEMBERS:
             destination = restore / member
@@ -196,7 +236,7 @@ def stage(name):
         shutil.copyfile(stock / "iphone/BuildManifest.plist", restore / "iPhone-BuildManifest.plist")
         shutil.copyfile(stock / provenance["txm_source"] / TXM, restore / TXM)
         shutil.copyfile(stock / BOOTER.name, vm / BOOTER.name)
-    write_json(run / "staging.json", {"variants": VARIANTS, "sources_sha256": sha((stock / "sources.json").read_bytes()),
+    write_json(run / "staging.json", {"variants": VARIANTS, "pair": PAIR, "scenarios": scenarios(), "sources_sha256": sha((stock / "sources.json").read_bytes()),
                                     "txm_source": provenance["txm_source"], "patcher_executed": False})
     print(run)
 
@@ -228,6 +268,10 @@ def verify(name):
     sources_data = (stock / "sources.json").read_bytes()
     sources = json.loads(sources_data)
     staging = json.loads((run / "staging.json").read_text())
+    if sources.get("pair", "261") != PAIR or staging.get("pair", "261") != PAIR:
+        raise ValueError("Pairing mismatch")
+    if staging.get("scenarios", scenarios() if PAIR == "261" else None) != scenarios():
+        raise ValueError("Staged scenarios mismatch")
     if staging["sources_sha256"] != sha(sources_data):
         raise ValueError("Provenance changed after staging")
     for record in sources["files"]:
@@ -249,15 +293,31 @@ def verify(name):
         "TXM": (stock / sources["txm_source"] / TXM, TXM),
     }
     result = {"scope": sources["scope"], "verification_scope": "Six binary components: complete record replay. DeviceTree: hashes only; requires separate serialized-tree parity.", "sources_sha256": sha(sources_data), "variants": {}}
-    for variant in VARIANTS:
-        report_path = run / variant / "report.json"
+    for scenario, settings in scenarios().items():
+        variant = settings["variant"]
+        report_path = run / scenario / "report.json"
         subprocess.run([str(ROOT / ".venv/bin/python3"), str(ROOT / "scripts/check_patch_report.py"), str(report_path)], check=True, cwd=ROOT)
         report_data = report_path.read_bytes()
         report = json.loads(report_data)
         if report["variant"] != variant:
             raise ValueError("Report variant mismatch")
-        vm = run / variant / "vm"
-        restore = vm / "iPhone17,3_26.1_23B85_Restore"
+        vm = run / scenario / "vm"
+        restore = vm / pair_config()["restore_name"]
+        config = pair_config()
+        expected_gates = {
+            "variant": variant, "iosBaseIs18": config["ios"].startswith("18."),
+            "iosBaseIs27": config["ios"].startswith("27."),
+            "cloudOSIsFridaCapable": config["cloud_key"] == "264",
+            "enableFrida": settings["frida"], "forceExcGuard": False,
+            "excGuardActive": variant == "dev" or config["ios"].startswith("18."),
+            "applyIOS27": config["ios"].startswith("27."), "applyFrida": settings["frida"],
+        }
+        for component in report["components"]:
+            if not component["results"]:
+                raise ValueError(f"Empty structured results: {scenario}/{component['component']}")
+            for step in component["results"]:
+                if step["gates"] != expected_gates:
+                    raise ValueError(f"Report gates mismatch: {scenario}/{step['id']}")
         buffers = {key: bytearray(payload(value[0], key == "AVPBooter")) for key, value in mapping.items()}
         counts = dict.fromkeys(mapping, 0)
         seen = set()
@@ -296,18 +356,23 @@ def verify(name):
             if source.read_bytes() != (restore / relative).read_bytes():
                 raise ValueError(f"Unpatched input changed: {variant}/{relative}")
             unchanged[relative] = sha(source.read_bytes())
-        result["variants"][variant] = {"report_sha256": sha(report_data), "components": checks, "unchanged_inputs": unchanged, "binary_replay_passed": True, "devicetree_parity_verified": False}
+        result["variants"][scenario] = {"variant": variant, "frida": settings["frida"], "report_sha256": sha(report_data), "components": checks, "unchanged_inputs": unchanged, "binary_replay_passed": True, "devicetree_parity_verified": False}
     write_json(output, result)
     print(output)
 
 
 def main():
+    global PAIR, OUTPUT
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--pair", choices=PAIRS, default="261", help="Fixed catalog pair; defaults to original 261 paths")
     commands = parser.add_subparsers(dest="action", required=True)
     commands.add_parser("fetch", help="Download exact ZIP members into new stock directory")
     commands.add_parser("stage", help="Stage stock into a new isolated run").add_argument("run_name")
     commands.add_parser("verify", help="Verify six binary record replays; record DT hashes for separate parity").add_argument("run_name")
     args = parser.parse_args()
+    PAIR = args.pair
+    if PAIR != "261":
+        OUTPUT = OUTPUT.with_name(OUTPUT.name + "-" + PAIR)
     # Reject redirected artifact roots so the fixed output cannot target a VM.
     if OUTPUT.resolve() != OUTPUT:
         raise ValueError("Output path must not contain symlinks")
