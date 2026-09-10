@@ -6,7 +6,7 @@
 
 **性质：纯加法、字节等价迁移。** 12 个方法体内的 emit/append/writeBytes/匹配锚点逻辑一律未改；只对其中 3 个方法（#7/#10/#11）新增或修改 `return` 表达式与返回类型。未写入任何新补丁字节（见 §7）。
 
-事实与推断区分：本文「迁移范围」「requirement/signal 决策表」「setup 幂等化方案」「字节等价论证」「parity 结果」均为代码/测试可验证的事实；「§8 两处 C1 清单遗留不一致」为对现状的事实描述，其处置为待用户定夺项。
+事实与推断区分：本文「迁移范围」「requirement/signal 决策表」「setup 幂等化方案」「字节等价论证」「parity 结果」均为代码/测试可验证的事实；§8 记录评审发现及其修复。
 
 ## 1. 迁移范围与文件改动
 
@@ -85,16 +85,7 @@ return patches.count > before ? .matched : .noMatch
 
 即只有 `isDev || applyExcGuard` 时才真正跑补丁体（与 legacy `KernelPatcher.findAll()` 的 `if isDev || applyExcGuard { patchExcGuardBehavior() }` 完全一致），否则不跑、返回 `.noMatch`；配合 `.conditional(.excGuardActive)`，门为假时经 `PatchOutcomeMapping` 归 `notApplicable`。
 
-四种门组合下的 requirement/outcome（requirement 恒为 `.conditional(.excGuardActive)`；`gates.excGuardActive = iosBaseIs18 || forceExcGuard`，见 `FirmwarePipeline.swift:178`；管线为 regular/jb/exp 传入 `applyExcGuard = iosBaseIs18 || forceExcGuard`，dev 传入 `isDev=true, applyExcGuard=false`）：
-
-| isDev | applyExcGuard | step 返回 | rule excGuardActive | outcome | 典型场景 |
-| --- | --- | --- | --- | --- | --- |
-| F | F | `.noMatch` | false | `notApplicable`（规则假 + 无锚） | regular/jb/exp，26.x 基线，无 `--force-exc-guard` |
-| F | T | `.matched` | true | `applied` | 18.x 基线，或 regular/jb/exp `--force-exc-guard` |
-| T | F | `.matched` | 见 §8(b) | `applied` | dev 变体（26.x 基线，excGuardActive 可能为 false→命中 mapping 的「matched 但规则假→applied」分支） |
-| T | T | `.matched` | true | `applied` | dev + 18.x/force |
-
-以上四组均不产生 required failure（`notApplicable`/`applied` 皆非 `failed`）。
+门控快照现为 `variant == .dev || iosBaseIs18 || forceExcGuard`，与工厂创建的 `isDev || applyExcGuard` 一致。门控生效时，命中映射为 `applied`，缺失锚点映射为 `failed` 并计入必需失败；门控未生效时不执行补丁体，结果为 `notApplicable`。所有 step 仍可消融。
 
 ## 6. requirement 决策（1–11 全 required）
 
@@ -116,12 +107,15 @@ return patches.count > before ? .matched : .noMatch
 - 已改写 VM 内核（`vm-new`/`vm-2607`）：parity 用例通过，14 条记录逐字节相等（仅幂等类补丁复命中，见 §6）。
 - 合成 no-match：通过（两路径均 0 记录）。
 
-## 8. 两处 C1 清单遗留不一致（本组不修，待用户定夺）
+## 8. 评审修复：EXC_GUARD 门控（P2）
 
-- **(a) gate 字符串 vs PatchRule case rawValue**：清单 `research/firmware_compatibility.json` 的 kernelcache `patchExcGuardBehavior` 项 `gate = "applyExcGuard"`，而代码 `PatchRule.excGuardActive` 的 rawValue 为 `"excGuardActive"`。二者命名不一致（`PatchRule.swift` 注释称每个 case 与清单 gate 字符串 1:1）。现有 Swift 清单对齐测试只比对方法名与 required，不交叉校验 gate 字符串，故不触发失败；但字符串本身不对齐。
-- **(b) gate 语义 vs findAll 运行门**：清单/`PatchGateSnapshot` 的 `excGuardActive = iosBaseIs18 || forceExcGuard`（**不含 isDev**），而 `findAll()`（及本组 step run）以 `isDev || applyExcGuard` 运行 excGuard。对 regular/jb/exp 二者等价（`applyExcGuard = iosBaseIs18 || forceExcGuard`，`isDev=false`）；但 dev 变体（`isDev=true, applyExcGuard=false`）在 excGuardActive 为假的基线上会真正运行并命中 excGuard，命中 `PatchOutcomeMapping` 的「`.matched` 但规则为假→记为 `applied`（附警告注释）」分支，而非规则驱动的 `notApplicable`。语义上 dev 的 excGuard 门比 rule 更宽。
+原提交的快照遗漏 dev。dev + 非 iOS 18 + 未传 force 时，补丁会执行，但缺失锚点被错误归为 `notApplicable`。这是结构化结果判定问题。
 
-两处均为 C1 建模与代码运行门之间的既有不一致，**本组不修**，仅记录为待用户定夺的 C1 后续项。
+修复：`FirmwarePipeline.gateSnapshot` 纳入 dev；`prepare()` 使用该快照。清单四个变体的 gate 统一为 `excGuardActive`；dev 的 `expected_not_applicable` 清空。补丁执行条件和写入字节未改变。
+
+验证：`KernelStructuredTests` 使用真实组件工厂及 `StructuredExecution.run`，覆盖 regular/dev/jb/exp × force 开关的 8 组无锚输入，并断言 outcome、必需失败、记录为空及数据未变。另有清单 gate 一致性测试。两项测试通过。
+
+验证范围：已有 parity 比较的是同一版本的 `findAll()` 与 step 路径；它不验证所有门控或失败分支，也不等于与父提交执行结果的比较。
 
 ## 9. `0_binary_patch_comparison.md` 无需改动
 

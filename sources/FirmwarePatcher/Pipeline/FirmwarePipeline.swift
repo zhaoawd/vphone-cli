@@ -168,18 +168,22 @@ public final class FirmwarePipeline {
                     : "  (< 26.4 — Frida kernel patches skipped)"))
         }
 
-        let gates = PatchGateSnapshot(
+        return (restoreDir, gateSnapshot)
+    }
+
+    /// Uses the same activation conditions as the component factories.
+    var gateSnapshot: PatchGateSnapshot {
+        PatchGateSnapshot(
             variant: variant.rawValue,
             iosBaseIs18: iosBaseIs18,
             iosBaseIs27: iosBaseIs27,
             cloudOSIsFridaCapable: cloudOSIsFridaCapable,
             forceExcGuard: forceExcGuard,
             enableFrida: enableFrida,
-            excGuardActive: iosBaseIs18 || forceExcGuard,
+            excGuardActive: variant == .dev || iosBaseIs18 || forceExcGuard,
             applyIOS27: iosBaseIs27,
             applyFrida: enableFrida && cloudOSIsFridaCapable
         )
-        return (restoreDir, gates)
     }
 
     /// Run the full pipeline and return a structured ``PatchRunReport``.

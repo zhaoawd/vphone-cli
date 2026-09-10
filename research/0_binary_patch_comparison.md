@@ -819,6 +819,8 @@ cache rebuild.
 
 ## Summary
 
+C3 structured-result migration (2026-09-10): the current Swift `KernelJBPatcher.findAll()` declares 33 orchestration methods. The historical “Kernel (JB methods) = 59” below is not the structured step count. This migration changes result reporting and ablation, with no new binary patch targets; see [C3 JB migration](patch_results_c3_kernel_jb_2026-09-10.md).
+
 | Component                          | Regular | Dev |  JB | EXP |
 | ---------------------------------- | ------: | --: | --: | --: |
 | AVPBooter                          |       1 |   1 |   1 |   1 |

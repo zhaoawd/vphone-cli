@@ -22,12 +22,12 @@ import Foundation
 extension KernelJBPatcher {
     /// Bypass the two early pid-0 guards in the inlined proc_pidinfo path.
     @discardableResult
-    func patchProcPidinfo() -> Bool {
+    func patchProcPidinfo() -> RawStepResult {
         log("\n[JB] _proc_pidinfo: NOP pid-0 guard (2 sites)")
 
         guard let (ks, ke) = kernTextRange else {
             log("  [-] kernel __TEXT_EXEC range not found")
-            return false
+            return .noMatch
         }
 
         var matches: [Int] = [] // file offset of i0 (the `ldr` opening the guard)
@@ -65,7 +65,7 @@ extension KernelJBPatcher {
 
         guard matches.count == 1 else {
             log("  [-] precise proc_pidinfo guard pair not found (\(matches.count) candidates)")
-            return false
+            return matches.count > 1 ? .ambiguous(count: matches.count) : .noMatch
         }
 
         let guardA = matches[0] + 4 // cbz Xd
@@ -78,6 +78,6 @@ extension KernelJBPatcher {
              patchID: "jb.proc_pidinfo.nop_guard_b",
              virtualAddress: fileOffsetToVA(guardB),
              description: "NOP [_proc_pidinfo pid-0 guard B]")
-        return true
+        return .matched
     }
 }

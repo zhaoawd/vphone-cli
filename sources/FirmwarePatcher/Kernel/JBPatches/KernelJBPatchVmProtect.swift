@@ -28,33 +28,35 @@ import Foundation
 extension KernelJBPatcher {
     /// Bypass the vm_map_protect W^X downgrade so write+execute protections are honored.
     @discardableResult
-    func patchVmMapProtect() -> Bool {
+    func patchVmMapProtect() -> RawStepResult {
         log("\n[JB] _vm_map_protect: bypass W^X downgrade")
 
         // Recover the function from the in-kernel "vm_map_protect(" panic string.
         guard let strOff = buffer.findString("vm_map_protect(") else {
             log("  [-] kernel-text 'vm_map_protect(' anchor not found")
-            return false
+            return .noMatch
         }
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty, let funcStart = findFunctionStart(refs[0].adrpOff) else {
             log("  [-] kernel-text 'vm_map_protect(' anchor not found")
-            return false
+            return .noMatch
         }
         let funcEnd = findFuncEnd(funcStart, maxSize: 0x2000)
 
         // Shape A: explicit skip branch (26.1 / 26.3). Rewrite `b.ne skip` -> `b skip`.
-        if let (brOff, target) = findWriteDowngradeGate(start: funcStart, end: funcEnd) {
+        let gates = findWriteDowngradeGates(start: funcStart, end: funcEnd)
+        guard gates.count <= 1 else { return .ambiguous(count: gates.count) }
+        if let (brOff, target) = gates.first {
             guard let bBytes = encodeB(from: brOff, to: target) else {
                 log("  [-] branch rewrite out of range")
-                return false
+                return .encodeFail(reason: "patchVmMapProtect: allocation or encoding failed")
             }
             let delta = target - brOff
             emit(brOff, bBytes,
                  patchID: "kernelcache_jb.vm_map_protect",
                  virtualAddress: fileOffsetToVA(brOff),
                  description: "b #0x\(String(format: "%X", delta)) [_vm_map_protect skip W^X downgrade]")
-            return true
+            return .matched
         }
 
         // Shape B (26.5 mask-widen) disabled: findWxMaskMov hit vm_map.c:6202
@@ -66,13 +68,13 @@ extension KernelJBPatcher {
         // Shape A stays for 26.1-26.4; this W^X patch is retired on 26.5+.
 
         log("  [-] vm_map_protect write-downgrade gate not found")
-        return false
+        return .noMatch
     }
 
     // MARK: - Shape A (26.1 / 26.3): explicit skip-branch gate
 
     /// Find the `b.ne` that skips the write-downgrade block, and its target.
-    private func findWriteDowngradeGate(start: Int, end: Int) -> (brOff: Int, target: Int)? {
+    private func findWriteDowngradeGates(start: Int, end: Int) -> [(brOff: Int, target: Int)] {
         let wZrReg: aarch64_reg = AARCH64_REG_WZR
 
         var hits: [(Int, Int)] = []
@@ -125,7 +127,7 @@ extension KernelJBPatcher {
             off += 4
         }
 
-        return hits.count == 1 ? hits[0] : nil
+        return hits
     }
 
     /// Scan [start, end) for `and wProt, wProt, #imm` that strips one of the low protection bits.

@@ -44,12 +44,12 @@ extension KernelJBPatcher {
     /// the SwapEnd struct size the handler gates on — the value being changed). Only
     /// the imm12 field is rewritten, preserving the rest of the instruction.
     @discardableResult
-    func patchIomfbSwapEndHandlerSize() -> Bool {
+    func patchIomfbSwapEndHandlerSize() -> RawStepResult {
         log("\n[JB] IOMFB swap_submit handler size gate cmp w2,#0x588 -> #0x6e0 (accept iOS 27 native struct)")
 
         guard let (ks, ke) = kernTextRange else {
             log("  [-] no kernel text range")
-            return false
+            return .noMatch
         }
 
         var hits: [Int] = []
@@ -69,13 +69,13 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] swap_submit handler size gate (cmp w2,#0x588 -> b.ne) not found uniquely (found \(hits.count))")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let cmpOff = hits[0]
         guard let newBytes = ARM64Encoder.encodeCmpImmediateW(rn: 2, imm12: Self.swapEndIOS27Size) else {
             log("  [-] failed to encode cmp w2,#0x6e0")
-            return false
+            return .encodeFail(reason: "patchIomfbSwapEndHandlerSize: allocation or encoding failed")
         }
 
         let va = fileOffsetToVA(cmpOff)
@@ -86,16 +86,16 @@ extension KernelJBPatcher {
             virtualAddress: va,
             description: "swap_submit cmp w2,#0x588 -> #0x6e0 [accept iOS 27 native SwapEnd struct]"
         )
-        return true
+        return .matched
     }
 
     @discardableResult
-    func patchIomfbSwapEndVariableSize() -> Bool {
+    func patchIomfbSwapEndVariableSize() -> RawStepResult {
         log("\n[JB] IOMFB SwapEnd dispatch checkStructureInputSize -> variable (accept iOS 27 native struct)")
 
         guard let seg = segments.first(where: { $0.name == "__DATA_CONST" }), seg.fileSize > 0 else {
             log("  [-] no __DATA_CONST segment")
-            return false
+            return .noMatch
         }
         let start = Int(seg.fileOffset)
         let end = start + Int(seg.fileSize)
@@ -120,7 +120,7 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] SwapEnd dispatch entry not found uniquely (found \(hits.count))")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let entryOff = hits[0]
@@ -137,6 +137,6 @@ extension KernelJBPatcher {
             virtualAddress: va,
             description: "SwapEnd checkStructureInputSize 0x588 -> variable [accept iOS 27 native IOMFBSwapRec]"
         )
-        return true
+        return .matched
     }
 }

@@ -21,17 +21,17 @@ extension KernelJBPatcher {
     ///   bl  port_name_to_task-like helper
     ///   cbz x0, fail       (same fail target)
     @discardableResult
-    func patchTaskForPid() -> Bool {
+    func patchTaskForPid() -> RawStepResult {
         log("\n[JB] _task_for_pid: upstream pid==0 gate NOP")
 
         guard let strOff = buffer.findString("proc_ro_ref_task") else {
             log("  [-] task_for_pid anchor function not found")
-            return false
+            return .noMatch
         }
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty, let funcStart = findFunctionStart(refs[0].adrpOff) else {
             log("  [-] task_for_pid anchor function not found")
-            return false
+            return .noMatch
         }
         let searchEnd = min(buffer.count, funcStart + 0x800)
 
@@ -48,7 +48,7 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] expected 1 upstream task_for_pid candidate, found \(hits.count)")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let patchOff = hits[0]
@@ -57,7 +57,7 @@ extension KernelJBPatcher {
              patchID: "kernelcache_jb.task_for_pid",
              virtualAddress: va,
              description: "NOP [_task_for_pid pid==0 gate]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

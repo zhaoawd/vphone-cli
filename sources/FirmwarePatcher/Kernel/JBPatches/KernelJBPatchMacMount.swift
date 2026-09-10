@@ -18,17 +18,17 @@ extension KernelJBPatcher {
     ///   2. Scan a bounded neighborhood for local callers.
     ///   3. Select the unique caller containing both upstream gates.
     @discardableResult
-    func patchMacMount() -> Bool {
+    func patchMacMount() -> RawStepResult {
         log("\n[JB] ___mac_mount: upstream twin bypass")
 
         guard let strOff = buffer.findString("mount_common()") else {
             log("  [-] mount_common anchor function not found")
-            return false
+            return .noMatch
         }
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty, let mountCommon = findFunctionStart(refs[0].adrpOff) else {
             log("  [-] mount_common anchor function not found")
-            return false
+            return .noMatch
         }
 
         // Scan +/-0x5000 of mount_common for callers in code ranges
@@ -51,7 +51,7 @@ extension KernelJBPatcher {
 
         guard candidates.count == 1 else {
             log("  [-] expected 1 upstream mac_mount candidate, found \(candidates.count)")
-            return false
+            return candidates.count > 1 ? .ambiguous(count: candidates.count) : .noMatch
         }
 
         let (branchOff, movOff) = candidates.values.first!
@@ -62,7 +62,7 @@ extension KernelJBPatcher {
         // build seen, but derived from the LDRB so the patch follows the encoding).
         guard let clearBytes = encodeMovXZeroForLdrbDest(at: movOff) else {
             log("  [-] mac_mount state gate: could not encode register clear")
-            return false
+            return .encodeFail(reason: "patchMacMount: allocation or encoding failed")
         }
 
         emit(branchOff, ARM64.nop,
@@ -73,7 +73,7 @@ extension KernelJBPatcher {
              patchID: "kernelcache_jb.mac_mount.state_clear",
              virtualAddress: va2,
              description: "mov x,xzr [___mac_mount upstream state clear]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

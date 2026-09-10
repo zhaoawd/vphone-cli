@@ -11,18 +11,19 @@ import Foundation
 extension KernelJBPatcher {
     /// Bypass the load_dylinker policy gate in the dyld path.
     @discardableResult
-    func patchLoadDylinker() -> Bool {
+    func patchLoadDylinker() -> RawStepResult {
         log("\n[JB] _load_dylinker: skip dyld policy check")
 
         guard let strOff = buffer.findString("/usr/lib/dyld") else {
             log("  [-] '/usr/lib/dyld' string not found")
-            return false
+            return .noMatch
         }
 
+        var encodingFailed = false
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty else {
             log("  [-] no kernel-text code refs to '/usr/lib/dyld'")
-            return false
+            return .noMatch
         }
 
         for (adrpOff, _) in refs {
@@ -34,18 +35,18 @@ extension KernelJBPatcher {
                 continue
             }
 
-            guard let bBytes = ARM64Encoder.encodeB(from: blOff, to: allowTarget) else { continue }
+            guard let bBytes = ARM64Encoder.encodeB(from: blOff, to: allowTarget) else { encodingFailed = true; continue }
 
             log("  [+] dyld anchor func at 0x\(String(format: "%X", funcStart)), patch BL at 0x\(String(format: "%X", blOff))")
             emit(blOff, bBytes,
                  patchID: "jb.load_dylinker.policy_bypass",
                  virtualAddress: fileOffsetToVA(blOff),
                  description: "b #0x\(String(format: "%X", allowTarget - blOff)) [_load_dylinker policy bypass]")
-            return true
+            return .matched
         }
 
         log("  [-] dyld policy gate not found in dyld-anchored function")
-        return false
+        return encodingFailed ? .encodeFail(reason: "branch encoding failed") : .noMatch
     }
 
     // MARK: - Private helpers

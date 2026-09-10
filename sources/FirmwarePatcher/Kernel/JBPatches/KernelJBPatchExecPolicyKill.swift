@@ -32,12 +32,12 @@ import Foundation
 
 extension KernelJBPatcher {
     @discardableResult
-    func patchExecSecurityPolicyKill() -> Bool {
+    func patchExecSecurityPolicyKill() -> RawStepResult {
         log("\n[JB] exec ip_mac_return SECURITY_POLICY kill: cbz -> b (allow)")
 
         guard let (ks, ke) = kernTextRange else {
             log("  [-] no kernel text range")
-            return false
+            return .noMatch
         }
 
         var hits: [(offset: Int, target: Int)] = []
@@ -73,14 +73,14 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] exec ip_mac_return kill guard not found uniquely (found \(hits.count))")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let (cbzOff, target) = hits[0]
 
         guard let bBytes = ARM64Encoder.encodeB(from: cbzOff, to: target) else {
             log("  [-] failed to encode B to 0x\(String(target, radix: 16))")
-            return false
+            return .encodeFail(reason: "patchExecSecurityPolicyKill: allocation or encoding failed")
         }
 
         let va = fileOffsetToVA(cbzOff)
@@ -91,6 +91,6 @@ extension KernelJBPatcher {
             virtualAddress: va,
             description: "cbz -> b [exec ip_mac_return SECURITY_POLICY kill bypass]"
         )
-        return true
+        return .matched
     }
 }

@@ -40,33 +40,33 @@ extension KernelJBPatcher {
 
     /// Faithful upstream C23: redirect ops[18] to a vnode-getattr trampoline.
     @discardableResult
-    func patchHookCredLabelUpdateExecve() -> Bool {
+    func patchHookCredLabelUpdateExecve() -> RawStepResult {
         log("\n[JB] _hook_cred_label_update_execve: faithful upstream C23")
 
         // 1. Find sandbox ops[18] entry and current wrapper target.
         guard let (opsTable, entryOff, entryRaw, wrapperOff) = findHookCredLabelWrapper() else {
-            return false
+            return .noMatch
         }
 
         // 2. Find vfs_context_current by prologue shape scan.
         let vfsCtxOff = findVfsContextCurrentByShape()
         guard vfsCtxOff >= 0 else {
             log("  [-] vfs_context_current not resolved")
-            return false
+            return .noMatch
         }
 
         // 3. Find vnode_getattr by BL scan near its log string.
         let vnodeGetattrOff = findVnodeGetattrViaString()
         guard vnodeGetattrOff >= 0 else {
             log("  [-] vnode_getattr not resolved")
-            return false
+            return .noMatch
         }
 
         // 4. Allocate code cave for 46 instructions (184 bytes).
         let caveSize = Self.c23CaveWords * 4
         guard let caveOff = findCodeCave(size: caveSize) else {
             log("  [-] no executable code cave found for faithful C23 (\(caveSize) bytes)")
-            return false
+            return .encodeFail(reason: "patchHookCredLabelUpdateExecve: allocation or encoding failed")
         }
 
         // 5. Build the C23 shellcode.
@@ -77,13 +77,13 @@ extension KernelJBPatcher {
             wrapperOff: wrapperOff
         ) else {
             log("  [-] failed to encode faithful C23 branch/call relocations")
-            return false
+            return .encodeFail(reason: "patchHookCredLabelUpdateExecve: allocation or encoding failed")
         }
 
         // 6. Retarget ops[18] to cave.
         guard let newEntry = encodeAuthRebaseLike(origVal: entryRaw, targetFoff: caveOff) else {
             log("  [-] failed to encode hook ops entry retarget")
-            return false
+            return .encodeFail(reason: "patchHookCredLabelUpdateExecve: allocation or encoding failed")
         }
 
         emit(entryOff, newEntry,
@@ -95,7 +95,7 @@ extension KernelJBPatcher {
              description: "faithful upstream C23 cave (vnode getattr -> uid/gid/P_SUGID fixup -> wrapper)")
 
         _ = opsTable
-        return true
+        return .matched
     }
 
     // MARK: - Sandbox Ops Table Finder

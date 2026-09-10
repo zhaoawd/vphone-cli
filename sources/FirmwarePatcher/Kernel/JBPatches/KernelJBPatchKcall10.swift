@@ -30,13 +30,13 @@ extension KernelJBPatcher {
 
     /// ABI-correct kcall10 patch: install a sysent[439] cave.
     @discardableResult
-    func patchKcall10() -> Bool {
+    func patchKcall10() -> RawStepResult {
         log("\n[JB] kcall10: ABI-correct sysent[439] cave")
 
         // 1. Find sysent table base (structural; this kernel is symbol-stripped).
         guard let sysEntOff = findSysentTable() else {
             log("  [-] sysent table not found")
-            return false
+            return .noMatch
         }
 
         let entry439 = sysEntOff + 439 * Self.sysent_entry_size
@@ -49,20 +49,20 @@ extension KernelJBPatcher {
         )
         guard mungerTarget >= 0 else {
             log("  [-] no unique reusable 8-arg munge32 helper found")
-            return false
+            return .noMatch
         }
 
         // 4. Build cave and allocate.
         let caveBytes = buildKcall10Cave()
         guard let caveOff = findCodeCave(size: caveBytes.count) else {
             log("  [-] no executable code cave found for kcall10")
-            return false
+            return .encodeFail(reason: "patchKcall10: allocation or encoding failed")
         }
 
         // 5. Read original sysent[439] chain metadata.
         guard entry439 + Self.sysent_entry_size <= buffer.count else {
             log("  [-] sysent[439] outside file")
-            return false
+            return .noMatch
         }
         let oldSyCallRaw = buffer.readU64(at: entry439)
         let callNext = extractChainNext(oldSyCallRaw)
@@ -106,7 +106,7 @@ extension KernelJBPatcher {
              patchID: "jb.kcall10.sysent_meta",
              description: "sysent[439].sy_return_type=7,sy_narg=8,sy_arg_bytes=0x20 [kcall10]")
 
-        return true
+        return .matched
     }
 
     // MARK: - Sysent Table Finder

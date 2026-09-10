@@ -22,25 +22,25 @@ extension KernelJBPatcher {
 
     /// Bypass the real rootvp auth failure branch inside _bsd_init.
     @discardableResult
-    func patchBsdInitAuth() -> Bool {
+    func patchBsdInitAuth() -> RawStepResult {
         log("\n[JB] _bsd_init: ignore FSIOC_KERNEL_ROOTAUTH failure")
 
         // Step 1: Recover _bsd_init function start.
         guard let funcStart = resolveBsdInit() else {
             log("  [-] _bsd_init not found")
-            return false
+            return .noMatch
         }
 
         // Step 2: Find the panic string ref inside this function.
         guard let (adrpOff, addOff) = rootvpPanicRefInFunc(funcStart) else {
             log("  [-] rootvp panic string ref not found in _bsd_init")
-            return false
+            return .noMatch
         }
 
         // Step 3: Find the BL to _panic near the ADD instruction.
         guard let blPanicOff = findPanicCallNear(addOff) else {
             log("  [-] BL _panic not found near rootvp panic string")
-            return false
+            return .noMatch
         }
 
         // Step 4: Scan backward from the ADRP for a valid cbnz gate site.
@@ -57,7 +57,7 @@ extension KernelJBPatcher {
 
         guard !candidates.isEmpty else {
             log("  [-] rootauth branch site not found")
-            return false
+            return .noMatch
         }
 
         let (branchOff, state): (Int, String)
@@ -68,21 +68,21 @@ extension KernelJBPatcher {
             let live = candidates.filter { $0.state == "live" }
             guard live.count == 1 else {
                 log("  [-] ambiguous rootauth branch sites: \(candidates.count) found")
-                return false
+                return .ambiguous(count: candidates.count)
             }
             (branchOff, state) = (live[0].off, live[0].state)
         }
 
         if state == "patched" {
             log("  [=] rootauth branch already bypassed at 0x\(String(format: "%X", branchOff))")
-            return true
+            return .idempotent
         }
 
         emit(branchOff, ARM64.nop,
              patchID: "jb.bsd_init_auth.nop_cbnz",
              virtualAddress: fileOffsetToVA(branchOff),
              description: "NOP cbnz (rootvp auth) [_bsd_init]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

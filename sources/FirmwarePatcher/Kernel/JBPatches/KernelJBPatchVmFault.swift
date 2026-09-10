@@ -16,7 +16,7 @@ extension KernelJBPatcher {
     ///
     /// NOPing the TBZ forces the fast-path unconditionally.
     @discardableResult
-    func patchVmFaultEnterPrepare() -> Bool {
+    func patchVmFaultEnterPrepare() -> RawStepResult {
         log("\n[JB] _vm_fault_enter_prepare: NOP")
 
         var candidateFuncs: [Int] = []
@@ -51,15 +51,15 @@ extension KernelJBPatcher {
                  patchID: "kernelcache_jb.vm_fault_enter_prepare",
                  virtualAddress: va,
                  description: "NOP [_vm_fault_enter_prepare]")
-            return true
+            return .matched
         } else if candidateSites.count > 1 {
             let list = candidateSites.sorted().map { String(format: "0x%X", $0) }.joined(separator: ", ")
             log("  [-] ambiguous vm_fault_enter_prepare candidates: \(list)")
-            return false
+            return .ambiguous(count: candidateSites.count)
         }
 
         log("  [-] patch site not found")
-        return false
+        return .noMatch
     }
 
     // MARK: - Private helpers

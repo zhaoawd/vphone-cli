@@ -51,7 +51,8 @@ public enum OutcomeKind: String, Codable, Sendable, Equatable {
 public enum RawStepResult: Sendable, Equatable {
     /// Anchor found and record(s) written.
     case matched
-    /// Anchor already patched; an idempotent record was emitted.
+    /// Anchor explicitly recognized as already patched. The method may emit an
+    /// idempotent record or preserve its legacy no-write behavior with no record.
     case idempotent
     /// No anchor found.
     case noMatch

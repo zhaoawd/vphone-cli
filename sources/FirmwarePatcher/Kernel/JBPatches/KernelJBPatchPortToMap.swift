@@ -11,18 +11,19 @@ import Foundation
 extension KernelJBPatcher {
     /// Skip kernel-map panic in _convert_port_to_map_with_flavor.
     @discardableResult
-    func patchConvertPortToMap() -> Bool {
+    func patchConvertPortToMap() -> RawStepResult {
         log("\n[JB] _convert_port_to_map_with_flavor: skip panic")
 
         guard let strOff = buffer.findString("userspace has control access to a kernel map") else {
             log("  [-] panic string not found")
-            return false
+            return .noMatch
         }
 
+        var encodingFailed = false
         let refs = findStringRefs(strOff)
         guard !refs.isEmpty else {
             log("  [-] no code refs")
-            return false
+            return .noMatch
         }
 
         for (adrpOff, _) in refs {
@@ -47,6 +48,7 @@ extension KernelJBPatcher {
                 // Found the conditional branch guarding the panic fall-through.
                 // Replace with unconditional B to the same forward target.
                 guard let bBytes = ARM64Encoder.encodeB(from: back + 4, to: branchTarget) else {
+                    encodingFailed = true
                     continue
                 }
 
@@ -54,11 +56,11 @@ extension KernelJBPatcher {
                      patchID: "jb.port_to_map.skip_panic",
                      virtualAddress: fileOffsetToVA(back + 4),
                      description: "b 0x\(String(format: "%X", branchTarget)) [_convert_port_to_map skip panic]")
-                return true
+                return .matched
             }
         }
 
         log("  [-] branch site not found")
-        return false
+        return encodingFailed ? .encodeFail(reason: "branch encoding failed") : .noMatch
     }
 }

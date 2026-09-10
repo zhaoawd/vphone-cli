@@ -17,12 +17,12 @@ extension KernelJBPatcher {
     /// Clear TSSF_CHECK_ENTITLEMENT in the flags passed by the thread_set_state
     /// user setters so Frida Stalker can update an existing thread's registers.
     @discardableResult
-    func patchThreadSetStateEntitlementFlag() -> Bool {
+    func patchThreadSetStateEntitlementFlag() -> RawStepResult {
         log("\n[FRIDA] thread_set_state: clear TSSF_CHECK_ENTITLEMENT in user setters")
 
         guard let strOff = buffer.findString(Self.tssEntitlement) else {
             log("  [~] thread-set-state entitlement string absent; skipping")
-            return true
+            return .noMatch
         }
 
         // All entitlement-string refs land in one function (thread_set_state_internal).
@@ -30,7 +30,7 @@ extension KernelJBPatcher {
         let starts = Set(refs.compactMap { findFunctionStart($0.adrpOff) })
         guard starts.count == 1, let fnStart = starts.first else {
             log("  [~] entitlement checks not in a single recovered function (\(starts.count)); skipping")
-            return true
+            return starts.count > 1 ? .ambiguous(count: starts.count) : .noMatch
         }
         let fnEnd = findFuncEnd(fnStart, maxSize: 0x1000)
 
@@ -54,7 +54,7 @@ extension KernelJBPatcher {
         let unique = Array(Set(setterOffsets)).sorted()
         guard !unique.isEmpty else {
             log("  [~] no TSSF_CHECK_ENTITLEMENT setter reaches thread_set_state; skipping")
-            return true
+            return .noMatch
         }
 
         for setterOff in unique {
@@ -67,14 +67,14 @@ extension KernelJBPatcher {
                   ops[1].type == AARCH64_OP_IMM, ops[1].imm == Int64(Self.tssFlagsCleared)
             else {
                 log("  [-] failed to assemble/verify cleared flags at 0x\(String(format: "%X", setterOff))")
-                return false
+                return .encodeFail(reason: "patchThreadSetStateEntitlementFlag: allocation or encoding failed")
             }
             emit(setterOff, bytes,
                  patchID: "kernelcache_frida.thread_set_state_entitlement_flag",
                  virtualAddress: fileOffsetToVA(setterOff),
                  description: "clear TSSF_CHECK_ENTITLEMENT (0x201 -> 0x1) [thread_set_state user setter, --frida]")
         }
-        return true
+        return .matched
     }
 
     // MARK: - Helpers

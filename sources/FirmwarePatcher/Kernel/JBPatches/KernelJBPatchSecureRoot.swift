@@ -20,13 +20,13 @@ import Foundation
 extension KernelJBPatcher {
     /// Force SecureRootName policy return to success in AppleARMPE::callPlatformFunction.
     @discardableResult
-    func patchIoSecureBsdRoot() -> Bool {
+    func patchIoSecureBsdRoot() -> RawStepResult {
         log("\n[JB] _IOSecureBSDRoot: force SecureRootName success")
 
         let candidates = findSecureRootFunctions()
         guard !candidates.isEmpty else {
             log("  [-] secure-root dispatch function not found")
-            return false
+            return .noMatch
         }
 
         // Collect the deny-return CSEL across every candidate function and require a
@@ -41,7 +41,7 @@ extension KernelJBPatcher {
 
         guard sites.count == 1 else {
             log("  [-] SecureRootName deny-return site not uniquely found (\(sites.count) candidates)")
-            return false
+            return sites.count > 1 ? .ambiguous(count: sites.count) : .noMatch
         }
 
         let (off, destReg) = sites[0]
@@ -49,13 +49,13 @@ extension KernelJBPatcher {
               let patchBytes = ARM64Encoder.encodeMovzW(rd: rd, imm16: 0)
         else {
             log("  [-] could not encode mov \(destReg), #0")
-            return false
+            return .encodeFail(reason: "patchIoSecureBsdRoot: allocation or encoding failed")
         }
         emit(off, patchBytes,
              patchID: "jb.io_secure_bsd_root.zero_return",
              virtualAddress: fileOffsetToVA(off),
              description: "mov \(destReg), #0 [_IOSecureBSDRoot SecureRootName allow]")
-        return true
+        return .matched
     }
 
     // MARK: - Private helpers

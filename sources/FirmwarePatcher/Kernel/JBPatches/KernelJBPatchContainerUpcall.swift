@@ -41,12 +41,12 @@ import Foundation
 
 extension KernelJBPatcher {
     @discardableResult
-    func patchContainerManagerUpcall() -> Bool {
+    func patchContainerManagerUpcall() -> RawStepResult {
         log("\n[JB] container-manager exec upcall: cbz w0 -> b (force success; skip autobox/temporary-sandbox)")
 
         guard let strOff = buffer.findString("failed to upcall to containermanagerd") else {
             log("  [-] 'failed to upcall to containermanagerd' string not found")
-            return false
+            return .noMatch
         }
 
         // The string ref (adrp+add loading the format string) sits on the failure
@@ -75,13 +75,13 @@ extension KernelJBPatcher {
 
         guard hits.count == 1 else {
             log("  [-] container-manager upcall guard not found uniquely (found \(hits.count))")
-            return false
+            return hits.count > 1 ? .ambiguous(count: hits.count) : .noMatch
         }
 
         let (cbzOff, target) = hits[0]
         guard let bBytes = ARM64Encoder.encodeB(from: cbzOff, to: target) else {
             log("  [-] failed to encode B to 0x\(String(target, radix: 16))")
-            return false
+            return .encodeFail(reason: "patchContainerManagerUpcall: allocation or encoding failed")
         }
 
         let va = fileOffsetToVA(cbzOff)
@@ -92,6 +92,6 @@ extension KernelJBPatcher {
             virtualAddress: va,
             description: "cbz w0 -> b [force container-manager exec upcall success; skip autobox/temporary-sandbox]"
         )
-        return true
+        return .matched
     }
 }

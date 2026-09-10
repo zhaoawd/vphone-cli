@@ -13,32 +13,32 @@ extension KernelJBPatcher {
     private static let vnodeCheckOpenIndex = 267
 
     @discardableResult
-    func patchFpfsScopedVnodeOpen() -> Bool {
+    func patchFpfsScopedVnodeOpen() -> RawStepResult {
         log("\n[JB] fpfs: scope vnode_check_open to FileProvider daemons")
 
         guard let opsTable = findSandboxOpsTableFpfs() else {
-            log("  [-] sandbox ops table not found"); return false
+            log("  [-] sandbox ops table not found"); return .noMatch
         }
         let entryOff = opsTable + Self.vnodeCheckOpenIndex * 8
-        guard entryOff + 8 <= buffer.count else { return false }
+        guard entryOff + 8 <= buffer.count else { return .noMatch }
         let entryRaw = buffer.readU64(at: entryOff)
         guard (entryRaw & (1 << 63)) != 0 else {
-            log("  [-] ops[267] not the real hook (neutered?): 0x\(String(format: "%016X", entryRaw))"); return false
+            log("  [-] ops[267] not the real hook (neutered?): 0x\(String(format: "%016X", entryRaw))"); return .noMatch
         }
         let realHookOff = decodeChainedPtr(entryRaw)
         guard realHookOff >= 0, codeRanges.contains(where: { realHookOff >= $0.start && realHookOff < $0.end }) else {
-            log("  [-] ops[267] target not in code"); return false
+            log("  [-] ops[267] target not in code"); return .noMatch
         }
 
-        guard let caveOff = findCodeCave(size: 20 * 4) else { log("  [-] no code cave"); return false }
-        guard let caveBytes = buildScopedOpenCave(caveOff: caveOff, realHookOff: realHookOff) else { return false }
-        guard let newEntry = encodeAuthRebaseTarget(origVal: entryRaw, targetFoff: caveOff) else { return false }
+        guard let caveOff = findCodeCave(size: 20 * 4) else { log("  [-] no code cave"); return .encodeFail(reason: "patchFpfsScopedVnodeOpen: allocation or encoding failed") }
+        guard let caveBytes = buildScopedOpenCave(caveOff: caveOff, realHookOff: realHookOff) else { return .encodeFail(reason: "patchFpfsScopedVnodeOpen: allocation or encoding failed") }
+        guard let newEntry = encodeAuthRebaseTarget(origVal: entryRaw, targetFoff: caveOff) else { return .encodeFail(reason: "patchFpfsScopedVnodeOpen: allocation or encoding failed") }
 
         emit(entryOff, newEntry, patchID: "jb.fpfs_scoped_open.ops_retarget",
              description: "ops[267] -> FileProvider-scoped vnode_check_open trampoline")
         emit(caveOff, caveBytes, patchID: "jb.fpfs_scoped_open.cave",
              description: "trampoline: FileProvider daemons -> real check, else allow")
-        return true
+        return .matched
     }
 
     // vphone600 struct offsets recovered via the kernel gdb stub; cave bytes verified by

@@ -27,12 +27,20 @@ public final class KernelJBPatcher: KernelJBPatcherBase, Patcher {
     /// JB/EXP firmware is byte-identical when false.
     public var applyFrida = false
 
-    public func findAll() throws -> [PatchRecord] {
-        try parseMachO()
+    private var didPrepare = false
+
+    func ensurePrepared() {
+        guard !didPrepare else { return }
+        parseMachO()
         buildADRPIndex()
         buildBLIndex()
         buildSymbolTable()
         findPanic()
+        didPrepare = true
+    }
+
+    public func findAll() throws -> [PatchRecord] {
+        ensurePrepared()
 
         // Group A
         patchAmfiCdhashInTrustcache()
