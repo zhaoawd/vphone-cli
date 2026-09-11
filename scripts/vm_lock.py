@@ -21,6 +21,8 @@ def check_inherited(directory):
     # Re-locking the same open-file description is harmless; an independently
     # opened descriptor cannot use this check to bypass an existing owner.
     fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    if os.path.lexists(directory / '.firmware-transaction'):
+        raise ValueError('pending firmware transaction; run patch-firmware --recover')
     return fd
 
 
@@ -39,6 +41,8 @@ def main(argv):
         directory = Path(argv[0]).resolve(strict=True)
         fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if argv[1] != 'fw-patch' and os.path.lexists(directory / '.firmware-transaction'):
+            raise ValueError('pending firmware transaction; run patch-firmware --recover')
         info = os.fstat(fd)
         record = dict(bundleIdentifier=f'{info.st_dev}:{info.st_ino}', bundlePath=str(directory),
                       pid=os.getpid(), instanceID=str(uuid.uuid4()),

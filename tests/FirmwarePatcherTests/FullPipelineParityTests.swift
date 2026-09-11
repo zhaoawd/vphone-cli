@@ -67,17 +67,23 @@ private final class MemoryPipelineLoader: FirmwarePipeline.FirmwareLoader {
     var saves: [URL] = []
 
     func load(from url: URL) throws -> Data {
-        if let data = outputs[url] { return data }
-        if let data = originalPayloads[url] { return data }
+        let key = logicalURL(url)
+        if let data = outputs[key] { return data }
+        if let data = originalPayloads[key] { return data }
         let bytes = try Data(contentsOf: url)
         let payload = try FirmwarePipeline.ContainerFirmwareLoader().load(from: url)
-        originalContainers[url] = bytes
-        originalPayloads[url] = payload
+        originalContainers[key] = bytes
+        originalPayloads[key] = payload
         return payload
     }
 
     func save(_ data: Data, to url: URL) throws {
-        outputs[url] = data
-        saves.append(url)
+        let key = logicalURL(url)
+        outputs[key] = data
+        saves.append(key)
+    }
+
+    private func logicalURL(_ url: URL) -> URL {
+        URL(fileURLWithPath: url.path.replacingOccurrences(of: "/.firmware-transaction/stage/", with: "/"))
     }
 }

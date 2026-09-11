@@ -87,6 +87,9 @@ public struct VPhoneBundleGuard: Sendable {
         do {
             lock = try VPhoneVMLock(directory: directory, operation: operation)
         } catch {
+            if let lockError = error as? VPhoneVMLockError, case .firmwareRecoveryRequired = lockError {
+                throw lockError
+            }
             throw VPhoneBundleGuardError.busy(
                 bundle: Self.bundleName(directory), detail: holderDetail(directory: directory))
         }

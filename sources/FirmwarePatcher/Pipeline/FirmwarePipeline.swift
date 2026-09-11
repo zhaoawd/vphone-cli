@@ -14,6 +14,7 @@
 
 import Darwin
 import Foundation
+import CryptoKit
 
 /// Orchestrates firmware patching for all boot-chain components.
 ///
@@ -83,6 +84,7 @@ public final class FirmwarePipeline {
     let forceExcGuard: Bool
     let enableFrida: Bool
     let loader: any FirmwareLoader
+    private var transaction: FirmwareTransaction?
 
     /// Set when the iPhone base is iOS 18.x (read from iPhone-BuildManifest.plist).
     /// Gates the skywalk-netagent boot-arg workaround (18.x-specific mDNSResponder
@@ -199,6 +201,111 @@ public final class FirmwarePipeline {
     /// ``PatchRunReport/failedRequired``. It throws only on hard I/O / format errors
     /// (missing files, unreadable payloads, unknown ablation ids).
     public func patchAllStructured(ablate ablateValues: [String] = [], allowOutput: Bool = true) throws -> PatchRunReport {
+        guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
+            throw PatcherError.invalidFormat("Pending firmware transaction; run patch-firmware --recover first")
+        }
+        let ablate = Set(ablateValues)
+        let unknown = ablate.subtracting(knownAblationTargets(buildComponentList()))
+        guard unknown.isEmpty else {
+            throw PatcherError.invalidFormat("unknown ablation id(s): \(unknown.sorted().joined(separator: ", "))")
+        }
+        if !ablate.isEmpty && !allowOutput {
+            return try executeStructured(ablate: ablateValues, allowOutput: false)
+        }
+        let (restore, _) = try prepare()
+        let rootInputs = try buildComponentList().filter { !$0.inRestoreDir }.map {
+            try findFile(in: vmDirectory, patterns: $0.searchPatterns, label: $0.name)
+        }
+        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: rootInputs + [restore], options: [
+            "variant": variant.rawValue, "noBinpack": String(noBinpack), "noVphoned": String(noVphoned),
+            "forceExcGuard": String(forceExcGuard), "frida": String(enableFrida),
+            "ablate": ablateValues.joined(separator: ","),
+        ])
+        do {
+            let staged = FirmwarePipeline(vmDirectory: transaction.stage, variant: variant, verbose: verbose,
+                noBinpack: noBinpack, noVphoned: noVphoned, forceExcGuard: forceExcGuard,
+                enableFrida: enableFrida, loader: loader)
+            staged.transaction = transaction
+            if variant == .less {
+                let restore = try staged.findRestoreDirectory()
+                try Self.validateManifestPaths(in: restore, name: "BuildManifest.plist")
+                try Self.validateManifestPaths(in: restore, name: "iPhone-BuildManifest.plist")
+            }
+            let report = try staged.executeStructured(ablate: ablateValues, allowOutput: allowOutput)
+            try transaction.saveReport(report)
+            guard report.failedRequired.isEmpty else {
+                transaction.recordFailure(PatcherError.patchSiteNotFound("Required patch failed; original firmware was not changed"))
+                return report
+            }
+            if variant == .less { try Self.validateManifest(in: staged.findRestoreDirectory()) }
+            let archive = try transaction.commit()
+            log("[+] Firmware transaction committed; receipt and backups: \(archive.path)")
+            return report
+        } catch {
+            transaction.recordFailure(error)
+            throw error
+        }
+    }
+
+    /// Call while holding the VM bundle lock. Recovery does not run patchers.
+    public static func recoverFirmware(in vmDirectory: URL) throws -> URL? {
+        try FirmwareTransaction.recover(vmDirectory: vmDirectory)
+    }
+
+    static func validateManifest(in restore: URL) throws {
+        let bytes = try Data(contentsOf: restore.appendingPathComponent("BuildManifest.plist"))
+        guard let root = try PropertyListSerialization.propertyList(from: bytes, format: nil) as? [String: Any],
+              let identities = root["BuildIdentities"] as? [[String: Any]], identities.count == 1,
+              let manifest = identities[0]["Manifest"] as? [String: [String: Any]] else {
+            throw PatcherError.invalidFormat("Invalid staged Manifest")
+        }
+        for (name, component) in manifest {
+            guard let info = component["Info"] as? [String: Any], let path = info["Path"] as? String,
+                  !path.hasPrefix("/"), !path.split(separator: "/").contains(".."),
+                  let expected = component["Digest"] as? Data else {
+                throw PatcherError.invalidFormat("Invalid staged Manifest component: \(name)")
+            }
+            let file = restore.appendingPathComponent(path)
+            guard file.resolvingSymlinksInPath().path.hasPrefix(restore.resolvingSymlinksInPath().path + "/") else {
+                throw PatcherError.invalidFormat("Manifest path escapes staged restore: \(name)")
+            }
+            let handle = try FileHandle(forReadingFrom: file)
+            defer { try? handle.close() }
+            var hash = SHA384()
+            while try autoreleasepool(invoking: {
+                guard let data = try handle.read(upToCount: 1024 * 1024), !data.isEmpty else { return false }
+                hash.update(data: data)
+                return true
+            }) {}
+            guard Data(hash.finalize()) == expected else {
+                throw PatcherError.patchVerificationFailed("Staged Manifest digest mismatch: \(name)")
+            }
+        }
+    }
+
+    private static func validateManifestPaths(in restore: URL, name: String) throws {
+        let bytes = try Data(contentsOf: restore.appendingPathComponent(name))
+        guard let root = try PropertyListSerialization.propertyList(from: bytes, format: nil) as? [String: Any],
+              let identities = root["BuildIdentities"] as? [[String: Any]], !identities.isEmpty else {
+            throw PatcherError.invalidFormat("Invalid staged input Manifest: \(name)")
+        }
+        for identity in identities {
+            guard let manifest = identity["Manifest"] as? [String: [String: Any]] else {
+                throw PatcherError.invalidFormat("Missing input Manifest components: \(name)")
+            }
+            for component in manifest.values {
+                // Some original identities contain non-file entries (rfta/rfts).
+                // Only file references can escape the staged input tree.
+                guard let info = component["Info"] as? [String: Any], info["Path"] != nil else { continue }
+                guard let path = info["Path"] as? String,
+                      !path.isEmpty, !path.hasPrefix("/"), !path.split(separator: "/").contains("..") else {
+                    throw PatcherError.invalidFormat("Input Manifest contains a path outside staged restore: \(name)")
+                }
+            }
+        }
+    }
+
+    private func executeStructured(ablate ablateValues: [String], allowOutput: Bool) throws -> PatchRunReport {
         // Validate ablation ids up front — before any component is loaded — so a
         // mistyped id fails fast instead of silently running as an unablated success.
         // The declared step-id set is gate-independent, so it is computed here without
@@ -214,11 +321,11 @@ public final class FirmwarePipeline {
             }
         }
 
-        // The less filesystem step writes external artifacts. Until C4 provides
-        // staging, a dry run must explicitly ablate this entire operation.
+        // Dry runs do not create a transaction. Filesystem operations require a
+        // staged output run, so a dry run must ablate this entire operation.
         if variant == .less, !ablate.isEmpty, !allowOutput,
            !StructuredExecution.isAblated(CryptexFilesystemPatcher.stepID, ablate) {
-            throw PatcherError.invalidFormat("less dry-run requires --ablate filesystem; filesystem staging is not implemented")
+            throw PatcherError.invalidFormat("less dry-run requires --ablate filesystem; filesystem operations require a staged output run")
         }
 
         let (restoreDir, gates) = try prepare()
@@ -612,7 +719,9 @@ public final class FirmwarePipeline {
                 return switch variant {
                 case .less:
                     [{ data, verbose in
-                        CryptexFilesystemPatcher(buildManiest: data, restoreDir: try! self.findRestoreDirectory(), verbose: verbose, noBinpack: self.noBinpack, noVphoned: self.noVphoned)
+                        let patcher = CryptexFilesystemPatcher(buildManiest: data, restoreDir: try! self.findRestoreDirectory(), verbose: verbose, noBinpack: self.noBinpack, noVphoned: self.noVphoned)
+                        patcher.transaction = self.transaction
+                        return patcher
                     }]
                 case .regular, .dev, .jb, .exp:
                     []

@@ -128,6 +128,9 @@ struct VPhoneBootCLI: ParsableCommand {
 }
 
 struct PatchFirmwareCLI: ParsableCommand {
+    @Flag(help: "Recover an interrupted firmware transaction without patching")
+    var recover = false
+
     enum VariantOption: String, CaseIterable, ExpressibleByArgument {
         case less
         case regular
@@ -223,6 +226,14 @@ struct PatchFirmwareCLI: ParsableCommand {
     var frida: Bool = false
 
     mutating func run() throws {
+        if recover {
+            let archive = try VPhoneBundleGuard.withBundleLock(directory: vmDirectory, operation: VPhoneVMOperation.fwPatch) { _ in
+                try FirmwarePipeline.recoverFirmware(in: vmDirectory)
+            }
+            print(archive.map { "[firmware] recovered; archive: \($0.path)" } ?? "[firmware] no pending transaction")
+            return
+        }
+
         let ablateIDs = Self.parseAblation(ablate)
 
         // Same protection as `fw patch`: a bare-path diagnostic entry must not

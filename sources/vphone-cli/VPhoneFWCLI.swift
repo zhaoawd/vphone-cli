@@ -96,6 +96,9 @@ struct VPhoneFWPrepareCommand: ParsableCommand {
 // MARK: - patch
 
 struct VPhoneFWPatchCommand: ParsableCommand {
+    @Flag(help: "Recover an interrupted firmware transaction without patching")
+    var recover = false
+
     static let configuration = CommandConfiguration(
         commandName: "patch", abstract: "Patch the boot chain (native Swift FirmwarePipeline)")
 
@@ -118,6 +121,14 @@ struct VPhoneFWPatchCommand: ParsableCommand {
     func run() throws {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
+        if recover {
+            let archive = try VPhoneBundleGuard.withBundleLock(directory: bundle.url, operation: VPhoneVMOperation.fwPatch) { _ in
+                try FirmwarePipeline.recoverFirmware(in: bundle.url)
+            }
+            print(archive.map { "[firmware] recovered; archive: \($0.path)" } ?? "[firmware] no pending transaction")
+            return
+        }
+
         let ablateIDs = PatchFirmwareCLI.parseAblation(ablate)
 
         // In-process pipeline (no subprocess) — CryptexFilesystemPatcher's

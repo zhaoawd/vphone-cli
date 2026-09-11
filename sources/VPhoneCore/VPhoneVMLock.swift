@@ -1,11 +1,16 @@
 import Darwin
 import Foundation
 
-public enum VPhoneVMLockError: Error, CustomStringConvertible {
+public enum VPhoneVMLockError: Error, CustomStringConvertible, LocalizedError {
     case unavailable(String, Int32)
+    case firmwareRecoveryRequired(String)
+
+    public var errorDescription: String? { description }
 
     public var description: String {
         switch self {
+        case let .firmwareRecoveryRequired(path):
+            return "Pending firmware transaction at \(path); run patch-firmware --recover before using this VM"
         case let .unavailable(path, code):
             return "VM lock unavailable at \(path): \(String(cString: strerror(code)))"
         }
@@ -49,6 +54,11 @@ public final class VPhoneVMLock {
         do {
             guard flock(fd, LOCK_EX | LOCK_NB) == 0 else {
                 throw VPhoneVMLockError.unavailable(directory.path, errno)
+            }
+            var pending = stat()
+            let pendingPath = directory.appendingPathComponent(".firmware-transaction").path
+            if operation != VPhoneVMOperation.fwPatch, lstat(pendingPath, &pending) == 0 {
+                throw VPhoneVMLockError.firmwareRecoveryRequired(pendingPath)
             }
             var info = stat()
             guard fstat(fd, &info) == 0 else { throw VPhoneVMLockError.unavailable(directory.path, errno) }

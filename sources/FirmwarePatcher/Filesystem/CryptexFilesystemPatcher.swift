@@ -52,6 +52,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     var buildManiest: Data
     var rebuiltData: Data?
     var tmpDirectories: [URL] = []
+    var transaction: FirmwareTransaction?
     
     // MARK: - Init
     
@@ -64,6 +65,8 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     }
     
     deinit {
+        // Transaction recovery owns these paths, including any mounted images.
+        guard transaction == nil else { return }
         for tmp in tmpDirectories {
             try? FileManager.default.removeItem(at: tmp)
         }
@@ -748,6 +751,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     }
     
     func createTmpDir() throws -> URL {
+        if let transaction { return try transaction.temporaryDirectory() }
         let tmpDir = FileManager.default.temporaryDirectory
             .appending(path: "vphone-\(UUID.init().uuidString)")
         try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
@@ -973,32 +977,13 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     
     // attachImage returns the device and mount point
     func attachImage(path: URL, readonly: Bool = false, forceRW: Bool = false) throws -> (String, String) {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/hdiutil")
-        process.arguments = if readonly {[
-            "attach",
-            "-readonly",
-            "-plist",
-            path.path,
-        ]} else {[
-            "attach",
-            "-plist",
-            path.path,
-        ]}
-        
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = pipe
-
-        try process.run()
-        process.waitUntilExit()
-        
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        guard process.terminationStatus == 0 else {
-            let output = String(data: data, encoding: .utf8) ?? ""
-            throw ProcessError.failed(process.terminationStatus, output)
+        let arguments = readonly ? ["attach", "-readonly", "-plist", path.path] : ["attach", "-plist", path.path]
+        let data = if let transaction {
+            try transaction.runTool("/usr/bin/hdiutil", arguments)
+        } else {
+            try FirmwareTransaction.run("/usr/bin/hdiutil", arguments)
         }
-        
+
         let root = try parsePlist(data: data)
         guard let entries = root["system-entities"] as? [Any] else {
             throw FirmwareManifest.ManifestError.missingKey("system-entities")
@@ -1025,6 +1010,10 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     }
     
     func runProcess(_ launchPath: String, _ arguments: [String], sudo: Bool = false, output: URL? = nil) throws -> String {
+        if let transaction {
+            if sudo && geteuid() != 0 { throw ProcessError.failed(42, "This operation requires root") }
+            return String(decoding: try transaction.runTool(launchPath, arguments, output: output), as: UTF8.self)
+        }
         let process = Process()
         if sudo {
             let whoami = try runProcess("/usr/bin/whoami", [])
