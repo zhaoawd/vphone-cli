@@ -77,3 +77,11 @@ vphone-cli fw patch VM_NAME --recover
 - `make build`：release 编译、签名与 app 打包通过。恢复提示透传修正后，共享操作保护定向回归 12 项通过；交付前再次执行 `make build`。
 - CLI 错误传播测试曾确认：待恢复错误被共享保护包装为普通 VM 占用提示。现已保留恢复错误类型和 `--recover` 提示；其他占用判断保持原路径。
 - 本轮未执行 VM 恢复刷写、启动和客户机功能验收，未更改二进制补丁匹配或指令内容。
+
+## 提交后 CLI 验证
+
+代码提交：`f7863e2`。该提交的 `make build` 通过，`codesign --verify --strict` 返回 0。但正式 release 和 app 内 CLI 执行 `--help` 均返回 137；新 inode 副本同样失败。系统日志明确报告 `Code has restricted entitlements, but the validation of its code signature failed`，因此静态签名通过不能记为当前宿主上的正式 CLI 运行通过。
+
+对本次二进制的临时副本使用空 entitlements 重新签名后，两个恢复入口的帮助信息、空初始化事务恢复、再次执行返回 `no pending transaction` 均通过。该实验只证明 CLI 解析、共享锁和恢复路径能执行；不验证带私有 entitlements 的正式程序或 VM 启动。临时副本已清理，正式二进制与宿主安全设置未修改。
+
+当前剩余限制分别是：完整 less 镜像成功验收需要更充足的磁盘空间；正式 CLI 执行需要符合项目运行要求的宿主签名/授权环境。两者不能互相替代，也不影响本轮 XCTest 实际事务恢复记录的结果。
