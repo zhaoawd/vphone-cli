@@ -1,0 +1,56 @@
+name: firmware checks (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Opt-in trusted runner only; never execute pull-request code on this host.
+jobs:
+  firmware:
+    if: github.ref == 'refs/heads/main' && vars.ENABLE_FIRMWARE_CI == 'true'
+    runs-on: [self-hosted, macOS, ARM64, vphone-firmware]
+    environment: firmware-validation
+    timeout-minutes: 45
+    concurrency:
+      group: vphone-firmware-validation
+      cancel-in-progress: false
+    env:
+      VPHONE_TEST_FIXTURES: ${{ vars.VPHONE_TEST_FIXTURES }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Initialize Swift dependencies
+        run: |
+          git submodule update --init --recursive --depth 1 \
+            vendor/swift-argument-parser vendor/Dynamic vendor/libcapstone-spm \
+            vendor/libimg4-spm vendor/MachOKit
+          printf 'enum VPhoneBuildInfo { static let commitHash = "%s" }\n' \
+            "$(git rev-parse --short HEAD)" > sources/vphone-cli/VPhoneBuildInfo.swift
+
+      - name: Check configured fixtures and run A1 firmware suite
+        id: tests
+        run: |
+          set -o pipefail
+          mkdir -p .build/ci
+          test -n "$VPHONE_TEST_FIXTURES" || { echo 'VPHONE_TEST_FIXTURES must be configured'; exit 1; }
+          make test_firmware 2>&1 | tee .build/ci/firmware.log
+
+      - name: Publish check summary
+        if: always()
+        env:
+          TEST_RESULT: ${{ steps.tests.outcome }}
+        run: |
+          printf '### Firmware fixture tests\n\nResult: %s\n\nThis suite does not boot a VM or execute the less acceptance pipeline.\n' \
+            "$TEST_RESULT" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: firmware-check-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .build/ci/*.log
+          if-no-files-found: warn
+          retention-days: 7

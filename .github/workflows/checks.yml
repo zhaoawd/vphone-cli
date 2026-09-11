@@ -1,0 +1,112 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast:
+    name: Fast tests (macOS ARM64)
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      PIP_CACHE_DIR: ${{ github.workspace }}/.build/pip-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Initialize Swift dependencies only
+        run: |
+          git submodule update --init --recursive --depth 1 \
+            vendor/swift-argument-parser vendor/Dynamic vendor/libcapstone-spm \
+            vendor/libimg4-spm vendor/MachOKit
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            scripts/setup_venv.sh
+
+      - name: Install native test dependencies
+        run: brew install keystone zstd xz actionlint
+
+      - name: Record toolchain and dependency identity
+        id: toolchain
+        run: |
+          mkdir -p .build/ci
+          {
+            sw_vers
+            xcodebuild -version
+            swift --version
+            python3 --version
+            brew list --versions keystone zstd xz
+            git submodule status --recursive
+          } | tee .build/ci/toolchain.log
+          printf 'digest=%s\n' "$(shasum -a 256 .build/ci/toolchain.log | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          # Swift tests compile the CLI without signing or launching a VM.
+          printf 'enum VPhoneBuildInfo { static let commitHash = "%s" }\n' \
+            "$(git rev-parse --short HEAD)" > sources/vphone-cli/VPhoneBuildInfo.swift
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .build/arm64-apple-macosx/debug
+            .build/test-cache
+            .build/test-module-cache
+          key: swift-${{ runner.os }}-${{ runner.arch }}-${{ steps.toolchain.outputs.digest }}-${{ hashFiles('Package.swift', 'Package.resolved', '**/Package.swift', '.gitmodules') }}-${{ github.sha }}
+          restore-keys: |
+            swift-${{ runner.os }}-${{ runner.arch }}-${{ steps.toolchain.outputs.digest }}-${{ hashFiles('Package.swift', 'Package.resolved', '**/Package.swift', '.gitmodules') }}-
+
+      - name: Check workflow and script syntax
+        id: syntax
+        run: |
+          set -o pipefail
+          actionlint -shellcheck= 2>&1 | tee .build/ci/workflows.log
+          python3 scripts/check_scripts.py 2>&1 | tee .build/ci/scripts.log
+
+      - name: Prepare project Python environment
+        id: dependencies
+        run: |
+          set -o pipefail
+          make setup_venv 2>&1 | tee .build/ci/setup.log
+
+      - name: Run A1 fast suite
+        id: tests
+        run: |
+          set -o pipefail
+          make test 2>&1 | tee .build/ci/fast.log
+
+      - name: Publish check summary
+        if: always()
+        env:
+          SYNTAX_RESULT: ${{ steps.syntax.outcome }}
+          DEPENDENCY_RESULT: ${{ steps.dependencies.outcome }}
+          TEST_RESULT: ${{ steps.tests.outcome }}
+        run: |
+          {
+            printf '### Fast checks\n\n'
+            printf '| Check | Result |\n| --- | --- |\n'
+            printf '| Script/workflow syntax | %s |\n' "$SYNTAX_RESULT"
+            printf '| Python dependencies | %s |\n' "$DEPENDENCY_RESULT"
+            printf '| A1 fast suite | %s |\n' "$TEST_RESULT"
+            printf '\nFirmware and VM boot tests are excluded. Logs are attached to this run.\n'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fast-check-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .build/ci/*.log
+          if-no-files-found: warn
+          retention-days: 7

@@ -34,6 +34,19 @@ class TestRunnerTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn(f"FIXTURES={(base / 'fixtures').resolve()}", result.stdout)
 
+    def test_fast_swift_does_not_inherit_firmware_acceptance_selectors(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            swift = Path(tmp) / "swift"
+            swift.write_text('#!/bin/sh\n[ -z "${VPHONE_C4_PIPELINE_VM+x}${VPHONE_LESS_PIPELINE_VM+x}${VPHONE_TEST_VMDIR+x}" ] || exit 67\n')
+            swift.chmod(0o755)
+            result = subprocess.run(
+                [sys.executable, str(RUNNER), "swift"],
+                env=dict(os.environ, PATH=tmp, VPHONE_C4_PIPELINE_VM="must-not-run",
+                         VPHONE_LESS_PIPELINE_VM="must-not-run", VPHONE_TEST_VMDIR="must-not-run"),
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_swift_failure_reaches_the_callers_exit_status(self):
         with tempfile.TemporaryDirectory() as tmp:
             swift = Path(tmp) / "swift"

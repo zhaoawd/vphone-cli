@@ -66,6 +66,11 @@ def run_python():
 
 def run_swift(firmware=False):
     env = os.environ.copy()
+    # Real firmware selectors must not activate acceptance tests in a fast run.
+    # The fixture suite also starts clean, then enables only its declared target.
+    for name in list(env):
+        if name.startswith(("VPHONE_TEST_", "VPHONE_LESS_", "VPHONE_C4_")):
+            del env[name]
     if firmware:
         env["VPHONE_TEST_FIXTURES"] = str(fixture_directory())
     cache = ROOT / ".build/test-cache"

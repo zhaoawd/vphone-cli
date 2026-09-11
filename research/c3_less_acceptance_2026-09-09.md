@@ -79,3 +79,7 @@ sudo -n env \
 本次覆盖 less 的真实 Filesystem → Manifest 产物链。未执行刷写、恢复或 VM 引导；不表示 C4 跨文件回滚或 C3 全部支持矩阵已经完成。
 
 验收完成后已卸载真实镜像与小型 APFS 实验镜像，`hdiutil info` 确认没有本次验收挂载。已删除独立解密验证副本和小型实验镜像；最终 AEA、Manifest、metadata、哈希与日志保留。
+
+## 2026-09-11 清理说明
+
+经用户确认，旧 `work/restore` 及 `seal-source` 内两份 DMG 已清理；本文运行结果保留为历史证据。旧 Manifest、报告和小型证据现位于同一归档的 `retained-restore-evidence`；原日志、verify 记录、工具和 seal-source BuildManifest 保留。删除清单及 SHA-256 见本地 `research/artifacts/cleanup-2026-09-11.json`。本文旧命令所需的完整输入目录已不存在，重新运行前需要重新准备样本。9 月 10 日完整成功产物不在本次删除范围。

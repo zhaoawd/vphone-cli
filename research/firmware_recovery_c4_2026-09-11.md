@@ -85,3 +85,13 @@ vphone-cli fw patch VM_NAME --recover
 对本次二进制的临时副本使用空 entitlements 重新签名后，两个恢复入口的帮助信息、空初始化事务恢复、再次执行返回 `no pending transaction` 均通过。该实验只证明 CLI 解析、共享锁和恢复路径能执行；不验证带私有 entitlements 的正式程序或 VM 启动。临时副本已清理，正式二进制与宿主安全设置未修改。
 
 当前剩余限制分别是：完整 less 镜像成功验收需要更充足的磁盘空间；正式 CLI 执行需要符合项目运行要求的宿主签名/授权环境。两者不能互相替代，也不影响本轮 XCTest 实际事务恢复记录的结果。
+
+## 2026-09-11 授权清理后的证据位置
+
+用户确认清理后，三份已恢复事务的 `stage` 已删除。完全相同的输入副本不再保留；后两份归档各有六个差异组件，已复制并校验到各自的 `retained-stage-differences`。journal、report、日志及先前的临时镜像清单保留。`.firmware-history` 当前约 88 MiB；当前 C4 Restore 输入和 9 月 10 日完整成功产物保留。
+
+同次清理删除了 9 月 9 日旧 `work/restore` 和两份 seal-source 镜像；旧 Manifest、报告和小型证据保存到 `c3-less-2026-09-09/retained-restore-evidence`，seal-source 的 BuildManifest 保留。逐文件大小、SHA-256、保留路径和删除结果见本地 `research/artifacts/cleanup-2026-09-11.json`。磁盘可用空间从约 21.9 GiB 增至 31.4 GiB，净增加约 9.5 GiB；APFS 克隆目录统计不能等同实际释放量。清理后无相关挂载。
+
+## 当前安排
+
+2026-09-11，用户因当前磁盘空间不足决定先绕过 C4。完整 less 成功验收暂停；C4 保持未完成，不再为本轮推进分配大型镜像。后续先推进不依赖固件样本的 A4 PR 快速测试，见 [A4 记录](pr_checks_a4_2026-09-11.md)。
