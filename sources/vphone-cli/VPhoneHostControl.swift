@@ -1,4 +1,5 @@
 import AppKit
+import CoreFoundation
 import Foundation
 import ImageIO
 import VPhoneCore
@@ -960,40 +961,70 @@ class VPhoneHostControl {
                                 message: "location_source_set mode must be fixed")
                         }
                         try Self.requireWGS84(json)
-                        let owner = json["owner"] as? String ?? ""
-                        let heartbeat = json["heartbeat_s"] as? Double ?? 1.0
+                        let owner = try Self.locationString(json, key: "owner")
+                        let heartbeat = try Self.locationDouble(
+                            json, key: "heartbeat_s", defaultValue: 1.0)
                         let fix = try Self.systemLocationFix(json)
-                        provider.beginExternalControl()
+                        let replace = try Self.locationBool(
+                            json, key: "replace", defaultValue: false)
+                        let persist = try Self.locationBool(
+                            json, key: "persist", defaultValue: false)
+                        try systemController.preflightFixedSource(
+                            owner: owner,
+                            fix: fix,
+                            heartbeatSeconds: heartbeat,
+                            replace: replace,
+                            persist: persist)
+                        let ownership = provider.beginExternalControl()
                         snapshot = try await systemController.setFixed(
                             owner: owner, fix: fix, heartbeatSeconds: heartbeat,
-                            replace: json["replace"] as? Bool ?? false,
-                            persist: json["persist"] as? Bool ?? false)
+                            replace: replace,
+                            persist: persist,
+                            precommit: {
+                                try provider.requireExternalControl(ownership)
+                            })
                     case "location_stream_start":
                         try Self.requireWGS84(json)
-                        provider.beginExternalControl()
+                        let owner = try Self.locationString(json, key: "owner")
+                        let watchdog = try Self.locationDouble(
+                            json, key: "watchdog_s", defaultValue: 3.0)
+                        let timeoutAction = try Self.locationString(
+                            json, key: "on_timeout", defaultValue: "hold")
+                        let replace = try Self.locationBool(
+                            json, key: "replace", defaultValue: false)
+                        try systemController.preflightStreamSource(
+                            owner: owner,
+                            watchdogSeconds: watchdog,
+                            onTimeout: timeoutAction,
+                            replace: replace)
+                        let ownership = provider.beginExternalControl()
                         snapshot = try await systemController.startStream(
-                            owner: json["owner"] as? String ?? "",
-                            watchdogSeconds: json["watchdog_s"] as? Double ?? 3.0,
-                            onTimeout: json["on_timeout"] as? String ?? "hold",
-                            replace: json["replace"] as? Bool ?? false)
+                            owner: owner,
+                            watchdogSeconds: watchdog,
+                            onTimeout: timeoutAction,
+                            replace: replace,
+                            precommit: {
+                                try provider.requireExternalControl(ownership)
+                            })
                     case "location_stream_push":
-                        let generation = json["generation"] as? String ?? ""
+                        let generation = try Self.locationString(
+                            json, key: "generation")
                         let fix = try Self.systemLocationFix(json)
                         snapshot = try await systemController.push(
                             generation: generation, fix: fix)
                     case "location_source_control":
-                        guard let paused = json["paused"] as? Bool else {
-                            throw VPhoneSystemLocationError(
-                                code: "invalid_location_source",
-                                message: "only paused control is currently supported")
-                        }
+                        let paused = try Self.locationBool(json, key: "paused")
+                        let generation = try Self.locationString(
+                            json, key: "generation")
                         snapshot = try await systemController.setPaused(
-                            paused, generation: json["generation"] as? String ?? "")
+                            paused, generation: generation)
                     case "location_source_status":
                         snapshot = systemController.snapshot()
                     case "location_source_stop":
+                        let generation = try Self.locationString(
+                            json, key: "generation")
                         snapshot = try await systemController.stop(
-                            generation: json["generation"] as? String)
+                            generation: generation)
                     default:
                         preconditionFailure("unreachable location command")
                     }
@@ -1018,15 +1049,28 @@ class VPhoneHostControl {
             // Fail-closed on the automation surface: reject out-of-range params,
             // require the guest to advertise the "location" capability, and wait
             // for the guest's ack (encode/disconnect/write/timeout all → ok:false).
-            guard let lat = json["lat"] as? Double, let lon = json["lon"] as? Double else {
-                writeResponse(fd, ok: false, error: "location requires lat and lon")
+            let lat: Double
+            let lon: Double
+            let alt: Double
+            let hacc: Double
+            let vacc: Double
+            let speed: Double
+            let course: Double
+            do {
+                lat = try Self.locationDouble(json, key: "lat")
+                lon = try Self.locationDouble(json, key: "lon")
+                alt = try Self.locationDouble(json, key: "alt", defaultValue: 0)
+                hacc = try Self.locationDouble(json, key: "hacc", defaultValue: 5)
+                vacc = try Self.locationDouble(json, key: "vacc", defaultValue: 5)
+                speed = try Self.locationDouble(json, key: "speed", defaultValue: 0)
+                course = try Self.locationDouble(json, key: "course", defaultValue: -1)
+            } catch let error as VPhoneSystemLocationError {
+                writeResponse(fd, ok: false, error: error.message)
+                return
+            } catch {
+                writeResponse(fd, ok: false, error: error.localizedDescription)
                 return
             }
-            let alt = json["alt"] as? Double ?? 0
-            let hacc = json["hacc"] as? Double ?? 5
-            let vacc = json["vacc"] as? Double ?? 5
-            let speed = json["speed"] as? Double ?? 0
-            let course = json["course"] as? Double ?? -1
             if let verr = Self.locationValidationError(
                 lat: lat, lon: lon, alt: alt, hacc: hacc,
                 vacc: vacc, speed: speed, course: course
@@ -1042,23 +1086,58 @@ class VPhoneHostControl {
                     result.error = "location provider unavailable"
                     return
                 }
+                guard let control = controller.control, control.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                guard control.guestCaps.contains("location") else {
+                    result.error = "guest does not support location simulation"
+                    return
+                }
                 // Take ownership of the guest location source: stop any Mac-location
                 // forwarding or route replay so this fixed fix isn't overwritten by
                 // the provider's next update (headless auto-forwards on connect; the
                 // GUI menu may be syncing or replaying a route). Ownership persists
                 // across guest reconnects until a GUI source is chosen again.
-                provider.beginExternalControl()
                 print("[location] deprecated host command 'location'; use location_source_set or stream")
                 do {
-                    _ = try await provider.systemLocationController.setFixed(
-                        owner: "legacy-uds",
-                        fix: VPhoneSystemLocationFix(
-                            producerSequence: 0,
-                            latitude: lat, longitude: lon, altitude: alt,
-                            horizontalAccuracy: hacc, verticalAccuracy: vacc,
-                            speed: speed, course: course,
-                            timestamp: Date().timeIntervalSince1970),
-                        heartbeatSeconds: 1.0)
+                    let legacyFix = VPhoneSystemLocationFix(
+                        producerSequence: 0,
+                        latitude: lat, longitude: lon, altitude: alt,
+                        horizontalAccuracy: hacc, verticalAccuracy: vacc,
+                        speed: speed, course: course,
+                        timestamp: Date().timeIntervalSince1970)
+                    if control.guestCaps.contains("location_owned") {
+                        try provider.systemLocationController.preflightFixedSource(
+                            owner: "legacy-uds",
+                            fix: legacyFix,
+                            heartbeatSeconds: 1.0,
+                            replace: true,
+                            persist: false)
+                        let ownership = provider.beginExternalControl()
+                        _ = try await provider.systemLocationController.setFixed(
+                            owner: "legacy-uds",
+                            fix: legacyFix,
+                            heartbeatSeconds: 1.0,
+                            replace: true,
+                            precommit: {
+                                try provider.requireExternalControl(ownership)
+                            })
+                    } else {
+                        let ownership = provider.beginExternalControl()
+                        _ = try await provider.systemLocationController.clearLegacyLocation(
+                            consistencyCheck: {
+                                try provider.requireExternalControl(ownership)
+                            },
+                            guestOperation: {
+                                try await Self.sendLegacyLocation(
+                                    legacyFix, control: control)
+                            },
+                            guestRollback: { rollbackFix in
+                                try await Self.sendLegacyLocation(
+                                    rollbackFix, control: control)
+                            })
+                    }
                     result.ok = true
                 } catch {
                     result.error = "\(error)"
@@ -1076,12 +1155,39 @@ class VPhoneHostControl {
                     result.error = "location provider unavailable"
                     return
                 }
-                // Silence the provider and hold ownership, else a live forwarder
-                // or a reconnect would re-inject a fix right after we clear.
-                provider.beginExternalControl()
+                guard let control = controller.control, control.isConnected else {
+                    result.error = "guest not connected"
+                    return
+                }
+                guard control.guestCaps.contains("location") else {
+                    result.error = "guest does not support location simulation"
+                    return
+                }
                 print("[location] deprecated host command 'location_stop'; use location_source_stop")
                 do {
-                    _ = try await provider.systemLocationController.clearLegacyLocation()
+                    if control.guestCaps.contains("location_owned") {
+                        // Silence the provider and hold ownership, else a live
+                        // forwarder or reconnect would re-inject after the clear.
+                        let ownership = provider.beginExternalControl()
+                        _ = try await provider.systemLocationController.clearLegacyLocation(
+                            consistencyCheck: {
+                                try provider.requireExternalControl(ownership)
+                            })
+                    } else {
+                        let ownership = provider.beginExternalControl()
+                        _ = try await provider.systemLocationController.clearLegacyLocation(
+                            consistencyCheck: {
+                                try provider.requireExternalControl(ownership)
+                            },
+                            guestOperation: {
+                                try await Self.sendLegacyLocation(
+                                    nil, control: control)
+                            },
+                            guestRollback: { rollbackFix in
+                                try await Self.sendLegacyLocation(
+                                    rollbackFix, control: control)
+                            })
+                    }
                     result.ok = true
                 } catch {
                     result.error = "\(error)"
@@ -1092,6 +1198,43 @@ class VPhoneHostControl {
 
         default:
             writeResponse(fd, ok: false, error: "unknown command: \(type)")
+        }
+    }
+
+    private static func sendLegacyLocation(
+        _ fix: VPhoneSystemLocationFix?,
+        control: VPhoneControl
+    ) async throws {
+        let payload: [String: Any]
+        let fallback: String
+        if let fix {
+            payload = [
+                "t": "location",
+                "lat": fix.latitude,
+                "lon": fix.longitude,
+                "alt": fix.altitude,
+                "hacc": fix.horizontalAccuracy,
+                "vacc": fix.verticalAccuracy,
+                "speed": fix.speed,
+                "course": fix.course,
+            ]
+            fallback = "guest rejected location"
+        } else {
+            payload = ["t": "location_stop"]
+            fallback = "guest rejected location_stop"
+        }
+
+        let response: [String: Any]
+        do {
+            (response, _) = try await control.sendRequest(payload)
+        } catch let error as VPhoneControl.ControlError {
+            throw VPhoneControlLocationGuestAdapter.map(error)
+        }
+        guard (response["t"] as? String) == "ok" else {
+            throw VPhoneSystemLocationError(
+                code: response["code"] as? String ?? "location_delivery_rejected",
+                message: response["msg"] as? String ?? fallback,
+                definitiveGuestRejection: true)
         }
     }
 
@@ -1107,20 +1250,93 @@ class VPhoneHostControl {
         }
     }
 
+    nonisolated static func locationDouble(
+        _ json: [String: Any],
+        key: String,
+        defaultValue: Double? = nil
+    ) throws -> Double {
+        guard let raw = json[key] else {
+            if let defaultValue { return defaultValue }
+            throw invalidLocationField(key, expected: "a number")
+        }
+        guard let number = strictJSONNumber(raw) else {
+            throw invalidLocationField(key, expected: "a number")
+        }
+        return number.doubleValue
+    }
+
+    nonisolated static func locationInteger(
+        _ json: [String: Any],
+        key: String
+    ) throws -> Int {
+        let value = try locationDouble(json, key: key)
+        let maximumSafeJSONInteger = 9_007_199_254_740_991.0
+        guard value.isFinite,
+              abs(value) <= maximumSafeJSONInteger,
+              let integer = Int(exactly: value)
+        else {
+            throw invalidLocationField(key, expected: "a safe integer")
+        }
+        return integer
+    }
+
+    nonisolated static func locationBool(
+        _ json: [String: Any],
+        key: String,
+        defaultValue: Bool? = nil
+    ) throws -> Bool {
+        guard let raw = json[key] else {
+            if let defaultValue { return defaultValue }
+            throw invalidLocationField(key, expected: "a boolean")
+        }
+        guard let number = raw as? NSNumber,
+              CFGetTypeID(number) == CFBooleanGetTypeID()
+        else {
+            throw invalidLocationField(key, expected: "a boolean")
+        }
+        return number.boolValue
+    }
+
+    nonisolated static func locationString(
+        _ json: [String: Any],
+        key: String,
+        defaultValue: String? = nil
+    ) throws -> String {
+        guard let raw = json[key] else {
+            if let defaultValue { return defaultValue }
+            throw invalidLocationField(key, expected: "a string")
+        }
+        guard let value = raw as? String else {
+            throw invalidLocationField(key, expected: "a string")
+        }
+        return value
+    }
+
+    private nonisolated static func strictJSONNumber(_ value: Any) -> NSNumber? {
+        guard let number = value as? NSNumber,
+              CFGetTypeID(number) != CFBooleanGetTypeID()
+        else { return nil }
+        return number
+    }
+
+    private nonisolated static func invalidLocationField(
+        _ key: String,
+        expected: String
+    ) -> VPhoneSystemLocationError {
+        VPhoneSystemLocationError(
+            code: "invalid_location_source",
+            message: "\(key) must be \(expected)")
+    }
+
     nonisolated static func systemLocationFix(
         _ json: [String: Any]
     ) throws -> VPhoneSystemLocationFix {
-        guard let sequence = json["producer_sequence"] as? Int,
-              let lat = json["lat"] as? Double,
-              let lon = json["lon"] as? Double
-        else {
-            throw VPhoneSystemLocationError(
-                code: "invalid_location_source",
-                message: "producer_sequence, lat and lon are required")
-        }
+        let sequence = try locationInteger(json, key: "producer_sequence")
+        let lat = try locationDouble(json, key: "lat")
+        let lon = try locationDouble(json, key: "lon")
         let timestamp: TimeInterval
-        if let numeric = json["timestamp"] as? Double {
-            timestamp = numeric
+        if json["timestamp"] == nil {
+            timestamp = 0
         } else if let text = json["timestamp"] as? String {
             let fractional = ISO8601DateFormatter()
             fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -1130,17 +1346,20 @@ class VPhoneHostControl {
                     code: "invalid_location_source", message: "timestamp must be ISO-8601")
             }
             timestamp = date.timeIntervalSince1970
+        } else if let raw = json["timestamp"], let numeric = strictJSONNumber(raw) {
+            timestamp = numeric.doubleValue
         } else {
-            timestamp = 0
+            throw invalidLocationField(
+                "timestamp", expected: "a number or ISO-8601 string")
         }
         return VPhoneSystemLocationFix(
             producerSequence: sequence,
             latitude: lat, longitude: lon,
-            altitude: json["alt"] as? Double ?? 0,
-            horizontalAccuracy: json["hacc"] as? Double ?? 5,
-            verticalAccuracy: json["vacc"] as? Double ?? 5,
-            speed: json["speed"] as? Double ?? 0,
-            course: json["course"] as? Double ?? -1,
+            altitude: try locationDouble(json, key: "alt", defaultValue: 0),
+            horizontalAccuracy: try locationDouble(json, key: "hacc", defaultValue: 5),
+            verticalAccuracy: try locationDouble(json, key: "vacc", defaultValue: 5),
+            speed: try locationDouble(json, key: "speed", defaultValue: 0),
+            course: try locationDouble(json, key: "course", defaultValue: -1),
             timestamp: timestamp)
     }
 

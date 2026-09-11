@@ -164,13 +164,13 @@ class VPhoneControl {
         }
     }
 
-    enum ControlError: Error, CustomStringConvertible {
+    enum ControlError: Error, CustomStringConvertible, Sendable {
         case notConnected
         case unsupportedCapability(String)
         case cancelled(String)
         case requestTimedOut(type: String, seconds: Int)
         case protocolError(String)
-        case guestError(String)
+        case guestError(code: String?, message: String)
 
         var description: String {
             switch self {
@@ -181,9 +181,17 @@ class VPhoneControl {
             case let .requestTimedOut(type, seconds):
                 "request timed out (\(type), \(seconds)s)"
             case let .protocolError(msg): "protocol error: \(msg)"
-            case let .guestError(msg): msg
+            case let .guestError(_, message): message
             }
         }
+    }
+
+    nonisolated static func controlError(
+        forGuestResponse response: [String: Any]
+    ) -> ControlError {
+        ControlError.guestError(
+            code: response["code"] as? String,
+            message: response["msg"] as? String ?? "unknown error")
     }
 
     private static func signCertURL() -> URL? {
@@ -561,9 +569,12 @@ class VPhoneControl {
     func installIPA(localURL: URL) async throws -> String {
         do {
             return try await installIPAWithBuiltInInstaller(localURL: localURL)
-        } catch let ControlError.guestError(message) where message == "unknown type: ipa_install" {
+        } catch let ControlError.guestError(_, message)
+            where message == "unknown type: ipa_install"
+        {
             throw ControlError.guestError(
-                "Guest vphoned does not support ipa_install yet. Reconnect or reboot the guest so the updated daemon can take over."
+                code: nil,
+                message: "Guest vphoned does not support ipa_install yet. Reconnect or reboot the guest so the updated daemon can take over."
             )
         }
     }
@@ -759,7 +770,9 @@ class VPhoneControl {
         // materialize; propagate that instead of reporting a phantom success.
         let ok = resp["ok"] as? Bool ?? false
         if !ok {
-            throw ControlError.guestError(resp["msg"] as? String ?? "failed to launch \(bundleId)")
+            throw ControlError.guestError(
+                code: nil,
+                message: resp["msg"] as? String ?? "failed to launch \(bundleId)")
         }
         return resp["pid"] as? Int ?? 0
     }
@@ -770,7 +783,9 @@ class VPhoneControl {
         // still running; don't swallow that into an unconditional success.
         let ok = resp["ok"] as? Bool ?? false
         if !ok {
-            throw ControlError.guestError(resp["msg"] as? String ?? "failed to terminate \(bundleId)")
+            throw ControlError.guestError(
+                code: nil,
+                message: resp["msg"] as? String ?? "failed to terminate \(bundleId)")
         }
     }
 
@@ -792,7 +807,7 @@ class VPhoneControl {
         let ok = resp["ok"] as? Bool ?? false
         if !ok {
             let msg = resp["msg"] as? String ?? "failed to open URL"
-            throw ControlError.guestError(msg)
+            throw ControlError.guestError(code: nil, message: msg)
         }
     }
 
@@ -847,7 +862,9 @@ class VPhoneControl {
         let (resp, _) = try await sendRequest(["t": "low_power_mode", "enabled": enabled])
         let ok = resp["ok"] as? Bool ?? false
         if !ok {
-            throw ControlError.guestError("low_power_mode: failed to set state on guest")
+            throw ControlError.guestError(
+                code: nil,
+                message: "low_power_mode: failed to set state on guest")
         }
     }
 
@@ -955,8 +972,10 @@ class VPhoneControl {
                     nonisolated(unsafe) let safeMsg = msg
 
                     if type == "err" {
-                        let detail = msg["msg"] as? String ?? "unknown error"
-                        DispatchQueue.main.async { pending.handler(.failure(ControlError.guestError(detail))) }
+                        let error = Self.controlError(forGuestResponse: msg)
+                        DispatchQueue.main.async {
+                            pending.handler(.failure(error))
+                        }
                         continue
                     }
 

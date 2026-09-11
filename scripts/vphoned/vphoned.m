@@ -19,6 +19,7 @@
 #include <stdatomic.h>
 #include <ifaddrs.h>
 #include <mach-o/dyld.h>
+#include <math.h>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -44,6 +45,20 @@
 #ifndef AF_VSOCK
 #define AF_VSOCK 40
 #endif
+
+static BOOL vp_parse_safe_json_integer(id value, NSInteger *parsed) {
+  if (![value isKindOfClass:[NSNumber class]] ||
+      CFGetTypeID((__bridge CFTypeRef)value) == CFBooleanGetTypeID()) {
+    return NO;
+  }
+  double number = [value doubleValue];
+  if (!isfinite(number) || trunc(number) != number ||
+      fabs(number) > 9007199254740991.0) {
+    return NO;
+  }
+  if (parsed) *parsed = (NSInteger)number;
+  return YES;
+}
 
 #define VMADDR_CID_ANY 0xFFFFFFFF
 #define VPHONED_PORT 1337
@@ -302,21 +317,23 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     NSString *generation = msg[@"generation"];
     if (generation != nil) {
       NSNumber *sequence = msg[@"delivery_sequence"];
-      if (![sequence isKindOfClass:[NSNumber class]]) {
+      NSInteger deliverySequence = 0;
+      if (!vp_parse_safe_json_integer(sequence, &deliverySequence) ||
+          deliverySequence < 0) {
         return location_protocol_response(
             VPLocationProtocolInvalid, reqId,
-            @"delivery_sequence is required for an owned location source");
+            @"delivery_sequence must be a non-negative safe integer");
       }
       BOOL idempotent = NO;
       VPLocationProtocolResult result = vp_location_simulate_owned(
-          generation, [sequence integerValue],
+          generation, deliverySequence,
           lat, lon, alt, hacc, vacc, speed, course,
           [msg[@"ts"] doubleValue], &idempotent);
       NSMutableDictionary *response = location_protocol_response(
           result, reqId, @"owned location delivery rejected");
       if (result == VPLocationProtocolOK) {
         response[@"generation"] = generation;
-        response[@"delivery_sequence"] = sequence;
+        response[@"delivery_sequence"] = @(deliverySequence);
         response[@"idempotent"] = @(idempotent);
       }
       return response;
@@ -494,6 +511,8 @@ static BOOL handle_client(int fd) {
         arrayWithObjects:@"hid", @"devmode", @"file", @"keychain", nil];
     if (vp_location_available())
       [caps addObject:@"location"];
+    if (vp_location_owned_available())
+      [caps addObject:@"location_owned"];
     if (vp_custom_installer_available())
       [caps addObject:@"ipa_install"];
     if (gClipboardAvailable)
