@@ -108,7 +108,23 @@ class VPhoneHostControl {
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
 
-        unlink(socketPath)
+        guard listenFD < 0 else { return }
+        let directory = URL(fileURLWithPath: socketPath).deletingLastPathComponent().path
+        var directoryInfo = stat()
+        guard lstat(directory, &directoryInfo) == 0,
+              directoryInfo.st_mode & S_IFMT == S_IFDIR,
+              directoryInfo.st_uid == geteuid(), directoryInfo.st_mode & 0o022 == 0 else {
+            print("[hostctl] socket directory must be owned by the current user and not writable by other users")
+            return
+        }
+        var existing = stat()
+        if lstat(socketPath, &existing) == 0 {
+            guard existing.st_mode & S_IFMT == S_IFSOCK, existing.st_uid == geteuid() else {
+                print("[hostctl] refusing to replace a non-socket or another user's socket")
+                return
+            }
+            unlink(socketPath)
+        }
 
         let fd = socket(AF_UNIX, SOCK_STREAM, 0)
         guard fd >= 0 else {
@@ -144,7 +160,12 @@ class VPhoneHostControl {
             return
         }
 
-        guard listen(fd, 4) == 0 else {
+        guard chmod(socketPath, 0o600) == 0 else {
+            close(fd)
+            unlink(socketPath)
+            return
+        }
+        guard listen(fd, Int32(HostControlIO.maximumConnections)) == 0 else {
             print("[hostctl] listen failed: \(String(cString: strerror(errno)))")
             close(fd)
             return
@@ -161,10 +182,11 @@ class VPhoneHostControl {
 
     func stop() {
         if listenFD >= 0 {
+            shutdown(listenFD, SHUT_RDWR)
             close(listenFD)
             listenFD = -1
+            unlink(socketPath)
         }
-        unlink(socketPath)
     }
 
     // MARK: - Compact Screenshot
@@ -280,29 +302,44 @@ class VPhoneHostControl {
     // MARK: - Accept Loop
 
     private nonisolated static func acceptLoop(listenFD: Int32, controller: VPhoneHostControl?) {
+        let slots = DispatchSemaphore(value: HostControlIO.maximumConnections)
         while true {
             let clientFD = accept(listenFD, nil, nil)
             guard clientFD >= 0 else { break }
+            HostControlIO.configure(clientFD)
+            var uid: uid_t = 0
+            var gid: gid_t = 0
+            guard getpeereid(clientFD, &uid, &gid) == 0, uid == geteuid(),
+                  slots.wait(timeout: .now()) == .success else {
+                close(clientFD)
+                continue
+            }
             // Handle each client on its own worker: commands that block for a
             // while (a long guest shell, a large file_get) must not freeze the
             // rest of the socket surface. Per-command ordering on the guest is
             // still enforced by the vsock request pipeline.
             DispatchQueue.global(qos: .userInitiated).async { [weak controller] in
+                defer { slots.signal() }
                 handleClient(clientFD, controller: controller)
             }
         }
     }
 
-    private nonisolated static func handleClient(_ fd: Int32, controller: VPhoneHostControl?) {
+    nonisolated static func handleClient(_ fd: Int32, controller: VPhoneHostControl?) {
         defer { close(fd) }
 
-        guard let line = readLine(from: fd) else { return }
+        let data: Data
+        do {
+            guard let request = try HostControlIO.readRequest(fd) else { return }
+            data = request
+        } catch {
+            writeResponse(fd, ok: false, error: "\(error)",
+                          extra: ["code": (error as? HostControlIO.Failure)?.rawValue ?? "io_error"])
+            return
+        }
 
-        guard let data = line.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let type = json["t"] as? String
-        else {
-            writeResponse(fd, ok: false, error: "invalid JSON")
+        guard let json = try? HostControlIO.decodeRequest(data), let type = json["t"] as? String else {
+            writeResponse(fd, ok: false, error: "invalid JSON", extra: ["code": "invalid_json"])
             return
         }
 
@@ -586,13 +623,19 @@ class VPhoneHostControl {
                     writeResponse(fd, ok: false, error: "data_b64 is not valid base64")
                     return
                 }
-                payload = decoded
-            } else if let loadPath = json["load"] as? String {
-                guard let read = FileManager.default.contents(atPath: loadPath) else {
-                    writeResponse(fd, ok: false, error: "cannot read host file: \(loadPath)")
+                guard decoded.count <= HostControlIO.maximumInlineBytes else {
+                    writeResponse(fd, ok: false, error: "inline file exceeds 1 MiB", extra: ["code": "file_too_large"])
                     return
                 }
-                payload = read
+                payload = decoded
+            } else if let loadPath = json["load"] as? String {
+                do {
+                    payload = try HostControlIO.loadFile(loadPath)
+                } catch {
+                    writeResponse(fd, ok: false, error: "cannot read host file: \(loadPath)",
+                                  extra: ["code": (error as? HostControlIO.Failure)?.rawValue ?? "io_error"])
+                    return
+                }
             } else {
                 writeResponse(fd, ok: false, error: "file_put requires data_b64 or load")
                 return
@@ -1409,23 +1452,6 @@ class VPhoneHostControl {
 
     // MARK: - Socket I/O
 
-    private nonisolated static func readLine(from fd: Int32) -> String? {
-        var buffer = [UInt8](repeating: 0, count: 4096)
-        var accumulated = Data()
-
-        while accumulated.count < 4096 {
-            let n = read(fd, &buffer, buffer.count)
-            guard n > 0 else { break }
-            accumulated.append(contentsOf: buffer[..<n])
-            if accumulated.contains(0x0A) { break }
-        }
-
-        if let nlRange = accumulated.firstIndex(of: 0x0A) {
-            return String(data: accumulated[..<nlRange], encoding: .utf8)
-        }
-        return accumulated.isEmpty ? nil : String(data: accumulated, encoding: .utf8)
-    }
-
     private nonisolated static func writeResponse(
         _ fd: Int32, ok: Bool, path: String? = nil, error: String? = nil, image: String? = nil,
         extra: [String: Any]? = nil
@@ -1441,15 +1467,6 @@ class VPhoneHostControl {
         else { return }
 
         json += "\n"
-        json.withCString { ptr in
-            var remaining = strlen(ptr)
-            var offset = 0
-            while remaining > 0 {
-                let written = write(fd, ptr.advanced(by: offset), remaining)
-                if written <= 0 { break }
-                offset += written
-                remaining -= written
-            }
-        }
+        HostControlIO.writeResponse(Data(json.utf8), to: fd)
     }
 }
