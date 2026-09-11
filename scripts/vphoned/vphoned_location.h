@@ -23,8 +23,12 @@ BOOL vp_location_load(void);
 /// Whether location simulation is available (load succeeded).
 BOOL vp_location_available(void);
 
-/// Bind subsequent owned deliveries to a host generation. Repeating begin is
-/// the reconnect handshake and resets the guest-local delivery sequence.
+/// Whether generation-owned location sources can set and clear simulation.
+BOOL vp_location_owned_available(void);
+
+/// Atomically clear any simulated location and bind subsequent owned deliveries
+/// to a host generation. Repeating begin is the reconnect handshake and resets
+/// the guest-local delivery sequence.
 VPLocationProtocolResult vp_location_begin(NSString *generation);
 
 /// Apply one generation-bound delivery. The first sequence after begin may be

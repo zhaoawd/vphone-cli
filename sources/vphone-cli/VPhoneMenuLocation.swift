@@ -100,13 +100,21 @@ extension VPhoneMenuController {
     @objc func toggleLocationSync() {
         guard let item = locationMenuItem else { return }
         if item.state == .on {
-            locationProvider?.stopForwarding()
-            control.sendLocationStop()
+            if let locationProvider {
+                guard locationProvider.stopAllLocationSourcesForGUI() else {
+                    print("[location] sync remains enabled: location source switch failed")
+                    return
+                }
+            } else {
+                control.sendLocationStop()
+            }
             item.state = .off
             print("[location] sync toggled off by user")
         } else {
-            locationProvider?.stopReplay()
-            locationProvider?.startForwarding()
+            guard let locationProvider, locationProvider.startForwarding() else {
+                print("[location] sync remains disabled: location source switch failed")
+                return
+            }
             item.state = .on
             print("[location] sync toggled on by user")
         }
@@ -116,26 +124,34 @@ extension VPhoneMenuController {
     @objc func setLocationPreset(_ sender: NSMenuItem) {
         guard locationMenuItem?.isEnabled == true else { return }
         guard sender.tag >= 0, sender.tag < locationPresets.count else { return }
+        guard let locationProvider else { return }
         let preset = locationPresets[sender.tag]
-        disableHostSyncForManualLocation()
-        locationProvider?.sendPreset(
+        guard locationProvider.sendPreset(
             name: preset.title,
             latitude: preset.latitude,
             longitude: preset.longitude,
             altitude: preset.altitude
-        )
+        ) else {
+            print("[location] preset not applied: location source switch failed")
+            return
+        }
+        disableHostSyncForManualLocation()
         refreshLocationReplayState(available: true)
     }
 
     @objc func startLocationReplay(_: NSMenuItem) {
         guard locationMenuItem?.isEnabled == true else { return }
-        disableHostSyncForManualLocation()
-        locationProvider?.startReplay(
+        guard let locationProvider else { return }
+        guard locationProvider.startReplay(
             name: locationReplayName,
             points: locationReplayPoints,
             intervalSeconds: 1.5,
             loop: true
-        )
+        ) else {
+            print("[location] replay not started: location source switch failed")
+            return
+        }
+        disableHostSyncForManualLocation()
         refreshLocationReplayState(available: true)
     }
 

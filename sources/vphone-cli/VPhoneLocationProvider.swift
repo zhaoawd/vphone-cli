@@ -10,6 +10,10 @@ import VPhoneCore
 /// after vphoned reconnects) - re-sends the last known position.
 @MainActor
 class VPhoneLocationProvider: NSObject {
+    struct ExternalControlToken: Equatable {
+        fileprivate let revision: UInt64
+    }
+
     struct ReplayPoint {
         let latitude: Double
         let longitude: Double
@@ -44,6 +48,7 @@ class VPhoneLocationProvider: NSObject {
         adapter: VPhoneControlLocationGuestAdapter(control: control),
         stateStore: VPhoneSystemLocationStateStore(url: locationStateURL))
     private var hostModeStarted = false
+    private var locationSourceRevision: UInt64 = 0
 
     /// True once an external controller (the UDS automation surface) has taken
     /// ownership of the guest location source. While set, reconnect logic must
@@ -97,18 +102,36 @@ class VPhoneLocationProvider: NSObject {
     /// (`startForwarding`/`sendPreset`/`startReplay`) is explicitly chosen again.
     /// This is also why there is no per-request release: a release keyed to one
     /// request could clear a *different* concurrent request's ownership.
-    func beginExternalControl() {
+    @discardableResult
+    func beginExternalControl() -> ExternalControlToken {
+        locationSourceRevision &+= 1
         externallyControlled = true
         stopReplay()
         stopForwarding()
+        return ExternalControlToken(revision: locationSourceRevision)
+    }
+
+    func requireExternalControl(_ token: ExternalControlToken) throws {
+        guard externallyControlled, token.revision == locationSourceRevision else {
+            throw VPhoneSystemLocationError(
+                code: "location_owner_conflict",
+                message: "location source superseded external request")
+        }
+    }
+
+    private func beginGUIControl() -> Bool {
+        locationSourceRevision &+= 1
+        guard systemLocationController.relinquishForGUI() else { return false }
+        externallyControlled = false
+        return true
     }
 
     /// Begin sending location to the guest.  Safe to call on every (re)connect.
-    func startForwarding() {
-        systemLocationController.relinquishForGUI()
-        externallyControlled = false
+    @discardableResult
+    func startForwarding() -> Bool {
+        guard let mgr = locationManager else { return false }
+        guard beginGUIControl() else { return false }
         stopReplay()
-        guard let mgr = locationManager else { return }
         mgr.requestAlwaysAuthorization()
         mgr.startUpdatingLocation()
         hostModeStarted = true
@@ -118,6 +141,7 @@ class VPhoneLocationProvider: NSObject {
             forward(last)
             print("[location] re-sent last known host location")
         }
+        return true
     }
 
     /// Stop forwarding host location updates.
@@ -129,10 +153,28 @@ class VPhoneLocationProvider: NSObject {
         }
     }
 
+    /// The GUI explicitly selected "no simulated location". Invalidate any
+    /// queued external ownership claim, remove persisted owned state, stop all
+    /// local producers, and clear the guest through the legacy GUI wire path.
+    @discardableResult
+    func stopAllLocationSourcesForGUI() -> Bool {
+        guard beginGUIControl() else { return false }
+        stopReplay()
+        stopForwarding()
+        control.sendLocationStop()
+        return true
+    }
+
     /// Send a fixed simulated location to the guest.
-    func sendPreset(name: String, latitude: Double, longitude: Double, altitude: Double = 0) {
-        systemLocationController.relinquishForGUI()
-        externallyControlled = false
+    @discardableResult
+    func sendPreset(
+        name: String,
+        latitude: Double,
+        longitude: Double,
+        altitude: Double = 0
+    ) -> Bool {
+        guard beginGUIControl() else { return false }
+        stopForwarding()
         stopReplay()
         sendSimulatedLocation(
             latitude: latitude,
@@ -144,22 +186,23 @@ class VPhoneLocationProvider: NSObject {
             course: -1
         )
         print("[location] applied preset '\(name)' (\(latitude), \(longitude))")
+        return true
     }
 
     /// Start replaying a list of simulated locations at a fixed interval.
+    @discardableResult
     func startReplay(
         name: String,
         points: [ReplayPoint],
         intervalSeconds: Double = 1.5,
         loop: Bool = true
-    ) {
+    ) -> Bool {
         guard !points.isEmpty else {
             print("[location] replay '\(name)' ignored: no points")
-            return
+            return false
         }
 
-        systemLocationController.relinquishForGUI()
-        externallyControlled = false
+        guard beginGUIControl() else { return false }
         stopForwarding()
         stopReplay()
 
@@ -207,6 +250,7 @@ class VPhoneLocationProvider: NSObject {
                 print("[location] replay finished: \(name)")
             }
         }
+        return true
     }
 
     /// Stop an active replay task.

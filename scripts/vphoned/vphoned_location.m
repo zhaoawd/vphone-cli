@@ -10,6 +10,7 @@ static SEL gClearLocationsSel = NULL;
 static SEL gFlushSel = NULL;
 static SEL gStartSimSel = NULL;
 static BOOL gLocationLoaded = NO;
+static BOOL gSimulationNeedsRestart = NO;
 static NSString *gOwnedGeneration = nil;
 static NSString *gLastClearedGeneration = nil;
 static NSInteger gLastDeliverySequence = -1;
@@ -139,10 +140,20 @@ BOOL vp_location_available(void) {
     return gLocationLoaded;
 }
 
+BOOL vp_location_owned_available(void) {
+    if (!gLocationLoaded || !gSimManager || !gSetLocationSel || !gClearLocationsSel)
+        return NO;
+    SEL stopSelector = NSSelectorFromString(@"stopLocationSimulation");
+    return gClearLocationsSel != stopSelector || gStartSimSel != nil;
+}
+
+static BOOL vp_location_restart_if_needed(void);
+
 static BOOL vp_location_simulate_raw(double lat, double lon, double alt,
                                      double hacc, double vacc,
                                      double speed, double course) {
     if (!gLocationLoaded || !gSimManager || !gSetLocationSel) return NO;
+    if (!vp_location_restart_if_needed()) return NO;
 
     @try {
         typedef struct { double latitude; double longitude; } CLCoord2D;
@@ -191,6 +202,7 @@ static BOOL vp_location_simulate_raw(double lat, double lon, double alt,
 
 static BOOL vp_location_clear_raw(void) {
     if (!gLocationLoaded || !gSimManager) return NO;
+    if (gSimulationNeedsRestart) return YES;
     // A clear selector is not required for the "location" capability, so its
     // absence is a real failure the caller must see (not a silent no-op).
     if (!gClearLocationsSel) {
@@ -202,10 +214,28 @@ static BOOL vp_location_clear_raw(void) {
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [gSimManager performSelector:gClearLocationsSel];
 #pragma clang diagnostic pop
+        if (gClearLocationsSel == NSSelectorFromString(@"stopLocationSimulation"))
+            gSimulationNeedsRestart = YES;
         NSLog(@"vphoned: cleared simulated location");
         return YES;
     } @catch (NSException *e) {
         NSLog(@"vphoned: clear_simulated_location exception: %@", e);
+        return NO;
+    }
+}
+
+static BOOL vp_location_restart_if_needed(void) {
+    if (!gSimulationNeedsRestart) return YES;
+    if (!gStartSimSel) return NO;
+    @try {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        [gSimManager performSelector:gStartSimSel];
+#pragma clang diagnostic pop
+        gSimulationNeedsRestart = NO;
+        return YES;
+    } @catch (NSException *e) {
+        NSLog(@"vphoned: restart location simulation exception: %@", e);
         return NO;
     }
 }
@@ -215,6 +245,9 @@ VPLocationProtocolResult vp_location_begin(NSString *generation) {
     if (![generation isKindOfClass:[NSString class]] || generation.length == 0)
         return VPLocationProtocolInvalid;
     @synchronized(vp_location_state_lock()) {
+        if (!vp_location_clear_raw()) return VPLocationProtocolUnavailable;
+        if (!vp_location_restart_if_needed())
+            return VPLocationProtocolUnavailable;
         gOwnedGeneration = [generation copy];
         gLastClearedGeneration = nil;
         gLastDeliverySequence = -1;
