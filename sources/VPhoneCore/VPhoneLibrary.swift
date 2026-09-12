@@ -35,13 +35,17 @@ public struct VPhoneLibrary: Sendable {
     public init(root: URL) { self.root = root }
 
     public static func defaultRoot() -> URL {
-        if let override = ProcessInfo.processInfo.environment["VPHONE_LIBRARY_ROOT"] {
+        defaultRoot(environment: ProcessInfo.processInfo.environment)
+    }
+
+    static func defaultRoot(environment: [String: String]) -> URL {
+        if let override = environment["VPHONE_LIBRARY_ROOT"] {
             return URL(fileURLWithPath: override, isDirectory: true)
         }
         // `~/.vphone/VMs` — deliberately space-free: bundle paths flow into the
         // shell/make firmware pipeline, and "Application Support" (a space) breaks
         // any unquoted expansion there. Keep the default path shell-safe.
-        return VPhoneResources.userDataRoot()
+        return VPhoneResources.userDataRoot(environment: environment)
             .appendingPathComponent("VMs", isDirectory: true)
     }
 

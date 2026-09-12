@@ -27,16 +27,14 @@ struct ResourcesTests {
     }
 
     @Test func cacheDirsAreHomeRelativeAndToolsBinIsBaseRelative() {
-        // The VPHONE_ROOT override would relocate the cache; only assert the default.
-        if ProcessInfo.processInfo.environment["VPHONE_ROOT"] != nil { return }
-        let r = VPhoneResources(base: URL(fileURLWithPath: "/Applications/vphone-cli.app/Contents/Resources"))
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/Applications/vphone-cli.app/Contents/Resources"), environment: [:])
         #expect(r.userCacheDir.path.hasSuffix("/.vphone"))
         #expect(r.toolsBinDir.path == r.base.appendingPathComponent(".tools/bin").path)
     }
 
     /// These all shell out; a missing interpreter must return false, not throw.
     @Test func venvProbesAreTotalForAMissingInterpreter() {
-        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"))
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [:])
         let missing = URL(fileURLWithPath: "/nonexistent/bin/python3")
         #expect(r.pythonIsUsable(missing) == false)
         #expect(r.keystoneIsUsable(missing) == false)
@@ -45,18 +43,13 @@ struct ResourcesTests {
     }
 
     @Test func managedVenvDefaultsUnderDotVphone() {
-        // The override env vars would change this; only assert the default.
-        if ProcessInfo.processInfo.environment["VPHONE_VENV_DIR"] != nil { return }
-        if ProcessInfo.processInfo.environment["VPHONE_ROOT"] != nil { return }
-        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"))
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [:])
         #expect(r.managedVenvDir.path.hasSuffix("/.vphone/venv"))
     }
 
     @Test func userCacheDirHonorsVPHONERoot() {
-        unsetenv("VPHONE_VENV_DIR")
-        setenv("VPHONE_ROOT", "/tmp/vphone-test-root", 1)
-        defer { unsetenv("VPHONE_ROOT") }
-        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"))
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"),
+                                environment: ["VPHONE_ROOT": "/tmp/vphone-test-root"])
         #expect(r.userCacheDir.path == "/tmp/vphone-test-root")
         #expect(r.ipswCacheDir.path == "/tmp/vphone-test-root/ipsws")
         #expect(r.sealVolumeCacheDir.path == "/tmp/vphone-test-root/tools")
@@ -65,13 +58,9 @@ struct ResourcesTests {
     }
 
     @Test func managedVenvOverrideBeatsVPHONERoot() {
-        setenv("VPHONE_ROOT", "/tmp/vphone-test-root", 1)
-        setenv("VPHONE_VENV_DIR", "/tmp/custom-venv", 1)
-        defer {
-            unsetenv("VPHONE_ROOT")
-            unsetenv("VPHONE_VENV_DIR")
-        }
-        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"))
+        let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [
+            "VPHONE_ROOT": "/tmp/vphone-test-root", "VPHONE_VENV_DIR": "/tmp/custom-venv",
+        ])
         #expect(r.managedVenvDir.path == "/tmp/custom-venv")
     }
 

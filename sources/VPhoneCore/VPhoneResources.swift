@@ -12,7 +12,21 @@ public enum VPhoneResourcesError: Error, Equatable {
 public struct VPhoneResources: Sendable {
     public let base: URL
 
-    public init(base: URL) { self.base = base }
+    private let environmentOverride: [String: String]?
+    private var environment: [String: String] {
+        environmentOverride ?? ProcessInfo.processInfo.environment
+    }
+
+    public init(base: URL) {
+        self.base = base
+        environmentOverride = nil
+    }
+
+    // Deterministic configuration for tests; normal callers keep live environment reads.
+    init(base: URL, environment: [String: String]) {
+        self.base = base
+        environmentOverride = environment
+    }
 
     // MARK: - Resolution
 
@@ -74,13 +88,17 @@ public struct VPhoneResources: Sendable {
     /// `VPhoneResources` (ipsws/tools/debs/venv) and `VPhoneLibrary` (VMs)
     /// derive from this so one variable redirects everything vphone-cli creates.
     public static func userDataRoot() -> URL {
-        if let root = ProcessInfo.processInfo.environment["VPHONE_ROOT"], !root.isEmpty {
+        userDataRoot(environment: ProcessInfo.processInfo.environment)
+    }
+
+    static func userDataRoot(environment: [String: String]) -> URL {
+        if let root = environment["VPHONE_ROOT"], !root.isEmpty {
             return URL(fileURLWithPath: root, isDirectory: true)
         }
         return FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".vphone")
     }
 
-    public var userCacheDir: URL { Self.userDataRoot() }
+    public var userCacheDir: URL { Self.userDataRoot(environment: environment) }
     public var ipswCacheDir: URL { userCacheDir.appendingPathComponent("ipsws") }
     public var sealVolumeCacheDir: URL { userCacheDir.appendingPathComponent("tools") }
     public var debsCacheDir: URL { userCacheDir.appendingPathComponent("debs") }
@@ -100,7 +118,7 @@ public struct VPhoneResources: Sendable {
     /// repo and the .app so the app is portable — a venv is never moved between
     /// machines (its links would break); it is built fresh on each host.
     public var managedVenvDir: URL {
-        if let dir = ProcessInfo.processInfo.environment["VPHONE_VENV_DIR"], !dir.isEmpty {
+        if let dir = environment["VPHONE_VENV_DIR"], !dir.isEmpty {
             return URL(fileURLWithPath: dir)
         }
         return userCacheDir.appendingPathComponent("venv")
