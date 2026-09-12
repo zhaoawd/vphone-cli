@@ -198,16 +198,13 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             let socketPath = options.configURL
                 .deletingLastPathComponent()
                 .appendingPathComponent("vphone.sock").path
-            let hc = VPhoneHostControl(socketPath: socketPath)
-            hc.start(
-                captureView: wc.captureView!,
-                screenRecorder: recorder,
-                control: control,
-                cameraServer: cameraServer,
-                locationProvider: locationProvider,
-                screenWidth: options.screenWidth,
-                screenHeight: options.screenHeight
-            )
+            let screen = VPhoneHostScreenAdapter(
+                view: wc.captureView!, recorder: recorder,
+                width: options.screenWidth, height: options.screenHeight)
+            let executor = VPhoneHostCommandExecutor(
+                control: control, camera: cameraServer, location: locationProvider, screen: screen)
+            let hc = VPhoneHostControl(socketPath: socketPath, executor: executor)
+            hc.start()
             hostControl = hc
 
             // Wire location toggle through onConnect/onDisconnect

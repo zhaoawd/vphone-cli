@@ -18,15 +18,15 @@ final class LocationHostControlParsingTests: XCTestCase {
             "lon": 118.8,
             "timestamp": "2026-08-05T10:00:00.123456+08:00",
         ]
-        let first = try VPhoneHostControl.systemLocationFix(payload)
-        let retry = try VPhoneHostControl.systemLocationFix(payload)
+        let first = try VPhoneHostCommandExecutor.systemLocationFix(payload)
+        let retry = try VPhoneHostCommandExecutor.systemLocationFix(payload)
         XCTAssertEqual(first, retry)
         XCTAssertEqual(first.producerSequence, 3)
         XCTAssertGreaterThan(first.timestamp, 0)
     }
 
     func testStreamFixRejectsInvalidTimestamp() {
-        XCTAssertThrowsError(try VPhoneHostControl.systemLocationFix([
+        XCTAssertThrowsError(try VPhoneHostCommandExecutor.systemLocationFix([
             "producer_sequence": 0,
             "lat": 31.2,
             "lon": 118.8,
@@ -49,7 +49,7 @@ final class LocationHostControlParsingTests: XCTestCase {
 
         for payload in invalidPayloads {
             XCTAssertThrowsError(
-                try VPhoneHostControl.systemLocationFix(parsedJSON(payload)),
+                try VPhoneHostCommandExecutor.systemLocationFix(parsedJSON(payload)),
                 "payload should be rejected: \(payload)"
             ) { error in
                 XCTAssertEqual(
@@ -69,24 +69,24 @@ final class LocationHostControlParsingTests: XCTestCase {
         }
         """#)
 
-        XCTAssertThrowsError(try VPhoneHostControl.locationDouble(
+        XCTAssertThrowsError(try VPhoneHostCommandExecutor.locationDouble(
             values, key: "heartbeat_s", defaultValue: 1))
-        XCTAssertThrowsError(try VPhoneHostControl.locationBool(
+        XCTAssertThrowsError(try VPhoneHostCommandExecutor.locationBool(
             values, key: "replace", defaultValue: false))
-        XCTAssertThrowsError(try VPhoneHostControl.locationString(
+        XCTAssertThrowsError(try VPhoneHostCommandExecutor.locationString(
             values, key: "on_timeout", defaultValue: "hold"))
-        XCTAssertThrowsError(try VPhoneHostControl.locationString(
+        XCTAssertThrowsError(try VPhoneHostCommandExecutor.locationString(
             values, key: "generation"))
-        XCTAssertThrowsError(try VPhoneHostControl.locationString(
+        XCTAssertThrowsError(try VPhoneHostCommandExecutor.locationString(
             [:], key: "generation"))
         XCTAssertEqual(
-            try VPhoneHostControl.locationDouble([:], key: "heartbeat_s", defaultValue: 1),
+            try VPhoneHostCommandExecutor.locationDouble([:], key: "heartbeat_s", defaultValue: 1),
             1)
         XCTAssertEqual(
-            try VPhoneHostControl.locationBool([:], key: "replace", defaultValue: false),
+            try VPhoneHostCommandExecutor.locationBool([:], key: "replace", defaultValue: false),
             false)
         XCTAssertEqual(
-            try VPhoneHostControl.locationString([:], key: "on_timeout", defaultValue: "hold"),
+            try VPhoneHostCommandExecutor.locationString([:], key: "on_timeout", defaultValue: "hold"),
             "hold")
     }
 
@@ -97,10 +97,10 @@ final class LocationHostControlParsingTests: XCTestCase {
             #"{"producer_sequence":9007199254740993}"#)
 
         XCTAssertEqual(
-            try VPhoneHostControl.locationInteger(maximum, key: "producer_sequence"),
+            try VPhoneHostCommandExecutor.locationInteger(maximum, key: "producer_sequence"),
             9_007_199_254_740_991)
         XCTAssertThrowsError(
-            try VPhoneHostControl.locationInteger(tooLarge, key: "producer_sequence")
+            try VPhoneHostCommandExecutor.locationInteger(tooLarge, key: "producer_sequence")
         ) { error in
             XCTAssertEqual(
                 (error as? VPhoneSystemLocationError)?.code,

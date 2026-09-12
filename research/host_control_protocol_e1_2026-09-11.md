@@ -37,3 +37,5 @@ socket 权限设为 0600。接收连接后使用 `getpeereid` 检查对端有效
 `make build` 通过，完成 release 编译、entitlements 签名和 app bundle。日志：`research/artifacts/e1-protocol-2026-09-11/build.log`。本轮未启动真实 VM；既有宿主私有 entitlements 运行限制仍保留。
 
 2026-09-12 核对：提交 `0eaec95` 的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34572983931) 已完成，结论为 success。此次仅查询远端结果，没有重新运行本地测试。
+
+2026-09-12，E2 已新增命令执行期限、协作取消和迟到结果处理。上述 E1 时点的命令生命周期限制由[E2 记录](host_control_e2_2026-09-12.md)补充；底层操作是否停止仍需区分。
