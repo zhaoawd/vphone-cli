@@ -74,3 +74,5 @@ socket 对端断开本身尚未转换为命令取消；该请求受命令期限�
 代码提交 `98fe7ec` 的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34675729174) 已完成且结果为 success；核对完整 SHA 为 `98fe7ecae9a3e5254fc6b6728b9fca3b7184ef74`。远端结果保存在上述目录的 `ci-result.json`。E2 已完成，项目计数为 12/28；E3/E4 和 C4 的未完成范围保持不变。
 
 同日后续：E3 已将实际 VM 的 socket 生命周期移出 GUI 分支，新增 boot_mode 能力字段，并完成限定实际 VM 接口验证。上文 GUI 生命周期与宿主执行限制描述属于 E2 时点；当前结果及限制见[E3 验收](host_control_e3_2026-09-12.md)。
+
+同日 E4 后续：客户机请求已支持 Task 取消、读取期限和连接身份隔离，协议集成测试及 CI 已通过。取消不代表客户机操作停止；实际运行限制见[E4 验收](guest_transport_e4_2026-09-12.md)。
