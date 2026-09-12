@@ -72,3 +72,5 @@ socket 对端断开本身尚未转换为命令取消；该请求受命令期限�
 `make build` 通过，完成 release 编译、entitlements 签名及 app bundle。构建通过不替代真实 VM 验收。日志及 SHA-256 清单保存在 `research/artifacts/e2-control-2026-09-12/`。
 
 代码提交 `98fe7ec` 的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34675729174) 已完成且结果为 success；核对完整 SHA 为 `98fe7ecae9a3e5254fc6b6728b9fca3b7184ef74`。远端结果保存在上述目录的 `ci-result.json`。E2 已完成，项目计数为 12/28；E3/E4 和 C4 的未完成范围保持不变。
+
+同日后续：E3 已将实际 VM 的 socket 生命周期移出 GUI 分支，新增 boot_mode 能力字段，并完成限定实际 VM 接口验证。上文 GUI 生命周期与宿主执行限制描述属于 E2 时点；当前结果及限制见[E3 验收](host_control_e3_2026-09-12.md)。

@@ -5,120 +5,175 @@ import VPhoneCore
 /// optional GUI capabilities live in VPhoneHostCommandExecutor.
 @MainActor
 final class VPhoneHostControl {
+    struct StartError: LocalizedError {
+        let message: String
+        var errorDescription: String? { message }
+    }
+
     private let socketPath: String
-    private var listenFD: Int32 = -1
+    private var source: DispatchSourceRead?
+    private var identity: (device: dev_t, inode: ino_t)?
+    private var stopped = false
     private let acceptQueue = DispatchQueue(label: "vphone.hostcontrol.accept")
     private let service: VPhoneHostCommandService
+    private let clients = Clients()
+
+    // Client workers own close(); stop only shuts down descriptors while holding
+    // the same lock, so it cannot accidentally shut down a reused descriptor.
+    final class Clients: @unchecked Sendable {
+        private let lock = NSLock()
+        private var descriptors: Set<Int32> = []
+        private var stopped = false
+        private let slots = DispatchSemaphore(value: HostControlIO.maximumConnections)
+
+        func add(_ fd: Int32) -> Bool {
+            lock.withLock {
+                guard !stopped, slots.wait(timeout: .now()) == .success else { return false }
+                descriptors.insert(fd)
+                return true
+            }
+        }
+
+        func closeClient(_ fd: Int32) {
+            lock.withLock {
+                if descriptors.remove(fd) != nil { close(fd); slots.signal() }
+            }
+        }
+
+        func stop() {
+            lock.withLock {
+                stopped = true
+                for fd in descriptors { shutdown(fd, SHUT_RDWR) }
+            }
+        }
+
+        var isStopped: Bool { lock.withLock { stopped } }
+    }
 
     init(socketPath: String, executor: VPhoneHostCommandExecutor) {
         self.socketPath = socketPath
         service = VPhoneHostCommandService(execute: executor.execute)
     }
 
-    func start() {
-        guard listenFD < 0 else { return }
+    func start() throws {
+        guard !stopped else { throw StartError(message: "host control already stopped") }
+        guard source == nil else { return }
         let directory = URL(fileURLWithPath: socketPath).deletingLastPathComponent().path
         var directoryInfo = stat()
         guard lstat(directory, &directoryInfo) == 0,
               directoryInfo.st_mode & S_IFMT == S_IFDIR,
               directoryInfo.st_uid == geteuid(), directoryInfo.st_mode & 0o022 == 0 else {
-            print("[hostctl] socket directory must be owned by the current user and not writable by other users")
-            return
+            throw StartError(message: "socket directory must be owned by the current user and not writable by other users")
         }
+        var address = sockaddr_un()
+        address.sun_family = sa_family_t(AF_UNIX)
+        let bytes = socketPath.utf8CString
+        guard !socketPath.utf8.contains(0), bytes.count <= MemoryLayout.size(ofValue: address.sun_path) else {
+            throw StartError(message: "invalid or oversized socket path")
+        }
+        withUnsafeMutablePointer(to: &address.sun_path) { pointer in
+            pointer.withMemoryRebound(to: CChar.self, capacity: bytes.count) { target in
+                for (index, byte) in bytes.enumerated() { target[index] = byte }
+            }
+        }
+
         var existing = stat()
         if lstat(socketPath, &existing) == 0 {
             guard existing.st_mode & S_IFMT == S_IFSOCK, existing.st_uid == geteuid() else {
-                print("[hostctl] refusing to replace a non-socket or another user's socket")
-                return
+                throw StartError(message: "refusing to replace a non-socket or another user's socket")
             }
-            unlink(socketPath)
+            let probe = socket(AF_UNIX, SOCK_STREAM, 0)
+            guard probe >= 0 else { throw StartError(message: "cannot probe existing socket") }
+            guard fcntl(probe, F_SETFL, O_NONBLOCK) == 0 else {
+                close(probe)
+                throw StartError(message: "cannot configure socket probe")
+            }
+            let result = withUnsafePointer(to: &address) { pointer in
+                pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                    connect(probe, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
+                }
+            }
+            let connectError = errno
+            close(probe)
+            guard result < 0, connectError == ECONNREFUSED else {
+                throw StartError(message: "socket already active or cannot be safely replaced")
+            }
+            var current = stat()
+            guard lstat(socketPath, &current) == 0,
+                  current.st_dev == existing.st_dev, current.st_ino == existing.st_ino,
+                  unlink(socketPath) == 0 else {
+                throw StartError(message: "stale socket changed or cannot be removed")
+            }
         }
 
         let fd = socket(AF_UNIX, SOCK_STREAM, 0)
-        guard fd >= 0 else {
-            print("[hostctl] failed to create socket: \(String(cString: strerror(errno)))")
-            return
+        guard fd >= 0 else { throw StartError(message: "failed to create socket") }
+        var published = false
+        defer {
+            if !published { close(fd); removeOwnedPath() }
         }
-
-        var addr = sockaddr_un()
-        addr.sun_family = sa_family_t(AF_UNIX)
-        let pathBytes = socketPath.utf8CString
-        guard pathBytes.count <= MemoryLayout.size(ofValue: addr.sun_path) else {
-            print("[hostctl] socket path too long")
-            close(fd)
-            return
+        guard fcntl(fd, F_SETFL, O_NONBLOCK) == 0 else {
+            throw StartError(message: "failed to configure listener")
         }
-        withUnsafeMutablePointer(to: &addr.sun_path) { ptr in
-            ptr.withMemoryRebound(to: CChar.self, capacity: pathBytes.count) { dst in
-                for (i, byte) in pathBytes.enumerated() {
-                    dst[i] = byte
-                }
+        let bound = withUnsafePointer(to: &address) { pointer in
+            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                bind(fd, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
             }
         }
-
-        let addrLen = socklen_t(MemoryLayout<sockaddr_un>.size)
-        let bindResult = withUnsafePointer(to: &addr) { ptr in
-            ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockPtr in
-                bind(fd, sockPtr, addrLen)
-            }
-        }
-        guard bindResult == 0 else {
-            print("[hostctl] bind failed: \(String(cString: strerror(errno)))")
-            close(fd)
-            return
-        }
-
-        guard chmod(socketPath, 0o600) == 0 else {
-            close(fd)
-            unlink(socketPath)
-            return
-        }
+        guard bound == 0 else { throw StartError(message: "bind failed: \(String(cString: strerror(errno)))") }
+        var info = stat()
+        guard lstat(socketPath, &info) == 0 else { throw StartError(message: "cannot inspect bound socket") }
+        identity = (info.st_dev, info.st_ino)
+        guard chmod(socketPath, 0o600) == 0 else { throw StartError(message: "failed to set socket permissions") }
         guard listen(fd, Int32(HostControlIO.maximumConnections)) == 0 else {
-            print("[hostctl] listen failed: \(String(cString: strerror(errno)))")
-            close(fd)
-            return
+            throw StartError(message: "listen failed: \(String(cString: strerror(errno)))")
         }
-
-        listenFD = fd
-        print("[hostctl] listening on \(socketPath)")
-
-        let capturedFD = fd
         let service = service
-        acceptQueue.async {
-            Self.acceptLoop(listenFD: capturedFD, service: service)
-        }
+        let clients = clients
+        let listener = DispatchSource.makeReadSource(fileDescriptor: fd, queue: acceptQueue)
+        listener.setEventHandler { @Sendable in Self.acceptAvailable(fd, service: service, clients: clients) }
+        listener.setCancelHandler { @Sendable in close(fd) }
+        source = listener
+        published = true
+        listener.resume()
+        print("[hostctl] listening on \(socketPath)")
     }
 
     func stop() {
+        stopped = true
         service.stop()
-        if listenFD >= 0 {
-            shutdown(listenFD, SHUT_RDWR)
-            close(listenFD)
-            listenFD = -1
-            unlink(socketPath)
-        }
+        clients.stop()
+        source?.cancel()
+        source = nil
+        removeOwnedPath()
     }
 
-    private nonisolated static func acceptLoop(listenFD: Int32, service: VPhoneHostCommandService) {
-        let slots = DispatchSemaphore(value: HostControlIO.maximumConnections)
-        while true {
-            let clientFD = accept(listenFD, nil, nil)
-            guard clientFD >= 0 else { break }
-            HostControlIO.configure(clientFD)
+    private func removeOwnedPath() {
+        guard let identity else { return }
+        var current = stat()
+        if lstat(socketPath, &current) == 0,
+           current.st_dev == identity.device, current.st_ino == identity.inode {
+            unlink(socketPath)
+        }
+        self.identity = nil
+    }
+
+    private nonisolated static func acceptAvailable(_ fd: Int32, service: VPhoneHostCommandService, clients: Clients) {
+        while !clients.isStopped {
+            let client = accept(fd, nil, nil)
+            if client < 0 {
+                if errno == EINTR { continue }
+                return
+            }
+            HostControlIO.configure(client)
             var uid: uid_t = 0
             var gid: gid_t = 0
-            guard getpeereid(clientFD, &uid, &gid) == 0, uid == geteuid(),
-                  slots.wait(timeout: .now()) == .success else {
-                close(clientFD)
+            guard getpeereid(client, &uid, &gid) == 0, uid == geteuid(), clients.add(client) else {
+                close(client)
                 continue
             }
-            // Handle each client on its own worker: commands that block for a
-            // while (a long guest shell, a large file_get) must not freeze the
-            // rest of the socket surface. Per-command ordering on the guest is
-            // still enforced by the vsock request pipeline.
             DispatchQueue.global(qos: .userInitiated).async {
-                defer { slots.signal() }
-                handleClient(clientFD, service: service)
+                handleClient(client, service: service, clients: clients)
             }
         }
     }
@@ -126,8 +181,8 @@ final class VPhoneHostControl {
     // This box is written once before signal() and read only after wait().
     private final class Reply: @unchecked Sendable { var data = Data() }
 
-    nonisolated static func handleClient(_ fd: Int32, service: VPhoneHostCommandService) {
-        defer { close(fd) }
+    nonisolated static func handleClient(_ fd: Int32, service: VPhoneHostCommandService, clients: Clients? = nil) {
+        defer { if let clients { clients.closeClient(fd) } else { close(fd) } }
         let request: Data
         do {
             guard let data = try HostControlIO.readRequest(fd) else { return }

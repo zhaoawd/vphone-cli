@@ -4,7 +4,7 @@ import VPhoneCore
 @testable import vphone_cli
 
 @MainActor
-private final class HostGuestFake: VPhoneHostGuest {
+final class HostGuestFake: VPhoneHostGuest {
     var isConnected = true
     var guestCaps = ["hid", "shell", "file", "apps", "url", "clipboard", "location", "location_owned", "vcam_status", "ipa_install"]
     var failure: Error?
@@ -45,7 +45,7 @@ private final class HostGuestFake: VPhoneHostGuest {
 }
 
 @MainActor
-private final class HostScreenFake: VPhoneHostScreen {
+final class HostScreenFake: VPhoneHostScreen {
     var isAvailable = true
     var colors: [Bool] = []
     var failure: Error?
@@ -58,7 +58,7 @@ private final class HostScreenFake: VPhoneHostScreen {
 }
 
 @MainActor
-private final class HostCameraFake: VPhoneHostCamera {
+final class HostCameraFake: VPhoneHostCamera {
     var isConnected = true
     var accepts = true
     var presented: String?
@@ -70,7 +70,7 @@ private final class HostCameraFake: VPhoneHostCamera {
 }
 
 @MainActor
-private final class HostLocationGuestFake: VPhoneSystemLocationGuestAdapter {
+final class HostLocationGuestFake: VPhoneSystemLocationGuestAdapter {
     var failure: VPhoneSystemLocationError?
     var fixes: [VPhoneSystemLocationFix] = []
     func requireOwnedLocationCapability() throws { if let failure { throw failure } }
@@ -80,7 +80,7 @@ private final class HostLocationGuestFake: VPhoneSystemLocationGuestAdapter {
 }
 
 @MainActor
-private final class HostLocationFake: VPhoneHostLocation {
+final class HostLocationFake: VPhoneHostLocation {
     let guest = HostLocationGuestFake()
     lazy var systemLocationController = VPhoneSystemLocationController(adapter: guest)
     var ownershipChecks = 0

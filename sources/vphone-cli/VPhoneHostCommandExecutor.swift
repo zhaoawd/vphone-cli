@@ -5,6 +5,8 @@ import VPhoneCore
 /// JSON command semantics, independent of sockets and AppKit views.
 @MainActor
 final class VPhoneHostCommandExecutor {
+    enum BootMode: String { case normal, dfu }
+    private let bootMode: BootMode
     private let control: (any VPhoneHostGuest)?
     private let cameraServer: (any VPhoneHostCamera)?
     private let locationProvider: (any VPhoneHostLocation)?
@@ -13,11 +15,13 @@ final class VPhoneHostCommandExecutor {
     init(control: (any VPhoneHostGuest)? = nil,
          camera: (any VPhoneHostCamera)? = nil,
          location: (any VPhoneHostLocation)? = nil,
-         screen: (any VPhoneHostScreen)? = nil) {
-        self.control = control
-        cameraServer = camera
-        locationProvider = location
-        self.screen = screen
+         screen: (any VPhoneHostScreen)? = nil,
+         bootMode: BootMode = .normal) {
+        self.bootMode = bootMode
+        self.control = bootMode == .normal ? control : nil
+        cameraServer = bootMode == .normal ? camera : nil
+        locationProvider = bootMode == .normal ? location : nil
+        self.screen = bootMode == .normal ? screen : nil
     }
 
     private func captureCompactScreenshot(color: Bool = false) async -> String? {
@@ -28,6 +32,10 @@ final class VPhoneHostCommandExecutor {
     func execute(_ data: Data) async -> Data {
         guard let json = try? HostControlIO.decodeRequest(data), let type = json["t"] as? String else {
             return Self.response(ok: false, error: "invalid JSON", extra: ["code": "invalid_json"])
+        }
+        guard bootMode != .dfu || type == "capabilities" else {
+            return Self.response(ok: false, error: "command unavailable in DFU mode",
+                                 extra: ["code": "capability_unavailable"])
         }
         // Whether to include a compact screenshot in the response (default: true)
         let wantScreen = json["screen"] as? Bool ?? true
@@ -862,7 +870,7 @@ final class VPhoneHostCommandExecutor {
         commands["camera_present"] = cameraServer?.isConnected == true && caps.contains("vcam_status")
         commands["camera_status"] = cameraServer != nil
         commands["camera_stop"] = cameraServer != nil
-        return ["protocol_version": 1, "guest_connected": connected,
+        return ["protocol_version": 1, "boot_mode": bootMode.rawValue, "guest_connected": connected,
                 "guest_capabilities": caps, "screen_available": visible,
                 "commands": commands,
                 "limits": ["request_bytes": HostControlIO.maximumRequestBytes,

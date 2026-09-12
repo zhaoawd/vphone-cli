@@ -65,7 +65,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 try await self.startVirtualMachine()
             } catch {
                 print("[vphone] Fatal: \(error)")
-                exit(EXIT_FAILURE)
+                VPhoneExitStatus.pending = EXIT_FAILURE
+                NSApp.terminate(nil)
             }
         }
     }
@@ -141,6 +142,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
+        var hostScreen: (any VPhoneHostScreen)?
         if !cli.noGraphics {
             let keyHelper = VPhoneKeyHelper(vm: vm, control: control)
             let wc = VPhoneWindowController()
@@ -195,17 +197,9 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             mc.screenRecorder = recorder
             menuController = mc
 
-            let socketPath = options.configURL
-                .deletingLastPathComponent()
-                .appendingPathComponent("vphone.sock").path
-            let screen = VPhoneHostScreenAdapter(
+            hostScreen = VPhoneHostScreenAdapter(
                 view: wc.captureView!, recorder: recorder,
                 width: options.screenWidth, height: options.screenHeight)
-            let executor = VPhoneHostCommandExecutor(
-                control: control, camera: cameraServer, location: locationProvider, screen: screen)
-            let hc = VPhoneHostControl(socketPath: socketPath, executor: executor)
-            hc.start()
-            hostControl = hc
 
             // Wire location toggle through onConnect/onDisconnect
             control.onConnect = { [weak mc, weak provider = locationProvider] caps in
@@ -277,6 +271,19 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 provider?.stopForwarding()
             }
         }
+
+        // Ordinary GUI/headless VMs share one control lifetime. DFU exposes only
+        // discovery: vphoned and its guest capabilities are not running there.
+        let executor = VPhoneHostCommandExecutor(
+            control: control, camera: cameraServer, location: locationProvider,
+            screen: hostScreen, bootMode: cli.dfu ? .dfu : .normal)
+        let hc = VPhoneHostControl(
+            socketPath: options.configURL.deletingLastPathComponent()
+                .appendingPathComponent("vphone.sock").path,
+            executor: executor)
+        hostControl = hc
+        try hc.start()
+
     }
 
     @MainActor

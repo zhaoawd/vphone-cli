@@ -54,7 +54,7 @@ final class HostControlProtocolTests: XCTestCase {
         let path = directory.appendingPathComponent("vphone.sock").path
         let server = VPhoneHostControl(socketPath: path, executor: VPhoneHostCommandExecutor())
         defer { server.stop(); try? FileManager.default.removeItem(at: directory) }
-        server.start()
+        try server.start()
         let attributes = try FileManager.default.attributesOfItem(atPath: path)
         XCTAssertEqual((attributes[.posixPermissions] as? NSNumber)?.intValue, 0o600)
         let data = try await Task.detached {
