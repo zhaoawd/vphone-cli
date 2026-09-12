@@ -1312,6 +1312,7 @@ final class SystemLocationControllerTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = VPhoneSystemLocationStateStore(url: stateURL)
 
+        let originalGeneration: String
         do {
             let guest = FakeSystemLocationGuestAdapter()
             let controller = VPhoneSystemLocationController(
@@ -1322,6 +1323,7 @@ final class SystemLocationControllerTests: XCTestCase {
                 fix: fix(0),
                 heartbeatSeconds: 60,
                 persist: true)
+            originalGeneration = try XCTUnwrap(snapshot["generation"] as? String)
             let desired = try XCTUnwrap(snapshot["desired"] as? [String: Any])
             XCTAssertEqual(desired["persistent"] as? Bool, true)
             XCTAssertEqual(desired["heartbeat_s"] as? Double, 60)
@@ -1333,16 +1335,86 @@ final class SystemLocationControllerTests: XCTestCase {
             adapter: restoredGuest,
             stateStore: store)
         let before = restored.snapshot()
-        let oldGeneration = try XCTUnwrap(before["generation"] as? String)
+        let restoredGeneration = try XCTUnwrap(before["generation"] as? String)
+        XCTAssertNotEqual(restoredGeneration, originalGeneration)
         XCTAssertEqual(before["state"] as? String, "applying")
         await restored.reapplyAfterReconnect()
 
-        XCTAssertEqual(restoredGuest.activations, [oldGeneration])
+        XCTAssertEqual(restoredGuest.activations, [restoredGeneration])
         XCTAssertEqual(restoredGuest.deliveries.count, 1)
         XCTAssertEqual(restored.snapshot()["state"] as? String, "running")
 
         restored.relinquishForGUI()
         XCTAssertFalse(FileManager.default.fileExists(atPath: stateURL.path))
+    }
+
+    func testCorruptInstanceDoesNotChangeOtherInstancesPersistedSource() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("vphone-location-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let firstURL = directory.appendingPathComponent("first/system-location.json")
+        let secondURL = directory.appendingPathComponent("second/system-location.json")
+        let first = VPhoneSystemLocationController(
+            adapter: FakeSystemLocationGuestAdapter(),
+            stateStore: VPhoneSystemLocationStateStore(url: firstURL))
+        let secondGuest = FakeSystemLocationGuestAdapter()
+        let second = VPhoneSystemLocationController(
+            adapter: secondGuest,
+            stateStore: VPhoneSystemLocationStateStore(url: secondURL))
+        _ = try await first.setFixed(owner: "first", fix: fix(0),
+                                     heartbeatSeconds: 60, persist: true)
+        _ = try await second.setFixed(owner: "second", fix: fix(0, latitude: 35),
+                                      heartbeatSeconds: 60, persist: true)
+        let secondBytes = try Data(contentsOf: secondURL)
+        let secondGeneration = second.generation
+        let corruptBytes = Data("{truncated".utf8)
+        try corruptBytes.write(to: firstURL)
+
+        let failedGuest = FakeSystemLocationGuestAdapter()
+        let restored = VPhoneSystemLocationController(
+            adapter: failedGuest,
+            stateStore: VPhoneSystemLocationStateStore(url: firstURL))
+        await restored.reapplyAfterReconnect()
+        XCTAssertFalse(restored.hasActiveSource)
+        XCTAssertTrue(failedGuest.activations.isEmpty)
+        let applied = try XCTUnwrap(restored.snapshot()["applied"] as? [String: Any])
+        let error = try XCTUnwrap(applied["last_error"] as? [String: String])
+        XCTAssertEqual(error["code"], "location_persistence_corrupt")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: firstURL.path))
+        let quarantine = try FileManager.default.contentsOfDirectory(
+            at: firstURL.deletingLastPathComponent(), includingPropertiesForKeys: nil)
+            .filter { $0.lastPathComponent.hasPrefix("system-location.json.corrupt-") }
+        XCTAssertEqual(quarantine.count, 1)
+        XCTAssertEqual(try Data(contentsOf: XCTUnwrap(quarantine.first)), corruptBytes)
+        XCTAssertEqual(try Data(contentsOf: secondURL), secondBytes)
+        XCTAssertEqual(second.generation, secondGeneration)
+        XCTAssertEqual(secondGuest.currentFix?.latitude, 35)
+    }
+
+    func testStreamReplacingPersistentFixedSourceDoesNotRestoreAfterReload() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("vphone-location-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("system-location.json")
+        let controller = VPhoneSystemLocationController(
+            adapter: FakeSystemLocationGuestAdapter(),
+            stateStore: VPhoneSystemLocationStateStore(url: url))
+        _ = try await controller.setFixed(owner: "fixed", fix: fix(0),
+                                          heartbeatSeconds: 60, persist: true)
+        let stream = try await controller.startStream(
+            owner: "stream", watchdogSeconds: 60, replace: true)
+        let generation = try XCTUnwrap(stream["generation"] as? String)
+        _ = try await controller.push(generation: generation, fix: fix(0, latitude: 35))
+        let restoredGuest = FakeSystemLocationGuestAdapter()
+        let restored = VPhoneSystemLocationController(
+            adapter: restoredGuest,
+            stateStore: VPhoneSystemLocationStateStore(url: url))
+        await restored.reapplyAfterReconnect()
+        XCTAssertEqual(restored.snapshot()["state"] as? String, "off")
+        XCTAssertNil(restored.generation)
+        XCTAssertTrue(restoredGuest.activations.isEmpty)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+        _ = try await controller.stop(generation: generation)
     }
 
     func testInterruptedPersistenceClearRestoresOnNextLoad() async throws {
