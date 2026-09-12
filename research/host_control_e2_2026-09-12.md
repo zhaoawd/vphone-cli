@@ -70,3 +70,5 @@ socket 对端断开本身尚未转换为命令取消；该请求受命令期限�
 本项不声称已完成真实 GUI 截图、headless VM、相机应用显示或双 VM 验收。当前宿主此前记录的私有 entitlements 运行限制未在本项修改。
 
 `make build` 通过，完成 release 编译、entitlements 签名及 app bundle。构建通过不替代真实 VM 验收。日志及 SHA-256 清单保存在 `research/artifacts/e2-control-2026-09-12/`。
+
+代码提交 `98fe7ec` 的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34675729174) 已完成且结果为 success；核对完整 SHA 为 `98fe7ecae9a3e5254fc6b6728b9fca3b7184ef74`。远端结果保存在上述目录的 `ci-result.json`。E2 已完成，项目计数为 12/28；E3/E4 和 C4 的未完成范围保持不变。

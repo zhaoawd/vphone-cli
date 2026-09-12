@@ -6,7 +6,7 @@
 
 原清单共 28 项，已完成 **12 项**：A1、A2、A4、B1–B4、C1–C3、E1、E2；未完成 **16 项**。该数字是工作项计数，不表示功能完成百分比。E2 已完成模块分离、能力发现及超时/取消测试，见[E2 验收](host_control_e2_2026-09-12.md)。C4 按用户决定继续暂停。
 
-E1 对应的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34572983931) 已完成且结果为 success，提交为 `0eaec9540b97d20e71bf508014baa32698c706ec`。此前“远端 CI 尚未确认”的状态已更新。
+E1 对应的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34572983931) 已完成且结果为 success，提交为 `0eaec9540b97d20e71bf508014baa32698c706ec`。此前“远端 CI 尚未确认”的状态已更新。9 月 12 日 E2 提交 `98fe7ec` 的 [CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34675729174) 也已通过。
 
 ## 分支与集成
 
