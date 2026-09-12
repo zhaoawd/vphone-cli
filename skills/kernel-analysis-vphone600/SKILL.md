@@ -1,54 +1,26 @@
 ---
 name: kernel-analysis-vphone600
-description: Analyze vphone600 kernel artifacts using the local symbol database and XNU source tree. Use when working on kernel reverse engineering, address-to-symbol lookup, release-vs-research kernel comparison, or patch analysis for vphone600 variants in this repository.
+description: Look up symbols and analyze vphone600 kernels or kernel patches in this repository.
 ---
 
 # Kernel Analysis Vphone600
 
-Use the local `research/kernel_info` dataset as the first source of truth for symbol lookup.
-Use `research/reference/xnu` as the source-level reference for semantics and structure.
+Use evidence for the requested `vphone600` kernel. This dataset does not establish behavior for other kernel targets.
 
-## Required Paths
+## Select the Relevant Evidence
 
-- `research/kernel_info/kernel_symbols.db`
-- `research/kernel_info/kernel_index.tsv`
-- `research/kernel_info/json/kernelcache.release.vphone600.bin.symbols.json`
-- `research/kernel_info/json/kernelcache.research.vphone600.bin.symbols.json`
-- `research/reference/xnu`
+- **Symbol/address lookup:** Use available matching data in `research/kernel_info`. Read [kernel-info-queries.md](references/kernel-info-queries.md) for read-only queries, portable path resolution, and missing-data handling. Source checkout is unnecessary for a lookup alone.
+- **Behavior or release/research comparison:** Inspect the relevant binary and symbol evidence for each kernel. Consult `research/reference/xnu` for source semantics when needed; record the source revision and its relationship to the target kernel version. If the relationship is unverified, label the source mapping as inference.
+- **Patch analysis:** Inspect the current patcher and its relevant research record, then verify anchors and control flow against the target image. Follow the kernel patcher guardrails in repository `AGENTS.md`, including the restricted `patch_bsd_init_auth` reveal flow. Exported symbols may assist analysis but must not become a patcher's runtime dependency.
 
-If `research/reference/xnu` is missing, create it with a shallow clone:
+## Missing Evidence
 
-```bash
-mkdir -p research/reference
-git clone --depth 1 https://github.com/apple-oss-distributions/xnu.git research/reference/xnu
-```
+- Check only the resources required by the task. The database is an index of symbol JSON files, not a substitute for their contents; stored paths may belong to another checkout.
+- If symbol data is absent or does not match, report the missing resource and which conclusions it prevents. Continue analysis supported by the available image or source without inventing symbol names or transferring addresses between kernels.
+- Obtain missing XNU source only when needed for the requested analysis. Select an appropriate tag or commit from `https://github.com/apple-oss-distributions/xnu`; do not automatically clone the latest revision. Record version uncertainty if matching public source is unavailable.
 
-## Workflow
+## Findings
 
-1. Confirm scope is `vphone600` only.
-2. Query `kernel_symbols.db` to select `release` or `research` dataset by name.
-3. Load the linked JSON symbol file and perform symbol/address lookups.
-4. Cross-reference candidate code paths in `research/reference/xnu`.
-5. Report findings with explicit kernel name, symbol path, and address.
-
-## Standard Queries
-
-- List known kernels:
-  - `sqlite3 research/kernel_info/kernel_symbols.db "select kernel_name, json_path from kernel_symbols order by kernel_name;"`
-- Find one kernel by name:
-  - `sqlite3 research/kernel_info/kernel_symbols.db "select * from kernel_symbols where kernel_name='kernelcache.release.vphone600';"`
-- Search symbol by substring in release JSON:
-  - `rg -n 'symbol_name_fragment' research/kernel_info/json/kernelcache.release.vphone600.bin.symbols.json`
-- Search symbol by address in research JSON:
-  - `rg -n '0xfffffe00...' research/kernel_info/json/kernelcache.research.vphone600.bin.symbols.json`
-
-## Output Rules
-
-- Always include which kernel was used: `kernelcache.release.vphone600` or `kernelcache.research.vphone600`.
-- Always include exact symbol name and address when available.
-- Always distinguish fact from inference when mapping symbols to XNU behavior.
-- Avoid claiming coverage outside vphone600 unless explicitly requested.
-
-## References
-
-- Read `references/kernel-info-queries.md` for reusable SQL and shell query snippets.
+- Identify the kernel (`kernelcache.release.vphone600` or `kernelcache.research.vphone600`), artifact path, and build/version when available.
+- Include exact symbol names and addresses when supported; distinguish virtual addresses from file offsets.
+- Distinguish observed binary behavior, symbol-dataset evidence, source-based inference, and unverified behavior. Do not claim coverage beyond the inspected artifacts.

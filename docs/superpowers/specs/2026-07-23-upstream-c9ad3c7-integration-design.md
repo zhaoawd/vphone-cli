@@ -1,5 +1,7 @@
 # Upstream c9ad3c7 Integration Design
 
+> Historical scope: this design describes the 2026-07-23 integration through upstream `c9ad3c7519894744e0ba89387856ab3b22a6db1c`. Its branch states and execution constraints apply to that integration, not to unrelated current work. Inspect the current implementation before reusing its assumptions.
+
 ## Objective
 
 Integrate `Lakr233/vphone-cli` through upstream commit

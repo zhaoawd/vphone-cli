@@ -1,5 +1,7 @@
 # Upstream c9ad3c7 Integration Implementation Plan
 
+> Historical scope: this plan describes the 2026-07-24 integration through upstream `c9ad3c7519894744e0ba89387856ab3b22a6db1c`. The branch states, worktree paths, skill requirements, and execution steps below belong to that task; they are not current repository-wide instructions. Reassess the current checkout and requested scope before reusing any step. Checkboxes preserve the original plan and do not establish current completion status.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Merge `Lakr233/vphone-cli` through `c9ad3c7519894744e0ba89387856ab3b22a6db1c`, preserve the local fork's behavior and history, and make the incoming Swift and Python patchers comply with the repository's typed-Capstone/computed-encoding guardrails.
