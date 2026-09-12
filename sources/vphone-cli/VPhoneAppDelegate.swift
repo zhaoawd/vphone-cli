@@ -408,6 +408,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_: Notification) {
         hostControl?.stop()
+        control?.close()
         if let hostSleepActivity {
             ProcessInfo.processInfo.endActivity(hostSleepActivity)
             self.hostSleepActivity = nil

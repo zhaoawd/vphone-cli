@@ -1,5 +1,7 @@
 #import "vphoned_protocol.h"
 #include <pthread.h>
+#include <errno.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 static pthread_mutex_t g_writer_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -11,6 +13,7 @@ BOOL vp_read_fully(int fd, void *buf, size_t count) {
     size_t offset = 0;
     while (offset < count) {
         ssize_t n = read(fd, (uint8_t *)buf + offset, count - offset);
+        if (n < 0 && errno == EINTR) continue;
         if (n <= 0) return NO;
         offset += n;
     }
@@ -21,6 +24,7 @@ BOOL vp_write_fully(int fd, const void *buf, size_t count) {
     size_t offset = 0;
     while (offset < count) {
         ssize_t n = write(fd, (const uint8_t *)buf + offset, count - offset);
+        if (n < 0 && errno == EINTR) continue;
         if (n <= 0) return NO;
         offset += n;
     }
@@ -41,7 +45,7 @@ NSDictionary *vp_read_message(int fd) {
     uint32_t header = 0;
     if (!vp_read_fully(fd, &header, 4)) return nil;
     uint32_t length = ntohl(header);
-    if (length == 0 || length > 4 * 1024 * 1024) return nil;
+    if (length == 0 || length > VP_MAX_MESSAGE_SIZE) return nil;
 
     NSMutableData *payload = [NSMutableData dataWithLength:length];
     if (!vp_read_fully(fd, payload.mutableBytes, length)) return nil;
@@ -55,7 +59,7 @@ NSDictionary *vp_read_message(int fd) {
 BOOL vp_write_message_locked(int fd, NSDictionary *dict) {
     NSError *err = nil;
     NSData *json = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&err];
-    if (!json) return NO;
+    if (!json || json.length == 0 || json.length > VP_MAX_MESSAGE_SIZE) return NO;
 
     uint32_t header = htonl((uint32_t)json.length);
     if (!vp_write_fully(fd, &header, 4)) return NO;

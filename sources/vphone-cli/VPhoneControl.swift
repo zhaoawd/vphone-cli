@@ -18,13 +18,20 @@ class VPhoneControl {
     private static let protocolVersion = 1
     private static let vsockPort: UInt32 = 1337
     private static let reconnectDelay: TimeInterval = 3
-    private static let handshakeTimeout: TimeInterval = 8
     private static let defaultRequestTimeout: TimeInterval = 10
     private static let slowRequestTimeout: TimeInterval = 30
     private static let transferRequestTimeout: TimeInterval = 180
     private static let heartbeatInterval: TimeInterval = 15
 
     private var connection: VZVirtioSocketConnection?
+    private var channel: VPhoneControlChannel?
+
+    struct Timing: Sendable {
+        var handshake: TimeInterval = 8
+        var request: TimeInterval? = nil
+        var transfer: TimeInterval = 180
+    }
+    private nonisolated let timing: Timing
     private weak var device: VZVirtioSocketDevice?
     private(set) var isConnected = false
     private(set) var guestName = ""
@@ -77,7 +84,7 @@ class VPhoneControl {
         writeEpochLock.lock(); _writeEpoch &+= 1; writeEpochLock.unlock()
     }
 
-    /// Bounds how long a bulk writer task may sit in `writeFully`. If the
+    /// Bounds queue wait plus write time for every outbound frame. If the
     /// guest reader stops draining without closing the fd, `Darwin.write`
     /// would otherwise block forever — the response timeout never arms
     /// (it's gated on writer completion) and heartbeat is suppressed by
@@ -107,16 +114,6 @@ class VPhoneControl {
         }
     }
 
-    private func armBulkWriteWatchdog(label: String) -> WriteWatchdog {
-        WriteWatchdog(timeout: Self.transferRequestTimeout) { [weak self] in
-            Task { @MainActor in
-                guard let self, self.isConnected else { return }
-                print("[control] \(label) write watchdog tripped after \(Int(Self.transferRequestTimeout))s; disconnecting")
-                self.disconnect()
-            }
-        }
-    }
-
     /// Heartbeat state. Counts in-flight bulk transfers (uploadFile,
     /// clipboardSet(image), pushUpdate) so the heartbeat tick can skip while
     /// the writer is busy — large transfers must not be misread as dead links.
@@ -125,13 +122,15 @@ class VPhoneControl {
 
     public var variant: VPhoneVirtualMachine.Variant = .regular
 
-    init(variant: VPhoneVirtualMachine.Variant) {
+    init(variant: VPhoneVirtualMachine.Variant, timing: Timing = Timing()) {
+        self.timing = timing
         self.variant = variant
     }
     
     // MARK: - Pending Requests
 
-    /// Callback for a pending request. Called on the read-loop queue.
+    /// Removed atomically before invocation; continuation handlers can run on
+    /// the actor, writer, timeout or caller-cancellation queue.
     private struct PendingRequest: @unchecked Sendable {
         let handler: (Result<([String: Any], Data?), any Error>) -> Void
     }
@@ -145,6 +144,11 @@ class VPhoneControl {
         pendingLock.lock()
         pendingRequests[id] = PendingRequest(handler: handler)
         pendingLock.unlock()
+    }
+
+    private nonisolated func hasPending(id: String) -> Bool {
+        pendingLock.lock(); defer { pendingLock.unlock() }
+        return pendingRequests[id] != nil
     }
 
     private nonisolated func removePending(id: String) -> PendingRequest? {
@@ -176,9 +180,9 @@ class VPhoneControl {
             case .notConnected: "not connected to vphoned"
             case let .unsupportedCapability(capability):
                 "guest does not support capability: \(capability)"
-            case let .cancelled(reason): "request cancelled: \(reason)"
+            case let .cancelled(reason): "request cancelled: \(reason); guest operation may continue"
             case let .requestTimedOut(type, seconds):
-                "request timed out (\(type), \(seconds)s)"
+                "request timed out (\(type), \(seconds)s); guest operation may continue"
             case let .protocolError(msg): "protocol error: \(msg)"
             case let .guestError(_, message): message
             }
@@ -218,10 +222,29 @@ class VPhoneControl {
     // MARK: - Connect
 
     func connect(device: VZVirtioSocketDevice) {
+        close()
         self.device = device
         cancelReconnect()
         loadGuestBinary()
         attemptConnect()
+    }
+
+    /// The same connected-descriptor entry used by socketpair integration tests.
+    /// The caller retains ownership of fd; this client owns a duplicate.
+    func connect(fileDescriptor: Int32) throws {
+        disconnect()
+        cancelReconnect()
+        device = nil
+        connectionAttemptToken &+= 1
+        channel = try VPhoneControlChannel(duplicating: fileDescriptor, readTimeout: timing.transfer)
+        performHandshake(fd: channel!.fileDescriptor, attemptToken: connectionAttemptToken)
+    }
+
+    func close() {
+        device = nil
+        cancelReconnect()
+        disconnect()
+        connectionAttemptToken &+= 1
     }
 
     private func attemptConnect() {
@@ -235,8 +258,13 @@ class VPhoneControl {
                 guard self.isCurrentAttempt(attemptToken) else { return }
                 switch result {
                 case let .success(conn):
-                    self.connection = conn
-                    self.performHandshake(fd: conn.fileDescriptor, attemptToken: attemptToken)
+                    do {
+                        self.channel = try VPhoneControlChannel(duplicating: conn.fileDescriptor, readTimeout: self.timing.transfer)
+                        self.connection = conn
+                        self.performHandshake(fd: self.channel!.fileDescriptor, attemptToken: attemptToken)
+                    } catch {
+                        self.scheduleReconnect(for: attemptToken, reason: "cannot retain connection")
+                    }
                 case let .failure(error):
                     print("[control] connect failed: \(error)")
                     self.scheduleReconnect(for: attemptToken, reason: "connect failed")
@@ -268,8 +296,10 @@ class VPhoneControl {
         }
         armHandshakeTimeout(fd: fd, attemptToken: attemptToken)
 
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            guard let resp = Self.readMessage(fd: fd) else {
+        guard let channel else { return }
+        DispatchQueue.global(qos: .userInteractive).async { [weak self, channel] in
+            defer { withExtendedLifetime(channel) {} }
+            guard let resp = Self.readMessage(fd: fd, timeout: channel.readTimeout) else {
                 Task { @MainActor in
                     guard let self else { return }
                     guard self.isCurrentAttempt(attemptToken, fd: fd) else { return }
@@ -341,11 +371,10 @@ class VPhoneControl {
         }
         // Header + binary payload as one indivisible writer task.
         beginTransfer()
-        let watchdog = armBulkWriteWatchdog(label: "update")
+        let attemptToken = connectionAttemptToken
         enqueueWrite([headerFrame, data], fd: fd) { [weak self] ok in
-            watchdog.cancel()
             Task { @MainActor in
-                guard let self else { return }
+                guard let self, self.isCurrentAttempt(attemptToken, fd: fd) else { return }
                 self.endTransfer()
                 if !ok {
                     print("[control] update: failed to send")
@@ -382,7 +411,7 @@ class VPhoneControl {
             "usage": usage,
         ]
         if let down { msg["down"] = down }
-        guard let fd = connection?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
+        guard let fd = channel?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
             print("[control] send failed (not connected)")
             return
         }
@@ -407,7 +436,7 @@ class VPhoneControl {
             "x": x,
             "y": y,
         ]
-        guard let fd = connection?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
+        guard let fd = channel?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
             print("[control] touch send failed (not connected)")
             return
         }
@@ -446,41 +475,53 @@ class VPhoneControl {
 
     /// Send a request and await the response. Returns the response dict and optional raw data.
     func sendRequest(_ dict: [String: Any]) async throws -> ([String: Any], Data?) {
-        guard let fd = connection?.fileDescriptor else {
-            throw ControlError.notConnected
-        }
+        try await performRequest(dict)
+    }
 
-        nextRequestId += 1
+    private func performRequest(_ dict: [String: Any], payload: Data? = nil) async throws -> ([String: Any], Data?) {
+        try Task.checkCancellation()
+        guard isConnected, let fd = channel?.fileDescriptor else { throw ControlError.notConnected }
+        let attemptToken = connectionAttemptToken
+        nextRequestId &+= 1
         let reqId = String(nextRequestId, radix: 16)
         var msg = dict
         msg["v"] = Self.protocolVersion
         msg["id"] = reqId
         let requestType = msg["t"] as? String ?? "unknown"
-        let timeout = Self.timeoutForRequest(type: requestType)
+        let timeout = timing.request ?? Self.timeoutForRequest(type: requestType)
         guard let frame = Self.encodeFrame(msg) else {
-            throw ControlError.protocolError("failed to encode request")
+            throw ControlError.protocolError("request JSON exceeds 4 MiB or cannot be encoded")
         }
-
-        return try await withCheckedThrowingContinuation { continuation in
-            addPending(id: reqId) { result in
-                nonisolated(unsafe) let r = result
-                continuation.resume(with: r)
-            }
-            // Arm the response timeout only after the bytes have actually
-            // left for the guest; otherwise a request queued behind a big
-            // upload could time out before the guest sees it, and the real
-            // response would arrive orphaned.
-            enqueueWrite([frame], fd: fd) { [weak self] ok in
-                guard let self else { return }
-                if ok {
-                    self.armRequestTimeout(id: reqId, type: requestType, timeout: timeout)
-                } else {
-                    if let pending = self.removePending(id: reqId) {
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                addPending(id: reqId) { result in
+                    nonisolated(unsafe) let r = result
+                    continuation.resume(with: r)
+                }
+                // Covers cancellation between entering the operation and registration.
+                if Task.isCancelled {
+                    removePending(id: reqId)?.handler(.failure(ControlError.cancelled("caller task cancelled")))
+                    return
+                }
+                if payload != nil { beginTransfer() }
+                enqueueWrite(payload.map { [frame, $0] } ?? [frame], fd: fd,
+                             requestID: reqId) { [weak self] ok in
+                    guard let self else { return }
+                    if ok {
+                        self.armRequestTimeout(id: reqId, type: requestType, timeout: timeout)
+                    } else if let pending = self.removePending(id: reqId) {
                         pending.handler(.failure(ControlError.notConnected))
                     }
-                    Task { @MainActor in self.disconnect() }
+                    Task { @MainActor in
+                        guard self.isCurrentAttempt(attemptToken, fd: fd) else { return }
+                        if payload != nil { self.endTransfer() }
+                        // A cancelled queued request was skipped without touching
+                        // the stream. Actual I/O failures are handled by enqueueWrite.
+                    }
                 }
             }
+        } onCancel: { [weak self] in
+            self?.removePending(id: reqId)?.handler(.failure(ControlError.cancelled("caller task cancelled")))
         }
     }
 
@@ -503,53 +544,7 @@ class VPhoneControl {
     }
 
     func uploadFile(path: String, data: Data, permissions: String = "644") async throws {
-        guard let fd = connection?.fileDescriptor else {
-            throw ControlError.notConnected
-        }
-
-        nextRequestId += 1
-        let reqId = String(nextRequestId, radix: 16)
-        let header: [String: Any] = [
-            "v": Self.protocolVersion,
-            "t": "file_put",
-            "id": reqId,
-            "path": path,
-            "size": data.count,
-            "perm": permissions,
-        ]
-        let timeout = Self.timeoutForRequest(type: "file_put")
-        guard let headerFrame = Self.encodeFrame(header) else {
-            throw ControlError.protocolError("failed to encode file_put header")
-        }
-
-        try await withCheckedThrowingContinuation {
-            (continuation: CheckedContinuation<Void, any Error>) in
-            addPending(id: reqId) { result in
-                switch result {
-                case .success: continuation.resume()
-                case let .failure(error): continuation.resume(throwing: error)
-                }
-            }
-            // Header + raw payload written as one indivisible writer task.
-            // Response timeout is armed after the bytes flush; a separate
-            // write-phase watchdog forces disconnect if writeFully wedges
-            // (e.g. guest reader stalls without closing fd).
-            beginTransfer()
-            let watchdog = armBulkWriteWatchdog(label: "file_put")
-            enqueueWrite([headerFrame, data], fd: fd) { [weak self] ok in
-                watchdog.cancel()
-                Task { @MainActor in self?.endTransfer() }
-                guard let self else { return }
-                if ok {
-                    self.armRequestTimeout(id: reqId, type: "file_put", timeout: timeout)
-                } else {
-                    if let pending = self.removePending(id: reqId) {
-                        pending.handler(.failure(ControlError.protocolError("failed to write file data")))
-                    }
-                    Task { @MainActor in self.disconnect() }
-                }
-            }
-        }
+        _ = try await performRequest(["t": "file_put", "path": path, "size": data.count, "perm": permissions], payload: data)
     }
 
     func createDirectory(path: String) async throws {
@@ -681,51 +676,7 @@ class VPhoneControl {
     }
 
     func clipboardSet(imageData: Data) async throws {
-        guard let fd = connection?.fileDescriptor else {
-            throw ControlError.notConnected
-        }
-
-        nextRequestId += 1
-        let reqId = String(nextRequestId, radix: 16)
-        let header: [String: Any] = [
-            "v": Self.protocolVersion,
-            "t": "clipboard_set",
-            "id": reqId,
-            "type": "image",
-            "size": imageData.count,
-        ]
-        let timeout = Self.timeoutForRequest(type: "clipboard_set")
-        guard let headerFrame = Self.encodeFrame(header) else {
-            throw ControlError.protocolError("failed to encode clipboard_set header")
-        }
-
-        try await withCheckedThrowingContinuation {
-            (continuation: CheckedContinuation<Void, any Error>) in
-            addPending(id: reqId) { result in
-                switch result {
-                case .success: continuation.resume()
-                case let .failure(error): continuation.resume(throwing: error)
-                }
-            }
-            // Header + image payload written as one indivisible writer task.
-            // Response timeout armed post-flush, with a write-phase
-            // watchdog to bound the flush itself (see uploadFile).
-            beginTransfer()
-            let watchdog = armBulkWriteWatchdog(label: "clipboard_set")
-            enqueueWrite([headerFrame, imageData], fd: fd) { [weak self] ok in
-                watchdog.cancel()
-                Task { @MainActor in self?.endTransfer() }
-                guard let self else { return }
-                if ok {
-                    self.armRequestTimeout(id: reqId, type: "clipboard_set", timeout: timeout)
-                } else {
-                    if let pending = self.removePending(id: reqId) {
-                        pending.handler(.failure(ControlError.protocolError("failed to write image data")))
-                    }
-                    Task { @MainActor in self.disconnect() }
-                }
-            }
-        }
+        _ = try await performRequest(["t": "clipboard_set", "type": "image", "size": imageData.count], payload: imageData)
     }
 
     // MARK: - App Management
@@ -924,7 +875,7 @@ class VPhoneControl {
             "course": course,
             "ts": Date().timeIntervalSince1970,
         ]
-        guard let fd = connection?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
+        guard let fd = channel?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
             print("[control] sendLocation failed (not connected)")
             return
         }
@@ -941,7 +892,7 @@ class VPhoneControl {
             "t": "location_stop",
             "id": String(nextRequestId, radix: 16),
         ]
-        guard let fd = connection?.fileDescriptor, let frame = Self.encodeFrame(msg) else { return }
+        guard let fd = channel?.fileDescriptor, let frame = Self.encodeFrame(msg) else { return }
         enqueueWrite([frame], fd: fd)
     }
 
@@ -954,11 +905,12 @@ class VPhoneControl {
 
         let reconnectAttemptToken = connectionAttemptToken
         let wasConnected = isConnected
-        let hadConnection = connection != nil
-        let fd = connection?.fileDescriptor
+        let hadConnection = channel != nil
         // Bump before clearing connection so writer-queue tasks observe the
         // new epoch even if they race against the rest of teardown.
         bumpWriteEpoch()
+        channel?.shutdown()
+        channel = nil
         connection = nil
         isConnected = false
         guestName = ""
@@ -974,10 +926,6 @@ class VPhoneControl {
             onDisconnect?()
         }
 
-        if let fd {
-            Self.shutdownSocket(fd: fd)
-        }
-
         if hadConnection, device != nil {
             scheduleReconnect(for: reconnectAttemptToken, reason: "connection lost")
         }
@@ -986,88 +934,52 @@ class VPhoneControl {
     // MARK: - Background Read Loop
 
     private func startReadLoop(fd: Int32, attemptToken: UInt64) {
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            while let msg = Self.readMessage(fd: fd) {
+        guard let channel else { return }
+        DispatchQueue.global(qos: .utility).async { [weak self, channel] in
+            defer { withExtendedLifetime(channel) {} }
+            while let msg = Self.readMessage(fd: fd, timeout: channel.readTimeout) {
                 guard let self else { break }
                 let type = msg["t"] as? String ?? ""
-                let reqId = msg["id"] as? String
-
-                // Check for pending request callback
-                if let reqId, let pending = removePending(id: reqId) {
-                    nonisolated(unsafe) let safeMsg = msg
-
-                    if type == "err" {
-                        let error = Self.controlError(forGuestResponse: msg)
-                        DispatchQueue.main.async {
-                            pending.handler(.failure(error))
-                        }
-                        continue
+                // Consume payloads even for cancelled, duplicate or unknown IDs.
+                // Keep the request registered until all bytes arrive, so its
+                // timeout/cancellation can still resume the caller during I/O.
+                var data: Data?
+                let payloadKey: String? = type == "file_data" ? "size"
+                    : (type == "clipboard_get" && msg["has_image"] as? Bool == true ? "image_size" : nil)
+                if let payloadKey {
+                    guard let number = msg[payloadKey] as? NSNumber,
+                          CFGetTypeID(number) != CFBooleanGetTypeID(),
+                          number.doubleValue >= 0, number.doubleValue <= 64 * 1024 * 1024,
+                          number.doubleValue.rounded(.towardZero) == number.doubleValue else { break }
+                    let size = number.intValue
+                    var payload = Data(count: size)
+                    let complete = payload.withUnsafeMutableBytes { bytes in
+                        size == 0 || Self.readFully(fd: fd, buf: bytes.baseAddress!, count: size, deadline: Self.deadline(after: channel.readTimeout))
                     }
-
-                    // For file_data, read inline binary payload
-                    if type == "file_data" {
-                        let size = msg["size"] as? Int ?? 0
-                        if size > 0 {
-                            let buf = UnsafeMutablePointer<UInt8>.allocate(capacity: size)
-                            if Self.readFully(fd: fd, buf: buf, count: size) {
-                                let data = Data(bytes: buf, count: size)
-                                buf.deallocate()
-                                DispatchQueue.main.async { pending.handler(.success((safeMsg, data))) }
-                            } else {
-                                buf.deallocate()
-                                DispatchQueue.main.async {
-                                    pending.handler(.failure(ControlError.protocolError("failed to read file data")))
-                                }
-                            }
-                        } else {
-                            DispatchQueue.main.async { pending.handler(.success((safeMsg, Data()))) }
-                        }
-                        continue
-                    }
-
-                    // For clipboard_get with image, read inline binary payload
-                    if type == "clipboard_get", msg["has_image"] as? Bool == true {
-                        let size = msg["image_size"] as? Int ?? 0
-                        if size > 0 {
-                            let buf = UnsafeMutablePointer<UInt8>.allocate(capacity: size)
-                            if Self.readFully(fd: fd, buf: buf, count: size) {
-                                let data = Data(bytes: buf, count: size)
-                                buf.deallocate()
-                                DispatchQueue.main.async { pending.handler(.success((safeMsg, data))) }
-                            } else {
-                                buf.deallocate()
-                                DispatchQueue.main.async {
-                                    pending.handler(
-                                        .failure(ControlError.protocolError("failed to read clipboard image data"))
-                                    )
-                                }
-                            }
-                        } else {
-                            DispatchQueue.main.async { pending.handler(.success((safeMsg, nil))) }
-                        }
-                        continue
-                    }
-
-                    // Normal response (ok, pong, etc.)
-                    DispatchQueue.main.async { pending.handler(.success((safeMsg, nil))) }
-                    continue
+                    guard complete else { break }
+                    data = payload
                 }
-
-                // No pending request — handle as before (fire-and-forget)
-                switch type {
-                case "ok":
-                    let detail = msg["msg"] as? String ?? ""
-                    if !detail.isEmpty { print("[vphoned] ok: \(detail)") }
-                case "pong":
-                    print("[vphoned] pong")
-                case "version":
-                    let hash = msg["hash"] as? String ?? "unknown"
-                    print("[vphoned] build: \(hash)")
-                case "err":
-                    let detail = msg["msg"] as? String ?? "unknown"
-                    print("[vphoned] error: \(detail)")
-                default:
-                    print("[vphoned] \(msg)")
+                nonisolated(unsafe) let response = msg
+                let payload = data
+                Task { @MainActor [weak self] in
+                    guard let self, self.isCurrentAttempt(attemptToken, fd: fd) else { return }
+                    guard let id = response["id"] as? String,
+                          let pending = self.removePending(id: id) else {
+                        switch type {
+                        case "ok":
+                            if let detail = response["msg"] as? String, !detail.isEmpty { print("[vphoned] ok: \(detail)") }
+                        case "pong": print("[vphoned] pong")
+                        case "version": print("[vphoned] build: \(response["hash"] as? String ?? "unknown")")
+                        case "err": print("[vphoned] error: \(response["msg"] as? String ?? "unknown")")
+                        default: break
+                        }
+                        return
+                    }
+                    if type == "err" {
+                        pending.handler(.failure(Self.controlError(forGuestResponse: response)))
+                    } else {
+                        pending.handler(.success((response, payload)))
+                    }
                 }
             }
             Task { @MainActor in
@@ -1084,7 +996,7 @@ class VPhoneControl {
     private func isCurrentAttempt(_ attemptToken: UInt64, fd: Int32? = nil) -> Bool {
         guard connectionAttemptToken == attemptToken else { return false }
         guard let fd else { return true }
-        return connection?.fileDescriptor == fd
+        return channel?.fileDescriptor == fd
     }
 
     private func cancelReconnect() {
@@ -1114,7 +1026,7 @@ class VPhoneControl {
     }
 
     private func armHandshakeTimeout(fd: Int32, attemptToken: UInt64) {
-        let timeout = Self.handshakeTimeout
+        let timeout = timing.handshake
         DispatchQueue.main.asyncAfter(deadline: .now() + timeout) { [weak self] in
             guard let self else { return }
             guard isCurrentAttempt(attemptToken, fd: fd) else { return }
@@ -1182,12 +1094,13 @@ class VPhoneControl {
         // Skip while a bulk transfer is in flight — the writer queue may be
         // saturated and a ping would queue up behind it.
         guard transfersInFlight == 0 else { return }
+        let attemptToken = connectionAttemptToken
         Task { [weak self] in
             do {
                 try await self?.sendPing()
             } catch {
                 guard let self else { return }
-                guard self.isConnected else { return }
+                guard self.isConnected, self.isCurrentAttempt(attemptToken) else { return }
                 print("[control] heartbeat failed: \(error); disconnecting")
                 self.disconnect()
             }
@@ -1204,7 +1117,8 @@ class VPhoneControl {
     /// Encode a dictionary as a length-prefixed JSON frame:
     /// `[uint32 big-endian length][UTF-8 JSON]`.
     private static func encodeFrame(_ dict: [String: Any]) -> Data? {
-        guard let json = try? JSONSerialization.data(withJSONObject: dict) else { return nil }
+        guard let json = try? JSONSerialization.data(withJSONObject: dict),
+              !json.isEmpty, json.count <= 4 * 1024 * 1024 else { return nil }
         var header = UInt32(json.count).bigEndian
         var frame = Data(capacity: 4 + json.count)
         withUnsafeBytes(of: &header) { frame.append(contentsOf: $0) }
@@ -1221,18 +1135,30 @@ class VPhoneControl {
     /// `shutdown(2)` from `disconnect()` unblocks any in-flight write and
     /// surfaces here as `false`.
     private func enqueueWrite(
-        _ chunks: [Data], fd: Int32, completion: (@Sendable (Bool) -> Void)? = nil
+        _ chunks: [Data], fd: Int32, requestID: String? = nil,
+        completion: (@Sendable (Bool) -> Void)? = nil
     ) {
+        guard let channel, channel.fileDescriptor == fd else { completion?(false); return }
         let expectedEpoch = currentWriteEpoch()
-        writerQueue.async { [weak self] in
+        let attemptToken = connectionAttemptToken
+        let watchdog = WriteWatchdog(timeout: timing.transfer) { [weak self, channel] in
+            channel.shutdown()
+            Task { @MainActor in
+                guard let self, self.isCurrentAttempt(attemptToken, fd: fd) else { return }
+                self.disconnect(ifCurrentAttempt: attemptToken)
+            }
+        }
+        writerQueue.async { [weak self, channel] in
+            defer { watchdog.cancel(); withExtendedLifetime(channel) {} }
             // Drop writes whose connection has been torn down. Even if the
             // raw fd number is now valid again (reused by a new connect),
             // the bytes belong to a dead session and would poison the new
             // handshake/stream.
-            if let self, self.currentWriteEpoch() != expectedEpoch {
+            guard let self, self.currentWriteEpoch() == expectedEpoch else {
                 completion?(false)
                 return
             }
+            guard requestID.map({ self.hasPending(id: $0) }) != false else { completion?(false); return }
             var ok = true
             for chunk in chunks where !chunk.isEmpty {
                 ok = chunk.withUnsafeBytes { buf in
@@ -1241,34 +1167,56 @@ class VPhoneControl {
                 if !ok { break }
             }
             completion?(ok)
+            if !ok {
+                Task { @MainActor [weak self] in
+                    guard let self, self.isCurrentAttempt(attemptToken, fd: fd) else { return }
+                    self.disconnect(ifCurrentAttempt: attemptToken)
+                }
+            }
         }
     }
 
-    private nonisolated static func readMessage(fd: Int32) -> [String: Any]? {
+    private nonisolated static func readMessage(fd: Int32, timeout: TimeInterval) -> [String: Any]? {
+        let deadline = deadline(after: timeout)
         var header: UInt32 = 0
         let hRead = withUnsafeMutableBytes(of: &header) { buf in
-            readFully(fd: fd, buf: buf.baseAddress!, count: 4)
+            readFully(fd: fd, buf: buf.baseAddress!, count: 4, deadline: deadline)
         }
         guard hRead else { return nil }
 
         let length = Int(UInt32(bigEndian: header))
-        guard length > 0, length < 4 * 1024 * 1024 else { return nil }
+        guard length > 0, length <= 4 * 1024 * 1024 else { return nil }
 
         let payload = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
         defer { payload.deallocate() }
-        guard readFully(fd: fd, buf: payload, count: length) else { return nil }
+        guard readFully(fd: fd, buf: payload, count: length, deadline: deadline) else { return nil }
 
         let data = Data(bytes: payload, count: length)
-        return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        guard let message = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let version = message["v"] as? NSNumber,
+              CFGetTypeID(version) != CFBooleanGetTypeID(), version.doubleValue == 1,
+              message["t"] is String else { return nil }
+        return message
     }
 
-    private nonisolated static func readFully(fd: Int32, buf: UnsafeMutableRawPointer, count: Int)
-        -> Bool
-    {
+    private nonisolated static func deadline(after seconds: TimeInterval) -> UInt64 {
+        DispatchTime.now().uptimeNanoseconds + UInt64(max(0, seconds) * 1_000_000_000)
+    }
+
+    private nonisolated static func readFully(fd: Int32, buf: UnsafeMutableRawPointer, count: Int,
+                                             deadline: UInt64) -> Bool {
         var offset = 0
         while offset < count {
-            let n = Darwin.read(fd, buf + offset, count - offset)
-            if n <= 0 { return false }
+            let now = DispatchTime.now().uptimeNanoseconds
+            guard now < deadline else { return false }
+            var event = pollfd(fd: fd, events: Int16(POLLIN), revents: 0)
+            let milliseconds = Int32(min(UInt64(Int32.max), max(1, (deadline - now) / 1_000_000)))
+            let ready = poll(&event, 1, milliseconds)
+            if ready < 0 && errno == EINTR { continue }
+            guard ready > 0 else { return false }
+            let n = Darwin.recv(fd, buf + offset, count - offset, MSG_DONTWAIT)
+            if n < 0 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK) { continue }
+            guard n > 0 else { return false }
             offset += n
         }
         return true
@@ -1278,6 +1226,7 @@ class VPhoneControl {
         var offset = 0
         while offset < count {
             let n = Darwin.write(fd, buf + offset, count - offset)
+            if n < 0 && errno == EINTR { continue }
             if n <= 0 { return false }
             offset += n
         }

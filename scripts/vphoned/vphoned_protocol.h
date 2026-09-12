@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 
 #define PROTOCOL_VERSION 1
+#define VP_MAX_MESSAGE_SIZE (4u * 1024u * 1024u)
 
 BOOL vp_read_fully(int fd, void *buf, size_t count);
 BOOL vp_write_fully(int fd, const void *buf, size_t count);
