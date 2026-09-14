@@ -6,10 +6,13 @@ import VPhoneCore
 @MainActor
 final class HostGuestFake: VPhoneHostGuest {
     var isConnected = true
-    var guestCaps = ["hid", "shell", "file", "apps", "url", "clipboard", "location", "location_owned", "vcam_status", "ipa_install"]
+    var guestCaps = ["hid", "shell", "file", "apps", "url", "clipboard", "location", "location_owned", "vcam_status", "vcam_receipt_v3", "ipa_install"]
     var failure: Error?
     var uploaded: (String, Data, String)?
     var request: [String: Any] = [:]
+    var cameraReply: [String: Any]?
+    var cameraReplyHook: (() -> Void)?
+    var cameraIDProvider: (() -> String)?
     var shellArgs: (String, String?, Int?)?
     var text: String?
     func check() throws { if let failure { throw failure } }
@@ -37,7 +40,10 @@ final class HostGuestFake: VPhoneHostGuest {
     func sendRequest(_ dict: [String: Any]) async throws -> ([String: Any], Data?) {
         try check(); request = dict
         if dict["t"] as? String == "vcam_status" {
-            return (["generation": dict["generation"]!, "vphoned_published_frame_index": 3,
+            cameraReplyHook?()
+            if let cameraReply { return (cameraReply, nil) }
+            return (["generation": dict["generation"]!, "presentation_id": cameraIDProvider?() ?? "",
+                     "vphoned_published_frame_index": 3,
                      "libvcam_observed_frame_index": 2], nil)
         }
         return (["t": "ok", "msg": "installed", "bundle_id": "app"], nil)
@@ -62,11 +68,23 @@ final class HostCameraFake: VPhoneHostCamera {
     var isConnected = true
     var accepts = true
     var presented: String?
+    var presentationID = UUID().uuidString
+    var role = "qr"
     func present(imagePath: String, generation: String, role: String, fps: Double) -> Bool {
-        presented = generation; return accepts
+        presented = generation; presentationID = UUID().uuidString; self.role = role; return accepts
     }
-    func hostStatus(generation: String) -> [String: Any] { ["generation": generation, "streaming": true] }
-    func stop(generation: String) -> Bool { generation == presented }
+    func presentNeutral(generation: String, fps: Double) -> Bool {
+        present(imagePath: "", generation: generation, role: "neutral", fps: fps)
+    }
+    func hostStatus(generation: String) -> [String: Any] {
+        ["generation": presented ?? "", "presentation_id": presentationID, "role": role,
+         "streaming": presented != nil, "connected": isConnected]
+    }
+    func stop(generation: String) -> Bool {
+        guard generation == presented else { return false }
+        presented = nil
+        return true
+    }
 }
 
 @MainActor
@@ -118,6 +136,7 @@ final class HostCommandExecutorTests: XCTestCase {
         let guest = HostGuestFake()
         let screen = HostScreenFake()
         let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
         let executor = VPhoneHostCommandExecutor(control: guest, camera: camera, screen: screen)
         let first = try await call(executor, ["t": "capabilities"])
         XCTAssertEqual((first["commands"] as? [String: Bool])?["shell"], true)
@@ -236,6 +255,7 @@ final class HostCommandExecutorTests: XCTestCase {
     func testCameraPreservesReceiptAndConflictSemantics() async throws {
         let guest = HostGuestFake()
         let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
         let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try Data().write(to: url)
@@ -252,6 +272,133 @@ final class HostCommandExecutorTests: XCTestCase {
         let failed = try await call(executor, ["t": "camera_present", "path": url.path, "generation": "g"])
         XCTAssertEqual(failed["ok"] as? Bool, false)
         XCTAssertEqual(failed["generation"] as? String, "g")
+    }
+
+    func testRepeatedGenerationCannotUseAnOldPresentationReceipt() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
+        camera.presented = "g"
+        let oldID = camera.presentationID
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        guest.cameraReply = ["generation": "g", "presentation_id": oldID,
+                             "vphoned_published_frame_index": 4, "libvcam_observed_frame_index": 3]
+        _ = camera.present(imagePath: "", generation: "g", role: "qr", fps: 8)
+        let status = try await call(executor, ["t": "camera_status", "generation": "g"])
+        XCTAssertNil(status["transport_receipt"])
+        let stop = try await call(executor, ["t": "camera_stop", "generation": "g", "presentation_id": oldID])
+        XCTAssertEqual(stop["ok"] as? Bool, false)
+        XCTAssertEqual(camera.presented, "g")
+        guest.cameraReply = nil
+        let fresh = try await call(executor, ["t": "camera_status", "generation": "g"])
+        XCTAssertEqual((fresh["transport_receipt"] as? [String: Any])?["presentation_id"] as? String, camera.presentationID)
+    }
+
+    func testSameGenerationReplacementDuringReplyInvalidatesTheRequest() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        camera.presented = "g"
+        guest.cameraIDProvider = { camera.presentationID }
+        guest.cameraReplyHook = { _ = camera.presentNeutral(generation: "g", fps: 8) }
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        let status = try await call(executor, ["t": "camera_status", "generation": "g"])
+        XCTAssertNil(status["transport_receipt"])
+    }
+
+    func testExplicitNeutralPolicyWaitsForItsOwnReceiptAndKeepsStreaming() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        camera.presented = "qr"
+        guest.cameraIDProvider = { camera.presentationID }
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        let result = try await call(executor, ["t": "camera_stop", "generation": "qr", "policy": "neutral"])
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        XCTAssertEqual(result["role"] as? String, "neutral")
+        XCTAssertEqual(result["streaming"] as? Bool, true)
+        XCTAssertNotEqual(result["generation"] as? String, "qr")
+        XCTAssertEqual((result["transport_receipt"] as? [String: Any])?["presentation_id"] as? String, camera.presentationID)
+        let off = try await call(executor, ["t": "camera_stop", "generation": camera.presented!])
+        XCTAssertEqual(off["stop_policy"] as? String, "keep_last")
+        XCTAssertEqual(off["streaming"] as? Bool, false)
+        XCTAssertEqual(off["guest_frame_cleared"] as? Bool, false)
+    }
+
+    func testNeutralPolicyDoesNotChangeSourceWhenUnavailableOrInvalid() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        camera.presented = "g"
+        camera.isConnected = false
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        for policy: Any in ["neutral", "invalid", 7] {
+            let result = try await call(executor, ["t": "camera_stop", "generation": "g", "policy": policy])
+            XCTAssertEqual(result["ok"] as? Bool, false)
+            XCTAssertEqual(camera.presented, "g")
+        }
+    }
+
+    func testNeutralProducerAndPresentationIdentityWithoutVM() throws {
+        let frame = try XCTUnwrap(VPhoneNeutralFrameProducer(width: 2, height: 2).nextFrame())
+        XCTAssertEqual(frame.pixels, Data(repeating: 255, count: 16))
+        XCTAssertEqual(frame.bytesPerRow, 8)
+        let camera = VPhoneCameraServer()
+        _ = camera.presentNeutral(generation: "g", fps: 8)
+        let first = camera.presentationID
+        _ = camera.presentNeutral(generation: "g", fps: 8)
+        XCTAssertNotEqual(first, camera.presentationID)
+        XCTAssertEqual(camera.currentRole, "neutral")
+        camera.setSource(.testPattern)
+        XCTAssertTrue(camera.presentationID.isEmpty)
+        XCTAssertTrue(camera.currentGeneration.isEmpty)
+    }
+
+    func testCameraGenerationFitsGuestUTF8Field() {
+        XCTAssertTrue(VPhoneHostCommandExecutor.validCameraGeneration(String(repeating: "a", count: 79)))
+        XCTAssertFalse(VPhoneHostCommandExecutor.validCameraGeneration(String(repeating: "a", count: 80)))
+        XCTAssertTrue(VPhoneHostCommandExecutor.validCameraGeneration(String(repeating: "中", count: 26)))
+        XCTAssertFalse(VPhoneHostCommandExecutor.validCameraGeneration(String(repeating: "中", count: 27)))
+        XCTAssertFalse(VPhoneHostCommandExecutor.validCameraGeneration(""))
+        XCTAssertFalse(VPhoneHostCommandExecutor.validCameraGeneration("a\0b"))
+    }
+
+    func testCameraStatusAfterStopDoesNotReturnRetainedGuestReceipt() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
+        camera.presented = "g"
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        _ = try await call(executor, ["t": "camera_stop", "generation": "g"])
+        let status = try await call(executor, ["t": "camera_status", "generation": "g"])
+        XCTAssertEqual(status["streaming"] as? Bool, false)
+        XCTAssertNil(status["transport_receipt"])
+    }
+
+    func testCameraSourceSwitchDuringGuestReplyCannotReturnOldReceipt() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
+        camera.presented = "g"
+        guest.cameraReplyHook = { camera.presented = "new" }
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        let status = try await call(executor, ["t": "camera_status", "generation": "g"])
+        XCTAssertNil(status["transport_receipt"])
+        XCTAssertEqual(status["generation"] as? String, "new")
+    }
+
+    func testCameraRejectsImpossibleAndUnconsumedGuestReceipts() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
+        camera.presented = "g"
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        for fields: [String: Any] in [
+            ["generation": "g", "vphoned_published_frame_index": 2, "libvcam_observed_frame_index": 3],
+            ["generation": "g", "vphoned_published_frame_index": 2, "libvcam_observed_frame_index": 0],
+            ["generation": "old", "vphoned_published_frame_index": 2, "libvcam_observed_frame_index": 1]
+        ] {
+            guest.cameraReply = fields.merging(["presentation_id": camera.presentationID]) { _, new in new }
+            let status = try await call(executor, ["t": "camera_status", "generation": "g"])
+            XCTAssertNil(status["transport_receipt"])
+        }
     }
 
     func testLocationUsesRealControllerWithFakeGuestAndPreservesCodes() async throws {

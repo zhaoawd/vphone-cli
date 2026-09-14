@@ -29,24 +29,8 @@ SCRIPT_DIR="${0:a:h}"
 # Resolve absolute paths
 VM_DIR="$(cd "$VM_DIR" && pwd)"
 
-# ── Python resolver — prefer project venv over whatever is in PATH ─
-_resolve_python3() {
-    if [[ -n "${VPHONE_PYTHON:-}" ]]; then
-        echo "$VPHONE_PYTHON"
-        return
-    fi
-    local venv_py="${SCRIPT_DIR:h}/.venv/bin/python3"
-    if [[ -x "$venv_py" ]]; then
-        echo "$venv_py"
-    else
-        command -v python3 || true
-    fi
-}
-PYTHON3="$(_resolve_python3)"
-"$PYTHON3" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR" || {
-    echo "[-] VM lock missing — run via cfw_install_host.sh" >&2
-    exit 1
-}
+source "$SCRIPT_DIR/lib/cfw_common.sh"
+cfw_require_runtime_and_lock
 
 : "${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
 
@@ -56,10 +40,6 @@ CFW_ARCHIVE="cfw_input.tar.zst"
 TEMP_DIR="$VM_DIR/.cfw_temp"
 
 # ── Helpers ─────────────────────────────────────────────────────
-die() {
-    echo "[-] $*" >&2
-    exit 1
-}
 
 check_prerequisites() {
     local missing=()
@@ -69,12 +49,6 @@ check_prerequisites() {
     fi
 }
 
-ldid_sign() {
-    local file="$1" bundle_id="${2:-}"
-    local args=(-S -M "-K$VM_DIR/$CFW_INPUT/signcert.p12")
-    [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    ldid "${args[@]}" "$file"
-}
 
 ldid_sign_ent() {
     local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
@@ -85,45 +59,13 @@ ldid_sign_ent() {
 
 # Detach a DMG mountpoint if currently mounted, ignore errors
 safe_detach() {
-    local mnt="$1"
-    if mount | grep -Fq " on $mnt "; then
-        sudo ${SUDO_ASKPASS:+-A} hdiutil detach -force "$mnt" 2>/dev/null || true
-    fi
+    cfw_detach_with "$1" sudo ${SUDO_ASKPASS:+-A} hdiutil
 }
 
-assert_mount_under_vm() {
-    local mnt="$1" label="${2:-mountpoint}"
-    local abs_vm abs_mnt
-
-    abs_vm="$(cd "$VM_DIR" && pwd -P)"
-    abs_mnt="$(cd "$mnt" && pwd -P)"
-    case "$abs_mnt/" in
-        "$abs_vm/"*) ;;
-        *) die "Unsafe ${label}: ${abs_mnt} (must be inside ${abs_vm})" ;;
-    esac
-}
-
-# ── Find restore directory ─────────────────────────────────────
-find_restore_dir() {
-    for dir in "$VM_DIR"/iPhone*_Restore; do
-        [[ -f "$dir/BuildManifest.plist" ]] && echo "$dir" && return
-    done
-    die "No restore directory found in $VM_DIR"
-}
 
 # ── Setup input resources ──────────────────────────────────────
 setup_cfw_input() {
-    [[ -d "$VM_DIR/$CFW_INPUT" ]] && return
-    local archive
-    for search_dir in "$SCRIPT_DIR/resources" "$SCRIPT_DIR" "$VM_DIR"; do
-        archive="$search_dir/$CFW_ARCHIVE"
-        if [[ -f "$archive" ]]; then
-            echo "  Extracting $CFW_ARCHIVE..."
-            tar --zstd -xf "$archive" -C "$VM_DIR"
-            return
-        fi
-    done
-    die "Neither $CFW_INPUT/ nor $CFW_ARCHIVE found"
+    cfw_extract_input "$CFW_INPUT" "$CFW_ARCHIVE" "Neither $CFW_INPUT/ nor $CFW_ARCHIVE found" tar --zstd
 }
 
 # ── Apply dev overlay (replace rpcserver_ios in iosbinpack64) ──
@@ -146,43 +88,13 @@ apply_dev_overlay() {
     die "Dev overlay not found (cfw_dev/rpcserver_ios)"
 }
 
-# ── Check prerequisites ────────────────────────────────────────
-check_prereqs() {
-    command -v ipsw >/dev/null 2>&1 || die "'ipsw' not found. Install: brew install blacktop/tap/ipsw"
-    command -v aea >/dev/null 2>&1 || die "'aea' not found (requires macOS 12+)"
-    [[ -x "$PYTHON3" ]] || die "python3 not found (tried: $PYTHON3). Run: make setup_venv"
-    echo "[*] Python: $PYTHON3 ($("$PYTHON3" --version 2>&1))"
-    local py_err
-    py_err="$("$PYTHON3" -c "import capstone, keystone" 2>&1)" || {
-        die "Missing Python deps (using $PYTHON3).\n  Error: ${py_err}\n  Fix:   source ${SCRIPT_DIR:h}/.venv/bin/activate && pip install capstone keystone-engine\n  Or:    make setup_venv"
-    }
-}
-
 # ── Cleanup trap (unmount DMGs on error) ───────────────────────
-cleanup_on_exit() {
-    safe_detach "$CFW_HOST_MNT/mnt_sysos"
-    safe_detach "$CFW_HOST_MNT/mnt_appos"
-}
 trap cleanup_on_exit EXIT
 
 # The VM's Disk.img is attached on the host by cfw_install_host.sh; its APFS
 # volumes are mounted here and every file is placed with plain cp/chmod/etc.
 # (the VM is off — nothing runs "on the device").
-: "${CFW_HOST_CONTAINER:?CFW_HOST_CONTAINER unset — run via cfw_install_host.sh}"
-HOST_MNT="${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
-MNT1="$HOST_MNT/mnt1"   # disk1s1 (System / rootfs)
-MNT3="$HOST_MNT/mnt3"   # disk1s3
-TAR="$(command -v gtar 2>/dev/null || echo /opt/homebrew/bin/gtar)"  # macOS bsdtar lacks GNU tar flags
-mkdir -p "$HOST_MNT"
-
-# Mount an APFS volume of the attached image container at a host mount point.
-mount_vol() {  # mount_vol <slice, e.g. s1> <mountpoint> [opts]
-    local dev="/dev/${CFW_HOST_CONTAINER}$1" mnt="$2" opts="${3:-rw}"
-    /bin/mkdir -p "$mnt"
-    /sbin/mount | /usr/bin/grep -Fq " on $mnt " && return 0
-    /sbin/mount_apfs -o "$opts" "$dev" "$mnt" 2>/dev/null || true
-    /sbin/mount | /usr/bin/grep -Fq " on $mnt " || die "mount failed: $dev -> $mnt"
-}
+cfw_init_mounts
 
 # ════════════════════════════════════════════════════════════════
 # Main
@@ -221,14 +133,10 @@ MNT_SYSOS="$CFW_HOST_MNT/mnt_sysos"
 MNT_APPOS="$CFW_HOST_MNT/mnt_appos"
 
 # Validate and publish SystemOS cache only after successful copy/decryption.
-"$PYTHON3" "$SCRIPT_DIR/cache_systemos.py" "$RESTORE_DIR/$CRYPTEX_SYSOS" "$SYSOS_DMG"
+cfw_cache_systemos "$RESTORE_DIR/$CRYPTEX_SYSOS" "$SYSOS_DMG"
 
 # Copy AppOS (unencrypted, cached)
-if [[ ! -f "$APPOS_DMG" ]]; then
-    cp "$RESTORE_DIR/$CRYPTEX_APPOS" "$APPOS_DMG"
-else
-    echo "  Using cached AppOS DMG"
-fi
+cfw_cache_appos "$RESTORE_DIR/$CRYPTEX_APPOS" "$APPOS_DMG"
 
 # Detach any leftover mounts from previous runs
 safe_detach "$MNT_SYSOS"

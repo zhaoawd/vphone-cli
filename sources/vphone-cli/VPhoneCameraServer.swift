@@ -50,6 +50,7 @@ final class VPhoneCameraServer {
     // instead of leaking a stale QR into the next generation.
     private(set) var currentGeneration: String = ""
     private(set) var currentRole: String = "neutral"
+    private(set) var presentationID: String = ""
     private var fps: Double = VPhoneCameraServer.defaultFPS
     private var wireFrameIndex: UInt64 = 0
     private let fence = VPhoneGenerationFence()
@@ -76,6 +77,8 @@ final class VPhoneCameraServer {
     }
 
     func disconnect() {
+        device = nil
+        connectionAttemptToken &+= 1
         stopStreaming()
         if connectionFD >= 0 {
             close(connectionFD)
@@ -94,6 +97,12 @@ final class VPhoneCameraServer {
         if sourceKind == kind, kind != .videoFile { return }
         let wasStreaming = (timer != nil)
         if wasStreaming { stopStreaming() }
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
+        currentGeneration = ""
+        presentationID = ""
+        currentRole = "test"
+        wireFrameIndex = 0
+        fps = Self.defaultFPS
         sourceKind = kind
         switch kind {
         case .off:
@@ -151,10 +160,21 @@ final class VPhoneCameraServer {
             print("[camera] present: failed to load \(imagePath): \(error)")
             return false
         }
+        return beginPresentation(producer, generation: generation, role: role, fps: fps)
+    }
+
+    func presentNeutral(generation: String, fps: Double) -> Bool {
+        beginPresentation(VPhoneNeutralFrameProducer(width: Self.defaultWidth, height: Self.defaultHeight),
+                          generation: generation, role: "neutral", fps: fps)
+    }
+
+    private func beginPresentation(_ producer: any VPhoneFrameProducer,
+                                   generation: String, role: String, fps: Double) -> Bool {
         stopStreaming()
         self.producer = producer
         self.sourceKind = .image
         self.currentGeneration = generation
+        self.presentationID = UUID().uuidString
         self.currentRole = role
         self.fps = min(30.0, max(1.0, fps))
         self.wireFrameIndex = 0
@@ -164,13 +184,15 @@ final class VPhoneCameraServer {
         return isConnected
     }
 
-    /// Stop only if `generation` owns the current source; otherwise a conflict.
+    /// Stop host production only if `generation` owns the source. The guest
+    /// retains its last copied frame; this does not present a neutral image.
     func stop(generation: String) -> Bool {
         guard currentGeneration == generation else { return false }
         stopStreaming()
         producer = nil
         sourceKind = .off
         currentGeneration = ""
+        presentationID = ""
         currentRole = "neutral"
         _ = fence.token.wrappingAdd(1, ordering: .relaxed)
         return true
@@ -183,9 +205,13 @@ final class VPhoneCameraServer {
             "source": sourceKind.rawValue,
             "role": currentRole,
             "generation": currentGeneration,
+            "presentation_id": presentationID,
             "streaming": timer != nil,
             "connected": isConnected,
+            // Retain the legacy field; it counts scheduled ticks, not completed writes.
             "host_published_frame_index": Int(wireFrameIndex),
+            "host_scheduled_frame_index": Int(wireFrameIndex),
+            "host_frame_index_semantics": "scheduled_tick",
             "matches_requested": currentGeneration == generation,
         ]
     }
@@ -212,6 +238,7 @@ final class VPhoneCameraServer {
             let fi = self.wireFrameIndex
             let gen = self.currentGeneration
             let role = self.currentRole
+            let presentationID = self.presentationID
             let fence = self.fence
             let tokenSnapshot = fence.token.load(ordering: .relaxed)
             let q = self.producerQueue
@@ -221,8 +248,9 @@ final class VPhoneCameraServer {
                 // than send an old QR under a new generation.
                 if fence.token.load(ordering: .relaxed) != tokenSnapshot { return }
                 guard let frame = producer.nextFrame() else { return }
+                if fence.token.load(ordering: .relaxed) != tokenSnapshot { return }
                 let ok = Self.send(fd: fd, frame: frame,
-                                   generation: gen, role: role, frameIndex: fi)
+                                   generation: gen, role: role, frameIndex: fi, presentationID: presentationID)
                 if !ok {
                     Task { @MainActor [weak self] in
                         guard let self else { return }
@@ -241,6 +269,7 @@ final class VPhoneCameraServer {
     }
 
     func stopStreaming() {
+        _ = fence.token.wrappingAdd(1, ordering: .relaxed)
         guard let t = timer else { return }
         t.cancel()
         timer = nil
@@ -303,17 +332,19 @@ final class VPhoneCameraServer {
     @discardableResult
     nonisolated private static func send(
         fd: Int32, frame: VPhoneCameraFrame,
-        generation: String = "", role: String = "test", frameIndex: UInt64 = 0
+        generation: String = "", role: String = "test", frameIndex: UInt64 = 0,
+        presentationID: String = ""
     ) -> Bool {
-        // header — protocol v2 adds pv/gen/role/fi (§8.3). The guest reader
-        // ignores unknown keys, so a v1 receiver stays compatible.
+        // Protocol v3 binds receipts to one presentation, even when generation is reused.
+        // Older receivers ignore the new field but cannot satisfy a v3 receipt.
         let headerDict: [String: Any] = [
             "w": frame.width,
             "h": frame.height,
             "bpr": frame.bytesPerRow,
             "fmt": Self.pixelFormat,
             "ts": frame.timestampNS,
-            "pv": 2,
+            "pv": 3,
+            "presentation_id": presentationID,
             "gen": generation,
             "role": role,
             "fi": frameIndex,

@@ -11,6 +11,21 @@ struct ResourcesTests {
         #expect(r.cfwPy.path == "/Applications/vphone-cli.app/Contents/Resources/scripts/patchers/cfw.py")
     }
 
+    @Test func symlinkLaunchResolvesBundleAndCertificate() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let executable = root.appendingPathComponent("App.app/Contents/MacOS/vphone-cli")
+        try FileManager.default.createDirectory(at: executable.deletingLastPathComponent(),
+                                                withIntermediateDirectories: true)
+        try Data("fixture".utf8).write(to: executable)
+        let link = root.appendingPathComponent("launcher")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: executable)
+        let resources = VPhoneResources.resolve(executablePath: link.path)
+        let expected = root.resolvingSymlinksInPath().appendingPathComponent("App.app/Contents/Resources")
+        #expect(resources.base == expected)
+        #expect(resources.signcert == expected.appendingPathComponent("scripts/vphoned/signcert.p12"))
+    }
+
     @Test func devLayoutWalksUpToProjectRoot() throws {
         // Fake a dev tree: <root>/.build/release/vphone-cli with a <root>/scripts dir.
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -37,9 +52,14 @@ struct ResourcesTests {
         let r = VPhoneResources(base: URL(fileURLWithPath: "/x"), environment: [:])
         let missing = URL(fileURLWithPath: "/nonexistent/bin/python3")
         #expect(r.pythonIsUsable(missing) == false)
-        #expect(r.keystoneIsUsable(missing) == false)
-        #expect(r.venvIsUsable(missing) == false)
-        #expect(r.repairKeystone(missing) == false)
+    }
+
+    @Test func explicitPythonMustPassFullLockedProbe() {
+        let resources = VPhoneResources(base: URL(fileURLWithPath: "/missing-resources"),
+                                        environment: ["VPHONE_PYTHON": "/usr/bin/false"])
+        #expect(throws: VPhoneResourcesError.self) {
+            try resources.pythonExecutable()
+        }
     }
 
     @Test func managedVenvDefaultsUnderDotVphone() {

@@ -311,6 +311,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 *.resolved
+!/Package.resolved
 /VM
 /ipsws/
 .limd/
@@ -339,3 +340,11 @@ setup_logs/
 
 # fetched debs cache
 /debs/
+
+# Managed project Python generations and provisioning lock
+/.venv.generations/
+/.venv.lock
+
+# Shared CFW shell source (the generic Python lib/ rule must not hide it).
+!/scripts/lib/
+!/scripts/lib/cfw_common.sh

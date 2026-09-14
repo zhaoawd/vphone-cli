@@ -69,6 +69,7 @@ elif name == 'sudo':
 elif name == 'python-stub':
     if args and args[0].endswith('cfw.py'):
         print('SystemOS.dmg.aea\nAppOS.dmg')
+    elif args and args[0].endswith('check_python_runtime.py'): pass
     elif args and args[0] in ('-c', '--version'): pass
     else: os.execv(sys.executable, [sys.executable] + args)
 ''')
@@ -197,6 +198,7 @@ elif name == 'python-stub':
         scripts.mkdir()
         for name in ("cfw_install.sh", "cfw_install_dev.sh", "cfw_install_jb.sh", "cfw_install_exp.sh", "cache_systemos.py", "vm_lock.py"):
             shutil.copyfile(ROOT / "scripts" / name, scripts / name)
+        shutil.copytree(ROOT / "scripts/lib", scripts / "lib")
         overlay = scripts / "resources/cfw_dev"
         overlay.mkdir(parents=True)
         (overlay / "rpcserver_ios").write_bytes(b"overlay")

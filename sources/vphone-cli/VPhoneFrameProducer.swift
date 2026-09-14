@@ -330,3 +330,23 @@ final class VPhoneStillImageProducer: VPhoneFrameProducer, @unchecked Sendable {
             timestampNS: ts, pixels: pixels)
     }
 }
+
+// MARK: - Neutral frame
+
+/// Opaque white BGRA frame. Remains streaming until explicitly stopped/replaced.
+final class VPhoneNeutralFrameProducer: VPhoneFrameProducer {
+    private let width: Int
+    private let height: Int
+    private let pixels: Data
+
+    init(width: Int, height: Int) {
+        self.width = width
+        self.height = height
+        pixels = Data(repeating: 255, count: width * height * 4)
+    }
+
+    func nextFrame() -> VPhoneCameraFrame? {
+        VPhoneCameraFrame(width: width, height: height, bytesPerRow: width * 4,
+                          timestampNS: UInt64(ProcessInfo.processInfo.systemUptime * 1e9), pixels: pixels)
+    }
+}

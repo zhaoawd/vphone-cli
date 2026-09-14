@@ -34,6 +34,7 @@ protocol VPhoneHostScreen: AnyObject {
 protocol VPhoneHostCamera: AnyObject {
     var isConnected: Bool { get }
     func present(imagePath: String, generation: String, role: String, fps: Double) -> Bool
+    func presentNeutral(generation: String, fps: Double) -> Bool
     func hostStatus(generation: String) -> [String: Any]
     func stop(generation: String) -> Bool
 }

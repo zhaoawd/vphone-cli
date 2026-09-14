@@ -9,7 +9,7 @@
 #
 # Usage:
 #   ./scripts/build.sh              # build + sign + bundle + vphoned
-#   ./scripts/build.sh --no-vphoned # skip the vphoned cross-compile
+#   ./scripts/build.sh --no-vphoned # reuse an existing signed daemon; still a complete app
 set -euo pipefail
 
 SCRIPT_DIR="${0:A:h}"
@@ -37,7 +37,7 @@ done
 echo "=== Building vphone-cli (${GIT_HASH}) ==="
 echo '// Auto-generated — do not edit' > "$BUILD_INFO"
 echo "enum VPhoneBuildInfo { static let commitHash = \"${GIT_HASH}\" }" >> "$BUILD_INFO"
-swift build -c release
+swift build -c release --force-resolved-versions
 
 echo "=== Signing with entitlements ==="
 codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BINARY"
@@ -45,14 +45,13 @@ echo "  signed OK → ${BINARY}"
 
 # --- Bundle (.app used for GUI boot) ---
 echo "=== Bundling ${BUNDLE} ==="
+rm -rf "$BUNDLE"
 mkdir -p "${BUNDLE}/Contents/MacOS" "${BUNDLE}/Contents/Resources"
 cp -f "$BINARY" "$BUNDLE_BIN"
 cp -f "$INFO_PLIST" "${BUNDLE}/Contents/Info.plist"
 cp -f "sources/AppIcon.icns" "${BUNDLE}/Contents/Resources/AppIcon.icns"
-cp -f "scripts/vphoned/signcert.p12" "${BUNDLE}/Contents/Resources/signcert.p12"
 cp -f "$(command -v ldid)" "${BUNDLE}/Contents/MacOS/ldid"
 codesign --force --sign - "${BUNDLE}/Contents/MacOS/ldid"
-codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BUNDLE_BIN"
 echo "  bundled → ${BUNDLE}"
 
 # --- vphoned guest daemon (cross-compiled + signed for iOS arm64) ---
@@ -91,10 +90,15 @@ for t in trustcache insert_dylib; do
   if [[ -x ".tools/bin/$t" ]]; then cp -f ".tools/bin/$t" "${RES}/.tools/bin/$t"
   else echo "Error: .tools/bin/$t missing — run ./scripts/setup_tools.sh first" >&2; exit 1; fi
 done
-[[ -f .build/vphoned.signed ]] && cp -f .build/vphoned.signed "${RES}/vphoned.signed" || true
+if [[ ! -s .build/vphoned.signed ]]; then
+  echo "Error: signed vphoned missing; omit --no-vphoned to build it" >&2
+  exit 1
+fi
+cp -f .build/vphoned.signed "${RES}/vphoned.signed"
 # requirements.txt lets the app provision its own ~/.vphone/venv on first run
 # (see VPhoneResources.pythonExecutable) — the app carries no venv itself.
 cp -f requirements.txt "${RES}/requirements.txt"
+cp -R dependencies "${RES}/dependencies"
 # debs.list = extra-deb manifest (fetch_debs.sh reads $base/debs.list); README.md
 # = the Tested-Environments table fw_prepare.sh reads to label Supported firmwares.
 cp -f debs.list "${RES}/debs.list"
@@ -106,12 +110,13 @@ cp -f scripts/vphone-amfidont "${RES}/vphone-amfidont"
 chmod +x "${RES}/vphone-amfidont"
 echo "  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, vphoned.signed, requirements.txt, debs.list, README.md, vphone-amfidont"
 
-# Re-sign: codesign seals Contents/Resources at sign time, so the earlier
-# bundle-step signature (made before these assets existed) is now stale —
-# re-signing here reseals against the final Resources tree.
-echo "=== Re-signing ${BUNDLE_BIN} (resealing Resources) ==="
-codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BUNDLE_BIN"
-echo "  resealed OK"
+python3 "$SCRIPT_DIR/record_build_dependencies.py" "$BUNDLE"
+
+# Seal the final resource tree only after every runtime asset is staged.
+echo "=== Signing ${BUNDLE} (final Resources) ==="
+codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BUNDLE"
+python3 "$SCRIPT_DIR/check_bundle.py" "$BUNDLE"
+echo "  resealed and verified OK"
 
 echo ""
 echo "=== Build complete ==="

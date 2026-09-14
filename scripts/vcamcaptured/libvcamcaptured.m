@@ -99,6 +99,7 @@ typedef struct __attribute__((packed)) {
   uint32_t _pad;
   uint64_t published_at_ns;
   char     generation[VCC_GENERATION_MAX];
+  uint8_t  presentation_id[16];
 } vcc_shm_header_t;
 
 // Observe shm — written here (we own it), read by vphoned to answer the
@@ -113,6 +114,7 @@ typedef struct __attribute__((packed)) {
   uint64_t observed_at_ns;
   uint64_t observed_count;
   char     observed_generation[VCC_GENERATION_MAX];
+  uint8_t  presentation_id[16];
 } vcc_observe_header_t;
 
 // MARK: - sentinel logging
@@ -4623,7 +4625,7 @@ static void vcc_observe_map(void) {
 
 // Publish an observe record for a frame we just copied out of the frame shm.
 // seq even/odd discipline so vphoned reads a stable snapshot.
-static void vcc_observe_write(uint64_t frame_index, const char *generation) {
+static void vcc_observe_write(uint64_t frame_index, const char *generation, const uint8_t presentation_id[16]) {
   if (!vcc_observe_base) vcc_observe_map();
   if (!vcc_observe_base) return;
   vcc_observe_header_t *oh = (vcc_observe_header_t *)vcc_observe_base;
@@ -4634,6 +4636,7 @@ static void vcc_observe_write(uint64_t frame_index, const char *generation) {
   atomic_store_explicit((_Atomic uint64_t *)&oh->seq, writing,
                         memory_order_release);
 
+  memcpy(oh->presentation_id, presentation_id, 16);
   oh->observed_frame_index = frame_index;
   oh->observed_at_ns = vcc_monotonic_ns();
   oh->observed_count = ++vcc_observe_count;
@@ -4689,6 +4692,8 @@ static int vcc_shm_read_latest(void) {
   uint64_t ts  = hdr->timestamp_ns;
   uint64_t idx = hdr->frame_index;
   uint32_t pix_len = hdr->pixels_length;
+  uint8_t presentation_id[16];
+  memcpy(presentation_id, hdr->presentation_id, 16);
   char gen[VCC_GENERATION_MAX];
   memcpy(gen, hdr->generation, VCC_GENERATION_MAX);
   gen[VCC_GENERATION_MAX - 1] = '\0';
@@ -4703,32 +4708,42 @@ static int vcc_shm_read_latest(void) {
     vcc_latest_frame.pixels_capacity =
         vcc_latest_frame.pixels ? pix_len : 0;
   }
-  if (vcc_latest_frame.pixels) {
-    memcpy(vcc_latest_frame.pixels,
-           vcc_shm_base + VCC_SHM_HEADER_SIZE, pix_len);
-    vcc_latest_frame.pixels_length = pix_len;
-    vcc_latest_frame.width = w;
-    vcc_latest_frame.height = h;
-    vcc_latest_frame.bytes_per_row = bpr;
-    vcc_latest_frame.pixel_format = fmt;
-    vcc_latest_frame.timestamp_ns = ts;
-    vcc_latest_frame.frame_index = idx;
+  if (!vcc_latest_frame.pixels) {
+    vcc_latest_frame.pixels_length = 0;
+    vcc_latest_frame.width = 0;
+    vcc_latest_frame.height = 0;
+    pthread_mutex_unlock(&vcc_latest_frame.lock);
+    return 0;
   }
-  pthread_mutex_unlock(&vcc_latest_frame.lock);
+  memcpy(vcc_latest_frame.pixels,
+         vcc_shm_base + VCC_SHM_HEADER_SIZE, pix_len);
 
-  // Re-check seq after copy. If it advanced past our snapshot+1 we may
-  // have torn — but the writer always sets even seq AFTER pixel write,
-  // so seeing the same even seq means our copy was clean.
+  // Keep app readers excluded until the copied pixels have a stable snapshot.
   uint64_t seq_b = atomic_load_explicit(
       (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
-  if (seq_b != seq_a) return 0;
+  if (seq_b != seq_a) {
+    // The reusable buffer was overwritten; do not expose it as the old frame.
+    vcc_latest_frame.pixels_length = 0;
+    vcc_latest_frame.width = 0;
+    vcc_latest_frame.height = 0;
+    pthread_mutex_unlock(&vcc_latest_frame.lock);
+    return 0;
+  }
+  vcc_latest_frame.pixels_length = pix_len;
+  vcc_latest_frame.width = w;
+  vcc_latest_frame.height = h;
+  vcc_latest_frame.bytes_per_row = bpr;
+  vcc_latest_frame.pixel_format = fmt;
+  vcc_latest_frame.timestamp_ns = ts;
+  vcc_latest_frame.frame_index = idx;
+  pthread_mutex_unlock(&vcc_latest_frame.lock);
 
   vcc_last_seq_seen = seq_a;
   vcc_frames_received++;
   // Report the observe half of the two-level transport receipt: this frame
   // (by monotonic frame_index + its generation) was genuinely consumed out
   // of the publish shm. vphoned reads this to answer host `vcam_status`.
-  vcc_observe_write(idx, gen);
+  vcc_observe_write(idx, gen, presentation_id);
   if ((vcc_frames_received & 29) == 1) {
     vcc_log(@"  shm frame #%llu (idx=%llu gen=%s) w=%u h=%u bpr=%u fmt=0x%08x",
             (unsigned long long)vcc_frames_received,

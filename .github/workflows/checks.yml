@@ -14,9 +14,13 @@ concurrency:
 
 jobs:
   fast:
-    name: Fast tests (macOS ARM64)
+    name: Fast tests (macOS ARM64, Python ${{ matrix.python }})
     runs-on: macos-26
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.13', '3.14']
     env:
       PIP_CACHE_DIR: ${{ github.workspace }}/.build/pip-cache
     steps:
@@ -32,10 +36,11 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: ${{ matrix.python }}
           cache: pip
           cache-dependency-path: |
             requirements.txt
+            dependencies/*.lock
             scripts/setup_venv.sh
 
       - name: Install native test dependencies
@@ -106,7 +111,29 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: fast-check-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          name: fast-check-logs-${{ matrix.python }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: .build/ci/*.log
           if-no-files-found: warn
           retention-days: 7
+
+  bundle:
+    name: Complete app resources and signature
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Initialize build and resource dependencies
+        run: |
+          git submodule update --init --recursive --depth 1 \
+            vendor/swift-argument-parser vendor/Dynamic vendor/libcapstone-spm \
+            vendor/libimg4-spm vendor/MachOKit scripts/resources \
+            scripts/repos/trustcache scripts/repos/insert_dylib
+      - name: Install build dependencies
+        run: brew install ldid-procursus openssl@3
+      - name: Build complete app and verify final signature
+        run: |
+          zsh scripts/build_runtime_tools.sh
+          make build
+          make check_bundle

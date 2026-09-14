@@ -509,8 +509,8 @@ final class VPhoneHostCommandExecutor {
             guard let path = json["path"] as? String, !path.isEmpty else {
                 return Self.response(ok: false, error: "camera_present requires path")
             }
-            guard let generation = json["generation"] as? String, !generation.isEmpty else {
-                return Self.response(ok: false, error: "camera_present requires generation")
+            guard let generation = json["generation"] as? String, Self.validCameraGeneration(generation) else {
+                return Self.response(ok: false, error: "camera_present requires 1...79 UTF-8 bytes of generation without NUL")
             }
             let role = json["role"] as? String ?? "qr"
             guard ["neutral", "qr", "test"].contains(role) else {
@@ -528,19 +528,24 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no camera server"
                     return
                 }
+                guard control?.guestCaps.contains("vcam_receipt_v3") == true else {
+                    result.error = "camera receipt v3 requires updated vphoned and libvcamcaptured"
+                    return
+                }
                 guard cam.present(imagePath: path, generation: generation, role: role, fps: fps) else {
                     result.error = "camera vsock not connected or image load failed"
                     return
                 }
-                // Assemble the two-level receipt from the guest. Until the guest
-                // vcam_status handler lands, sendRequest errors → fail-closed.
+                // Query a same-generation copy receipt; this does not verify app display or QR recognition.
+                let presentationID = cam.hostStatus(generation: generation)["presentation_id"] as? String ?? ""
                 let receipt = await Self.cameraTransportReceipt(
-                    controller: self, generation: generation)
-                box.extra["protocol_version"] = 2
+                    controller: self, generation: generation, presentationID: presentationID)
+                box.extra["protocol_version"] = 3
+                box.extra["presentation_id"] = presentationID
                 box.extra["source"] = "image"
                 box.extra["role"] = role
                 box.extra["generation"] = generation
-                box.extra["streaming"] = true
+                box.extra["streaming"] = cam.hostStatus(generation: generation)["streaming"]
                 if let receipt {
                     box.extra["transport_receipt"] = receipt
                     result.ok = true
@@ -556,8 +561,8 @@ final class VPhoneHostCommandExecutor {
             }
 
         case "camera_status":
-            guard let generation = json["generation"] as? String else {
-                return Self.response(ok: false, error: "camera_status requires generation")
+            guard let generation = json["generation"] as? String, Self.validCameraGeneration(generation) else {
+                return Self.response(ok: false, error: "camera_status requires 1...79 UTF-8 bytes of generation without NUL")
             }
             let result = ResultBox()
             let box = ExtraBox()
@@ -566,34 +571,60 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no camera server"
                     return
                 }
+                let presentationID = json["presentation_id"] as? String
+                    ?? cam.hostStatus(generation: generation)["presentation_id"] as? String ?? ""
+                let receipt = await Self.cameraTransportReceipt(controller: self, generation: generation,
+                                                               presentationID: presentationID)
+                // Re-read after the await: another request may have stopped/switched the source.
                 box.extra = cam.hostStatus(generation: generation)
-                if let receipt = await Self.cameraTransportReceipt(
-                    controller: self, generation: generation) {
-                    box.extra["transport_receipt"] = receipt
-                }
+                if let receipt { box.extra["transport_receipt"] = receipt }
                 result.ok = true
             }()
             return Self.response(ok: result.ok, error: result.error, extra: box.extra)
 
         case "camera_stop":
-            guard let generation = json["generation"] as? String else {
-                return Self.response(ok: false, error: "camera_stop requires generation")
+            guard let generation = json["generation"] as? String, Self.validCameraGeneration(generation) else {
+                return Self.response(ok: false, error: "camera_stop requires 1...79 UTF-8 bytes of generation without NUL")
             }
-            let result = ResultBox()
-            await { () async -> Void in
-                guard let cam = cameraServer else {
-                    result.error = "no camera server"
-                    return
+            guard let cam = cameraServer else { return Self.response(ok: false, error: "no camera server") }
+            let status = cam.hostStatus(generation: generation)
+            guard status["generation"] as? String == generation else {
+                return Self.response(ok: false, error: "generation does not own the camera source")
+            }
+            if let expected = json["presentation_id"] {
+                guard let expected = expected as? String,
+                      expected == status["presentation_id"] as? String else {
+                    return Self.response(ok: false, error: "presentation does not own the camera source")
                 }
-                // A generation mismatch is a conflict, not a stop — never stop
-                // another run's source (§8.4).
-                if cam.stop(generation: generation) {
-                    result.ok = true
-                } else {
-                    result.error = "generation \(generation) does not own the camera source"
-                }
-            }()
-            return Self.response(ok: result.ok, error: result.error)
+            }
+            let policy = json["policy"] as? String ?? "keep_last"
+            guard json["policy"] == nil || json["policy"] is String,
+                  ["keep_last", "neutral"].contains(policy) else {
+                return Self.response(ok: false, error: "camera_stop policy must be keep_last|neutral")
+            }
+            if policy == "keep_last" {
+                let stopped = cam.stop(generation: generation)
+                return Self.response(ok: stopped, extra: ["stop_policy": policy, "streaming": false,
+                                                         "guest_frame_cleared": false])
+            }
+            guard cam.isConnected, control?.isConnected == true,
+                  control?.guestCaps.contains("vcam_receipt_v3") == true else {
+                return Self.response(ok: false, error: "neutral presentation requires camera connection and receipt v3")
+            }
+            let neutralGeneration = UUID().uuidString
+            guard cam.presentNeutral(generation: neutralGeneration, fps: 8) else {
+                return Self.response(ok: false, error: "neutral source could not start")
+            }
+            let presentationID = cam.hostStatus(generation: neutralGeneration)["presentation_id"] as? String ?? ""
+            let receipt = await Self.cameraTransportReceipt(controller: self, generation: neutralGeneration,
+                                                           presentationID: presentationID)
+            var extra = cam.hostStatus(generation: neutralGeneration)
+            extra["stop_policy"] = policy
+            extra["protocol_version"] = 3
+            extra["neutral_generation"] = neutralGeneration
+            if let receipt { extra["transport_receipt"] = receipt }
+            return Self.response(ok: receipt != nil,
+                                 error: receipt == nil ? "neutral transport receipt unavailable" : nil, extra: extra)
 
         case "location_source_set", "location_stream_start", "location_stream_push",
              "location_source_control", "location_source_status", "location_source_stop":
@@ -867,7 +898,7 @@ final class VPhoneHostCommandExecutor {
             commands[name] = locationProvider != nil && caps.contains("location_owned")
         }
         commands["location_source_status"] = locationProvider != nil
-        commands["camera_present"] = cameraServer?.isConnected == true && caps.contains("vcam_status")
+        commands["camera_present"] = cameraServer?.isConnected == true && caps.contains("vcam_receipt_v3")
         commands["camera_status"] = cameraServer != nil
         commands["camera_stop"] = cameraServer != nil
         return ["protocol_version": 1, "boot_mode": bootMode.rawValue, "guest_connected": connected,
@@ -1082,26 +1113,44 @@ final class VPhoneHostCommandExecutor {
             course: course)
     }
 
-    /// Query the guest 1337 `vcam_status` for one generation and return the
-    /// composite receipt only when both the vphoned-published and
-    /// libvcamcaptured-observed frame indices match. Returns nil (fail-closed)
-    /// on any error, unsupported command, mismatch, or missing observe half.
+    nonisolated static func validCameraGeneration(_ generation: String) -> Bool {
+        !generation.isEmpty && generation.utf8.count < 80 && !generation.utf8.contains(0)
+    }
+
+    private func cameraSourceIsActive(generation: String, presentationID: String) -> Bool {
+        guard let cameraServer, cameraServer.isConnected else { return false }
+        let status = cameraServer.hostStatus(generation: generation)
+        return !presentationID.isEmpty && status["presentation_id"] as? String == presentationID
+            && status["generation"] as? String == generation && status["streaming"] as? Bool == true
+    }
+
+    /// Confirm that libvcamcaptured copied at least one frame of the active
+    /// generation from vphoned's shared memory. Both indices are publisher-local:
+    /// observation may lag publication. Neither is the host wire `fi`, and this
+    /// receipt does not establish app display or QR recognition.
     @MainActor
     private static func cameraTransportReceipt(
-        controller: VPhoneHostCommandExecutor, generation: String
+        controller: VPhoneHostCommandExecutor, generation: String, presentationID: String
     ) async -> [String: Any]? {
         guard let ctl = controller.control, ctl.isConnected else { return nil }
         // Give the guest a brief window to publish + observe the first frame.
         for _ in 0..<20 {
-            guard !Task.isCancelled else { return nil }
+            guard !Task.isCancelled, ctl.isConnected,
+                  controller.cameraSourceIsActive(generation: generation, presentationID: presentationID) else { return nil }
             guard let (resp, _) = try? await ctl.sendRequest(
-                ["t": "vcam_status", "generation": generation])
+                ["t": "vcam_status", "generation": generation, "presentation_id": presentationID])
             else { return nil }
+            guard !Task.isCancelled, ctl.isConnected,
+                  controller.cameraSourceIsActive(generation: generation, presentationID: presentationID) else { return nil }
             if let pub = resp["vphoned_published_frame_index"] as? Int,
                let obs = resp["libvcam_observed_frame_index"] as? Int,
                (resp["generation"] as? String) == generation,
-               pub > 0, obs > 0 {
+               (resp["presentation_id"] as? String) == presentationID,
+               pub > 0, obs > 0, obs <= pub {
                 return [
+                    "semantics": "presentation_frame_copied",
+                    "presentation_id": presentationID,
+                    "generation": generation,
                     "vphoned_published_frame_index": pub,
                     "libvcam_observed_frame_index": obs,
                     "vphoned_published_at_ns": resp["vphoned_published_at_ns"] as? Int ?? 0,

@@ -34,26 +34,8 @@ set -euo pipefail
 VM_DIR="${1:-.}"
 SCRIPT_DIR="${0:a:h}"
 
-# ── Python resolver — prefer project venv over whatever is in PATH ─
-# Resolves to .venv/bin/python3 relative to the project root (parent of
-# scripts/), falling back to the system python3 when the venv is absent.
-_resolve_python3() {
-    if [[ -n "${VPHONE_PYTHON:-}" ]]; then
-        echo "$VPHONE_PYTHON"
-        return
-    fi
-    local venv_py="${SCRIPT_DIR:h}/.venv/bin/python3"
-    if [[ -x "$venv_py" ]]; then
-        echo "$venv_py"
-    else
-        command -v python3 || true
-    fi
-}
-PYTHON3="$(_resolve_python3)"
-"$PYTHON3" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR" || {
-    echo "[-] VM lock missing — run via cfw_install_host.sh" >&2
-    exit 1
-}
+source "$SCRIPT_DIR/lib/cfw_common.sh"
+cfw_require_runtime_and_lock
 
 # ════════════════════════════════════════════════════════════════
 # Step 1: Run base CFW install (skip halt — we continue with JB phases)
@@ -89,7 +71,7 @@ if [[ -z "$JB_RESTORE_DIR" ]]; then
     echo "[!] hv_vmm DSC patch: no restore directory found, skipping"
 else
     JB_CRYPTEX_SYSOS=$("$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" cryptex-paths "$JB_RESTORE_DIR/iPhone-BuildManifest.plist" | head -1)
-    "$PYTHON3" "$SCRIPT_DIR/cache_systemos.py" "$JB_RESTORE_DIR/$JB_CRYPTEX_SYSOS" "$JB_SYSOS_DMG"
+    cfw_cache_systemos "$JB_RESTORE_DIR/$JB_CRYPTEX_SYSOS" "$JB_SYSOS_DMG"
 fi
 
 if [[ -f "$JB_SYSOS_DMG" ]]; then
@@ -156,10 +138,6 @@ TEMP_DIR="$VM_DIR/.cfw_temp"
 DISABLE_LAUNCHD_HOOK="${DISABLE_LAUNCHD_HOOK:-0}"
 
 # ── Helpers ─────────────────────────────────────────────────────
-die() {
-    echo "[-] $*" >&2
-    exit 1
-}
 
 check_prerequisites() {
     local missing=()
@@ -170,12 +148,6 @@ check_prerequisites() {
     fi
 }
 
-ldid_sign() {
-    local file="$1" bundle_id="${2:-}"
-    local args=(-S -M "-K$VM_DIR/$CFW_INPUT/signcert.p12")
-    [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    ldid "${args[@]}" "$file"
-}
 
 ldid_sign_ent() {
     local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
@@ -309,17 +281,7 @@ get_boot_manifest_hash() {
 
 # ── Setup JB input resources ──────────────────────────────────
 setup_cfw_jb_input() {
-    [[ -d "$VM_DIR/$CFW_JB_INPUT" ]] && return
-    local archive
-    for search_dir in "$SCRIPT_DIR/resources" "$SCRIPT_DIR" "$VM_DIR"; do
-        archive="$search_dir/$CFW_JB_ARCHIVE"
-        if [[ -f "$archive" ]]; then
-            echo "  Extracting $CFW_JB_ARCHIVE..."
-            tar --zstd -xf "$archive" -C "$VM_DIR"
-            return
-        fi
-    done
-    die "JB mode: neither $CFW_JB_INPUT/ nor $CFW_JB_ARCHIVE found"
+    cfw_extract_input "$CFW_JB_INPUT" "$CFW_JB_ARCHIVE" "JB mode: neither $CFW_JB_INPUT/ nor $CFW_JB_ARCHIVE found" tar --zstd
 }
 
 # ── Apply dev overlay (replace rpcserver_ios in iosbinpack64) ──
@@ -345,22 +307,7 @@ apply_dev_overlay() {
 # The VM's Disk.img is attached on the host by cfw_install_host.sh; its APFS
 # volumes are mounted here and every file is placed with plain cp/chmod/etc.
 # (the VM is off — nothing runs "on the device").
-: "${CFW_HOST_CONTAINER:?CFW_HOST_CONTAINER unset — run via cfw_install_host.sh}"
-HOST_MNT="${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
-MNT1="$HOST_MNT/mnt1"   # disk1s1 (System / rootfs)
-MNT3="$HOST_MNT/mnt3"   # disk1s3
-MNT5="$HOST_MNT/mnt5"   # disk1s5 (per-boot-manifest OS dir / procursus bootstrap)
-TAR="$(command -v gtar 2>/dev/null || echo /opt/homebrew/bin/gtar)"  # macOS bsdtar lacks GNU tar flags
-mkdir -p "$HOST_MNT"
-
-# Mount an APFS volume of the attached image container at a host mount point.
-mount_vol() {  # mount_vol <slice, e.g. s1> <mountpoint> [opts]
-    local dev="/dev/${CFW_HOST_CONTAINER}$1" mnt="$2" opts="${3:-rw}"
-    /bin/mkdir -p "$mnt"
-    /sbin/mount | /usr/bin/grep -Fq " on $mnt " && return 0
-    /sbin/mount_apfs -o "$opts" "$dev" "$mnt" 2>/dev/null || true
-    /sbin/mount | /usr/bin/grep -Fq " on $mnt " || die "mount failed: $dev -> $mnt"
-}
+cfw_init_mounts
 
 # ── Check JB prerequisites ────────────────────────────────────
 command -v zstd >/dev/null 2>&1 || die "'zstd' not found (required for JB bootstrap phase)"

@@ -106,191 +106,77 @@ public struct VPhoneResources: Sendable {
 
     // MARK: - Python
 
-    /// Runtime pip deps, mirrored from requirements.txt (fallback when the
-    /// bundled requirements.txt is somehow absent).
-    static let fallbackRequirements =
-        ["typer", "capstone", "keystone-engine", "pyimg4", "pymobiledevice3>=9.5.0", "ipsw-parser"]
-
-    /// Bundled/dev requirements list the managed venv is provisioned from.
     public var requirementsFile: URL { base.appendingPathComponent("requirements.txt") }
 
-    /// Per-user managed venv, created on demand. Deliberately OUTSIDE both the
-    /// repo and the .app so the app is portable — a venv is never moved between
-    /// machines (its links would break); it is built fresh on each host.
     public var managedVenvDir: URL {
         if let dir = environment["VPHONE_VENV_DIR"], !dir.isEmpty {
             return URL(fileURLWithPath: dir)
         }
         return userCacheDir.appendingPathComponent("venv")
     }
-    private var managedVenvPython: URL { managedVenvDir.appendingPathComponent("bin/python3") }
 
-    /// A python is usable only if it carries an `ipsw_parser` new enough for the
-    /// bridge — the exact gap behind `IPSW has no attribute 'create_from_path'`
-    /// when an old system-python build gets picked up.
+    /// Script and Swift callers use the same capabilities and platform lock.
     func pythonIsUsable(_ python: URL) -> Bool {
         guard FileManager.default.isExecutableFile(atPath: python.path) else { return false }
-        let probe = "from ipsw_parser.ipsw import IPSW; import sys; "
-            + "sys.exit(0 if hasattr(IPSW, 'create_from_path') else 1)"
-        return (try? VPhoneProcessRunner.runCapturing(python, ["-c", probe]))?.succeeded == true
+        return (try? VPhoneProcessRunner.runCapturing(python,
+            [scriptsDir.appendingPathComponent("check_python_runtime.py").path, "--locked", "--json"],
+            env: environment))?.succeeded == true
     }
 
-    /// Must assemble, not just import — a bindings-only install imports fine
-    /// and then fails inside `fw patch`.
-    func keystoneIsUsable(_ python: URL) -> Bool {
-        let probe = "from keystone import Ks, KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN; import sys; "
-            + "sys.exit(0 if bytes(Ks(KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN).asm('nop')[0]) else 1)"
-        return (try? VPhoneProcessRunner.runCapturing(python, ["-c", probe]))?.succeeded == true
+    public func pythonExecutable(forceManaged: Bool = false) throws -> URL {
+        if !forceManaged {
+            if let override = environment["VPHONE_PYTHON"], !override.isEmpty {
+                let python = URL(fileURLWithPath: override)
+                guard pythonIsUsable(python) else {
+                    throw VPhoneResourcesError.pythonNotFound(
+                        "VPHONE_PYTHON failed locked runtime verification: \(override)")
+                }
+                return python
+            }
+            let dev = base.appendingPathComponent(".venv/bin/python3")
+            if pythonIsUsable(dev) { return dev }
+            let managed = managedVenvDir.appendingPathComponent("bin/python3")
+            if pythonIsUsable(managed) { return managed }
+        }
+        return try bootstrapManagedVenv(force: forceManaged)
     }
 
-    func venvIsUsable(_ python: URL) -> Bool {
-        pythonIsUsable(python) && keystoneIsUsable(python)
-    }
-
-    // MARK: - keystone native library
-
-    /// Older bottles ship only the static archive.
-    private func homebrewKeystoneLibs() -> (dylib: URL?, archive: URL?) {
-        for prefix in ["/opt/homebrew/opt/keystone/lib", "/usr/local/opt/keystone/lib"] {
-            let dir = URL(fileURLWithPath: prefix)
-            guard let names = try? FileManager.default.contentsOfDirectory(atPath: dir.path) else { continue }
-            let dylib = names.first { $0.hasPrefix("libkeystone") && $0.hasSuffix(".dylib") }
-            let archive = names.first { $0 == "libkeystone.a" }
-            if dylib != nil || archive != nil {
-                return (dylib.map(dir.appendingPathComponent), archive.map(dir.appendingPathComponent))
+    /// The manager builds a new generation and only publishes it after verification.
+    /// A failed install leaves the previously selected environment available.
+    private func bootstrapManagedVenv(force: Bool) throws -> URL {
+        var errors: [String] = []
+        for host in candidateHostPythons() {
+            var args = [scriptsDir.appendingPathComponent("python_environment.py").path,
+                        "--base", base.path, "--venv", managedVenvDir.path]
+            if force { args.append("--force") }
+            do {
+                let result = try VPhoneProcessRunner.runCapturing(host, args, env: environment)
+                if !result.stderr.isEmpty { FileHandle.standardError.write(Data(result.stderr.utf8)) }
+                let python = managedVenvDir.appendingPathComponent("bin/python3")
+                if result.succeeded, pythonIsUsable(python) { return python }
+                errors.append("\(host.path): \(result.stderr)")
+            } catch {
+                errors.append("\(host.path): \(error)")
             }
         }
-        return (nil, nil)
-    }
-
-    /// Asked of the interpreter: `import keystone` is what's broken here.
-    private func keystonePackageDir(_ python: URL) -> URL? {
-        let probe = "import sysconfig; print(sysconfig.get_paths()['purelib'])"
-        guard let r = try? VPhoneProcessRunner.runCapturing(python, ["-c", probe]), r.succeeded else { return nil }
-        let purelib = r.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !purelib.isEmpty else { return nil }
-        return URL(fileURLWithPath: purelib).appendingPathComponent("keystone")
-    }
-
-    /// PyPI has no arm64 macOS wheel and the sdist ignores its build's exit
-    /// status, so a failed native build still installs bindings alone and pip
-    /// reports success. Same recovery as scripts/setup_venv.sh.
-    func repairKeystone(_ python: URL) -> Bool {
-        guard let pkgDir = keystonePackageDir(python),
-              FileManager.default.fileExists(atPath: pkgDir.path) else { return false }
-        let dest = pkgDir.appendingPathComponent("libkeystone.dylib")
-        let libs = homebrewKeystoneLibs()
-
-        if let dylib = libs.dylib {
-            try? FileManager.default.removeItem(at: dest)
-            guard (try? FileManager.default.copyItem(at: dylib, to: dest)) != nil else { return false }
-            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: dest.path)
-        } else if let archive = libs.archive {
-            let r = try? VPhoneProcessRunner.runCapturing(
-                URL(fileURLWithPath: "/usr/bin/clang"),
-                ["-shared", "-o", dest.path, "-Wl,-all_load", archive.path,
-                 "-lc++", "-install_name", "@rpath/libkeystone.dylib"])
-            guard r?.succeeded == true else { return false }
-        } else {
-            return false
-        }
-
-        guard keystoneIsUsable(python) else { return false }
-        FileHandle.standardError.write(Data("[+] Repaired keystone native library: \(dest.path)\n".utf8))
-        return true
-    }
-
-    /// Resolve a python with working deps: an explicit `VPHONE_PYTHON`, the dev
-    /// repo `.venv`, the managed per-user venv, else provision the managed venv
-    /// on this machine. Never silently falls back to a stale system python.
-    public func pythonExecutable() throws -> URL {
-        if let override = ProcessInfo.processInfo.environment["VPHONE_PYTHON"], !override.isEmpty {
-            let u = URL(fileURLWithPath: override)
-            if pythonIsUsable(u) { return u }
-        }
-        let devVenv = base.appendingPathComponent(".venv/bin/python3")
-        if venvIsUsable(devVenv) { return devVenv }
-        // Repair in place before rebuilding — a missing dylib is not worth a
-        // full re-install.
-        if pythonIsUsable(managedVenvPython),
-           keystoneIsUsable(managedVenvPython) || repairKeystone(managedVenvPython) {
-            return managedVenvPython
-        }
-        return try bootstrapManagedVenv()
-    }
-
-    /// Provision `~/.vphone/venv`: try each candidate host python for real
-    /// (build the venv, install deps, verify) and use the first that fully
-    /// succeeds — a candidate that imports `venv` can still fail `-m venv`
-    /// (e.g. a broken `ensurepip`), so we fall through instead of trusting it.
-    /// One-time per machine.
-    private func bootstrapManagedVenv() throws -> URL {
-        func log(_ s: String) { FileHandle.standardError.write(Data((s + "\n").utf8)) }
-        let candidates = candidateHostPythons()
-        guard !candidates.isEmpty else {
-            throw VPhoneResourcesError.venvBootstrapFailed(
-                "no host python3 found — install one (e.g. `brew install python@3.13`) or set VPHONE_PYTHON")
-        }
-        log("[*] First run: provisioning the vphone Python environment at \(managedVenvDir.path) (one-time)…")
-        let py = managedVenvPython
-        let install: [String] = FileManager.default.fileExists(atPath: requirementsFile.path)
-            ? ["-m", "pip", "install", "-r", requirementsFile.path]
-            : ["-m", "pip", "install"] + Self.fallbackRequirements
-        var lastError = "no candidate python could build a usable venv"
-
-        for host in candidates {
-            log("    → trying \(host.path) …")
-            try? FileManager.default.removeItem(at: managedVenvDir)
-            try FileManager.default.createDirectory(at: userCacheDir, withIntermediateDirectories: true)
-            guard (try? VPhoneProcessRunner.runStreaming(host, ["-m", "venv", managedVenvDir.path])) == 0 else {
-                lastError = "python -m venv failed with \(host.path)"; continue
-            }
-            _ = try? VPhoneProcessRunner.runStreaming(py, ["-m", "pip", "install", "--upgrade", "-q", "pip"])
-            guard (try? VPhoneProcessRunner.runStreaming(py, install)) == 0 else {
-                lastError = "pip install failed with \(host.path)"; continue
-            }
-            guard pythonIsUsable(py) else {
-                lastError = "venv from \(host.path) still lacks a usable ipsw_parser (too old?)"; continue
-            }
-            guard keystoneIsUsable(py) || repairKeystone(py) else {
-                lastError = "venv from \(host.path) has no working libkeystone — "
-                    + "`brew install keystone`, or install cmake so pip can build it"
-                continue
-            }
-            log("[+] Python environment ready: \(py.path)")
-            return py
-        }
-        try? FileManager.default.removeItem(at: managedVenvDir)
         throw VPhoneResourcesError.venvBootstrapFailed(
-            lastError + " — install a modern python3 (e.g. `brew install python@3.13`) or set VPHONE_PYTHON")
+            "No host Python could provision the locked environment. " + errors.joined(separator: "\n"))
     }
 
-    /// Ordered, existence-checked host python3 candidates to bootstrap from.
-    /// Canonical Homebrew locations first, then versioned names on PATH, then
-    /// generic `python3`, then system `/usr/bin/python3` (3.9) as a last resort
-    /// (it resolves an old, broken pymobiledevice3 stack).
     private func candidateHostPythons() -> [URL] {
+        if let explicit = environment["VPHONE_HOST_PYTHON"], !explicit.isEmpty {
+            return [URL(fileURLWithPath: explicit)]
+        }
         var paths: [String] = []
-        if let override = ProcessInfo.processInfo.environment["VPHONE_PYTHON"], !override.isEmpty {
-            paths.append(override)
+        for name in ["python3.13", "python3.14"] {
+            if let result = try? VPhoneProcessRunner.runCapturing(
+                URL(fileURLWithPath: "/usr/bin/which"), [name], env: environment), result.succeeded {
+                paths.append(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines))
+            }
+            paths.append("/opt/homebrew/bin/" + name)
         }
-        paths += ["/opt/homebrew/bin/python3", "/usr/local/bin/python3"]
-        for name in ["python3.14", "python3.13", "python3.12", "python3.11", "python3.10"] {
-            if let p = which(name) { paths.append(p) }
-        }
-        if let p = which("python3") { paths.append(p) }
-        paths.append("/usr/bin/python3")
-
         var seen = Set<String>()
-        return paths.filter { !$0.isEmpty && seen.insert($0).inserted }
-            .filter { FileManager.default.isExecutableFile(atPath: $0) }
+        return paths.filter { seen.insert($0).inserted && FileManager.default.isExecutableFile(atPath: $0) }
             .map { URL(fileURLWithPath: $0) }
-    }
-
-    private func which(_ name: String) -> String? {
-        let r = try? VPhoneProcessRunner.runCapturing(URL(fileURLWithPath: "/usr/bin/env"), ["which", name])
-        guard let r, r.succeeded else { return nil }
-        let p = r.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-        return p.isEmpty ? nil : p
     }
 }

@@ -51,12 +51,13 @@ typedef struct __attribute__((packed)) {
   uint32_t pixel_format;  /* 4cc */
   uint32_t _reserved;
   uint64_t timestamp_ns;
-  uint64_t frame_index;
+  uint64_t frame_index;  /* publisher-local count; NOT the host wire fi */
   uint32_t pixels_length;
   uint32_t _pad;
   /* v2 additions (offset 52+): */
   uint64_t published_at_ns;   /* CLOCK_MONOTONIC ns at publish */
   char     generation[80];    /* NUL-terminated generation of this frame */
+  uint8_t  presentation_id[16]; /* v3 UUID; zero means legacy frame */
   /* pixels start at offset VPHONED_VCAM_SHM_HEADER_SIZE (256). */
 } vphoned_vcam_shm_header_t;
 
@@ -87,7 +88,11 @@ typedef struct __attribute__((packed)) {
   uint64_t observed_at_ns;         /* CLOCK_MONOTONIC ns at observe */
   uint64_t observed_count;         /* total frames observed */
   char     observed_generation[VPHONED_VCAM_GENERATION_MAX];
+  uint8_t  presentation_id[16];
 } vphoned_vcam_observe_header_t;
+
+_Static_assert(sizeof(vphoned_vcam_shm_header_t) <= VPHONED_VCAM_SHM_HEADER_SIZE, "publish header overflow");
+_Static_assert(sizeof(vphoned_vcam_observe_header_t) == VPHONED_VCAM_OBSERVE_SHM_SIZE, "observe layout mismatch");
 
 /* Starts the listener on a background thread. Idempotent. */
 void vp_vcam_start(void);
@@ -96,7 +101,8 @@ void vp_vcam_start(void);
  * generation) with the observe shm (obs index) and returns the two-level
  * receipt fields the host requires. `msg` is the request dict (for the
  * `generation` filter and `id` echo). Fail-closed: obs index is reported
- * only when the observed generation matches the currently-published one. */
+ * only for a stable same-generation observation from this publisher run,
+ * with 0 < observed index <= published index. This is not an app receipt. */
 NSDictionary *vp_vcam_status(NSDictionary *msg);
 
 #ifdef __cplusplus

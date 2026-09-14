@@ -19,12 +19,7 @@ struct VPhoneSetupCommand: ParsableCommand {
 
     func run() throws {
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
-        if force { try? FileManager.default.removeItem(at: resources.managedVenvDir) }
-        // pythonExecutable() provisions ~/.vphone/venv on demand if none is
-        // usable — running any python-backed command does this automatically;
-        // `setup` just makes it explicit. It prints its own progress on a first
-        // provision, so here only report the resolved interpreter.
-        let python = try resources.pythonExecutable()
+        let python = try resources.pythonExecutable(forceManaged: force)
         print("python: \(python.path)")
     }
 }

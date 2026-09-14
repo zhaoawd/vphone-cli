@@ -525,6 +525,7 @@ static BOOL handle_client(int fd) {
       [caps addObject:@"shell"];
     [caps addObject:@"touch"];
     [caps addObject:@"vcam_status"];
+    [caps addObject:@"vcam_receipt_v3"];
 
     NSMutableDictionary *helloResp = [@{
       @"v" : @PROTOCOL_VERSION,

@@ -73,7 +73,9 @@ help:
 	@echo "  make setup_tools             Install all tools (brew, trustcache, insert_dylib, venv+pymobiledevice3)"
 	@echo ""
 	@echo "Build:"
-	@echo "  make build                   Build + sign vphone-cli.app"
+	@echo "  make preview_docs DOC=research/project_status_2026-09-11.md  Local Markdown preview"
+	@echo "  make build                   Build + sign the complete vphone-cli.app"
+	@echo "  make check_bundle            Verify complete resources, signature and entitlements"
 	@echo "  make vphoned                 Cross-compile + sign vphoned for iOS"
 	@echo "  make clean                   Remove build/tooling artifacts only"
 	@echo "    Options: CLEAN_VM=1        Also remove VM_DIR=$(VM_DIR) after confirmation"
@@ -159,6 +161,11 @@ help:
 # ═══════════════════════════════════════════════════════════════════
 # Setup
 # ═══════════════════════════════════════════════════════════════════
+
+DOC ?= README.md
+.PHONY: preview_docs
+preview_docs:
+	"$(HOME)/.local/bin/md-preview" "$(abspath $(DOC))" --root "$(CURDIR)"
 
 .PHONY: setup_machine setup_tools setup_venv
 
@@ -251,28 +258,16 @@ $(PATCHER_BINARY): $(SWIFT_SOURCES) Package.swift
 	@echo 'enum VPhoneBuildInfo { static let commitHash = "$(GIT_HASH)" }' >> $(BUILD_INFO)
 	@set -o pipefail; swift build 2>&1 | tail -5
 
-$(BINARY): $(SWIFT_SOURCES) Package.swift $(ENTITLEMENTS)
-	@echo "=== Building vphone-cli ($(GIT_HASH)) ==="
-	@echo '// Auto-generated — do not edit' > $(BUILD_INFO)
-	@echo 'enum VPhoneBuildInfo { static let commitHash = "$(GIT_HASH)" }' >> $(BUILD_INFO)
-	@set -o pipefail; swift build -c release 2>&1 | tail -5
-	@echo ""
-	@echo "=== Signing with entitlements ==="
-	codesign --force --sign - --entitlements $(ENTITLEMENTS) $@
-	@echo "  signed OK"
+# The script owns compilation, resource staging and final signing.
+$(BINARY): $(SWIFT_SOURCES) Package.swift Package.resolved $(ENTITLEMENTS) $(SCRIPTS)/build.sh
+	zsh $(SCRIPTS)/build.sh
 
-bundle: $(BINARY) $(INFO_PLIST)
-	@mkdir -p $(BUNDLE)/Contents/MacOS $(BUNDLE)/Contents/Resources
-	@cp -f $(BINARY) $(BUNDLE_BIN)
-	@cp -f $(INFO_PLIST) $(BUNDLE)/Contents/Info.plist
-	@cp -f sources/AppIcon.icns $(BUNDLE)/Contents/Resources/AppIcon.icns
-	@mkdir -p $(BUNDLE)/Contents/Resources/scripts/vphoned
-	@cp -f $(SCRIPTS)/vphoned/signcert.p12 $(BUNDLE)/Contents/Resources/scripts/vphoned/signcert.p12
-	@if [ -f $(VPHONED_SIGNED) ]; then cp -f $(VPHONED_SIGNED) $(BUNDLE)/Contents/Resources/vphoned.signed; fi
-	@cp -f $$(command -v ldid) $(BUNDLE)/Contents/MacOS/ldid
-	@codesign --force --sign - $(BUNDLE)/Contents/MacOS/ldid
-	@codesign --force --sign - --entitlements $(ENTITLEMENTS) $(BUNDLE_BIN)
-	@echo "  bundled → $(BUNDLE)"
+bundle:
+	zsh $(SCRIPTS)/build.sh
+
+.PHONY: check_bundle
+check_bundle:
+	python3 $(SCRIPTS)/check_bundle.py $(BUNDLE)
 
 # Cross-compile + sign vphoned daemon for iOS arm64 (requires ldid)
 .PHONY: vphoned
