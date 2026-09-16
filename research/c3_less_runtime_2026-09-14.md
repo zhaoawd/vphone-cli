@@ -89,3 +89,7 @@
 | 保留 | 原报告、日志、哈希、Manifest、差异组件；C4 约 9.47 GiB 输入；新验收 VM 磁盘约 14.30 GiB 及身份文件 |
 
 逐文件身份、删除结果与前后 `df` 原文保存在 `research/artifacts/c3-less-runtime-2026-09-14/cleanup-execution.json`，清理清单状态已更新为 `deleted`。此后原 C3 Restore 与验收 Restore 均缺少成功 AEA，不能直接用于再次恢复或完整组件校验；历史验证结果按执行日期保留，需要重跑时须重新生成镜像。普通 VM 启动仍使用保留的磁盘。本次未重启 VM，未修改二进制补丁。
+
+## 2026-09-16 实例删除
+
+用户确认后，整个 `vm-c3-runtime-20260914` 实例已删除。删除前确认实例已关闭，无 socket、待恢复固件事务、相关挂载或打开文件；版本、身份文件摘要和 Restore 逐文件摘要保存在 `research/artifacts/vm-cleanup-2026-09-16/`。本次不新增运行验收结果。F1 尚未执行的 less GUI、应用、DDI、定位和相机检查需要重新创建 26.1 / 23B85 less VM。完整范围、空间结果及两个保留 VM 的 Restore 清理见 [VM 输入清理记录](vm_input_cleanup_2026-09-16.md)。

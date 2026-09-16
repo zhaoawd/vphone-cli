@@ -65,3 +65,7 @@
 隔离测试新增重复 generation 旧回执、等待期间同 generation 替换、旧呈现停止保护、中性画面及能力不足场景。客户机测试新增旧呈现观察记录和旧消费端记录拒绝。Swift Testing 333 项/53 个 suite 通过；XCTest 138 项、3 项跳过、0 失败。客户机与消费端的 10 项隔离测试通过。独立签名构建、仓库外及符号链接资源执行检查通过。消费端单独交叉编译通过，日志仍包含 packed atomic alignment 警告。
 
 证据：`.build/offline-next/swift-tests.log`、`guest-tests.log`、`build.log`、`consumer-build.log`。构建包包含安装源码；单独编译的新版消费端位于隔离目录 `.build/libvcamcaptured.dylib`，未替换仓库中的预编译 dylib，未部署到客户机。运行中 VM 的完整验收和模块升级仍待安排。
+
+## 2026-09-15：rig2 部分运行验证
+
+已在独占 rig2 上验证同 generation 新呈现标识、旧呈现停止拒绝、暂停接收后新源发布、中性源发布、keep_last 停止和完整重启后的旧源隔离。未取得消费回执；Camera 与 Code Scanner 未启动，截图停留欢迎画面，应用显示与 QR 识别未通过。原客户机与消费端已恢复，rig2 已关闭。范围与证据见 [rig2 运行记录](camera_e6_rig2_2026-09-15.md)。E6 保持进行中。

@@ -21,7 +21,8 @@ import c3_full_pipeline_acceptance as common
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "research/artifacts/c3-less-pipeline-2026-09-10"
 STOCK = ROOT / "research/artifacts/c3-full-pipeline-2026-09-10/stock"
-SOURCE = ROOT / "vm-2607/iPhone17,3_26.1_23B85_Restore"
+DEFAULT_SOURCE = ROOT / "vm-2607/iPhone17,3_26.1_23B85_Restore"
+SOURCE = DEFAULT_SOURCE
 IPHONE_COMPONENTS = {"OS", "StaticTrustCache", "Ap,SystemVolumeCanonicalMetadata", "SystemVolume"}
 CLOUD_COMPONENTS = {
     "LLB", "iBSS", "iBEC", "iBoot", "Ap,RestoreSecurePageTableMonitor",
@@ -263,5 +264,12 @@ def prepare():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["prepare", "verify"])
+    parser.add_argument(
+        "--source",
+        type=pathlib.Path,
+        default=DEFAULT_SOURCE,
+        help="prepared iPhone*_Restore input directory (default: historical vm-2607 path)",
+    )
     args = parser.parse_args()
+    SOURCE = args.source.expanduser().resolve(strict=True)
     prepare() if args.command == "prepare" else verify()
