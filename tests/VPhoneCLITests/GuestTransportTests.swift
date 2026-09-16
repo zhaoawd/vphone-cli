@@ -1,4 +1,5 @@
 import Darwin
+import AppKit
 import Foundation
 import XCTest
 @testable import vphone_cli
@@ -66,11 +67,11 @@ private final class GuestSession {
         defer { Darwin.close(fds[0]) }
         try control.connect(fileDescriptor: fds[0])
     }
-    func ready() async throws {
+    func ready(caps: [String] = ["file", "shell"]) async throws {
         let peer = peer
         try await Task.detached {
             _ = try peer.readFrame()
-            try peer.send(["v": 1, "t": "hello", "name": "test", "caps": ["file", "shell"]], fragment: 1)
+            try peer.send(["v": 1, "t": "hello", "name": "test", "caps": caps], fragment: 1)
         }.value
         for _ in 0..<500 {
             if control.isConnected { return }
@@ -98,6 +99,71 @@ private final class GuestSession {
 
 @MainActor
 final class GuestTransportTests: XCTestCase {
+    func testTouchCapabilityAndConnectionMatrix() async throws {
+        let session = try GuestSession()
+        defer { session.stop() }
+        XCTAssertNil(session.control.touchSession)
+        try await session.ready()
+        XCTAssertTrue(session.control.isConnected)
+        XCTAssertFalse(session.control.useGuestTouchInjection)
+        XCTAssertNil(session.control.touchSession)
+        session.stop()
+
+        let touch = try GuestSession()
+        defer { touch.stop() }
+        try await touch.ready(caps: ["touch", "touch_edge"])
+        XCTAssertTrue(touch.control.useGuestTouchInjection)
+        XCTAssertNotNil(touch.control.touchSession)
+        touch.stop()
+        XCTAssertFalse(touch.control.useGuestTouchInjection)
+        XCTAssertNil(touch.control.touchSession)
+    }
+
+    func testMouseTouchCoordinatesAndEdgeFlagSurviveWindowScaling() async throws {
+        let session = try GuestSession()
+        defer { session.stop() }
+        try await session.ready(caps: ["touch", "touch_edge"])
+        let view = VPhoneVirtualMachineView(frame: NSRect(x: 0, y: 0, width: 430, height: 932))
+        view.control = session.control
+        for scale in [0.5, 1.0, 1.5] {
+            view.setFrameSize(NSSize(width: 430 * scale, height: 932 * scale))
+            func event(_ type: NSEvent.EventType, _ x: Double, _ y: Double) throws -> NSEvent {
+                try XCTUnwrap(NSEvent.mouseEvent(with: type, location: NSPoint(x: x * scale, y: y * scale),
+                    modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: 0,
+                    context: nil, eventNumber: 0, clickCount: 1, pressure: 1))
+            }
+            view.mouseDown(with: try event(.leftMouseDown, 215, 2))
+            var fields = try await session.readRequest()
+            XCTAssertEqual(fields["phase"] as? Int, 0)
+            XCTAssertEqual(fields["x"] as? Double, 0.5)
+            XCTAssertEqual(try XCTUnwrap(fields["y"] as? Double), 930.0 / 932, accuracy: 1e-12)
+            XCTAssertEqual(fields["edge"] as? Bool, true)
+            view.mouseDragged(with: try event(.leftMouseDragged, 215, 466))
+            fields = try await session.readRequest()
+            XCTAssertEqual(fields["y"] as? Double, 0.5)
+            XCTAssertEqual(fields["edge"] as? Bool, true)
+            view.mouseUp(with: try event(.leftMouseUp, 500, -10))
+            fields = try await session.readRequest()
+            XCTAssertEqual(fields["x"] as? Double, 1)
+            XCTAssertEqual(fields["y"] as? Double, 1)
+            XCTAssertEqual(fields["edge"] as? Bool, true)
+            view.mouseDown(with: try event(.leftMouseDown, 215, 466))
+            fields = try await session.readRequest()
+            XCTAssertEqual(fields["edge"] as? Bool, false)
+            view.mouseUp(with: try event(.leftMouseUp, 215, 466))
+            _ = try await session.readRequest()
+            for (x, y) in [(0.0, 466.0), (430.0, 466.0), (215.0, 932.0), (0.0, 0.0), (430.0, 932.0)] {
+                view.mouseDown(with: try event(.leftMouseDown, x, y))
+                fields = try await session.readRequest()
+                XCTAssertEqual(try XCTUnwrap(fields["x"] as? Double), x / 430, accuracy: 1e-12)
+                XCTAssertEqual(try XCTUnwrap(fields["y"] as? Double), 1 - y / 932, accuracy: 1e-12)
+                XCTAssertEqual(fields["edge"] as? Bool, true)
+                view.mouseUp(with: try event(.leftMouseUp, x, y))
+                _ = try await session.readRequest()
+            }
+        }
+    }
+
     func testFourMiBResponseIsAcceptedLikeGuestProtocol() async throws {
         let session = try GuestSession()
         defer { session.stop() }

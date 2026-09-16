@@ -260,7 +260,8 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
         // relying on private VZ touch delivery after the guest is connected.
         switch touchRoute.destination(phase: phase, guestSession: control?.touchSession) {
         case .guest:
-            control?.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y))
+            control?.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y),
+                               fromEdge: currentTouchSwipeAim != 0)
             return true
         case .discard:
             // The guest releases the touch when its session ends. Do not send

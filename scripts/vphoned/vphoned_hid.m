@@ -32,6 +32,7 @@ static dispatch_queue_t gHIDQueue;
 #define VP_DIG_TOUCH     0x00000002u
 #define VP_DIG_POSITION  0x00000004u
 #define VP_DIG_IDENTITY  0x00000020u
+#define VP_DIG_FROM_EDGE_TIP (1u << 11)
 #define VP_TRANSDUCER_HAND   1
 #define VP_TRANSDUCER_FINGER 2
 // kIOHIDEventFieldDigitizerIsDisplayIntegrated: (kIOHIDEventTypeDigitizer<<16)|offset.
@@ -133,25 +134,32 @@ static void dispatch_digitizer(double x, double y, boolean_t range,
 // The HID queue preserves event dispatch order across a session reset.
 static BOOL gTouchActive;
 static double gTouchX, gTouchY;
+static uint32_t gTouchEdgeMask;
 
 void vp_hid_touch_reset(void) {
     if (!gTouchActive) return;
-    dispatch_digitizer(gTouchX, gTouchY, 0, 0, VP_DIG_TOUCH | VP_DIG_IDENTITY);
+    dispatch_digitizer(gTouchX, gTouchY, 0, 0, VP_DIG_TOUCH | VP_DIG_IDENTITY | gTouchEdgeMask);
     gTouchActive = NO;
+    gTouchEdgeMask = 0;
 }
 
 void vp_hid_touch(int phase, double x, double y) {
+    vp_hid_touch_from_edge(phase, x, y, NO);
+}
+
+void vp_hid_touch_from_edge(int phase, double x, double y, BOOL fromEdge) {
     switch (phase) {
     case 0:
         vp_hid_touch_reset();
         gTouchActive = YES;
+        gTouchEdgeMask = fromEdge ? VP_DIG_FROM_EDGE_TIP : 0;
         gTouchX = x; gTouchY = y;
-        dispatch_digitizer(x, y, 1, 1, VP_DIG_TOUCH | VP_DIG_IDENTITY);
+        dispatch_digitizer(x, y, 1, 1, VP_DIG_TOUCH | VP_DIG_IDENTITY | gTouchEdgeMask);
         break;
     case 1:
         if (!gTouchActive) return;
         gTouchX = x; gTouchY = y;
-        dispatch_digitizer(x, y, 1, 1, VP_DIG_POSITION);
+        dispatch_digitizer(x, y, 1, 1, VP_DIG_POSITION | gTouchEdgeMask);
         break;
     case 3:
         if (!gTouchActive) return;

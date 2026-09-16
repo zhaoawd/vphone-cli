@@ -426,7 +426,7 @@ class VPhoneControl {
 
     /// Inject a single-finger digitizer touch guest-side (bypasses VZ USB touch).
     /// phase: 0 = down, 1 = move, 3 = up. x/y are normalized 0..1, top-left origin.
-    func sendTouch(phase: Int, x: Double, y: Double) {
+    func sendTouch(phase: Int, x: Double, y: Double, fromEdge: Bool = false) {
         nextRequestId += 1
         let msg: [String: Any] = [
             "v": Self.protocolVersion,
@@ -435,6 +435,7 @@ class VPhoneControl {
             "phase": phase,
             "x": x,
             "y": y,
+            "edge": fromEdge,
         ]
         guard let fd = channel?.fileDescriptor, let frame = Self.encodeFrame(msg) else {
             print("[control] touch send failed (not connected)")

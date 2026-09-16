@@ -256,7 +256,7 @@ static NSDictionary *handle_command(NSDictionary *msg) {
     int phase = [msg[@"phase"] intValue];
     double x = [msg[@"x"] doubleValue];
     double y = [msg[@"y"] doubleValue];
-    vp_hid_touch(phase, x, y);
+    vp_hid_touch_from_edge(phase, x, y, [msg[@"edge"] boolValue]);
     return vp_make_response(@"ok", reqId);
   }
 
@@ -524,6 +524,7 @@ static BOOL handle_client(int fd) {
     if (vp_shell_path() != NULL)
       [caps addObject:@"shell"];
     [caps addObject:@"touch"];
+    [caps addObject:@"touch_edge"];
     [caps addObject:@"vcam_status"];
     [caps addObject:@"vcam_receipt_v3"];
 

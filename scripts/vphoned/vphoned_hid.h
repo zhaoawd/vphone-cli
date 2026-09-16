@@ -23,5 +23,8 @@ void vp_hid_key(uint32_t page, uint32_t usage, BOOL down);
 /// injection instead of the private VZ USB touchscreen path.
 void vp_hid_touch(int phase, double x, double y);
 
+/// Edge-aware touch. fromEdge is captured on down and retained through release.
+void vp_hid_touch_from_edge(int phase, double x, double y, BOOL fromEdge);
+
 /// Release an active touch at the last coordinate when the client session ends.
 void vp_hid_touch_reset(void);
