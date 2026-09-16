@@ -371,6 +371,10 @@ public final class VPhoneSystemLocationController {
     }
 
     public var hasActiveSource: Bool { generation != nil }
+
+    /// Automatic host forwarding must not replace restored state or hide a
+    /// restoration error. An explicit source selection may clear either.
+    public var requiresExplicitSourceSelection: Bool { hasActiveSource || lastError != nil }
     var deliveryTurnWaiterCount: Int { deliveryTurnWaiters.count }
     var hasScheduledHeartbeat: Bool { heartbeatTask != nil }
 
