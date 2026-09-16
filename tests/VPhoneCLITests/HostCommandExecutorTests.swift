@@ -70,7 +70,14 @@ final class HostCameraFake: VPhoneHostCamera {
     var presented: String?
     var presentationID = UUID().uuidString
     var role = "qr"
+    var imagePath: String?
+    var videoPath: String?
     func present(imagePath: String, generation: String, role: String, fps: Double) -> Bool {
+        self.imagePath = imagePath
+        presented = generation; presentationID = UUID().uuidString; self.role = role; return accepts
+    }
+    func present(videoPath: String, generation: String, role: String, fps: Double) -> Bool {
+        self.videoPath = videoPath
         presented = generation; presentationID = UUID().uuidString; self.role = role; return accepts
     }
     func presentNeutral(generation: String, fps: Double) -> Bool {
@@ -272,6 +279,42 @@ final class HostCommandExecutorTests: XCTestCase {
         let failed = try await call(executor, ["t": "camera_present", "path": url.path, "generation": "g"])
         XCTAssertEqual(failed["ok"] as? Bool, false)
         XCTAssertEqual(failed["generation"] as? String, "g")
+    }
+
+    func testCameraVideoPresentationUsesVideoProducerAndReceiptSemantics() async throws {
+        let guest = HostGuestFake()
+        let camera = HostCameraFake()
+        guest.cameraIDProvider = { camera.presentationID }
+        let executor = VPhoneHostCommandExecutor(control: guest, camera: camera)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).mp4")
+        try Data().write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let present = try await call(executor, [
+            "t": "camera_present", "source": "video", "path": url.path,
+            "generation": "video-loop", "role": "test", "fps": 10,
+        ])
+
+        XCTAssertEqual(present["ok"] as? Bool, true)
+        XCTAssertEqual(present["source"] as? String, "video")
+        XCTAssertEqual(camera.videoPath, url.path)
+        XCTAssertNil(camera.imagePath)
+        XCTAssertNotNil(present["transport_receipt"])
+    }
+
+    func testCameraPresentRejectsUnknownSourceBeforeChangingPresentation() async throws {
+        let camera = HostCameraFake()
+        camera.presented = "existing"
+        let executor = VPhoneHostCommandExecutor(control: HostGuestFake(), camera: camera)
+        let result = try await call(executor, [
+            "t": "camera_present", "source": "stream", "path": "/missing",
+            "generation": "new",
+        ])
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "invalid_argument")
+        XCTAssertEqual(camera.presented, "existing")
+        XCTAssertNil(camera.imagePath)
+        XCTAssertNil(camera.videoPath)
     }
 
     func testRepeatedGenerationCannotUseAnOldPresentationReceipt() async throws {

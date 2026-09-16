@@ -500,7 +500,7 @@ final class VPhoneHostCommandExecutor {
             }
 
         case "camera_present":
-            // Present a still image (QR/neutral) through the synthetic camera
+            // Present an image or looping video through the synthetic camera
             // under a fresh generation/role (§8.1). Fail-closed: ok=true only
             // once the two-level transport receipt (vphoned published +
             // libvcamcaptured observed) confirms the requested generation via
@@ -508,6 +508,11 @@ final class VPhoneHostCommandExecutor {
             // success (invariant #7).
             guard let path = json["path"] as? String, !path.isEmpty else {
                 return Self.response(ok: false, error: "camera_present requires path")
+            }
+            let source = json["source"] as? String ?? "image"
+            guard ["image", "video"].contains(source) else {
+                return Self.response(ok: false, error: "camera_present source must be image|video",
+                                     extra: ["code": "invalid_argument"])
             }
             guard let generation = json["generation"] as? String, Self.validCameraGeneration(generation) else {
                 return Self.response(ok: false, error: "camera_present requires 1...79 UTF-8 bytes of generation without NUL")
@@ -532,8 +537,14 @@ final class VPhoneHostCommandExecutor {
                     result.error = "camera receipt v3 requires updated vphoned and libvcamcaptured"
                     return
                 }
-                guard cam.present(imagePath: path, generation: generation, role: role, fps: fps) else {
-                    result.error = "camera vsock not connected or image load failed"
+                let presented: Bool
+                if source == "video" {
+                    presented = cam.present(videoPath: path, generation: generation, role: role, fps: fps)
+                } else {
+                    presented = cam.present(imagePath: path, generation: generation, role: role, fps: fps)
+                }
+                guard presented else {
+                    result.error = "camera vsock not connected or \(source) load failed"
                     return
                 }
                 // Query a same-generation copy receipt; this does not verify app display or QR recognition.
@@ -542,7 +553,7 @@ final class VPhoneHostCommandExecutor {
                     controller: self, generation: generation, presentationID: presentationID)
                 box.extra["protocol_version"] = 3
                 box.extra["presentation_id"] = presentationID
-                box.extra["source"] = "image"
+                box.extra["source"] = source
                 box.extra["role"] = role
                 box.extra["generation"] = generation
                 box.extra["streaming"] = cam.hostStatus(generation: generation)["streaming"]

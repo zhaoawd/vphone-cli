@@ -160,19 +160,36 @@ final class VPhoneCameraServer {
             print("[camera] present: failed to load \(imagePath): \(error)")
             return false
         }
-        return beginPresentation(producer, generation: generation, role: role, fps: fps)
+        return beginPresentation(producer, sourceKind: .image,
+                                 generation: generation, role: role, fps: fps)
+    }
+
+    /// Present a looping video under a fresh generation/role at a given FPS.
+    func present(videoPath: String, generation: String, role: String, fps: Double) -> Bool {
+        let producer: VPhoneFrameProducer
+        do {
+            producer = try VPhoneVideoFileProducer(
+                url: URL(fileURLWithPath: videoPath),
+                width: Self.defaultWidth, height: Self.defaultHeight)
+        } catch {
+            print("[camera] present: failed to load \(videoPath): \(error)")
+            return false
+        }
+        return beginPresentation(producer, sourceKind: .videoFile,
+                                 generation: generation, role: role, fps: fps)
     }
 
     func presentNeutral(generation: String, fps: Double) -> Bool {
         beginPresentation(VPhoneNeutralFrameProducer(width: Self.defaultWidth, height: Self.defaultHeight),
-                          generation: generation, role: "neutral", fps: fps)
+                          sourceKind: .image, generation: generation, role: "neutral", fps: fps)
     }
 
     private func beginPresentation(_ producer: any VPhoneFrameProducer,
+                                   sourceKind: SourceKind,
                                    generation: String, role: String, fps: Double) -> Bool {
         stopStreaming()
         self.producer = producer
-        self.sourceKind = .image
+        self.sourceKind = sourceKind
         self.currentGeneration = generation
         self.presentationID = UUID().uuidString
         self.currentRole = role

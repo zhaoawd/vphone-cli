@@ -636,6 +636,19 @@ indices and `observed_at_ns >= published_at_ns`; an old-generation status query
 returned no receipt, a wrong-owner stop was rejected, and a receipt-backed
 neutral generation was stopped back to `source=off`.
 
+Follow-up validation on `vm-2607-rig2` (2026-09-16) extended the same host
+command to an explicit `source=video` path while preserving the v3 receipt
+contract. A 2-second red/blue file obtained a matching copy receipt, guest
+shared-memory samples changed color, and Camera.app with the current-source
+`libcamfix` displayed red/blue changes for 4.84 seconds. A subsequent neutral
+presentation used a new generation and presentation ID, obtained its own
+receipt, and displayed white. The installed older consumer and older
+`libcamfix` were retained as negative controls: the first could not issue a
+v3 copy receipt, and the second displayed only the first video frame. Current
+CFW installation builds both dylibs from the repository sources. Full evidence
+and restore hashes are recorded in
+`research/camera_e6_video_acceptance_2026-09-16.md`.
+
 ### Detector luma bbox-fill geometry (userspace camera daemon)
 
 `scripts/vcamcaptured/libvcamcaptured.m` keeps the live-qualified QR geometry
