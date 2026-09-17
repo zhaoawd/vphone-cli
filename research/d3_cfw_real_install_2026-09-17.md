@@ -84,3 +84,9 @@ python3 research/d3_cfw_parity.py preflight /path/to/parity \
 该检查不替代管理员环境中的八次安装和三卷只读扫描；它只固化续跑前置条件。
 
 上述续跑检查记录的是另一主机的状态。原主机 `/Users/kolar/github/vphone-cli` 上的批次已完成，结果见“同输入迁移对照结果”。
+
+## 清理
+
+2026-09-17 D3 关闭后，删除前复核 `.build/d3` 下无挂载、无 `hdiutil` 附加镜像、磁盘无打开句柄、无活动固件事务和 socket。已删除：8 个配对 VM、`parity/base`、8 份 `*.inventory.json`、`vm-baseline`、`vm-dev`、`vm-jb`，以及 `vm-regular`、`vm-exp` 的 `.firmware-history`。数据卷可用空间从 228 GiB 增至 314 GiB（增加 85 GiB）；`du` 统计值较大，差值来自 APFS 克隆共享块。
+
+保留：`parity/` 下的安装日志、比较结果、配对输入清单、`legacy-source` 与 `legacy-runtime`，以及 `vm-regular`、`vm-exp`（已安装 CFW 的磁盘与 Restore 输入，供 F1/D4 复用；两者未启动验证，也不再有固件事务回滚备份）。分类文件中记录的清单 SHA-256 已无对应本地文件，需要时可从新的配对安装重新生成。
