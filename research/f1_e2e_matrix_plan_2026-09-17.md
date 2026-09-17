@@ -300,3 +300,92 @@
 7. 首次设置助理的统一选项（语言、地区、是否登录 Apple 账号），以及客户机代理配置是否作为标准步骤。
 8. 每台 VM 验收后保留或删除；§4.1 可选释放项是否清理。
 9. 结果是否回写 `research/firmware_compatibility.json`，以及运行摘要是否提交到仓库。
+
+## 8. 自动化实现（未提交，未实机运行）
+
+日期：2026-09-17。基线 `22a7c02`。本节记录的脚本只在本地假 Unix socket 服务端上测试，未连接任何真实 VM 控制 socket，未启动或停止 VM，未提交。
+
+### 8.1 入口与文件
+
+| 文件 | 作用 |
+| --- | --- |
+| `scripts/host_control_client.py` | 从 `f2_dual_vm_acceptance.py` 抽取的公共客户端：`Endpoint`、socket 校验、单连接单请求收发、`require_ok`、`decode_file`、`running_app`、`camera_status`。新增 `HostControlTransportError`（`AcceptanceFailure` 子类，带 `timed_out`），F2 的异常类型与消息不变 |
+| `scripts/f2_dual_vm_acceptance.py` | 改为从公共模块导入上述函数；场景逻辑未改，`tests/test_f2_dual_vm_acceptance.py` 8 项通过 |
+| `scripts/f1_runtime_acceptance.py` | 单实例运行验收 |
+| `scripts/f1_support_matrix.py` | 支持矩阵生成器 |
+| `tests/test_f1_runtime_acceptance.py`、`tests/test_f1_support_matrix.py` | 假服务端继承 F2 测试的 `HostControlFixture`，由 `make test_python` 发现 |
+
+运行示例（以 d4-acc 为例，需 VM 已由用户按 §4.3 授权启动）：
+
+```sh
+python3 scripts/f1_runtime_acceptance.py --socket .build/d4acc/lib/d4-acc/vphone.sock \
+  --variant regular --combo P --vm-name d4-acc --ios-version 26.1 --ios-build 23B85 \
+  --cloudos-version 26.1 --cloudos-build 23B85 --out research/artifacts/f1-matrix/<run_id> \
+  --steps all --second-boot-phase write
+# vm stop / vm launch 后
+python3 scripts/f1_runtime_acceptance.py ... --steps S4 --second-boot-phase verify \
+  --s4-state research/artifacts/f1-matrix/<run_id>/steps/S4/s4_state.json --out <新目录>
+python3 scripts/f1_support_matrix.py research/artifacts/f1-matrix --json-out <json> --md-out <md>
+```
+
+退出码：有步骤为 `failed` 时为 1；输出目录已存在或参数错误时为 2；其他为 0（含 `blocked`）。
+
+### 8.2 步骤覆盖与判定规则
+
+通用规则：
+
+- 每步先按 `capabilities.commands` 判断命令可用性。客户机已连接且 `guest_capabilities` 不含对应能力时记 `not_applicable`；客户机声明了能力但宿主命令不可用、预检失败或 socket 不可用时记 `blocked`。
+- 请求超时或连接错误记 `blocked`，`failure.timed_out` 标明是否为超时。响应 `ok=false` 且错误含 “not connected” 记 `blocked`，其他 `ok=false` 或判据不符记 `failed`。
+- 每步由若干子检查汇总：任一 `failed` → `failed`；全部 `passed`（忽略 `not_applicable` 与可选项）→ `passed`；部分通过 → `partial`；无通过且有 `blocked` → `blocked`。清理失败会把 `passed`/`partial` 改为 `failed`。
+
+| 步骤 | 实现 | 最高自动判定 |
+| --- | --- | --- |
+| preflight | `capabilities`；记录 `protocol_version`、`boot_mode`、`guest_capabilities`、可用/不可用命令、`limits`。判据为响应有效、`guest_connected=true`、`boot_mode=normal`；能力声明不计为功能通过 | `passed` |
+| S4 | `write`：`file_put` 标记到 `/var/mobile/Library/f1-<run>.txt` 并读回；有 `shell` 时记录 `sysctl -n kern.boottime`；给 `--bundle` 时只读记录 `<bundle>/.vphone-runtime.json` 的 `pid`、`startedAt`（及 `instanceID`、文件摘要）；写 `s4_state.json`，结果 `partial`。`verify`：标记逐字节一致，且 `restart_evidence` 通过才判 `passed`。重启证据优先用 boottime 是否变化（`source=kern.boottime`）；boottime 不可用时要求运行记录的 `pid` 与 `startedAt` 都变化（`source=host_runtime_record`，记录中注明这是宿主进程重启证据，不等同客户机内核 boottime）。两者都有时都记录，以 boottime 判定。两者都没有时 `restart_evidence=blocked`，结果 `partial`；未给 `--second-boot-phase` 时为 `not_run` | `passed`（verify） |
+| S5 | 不判定 | `not_run` |
+| S6 | `file_put` → `file_get` 摘要比对；`ls -1 /tmp`、`mv`、`rm` 经 `shell` 执行；改名后新路径摘要一致且旧路径 `file_get` 报 ENOENT；删除后 `file_get` 报 ENOENT | `passed`；无 `shell` 时 `partial` |
+| S7 | `app_list filter=running` 原始列表记为观察值（含空列表）→ 若目标已运行先终止 → `app_launch` → running 列表 PID 与启动 PID 一致 → `screenshot` 存入证据目录 → `app_terminate` → PID 消失。jb/exp 且给 `--ipa` 时：`file_put load` 到客户机 `/tmp`、`ipa_install`、启动与终止安装包。`app_launch` 错误文本含 `uiopen unavailable` 时仍判 `failed`，`failure.classification=capability_declared_but_uiopen_missing`。无 `screenshot` 时截图子检查为 `blocked` 并注明 `screen_available` | `partial`（截图是否为目标应用需人工确认） |
+| S8 | 不判定 | `not_run` |
+| S9 | 初始 `location_source_status` 若已有活动源则 `blocked`（不替换）；`location_source_set`（fixed、wgs84、`persist=false`、`replace=false`）→ 轮询状态至 `running`、generation 相同、`applied.last_fix` 坐标一致、`last_delivery_sequence>0` 且有 `last_ack_at` → `location_source_stop` → 状态 `off`、generation 为 null | `partial`（应用层读数无探针） |
+| S10 exp | `camera_present` 不可用时记 `blocked`，原因注明 `screen_available` 与“需要 GUI 启动”；否则启动 `com.apple.camera` → `camera_present`（image、role `qr`）要求同 generation/presentation_id 的 `transport_receipt` → 带 presentation_id 的 `camera_status` 要求 streaming、`matches_requested` 与回执一致 → `camera_stop keep_last` → 状态停止 → 终止消费应用 | `partial`（QR 识别与画面截图需外部探针或人工） |
+| S10 非 exp | `expectation=absent`。`file_get`（`save` 到证据目录）检查 `/var/jb/usr/lib/libvcamcaptured.dylib` 与 `/var/jb/Library/MobileSubstrate/DynamicLibraries/libcamfix.dylib` 报 ENOENT；新 generation 的 `camera_status` 无回执；给 `--camera-image` 时发送 `camera_present` 并原样记录响应，出现有效回执记 `failed` | `passed`（负向记录） |
+| S11 | 非 jb/exp 或未带 `--frida` 为 `not_applicable`；否则 `not_run` 并列出 §5.1 要求的字段 | `not_run` |
+| S12 | `shell` 执行 `sysctl -n kern.hv_vmm_present`、`kern.Xv_vmm_present`、`hw.machine`；`file_get` 读取 `SystemVersion.plist`（给 `--spoof-build` 时比对 `ProductBuildVersion`）；非 exp 同时检查 S10 的注入文件不存在。exp 判据：hv 为 unknown oid、Xv 为 1、`hw.machine=iPhone17,3`；非 exp：hv 存在、Xv 不存在、`hw.machine=iPhone99,11`。sysctl 缺失为 `blocked`；DT `target-type`/`compatible` 直接读取、exp 图形与计算探针固定为 `blocked`；watchdogd 状态不判定 | `partial` |
+
+`run.json` 顶层 `launch` 记录 `--launch-mode`（操作者声明，脚本不核实）、预检得到的 `screen_available` 与 `boot_mode`。
+
+生成器规则：行键为 combo、设备、iOS 与 cloudOS 版本/构建、变体、选项、工具提交；不同键不合并。同一格取 `finished_at` 最新的非 `not_run` 记录，历史保留在 `history`；无记录显示 `not_run`。`passed`/`failed`/`partial` 缺证据摘要、状态值非法时拒绝生成。S11 `passed` 缺 `client_version`、`server_version`、`attach_target`、`script_sha256`、`messages` 任一字段时降为 `partial`。`expectation=absent` 的格子在 Markdown 中标 `(negative)`；带 `failure.classification` 的格子标 `*`。表后 Notes 列出每次运行的启动模式与 `screen_available`，以及各格的 classification 与 S11 降级说明。
+
+### 8.3 与 §3、§5 的差异
+
+- 输出结构：`--out/run.json`，每步 `steps/<id>/step.json` 与 `steps/<id>/requests.jsonl`。请求与响应中键名匹配 password/token/secret 等的值替换为 `<redacted>`；`data`、`data_b64`、`image` 替换为字节数与 SHA-256。
+- `run.json` 与 §5.1 相比：`combination` 增加 `combo_id`，选项只有 `frida`、`spoof_build`（`force_dsc_max_slide`、`force_exc_guard` 未提供参数）；`tool.vphoned_sha256` 固定为 null；`vm` 只含名称与 socket（无 ECID/UDID/CPU/内存）；`disk` 为空数组；另增 `invocation`、`script`、`started_at`、`finished_at`。步骤增加 `title`、`checks`、`reason`、`record`；`exit_code` 为 null（socket 请求无进程退出码，shell 退出码在 `observed` 或子检查中）；`failure` 字段为 `stage`、`reason`、`timed_out`、`log`（requests.jsonl 路径与行数）。
+- 步骤 ID：`preflight` 为控制 socket 能力预检，与 §3 的 S0 宿主前置检查不同；S0–S3 不由本脚本生成，矩阵中显示 `not_run`，需另行从 `vm create-status` 检查点整理。
+- S6：宿主控制 socket 未提供 `file_list`、`file_rename`、`file_delete`（`VPhoneHostCommandExecutor.swift` 只处理 `file_get`、`file_put`；这三个命令只由 `VPhoneControl.swift` 直接发给 vphoned），因此列表、改名、删除经 `shell` 的 `ls`/`mv`/`rm` 执行，`observed.list_rename_delete_method=shell`。
+- S7：§3 的 `app_foreground` 只记录不判定；截图判定留给人工，因此自动结果最高为 `partial`。
+- S10 非 exp：§3 只列出 `libvcamcaptured.dylib`，脚本另检查 `cfw_install_exp.sh` 中 `libcamfix.dylib` 的安装路径。
+- S12：§3 要求读取 DeviceTree `model`/`target-type`/`compatible`；脚本用 `hw.machine` 间接判断 `model`，其余两项记 `blocked`。
+
+### 8.4 未验证内容
+
+- 全部步骤未在真实 VM 上运行。以下为待验证假设：客户机存在 `/usr/sbin/sysctl` 或 `/var/jb/usr/sbin/sysctl`；不存在的 OID 在 stderr 输出 “unknown oid”；`kern.boottime` 输出格式为 `{ sec = N, usec = N }`；`hw.machine` 在非 exp 为 `iPhone99,11`、在 exp 为 `iPhone17,3`（依据 `cfw_install_exp.sh` EXP-JB-6 注释与 DT 改写脚本，未经客户机读取）；less 与 regular 的 `/bin/ls`、`/bin/mv`、`/bin/rm` 可用性。
+- `file_get` 不存在文件的错误文本依据 `vphoned_files.m` 的 `open failed: strerror(errno)`，宿主是否原样透传未实机确认。
+- S9 的状态轮询默认最长 15 秒；真实交付耗时未测。S10 依赖系统相机应用作为回执消费者，与 F2 场景一致，未在单实例脚本中实机验证。
+- 2026-09-17 首次实机运行（P-regular，`d4-acc`，headless，构建 `22a7c02`，证据 `research/artifacts/f1-matrix/f1-P-regular-20260917T125810Z/`）暴露并据此修正的问题：
+  - S9 请求缺 `timestamp`，宿主返回 `timestamp must be > 0`。按 `VPhoneHostCommandExecutor.systemLocationFix` 与 `VPhoneSystemLocationController.preflightFixedSource/validateFix`，fixed 源要求 `producer_sequence=0`、`timestamp>0`（Unix 秒数值或 ISO-8601 字符串；缺省按 0 处理），`heartbeat_s` 在 0.01–86400 秒。脚本改为发送 `producer_sequence=0` 与当前 Unix 秒；假服务端按相同顺序校验这些字段。修正后的请求未实机复验。
+  - regular 客户机不声明 `shell`，S4 只能 `partial`；增加 `--bundle` 宿主运行记录证据（见 8.2）。
+  - regular 上 `app_launch` 返回 `uiopen unavailable to launch com.apple.Preferences`：`vphoned_apps.m` 只在 `/var/jb/usr/bin/uiopen` 或 `/usr/bin/uiopen` 存在时能启动应用，而 `apps` 能力按 `gAppsAvailable` 声明。判定保持 `failed`，增加 classification。
+  - headless 下 `screenshot`、`tap`、`swipe`、`camera_present` 不可用。代码中前三者依赖 VM 窗口（`VPhoneHostScreenAdapter.isAvailable`）；`camera_present` 的可用条件是相机 vsock 已连接且客户机声明 `vcam_receipt_v3`，与屏幕没有直接代码依赖。该次 regular 运行中 `camera_present` 不可用的原因未查明（regular 无 `libvcamcaptured` 也可能影响相机连接，待验证假设）；GUI 启动能否使 exp 的 `camera_present` 可用待验证。
+- 支持矩阵的“最新记录优先”规则尚未经用户确认；是否回写 `firmware_compatibility.json` 仍按 §7 第 9 项待决定，生成器未实现 `--update-compatibility`。
+- S5、S8、S11 的自动化、定位应用层探针、QR 探针集成、EXP 图形与计算探针仍为缺口。
+
+## 9. 用户决定（2026-09-17）
+
+| 事项 | 决定 | 对执行的影响 |
+| --- | --- | --- |
+| 旧版本组合 L（18.6.2/22G100） | 暂不纳入，不下载 | L 全部记为 `not_run`；F1 “旧版本组合”条目不满足，F1 不能按原定义完全关闭 |
+| Frida 组合 N 的 iOS 构建 | 使用本地 `iPhone17,3_26.6.1_23G82_Restore.ipsw` | 矩阵标注“非 catalog 构建（catalog 为 23G83）” |
+| 验收后的 VM | F1 新建的 VM 在该 VM 的全部步骤（含人工步骤）完成后删除，保留日志与 `run.json` | 旧实验数据（d4-acc 事务归档、C5/D3 VM、C4 less 输入）不在授权范围内，不删除 |
+| 人工环节 | 自动步骤先执行，人工步骤（首次设置、权限弹窗、DDI 信任/开发者模式、VZ 窗口输入抽查）集中列出后由用户统一处理 | 待人工的 VM 需保留到人工步骤完成；同时保留的 F1 VM 按空间控制在 2–3 台 |
+
+执行构建：独立工作树 `.build/f1/src`，HEAD `22a7c02`（含 restore 桥接修复），`make build` 签名；该工作树需要 `git submodule update --init --recursive` 并提供 `.tools/bin/{trustcache,insert_dylib}`（从既有工作树复制）后才能构建。

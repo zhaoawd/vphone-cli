@@ -3,7 +3,6 @@
 
 import argparse
 import base64
-from dataclasses import dataclass
 from datetime import datetime, timezone
 import fcntl
 import hashlib
@@ -11,24 +10,20 @@ import json
 import os
 from pathlib import Path
 import shlex
-import socket
-import stat
 import subprocess
 import sys
 import uuid
 
-
-MAXIMUM_MESSAGE_BYTES = 2 * 1024 * 1024
-
-
-class AcceptanceFailure(RuntimeError):
-    pass
-
-
-@dataclass(frozen=True)
-class Endpoint:
-    name: str
-    socket_path: Path
+from host_control_client import (
+    AcceptanceFailure,
+    Endpoint,
+    camera_status,
+    decode_file,
+    endpoint,
+    request,
+    require_ok,
+    running_app,
+)
 
 
 class Evidence:
@@ -56,18 +51,6 @@ class Evidence:
         )
 
 
-def endpoint(name, path):
-    if not name or any(character in "\r\n\0" for character in name):
-        raise AcceptanceFailure("instance names must be nonempty single-line strings")
-    candidate = Path(path).expanduser().resolve(strict=True)
-    info = candidate.stat()
-    if not stat.S_ISSOCK(info.st_mode):
-        raise AcceptanceFailure(f"host-control endpoint is not a Unix socket: {candidate}")
-    if info.st_uid != os.geteuid():
-        raise AcceptanceFailure(f"host-control socket is not owned by the current user: {candidate}")
-    return Endpoint(name=name, socket_path=candidate)
-
-
 def validate_distinct(left: Endpoint, right: Endpoint):
     if left.name == right.name:
         raise AcceptanceFailure("instance names must be distinct")
@@ -75,50 +58,6 @@ def validate_distinct(left: Endpoint, right: Endpoint):
     right_info = right.socket_path.stat()
     if (left_info.st_dev, left_info.st_ino) == (right_info.st_dev, right_info.st_ino):
         raise AcceptanceFailure("instance sockets resolve to the same endpoint")
-
-
-def read_line(connection):
-    data = bytearray()
-    while True:
-        chunk = connection.recv(65536)
-        if not chunk:
-            raise AcceptanceFailure("host-control endpoint closed before a complete response")
-        newline = chunk.find(b"\n")
-        data.extend(chunk if newline < 0 else chunk[:newline])
-        if len(data) > MAXIMUM_MESSAGE_BYTES:
-            raise AcceptanceFailure("host-control response exceeds 2 MiB")
-        if newline >= 0:
-            break
-    try:
-        response = json.loads(data)
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise AcceptanceFailure(f"invalid host-control response: {error}") from error
-    if not isinstance(response, dict):
-        raise AcceptanceFailure("host-control response must be a JSON object")
-    return response
-
-
-def request(endpoint: Endpoint, payload, evidence: Evidence, timeout):
-    encoded = json.dumps(payload, separators=(",", ":")).encode() + b"\n"
-    if len(encoded) > MAXIMUM_MESSAGE_BYTES:
-        raise AcceptanceFailure("host-control request exceeds 2 MiB")
-    try:
-        with socket.socket(socket.AF_UNIX) as connection:
-            connection.settimeout(timeout)
-            connection.connect(str(endpoint.socket_path))
-            connection.sendall(encoded)
-            response = read_line(connection)
-    except (OSError, socket.timeout) as error:
-        raise AcceptanceFailure(f"{endpoint.name} host-control request failed: {error}") from error
-    evidence.record(endpoint, payload, response)
-    return response
-
-
-def require_ok(endpoint: Endpoint, command, response):
-    if response.get("ok") is not True:
-        raise AcceptanceFailure(
-            f"{endpoint.name} {command} failed: {response.get('error', response)!r}"
-        )
 
 
 def preflight(endpoint: Endpoint, evidence: Evidence, timeout, required=None):
@@ -134,17 +73,6 @@ def preflight(endpoint: Endpoint, evidence: Evidence, timeout, required=None):
 
 def marker(run_id, endpoint):
     return f"vphone-f2:{run_id}:{endpoint.name}".encode()
-
-
-def decode_file(endpoint, response):
-    require_ok(endpoint, "file_get", response)
-    try:
-        data = base64.b64decode(response["data"], validate=True)
-    except (KeyError, TypeError, ValueError) as error:
-        raise AcceptanceFailure(f"{endpoint.name} file_get returned invalid data") from error
-    if response.get("size") != len(data):
-        raise AcceptanceFailure(f"{endpoint.name} file_get size does not match payload")
-    return data
 
 
 def cleanup(endpoint: Endpoint, guest_path, evidence: Evidence, timeout):
@@ -216,26 +144,6 @@ def file_isolation(left, right, guest_path, evidence, timeout):
         },
         "guest_path": guest_path,
     }
-
-
-def running_app(endpoint: Endpoint, bundle_id, evidence: Evidence, timeout):
-    response = request(
-        endpoint, {"t": "app_list", "filter": "running"}, evidence, timeout,
-    )
-    require_ok(endpoint, "app_list", response)
-    apps = response.get("apps")
-    if not isinstance(apps, list):
-        raise AcceptanceFailure(f"{endpoint.name} app_list returned invalid apps")
-    matches = [app for app in apps if isinstance(app, dict) and app.get("bundle_id") == bundle_id]
-    if len(matches) > 1:
-        raise AcceptanceFailure(f"{endpoint.name} app_list returned duplicate bundle IDs")
-    if not matches:
-        return None
-    pid = matches[0].get("pid")
-    if (matches[0].get("state") != "running" or not isinstance(pid, int)
-            or isinstance(pid, bool) or pid <= 0):
-        raise AcceptanceFailure(f"{endpoint.name} app_list returned invalid running identity")
-    return {"bundle_id": bundle_id, "pid": pid, "name": matches[0].get("name", "")}
 
 
 def app_isolation(left, right, bundle_id, evidence, timeout):
@@ -335,17 +243,6 @@ def app_isolation(left, right, bundle_id, evidence, timeout):
         "initial_target_state": {current.name: initial[current] for current in (left, right)},
         "observations": observations,
     }
-
-
-def camera_status(endpoint, generation, evidence, timeout, presentation_id=None):
-    payload = {"t": "camera_status", "generation": generation}
-    if presentation_id:
-        payload["presentation_id"] = presentation_id
-    response = request(endpoint, payload, evidence, timeout)
-    require_ok(endpoint, "camera_status", response)
-    if not isinstance(response.get("streaming"), bool):
-        raise AcceptanceFailure(f"{endpoint.name} camera_status returned invalid streaming state")
-    return response
 
 
 def camera_isolation(observer, presenter, source_path, consumer_bundle_id, evidence, timeout):
