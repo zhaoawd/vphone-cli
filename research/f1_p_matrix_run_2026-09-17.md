@@ -100,3 +100,38 @@ patch 记录数与方案 §3 S1 的历史值一致。less 的 restore 中 URLAss
 - **删除**：`vm delete` 删除 f1-261-dev（29 GiB）、f1-261-jb（29 GiB）、f1-261-exp（30 GiB），less 以 sudo 删除；数据卷可用由 86 GiB 变为 202 GiB（`.build/f1/logs/delete.log`）。
 
 结论：P 组合 regular/dev/jb/exp/less 完成 F1 规定步骤的一轮执行，S1–S4、S6、S9（协议层）、S12（可判定部分）按上表；S7 在 regular/dev/less 因 uiopen 缺失失败（能力声明修正见 `5fd007c`，未部署）；S8 在 regular/less 阻塞；jb 底部回主屏手势与 exp 系统相机 QR 识别提示原因未查明。P 组合不满足全部步骤通过。
+
+## N 组合（Frida）运行记录（2026-09-17）
+
+实验设置：同一构建（`.build/f1/src`，`22a7c02`）。输入 `~/.vphone/ipsws/iPhone17,3_26.6.1_23G82_Restore.ipsw`（非 catalog 构建，catalog 为 23G83）与 `c0ecdb4b…-b80d96a0b616.ipsw`（cloudOS 26.4/23E5207q）；`vm create -V exp|jb --frida`。客户机 frida-server 由创建流程安装 `frida_17.18.0_iphoneos-arm64.deb`；宿主客户端为 autophone venv 的 frida 17.16.1（用户决定 B）。S11 使用 `research/probes/f1_frida_s11.py`（附加 SpringBoard；hook `open` 并回传消息，宿主启动/终止设置产生调用；独立脚本 Stalker 跟随现有线程 1.5 秒；卸载与分离限时 20 秒；检查 SpringBoard pid）。代理写入使用 `research/probes/f1_guest_proxy.py`。
+
+| 步骤 | N-exp (--frida) | N-jb (--frida) |
+| --- | --- | --- |
+| S1 创建 | completed_unverified（jb_finalize 设计为 unverified）；patch 183；16:27:52–16:33:07 | completed_unverified；patch 157；16:34:10–16:39:48 |
+| JB 首次收尾 | 完成标记 16:35:41 | 完成 |
+| S4 | passed（kern.boottime） | passed |
+| S5 | passed | partial：底部上滑回主屏失败（鼠标与宿主注入均失败，注入结果由用户目视） |
+| S6 | passed | passed |
+| S7（首次设置后） | partial：launch/terminate passed | partial：launch/terminate passed |
+| S8 | passed | passed |
+| S9 | partial（协议层） | partial（协议层） |
+| S10 | partial：验收脚本在相机启动约 1 秒后 present 返回 `two-level transport receipt unavailable`；启动 4 秒后 present 复制回执 passed（帧序号 1→17），用户确认 QR 完整显示（先关闭“全新相机设计”引导） | 负向 passed |
+| S11 | failed | failed |
+| S12 | 可判定部分 passed（Xv_vmm_present=1、hw.machine=iPhone17,3）；图形人工 passed | 负向 passed |
+
+S11 细节（两台一致）：`device_connect`、`hook_message`、`hook_counts_open`（N-exp 8 次、N-jb 32 次）、`hook_unload`、`stalker_follow_existing_thread`（blocks=1）passed；`stalker_unload` 与 `session_detach` 20 秒内未返回；SpringBoard pid 未变，用户确认主屏操作正常。N-exp 首次运行（hook 与 Stalker 同一脚本）在卸载/分离阶段挂起约 6 分钟后被终止。Stalker 卸载挂起原因未查明；blocks=1 表示被跟随的主线程在跟随期间几乎未执行（推断）。
+
+其他：N-jb 的宿主截图返回 `encodingFailed`，同期 `app_launch` 成功，因此“截图 encodingFailed 表示熄屏”不成立；截图失败原因未查明。两台 N VM 于 17:00 UTC 删除（31 GiB、29 GiB）。
+
+## F1 当前结论（2026-09-17）
+
+- 已执行：P（26.1/23B85）less/regular/dev/jb/exp 与 N（26.6.1/23G82 + cloudOS 26.4）jb/exp --frida 的创建、恢复、首次/第二次启动、GUI 输入、文件、应用、DDI、定位协议层、相机、Frida 客户端与 EXP 身份检查。L（旧版本）按用户决定不纳入。
+- 未通过或未完成的项目：
+  1. regular/dev/less 应用启动因 uiopen 缺失失败（能力声明修正 `5fd007c` 未部署，修正后应为 not_applicable）。
+  2. regular/less 开发者模式无法开启，S8 阻塞。
+  3. jb（P 与 N）底部边缘回主屏手势在宿主注入路径失败；regular、less 的鼠标路径失败（regular 注入通过）。
+  4. S11 Frida Stalker 卸载与会话分离挂起（N-exp、N-jb）。
+  5. exp 系统相机 QR 识别提示未观察到（用户决定暂不用探针复测）。
+  6. S9 应用层读数、S12 DeviceTree target-type/compatible 与计算路径无探针。
+- 验收脚本待改进：S7 前确认屏幕亮起并解锁；S10 在相机应用启动后等待（本轮 4 秒可用）并处理首次引导；矩阵生成器读取创建检查点以填充 S1–S3。
+- 按 F1 原定义（主要与旧版本组合、全部适用步骤通过、从运行证据生成支持矩阵），F1 未完成。
