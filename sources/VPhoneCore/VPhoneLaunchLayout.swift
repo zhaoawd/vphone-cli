@@ -87,9 +87,14 @@ public enum VPhoneBootProcessLocator {
         parsePIDs(psOutput, configPaths: configPathVariants(for: configURL))
     }
 
+    /// Matches `--config` arguments against `configPaths` by exact spelling or
+    /// by canonical path (`canonicalConfigPath`), so a launcher that passed
+    /// `/a/../vms/x/config.plist` or a symlinked directory still matches. Paths
+    /// are compared whole: `/vms/x` never matches `/vms/x-2`.
     public static func parsePIDs(_ psOutput: String, configPaths: [String]) -> [Int32] {
         let wanted = Set(configPaths.filter { !$0.isEmpty })
         guard !wanted.isEmpty else { return [] }
+        let canonical = Set(wanted.map(canonicalConfigPath))
 
         var seen = Set<Int32>()
         var pids: [Int32] = []
@@ -97,11 +102,28 @@ public enum VPhoneBootProcessLocator {
             let fields = line.split(whereSeparator: \.isWhitespace).map(String.init)
             guard fields.count >= 2, let pid = Int32(fields[0]), pid > 0 else { continue }
             let argv = Array(fields.dropFirst())
-            guard isVPhoneCLIExecutable(argv[0]), hasConfigArgument(argv, in: wanted) else { continue }
+            guard isVPhoneCLIExecutable(argv[0]),
+                  hasConfigArgument(argv, matching: { wanted.contains($0) || canonical.contains(canonicalConfigPath($0)) })
+            else { continue }
             guard seen.insert(pid).inserted else { continue }
             pids.append(pid)
         }
         return pids.sorted()
+    }
+
+    /// Absolute path whose parent directory is resolved by `realpath(3)` (`.`,
+    /// `..` and symlinks resolved as the kernel resolves them) when it exists,
+    /// otherwise the lexically standardized path. A relative path is returned
+    /// unchanged: the working directory of the process that received it is unknown.
+    public static func canonicalConfigPath(_ path: String) -> String {
+        guard path.hasPrefix("/") else { return path }
+        let url = URL(fileURLWithPath: path)
+        let last = url.lastPathComponent
+        var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+        if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+            return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+        }
+        return url.standardizedFileURL.path
     }
 
     /// True for both the dev binary (`.build/release/vphone-cli`) and the
@@ -112,12 +134,11 @@ public enum VPhoneBootProcessLocator {
 
     /// Requires an exact `--config <path>` (or `--config=<path>`) token pair, so
     /// a process that merely mentions the path elsewhere does not match.
-    static func hasConfigArgument(_ argv: [String], in wanted: Set<String>) -> Bool {
+    static func hasConfigArgument(_ argv: [String], matching matches: (String) -> Bool) -> Bool {
         for (index, token) in argv.enumerated() {
             if token == "--config" {
-                if index + 1 < argv.count, wanted.contains(argv[index + 1]) { return true }
-            } else if token.hasPrefix("--config="),
-                      wanted.contains(String(token.dropFirst("--config=".count))) {
+                if index + 1 < argv.count, matches(argv[index + 1]) { return true }
+            } else if token.hasPrefix("--config="), matches(String(token.dropFirst("--config=".count))) {
                 return true
             }
         }

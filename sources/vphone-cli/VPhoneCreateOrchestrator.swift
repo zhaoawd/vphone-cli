@@ -358,8 +358,11 @@ public struct VPhoneCreateOrchestrator {
     ///
     /// A refusal because the bundle or the checkpoint is in use leads with the
     /// stop/wait guidance: resuming again before the holder exits is refused
-    /// the same way. Such refusals write nothing, so the checkpoint's derived
-    /// status is reported as unchanged rather than as `recovery_required`.
+    /// the same way. Every refusal thrown before the first checkpoint write
+    /// (`VPhoneCreateRunError.isRefusalBeforeWrite`) leads with its own cause
+    /// and action and reports the checkpoint as unchanged. A recovery
+    /// requirement stored by an earlier attempt is printed only with a label
+    /// saying so. "stopped" is reserved for failures after the run started.
     /// `holder` describes the live holder of the bundle lock from the runtime
     /// record (nil when the record is absent or names an exited pid).
     static func recoveryHintLines(
@@ -389,30 +392,101 @@ public struct VPhoneCreateOrchestrator {
             ]
         case let VPhoneCreateRunError.recoveryRequired(requirement):
             // Thrown before any write, so the requirement is not in the checkpoint.
-            return [
+            var lines = [
                 "[-] vm create --resume refused: recovery required (\(requirement.kind)"
                     + (requirement.stage.map { ", stage \($0.rawValue)" } ?? "") + "); \(unchanged).",
                 "    detail: \(requirement.detail)",
                 "    action: \(requirement.action)",
-                inspect, resume,
             ]
+            if let checkpoint, checkpoint.recoveryRequired != requirement {
+                lines += recordedRequirementLines(checkpoint)
+            }
+            return lines + [inspect, resume]
         default:
             break
         }
         guard let checkpoint else { return [] }
+        if let refusal = error as? VPhoneCreateRunError, refusal.isRefusalBeforeWrite,
+           case let (cause, actions)? = refusalGuidance(refusal, name: name) {
+            var lines = ["[-] vm create --resume refused: \(cause); \(unchanged)."]
+            lines += actions.map { "    action: \($0)" }
+            lines += recordedRequirementLines(checkpoint)
+            lines.append(inspect)
+            return lines
+        }
         var lines = ["[-] vm create stopped (overall: \(checkpoint.overallStatus.rawValue)); recovery inputs are kept."]
         if let requirement = checkpoint.recoveryRequired {
             lines.append("    recovery required: \(requirement.detail)")
             lines.append("    action: \(requirement.action)")
         }
-        switch error {
-        case VPhoneCreateRunError.artifactChanged, VPhoneCreateRunError.artifactUnavailable:
-            lines.append("    Recorded inputs changed or were removed. Restart from the stage that produces them "
-                + "(vphone-cli vm create --resume \(name) --restart-from prepare), or delete the VM and create it again.")
-        default:
-            lines += [inspect, resume]
-        }
+        lines += [inspect, resume]
         return lines
+    }
+
+    /// Cause and actions of a resume refusal thrown before any checkpoint write.
+    /// Busy, run-in-progress and live-state refusals are handled above.
+    static func refusalGuidance(_ error: VPhoneCreateRunError, name: String) -> (String, [String])? {
+        let command = "vphone-cli vm create --resume \(name)"
+        let recreate = "or delete the VM (`vphone-cli vm delete \(name)`) and create it again"
+        switch error {
+        case let .artifactUnavailable(artifact, stage, rebuild):
+            return ("artifact \(artifact) needed by \(stage.rawValue) was removed", [
+                rebuild.map { "rebuild it by restarting from the stage that produces it: \($0)" }
+                    ?? "restart from a stage that produces \(artifact) (\(command) --restart-from <stage>)",
+                recreate,
+            ])
+        case let .artifactChanged(artifact, stage, detail):
+            return ("artifact \(artifact) recorded by \(stage.rawValue) changed (\(detail))", [
+                "restart from a stage that rewrites \(artifact), at the latest \(stage.rawValue); "
+                    + "\(command) --restart-from prepare rebuilds every input",
+                recreate,
+            ])
+        case let .toolChanged(recorded, current):
+            return ("the vphone-cli executable differs from the one recorded in the checkpoint "
+                + "(\(recorded.map { String($0.prefix(12)) } ?? "unknown") -> \(current.map { String($0.prefix(12)) } ?? "unknown"))", [
+                "to continue with this build: \(command) --accept-tool-change",
+                "or resume with the build whose SHA-256 is recorded in the checkpoint",
+            ])
+        case let .contractChanged(recorded, current):
+            return ("the stage contract version changed (\(recorded) -> \(current))", [
+                "this checkpoint cannot be resumed; delete the VM (`vphone-cli vm delete \(name)`) and create it again",
+            ])
+        case let .optionsChanged(changes):
+            return ("options differ from the checkpoint for stages that already ran: \(changes.joined(separator: "; "))", [
+                "resume without the changed options, or restart from the earliest affected stage with --restart-from",
+            ])
+        case let .verificationFailed(stage, detail):
+            return ("completed stage \(stage.rawValue) no longer passes verification (\(detail))", [
+                "restart from \(stage.rawValue) or an earlier stage: \(command) --restart-from \(stage.rawValue)",
+                recreate,
+            ])
+        case let .identityMismatch(detail):
+            return ("the bundle does not match the checkpoint (\(detail))", [
+                "a moved, cloned, imported or recreated bundle cannot be resumed; create the VM again",
+            ])
+        case let .invalidRestart(detail):
+            return ("invalid --restart-from (\(detail))", [
+                "choose a stage at or before the next unfinished stage shown by `vphone-cli vm create-status \(name)`",
+            ])
+        case let .sourceRequired(detail):
+            return ("a firmware source must be supplied again (\(detail))", [
+                "resume again with --iphone-source / --cloudos-source",
+            ])
+        case .runInProgress, .bundleBusy, .recoveryRequired, .io, .artifactMissing, .stageFailed, .stageCancelled,
+             .checkpointWriteFailed:
+            return nil
+        }
+    }
+
+    /// A requirement stored by an earlier attempt. A pre-write refusal did not
+    /// cause it; the next accepted resume re-probes live state and clears it.
+    static func recordedRequirementLines(_ checkpoint: VPhoneCreateCheckpoint) -> [String] {
+        guard let requirement = checkpoint.recoveryRequired else { return [] }
+        return [
+            "    recorded earlier by attempt \(checkpoint.attemptId) (not the cause of this refusal): recovery required ("
+                + requirement.kind + (requirement.stage.map { ", stage \($0.rawValue)" } ?? "") + "): \(requirement.detail)",
+            "      recorded action: \(requirement.action)",
+        ]
     }
 
     // MARK: - trace

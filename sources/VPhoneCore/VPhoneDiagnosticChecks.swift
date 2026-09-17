@@ -495,20 +495,11 @@ public struct VPhoneDiagnostics: Sendable {
         }
     }
 
-    /// Boot processes of one bundle. Besides `VPhoneBootProcessLocator`'s
-    /// spellings this also matches a `--config` path containing `..` or symlinks
-    /// (a launcher started from another directory), normalized on both sides.
+    /// Boot processes of one bundle. `VPhoneBootProcessLocator` also matches a
+    /// `--config` path containing `..` or symlinks (a launcher started from
+    /// another directory).
     static func bootPIDs(_ ps: String, bundleURL: URL) -> [Int32] {
-        let config = bundleURL.appendingPathComponent("config.plist")
-        let normalized = { (path: String) in
-            URL(fileURLWithPath: path).standardizedFileURL.resolvingSymlinksInPath().path
-        }
-        let target = normalized(config.path)
-        var pids = VPhoneBootProcessLocator.parsePIDs(ps, configURL: config)
-        for (pid, path) in bootProcesses(ps) where !pids.contains(pid) && normalized(path) == target {
-            pids.append(pid)
-        }
-        return pids
+        VPhoneBootProcessLocator.parsePIDs(ps, configURL: bundleURL.appendingPathComponent("config.plist"))
     }
 
     // MARK: Library

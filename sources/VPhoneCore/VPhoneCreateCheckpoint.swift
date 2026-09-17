@@ -342,8 +342,10 @@ public struct VPhoneCreateCheckpoint: Codable, Equatable, Sendable {
         body(&stages[index])
     }
 
+    /// The record of `name` written by the latest stage, which is the one later
+    /// stages consume. Older records of the same name only document history.
     public func artifact(_ name: String) -> VPhoneCreateArtifactRecord? {
-        artifacts.first { $0.name == name }
+        artifacts.filter { $0.name == name }.max { $0.recordedBy < $1.recordedBy }
     }
 
     /// First stage that still has to run, nil when every stage is done.

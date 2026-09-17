@@ -93,6 +93,45 @@ struct LaunchLayoutTests {
             configURL: viaLink) == [700])
     }
 
+    @Test func matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() throws {
+        // Real host 2026-09-17: vm-2607 was launched as
+        // /Users/kolar/github/autophone/../vphone-cli/vm-2607/config.plist.
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString).resolvingSymlinksInPath()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let fm = FileManager.default
+        for dir in ["autophone", "vphone-cli/vm-2607", "vphone-cli/vm-2607-rig2"] {
+            try fm.createDirectory(at: root.appendingPathComponent(dir), withIntermediateDirectories: true)
+        }
+        let library = root.appendingPathComponent("vphone-cli")
+        let link = root.appendingPathComponent("lib-link")
+        try fm.createSymbolicLink(at: link, withDestinationURL: library)
+        let config = library.appendingPathComponent("vm-2607/config.plist")
+        let r = root.path
+        let ps = """
+        901 /repo/.build/release/vphone-cli --config \(r)/autophone/../vphone-cli/vm-2607/config.plist --headless
+        902 /repo/.build/release/vphone-cli --config=\(r)/lib-link/vm-2607/config.plist
+        903 /repo/.build/release/vphone-cli --config \(r)/vphone-cli/./vm-2607/config.plist
+        904 /repo/.build/release/vphone-cli --config \(r)/vphone-cli/vm-2607-rig2/config.plist
+        905 /repo/.build/release/vphone-cli --config \(r)/autophone/../vphone-cli/vm-2607-rig2/config.plist
+        906 /repo/.build/release/vphone-cli --config \(r)/vphone-cli/vm-2607/../vm-2607-rig2/config.plist
+        907 /repo/.build/release/vphone-cli --config \(r)/lib-link/vm-2607-rig2/config.plist
+        908 /repo/.build/release/vphone-cli --config \(r)/vphone-cli/vm-2607/config.plist.bak
+        909 /repo/.build/release/vphone-cli --config vm-2607/config.plist
+        910 /usr/bin/tail -f \(r)/autophone/../vphone-cli/vm-2607/config.plist
+        """
+        #expect(VPhoneBootProcessLocator.parsePIDs(ps, configURL: config) == [901, 902, 903])
+        // The same holds when the bundle itself is named through the symlink or with `..`.
+        #expect(VPhoneBootProcessLocator.parsePIDs(ps, configURL: link.appendingPathComponent("vm-2607/config.plist")) == [901, 902, 903])
+        #expect(VPhoneBootProcessLocator.parsePIDs(
+            ps, configURL: URL(fileURLWithPath: "\(r)/autophone/../vphone-cli/vm-2607-rig2/config.plist")) == [904, 905, 906, 907])
+        // Paths that do not exist are compared after lexical standardization only.
+        #expect(VPhoneBootProcessLocator.parsePIDs(
+            "1 vphone-cli --config /nonexistent/x/../vm/config.plist\n2 vphone-cli --config /nonexistent/vm-2/config.plist",
+            configPaths: ["/nonexistent/vm/config.plist"]) == [1])
+        #expect(VPhoneBootProcessLocator.canonicalConfigPath("relative/config.plist") == "relative/config.plist")
+    }
+
     @Test func stageVphonedCopiesWhenSourceExists() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(

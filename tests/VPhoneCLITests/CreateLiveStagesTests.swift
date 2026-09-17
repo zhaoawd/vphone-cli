@@ -401,7 +401,92 @@ struct CreateLiveStagesTests {
         let busy = VPhoneCreateOrchestrator.recoveryHintLines(
             name: "vm", bundleURL: w.bundle, error: VPhoneCreateRunError.runInProgress(w.bundle.path))
         #expect(busy.first?.contains("another vm create or resume") == true)
+        #expect(busy.first?.contains("the checkpoint was not changed (overall: incomplete)") == true)
+        #expect(liveLines.first?.contains("the checkpoint was not changed (overall: incomplete)") == true)
         #expect(busy.dropFirst().first?.contains("wait for that run to exit") == true)
+    }
+
+    /// Rewrites the workspace checkpoint with a recovery requirement stored by an earlier attempt.
+    private func recordRequirement(_ w: Workspace) throws -> Data {
+        _ = try w.writeCheckpoint()
+        var checkpoint = try VPhoneCreateCheckpointStore.load(bundleURL: w.bundle).checkpoint
+        checkpoint.recoveryRequired = try VPhoneCreateJSON.decoder.decode(
+            VPhoneCreateRecoveryRequirement.self,
+            from: Data(#"{"kind":"live_state","stage":"prepare","detail":"the bundle lock is held; a child of the interrupted run may still be running","action":"stop it, then resume"}"#.utf8))
+        try withExtendedLifetime(VPhoneCreateCheckpointStore.open(bundleURL: w.bundle)) { try $0.commit(checkpoint) }
+        return try Data(contentsOf: w.checkpointURL)
+    }
+
+    @Test func removedArtifactRefusalLeadsWithItsCauseNotStopped() throws {
+        // Real run 2026-09-17 printed "vm create stopped (overall: succeeded)" for this refusal.
+        let w = try Workspace(); defer { w.cleanup() }
+        let bytes = try w.writeCheckpoint()
+        let error = VPhoneCreateRunError.artifactUnavailable(
+            name: "restore_tree", neededBy: .cfw, rebuild: "vphone-cli vm create --resume vm --restart-from prepare")
+        let lines = VPhoneCreateOrchestrator.recoveryHintLines(name: "vm", bundleURL: w.bundle, error: error)
+        #expect(lines.first == "[-] vm create --resume refused: artifact restore_tree needed by cfw was removed; "
+            + "the checkpoint was not changed (overall: incomplete).")
+        #expect(lines.dropFirst().first?.contains("action: rebuild it by restarting from the stage that produces it: "
+            + "vphone-cli vm create --resume vm --restart-from prepare") == true)
+        #expect(!lines.contains { $0.contains("stopped") || $0.contains("recovery inputs are kept") })
+        #expect(!lines.contains { $0.hasPrefix("    Resume:") })
+        #expect(try Data(contentsOf: w.checkpointURL) == bytes)
+    }
+
+    @Test func toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() throws {
+        // Real run 2026-09-17 printed the stored lock-held requirement as if it caused the refusal.
+        let w = try Workspace(); defer { w.cleanup() }
+        let bytes = try recordRequirement(w)
+        let error = VPhoneCreateRunError.toolChanged(recorded: String(repeating: "a", count: 64), current: String(repeating: "b", count: 64))
+        let lines = VPhoneCreateOrchestrator.recoveryHintLines(name: "vm", bundleURL: w.bundle, error: error)
+        #expect(lines.first?.hasPrefix("[-] vm create --resume refused: the vphone-cli executable differs") == true)
+        #expect(lines.first?.hasSuffix("the checkpoint was not changed (overall: recovery_required).") == true)
+        #expect(lines.dropFirst().first == "    action: to continue with this build: vphone-cli vm create --resume vm --accept-tool-change")
+        #expect(!lines.contains { $0.hasPrefix("    recovery required:") })
+        let recorded = lines.firstIndex { $0.contains("recorded earlier by attempt") && $0.contains("not the cause of this refusal") }
+        let action = lines.firstIndex { $0.contains("--accept-tool-change") }
+        #expect(recorded != nil && action != nil && action! < recorded!)
+        #expect(lines[recorded!].contains("the bundle lock is held"))
+        #expect(try Data(contentsOf: w.checkpointURL) == bytes)
+    }
+
+    @Test func everyRefusalBeforeWriteSaysRefusedAndUnchanged() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        _ = try recordRequirement(w)
+        let requirement = try VPhoneCreateJSON.decoder.decode(
+            VPhoneCreateRecoveryRequirement.self,
+            from: Data(#"{"kind":"live_state","stage":"restore","detail":"restore bridge still running","action":"stop it, then resume"}"#.utf8))
+        let refusals: [(VPhoneCreateRunError, String)] = [
+            (.runInProgress(w.bundle.path), "another vm create or resume"),
+            (.bundleBusy("lock held"), "the bundle is in use"),
+            (.identityMismatch("recorded path /a"), "the bundle does not match the checkpoint"),
+            (.artifactChanged(name: "restore_tree", recordedBy: .patch, detail: "fingerprint x -> y"), "artifact restore_tree recorded by patch changed"),
+            (.artifactUnavailable(name: "restore_tree", neededBy: .patch, rebuild: nil), "artifact restore_tree needed by patch was removed"),
+            (.verificationFailed(stage: .cfw, detail: "gone"), "completed stage cfw no longer passes verification"),
+            (.recoveryRequired(requirement), "recovery required (live_state, stage restore)"),
+            (.optionsChanged(["variant affects patch, already succeeded"]), "options differ"),
+            (.toolChanged(recorded: "a", current: "b"), "executable differs"),
+            (.contractChanged(recorded: 1, current: 2), "stage contract version changed"),
+            (.invalidRestart("cfw is after the next unfinished stage patch"), "invalid --restart-from"),
+            (.sourceRequired("pass --iphone-source again"), "firmware source must be supplied again"),
+        ]
+        for (error, cause) in refusals {
+            #expect(error.isRefusalBeforeWrite)
+            let lines = VPhoneCreateOrchestrator.recoveryHintLines(name: "vm", bundleURL: w.bundle, error: error)
+            #expect(lines.first?.hasPrefix("[-] vm create --resume refused: ") == true, "\(error)")
+            #expect(lines.first?.contains(cause) == true, "\(error): \(lines.first ?? "")")
+            #expect(lines.first?.contains("the checkpoint was not changed") == true, "\(error)")
+            #expect(lines.dropFirst().first.map { $0.contains("action") || $0.contains("detail") || $0.contains("holder") } == true, "\(error)")
+            #expect(!lines.contains { $0.contains("vm create stopped") || $0.hasPrefix("    recovery required:") }, "\(error)")
+        }
+
+        // Failures after the run started write the checkpoint; they keep the "stopped" wording.
+        for error in [VPhoneCreateRunError.stageFailed(stage: .cfw, detail: "exit 1"), .stageCancelled(stage: .cfw, detail: "signal"),
+                      .checkpointWriteFailed(write: "EIO", original: nil)] {
+            #expect(!error.isRefusalBeforeWrite)
+            let lines = VPhoneCreateOrchestrator.recoveryHintLines(name: "vm", bundleURL: w.bundle, error: error)
+            #expect(lines.first == "[-] vm create stopped (overall: recovery_required); recovery inputs are kept.")
+        }
     }
 
     // MARK: Prober
