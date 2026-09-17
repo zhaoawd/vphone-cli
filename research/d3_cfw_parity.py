@@ -84,7 +84,7 @@ def preflight(root, minimum_free_gib):
         raise ValueError(f"free space {free} is below required {minimum} bytes")
     pairs = {}
     for variant in VARIANTS:
-        sides = {side: pair_input(root / f"{variant}-{side}") for side in PAIR_SIDES}
+        sides = {side: pair_input(root / f"vm-{variant}-{side}") for side in PAIR_SIDES}
         legacy, current = sides["legacy"], sides["current"]
         for field in ("disk_bytes", "config", "restore", "manifests"):
             if legacy[field] != current[field]:

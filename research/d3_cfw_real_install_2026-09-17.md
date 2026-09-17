@@ -33,15 +33,42 @@ regular 首次安装后的只读复查使用 [清单脚本](d3_cfw_inventory.py)
 
 - 锁定 Python 环境已通过 `check_python_runtime.py --locked`；`make build` 及包签名检查通过。
 - `make test_python` 在普通沙箱中因本地 Unix socket 绑定受限出现 8 个环境错误；在允许本地 socket 的环境重跑，121 项通过。
-- 本轮四变体离线安装与重复安装验收已完成。迁移前脚本未对同一份真实磁盘输入再次安装，因此未取得迁移前后完整磁盘产物的逐字节对照；已有 [公共步骤记录](d3_shared_cfw_2026-09-14.md) 保存阶段语句比较及故障清理回归。正常启动、客户机服务、JB 首启脚本实际执行和 EXP 客户机功能仍需后续端到端任务验证。
+- 本轮四变体离线安装与重复安装验收已完成。上述专用 VM 未由迁移前脚本安装；迁移前后同输入产物对照在下文配对磁盘中完成；已有 [公共步骤记录](d3_shared_cfw_2026-09-14.md) 保存阶段语句比较及故障清理回归。正常启动、客户机服务、JB 首启脚本实际执行和 EXP 客户机功能仍需后续端到端任务验证。
 
 ## 同输入迁移对照准备
 
-从公共步骤提取前的 `bc7f075^` 读取四份原安装脚本，SHA-256 清单保存在 `.build/d3/parity/legacy-source/` 对应文件。运行副本暂存于 `scripts/.d3-parity-legacy-*.sh`；仅将 JB/EXP 对基础脚本的调用指向该副本。旧版与当前版共用未修改的 `cfw_install_host.sh` 挂载和清理逻辑，运行副本中的 host driver 只改变变体到脚本文件名的映射。对照结束后应移除这些临时运行副本。
+从公共步骤提取前的 `bc7f075^` 读取四份原安装脚本，SHA-256 清单保存在 `.build/d3/parity/legacy-source/` 对应文件。运行副本暂存于 `scripts/.d3-parity-legacy-*.sh`；仅将 JB/EXP 对基础脚本的调用指向该副本。旧版与当前版共用未修改的 `cfw_install_host.sh` 挂载和清理逻辑，运行副本中的 host driver 只改变变体到脚本文件名的映射。对照结束后，这些运行副本已从 `scripts/` 移至受 Git 忽略的 `.build/d3/parity/legacy-runtime/`；移动后的副本不再可直接运行。
 
 新建 `.build/d3/parity/base`，用 26.1 / 23B85 的 regular Restore 输入完成 DFU 恢复；停止专用 DFU 宿主后确认磁盘无打开句柄、socket 和活动事务。只读清单 `research/artifacts/d3-cfw-2026-09-17/parity-base-before.json` 显示无 Cryptex OS/App、`vphoned` 或 `seputil.bak`。四个变体分别从这份恢复后、未安装 CFW 的磁盘克隆出 legacy/current 配对磁盘，再从相应 D3 变体复制相同的固件 Restore 输入。每对配置和两份 Manifest 的大小、SHA-256 相同，清单在 `.build/d3/parity/paired-inputs.json`。
 
-八次安装与 [卷清单脚本](d3_cfw_parity.py) 已编排在 `.build/d3/parity/install-batch.zsh`，逐一检查关机、磁盘占用和至少 80 GiB 可用空间，随后比较 System、xART、Preboot 卷。管理员认证后批次已启动；2026-09-17 15:23 的日志显示 regular 两次安装及 dev 迁移前安装完成，dev 当前版安装已启动。全量只读扫描在普通用户环境遇到 System 卷受保护文件 `.file` 的权限拒绝，并已卸载镜像；批次中的扫描将在管理员环境重试。配对磁盘的完整产物比较尚无结论。
+八次安装与 [卷清单脚本](d3_cfw_parity.py) 已编排在 `.build/d3/parity/install-batch.zsh`，逐一检查关机、磁盘占用和至少 80 GiB 可用空间，随后比较 System、xART、Preboot 卷。管理员认证后批次已启动；2026-09-17 15:23 的日志显示 regular 两次安装及 dev 迁移前安装完成，dev 当前版安装已启动。全量只读扫描在普通用户环境遇到 System 卷受保护文件 `.file` 的权限拒绝，并已卸载镜像；批次中的扫描随后在管理员环境执行。
+
+## 同输入迁移对照结果
+
+批次日志显示八次安装全部结束于 `[+] host-mode CFW install complete`，首次安装均包含 snapshot 重命名记录。随后在管理员环境对八个磁盘执行只读 System、xART、Preboot 全量扫描，并生成四份 legacy/current 比较结果。完成后复核：配对目录下无残留挂载，`hdiutil info` 无配对磁盘，`lsof` 无打开句柄。
+
+四个变体的三卷目录项数量在 legacy 与 current 之间一致：
+
+| 变体 | System | Preboot | xART | 差异条目 |
+| --- | ---: | ---: | ---: | ---: |
+| regular | 447168 | 67 | 4 | 10 |
+| dev | 447318 | 67 | 4 | 143 |
+| jb | 447326 | 6604 | 4 | 22 |
+| exp | 447328 | 6610 | 4 | 159 |
+
+没有仅存在于一侧的安装文件。全部差异分为以下类别，分类结果在 `research/artifacts/d3-cfw-2026-09-17/parity/classification.json`，四份比较结果和配对输入清单保存在同一目录。`research/artifacts/` 与 `.build/` 均受 Git 忽略，这些文件只保存在原主机；约 100 MiB 的逐卷清单保留在 `.build/d3/parity/*.inventory.json`，其 SHA-256 记录在分类文件中。
+
+| 类别 | 涉及变体 | 证据 |
+| --- | --- | --- |
+| `.fseventsd` 日志文件（6–15 条） | 全部 | macOS 文件系统事件日志及 `fseventsd-uuid`，在读写挂载期间生成；安装脚本不直接放置这些文件 |
+| thin Mach-O 仅签名区域不同（4–8 条） | 全部 | `usr/bin/vphoned`、`seputil`、`launchd_cache_loader`、`mobileactivationd`；dev/JB/EXP 另有 `sbin/launchd`、`debugserver`；EXP 另有 Preboot 中 `libcamfix.dylib`、`libvcamcaptured.dylib`。比较工具确认长度、模式、签名区域位置相同，签名区域外字节 SHA-256 相同 |
+| iosbinpack64 AppleDouble 文件（131 条） | dev、EXP | 两侧 `cfw_input/jb/iosbinpack64.tar` 均在安装时由 dev overlay 重新打包，620 个成员名称、模式、大小一致。131 个 `._*` 成员的内容差异全部位于 `com.apple.quarantine` 值 `0281;<8 位十六进制时间>;` 的时间字段；另有同名 pax 扩展属性和 1 个 mtime 不同。四个磁盘上 310 个 `._*` 文件的 SHA-256 均与各自 tar 成员一致 |
+| fat Mach-O 仅签名区域不同（4 条） | JB、EXP | `/b`、`cores/launchdhook.dylib`、`libellekit.dylib`、`systemhook.dylib`。只读挂载提取后逐字节比较：两个 arm64 slice 的 `LC_CODE_SIGNATURE` 位置相同，全部差异字节位于签名区域 |
+| `TweakLoader.dylib`（1 条） | JB、EXP | 签名区域外仅 `LC_ID_DYLIB`（35 字节）和 `LC_UUID`（16 字节）不同。install name 分别为 `.build/d3/parity/vm-<variant>-legacy/.cfw_temp/TweakLoader.dylib` 和 `vm-<variant>-current/...`；迁移前后 `build_tweakloader` 的编译命令相同，`TEMP_DIR` 均为 `$VM_DIR/.cfw_temp`。差异来源于配对目录名 |
+
+结论：同一恢复后磁盘、同一配置和 Manifest 输入下，迁移前后四个安装入口放置的文件集合一致；内容差异均可归因于签名、事件日志、安装时 quarantine 时间和 VM 目录路径，未发现迁移引入或遗漏的补丁、文件或阶段。此结论不覆盖客户机启动、首启脚本执行和客户机功能；fat Mach-O 与 `TweakLoader.dylib` 的逐字节分析由一次性脚本完成，未保存为回归测试。签名内容每次变化的具体机制未分析。
+
+`d3_cfw_parity.py preflight` 原先要求 `<variant>-<side>` 目录名，与本批次实际使用的 `vm-<variant>-<side>` 不一致；已改为 `vm-<variant>-<side>` 并同步测试。在安装后的配对目录上执行该检查通过（可用空间 228 GiB）；该次运行在安装之后，不作为安装前置证据。
 
 ## 续跑环境检查
 
@@ -55,3 +82,5 @@ python3 research/d3_cfw_parity.py preflight /path/to/parity \
 ```
 
 该检查不替代管理员环境中的八次安装和三卷只读扫描；它只固化续跑前置条件。
+
+上述续跑检查记录的是另一主机的状态。原主机 `/Users/kolar/github/vphone-cli` 上的批次已完成，结果见“同输入迁移对照结果”。

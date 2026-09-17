@@ -24,7 +24,7 @@ class D3CFWParityTests(unittest.TestCase):
 
     def make_pair(self, variant, current_manifest=b"cloud"):
         for side in PARITY.PAIR_SIDES:
-            vm = self.root / f"{variant}-{side}"
+            vm = self.root / f"vm-{variant}-{side}"
             restore = vm / "iPhone17,3_26.1_23B85_Restore"
             restore.mkdir(parents=True)
             (vm / "Disk.img").write_bytes(b"disk")
