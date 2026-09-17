@@ -7,7 +7,8 @@ struct VPhoneFWCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "fw",
         abstract: "Firmware pipeline: prepare (download/merge IPSWs) and patch",
-        subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self])
+        subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self,
+                      VPhoneFWRecordCommand.self])
 }
 
 // MARK: - catalog
@@ -116,6 +117,9 @@ struct VPhoneFWPatchCommand: ParsableCommand {
     var allowAblationOutput = false
     @Option(name: .customLong("report-out"), help: "Optional path to write the structured PatchRunReport JSON.")
     var reportOut: String?
+    @Option(name: .customLong("record-out"),
+            help: "Write a reproducible experiment record JSON (and <name>.summary.txt) for this run, including failures.")
+    var recordOut: String?
     @Flag(name: .shortAndLong, help: "Suppress per-component progress") var quiet = false
 
     func run() throws {
@@ -143,14 +147,16 @@ struct VPhoneFWPatchCommand: ParsableCommand {
         let report = try VPhoneBundleGuard.withBundleLock(
             directory: bundle.url, operation: VPhoneVMOperation.fwPatch
         ) { _ in
-            try FirmwarePipeline(
-                vmDirectory: bundle.url,
-                variant: variant.pipelineVariant,
-                verbose: !quiet,
-                noBinpack: false,
-                noVphoned: false,
-                forceExcGuard: forceExcGuard,
-                enableFrida: frida).patchAllStructured(ablate: ablateIDs, allowOutput: allowAblationOutput)
+            try VPhonePatchRecording.run(
+                FirmwarePipeline(
+                    vmDirectory: bundle.url,
+                    variant: variant.pipelineVariant,
+                    verbose: !quiet,
+                    noBinpack: false,
+                    noVphoned: false,
+                    forceExcGuard: forceExcGuard,
+                    enableFrida: frida),
+                ablate: ablateIDs, allowOutput: allowAblationOutput, recordOut: recordOut)
         }
 
         if let reportOut {
@@ -174,5 +180,76 @@ struct VPhoneFWPatchCommand: ParsableCommand {
                 "required patches failed: "
                     + report.failedRequired.map(\.description).joined(separator: ", "))
         }
+    }
+}
+
+// MARK: - experiment records
+
+/// Runs the pipeline directly, or through the C5 recorder when a record path is given.
+enum VPhonePatchRecording {
+    static func run(_ pipeline: FirmwarePipeline, ablate: [String], allowOutput: Bool, recordOut: String?) throws -> PatchRunReport {
+        guard let recordOut else { return try pipeline.patchAllStructured(ablate: ablate, allowOutput: allowOutput) }
+        let url = URL(fileURLWithPath: recordOut)
+        let executable = VPhoneResources.runningExecutable()
+        let resources = VPhoneResources.resolve()
+        // Same resolution as CryptexFilesystemPatcher: VPHONE_SEAL_DIR, else ./.tools.
+        let sealDirectory = ProcessInfo.processInfo.environment["VPHONE_SEAL_DIR"].map { URL(fileURLWithPath: $0) }
+            ?? URL(fileURLWithPath: ".tools")
+        let environment = PatchExperimentEnvironment(
+            buildCommit: VPhoneBuildInfo.commitHash, executable: executable,
+            sourceRoot: PatchExperimentEnvironment.locateSourceRoot(from: executable),
+            resourcesBase: resources.base, sealDirectory: sealDirectory,
+            pythonExecutable: { try resources.pythonExecutable() })
+        print("[record] experiment record: \(url.path)")
+        return try PatchExperimentRecorder(recordURL: url, environment: environment)
+            .run(pipeline, ablate: ablate, allowOutput: allowOutput)
+    }
+}
+
+struct VPhoneFWRecordCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "record", abstract: "Inspect patch experiment records written by --record-out",
+        subcommands: [VPhoneFWRecordShowCommand.self, VPhoneFWRecordCompareCommand.self])
+}
+
+struct VPhoneFWRecordShowCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "show", abstract: "Validate a record and print its summary")
+
+    @Argument(help: "Record JSON path") var record: String
+
+    func run() throws {
+        print(try PatchExperimentRecord.load(from: URL(fileURLWithPath: record)).summary(), terminator: "")
+    }
+}
+
+struct VPhoneFWRecordCompareCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "compare",
+        abstract: "Compare two records: conditions, patch results and artifact digests",
+        discussion: "Exit status: 0 when all three results are 'same', 1 when any differs or cannot be determined, 2 when a record is invalid.")
+
+    @Argument(help: "Left record JSON path") var left: String
+    @Argument(help: "Right record JSON path") var right: String
+    @Flag(help: "Emit the comparison as JSON") var json = false
+
+    func run() throws {
+        let comparison: PatchExperimentComparison
+        do {
+            comparison = try PatchExperimentRecord.compare(
+                PatchExperimentRecord.load(from: URL(fileURLWithPath: left)),
+                PatchExperimentRecord.load(from: URL(fileURLWithPath: right)))
+        } catch {
+            FileHandle.standardError.write(Data("[record] \(error)\n".utf8))
+            throw ExitCode(2)
+        }
+        if json {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+            print(String(decoding: try encoder.encode(comparison), as: UTF8.self))
+        } else {
+            print(comparison.render(), terminator: "")
+        }
+        if !comparison.allSame { throw ExitCode(1) }
     }
 }

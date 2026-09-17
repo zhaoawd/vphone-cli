@@ -86,6 +86,10 @@ public final class FirmwarePipeline {
     let loader: any FirmwareLoader
     private var transaction: FirmwareTransaction?
 
+    /// Progress of the most recent run (C5). Shared with the staged pipeline so a
+    /// failure keeps the stage, completed component reports and transaction.
+    public internal(set) var trace = FirmwareRunTrace()
+
     /// Set when the iPhone base is iOS 18.x (read from iPhone-BuildManifest.plist).
     /// Gates the skywalk-netagent boot-arg workaround (18.x-specific mDNSResponder
     /// crash-loop). Computed in `patchAll()` before `buildComponentList()` runs.
@@ -201,6 +205,8 @@ public final class FirmwarePipeline {
     /// ``PatchRunReport/failedRequired``. It throws only on hard I/O / format errors
     /// (missing files, unreadable payloads, unknown ablation ids).
     public func patchAllStructured(ablate ablateValues: [String] = [], allowOutput: Bool = true) throws -> PatchRunReport {
+        trace = FirmwareRunTrace()
+        trace.stage = .preflight
         guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
             throw PatcherError.invalidFormat("Pending firmware transaction; run patch-firmware --recover first")
         }
@@ -210,22 +216,26 @@ public final class FirmwarePipeline {
             throw PatcherError.invalidFormat("unknown ablation id(s): \(unknown.sorted().joined(separator: ", "))")
         }
         if !ablate.isEmpty && !allowOutput {
-            return try executeStructured(ablate: ablateValues, allowOutput: false)
+            let report = try executeStructured(ablate: ablateValues, allowOutput: false)
+            trace.stage = .finished
+            return report
         }
-        let (restore, _) = try prepare()
-        let rootInputs = try buildComponentList().filter { !$0.inRestoreDir }.map {
-            try findFile(in: vmDirectory, patterns: $0.searchPatterns, label: $0.name)
-        }
-        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: rootInputs + [restore], options: [
+        trace.stage = .prepare
+        _ = try prepare()
+        let roots = try transactionRoots()
+        trace.stage = .stageInputs
+        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots, options: [
             "variant": variant.rawValue, "noBinpack": String(noBinpack), "noVphoned": String(noVphoned),
             "forceExcGuard": String(forceExcGuard), "frida": String(enableFrida),
             "ablate": ablateValues.joined(separator: ","),
         ])
+        trace.transaction = transaction
         do {
             let staged = FirmwarePipeline(vmDirectory: transaction.stage, variant: variant, verbose: verbose,
                 noBinpack: noBinpack, noVphoned: noVphoned, forceExcGuard: forceExcGuard,
                 enableFrida: enableFrida, loader: loader)
             staged.transaction = transaction
+            staged.trace = trace
             if variant == .less {
                 let restore = try staged.findRestoreDirectory()
                 try Self.validateManifestPaths(in: restore, name: "BuildManifest.plist")
@@ -237,14 +247,27 @@ public final class FirmwarePipeline {
                 transaction.recordFailure(PatcherError.patchSiteNotFound("Required patch failed; original firmware was not changed"))
                 return report
             }
+            trace.stage = .validateOutput
+            trace.component = nil
             if variant == .less { try Self.validateManifest(in: staged.findRestoreDirectory()) }
+            trace.stage = .commit
             let archive = try transaction.commit()
             log("[+] Firmware transaction committed; receipt and backups: \(archive.path)")
+            trace.stage = .finished
             return report
         } catch {
             transaction.recordFailure(error)
             throw error
         }
+    }
+
+    /// The transaction roots: VM-root component files plus the Restore directory.
+    func transactionRoots() throws -> [URL] {
+        let restore = try findRestoreDirectory()
+        let rootInputs = try buildComponentList().filter { !$0.inRestoreDir }.map {
+            try findFile(in: vmDirectory, patterns: $0.searchPatterns, label: $0.name)
+        }
+        return rootInputs + [restore]
     }
 
     /// Call while holding the VM bundle lock. Recovery does not run patchers.
@@ -336,8 +359,11 @@ public final class FirmwarePipeline {
             throw PatcherError.invalidFormat("less dry-run requires --ablate filesystem; filesystem operations require a staged output run")
         }
 
+        trace.stage = .prepare
         let (restoreDir, gates) = try prepare()
+        trace.gates = gates
         let components = buildComponentList()
+        trace.plannedComponents = components.map(\.name)
 
         let isDry = !ablate.isEmpty && !allowOutput
         log("[*] Patching \(components.count) boot-chain components ..."
@@ -346,6 +372,8 @@ public final class FirmwarePipeline {
         var componentReports: [ComponentReport] = []
 
         for component in components {
+            trace.stage = .patch
+            trace.component = component.name
             let baseDir = component.inRestoreDir ? restoreDir : vmDirectory
             let fileURL = try findFile(in: baseDir, patterns: component.searchPatterns, label: component.name)
 
@@ -368,6 +396,7 @@ public final class FirmwarePipeline {
 
             let componentFailed = reports.contains { $0.hasRequiredFailure }
             if componentFailed {
+                trace.record(component.name, reports)
                 log("  [x] required failure — not saved; stopping before dependent components")
                 break
             } else if isDry {
@@ -376,17 +405,11 @@ public final class FirmwarePipeline {
                 try loader.save(currentData, to: fileURL)
                 log("  [+] saved")
             }
+            trace.record(component.name, reports)
         }
 
-        let ablatedIDs = componentReports
-            .flatMap { $0.results }
-            .filter { $0.outcome == .ablated }
-            .map { $0.id }
-
-        let report = PatchRunReport(
-            variant: variant.rawValue, gates: gates,
-            components: componentReports, ablation: ablatedIDs
-        )
+        let report = Self.makeReport(variant: variant.rawValue, gates: gates, components: componentReports)
+        let ablatedIDs = report.ablation
 
         log("\n\(String(repeating: "=", count: 60))")
         if report.failedRequired.isEmpty {
@@ -399,6 +422,12 @@ public final class FirmwarePipeline {
         log(String(repeating: "=", count: 60))
 
         return report
+    }
+
+    /// Builds the run report; the ablation list is every ablated result in order.
+    static func makeReport(variant: String, gates: PatchGateSnapshot, components: [ComponentReport]) -> PatchRunReport {
+        let ablatedIDs = components.flatMap { $0.results }.filter { $0.outcome == .ablated }.map { $0.id }
+        return PatchRunReport(variant: variant, gates: gates, components: components, ablation: ablatedIDs)
     }
 
     /// Emit the stable structured log lines for one component's reports.
@@ -779,13 +808,18 @@ public final class FirmwarePipeline {
 
     /// `ProductVersion` from a manifest in `restoreDir`, or nil if absent/unreadable.
     static func readProductVersion(_ restoreDir: URL, manifest: String) -> String? {
+        readManifestString(restoreDir, manifest: manifest, key: "ProductVersion")
+    }
+
+    /// A top-level string from a manifest in `restoreDir`, or nil if absent/unreadable.
+    static func readManifestString(_ restoreDir: URL, manifest: String, key: String) -> String? {
         let url = restoreDir.appendingPathComponent(manifest)
         guard let data = try? Data(contentsOf: url),
               let plist = try? PropertyListSerialization.propertyList(from: data, format: nil),
               let dict = plist as? [String: Any],
-              let version = dict["ProductVersion"] as? String
+              let value = dict[key] as? String
         else { return nil }
-        return version
+        return value
     }
 
     /// iPhone base version (`iPhone-BuildManifest.plist`, preserved by fw_prepare).

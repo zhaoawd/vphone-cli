@@ -7,12 +7,12 @@ import VPhoneCore
 /// Callers hold the VM bundle lock throughout creation, execution or recovery.
 final class FirmwareTransaction {
     enum Phase: String, Codable { case building, ready, publishing, rollingBack, committed }
-    struct Entry: Codable {
+    struct Entry: Codable, Equatable {
         let name: String
         let original: String
         var output: String?
     }
-    struct Journal: Codable {
+    struct Journal: Codable, Equatable {
         var version = 1
         let id: String
         let vmPath: String
@@ -36,6 +36,9 @@ final class FirmwareTransaction {
     var work: URL { root.appendingPathComponent("work") }
     private var backup: URL { root.appendingPathComponent("backup") }
     private var journal: Journal
+    /// Read-only views for experiment records (C5); the journal stays the source of truth.
+    var journalSnapshot: Journal { journal }
+    private(set) var archiveURL: URL?
     private let inject: (Event) throws -> Void
     private let mounts: (URL, Bool) throws -> Void
     private let fm = FileManager.default
@@ -210,6 +213,7 @@ final class FirmwareTransaction {
         let destination = history.appendingPathComponent(journal.id)
         guard !Self.exists(destination) else { throw Self.error("Firmware archive already exists") }
         try Self.move(root, to: destination)
+        archiveURL = destination
         return destination
     }
 

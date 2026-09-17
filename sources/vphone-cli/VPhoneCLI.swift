@@ -189,6 +189,12 @@ struct PatchFirmwareCLI: ParsableCommand {
     var reportOut: String?
 
     @Option(
+        name: .customLong("record-out"),
+        help: "Write a reproducible experiment record JSON (and <name>.summary.txt) for this run, including failures."
+    )
+    var recordOut: String?
+
+    @Option(
         name: .customLong("ablate"),
         parsing: .upToNextOption,
         help: ArgumentHelp("Disable one or more patch steps by id (repeatable and comma-separated). "
@@ -241,15 +247,16 @@ struct PatchFirmwareCLI: ParsableCommand {
         let report = try VPhoneBundleGuard.withBundleLock(
             directory: vmDirectory, operation: VPhoneVMOperation.fwPatch
         ) { _ in
-            try FirmwarePipeline(
-                vmDirectory: vmDirectory,
-                variant: variant.pipelineVariant,
-                verbose: !quiet,
-                noBinpack: noBinpack,
-                noVphoned: noVphoned,
-                forceExcGuard: forceExcGuard,
-                enableFrida: frida
-            ).patchAllStructured(ablate: ablateIDs, allowOutput: allowAblationOutput)
+            try VPhonePatchRecording.run(
+                FirmwarePipeline(
+                    vmDirectory: vmDirectory,
+                    variant: variant.pipelineVariant,
+                    verbose: !quiet,
+                    noBinpack: noBinpack,
+                    noVphoned: noVphoned,
+                    forceExcGuard: forceExcGuard,
+                    enableFrida: frida),
+                ablate: ablateIDs, allowOutput: allowAblationOutput, recordOut: recordOut)
         }
 
         // --records-out keeps its original payload: the flat [PatchRecord] array.
