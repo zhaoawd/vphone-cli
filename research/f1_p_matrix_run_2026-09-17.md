@@ -135,3 +135,25 @@ S11 细节（两台一致）：`device_connect`、`hook_message`、`hook_counts_
   6. S9 应用层读数、S12 DeviceTree target-type/compatible 与计算路径无探针。
 - 验收脚本待改进：S7 前确认屏幕亮起并解锁；S10 在相机应用启动后等待（本轮 4 秒可用）并处理首次引导；矩阵生成器读取创建检查点以填充 S1–S3。
 - 按 F1 原定义（主要与旧版本组合、全部适用步骤通过、从运行证据生成支持矩阵），F1 未完成。
+
+## 最终矩阵（2026-09-18）
+
+按用户决定，F1 以本轮组合（P、N）的证据矩阵关闭；L 按决定不纳入，矩阵中整行记为 `not_run`。F1 原定义中的旧版本组合条目未满足。
+
+- 矩阵：[f1_support_matrix_2026-09-17.md](f1_support_matrix_2026-09-17.md)（Markdown，含生成命令、输入清单与各输入 SHA-256）、[f1_support_matrix_2026-09-17.json](f1_support_matrix_2026-09-17.json)。
+- 已知限制与未解决问题配置：[f1_known_limits_2026-09-17.json](f1_known_limits_2026-09-17.json)。已知限制 L1–L3 按用户决定 B 不再复测；未解决问题 O1–O3 单独跟踪，不计为通过。
+- 生成器：`scripts/f1_support_matrix.py` 新增 `--create-status`、`--manual`、`--jb-setup-log`（参数形式 `<combo>:<variant>[:<options>]=<path>`）与 `--limits`。只给 `run.json` 时输出与此前一致。
+
+合并规则：
+
+1. 行绑定：`run.json` 按 `--bundle`/`--socket` 所在 bundle 与创建检查点的 bundle 匹配后归入同一行，不同验收脚本提交（`22a7c02`、`4ece8ea`、`5fd007c`、`205ea01`）的记录合并到该行，并在备注列出提交。N 组合两份 `-s4verify` 记录的 `options.frida=false`（调用时未传 `--frida`），按 bundle 归入 `--frida` 行，备注保留该不一致。
+2. 来源：S1–S3 由创建检查点推导（`checkpoint`）；jb/exp 的 `jb_finalize` 在检查点中按设计为 `unverified`，收尾完成标记来自人工取回的 `vphone_jb_setup.log`（`checkpoint+manual`）。其余步骤来自 `run.json`（`auto`）与 `manual_results.json`（`manual`）。
+3. 选择：`manual` 排序高于 `auto` 与 `checkpoint`；同一排序内取时间最新的记录。人工结果记录时间晚于首次设置后的 GUI 复跑，因此 GUI 复跑与人工结果优先于首次设置前的 headless 结果。
+4. `failed` 保护：若某条 `failed` 记录晚于被选中的非 `failed` 记录，状态保持 `failed`。本轮数据中该保护未改变任何单元格。
+5. 人工子项（`S12_graphics`、`setup_assistant`、嵌套的底部上滑宿主注入结果）只写入备注，不决定单元格状态。被替换的记录保留在 JSON `candidates` 与 Markdown 备注中。
+
+与上文人工结果表相比的差异（事实）：
+
+- less 的 S3 为 `partial`：检查点 verification 为 `unverified`（less 启动无成功标记）。
+- exp 的 S12 为 `partial`：人工图形判定 passed 作为子项写入备注，DeviceTree target-type/compatible 与计算路径仍为 blocked（L3）。
+- regular 的 S5 为 `partial`：鼠标路径 failed，宿主注入 passed（O2）。

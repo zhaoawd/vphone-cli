@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-17",
+  "scope": "F1 本轮组合（P 26.1/23B85 五个变体、N 26.6.1/23G82 + cloudOS 26.4 jb/exp --frida）的证据矩阵；来源为 research/f1_p_matrix_run_2026-09-17.md 与各 VM 的人工结果文件",
+  "known_limits": [
+    {
+      "id": "L1",
+      "summary": "regular、less 客户机开发者模式无法开启，S8 DDI 阻塞",
+      "detail": "ddiServices 报 Developer Mode is disabled；amfi reveal-developer-mode 后开关出现，开启并重启后该项消失，developer-mode-status=false；原因未查明",
+      "decision": "用户决定 B：不再复测",
+      "applies_to": [
+        {"spec": "P:regular", "steps": ["S8"]},
+        {"spec": "P:less", "steps": ["S8"]}
+      ],
+      "evidence": [
+        {"path": ".build/f1/logs/d4-acc/manual/manual_results.json", "detail": "S8 blocked 及 5 次尝试"},
+        {"path": ".build/f1/logs/d4-acc/manual/ddi/ddi.txt", "detail": "Developer Mode is disabled"},
+        {"path": ".build/f1/logs/f1-261-less/manual/manual_results.json", "detail": "S8 blocked"},
+        {"path": ".build/f1/logs/f1-261-less/manual/ddi/ddi.txt"},
+        {"path": "research/f1_p_matrix_run_2026-09-17.md", "detail": "人工步骤结果 Developer Mode 条目"}
+      ]
+    },
+    {
+      "id": "L2",
+      "summary": "exp 系统相机 QR 识别提示未观察到，未用 E6 探针复测",
+      "detail": "P-exp：URL QR 完整位于取景框，12 秒 12 张宿主截图无识别提示，原因未查明；N-exp：复制回执与画面通过，QR 识别检查未执行（qr_recognition=not_run）",
+      "decision": "用户决定 B：不再复测（不用 E6 探针复测）",
+      "applies_to": [
+        {"spec": "P:exp", "steps": ["S10"]},
+        {"spec": "N:exp:frida", "steps": ["S10"]}
+      ],
+      "evidence": [
+        {"path": ".build/f1/logs/f1-261-exp/manual/manual_results.json", "detail": "S10_after_setup.system_camera_qr_banner=not_observed"},
+        {"path": ".build/f1/logs/f1-261-exp/manual/qr-url2/requests.jsonl"},
+        {"path": ".build/f1/logs/f1-2661-exp-frida/manual/manual_results.json", "detail": "S10.qr_recognition=not_run"}
+      ]
+    },
+    {
+      "id": "L3",
+      "summary": "S9 应用层定位读数、S12 DeviceTree target-type/compatible 与计算路径无探针",
+      "detail": "S9 仅协议层 set/status/stop 通过（app_layer_reading=not_run）；S12 dt_target_type_compatible、compute 为 blocked；exp 图形由人工观察 VM 窗口判定",
+      "decision": "用户决定 B：不再复测，不新建探针",
+      "applies_to": [
+        {"spec": "P:regular", "steps": ["S9", "S12"]},
+        {"spec": "P:dev", "steps": ["S9", "S12"]},
+        {"spec": "P:jb", "steps": ["S9", "S12"]},
+        {"spec": "P:exp", "steps": ["S9", "S12"]},
+        {"spec": "P:less", "steps": ["S9", "S12"]},
+        {"spec": "N:jb:frida", "steps": ["S9", "S12"]},
+        {"spec": "N:exp:frida", "steps": ["S9", "S12"]}
+      ],
+      "evidence": [
+        {"path": "research/artifacts/f1-matrix/f1-P-exp-20260917T130732Z/run.json", "detail": "S9 app_layer_reading=not_run；S12 dt_target_type_compatible/graphics/compute=blocked"},
+        {"path": "research/artifacts/f1-matrix/f1-N-jb-20260917T164243Z/run.json", "detail": "S12 dt_target_type_compatible=blocked"},
+        {"path": "research/f1_e2e_matrix_plan_2026-09-17.md", "detail": "§3.2 S9/S12 判据"}
+      ]
+    }
+  ],
+  "open_issues": [
+    {
+      "id": "O1",
+      "summary": "regular、dev、less 客户机缺少 uiopen，应用启动失败",
+      "detail": "vphoned 声明 apps 但 app_launch 返回 uiopen unavailable（classification capability_declared_but_uiopen_missing）；能力声明修正 5fd007c 未部署到客户机，部署后 S7 启动检查预期为 not_applicable（待验证）",
+      "tracking": "单独跟踪：部署含 5fd007c 的 vphoned 后复测 S7；不计为通过",
+      "applies_to": [
+        {"spec": "P:regular", "steps": ["S7"]},
+        {"spec": "P:dev", "steps": ["S7"]},
+        {"spec": "P:less", "steps": ["S7"]}
+      ],
+      "evidence": [
+        {"path": "research/artifacts/f1-matrix/f1-P-regular-gui-20260917T155133Z/run.json"},
+        {"path": "research/artifacts/f1-matrix/f1-P-dev-gui-20260917T154524Z/run.json"},
+        {"path": "research/artifacts/f1-matrix/f1-P-less-20260917T142944Z/run.json", "detail": "headless；less GUI 复跑无效，未计入"},
+        {"path": "research/host_control_e2_2026-09-12.md", "detail": "应用与 URL 能力映射修正"}
+      ]
+    },
+    {
+      "id": "O2",
+      "summary": "底部边缘上滑回主屏失败：jb（P、N）宿主注入路径失败；regular、less 鼠标原生路径失败",
+      "detail": "P-jb 宿主 swipe 645,2790→1600 两次前后截图相同；N-jb 注入与鼠标路径均失败（注入结果由用户目视）；regular 鼠标路径失败、宿主注入通过；less 鼠标路径失败、宿主注入未测（测试方法错误的运行已移出）；原因未查明",
+      "tracking": "单独跟踪；不计为通过",
+      "applies_to": [
+        {"spec": "P:jb", "steps": ["S5"]},
+        {"spec": "N:jb:frida", "steps": ["S5"]},
+        {"spec": "P:regular", "steps": ["S5"]},
+        {"spec": "P:less", "steps": ["S5"]}
+      ],
+      "evidence": [
+        {"path": ".build/f1/logs/f1-261-jb/manual/home-swipe/requests.jsonl"},
+        {"path": ".build/f1/logs/f1-261-jb/manual/manual_results.json", "detail": "S5.bottom_edge_swipe_home_guest_path=failed"},
+        {"path": ".build/f1/logs/f1-2661-jb-frida/manual/home-swipe/requests-visual.jsonl"},
+        {"path": ".build/f1/logs/f1-2661-jb-frida/manual/manual_results.json"},
+        {"path": ".build/f1/logs/d4-acc/manual/manual_results.json", "detail": "鼠标 failed；宿主注入 passed"},
+        {"path": ".build/f1/logs/f1-261-less/manual/manual_results.json", "detail": "鼠标 failed；宿主注入 not_run"}
+      ]
+    },
+    {
+      "id": "O3",
+      "summary": "Frida Stalker 脚本卸载与会话分离挂起",
+      "detail": "device_connect、hook_message、hook_counts_open、hook_unload、stalker_follow_existing_thread 通过；stalker_unload 与 session_detach 20 秒内未返回；SpringBoard pid 未变；原因未查明",
+      "tracking": "单独跟踪；S11 记为 failed",
+      "applies_to": [
+        {"spec": "N:exp:frida", "steps": ["S11"]},
+        {"spec": "N:jb:frida", "steps": ["S11"]}
+      ],
+      "evidence": [
+        {"path": ".build/f1/logs/f1-2661-exp-frida/manual/s11/s11.json"},
+        {"path": ".build/f1/logs/f1-2661-jb-frida/manual/s11/s11.json"},
+        {"path": "research/probes/f1_frida_s11.py", "detail": "S11 探针脚本"}
+      ]
+    }
+  ],
+  "excluded_combinations": [
+    {
+      "combo_id": "L",
+      "variants": ["regular", "dev", "jb", "exp"],
+      "reason": "用户决定旧版本组合 L（18.6.2/22G100）暂不纳入，未下载 IPSW，全部步骤记为 not_run",
+      "evidence": [
+        {"path": "research/f1_e2e_matrix_plan_2026-09-17.md", "detail": "§9 用户决定"}
+      ]
+    }
+  ]
+}
