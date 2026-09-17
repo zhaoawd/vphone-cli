@@ -4,7 +4,7 @@
 
 状态：状态模型、检查点存储、续跑入口、只读状态视图、真实阶段执行器与验证器、无 VM 测试已实现。真实 VM 的中断恢复验收进行中：场景 1（restore 中断）已执行一次，续跑的 restore 本身完成，但阶段被验证器拒绝，暴露的缺陷与修复见“真实验收发现与修复（2026-09-17）”。修复后的构建尚未重新执行真实验收，D4 保持未完成。场景 1 完成后的 `--restart-from` 检查暴露了续跑产物校验、拒绝提示文本和启动进程路径匹配的缺陷，修复见“真实验收发现与修复：restart-from、拒绝提示与启动进程路径（2026-09-17）”，修复后的构建同样尚未重新执行真实验收。
 
-2026-09-17 更新：在 `8b6365f` 构建上完成真实验收场景 1 补充路径与场景 2–4，`--restart-from prepare` 重建已删除 restore 树、修改后的拒绝提示和含 `..` 的启动进程路径匹配均在实机确认，D4 完成。另记录 restore 桥接进程在 FCS 密钥请求失败后挂起的问题，不属于 D4 修改范围。见“真实验收记录：`8b6365f` 构建（2026-09-17）”。
+2026-09-17 更新：在 `8b6365f` 构建上完成真实验收场景 1 补充路径与场景 2–4，`--restart-from prepare` 重建已删除 restore 树、修改后的拒绝提示和含 `..` 的启动进程路径匹配均在实机确认，D4 完成。另记录 restore 桥接进程在 FCS 密钥请求失败后挂起的问题，同日在桥接脚本中修复并实机验收（见“问题：restore 桥接进程挂起”）。见“真实验收记录：`8b6365f` 构建（2026-09-17）”。
 
 ## 代码位置
 
@@ -409,6 +409,44 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 - 推断：设备端在等待密钥响应，因而停止读取 ASR 数据；requests 默认不重试，一次代理连接中断即导致挂起。原因中“代理连接中断的来源”未查明。
 - 影响：vm create 在 restore 阶段无限等待。恢复路径已由本轮场景 1 补充确认：终止主进程与子进程后续跑，restore 重新执行。
 - 可选方向（未实现、未验证）：桥接脚本对后台任务异常以非零退出；对 URL 资源请求增加超时与重试；vphone-cli 对 restore-update 增加无输出或总时长上限；主进程收到 SIGINT/SIGTERM 时回收子进程。
+
+#### 修复
+
+版本依据：`requirements.txt` 为 `pymobiledevice3>=9.5.0`；D2 锁文件 `dependencies/python-darwin-arm64-3.13.lock` 锁定 `pymobiledevice3==11.9.2`、`requests==2.34.2`。`~/.vphone/venv`（Python 3.13.13）与项目 `.venv`（Python 3.14.5）安装的均为 11.9.2。以下兼容性判断以 11.9.2 为准。
+
+改动（只涉及 `scripts/pymobiledevice3_bridge.py`，Swift 未改）：
+
+- URL 资源请求：`restore-update` 使用 `Restore` 的子类，覆盖 `send_url_asset`。回复内容照搬 11.9.2：`ResponseBody`、`ResponseBodyDone`、`ResponseHeaders`、`ResponseStatus`，`FMT_BINARY`，之后 `service.close()`；缓存命中逻辑不变。网络获取 `fetch_url_asset` 改为：超时 (连接 15 秒, 读取 60 秒)，最多 4 次尝试，间隔 2/4/8 秒。只对 `requests` 的 `ConnectionError`（含 `SSLError`、`ProxyError`）、`Timeout`、`ChunkedEncodingError` 与 HTTP 5xx 重试。其他异常立即抛出。异常类错误重试耗尽时抛出 `URLAssetFetchError`，不向设备回复；5xx 重试耗尽时与上游一致，将最后的响应转发给设备，但不写入缓存。任务被取消时通过 `threading.Event` 停止后续重试。
+- 结构检测：启动时检查 `Restore.send_url_asset` 存在、为协程、参数为 `(self, message)`，源码包含上述回复字段、`_get_service_for_data_request`、`_url_assets_cache`、`requests.get`、`service.close()`。任一不符时打印 `[!] warning: URLAsset retry disabled; …`，使用原 `Restore`。构造后检查 `_data_request_handlers["URLAsset"]` 是否指向子类方法，不符时警告。
+- 后台任务：`restore.update()` 以任务运行，每 0.5 秒检查 `Restore._tasks`。任一任务以非 `CancelledError` 异常结束时，取消 update 与其他未完成任务（各等待不超过 5 秒），打印 `[-] restore-update failed: background task '<名称>' raised <异常类型>: <内容>`，退出码 1。正常返回或被取消的任务不计为失败。`update()` 返回后不再检查任务，以避免设备重启时 FDR 连接断开被计为失败。`_tasks` 不是列表时打印警告并按原方式运行。
+- 故障注入（仅用于验收）：环境变量 `VPHONE_BRIDGE_FAULT_URL_ASSET=<N>` 使本进程前 N 次 URL 资源获取尝试在访问网络前抛出 `requests.exceptions.SSLError`；`always` 使每次尝试都失败；未设置或 `0` 时无行为变化；其他值退出码 2。启用时打印警告。
+
+测试：新增 `tests/test_pymobiledevice3_bridge.py`（27 项，不连设备）。其中 `test_background_task_failure_exits_nonzero_instead_of_hanging` 以子进程运行脚本入口并替换 Restore/usbmux/IPSW；修复前该测试在 45 秒超时处失败，修复后约 1 秒以非零退出。其余覆盖：暂态失败后重试成功并按原协议回复与关闭、重试耗尽、非暂态错误与 4xx 不重试、5xx 重试与不缓存、退避间隔、故障注入计数与取值解析、结构不符时退回并警告、锁定版本 `Restore` 通过结构检测、正常/取消任务不触发失败、update 返回后的任务失败不报告、子类 + 故障注入 + 监视的组合（N=1 完成，`always` 3 秒内失败）。`make test_python`：153 项通过。
+
+#### 实机验收（2026-09-17）
+
+实验设置：`.build/d4acc/src`（HEAD `8b6365f`）应用本修复的 bridge 改动后 `make build` 签名；`d4-acc`，regular 26.1 / 23B85，`--root-popup -v`。上一轮 CFW 以 root 运行后在应用包 `Contents/Resources/scripts/patchers/__pycache__` 留下 root 属主文件，`make build` 删除旧包失败；将旧包移至 `.build/d4acc/stale/` 后构建成功（见“其他发现”）。脚本 `.build/d4acc/s5-run.zsh`，证据 `.build/d4acc/logs/s5*`。
+
+| 步骤 | 时间（UTC） | 结果 |
+| --- | --- | --- |
+| `VPHONE_BRIDGE_FAULT_URL_ASSET=1`，`--restart-from prepare --keep-artifacts --accept-tool-change` | 12:29:38–12:34:12 | 启动时打印注入警告。URLAsset `https://wkms-public.apple.com/fcs-keys/…` 第 1 次为注入的 SSLError（12:31:09）；第 2 次为真实的经代理 `SSLEOFError UNEXPECTED_EOF_WHILE_READING`（12:31:13，非注入）；第 3 次成功，restore 继续并通过验证。全部阶段 succeeded，退出码 0 |
+| `VPHONE_BRIDGE_FAULT_URL_ASSET=always`，`--restart-from restore --keep-artifacts` | 12:34:12–12:34:58 | 4 次尝试（间隔 2/4/8 秒）后打印 `[-] restore-update failed: background task 'AsyncDataRequestMsg-URLAsset' raised URLAssetFetchError: … 4 attempts failed …`；vm create 输出 `Error: stage restore failed: restore-update failed (exit 1)`，退出码 1。检查点 restore 为 failed，整体 `failed`；无桥接或 DFU 残留进程，bundle 锁已释放（`s5b-status.json`、`s5b-ps.txt`） |
+| 不设变量续跑 | 12:35:00–12:38:27 | 从 restore 续跑；restore 12:35:04–12:36:56 succeeded，cfw、first_boot、verification succeeded，整体 `succeeded`，restore 树删除；无残留进程 |
+
+结论：真实 restore 中，URL 资源请求失败后的重试结果被设备接受并完成 restore；重试耗尽时 restore-update 在约 14 秒重试窗口后以非零退出，vm create 将 restore 记为 failed 并可续跑。第 2 次尝试出现的真实 SSL EOF 表明该代理路径上的连接中断会重复出现（事实）；中断来源仍未查明。
+
+未验证内容：
+
+- 单次尝试读取超时（60 秒）与总重试时长（最长约 4×75+14 秒）是否在设备端等待上限之内；本轮失败均为立即抛出的连接错误。
+- 本轮均使用 `-v`；默认输出级别下桥接警告与失败原因是否可见未确认。
+- FDR 等其他后台任务在 restore 期间以非 `ConnectionTerminatedError` 异常结束时现在会使 restore 失败；本轮三次 restore 未出现该情况。
+- 若运行环境只含 `.pyc` 而无源码，结构检测会退回原实现（有警告）。
+
+#### 其他发现：root CFW 安装在应用包内写入字节码缓存
+
+- 现象（事实）：`--root-popup` 的 CFW 安装后，`.build/d4acc/src/.build/vphone-cli.app/Contents/Resources/scripts/patchers/__pycache__/*.cpython-313.pyc` 属主为 root；随后以普通用户 `make build` 在删除旧应用包时报 `Directory not empty` 失败。`.build/d4acc/stale/vphone-cli.app-pycache-193301` 为较早一次同类残留。
+- 推断：root 身份的 Python 从应用包内导入 `patchers` 模块并写入 `__pycache__`；`scripts/build.sh` 打包时排除 `__pycache__`，但不阻止运行时写入。是否影响应用包签名校验未验证。
+- 未修复；可选方向：CFW 安装以 `PYTHONDONTWRITEBYTECODE=1` 运行 Python，或设置 `PYTHONPYCACHEPREFIX` 到应用包外。
 
 ### 仍未覆盖
 
