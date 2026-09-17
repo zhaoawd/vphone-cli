@@ -203,11 +203,17 @@ public final class VPhoneCreateCheckpointStore {
 
     // MARK: Bundle lock
 
+    /// How long production code waits for a stage's child to release the
+    /// bundle lock: checkpoint writes retry for this long, and the live
+    /// verifier polls for this long before it rejects a stage whose lock is
+    /// still held.
+    public static let bundleLockRetryTimeout: TimeInterval = 30
+
     /// Production bundle-lock acquisition for a checkpoint write. Retries
     /// briefly: a stage's child (DFU boot, CFW script) releases the lock when
     /// it exits, which can trail the parent's return by a moment.
     public static func acquireBundleLock(_ bundleURL: URL) throws -> AnyObject {
-        let deadline = Date().addingTimeInterval(30)
+        let deadline = Date().addingTimeInterval(bundleLockRetryTimeout)
         while true {
             do {
                 return try VPhoneVMLock(directory: bundleURL, operation: VPhoneVMOperation.createCheckpoint)

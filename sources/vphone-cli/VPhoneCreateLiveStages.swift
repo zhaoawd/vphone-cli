@@ -26,6 +26,12 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
     let orchestrator: VPhoneCreateOrchestrator
     let runtime: VPhoneCreateRuntime
     var lockHeld: (URL) -> Bool = { VPhoneVMLockProbe.isLockHeld(directory: $0) }
+    /// How long the verifier waits for a stage's children to release the
+    /// bundle lock before rejecting. A child releases the lock when it exits,
+    /// which can trail the executor's return (real run, 2026-09-17: a DFU
+    /// child killed after restore still held the lock when the verifier ran).
+    var lockReleaseTimeout: TimeInterval = VPhoneCreateCheckpointStore.bundleLockRetryTimeout
+    var lockPollInterval: TimeInterval = 0.1
 
     let version = "vm-create-live-verifier-1"
 
@@ -155,7 +161,7 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             guard evidence["restore_update_exit"] == "0", let ecid = evidence["ecid"] else {
                 return .rejected("no restore-update exit status")
             }
-            if lockHeld(bundleURL) { return .rejected("bundle lock still held after restore (DFU child alive)") }
+            if !waitForLockRelease(bundleURL) { return .rejected(lockStillHeld("after restore (DFU child alive)")) }
             guard let identity = try? orchestrator.loadDeviceIdentity(bundleURL: bundleURL, wait: 0),
                   "0x\(identity.ecid)" == ecid
             else { return .rejected("udid-prediction.txt does not match the restored ECID \(ecid)") }
@@ -171,7 +177,7 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
 
         case .cfw:
             guard evidence["cfw_install_exit"] == "0" else { return .rejected("no CFW install exit status") }
-            if lockHeld(bundleURL) { return .rejected("bundle lock still held after CFW install") }
+            if !waitForLockRelease(bundleURL) { return .rejected(lockStillHeld("after CFW install")) }
             guard let bundle = try? VPhoneBundle.load(at: bundleURL),
                   VPhoneRestoreInfo.load(fromBundle: bundle)?.variant == context.options.variant
             else { return .rejected("restore-info.json does not record variant \(context.options.variant)") }
@@ -182,7 +188,7 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
 
         case .firstBoot:
             guard evidence["boot_exit"] != nil else { return .rejected("no first-boot exit status") }
-            if lockHeld(bundleURL) { return .rejected("bundle lock still held after first boot") }
+            if !waitForLockRelease(bundleURL) { return .rejected(lockStillHeld("after first boot")) }
             let artifacts = Self.diskArtifacts(bundleURL, includeRestoreInfo: false)
             switch evidence["prompt"] {
             case "matched", "operator_confirmed":
@@ -200,7 +206,7 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
                 artifacts: [], evidence: [:])
 
         case .verification:
-            if lockHeld(bundleURL) { return .rejected("bundle lock still held after the verification boot") }
+            if !waitForLockRelease(bundleURL) { return .rejected(lockStillHeld("after the verification boot")) }
             let artifacts = Self.diskArtifacts(bundleURL, includeRestoreInfo: false)
             if context.options.variant == "less" {
                 guard evidence["less_boot_exit"] == "0" else { return .rejected("no less boot exit status") }
@@ -214,6 +220,25 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
     }
 
     // MARK: Helpers
+
+    /// Polls until no process holds the bundle lock. Returns false when the
+    /// lock is still held after `lockReleaseTimeout`; never waits longer.
+    func waitForLockRelease(_ bundleURL: URL) -> Bool {
+        let deadline = Date().addingTimeInterval(lockReleaseTimeout)
+        while lockHeld(bundleURL) {
+            guard Date() < deadline else { return false }
+            Thread.sleep(forTimeInterval: lockPollInterval)
+        }
+        return true
+    }
+
+    func lockStillHeld(_ when: String) -> String {
+        "bundle lock still held \(Self.seconds(lockReleaseTimeout)) \(when)"
+    }
+
+    static func seconds(_ interval: TimeInterval) -> String {
+        interval >= 1 ? "\(Int(interval))s" : String(format: "%.2fs", interval)
+    }
 
     static func restoreTree(_ bundleURL: URL) -> URL? {
         let names = ((try? FileManager.default.contentsOfDirectory(atPath: bundleURL.path)) ?? [])

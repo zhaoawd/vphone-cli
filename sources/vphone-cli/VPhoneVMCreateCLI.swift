@@ -110,9 +110,16 @@ struct VPhoneCreateStatusReport: Encodable {
         var firmwareTransaction: VPhoneCreateRecoveryRequirement?
     }
 
+    /// Status shown by this view: `running` while a create/resume run holds
+    /// the checkpoint's run lock, otherwise the checkpoint's derived status.
+    /// Only the view says `running`; resume decides from `checkpointOverallStatus`.
+    static let runningStatus = "running"
+
     var bundle: String
     var checkpointError: String?
-    var overallStatus: VPhoneCreateOverallStatus?
+    var overallStatus: String?
+    /// Status derived from the stored stages alone (a live run shows `interrupted`).
+    var checkpointOverallStatus: VPhoneCreateOverallStatus?
     var nextStage: VPhoneCreateStage?
     var live: Live
     var checkpoint: VPhoneCreateCheckpoint?
@@ -124,11 +131,15 @@ struct VPhoneCreateStatusReport: Encodable {
             firmwareTransaction: VPhoneCreateRunner.firmwareTransactionRequirement(bundleURL: bundleURL))
         do {
             let checkpoint = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint
+            let derived = checkpoint.overallStatus
             return .init(
-                bundle: bundleURL.path, checkpointError: nil, overallStatus: checkpoint.overallStatus,
-                nextStage: checkpoint.nextStage, live: live, checkpoint: checkpoint)
+                bundle: bundleURL.path, checkpointError: nil,
+                overallStatus: live.createRunInProgress ? runningStatus : derived.rawValue,
+                checkpointOverallStatus: derived, nextStage: checkpoint.nextStage, live: live, checkpoint: checkpoint)
         } catch {
-            return .init(bundle: bundleURL.path, checkpointError: "\(error)", overallStatus: nil, nextStage: nil, live: live, checkpoint: nil)
+            return .init(
+                bundle: bundleURL.path, checkpointError: "\(error)", overallStatus: nil, checkpointOverallStatus: nil,
+                nextStage: nil, live: live, checkpoint: nil)
         }
     }
 
@@ -136,7 +147,12 @@ struct VPhoneCreateStatusReport: Encodable {
         var lines = ["bundle:   \(bundle)"]
         if let checkpointError { lines.append("checkpoint: \(checkpointError)") }
         if let checkpoint {
-            lines.append("overall:  \(checkpoint.overallStatus.rawValue)" + (live.createRunInProgress ? " (a create/resume run holds the checkpoint now)" : ""))
+            if live.createRunInProgress {
+                lines.append("overall:  \(Self.runningStatus) (a create/resume run holds the checkpoint; "
+                    + "stored stages alone read \(checkpoint.overallStatus.rawValue))")
+            } else {
+                lines.append("overall:  \(checkpoint.overallStatus.rawValue)")
+            }
             lines.append("variant:  \(checkpoint.effectiveOptions.variant)")
             lines.append("creation: \(checkpoint.creationId)  attempt: \(checkpoint.attemptId)  attempts: \(checkpoint.attempts.count)")
             for record in checkpoint.stages {

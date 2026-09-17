@@ -877,6 +877,31 @@ private let allStages = VPhoneCreateStage.allCases
         #expect(f.fake.executed.first == .restore)
     }
 
+    /// The runtime record is diagnostic (see `VPhoneVMRuntimeState`): no lock
+    /// holder deletes it on release, and readers check the kernel lock and pid
+    /// liveness. Checkpoint writes follow the same rule; what must not remain is
+    /// the lock itself, on the success path and on a failed write alike.
+    @Test func checkpointWritesReleaseTheBundleLockAndLeaveOnlyADiagnosticRecord() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        try f.create(f.runner(), variant: "regular")
+        #expect(VPhoneVMRuntimeState.read(in: f.bundle)?.operation == VPhoneVMOperation.createCheckpoint)
+        #expect(!VPhoneVMLockProbe.isLockHeld(directory: f.bundle))
+
+        let g = try Fixture(); defer { g.cleanup() }
+        g.fake.setFault(.restore, .afterExecution)
+        let inject: (VPhoneCreateCheckpointStore.WriteStep, VPhoneCreateCheckpoint) throws -> Void = { step, checkpoint in
+            if step == .rename, checkpoint.record(.restore).status == .failed { throw InjectedWriteFailure() }
+        }
+        #expect(throws: VPhoneCreateRunError.self) { try g.create(g.runner(inject: inject)) }
+        #expect(VPhoneVMRuntimeState.read(in: g.bundle)?.operation == VPhoneVMOperation.createCheckpoint)
+        #expect(!VPhoneVMLockProbe.isLockHeld(directory: g.bundle))
+
+        // The leftover record does not block the next holder, which replaces it.
+        let vm = try VPhoneVMLock(directory: g.bundle, operation: VPhoneVMOperation.boot)
+        #expect(VPhoneVMRuntimeState.read(in: g.bundle)?.operation == VPhoneVMOperation.boot)
+        withExtendedLifetime(vm) {}
+    }
+
     @Test func missingCheckpointIsNotResumable() throws {
         let f = try Fixture(); defer { f.cleanup() }
         #expect(throws: VPhoneCreateCheckpointError.self) { try f.runner().resume(bundleURL: f.bundle) }

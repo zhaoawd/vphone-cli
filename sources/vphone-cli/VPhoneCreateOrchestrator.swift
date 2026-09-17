@@ -29,6 +29,7 @@ enum VPhoneCreateError: Error, CustomStringConvertible {
     case bootAnalysisTimeout
     case lessBootFailed(Int32)
     case alreadyExistsWithCheckpoint(String)
+    case childDidNotExit(label: String, timeout: TimeInterval)
 
     var description: String {
         switch self {
@@ -76,6 +77,9 @@ enum VPhoneCreateError: Error, CustomStringConvertible {
         case let .alreadyExistsWithCheckpoint(name):
             "VM '\(name)' already exists and has a create checkpoint; inspect it with "
                 + "`vphone-cli vm create-status \(name)` and continue with `vphone-cli vm create --resume \(name)`"
+        case let .childDidNotExit(label, timeout):
+            "\(label) did not exit within \(VPhoneCreateLiveStages.seconds(timeout)) after it was stopped; "
+                + "it may still hold the bundle lock or the device"
         }
     }
 }
@@ -337,20 +341,78 @@ public struct VPhoneCreateOrchestrator {
     }
 
     static func printRecoveryHint(name: String, bundleURL: URL, error: Error) {
-        guard let checkpoint = try? VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint else { return }
-        print("\n[-] vm create stopped (overall: \(checkpoint.overallStatus.rawValue)); recovery inputs are kept.")
+        let lines = recoveryHintLines(
+            name: name, bundleURL: bundleURL, error: error,
+            holder: { VPhoneVMRuntimeState.read(in: $0).flatMap { record in
+                guard let identity = VPhoneProcessInfo.identity(of: record.pid), !identity.isZombie else { return nil }
+                return "pid \(record.pid) running operation \"\(record.operation)\""
+            } })
+        guard !lines.isEmpty else { return }
+        print("\n" + lines.joined(separator: "\n"))
+        // stdout is buffered when redirected; flush so the hint precedes the
+        // `Error:` line ArgumentParser writes to stderr afterwards.
+        fflush(stdout)
+    }
+
+    /// The hint printed after a failed create or resume.
+    ///
+    /// A refusal because the bundle or the checkpoint is in use leads with the
+    /// stop/wait guidance: resuming again before the holder exits is refused
+    /// the same way. Such refusals write nothing, so the checkpoint's derived
+    /// status is reported as unchanged rather than as `recovery_required`.
+    /// `holder` describes the live holder of the bundle lock from the runtime
+    /// record (nil when the record is absent or names an exited pid).
+    static func recoveryHintLines(
+        name: String, bundleURL: URL, error: Error, holder: (URL) -> String? = { _ in nil }
+    ) -> [String] {
+        let checkpoint = try? VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint
+        let inspect = "    Inspect: vphone-cli vm create-status \(name)"
+        let resume = "    Resume:  vphone-cli vm create --resume \(name)"
+        let unchanged = checkpoint.map { "the checkpoint was not changed (overall: \($0.overallStatus.rawValue))" }
+            ?? "the checkpoint was not changed"
+        switch error {
+        case VPhoneCreateRunError.bundleBusy:
+            var lines = ["[-] vm create --resume refused: the bundle is in use; \(unchanged)."]
+            if let holder = holder(bundleURL) { lines.append("    holder (runtime record): \(holder)") }
+            lines += [
+                "    action: wait for the interrupted run's children (fw prepare, DFU/restore, CFW or boot) to exit, "
+                    + "or stop the VM (`vphone-cli vm stop \(name)`)",
+                "    then check that `vphone-cli vm create-status \(name) --json` reports live.bundle_lock_held = false,",
+                "    and resume: vphone-cli vm create --resume \(name)",
+            ]
+            return lines
+        case VPhoneCreateRunError.runInProgress:
+            return [
+                "[-] vm create --resume refused: another vm create or resume of \(name) is running; \(unchanged).",
+                "    action: wait for that run to exit (`vphone-cli vm create-status \(name)` reports overall: running while it holds the checkpoint)",
+                "    and resume only if it stopped before completing: vphone-cli vm create --resume \(name)",
+            ]
+        case let VPhoneCreateRunError.recoveryRequired(requirement):
+            // Thrown before any write, so the requirement is not in the checkpoint.
+            return [
+                "[-] vm create --resume refused: recovery required (\(requirement.kind)"
+                    + (requirement.stage.map { ", stage \($0.rawValue)" } ?? "") + "); \(unchanged).",
+                "    detail: \(requirement.detail)",
+                "    action: \(requirement.action)",
+                inspect, resume,
+            ]
+        default:
+            break
+        }
+        guard let checkpoint else { return [] }
+        var lines = ["[-] vm create stopped (overall: \(checkpoint.overallStatus.rawValue)); recovery inputs are kept."]
         if let requirement = checkpoint.recoveryRequired {
-            print("    recovery required: \(requirement.detail)")
-            print("    action: \(requirement.action)")
+            lines.append("    recovery required: \(requirement.detail)")
+            lines.append("    action: \(requirement.action)")
         }
         switch error {
         case VPhoneCreateRunError.artifactChanged, VPhoneCreateRunError.artifactUnavailable:
-            print("    Recorded inputs changed or were removed. Restart from the stage that produces them "
+            lines.append("    Recorded inputs changed or were removed. Restart from the stage that produces them "
                 + "(vphone-cli vm create --resume \(name) --restart-from prepare), or delete the VM and create it again.")
         default:
-            print("    Inspect: vphone-cli vm create-status \(name)")
-            print("    Resume:  vphone-cli vm create --resume \(name)")
+            lines += [inspect, resume]
         }
+        return lines
     }
 
     // MARK: - trace
@@ -512,6 +574,57 @@ public struct VPhoneCreateOrchestrator {
         return records.count
     }
 
+    // MARK: - managed children
+
+    /// Upper bound on waiting for a stopped stage child to exit.
+    static let childExitTimeout: TimeInterval = 60
+
+    /// Runs `body`, then stops the stage's child and waits until it has exited,
+    /// on the success and the error path alike, so the stage's verifier never
+    /// runs while the child still holds the bundle lock or the device.
+    ///
+    /// The wait is bounded by `timeout`. After a successful body a child that
+    /// does not exit fails the stage with `childDidNotExit`; after a failed
+    /// body the original error is kept and the stuck child is only reported.
+    static func withStoppedChild<T>(
+        _ label: String, timeout: TimeInterval = childExitTimeout,
+        stop: () -> Void, awaitExit: (TimeInterval) -> Bool, _ body: () throws -> T
+    ) throws -> T {
+        let result: T
+        do {
+            result = try body()
+        } catch {
+            stop()
+            if !awaitExit(timeout) {
+                print("[!] \(label) did not exit within \(VPhoneCreateLiveStages.seconds(timeout)) after it was stopped.")
+            }
+            throw error
+        }
+        stop()
+        guard awaitExit(timeout) else { throw VPhoneCreateError.childDidNotExit(label: label, timeout: timeout) }
+        return result
+    }
+
+    static func withStoppedChild<T>(
+        _ child: VPhoneManagedProcess, _ label: String, timeout: TimeInterval = childExitTimeout, _ body: () throws -> T
+    ) throws -> T {
+        try withStoppedChild(
+            label, timeout: timeout, stop: { child.terminate() }, awaitExit: { awaitExit(child, timeout: $0) }, body)
+    }
+
+    /// Bounded wait for a managed child to exit. `VPhoneManagedProcess` only
+    /// offers an unbounded `waitUntilExit`; a never-matching pattern turns
+    /// `waitForOutput` into a short poll that reports `.exited` once it has.
+    static func awaitExit(_ child: VPhoneManagedProcess, timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            if case .exited = child.waitForOutput(matching: "[^\\s\\S]", timeout: min(0.25, max(timeout, 0))) {
+                return true
+            }
+        } while Date() < deadline
+        return false
+    }
+
     // MARK: - restore phase
 
     /// Returns the evidence the restore verifier checks.
@@ -524,7 +637,14 @@ public struct VPhoneCreateOrchestrator {
         let dfu = VPhoneManagedProcess(
             selfExecutable, ["--config", configURL.path, "--dfu"], cwd: bundleURL, echo: false)
         try dfu.start()
-        defer { dfu.terminate() }
+        return try Self.withStoppedChild(dfu, "DFU boot process") {
+            try restoreWithDFU(dfu, bundleURL: bundleURL, verbosity: v)
+        }
+    }
+
+    private func restoreWithDFU(
+        _ dfu: VPhoneManagedProcess, bundleURL: URL, verbosity v: VPhoneVerbosity
+    ) throws -> [String: String] {
         guard case .matched = dfu.waitForOutput(matching: "VM lock acquired", timeout: 30) else {
             throw VPhoneCreateError.bootLockNotAcquired
         }
@@ -568,7 +688,7 @@ public struct VPhoneCreateOrchestrator {
         case .timedOut:
             print("[*] No panic marker observed in 30s; stopping DFU anyway.")
         }
-        // `defer` above terminates the DFU process on every exit path.
+        // runRestorePhase stops the DFU process and waits for it to exit on every path.
         return [
             "udid": udid, "ecid": "0x\(ecid)", "restore_get_shsh_exit": "0", "restore_update_exit": "0",
             "post_restore_dfu_outcome": "\(dfuOutcome)",
@@ -731,8 +851,14 @@ public struct VPhoneCreateOrchestrator {
         trace("spawn \(selfExecutable.path) \(args.joined(separator: " ")) (guest serial: off)", v)
         let boot = VPhoneManagedProcess(selfExecutable, args, cwd: bundleURL, echo: false)
         try boot.start()
-        defer { boot.terminate() }
+        return try Self.withStoppedChild(boot, "first-boot VM process") {
+            try firstBootSession(boot, interactive: interactive, verbosity: v)
+        }
+    }
 
+    private func firstBootSession(
+        _ boot: VPhoneManagedProcess, interactive: Bool, verbosity v: VPhoneVerbosity
+    ) throws -> [String: String] {
         var prompt = "operator_confirmed"
         if interactive {
             print("[*] Press Enter once the VM is fully booted")
@@ -774,8 +900,12 @@ public struct VPhoneCreateOrchestrator {
         let vm = VPhoneManagedProcess(
             selfExecutable, ["--config", configURL.path, "--headless"], cwd: bundleURL, echo: false)
         try vm.start()
-        defer { vm.terminate() }
+        try Self.withStoppedChild(vm, "boot-analysis VM process") {
+            try analyzeBoot(vm, verbosity: v)
+        }
+    }
 
+    private func analyzeBoot(_ vm: VPhoneManagedProcess, verbosity v: VPhoneVerbosity) throws {
         let outcome = vm.waitForOutput(matching: VPhoneBootPatterns.panicOrPromptRegex, timeout: 300)
         trace("boot-analysis managed-process outcome: \(outcome)", v)
         switch outcome {

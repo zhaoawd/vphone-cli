@@ -2,7 +2,7 @@
 
 日期：2026-09-17。基线：`61eebdb`。设计输入：[C5/D4 字段与测试草案](c5_d4_fields_and_tests_2026-09-14.md)。
 
-状态：状态模型、检查点存储、续跑入口、只读状态视图、真实阶段执行器与验证器、无 VM 测试已实现。真实 VM 的中断恢复验收未执行，D4 验收条件中的“真实 restore 中断后重新探测状态”未取得实机证据，D4 保持未完成。本轮未启动、恢复、挂载或安装任何 VM，未使用 sudo，未访问仓库中的 VM 目录。
+状态：状态模型、检查点存储、续跑入口、只读状态视图、真实阶段执行器与验证器、无 VM 测试已实现。真实 VM 的中断恢复验收进行中：场景 1（restore 中断）已执行一次，续跑的 restore 本身完成，但阶段被验证器拒绝，暴露的缺陷与修复见“真实验收发现与修复（2026-09-17）”。修复后的构建尚未重新执行真实验收，D4 保持未完成。
 
 ## 代码位置
 
@@ -88,7 +88,8 @@ JSON 使用 snake_case 字段名、ISO 8601 时间、排序键。
 ## 写入与锁
 
 - 运行锁：对 `.create-checkpoint` 目录 inode 加非阻塞 flock，在整个 create/resume 过程中持有。第二个调用取锁失败后返回 `runInProgress`，不写入。
-- 实例锁：每次写检查点时取 bundle 目录锁（操作名 `create-checkpoint`），写完释放。不能在整个创建过程中持有该锁，因为 fw prepare（`vm_lock.py`）、fw patch、DFU 启动、CFW 脚本和启动子进程各自取同一把锁。生产实现对该锁最多重试 30 秒，用于子进程退出与锁释放之间的间隔；测试注入不重试的实现。
+- 实例锁：每次写检查点时取 bundle 目录锁（操作名 `create-checkpoint`），写完释放。不能在整个创建过程中持有该锁，因为 fw prepare（`vm_lock.py`）、fw patch、DFU 启动、CFW 脚本和启动子进程各自取同一把锁。生产实现对该锁最多重试 `VPhoneCreateCheckpointStore.bundleLockRetryTimeout`（30 秒），用于子进程退出与锁释放之间的间隔；测试注入不重试的实现。
+- 运行记录：取实例锁时 `VPhoneVMLock` 写入 `<bundle>/.vphone-runtime.json`（本操作为 `create-checkpoint`）。释放锁时不删除该文件，与其他操作相同，见“真实验收发现与修复”中的缺陷 2。
 - `create-checkpoint` 操作在存在 `.firmware-transaction` 时仍可取锁，使 patch 失败且事务未恢复时仍能写入 `failed` 与 `recovery_required`。其他操作的行为不变。
 - 单次写入：`O_EXCL` 临时文件 → write → fsync → rename → fsync 目录。临时文件在任何失败路径上删除。文件持久化不代表整个 VM 创建具有原子性。
 - 写入失败时 runner 停止，不继续执行后续阶段。记录失败结果的写入也失败时，错误同时包含写入错误和原始阶段错误；磁盘上的该阶段保持 `running`，续跑按中断处理。
@@ -113,11 +114,11 @@ JSON 使用 snake_case 字段名、ISO 8601 时间、排序键。
 | --- | --- | --- | --- | --- |
 | prepare | 从 Virtualization.framework 重新复制 AVPBooter，然后运行 fw prepare | 仅有一个 `iPhone*_Restore`；两个 BuildManifest 可读出版本与构建号 | restore_tree、avpbooter | restore_tree、avpbooter |
 | patch | 进程内 FirmwarePipeline；记录新增的 `.firmware-history` 条目 | 无 `.firmware-transaction`；恰有一个新增归档；其 journal `phase = committed` 且 `options.variant` 与当前 variant 相同 | restore_tree、avpbooter | 无 |
-| restore | DFU、SHSH、restore-update（原逻辑） | 无进程持有 bundle 锁；udid-prediction 的 ECID 与证据一致；config.plist 有 machineIdentifier；恢复版本可读取 | disk_image、restore_info、config | disk_image、config、restore_info |
-| cfw | 等待 5 秒后运行 host-mount 安装并记录 variant | 无进程持有 bundle 锁；restore-info.json 的 variant 与当前 variant 相同；无 `.cfw_mount.*` 残留 | disk_image、restore_info | disk_image、restore_info |
-| first_boot | 原首次启动与命令注入 | 有启动退出码；无进程持有 bundle 锁；提示符匹配或操作员确认为 verified；60 秒未见提示符为 unverified | disk_image | disk_image |
+| restore | DFU、SHSH、restore-update（原逻辑）；返回前停止 DFU 子进程并等待其退出（最多 60 秒） | 最多等待 30 秒后无进程持有 bundle 锁；udid-prediction 的 ECID 与证据一致；config.plist 有 machineIdentifier；恢复版本可读取 | disk_image、restore_info、config | disk_image、config、restore_info |
+| cfw | 等待 5 秒后运行 host-mount 安装并记录 variant | 最多等待 30 秒后无进程持有 bundle 锁；restore-info.json 的 variant 与当前 variant 相同；无 `.cfw_mount.*` 残留 | disk_image、restore_info | disk_image、restore_info |
+| first_boot | 原首次启动与命令注入；返回前停止启动子进程并等待其退出（最多 60 秒） | 有启动退出码；最多等待 30 秒后无进程持有 bundle 锁；提示符匹配或操作员确认为 verified；60 秒未见提示符为 unverified | disk_image | disk_image |
 | jb_finalize | 打印提示（原逻辑） | 始终 unverified：主机侧没有读取 `/var/log/vphone_jb_setup.log` 的证据收集器 | 无 | 无 |
-| verification | 非 less：启动分析；less：前台启动 | 非 less：检测到提示符为 verified；less：unverified，退出码不能证明启动成功 | disk_image | disk_image |
+| verification | 非 less：启动分析，返回前停止启动子进程并等待其退出（最多 60 秒）；less：前台启动 | 最多等待 30 秒后无进程持有 bundle 锁；非 less：检测到提示符为 verified；less：unverified，退出码不能证明启动成功 | disk_image | disk_image |
 
 探测器（`VPhoneCreateLiveProber`）的输入均可注入：
 
@@ -141,7 +142,8 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 - 续跑时未传入的选项沿用检查点；标志类选项只在传入时参与比较。`--restart-from`、`--accept-tool-change` 只能与 `--resume` 一起使用。
 - 同名目录已存在且含 `.create-checkpoint` 时，新建报错并给出 `create-status` 与 `--resume` 命令；无检查点时保持原 `already exists` 错误。
 - 续跑或新建失败时打印整体状态、`recovery_required` 内容和下一步命令；产物变化类错误提示从 prepare 重启或删除后重建。
-- `create-status` 不取锁、不写文件。文本输出列出各阶段状态、原因、错误、历史条数、已删除产物、恢复要求、下一阶段，以及 bundle 锁、运行锁、C4 事务的实时状态。`--json` 输出 `bundle`、`checkpoint_error`、`overall_status`、`next_stage`、`live`、`checkpoint`。检查点缺失或无效时退出码为 2。
+- `create-status` 不取锁、不写文件。文本输出列出各阶段状态、原因、错误、历史条数、已删除产物、恢复要求、下一阶段，以及 bundle 锁、运行锁、C4 事务的实时状态。`--json` 输出 `bundle`、`checkpoint_error`、`overall_status`、`checkpoint_overall_status`、`next_stage`、`live`、`checkpoint`。运行锁被持有时 `overall_status` 为 `running`，否则等于 `checkpoint_overall_status`；`checkpoint_overall_status` 只由阶段记录推导，续跑使用同一推导。检查点缺失或无效时退出码为 2。
+- 续跑因 bundle 锁被占用（`bundleBusy`）、运行锁被占用（`runInProgress`）或未写入的 `recovery_required`（C4 事务、实时状态探测）被拒绝时，提示首行说明拒绝原因和“检查点未改变”及其推导状态，随后是停止或等待的操作说明，最后才是续跑命令。
 
 ## 新建流程的行为变化
 
@@ -169,6 +171,7 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 | 恢复输入保留 | `recoveryInputsAreKeptUntilRetainingStagesFinish`、`keepArtifactsSkipsRemoval`、`removableArtifactsFollowSynthesizedStageStates` | first_boot 失败后 restore_tree 保留且记录可用；续跑完成后删除并记录重建命令；合成状态中 first_boot/verification 未完成时不可删除，jb_finalize 不阻止删除 |
 | 写入失败注入 | `writeFailureBeforeStageStopsWithoutExecuting`（writeTemporary、syncFile、rename、syncDirectory 共 4 例）、`failureRecordWriteErrorKeepsOriginalError` | 执行器不运行；syncDirectory 失败时 running 已落盘，其余为 pending；无临时文件残留；失败记录写入失败时保留原始错误，续跑先探测 |
 | 其他 | `freshCreateRecordsEveryStageAndOverallStatus`、`unverifiedStageNeverReportsOverallSuccess`、`optionChangeAffectingCompletedStageIsRefused`、`variantChangeBeforePatchRecomputesApplicability`、`toolChangeRequiresExplicitAcceptance`、`credentialsInSourcesAreNotStoredAndMustBeResupplied`、`sourceRecordRedactsOnlyURLSecrets`、`restartAfterNextUnfinishedStageIsRejected` | 整体状态推导、完成后续跑不写入、选项/工具变化规则、来源脱敏 |
+| 真实验收缺陷回归（2026-09-17） | `CreateLiveStagesTests`：`verifierAcceptsWhenTheLockIsReleasedWithinTheBound`、`verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased`、`verifierWaitsForARealBundleLockHolderToRelease`、`stageReturnsOnlyAfterItsChildExited`、`stuckChildFailsTheStageAfterTheBound`、`realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns`、`statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock`、`busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint`、`unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst`；`CreateCheckpointTests.checkpointWritesReleaseTheBundleLockAndLeaveOnlyADiagnosticRecord` | 锁在界限内释放时验证通过，始终不释放时在注入的 0.3 秒界限后拒绝（restore、cfw、first_boot、verification）；真实 flock 持有者延迟释放后验证通过；子进程等待使用伪子进程（延迟退出、永不退出、阶段本身抛错）和真实 python3 锁持有进程（SIGINT 后 0.5 秒退出），阶段返回时锁已释放；另一进程持有运行锁时状态视图为 `running`，释放后为推导状态；bundle 锁被占用时续跑抛出 `bundleBusy`、检查点字节不变、提示中操作说明先于续跑命令；检查点写入成功和写入失败后 bundle 锁均已释放，运行记录保留 |
 | 真实验证器与状态视图 | `CreateLiveStagesTests`：jb_finalize、first_boot、less verification、patch 事务、prepare 目录、重写声明、状态视图 | jb_finalize 不因提示输出变为 verified；patch 仅接受一个已提交且 variant 一致的归档；状态视图只读 |
 
 测试结果见下文“验证记录”。
@@ -182,7 +185,16 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 | `swift test --disable-sandbox --filter CreateLiveStagesTests` | 13 个测试函数、13 个用例通过 |
 | `make test_swift`（`python3 scripts/run_tests.py swift`，跳过 `FirmwareIntegrationTests`） | 退出码 0；Swift Testing 390 个测试、55 个 suite 通过；XCTest 143 项、3 项跳过、0 失败 |
 
-新增测试合计 53 个测试函数、96 个用例。本轮 `make test_swift` 未出现 ResourcesTests 的 `VPHONE_ROOT` 并行竞争失败。`make test_python` 未运行。
+新增测试合计 53 个测试函数、96 个用例。
+
+2026-09-17 真实验收缺陷修复后（工作树 `codex/autophone-location-multivm-integration`，HEAD `ec9a20f` 加未提交修改）：
+
+| 命令 | 结果 |
+| --- | --- |
+| `swift build --disable-sandbox --product vphone-cli`、`swift build --disable-sandbox --build-tests` | 构建完成；修改文件无编译警告 |
+| `swift test --disable-sandbox --filter CreateCheckpointTests` | 41 个测试函数通过 |
+| `swift test --disable-sandbox --filter CreateLiveStagesTests` | 22 个测试函数通过 |
+| `make test_swift` | 退出码 2。XCTest 143 项、3 项跳过、0 失败；Swift Testing 452 个测试、63 个 suite，1 个失败：`DoctorCLITests.reportExitCodeFollowsWorstFindingAndCommandParses`（`DoctorCLITests.swift:100`，期望 `pythonRuntime` 错误项）。该测试属于同一工作树中并行开发、尚未提交的 D5 诊断命令，本轮未修改其文件；该失败与本轮修改的关系未查明，D4 相关 suite 全部通过 |本轮 `make test_swift` 未出现 ResourcesTests 的 `VPHONE_ROOT` 并行竞争失败。`make test_python` 未运行。
 
 ## 限制与待验证假设
 
@@ -190,11 +202,64 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 - 身份比较使用 bundle 路径的规范化字符串；用不同拼写（例如经符号链接）指定同一库根会被判为路径不一致（事实）。
 - `stage_contract_version` 需要在阶段输出契约变化时人工递增；未递增时，工具摘要检查是唯一的防护，且可被 `--accept-tool-change` 放行（事实）。
 - less 创建整体以 root 运行，检查点文件属主为 root，续跑也需要 root（推断，未实测）。
-- 生产锁重试 30 秒足以覆盖 DFU/CFW 子进程退出后的锁释放间隔（待验证假设）。
+- 生产锁重试 30 秒、验证器等待 30 秒、执行器等待子进程退出 60 秒足以覆盖 DFU/CFW/启动子进程退出与锁释放之间的间隔（待验证假设；2026-09-17 实机中锁在验证器拒绝后数秒内释放，具体间隔未测量）。
+- 子进程超过 60 秒未退出时，阶段以 `childDidNotExit` 失败；记录失败结果的写入需要 bundle 锁，若该子进程仍持有锁，写入在 30 秒后失败，磁盘上该阶段保持 `running`，续跑按中断处理并探测（设计结果，未实测）。
 - 真实探测器通过命令行文本识别 restore 桥接进程；如果桥接进程命令行不包含 `--ecid 0x<ECID>`，该项探测会漏报（待验证假设；当前执行器传入该参数）。
 - `recovery-probe` 无应答被解释为设备端点不存在；探测超时 2 秒是否足以区分（待验证假设）。
 - 首次启动 60 秒未检测到提示符时继续执行的原逻辑保留，结果记为 unverified；这种情况下 first_boot 仍计为完成并允许清理 restore_tree（设计决定）。
 - jb_finalize 没有证据收集器，jb/exp 创建整体状态不会为 `succeeded`。要改为 verified，需要在 verification 启动中通过 vphoned 读取 `/var/log/vphone_jb_setup.log` 或终态标记（未实现）。
+
+## 真实验收发现与修复（2026-09-17）
+
+### 实验设置
+
+- 构建：`make build` 签名的应用，库根 `.build/d4acc/lib`，VM 名称 `d4-acc`。证据目录 `.build/d4acc/logs`。
+- 命令：`vm create d4-acc -V regular -l .build/d4acc/lib --root-popup -v`；restore-update 期间向主进程发送 SIGKILL（`s1-kill.time`：09:53:04Z，pid 95712）；子进程在 2 秒内自行退出（`s1-status-after-kill.json`：`live.bundle_lock_held = false`，restore 为 `running`，整体 `interrupted`）。
+- 随后手动启动 DFU（`s1-manual-dfu.pid`，日志首行 `VM lock acquired`），在其持有 bundle 锁时执行续跑（`s1-resume-busy.log`）；之后执行 `vm create --resume d4-acc`（`s1-resume.log`）。
+
+### 结果
+
+- 续跑前检查通过，新尝试从 restore 开始；DFU 启动、SHSH、restore-update 完成，`restore-info.json` 写入正确。
+- 输出 `[+] Panic marker observed; stopping DFU now.` 之后，阶段以 `verifier rejected: bundle lock still held after restore (DFU child alive)` 失败；失败记录中探测器同样观察到锁被持有，写入 `recovery_required (live_state, stage restore)`（`s1-final.json`，整体 `recovery_required`）。数秒后没有进程持有该锁。
+- 进程退出后 `<bundle>/.vphone-runtime.json` 仍存在，内容为 `"operation": "create-checkpoint"` 与已退出的续跑进程 pid 98556。
+- 运行锁被持有期间（`s1-poll.json` 取自首次 create 运行中，`s1-resume-early.json` 取自 09:54Z 前后的续跑运行中，均为 `live.create_run_in_progress = true`），`create-status --json` 的 `overall_status` 为 `interrupted`。
+- 手动 DFU 持有锁时的续跑输出 `Error: bundle is busy ... stop it first`，提示为通用的 `Inspect`/`Resume` 两行，整体状态 `interrupted`。
+
+### 缺陷 1：验证器与子进程退出竞争
+
+- 原因：`runRestorePhase` 以 `defer { dfu.terminate() }` 停止 DFU 子进程。`VPhoneManagedProcess.terminate()` 发送 SIGINT，最多等待 2 秒，仍在运行时发送 SIGKILL 后立即返回，不等待进程退出。runner 随后立即调用验证器，`case .restore` 中 `lockHeld(bundleURL)` 只检查一次。`runFirstBoot`（出错路径）与 `runBootAnalysis`（成功与出错路径）使用相同的 `defer` 模式；`cfw`、`first_boot`、`verification` 的验证器使用相同的单次检查。
+- 推断（未直接观测）：本次 DFU 子进程在 2 秒内未响应 SIGINT，`terminate()` 走 SIGKILL 分支返回，进程终止与文件描述符关闭晚于验证器的检查。日志中两行输出之间没有时间戳，无法确认走的是哪个分支。
+- 修复：
+  - 执行器：新增 `VPhoneCreateOrchestrator.withStoppedChild`。阶段主体结束后（成功或抛错）停止子进程，并以 `awaitExit` 等待其退出，最多 `childExitTimeout`（60 秒）。成功路径超时抛出 `VPhoneCreateError.childDidNotExit`，阶段记为 failed；出错路径保留原错误并打印子进程未退出的警告。`VPhoneManagedProcess` 只提供无界的 `waitUntilExit`，`awaitExit` 以不匹配任何文本的模式调用 `waitForOutput`（每次 0.25 秒）轮询 `.exited`。restore（DFU）、first_boot（启动进程）、verification 的启动分析均改用该函数。
+  - 验证器：`VPhoneCreateLiveStages.waitForLockRelease` 以 0.1 秒间隔轮询 bundle 锁，最多 `lockReleaseTimeout`，默认值为检查点写入使用的 `VPhoneCreateCheckpointStore.bundleLockRetryTimeout`（30 秒）；超时后拒绝，原因包含等待时长。restore、cfw、first_boot、verification 均使用。持续被持有的锁仍产生拒绝，等待有上限。
+- 影响：正常路径中子进程退出后才进入验证；一个在 SIGKILL 后仍不退出的子进程最多使阶段额外耗时 60 秒（执行器）或 30 秒（验证器）后失败。
+
+### 缺陷 2：运行记录残留
+
+- 调查结果：`.vphone-runtime.json` 按设计不在释放锁时删除，不作为占用证据。证据：
+  - `VPhoneVMRuntimeState` 注释：`Diagnostic record only. Kernel lock ownership, not this file, determines use.`；`read(in:)` 注释说明内容可能过期。
+  - `VPhoneVMLock.deinit` 只执行 `flock(LOCK_UN)` 与 `close`；`scripts/vm_lock.py` 写入后 exec 目标命令，不删除记录。`boot`、`dfu`、`fw-prepare`、`cfw` 等所有操作都保留记录。
+  - 读取方均先检查内核锁或 pid 存活：`VPhoneBundleGuard.holderDetail` 与 `requireDFUOwner`（注释：`it is never deleted and can name a reused pid`）、`VPhoneVMStopper.confirmedInstanceID`（注释：`it is never deleted on exit, so it survives every VM run`）、D5 诊断中的 `vmOccupancy`（记录 `record_pid_alive`）。
+  - [F2 双 VM 准备](f2_dual_vm_preparation_2026-09-16.md) 将该文件定义为诊断记录，不作为占用证据。
+- 决定：`create-checkpoint` 保持与其他操作一致，不删除记录，未修改 `VPhoneVMLock`。实际需要保证的是锁释放：`CreateCheckpointTests.checkpointWritesReleaseTheBundleLockAndLeaveOnlyADiagnosticRecord` 断言检查点写入成功和写入失败（rename 注入）后 bundle 锁均未被持有，记录仍为 `create-checkpoint`，下一个持有者可以取锁并覆盖记录。
+- 限制：在所有操作上统一改为释放时删除需要修改 `VPhoneVMLock` 与 `vm_lock.py`，并处理“解锁与删除之间被其他进程取锁并写入”的顺序问题，不在本轮范围内。
+
+### 缺陷 3：运行中状态显示为 interrupted
+
+- 原因：`VPhoneCreateStatusReport.make` 直接使用 `checkpoint.overallStatus`；运行中的阶段记录为 `running`，推导结果为 `interrupted`，与 `live.create_run_in_progress` 无关。
+- 修复：状态视图在运行锁被持有时将 `overall_status` 报告为 `running`，并新增 `checkpoint_overall_status` 保留推导值；文本输出为 `overall:  running (... stored stages alone read <推导值>)`。`VPhoneCreateOverallStatus` 与 `VPhoneCreateCheckpoint.overallStatus` 未改变，续跑判断不受影响。
+
+### 缺陷 4：bundle 锁占用时的续跑提示
+
+- 原因：`printRecoveryHint` 对除产物变化外的所有错误打印相同的 `Inspect`/`Resume` 两行，且只显示检查点中已记录的 `recovery_required`；续跑前的拒绝不写入，因此提示不包含拒绝原因。stdout 被重定向时为块缓冲，提示在进程退出时才写出，位于 stderr 的 `Error:` 行之后。
+- 修复：提示内容由 `recoveryHintLines` 生成。`bundleBusy`：首行说明拒绝与检查点未改变（含推导状态），如运行记录指向存活进程则列出该进程和操作，然后是等待子进程退出或 `vphone-cli vm stop <name>` 的操作说明、用 `create-status --json` 确认 `live.bundle_lock_held = false`，最后是续跑命令。`runInProgress`：说明等待另一运行结束。续跑前抛出的 `recoveryRequired`（C4 事务或实时状态探测）：首行列出 kind 与 stage，随后 detail、action，最后是 `Inspect`/`Resume`。打印后调用 `fflush(stdout)`，使提示先于 `Error:` 行。
+- 与设计的差异：原验收步骤 1.3 预期子进程存在时续跑报告 `recovery_required (live_state, stage restore)`。实机中该拒绝来自续跑第 1 步的 bundle 锁检查（`bundleBusy`），探测器未被调用。探测器中的锁检查只在第 1 步之后锁才被取得时生效。
+- 决定：bundle 锁占用的拒绝不写入 `recovery_required`，提示也不把它表述为 `recovery_required`。依据：(1) 拒绝时检查点字节不变是续跑前检查的约束；(2) 第 1 步在加载与结构校验之前执行，此时没有可信的阶段信息用于填写 `stage`；(3) `recovery_required` 是持久化字段，只打印不写入会使提示与 `create-status` 的整体状态不一致。提示改为明确说明拒绝原因、检查点未改变及其推导状态。验收步骤 1.3 已按此更新。
+
+### 未验证内容
+
+- 修复后的构建未重新执行真实 restore 中断与续跑；子进程等待与验证器等待在实机中的耗时未测量。
+- `awaitExit` 在输出量较大的 DFU 子进程上每次轮询都对全部已捕获输出做一次正则匹配；子进程及时退出时只执行一次，长时间不退出时的 CPU 开销未测量。
 
 ## 待执行的真实 VM 验收
 
@@ -203,7 +268,7 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 1. restore 中断
    1. `vphone-cli vm create d4-acc -V regular -l <专用库根> ...`，在输出 `Restoring...` 之后、restore-update 结束之前向 vphone-cli 主进程发送 SIGKILL（不向子进程发信号）。
    2. 立即执行 `vm create-status d4-acc --json`，记录：restore 为 `running`；`live.bundle_lock_held` 的值；`ps -axo pid=,command=` 中 DFU 子进程与 `pymobiledevice3_bridge.py restore-update` 进程是否存在。
-   3. 子进程仍存在时执行 `vm create --resume d4-acc`，必须以 `recovery_required (live_state, stage restore)` 退出，检查点字节不变（对 checkpoint.json 做 `shasum -a 256` 前后比较）。
+   3. 子进程仍存在时执行 `vm create --resume d4-acc`，必须被拒绝且检查点字节不变（对 checkpoint.json 做 `shasum -a 256` 前后比较）。子进程持有 bundle 锁时，拒绝来自续跑第 1 步的 `bundleBusy`，提示首行为 `vm create --resume refused: the bundle is in use`；bundle 锁已释放但 restore 桥接进程、设备端点或该 bundle 的启动进程仍存在时，拒绝来自探测器的 `recovery required (live_state, stage restore)`。两种拒绝都不写入检查点。
    4. 手动终止残留子进程，确认 bundle 锁释放、`recovery-probe --ecid` 无应答，再次续跑。必须记录：新尝试的 `checks["probe.restore"]` 内容；restore 从 DFU 启动重新开始；restore 成功后 cfw、first_boot、verification 依次执行；`attempts/` 下存在上一份检查点归档。
    5. 同一流程再做一次“子进程先退出、主进程后被杀”的顺序，确认 idle 探测与重跑。
 2. cfw 中断：在 CFW 挂载期间终止主进程；续跑必须因 bundle 锁或 bundle 内挂载镜像返回 busy；清理挂载后续跑，cfw 重复安装成功，D3 的重复安装结论适用。
