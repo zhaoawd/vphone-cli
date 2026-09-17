@@ -42,3 +42,16 @@ regular 首次安装后的只读复查使用 [清单脚本](d3_cfw_inventory.py)
 新建 `.build/d3/parity/base`，用 26.1 / 23B85 的 regular Restore 输入完成 DFU 恢复；停止专用 DFU 宿主后确认磁盘无打开句柄、socket 和活动事务。只读清单 `research/artifacts/d3-cfw-2026-09-17/parity-base-before.json` 显示无 Cryptex OS/App、`vphoned` 或 `seputil.bak`。四个变体分别从这份恢复后、未安装 CFW 的磁盘克隆出 legacy/current 配对磁盘，再从相应 D3 变体复制相同的固件 Restore 输入。每对配置和两份 Manifest 的大小、SHA-256 相同，清单在 `.build/d3/parity/paired-inputs.json`。
 
 八次安装与 [卷清单脚本](d3_cfw_parity.py) 已编排在 `.build/d3/parity/install-batch.zsh`，逐一检查关机、磁盘占用和至少 80 GiB 可用空间，随后比较 System、xART、Preboot 卷。管理员认证后批次已启动；2026-09-17 15:23 的日志显示 regular 两次安装及 dev 迁移前安装完成，dev 当前版安装已启动。全量只读扫描在普通用户环境遇到 System 卷受保护文件 `.file` 的权限拒绝，并已卸载镜像；批次中的扫描将在管理员环境重试。配对磁盘的完整产物比较尚无结论。
+
+## 续跑环境检查
+
+2026-09-17 在 `/Users/qcz3840/github/vphone-cli` 续跑时，上一主机位于 `.build/d3/parity` 的配对磁盘、运行副本和日志不存在；当前主机没有 D3 批次进程。当前主机保留两份 26.1 / 23B85 IPSW 缓存，但三个现有 VM 均无 Restore 输入，其中 `vm-2607` 正在运行。数据卷可用空间为 38 GiB，低于上一批次采用的 80 GiB 前置阈值。本轮未创建磁盘副本、未重新恢复、未执行 CFW 安装，也未修改三个现有 VM。配对磁盘完整产物比较仍无结论。
+
+[卷清单脚本](d3_cfw_parity.py) 新增 `preflight` 子命令。该检查要求 regular、dev、JB、EXP 各有 `legacy`/`current` 配对目录，核对配置和两份 Manifest 的大小与 SHA-256，拒绝符号链接磁盘、活动固件事务、socket、打开的磁盘、根目录下的残留挂载和低于阈值的可用空间。检查结果写入新的 JSON 文件，拒绝覆盖已有证据。准备好配对目录后先执行：
+
+```sh
+python3 research/d3_cfw_parity.py preflight /path/to/parity \
+  --minimum-free-gib 80 --output /path/to/preflight.json
+```
+
+该检查不替代管理员环境中的八次安装和三卷只读扫描；它只固化续跑前置条件。

@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import shutil
 import stat
 import struct
 import subprocess
@@ -15,10 +16,86 @@ import tempfile
 
 
 ROLES = ("System", "xART", "Preboot")
+VARIANTS = ("regular", "dev", "jb", "exp")
+PAIR_SIDES = ("legacy", "current")
 
 
 def command(*args):
     return subprocess.check_output(args)
+
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(4 * 1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def pair_input(vm):
+    vm = vm.resolve(strict=True)
+    disk = vm / "Disk.img"
+    config = vm / "config.plist"
+    if not disk.is_file() or disk.is_symlink():
+        raise ValueError(f"{vm}: Disk.img missing or linked")
+    if not config.is_file() or config.is_symlink():
+        raise ValueError(f"{vm}: config.plist missing or linked")
+    if (vm / ".firmware-transaction").exists():
+        raise ValueError(f"{vm}: pending firmware transaction")
+    sockets = sorted(path.relative_to(vm).as_posix() for path in vm.rglob("*") if path.is_socket())
+    if sockets:
+        raise ValueError(f"{vm}: sockets present: {sockets}")
+    opened = subprocess.run(["lsof", "-nP", str(disk)], capture_output=True)
+    if opened.returncode == 0:
+        raise ValueError(f"{vm}: Disk.img is open")
+    if opened.returncode not in (1,):
+        raise ValueError(f"{vm}: lsof failed with status {opened.returncode}")
+    restores = sorted(path for path in vm.iterdir()
+                      if path.is_dir() and not path.is_symlink()
+                      and path.name.startswith("iPhone") and path.name.endswith("_Restore"))
+    if len(restores) != 1:
+        raise ValueError(f"{vm}: expected one Restore directory, got {len(restores)}")
+    restore = restores[0]
+    manifests = {}
+    for name in ("BuildManifest.plist", "iPhone-BuildManifest.plist"):
+        path = restore / name
+        if not path.is_file() or path.is_symlink():
+            raise ValueError(f"{vm}: {name} missing or linked")
+        manifests[name] = {"bytes": path.stat().st_size, "sha256": sha256(path)}
+    return {
+        "vm": str(vm),
+        "disk_bytes": disk.stat().st_size,
+        "config": {"bytes": config.stat().st_size, "sha256": sha256(config)},
+        "restore": restore.name,
+        "manifests": manifests,
+    }
+
+
+def preflight(root, minimum_free_gib):
+    root = root.resolve(strict=True)
+    mounts = command("mount").decode(errors="replace").splitlines()
+    marker = f" on {root}/"
+    mounted = [line for line in mounts if marker in line]
+    if mounted:
+        raise ValueError(f"mounted filesystem beneath parity root: {mounted}")
+    free = shutil.disk_usage(root).free
+    minimum = int(minimum_free_gib * 1024 ** 3)
+    if free < minimum:
+        raise ValueError(f"free space {free} is below required {minimum} bytes")
+    pairs = {}
+    for variant in VARIANTS:
+        sides = {side: pair_input(root / f"{variant}-{side}") for side in PAIR_SIDES}
+        legacy, current = sides["legacy"], sides["current"]
+        for field in ("disk_bytes", "config", "restore", "manifests"):
+            if legacy[field] != current[field]:
+                raise ValueError(f"{variant}: paired {field} differs")
+        pairs[variant] = sides
+    return {
+        "root": str(root),
+        "minimum_free_bytes": minimum,
+        "free_bytes": free,
+        "pairs": pairs,
+    }
 
 
 def signature_region(path, length):
@@ -162,6 +239,10 @@ def compare(left, right):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
+    check = sub.add_parser("preflight")
+    check.add_argument("root", type=Path)
+    check.add_argument("--minimum-free-gib", type=float, default=80)
+    check.add_argument("--output", type=Path, required=True)
     scan = sub.add_parser("scan")
     scan.add_argument("vm", type=Path)
     scan.add_argument("--output", type=Path, required=True)
@@ -172,7 +253,9 @@ def main():
     args = parser.parse_args()
     if args.output.exists() or args.output.is_symlink():
         parser.error("output exists")
-    if args.command == "scan":
+    if args.command == "preflight":
+        result = preflight(args.root, args.minimum_free_gib)
+    elif args.command == "scan":
         result = inventory(args.vm)
     else:
         result = compare(json.loads(args.legacy.read_text()), json.loads(args.current.read_text()))
