@@ -2,7 +2,9 @@
 
 日期：2026-09-17。基线：`ec9a20f`。
 
-状态：`vphone-cli doctor` 只读诊断命令、文本与 JSON 输出、稳定类别与代码、脱敏规则和无 VM 测试已实现。已对真实宿主、运行中的 `vm-2607`（只读）和 `.build/c5` 记录执行命令并保存样例。未执行任何修复动作；清单未修改。
+状态（2026-09-17 更新）：签名应用运行、E2 之后构建启动的 VM 上的客户机连接探测、D4 完成后的创建状态报告已实测，D5 完成；见“签名应用与客户机连接验收”。
+
+原状态：`vphone-cli doctor` 只读诊断命令、文本与 JSON 输出、稳定类别与代码、脱敏规则和无 VM 测试已实现。已对真实宿主、运行中的 `vm-2607`（只读）和 `.build/c5` 记录执行命令并保存样例。未执行任何修复动作；清单未修改。
 
 ## 代码位置
 
@@ -265,11 +267,24 @@ VM 相关 finding：`occupancy/vm_running` ok（`record_pid_is_boot_process: tru
 
 ## 未覆盖范围与限制
 
-- 未用已签名应用包运行 doctor，`signing_entitlements` 的 ok 路径只由测试覆盖。
-- 未在 E2 之后构建启动的 VM 上执行主机控制探测，`guest_connected`/`guest_disconnected` 只由假 socket 与注入探测覆盖。
+- （2026-09-17 后续已实测，见“签名应用与客户机连接验收”）已签名应用包的 `signing_entitlements` ok 路径；E2 之后构建启动的 VM 上的 `guest_disconnected` 与 `guest_connected`。
+- `guest_connected` 只在 regular 变体、headless 启动的 `d4-acc` 上实测；GUI 启动、其他变体未实测。
 - JB 首次启动收尾（`/var/log/vphone_jb_setup.log`）不可从宿主只读获得，doctor 不报告该状态；D4 检查点的 `jb_finalize` 始终为 unverified。
 - 实验记录没有默认位置，未传入 `--patch-record` 时不报告最后一次补丁运行的失败原因；只能从固件事务日志和创建检查点获得。
 - `research_guests` 在多个 macOS 安装时为 unknown；doctor 不交互选择。
 - 未覆盖网络可达性（IPSW 下载）、sudo/askpass 可用性和 amfidont 是否允许特定 cdhash。
 - 库摘要对每个 bundle 做锁探测；锁探测竞争窗口见“只读性”。
 - 修复动作未实现，只输出建议命令。
+
+## 签名应用与客户机连接验收（2026-09-17）
+
+实验设置：独立工作树 `.build/d4acc/src`，HEAD `8b6365f`，`make build` 签名应用；amfidont 运行中。`d4-acc`（库根 `.build/d4acc/lib`，regular，26.1 / 23B85）在 D4 真实验收完成后整体 `succeeded`。证据位于 `.build/d4acc/logs/d5-*`（受 Git 忽略）。
+
+| 步骤 | 命令 | 结果 |
+| --- | --- | --- |
+| VM 关闭 | `doctor d4-acc -l .build/d4acc/lib --json` | 退出码 3（warning）；ok 17、warning 1。`environment/signing_entitlements` ok（`amfidont_running: true`，可执行文件为签名应用）；`guest_runtime/create_succeeded` ok；唯一 warning 为 `environment/sip_status`（宿主 SIP 为自定义配置） |
+| 以本构建 headless 启动 `d4-acc`（12:13:21Z），每 5 秒运行 doctor | `vphone-cli --config …/d4-acc/config.plist --headless`；`doctor d4-acc … --json` | 第 5 秒：`guest_runtime/guest_disconnected` warning；第 10 秒：`guest_runtime/guest_connected` ok，`guest_capability_count: 15`、`protocol_version: 1`、`screen_available: false`；`occupancy/vm_running` ok（`boot_pids: 78373`、`record_pid_is_boot_process: true`）；`occupancy/running_vm_processes` 列出 `vm-2607` 与 `d4-acc` 两个进程 |
+| 停止 | `vm stop d4-acc -l .build/d4acc/lib` | 退出码 0，启动进程退出 |
+| 运行中的 `vm-2607`（只读） | `doctor vm-2607 -l ~/github/vphone-cli --json` | 退出码 4（unknown）；`occupancy/vm_running` ok，`boot_pids: 41303`（`--config` 含 `..`，由 `8b6365f` 的 `canonicalConfigPath` 匹配）；`host_control_capabilities_unavailable` unknown，与此前记录一致（该 VM 由 E2 之前构建启动，推断） |
+
+主机控制探测为只读的 `capabilities` 请求；本轮未对 `vm-2607` 执行其他操作。

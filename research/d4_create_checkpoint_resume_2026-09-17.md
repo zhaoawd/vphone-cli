@@ -4,6 +4,8 @@
 
 状态：状态模型、检查点存储、续跑入口、只读状态视图、真实阶段执行器与验证器、无 VM 测试已实现。真实 VM 的中断恢复验收进行中：场景 1（restore 中断）已执行一次，续跑的 restore 本身完成，但阶段被验证器拒绝，暴露的缺陷与修复见“真实验收发现与修复（2026-09-17）”。修复后的构建尚未重新执行真实验收，D4 保持未完成。场景 1 完成后的 `--restart-from` 检查暴露了续跑产物校验、拒绝提示文本和启动进程路径匹配的缺陷，修复见“真实验收发现与修复：restart-from、拒绝提示与启动进程路径（2026-09-17）”，修复后的构建同样尚未重新执行真实验收。
 
+2026-09-17 更新：在 `8b6365f` 构建上完成真实验收场景 1 补充路径与场景 2–4，`--restart-from prepare` 重建已删除 restore 树、修改后的拒绝提示和含 `..` 的启动进程路径匹配均在实机确认，D4 完成。另记录 restore 桥接进程在 FCS 密钥请求失败后挂起的问题，不属于 D4 修改范围。见“真实验收记录：`8b6365f` 构建（2026-09-17）”。
+
 ## 代码位置
 
 | 路径 | 内容 |
@@ -361,6 +363,56 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 
 ### 未验证内容
 
-- 修复后的构建未在 `d4-acc` 上重新执行 `--restart-from prepare`；真实 fw prepare 重新生成目录、patch 在重建目录上提交事务、restore 在已完成的磁盘上重新执行的行为未实测。
-- 修改后的提示文本未在真实命令输出中确认。
-- `canonicalConfigPath` 未对运行中的 `vm-2607` 进程实测；`VPhoneVMStopper` 与 `requireDFUOwner` 在该拼写下的行为变化只由单元测试覆盖。
+- （2026-09-17 后续已实测，见“真实验收记录：`8b6365f` 构建”）`--restart-from prepare` 重建目录、patch 提交与 restore 重新执行；修改后的提示文本；`doctor` 对 `vm-2607` 的路径匹配。
+- `VPhoneVMStopper` 与 `requireDFUOwner` 在含 `..` 拼写下的行为变化仍只由单元测试覆盖。
+
+## 真实验收记录：`8b6365f` 构建（2026-09-17）
+
+### 实验设置
+
+- 构建：独立工作树 `.build/d4acc/src`，HEAD `8b6365f`，无未提交修改；`make build` 签名应用，运行中的 amfidont 以仓库路径前缀放行。未替换 `vm-2607` 使用的 `.build/vphone-cli.app`，未操作 `vm-2607`（仅执行一次只读 `doctor`）。
+- VM：库根 `.build/d4acc/lib`，`d4-acc`，regular，本地 26.1 / 23B85 iPhone IPSW 与 cloudOS IPSW，`--root-popup`。
+- 证据：`.build/d4acc/logs/`（受 Git 忽略）。脚本：`s2-run.zsh`、`s2c-watch.zsh`、`s3_freeze.py`、`s3-run.zsh`、`s4-run.zsh`（同目录）。
+- 场景 3 的中断点：patch 在 vm create 主进程内执行。`s3_freeze.py` 以 kqueue 监视 `.firmware-transaction`（或 `.firmware-history`），条件满足时先对主进程发送 SIGSTOP、记录目录状态，再发送 SIGKILL。
+
+### 结果
+
+| 场景 | 时间（UTC） | 操作 | 结果 |
+| --- | --- | --- | --- |
+| `--restart-from prepare`（缺陷 5 复验） | 11:33:25– | 场景 1 完成后 restore 树已删除，执行 `vm create --resume d4-acc --restart-from prepare --keep-artifacts --accept-tool-change` | 被接受；prepare 重新生成 restore 树并通过验证（11:33:29–11:34:11），patch 提交事务并通过验证（11:34:11–11:34:34）。restore 阶段挂起，见“问题：restore 桥接进程挂起” |
+| 1 补充：主进程被杀后子进程存活 | 11:52:34 | 挂起状态下对主进程 49939 发送 SIGKILL | DFU 宿主 50666 与 restore 桥接进程 50692 均存活，PPID 变为 1；`live.bundle_lock_held = true`，restore 为 `running`，整体 `interrupted`（`s1b-ps-after-kill.txt`、`s1b-status-after-kill.json`） |
+| 1 补充：子进程持锁时续跑 | 11:52:34 与 11:53:01 之间 | `vm create --resume d4-acc` | 退出码 1；首行 `vm create --resume refused: the bundle is in use; the checkpoint was not changed (overall: interrupted).`，列出 `pid 50666 running operation "dfu"`，随后为停止、确认锁释放和续跑的操作说明；检查点 SHA-256 前后均为 `4553bff7…`（`s1b-resume-busy.log`） |
+| 1 补充：停止子进程后续跑 | 11:53:01–11:55:10 | 对 DFU 宿主发送 SIGINT；桥接进程随设备连接中断退出（`ConnectionTerminatedError`）；续跑 | `probe.restore`：`bundle lock free; no boot process; no restore bridge process for 0xCECF1D19F7EF01FA; no DFU/recovery endpoint for 0xCECF1D19F7EF01FA`；restore 从 DFU 重新执行，11:53:16–11:55:10 succeeded，DFU 结果 `matched` |
+| 2 cfw 中断 | 11:56:37 | CFW 挂载出现 15 秒后对主进程 60457 发送 SIGKILL | root 身份的 `cfw_install_host.sh`（62369）继续运行并持有 bundle 锁；cfw 为 `running`。续跑退出码 1，提示 `pid 62369 running operation "cfw"`；检查点 SHA-256 前后均为 `8212cb9a…`（`s2c-*`） |
+| 2 残留进程退出后续跑 | 11:57:28–11:59:23 | 残留 CFW 进程 11:57:28 退出（是否完成安装未确认）；之后无 `hdiutil` 挂载、无 `.cfw_mount.*`，锁释放；续跑 | `probe.cfw`：`bundle lock free; no boot process; no attached image inside the bundle`；从 cfw 续跑，cfw 重复安装 succeeded（11:57:53–11:59:10，输出 `no com.apple.os.update-* root snapshot found (already flipped?)`），first_boot、verification succeeded，整体 `succeeded`，restore 树在 verification 后删除 |
+| 3a patch publishing 中断 | 12:02:02 | 从 prepare 重跑；journal 为 `publishing` 时冻结并杀主进程 | 冻结时 `backup/` 为空，`stage/` 含 AVPBooter 与 restore 树（`s3a-frozen.json`）。续跑退出码 1：`refused: recovery required (firmware_transaction, stage patch)`，detail `phase publishing`，action `vphone-cli fw patch d4-acc --recover`；检查点 SHA-256 不变（`a1379876…`）。`fw patch --recover -l … d4-acc` 退出码 0，归档 `5ae8f176…`，`.firmware-transaction` 已移除 |
+| 3b 事务已提交、检查点未写入 | 12:02:07–12:02:29 | 续跑重新执行 patch；`.firmware-history` 出现新归档 `30ebddbd…` 时冻结并杀主进程 | patch 仍为 `running`。续跑退出码 1：`refused: artifact avpbooter recorded by prepare changed (fingerprint fc94622f710a -> 8200ba0d93b0)`，action 为 `--restart-from prepare` 或删除重建；检查点 SHA-256 不变（`df557aaf…`）。与“待执行的真实 VM 验收”第 3 项的差异：拒绝由 avpbooter 指纹变化触发，未报告 restore_tree；两者均为已提交 patch 改写的产物，产物按记录顺序比较，首个不一致即拒绝 |
+| 3 完成 | 12:02:30–12:06:50 | `--restart-from prepare` | 退出码 0；prepare、patch（新事务 `f1e207e4…`，58 条记录）、restore、cfw、first_boot、verification 均 succeeded，整体 `succeeded` |
+| 4a first_boot 断开 | 12:07:46–12:11:53 | 从 prepare 重跑；first_boot 启动子进程出现 1 秒后发送 SIGKILL | 主进程退出码 1：`stage first_boot failed: first boot exited before command injection (exit 9)`；整体 `failed`；restore 树保留 |
+| 4b 续跑与 verification 断开 | 12:11:53–12:12:03 | 续跑；first_boot 子进程退出后，对 verification 启动子进程发送 SIGKILL | 续跑从 first_boot 开始，first_boot succeeded（prompt matched）；verification failed：`boot analysis: process exited before success marker (exit 9)`；整体 `failed`；restore 树保留 |
+| 4c 续跑 | 12:12:03–12:12:07 | 续跑 | 只执行 verification，succeeded（prompt_detected）；整体 `succeeded`；restore 树删除并记录 |
+
+检查点 `attempts/` 在本轮结束时保存 12 次尝试（`doctor` 报告 `attempts: 12`）。
+
+### 其他确认
+
+- 缺陷 6 的拒绝提示在真实输出中确认：bundle 占用、C4 事务、产物变化三类拒绝的首行均为 `vm create --resume refused: …; the checkpoint was not changed (…)`，未出现 "stopped" 首行。
+- 缺陷 7：`doctor vm-2607 -l ~/github/vphone-cli --json`（本构建）报告 `vm_running` 的 `boot_pids: 41303`、`record_pid_is_boot_process: true`；该 VM 以含 `..` 的 `--config` 路径启动，`VPhoneDiagnostics.bootPIDs` 现直接调用 `parsePIDs`（`d5-doctor-vm2607-8b6365f.json`）。
+
+### 问题：restore 桥接进程挂起
+
+- 现象（事实）：11:34:57 后，`pymobiledevice3_bridge.py restore-update` 经本机 HTTP 代理 127.0.0.1:10808 请求 `fcs-keys-pub-prod.cdn-apple.com` 时出现 `requests.exceptions.SSLError … UNEXPECTED_EOF_WHILE_READING`；之后约 17 分钟无输出，进程 CPU 0%，唯一 TCP 连接为 CLOSED，未退出；vm create 主进程持续等待。约 11:51 手动以 curl 经代理与直连请求同一 URL，均返回 200。
+- 代码分析（只读，pymobiledevice3 11.9.2，路径相对 site-packages）：
+  - 请求在 `pymobiledevice3/restore/restore.py:1443` 的 `send_url_asset` 中经线程池执行，所在任务由 `handle_async_data_request_msg`（`restore.py:182-188`）以 `asyncio.create_task` 创建；`self._tasks` 只追加，不 await、不检查，任务异常不传到主协程。
+  - 异常路径跳过向设备回复与关闭该数据连接（`restore.py:1446-1463`）；主协程停在无超时的 `await self._restored.recv()`（`restore.py:1680`）。
+  - vphone-cli 侧 `VPhoneProcessRunner.runStreaming`（`sources/VPhoneCore/VPhoneProcessRunner.swift:204-227`）只调用 `waitUntilExit()`，对 restore-update 无超时或无输出检测。
+- 推断：设备端在等待密钥响应，因而停止读取 ASR 数据；requests 默认不重试，一次代理连接中断即导致挂起。原因中“代理连接中断的来源”未查明。
+- 影响：vm create 在 restore 阶段无限等待。恢复路径已由本轮场景 1 补充确认：终止主进程与子进程后续跑，restore 重新执行。
+- 可选方向（未实现、未验证）：桥接脚本对后台任务异常以非零退出；对 URL 资源请求增加超时与重试；vphone-cli 对 restore-update 增加无输出或总时长上限；主进程收到 SIGINT/SIGTERM 时回收子进程。
+
+### 仍未覆盖
+
+- 桥接进程或设备端点仍存在、但 bundle 锁已释放时的实时探测拒绝（`recovery required (live_state, stage restore)`）：本轮停止 DFU 宿主后桥接进程随即退出，未形成该状态；该路径只由无 VM 测试覆盖。
+- first_boot/verification 阶段主进程（而非启动子进程）被杀的情况；jb、exp、dev、less 变体的真实中断续跑。
+- 场景 2 中残留 CFW 进程退出前是否完成安装未确认；续跑的 cfw 按重复安装处理，D3 的重复安装结论适用。
+- 生产等待上限（锁 30 秒、子进程 60 秒）的实际余量未测量；本轮子进程均在上限内退出。
