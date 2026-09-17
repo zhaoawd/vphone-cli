@@ -20,3 +20,8 @@ NSDictionary *vp_handle_apps_command(NSDictionary *msg);
 /// The in-process LSApplicationWorkspace open path is rejected from the daemon
 /// context, so URL/app open is delegated to uiopen.
 int vp_open_via_uiopen(NSString *url, NSString *bundleID);
+
+/// YES when an executable `uiopen` exists at one of the probed paths. app_launch
+/// and open_url have no other launch path, so the `app_launch` and `url`
+/// capabilities are declared only when this returns YES. Checked per hello.
+BOOL vp_uiopen_available(void);

@@ -887,6 +887,14 @@ final class VPhoneHostCommandExecutor {
         }
     }
 
+    /// `apps_v2` guests declare `app_launch` separately (only when uiopen is
+    /// executable). Guests without `apps_v2` predate the split: their `apps`
+    /// capability implied app_launch, so keep that meaning for them.
+    static func guestDeclaresAppLaunch(_ caps: [String]) -> Bool {
+        guard caps.contains("apps") else { return false }
+        return caps.contains("apps_v2") ? caps.contains("app_launch") : true
+    }
+
     private func capabilitySnapshot() -> [String: Any] {
         let connected = control?.isConnected == true
         let caps = connected ? (control?.guestCaps ?? []) : []
@@ -896,11 +904,12 @@ final class VPhoneHostCommandExecutor {
         for (names, capability) in [
             (["key"], "hid"), (["type"], "clipboard"), (["shell"], "shell"),
             (["file_get", "file_put"], "file"),
-            (["app_launch", "app_terminate", "app_list", "app_foreground"], "apps"),
+            (["app_terminate", "app_list", "app_foreground"], "apps"),
             (["open_url"], "url"), (["ipa_install"], "ipa_install"),
         ] {
             for name in names { commands[name] = connected && caps.contains(capability) }
         }
+        commands["app_launch"] = connected && Self.guestDeclaresAppLaunch(caps)
         for name in ["location", "location_stop"] {
             commands[name] = locationProvider != nil && caps.contains("location")
         }

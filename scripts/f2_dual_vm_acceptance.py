@@ -67,8 +67,17 @@ def preflight(endpoint: Endpoint, evidence: Evidence, timeout, required=None):
         raise AcceptanceFailure(f"{endpoint.name} guest is not connected")
     commands = response.get("commands")
     required = required or ("file_get", "file_put", "shell")
-    if not isinstance(commands, dict) or any(commands.get(name) is not True for name in required):
-        raise AcceptanceFailure(f"{endpoint.name} does not expose required commands: {required}")
+    commands = commands if isinstance(commands, dict) else {}
+    missing = [name for name in required if commands.get(name) is not True]
+    if missing:
+        reason = ""
+        guest_caps = response.get("guest_capabilities")
+        if ("app_launch" in missing and isinstance(guest_caps, list)
+                and "apps_v2" in guest_caps and "app_launch" not in guest_caps):
+            # apps_v2 guests declare app_launch only when uiopen is executable.
+            reason = "; guest declares apps_v2 without app_launch (uiopen not executable on guest)"
+        raise AcceptanceFailure(
+            f"{endpoint.name} does not expose required commands: {required}; missing: {missing}{reason}")
 
 
 def marker(run_id, endpoint):

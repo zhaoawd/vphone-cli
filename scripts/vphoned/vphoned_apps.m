@@ -64,6 +64,8 @@ static int vp_uiopen_run(const char *const argTail[], size_t argTailCount) {
   return -1;
 }
 
+BOOL vp_uiopen_available(void) { return vp_uiopen_path() != NULL; }
+
 int vp_open_via_uiopen(NSString *url, NSString *bundleID) {
   if (url.length > 0) {
     const char *tail[] = {"--url", url.UTF8String};

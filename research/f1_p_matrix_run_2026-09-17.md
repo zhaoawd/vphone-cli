@@ -51,6 +51,7 @@ patch 记录数与方案 §3 S1 的历史值一致。less 的 restore 中 URLAss
 ## 发现
 
 1. **能力声明与应用启动不一致（事实）**：regular、dev、less 的 vphoned 声明 `apps`，但 `app_launch` 返回 `uiopen unavailable`。`scripts/vphoned/vphoned_apps.m` 只在 `/var/jb/usr/bin/uiopen` 或 `/usr/bin/uiopen` 存在时能启动应用，`apps` 能力按 `gAppsAvailable` 声明，不检查 uiopen。未修改。
+   - 修正（未提交，未部署到客户机）：按方案 A 只修正声明。vphoned 新增始终声明的 `apps_v2`，`app_launch` 仅在 apps 可用且 uiopen 可执行时声明，`url` 改为仅在 uiopen 可执行时声明；宿主 app_launch 对 `apps_v2` 客户机要求 `app_launch`，对旧客户机沿用 `apps`。F1 S7 在 `apps_v2` 且无 `app_launch` 时将启动相关检查记为 not_applicable，S10 整步 not_applicable；F2 预检失败信息列出缺失命令与原因。映射表见 [E2 能力发现](host_control_e2_2026-09-12.md#应用与-url-能力映射2026-09-17-修正未提交未部署到客户机)。客户机 vphoned 需重新构建并部署后本矩阵的 regular/dev/less 才会反映新声明；未做真实 VM 验证。
 2. **jb/exp 应用未启动（原因未查明）**：`uiopen` 返回成功但未出现进程。待验证假设：客户机停在首次设置助理，或 headless 启动没有显示。需在 GUI 首次设置后复跑 S7、S10。
 3. **less 创建的前台 verification**：`vm create -V less` 的 verification 阶段前台启动 VM 并等待其退出；非交互运行时 create 不会自行结束，需要 `vm stop`（root）后才记录 `unverified` 并返回（事实）。
 4. **less 实例属主为 root**：bundle 文件与 `vphone.sock`（权限 0600）属主为 root；普通用户的 doctor 报 `host_control_unreachable: Permission denied`，验收脚本、停止与删除均需 root（事实）。

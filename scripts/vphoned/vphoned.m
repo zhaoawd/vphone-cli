@@ -517,9 +517,19 @@ static BOOL handle_client(int fd) {
       [caps addObject:@"ipa_install"];
     if (gClipboardAvailable)
       [caps addObject:@"clipboard"];
+    // `apps` covers app_list / app_terminate / app_foreground (private
+    // frameworks only). app_launch and open_url shell out to uiopen, so they
+    // get their own capabilities, declared only when uiopen is executable.
+    // `apps_v2` marks a guest that uses this split; hosts treat `apps` without
+    // `apps_v2` as the legacy meaning (apps implied app_launch).
+    BOOL uiopenAvailable = vp_uiopen_available();
+    [caps addObject:@"apps_v2"];
     if (gAppsAvailable)
       [caps addObject:@"apps"];
-    [caps addObject:@"url"];
+    if (gAppsAvailable && uiopenAvailable)
+      [caps addObject:@"app_launch"];
+    if (uiopenAvailable)
+      [caps addObject:@"url"];
     [caps addObject:@"settings"];
     if (vp_shell_path() != NULL)
       [caps addObject:@"shell"];

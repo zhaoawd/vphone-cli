@@ -389,3 +389,12 @@ python3 scripts/f1_support_matrix.py research/artifacts/f1-matrix --json-out <js
 | 人工环节 | 自动步骤先执行，人工步骤（首次设置、权限弹窗、DDI 信任/开发者模式、VZ 窗口输入抽查）集中列出后由用户统一处理 | 待人工的 VM 需保留到人工步骤完成；同时保留的 F1 VM 按空间控制在 2–3 台 |
 
 执行构建：独立工作树 `.build/f1/src`，HEAD `22a7c02`（含 restore 桥接修复），`make build` 签名；该工作树需要 `git submodule update --init --recursive` 并提供 `.tools/bin/{trustcache,insert_dylib}`（从既有工作树复制）后才能构建。
+
+### 9.1 用户决定（2026-09-17，第二批）
+
+| 事项 | 决定 |
+| --- | --- |
+| 人工步骤 | 立即开始，逐台 GUI 启动 |
+| 首次设置助理 | 简体中文；客户机 en0 配置 HTTP/HTTPS 代理 `192.168.64.1:10808`（F2 字段，经宿主控制 `file_put` 预先写入并重启生效）；定位服务开启；Apple ID、分析、屏幕使用时间、Siri、面容 ID、密码等全部跳过或关闭 |
+| Frida 客户端 | 复用 autophone venv 中的 frida 17.16.1；客户机 frida-server 版本在创建后读取并记录，主版本不一致时 S11 记为 blocked 并说明 |
+| regular/dev/less 的 `apps` 能力 | 方案 A：修正能力声明，没有 uiopen 时不声明应用启动能力；为非 JB 变体补启动方式另行评估 |

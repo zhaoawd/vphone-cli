@@ -478,6 +478,44 @@ class F1RuntimeAcceptanceTests(unittest.TestCase):
         self.assertEqual(step["failure"]["classification"], "capability_declared_but_uiopen_missing")
         self.assertEqual(step["observed"]["initial_running_apps"], {"count": 0, "empty": True, "bundle_ids": []})
 
+    def test_s7_split_guest_without_app_launch_marks_launch_checks_not_applicable(self):
+        caps = [cap for cap in ALL_GUEST_CAPS if cap != "url"] + ["apps_v2"]
+        fixture = self.fixture(guest_caps=caps, commands_off=("app_launch", "open_url"),
+                               uiopen_missing=True)
+        for variant in ("regular", "jb"):
+            result, run, _ = self.run_probe(fixture, variant, "S7", out=variant)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            step = self.steps(run)["S7"]
+            self.assertEqual(step["status"], "not_applicable")
+            checks = {check["name"]: check for check in step["checks"]}
+            self.assertEqual({name: check["status"] for name, check in checks.items()},
+                             dict.fromkeys(("launch_pid", "screenshot_shows_app",
+                                            "terminate_pid_gone", "ipa_install"), "not_applicable"))
+            self.assertIn("apps_v2 without app_launch", checks["launch_pid"]["detail"])
+            self.assertFalse(step["observed"]["app_launch_declared"])
+        self.assertNotIn("app_launch", fixture.types())
+        self.assertNotIn("app_terminate", fixture.types())
+
+    def test_s7_split_guest_declaring_app_launch_still_fails_on_launch_error(self):
+        fixture = self.fixture(guest_caps=list(ALL_GUEST_CAPS) + ["apps_v2", "app_launch"],
+                               uiopen_missing=True)
+        result, run, _ = self.run_probe(fixture, "jb", "S7")
+        self.assertEqual(result.returncode, 1)
+        step = self.steps(run)["S7"]
+        self.assertEqual(step["status"], "failed")
+        self.assertEqual(step["failure"]["classification"], "capability_declared_but_uiopen_missing")
+
+    def test_s10_split_guest_without_app_launch_is_not_applicable_before_present(self):
+        caps = [cap for cap in ALL_GUEST_CAPS if cap != "url"] + ["apps_v2"]
+        fixture = self.fixture(guest_caps=caps, commands_off=("app_launch", "open_url"))
+        image = self.root / "qr.png"
+        image.write_bytes(b"qr")
+        result, run, _ = self.run_probe(fixture, "exp", "S10", "--camera-image", str(image))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.steps(run)["S10"]["status"], "not_applicable")
+        self.assertNotIn("camera_present", fixture.types())
+        self.assertNotIn("app_launch", fixture.types())
+
     def test_headless_records_launch_and_blocks_screen_dependent_camera(self):
         fixture = self.fixture(headless=True)
         image = self.root / "qr.png"

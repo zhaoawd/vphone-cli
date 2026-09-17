@@ -157,6 +157,38 @@ final class HostCommandExecutorTests: XCTestCase {
         XCTAssertEqual(commands["camera_present"], false)
     }
 
+    func testAppLaunchAvailabilityFollowsSplitAppsCapability() async throws {
+        let guest = HostGuestFake()
+        let executor = VPhoneHostCommandExecutor(control: guest, screen: HostScreenFake())
+        let base = ["hid", "shell", "file", "clipboard"]
+        // (guest caps, app_launch, app_list/app_terminate/app_foreground, open_url)
+        let cases: [([String], Bool, Bool, Bool)] = [
+            // Legacy guest (no apps_v2): apps keeps implying app_launch.
+            (base + ["apps", "url"], true, true, true),
+            // Split guest without uiopen (regular/dev/less).
+            (base + ["apps_v2", "apps"], false, true, false),
+            // Split guest with uiopen (jb/exp).
+            (base + ["apps_v2", "apps", "app_launch", "url"], true, true, true),
+            // app_launch still requires apps (handler rejects when apps failed to load).
+            (base + ["apps_v2", "app_launch", "url"], false, false, true),
+            (base, false, false, false),
+        ]
+        for (caps, launch, query, url) in cases {
+            guest.guestCaps = caps
+            let snapshot = try await call(executor, ["t": "capabilities"])
+            let commands = try XCTUnwrap(snapshot["commands"] as? [String: Bool])
+            XCTAssertEqual(commands["app_launch"], launch, "\(caps)")
+            for name in ["app_list", "app_terminate", "app_foreground"] {
+                XCTAssertEqual(commands[name], query, "\(name) \(caps)")
+            }
+            XCTAssertEqual(commands["open_url"], url, "\(caps)")
+        }
+        guest.isConnected = false
+        guest.guestCaps = base + ["apps_v2", "apps", "app_launch", "url"]
+        let offline = try await call(executor, ["t": "capabilities"])
+        XCTAssertEqual((offline["commands"] as? [String: Bool])?["app_launch"], false)
+    }
+
     func testShellFieldsAndScreenOptInArePreserved() async throws {
         let guest = HostGuestFake()
         let screen = HostScreenFake()

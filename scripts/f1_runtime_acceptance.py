@@ -251,6 +251,20 @@ def classify_error(command, error):
     return None
 
 
+def launch_not_declared(run):
+    """Reason string when an apps_v2 guest omits app_launch, else None.
+
+    apps_v2 guests declare app_launch only when uiopen is executable; guests without
+    apps_v2 predate the split and their `apps` capability still implies app_launch.
+    """
+    capabilities = run.capabilities or {}
+    guest_caps = capabilities.get("guest_capabilities")
+    if (capabilities.get("guest_connected") is True and isinstance(guest_caps, list)
+            and "apps_v2" in guest_caps and "app_launch" not in guest_caps):
+        return "guest declares apps_v2 without app_launch (uiopen not executable on guest)"
+    return None
+
+
 def screen_note(run):
     available = (run.capabilities or {}).get("screen_available")
     if available is False:
@@ -619,7 +633,10 @@ def step_s7(run, step):
     step.criteria = ("app_launch PID appears in running app_list; screenshot shows the application "
                      "(manual review); after app_terminate the PID is gone; jb/exp additionally "
                      "install a test IPA and launch it")
-    step.require(("app_launch", "app_terminate", "app_list"), "apps")
+    step.require(("app_terminate", "app_list"), "apps")
+    launch_reason = launch_not_declared(run)
+    if launch_reason is None:
+        step.require(("app_launch",), "apps")
     bundle_id = run.args.bundle_id
     step.observed["bundle_id"] = bundle_id
     listing = step.ok("initial_list", {"t": "app_list", "filter": "running"})
@@ -632,6 +649,15 @@ def step_s7(run, step):
     step.commands.append({"t": "app_list", "filter": "running"})
     initial = running_app(run.endpoint, bundle_id, step.recorder, run.timeout)
     step.observed["initial"] = initial
+    if launch_reason is not None:
+        step.observed["app_launch_declared"] = False
+        for name in ("launch_pid", "screenshot_shows_app", "terminate_pid_gone"):
+            step.check(name, "not_applicable", launch_reason)
+        if run.args.variant in ("jb", "exp"):
+            step.check("ipa_install", "not_applicable", f"installed package cannot be launched: {launch_reason}")
+        else:
+            step.check("ipa_install", "not_applicable", "plan limits ipa_install to jb/exp")
+        return
     if initial is not None:
         step.ok("pre_terminate", {"t": "app_terminate", "bundle_id": bundle_id, "screen": False})
         step.commands.append({"t": "app_list", "filter": "running"})
@@ -782,7 +808,11 @@ def step_s10(run, step):
         step.check("copy_receipt", "not_run", "no --camera-image provided")
         step.check("qr_recognition", "not_run", "external QR probe required")
         return
-    step.require(("app_launch", "app_terminate", "app_list"), "apps")
+    step.require(("app_terminate", "app_list"), "apps")
+    launch_reason = launch_not_declared(run)
+    if launch_reason is not None:
+        raise StepNotApplicable(f"camera consumer cannot be launched: {launch_reason}")
+    step.require(("app_launch",), "apps")
     image = Path(run.args.camera_image).expanduser().resolve(strict=True)
     generation = f"f1-{uuid.uuid4().hex}"
     consumer = run.args.camera_consumer_bundle_id

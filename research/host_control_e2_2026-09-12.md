@@ -42,6 +42,27 @@ AppDelegate 在原有 GUI 分支创建画面适配器和命令执行对象，然
 | `commands` | 命令名称到布尔值的映射，根据宿主实现、画面、客户机声明和相机连接状态计算 |
 | `limits` | 请求字节、内联文件字节、宿主文件字节、连接上限和 `command_timeout_ms` |
 
+### 应用与 URL 能力映射（2026-09-17 修正，未提交，未部署到客户机）
+
+F1 运行发现 regular/dev/less 声明 `apps` 但 `app_launch` 因缺少 uiopen 失败，见 [F1 P 矩阵记录](f1_p_matrix_run_2026-09-17.md) 发现 1。vphoned 的 app_launch 与 open_url 只通过 `/var/jb/usr/bin/uiopen` 或 `/usr/bin/uiopen` 执行；app_list、app_terminate、app_foreground 只使用 LSApplicationWorkspace、FBSSystemService、SpringBoardServices，不调用 uiopen。修正后的客户机能力声明（每次 hello 时计算）：
+
+| 客户机能力 | 旧声明条件 | 新声明条件 |
+| --- | --- | --- |
+| `apps` | LSApplicationWorkspace 可用 | 不变 |
+| `app_launch` | 无 | `apps` 条件成立且 uiopen 可执行 |
+| `url` | 无条件 | uiopen 可执行 |
+| `apps_v2` | 无 | 始终声明；表示本客户机的 `apps` 不再包含启动 |
+
+宿主 `commands` 映射：
+
+| 命令 | 条件（均要求客户机已连接） |
+| --- | --- |
+| app_list、app_terminate、app_foreground | `apps` |
+| app_launch | `apps`，且声明 `apps_v2` 时还需 `app_launch`；未声明 `apps_v2` 的旧客户机沿用 `apps` |
+| open_url | `url` |
+
+兼容性依据：旧客户机无条件声明 `url`，且不声明 `apps_v2`，因此旧客户机在新宿主上的 `commands` 与修正前相同。旧宿主连接新客户机时仍按 `apps` 报告 app_launch 可用（与修正前相同），open_url 按新的 `url` 声明报告。
+
 状态查询命令可以在客户机断线时仍可用，例如存在定位实现时的 location_source_status。命令可用只表示查询时具备其入口所需能力；参数、generation、文件、连接后续变化仍可能使调用失败。旧命令继续使用原校验和客户机错误，不强制把所有错误改写为新格式。
 
 ## 期限、取消和迟到结果

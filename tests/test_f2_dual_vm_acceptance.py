@@ -15,8 +15,9 @@ PROBE = ROOT / "scripts/f2_dual_vm_acceptance.py"
 
 
 class HostControlFixture:
-    def __init__(self, directory, name, corrupt_reads=False):
+    def __init__(self, directory, name, corrupt_reads=False, guest_capabilities=None):
         self.name = name
+        self.guest_capabilities = guest_capabilities
         self.corrupt_reads = corrupt_reads
         self.path = Path(directory) / f"{name}.sock"
         self.files = {}
@@ -66,7 +67,7 @@ class HostControlFixture:
     def _handle(self, request):
         command = request["t"]
         if command == "capabilities":
-            return {
+            response = {
                 "ok": True,
                 "guest_connected": True,
                 "commands": {
@@ -76,6 +77,12 @@ class HostControlFixture:
                     "camera_present": True, "camera_status": True, "camera_stop": True,
                 },
             }
+            if self.guest_capabilities is not None:
+                caps = list(self.guest_capabilities)
+                response["guest_capabilities"] = caps
+                response["commands"]["app_launch"] = (
+                    "apps" in caps and ("app_launch" in caps if "apps_v2" in caps else True))
+            return response
         if command == "file_put":
             data = base64.b64decode(request["data_b64"])
             self.files[request["path"]] = data
@@ -250,6 +257,32 @@ class DualVMAcceptanceTests(unittest.TestCase):
                 ["capabilities", "app_list", "app_list", "app_launch",
                  "app_list", "app_list", "app_terminate"],
             )
+
+    def test_app_isolation_fails_in_preflight_when_split_guest_lacks_app_launch(self):
+        with tempfile.TemporaryDirectory(prefix="vphone-f2-") as temporary:
+            left = HostControlFixture(temporary, "left", guest_capabilities=["apps_v2", "apps"])
+            right = HostControlFixture(temporary, "right",
+                                       guest_capabilities=["apps_v2", "apps", "app_launch", "url"])
+            left.start()
+            right.start()
+            self.addCleanup(left.stop)
+            self.addCleanup(right.stop)
+            output = Path(temporary) / "evidence"
+
+            result = subprocess.run([
+                sys.executable, str(PROBE), "app-isolation",
+                "--left-name", "vm-left", "--left-socket", str(left.path),
+                "--right-name", "vm-right", "--right-socket", str(right.path),
+                "--output", str(output),
+            ], cwd=ROOT, capture_output=True, text=True)
+
+            self.assertEqual(result.returncode, 1)
+            summary = json.loads((output / "summary.json").read_text())
+            self.assertEqual(summary["result"], "fail")
+            self.assertIn("missing: ['app_launch']", summary["error"])
+            self.assertIn("apps_v2 without app_launch", summary["error"])
+            self.assertEqual([request["t"] for request in left.requests], ["capabilities"])
+            self.assertEqual(right.requests, [])
 
     def test_path_alias_is_rejected_before_requests_are_sent(self):
         with tempfile.TemporaryDirectory(prefix="vphone-f2-") as temporary:
