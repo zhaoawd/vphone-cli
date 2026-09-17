@@ -389,6 +389,22 @@ extension PatchExperimentRecord {
     }
 }
 
+// MARK: - Diagnostics View
+
+/// Read-only fields for `vphone-cli doctor --patch-record`; the record itself stays internal.
+extension PatchExperimentRecord {
+    public var runIdentifier: String { runID }
+    public var variantName: String { conditions.options.variant }
+    public var finishedAtText: String? { finishedAt }
+    /// `FirmwareRunStage` raw value or `record`; nil unless failed or cancelled.
+    public var failedStageName: String? { failedStage?.stage }
+    public var failedComponentName: String? { failedStage?.component }
+    public var errorMessage: String? { error }
+    public var failedRequiredPatches: [String] { patch.failedRequired }
+    /// `committed`, `uncommitted` or `none`.
+    public var transactionState: String { transaction.state }
+}
+
 // MARK: - Summary
 
 extension PatchExperimentRecord {

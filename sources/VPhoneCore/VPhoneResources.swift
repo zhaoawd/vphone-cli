@@ -74,6 +74,23 @@ public struct VPhoneResources: Sendable {
     public var apfsSnapRename: URL { base.appendingPathComponent("tools/apfs_snap_rename.py") }
     public var signcert: URL { scriptsDir.appendingPathComponent("vphoned/signcert.p12") }
 
+    /// Files the `resources` probe requires.
+    public var coreRuntimeResources: [URL] { [fwPrepareScript, cfwPy, signcert, requirementsFile] }
+
+    /// Every file a full create (prepare, patch, restore, CFW, boot) reads from
+    /// the resource base. `scripts/check_bundle.py` checks the complete app list.
+    public var runtimeResources: [URL] {
+        coreRuntimeResources + [
+            cfwInstallHostScript, preflightScript, pmd3Bridge, apfsSnapRename, pythonRuntimeCheckScript,
+            scriptsDir.appendingPathComponent("python_environment.py"),
+            resourceArchivesDir.appendingPathComponent("cfw_input.tar.zst"),
+            resourceArchivesDir.appendingPathComponent("cfw_jb_input.tar.zst"),
+            toolsBinDir.appendingPathComponent("trustcache"),
+            toolsBinDir.appendingPathComponent("insert_dylib"),
+            vphoned,
+        ]
+    }
+
     public var vphoned: URL {
         let bundled = base.appendingPathComponent("vphoned.signed")
         if FileManager.default.fileExists(atPath: bundled.path) { return bundled }
@@ -119,24 +136,37 @@ public struct VPhoneResources: Sendable {
     func pythonIsUsable(_ python: URL) -> Bool {
         guard FileManager.default.isExecutableFile(atPath: python.path) else { return false }
         return (try? VPhoneProcessRunner.runCapturing(python,
-            [scriptsDir.appendingPathComponent("check_python_runtime.py").path, "--locked", "--json"],
+            [pythonRuntimeCheckScript.path, "--locked", "--json"],
             env: environment))?.succeeded == true
     }
 
+    public enum PythonSource: String, Sendable {
+        /// `VPHONE_PYTHON`; when set it is the only candidate.
+        case environmentOverride = "VPHONE_PYTHON"
+        case developmentVenv = "dev_venv"
+        case managedVenv = "managed_venv"
+    }
+
+    /// Interpreters `pythonExecutable()` tries, in order, before bootstrapping.
+    public var pythonCandidates: [(source: PythonSource, url: URL)] {
+        if let override = environment["VPHONE_PYTHON"], !override.isEmpty {
+            return [(.environmentOverride, URL(fileURLWithPath: override))]
+        }
+        return [(.developmentVenv, base.appendingPathComponent(".venv/bin/python3")),
+                (.managedVenv, managedVenvDir.appendingPathComponent("bin/python3"))]
+    }
+
+    public var pythonRuntimeCheckScript: URL { scriptsDir.appendingPathComponent("check_python_runtime.py") }
+
     public func pythonExecutable(forceManaged: Bool = false) throws -> URL {
         if !forceManaged {
-            if let override = environment["VPHONE_PYTHON"], !override.isEmpty {
-                let python = URL(fileURLWithPath: override)
-                guard pythonIsUsable(python) else {
+            for candidate in pythonCandidates {
+                if pythonIsUsable(candidate.url) { return candidate.url }
+                if candidate.source == .environmentOverride {
                     throw VPhoneResourcesError.pythonNotFound(
-                        "VPHONE_PYTHON failed locked runtime verification: \(override)")
+                        "VPHONE_PYTHON failed locked runtime verification: \(candidate.url.path)")
                 }
-                return python
             }
-            let dev = base.appendingPathComponent(".venv/bin/python3")
-            if pythonIsUsable(dev) { return dev }
-            let managed = managedVenvDir.appendingPathComponent("bin/python3")
-            if pythonIsUsable(managed) { return managed }
         }
         return try bootstrapManagedVenv(force: forceManaged)
     }

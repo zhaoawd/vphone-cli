@@ -10,7 +10,7 @@ struct VPhoneResourcesCommand: ParsableCommand {
 
     func run() throws {
         let resources = VPhoneResources.resolve()
-        for url in [resources.fwPrepareScript, resources.cfwPy, resources.signcert, resources.requirementsFile] {
+        for url in resources.coreRuntimeResources {
             guard FileManager.default.fileExists(atPath: url.path) else {
                 throw ValidationError("Missing runtime resource: \(url.path)")
             }

@@ -6,11 +6,14 @@ public struct VPhoneProcessResult: Sendable {
     public let exitCode: Int32
     public let stdout: String
     public let stderr: String
+    /// True when `runCapturing(timeout:)` terminated the process at its deadline.
+    public let timedOut: Bool
 
-    public init(exitCode: Int32, stdout: String, stderr: String) {
+    public init(exitCode: Int32, stdout: String, stderr: String, timedOut: Bool = false) {
         self.exitCode = exitCode
         self.stdout = stdout
         self.stderr = stderr
+        self.timedOut = timedOut
     }
 
     public var succeeded: Bool { exitCode == 0 }
@@ -29,6 +32,13 @@ public enum VPhoneProcessRunner {
         func take() -> Data { lock.lock(); defer { lock.unlock() }; return data }
     }
 
+    private final class DeadlineFlag: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value = false
+        func set() { lock.lock(); value = true; lock.unlock() }
+        var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
+    }
+
     /// Run `executable args` to completion, capturing stdout/stderr.
     /// Throws only if the process cannot be launched; a nonzero exit is
     /// returned in the result, not thrown.
@@ -36,17 +46,23 @@ public enum VPhoneProcessRunner {
     /// stdout and stderr are drained CONCURRENTLY via readability handlers —
     /// a sequential "read stdout fully, then stderr" drain deadlocks when a
     /// child fills one pipe's ~64 KB buffer while still writing the other.
+    ///
+    /// With `timeout`, stdin is `/dev/null` (a probe must never wait on the
+    /// terminal) and the process is terminated at the deadline; the result then
+    /// has `timedOut == true`.
     public static func runCapturing(
         _ executable: URL,
         _ args: [String],
         cwd: URL? = nil,
-        env: [String: String]? = nil
+        env: [String: String]? = nil,
+        timeout: TimeInterval? = nil
     ) throws -> VPhoneProcessResult {
         let process = Process()
         process.executableURL = executable
         process.arguments = args
         if let cwd { process.currentDirectoryURL = cwd }
         if let env { process.environment = env }
+        if timeout != nil { process.standardInput = FileHandle.nullDevice }
 
         let outPipe = Pipe()
         let errPipe = Pipe()
@@ -70,13 +86,23 @@ public enum VPhoneProcessRunner {
         }
 
         try process.run()
+        let expired = DeadlineFlag()
+        if let timeout {
+            let target = process
+            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
+                guard target.isRunning else { return }
+                expired.set()
+                target.terminate()
+            }
+        }
         process.waitUntilExit()
         group.wait()
 
         return VPhoneProcessResult(
             exitCode: process.terminationStatus,
             stdout: String(decoding: outBox.take(), as: UTF8.self),
-            stderr: String(decoding: errBox.take(), as: UTF8.self))
+            stderr: String(decoding: errBox.take(), as: UTF8.self),
+            timedOut: expired.isSet)
     }
 
     /// Stream an archive through a `/usr/bin/tar` consumer that reads on stdin,
