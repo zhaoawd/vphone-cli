@@ -1,6 +1,6 @@
 # C4 固件暂存与中断恢复
 
-日期：2026-09-11。实现基线：`cf4f1ba`。状态：已实现暂存、提交记录和显式恢复；非 less 实际产物与故障恢复已验证，完整 less 成功路径仍待验收，暂不计为 C4 完成。
+日期：2026-09-11。实现基线：`cf4f1ba`。2026-09-17 最新状态：C4 的完整 less 成功路径、事务提交、Manifest 校验和原输入备份校验通过；本地验收完成。历史运行与限制保留在下文。
 
 ## 实现前的写入审计（`da678a3`）
 
@@ -95,3 +95,25 @@ vphone-cli fw patch VM_NAME --recover
 ## 当前安排
 
 2026-09-11，用户因当前磁盘空间不足决定先绕过 C4。完整 less 成功验收暂停；C4 保持未完成，不再为本轮推进分配大型镜像。后续先推进不依赖固件样本的 A4 PR 快速测试，见 [A4 记录](pr_checks_a4_2026-09-11.md)。
+
+## 2026-09-17 恢复准备
+
+用户已解除 C4 完整 less 成功路径验收的暂停。执行前可用空间约 380 GiB；完成 D3 四台专用 VM 的固件准备和恢复后约 328 GiB，仍高于此前记录的约 60 GiB 建议预算。该预算不是峰值实测。
+
+旧的 `research/artifacts/c3-full-pipeline-2026-09-10` 与 `c3-less-pipeline-2026-09-10` 输入在当前工作区不存在。本轮重新运行 `c3_full_pipeline_acceptance.py fetch`，以 `vm-new/iPhone17,3_26.1_23B85_Restore` 为只读源运行 `c3_less_pipeline_acceptance.py --source ... prepare`，随后运行 `c4_transaction_acceptance.py less`。隔离输入位于 `research/artifacts/c4-less-2026-09-11/vm`，准备脚本逐文件核对 ZIP 成员大小、CRC32 和本地 SHA-256；当前尚未执行完整补丁。
+
+当前 `.tools` 缺少 `apfs_sealvolume_26.1`。项目原下载函数通过 `ipsw download appledb` 选择了 macOS 26.1 beta，正式版重试也因该命令报告不支持范围请求而失败。直接对 Apple 正式版 `UniversalMac_26.1_25B78_Restore.ipsw` 发起单字节范围请求返回 206；本轮使用项目 `RemoteZIP` 按 ZIP 成员提取 `BuildManifest.plist` 与其指定的 `043-56831-106.dmg`。成员来源、大小、CRC32 和 SHA-256 保存在 `.build/c4-seal/provenance.json`。从 RestoreRamDisk 只读提取并临时签名的 `.tools/apfs_sealvolume_26.1` SHA-256 为 `3b1e1e7190456cd51100e76a3b7fca71524848e951a4baaf9d754ec0b3f6a9d4`，提取后已卸载镜像。
+
+`check_python_runtime.py --locked` 通过；`FirmwareTransactionAcceptanceTests/testLargeImageDigestUsesBoundedMemory` 通过。完整 less 生产路径仍待管理员权限执行和产物验证，C4 状态暂不改变。
+
+## 2026-09-17 完整 less 首次运行与修复
+
+管理员权限下的完整 less 流水线完成 9 个组件、26 条补丁记录，但在提交前的 `validateManifest` 返回 `Staged Manifest digest mismatch: Ap,RestoreSecurePageTableMonitor`，测试退出 1，正式 Restore 未被替换。日志为 `research/artifacts/c4-less-2026-09-11/pipeline-admin-20260917.log`。
+
+原因：`ManifestHashPatcher` 对指定的 IM4P 组件先按 Manifest 声明的 `Img4PayloadType` 重命名，再计算摘要；C4 提交前校验直接对磁盘文件计算摘要。两处计算对象不同。校验现复用相同的组件集合与重命名函数；其他文件继续分块计算摘要。`lessManifestChecksRetypedIM4PDigest` 回归在重命名摘要匹配时通过、文件内容改变时拒绝。失败事务随后通过 `VPHONE_C4_RECOVER_ONLY=1` 的真实恢复测试归档，日志为 `recovery-admin-20260917.log`。
+
+同一隔离输入的完整流水线重跑通过，日志为 `pipeline-admin-retry-20260917.log`：XCTest 1 项通过，耗时 341.314 秒；补丁流水线处理 9 个组件、26 条补丁记录；提交归档 ID 为 `29bdd8a7-d03f-4844-a926-1570db71e9c0`。验收测试检查 `failedRequired` 为空、非消融、单一新归档、归档 backup 与原 Restore 摘要相同、活动事务目录消失，并对正式 Restore 的所有 Manifest 引用执行摘要校验。`report.json` 已生成。结束后未发现该隔离输入的残留镜像挂载，磁盘可用空间约 283 GiB。
+
+修复后 `swift test --filter FirmwareTransactionTests` 的 17 项通过；`make test_swift` 的 337 项 Swift Testing 通过，XCTest 无失败（固件输入依赖项按条件跳过）；`make build` 的正式二进制与应用包构建、签名和资源检查通过。
+
+本轮真实恢复记录与先前故障注入、进程退出测试共同满足 C4 本地验收范围。未进行物理断电实验；该范围限制不改变本次进程中断恢复和完整 less 提交结果。

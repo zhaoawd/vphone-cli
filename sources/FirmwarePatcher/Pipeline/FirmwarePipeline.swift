@@ -269,15 +269,23 @@ public final class FirmwarePipeline {
             guard file.resolvingSymlinksInPath().path.hasPrefix(restore.resolvingSymlinksInPath().path + "/") else {
                 throw PatcherError.invalidFormat("Manifest path escapes staged restore: \(name)")
             }
-            let handle = try FileHandle(forReadingFrom: file)
-            defer { try? handle.close() }
-            var hash = SHA384()
-            while try autoreleasepool(invoking: {
-                guard let data = try handle.read(upToCount: 1024 * 1024), !data.isEmpty else { return false }
-                hash.update(data: data)
-                return true
-            }) {}
-            guard Data(hash.finalize()) == expected else {
+            let actual: Data
+            if manifestRetypedIM4PComponents.contains(name) {
+                let bytes = try Data(contentsOf: file)
+                let retyped = try patchIm4pTypeTag(name, info["Img4PayloadType"] as? String, bytes)
+                actual = Data(SHA384.hash(data: retyped))
+            } else {
+                let handle = try FileHandle(forReadingFrom: file)
+                defer { try? handle.close() }
+                var hash = SHA384()
+                while try autoreleasepool(invoking: {
+                    guard let data = try handle.read(upToCount: 1024 * 1024), !data.isEmpty else { return false }
+                    hash.update(data: data)
+                    return true
+                }) {}
+                actual = Data(hash.finalize())
+            }
+            guard actual == expected else {
                 throw PatcherError.patchVerificationFailed("Staged Manifest digest mismatch: \(name)")
             }
         }

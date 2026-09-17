@@ -1,6 +1,7 @@
 import CryptoKit
 import Darwin
 import Foundation
+import Img4tool
 import Testing
 @testable import FirmwarePatcher
 
@@ -156,6 +157,27 @@ import Testing
         try data.write(to: f.restore.appendingPathComponent("BuildManifest.plist"))
         try FirmwarePipeline.validateManifest(in: f.restore)
         try Data("corrupt".utf8).write(to: file)
+        #expect(throws: (any Error).self) { try FirmwarePipeline.validateManifest(in: f.restore) }
+    }
+
+    @Test func lessManifestChecksRetypedIM4PDigest() throws {
+        let f = try Fixture()
+        let original = try IM4P(fourcc: "sptm", description: "fixture", payload: Data("payload".utf8))
+        let path = "Firmware/sptm.im4p"
+        let file = f.restore.appendingPathComponent(path)
+        try original.data.write(to: file)
+        let expected = try patchIm4pTypeTag("Ap,RestoreSecurePageTableMonitor", "rspt", original.data)
+        let manifest: [String: Any] = ["BuildIdentities": [["Manifest": [
+            "Ap,RestoreSecurePageTableMonitor": [
+                "Info": ["Path": path, "Img4PayloadType": "rspt"],
+                "Digest": Data(SHA384.hash(data: expected)),
+            ],
+        ]]]]
+        let bytes = try PropertyListSerialization.data(fromPropertyList: manifest, format: .xml, options: 0)
+        try bytes.write(to: f.restore.appendingPathComponent("BuildManifest.plist"))
+        try FirmwarePipeline.validateManifest(in: f.restore)
+        let altered = try IM4P(fourcc: "sptm", description: "fixture", payload: Data("altered".utf8))
+        try altered.data.write(to: file)
         #expect(throws: (any Error).self) { try FirmwarePipeline.validateManifest(in: f.restore) }
     }
 

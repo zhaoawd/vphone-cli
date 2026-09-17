@@ -142,8 +142,7 @@ public final class ManifestHashPatcher: StructuredPatcher {
     }
 }
 
-func patchIm4pTypeTag(_ component: String, _ declaredType: String?, _ data: Data) throws -> Data {
-    guard [
+let manifestRetypedIM4PComponents: Set<String> = [
         "RestoreKernelCache",
         "RestoreDeviceTree",
         "RestoreSEP",
@@ -158,7 +157,10 @@ func patchIm4pTypeTag(_ component: String, _ declaredType: String?, _ data: Data
         "Ap,RestoreSecurePageTableMonitor",
         "Ap,RestoreTrustedExecutionMonitor",
         "Ap,RestorecL4"
-    ].contains(component) else {
+]
+
+func patchIm4pTypeTag(_ component: String, _ declaredType: String?, _ data: Data) throws -> Data {
+    guard manifestRetypedIM4PComponents.contains(component) else {
         return data
     }
     guard let declaredType else {

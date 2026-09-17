@@ -52,7 +52,7 @@ let package = Package(
         ),
         .testTarget(
             name: "FirmwarePatcherTests",
-            dependencies: ["FirmwarePatcher"],
+            dependencies: ["FirmwarePatcher", .product(name: "Img4tool", package: "libimg4-spm")],
             path: "tests/FirmwarePatcherTests"
         ),
         .testTarget(
