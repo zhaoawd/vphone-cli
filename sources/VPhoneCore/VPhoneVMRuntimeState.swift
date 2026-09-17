@@ -29,6 +29,9 @@ public enum VPhoneVMOperation {
     public static let cfwRecord = "cfw-record"
     public static let restoreDecrypt = "restore-decrypt"
     public static let cleanupFirmware = "cleanup-firmware"
+    /// A `vm create` checkpoint write between stages. Allowed while a firmware
+    /// transaction is pending so a failed patch stage can still be recorded.
+    public static let createCheckpoint = "create-checkpoint"
 
     // Written by shell entries through `scripts/vm_lock.py`, which takes the
     // same directory flock. `fwPrepare` and `cfw` are also written by Swift
@@ -48,7 +51,7 @@ public enum VPhoneVMOperation {
     /// Complete vocabulary, for tests and diagnostics.
     public static let all: [String] = [
         boot, dfu, stageVphoned, config, rename, clone, delete, export, importArchive, create,
-        fwPrepare, fwPatch, cfw, cfwRecord, restoreDecrypt, cleanupFirmware,
+        fwPrepare, fwPatch, cfw, cfwRecord, restoreDecrypt, cleanupFirmware, createCheckpoint,
         backup, restoreBackup, switchVM, package,
     ]
 }

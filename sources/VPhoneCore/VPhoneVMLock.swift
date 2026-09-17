@@ -57,7 +57,8 @@ public final class VPhoneVMLock {
             }
             var pending = stat()
             let pendingPath = directory.appendingPathComponent(".firmware-transaction").path
-            if operation != VPhoneVMOperation.fwPatch, lstat(pendingPath, &pending) == 0 {
+            if operation != VPhoneVMOperation.fwPatch, operation != VPhoneVMOperation.createCheckpoint,
+               lstat(pendingPath, &pending) == 0 {
                 throw VPhoneVMLockError.firmwareRecoveryRequired(pendingPath)
             }
             var info = stat()

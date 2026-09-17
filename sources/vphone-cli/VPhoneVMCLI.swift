@@ -21,6 +21,7 @@ struct VPhoneVMCommand: ParsableCommand {
             VPhoneVMLaunchCommand.self,
             VPhoneVMStopCommand.self,
             VPhoneVMCreateCommand.self,
+            VPhoneVMCreateStatusCommand.self,
         ]
     )
 }
