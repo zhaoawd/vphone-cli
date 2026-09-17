@@ -275,3 +275,18 @@ vphone-cli vm create-status [<name>] [--json]            只读查看
 3. patch 中断：在 C4 事务 publishing 阶段终止；续跑必须提示 `fw patch --recover`；恢复后续跑，patch 从头执行并提交。另做一次“事务已提交、检查点未写入”（在 archive 之后、成功记录写入之前终止）：续跑必须以 restore_tree 变化拒绝，`--restart-from prepare` 完成。
 4. first_boot/verification 断开：终止启动子进程；续跑重跑该阶段；restore_tree 在 verification 完成前保持存在。
 5. 每个场景记录：命令、时间、终止信号与目标 pid、`create-status --json` 输出、检查点文件摘要、最终整体状态、产物是否保留。整体状态为 `failed`、`interrupted`、`recovery_required` 或 `incomplete` 时不得报告为创建成功。
+
+## 真实验收记录：场景 1 restore 中断（2026-09-17）
+
+实验设置：签名应用从独立工作树 `.build/d4acc/src` 构建，未替换 `vm-2607` 使用的 `.build/vphone-cli.app`；运行中的 amfidont 以仓库路径前缀放行。库根 `.build/d4acc/lib`，VM `d4-acc`，regular，本地 26.1 / 23B85 iPhone IPSW 与 cloudOS IPSW，`--root-popup`。证据位于 `.build/d4acc/logs/`（受 Git 忽略）。
+
+| 步骤 | 构建 | 结果 |
+| --- | --- | --- |
+| 首次创建，restore 阶段 `restore-update` 运行约 20 秒后对主进程发送 SIGKILL（09:53:04Z） | `ec9a20f` | 检查点 restore 为 `running`；DFU 宿主与 restore bridge 子进程在 2 秒内自行退出（`s1-ps-before-kill.txt`、`s1-ps-after-kill.txt`） |
+| 手动启动该 bundle 的 DFU 宿主后续跑 | `ec9a20f` | 退出码 1，`bundle is busy`；检查点 SHA-256 前后均为 `3d947ec9…`。拒绝来自 bundle 锁检查，未进入实时探测 |
+| 停止 DFU 宿主后续跑 | `ec9a20f` | 续跑前检查：prepare/patch 验证通过，AVPBooter 与 restore 树与 patch 记录一致，`probe.restore` 无锁、无启动进程、无 bridge、无 DFU/recovery 端点；上一份检查点归档。restore 从 DFU 重新执行并完成，但验证器在 DFU 子进程退出前检查锁，误判失败并记录 `recovery_required (live_state)`。该缺陷由 `99da011` 修复 |
+| 修复后构建，不带 `--accept-tool-change` 续跑 | `c2fac55` | 退出码 1，报告可执行文件 SHA-256 变化；检查点字节不变。拒绝前提示仍输出旧的 recovery_required 内容，提示与本次拒绝原因不一致，未修复 |
+| `doctor d4-acc`（签名应用） | `c2fac55` | 签名权益 OK；识别运行中的 vm-2607；`d4-acc` 运行记录为已退出进程；报告检查点中的 recovery_required；退出码 5 |
+| 带 `--accept-tool-change` 续跑（10:10:00Z–11:17:28Z） | `c2fac55` | 退出码 0，整体 `succeeded`。restore 10:10:04–10:11:56；cfw 10:11:56–11:17:16（包含管理员认证等待，未单独计时）；first_boot 11:17:16–11:17:25（prompt matched，7 条命令）；verification 11:17:25–11:17:28（prompt_detected）。`attempts/` 保存两份历史检查点；restore 树在 verification 完成后删除并记录为 removed；`restore-info.json` 记录 variant regular |
+
+结论：restore 中断后，续跑在确认无活动子进程和设备端点后从 DFU 重新执行 restore，并依次完成后续阶段；忙碌状态与工具变化均在不修改检查点的前提下拒绝。未覆盖：主进程被杀后子进程仍长时间存活的情况（本次子进程自行退出，改用手动 DFU 宿主模拟）；restore bridge 进程或 DFU 端点仍存在但锁未被持有的实时探测拒绝路径。场景 2–4（cfw、patch、启动阶段中断）尚未执行，D4 真实验收仍在进行。
