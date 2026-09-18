@@ -91,14 +91,20 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no active VM view"
                     return
                 }
-                screen.tap(x: x, y: y)
+                guard screen.tap(x: x, y: y) else {
+                    result.error = "gesture queue is full"
+                    result.code = "gesture_busy"
+                    return
+                }
                 result.ok = true
                 if wantScreen {
                     try? await Task.sleep(nanoseconds: UInt64(screenDelay) * 1_000_000)
                     result.imageBase64 = await captureCompactScreenshot()
                 }
             }()
-            return Self.response(ok: result.ok, error: result.error, image: result.imageBase64)
+            var tapExtra: [String: Any] = [:]
+            if let code = result.code { tapExtra["code"] = code }
+            return Self.response(ok: result.ok, error: result.error, image: result.imageBase64, extra: tapExtra)
 
         case "swipe":
             guard let x1 = json["x1"] as? Double, let y1 = json["y1"] as? Double,
@@ -117,10 +123,14 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no active VM view"
                     return
                 }
-                screen.swipe(
+                guard screen.swipe(
                     fromX: x1, fromY: y1, toX: x2, toY: y2,
                     durationMs: durationMs
-                )
+                ) else {
+                    result.error = "gesture queue is full"
+                    result.code = "gesture_busy"
+                    return
+                }
                 result.ok = true
                 if wantScreen {
                     // Wait for swipe to finish + settle
@@ -129,7 +139,9 @@ final class VPhoneHostCommandExecutor {
                     result.imageBase64 = await captureCompactScreenshot()
                 }
             }()
-            return Self.response(ok: result.ok, error: result.error, image: result.imageBase64)
+            var swipeExtra: [String: Any] = [:]
+            if let code = result.code { swipeExtra["code"] = code }
+            return Self.response(ok: result.ok, error: result.error, image: result.imageBase64, extra: swipeExtra)
 
         case "key":
             guard let name = json["name"] as? String else {

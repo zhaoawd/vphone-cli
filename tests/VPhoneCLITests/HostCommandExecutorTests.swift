@@ -57,10 +57,15 @@ final class HostScreenFake: VPhoneHostScreen {
     var failure: Error?
     var tapped: (Double, Double)?
     var swipeDuration: Int?
+    /// false makes the fake behave like a full gesture queue.
+    var acceptsGestures = true
     func saveScreenshot(to url: URL) async throws -> URL { if let failure { throw failure }; return url }
     func captureCompactScreenshot(color: Bool) async -> String? { colors.append(color); return "jpeg" }
-    func tap(x: Double, y: Double) { tapped = (x, y) }
-    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) { swipeDuration = durationMs }
+    func tap(x: Double, y: Double) -> Bool { tapped = (x, y); return acceptsGestures }
+    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) -> Bool {
+        swipeDuration = durationMs
+        return acceptsGestures
+    }
 }
 
 @MainActor

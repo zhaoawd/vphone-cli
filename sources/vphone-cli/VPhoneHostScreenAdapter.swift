@@ -27,13 +27,14 @@ final class VPhoneHostScreenAdapter: VPhoneHostScreen {
         return try await recorder.saveScreenshot(view: view, to: url)
     }
 
-    func tap(x: Double, y: Double) {
-        captureView?.injectTap(pixelX: x, pixelY: y, screenWidth: screenWidth, screenHeight: screenHeight)
+    func tap(x: Double, y: Double) -> Bool {
+        captureView?.injectTap(pixelX: x, pixelY: y, screenWidth: screenWidth, screenHeight: screenHeight) ?? false
     }
 
-    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) {
+    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) -> Bool {
         captureView?.injectSwipe(fromX: fromX, fromY: fromY, toX: toX, toY: toY,
-                                 screenWidth: screenWidth, screenHeight: screenHeight, durationMs: durationMs)
+                                 screenWidth: screenWidth, screenHeight: screenHeight,
+                                 durationMs: durationMs) ?? false
     }
 
     /// Capture current screen as a small JPEG, returned as base64.
