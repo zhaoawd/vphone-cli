@@ -1,13 +1,16 @@
 import base64
 from datetime import datetime, timedelta, timezone
 import json
+import os
 from pathlib import Path
+import plistlib
 import signal
 import subprocess
 import sys
 import tempfile
 import time
 import unittest
+import uuid
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -557,6 +560,91 @@ class F3RecoveryAndLoadTests(DriverTestCase):
         self.assertGreaterEqual(run["details"]["probes"], 1)
 
 
+class F3BootTimeTests(DriverTestCase):
+    """§2.1 fixed item: the time since the VM under test was started (evidence 10.11)."""
+
+    def bundle(self, name="d4-acc", *, record=None):
+        directory = self.root / name
+        directory.mkdir()
+        with (directory / "config.plist").open("wb") as handle:
+            plistlib.dump({"cpuCount": 8, "memorySize": 8 * (1 << 30)}, handle)
+        if record is not None:
+            (directory / ".vphone-runtime.json").write_text(json.dumps(record))
+        return directory
+
+    @staticmethod
+    def runtime_record(pid, started_at, operation="boot"):
+        return {"bundleIdentifier": "com.vphone.d4-acc", "bundlePath": "/tmp/d4-acc",
+                "pid": pid, "instanceID": "instance-1", "startedAt": started_at,
+                "operation": operation}
+
+    @staticmethod
+    def dead_pid():
+        """A pid that no process holds, for the stale-record case."""
+        for candidate in range(90000, 60000, -1):
+            try:
+                os.kill(candidate, 0)
+            except ProcessLookupError:
+                return candidate
+            except OSError:
+                continue
+        raise unittest.SkipTest("no free pid found")
+
+    def run_with_bundle(self, bundle):
+        tag = uuid.uuid4().hex[:6]
+        fixture = self.fixture(name=f"sock-{tag}")
+        output = self.root / f"out-{bundle.name}-{tag}"
+        self.run_probe("latency", "--sock", fixture.path, "--out", output,
+                       "--commands", "capabilities", "--samples", 1, "--warmup", 0,
+                       "--timeout", 5, "--bundle", bundle, expect=0)
+        return json.loads((output / "run.json").read_text())["vm"]
+
+    def test_run_json_records_the_vm_start_time_and_its_age_at_the_run_start(self):
+        started = datetime.now(timezone.utc) - timedelta(seconds=1800)
+        bundle = self.bundle(record=self.runtime_record(os.getpid(), started.isoformat()))
+        vm = self.run_with_bundle(bundle)
+        boot = vm["boot"]
+        self.assertEqual(boot["started_at"], started.isoformat())
+        self.assertEqual(boot["pid"], os.getpid())
+        self.assertTrue(boot["pid_alive"])
+        self.assertFalse(boot["stale"])
+        self.assertTrue(boot["is_boot_operation"])
+        self.assertEqual(boot["operation"], "boot")
+        self.assertIsNone(boot["unavailable"])
+        self.assertAlmostEqual(boot["uptime_at_run_start_s"], 1800, delta=120)
+        self.assertIn(".vphone-runtime.json", boot["source"])
+        self.assertEqual(vm["config"]["cpuCount"], 8)
+
+    def test_a_missing_or_stale_runtime_record_is_recorded_without_failing_the_run(self):
+        absent = self.run_with_bundle(self.bundle("no-record"))["boot"]
+        self.assertIsNone(absent["started_at"])
+        self.assertIsNone(absent["uptime_at_run_start_s"])
+        self.assertIsNone(absent["pid_alive"])
+        self.assertIn("cannot read", absent["unavailable"])
+
+        started = datetime.now(timezone.utc) - timedelta(seconds=600)
+        pid = self.dead_pid()
+        stale = self.run_with_bundle(
+            self.bundle("stale", record=self.runtime_record(pid, started.isoformat())))["boot"]
+        self.assertEqual(stale["pid"], pid)
+        self.assertIs(stale["pid_alive"], False)
+        self.assertTrue(stale["stale"])
+        self.assertEqual(stale["started_at"], started.isoformat())
+        self.assertAlmostEqual(stale["uptime_at_run_start_s"], 600, delta=120)
+        self.assertIn("stale", stale["unavailable"])
+
+    def test_a_run_without_a_bundle_records_why_the_boot_time_is_unknown(self):
+        fixture = self.fixture()
+        output = self.root / "no-bundle"
+        self.run_probe("latency", "--sock", fixture.path, "--out", output,
+                       "--commands", "capabilities", "--samples", 1, "--warmup", 0,
+                       "--timeout", 5, expect=0)
+        boot = json.loads((output / "run.json").read_text())["vm"]["boot"]
+        self.assertEqual(boot["unavailable"], "no --bundle given")
+        self.assertIsNone(boot["started_at"])
+        self.assertIsNone(boot["uptime_at_run_start_s"])
+
+
 class F3SignalTests(DriverTestCase):
     def test_sigterm_still_writes_run_json(self):
         fixture = self.fixture()
@@ -729,8 +817,22 @@ class SummarizeTests(unittest.TestCase):
         return (datetime(2026, 9, 18, tzinfo=timezone.utc)
                 + timedelta(seconds=seconds)).isoformat()
 
+    @staticmethod
+    def footprint_mib(index, slope_per_sample, step_mib, step_index, jitter_mib):
+        """Footprint sample: a linear part, an optional discrete step, and small jitter.
+
+        The jitter keeps the point-to-point differences from being all identical, so the
+        step criterion has a non-zero robust scale to measure against.
+        """
+        value = 300.0 + index * slope_per_sample
+        if step_index is not None and index >= step_index:
+            value += step_mib
+        return value + jitter_mib * ((index * 7) % 5 - 2)
+
     def build_run(self, name, *, slope_per_sample=0.0, vz_after=(11, 12), latency_ms=None,
-                  log_growth_kib=64.0, guest_log_ok=True, load_seconds=None):
+                  log_growth_kib=64.0, guest_log_ok=True, load_seconds=None,
+                  step_mib=0.0, step_index=None, jitter_mib=0.0, vz_process=False,
+                  vz_marker="is_vz", quantize_footprint=False):
         directory = self.root / name
         (directory / "samples").mkdir(parents=True)
         run_json = {
@@ -766,9 +868,30 @@ class SummarizeTests(unittest.TestCase):
         for index in range(120):
             t_mono = 1000.0 + index * 60.0
             t_wall = self.wall(index * 60.0)
-            host.append({"kind": "process", "label": "vphone-cli", "pid": 4242, "t_mono": t_mono,
-                         "t_wall": t_wall, "cpu_seconds": index * 6.0,
-                         "footprint_bytes": int((300 + index * slope_per_sample) * (1 << 20))})
+            footprint = self.footprint_mib(index, slope_per_sample, step_mib, step_index,
+                                           jitter_mib)
+            if quantize_footprint:
+                # What `footprint -p` really reports: whole MiB.
+                footprint = float(int(footprint))
+            cli = {"kind": "process", "label": "vphone-cli", "pid": 4242, "t_mono": t_mono,
+                   "t_wall": t_wall, "source": "argument", "cpu_seconds": index * 6.0,
+                   "footprint_bytes": int(footprint * (1 << 20))}
+            if vz_marker == "is_vz":
+                cli["is_vz"] = False
+            host.append(cli)
+            if vz_process:
+                # The operator passes the Virtualization pid with --pid, so its
+                # `source` is "argument" exactly like the vphone-cli process.
+                vz = {"kind": "process", "label": "d4acc-vz-a", "pid": 83588,
+                      "t_mono": t_mono, "t_wall": t_wall, "source": "argument",
+                      "cpu_seconds": index * 6.0,
+                      "footprint_bytes": int(footprint * (1 << 20))}
+                if vz_marker == "is_vz":
+                    vz["is_vz"] = True
+                host.append(vz)
+                if vz_marker == "vz_scan":
+                    host.append({"kind": "vz_scan", "t_mono": t_mono, "t_wall": t_wall,
+                                 "error": None, "pids": [83588]})
             host.append({"kind": "disk", "label": "Disk.img", "t_mono": t_mono, "t_wall": t_wall,
                          "st_blocks": 42473888 + index * 8})
             host.append({"kind": "file", "label": "boot.log", "path": "/tmp/boot.log",
@@ -840,6 +963,121 @@ class SummarizeTests(unittest.TestCase):
         self.assertIn("增长判定", markdown)
         self.assertIn("恢复区间", markdown)
 
+    def test_a_clean_trend_keeps_its_verdict_and_reports_no_step(self):
+        first = self.build_run("trend-a", slope_per_sample=0.5, jitter_mib=0.05)
+        second = self.build_run("trend-b", slope_per_sample=0.5, jitter_mib=0.05)
+        _, summary, output = self.summarize(first, second, out="trend-summary")
+        footprint = summary["runs"][0]["resources"]["slopes"]["process/vphone-cli/footprint_mib"]
+        self.assertEqual(footprint["step_count"], 0)
+        self.assertEqual(footprint["steps"], [])
+        self.assertFalse(footprint["step_dominated"])
+        growth = summary["growth"]["process/vphone-cli/footprint_mib"]
+        self.assertEqual(growth["verdict"], "confirmed")
+        self.assertEqual(summary["step_detection"]["dominance_share"], 0.5)
+        self.assertIn("阶跃检测", (output / "summary.md").read_text())
+
+    def test_a_flat_series_with_one_step_is_reported_as_step_dominated(self):
+        first = self.build_run("step-a", step_mib=80.0, step_index=60, jitter_mib=0.05)
+        second = self.build_run("step-b", step_mib=80.0, step_index=60, jitter_mib=0.05)
+        _, summary, output = self.summarize(first, second, out="step-summary")
+        footprint = summary["runs"][0]["resources"]["slopes"]["process/vphone-cli/footprint_mib"]
+        self.assertGreater(footprint["ci_low"], 0)
+        self.assertEqual(footprint["step_count"], 1)
+        step = footprint["steps"][0]
+        self.assertAlmostEqual(step["delta"], 80.0, delta=0.5)
+        self.assertAlmostEqual(step["offset_s"], 3000.0, places=3)
+        self.assertGreater(footprint["step_dominated_share"], 0.9)
+        self.assertTrue(footprint["step_dominated"])
+        self.assertEqual(footprint["step_criterion"]["dominance_share"], 0.5)
+        growth = summary["growth"]["process/vphone-cli/footprint_mib"]
+        self.assertEqual(growth["verdict"], "step_dominated")
+        markdown = (output / "summary.md").read_text()
+        self.assertIn("阶跃主导", markdown)
+        self.assertIn("t+50.00 分", markdown)
+
+    def test_the_dominance_share_is_a_recorded_command_line_choice(self):
+        run = self.build_run("share", step_mib=80.0, step_index=60, jitter_mib=0.05)
+        _, summary, _ = self.summarize(run, out="share-summary",
+                                       extra=("--step-dominance-share", "0.999"))
+        self.assertEqual(summary["step_detection"]["dominance_share"], 0.999)
+        footprint = summary["runs"][0]["resources"]["slopes"]["process/vphone-cli/footprint_mib"]
+        self.assertEqual(footprint["step_count"], 1)
+        self.assertFalse(footprint["step_dominated"])
+        self.assertEqual(summary["growth"]["process/vphone-cli/footprint_mib"]["verdict"],
+                         "candidate")
+
+    def test_a_constant_series_has_no_step_and_no_verdict_change(self):
+        run = self.build_run("constant")
+        _, summary, _ = self.summarize(run, out="constant-summary")
+        footprint = summary["runs"][0]["resources"]["slopes"]["process/vphone-cli/footprint_mib"]
+        self.assertEqual(footprint["step_count"], 0)
+        self.assertEqual(footprint["net_change"], 0.0)
+        self.assertIsNone(footprint["step_dominated_share"])
+        self.assertFalse(footprint["step_dominated"])
+        self.assertEqual(summary["growth"]["process/vphone-cli/footprint_mib"]["verdict"],
+                         "not_detected")
+
+    def test_virtualization_processes_are_marked_as_background_covariates(self):
+        run = self.build_run("vz-role", slope_per_sample=0.5, jitter_mib=0.05, vz_process=True)
+        _, summary, output = self.summarize(run, out="vz-role-summary")
+        slopes = summary["runs"][0]["resources"]["slopes"]
+        self.assertEqual(slopes["process/vphone-cli/footprint_mib"]["role"], "judged")
+        self.assertEqual(slopes["process/d4acc-vz-a/footprint_mib"]["role"], "covariate")
+        self.assertEqual(slopes["disk/Disk.img/actual_mib"]["role"], "judged")
+        self.assertEqual(slopes["file/boot.log/size_kib"]["role"], "judged")
+        self.assertEqual(slopes["guest_log/vphone-vcam.log/size_kib"]["role"], "judged")
+        growth = summary["growth"]
+        self.assertEqual(growth["process/d4acc-vz-a/footprint_mib"]["role"], "covariate")
+        self.assertEqual(growth["process/vphone-cli/footprint_mib"]["role"], "judged")
+        # Sampling is unchanged: the covariate series keeps its slope and interval.
+        self.assertAlmostEqual(slopes["process/d4acc-vz-a/footprint_mib"]["slope_per_hour"],
+                               30.0, places=6)
+        self.assertIn("背景协变量", (output / "summary.md").read_text())
+
+    def test_an_older_run_without_is_vz_falls_back_to_the_scan_records(self):
+        run = self.build_run("vz-scan", slope_per_sample=0.5, jitter_mib=0.05,
+                             vz_process=True, vz_marker="vz_scan")
+        _, summary, _ = self.summarize(run, out="vz-scan-summary")
+        slopes = summary["runs"][0]["resources"]["slopes"]
+        self.assertEqual(slopes["process/d4acc-vz-a/footprint_mib"]["role"], "covariate")
+        self.assertIn("vz_scan", slopes["process/d4acc-vz-a/footprint_mib"]["role_reason"])
+        self.assertEqual(slopes["process/vphone-cli/footprint_mib"]["role"], "judged")
+
+    def test_a_process_no_evidence_identifies_is_reported_as_unknown_not_guessed(self):
+        run = self.build_run("vz-none", slope_per_sample=0.5, jitter_mib=0.05,
+                             vz_process=True, vz_marker="none")
+        _, summary, output = self.summarize(run, out="vz-none-summary")
+        slopes = summary["runs"][0]["resources"]["slopes"]
+        for label in ("vphone-cli", "d4acc-vz-a"):
+            entry = slopes[f"process/{label}/footprint_mib"]
+            self.assertEqual(entry["role"], "unknown")
+            self.assertIn("无法判断", entry["role_reason"])
+        self.assertEqual(summary["growth"]["process/d4acc-vz-a/footprint_mib"]["role"], "unknown")
+        self.assertIn("归属未知", (output / "summary.md").read_text())
+
+    def test_a_quantized_staircase_is_a_trend_not_a_series_of_events(self):
+        """§3.6: footprint is sampled in whole MiB, so a slow rise arrives as 1 MiB jumps."""
+        run = self.build_run("quantized", slope_per_sample=0.05, quantize_footprint=True)
+        _, summary, _ = self.summarize(run, out="quantized-summary")
+        footprint = summary["runs"][0]["resources"]["slopes"]["process/vphone-cli/footprint_mib"]
+        # The series really is a staircase of single-MiB jumps.
+        self.assertEqual(footprint["first_value"], 300.0)
+        self.assertEqual(footprint["last_value"], 305.0)
+        self.assertEqual(footprint["step_criterion"]["scale_source"], "sparse moves")
+        self.assertEqual(footprint["step_count"], 0)
+        self.assertFalse(footprint["step_dominated"])
+        self.assertNotEqual(summary["growth"]["process/vphone-cli/footprint_mib"]["verdict"],
+                            "step_dominated")
+
+    def test_a_quantized_series_still_reports_a_jump_of_many_quanta(self):
+        run = self.build_run("quantized-step", step_mib=80.0, step_index=60,
+                             quantize_footprint=True)
+        _, summary, _ = self.summarize(run, out="quantized-step-summary")
+        footprint = summary["runs"][0]["resources"]["slopes"]["process/vphone-cli/footprint_mib"]
+        self.assertEqual(footprint["step_count"], 1)
+        self.assertAlmostEqual(footprint["steps"][0]["delta"], 80.0, delta=0.5)
+        self.assertTrue(footprint["step_dominated"])
+
     def test_flat_series_is_not_detected_as_growth(self):
         run = self.build_run("flat", slope_per_sample=0.0)
         _, summary, _ = self.summarize(run, out="flat-summary")
@@ -899,7 +1137,8 @@ class SummarizeTests(unittest.TestCase):
         self.assertEqual(len(values), 8)
         self.assertEqual(times[0], 600.0)
         self.assertEqual(values[0], 1056.0)
-        self.assertEqual(f3_benchmark.guest_log_series([]), {"series": {}, "unavailable": {}})
+        self.assertEqual(f3_benchmark.guest_log_series([]),
+                         {"series": {}, "roles": {}, "role_reasons": {}, "unavailable": {}})
 
     def test_file_records_build_a_size_series(self):
         samples = [{"kind": "file", "label": "boot.log", "path": "/tmp/boot.log", "present": True,

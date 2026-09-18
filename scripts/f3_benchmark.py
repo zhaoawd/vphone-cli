@@ -16,6 +16,7 @@ import base64
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 import plistlib
 import posixpath
 import random
@@ -44,6 +45,12 @@ SCHEMA_VERSION = 1
 ROOT = Path(__file__).resolve().parents[1]
 GUEST_ROOT = "/var/mobile/Library/f3-bench/"
 BLOCKED_BUNDLE_NAMES = ("vm-2607",)
+# §2.1 time since cold boot: the bundle's diagnostic runtime record written by the
+# lock holder (VPhoneCore/VPhoneVMRuntimeState.swift). Read-only, and it can be
+# absent or stale.
+RUNTIME_RECORD = ".vphone-runtime.json"
+# `operation` values a running VM holds (VPhoneVMOperation.vmLifetime).
+VM_LIFETIME_OPERATIONS = ("boot", "dfu")
 ERROR_PREFIX_BYTES = 200
 LOCATION_OWNER = "vphone-f3-bench"
 WARMUP_SAMPLES = 10
@@ -82,6 +89,15 @@ BLOCK_KEYS = ("st_blocks", "blocks")
 SIZE_KEYS = ("size_bytes", "st_size")
 LABEL_KEYS = ("label", "role", "target", "name")
 AVAILABLE_KEYS = ("available_bytes", "avail_bytes", "free_bytes")
+# §3.3, amended after 10.6 and 10.9: the §3.6 growth rule is applied to the
+# vphone-cli process, the disk files and the log files. The Virtualization XPC
+# processes are sampled unchanged but reported as background covariates, because
+# their footprint stays exactly at the guest memory allocation and their RSS is
+# dominated by large steps. `df` and `host` series are whole-host background by
+# §3.4. The Virtualization processes are recognised by the sampler's own
+# `source="vz"` field (its executable-name scan), not by the operator's label.
+COVARIATE_KINDS = ("df", "host")
+VZ_SAMPLE_SOURCE = "vz"
 
 
 class BenchmarkError(AcceptanceFailure):
@@ -296,7 +312,7 @@ class Run:
             "invocation": {"argv": f3_common.redact_argv(raw_argv)},
             "git": dict(zip(("commit", "worktree_clean"), f3_common.git_state())),
             "host": f3_common.host_record(),
-            "vm": vm_record(self.args, self.endpoint),
+            "vm": vm_record(self.args, self.endpoint, self.started_at),
             "artifacts": artifact_digests(self.args),
             "capabilities": self.capabilities,
             "parameters": parameters,
@@ -313,7 +329,7 @@ class Run:
         return payload
 
 
-def vm_record(args, endpoint):
+def vm_record(args, endpoint, run_started_at=None):
     bundle = getattr(args, "bundle", None)
     record = {
         "name": getattr(args, "name", None),
@@ -327,6 +343,83 @@ def vm_record(args, endpoint):
             record["config"] = {key: config.get(key) for key in ("cpuCount", "memorySize")}
         except (OSError, ValueError, plistlib.InvalidFileException) as error:
             record["config_error"] = str(error)
+    record["boot"] = boot_record(bundle, run_started_at)
+    return record
+
+
+def pid_alive(pid):
+    """True/False for a live host pid, None when liveness cannot be decided."""
+    if not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0:
+        return None
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        # The process exists and belongs to another user.
+        return True
+    except OSError:
+        return None
+    return True
+
+
+def boot_record(bundle, run_started_at):
+    """§2.1 fixed item: when the VM under test was started and its age at the run start.
+
+    Evidence 10.11: whether a measurement window contains the post-boot allocation step
+    decides the `Disk.img` verdict, so the time since cold boot has to be recorded with
+    every run. The source is the bundle's `.vphone-runtime.json` diagnostic record
+    (host process start, not guest kernel boot time). It is read read-only, and every
+    failure is recorded instead of raised: a missing bundle, a missing or unparseable
+    file, and a record whose pid no longer exists all leave the run intact.
+    """
+    record = {"source": None, "started_at": None, "uptime_at_run_start_s": None,
+              "pid": None, "pid_alive": None, "operation": None, "instance_id": None,
+              "is_boot_operation": None, "stale": None, "unavailable": None,
+              "note": ("host process start time from <bundle>/.vphone-runtime.json; "
+                       "not the guest kernel boot time")}
+    if not bundle:
+        record["unavailable"] = "no --bundle given"
+        return record
+    path = Path(bundle).expanduser() / RUNTIME_RECORD
+    record["source"] = str(path)
+    try:
+        payload = json.loads(path.read_bytes())
+    except (OSError, ValueError) as error:
+        record["unavailable"] = f"cannot read {path}: {error}"
+        return record
+    if not isinstance(payload, dict):
+        record["unavailable"] = f"{path} is not a JSON object"
+        return record
+    pid = payload.get("pid")
+    record["pid"] = pid if isinstance(pid, int) and not isinstance(pid, bool) else None
+    record["operation"] = payload.get("operation")
+    record["instance_id"] = payload.get("instanceID")
+    record["is_boot_operation"] = (record["operation"] in VM_LIFETIME_OPERATIONS
+                                   if isinstance(record["operation"], str) else None)
+    started = payload.get("startedAt")
+    record["started_at"] = started if isinstance(started, str) and started else None
+    record["pid_alive"] = pid_alive(record["pid"])
+    reasons = []
+    if record["pid"] is None:
+        reasons.append("the record has no usable pid")
+    elif record["pid_alive"] is False:
+        reasons.append(f"pid {record['pid']} no longer exists, the record is stale")
+    if record["started_at"] is None:
+        reasons.append("the record has no startedAt")
+    if record["is_boot_operation"] is False:
+        reasons.append(f"operation={record['operation']!r} is not a VM lifetime operation")
+    record["stale"] = record["pid_alive"] is False
+    started_epoch = parse_utc_epoch(record["started_at"])
+    run_epoch = parse_utc_epoch(run_started_at)
+    if started_epoch is None:
+        if record["started_at"] is not None:
+            reasons.append(f"startedAt={record['started_at']!r} is not an ISO timestamp")
+    elif run_epoch is None:
+        reasons.append("the run start time is not an ISO timestamp")
+    else:
+        record["uptime_at_run_start_s"] = run_epoch - started_epoch
+    record["unavailable"] = "; ".join(reasons) or None
     return record
 
 
@@ -1546,23 +1639,85 @@ def windowed_records(records, window):
     return kept, applied
 
 
+def scanned_vz_pids(host_samples):
+    """§3.3 fallback: the Virtualization XPC pids the sampler's scans listed.
+
+    `f3_host_sampler` emits a `vz_scan` record on every process tick holding the
+    pids whose executable basename is the Virtualization XPC service. Runs made
+    before the sampler marked each tracked process carry no `is_vz` field, but
+    they do carry these scans, so the set is recoverable from the run directory.
+
+    Returns `(pids, scanned)`; `scanned` is False when no scan succeeded, and the
+    empty set then means "unknown", not "none".
+    """
+    pids = set()
+    scanned = False
+    for record in host_samples:
+        if not isinstance(record, dict) or record.get("kind") != "vz_scan":
+            continue
+        for key in ("pids", "baseline_pids"):
+            listed = record.get(key)
+            if isinstance(listed, list):
+                scanned = True
+                pids.update(pid for pid in listed
+                            if isinstance(pid, int) and not isinstance(pid, bool))
+    return pids, scanned
+
+
+def series_role(kind, records, vz_pids=frozenset(), vz_scanned=False):
+    """§3.3: `judged` when the §3.6 growth rule applies, `covariate` when the series
+    is background, `unknown` when nothing in the run identifies the process.
+
+    Returns `(role, reason)`. Virtualization XPC processes are recognised from
+    the sampler's own executable scan - the `is_vz` field it now writes on every
+    tracked process, or the `vz_scan` pid lists in older runs - never from the
+    operator's label or from how the pid was supplied.
+    """
+    if kind in COVARIATE_KINDS:
+        return "covariate", f"kind={kind} 为宿主背景序列（方案 3.4）"
+    if kind != "process":
+        return "judged", None
+    marked = {record.get("is_vz") for record in records
+              if isinstance(record.get("is_vz"), bool)}
+    if True in marked:
+        return "covariate", "采样器标记 is_vz=true：可执行文件为 Virtualization XPC 服务"
+    if marked:
+        return "judged", "采样器标记 is_vz=false"
+    pids = {record.get("pid") for record in records
+            if isinstance(record.get("pid"), int) and not isinstance(record.get("pid"), bool)}
+    if not pids:
+        return "unknown", "采样记录既无 is_vz 字段也无 pid，无法判断是否为 Virtualization XPC 进程"
+    if not vz_scanned:
+        return "unknown", ("采样记录无 is_vz 字段，且本次运行没有成功的 vz_scan 记录，"
+                           "无法判断是否为 Virtualization XPC 进程")
+    if pids & vz_pids:
+        return "covariate", "pid 出现在采样器的 vz_scan 列表中（旧版运行的回退依据）"
+    return "judged", "pid 未出现在采样器的 vz_scan 列表中（旧版运行的回退依据）"
+
+
 def resource_series(host_samples, warmup_seconds=RESOURCE_WARMUP_SECONDS):
     """Build (times_hours, values) series from host_samples.jsonl.
 
-    Returns {"series": {...}, "unavailable": {...}}; CPU is derived from cumulative
-    CPU time differences over wall-clock differences (§3.3), never from `ps %cpu`.
+    Returns {"series": {...}, "roles": {...}, "unavailable": {...}}; CPU is derived from
+    cumulative CPU time differences over wall-clock differences (§3.3), never from `ps %cpu`.
     """
     series = {}
+    roles = {}
+    role_reasons = {}
     unavailable = {}
+    # Computed over every record, including the warm-up: a scan there identifies
+    # the process just as well.
+    vz_pids, vz_scanned = scanned_vz_pids(host_samples)
     timed = [record for record in host_samples
              if isinstance(record.get("t_mono"), (int, float))
              and not isinstance(record.get("t_mono"), bool)]
     if not timed:
-        return {"series": {}, "unavailable": {"all": "host_samples.jsonl has no t_mono records"}}
+        return {"series": {}, "roles": {}, "role_reasons": {},
+                "unavailable": {"all": "host_samples.jsonl has no t_mono records"}}
     start = min(record["t_mono"] for record in timed)
     kept = [record for record in timed if record["t_mono"] - start >= warmup_seconds]
     if not kept:
-        return {"series": {},
+        return {"series": {}, "roles": {}, "role_reasons": {},
                 "unavailable": {"all": f"all host samples fall inside the {warmup_seconds:g}s warm-up"}}
     grouped = {}
     for record in kept:
@@ -1572,6 +1727,8 @@ def resource_series(host_samples, warmup_seconds=RESOURCE_WARMUP_SECONDS):
         # Times stay in seconds: f3_stats.moving_block_bootstrap_slope_ci takes block_span
         # in the same unit; slopes are converted to "per hour" in slope_record.
         times = [record["t_mono"] - start for record in records]
+        built_before = set(series)
+        role, role_reason = series_role(kind, records, vz_pids, vz_scanned)
         if kind == "process":
             cpu = series_points(records, times, CPU_TIME_KEYS)
             if len(cpu) > 1:
@@ -1625,20 +1782,26 @@ def resource_series(host_samples, warmup_seconds=RESOURCE_WARMUP_SECONDS):
                 if len(points) > 1:
                     series[f"host/{key}"] = ([point[0] for point in points],
                                              [point[1] for point in points])
-    return {"series": series, "unavailable": unavailable}
+        for name in set(series) - built_before:
+            roles[name] = role
+            role_reasons[name] = role_reason
+    return {"series": series, "roles": roles, "role_reasons": role_reasons,
+            "unavailable": unavailable}
 
 
 def guest_log_series(records, warmup_seconds=RESOURCE_WARMUP_SECONDS):
     """Build `guest_log/<basename>/size_kib` series from samples/guest_log.jsonl (§3.7)."""
     series = {}
+    roles = {}
     unavailable = {}
     if not records:
-        return {"series": {}, "unavailable": {}}
+        return {"series": {}, "roles": {}, "role_reasons": {}, "unavailable": {}}
     timed = [record for record in records
              if isinstance(record.get("t_mono"), (int, float))
              and not isinstance(record.get("t_mono"), bool)]
     if not timed:
-        return {"series": {}, "unavailable": {"guest_log": "guest_log.jsonl has no t_mono records"}}
+        return {"series": {}, "roles": {}, "role_reasons": {},
+                "unavailable": {"guest_log": "guest_log.jsonl has no t_mono records"}}
     start = min(record["t_mono"] for record in timed)
     grouped = {}
     for record in timed:
@@ -1654,27 +1817,55 @@ def guest_log_series(records, warmup_seconds=RESOURCE_WARMUP_SECONDS):
         name = f"guest_log/{label}/size_kib"
         if len(points) > 1:
             series[name] = ([point[0] for point in points], [point[1] for point in points])
+            # §3.3: log files stay inside the set the growth rule is applied to.
+            roles[name] = "judged"
         else:
             unavailable[name] = (
                 f"only {len(points)} reading(s) with a size outside the "
                 f"{warmup_seconds:g}s warm-up among {len(rows)} sample(s)")
-    return {"series": series, "unavailable": unavailable}
+    return {"series": series, "roles": roles, "role_reasons": {}, "unavailable": unavailable}
 
 
-def slope_record(times, values, seed, resamples, confidence):
-    """Theil-Sen slope and moving block bootstrap interval, both in value unit per hour."""
+def slope_record(times, values, seed, resamples, confidence,
+                 dominance_share=f3_stats.STEP_DOMINANCE_SHARE, role="judged",
+                 role_reason=None):
+    """Theil-Sen slope, bootstrap interval and step report for one series.
+
+    The slope and the interval bounds are in value unit per hour. The step
+    report (§3.6, evidence 10.11) keeps its deltas in the series' own unit and
+    its offsets in seconds from the first point of the analysis window.
+    """
     slope = f3_stats.theil_sen(times, values) * 3600.0
     interval = f3_stats.moving_block_bootstrap_slope_ci(
         times, values, block_span=BLOCK_SECONDS, seed=seed, resamples=resamples,
         confidence=confidence)
     bounds = interval.get("ci")
     low, high = (bounds[0] * 3600.0, bounds[1] * 3600.0) if bounds else (None, None)
+    steps = f3_stats.step_summary(times, values, dominance_share=dominance_share)
+    origin = times[0] if times else 0.0
     return {"slope_per_hour": slope, "slope": slope, "ci_low": low, "ci_high": high,
             "ci": [low, high] if bounds else None,
             "ci_reason": interval.get("reason"), "block_count": interval.get("block_count"),
             "count": len(values), "first_value": values[0], "last_value": values[-1],
             "max_value": max(values),
             "span_hours": (times[-1] - times[0]) / 3600.0 if times else None,
+            "role": role, "role_reason": role_reason,
+            "steps": [{"offset_s": step["time"] - origin,
+                       "offset_minutes": (step["time"] - origin) / 60.0,
+                       "delta": step["delta"]}
+                      for step in steps["steps"]],
+            "step_count": steps["step_count"],
+            "step_delta_sum": steps["step_delta_sum"],
+            "step_aligned_sum": steps["aligned_delta_sum"],
+            "net_change": steps["net_change"],
+            "step_dominated_share": steps["dominated_share"],
+            "step_dominated": steps["step_dominated"],
+            "step_criterion": {"mad_multiplier": steps["mad_multiplier"],
+                               "dominance_share": steps["dominance_share"],
+                               "scale": steps["scale"],
+                               "scale_source": steps["scale_source"],
+                               "median_difference": steps["median_difference"],
+                               "threshold": steps["threshold"]},
             **head_tail_means(times, values)}
 
 
@@ -1698,19 +1889,40 @@ def growth_verdicts(per_run):
         except (TypeError, KeyError, ValueError, AttributeError, IndexError) as error:
             verdict = local_growth_verdict(runs)
             source = f"local fallback ({type(error).__name__})"
-        verdicts[metric] = {"verdict": verdict, "verdict_source": source, "runs": runs}
+        verdicts[metric] = {"verdict": verdict, "verdict_source": source,
+                            "role": metric_role_of_runs(runs), "runs": runs}
     return verdicts
 
 
 def local_growth_verdict(runs):
-    """§3.6: candidate when the CI lower bound > 0; confirmed when two runs agree in sign."""
+    """§3.6: candidate when the CI lower bound > 0; confirmed when two runs agree in sign.
+
+    Runs whose net change is dominated by discrete steps do not support a
+    continuous-growth claim and give `step_dominated` instead (10.11).
+    """
     positive = [item for item in runs
                 if item.get("ci_low") is not None and item["ci_low"] > 0]
+    dominated = [item for item in positive if item.get("step_dominated") is True]
+    positive = [item for item in positive if item.get("step_dominated") is not True]
     if len(positive) >= 2 and len({item["slope"] > 0 for item in positive}) == 1:
         return "confirmed"
     if positive:
         return "candidate"
-    return "not_detected"
+    return "step_dominated" if dominated else "not_detected"
+
+
+def metric_role_of_runs(runs):
+    """§3.3 role across the runs of one metric.
+
+    `covariate` only when every run agrees, `unknown` when any run could not
+    identify the process, otherwise `judged`.
+    """
+    roles = {item.get("role", "judged") for item in runs}
+    if roles == {"covariate"}:
+        return "covariate"
+    if "unknown" in roles:
+        return "unknown"
+    return "judged"
 
 
 def vz_attribution(record, expected=2, window_seconds=60.0):
@@ -1737,7 +1949,8 @@ def vz_attribution(record, expected=2, window_seconds=60.0):
     return {"attributed": True, "pids": new, "reason": None}
 
 
-def summarize_runs(directories, seed, resamples, confidence, expected_vz):
+def summarize_runs(directories, seed, resamples, confidence, expected_vz,
+                   dominance_share=f3_stats.STEP_DOMINANCE_SHARE):
     loaded = [load_run_directory(directory) for directory in directories]
     summary = {
         "schema_version": SCHEMA_VERSION,
@@ -1745,6 +1958,8 @@ def summarize_runs(directories, seed, resamples, confidence, expected_vz):
         "seed": seed,
         "resamples": resamples,
         "confidence": confidence,
+        "step_detection": {"mad_multiplier": f3_stats.STEP_MAD_MULTIPLIER,
+                           "dominance_share": dominance_share},
         "runs": [],
         "growth": {},
     }
@@ -1758,6 +1973,8 @@ def summarize_runs(directories, seed, resamples, confidence, expected_vz):
         resources = resource_series(host_samples)
         logs = guest_log_series(guest_log)
         resources["series"].update(logs["series"])
+        resources["roles"].update(logs["roles"])
+        resources["role_reasons"].update(logs.get("role_reasons") or {})
         resources["unavailable"].update(logs["unavailable"])
         slopes = {}
         for metric, (times, values) in sorted(resources["series"].items()):
@@ -1765,7 +1982,11 @@ def summarize_runs(directories, seed, resamples, confidence, expected_vz):
                 resources["unavailable"][metric] = f"only {len(values)} points; no slope estimated"
                 continue
             try:
-                slopes[metric] = slope_record(times, values, seed, resamples, confidence)
+                slopes[metric] = slope_record(
+                    times, values, seed, resamples, confidence,
+                    dominance_share=dominance_share,
+                    role=resources["roles"].get(metric, "judged"),
+                    role_reason=resources["role_reasons"].get(metric))
             except ValueError as error:
                 resources["unavailable"][metric] = f"slope undefined: {error}"
                 continue
@@ -1823,6 +2044,57 @@ def interval_text(pair, digits=3):
     if not isinstance(pair, (list, tuple)) or len(pair) != 2 or pair[0] is None:
         return None
     return f"[{pair[0]:.{digits}f}, {pair[1]:.{digits}f}]"
+
+
+def role_text(role):
+    """§3.3 metric role as it appears in the tables."""
+    if role == "covariate":
+        return "背景协变量"
+    if role == "unknown":
+        return "归属未知"
+    return "判定对象"
+
+
+def step_text(values):
+    """One cell summarising the §3.6 step detection for one series."""
+    count = values.get("step_count") or 0
+    if not count:
+        return "无"
+    share = values.get("step_dominated_share")
+    share_text = "净变化为 0" if share is None else f"占净变化 {share * 100:.1f}%"
+    mark = "，阶跃主导" if values.get("step_dominated") else ""
+    return f"{count} 次，{share_text}{mark}"
+
+
+def step_lines(resources, detection):
+    """The §3.6 step list stated next to the slope table (evidence 10.11)."""
+    criterion = detection or {}
+    multiplier = criterion.get("mad_multiplier")
+    share = criterion.get("dominance_share")
+    lines = [("阶跃检测（方案 3.6）：逐点差分中偏离差分中位数超过 "
+              f"{multiplier if multiplier is not None else '—'} 倍稳健尺度的点记为阶跃。稳健尺度"
+              "优先取差分的离散度（中位数绝对偏差与四分位距除以 1.349 的较大者）；该离散度为 0 时"
+              "（差分四分之三以上取同一值，如整 MiB 量化序列）改由移动量给出：序列在最小移动量"
+              "构成的格点上且数值远高于该格点时，以该量化步长为尺度，否则以移动量的中位数为尺度，"
+              "使量化台阶不被读作离散事件。与净变化同向的阶跃合计占该净变化的比例超过 "
+              f"{share if share is not None else '—'} 时判为阶跃主导，该序列的斜率不能读作速率"
+              "（依据 10.11）。")]
+    detailed = [(metric, values) for metric, values in sorted((resources.get("slopes") or {}).items())
+                if values.get("step_count")]
+    if not detailed:
+        lines.append("本次运行的全部序列均未检出阶跃。")
+        return lines
+    for metric, values in detailed:
+        items = "；".join(f"t+{step['offset_minutes']:.2f} 分 {step['delta']:+.3f}"
+                          for step in values.get("steps") or [])
+        share = values.get("step_dominated_share")
+        share_text = "净变化为 0" if share is None else f"占净变化 {share * 100:.1f}%"
+        lines.append(f"- {metric}：{values['step_count']} 次阶跃（{items}），合计 "
+                     f"{values.get('step_delta_sum', 0.0):+.3f}，其中与净变化同向 "
+                     f"{values.get('step_aligned_sum', 0.0):+.3f}，净变化 "
+                     f"{values.get('net_change', 0.0):+.3f}，{share_text}"
+                     f"{'，阶跃主导' if values.get('step_dominated') else ''}。")
+    return lines
 
 
 def window_lines(window):
@@ -1896,14 +2168,24 @@ def summary_markdown(summary):
         if slopes:
             lines.append("### 资源时间序列斜率（每小时；已排除启动后前 10 分钟）")
             lines.append("")
-            rows = [[metric, values["count"], number(values["slope_per_hour"]),
+            rows = [[metric, role_text(values.get("role")), values["count"],
+                     number(values["slope_per_hour"]),
                      interval_text(values["ci"]), number(values["first_value"]),
-                     number(values["last_value"]), number(values["max_value"])]
+                     number(values["last_value"]), number(values["max_value"]),
+                     step_text(values)]
                     for metric, values in sorted(slopes.items())]
-            lines.append(table(["指标", "样本数", "Theil–Sen 斜率", "移动块 bootstrap 区间",
-                                "首值", "末值", "最大值"], rows))
+            lines.append(table(["指标", "口径", "样本数", "Theil–Sen 斜率", "移动块 bootstrap 区间",
+                                "首值", "末值", "最大值", "阶跃"], rows))
             lines.append("斜率单位为指标名后缀对应的单位每小时（footprint_mib 为 MiB、size_kib 为 KiB、"
                          "cpu_cores 为核）；区间为块长 5 分钟的移动块 bootstrap 95% 区间。")
+            lines.append("“口径”按方案 3.3：判定对象参与 3.6 增长判定；背景协变量（Virtualization "
+                         "XPC 进程、宿主整体与数据卷序列）同样采样与报告，但不做增长判定；"
+                         "归属未知表示本次运行的采样记录不足以判断该进程是否为 Virtualization "
+                         "XPC 服务，其增长结论不成立。")
+            lines.extend(f"- {metric} 口径依据：{values['role_reason']}"
+                         for metric, values in sorted(slopes.items())
+                         if values.get("role_reason") and values.get("role") != "judged")
+            lines.extend(step_lines(entry["resources"], summary.get("step_detection")))
             lines.extend(window_lines(entry["resources"].get("window")))
             lines.append("")
         unavailable = entry["resources"]["unavailable"]
@@ -1945,14 +2227,20 @@ def summary_markdown(summary):
     if summary["growth"]:
         lines.append("## 增长判定（方案 3.6）")
         lines.append("")
-        rows = [[metric, item["verdict"], len(item["runs"]),
+        rows = [[metric, role_text(item.get("role")), item["verdict"], len(item["runs"]),
                  "；".join(interval_text(run["ci"]) or "—" for run in item["runs"]),
+                 "；".join(step_text(run) for run in item["runs"]),
                  item["verdict_source"]]
                 for metric, item in sorted(summary["growth"].items())]
-        lines.append(table(["指标", "判定", "运行数", "各运行区间", "判定来源"], rows))
+        lines.append(table(["指标", "口径", "判定", "运行数", "各运行区间", "各运行阶跃",
+                            "判定来源"], rows))
         lines.append("")
-        lines.append("判定取值：confirmed 表示两次独立运行均区间下限 > 0 且斜率同号；"
-                     "candidate 表示单次运行区间下限 > 0；not_detected 表示未检出持续增长。")
+        lines.append("判定取值：confirmed 表示两次独立运行均区间下限 > 0、斜率同号且都未被阶跃主导；"
+                     "candidate 表示单次运行满足该条件；step_dominated 表示区间下限 > 0 的运行"
+                     "其净变化由离散阶跃主导，区间排除 0 来自窗口内的跳变而不是速率（10.11）；"
+                     "not_detected 表示未检出持续增长。")
+        lines.append("口径为“背景协变量”的行按方案 3.3 不作为被测对象的增长结论，只作背景记录；"
+                     "口径为“归属未知”的行缺少判断进程身份的采样证据，其判定不作结论。")
         lines.append("")
     return "\n".join(lines) + "\n"
 
@@ -1961,7 +2249,7 @@ def run_summarize(args, raw_argv):
     output = Path(args.out).expanduser().resolve()
     f3_common.create_output_directory(output)
     summary = summarize_runs(args.runs, args.seed, args.resamples, args.confidence,
-                             args.expected_vz_processes)
+                             args.expected_vz_processes, args.step_dominance_share)
     summary["invocation"] = {"argv": f3_common.redact_argv(raw_argv)}
     f3_common.write_json(output / "summary.json", summary)
     (output / "summary.md").write_text(summary_markdown(summary))
@@ -2104,11 +2392,19 @@ def parse_args(argv):
     summarize.add_argument("--resamples", type=int, default=2000)
     summarize.add_argument("--confidence", type=float, default=0.95)
     summarize.add_argument("--expected-vz-processes", type=int, default=2)
+    summarize.add_argument("--step-dominance-share", type=float,
+                           default=f3_stats.STEP_DOMINANCE_SHARE,
+                           help="a series is reported as step dominated when the detected "
+                                "steps account for more than this share of its net change "
+                                f"(default {f3_stats.STEP_DOMINANCE_SHARE}); recorded in "
+                                "summary.json")
     return parser.parse_args(argv)
 
 
 def validate(args):
     if args.command == "summarize":
+        if not 0.0 < args.step_dominance_share <= 1.0:
+            raise BenchmarkError("--step-dominance-share must lie in (0, 1]")
         return None
     if args.timeout <= 0 or args.timeout > 300:
         raise BenchmarkError("--timeout must be in (0, 300]")
