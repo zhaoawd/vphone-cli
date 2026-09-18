@@ -1371,6 +1371,122 @@ def sample_label(record):
     return f"pid-{pid}" if pid is not None else "unknown"
 
 
+# MARK: - Analysis window (§3.6)
+
+def parse_utc_epoch(text):
+    """Seconds since the epoch for an ISO UTC timestamp; None when it cannot be parsed."""
+    if not isinstance(text, str) or not text:
+        return None
+    try:
+        moment = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return moment.timestamp()
+
+
+def format_utc_epoch(epoch):
+    return None if epoch is None else datetime.fromtimestamp(epoch, timezone.utc).isoformat()
+
+
+def record_mono(record):
+    value = record.get("t_mono") if isinstance(record, dict) else None
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return float(value)
+    return None
+
+
+def analysis_window(run_json, warmup_seconds=RESOURCE_WARMUP_SECONDS):
+    """§3.6 slope window: always drop the warm-up, and drop the tail when a load phase exists.
+
+    `details.load_seconds` is written by the soak experiment only. Latency, idle and camera
+    runs have no load phase, so their window keeps every sample after the warm-up.
+    """
+    details = run_json.get("details") or {}
+    load_seconds = details.get("load_seconds")
+    started_at = run_json.get("started_at")
+    window = {
+        "warmup_seconds": warmup_seconds,
+        "started_at": started_at,
+        "load_seconds": None,
+        "load_ends_at": None,
+        "deadline_epoch": None,
+        "tail_excluded": False,
+        "reason": "run.json 无 details.load_seconds：该运行没有负载阶段，仅排除预热窗口。",
+    }
+    if not isinstance(load_seconds, (int, float)) or isinstance(load_seconds, bool):
+        return window
+    window["load_seconds"] = float(load_seconds)
+    started = parse_utc_epoch(started_at)
+    if started is None:
+        window["reason"] = ("run.json 记录了 details.load_seconds，但 started_at 无法解析，"
+                            "负载结束时刻未确定，尾段未排除。")
+        return window
+    deadline = started + float(load_seconds)
+    window.update({
+        "deadline_epoch": deadline,
+        "load_ends_at": format_utc_epoch(deadline),
+        "tail_excluded": True,
+        "reason": ("负载阶段在 started_at + details.load_seconds 处结束；其后的空载尾段"
+                   "不属于负载阶段，已排除在斜率估计之外，因此斜率只覆盖负载阶段。"),
+    })
+    return window
+
+
+def monotonic_deadline(records, deadline_epoch):
+    """Map a wall-clock deadline onto one sampler's own monotonic clock.
+
+    Host samples and guest log samples are written by different processes, so each series is
+    mapped with its own `t_wall`/`t_mono` pairs. The median offset is used so a single skewed
+    record cannot move the boundary.
+    """
+    offsets = []
+    for record in records:
+        mono = record_mono(record)
+        epoch = parse_utc_epoch(record.get("t_wall") if isinstance(record, dict) else None)
+        if mono is not None and epoch is not None:
+            offsets.append(mono - epoch)
+    if not offsets:
+        return None
+    offsets.sort()
+    middle = len(offsets) // 2
+    offset = (offsets[middle] if len(offsets) % 2
+              else (offsets[middle - 1] + offsets[middle]) / 2)
+    return deadline_epoch + offset
+
+
+def windowed_records(records, window):
+    """Apply `window` to one sampler's records.
+
+    Returns (kept_records, applied) where `applied` carries both bounds of the window in wall
+    time and how many tail samples were dropped. The warm-up bound is reported here but is
+    applied by resource_series / guest_log_series, which need the untrimmed series start.
+    """
+    applied = {"start": None, "end": None, "kept": len(records), "dropped": 0, "note": None}
+    timed = [record for record in records if record_mono(record) is not None]
+    if not timed:
+        return records, applied
+    first = min(timed, key=record_mono)
+    first_epoch = parse_utc_epoch(first.get("t_wall"))
+    if first_epoch is not None:
+        applied["start"] = format_utc_epoch(first_epoch + window["warmup_seconds"])
+    last_epoch = parse_utc_epoch(max(timed, key=record_mono).get("t_wall"))
+    applied["end"] = format_utc_epoch(last_epoch)
+    deadline_epoch = window.get("deadline_epoch")
+    if deadline_epoch is None:
+        return records, applied
+    cutoff = monotonic_deadline(records, deadline_epoch)
+    if cutoff is None:
+        applied["note"] = "样本没有可解析的 t_wall，负载结束时刻未能定位，尾段未排除。"
+        return records, applied
+    kept = [record for record in records
+            if record_mono(record) is None or record_mono(record) <= cutoff]
+    applied.update({"kept": len(kept), "dropped": len(records) - len(kept),
+                    "end": window["load_ends_at"]})
+    return kept, applied
+
+
 def resource_series(host_samples, warmup_seconds=RESOURCE_WARMUP_SECONDS):
     """Build (times_hours, values) series from host_samples.jsonl.
 
@@ -1576,8 +1692,12 @@ def summarize_runs(directories, seed, resamples, confidence, expected_vz):
     per_metric = {}
     for item in loaded:
         run_json = item["run"]
-        resources = resource_series(item["host_samples"])
-        logs = guest_log_series(item["samples"].get("guest_log", []))
+        window = analysis_window(run_json)
+        host_samples, host_applied = windowed_records(item["host_samples"], window)
+        guest_log, guest_applied = windowed_records(
+            item["samples"].get("guest_log", []), window)
+        resources = resource_series(host_samples)
+        logs = guest_log_series(guest_log)
         resources["series"].update(logs["series"])
         resources["unavailable"].update(logs["unavailable"])
         slopes = {}
@@ -1602,7 +1722,19 @@ def summarize_runs(directories, seed, resamples, confidence, expected_vz):
             "counts": run_json.get("counts"),
             "latency": latency_tables(item["samples"], seed, resamples),
             "recovery": recovery_tables(item["samples"]),
-            "resources": {"slopes": slopes, "unavailable": resources["unavailable"]},
+            "resources": {
+                "slopes": slopes,
+                "unavailable": resources["unavailable"],
+                "window": {
+                    "warmup_seconds": window["warmup_seconds"],
+                    "load_seconds": window["load_seconds"],
+                    "started_at": window["started_at"],
+                    "load_ends_at": window["load_ends_at"],
+                    "tail_excluded": window["tail_excluded"],
+                    "reason": window["reason"],
+                    "sources": {"host_samples": host_applied, "guest_log": guest_applied},
+                },
+            },
             "camera": camera_metrics(item["camera_samples"]) if item["camera_samples"] else None,
             "vz_attribution": [
                 {"iteration": record.get("iteration"), **vz_attribution(record, expected_vz)}
@@ -1632,6 +1764,27 @@ def interval_text(pair, digits=3):
     if not isinstance(pair, (list, tuple)) or len(pair) != 2 or pair[0] is None:
         return None
     return f"[{pair[0]:.{digits}f}, {pair[1]:.{digits}f}]"
+
+
+def window_lines(window):
+    """The §3.6 analysis window stated next to the slope table."""
+    if not window:
+        return []
+    sources = window.get("sources") or {}
+    host = sources.get("host_samples") or {}
+    guest = sources.get("guest_log") or {}
+    start = host.get("start") or guest.get("start") or "未记录"
+    end = window.get("load_ends_at") or host.get("end") or guest.get("end") or "未记录"
+    text = (f"分析窗口：{start} 至 {end}；起点为宿主采样起始时刻后 "
+            f"{window['warmup_seconds']:g} 秒（预热排除）。{window['reason']}")
+    if window.get("tail_excluded"):
+        text += (f"本次剔除宿主采样尾段 {host.get('dropped', 0)} 条、"
+                 f"客户机日志尾段 {guest.get('dropped', 0)} 条。")
+    lines = [text]
+    lines.extend(f"{name} 采样：{value['note']}"
+                 for name, value in (("宿主", host), ("客户机日志", guest))
+                 if value.get("note"))
+    return lines
 
 
 def summary_markdown(summary):
@@ -1692,6 +1845,7 @@ def summary_markdown(summary):
                                 "首值", "末值", "最大值"], rows))
             lines.append("斜率单位为指标名后缀对应的单位每小时（footprint_mib 为 MiB、size_kib 为 KiB、"
                          "cpu_cores 为核）；区间为块长 5 分钟的移动块 bootstrap 95% 区间。")
+            lines.extend(window_lines(entry["resources"].get("window")))
             lines.append("")
         unavailable = entry["resources"]["unavailable"]
         if unavailable:

@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import signal
@@ -667,16 +668,27 @@ class SummarizeTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 
+    STARTED_AT = "2026-09-18T00:00:00+00:00"
+
+    @staticmethod
+    def wall(seconds):
+        """The run-relative wall clock the samplers would write for `seconds` after the start."""
+        return (datetime(2026, 9, 18, tzinfo=timezone.utc)
+                + timedelta(seconds=seconds)).isoformat()
+
     def build_run(self, name, *, slope_per_sample=0.0, vz_after=(11, 12), latency_ms=None,
-                  log_growth_kib=64.0, guest_log_ok=True):
+                  log_growth_kib=64.0, guest_log_ok=True, load_seconds=None):
         directory = self.root / name
         (directory / "samples").mkdir(parents=True)
-        (directory / "run.json").write_text(json.dumps({
+        run_json = {
             "schema_version": 1, "experiment": "soak", "run_id": name,
-            "started_at": "2026-09-18T00:00:00+00:00", "finished_at": "2026-09-18T01:00:00+00:00",
+            "started_at": self.STARTED_AT, "finished_at": "2026-09-18T01:00:00+00:00",
             "counts": {"requests": 10, "failures_by_code": {}, "skipped": {}},
             "interrupted": None, "aborted": None,
-        }))
+        }
+        if load_seconds is not None:
+            run_json["details"] = {"cycles": 100, "load_seconds": load_seconds}
+        (directory / "run.json").write_text(json.dumps(run_json))
         values = latency_ms if latency_ms is not None else [1.0 + index * 0.01
                                                             for index in range(120)]
         lines = []
@@ -700,13 +712,14 @@ class SummarizeTests(unittest.TestCase):
         host = []
         for index in range(120):
             t_mono = 1000.0 + index * 60.0
+            t_wall = self.wall(index * 60.0)
             host.append({"kind": "process", "label": "vphone-cli", "pid": 4242, "t_mono": t_mono,
-                         "cpu_seconds": index * 6.0,
+                         "t_wall": t_wall, "cpu_seconds": index * 6.0,
                          "footprint_bytes": int((300 + index * slope_per_sample) * (1 << 20))})
-            host.append({"kind": "disk", "label": "Disk.img", "t_mono": t_mono,
+            host.append({"kind": "disk", "label": "Disk.img", "t_mono": t_mono, "t_wall": t_wall,
                          "st_blocks": 42473888 + index * 8})
             host.append({"kind": "file", "label": "boot.log", "path": "/tmp/boot.log",
-                         "t_mono": t_mono, "present": True,
+                         "t_mono": t_mono, "t_wall": t_wall, "present": True,
                          "size_bytes": int((100 + index * 30) * 1024), "blocks": 8,
                          "allocated_bytes": 4096})
         (directory / "host_samples.jsonl").write_text(
@@ -714,7 +727,7 @@ class SummarizeTests(unittest.TestCase):
         guest = []
         for index in range(24):
             size = int((2048 + index * log_growth_kib) * 1024)
-            guest.append({"t_wall": "2026-09-18T00:00:00+00:00", "t_mono": 1000.0 + index * 600.0,
+            guest.append({"t_wall": self.wall(index * 600.0), "t_mono": 1000.0 + index * 600.0,
                           "path": "/var/jb/var/mobile/Library/vphone-vcam.log",
                           "size_bytes": size if guest_log_ok else None,
                           "ok": guest_log_ok,
@@ -880,6 +893,54 @@ class SummarizeTests(unittest.TestCase):
         built = f3_benchmark.resource_series(samples)
         self.assertEqual(built["series"], {})
         self.assertIn("warm-up", built["unavailable"]["all"])
+
+    def test_soak_tail_samples_are_dropped_from_the_slope_window(self):
+        # 3600 s of load inside a 7140 s sample span: everything after 01:00:00Z is the idle tail.
+        run = self.build_run("soak-tail", slope_per_sample=0.5, load_seconds=3600.0)
+        _, summary, output = self.summarize(run, out="soak-tail-summary")
+        window = summary["runs"][0]["resources"]["window"]
+        self.assertTrue(window["tail_excluded"])
+        self.assertEqual(window["load_seconds"], 3600.0)
+        self.assertEqual(window["load_ends_at"], "2026-09-18T01:00:00+00:00")
+        self.assertEqual(window["sources"]["host_samples"]["start"], "2026-09-18T00:10:00+00:00")
+        self.assertEqual(window["sources"]["host_samples"]["end"], "2026-09-18T01:00:00+00:00")
+        # 61 of 120 ticks per kind survive the deadline; the warm-up then drops the first 10.
+        self.assertEqual(window["sources"]["host_samples"]["kept"], 183)
+        self.assertEqual(window["sources"]["host_samples"]["dropped"], 177)
+        self.assertEqual(window["sources"]["guest_log"]["dropped"], 17)
+        slopes = summary["runs"][0]["resources"]["slopes"]
+        self.assertEqual(slopes["process/vphone-cli/footprint_mib"]["count"], 51)
+        self.assertEqual(slopes["guest_log/vphone-vcam.log/size_kib"]["count"], 6)
+        markdown = (output / "summary.md").read_text()
+        self.assertIn("分析窗口：2026-09-18T00:10:00+00:00 至 2026-09-18T01:00:00+00:00", markdown)
+        self.assertIn("空载尾段不属于负载阶段，已排除在斜率估计之外", markdown)
+        self.assertIn("剔除宿主采样尾段 177 条", markdown)
+
+    def test_run_without_load_seconds_keeps_every_sample(self):
+        run = self.build_run("no-load", slope_per_sample=0.5)
+        _, summary, output = self.summarize(run, out="no-load-summary")
+        window = summary["runs"][0]["resources"]["window"]
+        self.assertFalse(window["tail_excluded"])
+        self.assertIsNone(window["load_seconds"])
+        self.assertIsNone(window["load_ends_at"])
+        self.assertEqual(window["sources"]["host_samples"]["dropped"], 0)
+        self.assertEqual(window["sources"]["host_samples"]["kept"], 360)
+        self.assertEqual(window["sources"]["guest_log"]["dropped"], 0)
+        slopes = summary["runs"][0]["resources"]["slopes"]
+        self.assertEqual(slopes["process/vphone-cli/footprint_mib"]["count"], 110)
+        self.assertEqual(slopes["guest_log/vphone-vcam.log/size_kib"]["count"], 23)
+        self.assertIn("run.json 无 details.load_seconds", (output / "summary.md").read_text())
+
+    def test_a_sample_exactly_at_the_load_deadline_is_kept(self):
+        window = f3_benchmark.analysis_window(
+            {"started_at": self.STARTED_AT, "details": {"load_seconds": 600.0}})
+        records = [{"t_wall": self.wall(index * 60.0), "t_mono": 5000.0 + index * 60.0}
+                   for index in range(12)]
+        kept, applied = f3_benchmark.windowed_records(records, window)
+        self.assertEqual(kept[-1]["t_wall"], "2026-09-18T00:10:00+00:00")
+        self.assertEqual(len(kept), 11)
+        self.assertEqual(applied["dropped"], 1)
+        self.assertEqual(applied["end"], "2026-09-18T00:10:00+00:00")
 
     def test_summarize_refuses_an_existing_output_directory(self):
         run = self.build_run("run-x")
