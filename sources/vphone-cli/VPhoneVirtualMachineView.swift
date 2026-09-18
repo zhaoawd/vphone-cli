@@ -11,6 +11,86 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     private var currentTouchSwipeAim: Int = 0
     private var isDragHighlightVisible = false
 
+    // MARK: - Touch Event Log (opt-in)
+
+    /// Set `VPHONE_TOUCH_LOG=1` to trace injected gestures and the route each
+    /// resulting touch phase takes. Read once; disabled means no per-event work.
+    private static let touchLogEnabled = ProcessInfo.processInfo.environment["VPHONE_TOUCH_LOG"] == "1"
+
+    @MainActor private static var nextGestureID = 0
+
+    /// Identifies the injected gesture whose synthesized events are currently
+    /// being delivered, so the route log can be correlated with the injection log.
+    private var loggingGestureID: Int?
+
+    @MainActor private static func allocateGestureID() -> Int {
+        nextGestureID += 1
+        return nextGestureID
+    }
+
+    private static func touchLogTime() -> String {
+        String(format: "%.4f", ProcessInfo.processInfo.systemUptime)
+    }
+
+    private static func touchLogCoord(_ value: Double) -> String {
+        String(format: "%.2f", value)
+    }
+
+    /// One injected event: `[touchlog] t=… gid=… src=inject …`
+    private static func logInjectEvent(
+        gestureID: Int,
+        gesture: String,
+        kind: String,
+        step: Int,
+        steps: Int,
+        pixel: NSPoint,
+        windowPoint: NSPoint
+    ) {
+        guard touchLogEnabled else { return }
+        print(
+            "[touchlog] t=\(touchLogTime()) gid=\(gestureID) src=inject gesture=\(gesture) kind=\(kind)"
+                + " step=\(step) steps=\(steps)"
+                + " px=\(touchLogCoord(pixel.x)) py=\(touchLogCoord(pixel.y))"
+                + " wx=\(touchLogCoord(windowPoint.x)) wy=\(touchLogCoord(windowPoint.y))"
+        )
+    }
+
+    /// One routed touch phase: `[touchlog] t=… gid=… src=route …`
+    private func logRouteEvent(phase: Int, normalizedPoint: CGPoint, destination: VPhoneTouchRoute.Destination) {
+        guard Self.touchLogEnabled else { return }
+        let route: String
+        let session: String
+        switch destination {
+        case .native:
+            route = "native"
+            session = "-"
+        case let .guest(value):
+            route = "guest"
+            session = "\(value)"
+        case .discard:
+            route = "discard"
+            session = "-"
+        }
+        let gid = loggingGestureID.map(String.init) ?? "-"
+        print(
+            "[touchlog] t=\(Self.touchLogTime()) gid=\(gid) src=route phase=\(phase) route=\(route)"
+                + " session=\(session) edge=\(currentTouchSwipeAim)"
+                + " nx=\(String(format: "%.5f", normalizedPoint.x)) ny=\(String(format: "%.5f", normalizedPoint.y))"
+        )
+    }
+
+    /// Tag the synthesized events of one injected gesture with its id.
+    private func withLoggedGesture(_ gestureID: Int, _ body: () -> Void) {
+        guard Self.touchLogEnabled else {
+            body()
+            return
+        }
+        let previous = loggingGestureID
+        loggingGestureID = gestureID
+        body()
+        loggingGestureID = previous
+    }
+
     // MARK: - Private API Accessors
 
     /// https://github.com/wh1te4ever/super-tart-vphone-writeup/blob/main/contents/ScreenSharingVNC.swift
@@ -196,14 +276,24 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     func injectTap(pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int) {
         let localPoint = pixelToLocal(pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight)
         let windowPoint = convert(localPoint, to: nil)
+        let gestureID = Self.touchLogEnabled ? Self.allocateGestureID() : 0
+        let pixel = NSPoint(x: pixelX, y: pixelY)
 
+        Self.logInjectEvent(
+            gestureID: gestureID, gesture: "tap", kind: "down", step: 0, steps: 0,
+            pixel: pixel, windowPoint: windowPoint
+        )
         if let downEvent = synthesizeMouseEvent(type: .leftMouseDown, at: windowPoint) {
-            mouseDown(with: downEvent)
+            withLoggedGesture(gestureID) { mouseDown(with: downEvent) }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             guard let self else { return }
+            Self.logInjectEvent(
+                gestureID: gestureID, gesture: "tap", kind: "up", step: 0, steps: 0,
+                pixel: pixel, windowPoint: windowPoint
+            )
             if let upEvent = self.synthesizeMouseEvent(type: .leftMouseUp, at: windowPoint) {
-                self.mouseUp(with: upEvent)
+                self.withLoggedGesture(gestureID) { self.mouseUp(with: upEvent) }
             }
         }
     }
@@ -220,9 +310,14 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
 
         let steps = max(10, durationMs / 16)
         let stepInterval = Double(durationMs) / Double(steps) / 1000.0
+        let gestureID = Self.touchLogEnabled ? Self.allocateGestureID() : 0
 
+        Self.logInjectEvent(
+            gestureID: gestureID, gesture: "swipe", kind: "down", step: 0, steps: steps,
+            pixel: NSPoint(x: fromX, y: fromY), windowPoint: startWindow
+        )
         if let downEvent = synthesizeMouseEvent(type: .leftMouseDown, at: startWindow) {
-            mouseDown(with: downEvent)
+            withLoggedGesture(gestureID) { mouseDown(with: downEvent) }
         }
 
         for i in 1...steps {
@@ -230,20 +325,29 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
             let x = startWindow.x + (endWindow.x - startWindow.x) * t
             let y = startWindow.y + (endWindow.y - startWindow.y) * t
             let pt = NSPoint(x: x, y: y)
+            let pixel = NSPoint(x: fromX + (toX - fromX) * t, y: fromY + (toY - fromY) * t)
             let delay = stepInterval * Double(i)
 
             if i < steps {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                     guard let self else { return }
+                    Self.logInjectEvent(
+                        gestureID: gestureID, gesture: "swipe", kind: "drag", step: i, steps: steps,
+                        pixel: pixel, windowPoint: pt
+                    )
                     if let dragEvent = self.synthesizeMouseEvent(type: .leftMouseDragged, at: pt) {
-                        self.mouseDragged(with: dragEvent)
+                        self.withLoggedGesture(gestureID) { self.mouseDragged(with: dragEvent) }
                     }
                 }
             } else {
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                     guard let self else { return }
+                    Self.logInjectEvent(
+                        gestureID: gestureID, gesture: "swipe", kind: "up", step: i, steps: steps,
+                        pixel: pixel, windowPoint: pt
+                    )
                     if let upEvent = self.synthesizeMouseEvent(type: .leftMouseUp, at: pt) {
-                        self.mouseUp(with: upEvent)
+                        self.withLoggedGesture(gestureID) { self.mouseUp(with: upEvent) }
                     }
                 }
             }
@@ -258,7 +362,10 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
 
         // Prefer vphoned's guest-side HID path when available. This avoids
         // relying on private VZ touch delivery after the guest is connected.
-        switch touchRoute.destination(phase: phase, guestSession: control?.touchSession) {
+        let destination = touchRoute.destination(phase: phase, guestSession: control?.touchSession)
+        logRouteEvent(phase: phase, normalizedPoint: normalizedPoint, destination: destination)
+
+        switch destination {
         case .guest:
             control?.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y),
                                fromEdge: currentTouchSwipeAim != 0)
