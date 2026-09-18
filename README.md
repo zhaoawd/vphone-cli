@@ -85,6 +85,15 @@ vphone-cli vm launch myphone                            # 6. first boot
 
 Update to a newer iOS by pointing `fw prepare` at an IPSW: `--iphone-source /path/to.ipsw --cloudos-source /path/to.ipsw`.
 
+## Recovery
+
+- `vphone-cli doctor [<name>]` — read-only diagnostics of the host and, with a VM name, that VM (files, locks, firmware transaction, restore state, create checkpoint, host control channel). Nothing is repaired; `--json` emits machine-readable output.
+- `vphone-cli vm stop <name> --force` — skip the graceful shutdown request and SIGKILL the boot process immediately.
+- `vphone-cli fw patch <name> --recover` — recover an interrupted firmware transaction without patching (reports the recovered archive, or that there is no pending transaction).
+- `vphone-cli vm create --resume <name>` — continue an interrupted `vm create` from its checkpoint; `vphone-cli vm create-status <name>` prints the checkpoint without changing anything.
+
+Offline bundle operations (`fw prepare`/`fw patch`, `cfw install`, `vm export`/`vm import`, `vm clone`/`vm rename`/`vm delete`) take a per-VM directory lock and refuse a busy VM (a running VM, or another offline operation holding the bundle). There is no separate command for this guard.
+
 ## Firmware Variants
 
 Five patch variants with increasing security bypass — pass one to `--variant`:
@@ -98,6 +107,8 @@ Five patch variants with increasing security bypass — pass one to `--variant`:
 | `exp`        | 141 patches | 18 phases | JB superset + anti-VM-detection research patches                  |
 
 See [`research/0_binary_patch_comparison.md`](./research/0_binary_patch_comparison.md) for the per-component breakdown.
+
+The counts above are not annotated with the firmware combination or the date they apply to, and different measurement methods yield different numbers. For example, the Summary table in `research/0_binary_patch_comparison.md` reports boot-chain totals of 46/58/117/132 (regular/dev/jb/exp) and, including CFW, grand totals of 56/70/132/163 — a different method from the per-variant counts in this table; the two sets are not the same measurement and are not interchangeable. Treat dated evidence as authoritative: see [`research/0_binary_patch_comparison.md`](./research/0_binary_patch_comparison.md) and [`research/firmware_compatibility.md`](./research/firmware_compatibility.md).
 
 ## Running & Connecting
 
@@ -116,7 +127,7 @@ Everything vphone-cli creates lives under `~/.vphone/` — kept outside the repo
 | `~/.vphone/ipsws/`| Downloaded iPhone + cloudOS IPSWs, cached and reused across VMs.                              |
 | `~/.vphone/tools/`| Cached APFS seal-volume artifacts (`apfs_sealvolume_<version>`) fetched during `fw prepare`.  |
 | `~/.vphone/debs/` | Cached `.deb` packages the `jb`/`exp` CFW install lays into the guest (Sileo, apt, …).        |
-| `~/.vphone/venv/` | Auto-provisioned Python environment (see [Python runtime](#python-runtime); override with `$VPHONE_VENV_DIR`). |
+| `~/.vphone/venv/` | Auto-provisioned Python environment (override with `$VPHONE_VENV_DIR`). |
 
 Precedence: the per-item overrides (`$VPHONE_LIBRARY_ROOT`, `$VPHONE_VENV_DIR`) win over `$VPHONE_ROOT`, which wins over the `~/.vphone` default. The `ipsws/`, `tools/`, and `debs/` caches always sit directly under whichever root is active.
 
@@ -175,6 +186,23 @@ vphone-amfidont         # .build/vphone-cli.app/Contents/Resources/vphone-amfido
 | Mac16,11 27.0b2 | `17,3_27.0_24A5424a`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5430a`  | `26.4-23E5207q` |
 
+## Support Scope
+
+The following is the measured scope as of each evidence date, not a general support guarantee for every version combination. All entries use device `iPhone17,3`.
+
+**Firmware compatibility registry (as of 2026-09-09, source `research/firmware_compatibility.json`)**
+The registry records 23 catalog version pairings (with exact build numbers, 18.6.2 through 27.0 beta) and 4 cloudOS images (26.1 = `23B85`, 26.2 = build number not recorded, 26.3 = `23D128`, 26.4 = `23E5207q`). All five variants (less/regular/dev/jb/exp) are code_selectable on all 23 pairings (they can be selected into the pipeline; no patch or boot verification performed). Patch-byte verification (patch_verified) covers less 1, regular 7, dev 7, jb 10, exp 7 combinations. On-device capability verification (capability_verified): jb 3 combinations (27.0 series `24A5380h`/`24A5390f`/`24A5408d`, of which `24A5408d` uses `--frida`), exp 1 combination (26.6.1/`23G83` rig-baseline). The regular and dev variants have no complete on-device boot evidence yet.
+
+**End-to-end evidence matrix (as of 2026-09-17, source `research/f1_support_matrix_2026-09-17.md`)**
+This round verified two combinations step by step (S1 create through S12 EXP-specific):
+
+- P: 26.1/`23B85` + cloudOS 26.1/`23B85`, all five variants.
+- N: 26.6.1/`23G82` (non-catalog build, specified by local path) + cloudOS 26.4/`23E5207q`, jb and exp (`--frida`).
+
+Patch-record counts at the create stage: regular 58, dev 70, jb 152, exp 178, less 26 (P set); jb-frida 157, exp-frida 183 (N set). Known limitations L1–L3 and open questions O1–O3 are not counted as passing and are tracked separately (see `research/f1_known_limits_2026-09-17.json`). The L combination (18.6.2/`22G100`) was not included this round; no IPSW was downloaded and all steps are recorded as not run.
+
+The various patch counts (boot chain / totals / historical method counts) differ between measurement methods; see `research/0_binary_patch_comparison.md` and section 5 of `research/firmware_compatibility.md` for the method notes.
+
 ## FAQ
 
 **`zsh: killed ./vphone-cli`** — AMFI/debug restrictions aren't bypassed; see [Prerequisites](#prerequisites) (`amfi_get_out_of_my_way=1` or `amfidont`).
@@ -194,6 +222,8 @@ vphone-amfidont         # .build/vphone-cli.app/Contents/Resources/vphone-amfido
 ## Automation
 
 `vphone-cli` exposes a host control socket (`<bundle>/vphone.sock`) for programmatic control — screenshots, touch, swipes, hardware keys, clipboard — each action returning an inline screenshot for AI-driven E2E testing. See [vphone-mcp](https://github.com/pluginslab/vphone-mcp) for an MCP server wrapping it.
+
+When a VM is launched with `--headless` (no VM window), the capability snapshot reports `screen_available=false` and the screen-dependent commands — screenshot, touch, and swipe — are unavailable; hardware keys and clipboard remain available.
 
 ## Acknowledgements
 
