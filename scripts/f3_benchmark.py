@@ -1812,7 +1812,11 @@ def parse_args(argv):
                          help="warm-up requests per class, excluded from statistics (default 10)")
     latency.add_argument("--concurrency", type=int, default=1)
     latency.add_argument("--bundle-id", default="com.apple.Preferences")
-    latency.add_argument("--tap-x", type=int, default=640)
+    # The Settings list scrolls during the interleaved swipe rounds, so a tap
+    # inside the cards stops being non-interactive and navigates into a
+    # subpage. x=33 stays in the left margin outside the cards at every scroll
+    # offset (cards start at x=67 on a 1290-wide screen).
+    latency.add_argument("--tap-x", type=int, default=33)
     latency.add_argument("--tap-y", type=int, default=1400)
     latency.add_argument("--swipe-x", type=int, default=645)
     latency.add_argument("--swipe-y1", type=int, default=2000)
