@@ -376,4 +376,55 @@ d4-acc（regular）在 F1 中的能力边界（事实，来自 F1 记录）：�
 
 补充固定项：用户确认实验期间宿主接交流电源（2.1 已列为要求）。
 
-执行状态：第 6 节顺序 0 已完成。下一步为顺序 1（离线实现工具与测试，不启动 VM）。
+执行状态见第 10 节。
+
+## 10. 执行记录
+
+### 10.1 顺序 1：工具与测试（离线，已完成）
+
+提交 `f92ac0f`（`scripts/f3_*.py` 与 `tests/test_f3_*.py`，`scripts/host_control_client.py` 计时扩展，`f1_runtime_acceptance.py` 导入改动）与 `c6b38c8`（第 9 节决定记录、3.6 残差块 bootstrap 方法说明）。两个提交均在本地，未推送。未启动 VM，未连接控制 socket。
+
+### 10.2 顺序 2：独立工作树构建与签名（2026-09-18，已完成）
+
+| 项目 | 值 | 来源 |
+| --- | --- | --- |
+| 工作树 | `.build/f3/src`，`git worktree add .build/f3/src 0d7b009` | 命令输出 |
+| 提交 | `0d7b009a9434d9b1d58208ad003bfaa6890d6fc4`（第 9 节决定 10 指定） | `git rev-parse HEAD` |
+| 工作树状态 | `git status --porcelain` 无输出 | 同上目录执行 |
+| 前置 | `git submodule update --init --recursive`（8 个子模块 + capstone 嵌套子模块）；从主工作树复制 `.tools/bin/{trustcache,insert_dylib}`（未跟踪文件） | 命令输出 |
+| 构建 | `make build` 退出码 0，01:29:39Z–01:30:34Z（约 55 秒） | 命令输出 |
+| 嵌入提交号 | `VPhoneBuildInfo.commitHash = "0d7b009"` | `sources/VPhoneCore/VPhoneBuildInfo.swift`（构建生成） |
+| 构建产物占用 | `.build/f3/src/.build` 536 MB；构建后数据卷可用 200 GiB | `du -sh`、`df -h` |
+
+SHA-256 与 cdhash（记录用于第 2.1 节“可复跑记录”）：
+
+| 对象 | SHA-256 | cdhash |
+| --- | --- | --- |
+| `.build/release/vphone-cli` | `521d69010804729005b9163199371ac4fe69b9a42bbf261e11043514536c7b16` | `c7c1d3869e7fa16c920f728feca7c5e2f5ec9b13` |
+| `.build/vphone-cli.app/Contents/MacOS/vphone-cli` | `82e5fefad3d93e2eba5eed3618864951aaa41749170bc422c73932792cbb6a0c` | `d29917d76cf22e6b82c154d67f92f25c6e992250` |
+| `.build/vphoned.signed`（与 bundle 内 `Contents/Resources/vphoned.signed` 相同） | `5f4b708beefc095d151e4ffd0d509743773f9082522146daf3953bc0777caa97` | — |
+
+事实：该 `vphoned.signed` 与 d4-acc 当前已部署的 `.vphoned.signed`（前缀 `5b63d668c1e8f5e4`，见 1.3）不同。按第 9 节决定 10，客户机 vphoned 随启动更新，E0 需记录更新后的能力声明。
+
+运行验证（本轮未启动任何 VM）：
+
+| 检查 | 结果 |
+| --- | --- |
+| `.build/release/vphone-cli --help` | 退出码 0（未被 AMFI SIGKILL；137 表示仍被终止） |
+| `.build/vphone-cli.app/Contents/MacOS/vphone-cli --help` | 退出码 0 |
+| `codesign -d --entitlements -` | 含 `com.apple.private.virtualization`、`com.apple.private.virtualization.security-research`、`com.apple.security.virtualization`、`com.apple.private.bmk.allow` |
+| `vphone-cli doctor --json` | 退出码 3（含 warning）；`macos 26.5.0`、`kern.hv_support=1`、`kern.hv_vmm_present=0`、SIP `custom configuration` |
+
+amfidont 放行（本轮未使用管理员密码）：
+
+- 事实：守护进程 pid 19950 已在运行，参数为 `--spoof-apple --path /Users/kolar/github/vphone-cli --cdhash cdf97f16f9700b76329168e04408e275faa0a524 --cdhash 900c3012d84f1a2fecd5311941b384777add8b9f`。
+- 事实：`amfidont/bypass_runtime.py:72` 与 `:124` 使用 `result["path"].startswith(path)` 判定放行；本次构建产物路径 `/Users/kolar/github/vphone-cli/.build/f3/src/.build/...` 以 `--path` 值为前缀。
+- 事实：两个二进制 `--help` 均退出 0，未新增 cdhash 注册。
+- 推断：因路径前缀匹配命中，本次构建无需重新放行。该结论仅在守护进程保持运行时成立；宿主重启后需按既有流程（`scripts/start_amfidont_for_vphone.sh`）重新启动守护进程，并重新验证 `--help` 退出码。
+
+隔离性（第 7 节“替换正在运行的应用包”风险）：
+
+- 事实：主工作树 `.build/vphone-cli.app/Contents/MacOS/vphone-cli` 与 `.build/vphoned.signed` 的修改时间仍为 2026-09-17 14:29，未被本次构建改写。
+- 事实：`vm-2607` 的 vphone-cli 进程 41303 仍在运行，使用主工作树的 `.build/vphone-cli.app`。
+
+下一步：第 6 节顺序 3（d4-acc GUI 启动、设置“自动锁定=永不”、确认 tap/swipe 坐标），需用户操作 GUI。
