@@ -282,7 +282,8 @@ struct CreateLiveStagesTests {
         #expect(isRejected(stages.verify(.verification, context: w.context(), evidence: ["boot_analysis": "prompt_detected"])))
 
         stages.lockReleaseTimeout = 10
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) { holder.lock = nil }
+        // A dedicated thread: the global queue can be saturated by parallel tests.
+        Thread { Thread.sleep(forTimeInterval: 0.3); holder.lock = nil }.start()
         #expect(isVerified(stages.verify(.verification, context: w.context(), evidence: ["boot_analysis": "prompt_detected"])))
     }
 

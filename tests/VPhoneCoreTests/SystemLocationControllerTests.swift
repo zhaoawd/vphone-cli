@@ -1112,9 +1112,13 @@ final class SystemLocationControllerTests: XCTestCase {
         let generation = try XCTUnwrap(started["generation"] as? String)
         _ = try await controller.push(generation: generation, fix: fix(0))
 
-        try await Task.sleep(for: .milliseconds(40))
+        for _ in 0..<200 {
+            if guest.deliveries.count >= 2 { break }
+            try await Task.sleep(for: .milliseconds(5))
+        }
 
         XCTAssertGreaterThanOrEqual(guest.deliveries.count, 2)
+        guard guest.deliveries.count >= 2 else { return }
         XCTAssertEqual(guest.deliveries[0].fix.speed, 10)
         XCTAssertEqual(guest.deliveries[1].fix.speed, 0)
         XCTAssertEqual(guest.deliveries[0].fix.latitude, guest.deliveries[1].fix.latitude)

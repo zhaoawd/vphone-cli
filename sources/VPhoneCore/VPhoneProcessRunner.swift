@@ -89,11 +89,20 @@ public enum VPhoneProcessRunner {
         let expired = DeadlineFlag()
         if let timeout {
             let target = process
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                guard target.isRunning else { return }
-                expired.set()
-                target.terminate()
-            }
+            // A dedicated thread: a block queued on the global concurrent queue
+            // can be starved by pending work, so the deadline never runs.
+            Thread {
+                // A monotonic deadline: the wall clock can jump, DispatchTime cannot.
+                let deadline = DispatchTime.now() + timeout
+                while target.isRunning {
+                    if DispatchTime.now() >= deadline {
+                        expired.set()
+                        target.terminate()
+                        return
+                    }
+                    Thread.sleep(forTimeInterval: min(0.05, max(0.005, timeout / 10)))
+                }
+            }.start()
         }
         process.waitUntilExit()
         group.wait()
