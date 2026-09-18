@@ -220,9 +220,11 @@ class F3LatencyTests(DriverTestCase):
         self.assertEqual(len(measured), 6)
         for record in measured:
             for key in ("seq", "class", "command", "params", "ok", "code", "error",
-                        "response_bytes", "started_utc", "t_start_ns", "t_connect_ns",
-                        "t_send_ns", "t_total_ns"):
+                        "response_bytes", "started_utc", "t_paced_ns", "t_start_ns",
+                        "t_connect_ns", "t_send_ns", "t_total_ns"):
                 self.assertIn(key, record)
+            # No gate paces these classes, so they carry no reserved start.
+            self.assertIsNone(record["t_paced_ns"])
             self.assertTrue(record["ok"])
             self.assertGreaterEqual(record["t_total_ns"], record["t_send_ns"])
             self.assertGreaterEqual(record["t_send_ns"], record["t_connect_ns"])
@@ -348,28 +350,34 @@ class F3LatencyTests(DriverTestCase):
                           key=lambda record: record["seq"])
         self.assertEqual(len(measured), 6)
         starts = [record["t_start_ns"] for record in measured]
-        # The gate reserves the injector just before the request starts, so the
-        # start-to-start gap carries that much scheduling jitter.
-        jitter_ns = 20 * 1_000_000
-        for before, after in zip(starts, starts[1:]):
-            self.assertGreaterEqual(after - before, spacing_ns - jitter_ns)
+        # The gate paces the reserved starts, not the request starts: how long a
+        # request takes to get going after its reservation is host scheduling and
+        # is not paced, so only the reservations are spacing apart.
+        paced = [record["t_paced_ns"] for record in measured]
+        for before, after in zip(paced, paced[1:]):
+            self.assertGreaterEqual(after - before, spacing_ns)
         for record in measured:
             self.assertTrue(record["ok"])
+            self.assertGreaterEqual(record["t_start_ns"], record["t_paced_ns"])
             self.assertLess(record["t_total_ns"], spacing_ns)
         span = starts[-1] + measured[-1]["t_total_ns"] - starts[0]
         self.assertGreater(span, 4 * spacing_ns)
         self.assertLess(sum(record["t_total_ns"] for record in measured), span / 2)
 
     def test_round_longer_than_the_spacing_does_not_add_a_sleep(self):
-        now = [1000.0]
+        now = [1_000 * 1_000_000_000]
         gate = f3_benchmark.InjectorGate(clock=lambda: now[0])
-        self.assertEqual(gate.reserve(0.35), 0.0)
-        now[0] += 0.5  # the other classes in the round already took longer than the spacing
-        self.assertEqual(gate.reserve(0.35), 0.0)
-        now[0] += 0.1  # a shorter round waits out only the remainder
-        self.assertAlmostEqual(gate.reserve(0.10), 0.25)
-        now[0] += 0.25
-        self.assertAlmostEqual(gate.reserve(0.10), 0.10)
+        self.assertEqual(gate.reserve(0.35), (0.0, now[0]))
+        now[0] += 500 * 1_000_000  # the other classes in the round already took longer
+        self.assertEqual(gate.reserve(0.35), (0.0, now[0]))
+        now[0] += 100 * 1_000_000  # a shorter round waits out only the remainder
+        delay, start = gate.reserve(0.10)
+        self.assertAlmostEqual(delay, 0.25)
+        # The reserved start is the previous reservation plus its spacing, whatever
+        # the caller did in between; this is what the sample records carry.
+        self.assertEqual(start, now[0] + 250 * 1_000_000)
+        now[0] += 250 * 1_000_000
+        self.assertEqual(gate.reserve(0.10), (0.10, now[0] + 100 * 1_000_000))
 
 
 class F3RecoveryAndLoadTests(DriverTestCase):

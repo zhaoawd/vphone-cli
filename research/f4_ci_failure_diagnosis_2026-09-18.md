@@ -375,3 +375,51 @@ $ git merge-base --is-ancestor 2011bc7 799d168
 3. 第 2 项"释放块被延迟超过 10 秒"在本机未直接观测到，标记为待验证假设；本机只观测到同一原语被延迟 3.8–4.5 秒。
 4. 本次未执行 `make build`、未启动 VM、未提交、未推送。
 5. 未在 CI 上验证任何改法。
+
+## 6. 2026-09-19 补充：修复后新暴露的两项失败
+
+运行 `35364546072`（`5beab7b`，已含第 2–4 节三项修复）仍失败，失败项与前三项不同：
+
+| 作业 | 失败项 | CI 输出 |
+| --- | --- | --- |
+| Python 3.13 | `SystemLocationControllerTests.testPauseUsesIndependentDeliverySequence`（`tests/VPhoneCoreTests/SystemLocationControllerTests.swift:820`） | `XCTAssertGreaterThanOrEqual failed: ("2") is less than ("3")` |
+| Python 3.14 | `test_f3_benchmark.F3LatencyTests.test_gesture_pacing_stays_outside_the_recorded_latency`（`tests/test_f3_benchmark.py:355`） | `AssertionError: 93077625 not greater than or equal to 130000000` |
+
+两项均为断言依赖固定墙钟窗口，与第 2 节三项属同一类别。
+
+### 6.1 `testPauseUsesIndependentDeliverySequence`
+
+事实：该测试以 `watchdogSeconds: 0.01` 启动，`setPaused` 之后固定 `Task.sleep(for: .milliseconds(35))`，再断言 `guest.deliveries.count >= 3`。第 3 次投递需要 pause 之后至少一次 watchdog tick。
+
+判定：测试缺陷，与 3.1 同一模式（该模式在 `2b93671` 中只修了 `testWatchdogHoldsLastAcceptedCoordinate`，本项遗漏）。改法：新增 `waitForDeliveries(atLeast:to:)`（每 5 ms 轮询，上限 1 秒，helper 内不断言，超时由调用方在自身行号失败），并在断言后加 `guard` 阻断越界索引。同文件另两处同类固定睡眠一并改为轮询：`testFixedSourceRefreshesUntilStopped`（40 ms → 等投递数）、`testWatchdogCanStopOwnedStream`（40 ms → 已有的 `waitForState("off",…)`）。断言强度不变。
+
+未改动的两处固定睡眠：`testFixedHeartbeatCannotUndoPauseWhileWaitingForDeliveryTurn` 的 70 ms（其后即为 `waitForDeliveryTurnWaiter` 轮询，睡眠只作下界）与 pause 之后的 20 ms（负向断言的静置窗口，运行变慢只降低捕获能力，不会误报）。
+
+### 6.2 `test_gesture_pacing_stays_outside_the_recorded_latency`
+
+事实：`InjectorGate.reserve` 在请求开始之前被 `CommandClass.wait_turn` 调用；`t_start_ns` 由 `host_control_client.request` 在建立连接前取 `time.perf_counter_ns()`（`scripts/host_control_client.py:92`）。修改前网关用 `time.monotonic`，记录用 `perf_counter_ns`，是两个 API。
+
+推断（算术推导）：设第 n 条请求的预约时刻为 `r_n`、记录起点为 `s_n`、`e_n = s_n - r_n ≥ 0`，则 `s_{n+1} - s_n = (r_{n+1} - r_n) + e_{n+1} - e_n ≥ spacing - e_n`。`e` 是预约返回到请求真正开始之间的宿主调度耗时，网关不约束它。因此原断言"相邻 `t_start_ns` 间隔 ≥ spacing − 20 ms"测的是实现不保证的性质；CI 上 `e_n ≥ 57 ms` 即失败。
+
+改法：`InjectorGate` 时钟统一为 `time.perf_counter_ns`，`reserve()` 返回 `(delay, start_ns)`；`wait_turn` 经线程局部变量把预约时刻交给同线程的请求，`Run.perform` 记入样本新字段 `t_paced_ns`（无网关时为 `None`）。测试改为断言相邻 measure 记录的 `t_paced_ns` 间隔 `≥ spacing`（无容差，来自网关算术）与每条记录 `t_start_ns ≥ t_paced_ns`；原有 `ok`、`t_total_ns < spacing`、span 与 `sum(t_total) < span/2` 断言保留。`scripts/f3_stats.py` 与 `summarize` 不读取该字段，`run.json` 的 `SCHEMA_VERSION` 未变。计划文档 3.1 的间隔口径同步更正为"从一次预约开始到下一次预约开始计时"。
+
+### 6.3 复现与验证
+
+两项在本机（`hw.ncpu` 15）加 60–80 路 CPU 忙循环均未自然复现，复现依靠人工注入：
+
+| 项 | 修复前复现 | 结果 |
+| --- | --- | --- |
+| 6.1 | 把固定窗口临时改为 1 ms（等价于 tick 落在窗口之外） | 与 CI 同一签名 `("2") is less than ("3")` |
+| 6.2 | 在 `host_control_client.request` 取 `t_start_ns` 之前注入 0–80 ms 伪随机延迟（放大 `e`） | 同一行 `AssertionError: 112328334 not greater than or equal to 130000000` |
+
+修复后：6.2 同注入下 `F3_JITTER_MS=80` 五个种子、`F3_JITTER_MS=140` 两个种子全部通过。完整 `make test` 通过（Python `Ran 344 tests` / `OK`；XCTest `Executed 144 tests, with 3 tests skipped and 0 failures`；Swift Testing `468 tests in 64 suites passed`）。60 路忙循环下 `swift test --filter SystemLocationControllerTests` 三次（每次 `Executed 65 tests, with 0 failures`）与 `python3 -m unittest tests.test_f3_benchmark.F3LatencyTests` 三次（每次 `Ran 12 tests` / `OK`）全部通过。
+
+### 6.4 未完成与限制
+
+1. 两项在本机未自然复现，复现均为人工注入。因此"CI 上不再失败"未经验证；已验证的是断言不再依赖失败时不成立的那条时间性质。
+2. CI runner 上 `e_n ≥ 57 ms` 的来源（CPU 争用、GC 或 socket 层调度）未查明，标记为待验证假设。
+3. `t_total_ns < spacing_ns` 与 `sum(t_total) < span/2` 仍是墙钟假设（本地 socket 假服务端往返对 150 ms 预算余量约 150 倍），本次未改动。
+4. 同类模式在本次范围之外仍有：`tests/VPhoneCLITests/GuestTransportTests.swift:236` 与 `:245`，未改动。
+5. `--concurrency > 1` 下"按 `seq` 相邻即预约相邻"不成立；该测试用并发 1，仓库中无并发 > 1 的 latency 测试，未覆盖。
+6. `t_paced_ns` 只在假服务端下验证，未在真机 latency 运行中取值。
+7. 本次未执行 `make build`、未启动 VM。

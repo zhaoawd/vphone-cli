@@ -216,6 +216,7 @@ class Run:
     # Requests --------------------------------------------------------------
     def perform(self, label, payload, params, phase="measure", verify=None, writer=None):
         """Send one request, write one sample line and return (response, ok)."""
+        paced_start = take_paced_start()
         timing = {}
         response = None
         code = None
@@ -257,6 +258,9 @@ class Run:
             "error": error,
             "response_bytes": size,
             "started_utc": timing.get("t_wall_utc"),
+            # Gesture pacing: the injector start this request was reserved for,
+            # on the t_start_ns clock; None when no gate paced the request.
+            "t_paced_ns": paced_start,
             "t_start_ns": timing.get("t_start_ns"),
             "t_connect_ns": timing.get("t_connect_ns"),
             "t_send_ns": timing.get("t_send_ns"),
@@ -536,28 +540,53 @@ class GuestLogSampler:
 
 # MARK: - Latency (§3.1)
 
+# The injector reservation the current thread is waiting on. CommandClass.wait_turn
+# writes it and the request it paces reads it once (Run.perform, field t_paced_ns);
+# the schedule runs wait_turn and the request on the same thread.
+PACED_START = threading.local()
+
+
+def take_paced_start():
+    """Return and clear this thread's injector reservation, or None when ungated."""
+    start = getattr(PACED_START, "value", None)
+    PACED_START.value = None
+    return start
+
+
 class InjectorGate:
     """Minimum spacing shared by the command classes that inject a gesture.
 
     The guest injector runs one gesture at a time and rejects a request that
     arrives while a gesture is still running (code gesture_busy). Each class
     reserves the injector for its own spacing, measured from the start of one
-    request to the start of the next; the wait is returned to the caller so it
-    happens outside the §3.1 latency measurement.
+    reservation to the start of the next; the wait is returned to the caller so
+    it happens outside the §3.1 latency measurement.
+
+    The clock is `time.perf_counter_ns()`, the same clock the sample records'
+    `t_start_ns` comes from, so a record can carry the reserved start it was
+    paced to (`t_paced_ns`). The request itself starts at or after that point:
+    how much later depends on host scheduling and is not paced by the gate.
     """
 
-    def __init__(self, clock=time.monotonic):
+    def __init__(self, clock=time.perf_counter_ns):
         self.clock = clock
         self.lock = threading.Lock()
-        self.due = 0.0
+        self.due = 0
 
     def reserve(self, spacing):
-        """Reserve the injector for `spacing` seconds; return the wait before starting."""
+        """Reserve the injector for `spacing` seconds.
+
+        Returns `(delay, start_ns)`: the wait in seconds before the caller may
+        start its request, and the reserved start on the gate clock. Successive
+        reservations are at least the earlier one's spacing apart by
+        construction, whatever the caller's own scheduling does.
+        """
+        spacing_ns = round(spacing * 1_000_000_000)
         with self.lock:
             now = self.clock()
-            delay = max(0.0, self.due - now)
-            self.due = now + delay + spacing
-            return delay
+            start = max(now, self.due)
+            self.due = start + spacing_ns
+            return (start - now) / 1_000_000_000, start
 
 
 class CommandClass:
@@ -577,8 +606,11 @@ class CommandClass:
     def wait_turn(self, run):
         """Hold the next request until the shared gate is free; never inside a measurement."""
         if self.gate is None or self.spacing <= 0:
+            PACED_START.value = None
             return not run.should_stop
-        return run.sleep(self.gate.reserve(self.spacing))
+        delay, start_ns = self.gate.reserve(self.spacing)
+        PACED_START.value = start_ns
+        return run.sleep(delay)
 
     def skip_reason(self, capabilities):
         missing = [name for name in self.commands if not command_available(capabilities, name)]
