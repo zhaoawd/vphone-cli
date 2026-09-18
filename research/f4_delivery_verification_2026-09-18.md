@@ -73,13 +73,15 @@
 
 推断：第 2、3 项涉及的代码由 2026-09-17 的 `99da011`（D4）与 `c2fac55`（D5）引入，晚于最后一次成功运行，与失败起始时间一致。第 1 项的测试自 2026-08-19 起即为现状，其在本次被触发的具体条件未查明。
 
-事实：`VPhoneProcessRunner` 的同一实现还用于 `VPhoneCreateLiveStages.swift` 的 `recoveryReachable`、`attachedImages` 等探测路径，该缺陷的影响不限于测试。
+事实：`sources/` 下向 `runCapturing` 传 `timeout` 的调用点只有 `VPhoneDiagnosticChecks.swift` 第 93、111、117 行，均在 `vphone-cli doctor` 的顺序检查中；`VPhoneCreateLiveStages.swift` 第 299、303、308 行的三处调用不传 `timeout`，不进入超时分支。该缺陷的实际影响范围是 `doctor` 的外部命令探测与测试。
 
 ## 4. 本轮未完成
 
-1. `VPhoneProcessRunner` 的超时缺陷未修复。诊断记录中有经本机验证的改法（超时改由独立 `Thread` 轮询），未应用。
-2. 三项测试失败的改法未在 CI 上验证。
-3. 变体计数表 4/42/53/113/141 与 2/10/12/14/18 的来源与适用组合未查明。
-4. `0_binary_patch_comparison.md` 的三个汇总表仍无逐格日期与证据链接。
-5. `release` workflow 在本仓库无运行证据。取得该证据需要发布流程实际运行，本轮未执行。
-6. F1 的未解决问题 O1–O3 与 F3 的遗留项需要 VM 与客户机，不在本轮范围。
+1. ~~`VPhoneProcessRunner` 的超时缺陷未修复。~~ 已在提交 `2b93671` 修复：超时改由独立 `Thread` 按单调的 `DispatchTime` deadline 轮询，两项测试缺陷同时修复。验证结果：完整 `make test` 通过（Python 344、XCTest 144 含 3 项跳过、Swift Testing 468 / 64 suites，`exit=0`）；三项各单独复跑 5 次全部通过；整套 Swift 在 24 个忙循环负载下复跑 5 次，失败 0 次；饱和探针由 `timedOut=false elapsed=5.0067` 变为 `timedOut=true elapsed=0.2249`。探针为临时用例，验证后已删除。
+2. 三项测试失败的改法未在 CI 上验证。第 1、2 项的原始失败在本机从未自然复现，本机通过只证明不引入回归，不证明 CI 失败已消除；CI 侧的具体调度成因仍为待验证假设。
+3. 带 `timeout` 的 `runCapturing` 每次调用创建一个独立线程，生存期为子进程运行期。当前调用点均在 `doctor` 的顺序检查中，无循环或高并发使用。若后续在高并发路径中使用，线程数随并发度线性增长，需改为共享定时机制。该影响未测量。
+4. 轮询间隔为 `min(0.05, max(0.005, timeout / 10))`，终止时刻最多迟于 deadline 一个间隔。原 `asyncAfter` 在队列不拥塞时精度更高，该偏差对现有调用点的影响未测量。
+5. 变体计数表 4/42/53/113/141 与 2/10/12/14/18 的来源与适用组合未查明。
+6. `0_binary_patch_comparison.md` 的三个汇总表仍无逐格日期与证据链接。
+7. `release` workflow 在本仓库无运行证据。取得该证据需要发布流程实际运行，本轮未执行。
+8. F1 的未解决问题 O1–O3 与 F3 的遗留项需要 VM 与客户机，不在本轮范围。

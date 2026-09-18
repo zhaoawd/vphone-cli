@@ -213,6 +213,8 @@ STARVATION_PROBE timedOut=false elapsed=5.01180899143219
 
 因此本项不是断言写得过紧的问题：`#expect(slow.timedOut)` 是对 `runCapturing` 超时语义的正确要求，实现无法在全局队列拥塞时兑现该语义。该实现同时用于 `sources/vphone-cli/VPhoneCreateLiveStages.swift` 中的 `recoveryReachable`、`attachedImages` 等探测路径，超时失效不限于测试场景。
 
+**2026-09-18 修正**：上一句关于影响范围的判断有误。复核 `sources/` 下全部 `runCapturing` 调用点，`VPhoneCreateLiveStages.swift` 第 299、303、308 行的三处调用**均未传 `timeout` 参数**，不进入超时分支，因此不受该缺陷影响。`sources/` 下传 `timeout` 的调用点只有 `sources/VPhoneCore/VPhoneDiagnosticChecks.swift` 第 93、111、117 行，均在 `vphone-cli doctor` 的顺序检查中。该缺陷的实际影响范围是 `doctor` 的外部命令探测与测试，不是创建流程的探测路径。
+
 补充观测：本机同一次整套运行中 512 阻塞块之外的常规并行负载已足以把该块延迟 3.8–4.5 秒，说明拥塞在正常测试并行度下即可发生。
 
 ## 3. 建议改法与验证结果
