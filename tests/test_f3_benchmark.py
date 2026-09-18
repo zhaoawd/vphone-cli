@@ -315,6 +315,59 @@ class F3LatencyTests(DriverTestCase):
         self.assertEqual(run["counts"]["failures_by_code"], {})
         self.assertEqual(run["parameters"]["concurrency"], 3)
 
+    def gesture_args(self, *extra):
+        return f3_benchmark.parse_args(["latency", "--sock", str(self.root / "s"),
+                                        "--out", str(self.root / "o"), *extra])
+
+    def test_swipe_spacing_follows_the_configured_swipe_duration(self):
+        args = self.gesture_args()
+        tap, swipe = f3_benchmark.resolve_gesture_spacing(args)
+        self.assertAlmostEqual(tap, 0.100)
+        self.assertAlmostEqual(swipe, 0.350)
+        self.assertEqual(args.swipe_ms, 300)
+        self.assertEqual(args.swipe_spacing_ms, 350)
+        longer = self.gesture_args("--swipe-ms", "500")
+        self.assertAlmostEqual(f3_benchmark.resolve_gesture_spacing(longer)[1], 0.550)
+        self.assertEqual(longer.swipe_spacing_ms, 550)
+        explicit = self.gesture_args("--swipe-ms", "500", "--swipe-spacing-ms", "120")
+        self.assertAlmostEqual(f3_benchmark.resolve_gesture_spacing(explicit)[1], 0.120)
+
+    def test_gesture_pacing_stays_outside_the_recorded_latency(self):
+        fixture = self.fixture()
+        spacing_ns = 150 * 1_000_000
+        _, run, records, _ = self.latency(
+            fixture, "--tap-spacing-ms", "150", "--swipe-ms", "100",
+            commands="tap:noscreen,swipe:noscreen", out="pacing", samples=3, warmup=1)
+        # The derived swipe spacing and the tap spacing are both recorded.
+        self.assertEqual(run["parameters"]["tap_spacing_ms"], 150)
+        self.assertEqual(run["parameters"]["swipe_spacing_ms"], 150)
+        measured = sorted((record for record in records if record["phase"] == "measure"),
+                          key=lambda record: record["seq"])
+        self.assertEqual(len(measured), 6)
+        starts = [record["t_start_ns"] for record in measured]
+        # The gate reserves the injector just before the request starts, so the
+        # start-to-start gap carries that much scheduling jitter.
+        jitter_ns = 20 * 1_000_000
+        for before, after in zip(starts, starts[1:]):
+            self.assertGreaterEqual(after - before, spacing_ns - jitter_ns)
+        for record in measured:
+            self.assertTrue(record["ok"])
+            self.assertLess(record["t_total_ns"], spacing_ns)
+        span = starts[-1] + measured[-1]["t_total_ns"] - starts[0]
+        self.assertGreater(span, 4 * spacing_ns)
+        self.assertLess(sum(record["t_total_ns"] for record in measured), span / 2)
+
+    def test_round_longer_than_the_spacing_does_not_add_a_sleep(self):
+        now = [1000.0]
+        gate = f3_benchmark.InjectorGate(clock=lambda: now[0])
+        self.assertEqual(gate.reserve(0.35), 0.0)
+        now[0] += 0.5  # the other classes in the round already took longer than the spacing
+        self.assertEqual(gate.reserve(0.35), 0.0)
+        now[0] += 0.1  # a shorter round waits out only the remainder
+        self.assertAlmostEqual(gate.reserve(0.10), 0.25)
+        now[0] += 0.25
+        self.assertAlmostEqual(gate.reserve(0.10), 0.10)
+
 
 class F3RecoveryAndLoadTests(DriverTestCase):
     def test_recovery_boot_records_each_interval_and_keeps_the_log(self):

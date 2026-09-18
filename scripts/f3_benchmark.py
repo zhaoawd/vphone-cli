@@ -48,6 +48,13 @@ ERROR_PREFIX_BYTES = 200
 LOCATION_OWNER = "vphone-f3-bench"
 WARMUP_SAMPLES = 10
 DEFAULT_MAX_CONSECUTIVE_FAILURES = 20
+# §3.1 手势节流：客户机注入器一次只执行一个手势，手势执行期间到达的请求以
+# code=gesture_busy 被拒绝，因此 tap/swipe 类之间需要最小间隔（见 10.10）。
+DEFAULT_SWIPE_MS = 300
+# tap 注入占用注入器 80 毫秒（10.10），加 20 毫秒余量。
+DEFAULT_TAP_SPACING_MS = 100
+# swipe 间隔由本次运行发送的 ms 时长加余量得出，不单独写死。
+GESTURE_SPACING_MARGIN_MS = 50
 # §3.6: the first 10 minutes after launch are warm-up and are dropped from the series.
 RESOURCE_WARMUP_SECONDS = 600.0
 # §3.6: moving block bootstrap with a 5 minute block.
@@ -436,16 +443,49 @@ class GuestLogSampler:
 
 # MARK: - Latency (§3.1)
 
+class InjectorGate:
+    """Minimum spacing shared by the command classes that inject a gesture.
+
+    The guest injector runs one gesture at a time and rejects a request that
+    arrives while a gesture is still running (code gesture_busy). Each class
+    reserves the injector for its own spacing, measured from the start of one
+    request to the start of the next; the wait is returned to the caller so it
+    happens outside the §3.1 latency measurement.
+    """
+
+    def __init__(self, clock=time.monotonic):
+        self.clock = clock
+        self.lock = threading.Lock()
+        self.due = 0.0
+
+    def reserve(self, spacing):
+        """Reserve the injector for `spacing` seconds; return the wait before starting."""
+        with self.lock:
+            now = self.clock()
+            delay = max(0.0, self.due - now)
+            self.due = now + delay + spacing
+            return delay
+
+
 class CommandClass:
     """One latency command class: a label, a sample count and an execute callable."""
 
-    def __init__(self, label, samples, execute, *, commands=(), capability=None, needs_screen=False):
+    def __init__(self, label, samples, execute, *, commands=(), capability=None,
+                 needs_screen=False, gate=None, spacing=0.0):
         self.label = label
         self.samples = samples
         self.execute = execute
         self.commands = tuple(commands)
         self.capability = capability
         self.needs_screen = needs_screen
+        self.gate = gate
+        self.spacing = spacing
+
+    def wait_turn(self, run):
+        """Hold the next request until the shared gate is free; never inside a measurement."""
+        if self.gate is None or self.spacing <= 0:
+            return not run.should_stop
+        return run.sleep(self.gate.reserve(self.spacing))
 
     def skip_reason(self, capabilities):
         missing = [name for name in self.commands if not command_available(capabilities, name)]
@@ -499,10 +539,25 @@ def decoded_digest(response):
         return None
 
 
+def resolve_gesture_spacing(args):
+    """Resolve the effective tap/swipe spacing in seconds.
+
+    The swipe value follows the `ms` duration this run sends, so changing
+    --swipe-ms keeps the spacing above the gesture. The resolved value is
+    written back into args so run.json's parameters record it.
+    """
+    if getattr(args, "swipe_spacing_ms", None) is None:
+        args.swipe_spacing_ms = args.swipe_ms + GESTURE_SPACING_MARGIN_MS
+    return args.tap_spacing_ms / 1000.0, args.swipe_spacing_ms / 1000.0
+
+
 def latency_classes(run, counts):
     """Build the §3.1 command classes for this run."""
     args = run.args
     classes = []
+    # tap and swipe share one injector, so they share one gate.
+    injector = InjectorGate()
+    tap_spacing, swipe_spacing = resolve_gesture_spacing(args)
 
     def add(label, samples, execute, **options):
         classes.append(CommandClass(label, counts.get(label, samples), execute, **options))
@@ -618,19 +673,21 @@ def latency_classes(run, counts):
                     {"x": args.tap_x, "y": args.tap_y, "screen": screen, "delay": delay},
                     phase=phase_of(index))
     add("tap:noscreen", 200, lambda index, worker: tap(index, worker, False),
-        commands=("tap",), needs_screen=True)
+        commands=("tap",), needs_screen=True, gate=injector, spacing=tap_spacing)
     add("tap:screen", 100, lambda index, worker: tap(index, worker, True, delay=0),
-        commands=("tap",), needs_screen=True)
+        commands=("tap",), needs_screen=True, gate=injector, spacing=tap_spacing)
 
     def swipe(index, worker):
         up = index % 2 == 0
         start_y, end_y = (args.swipe_y1, args.swipe_y2) if up else (args.swipe_y2, args.swipe_y1)
         payload = {"t": "swipe", "x1": args.swipe_x, "y1": start_y, "x2": args.swipe_x,
-                   "y2": end_y, "ms": 300, "screen": False}
+                   "y2": end_y, "ms": args.swipe_ms, "screen": False}
         run.perform("swipe:noscreen", payload,
-                    {"x": args.swipe_x, "y1": start_y, "y2": end_y, "ms": 300, "screen": False},
+                    {"x": args.swipe_x, "y1": start_y, "y2": end_y, "ms": args.swipe_ms,
+                     "screen": False},
                     phase=phase_of(index))
-    add("swipe:noscreen", 200, swipe, commands=("swipe",), needs_screen=True)
+    add("swipe:noscreen", 200, swipe, commands=("swipe",), needs_screen=True,
+        gate=injector, spacing=swipe_spacing)
 
     simple("shell", lambda index, worker: {"t": "shell", "cmd": "true", "screen": False},
            samples=200, commands=("shell",), capability="shell")
@@ -721,7 +778,7 @@ def execute_schedule(run, schedule):
     concurrency = max(1, run.args.concurrency)
     if concurrency == 1:
         for item, index, _ in schedule:
-            if run.should_stop:
+            if not item.wait_turn(run):
                 return
             item.execute(index, 0)
         return
@@ -737,6 +794,8 @@ def execute_schedule(run, schedule):
                     return
                 cursor["position"] = position + 1
             item, index, _ = schedule[position]
+            if not item.wait_turn(run):
+                return
             try:
                 item.execute(index, number)
             except AcceptanceFailure as error:
@@ -1975,6 +2034,14 @@ def parse_args(argv):
     latency.add_argument("--swipe-x", type=int, default=645)
     latency.add_argument("--swipe-y1", type=int, default=2000)
     latency.add_argument("--swipe-y2", type=int, default=1200)
+    latency.add_argument("--swipe-ms", type=int, default=DEFAULT_SWIPE_MS,
+                         help=f"swipe duration sent as ms (default {DEFAULT_SWIPE_MS})")
+    latency.add_argument("--tap-spacing-ms", type=float, default=DEFAULT_TAP_SPACING_MS,
+                         help="minimum milliseconds between two tap injections, measured "
+                              f"start to start (default {DEFAULT_TAP_SPACING_MS})")
+    latency.add_argument("--swipe-spacing-ms", type=float, default=None,
+                         help="minimum milliseconds between two swipe injections, measured "
+                              f"start to start (default --swipe-ms + {GESTURE_SPACING_MARGIN_MS})")
     latency.add_argument("--cleanup-guest-files", action="store_true",
                          help=f"delete {GUEST_ROOT} on the guest when the run finishes")
     latency.add_argument("--list-commands", action="store_true",

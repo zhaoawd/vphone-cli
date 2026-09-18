@@ -188,15 +188,17 @@ d4-acc（regular）在 F1 中的能力边界（事实，来自 F1 记录）：�
 | `file_get` | 内联 1 KiB、64 KiB、1 MiB；`save` 16 MiB、64 MiB | 全部 | 内联各 200；`save` 各 30 |
 | `location_source_set` + `location_source_stop` | 固定坐标，`persist=false`，每对新 generation | 声明 `location_owned` 的实例 | 100 对（分别统计 set 与 stop） |
 | `screenshot` | 默认（灰度 compact）；`color=true` | GUI 启动 | 各 200 |
-| `tap` | `screen=false`，固定非交互坐标 | GUI 启动 | 200 |
-| `swipe` | `screen=false`，`ms=300`，在“设置”列表内上下交替 | GUI 启动 | 200 |
-| `tap` | `screen=true`，`delay=0` | GUI 启动 | 100 |
+| `tap` | `screen=false`，固定非交互坐标；节流间隔 `--tap-spacing-ms`（默认 100 毫秒） | GUI 启动 | 200 |
+| `swipe` | `screen=false`，`ms=--swipe-ms`（默认 300），在“设置”列表内上下交替；节流间隔 `--swipe-spacing-ms`（默认 `--swipe-ms` + 50 毫秒） | GUI 启动 | 200 |
+| `tap` | `screen=true`，`delay=0`；节流间隔同上 `--tap-spacing-ms` | GUI 启动 | 100 |
 | `shell` | `true` | jb/exp | 200 |
 | `app_launch`/`app_terminate` | `com.apple.Preferences` | exp（regular 不适用） | 各 30 |
 
 文件路径：regular 使用 `/var/mobile/Library/f3-bench/<size>.bin`，每次覆盖同一路径，避免基准自身产生磁盘增长；运行结束删除该目录属于客户机文件删除，需在授权范围内确认（见第 7 节）。内容为固定种子伪随机字节，读回后比对 SHA-256，不一致计为失败。
 
 `tap`/`swipe` 的 `screen=false` 延迟只表示注入调用返回，不表示客户机完成手势（事实，见 1.5）。坐标需在实验前人工确认不会触发导航。
+
+手势节流：注入器一次只执行一个手势，手势执行期间到达的请求以 `code=gesture_busy` 被拒绝（`tap` 占用 80 毫秒，`swipe` 占用其 `ms` 时长，见 10.10）。因此三个手势类共用一个最小间隔，从一次请求开始到下一次请求开始计时：`tap` 两类合计不小于 `--tap-spacing-ms`，`swipe` 不小于 `--swipe-spacing-ms`。`--swipe-spacing-ms` 默认由本次运行发送的 `--swipe-ms` 加 50 毫秒余量得出，改变 `ms` 时长间隔随之改变。等待发生在请求开始之前，不计入 `t_total`；轮次中已经消耗在其他命令类上的时间计入该间隔，已超过间隔的轮次不再等待；非手势命令类不受该间隔约束。生效值记入 `run.json` 的 `parameters`。
 
 ### 3.2 连接恢复
 
