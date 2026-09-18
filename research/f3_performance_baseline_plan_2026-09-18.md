@@ -427,4 +427,49 @@ amfidont 放行（本轮未使用管理员密码）：
 - 事实：主工作树 `.build/vphone-cli.app/Contents/MacOS/vphone-cli` 与 `.build/vphoned.signed` 的修改时间仍为 2026-09-17 14:29，未被本次构建改写。
 - 事实：`vm-2607` 的 vphone-cli 进程 41303 仍在运行，使用主工作树的 `.build/vphone-cli.app`。
 
-下一步：第 6 节顺序 3（d4-acc GUI 启动、设置“自动锁定=永不”、确认 tap/swipe 坐标），需用户操作 GUI。
+### 10.3 顺序 3：d4-acc GUI 启动与客户机状态固定（2026-09-18，已完成）
+
+启动命令（E1、E4、E5 与 E2 的 `--launch-command` 统一使用该形式）：
+
+```
+.build/f3/src/.build/vphone-cli.app/Contents/MacOS/vphone-cli \
+  --config .build/d4acc/lib/d4-acc/config.plist \
+  --vphoned-bin .build/f3/src/.build/vphoned.signed
+```
+
+`--vphoned-bin` 是必需项，依据见下。stdout/stderr 重定向到 `.build/f3/logs/d4acc-gui-<UTC>.log`。
+
+| 项目 | 值 |
+| --- | --- |
+| 本轮启动 | 01:45:49Z，宿主进程 pid 83586；`vphone.sock` 出现 |
+| 新增 VZ XPC 进程 | 首次启动 79169、79171；重启后需按 3.3 重新采集（启动前集合为 `vm-2607` 的 41311、41316） |
+| `capabilities` | `guest_connected=true`、`screen_available=true`、`boot_mode=normal` |
+| `limits` | `command_timeout_ms=180000`、`request_bytes=2097152`、`inline_file_bytes=1048576`、`host_file_bytes=67108864`、`connections=16` |
+| 电源 | 交流电源，电量 100%（2.1 固定项满足） |
+
+客户机 vphoned 部署（决定 10 的前提条件）：
+
+- 事实：以 `--config` 启动时，`--vphoned-bin` 默认值是相对路径 `.vphoned.signed`（`VPhoneCLI.swift:53`），仓库根目录不存在该文件，`VPhoneAppDelegate.swift:124` 的存在性检查因此不设 `control.guestBinaryURL`，握手不携带哈希，客户机守护进程不更新。只有 `vm launch` 调用 `stageVphoned`（`VPhoneVMLaunchCLI.swift:58`）把构建产物暂存进 bundle。
+- 事实：01:39 那次不带 `--vphoned-bin` 的启动，客户机声明 `apps`、`url`，无 `apps_v2`、无 `app_launch`，即 F1 时期的守护进程。
+- 事实：01:45 带 `--vphoned-bin` 重启后，客户机声明 `apps_v2` 且不含 `app_launch`、`url`，完整集合为 `apps,apps_v2,clipboard,devmode,file,hid,ipa_install,keychain,location,location_owned,settings,touch,touch_edge,vcam_receipt_v3,vcam_status`。
+- 这是决定 10 要求的 `5fd007c` 部署后观察：regular 客户机无 uiopen，因此不声明 `app_launch` 与 `url`，与提交描述一致。dev/less 变体本轮未观察。
+
+客户机状态固定项（2.4）：
+
+| 项目 | 结果 |
+| --- | --- |
+| 自动锁定 | 观察值已是“永不”（01:41 截图，设置 → 显示与亮度）。本轮未修改，因此结束时无需恢复。该值何时设定，未查明 |
+| 解锁 | 重启后停在锁屏。注入路径 4 次尝试均未解锁：swipe (645,2100)→(645,900)、(645,2500)→(645,1200) ms=400、(645,2790)→(645,1500) ms=700，以及 `key home`；`key power` 可唤醒屏幕（锁屏下约 30 秒休眠，休眠期间截图返回静止帧）。由用户在 GUI 窗口手动解锁后恢复。推断：与既有记录一致，SpringBoard 系统手势（Home、解锁）不响应该注入路径，应用内点击与滚动正常；原因未查明 |
+| 前台应用 | “设置”根页面，滚动在顶部（大标题可见）。经主屏幕图标 (496,1957) 打开；打开前以 (422,1575) 关闭“完成 iPhone 设置”弹窗的“以后”按钮 |
+
+tap/swipe 坐标（像素，屏幕 1290×2796）：
+
+| 用途 | 坐标 | 验证 |
+| --- | --- | --- |
+| 非交互 tap | (643, 1084)，两组卡片之间的空隙 | 连续 5 次 tap 后截图与操作前逐字节相同 |
+| 列表内上下交替 swipe | (643, 1957) ↔ (643, 1258)，`ms=300` | 3 组上下滑动后截图与操作前逐字节相同；不触发导航 |
+| 返回根页面（准备用） | (126, 243) 为二级页面返回按钮 | 从“显示与亮度”返回根页面成功 |
+
+事实：宿主 stdout 日志中 Swift `print` 的 `[control]` 行按块缓冲，串口输出实时写入，因此启动日志不能用于判断客户机连接时刻；状态经 `vphone.sock` 的 `capabilities` 判定（3.2 的轮询方法已按此设计）。
+
+下一步：第 6 节顺序 4（E0、E1、E5a、E5b、E4），约 5 小时专用时段。
