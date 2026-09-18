@@ -11,17 +11,22 @@ import base64
 from datetime import datetime, timezone
 import hashlib
 import json
-import os
 from pathlib import Path
-import platform
 import plistlib
 import re
 import shlex
-import subprocess
 import sys
 import time
 import uuid
 
+from f3_common import (
+    git_state,
+    host_info,
+    redact,
+    redact_argv,
+    sha256_file,
+    utc_now,
+)
 from host_control_client import (
     AcceptanceFailure,
     HostControlTransportError,
@@ -34,7 +39,6 @@ from host_control_client import (
 
 
 SCHEMA_VERSION = 1
-ROOT = Path(__file__).resolve().parents[1]
 STATUSES = ("passed", "failed", "partial", "blocked", "not_applicable", "not_run")
 VARIANTS = ("less", "regular", "dev", "jb", "exp")
 STEP_TITLES = {
@@ -55,9 +59,6 @@ EXP_INJECTED_FILES = (
     "/var/jb/Library/MobileSubstrate/DynamicLibraries/libcamfix.dylib",
 )
 SYSTEM_VERSION_PLIST = "/System/Library/CoreServices/SystemVersion.plist"
-SENSITIVE_KEY = re.compile(r"pass(word|wd)?|token|secret|credential|authorization|cookie|api[_-]?key",
-                           re.IGNORECASE)
-BASE64_KEYS = ("data", "data_b64", "image")
 LOCATION_OWNER = "vphone-f1-acceptance"
 TOOL_PATHS = {
     "sysctl": ("/usr/sbin/sysctl", "/var/jb/usr/sbin/sysctl"),
@@ -67,60 +68,8 @@ TOOL_PATHS = {
 }
 
 
-# MARK: - Evidence helpers
-
-def utc_now():
-    return datetime.now(timezone.utc).isoformat()
-
-
-def sha256_file(path):
-    digest = hashlib.sha256()
-    with open(path, "rb") as stream:
-        for block in iter(lambda: stream.read(1 << 20), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
-def redact(value):
-    """Remove credentials and replace inline base64 payloads with length and digest."""
-    if isinstance(value, dict):
-        result = {}
-        for key, item in value.items():
-            if isinstance(key, str) and SENSITIVE_KEY.search(key):
-                result[key] = "<redacted>"
-            elif key in BASE64_KEYS and isinstance(item, str):
-                try:
-                    decoded = base64.b64decode(item, validate=True)
-                    result[key] = {"omitted_base64_bytes": len(decoded),
-                                   "sha256": hashlib.sha256(decoded).hexdigest()}
-                except ValueError:
-                    result[key] = {"omitted_text_chars": len(item)}
-            else:
-                result[key] = redact(item)
-        return result
-    if isinstance(value, list):
-        return [redact(item) for item in value]
-    return value
-
-
-def redact_argv(argv):
-    result = []
-    hide_next = False
-    for item in argv:
-        if hide_next:
-            result.append("<redacted>")
-            hide_next = False
-            continue
-        flag = item.split("=", 1)[0]
-        if item.startswith("--") and SENSITIVE_KEY.search(flag):
-            if "=" in item:
-                result.append(f"{flag}=<redacted>")
-            else:
-                result.append(item)
-                hide_next = True
-            continue
-        result.append(item)
-    return result
+# MARK: - Evidence helpers (utc_now, sha256_file, redact, redact_argv,
+# git_state, host_info live in scripts/f3_common.py)
 
 
 class StepFailed(Exception):
@@ -1095,30 +1044,6 @@ def execute_step(run, step_id, selected):
     record_path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
     record["record"] = str(record_path.relative_to(run.output))
     return record
-
-
-def git_state():
-    try:
-        commit = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True,
-                                text=True, timeout=10).stdout.strip() or None
-        porcelain = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain"],
-                                   capture_output=True, text=True, timeout=10)
-        clean = porcelain.returncode == 0 and porcelain.stdout.strip() == ""
-        return commit, clean if porcelain.returncode == 0 else None
-    except (OSError, subprocess.SubprocessError):
-        return None, None
-
-
-def host_info():
-    memory = None
-    try:
-        output = subprocess.run(["/usr/sbin/sysctl", "-n", "hw.memsize"], capture_output=True,
-                                text=True, timeout=5).stdout.strip()
-        memory = round(int(output) / (1 << 30), 1) if output else None
-    except (OSError, ValueError, subprocess.SubprocessError):
-        pass
-    return {"macos": platform.mac_ver()[0] or None, "machine": platform.machine(),
-            "cpu": os.cpu_count(), "memory_gib": memory}
 
 
 def parse_steps(value):

@@ -4,15 +4,20 @@ The host-control socket (`<vm>/vphone.sock`) accepts one newline-terminated JSON
 request per connection and returns one newline-terminated JSON object. Callers
 provide a recorder with `record(endpoint, request, response)`; it is invoked only
 after a complete response is received.
+
+`request` accepts an optional `timing` dict for latency measurements; see its
+docstring for the recorded keys.
 """
 
 import base64
 from dataclasses import dataclass
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
 import socket
 import stat
+import time
 
 
 MAXIMUM_MESSAGE_BYTES = 2 * 1024 * 1024
@@ -69,21 +74,43 @@ def read_line(connection):
     return response
 
 
-def request(endpoint: Endpoint, payload, recorder, timeout):
+def request(endpoint: Endpoint, payload, recorder, timeout, *, timing=None):
+    """Send one request and return the parsed response.
+
+    When `timing` is a dict it receives `t_wall_utc` (request start, ISO-8601 UTC),
+    `t_start_ns` (`time.perf_counter_ns()` taken before the connection is opened),
+    and `t_connect_ns`, `t_send_ns`, `t_total_ns` as nanosecond offsets from
+    `t_start_ns` measured after `connect()`, after `sendall()` and after the complete
+    response line has been read. A failed request keeps the points reached so far and
+    still receives `t_total_ns` (time until the failure). Request encoding happens
+    before `t_start_ns` and is not measured.
+    """
     encoded = json.dumps(payload, separators=(",", ":")).encode() + b"\n"
     if len(encoded) > MAXIMUM_MESSAGE_BYTES:
         raise AcceptanceFailure("host-control request exceeds 2 MiB")
+    start = None
+    if timing is not None:
+        timing["t_wall_utc"] = datetime.now(timezone.utc).isoformat()
+        start = time.perf_counter_ns()
+        timing["t_start_ns"] = start
     try:
         with socket.socket(socket.AF_UNIX) as connection:
             connection.settimeout(timeout)
             connection.connect(str(endpoint.socket_path))
+            if timing is not None:
+                timing["t_connect_ns"] = time.perf_counter_ns() - start
             connection.sendall(encoded)
+            if timing is not None:
+                timing["t_send_ns"] = time.perf_counter_ns() - start
             response = read_line(connection)
     except (OSError, socket.timeout) as error:
         raise HostControlTransportError(
             f"{endpoint.name} host-control request failed: {error}",
             timed_out=isinstance(error, (socket.timeout, TimeoutError)),
         ) from error
+    finally:
+        if timing is not None:
+            timing["t_total_ns"] = time.perf_counter_ns() - start
     recorder.record(endpoint, payload, response)
     return response
 
