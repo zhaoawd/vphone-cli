@@ -57,14 +57,37 @@ final class HostScreenFake: VPhoneHostScreen {
     var failure: Error?
     var tapped: (Double, Double)?
     var swipeDuration: Int?
+    var gestureCompleted = true
+    var suspendGestures = false
+    var gestureContinuation: CheckedContinuation<Void, Never>?
+    var screenshotAfterGesture: Bool?
     /// false makes the fake behave like a full gesture queue.
     var acceptsGestures = true
     func saveScreenshot(to url: URL) async throws -> URL { if let failure { throw failure }; return url }
-    func captureCompactScreenshot(color: Bool) async -> String? { colors.append(color); return "jpeg" }
-    func tap(x: Double, y: Double) -> Bool { tapped = (x, y); return acceptsGestures }
-    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) -> Bool {
-        swipeDuration = durationMs
+    func captureCompactScreenshot(color: Bool) async -> String? {
+        colors.append(color)
+        screenshotAfterGesture = gestureCompleted
+        return "jpeg"
+    }
+    func tap(x: Double, y: Double) async -> Bool {
+        tapped = (x, y)
+        await waitForGestureIfNeeded()
         return acceptsGestures
+    }
+    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) async -> Bool {
+        swipeDuration = durationMs
+        await waitForGestureIfNeeded()
+        return acceptsGestures
+    }
+    func completeGesture() {
+        gestureCompleted = true
+        gestureContinuation?.resume()
+        gestureContinuation = nil
+    }
+    private func waitForGestureIfNeeded() async {
+        guard suspendGestures else { return }
+        gestureCompleted = false
+        await withCheckedContinuation { gestureContinuation = $0 }
     }
 }
 
@@ -285,6 +308,23 @@ final class HostCommandExecutorTests: XCTestCase {
         }
         XCTAssertNil(screen.tapped)
         XCTAssertNil(screen.swipeDuration)
+    }
+
+    func testGestureScreenshotWaitsForThatGestureToComplete() async throws {
+        let screen = HostScreenFake()
+        screen.suspendGestures = true
+        let executor = VPhoneHostCommandExecutor(screen: screen)
+        let requestData = try JSONSerialization.data(
+            withJSONObject: ["t": "tap", "x": 1, "y": 2, "delay": 0])
+        let request = Task { await executor.execute(requestData) }
+        while screen.gestureContinuation == nil { await Task.yield() }
+        XCTAssertTrue(screen.colors.isEmpty)
+        screen.completeGesture()
+        let responseData = await request.value
+        let result = try XCTUnwrap(JSONSerialization.jsonObject(with: responseData) as? [String: Any])
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        XCTAssertEqual(result["image"] as? String, "jpeg")
+        XCTAssertEqual(screen.screenshotAfterGesture, true)
     }
 
     func testScreenshotAlwaysCapturesAndSupportsColor() async throws {

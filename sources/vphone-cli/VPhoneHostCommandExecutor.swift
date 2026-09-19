@@ -91,7 +91,7 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no active VM view"
                     return
                 }
-                guard screen.tap(x: x, y: y) else {
+                guard await screen.tap(x: x, y: y) else {
                     result.error = "gesture queue is full"
                     result.code = "gesture_busy"
                     return
@@ -123,7 +123,7 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no active VM view"
                     return
                 }
-                guard screen.swipe(
+                guard await screen.swipe(
                     fromX: x1, fromY: y1, toX: x2, toY: y2,
                     durationMs: durationMs
                 ) else {
@@ -133,9 +133,9 @@ final class VPhoneHostCommandExecutor {
                 }
                 result.ok = true
                 if wantScreen {
-                    // Wait for swipe to finish + settle
-                    let totalDelay = durationMs + screenDelay
-                    try? await Task.sleep(nanoseconds: UInt64(totalDelay) * 1_000_000)
+                    // The screen adapter has observed this swipe's final event;
+                    // wait only for the requested post-gesture settle interval.
+                    try? await Task.sleep(nanoseconds: UInt64(screenDelay) * 1_000_000)
                     result.imageBase64 = await captureCompactScreenshot()
                 }
             }()

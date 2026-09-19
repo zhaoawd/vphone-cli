@@ -14,6 +14,7 @@ started or stopped unless `recovery-boot` is given --allow-vm-lifecycle.
 import argparse
 import base64
 from datetime import datetime, timezone
+import fcntl
 import hashlib
 import json
 import os
@@ -367,6 +368,30 @@ def pid_alive(pid):
     return True
 
 
+def bundle_runtime_identity(bundle):
+    """Resolved bundle path, directory dev:ino, and whether its VM lock is held."""
+    try:
+        path = Path(bundle).expanduser().resolve(strict=True)
+        info = path.stat()
+        descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+    except OSError as error:
+        return None, None, None, str(error)
+    held = None
+    try:
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            held = True
+        else:
+            held = False
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
+    except OSError as error:
+        return str(path), f"{info.st_dev}:{info.st_ino}", None, str(error)
+    finally:
+        os.close(descriptor)
+    return str(path), f"{info.st_dev}:{info.st_ino}", held, None
+
+
 def boot_record(bundle, run_started_at):
     """§2.1 fixed item: when the VM under test was started and its age at the run start.
 
@@ -379,7 +404,9 @@ def boot_record(bundle, run_started_at):
     """
     record = {"source": None, "started_at": None, "uptime_at_run_start_s": None,
               "pid": None, "pid_alive": None, "operation": None, "instance_id": None,
-              "is_boot_operation": None, "stale": None, "unavailable": None,
+              "bundle_path": None, "bundle_identifier": None, "bundle_matches": None,
+              "bundle_lock_held": None, "is_boot_operation": None, "stale": None,
+              "unavailable": None,
               "note": ("host process start time from <bundle>/.vphone-runtime.json; "
                        "not the guest kernel boot time")}
     if not bundle:
@@ -399,12 +426,31 @@ def boot_record(bundle, run_started_at):
     record["pid"] = pid if isinstance(pid, int) and not isinstance(pid, bool) else None
     record["operation"] = payload.get("operation")
     record["instance_id"] = payload.get("instanceID")
+    record["bundle_path"] = payload.get("bundlePath")
+    record["bundle_identifier"] = payload.get("bundleIdentifier")
     record["is_boot_operation"] = (record["operation"] in VM_LIFETIME_OPERATIONS
                                    if isinstance(record["operation"], str) else None)
     started = payload.get("startedAt")
     record["started_at"] = started if isinstance(started, str) and started else None
     record["pid_alive"] = pid_alive(record["pid"])
     reasons = []
+    current_path, current_identifier, lock_held, identity_error = bundle_runtime_identity(bundle)
+    record["bundle_lock_held"] = lock_held
+    if identity_error:
+        reasons.append(f"cannot verify bundle identity or lock: {identity_error}")
+    path_matches = (isinstance(record["bundle_path"], str)
+                    and record["bundle_path"] == current_path)
+    identifier_matches = (isinstance(record["bundle_identifier"], str)
+                          and record["bundle_identifier"] == current_identifier)
+    record["bundle_matches"] = path_matches and identifier_matches
+    if not path_matches:
+        reasons.append("runtime record bundlePath does not match the benchmark bundle")
+    if not identifier_matches:
+        reasons.append("runtime record bundleIdentifier does not match the benchmark bundle")
+    if lock_held is False:
+        reasons.append("the bundle lock is free, so no VM lifetime operation owns this bundle")
+    elif lock_held is None and identity_error is None:
+        reasons.append("the bundle lock state could not be determined")
     if record["pid"] is None:
         reasons.append("the record has no usable pid")
     elif record["pid_alive"] is False:
@@ -413,7 +459,8 @@ def boot_record(bundle, run_started_at):
         reasons.append("the record has no startedAt")
     if record["is_boot_operation"] is False:
         reasons.append(f"operation={record['operation']!r} is not a VM lifetime operation")
-    record["stale"] = record["pid_alive"] is False
+    record["stale"] = (record["pid_alive"] is False or record["bundle_matches"] is False
+                       or lock_held is False)
     started_epoch = parse_utc_epoch(record["started_at"])
     run_epoch = parse_utc_epoch(run_started_at)
     if started_epoch is None:

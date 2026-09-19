@@ -449,15 +449,15 @@ async def run_update_with_task_watchdog(
     try:
         while True:
             await asyncio.wait({update_task}, timeout=poll_interval)
-            if update_task.done():
-                update_task.result()
-                return
             failed = first_failed_task(tasks)
             if failed is not None:
                 name, error = failed
                 await _cancel_and_wait([update_task])
                 await _cancel_and_wait(tasks)
                 raise RestoreBackgroundTaskError(name, error) from error
+            if update_task.done():
+                update_task.result()
+                return
     finally:
         if not update_task.done():
             await _cancel_and_wait([update_task])

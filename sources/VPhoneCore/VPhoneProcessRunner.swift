@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 // MARK: - VPhoneProcessResult
@@ -39,6 +40,49 @@ public enum VPhoneProcessRunner {
         var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
     }
 
+    /// Pipe bytes plus a once-only completion gate. On timeout, descendants may
+    /// keep an inherited write descriptor open after the direct child exits; in
+    /// that case `forceFinish` stops waiting for EOF without double-leaving the
+    /// dispatch group if the readability handler finishes concurrently.
+    private final class PipeCapture: @unchecked Sendable {
+        private let lock = NSLock()
+        private var data = Data()
+        private var finished = false
+        private let group: DispatchGroup
+
+        init(group: DispatchGroup) { self.group = group }
+
+        func consume(_ handle: FileHandle) {
+            let chunk = handle.availableData
+            guard !chunk.isEmpty else {
+                finish(handle)
+                return
+            }
+            lock.lock()
+            data.append(chunk)
+            lock.unlock()
+        }
+
+        func forceFinish(_ handle: FileHandle) {
+            finish(handle)
+        }
+
+        func take() -> Data {
+            lock.lock()
+            defer { lock.unlock() }
+            return data
+        }
+
+        private func finish(_ handle: FileHandle) {
+            handle.readabilityHandler = nil
+            lock.lock()
+            let shouldLeave = !finished
+            finished = true
+            lock.unlock()
+            if shouldLeave { group.leave() }
+        }
+    }
+
     /// Run `executable args` to completion, capturing stdout/stderr.
     /// Throws only if the process cannot be launched; a nonzero exit is
     /// returned in the result, not thrown.
@@ -69,20 +113,16 @@ public enum VPhoneProcessRunner {
         process.standardOutput = outPipe
         process.standardError = errPipe
 
-        let outBox = DataBox()
-        let errBox = DataBox()
         let group = DispatchGroup()
         group.enter()
         group.enter()
+        let outCapture = PipeCapture(group: group)
+        let errCapture = PipeCapture(group: group)
         outPipe.fileHandleForReading.readabilityHandler = { handle in
-            let chunk = handle.availableData
-            if chunk.isEmpty { handle.readabilityHandler = nil; group.leave() }
-            else { outBox.append(chunk) }
+            outCapture.consume(handle)
         }
         errPipe.fileHandleForReading.readabilityHandler = { handle in
-            let chunk = handle.availableData
-            if chunk.isEmpty { handle.readabilityHandler = nil; group.leave() }
-            else { errBox.append(chunk) }
+            errCapture.consume(handle)
         }
 
         try process.run()
@@ -98,6 +138,16 @@ public enum VPhoneProcessRunner {
                     if DispatchTime.now() >= deadline {
                         expired.set()
                         target.terminate()
+                        // SIGTERM is advisory. Escalate after a short grace so a
+                        // probe that ignores it cannot defeat the timeout.
+                        let grace = min(0.5, max(0.05, timeout / 10))
+                        let killDeadline = DispatchTime.now() + grace
+                        while target.isRunning, DispatchTime.now() < killDeadline {
+                            Thread.sleep(forTimeInterval: 0.01)
+                        }
+                        if target.isRunning {
+                            _ = Darwin.kill(target.processIdentifier, SIGKILL)
+                        }
                         return
                     }
                     Thread.sleep(forTimeInterval: min(0.05, max(0.005, timeout / 10)))
@@ -105,12 +155,16 @@ public enum VPhoneProcessRunner {
             }.start()
         }
         process.waitUntilExit()
+        if expired.isSet {
+            outCapture.forceFinish(outPipe.fileHandleForReading)
+            errCapture.forceFinish(errPipe.fileHandleForReading)
+        }
         group.wait()
 
         return VPhoneProcessResult(
             exitCode: process.terminationStatus,
-            stdout: String(decoding: outBox.take(), as: UTF8.self),
-            stderr: String(decoding: errBox.take(), as: UTF8.self),
+            stdout: String(decoding: outCapture.take(), as: UTF8.self),
+            stderr: String(decoding: errCapture.take(), as: UTF8.self),
             timedOut: expired.isSet)
     }
 

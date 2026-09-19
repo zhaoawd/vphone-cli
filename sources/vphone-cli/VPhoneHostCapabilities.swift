@@ -26,9 +26,10 @@ protocol VPhoneHostScreen: AnyObject {
     var isAvailable: Bool { get }
     func saveScreenshot(to url: URL) async throws -> URL
     func captureCompactScreenshot(color: Bool) async -> String?
-    /// Returns false when the gesture queue is full and the gesture was not injected.
-    func tap(x: Double, y: Double) -> Bool
-    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) -> Bool
+    /// Returns after this gesture emitted its final event. False means the
+    /// gesture queue was full and the gesture was not injected.
+    func tap(x: Double, y: Double) async -> Bool
+    func swipe(fromX: Double, fromY: Double, toX: Double, toY: Double, durationMs: Int) async -> Bool
 }
 
 @MainActor

@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime, timedelta, timezone
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -577,13 +578,16 @@ class F3BootTimeTests(DriverTestCase):
         with (directory / "config.plist").open("wb") as handle:
             plistlib.dump({"cpuCount": 8, "memorySize": 8 * (1 << 30)}, handle)
         if record is not None:
+            record = dict(record)
+            info = directory.stat()
+            record["bundlePath"] = str(directory.resolve())
+            record["bundleIdentifier"] = f"{info.st_dev}:{info.st_ino}"
             (directory / ".vphone-runtime.json").write_text(json.dumps(record))
         return directory
 
     @staticmethod
     def runtime_record(pid, started_at, operation="boot"):
-        return {"bundleIdentifier": "com.vphone.d4-acc", "bundlePath": "/tmp/d4-acc",
-                "pid": pid, "instanceID": "instance-1", "startedAt": started_at,
+        return {"pid": pid, "instanceID": "instance-1", "startedAt": started_at,
                 "operation": operation}
 
     @staticmethod
@@ -602,9 +606,15 @@ class F3BootTimeTests(DriverTestCase):
         tag = uuid.uuid4().hex[:6]
         fixture = self.fixture(name=f"sock-{tag}")
         output = self.root / f"out-{bundle.name}-{tag}"
-        self.run_probe("latency", "--sock", fixture.path, "--out", output,
-                       "--commands", "capabilities", "--samples", 1, "--warmup", 0,
-                       "--timeout", 5, "--bundle", bundle, expect=0)
+        descriptor = os.open(bundle, os.O_RDONLY | os.O_DIRECTORY)
+        fcntl.flock(descriptor, fcntl.LOCK_EX)
+        try:
+            self.run_probe("latency", "--sock", fixture.path, "--out", output,
+                           "--commands", "capabilities", "--samples", 1, "--warmup", 0,
+                           "--timeout", 5, "--bundle", bundle, expect=0)
+        finally:
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
+            os.close(descriptor)
         return json.loads((output / "run.json").read_text())["vm"]
 
     def test_run_json_records_the_vm_start_time_and_its_age_at_the_run_start(self):
@@ -622,6 +632,8 @@ class F3BootTimeTests(DriverTestCase):
         self.assertAlmostEqual(boot["uptime_at_run_start_s"], 1800, delta=120)
         self.assertIn(".vphone-runtime.json", boot["source"])
         self.assertEqual(vm["config"]["cpuCount"], 8)
+        self.assertTrue(boot["bundle_matches"])
+        self.assertTrue(boot["bundle_lock_held"])
 
     def test_a_missing_or_stale_runtime_record_is_recorded_without_failing_the_run(self):
         absent = self.run_with_bundle(self.bundle("no-record"))["boot"]
@@ -651,6 +663,21 @@ class F3BootTimeTests(DriverTestCase):
         self.assertEqual(boot["unavailable"], "no --bundle given")
         self.assertIsNone(boot["started_at"])
         self.assertIsNone(boot["uptime_at_run_start_s"])
+
+    def test_mismatched_bundle_identity_is_not_accepted_as_current_boot(self):
+        started = datetime.now(timezone.utc) - timedelta(seconds=60)
+        bundle = self.bundle("copied", record=self.runtime_record(os.getpid(), started.isoformat()))
+        path = bundle / ".vphone-runtime.json"
+        record = json.loads(path.read_text())
+        record["bundlePath"] = "/tmp/original-vm"
+        record["bundleIdentifier"] = "1:2"
+        path.write_text(json.dumps(record))
+
+        boot = self.run_with_bundle(bundle)["boot"]
+        self.assertFalse(boot["bundle_matches"])
+        self.assertTrue(boot["stale"])
+        self.assertIn("bundlePath", boot["unavailable"])
+        self.assertIn("bundleIdentifier", boot["unavailable"])
 
 
 class F3SignalTests(DriverTestCase):

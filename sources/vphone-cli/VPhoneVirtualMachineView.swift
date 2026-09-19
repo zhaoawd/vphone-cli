@@ -289,6 +289,26 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     /// injected at all, and the caller reports the rejection.
     @discardableResult
     func injectTap(pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int) -> Bool {
+        enqueueTap(
+            pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight,
+            completion: nil)
+    }
+
+    func injectTapAndWait(pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int) async -> Bool {
+        await withCheckedContinuation { continuation in
+            let accepted = enqueueTap(
+                pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight
+            ) {
+                continuation.resume(returning: true)
+            }
+            if !accepted { continuation.resume(returning: false) }
+        }
+    }
+
+    private func enqueueTap(
+        pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int,
+        completion: (() -> Void)?
+    ) -> Bool {
         let localPoint = pixelToLocal(pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight)
         let windowPoint = convert(localPoint, to: nil)
         let pixel = NSPoint(x: pixelX, y: pixelY)
@@ -297,7 +317,7 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
             GestureStep(delay: 0, type: .leftMouseDown, kind: "down", index: 0, pixel: pixel, windowPoint: windowPoint),
             GestureStep(delay: 0.08, type: .leftMouseUp, kind: "up", index: 0, pixel: pixel, windowPoint: windowPoint),
         ]
-        return enqueueGesture(name: "tap", stepCount: 0, steps: steps)
+        return enqueueGesture(name: "tap", stepCount: 0, steps: steps, completion: completion)
     }
 
     /// Inject a swipe from one pixel coordinate to another.
@@ -307,6 +327,32 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     func injectSwipe(
         fromX: Double, fromY: Double, toX: Double, toY: Double,
         screenWidth: Int, screenHeight: Int, durationMs: Int = 300
+    ) -> Bool {
+        enqueueSwipe(
+            fromX: fromX, fromY: fromY, toX: toX, toY: toY,
+            screenWidth: screenWidth, screenHeight: screenHeight, durationMs: durationMs,
+            completion: nil)
+    }
+
+    func injectSwipeAndWait(
+        fromX: Double, fromY: Double, toX: Double, toY: Double,
+        screenWidth: Int, screenHeight: Int, durationMs: Int = 300
+    ) async -> Bool {
+        await withCheckedContinuation { continuation in
+            let accepted = enqueueSwipe(
+                fromX: fromX, fromY: fromY, toX: toX, toY: toY,
+                screenWidth: screenWidth, screenHeight: screenHeight, durationMs: durationMs
+            ) {
+                continuation.resume(returning: true)
+            }
+            if !accepted { continuation.resume(returning: false) }
+        }
+    }
+
+    private func enqueueSwipe(
+        fromX: Double, fromY: Double, toX: Double, toY: Double,
+        screenWidth: Int, screenHeight: Int, durationMs: Int,
+        completion: (() -> Void)?
     ) -> Bool {
         let startLocal = pixelToLocal(pixelX: fromX, pixelY: fromY, screenWidth: screenWidth, screenHeight: screenHeight)
         let endLocal = pixelToLocal(pixelX: toX, pixelY: toY, screenWidth: screenWidth, screenHeight: screenHeight)
@@ -334,7 +380,7 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
                 index: i, pixel: pixel, windowPoint: pt
             ))
         }
-        return enqueueGesture(name: "swipe", stepCount: steps, steps: plan)
+        return enqueueGesture(name: "swipe", stepCount: steps, steps: plan, completion: completion)
     }
 
     // MARK: - Gesture Queue
@@ -356,6 +402,7 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
         /// The `steps=` value of the log lines; 0 for a tap, as before.
         let stepCount: Int
         let steps: [GestureStep]
+        let completion: (() -> Void)?
     }
 
     /// Gestures waiting behind the one currently emitting. A host-control
@@ -370,13 +417,16 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     /// Pending gestures plus the one emitting, for tests and diagnostics.
     var pendingGestureCount: Int { gestureQueue.count + (isEmittingGesture ? 1 : 0) }
 
-    private func enqueueGesture(name: String, stepCount: Int, steps: [GestureStep]) -> Bool {
+    private func enqueueGesture(
+        name: String, stepCount: Int, steps: [GestureStep], completion: (() -> Void)?
+    ) -> Bool {
         guard gestureQueue.count < Self.maxPendingGestures else {
             Self.logRejectedGesture(gesture: name, pending: gestureQueue.count)
             return false
         }
         gestureQueue.append(PlannedGesture(
-            id: Self.allocateGestureID(), name: name, stepCount: stepCount, steps: steps
+            id: Self.allocateGestureID(), name: name, stepCount: stepCount, steps: steps,
+            completion: completion
         ))
         startNextGestureIfIdle()
         return true
@@ -418,6 +468,7 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
         guard isLast else { return }
         touchRoute.endGesture(.injected(gesture.id))
         isEmittingGesture = false
+        gesture.completion?()
         startNextGestureIfIdle()
     }
 
