@@ -11,6 +11,97 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     private var currentTouchSwipeAim: Int = 0
     private var isDragHighlightVisible = false
 
+    // MARK: - Touch Event Log (opt-in)
+
+    /// Set `VPHONE_TOUCH_LOG=1` to trace injected gestures and the route each
+    /// resulting touch phase takes. Read once; disabled means no per-event work.
+    private static let touchLogEnabled = ProcessInfo.processInfo.environment["VPHONE_TOUCH_LOG"] == "1"
+
+    @MainActor private static var nextGestureID = 0
+
+    /// Identity used to route the touch phases currently being delivered, and
+    /// printed on both the inject and the route log lines. Real user mouse
+    /// events keep `.user`; an injected gesture installs its own id while its
+    /// synthesized events are delivered. Ids are allocated whether or not the
+    /// log is enabled, because routing depends on them.
+    private var currentGesture: VPhoneTouchRoute.GestureID = .user
+
+    @MainActor private static func allocateGestureID() -> Int {
+        nextGestureID += 1
+        return nextGestureID
+    }
+
+    private static func touchLogTime() -> String {
+        String(format: "%.4f", ProcessInfo.processInfo.systemUptime)
+    }
+
+    private static func touchLogCoord(_ value: Double) -> String {
+        String(format: "%.2f", value)
+    }
+
+    /// One injected event: `[touchlog] t=… gid=… src=inject …`
+    private static func logInjectEvent(
+        gestureID: Int,
+        gesture: String,
+        kind: String,
+        step: Int,
+        steps: Int,
+        pixel: NSPoint,
+        windowPoint: NSPoint
+    ) {
+        guard touchLogEnabled else { return }
+        print(
+            "[touchlog] t=\(touchLogTime()) gid=\(gestureID) src=inject gesture=\(gesture) kind=\(kind)"
+                + " step=\(step) steps=\(steps)"
+                + " px=\(touchLogCoord(pixel.x)) py=\(touchLogCoord(pixel.y))"
+                + " wx=\(touchLogCoord(windowPoint.x)) wy=\(touchLogCoord(windowPoint.y))"
+        )
+    }
+
+    /// A gesture the queue refused: `[touchlog] t=… gid=- src=reject …`
+    private static func logRejectedGesture(gesture: String, pending: Int) {
+        guard touchLogEnabled else { return }
+        print(
+            "[touchlog] t=\(touchLogTime()) gid=- src=reject gesture=\(gesture)"
+                + " pending=\(pending) cap=\(maxPendingGestures)"
+        )
+    }
+
+    /// One routed touch phase: `[touchlog] t=… gid=… src=route …`
+    private func logRouteEvent(phase: Int, normalizedPoint: CGPoint, destination: VPhoneTouchRoute.Destination) {
+        guard Self.touchLogEnabled else { return }
+        let route: String
+        let session: String
+        switch destination {
+        case .native:
+            route = "native"
+            session = "-"
+        case let .guest(value):
+            route = "guest"
+            session = "\(value)"
+        case .discard:
+            route = "discard"
+            session = "-"
+        }
+        let gid: String = switch currentGesture {
+        case .user: "user"
+        case let .injected(value): "\(value)"
+        }
+        print(
+            "[touchlog] t=\(Self.touchLogTime()) gid=\(gid) src=route phase=\(phase) route=\(route)"
+                + " session=\(session) edge=\(currentTouchSwipeAim)"
+                + " nx=\(String(format: "%.5f", normalizedPoint.x)) ny=\(String(format: "%.5f", normalizedPoint.y))"
+        )
+    }
+
+    /// Tag the synthesized events of one injected gesture with its id.
+    private func withGesture(_ gestureID: Int, _ body: () -> Void) {
+        let previous = currentGesture
+        currentGesture = .injected(gestureID)
+        body()
+        currentGesture = previous
+    }
+
     // MARK: - Private API Accessors
 
     /// https://github.com/wh1te4ever/super-tart-vphone-writeup/blob/main/contents/ScreenSharingVNC.swift
@@ -193,26 +284,76 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     }
 
     /// Inject a tap at pixel coordinates (matching screenshot image dimensions).
-    func injectTap(pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int) {
-        let localPoint = pixelToLocal(pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight)
-        let windowPoint = convert(localPoint, to: nil)
+    ///
+    /// Returns false when the gesture queue is full; the tap is then not
+    /// injected at all, and the caller reports the rejection.
+    @discardableResult
+    func injectTap(pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int) -> Bool {
+        enqueueTap(
+            pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight,
+            completion: nil)
+    }
 
-        if let downEvent = synthesizeMouseEvent(type: .leftMouseDown, at: windowPoint) {
-            mouseDown(with: downEvent)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
-            guard let self else { return }
-            if let upEvent = self.synthesizeMouseEvent(type: .leftMouseUp, at: windowPoint) {
-                self.mouseUp(with: upEvent)
+    func injectTapAndWait(pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int) async -> Bool {
+        await withCheckedContinuation { continuation in
+            let accepted = enqueueTap(
+                pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight
+            ) {
+                continuation.resume(returning: true)
             }
+            if !accepted { continuation.resume(returning: false) }
         }
     }
 
+    private func enqueueTap(
+        pixelX: Double, pixelY: Double, screenWidth: Int, screenHeight: Int,
+        completion: (() -> Void)?
+    ) -> Bool {
+        let localPoint = pixelToLocal(pixelX: pixelX, pixelY: pixelY, screenWidth: screenWidth, screenHeight: screenHeight)
+        let windowPoint = convert(localPoint, to: nil)
+        let pixel = NSPoint(x: pixelX, y: pixelY)
+
+        let steps = [
+            GestureStep(delay: 0, type: .leftMouseDown, kind: "down", index: 0, pixel: pixel, windowPoint: windowPoint),
+            GestureStep(delay: 0.08, type: .leftMouseUp, kind: "up", index: 0, pixel: pixel, windowPoint: windowPoint),
+        ]
+        return enqueueGesture(name: "tap", stepCount: 0, steps: steps, completion: completion)
+    }
+
     /// Inject a swipe from one pixel coordinate to another.
+    ///
+    /// Returns false when the gesture queue is full; see `injectTap`.
+    @discardableResult
     func injectSwipe(
         fromX: Double, fromY: Double, toX: Double, toY: Double,
         screenWidth: Int, screenHeight: Int, durationMs: Int = 300
-    ) {
+    ) -> Bool {
+        enqueueSwipe(
+            fromX: fromX, fromY: fromY, toX: toX, toY: toY,
+            screenWidth: screenWidth, screenHeight: screenHeight, durationMs: durationMs,
+            completion: nil)
+    }
+
+    func injectSwipeAndWait(
+        fromX: Double, fromY: Double, toX: Double, toY: Double,
+        screenWidth: Int, screenHeight: Int, durationMs: Int = 300
+    ) async -> Bool {
+        await withCheckedContinuation { continuation in
+            let accepted = enqueueSwipe(
+                fromX: fromX, fromY: fromY, toX: toX, toY: toY,
+                screenWidth: screenWidth, screenHeight: screenHeight, durationMs: durationMs
+            ) {
+                continuation.resume(returning: true)
+            }
+            if !accepted { continuation.resume(returning: false) }
+        }
+    }
+
+    private func enqueueSwipe(
+        fromX: Double, fromY: Double, toX: Double, toY: Double,
+        screenWidth: Int, screenHeight: Int, durationMs: Int,
+        completion: (() -> Void)?
+    ) -> Bool {
         let startLocal = pixelToLocal(pixelX: fromX, pixelY: fromY, screenWidth: screenWidth, screenHeight: screenHeight)
         let endLocal = pixelToLocal(pixelX: toX, pixelY: toY, screenWidth: screenWidth, screenHeight: screenHeight)
         let startWindow = convert(startLocal, to: nil)
@@ -221,33 +362,114 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
         let steps = max(10, durationMs / 16)
         let stepInterval = Double(durationMs) / Double(steps) / 1000.0
 
-        if let downEvent = synthesizeMouseEvent(type: .leftMouseDown, at: startWindow) {
-            mouseDown(with: downEvent)
-        }
-
+        var plan = [GestureStep(
+            delay: 0, type: .leftMouseDown, kind: "down", index: 0,
+            pixel: NSPoint(x: fromX, y: fromY), windowPoint: startWindow
+        )]
         for i in 1...steps {
             let t = Double(i) / Double(steps)
-            let x = startWindow.x + (endWindow.x - startWindow.x) * t
-            let y = startWindow.y + (endWindow.y - startWindow.y) * t
-            let pt = NSPoint(x: x, y: y)
-            let delay = stepInterval * Double(i)
+            let pt = NSPoint(
+                x: startWindow.x + (endWindow.x - startWindow.x) * t,
+                y: startWindow.y + (endWindow.y - startWindow.y) * t
+            )
+            let pixel = NSPoint(x: fromX + (toX - fromX) * t, y: fromY + (toY - fromY) * t)
+            plan.append(GestureStep(
+                delay: stepInterval * Double(i),
+                type: i < steps ? .leftMouseDragged : .leftMouseUp,
+                kind: i < steps ? "drag" : "up",
+                index: i, pixel: pixel, windowPoint: pt
+            ))
+        }
+        return enqueueGesture(name: "swipe", stepCount: steps, steps: plan, completion: completion)
+    }
 
-            if i < steps {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-                    guard let self else { return }
-                    if let dragEvent = self.synthesizeMouseEvent(type: .leftMouseDragged, at: pt) {
-                        self.mouseDragged(with: dragEvent)
-                    }
-                }
+    // MARK: - Gesture Queue
+
+    /// One synthesized event of an injected gesture, with its delay measured
+    /// from the moment the gesture starts emitting.
+    private struct GestureStep {
+        let delay: TimeInterval
+        let type: NSEvent.EventType
+        let kind: String
+        let index: Int
+        let pixel: NSPoint
+        let windowPoint: NSPoint
+    }
+
+    private struct PlannedGesture {
+        let id: Int
+        let name: String
+        /// The `steps=` value of the log lines; 0 for a tap, as before.
+        let stepCount: Int
+        let steps: [GestureStep]
+        let completion: (() -> Void)?
+    }
+
+    /// Gestures waiting behind the one currently emitting. A host-control
+    /// caller can enqueue far faster than gestures complete (the F3 benchmark
+    /// sends 200 taps in 0.03 s), so the queue is bounded and a full queue
+    /// rejects the injection instead of dropping events silently.
+    static let maxPendingGestures = 4
+
+    private var gestureQueue: [PlannedGesture] = []
+    private var isEmittingGesture = false
+
+    /// Pending gestures plus the one emitting, for tests and diagnostics.
+    var pendingGestureCount: Int { gestureQueue.count + (isEmittingGesture ? 1 : 0) }
+
+    private func enqueueGesture(
+        name: String, stepCount: Int, steps: [GestureStep], completion: (() -> Void)?
+    ) -> Bool {
+        guard gestureQueue.count < Self.maxPendingGestures else {
+            Self.logRejectedGesture(gesture: name, pending: gestureQueue.count)
+            return false
+        }
+        gestureQueue.append(PlannedGesture(
+            id: Self.allocateGestureID(), name: name, stepCount: stepCount, steps: steps,
+            completion: completion
+        ))
+        startNextGestureIfIdle()
+        return true
+    }
+
+    /// Start the next gesture only once the previous one has emitted every one
+    /// of its queued events, so two injected gestures never interleave.
+    private func startNextGestureIfIdle() {
+        guard !isEmittingGesture, !gestureQueue.isEmpty else { return }
+        let gesture = gestureQueue.removeFirst()
+        isEmittingGesture = true
+        for (offset, step) in gesture.steps.enumerated() {
+            let isLast = offset == gesture.steps.count - 1
+            if step.delay <= 0 {
+                emit(step: step, of: gesture, isLast: isLast)
             } else {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-                    guard let self else { return }
-                    if let upEvent = self.synthesizeMouseEvent(type: .leftMouseUp, at: pt) {
-                        self.mouseUp(with: upEvent)
-                    }
+                DispatchQueue.main.asyncAfter(deadline: .now() + step.delay) { [weak self] in
+                    self?.emit(step: step, of: gesture, isLast: isLast)
                 }
             }
         }
+    }
+
+    private func emit(step: GestureStep, of gesture: PlannedGesture, isLast: Bool) {
+        Self.logInjectEvent(
+            gestureID: gesture.id, gesture: gesture.name, kind: step.kind,
+            step: step.index, steps: gesture.stepCount,
+            pixel: step.pixel, windowPoint: step.windowPoint
+        )
+        if let event = synthesizeMouseEvent(type: step.type, at: step.windowPoint) {
+            withGesture(gesture.id) {
+                switch step.type {
+                case .leftMouseDown: mouseDown(with: event)
+                case .leftMouseDragged: mouseDragged(with: event)
+                default: mouseUp(with: event)
+                }
+            }
+        }
+        guard isLast else { return }
+        touchRoute.endGesture(.injected(gesture.id))
+        isEmittingGesture = false
+        gesture.completion?()
+        startNextGestureIfIdle()
     }
 
     // MARK: - Legacy Touch Injection (macOS 15)
@@ -258,7 +480,12 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
 
         // Prefer vphoned's guest-side HID path when available. This avoids
         // relying on private VZ touch delivery after the guest is connected.
-        switch touchRoute.destination(phase: phase, guestSession: control?.touchSession) {
+        let destination = touchRoute.destination(
+            gesture: currentGesture, phase: phase, guestSession: control?.touchSession
+        )
+        logRouteEvent(phase: phase, normalizedPoint: normalizedPoint, destination: destination)
+
+        switch destination {
         case .guest:
             control?.sendTouch(phase: phase, x: Double(normalizedPoint.x), y: Double(normalizedPoint.y),
                                fromEdge: currentTouchSwipeAim != 0)

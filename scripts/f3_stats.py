@@ -13,6 +13,7 @@ Contents:
   latency_summary                         §3.1 latency report for one command class
   theil_sen                               Theil-Sen slope
   moving_block_bootstrap_slope_ci         §3.6 moving-block bootstrap slope interval
+  step_summary                            §3.6 discrete-step detection (see 10.11)
   growth_verdict                          §3.6 growth decision over independent runs
 
 Time unit: the caller chooses the unit of `times`; F3 passes seconds, so a
@@ -36,6 +37,45 @@ THEIL_SEN_SAMPLE_SEED = 20260918
 
 # §3.1: p99 is not reported below this sample count.
 MIN_SAMPLES_FOR_P99 = 100
+
+# The interquartile range of a standard normal sample, used to express an IQR in
+# the same unit as a median absolute deviation.
+GAUSSIAN_IQR_IN_SIGMA = 1.349
+
+# Step detection (§3.6, evidence 10.11). A point-to-point difference counts as a
+# discrete step when it lies more than STEP_MAD_MULTIPLIER robust scale units
+# away from the median difference. The scale comes from `_spread_scale`, or from
+# `_sparse_move_scale` when the differences have no measurable spread, so the
+# criterion carries no absolute size constant and works on MiB, KiB and CPU
+# cores alike.
+#
+# Multiplier 8: the scale equals sigma for Gaussian differences, so the
+# threshold is about 8 sigma and a 60-to-1000 point series produces no false
+# step. The events 10.11 has to catch sit far above that: the ~76 MiB Disk.img
+# allocation appears in a series whose other point-to-point changes are a few
+# MiB, tens of scale units away. A smaller multiplier (3-5, the usual outlier
+# convention) would also catch them but would start flagging ordinary sampling
+# jitter in the near-flat series, which must keep their existing verdicts.
+STEP_MAD_MULTIPLIER = 8.0
+
+# Quantization evidence (see `_quantum`). A series counts as quantised at `q`
+# only when its smallest value is at least this many quanta above zero. Without
+# it the test is vacuous: a flat series holding one jump has values 0 and 1
+# jumps' worth, which are trivially "multiples of the jump" and say nothing
+# about the measurement resolution.
+STEP_QUANTIZATION_LEVELS = 8
+
+# A series is called step dominated when the detected steps account for more
+# than this share of its net change.
+#
+# Share 0.5: above it the discrete component exceeds everything else in the
+# window, so the Theil-Sen slope cannot be read as a rate. The observed values
+# separate widely around it - 10.11 reports 0.83 (headless run: +75.5 of
+# +91.1 MiB), 0.92 (E5a rerun: +103 of +112.3 MiB) and ~0.99 (E5a: +286 of
+# +287.6 MiB), against 0 for the step-free windows E5b and E4 - so the exact
+# cut inside that gap does not change any recorded verdict. The share counts
+# only the steps aligned with the net change (see `step_summary`).
+STEP_DOMINANCE_SHARE = 0.5
 
 # Attempts per drawn pair when sampling pairs with distinct times.
 _PAIR_DRAW_ATTEMPTS = 8
@@ -397,6 +437,189 @@ def moving_block_bootstrap_slope_ci(times, values, *, block_span, seed,
             "block_count": block_count, "reason": None}
 
 
+# MARK: - step detection
+
+
+def _spread_scale(differences, median_difference):
+    """Return the robust spread of the differences, or 0.0 when it is unmeasurable.
+
+    Two estimators, larger first, both in the unit of the differences:
+
+    1. The median absolute deviation of the differences from their median.
+    2. Their interquartile range divided by GAUSSIAN_IQR_IN_SIGMA, which puts it
+       in the same unit as the MAD (both equal sigma for Gaussian differences).
+
+    The MAD alone is not enough: a quantised ramp drives it to 0 or to a
+    rounding remainder, and a threshold built on that flags ordinary jitter as
+    steps. The interquartile range keeps a usable spread in those series while
+    staying robust. A 0 here means more than three quarters of the differences
+    are the same value, so no "n sigma" scale exists and the caller falls back
+    to `_sparse_move_scale`.
+    """
+    deviations = [abs(difference - median_difference) for difference in differences]
+    ordered = sorted(differences)
+    iqr = _quantile_sorted(ordered, 0.75) - _quantile_sorted(ordered, 0.25)
+    return max(statistics.median(deviations), iqr / GAUSSIAN_IQR_IN_SIGMA)
+
+
+def _quantum(values, candidate):
+    """Return `candidate` when the series is quantised at it, else 0.0.
+
+    The series is quantised at `candidate` when every value is an integer
+    multiple of it and the smallest value is at least STEP_QUANTIZATION_LEVELS
+    quanta above zero. The second condition is what makes the test evidence
+    rather than arithmetic: a flat series holding a single jump trivially passes
+    the first one, because its two values are 0 and 1 jumps above the origin.
+    A `footprint` series reported in whole MiB sits at 73 and 74 quanta and
+    passes both, so its 1 MiB movements are resolution, not events.
+    """
+    if candidate <= 0.0:
+        return 0.0
+    smallest = min(abs(value) for value in values)
+    if smallest < STEP_QUANTIZATION_LEVELS * candidate:
+        return 0.0
+    for value in values:
+        multiple = value / candidate
+        if abs(multiple - round(multiple)) > 1e-6 * max(1.0, abs(multiple)):
+            return 0.0
+    return candidate
+
+
+def _sparse_move_scale(values, moves):
+    """Return the scale for a series whose differences have no measurable spread.
+
+    `moves` are the non-zero deviations from the median difference: the whole
+    movement of such a series. The staircase problem lives here. A series
+    sampled in whole MiB rises one quantum at a time, so a slow trend arrives as
+    a handful of identical 1 MiB differences; calling each of them a discrete
+    event is wrong. One large jump in an otherwise constant series has exactly
+    the same shape - differences that are mostly zero - so the two cannot be
+    separated by counting or by the size of the smallest move.
+
+    What separates them is whether the moves look like the measurement
+    resolution and whether they look like each other:
+
+    - `_quantum` asks the values, not the moves, whether the series lives on a
+      lattice whose pitch is the smallest move. A movement of a few quanta on
+      such a lattice is resolution.
+    - The median move covers a staircase of several similar jumps: a genuine
+      event stands out from the other moves, a stair does not. It is only
+      meaningful with at least two moves, so a lone move is measured against the
+      lattice alone, and a lone move on a series with no lattice evidence is an
+      event whatever its size.
+
+    Both are expressed in the unit of the differences, so the caller applies the
+    same multiplier as in the ordinary case. A scale of 0 means every move is an
+    event.
+    """
+    if not moves:
+        return 0.0
+    quantum = _quantum(values, min(moves))
+    if len(moves) == 1:
+        return quantum
+    return max(quantum, statistics.median(moves))
+
+
+def step_summary(times, values, *, mad_multiplier=STEP_MAD_MULTIPLIER,
+                 dominance_share=STEP_DOMINANCE_SHARE):
+    """Return the §3.6 discrete-step report for one series.
+
+    A step is a point-to-point difference whose deviation from the median
+    difference exceeds `mad_multiplier` robust scale units (see
+    STEP_MAD_MULTIPLIER). The criterion is scale free: it holds no absolute
+    size constant and so applies to MiB, KiB and CPU core series alike.
+
+    The scale comes from the spread of the differences when that spread is
+    measurable, and from the movement itself when it is not (`_spread_scale`,
+    `_sparse_move_scale`); `scale_source` records which was used.
+
+    Return shape, always these keys:
+        {"steps": [{"index": int, "time": float, "delta": float}, ...],
+         "step_count": int, "step_delta_sum": float, "aligned_delta_sum": float,
+         "net_change": float,
+         "dominated_share": float or None, "step_dominated": bool,
+         "scale": float, "scale_source": str, "median_difference": float,
+         "threshold": float, "mad_multiplier": float, "dominance_share": float}
+
+    `time` is the time of the later point of the pair, in the caller's unit.
+    `dominated_share` is `|aligned_delta_sum| / |net_change|`, where
+    `aligned_delta_sum` adds only the steps that move the series in the
+    direction of its net change: those are the ones that could account for it.
+    The share is None when the net change is 0, and `step_dominated` is then
+    True whenever a step was found, because all of the movement inside the
+    window is discrete.
+
+    Raises ValueError for mismatched lengths, non-numeric input, a
+    non-positive multiplier, or a dominance share outside (0, 1].
+    """
+    time_points, measurements = _check_series(times, values)
+    mad_multiplier = _as_float(mad_multiplier, "mad_multiplier")
+    if mad_multiplier <= 0.0:
+        raise ValueError(f"mad_multiplier must be > 0, got {mad_multiplier!r}")
+    dominance_share = _as_float(dominance_share, "dominance_share")
+    if not 0.0 < dominance_share <= 1.0:
+        raise ValueError(f"dominance_share must lie in (0, 1], got {dominance_share!r}")
+
+    order = sorted(range(len(time_points)), key=lambda index: time_points[index])
+    time_points = [time_points[index] for index in order]
+    measurements = [measurements[index] for index in order]
+
+    empty = {"steps": [], "step_count": 0, "step_delta_sum": 0.0,
+             "aligned_delta_sum": 0.0,
+             "net_change": measurements[-1] - measurements[0],
+             "dominated_share": None, "step_dominated": False,
+             "scale": 0.0, "scale_source": "no difference", "median_difference": 0.0,
+             "threshold": 0.0,
+             "mad_multiplier": mad_multiplier, "dominance_share": dominance_share}
+    if len(measurements) < 2:
+        return empty
+
+    differences = [measurements[index] - measurements[index - 1]
+                   for index in range(1, len(measurements))]
+    median_difference = statistics.median(differences)
+    moves = [abs(difference - median_difference) for difference in differences
+             if difference != median_difference]
+    scale = _spread_scale(differences, median_difference)
+    scale_source = "difference spread"
+    if scale <= 0.0:
+        # More than three quarters of the differences are identical: a constant
+        # series, a perfect ramp, or a quantised series that moves one step at a
+        # time. The spread carries no information, so the scale comes from the
+        # movement itself.
+        scale = _sparse_move_scale(measurements, moves)
+        scale_source = "sparse moves"
+    if not moves:
+        return dict(empty, median_difference=median_difference,
+                    scale_source="no movement")
+
+    threshold = mad_multiplier * scale
+    steps = [{"index": index + 1, "time": time_points[index + 1], "delta": difference}
+             for index, difference in enumerate(differences)
+             if abs(difference - median_difference) > threshold]
+    delta_sum = math.fsum(step["delta"] for step in steps)
+    net_change = measurements[-1] - measurements[0]
+    # Dominance asks whether the net change of the window is a discrete event
+    # rather than a rate, so only the steps that move the series the way it
+    # actually went can account for it. Steps against the net change cancel part
+    # of it instead of explaining it; counting them gives shares above 1 on quiet
+    # series, where a few small drops against a small net rise would otherwise be
+    # read as "the growth is a step".
+    aligned_sum = math.fsum(step["delta"] for step in steps
+                            if (step["delta"] > 0.0) == (net_change > 0.0))
+    if net_change == 0.0:
+        share = None
+        dominated = bool(steps)
+    else:
+        share = abs(aligned_sum) / abs(net_change)
+        dominated = share > dominance_share
+    return {"steps": steps, "step_count": len(steps), "step_delta_sum": delta_sum,
+            "aligned_delta_sum": aligned_sum,
+            "net_change": net_change, "dominated_share": share,
+            "step_dominated": dominated, "scale": scale, "scale_source": scale_source,
+            "median_difference": median_difference, "threshold": threshold,
+            "mad_multiplier": mad_multiplier, "dominance_share": dominance_share}
+
+
 # MARK: - growth decision
 
 
@@ -406,23 +629,34 @@ def growth_verdict(runs):
     Each run is a mapping `{"slope": float, "ci_low": float or None,
     "ci_high": float or None}`; None bounds mean the interval is unavailable.
     A run satisfies the growth condition when `ci_low` is present and > 0.
+    An optional `"step_dominated": True` marks a run whose net change is
+    dominated by discrete steps (see `step_summary`); a run without that key is
+    treated as not dominated, so callers that predate step detection keep their
+    results unchanged.
 
     Returns:
-        "confirmed"    at least two satisfying runs whose slopes share one sign
-        "candidate"    at least one satisfying run, condition for "confirmed"
-                       not met (this includes two or more satisfying runs with
-                       slopes of different signs)
-        "not_detected" no satisfying run, including an empty input
+        "confirmed"      at least two satisfying, not step dominated runs whose
+                         slopes share one sign
+        "candidate"      at least one satisfying, not step dominated run,
+                         condition for "confirmed" not met (this includes two or
+                         more such runs with slopes of different signs)
+        "step_dominated" no satisfying run survives the step filter, but at
+                         least one satisfying run was step dominated: the
+                         interval excludes zero because of one or more discrete
+                         jumps inside the window, not because of a rate
+        "not_detected"   no satisfying run, including an empty input
 
     Raises ValueError when a run is not a mapping, lacks `slope`, or holds a
     non-numeric field.
     """
     satisfying_slopes = []
+    dominated_count = 0
     for index, run in enumerate(_iterable(runs, "runs")):
         label = f"runs[{index}]"
         try:
             slope = run["slope"]
             ci_low = run.get("ci_low")
+            dominated = run.get("step_dominated")
         except (TypeError, AttributeError) as error:
             raise ValueError(f"{label} must be a mapping with a 'slope' key: {error}") from error
         except KeyError as error:
@@ -430,11 +664,15 @@ def growth_verdict(runs):
         slope = _as_float(slope, f"{label}['slope']")
         if ci_low is None:
             continue
-        if _as_float(ci_low, f"{label}['ci_low']") > 0.0:
-            satisfying_slopes.append(slope)
+        if _as_float(ci_low, f"{label}['ci_low']") <= 0.0:
+            continue
+        if dominated is True:
+            dominated_count += 1
+            continue
+        satisfying_slopes.append(slope)
 
     if not satisfying_slopes:
-        return "not_detected"
+        return "step_dominated" if dominated_count else "not_detected"
     if len(satisfying_slopes) >= 2:
         positive = all(slope > 0.0 for slope in satisfying_slopes)
         negative = all(slope < 0.0 for slope in satisfying_slopes)

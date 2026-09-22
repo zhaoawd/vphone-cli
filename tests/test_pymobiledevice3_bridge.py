@@ -453,6 +453,22 @@ class WatchdogTests(unittest.TestCase):
 
         self.run_watchdog(update)
 
+    def test_task_failure_before_update_returns_wins_same_poll_cycle(self):
+        async def update(restore):
+            async def fail_now():
+                raise bridge.URLAssetFetchError('URLAsset failed before update returned')
+
+            restore._tasks.append(asyncio.create_task(
+                fail_now(), name='AsyncDataRequestMsg-URLAsset'))
+            # Both tasks are done before the watchdog wakes. The background
+            # failure still has to win over update() returning successfully.
+            await asyncio.sleep(0)
+
+        with self.assertRaises(bridge.RestoreBackgroundTaskError) as caught:
+            self.run_watchdog(update)
+        self.assertEqual(caught.exception.task_name, 'AsyncDataRequestMsg-URLAsset')
+        self.assertIn('URLAssetFetchError', str(caught.exception))
+
     def test_update_exception_propagates(self):
         async def update(restore):
             raise RuntimeError('restore failed')

@@ -492,6 +492,21 @@ class SamplerRunTests(TemporaryDirectoryCase):
         self.assertTrue([record for record in samples if record["kind"] == "process"
                          and record["pid"] == 52000 and record["measurement"] == "ps"])
 
+    def test_explicit_pids_are_marked_by_executable_not_by_how_they_were_supplied(self):
+        """§3.3: is_vz comes from the sampler's own scan, for --pid entries too."""
+        stub = CommandStub()
+        _output, samples, _report = self.run_sampler(
+            stub, ["--pid", "41303", "--pid", "41311",
+                   "--label", "41303=d4acc-cli", "--label", "41311=d4acc-vz-a"])
+        entries = {}
+        for record in samples:
+            if record["kind"] == "process" and record["measurement"].startswith("ps"):
+                entries[record["pid"]] = record
+        self.assertEqual(entries[41303]["source"], "argument")
+        self.assertEqual(entries[41311]["source"], "argument")
+        self.assertIs(entries[41303]["is_vz"], False)
+        self.assertIs(entries[41311]["is_vz"], True)
+
     def test_absent_pid_is_recorded_as_not_present_without_counting_a_failure(self):
         stub = CommandStub(dead_pids=(999999,))
         _output, samples, report = self.run_sampler(stub, ["--pid", "999999"])

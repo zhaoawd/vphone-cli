@@ -312,6 +312,11 @@ class Sampler:
             "lstart": lstart,
             "first_seen_wall": (first_seen or {}).get("t_wall"),
             "first_seen_mono": (first_seen or {}).get("t_mono"),
+            # §3.3: whether this pid's executable is the Virtualization XPC
+            # service, decided by the scan below and not by how the pid reached
+            # the sampler (--pid or the scan itself) nor by its label. None
+            # until the first successful scan.
+            "is_vz": True if source == "vz" else None,
             "gone": False,
         }
         self.tracked[pid] = entry
@@ -346,6 +351,14 @@ class Sampler:
         pids = virtualization_pids(result.get("stdout"))
         record["error"] = None
         record["pids"] = pids
+        # Mark every tracked pid, however it was supplied. A live pid does not
+        # change executable, so the first scan that sees the pid settles the
+        # answer; a later absence means the process exited, not that it was
+        # something else.
+        scanned = set(pids)
+        for tracked_pid, entry in self.tracked.items():
+            if entry["is_vz"] is None and not entry["gone"]:
+                entry["is_vz"] = tracked_pid in scanned
         appeared = []
         for pid in pids:
             if pid in self.tracked:
@@ -404,7 +417,8 @@ class Sampler:
         for pid in sorted(self.tracked):
             info = self.tracked[pid]
             record = dict(clock, kind="process", measurement="ps", pid=pid,
-                          label=info["label"], source=info["source"])
+                          label=info["label"], source=info["source"],
+                          is_vz=info["is_vz"])
             if info["gone"]:
                 record["present"] = False
                 record["gone"] = True

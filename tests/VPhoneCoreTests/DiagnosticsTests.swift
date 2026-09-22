@@ -704,6 +704,17 @@ struct DiagnosticsLiveProbeTests {
         #expect(cat.succeeded)
     }
 
+    @Test func boundedRunnerEscalatesAndDoesNotWaitForInheritedPipes() throws {
+        let start = Date()
+        let script = "trap '' TERM; (sleep 5) & while true; do sleep 1; done"
+        let result = try VPhoneProcessRunner.runCapturing(
+            URL(fileURLWithPath: "/bin/sh"), ["-c", script], timeout: 0.1)
+        #expect(result.timedOut)
+        // The background sleep inherits stdout/stderr. Returning promptly proves
+        // the runner neither waits for that EOF nor accepts ignored SIGTERM.
+        #expect(Date().timeIntervalSince(start) < 2)
+    }
+
     @Test func bootProcessParserIgnoresOtherCommands() {
         let ps = """
           10 /x/vphone-cli --config /a/config.plist

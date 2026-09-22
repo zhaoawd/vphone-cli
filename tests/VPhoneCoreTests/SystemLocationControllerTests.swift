@@ -253,6 +253,21 @@ final class SystemLocationControllerTests: XCTestCase {
             line: line)
     }
 
+    /// Wait for the guest to receive `count` deliveries, up to one second.
+    ///
+    /// The caller still asserts the count, so a timeout fails on the caller's
+    /// own line. Timer-driven deliveries land whenever the runner schedules
+    /// them, so a fixed sleep would assert on the machine speed instead.
+    private func waitForDeliveries(
+        atLeast count: Int,
+        to guest: FakeSystemLocationGuestAdapter
+    ) async {
+        for _ in 0..<200 {
+            if guest.deliveries.count >= count { return }
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+    }
+
     func testStreamAcceptsStrictSequenceAndCachesIdenticalRetry() async throws {
         let guest = FakeSystemLocationGuestAdapter()
         let controller = VPhoneSystemLocationController(adapter: guest)
@@ -815,9 +830,10 @@ final class SystemLocationControllerTests: XCTestCase {
         _ = try await controller.push(generation: generation, fix: fix(0))
         let paused = try await controller.setPaused(true, generation: generation)
 
-        try await Task.sleep(for: .milliseconds(35))
+        await waitForDeliveries(atLeast: 3, to: guest)
 
         XCTAssertGreaterThanOrEqual(guest.deliveries.count, 3)
+        guard guest.deliveries.count >= 3 else { return }
         XCTAssertEqual(guest.deliveries[0].sequence, 0)
         XCTAssertTrue(guest.deliveries.dropFirst().allSatisfy { $0.fix.speed == 0 })
         XCTAssertEqual(paused["state"] as? String, "paused")
@@ -1112,9 +1128,13 @@ final class SystemLocationControllerTests: XCTestCase {
         let generation = try XCTUnwrap(started["generation"] as? String)
         _ = try await controller.push(generation: generation, fix: fix(0))
 
-        try await Task.sleep(for: .milliseconds(40))
+        for _ in 0..<200 {
+            if guest.deliveries.count >= 2 { break }
+            try await Task.sleep(for: .milliseconds(5))
+        }
 
         XCTAssertGreaterThanOrEqual(guest.deliveries.count, 2)
+        guard guest.deliveries.count >= 2 else { return }
         XCTAssertEqual(guest.deliveries[0].fix.speed, 10)
         XCTAssertEqual(guest.deliveries[1].fix.speed, 0)
         XCTAssertEqual(guest.deliveries[0].fix.latitude, guest.deliveries[1].fix.latitude)
@@ -1281,7 +1301,8 @@ final class SystemLocationControllerTests: XCTestCase {
             owner: "dashboard", fix: fix(0), heartbeatSeconds: 0.01)
         let generation = try XCTUnwrap(started["generation"] as? String)
 
-        try await Task.sleep(for: .milliseconds(40))
+        await waitForDeliveries(atLeast: 2, to: guest)
+
         XCTAssertGreaterThanOrEqual(guest.deliveries.count, 2)
         XCTAssertEqual(guest.deliveries.map(\.sequence), Array(0..<guest.deliveries.count))
         XCTAssertTrue(guest.deliveries.allSatisfy { $0.fix.timestamp > 1_700_000_000 })
@@ -1298,7 +1319,7 @@ final class SystemLocationControllerTests: XCTestCase {
         let generation = try XCTUnwrap(started["generation"] as? String)
         _ = try await controller.push(generation: generation, fix: fix(0))
 
-        try await Task.sleep(for: .milliseconds(40))
+        await waitForState("off", in: controller)
 
         XCTAssertNil(controller.generation)
         XCTAssertEqual(controller.snapshot()["state"] as? String, "off")

@@ -85,6 +85,15 @@ vphone-cli vm launch myphone                            # 6. 初回起動
 
 新しい iOS に更新するには、`fw prepare` を IPSW に向けます: `--iphone-source /path/to.ipsw --cloudos-source /path/to.ipsw`。
 
+## リカバリー
+
+- `vphone-cli doctor [<name>]` — ホストの読み取り専用診断。VM 名を指定するとその VM も診断します（ファイル、ロック、ファームウェアトランザクション、復元状態、作成チェックポイント、ホスト制御チャネル）。何も修復しません。`--json` で機械可読な出力を出します。
+- `vphone-cli vm stop <name> --force` — 優雅なシャットダウン要求をスキップし、ブートプロセスを直ちに SIGKILL します。
+- `vphone-cli fw patch <name> --recover` — パッチを当てずに、中断されたファームウェアトランザクションを復旧します（復旧されたアーカイブ、または保留中のトランザクションがない旨を報告します）。
+- `vphone-cli vm create --resume <name>` — 中断された `vm create` をチェックポイントから継続します。`vphone-cli vm create-status <name>` は何も変更せずにチェックポイントを表示します。
+
+オフラインの bundle 操作（`fw prepare`/`fw patch`、`cfw install`、`vm export`/`vm import`、`vm clone`/`vm rename`/`vm delete`）は VM ごとのディレクトリロックを取得し、使用中の VM（実行中の VM、または別のオフライン操作が bundle を保持している場合）に対しては実行を拒否します。このガードに専用のコマンドはありません。
+
 ## ファームウェアバリアント
 
 セキュリティバイパスの度合いが段階的に増す 5 つのパッチバリアント — いずれか 1 つを `--variant` に渡します:
@@ -98,6 +107,8 @@ vphone-cli vm launch myphone                            # 6. 初回起動
 | `exp`        | 141 patches | 18 phases | JB のスーパーセット + VM 検出対策リサーチパッチ                    |
 
 コンポーネントごとの内訳については [`research/0_binary_patch_comparison.md`](../research/0_binary_patch_comparison.md) を参照してください。
+
+上の表の数は、適用されるファームウェアの組み合わせや日付が注記されておらず、集計方法が異なれば数値も異なります。例えば `research/0_binary_patch_comparison.md` の Summary 表は、ブートチェーンの合計を 46/58/117/132（regular/dev/jb/exp）、CFW を含めた総計を 56/70/132/163 と報告しています — これはこの表のバリアント別の数とは異なる集計方法であり、2 つのセットは同一の計測ではなく、混用できません。日付付きの証拠を正とみなしてください: [`research/0_binary_patch_comparison.md`](../research/0_binary_patch_comparison.md) と [`research/firmware_compatibility.md`](../research/firmware_compatibility.md) を参照してください。
 
 ## 実行と接続
 
@@ -116,7 +127,7 @@ vphone-cli が生成するものはすべて `~/.vphone/` 以下に置かれま�
 | `~/.vphone/ipsws/`| ダウンロードされた iPhone + cloudOS の IPSW。キャッシュされ、複数の VM で再利用されます。       |
 | `~/.vphone/tools/`| `fw prepare` 中に取得された APFS seal-volume アーティファクト（`apfs_sealvolume_<version>`）のキャッシュ。 |
 | `~/.vphone/debs/` | `jb`/`exp` の CFW インストールがゲストに配置する `.deb` パッケージのキャッシュ（Sileo、apt など）。 |
-| `~/.vphone/venv/` | 自動的にプロビジョニングされる Python 環境（[Python ランタイム](#python-ランタイム) を参照。`$VPHONE_VENV_DIR` で上書き可能）。 |
+| `~/.vphone/venv/` | 自動的にプロビジョニングされる Python 環境（`$VPHONE_VENV_DIR` で上書き可能）。 |
 
 優先順位: 項目ごとの上書き（`$VPHONE_LIBRARY_ROOT`、`$VPHONE_VENV_DIR`）が `$VPHONE_ROOT` より優先され、`$VPHONE_ROOT` は `~/.vphone` のデフォルトより優先されます。`ipsws/`、`tools/`、`debs/` キャッシュは、常に現在有効なルートの直下に置かれます。
 
@@ -175,6 +186,23 @@ vphone-amfidont         # ローカルビルドの場合は .build/vphone-cli.ap
 | Mac16,11 27.0b2 | `17,3_27.0_24A5424a`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5430a`  | `26.4-23E5207q` |
 
+## サポート範囲
+
+以下は各証拠日付時点での実測範囲であり、すべてのバージョンの組み合わせに対する一般的なサポート保証ではありません。デバイスはすべて `iPhone17,3` です。
+
+**ファームウェア互換性レジストリ（2026-09-09 時点、出典 `research/firmware_compatibility.json`）**
+レジストリには 23 件の catalog バージョンペア（正確なビルド番号付き、18.6.2 から 27.0 beta まで）と 4 つの cloudOS イメージ（26.1 = `23B85`、26.2 = ビルド番号未記録、26.3 = `23D128`、26.4 = `23E5207q`）が登録されています。5 つのバリアント（less/regular/dev/jb/exp）は全 23 ペアで code_selectable です（パイプラインに選択して投入可能。パッチや起動の検証は未実施）。パッチバイト検証（patch_verified）は less 1、regular 7、dev 7、jb 10、exp 7 の組み合わせをカバーします。実機能力検証（capability_verified）: jb 3 組み合わせ（27.0 系列 `24A5380h`/`24A5390f`/`24A5408d`、うち `24A5408d` は `--frida`）、exp 1 組み合わせ（26.6.1/`23G83` rig-baseline）。regular/dev バリアントには完全な実機起動の証拠はまだありません。
+
+**エンドツーエンド証拠マトリクス（2026-09-17 時点、出典 `research/f1_support_matrix_2026-09-17.md`）**
+今回はステップごと（S1 作成から S12 EXP 専用まで）に 2 つの組み合わせを検証しました:
+
+- P: 26.1/`23B85` + cloudOS 26.1/`23B85`、5 つのバリアント。
+- N: 26.6.1/`23G82`（非 catalog ビルド、ローカルパスで指定）+ cloudOS 26.4/`23E5207q`、jb と exp（`--frida`）。
+
+作成段階のパッチレコード数: regular 58、dev 70、jb 152、exp 178、less 26（P グループ）；jb-frida 157、exp-frida 183（N グループ）。既知の制限 L1–L3 と未解決の問題 O1–O3 は合格として数えず、別途追跡します（`research/f1_known_limits_2026-09-17.json` を参照）。L の組み合わせ（18.6.2/`22G100`）は今回対象外で、IPSW をダウンロードせず、全ステップを未実行として記録しています。
+
+各集計方法のパッチ数（ブートチェーン/総計/歴史的なメソッド数）は方法によって数値が異なります。方法の注記については `research/0_binary_patch_comparison.md` と `research/firmware_compatibility.md` の第 5 節を参照してください。
+
 ## FAQ
 
 **`zsh: killed ./vphone-cli`** — AMFI/デバッグ制限がバイパスされていません。[前提条件](#前提条件) を参照してください（`amfi_get_out_of_my_way=1` または `amfidont`）。
@@ -189,9 +217,13 @@ vphone-amfidont         # ローカルビルドの場合は .build/vphone-cli.ap
 
 **`.ipa`/`.tipa` をインストールする** — 実行中の VM の Install メニューを使用します（ドラッグ&ドロップまたはファイルピッカー）。
 
+**`cfw install` がシステムバイナリ（例: `Campo`）の再署名中に停止し、メモリが際限なく増加する** — `ldid-procursus` の `2.1.5-procursus7`（現在の Homebrew `stable`）までの既知の不具合: `bytes(uint64_t)` がゼロガードなしで `__builtin_clzll(0)` を呼び出し、これは未定義動作であり、このビルドでは `0` 長に解決され、符号なしループカウンタがアンダーフローします — `ldid` は終了せず、増大するバッファに 1 バイトずつ書き込み続けます。整数値がちょうど `0` の値を含む *あらゆる* entitlements plist で発生します（一部の実際の Apple システムバイナリがこれを持ちます）。上流では修正済みですが、まだ tagged release に入っていません。ソースから再ビルドしてください: `brew install --HEAD ldid-procursus && brew link --overwrite ldid-procursus`。すでに遭遇している場合は、まず停止した `ldid` プロセスを終了してください（`sudo kill -9 <pid>`）。
+
 ## 自動化
 
 `vphone-cli` はプログラムによる制御のためにホスト制御ソケット（`<bundle>/vphone.sock`）を公開します — スクリーンショット、タッチ、スワイプ、ハードウェアキー、クリップボード — 各アクションは AI 駆動の E2E テスト用にインラインのスクリーンショットを返します。それをラップする MCP サーバーについては [vphone-mcp](https://github.com/pluginslab/vphone-mcp) を参照してください。
+
+`--headless`（VM ウィンドウなし）で VM を起動した場合、能力スナップショットは `screen_available=false` を報告し、画面に依存するコマンド — スクリーンショット、タッチ、スワイプ — は使用できません。ハードウェアキーとクリップボードは引き続き使用できます。
 
 ## 謝辞
 
