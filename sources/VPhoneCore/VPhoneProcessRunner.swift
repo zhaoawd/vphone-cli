@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 // MARK: - VPhoneProcessResult
@@ -6,7 +7,7 @@ public struct VPhoneProcessResult: Sendable {
     public let exitCode: Int32
     public let stdout: String
     public let stderr: String
-    /// True when `runCapturing(timeout:)` terminated the process at its deadline.
+    /// True when the deadline expired while waiting for the child or its output.
     public let timedOut: Bool
 
     public init(exitCode: Int32, stdout: String, stderr: String, timedOut: Bool = false) {
@@ -16,7 +17,7 @@ public struct VPhoneProcessResult: Sendable {
         self.timedOut = timedOut
     }
 
-    public var succeeded: Bool { exitCode == 0 }
+    public var succeeded: Bool { exitCode == 0 && !timedOut }
 }
 
 // MARK: - VPhoneProcessRunner
@@ -32,24 +33,17 @@ public enum VPhoneProcessRunner {
         func take() -> Data { lock.lock(); defer { lock.unlock() }; return data }
     }
 
-    private final class DeadlineFlag: @unchecked Sendable {
-        private let lock = NSLock()
-        private var value = false
-        func set() { lock.lock(); value = true; lock.unlock() }
-        var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
-    }
-
     /// Run `executable args` to completion, capturing stdout/stderr.
     /// Throws only if the process cannot be launched; a nonzero exit is
     /// returned in the result, not thrown.
     ///
-    /// stdout and stderr are drained CONCURRENTLY via readability handlers —
-    /// a sequential "read stdout fully, then stderr" drain deadlocks when a
-    /// child fills one pipe's ~64 KB buffer while still writing the other.
+    /// Both output pipes are drained concurrently (readability handlers without
+    /// a timeout, nonblocking polling with one), so a full stderr pipe cannot
+    /// deadlock a child while the caller waits for stdout to reach EOF.
     ///
-    /// With `timeout`, stdin is `/dev/null` (a probe must never wait on the
-    /// terminal) and the process is terminated at the deadline; the result then
-    /// has `timedOut == true`.
+    /// With `timeout`, stdin is `/dev/null`. The deadline covers both the child
+    /// and its output pipes. SIGTERM is followed by SIGKILL after 250 ms; pipe
+    /// draining and exit observation stop within one second of the deadline.
     public static func runCapturing(
         _ executable: URL,
         _ args: [String],
@@ -62,7 +56,9 @@ public enum VPhoneProcessRunner {
         process.arguments = args
         if let cwd { process.currentDirectoryURL = cwd }
         if let env { process.environment = env }
-        if timeout != nil { process.standardInput = FileHandle.nullDevice }
+        if let timeout {
+            return try runCapturingBounded(process, timeout: timeout)
+        }
 
         let outPipe = Pipe()
         let errPipe = Pipe()
@@ -86,23 +82,69 @@ public enum VPhoneProcessRunner {
         }
 
         try process.run()
-        let expired = DeadlineFlag()
-        if let timeout {
-            let target = process
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                guard target.isRunning else { return }
-                expired.set()
-                target.terminate()
-            }
-        }
         process.waitUntilExit()
         group.wait()
 
         return VPhoneProcessResult(
             exitCode: process.terminationStatus,
             stdout: String(decoding: outBox.take(), as: UTF8.self),
-            stderr: String(decoding: errBox.take(), as: UTF8.self),
-            timedOut: expired.isSet)
+            stderr: String(decoding: errBox.take(), as: UTF8.self))
+    }
+
+    /// Poll on the calling thread so deadlines cannot queue behind blocking
+    /// work on Dispatch's global pool. Nonblocking reads also bound capture
+    /// when a descendant inherits a pipe after the direct child has exited.
+    private static func runCapturingBounded(_ process: Process, timeout: TimeInterval) throws -> VPhoneProcessResult {
+        let pipes = [Pipe(), Pipe()]
+        defer {
+            for pipe in pipes {
+                try? pipe.fileHandleForReading.close()
+                try? pipe.fileHandleForWriting.close()
+            }
+        }
+        var descriptors = try pipes.map { pipe -> pollfd in
+            let fd = pipe.fileHandleForReading.fileDescriptor
+            let flags = fcntl(fd, F_GETFL)
+            guard flags >= 0, fcntl(fd, F_SETFL, flags | O_NONBLOCK) == 0 else {
+                throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+            }
+            return pollfd(fd: fd, events: Int16(POLLIN), revents: 0)
+        }
+        process.standardInput = FileHandle.nullDevice
+        process.standardOutput = pipes[0]
+        process.standardError = pipes[1]
+        try process.run()
+        for pipe in pipes { try? pipe.fileHandleForWriting.close() }
+        let deadline = ProcessInfo.processInfo.systemUptime + max(0, timeout)
+        var output = [Data(), Data()]
+        var buffer = [UInt8](repeating: 0, count: 65536)
+        var timedOut = false
+        var killed = false
+        while process.isRunning || descriptors.contains(where: { $0.fd >= 0 }) {
+            let now = ProcessInfo.processInfo.systemUptime
+            if now >= deadline, !timedOut {
+                timedOut = true
+                if process.isRunning { process.terminate() }
+            }
+            if timedOut, now >= deadline + 0.25, !killed {
+                if process.isRunning { _ = kill(process.processIdentifier, SIGKILL) }
+                killed = true
+            }
+            if timedOut, now >= deadline + 1 { break }
+            _ = poll(&descriptors, nfds_t(descriptors.count), 10)
+            for index in descriptors.indices where descriptors[index].fd >= 0 && descriptors[index].revents != 0 {
+                let count = read(descriptors[index].fd, &buffer, buffer.count)
+                if count > 0 {
+                    output[index].append(contentsOf: buffer[..<count])
+                } else if count == 0 || (errno != EINTR && errno != EAGAIN) {
+                    descriptors[index].fd = -1
+                }
+            }
+        }
+        return VPhoneProcessResult(
+            exitCode: process.isRunning ? -1 : process.terminationStatus,
+            stdout: String(decoding: output[0], as: UTF8.self),
+            stderr: String(decoding: output[1], as: UTF8.self), timedOut: timedOut)
     }
 
     /// Stream an archive through a `/usr/bin/tar` consumer that reads on stdin,

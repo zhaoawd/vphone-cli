@@ -282,7 +282,15 @@ struct CreateLiveStagesTests {
         #expect(isRejected(stages.verify(.verification, context: w.context(), evidence: ["boot_analysis": "prompt_detected"])))
 
         stages.lockReleaseTimeout = 10
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) { holder.lock = nil }
+        // Blocking tests can saturate the global queue; release the real lock
+        // on a dedicated thread so this tests the verifier's polling deadline.
+        let released = DispatchSemaphore(value: 0)
+        defer { released.wait() }
+        Thread {
+            Thread.sleep(forTimeInterval: 0.3)
+            holder.lock = nil
+            released.signal()
+        }.start()
         #expect(isVerified(stages.verify(.verification, context: w.context(), evidence: ["boot_analysis": "prompt_detected"])))
     }
 

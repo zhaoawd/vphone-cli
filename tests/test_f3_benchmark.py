@@ -1,7 +1,10 @@
 import base64
 import json
+import os
 from pathlib import Path
 import signal
+import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -143,6 +146,14 @@ class DriverTestCase(unittest.TestCase):
 
 
 class F3SafetyTests(DriverTestCase):
+    def test_recovery_boot_requires_a_stop_command_before_creating_output(self):
+        output = self.root / "no-stop"
+        result = self.run_probe(
+            "recovery-boot", "--sock", self.root / "missing.sock", "--out", output,
+            "--allow-vm-lifecycle", "--launch-command", "/usr/bin/true", expect=2)
+        self.assertIn("--stop-command", result.stderr)
+        self.assertFalse(output.exists())
+
     def test_socket_inside_vm_2607_is_refused_before_any_request(self):
         bundle = self.root / "vm-2607"
         bundle.mkdir()
@@ -316,15 +327,79 @@ class F3LatencyTests(DriverTestCase):
 
 
 class F3RecoveryAndLoadTests(DriverTestCase):
-    def test_recovery_boot_records_each_interval_and_keeps_the_log(self):
+    def boot_commands(self, *, stop_failure=False, leave_socket=False):
+        """A foreground child owns a real socket for exactly one boot lifetime."""
+        pid_file = self.root / "boot.pid"
+        launches = self.root / "launches.txt"
+        sock = self.root / "boot.sock"
+        launch = self.root / "launch.py"
+        launch.write_text(f"""
+import os, signal, sys, threading
+from pathlib import Path
+sys.path.insert(0, {str(ROOT / 'tests')!r})
+from test_f3_benchmark import BenchFixture
+done = threading.Event()
+signal.signal(signal.SIGTERM, lambda *_: done.set())
+pid = Path({str(pid_file)!r})
+pid.write_text(str(os.getpid()))
+with Path({str(launches)!r}).open('a') as output:
+    output.write(str(os.getpid()) + '\\n')
+fixture = BenchFixture(Path({str(self.root)!r}), name='boot')
+fixture.start()
+try:
+    done.wait(20)
+finally:
+    fixture.stop()
+    if not {leave_socket!r}:
+        fixture.path.unlink(missing_ok=True)
+    pid.unlink(missing_ok=True)
+""")
+        stop = self.root / "stop.py"
+        stop.write_text(f"""
+import os, signal, sys
+from pathlib import Path
+if {stop_failure!r}:
+    sys.exit(3)
+pid = Path({str(pid_file)!r})
+if pid.exists():
+    os.kill(int(pid.read_text()), signal.SIGTERM)
+""")
+
+        def cleanup():
+            if pid_file.exists():
+                try:
+                    os.kill(int(pid_file.read_text()), signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+                deadline = time.monotonic() + 3
+                while pid_file.exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+        self.addCleanup(cleanup)
+        return sock, shlex.join([sys.executable, str(launch)]), shlex.join([sys.executable, str(stop)]), launches
+
+    def test_recovery_boot_refuses_an_existing_endpoint_before_launch(self):
         fixture = self.fixture()
+        marker = self.root / "launched"
+        result = self.run_probe(
+            "recovery-boot", "--sock", fixture.path, "--out", self.root / "old-boot",
+            "--allow-vm-lifecycle", "--launch-command", f"/usr/bin/touch {marker}",
+            "--stop-command", "/usr/bin/true", "--count", 1, expect=1)
+        self.assertIn("socket already exists", result.stderr)
+        self.assertFalse(marker.exists())
+        self.assertEqual(fixture.requests, [])
+
+    def test_recovery_boot_records_each_interval_and_keeps_the_log(self):
+        sock, launch, stop, launches = self.boot_commands()
         output = self.root / "boot"
-        self.run_probe("recovery-boot", "--sock", fixture.path, "--out", output,
-                       "--allow-vm-lifecycle", "--launch-command", "/usr/bin/true",
-                       "--count", 1, "--gap", 0, "--boot-timeout", 20, expect=0)
+        self.run_probe("recovery-boot", "--sock", sock, "--out", output,
+                       "--allow-vm-lifecycle", "--launch-command", launch, "--stop-command", stop,
+                       "--count", 2, "--gap", 0, "--boot-timeout", 20, expect=0)
         records = [json.loads(line) for line in
                    (output / "samples/recovery_boot.jsonl").read_text().splitlines()]
-        self.assertEqual(len(records), 1)
+        self.assertEqual(len(records), 2)
+        self.assertEqual(len(set(launches.read_text().splitlines())), 2)
+        self.assertTrue(all(record["ok"] and record["stop_confirmed"] for record in records))
+        self.assertFalse(sock.exists())
         record = records[0]
         self.assertTrue(record["ok"])
         self.assertIsNotNone(record["t_sock_s"])
@@ -335,6 +410,39 @@ class F3RecoveryAndLoadTests(DriverTestCase):
         self.assertTrue((output / "boot-1.png").is_file())
         run = json.loads((output / "run.json").read_text())
         self.assertEqual(run["details"]["failed"], 0)
+
+    def test_recovery_boot_records_launch_failure_and_stops_before_next_iteration(self):
+        output = self.root / "failed-launch"
+        self.run_probe(
+            "recovery-boot", "--sock", self.root / "absent.sock", "--out", output,
+            "--allow-vm-lifecycle", "--launch-command", "/usr/bin/false",
+            "--stop-command", "/usr/bin/true", "--count", 2,
+            "--gap", 0, "--boot-timeout", 2, expect=1)
+        records = [json.loads(line) for line in (output / "samples/recovery_boot.jsonl").read_text().splitlines()]
+        self.assertEqual(len(records), 1)
+        self.assertFalse(records[0]["ok"])
+        self.assertIn("exit 1", records[0]["error"])
+
+    def assert_stop_failure(self, leave_socket):
+        sock, launch, stop, launches = self.boot_commands(
+            stop_failure=not leave_socket, leave_socket=leave_socket)
+        output = self.root / "failed-stop"
+        self.run_probe(
+            "recovery-boot", "--sock", sock, "--out", output,
+            "--allow-vm-lifecycle", "--launch-command", launch, "--stop-command", stop,
+            "--count", 2, "--gap", 0, "--boot-timeout", 2, expect=1)
+        records = [json.loads(line) for line in (output / "samples/recovery_boot.jsonl").read_text().splitlines()]
+        self.assertEqual(len(records), 1)
+        self.assertFalse(records[0]["ok"])
+        self.assertFalse(records[0]["stop_confirmed"])
+        self.assertIn("stop_error", records[0])
+        self.assertEqual(len(launches.read_text().splitlines()), 1)
+
+    def test_recovery_boot_stop_failure_prevents_next_iteration(self):
+        self.assert_stop_failure(leave_socket=False)
+
+    def test_recovery_boot_remaining_socket_prevents_next_iteration(self):
+        self.assert_stop_failure(leave_socket=True)
 
     def test_recovery_daemon_measures_the_reconnect_intervals(self):
         fixture = self.fixture(down_cycles=2)
@@ -773,6 +881,17 @@ class SummarizeTests(unittest.TestCase):
         self.assertIn("Theil–Sen 斜率", markdown)
         self.assertIn("增长判定", markdown)
         self.assertIn("恢复区间", markdown)
+
+    def test_duplicate_runs_are_rejected_before_growth_is_confirmed(self):
+        original = self.build_run("original", slope_per_sample=0.5)
+        alias = self.root / "alias"
+        alias.symlink_to(original, target_is_directory=True)
+        copy = self.root / "copy"
+        shutil.copytree(original, copy)
+        for duplicate in (original, alias, copy):
+            with self.subTest(duplicate=duplicate):
+                with self.assertRaisesRegex(f3_benchmark.BenchmarkError, "duplicate run"):
+                    f3_benchmark.summarize_runs([original, duplicate], 1, 2, 0.95, 2)
 
     def test_flat_series_is_not_detected_as_growth(self):
         run = self.build_run("flat", slope_per_sample=0.0)

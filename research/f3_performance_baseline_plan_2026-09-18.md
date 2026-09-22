@@ -303,7 +303,7 @@ d4-acc（regular）在 F1 中的能力边界（事实，来自 F1 记录）：�
 | --- | --- |
 | 脚本 | `scripts/f3_benchmark.py`，子命令 `latency`、`recovery-boot`、`recovery-daemon`、`soak`、`idle`、`camera`、`summarize`；宿主采样器 `scripts/f3_host_sampler.py`（独立进程，便于在 VM 启动前开始采样） |
 | 复用 | 请求层复用 `scripts/host_control_client.request/endpoint/require_ok/camera_status`；为计时新增不改变现有行为的可选计时回调或在 recorder 中记录时间（修改公共客户端需保持 F1/F2 测试通过）；证据目录、`git_state`、`host_info`、`sha256_file`、`redact` 从 `f1_runtime_acceptance.py` 抽出到 `scripts/lib` 共享模块或直接引用；定位与相机参数模板沿用 F1 S9/S10 |
-| 启动/停止 | 冷启动恢复实验沿用 `.build/f1/runtime.zsh` 的启动方式（`--config ... --headless` 或 `vm launch`），stdout/stderr 重定向文件；停止使用 `vm stop`；工具默认不启动 VM，`recovery-boot` 需显式 `--allow-vm-lifecycle` |
+| 启动/停止 | 冷启动恢复实验沿用前台启动方式（`--config ... --headless` 或 `vm launch`），stdout/stderr 重定向文件；停止使用 `vm stop`；`recovery-boot` 需显式 `--allow-vm-lifecycle` 和 `--stop-command`。每轮启动前 socket 必须不存在；启动命令需持续运行到 VM 停止；停止命令成功、启动进程退出且 socket 移除后才进入下一轮 |
 | 安全约束 | 拒绝 socket 路径解析到 `vm-2607`；输出目录必须不存在；所有客户机写入限定 `/var/mobile/Library/f3-bench/` |
 | 输出 | `<out>/run.json`（设置、提交、SHA-256、宿主、VM 配置、实验参数、随机种子）；`samples/*.jsonl`（每请求一行）；`host_samples.jsonl`；`camera_samples.jsonl`；`summary.json`（分位数、斜率与区间、判定）；`summary.md`（中文表格，由 `summary` 子命令生成） |
 | 可复跑记录 | 构建提交与工作树是否干净；`vphone-cli` 主程序 SHA-256 与 cdhash；bundle 内 `.vphoned.signed` SHA-256；客户机 `capabilities.guest_capabilities`；宿主 1.1 各项；VM `config.plist` 的 cpu/内存；`vm-2607` 是否运行；电源状态；实验开始/结束 UTC |
@@ -369,7 +369,7 @@ d4-acc（regular）在 F1 中的能力边界（事实，来自 F1 记录）：�
 | 4 | E4/E5/E6c 采用 60 分钟 | headless 空闲对照为可选项，本轮不执行；E2 冷启动恢复仍按 headless 5 次 + GUI 5 次 |
 | 5 | 授权 E3 与 E2 | 授权在 exp 上经 `shell` 终止 vphoned（20 次），授权 d4-acc 冷启动 10 次 |
 | 6 | 授权删除 `/var/mobile/Library/f3-bench/` | 仅限该目录，基准结束后执行 |
-| 7 | 接受 3.6 判定规则 | 不设数值阈值；“测量确认的增长”需两次独立运行均满足区间下限 > 0 且斜率同号 |
+| 7 | 接受 3.6 判定规则 | 不设数值阈值；“测量确认的增长”需两次独立运行均满足区间下限 > 0 且斜率同号。2026-09-22 修复：汇总前按解析符号链接后的目录路径及 `run_id` 拒绝重复输入；复制同一运行目录也不能作为第二次运行。缺少有效 `run_id` 时拒绝汇总 |
 | 8 | 接受相机端到端延迟不可测 | 不在 F3 之前实施“回执转发 `libvcam_observed_count`/`timestamp_ns`”与“宿主暴露待处理请求计数”；两项列为 F3 之后的候选改动 |
 | 9 | 仅用标准库 | 不引入 NumPy；分位数、bootstrap、Theil–Sen 自行实现并测试 |
 | 10 | 以 F1 关闭时的 HEAD `0d7b009` 构建 | 该构建含 `5fd007c`；与 F1 的 `22a7c02` 证据比较时标注构建差异。E0 顺带记录 regular/dev/less 的 `app_launch`/`apps_v2` 能力声明，作为 `5fd007c` 的部署后观察（不改变 F1 已关闭的结论） |

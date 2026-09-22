@@ -260,6 +260,13 @@ public struct VPhoneCreateRunner {
         // 2. Load, validate, identity.
         let (stored, storedData) = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL)
         try verifyIdentity(stored, bundleURL: bundleURL)
+        // Disk allocation happens before the checkpoint's prepare stage and
+        // is never repeated by resume, even with --restart-from prepare.
+        if let size = request.overrides.diskSizeGb, size != stored.effectiveOptions.diskSizeGb {
+            throw VPhoneCreateRunError.optionsChanged([
+                "disk_size_gb is fixed when the bundle is created; create a new VM to change it",
+            ])
+        }
         guard let next = stored.nextStage ?? request.restartFrom else {
             log("[create] nothing to resume: overall \(stored.overallStatus.rawValue)")
             return stored
@@ -286,7 +293,6 @@ public struct VPhoneCreateRunner {
         if let spoof = overrides.spoofBuild { options.spoofBuild = spoof }
         if let value = overrides.forceDscMaxSlide { options.forceDscMaxSlide = value }
         if let value = overrides.enableFrida { options.enableFrida = value }
-        if let value = overrides.diskSizeGb { options.diskSizeGb = value }
         if overrides.iphoneSource == nil, let record = stored.effectiveOptions.iphoneSource, !record.redacted {
             overrides.iphoneSource = record.display
         }

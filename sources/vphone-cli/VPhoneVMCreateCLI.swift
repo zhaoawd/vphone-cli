@@ -26,7 +26,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
     @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp | less (default regular; with --resume: must match unless no affected stage ran)") var variant: String?
     @Option(name: .shortAndLong, help: "iPhone IPSW URL or local path") var iphoneSource: String?
     @Option(name: .shortAndLong, help: "cloudOS IPSW URL or local path") var cloudosSource: String?
-    @Option(name: .shortAndLong, help: "Disk size (GB, default 64)") var diskSize: UInt64?
+    @Option(name: .shortAndLong, help: "Disk size (GB, default 64; with --resume: must equal the recorded size)") var diskSize: UInt64?
     @Option(name: .shortAndLong, help: "sudo password for the CFW host-mount install (via askpass; never logged)")
     var sudoPassword: String?
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?

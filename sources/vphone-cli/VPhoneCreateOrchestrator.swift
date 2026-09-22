@@ -452,6 +452,11 @@ public struct VPhoneCreateOrchestrator {
                 "this checkpoint cannot be resumed; delete the VM (`vphone-cli vm delete \(name)`) and create it again",
             ])
         case let .optionsChanged(changes):
+            if changes.contains(where: { $0.contains("disk_size_gb") }) {
+                return (changes.joined(separator: "; "), [
+                    "resume with the recorded disk size, or create a new VM with the desired size",
+                ])
+            }
             return ("options differ from the checkpoint for stages that already ran: \(changes.joined(separator: "; "))", [
                 "resume without the changed options, or restart from the earliest affected stage with --restart-from",
             ])

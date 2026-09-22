@@ -742,6 +742,36 @@ private let allStages = VPhoneCreateStage.allCases
 
     // MARK: Options and tool
 
+    @Test(arguments: [false, true])
+    func changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed: Bool) throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let disk = f.bundle.appendingPathComponent("Disk.img")
+        try Data("original disk".utf8).write(to: disk)
+        if completed {
+            try f.create(f.runner())
+        } else {
+            f.fake.setFault(.prepare, .beforeExecution)
+            #expect(throws: VPhoneCreateRunError.self) { try f.create(f.runner()) }
+        }
+        let before = f.checkpointBytes()
+        let diskBefore = try Data(contentsOf: disk)
+        f.fake.resetCalls()
+        #expect {
+            try f.runner().resume(bundleURL: f.bundle, request: .init(
+                overrides: .init(diskSizeGb: 128), restartFrom: .prepare))
+        } throws: { error in
+            guard case let VPhoneCreateRunError.optionsChanged(lines) = error else { return false }
+            return lines.contains { $0.contains("disk_size_gb") }
+        }
+        #expect(f.fake.executed.isEmpty)
+        #expect(f.checkpointBytes() == before)
+        #expect(try Data(contentsOf: disk) == diskBefore)
+        // Repeating the original value is harmless and must remain supported.
+        let resumed = try f.runner().resume(bundleURL: f.bundle, request: .init(
+            overrides: .init(diskSizeGb: 64), restartFrom: .prepare))
+        #expect(resumed.effectiveOptions.diskSizeGb == 64)
+    }
+
     @Test func optionChangeAffectingCompletedStageIsRefused() throws {
         let f = try Fixture(); defer { f.cleanup() }
         f.fake.setFault(.restore, .beforeExecution)

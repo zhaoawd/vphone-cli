@@ -806,23 +806,44 @@ def probe_capabilities(run, phase):
     return response if ok else None
 
 
+def stop_recovery_boot(run, process, stop, socket_path):
+    """Confirm the foreground launcher exited and its endpoint was removed.
+
+    Cleanup continues after SIGINT/SIGTERM; stopping polling early would leave
+    the VM running and allow a later run to measure the wrong instance.
+    """
+    deadline = time.monotonic() + run.args.boot_timeout
+    subprocess.run(stop, cwd=str(ROOT), capture_output=True, text=True,
+                   timeout=run.args.boot_timeout, check=True)
+    process.wait(timeout=max(0.01, deadline - time.monotonic()))
+    while socket_path.exists() or socket_path.is_symlink():
+        if time.monotonic() >= deadline:
+            raise BenchmarkError("stop command completed but the host-control socket remains")
+        time.sleep(SOCKET_POLL_SECONDS)
+
+
 def run_recovery_boot(run, raw_argv):
     args = run.args
     launch = shlex.split(args.launch_command)
-    stop = shlex.split(args.stop_command) if args.stop_command else None
-    if not launch:
-        raise BenchmarkError("--launch-command must contain an executable")
+    stop = shlex.split(args.stop_command or "")
+    if not launch or not stop:
+        raise BenchmarkError("recovery-boot requires nonempty --launch-command and --stop-command")
     socket_path = Path(args.sock).expanduser()
     expected = [name.strip() for name in (args.expect_capabilities or "").split(",") if name.strip()]
     writer = run.writer("samples/recovery_boot.jsonl")
     results = []
+    run.details["iterations"] = results
     for index in range(1, args.count + 1):
         if run.should_stop:
             break
+        # Do not delete a stale socket or stop an existing VM: this iteration
+        # has not launched it. Require an absent endpoint before every spawn.
+        if socket_path.exists() or socket_path.is_symlink():
+            raise BenchmarkError("host-control socket already exists; stop the VM before recovery-boot")
         log_path = run.output / f"boot-{index}.log"
         record = {"iteration": index, "started_utc": f3_common.utc_now(),
                   "launch_command": launch, "log": log_path.name,
-                  "vz_pids_before": None, "vz_pids_after": None}
+                  "vz_pids_before": None, "vz_pids_after": None, "ok": False}
         before = vz_process_pids()
         record["vz_pids_before"] = sorted(before) if before is not None else None
         with log_path.open("wb") as log:
@@ -830,18 +851,25 @@ def run_recovery_boot(run, raw_argv):
             record["spawn_epoch"] = time.time()
             process = subprocess.Popen(launch, stdout=log, stderr=subprocess.STDOUT, cwd=str(ROOT))
         deadline = t0 + args.boot_timeout
-        t_sock = wait_for(run, lambda: socket_path.exists(), deadline, SOCKET_POLL_SECONDS)
-        record["t_sock_s"] = None if t_sock is None else t_sock - t0
-        t_guest = t_caps = t_screen = None
-        if t_sock is not None:
-            try:
+        t_sock = t_guest = t_caps = t_screen = None
+        failure = None
+        try:
+            def launcher_alive():
+                code = process.poll()
+                if code is not None:
+                    raise BenchmarkError(f"foreground launch command exited before boot completed (exit {code})")
+
+            def socket_ready():
+                launcher_alive()
+                return socket_path.exists()
+
+            t_sock = wait_for(run, socket_ready, deadline, SOCKET_POLL_SECONDS)
+            if t_sock is not None:
                 run.endpoint = resolve_endpoint(args.name, socket_path)
-            except (AcceptanceFailure, OSError) as error:
-                record["endpoint_error"] = str(error)
-            if run.endpoint is not None:
                 state = {}
 
                 def connected():
+                    launcher_alive()
                     response = probe_capabilities(run, "recovery")
                     state["last"] = response
                     return bool(response and response.get("guest_connected") is True)
@@ -849,6 +877,7 @@ def run_recovery_boot(run, raw_argv):
                 t_guest = wait_for(run, connected, deadline, CAPABILITY_POLL_SECONDS)
                 if t_guest is not None:
                     def declared():
+                        launcher_alive()
                         response = probe_capabilities(run, "recovery")
                         state["last"] = response
                         guest = (response or {}).get("guest_capabilities")
@@ -856,47 +885,58 @@ def run_recovery_boot(run, raw_argv):
                             return False
                         return all(name in guest for name in expected)
 
-                    t_caps = time.monotonic() if declared() else wait_for(
-                        run, declared, deadline, CAPABILITY_POLL_SECONDS)
+                    t_caps = wait_for(run, declared, deadline, CAPABILITY_POLL_SECONDS)
                     last = state.get("last") or {}
                     if last.get("screen_available") is True and not args.no_screen:
                         target = run.output / f"boot-{index}.png"
 
                         def shot():
+                            launcher_alive()
                             _, ok = run.perform("screenshot",
-                                                {"t": "screenshot", "path": str(target),
-                                                 "screen": False},
+                                                {"t": "screenshot", "path": str(target), "screen": False},
                                                 {"host_path": str(target)}, phase="recovery")
                             return ok
 
                         t_screen = wait_for(run, shot, deadline, CAPABILITY_POLL_SECONDS)
-        record.update({
-            "t_guest_s": None if t_guest is None else t_guest - t0,
-            "t_caps_s": None if t_caps is None else t_caps - t0,
-            "t_screen_s": None if t_screen is None else t_screen - t0,
-            "expected_capabilities": expected,
-            "timeout_s": args.boot_timeout,
-            "ok": t_guest is not None,
-            "finished_utc": f3_common.utc_now(),
-        })
-        after = vz_process_pids()
-        record["vz_pids_after"] = sorted(after) if after is not None else None
-        if before is not None and after is not None:
-            record["vz_lstart"] = {str(pid): after[pid] for pid in set(after) - set(before)}
-        run.write_sample(record, writer=writer)
-        results.append(record)
-        if stop:
+                        if t_screen is None and not run.should_stop:
+                            raise BenchmarkError("boot timed out waiting for a screenshot")
+            if not run.should_stop:
+                launcher_alive()
+                if t_guest is None or t_caps is None:
+                    raise BenchmarkError("boot timed out waiting for guest connection and capabilities")
+                record["ok"] = True
+        except (AcceptanceFailure, OSError, subprocess.SubprocessError) as error:
+            failure = error
+            record["error"] = str(error)
+        finally:
+            record.update({
+                "t_sock_s": None if t_sock is None else t_sock - t0,
+                "t_guest_s": None if t_guest is None else t_guest - t0,
+                "t_caps_s": None if t_caps is None else t_caps - t0,
+                "t_screen_s": None if t_screen is None else t_screen - t0,
+                "expected_capabilities": expected, "timeout_s": args.boot_timeout,
+                "finished_utc": f3_common.utc_now(),
+            })
+            after = vz_process_pids()
+            record["vz_pids_after"] = sorted(after) if after is not None else None
+            if before is not None and after is not None:
+                record["vz_lstart"] = {str(pid): after[pid] for pid in set(after) - set(before)}
             try:
-                subprocess.run(stop, cwd=str(ROOT), capture_output=True, text=True,
-                               timeout=args.boot_timeout)
-            except (OSError, subprocess.SubprocessError) as error:
+                stop_recovery_boot(run, process, stop, socket_path)
+                record["stop_confirmed"] = True
+            except (AcceptanceFailure, OSError, subprocess.SubprocessError) as error:
+                record["ok"] = False
+                record["stop_confirmed"] = False
                 record["stop_error"] = str(error)
-        process.poll()
-        run.endpoint = None
+                failure = failure or error
+            run.write_sample(record, writer=writer)
+            results.append(record)
+            run.details["failed"] = sum(1 for item in results if not item["ok"])
+            run.endpoint = None
+        if failure is not None:
+            raise BenchmarkError(f"boot iteration {index} failed: {failure}") from failure
         if index < args.count:
             run.sleep(args.gap)
-    run.details["iterations"] = results
-    run.details["failed"] = sum(1 for item in results if not item["ok"])
 
 
 def run_recovery_daemon(run, raw_argv):
@@ -1563,7 +1603,21 @@ def vz_attribution(record, expected=2, window_seconds=60.0):
 
 
 def summarize_runs(directories, seed, resamples, confidence, expected_vz):
-    loaded = [load_run_directory(directory) for directory in directories]
+    loaded = []
+    paths, run_ids = set(), set()
+    for directory in directories:
+        path = Path(directory).expanduser().resolve()
+        if path in paths:
+            raise BenchmarkError(f"duplicate run directory: {directory}")
+        item = load_run_directory(path)
+        run_id = item["run"].get("run_id")
+        if not isinstance(run_id, str) or not run_id.strip():
+            raise BenchmarkError(f"{directory}: run_id must be a nonempty string")
+        if run_id in run_ids:
+            raise BenchmarkError(f"duplicate run_id {run_id!r}: {directory}")
+        paths.add(path)
+        run_ids.add(run_id)
+        loaded.append(item)
     summary = {
         "schema_version": SCHEMA_VERSION,
         "generated_at": f3_common.utc_now(),
@@ -1827,8 +1881,8 @@ def parse_args(argv):
     boot.add_argument("--allow-vm-lifecycle", action="store_true",
                       help="required: this experiment starts and stops the VM")
     boot.add_argument("--launch-command", required=True,
-                      help="launch command line, split with shlex and run without a shell")
-    boot.add_argument("--stop-command", help="stop command line, split with shlex")
+                      help="foreground launch command (must stay running until VM stops), split with shlex")
+    boot.add_argument("--stop-command", help="required stop command; must exit successfully and remove the VM socket")
     boot.add_argument("--count", type=int, default=10)
     boot.add_argument("--gap", type=float, default=60.0, help="seconds between iterations")
     boot.add_argument("--boot-timeout", type=float, default=600.0)
@@ -1896,6 +1950,11 @@ def validate(args):
     if args.command == "recovery-boot" and not args.allow_vm_lifecycle:
         raise BenchmarkError(
             "recovery-boot starts and stops the VM; pass --allow-vm-lifecycle to authorize it")
+    if args.command == "recovery-boot":
+        if not args.stop_command or not args.stop_command.strip():
+            raise BenchmarkError("recovery-boot requires --stop-command to confirm each VM has stopped")
+        if args.count < 1 or args.boot_timeout <= 0:
+            raise BenchmarkError("--count and --boot-timeout must be positive")
     if args.command == "latency" and args.concurrency < 1:
         raise BenchmarkError("--concurrency must be >= 1")
     return socket_path
