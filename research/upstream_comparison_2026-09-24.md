@@ -16,6 +16,8 @@
 
 后续复核：修正 `icli.execute` 对 shell 的覆盖结论，确认 `postValidation` 幂等处理本地已具备，并补充截至本地 `2c604ea` 的合并模拟结果。完整分析见 [2d76f81 复核与合入建议](upstream_review_2d76f81_2026-09-24.md)。
 
+`21a9ce2` 后续复核：相机 DSC 的影响还包括部分应用输入不能补齐，以及逐站点写入后遇错未执行页面哈希重算。本文据内存模拟结果补充合入与验收范围；没有新增真实 DSC 或 VM 验收。
+
 ## 1. 比较基线与证据范围
 
 | 对象 | 版本 / 结果 |
@@ -225,7 +227,9 @@ CFW 安装新增了几项前置检查：
 
 不建议用上游扫描器覆盖本地算法。应先对相同哈希的输入，比较两边的候选、修改地址、指令和输出，再判断是否需要增加兼容分支。地址只用于证据对照，不应写入补丁逻辑。
 
-DSC 补丁的幂等处理同样存在差异。上游 Swift 版能识别已补丁的 prologue，并按成功处理。本地 `scripts/patchers/cfw_patch_camera_dsc.py:111-114` 要求 prologue 必须是 `pacibsp`，否则报错（除非加 `--force`），因此对已补丁的输入会失败。这是有意设计（`scripts/cfw_install_exp.sh:78-80`）：重跑时 EXP 安装输出 `camera DSC patch: failed (likely build-version mismatch); continuing` 并继续，安装不中断。实际影响是日志不能区分“已施加”和“版本不匹配”。本地的 maxslide、hv_vmm_dsc 和 dsc_codesign 已有幂等处理。
+DSC 补丁的幂等处理同样存在差异。上游 Swift 版能识别已补丁的 prologue，并在检查全部目标后才开始写入。本地 `scripts/patchers/cfw_patch_camera_dsc.py:111-114` 要求 prologue 必须是 `pacibsp`，否则报错（除非加 `--force`），因此对已补丁的输入会失败。安装脚本注释明确记录了这一拒绝行为（`scripts/cfw_install_exp.sh:78-81`）；EXP 安装捕获错误后输出 `camera DSC patch: failed (likely build-version mismatch); continuing` 并继续。对全部目标均已完整补丁的输入，重跑没有新增写入，但日志不能区分“已施加”和“不匹配”。
+
+部分应用输入还存在其他影响。内存模拟确认：NeutrinoCore 已补丁而 AVFCapture 未补丁时，补丁函数提前退出，不能补齐 AVFCapture；同一 NeutrinoCore 补丁组中，若先遇到原始站点、后遇到已补丁站点，则会先写入再抛错，不调用组末的 `reattest_modified_pages`。真实 `DSCChunks.write_at_vma` 会直接写文件，因此不能仅根据安装继续判断补丁完整。实验设置、结果与限制见 [复核报告 §2](upstream_review_2d76f81_2026-09-24.md)。这些结果只验证函数控制流，未验证真实 DSC 签名或客户机行为。本地的 maxslide、hv_vmm_dsc 和 dsc_codesign 已有幂等处理。
 
 上游 `6d5ce7d` 记录了 26.4 用户态 + cloudOS 26.4 的启动情况，以及 SpringBoard、Safari、Sileo 的观察结果，但明确说明没有专门验证 debugger attach 和 tweak RWX 写入。这条记录早于当前移除默认 bootstrap 的流程，不能作为当前默认镜像包含 Sileo 的证据。
 
@@ -309,7 +313,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 1. **修复本地导入缺陷。** 本地 `sources/VPhoneCore/VPhoneBundleOps.swift:391` 在库锁内把解包结果移入库中的最终目录，`:393` 在锁外调用 `VPhoneBundle.load`。`:365` 的 `defer` 只清理暂存目录。因此，manifest 无效的归档会留在库中的最终目录，占用该名称，且不会被清理。上游 `b86dcaf` 的做法是先在暂存目录内完成 `VPhoneBundle.load`，验证通过后再移入库（`Sources/VPhoneArchive/VPhoneBundleTransfer.swift`）。修复时保留本地的库锁，只把验证前移，并补充一个无效 manifest 的回归测试。
    状态：已修复。`importArchive` 在暂存目录内加载 manifest，通过后才在库锁内移入最终目录；回归测试为 `tests/VPhoneCoreTests/BundleOpsTests.swift` 的 `importRejectsInvalidManifestWithoutPlacingBundle`。
 2. 补充两个精确的固件配对条目，同时保持本地兼容性证据的分级。
-3. 核对 Swift DSC 移植中对已补丁形态的识别，与本地 Python 的幂等处理对比，只吸收本地缺失的行为。已确认一处差异：`cfw_patch_camera_dsc.py` 不区分已补丁输入和不匹配输入。只在 EXP 范围内增加已补丁识别，保留对不匹配输入的拒绝。
+3. 在 EXP 范围内为相机 DSC 补丁区分原始、已补丁和不匹配三种状态，并吸收上游“检查全部目标后再写入”的做法。验证混合输入能补齐剩余站点，不匹配输入在写入前被拒绝，成功写入后页面哈希与内容一致。EXP 安装遇错是否继续属于独立策略，不随已补丁识别一并改变。这些行为可以单独移植，无需先迁移整个 Swift DSC 模块。
 4. 对 `vm_map_protect` 用相同输入做对照，不重复新增同一补丁。如果需要吸收上游的扫描逻辑，应保留本地对已补丁 `b` 的幂等识别。
 5. 把本地 `scripts/fw_prepare.sh:411` 的 `cp -R` 改为 `cp -Rc`（上游 `8c2cf10`）。状态：已修改。本机 APFS 上复制 200 MB 目录树的可用空间变化为 0 KB，内容、权限和符号链接一致；未对完整 IPSW 执行 `fw_prepare`。
 6. 决定 VM 格式迁移方案（见 §3.9），并在后续阶段开始前固定下来。
@@ -344,6 +348,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 | 范围 | 需要确认的结果 |
 | --- | --- |
 | 补丁 | 相同哈希输入下的 PatchRecord、payload、必需步骤、幂等、缺失/歧义拒绝；多变体门控互不混用 |
+| 相机 DSC（EXP） | 原始、全部已补丁及部分已补丁输入的状态识别；混合输入补齐；全部目标写入前校验；不匹配输入零写入；成功写入后的页面哈希一致性；日志分类与安装遇错继续策略分别验证 |
 | VM 格式 | 旧 bundle 被明确拒绝或迁移成功；迁移后启动、克隆、导入导出行为正确 |
 | 创建与恢复 | 全新 create、各阶段中断续跑、失败清理、ticket/恢复超时、配套 daemon 的实际 ping |
 | 导入 | manifest 无效的归档不占用库中的最终目录；库锁下的名称检查与放置保持原子 |
@@ -354,7 +359,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 | 位置与相机 | owner/序列/持久化、VM 重启边界、真实 CoreLocation 读数、真实帧消费和应用识别；iOS 27 应用注册 |
 | 分发 | 在不装开发工具的干净宿主上做实际操作；静态依赖检查和 `--help` smoke 不能替代 |
 
-本次完成了提交图、目录差异和关键功能的静态核对，没有产生新的固件输出或运行验收结论。
+本次完成了提交图、目录差异和关键功能的静态核对；后续补充了相机 DSC 补丁函数的内存模拟。没有产生真实固件输出或新增 VM 运行验收结论。
 
 [upstream]: https://github.com/Lakr233/vphone-cli/tree/4bab3b76b3a2b6c5d68fecd292348176dbc18c4e
 [local]: https://github.com/zhaoawd/vphone-cli/tree/6288a02ad295889d31b4bdd024fa85bcbd0f22f1

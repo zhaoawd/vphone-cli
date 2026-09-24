@@ -48,6 +48,25 @@
 
 postValidation 的已补丁形态识别，本地在 2d76f81 时已经存在；本地还要求原始候选与已补丁候选总数为一，并返回结构化 .idempotent/.ambiguous。无需再移植上游的 Bool 返回版本。这是合入范围补充，不是原文关于上游提交内容的事实错误。
 
+### 21a9ce2 后续复核：相机 DSC 的部分应用输入
+
+`21a9ce2` 正确补充了 EXP 安装捕获相机补丁错误后继续的行为，但“影响是日志不能区分状态”需要限定为全部目标已完整补丁的输入。安装继续不证明剩余目标已补齐，也不证明失败前没有写入。
+
+实验设置：使用本地 `.venv` 调用 `cfw_patch_camera_dsc.apply_all_camera_patches`，以该模块的五个 NeutrinoCore 符号和一个 AVFCapture 符号构造内存输入。指令由项目 `cfw_asm.asm` 生成：原始输入为 `pacibsp; nop` 的编码，已补丁输入分别为 `mov w0, #0; ret` 和 `mov w0, #3; ret`。符号解析、chunk 存储和 `reattest_modified_pages` 均替换为模拟实现；后者只记录调用，不重算真实页面哈希。实际补丁函数的检查、写入顺序和异常路径保持不变。
+
+| 输入状态 | 内存写入次数 | 页面哈希重算函数调用次数 | 结果 |
+| --- | ---: | ---: | --- |
+| 六个站点均为原始输入 | 6 | 2 | 两组补丁完成 |
+| 六个站点均已补丁 | 0 | 0 | 第一个 NeutrinoCore 站点报错；没有新增写入 |
+| NeutrinoCore 全部已补丁，AVFCapture 未补丁 | 0 | 0 | NeutrinoCore 阶段报错；AVFCapture 保持未补丁 |
+| 按符号排序，第一个 NeutrinoCore 站点为原始输入，第二个已补丁，其余为原始输入 | 1 | 0 | 第一个站点写入后，在第二个站点报错；未到组末的哈希重算 |
+
+源码核对：本地在循环内逐站点检查和写入，整组完成后才调用 `reattest_modified_pages`；真实 `DSCChunks.write_at_vma` 直接写入文件。上游相机 DSC 实现先解析并检查全部目标，再进入写入阶段。这支持把“部分应用后的恢复”和“写入前完整校验”列入迁移范围。该预检查不等同于对写入阶段 I/O 失败提供回滚保证。
+
+建议在 EXP 范围内识别原始、已补丁和不匹配三种状态；混合输入应能补齐剩余站点，不匹配输入应在写入前被拒绝，并验证成功写入后的页面哈希。EXP 安装遇错是否继续作为独立策略处理。以上实验没有读写真实 DSC，没有验证真实签名或 VM 行为。
+
+证据：[本地相机补丁函数](../scripts/patchers/cfw_patch_camera_dsc.py)、[chunk 写入](../scripts/patchers/cfw_dsc_chunks.py)、[EXP 安装错误处理](../scripts/cfw_install_exp.sh)、[固定上游相机 DSC 实现](https://github.com/Lakr233/vphone-cli/blob/4bab3b76b3a2b6c5d68fecd292348176dbc18c4e/Sources/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheCameraPatcher.swift)。
+
 ## 3. 可以合入什么
 
 “可以合入”表示值得选择性迁移，不表示整个上游提交已通过 cherry-pick、编译或 VM 验收。
@@ -57,7 +76,7 @@ postValidation 的已补丁形态识别，本地在 2d76f81 时已经存在；�
 | b86dcaf 导入校验前移 | 防止无效归档占用最终 VM 名称 | 002ef63 已吸收；保留本地库锁 | 已有回归测试，本次未重跑 |
 | 8c2cf10 的 APFS clone | 减少准备固件时的重复写入 | 002ef63 已吸收；不需重复合入 | 完整 IPSW 准备仍未验证 |
 | 9c23c8a 两个固件目录条目 | 增加 26.6.2/23G90、27.0/24A435 与 cloudOS 26.4 的配对 | 可优先选择性移植条目及对应菜单测试 | 只增加选择项；上游运行记录不能写成本地全部变体支持 |
-| 相机 DSC 已补丁识别 | 区分已写入 mov/ret 的输入与版本不匹配的输入 | 本地拒绝非 `pacibsp` prologue 是有意设计（`scripts/cfw_install_exp.sh:78-80`）；重跑时 EXP 安装输出 `failed (likely build-version mismatch); continuing` 并继续，安装不中断，但日志不能区分“已施加”和“不匹配”。只在 EXP 范围内增加已补丁识别，保留对不匹配输入的拒绝 | 同输入首次/重复应用、错误 prologue 拒绝、日志分类、DSC 签名一致性 |
+| 相机 DSC 状态识别与写入前校验 | 区分原始、已补丁和不匹配输入；检查全部目标后再写入 | 可在 EXP 范围内单独吸收；本地混合输入可能提前退出，或先写入后报错而未调用页面哈希重算。安装捕获错误后继续，不证明补丁完整；详见 §2 | 首次/重复/部分应用输入、剩余站点补齐、不匹配输入零写入、日志分类、页面哈希一致性；安装遇错继续策略单独验证 |
 | VPhoneSign | 进程内完成原先由 ldid 承担的签名 | 适配后合入，边界相对独立 | entitlements、CodeDirectory、实际执行 |
 | VPhoneArchive | 原生归档、解包及元数据处理 | 适配后合入；导入导出必须继续经过本地锁和占用保护 | 权限、硬链接、稀疏文件、路径与无效 manifest |
 | VPhoneRestore 与 C 后端 | 用内嵌 libirecovery/idevicerestore 替换 Python 恢复桥接 | 值得迁移；替换本地创建阶段的后端 | ECID 选择、DFU owner、TSS、超时、取消、清理及真实恢复 |
@@ -108,22 +127,27 @@ API 的 TCP 监听默认关闭；显式绑定非 loopback 地址时，上游没�
 - 旧 VPhoneControl、创建/恢复/固件 CLI、CFW 脚本与 ObjC daemon handlers：上游替换或移除，本地仍有增强行为。
 - PatchComparisonTests、VerboseJBDebug：双方移动/改名目标不同。需保留本地 FirmwareIntegrationTests 与快速测试的隔离。
 
-[全部未合并路径与冲突事件](upstream_review_2d76f81_conflicts_2026-09-24.txt)。模拟的结构化结果保存在本地 `research/artifacts/upstream_review_2d76f81_merge_2026-09-24.json`，该目录不入库。该结果只对应上述两个本地提交，可在临时仓库中用以下命令重新生成：
+[全部未合并路径与冲突事件](upstream_review_2d76f81_conflicts_2026-09-24.txt)。`21a9ce2` 已将原 JSON 快照移出版本控制，约定本地路径为 `research/artifacts/upstream_review_2d76f81_merge_2026-09-24.json`；该产物不随仓库分发。以下命令需要在包含双方提交对象的临时仓库中运行，只重新生成一次合并的 **NUL 分隔原始输出**，不会生成 JSON：
 
 ```sh
-git merge-tree --write-tree --messages -z <local-commit> 4bab3b76b3a2b6c5d68fecd292348176dbc18c4e
+git merge-tree --write-tree --messages -z \
+  2c604ea51361c0328964c7edf8b4c634cc4d3c81 \
+  4bab3b76b3a2b6c5d68fecd292348176dbc18c4e \
+  > /tmp/vphone-merge-2c604ea-4bab3b7.bin
 ```
+
+复核另一组结果时，将第一个提交参数替换为 `2d76f814490e23e599197c22929f4b50071a978a`，并使用不同输出文件名。存在合并冲突时，该命令退出码为 1，仍会输出冲突结果。恢复原 JSON 格式还需要解析 NUL 分隔字段，并组合两次模拟及其元数据；这里不提供该 JSON 重建脚本，也不将原始输出标为 JSON。
 
 ## 6. 建议的合入顺序
 
-1. 先修正文档的 shell 覆盖结论，并标明导入/APFS clone 已完成。选择性移植两个固件目录条目，并在 EXP 范围内为相机 DSC 补丁增加已补丁识别。
+1. 文档的 shell 覆盖结论已修正，导入/APFS clone 已完成。后续选择性移植两个固件目录条目，并在 EXP 范围内增加相机 DSC 三种状态识别、全部目标写入前校验及混合输入补齐；安装遇错继续策略单独处理，无需先迁移整个 Swift DSC 模块。
 2. 独立引入签名、归档、恢复模块，保留本地阶段合约、排他锁和错误状态。原生恢复先完成探测/ticket/错误路径验证，再做真实恢复。
 3. 成套迁移进程拆分与权限检查，验证停止身份、DFU owner、双 VM 和退出后的资源释放。
 4. 保留本地宿主 API 和状态模型，引入 HTTP/WebSocket 客户机传输；逐项迁移 shell、位置所有权、相机回执、手势路由和取消/迟到响应处理。客户端库可复用，但不替代这些语义。
 5. 在 VM 格式和客户机升级路径确定后迁移 v2 manifest、原生 CFW/GPU 流程；保留多变体安装器和需要的附带客户机环境。
 6. 最后统一目录、名称、构建和 CI。目录变更可预先作为独立准备提交，但应避免与协议及补丁逻辑混在一个提交中。
 
-本次没有执行构建、测试、固件补丁、恢复或 VM 启动。补丁比较仅复核实现与既有研究记录，没有新增同输入二进制对照结果。上述顺序是基于依赖和现有实现的整合建议，不是运行验收结论。
+本次没有执行构建、项目测试套件、真实固件补丁、恢复或 VM 启动。后续相机 DSC 实验只使用内存模拟输入验证本地函数控制流，没有新增真实固件同输入二进制对照或签名验证结果。上述顺序是基于依赖和现有实现的整合建议，不是运行验收结论。
 
 ## 7. 关键源码证据
 
