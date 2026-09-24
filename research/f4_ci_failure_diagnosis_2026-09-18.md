@@ -423,3 +423,27 @@ $ git merge-base --is-ancestor 2011bc7 799d168
 5. `--concurrency > 1` 下"按 `seq` 相邻即预约相邻"不成立；该测试用并发 1，仓库中无并发 > 1 的 latency 测试，未覆盖。
 6. `t_paced_ns` 只在假服务端下验证，未在真机 latency 运行中取值。
 7. 本次未执行 `make build`、未启动 VM。
+
+## 7. 2026-09-19 补充：`557ce11` 的宿主采样测试失败
+
+运行 `35411246357`（`557ce11`）的 Python 3.14 作业失败。唯一失败项为
+`test_new_virtualization_pid_is_tracked_with_lstart`：测试已确认新 Virtualization PID
+进入 `tracked`，但只查找 `measurement == "ps"` 的进程记录，结果为空。Python 3.13
+作业通过。
+
+原因已查明。`sample_processes()` 在慢采样到期的 tick 上把 `footprint` 合入同一条
+进程记录，并将 `measurement` 记为 `ps+footprint`。CI 调度使发现新 PID 的第二个
+process tick 跨过 0.1 秒慢采样边界；新 PID 已采样，但测试排除了这条合法记录。
+该失败不表示宿主采样器遗漏新 PID。
+
+测试加入 120 毫秒受控延迟，稳定制造第二个 process tick 跨过慢采样边界的条件。
+修改前该用例在 0.67 秒内得到与 CI 相同的空列表断言；修改后按
+`measurement.startswith("ps")` 查找进程记录，并确认受控场景实际得到
+`ps+footprint`。定向用例连续 11 次通过，`tests.test_f3_host_sampler` 29 项通过。
+
+完整本地回归未完成。`make test` 在测试开始前被当前主机未接受的 Xcode 许可阻止；
+直接运行 Python 入口时，沙箱禁止 Unix socket 绑定，客户机组件编译同样被 Xcode
+许可阻止。未修改系统许可状态。
+
+2026-09-24 更新：含该改法的工作区执行 `make test` 通过，其中 Python 352 项通过
+（含本用例），Swift Testing 与 XCTest 无失败。改法随后提交并推送，尚未在 CI 上验证。

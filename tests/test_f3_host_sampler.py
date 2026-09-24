@@ -479,7 +479,15 @@ class SamplerRunTests(TemporaryDirectoryCase):
     def test_new_virtualization_pid_is_tracked_with_lstart(self):
         # First listing: --vz-baseline. Second: first scan. Third onwards: the new PID.
         stub = CommandStub(ps_comm=[PS_COMM, PS_COMM, PS_COMM_EXTRA])
-        _output, samples, report = self.run_sampler(stub, ["--vz-baseline"])
+        original_sample_host = sampler.Sampler.sample_host
+
+        def delayed_sample_host(instance):
+            # Force the second process tick past the slower footprint interval.
+            time.sleep(0.12)
+            return original_sample_host(instance)
+
+        with mock.patch.object(sampler.Sampler, "sample_host", delayed_sample_host):
+            _output, samples, report = self.run_sampler(stub, ["--vz-baseline"])
         scans = [record for record in samples if record["kind"] == "vz_scan"]
         self.assertGreaterEqual(len(scans), 2)
         self.assertEqual(scans[0]["pids"], [41311])
@@ -489,8 +497,10 @@ class SamplerRunTests(TemporaryDirectoryCase):
         self.assertFalse(appeared[0]["in_baseline"])
         self.assertEqual(report["vz_baseline"]["pids"], [41311])
         self.assertIn(52000, [item["pid"] for item in report["tracked"]])
-        self.assertTrue([record for record in samples if record["kind"] == "process"
-                         and record["pid"] == 52000 and record["measurement"] == "ps"])
+        process = next(record for record in samples if record["kind"] == "process"
+                       and record["pid"] == 52000
+                       and record["measurement"].startswith("ps"))
+        self.assertEqual(process["measurement"], "ps+footprint")
 
     def test_explicit_pids_are_marked_by_executable_not_by_how_they_were_supplied(self):
         """§3.3: is_vz comes from the sampler's own scan, for --pid entries too."""
