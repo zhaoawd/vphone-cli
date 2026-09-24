@@ -14,7 +14,7 @@
 
 修订记录：初版以上游 `3f70114` 为基线。同日复核后改为以 `4bab3b7` 为基线，修正 §3.1、§3.3、§3.8 和 §4 的表述，并补充 §3.9 以及 §3.5、§4、§5、§6 中遗漏的内容。
 
-后续复核：修正 `icli.execute` 对 shell 的覆盖结论，确认 `postValidation` 幂等处理本地已具备，并补充截至本地 `2c604ea` 的合并模拟结果。完整分析见 [2d76f81 复核与合入建议](upstream-review-2d76f81.md)。
+后续复核：修正 `icli.execute` 对 shell 的覆盖结论，确认 `postValidation` 幂等处理本地已具备，并补充截至本地 `2c604ea` 的合并模拟结果。完整分析见 [2d76f81 复核与合入建议](upstream_review_2d76f81_2026-09-24.md)。
 
 ## 1. 比较基线与证据范围
 
@@ -29,7 +29,7 @@
 | 上游相对共同祖先的文本统计 | 649 个文件，新增 87,348 行、删除 26,915 行 |
 | 两个最终目录树的文本统计 | 900 个文件，新增 90,244 行、删除 98,285 行；方向为本仓库 → 上游 |
 
-统计排除仓库根目录 `TODO.md`。上游独有提交中，109 个集中在 9 月 22—24 日。按 Git 默认相似度检测，上游相对共同祖先有 207 个文件被标为重命名；这个计数不能覆盖所有拆分、改名和格式化。
+统计排除仓库根目录 `TODO.md`；比较涉及的各个树均未跟踪该文件，排除不改变结果。上游独有提交中，109 个集中在 9 月 22—24 日。按 Git 默认相似度检测，上游相对共同祖先有 207 个文件被标为重命名；这个计数不能覆盖所有拆分、改名和格式化。
 
 初版基线 `3f70114` 之后，上游又有 9 个提交：
 
@@ -225,7 +225,7 @@ CFW 安装新增了几项前置检查：
 
 不建议用上游扫描器覆盖本地算法。应先对相同哈希的输入，比较两边的候选、修改地址、指令和输出，再判断是否需要增加兼容分支。地址只用于证据对照，不应写入补丁逻辑。
 
-DSC 补丁的幂等处理同样存在差异。上游 Swift 版能识别已补丁的 prologue，并按成功处理。本地 `scripts/patchers/cfw_patch_camera_dsc.py:111-114` 要求 prologue 必须是 `pacibsp`，否则报错（除非加 `--force`），因此对已补丁的输入会失败。本地的 maxslide、hv_vmm_dsc 和 dsc_codesign 已有幂等处理。
+DSC 补丁的幂等处理同样存在差异。上游 Swift 版能识别已补丁的 prologue，并按成功处理。本地 `scripts/patchers/cfw_patch_camera_dsc.py:111-114` 要求 prologue 必须是 `pacibsp`，否则报错（除非加 `--force`），因此对已补丁的输入会失败。这是有意设计（`scripts/cfw_install_exp.sh:78-80`）：重跑时 EXP 安装输出 `camera DSC patch: failed (likely build-version mismatch); continuing` 并继续，安装不中断。实际影响是日志不能区分“已施加”和“版本不匹配”。本地的 maxslide、hv_vmm_dsc 和 dsc_codesign 已有幂等处理。
 
 上游 `6d5ce7d` 记录了 26.4 用户态 + cloudOS 26.4 的启动情况，以及 SpringBoard、Safari、Sileo 的观察结果，但明确说明没有专门验证 debugger attach 和 tweak RWX 写入。这条记录早于当前移除默认 bootstrap 的流程，不能作为当前默认镜像包含 Sileo 的证据。
 
@@ -309,7 +309,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 1. **修复本地导入缺陷。** 本地 `sources/VPhoneCore/VPhoneBundleOps.swift:391` 在库锁内把解包结果移入库中的最终目录，`:393` 在锁外调用 `VPhoneBundle.load`。`:365` 的 `defer` 只清理暂存目录。因此，manifest 无效的归档会留在库中的最终目录，占用该名称，且不会被清理。上游 `b86dcaf` 的做法是先在暂存目录内完成 `VPhoneBundle.load`，验证通过后再移入库（`Sources/VPhoneArchive/VPhoneBundleTransfer.swift`）。修复时保留本地的库锁，只把验证前移，并补充一个无效 manifest 的回归测试。
    状态：已修复。`importArchive` 在暂存目录内加载 manifest，通过后才在库锁内移入最终目录；回归测试为 `tests/VPhoneCoreTests/BundleOpsTests.swift` 的 `importRejectsInvalidManifestWithoutPlacingBundle`。
 2. 补充两个精确的固件配对条目，同时保持本地兼容性证据的分级。
-3. 核对 Swift DSC 移植中对已补丁形态的识别，与本地 Python 的幂等处理对比，只吸收本地缺失的行为。已确认一处差异：`cfw_patch_camera_dsc.py` 不能识别已补丁的输入。
+3. 核对 Swift DSC 移植中对已补丁形态的识别，与本地 Python 的幂等处理对比，只吸收本地缺失的行为。已确认一处差异：`cfw_patch_camera_dsc.py` 不区分已补丁输入和不匹配输入。只在 EXP 范围内增加已补丁识别，保留对不匹配输入的拒绝。
 4. 对 `vm_map_protect` 用相同输入做对照，不重复新增同一补丁。如果需要吸收上游的扫描逻辑，应保留本地对已补丁 `b` 的幂等识别。
 5. 把本地 `scripts/fw_prepare.sh:411` 的 `cp -R` 改为 `cp -Rc`（上游 `8c2cf10`）。状态：已修改。本机 APFS 上复制 200 MB 目录树的可用空间变化为 0 KB，内容、权限和符号链接一致；未对完整 IPSW 执行 `fw_prepare`。
 6. 决定 VM 格式迁移方案（见 §3.9），并在后续阶段开始前固定下来。
@@ -337,7 +337,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 
 先确定继续支持哪些固件变体和附带的客户机环境，再修改 CFW 编排。目录/类型重命名可以单独提交，便于核对逻辑变化。最后统一构建命令、资源清单、测试入口和发布检查。上游 CI 不运行测试，本地的回归 workflow 需要保留。
 
-不建议直接用上游目录树覆盖本仓库。后续已用 Git 2.53.0 在临时裸仓库中模拟三方合并：排除根目录 `TODO.md` 后，`2d76f81` 与上游 `4bab3b7` 有 313 个未合并路径，本地 `2c604ea` 与同一上游有 315 个。后者包含 54 条内容冲突、57 条修改/删除冲突、200 条目录迁移提示和 2 条重命名冲突。路径数和事件数是不同统计单位；这些结果不构成工时或行为兼容性结论。方法及限制见 [复核报告](upstream-review-2d76f81.md)，具体路径见 [冲突清单](upstream-review-2d76f81-conflicts.txt)。
+不建议直接用上游目录树覆盖本仓库。后续已用 Git 2.53.0 在临时裸仓库中模拟三方合并。排除根目录 `TODO.md` 后（各树均未跟踪该文件，结果不变），`2d76f81` 与上游 `4bab3b7` 有 313 个未合并路径，本地 `2c604ea` 与同一上游有 315 个。后者包含 54 条内容冲突（其中 1 条为 `Package.resolved` 的 add/add 冲突）、57 条修改/删除冲突、200 条目录迁移提示和 2 条重命名冲突。路径数和事件数是不同统计单位；这些结果不构成工时或行为兼容性结论。方法及限制见 [复核报告](upstream_review_2d76f81_2026-09-24.md)，具体路径见 [冲突清单](upstream_review_2d76f81_conflicts_2026-09-24.txt)。
 
 ## 6. 后续验收的最低范围
 

@@ -17,7 +17,7 @@
 
 2d76f81 只修改 research/upstream_comparison_2026-09-24.md，没有引入上游生产代码。本次从 Git 获取固定上游版本，核对关键入口和实现，并用 Git 2.53.0 在临时裸仓库模拟三方合并。
 
-按仓库规则，在共同祖先、本地、上游的顶层树中排除 TODO.md，再构造仅供模拟的提交。没有读取该文件内容。模拟未修改原仓库的分支、remote、索引或工作区，也未解决或提交冲突。
+按仓库规则，在共同祖先、本地、上游的顶层树中排除 TODO.md，再构造仅供模拟的提交。没有读取该文件内容。事后核对：这三个树及 2d76f81 中均未跟踪 TODO.md，排除步骤不改变模拟输入；直接对原提交执行 `git merge-tree --write-tree` 得到相同计数。模拟未修改原仓库的分支、remote、索引或工作区，也未解决或提交冲突。
 
 重新计算得到原报告的 178 个本地独有提交、114 个上游独有提交，以及 649 文件/87,348 新增行/26,915 删除行的上游变化统计，均与原报告一致。大量变化来自文件拆分、目录改名、Swift 移植和内嵌 C 依赖，不能当作独立新增功能数量。
 
@@ -57,7 +57,7 @@ postValidation 的已补丁形态识别，本地在 2d76f81 时已经存在；�
 | b86dcaf 导入校验前移 | 防止无效归档占用最终 VM 名称 | 002ef63 已吸收；保留本地库锁 | 已有回归测试，本次未重跑 |
 | 8c2cf10 的 APFS clone | 减少准备固件时的重复写入 | 002ef63 已吸收；不需重复合入 | 完整 IPSW 准备仍未验证 |
 | 9c23c8a 两个固件目录条目 | 增加 26.6.2/23G90、27.0/24A435 与 cloudOS 26.4 的配对 | 可优先选择性移植条目及对应菜单测试 | 只增加选择项；上游运行记录不能写成本地全部变体支持 |
-| 相机 DSC 幂等识别 | 对已写入 mov/ret 的输入识别为已施加 | 可单独吸收行为；保持 EXP 范围 | 同输入首次/重复应用、错误 prologue 拒绝、DSC 签名一致性 |
+| 相机 DSC 已补丁识别 | 区分已写入 mov/ret 的输入与版本不匹配的输入 | 本地拒绝非 `pacibsp` prologue 是有意设计（`scripts/cfw_install_exp.sh:78-80`）；重跑时 EXP 安装输出 `failed (likely build-version mismatch); continuing` 并继续，安装不中断，但日志不能区分“已施加”和“不匹配”。只在 EXP 范围内增加已补丁识别，保留对不匹配输入的拒绝 | 同输入首次/重复应用、错误 prologue 拒绝、日志分类、DSC 签名一致性 |
 | VPhoneSign | 进程内完成原先由 ldid 承担的签名 | 适配后合入，边界相对独立 | entitlements、CodeDirectory、实际执行 |
 | VPhoneArchive | 原生归档、解包及元数据处理 | 适配后合入；导入导出必须继续经过本地锁和占用保护 | 权限、硬链接、稀疏文件、路径与无效 manifest |
 | VPhoneRestore 与 C 后端 | 用内嵌 libirecovery/idevicerestore 替换 Python 恢复桥接 | 值得迁移；替换本地创建阶段的后端 | ECID 选择、DFU owner、TSS、超时、取消、清理及真实恢复 |
@@ -92,12 +92,12 @@ API 的 TCP 监听默认关闭；显式绑定非 loopback 地址时，上游没�
 | 结果 | 2d76f81 → 上游 4bab3b7 | 当前 2c604ea → 上游 4bab3b7 |
 | --- | ---: | ---: |
 | 未合并路径数 | 313 | 315 |
-| 内容冲突事件 | 54 | 54 |
+| 内容冲突事件（含 1 条 add/add） | 54 | 54 |
 | 修改/删除冲突事件 | 56 | 57 |
 | 目录迁移提示事件 | 199 | 200 |
 | 重命名/重命名冲突事件 | 2 | 2 |
 
-路径数和事件数的统计单位不同；同一重命名冲突可能涉及多个路径。200 条目录迁移提示不等于 200 处逻辑冲突，也不代表目录可以全部自动接受。例如，Git 建议把本地若干输入/宿主诊断文档统一移到 Research/Kernel，仍需人工确定归属。
+内容冲突事件按 `--messages -z` 的消息类型 `CONFLICT (contents)` 统计，其中 53 条为普通内容冲突，1 条为 `Package.resolved` 的 add/add 冲突。路径数和事件数的统计单位不同；同一重命名冲突可能涉及多个路径。200 条目录迁移提示不等于 200 处逻辑冲突，也不代表目录可以全部自动接受。例如，Git 建议把本地若干输入/宿主诊断文档统一移到 Research/Kernel，仍需人工确定归属。
 
 主要冲突位置：
 
@@ -108,11 +108,15 @@ API 的 TCP 监听默认关闭；显式绑定非 loopback 地址时，上游没�
 - 旧 VPhoneControl、创建/恢复/固件 CLI、CFW 脚本与 ObjC daemon handlers：上游替换或移除，本地仍有增强行为。
 - PatchComparisonTests、VerboseJBDebug：双方移动/改名目标不同。需保留本地 FirmwareIntegrationTests 与快速测试的隔离。
 
-[全部未合并路径与冲突事件](./upstream-review-2d76f81-conflicts.txt)。[模拟结构化结果](./upstream-review-2d76f81-merge.json)。
+[全部未合并路径与冲突事件](upstream_review_2d76f81_conflicts_2026-09-24.txt)。模拟的结构化结果保存在本地 `research/artifacts/upstream_review_2d76f81_merge_2026-09-24.json`，该目录不入库。该结果只对应上述两个本地提交，可在临时仓库中用以下命令重新生成：
+
+```sh
+git merge-tree --write-tree --messages -z <local-commit> 4bab3b76b3a2b6c5d68fecd292348176dbc18c4e
+```
 
 ## 6. 建议的合入顺序
 
-1. 先修正文档的 shell 覆盖结论，并标明导入/APFS clone 已完成。选择性移植两个固件目录条目和相机 DSC 幂等行为。
+1. 先修正文档的 shell 覆盖结论，并标明导入/APFS clone 已完成。选择性移植两个固件目录条目，并在 EXP 范围内为相机 DSC 补丁增加已补丁识别。
 2. 独立引入签名、归档、恢复模块，保留本地阶段合约、排他锁和错误状态。原生恢复先完成探测/ticket/错误路径验证，再做真实恢复。
 3. 成套迁移进程拆分与权限检查，验证停止身份、DFU owner、双 VM 和退出后的资源释放。
 4. 保留本地宿主 API 和状态模型，引入 HTTP/WebSocket 客户机传输；逐项迁移 shell、位置所有权、相机回执、手势路由和取消/迟到响应处理。客户端库可复用，但不替代这些语义。
@@ -123,7 +127,7 @@ API 的 TCP 监听默认关闭；显式绑定非 loopback 地址时，上游没�
 
 ## 7. 关键源码证据
 
-- [原评估文档](../research/upstream_comparison_2026-09-24.md)
+- [原评估文档](upstream_comparison_2026-09-24.md)
 - [本地进程识别](../sources/VPhoneCore/VPhoneLaunchLayout.swift)
 - [本地占用保护](../sources/VPhoneCore/VPhoneBundleGuard.swift)
 - [本地停止身份检查](../sources/VPhoneCore/VPhoneVMStopper.swift)
