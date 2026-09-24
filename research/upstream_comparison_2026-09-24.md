@@ -303,10 +303,11 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 ### 第一阶段：小范围修正和事实同步
 
 1. **修复本地导入缺陷。** 本地 `sources/VPhoneCore/VPhoneBundleOps.swift:391` 在库锁内把解包结果移入库中的最终目录，`:393` 在锁外调用 `VPhoneBundle.load`。`:365` 的 `defer` 只清理暂存目录。因此，manifest 无效的归档会留在库中的最终目录，占用该名称，且不会被清理。上游 `b86dcaf` 的做法是先在暂存目录内完成 `VPhoneBundle.load`，验证通过后再移入库（`Sources/VPhoneArchive/VPhoneBundleTransfer.swift`）。修复时保留本地的库锁，只把验证前移，并补充一个无效 manifest 的回归测试。
+   状态：已修复。`importArchive` 在暂存目录内加载 manifest，通过后才在库锁内移入最终目录；回归测试为 `tests/VPhoneCoreTests/BundleOpsTests.swift` 的 `importRejectsInvalidManifestWithoutPlacingBundle`。
 2. 补充两个精确的固件配对条目，同时保持本地兼容性证据的分级。
 3. 核对 Swift DSC 移植中对已补丁形态的识别，与本地 Python 的幂等处理对比，只吸收本地缺失的行为。已确认一处差异：`cfw_patch_camera_dsc.py` 不能识别已补丁的输入。
 4. 对 `vm_map_protect` 用相同输入做对照，不重复新增同一补丁。如果需要吸收上游的扫描逻辑，应保留本地对已补丁 `b` 的幂等识别。
-5. 把本地 `scripts/fw_prepare.sh:411` 的 `cp -R` 改为 `cp -Rc`（上游 `8c2cf10`）。
+5. 把本地 `scripts/fw_prepare.sh:411` 的 `cp -R` 改为 `cp -Rc`（上游 `8c2cf10`）。状态：已修改。本机 APFS 上复制 200 MB 目录树的可用空间变化为 0 KB，内容、权限和符号链接一致；未对完整 IPSW 执行 `fw_prepare`。
 6. 决定 VM 格式迁移方案（见 §3.9），并在后续阶段开始前固定下来。
 
 ### 第二阶段：原生基础模块

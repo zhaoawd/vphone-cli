@@ -408,7 +408,10 @@ extract() {
     fi
     rm -rf "$out"
     echo "==> Cloning ${cache##*/} → ${out##*/} ..."
-    cp -R "$cache" "$out"
+    # -c makes this the APFS clone the message claims; plain -R writes a full
+    # second copy of the extracted IPSW (~11.5 GB for an iPhone restore).
+    # cp falls back to copyfile(2) where the target cannot be cloned.
+    cp -Rc "$cache" "$out"
 }
 
 download_apfs_sealvolume() {

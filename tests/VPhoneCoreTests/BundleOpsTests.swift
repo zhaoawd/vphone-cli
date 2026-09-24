@@ -362,6 +362,30 @@ struct BundleOpsTests {
         }
     }
 
+    @Test func importRejectsInvalidManifestWithoutPlacingBundle() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        // A single top-level dir whose config.plist exists but does not parse.
+        let src = root.appendingPathComponent("src")
+        let bundleDir = src.appendingPathComponent("broken")
+        try FileManager.default.createDirectory(at: bundleDir, withIntermediateDirectories: true)
+        try Data("not a plist".utf8).write(to: bundleDir.appendingPathComponent("config.plist"))
+        let archive = root.appendingPathComponent("broken.tgz")
+        let made = try VPhoneProcessRunner.runCapturing(
+            URL(fileURLWithPath: "/usr/bin/tar"), ["-czf", archive.path, "-C", src.path, "broken"])
+        #expect(made.succeeded)
+
+        let libRoot = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: libRoot) }
+        let lib = VPhoneLibrary(root: libRoot)
+        #expect(throws: VPhoneManifestError.self) {
+            _ = try VPhoneBundleOps.importArchive(from: archive, name: nil, in: lib)
+        }
+        // The rejected bundle must not occupy its library name, and staging is gone.
+        #expect(!FileManager.default.fileExists(atPath: lib.url(forName: "broken").path))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: libRoot.path).isEmpty)
+    }
+
     // MARK: - Compression presets
 
     private static let zstdMagic: [UInt8] = [0x28, 0xB5, 0x2F, 0xFD]

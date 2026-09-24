@@ -383,6 +383,9 @@ public enum VPhoneBundleOps {
             throw VPhoneBundleOpsError.badArchive(
                 "archive did not contain a valid bundle (\(archived)/config.plist)")
         }
+        // Parse the manifest while the bundle is still in staging: a bundle that
+        // fails to load must never occupy its library name.
+        let staged = try VPhoneBundle.load(at: extracted)
         // Extraction ran outside the lock (it only writes into the private
         // staging dir); the name check and the placement are one lock lifetime.
         try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
@@ -390,7 +393,7 @@ public enum VPhoneBundleOps {
             afterNameCheck?()
             try fm.moveItem(at: extracted, to: dst)
         }
-        return try VPhoneBundle.load(at: dst)
+        return VPhoneBundle(url: dst, manifest: staged.manifest)
     }
 
     private static func fileByteSize(_ url: URL) -> Int64 {
