@@ -14,12 +14,14 @@
 
 修订记录：初版以上游 `3f70114` 为基线。同日复核后改为以 `4bab3b7` 为基线，修正 §3.1、§3.3、§3.8 和 §4 的表述，并补充 §3.9 以及 §3.5、§4、§5、§6 中遗漏的内容。
 
+后续复核：修正 `icli.execute` 对 shell 的覆盖结论，确认 `postValidation` 幂等处理本地已具备，并补充截至本地 `2c604ea` 的合并模拟结果。完整分析见 [2d76f81 复核与合入建议](upstream-review-2d76f81.md)。
+
 ## 1. 比较基线与证据范围
 
 | 对象 | 版本 / 结果 |
 | --- | --- |
 | 本仓库比较分支 | `codex/autophone-location-multivm-integration`，不是本地 `main` |
-| 本仓库比较版本 | `6288a02ad295889d31b4bdd024fa85bcbd0f22f1`，2026-09-22。其后的提交只增加或修改本报告，`sources`、`scripts`、`tests` 无变化 |
+| 本仓库比较版本 | `6288a02ad295889d31b4bdd024fa85bcbd0f22f1`，2026-09-22。截至 `2d76f81`，其后的提交只修改本报告；后续 `002ef63` 和 `ecf7bde` 已修改代码或测试，见复核报告 |
 | 上游 `Lakr233/vphone-cli` 的 `main` | `4bab3b76b3a2b6c5d68fecd292348176dbc18c4e`，2026-09-24 |
 | 共同祖先 | `87f796c62a7cb385cd37afce121f6e222d83e5b5`，2026-09-01 |
 | 上游独有提交 | 114 个，其中 106 个非合并提交 |
@@ -197,7 +199,9 @@ CFW 安装新增了几项前置检查：
 
 非 loopback 部署必须在部署层提供访问控制。
 
-上游已有的组件可以减少本地自研的范围：`VPhoneAPIKit`（含 WebSocket 客户端）、`/openapi.json`、`icli.execute` 和流式文件传输，能覆盖本地的文件、应用和 shell 命令。本地需要保留的，主要是 E1–E4 的期限、取消和迟到响应语义，以及定位所有权和相机回执。
+上游的 `VPhoneAPIKit`（含 WebSocket 客户端）、`/openapi.json`、`icli.execute` 和流式文件传输，可以复用为文件、应用及 icli 命令的访问入口，但仍需核对本地参数和返回值语义。`icli.execute` 不能覆盖本地任意 shell 执行：上游 `IcliCommand.execute` 固定启动 `/usr/bin/icli`，固定依赖 icli 0.6.1 的命令树没有 shell，其 README 明确说明 shell 在 0.3.0 被移除。本地 `runShell` 的命令、`cwd`、`timeout_ms`、输出与退出状态，以及依赖它的客户机关机流程，需要单独迁移。证据：[上游执行入口](https://github.com/Lakr233/vphone-cli/blob/4bab3b76b3a2b6c5d68fecd292348176dbc18c4e/Scripts/VPhoned/Daemon/IcliCommand.swift)、[固定 icli 版本说明](https://github.com/owngoal-dev/icli/blob/c3407df5f160919b5eb7d2fefb5a5c21351314fb/README.md#L197)。
+
+本地还需保留 E1–E4 的期限、取消和迟到响应语义，以及定位所有权和相机回执。新传输层不能自动提供这些状态机制。
 
 代表提交：`11f9dc4`、`c8d155e`、`8eecc0d`。证据：[API 合约][api]、[宿主基本自动化入口][automation]、[宿主客户机控制][guest-control]、[客户机命令实现][guest-api]；本地 [E1 合约](host_control_protocol_e1_2026-09-11.md)、[E2 生命周期](host_control_e2_2026-09-12.md)。
 
@@ -208,7 +212,7 @@ CFW 安装新增了几项前置检查：
 上游 FirmwarePatcher 目录下的提交大多是移植、改名或重构。涉及补丁行为的有两个：
 
 - `05b4181`：新增 cloudOS 26.4 `vm_map_protect` 的 BIC/CMP/CCMP 形态（Shape C）匹配。**本仓库已在 2026-09-09 实现了针对同一分支门控的修正。**
-- `8c2cf10`：`patchPostValidationAdditional` 在同一站点已被基础层第 9 项修改时，改为识别为已施加，不再输出“找到 0 个站点”的错误日志。补丁目标和总数（164）不变。该提交还有一处非补丁修改：把 `fw_prepare.sh` 的 `cp -R` 改为 `cp -Rc`（APFS clone）。按提交记录，这样可以省去 iPhone 恢复目录约 11.5 GB 的重复写入。本地 `scripts/fw_prepare.sh:411` 仍是 `cp -R`。
+- `8c2cf10`：`patchPostValidationAdditional` 在同一站点已被基础层第 9 项修改时，改为识别为已施加，不再输出“找到 0 个站点”的错误日志。补丁目标和总数（164）不变。本地在 `2d76f81` 时已经识别已补丁形态，并要求原始候选与已补丁候选总数为一，返回结构化的 `.idempotent` 或 `.ambiguous`，无需用上游的 Bool 返回版本替换。该提交还有一处非补丁修改：把 `fw_prepare.sh` 的 `cp -R` 改为 `cp -Rc`（APFS clone）。按上游提交记录，这样可以省去 iPhone 恢复目录约 11.5 GB 的重复写入。本地原比较基线仍是 `cp -R`，后续 `002ef63` 已改为 `cp -Rc`。
 
 | 比较项 | 本仓库 | 上游 |
 | --- | --- | --- |
@@ -318,12 +322,12 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 
 ### 第三阶段：API 与客户机协议
 
-把 HTTP/WebSocket 作为独立的迁移项。有两种方案可以比较：
+把 HTTP/WebSocket 作为独立的迁移项。以下两项可以组合实施：
 
 - **A：保留本地 Unix socket 的对外合约**，在其下对接新的 guest API；
-- **B：基于 `VPhoneAPIKit` 做一层宿主适配**，复用上游的 API 客户端、OpenAPI、`icli.execute` 和流式文件传输，本地只实现 E1–E4 的期限、取消和迟到响应语义，以及定位所有权和相机回执。
+- **B：基于 `VPhoneAPIKit` 做一层宿主适配**，复用上游的 API 客户端、OpenAPI、`icli.execute` 和流式文件传输；继续保留 E1–E4 的期限、取消和迟到响应语义、定位所有权及相机回执，并单独迁移 shell handler、所需客户机环境和依赖 shell 的关机操作。
 
-方案 B 需要自研的范围较小，但需要确认上游 API 的超时和乱序响应能否承载 E1–E4 语义。
+采用 B 可以复用已有客户端实现，但具体减少的开发范围尚未验证。需要确认上游 API 的超时和乱序响应能否承载 E1–E4 语义，并逐项核对现有命令的参数和返回值。
 
 旧客户机的升级路径需要在两种方式中选择：一是 §3.5 所述的缓存迁移（待验证假设），二是配套安装新镜像。定位所有权、相机回执和取消语义必须同时映射到新 guest API，避免出现传输可用但业务状态缺失的情况。
 
@@ -333,7 +337,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 
 先确定继续支持哪些固件变体和附带的客户机环境，再修改 CFW 编排。目录/类型重命名可以单独提交，便于核对逻辑变化。最后统一构建命令、资源清单、测试入口和发布检查。上游 CI 不运行测试，本地的回归 workflow 需要保留。
 
-不建议直接用最新上游目录树覆盖本仓库。保留双方历史的整合方式可行，但本次尚未模拟 merge，无法给出准确的冲突文件数和工时。建议下一步在临时仓库中做一次 `git merge --no-commit`，得到冲突清单后再评估。
+不建议直接用上游目录树覆盖本仓库。后续已用 Git 2.53.0 在临时裸仓库中模拟三方合并：排除根目录 `TODO.md` 后，`2d76f81` 与上游 `4bab3b7` 有 313 个未合并路径，本地 `2c604ea` 与同一上游有 315 个。后者包含 54 条内容冲突、57 条修改/删除冲突、200 条目录迁移提示和 2 条重命名冲突。路径数和事件数是不同统计单位；这些结果不构成工时或行为兼容性结论。方法及限制见 [复核报告](upstream-review-2d76f81.md)，具体路径见 [冲突清单](upstream-review-2d76f81-conflicts.txt)。
 
 ## 6. 后续验收的最低范围
 
@@ -345,7 +349,7 @@ GUI 中的文件、应用、Keychain 浏览器、录屏、菜单、位置预设/
 | 导入 | manifest 无效的归档不占用库中的最终目录；库锁下的名称检查与放置保持原子 |
 | 显示 | 最终 GPU 来源 + compiler plugin + HTTP daemon 组合下的锁屏、持续显示、Metal 编译和重启 |
 | 生命周期 | 同 VM 互斥、双 VM 隔离、离线操作拒绝、停止目标身份和锁释放；确认 `vphone-vm` 与 Virtualization.framework 辅助进程的关系 |
-| API | 旧镜像迁移、GUI/headless、文件流、断线重连、期限和迟到响应、旧脚本兼容；非 loopback 监听的访问控制 |
+| API | 旧镜像迁移、GUI/headless、文件流、断线重连、期限和迟到响应、旧脚本兼容；任意 shell 执行及依赖它的关机操作；非 loopback 监听的访问控制 |
 | 输入 | GUI 与 API 两个入口在 iOS 26 前后各自的注入路径；重连时手势不会被拆到两条路径上 |
 | 位置与相机 | owner/序列/持久化、VM 重启边界、真实 CoreLocation 读数、真实帧消费和应用识别；iOS 27 应用注册 |
 | 分发 | 在不装开发工具的干净宿主上做实际操作；静态依赖检查和 `--help` smoke 不能替代 |
