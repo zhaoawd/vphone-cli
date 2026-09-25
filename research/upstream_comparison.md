@@ -139,7 +139,19 @@ CFW 需要 root、空闲磁盘和大于 50 GiB 可用空间；这些检查不代
 
 上游现在使用 `VPhone.xcworkspace` 的 `VPhone` scheme。`VPhone.bundle` 是 `BNDL` 容器，没有 `CFBundleExecutable`；入口仍为 `Contents/MacOS/vphone-cli`，其启动同目录的 `vphone-vm`。VM 私有 entitlements、客户机 daemon entitlements 和普通宿主 CLI 的签名分开。`VPhoneEscalator` 替代此前的 AMFI 辅助程序；归档入口变成 `vphone-cli archive`。
 
-`StageBundle.sh` 嵌套构建恢复模块、CLI、iOS daemon、AMFI 辅助程序及 guest components，然后复制、签名和校验。它还为宿主 VM 处理 `libswiftCompatibilitySpan.vphone.dylib`，并拒绝依赖 `_swift_initBorrow` 的 daemon。daemon 工程固定 Swift Collections 1.6.0；workspace 与 daemon 的 lockfile 固定 icli 0.6.9、SwiftNIO 2.83.0。归档依赖升级为提供 `ArchiveKit` 的 `libarchive.xcframework` 1.0.0。不同子工程有自己的 lockfile，不能只迁移根 workspace 的一份。
+`StageBundle.sh` 嵌套构建恢复模块、CLI、iOS daemon、AMFI 辅助程序及 guest components，然后复制、签名和校验。它还为宿主 VM 处理 `libswiftCompatibilitySpan.vphone.dylib`，并拒绝依赖 `_swift_initBorrow` 的 daemon。归档依赖升级为提供 `ArchiveKit` 的 `libarchive.xcframework` 1.0.0。
+
+上游共有 6 个 `Package.resolved`。三项共享依赖的固定版本：
+
+| lockfile | icli | Swift Collections | SwiftNIO |
+| --- | --- | --- | --- |
+| `VPhone.xcworkspace` | 0.6.9（`74843a56`） | 1.6.0 | 2.83.0 |
+| `VPhoneDaemon.xcodeproj` | 0.6.9（`74843a56`） | 1.6.0 | 2.83.0 |
+| `VPhoneVirtualization.xcodeproj` | 无 | 1.7.0 | 2.83.0 |
+
+其余 3 个不含上述依赖：`VPhoneCommand.xcodeproj` 共 13 项，含 libarchive.xcframework 1.0.0、AppleMobileDeviceLibrary 1.0.1790243523、MachOKit 0.52.2；`VPhoneRestore.xcodeproj` 为 AppleMobileDeviceLibrary 1.0.1790243523、openssl-spm 3.6.2；`VPhoneKit.xcodeproj` 为 libarchive.xcframework 1.0.0、swift-argument-parser 1.3.1。
+
+构建入口：CI 构建 workspace 的 `VPhone` scheme；`VPhoneVirtualization` 目标的构建阶段调用 `StageBundle.sh`，脚本以 `-project` 分别构建 VPhoneRestore、VPhoneCommand、VPhoneDaemon、VPhoneEscalator，注释说明要求各工程解析自己的依赖图。因此这几个工程按各自 lockfile 解析。`VPhoneVirtualization` 在 workspace 构建中使用 workspace lockfile（Collections 1.6.0），单独打开工程时使用自身 lockfile（1.7.0）；这一点依据 Xcode 的 lockfile 选择规则推断，未运行验证。迁移时逐个核对 lockfile 与构建入口，不能只迁移根 workspace 的一份。
 
 `ValidateBundle.sh` 检查二进制、签名、entitlements 隔离、资源、部分动态依赖和最小归档往返；这些检查不证明 VM、真实恢复或客户机 API 可用。新 build/release workflow 运行构建和该脚本，没有运行 Xcode test 或本地 firmware-free 套件。
 
@@ -152,6 +164,13 @@ CFW 需要 root、空闲磁盘和大于 50 GiB 可用空间；这些检查不代
 `VPhoneCustomFirmwareInstaller.elevate` 在非 root 调用时抛错，要求调用方使用 sudo。恢复 C 后端管理系统 `deviceinterfaced` 时也不再内部调用 sudo，非 root 的特权操作返回 `-EPERM`。这改变了本地“在特定阶段提权”的控制流，必须同时适配错误、取消、环境传递和调用用户身份。
 
 新增 `VPhoneInvokingUser` 用 `SUDO_UID/GID` 恢复 root 生成文件的所有者，保留 mode；但 `VPhoneHostFilePermissions` 又对普通文件和目录执行 `fchmod(..., 0o777)`。后者接入创建、克隆、固件缓存、CFW 和部分发布操作。因此“恢复了所有者”不表示保留了访问限制。权限函数本身跳过符号链接和特殊文件；仍会扩大其处理的普通文件权限。
+
+`08db376` 源码核对结果：
+
+- `makeAccessible` 递归处理目录，对目录和普通文件都执行 `fchmod(0o777)`，普通文件因此获得执行位。
+- 放宽权限不检查 root。`VPhoneVirtualMachineCreator.run` 和 `VPhoneIPSWCache` 在非 sudo 运行时同样执行。`VPhoneInvokingUser.current` 只在 euid 为 0 且有 `SUDO_UID/GID` 时非空，所以所有权恢复只在 sudo 下发生，权限放宽没有这个条件。
+- `run` 在检查 `alreadyExists` 之前注册 `defer`。目标 bundle 已存在而被拒绝时，`defer` 仍对这个已有 bundle 递归执行 `0777`，并把库根目录和用户数据根目录设为 `0777`；sudo 下还会对其中 root 所有的条目执行 `lchown`。这是上游现有行为，不只是本地验收要求。
+- `VPhoneInvokingUser.restoreOwnership` 的注释写明 “Never use 0777”，与 `VPhoneHostFilePermissions` 的实现相反。
 
 整合决定：可吸收调用用户识别和所有权恢复；不迁入递归 `0777` 策略。保留本地 socket `0600`、同用户校验和锁。跨进程使用 bundle 通过明确的同用户/所有权约定实现。验收需覆盖成功及失败退出，尤其是对已存在 bundle 的拒绝路径不得顺带修改权限。
 
@@ -319,6 +338,7 @@ git merge-tree --write-tree --messages -z \
 | 2026-09-25 | 目标更新到 `08db376`，分析新增 57 个提交并调整计划 | 本文固定基线、增量分析和冲突附件 |
 | 2026-09-25 | 合并整体评估与增量报告，采用固定文件名；日期和 SHA 在正文维护 | 历史全文保留在 Git，不再按日期创建报告副本 |
 | 2026-09-25 | 补充上游 tag 基线（`1.0.13`/`1.0.14`/`2.0.0`）与锚点规则；catalog 改为 cherry-pick `9c23c8a` | 1.1 节、第 8 节核对记录 |
+| 2026-09-25 | 更正 4.1 节 lockfile 描述（6 个 lockfile，Collections 1.6.0/1.7.0 不一致）；4.2 节补充 `0777` 无 root 条件及已存在 bundle 拒绝路径的源码事实 | 4.1、4.2 节 |
 
 [stage]: https://github.com/Lakr233/vphone-cli/blob/08db376d9417a7ec0779967d6b2e748e3638d3c6/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
 [validate]: https://github.com/Lakr233/vphone-cli/blob/08db376d9417a7ec0779967d6b2e748e3638d3c6/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh

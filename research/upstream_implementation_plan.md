@@ -88,7 +88,7 @@
 
 1. 建立本地目标到 Xcode/bundle 的清单：CLI、VM 子进程、Core、Sign、Archive、Restore、daemon、guest dylibs、字符串及 entitlements。Sign/Archive/Restore 的源码迁移与目标接线分为可审查提交。
 2. 引入 `VPhoneSign`、`VPhoneArchiveKit`、`VPhoneRestore`/MobileRestoreCore；适配现有接口与测试。归档依赖核对 ArchiveKit 1.0.0，恢复依赖核对固定 AppleMobileDeviceLibrary。保留本地归档 staging、manifest 校验、排他发布和权限策略。
-3. 固定 IcliKit 0.6.9（`74843a56df54936c3949239a4ffb3ddcbe37dee4`）、daemon Swift Collections 1.6.0、SwiftNIO 2.83.0；核对实际参与构建的各 lockfile。宿主与 iOS 的依赖图分别验证，不盲目统一子工程版本。
+3. 固定 IcliKit 0.6.9（`74843a56df54936c3949239a4ffb3ddcbe37dee4`）、SwiftNIO 2.83.0；Swift Collections 在 workspace 与 daemon 为 1.6.0，在 `VPhoneVirtualization.xcodeproj` 为 1.7.0。逐个核对 6 个 lockfile 与实际构建入口（workspace scheme、`StageBundle.sh` 的 `-project` 构建）的对应关系，见对比报告 4.1 节。宿主与 iOS 的依赖图分别验证，不盲目统一子工程版本。
 4. 构建 daemon 和 guest components；校验 `_swift_initBorrow`、iOS deployment target、架构和 entitlements。保留所有本地 capability 对应的资源，不按上游 bundle 缺少某项就删除本地资源。
 5. 确立 `Contents/MacOS`/`Contents/Resources` 及开发树路径解析；支持 PATH、符号链接和任意 cwd 启动。GPU compiler plugin 从 dylib 定位；`.vphoned.signed` 安装和更新源必须一致。
 6. 将 bundle 校验接入本地构建包装：二进制清单、签名权限隔离、资源、动态依赖、归档往返。继续由 `make build` 生成可执行 VM 的实际签名产物；若实现切换到 xcodebuild，由 Makefile 包装并更新项目说明。
@@ -101,7 +101,7 @@
 
 依赖 P2。迁入 `vphone-vm` 进程，配套修改 `VPhoneLaunchLayout`、`VPhoneVMStopper`、`VPhoneBundleGuard`、DFU owner、资源定位和 doctor。CLI 父进程不冒充 VM 身份；实际 VM 子进程持锁并在退出后释放。
 
-保留本地受控 sudo 重执行：只传递所需环境和 bundle 路径，明确 `SUDO_UID/GID` 对库根目录和产物所有权的影响。CFW 和 deviceinterfaced 操作的非 root 错误、无 TTY、取消与失败清理都需测试。迁入所有权恢复时不引入 `VPhoneHostFilePermissions` 的递归 `0777`，也不在“目标已存在”等拒绝路径修改现有数据权限。
+保留本地受控 sudo 重执行：只传递所需环境和 bundle 路径，明确 `SUDO_UID/GID` 对库根目录和产物所有权的影响。CFW 和 deviceinterfaced 操作的非 root 错误、无 TTY、取消与失败清理都需测试。迁入所有权恢复时不引入 `VPhoneHostFilePermissions` 的递归 `0777`，也不在“目标已存在”等拒绝路径修改现有数据权限。上游在非 sudo 运行和已存在 bundle 的拒绝路径上都会放宽权限（对比报告 4.2 节）；迁移创建流程时增加回归测试，断言已存在 bundle 被拒绝后其 mode 与 owner 不变，非 sudo 运行不修改产物 mode。
 
 原生 Restore 接入现有阶段 runner，保持 ECID/UDID 选择、DFU owner、超时、取消、错误状态和资源清理。真实恢复前完成 probe/ticket 与故障路径验证；真实恢复使用独立 bundle，不替换可用旧后端直至验收完成。
 
@@ -212,5 +212,6 @@
 | 2026-09-25 | 合并按日期维护的计划，改为固定文件名；后续直接更新本文 | 历史决策通过 Git 查询 |
 | 2026-09-25 | 增加上游 tag 基线与锚点规则；P1a 改为 cherry-pick `9c23c8a` 并同步兼容性清单 | 第 1 节、P1a、[对比报告 1.1 节](upstream_comparison.md#11-上游-tag-与版本线) |
 | 2026-09-25 | P1a 决定保留 `9c23c8a` 带来的 README 及译文 Tested Environments 两行 | P1a 第 1 步 |
+| 2026-09-25 | P2 第 3 步更正 lockfile 版本；P3 增加 `0777` 拒绝路径与非 sudo 回归要求 | P2、P3；对比报告 4.1、4.2 节 |
 
 [history-plan]: https://github.com/zhaoawd/vphone-cli/blob/9489ab296e3c1d345f936135b370d51da7a3c65d/research/upstream_implementation_plan_2026-09-24.md
