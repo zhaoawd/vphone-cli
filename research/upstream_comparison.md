@@ -4,6 +4,8 @@
 
 结论：继续选择性迁移，但将目标从 `4bab3b7` 更新为 `08db376`。新增 57 个提交改变了构建产物、权限边界、客户机依赖、API 范围及 bootstrap/注入流程。旧计划的本地功能保留原则仍适用；构建与资源适配需要提前，bootstrap 与相机需要单独验收。
 
+版本线：共同祖先是上游 tag `1.0.13`。上游 1.x 稳定 tag `1.0.14` 只多 2 个提交，其中 catalog 提交可直接 cherry-pick。`08db376` 是 tag `2.0.0`（pre-release）之后仅修改 CI workflow 的 1 个提交；上游 README 将 2.0 标为 under construction，并将 1.0.14 列为稳定版本。详见 1.1 节。
+
 本报告合并原整体评估与 `4bab3b7 → 08db376` 增量分析，保留仍有效的本地功能约束。执行以 [融合实施计划](upstream_implementation_plan.md) 为准；实验详情见[历史复核记录](upstream_review_2d76f81_2026-09-24.md)。当前交付范围为分析与计划，不迁入生产代码。
 
 ## 1. 固定基线与证据范围
@@ -14,7 +16,9 @@
 | 本地版本 | `9489ab296e3c1d345f936135b370d51da7a3c65d` |
 | 上一版上游 | `4bab3b76b3a2b6c5d68fecd292348176dbc18c4e` |
 | 本次上游 | `08db376d9417a7ec0779967d6b2e748e3638d3c6`，本次开始与交付前两次 `ls-remote` 的 `main`/HEAD 一致 |
-| 共同祖先 | `87f796c62a7cb385cd37afce121f6e222d83e5b5`，未变化 |
+| 共同祖先 | `87f796c62a7cb385cd37afce121f6e222d83e5b5`，未变化；即上游 tag `1.0.13` |
+| 上游 1.x 稳定 tag | `1.0.14` → `9c23c8adcd4b362120988ab9d228b959bcc23ae3`（轻量 tag） |
+| 上游 2.x tag | `2.0.0`（带注释 tag 对象 `8b5886e6d3687c4b1fae8cf0792c66b5f1fa2f5c`）→ `3aa5561eaec23b3a06c4e02b48e72187a85fc18b` |
 | 上游新增提交 | 57 个，其中 54 个非合并提交 |
 | 当前双方独有提交 | 上游 171 个（160 个非合并提交）；本地 187 个 |
 | 上游增量目录树差异 | 571 文件，新增 51,965 行、删除 9,962 行；Git 检测到 398 项重命名 |
@@ -26,6 +30,29 @@
 本地从上一版计划起点 `2fd54ee` 到当前 `9489ab2` 只新增计划文档，生产代码未变；旧计划 P1–P6 及当前计划 P1–P8 均未实施。此前已完成的导入 staging 校验、APFS clone 和 postValidation 幂等处理继续保留，不再次列为待移植改动。
 
 方法：在独立临时仓库取得固定上游对象，导出两版源码时排除根目录 `TODO.md`；核对增量提交、重命名后的实际代码、构建配置和研究记录；对同一本地版本分别模拟旧、新上游合并。未修改当前仓库的 remote、分支、索引和生产代码，也未构建上游或运行 VM。
+
+### 1.1 上游 tag 与版本线
+
+tag 信息来自 `git ls-remote --tags upstream` 及临时仓库中获取的 tag 对象。
+
+| tag | 指向 | 与本文基线的关系 |
+| --- | --- | --- |
+| `1.0.13` | `87f796c` | 即共同祖先 |
+| `1.0.14` | `9c23c8a` | `1.0.13` 之后 2 个提交，仍使用本地旧目录布局；均包含在 `08db376` 历史中，属于上游 171 个独有提交 |
+| `2.0.0` | `3aa5561` | tag 说明为 “vphone-cli 2.0.0 pre-release”，tagger 时间 2026-09-25T04:56:06+09:00；`4bab3b7..3aa5561` 为 56 个提交 |
+
+`1.0.14` 的 2 个提交：
+
+- `b86dcaf`：导入 VM 前校验 manifest。本地 `002ef63` 已完成导入 manifest 校验前移（见 2.3 节）；该提交与本地在 `VPhoneBundleOps.swift`、`BundleOpsTests.swift` 发生内容冲突，不再移植。二者逐行对应关系本次未核对。
+- `9c23c8a`：catalog 增加 26.6.2/23G90、27.0 RC/24A435，配对 cloudOS 26.4，并将 `FirmwarePickerTests` 计数 23 改为 25；同时修改 README 及 ja/ko/zh 译文的 Tested Environments 表。`git merge-tree --merge-base=9c23c8a^ 71bbf60 9c23c8a` 退出 0，可干净应用到本地 `71bbf60`。
+
+`08db376` 相对 `3aa5561` 只修改 `.github/workflows/build.yml`、`release.yml`（新增 62 行、删除 14 行）。本地 `9489ab2` 对 `3aa5561` 的 merge-tree 结果与对 `08db376` 相同（277 个未合并路径，事件计数相同）。因此第 2、4 节的源码结论同样适用于 `2.0.0`；第 3 节 CI 行中的 push/PR build workflow 属于 `08db376`，不属于 `2.0.0`。
+
+`3aa5561` 的 README 标注 2.0 “under construction”，并将 `1.0.14` 列为稳定版本。版本锚点规则：
+
+1. 1.x 版本线上的修复从 1.x tag 取提交，优先 cherry-pick（`-x` 记录来源）。
+2. 2.x 结构对比以 `2.0.0` 或之后的 tag 为锚点；`main` 上 tag 之后的提交单独列出，不作为独立基线。
+3. 本文固定 SHA 仍为 `08db376`，文中源码链接继续指向该提交。
 
 ## 2. 当前整体差异与本地保留范围
 
@@ -79,7 +106,7 @@ CFW 需要 root、空闲磁盘和大于 50 GiB 可用空间；这些检查不代
 | APFS clone | `002ef63` 已改为 `cp -Rc` | 已有 200 MB 目录复制实验；完整 IPSW 准备仍未验收 |
 | postValidation 已补丁识别 | 本地原已具备 | 不重复移植上游 Bool 返回版本 |
 | EXP 相机 DSC | 待修正 | 内存模拟显示部分输入可能提前退出，或先写后失败而未调用页面哈希重算；不代表已验证真实签名 |
-| 固件 catalog 两项 | 待移植 | 保留原有条目/默认选择，增加条目后另做组合验收 |
+| 固件 catalog 两项 | 待 cherry-pick | 取 `1.0.14` 的 `9c23c8a`，可干净应用；需同步本地兼容性清单（见计划 P1a），增加条目后另做组合验收 |
 
 证据：[历史复核与相机内存实验](upstream_review_2d76f81_2026-09-24.md)、[本地内核重新定位记录](c3_kernel_retarget_2026-09-09.md)、[本地补丁比较](0_binary_patch_comparison.md)。
 
@@ -212,7 +239,7 @@ CFW 安装 `launchdhook-vphone.dylib`、`SystemHook-vphone.dylib`，创建 `/vh`
 
 ### 4.9 未发生的新内核变更
 
-将旧 `Sources/FirmwarePatcher/Kernel` 和新 `VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel` 的 Swift 文件按文件名一一对应：各 50 个，集合相同，文件内容逐字节相同。本次增量没有这些内核文件的算法变更。固件 catalog 内容也未变，因此此前缺少的 26.6.2/23G90 与 27.0/24A435 仍是待选择性移植条目。
+将旧 `Sources/FirmwarePatcher/Kernel` 和新 `VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel` 的 Swift 文件按文件名一一对应：各 50 个，集合相同，文件内容逐字节相同。本次增量没有这些内核文件的算法变更。固件 catalog 内容也未变，因此此前缺少的 26.6.2/23G90 与 27.0/24A435 仍是待移植条目；本地可直接 cherry-pick `1.0.14` 的 `9c23c8a`（见 1.1 节）。
 
 已阅读项目 `kernel-analysis-vphone600` 技能以确认取证边界。本次没有分析目标 kernelcache 的指令或符号，不新增补丁可用性结论。本地 PatchOutcome、事务、必需步骤、消融、vm_map_protect/postValidation 和多变体约束继续保留。
 
@@ -262,7 +289,7 @@ git merge-tree --write-tree --messages -z \
 
 ## 7. 保留决定与优先级
 
-1. 先完成独立的 catalog 和 EXP 相机 DSC 修正；这两项未因本次增量失效。
+1. 先完成独立的 catalog 和 EXP 相机 DSC 修正；这两项未因本次增量失效。catalog 通过 cherry-pick `9c23c8a` 完成，不从 2.x 路径手工抄写。
 2. 提前确定 bundle 资源、依赖、签名、提权、文件权限和测试入口，再逐模块迁入 Sign/Archive/Restore 与 VM 进程。
 3. 将 HTTP/WS + IcliKit 的传输改进与本地协议适配成套交付；shell、定位所有权、相机身份/回执、headless、取消语义均保留。
 4. 原生准备/CFW 接入既有 checkpoint runner；新建 v2 bundle 为首条路径。保留旧 VM 可启动路径，不通过添加版本字段宣称升级完成。
@@ -274,6 +301,7 @@ git merge-tree --write-tree --messages -z \
 | 检查 | 结果 |
 | --- | --- |
 | 固定对象、共同祖先、增量计数、重命名与关键源码 | 已核对 |
+| 上游 tag 与版本线 | `1.0.13`/`1.0.14`/`2.0.0` 指向已核对；`9489ab2` 对 `3aa5561` 的 merge-tree 结果与 `08db376` 相同；`9c23c8a` 对 `71bbf60` 的 merge-tree 退出 0 |
 | 文档检查 | 合并后的本地链接、固定上游路径、引用定义和空白已核对 |
 | 两次 merge-tree | 均退出 1；冲突已记录，未执行真实合并 |
 | 本地工具链 | Xcode 26.4（17E192）、Apple Swift 6.3；未验证能否构建固定上游 |
@@ -281,7 +309,7 @@ git merge-tree --write-tree --messages -z \
 | `make test` / 上游 Xcode tests | 本次未运行；实施前需记录新的测试基线 |
 | 真实固件对照、恢复、启动、多 VM、应用验收 | 本次未运行；上游研究记录与本地既有记录不等于新组合的验收 |
 
-夹具缺失限制真实固件对比，不阻止继续完成构建适配和无固件回归。下一次实施仍使用固定 SHA；若上游继续提交，应在本文更新增量分析、固定 SHA 和修订记录，并同步实施计划；不在实施途中自动切换 `main`。
+夹具缺失限制真实固件对比，不阻止继续完成构建适配和无固件回归。下一次实施仍使用固定 SHA；若上游继续提交，按 1.1 节的 tag 锚点规则更新增量分析、固定 SHA 和修订记录，并同步实施计划；不在实施途中自动切换 `main`。
 
 ## 9. 修订记录
 
@@ -290,6 +318,7 @@ git merge-tree --write-tree --messages -z \
 | 2026-09-24 | 完成 `4bab3b7` 基线评估，修正 shell 覆盖结论，补充相机部分应用状态与合并模拟 | [历史评估全文][history-comparison]、[复核记录](upstream_review_2d76f81_2026-09-24.md) |
 | 2026-09-25 | 目标更新到 `08db376`，分析新增 57 个提交并调整计划 | 本文固定基线、增量分析和冲突附件 |
 | 2026-09-25 | 合并整体评估与增量报告，采用固定文件名；日期和 SHA 在正文维护 | 历史全文保留在 Git，不再按日期创建报告副本 |
+| 2026-09-25 | 补充上游 tag 基线（`1.0.13`/`1.0.14`/`2.0.0`）与锚点规则；catalog 改为 cherry-pick `9c23c8a` | 1.1 节、第 8 节核对记录 |
 
 [stage]: https://github.com/Lakr233/vphone-cli/blob/08db376d9417a7ec0779967d6b2e748e3638d3c6/VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh
 [validate]: https://github.com/Lakr233/vphone-cli/blob/08db376d9417a7ec0779967d6b2e748e3638d3c6/VPhoneExecutable/VPhoneVirtualization/Build/ValidateBundle.sh

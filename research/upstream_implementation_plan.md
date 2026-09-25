@@ -14,10 +14,13 @@
 | 当前本地起点 | `9489ab296e3c1d345f936135b370d51da7a3c65d` |
 | 新上游目标 | `08db376d9417a7ec0779967d6b2e748e3638d3c6` |
 | 上一版目标 | `4bab3b76b3a2b6c5d68fecd292348176dbc18c4e`，仅用于增量对比 |
+| 上游 tag | `1.0.13` = 共同祖先；1.x 稳定 `1.0.14` → `9c23c8a`；2.x pre-release `2.0.0` → `3aa5561`（`08db376` 在其后只改 CI workflow） |
 | 分析与路径映射 | [当前对比报告](upstream_comparison.md) |
 | Git 证据 | [57 个提交及冲突清单](upstream_review_08db376_conflicts_2026-09-25.txt) |
 
 固定输入不能替换为浮动 `main`。继续使用现有实施分支，分阶段提交；不整批 merge/cherry-pick 57 个增量提交。上游 hook 曾撤销再重做，选择性移植以固定最终源码及其依赖为依据。
+
+版本锚点按[对比报告 1.1 节](upstream_comparison.md#11-上游-tag-与版本线)：1.x 版本线上的修复从 1.x tag 取提交并用 `git cherry-pick -x` 记录来源；2.x 结构迁移以 `2.0.0` 或之后的 tag 为锚点，`main` 上 tag 之后的提交单独列出。
 
 ## 2. 保留决定与新增决定
 
@@ -67,7 +70,11 @@
 
 ### P1：独立修正
 
-**P1a 固件目录**：在 `sources/VPhoneCore/VPhoneFirmwareCatalog.swift` 增加 26.6.2/23G90、27.0/24A435（上游标 RC），配对 cloudOS 26.4/23E5207q。从新目标的 `VPhoneKit/VPhoneCoreKit/Firmware/VPhoneFirmwareCatalog.swift` 核对完整 URL。保留现有条目和默认选择。测试 JSON 输出与实际选择；执行 `make test_swift`。可选择不表示所有变体已支持。
+**P1a 固件目录**：cherry-pick 上游 `1.0.14` 的 `9c23c8a`，增加 26.6.2/23G90、27.0 RC/24A435，配对 cloudOS 26.4/23E5207q。该提交使用本地目录布局，已含 `FirmwarePickerTests` 计数 23→25；merge-tree 显示可干净应用到 `71bbf60`。不从 2.x 路径手工抄写 URL；两条 URL 与 `08db376` 中 2.x catalog 的对应条目一致。
+
+1. 执行 `git cherry-pick --no-commit 9c23c8a`（`--no-commit` 时 `-x` 不写入来源，提交信息需手工加入 `(cherry picked from commit 9c23c8adcd4b362120988ab9d228b959bcc23ae3)`）。保留 catalog 与测试改动；README 及 ja/ko/zh 译文的 Tested Environments 行记录的是上游在 Mac16,6 26.6.1 上的测试，不是本地实测，是否保留待决定。
+2. 同一提交内同步本地兼容性清单：`research/firmware_compatibility.json` 的 `firmware.ios` 增加两条 `source: catalog` 记录，`combinations` 增加两条 `stage: code_selectable`、五个变体的组合（参照现有 `cs-23G83` 格式，cloudOS 构建号为 null）；`research/firmware_compatibility.md` 及 README 与 ja/ko/zh 译文支持矩阵段落中的 catalog 配对计数（当前为 23，每段出现两处）同步为 25，范围描述“18.6.2 至 27.0 beta”同步包含 27.0 RC。按测试源码，只合入 catalog 会使 `FirmwareCompatibilityManifestTests.catalogPairingsMatchManifest` 失败（catalog 与清单不一致），该结论尚未运行验证。
+3. 保留现有条目和默认选择。执行 `make test`（覆盖 Swift catalog/清单一致性与 Python `test_firmware_compatibility.py`），并检查 `fw catalog --json` 输出与交互选择。新条目只记为 code_selectable，不表示任何变体已支持。
 
 **P1b EXP 相机 DSC**：改造 `scripts/patchers/cfw_patch_camera_dsc.py`，六个目标全部解析、读取、分类后才写入；区分原始、已补丁、不匹配，补齐混合输入。保留 AVF-only、dry-run 和显式 force 行为；指令继续使用 Keystone helper，记录 offset、前后字节和状态。
 
@@ -189,6 +196,7 @@
 | 新上游取证与对比 | 已完成 | `4bab3b7 → 08db376`，57 个提交，固定源码与职责映射 |
 | 合并模拟 | 已完成 | 同一本地分别对旧/新上游；318/277 个未合并路径 |
 | 本地生产代码状态 | 未改动 | `2fd54ee → 9489ab2` 只有旧计划文档 |
+| 上游 tag 基线 | 已核对 | `1.0.13` = 共同祖先，`1.0.14` = `9c23c8a`，`2.0.0` = `3aa5561`；P1a 改为 cherry-pick |
 | 环境检查 | 部分完成 | Xcode 26.4、Swift 6.3；`make test_fixtures` 失败，缺 17 文件 |
 | P0 测试基线 | 待执行 | 实施前运行 `make test`；补齐夹具后再执行固件比较 |
 | P1–P8 | 待执行 | 先 P1a/P1b，再 P2 构建与资源适配；按依赖推进 |
@@ -202,5 +210,6 @@
 | 2026-09-24 | 建立 `4bab3b7` 目标的 P0–P6 计划及实施分支 | [历史计划全文][history-plan] |
 | 2026-09-25 | 目标更新为 `08db376`，提前构建适配，重排为 P0–P8，单列相机与 bootstrap 验收 | 本文阶段对应表、实施决定和完成条件 |
 | 2026-09-25 | 合并按日期维护的计划，改为固定文件名；后续直接更新本文 | 历史决策通过 Git 查询 |
+| 2026-09-25 | 增加上游 tag 基线与锚点规则；P1a 改为 cherry-pick `9c23c8a` 并同步兼容性清单 | 第 1 节、P1a、[对比报告 1.1 节](upstream_comparison.md#11-上游-tag-与版本线) |
 
 [history-plan]: https://github.com/zhaoawd/vphone-cli/blob/9489ab296e3c1d345f936135b370d51da7a3c65d/research/upstream_implementation_plan_2026-09-24.md
