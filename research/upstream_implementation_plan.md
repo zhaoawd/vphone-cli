@@ -72,7 +72,7 @@
 
 **P1a 固件目录**：cherry-pick 上游 `1.0.14` 的 `9c23c8a`，增加 26.6.2/23G90、27.0 RC/24A435，配对 cloudOS 26.4/23E5207q。该提交使用本地目录布局，已含 `FirmwarePickerTests` 计数 23→25；merge-tree 显示可干净应用到 `71bbf60`。不从 2.x 路径手工抄写 URL；两条 URL 与 `08db376` 中 2.x catalog 的对应条目一致。
 
-1. 执行 `git cherry-pick --no-commit 9c23c8a`（`--no-commit` 时 `-x` 不写入来源，提交信息需手工加入 `(cherry picked from commit 9c23c8adcd4b362120988ab9d228b959bcc23ae3)`）。保留 catalog 与测试改动；README 及 ja/ko/zh 译文的 Tested Environments 行记录的是上游在 Mac16,6 26.6.1 上的测试，不是本地实测，是否保留待决定。
+1. 执行 `git cherry-pick --no-commit 9c23c8a`（`--no-commit` 时 `-x` 不写入来源，提交信息需手工加入 `(cherry picked from commit 9c23c8adcd4b362120988ab9d228b959bcc23ae3)`）。保留 catalog 与测试改动；README 及 ja/ko/zh 译文的 Tested Environments 两行一并保留（2026-09-25 决定）。这两行是上游在 Mac16,6 26.6.1 上的测试记录，不是本地实测；提交信息注明来源，本地支持矩阵中这两项仍只记为 code_selectable。
 2. 同一提交内同步本地兼容性清单：`research/firmware_compatibility.json` 的 `firmware.ios` 增加两条 `source: catalog` 记录，`combinations` 增加两条 `stage: code_selectable`、五个变体的组合（参照现有 `cs-23G83` 格式，cloudOS 构建号为 null）；`research/firmware_compatibility.md` 及 README 与 ja/ko/zh 译文支持矩阵段落中的 catalog 配对计数（当前为 23，每段出现两处）同步为 25，范围描述“18.6.2 至 27.0 beta”同步包含 27.0 RC。按测试源码，只合入 catalog 会使 `FirmwareCompatibilityManifestTests.catalogPairingsMatchManifest` 失败（catalog 与清单不一致），该结论尚未运行验证。
 3. 保留现有条目和默认选择。执行 `make test`（覆盖 Swift catalog/清单一致性与 Python `test_firmware_compatibility.py`），并检查 `fw catalog --json` 输出与交互选择。新条目只记为 code_selectable，不表示任何变体已支持。
 
@@ -211,5 +211,6 @@
 | 2026-09-25 | 目标更新为 `08db376`，提前构建适配，重排为 P0–P8，单列相机与 bootstrap 验收 | 本文阶段对应表、实施决定和完成条件 |
 | 2026-09-25 | 合并按日期维护的计划，改为固定文件名；后续直接更新本文 | 历史决策通过 Git 查询 |
 | 2026-09-25 | 增加上游 tag 基线与锚点规则；P1a 改为 cherry-pick `9c23c8a` 并同步兼容性清单 | 第 1 节、P1a、[对比报告 1.1 节](upstream_comparison.md#11-上游-tag-与版本线) |
+| 2026-09-25 | P1a 决定保留 `9c23c8a` 带来的 README 及译文 Tested Environments 两行 | P1a 第 1 步 |
 
 [history-plan]: https://github.com/zhaoawd/vphone-cli/blob/9489ab296e3c1d345f936135b370d51da7a3c65d/research/upstream_implementation_plan_2026-09-24.md
