@@ -151,7 +151,7 @@ git merge-tree --write-tree --messages -z \
 
 ## 7. 关键源码证据
 
-- [原评估文档](upstream_comparison_2026-09-24.md)
+- [当前对比报告](upstream_comparison.md)；[原评估历史版本](https://github.com/zhaoawd/vphone-cli/blob/9489ab296e3c1d345f936135b370d51da7a3c65d/research/upstream_comparison_2026-09-24.md)
 - [本地进程识别](../sources/VPhoneCore/VPhoneLaunchLayout.swift)
 - [本地占用保护](../sources/VPhoneCore/VPhoneBundleGuard.swift)
 - [本地停止身份检查](../sources/VPhoneCore/VPhoneVMStopper.swift)
