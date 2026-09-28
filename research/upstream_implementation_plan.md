@@ -4,7 +4,7 @@
 
 本计划依据 [上游与本地仓库对比分析](upstream_comparison.md)，选择性吸收上游模块，同时保留本地多变体、检查点续跑、自动化合约和补丁约束。当前目标更新为上游 `2.0.8`。新增 P1c 启动状态修正，并将 API 认证、核心包校验、应用层定位、guest 同步和管理器生命周期纳入实施范围。P4 提供基础 SystemHook，P6 仅处理可选 Irisin 环境。
 
-P1c 已在独立副本上通过连续启动与 clone 启动；真实导入及导入后启动仍未通过，2026-09-28 按用户要求跳过该验收并继续其他整合。P1a 目录更新和 P1b EXP 相机 DSC 预检查已应用，验证结果见 [P1a/P1b 整合记录](p1ab_integration_2026-09-28.md)。P2 已接入原生签名/归档库、可选原生 VM 传输、IPSW 检查/缓存及 Restore 库/离线检查接口；P0 其余检查和 P2 其余模块、P3–P8 尚未完成。P1a/P1b/P1c 和 P2 前三批的代码、测试与研究记录已纳入 `614b6f6`；第四批 Restore 变更已提交为 `f546d2f`；第五批预签名客户机载荷/资源布局及第六批 API daemon 独立候选构建已提交为 `2efd925`。第七批独立宿主 HTTP/WebSocket 库已提交为 `a0af165`。第八批显式回环 TCP→VSOCK 1339 代理及启动入口已提交为 `6845e1c`。第九批已接入 API 会话身份校验、心跳、重连及只读状态查询；第十批通过显式请求路由接入应用列表和前台查询。两批一并纳入本次提交，验证记录见下文。
+P1c 已在独立副本上通过连续启动与 clone 启动；真实导入及导入后启动仍未通过，2026-09-28 按用户要求跳过该验收并继续其他整合。P1a 目录更新和 P1b EXP 相机 DSC 预检查已应用，验证结果见 [P1a/P1b 整合记录](p1ab_integration_2026-09-28.md)。P2 已接入原生签名/归档库、可选原生 VM 传输、IPSW 检查/缓存及 Restore 库/离线检查接口；P0 其余检查和 P2 其余模块、P3–P8 尚未完成。P1a/P1b/P1c 和 P2 前三批的代码、测试与研究记录已纳入 `614b6f6`；第四批 Restore 变更已提交为 `f546d2f`；第五批预签名客户机载荷/资源布局及第六批 API daemon 独立候选构建已提交为 `2efd925`。第七批独立宿主 HTTP/WebSocket 库已提交为 `a0af165`。第八批显式回环 TCP→VSOCK 1339 代理及启动入口已提交为 `6845e1c`。第九批已接入 API 会话身份校验、心跳、重连及只读状态查询；第十批通过显式请求路由接入应用列表和前台查询。两批已提交为 `3bfa613`；第十一、十二批 API 文件上传/下载已提交为 `d57de8e`，独立客户机组件构建提交为 `c493d0a`。独立 VM 进程、schema 拒绝边界及 API 应用启动/终止分别提交为 `dc1af20`、`b6ba71a`、`f502e04`；完整范围与阻塞见 [剩余阶段进展](upstream_remaining_progress_2026-09-29.md)。
 
 ## 1. 固定输入
 
@@ -102,7 +102,7 @@ P0 检查项及剩余工作：
 
 ### P2：构建基础、资源及原生库
 
-**当前状态（2026-09-28）**：VPhoneSign 和 VPhoneArchiveKit、SwiftPM 目标与显式 CLI 已接入。归档库采用固定 ArchiveKit 依赖，覆盖权限、链接、路径检查、排他输出和稀疏文件往返；具体验证见 [P2 第一批签名记录](p2_sign_integration_2026-09-28.md)及 [P2 第二批归档记录](p2_archive_integration_2026-09-28.md)。原有 build/CFW 签名路径保留。VM 传输已通过可选 native 后端接线，默认仍为 system-tar；IPSW 缓存和本地检查接口已接入，固件准备脚本尚未切换。详见 [P2 第三批记录](p2_transfer_integration_2026-09-28.md)。Restore 三层库与固定依赖已迁入，新增 `restore-inspect` 离线检查，原生恢复尚未接入执行阶段；详见 [P2 第四批记录](p2_restore_integration_2026-09-28.md)。本地普通/less daemon 已统一预签名构建，安装及更新共用 `guest-resources`，详见 [P2 第五批记录](p2_guest_layout_integration_2026-09-28.md)。上游 API daemon/proxy 已接入独立候选构建和无固件测试，尚未接入宿主或默认安装，详见 [P2 第六批记录](p2_daemon_api_integration_2026-09-28.md)。第七批已新增独立 `VPhoneAPIKit` 库和回环传输测试，详见 [P2 第七批记录](p2_host_api_integration_2026-09-28.md)。第八批通过显式 `--api-listen` 接入回环 TCP→VSOCK 1339 代理，默认控制路径仍使用 1337，详见 [P2 第八批记录](p2_api_proxy_integration_2026-09-28.md)。第九批已新增绑定 VM runtime 的 API 会话，通过 HTTP/WS 实例、摘要和能力比较控制 ready 状态，并在断线后重新协商；详见 [P2 第九批记录](p2_api_session_integration_2026-09-28.md)。第十批已接入显式 `transport:"api"` 的 `app_list/app_foreground` 映射及 API 命令能力查询，详见 [P2 第十批记录](p2_api_commands_integration_2026-09-29.md)。其他 guest components、其余宿主业务命令适配和完整 bundle 布局仍待完成；P2 保持部分完成。
+**当前状态（2026-09-28）**：VPhoneSign 和 VPhoneArchiveKit、SwiftPM 目标与显式 CLI 已接入。归档库采用固定 ArchiveKit 依赖，覆盖权限、链接、路径检查、排他输出和稀疏文件往返；具体验证见 [P2 第一批签名记录](p2_sign_integration_2026-09-28.md)及 [P2 第二批归档记录](p2_archive_integration_2026-09-28.md)。原有 build/CFW 签名路径保留。VM 传输已通过可选 native 后端接线，默认仍为 system-tar；IPSW 缓存和本地检查接口已接入，固件准备脚本尚未切换。详见 [P2 第三批记录](p2_transfer_integration_2026-09-28.md)。Restore 三层库与固定依赖已迁入，新增 `restore-inspect` 离线检查，原生恢复尚未接入执行阶段；详见 [P2 第四批记录](p2_restore_integration_2026-09-28.md)。本地普通/less daemon 已统一预签名构建，安装及更新共用 `guest-resources`，详见 [P2 第五批记录](p2_guest_layout_integration_2026-09-28.md)。上游 API daemon/proxy 已接入独立候选构建和无固件测试，尚未接入宿主或默认安装，详见 [P2 第六批记录](p2_daemon_api_integration_2026-09-28.md)。第七批已新增独立 `VPhoneAPIKit` 库和回环传输测试，详见 [P2 第七批记录](p2_host_api_integration_2026-09-28.md)。第八批通过显式 `--api-listen` 接入回环 TCP→VSOCK 1339 代理，默认控制路径仍使用 1337，详见 [P2 第八批记录](p2_api_proxy_integration_2026-09-28.md)。第九批已新增绑定 VM runtime 的 API 会话，通过 HTTP/WS 实例、摘要和能力比较控制 ready 状态，并在断线后重新协商；详见 [P2 第九批记录](p2_api_session_integration_2026-09-28.md)。第十批已接入显式 `transport:"api"` 的 `app_list/app_foreground` 映射及 API 命令能力查询，详见 [P2 第十批记录](p2_api_commands_integration_2026-09-29.md)。第十一批增加有界流式文件下载、响应身份检查及排他宿主文件发布，详见 [P2 第十一批记录](p2_api_files_integration_2026-09-29.md)。其他 guest components、其余宿主业务命令适配和完整 bundle 布局仍待完成；P2 保持部分完成。
 
 依赖 P0。先保持本地现有路径可构建，再引入对应模块；不得先删除 Package.swift、Makefile 或现有测试。
 
@@ -120,6 +120,8 @@ P0 检查项及剩余工作：
 完成条件：旧入口和新模块都可构建、相关测试通过，实际 bundle 通过校验。Xcode 编译通过不等于真实恢复或 VM 通过。
 
 ### P3：VM 进程、提权、生命周期与恢复
+
+2026-09-29：独立 VM executable 和本地生命周期适配见 [P3 实施记录](p3_vm_process_integration_2026-09-29.md)。原生 Restore/helper 与真实验收仍待完成。
 
 依赖 P2。迁入 `vphone-vm` 进程，配套修改 `VPhoneLaunchLayout`、`VPhoneVMStopper`、`VPhoneBundleGuard`、DFU owner、资源定位和 doctor。CLI 父进程不冒充 VM 身份；实际 VM 子进程持锁并在退出后释放。
 
@@ -236,7 +238,7 @@ Launchpad 配套检查分三类显示：宿主 Core Bundle 最低版本、VM sch
 | P1a | 实现与回归完成，纳入本次提交 | catalog 25 条，清单一致性、CLI JSON 和菜单选择通过；新组合仅为 code_selectable |
 | P1b | 实现与无固件回归完成，纳入本次提交 | 17 项合成 DSC 测试通过；真实 DSC 验收未完成 |
 | P2 | 部分完成 | Sign/Archive/Restore 库、显式 CLI、可选原生 VM 传输和 IPSW 缓存接口已接入；本地普通/less daemon 的预签名构建及 guest-resources 已接入；原生恢复执行、原生固件准备、上游 daemon/guest 其余部分和完整 bundle 布局待完成 |
-| P3–P8 | 待执行 | 按本计划依赖推进，不整体合并 |
+| P3–P8 | 部分前置实现已推进，整体未完成 | P3 独立 VM 进程；P4 schema 拒绝；P5 应用启动/终止；P8 新增构建检查。其余按本计划及本轮进展记录继续 |
 
 此前已运行原工程测试、本地签名构建及独立副本启动。2026-09-28 按用户要求跳过 P1c 真实导入及导入后启动验收，继续 P1a/P1b 和剩余 P0 取证。上游 2.x 构建、恢复及完整融合尚未完成。
 
@@ -291,3 +293,5 @@ Launchpad 配套检查分三类显示：宿主 Core Bundle 最低版本、VM sch
 | 2026-09-28 | 第五、六批提交为 `2efd925`；第七批新增独立宿主 API v1 HTTP/WebSocket 库，VM 接线与真实客户机验收待完成 | [P2 第七批记录](p2_host_api_integration_2026-09-28.md) |
 
 | 2026-09-28 | 第七批提交为 `a0af165`；第八批新增显式回环代理及 VSOCK 1339 接线，真实 VM 未验收 | [P2 第八批记录](p2_api_proxy_integration_2026-09-28.md) |
+
+| 2026-09-29 | 范围明确为全部 8 个剩余阶段；完成文件传输、候选组件构建，推进 VM 进程与应用映射；真实输入和执行准入存在阻塞 | [本轮进展](upstream_remaining_progress_2026-09-29.md) |

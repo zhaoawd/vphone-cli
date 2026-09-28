@@ -290,7 +290,11 @@ commands: `{"t":"app_list","transport":"api","filter":"user"}` and
 `verified` boolean; a positive PID does not imply verification. Discovery via
 `{"t":"capabilities"}` adds `api_commands` alongside classic `commands`.
 Omitting `transport` keeps classic routing; API failures never fall back.
-Other app commands are rejected on the API route. See the
+`app_launch` and `app_terminate` also accept the explicit API route with
+`bundle_id`; launch accepts an optional `url`. Launch results preserve
+`frontmost_verified`. Errors after submission may include
+`operation_may_continue:true`. Installation remains unavailable on this route.
+See the
 [read-only command report](research/p2_api_commands_integration_2026-09-29.md).
 
 `{"t":"file_get","transport":"api","path":"/guest/file"}` downloads up to
@@ -308,6 +312,15 @@ identity and exact length are checked before atomic replacement in the guest.
 Errors after submission include `operation_may_continue:true`. Cancellation or
 response loss does not prove the guest did not write the file. See the
 [upload report](research/p2_api_upload_integration_2026-09-29.md).
+
+`make build` produces paired `vphone-cli` and `vphone-vm` executables. Boot
+commands transfer to the VM executable before creating a VM or acquiring its
+lock. Only `vphone-vm` carries private virtualization entitlements. `doctor`
+inspects that executable; signature validity does not establish host execution
+permission. Keep the pair together when distributing or updating the app.
+Legacy VM manifests remain supported. A manifest with `schemaVersion` is
+explicitly rejected by the current backend until the v2 runtime is integrated;
+it is never silently converted to the legacy layout.
 
 Guest daemon payloads are built and signed with `make vphoned` (also run by
 `make build`). Development output is `.build/guest`; packaged output is

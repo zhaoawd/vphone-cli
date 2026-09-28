@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-29 VM runtime split, schema boundary and API app actions
+
+Added a paired VM executable with separate signing, boot exec handoff, legacy/new process identity matching and combined CLI/VM checkpoint fingerprints. Versioned manifests are refused by the legacy backend without rewriting them. Explicit API launch/terminate preserves foreground verification and reports post-submission uncertainty. No firmware/kernel/DSC patch bytes or default guest payloads changed. The new VM executable is rejected by AMFI for restricted entitlements; real VM acceptance remains incomplete. See [runtime details](p3_vm_process_integration_2026-09-29.md) and [remaining stage status](upstream_remaining_progress_2026-09-29.md).
+
 ## 2026-09-29 P2 isolated guest components
 
 Added fixed-source LaunchHook, SystemHook, location/camera libraries and GPU compiler plugin candidates with separate build metadata, source hashes and host C checks. Their 64-byte camera header is incompatible with the local 256-byte publish header; candidates are not installed or activated. Existing firmware/kernel/DSC patches and variant defaults remain in place. See the [component record](p2_guest_components_integration_2026-09-29.md).

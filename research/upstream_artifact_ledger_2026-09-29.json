@@ -1,0 +1,79 @@
+{
+  "recorded_at": "2026-09-28T17:57:24.526222+00:00",
+  "source_revision": "f502e04eb5e3a5176c1d4a2a0a0aa9ad1e9633d1",
+  "upstream_revision": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "host_app_version": "1.0",
+  "host_app_build": "1",
+  "guest_activation": "classic_only_api_and_components_candidates_inactive",
+  "real_vm_acceptance": "not_run",
+  "artifacts": {
+    ".build/vphone-cli.app/Contents/MacOS/vphone-cli": {
+      "sha256": "ba3af94d2e5cc83b349e3f77e7d402f439f8594ed8ad538ae7fbcd30a79ae850",
+      "bytes": 57693584,
+      "entitlements": {},
+      "cdhash": "4df00ff42cdf19048637f9992fba5924a759b09b",
+      "help_exit_code": 0
+    },
+    ".build/vphone-cli.app/Contents/MacOS/vphone-vm": {
+      "sha256": "9030e25f629c4397475ce80d51894a676a46e149daddccaf4e9d3cc70fc1f54d",
+      "bytes": 57694544,
+      "entitlements": {
+        "com.apple.private.bmk.allow": true,
+        "com.apple.private.virtualization": true,
+        "com.apple.private.virtualization.security-research": true,
+        "com.apple.security.get-task-allow": true,
+        "com.apple.security.personal-information.location": true,
+        "com.apple.security.virtualization": true,
+        "com.apple.vm.networking": true
+      },
+      "cdhash": "2a6254e342d9cf2e4e32b12519e62c0fa8f30993",
+      "help_exit_code": -9
+    },
+    ".build/vphone-cli.app/Contents/Info.plist": {
+      "sha256": "18adccc66735ea3816990583ddcd4e77deb8e47f3632653651a595b9ec29ef52",
+      "bytes": 1041
+    },
+    ".build/vphone-cli.app/Contents/Resources/build-dependencies.json": {
+      "sha256": "20a2b1b4db3fd99aa8d19ced791c2243741a5d70342b49d15a6355aa6f03ce3d",
+      "bytes": 22021
+    },
+    ".build/guest/manifest.json": {
+      "sha256": "46ef1770940bb8402270c4f8522f4ccf0d612b29c1f9f141ef72c50e9a5d7716",
+      "bytes": 584
+    },
+    ".build/daemon-api-v2/candidate/manifest.json": {
+      "sha256": "7e8bbc8f2aeea3284746ae77bb1efa0e180dc5d08887a1a577f5aa215ecc782b",
+      "bytes": 7017
+    },
+    ".build/guest-components-v2/stage/manifest.json": {
+      "sha256": "e14fc32ef9f4fe56b81dbc77048066e8a24cd920cee578cd6138ba27f21a60ad",
+      "bytes": 1609
+    }
+  },
+  "logs_sha256": {
+    "app-mutation-tests.log": "68eb5268f1686e74a1c3621f8c29aef161376efbeb93993d00affa9de0d555d0",
+    "build.log": "170f4bbb649164274ac78289425943c685882e34bb7fc80caa6b4a74243c90e6",
+    "committed-build.log": "0cffbea04bdee6f35d52426471e0ddd24196e8edbddf7926dd4471ac56ce58b9",
+    "daemon-build.log": "cedf75c2702e0aae8b43f7203538fed69244f0613e10518d9dfb07f69a5cde29",
+    "final-build.log": "4d522861930329399409e8b0078ff928e737e9cdb42f50a94fa0c69808112a1f",
+    "final-regression.log": "149162ed2843cfece38ecf3843d5027a77d0f049328d567c1f981370ee772038",
+    "final-swift-rerun.log": "7d554d68fca190d434ce9ce3e852997e13ed3bcf6017e3df78a76f5c2bfeca9e",
+    "fixtures.log": "2b38a83e214a5b2fe1f4679b6bc59b01858b3acb326a9510885ae5e2dbadde6d",
+    "full-tests-final.log": "dd651a7410140b384d94ef26cf0fef40c5bb50d24a18987a16938ad5166e2db0",
+    "full-tests.log": "0ec89910d6b2831695d3ec6488bb21f2955fce5a8355994aa9afe95482cc958a",
+    "guest-components-build.log": "9de30071d1f80706fb6c4d3bc2c5471e58617bdea3bbab3a725b05f5c4f8f14a",
+    "guest-components-verified.log": "ec8644fb0ebb6bdbf842ed7a3b0a0676b9ffcd48dc6624f5b95ecbd4f6f13b8a",
+    "process-split-tests-final.log": "2e625369d071c34a518347b86e9cb92eebf070bbcdd3f470b77052eee2c467b9",
+    "process-split-tests.log": "912338ab9f34f1c64c4729c5dd5af0b362ae85787ffeb7a74b7a397e71789175",
+    "runtime-schema-tests.log": "17db4177cc7f35431878c2acc77f87a586100d49977e251a11cc1b80506e552e",
+    "script-checks.log": "802aa423b03f58225bcdb8a6ad00982c552a5d6cb340fbf86b6a09991a2e4130",
+    "signed-entrypoints.json": "5d39590e5a58f7287dc25133f8cdc2b1421cffa05d0e8d1c9814776479515460",
+    "test-upload-final.log": "33fccbecef803c44cd45039871b48ba7979554f6f82251356edbdd91a07b8c65",
+    "test-upload-initial.log": "8aff5b6fb76dc3e83a77d879676e6721618204afb726374705a717c46fdabca3",
+    "test-upload-rerun.log": "a7a826c47a51a9e1d6db40900e8c811967386eb2349ac954204fb82cb7203b4d",
+    "test-upload.log": "b62ede5a127a1d58ff39b279ea49ceaf5579aa0565ca8854ccf68002f840d36c",
+    "toolchain-tests-final.log": "db093facac22366438841f3f0229f74d94bf1bf5746572fe32782932986bcf8b",
+    "vm-execution-policy.log": "b44dbee8ed90812b925db6db264a94aee01090100b16eacb3128c4a420782cf9",
+    "workflow-checks.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
