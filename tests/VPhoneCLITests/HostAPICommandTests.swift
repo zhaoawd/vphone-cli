@@ -85,6 +85,12 @@ final class HostAPICommandTests: XCTestCase {
         let foreground = try await endpoint.request(["t": "app_foreground", "transport": "api"])
         XCTAssertEqual(foreground["verified"] as? Bool, false)
         XCTAssertEqual(foreground["pid"] as? Int, 42)
+        let launched = try await endpoint.request(["t": "app_launch", "transport": "api", "bundle_id": "loopback.app", "screen": false])
+        XCTAssertEqual(launched["pid"] as? Int, 42)
+        XCTAssertEqual(launched["frontmost_verified"] as? Bool, false)
+        let terminated = try await endpoint.request(["t": "app_terminate", "transport": "api", "bundle_id": "loopback.app", "screen": false])
+        XCTAssertEqual(terminated["ok"] as? Bool, true)
+        XCTAssertEqual(terminated["pids"] as? [Int], [42])
         XCTAssertEqual((discovery["api_commands"] as? [String: Bool])?["file_get"], true)
         let inline = try await endpoint.request(["t": "file_get", "transport": "api", "path": "/bytes/256"])
         XCTAssertEqual(inline["size"] as? Int, 256)
@@ -137,6 +143,37 @@ final class HostAPICommandTests: XCTestCase {
         session.stop()
         let stopped = try await endpoint.request(["t": "app_list", "transport": "api"])
         XCTAssertEqual(stopped["code"] as? String, "api_not_ready")
+    }
+
+    func testAppMutationsValidateResultsAndPreserveUncertainty() async throws {
+        let api = HostAPISessionFake()
+        let executor = VPhoneHostCommandExecutor(apiSession: api)
+        api.result = .object(["pid": .number(42), "frontmost_verified": .bool(false)])
+        let launched = try await call(executor, ["t": "app_launch", "transport": "api", "bundle_id": "fixture.app", "url": "fixture://open", "screen": false])
+        XCTAssertEqual(launched["pid"] as? Int, 42)
+        XCTAssertEqual(launched["frontmost_verified"] as? Bool, false)
+        XCTAssertEqual(api.calls.last?.0, "apps.launch")
+        XCTAssertEqual(api.calls.last?.1, ["bundle_id": .string("fixture.app"), "url": .string("fixture://open")])
+        api.result = .object(["killed": .string("fixture.app"), "pids": .array([.number(42)]), "already_stopped": .bool(false)])
+        let stopped = try await call(executor, ["t": "app_terminate", "transport": "api", "bundle_id": "fixture.app", "screen": false])
+        XCTAssertEqual(stopped["ok"] as? Bool, true)
+        XCTAssertEqual(stopped["pids"] as? [Int], [42])
+        api.result = .object(["pid": .number(42)])
+        let invalid = try await call(executor, ["t": "app_launch", "transport": "api", "bundle_id": "fixture.app", "screen": false])
+        XCTAssertEqual(invalid["code"] as? String, "api_protocol")
+        XCTAssertEqual(invalid["operation_may_continue"] as? Bool, true)
+        api.handler = { throw CancellationError() }
+        let cancelled = try await call(executor, ["t": "app_terminate", "transport": "api", "bundle_id": "fixture.app", "screen": false])
+        XCTAssertEqual(cancelled["operation_may_continue"] as? Bool, true)
+        let count = api.calls.count
+        for fields: [String: Any] in [["bundle_id": ""], ["bundle_id": 1], ["bundle_id": "app", "url": 2]] {
+            var request: [String: Any] = ["t": "app_launch", "transport": "api"]
+            request.merge(fields) { _, value in value }
+            let rejected = try await call(executor, request)
+            XCTAssertEqual(rejected["code"] as? String, "invalid_argument")
+            XCTAssertNil(rejected["operation_may_continue"])
+        }
+        XCTAssertEqual(api.calls.count, count)
     }
 
     func testListMapsFiltersFieldsAndDataContainer() async throws {
@@ -203,7 +240,7 @@ final class HostAPICommandTests: XCTestCase {
             api.state = state
             let discovery = try await call(executor, ["t": "capabilities"])
             XCTAssertEqual(discovery["api_commands"] as? [String: Bool],
-                           ["app_list": state == "ready", "app_foreground": state == "ready", "file_get": false, "file_put": false])
+                           ["app_list": state == "ready", "app_foreground": state == "ready", "app_launch": state == "ready", "app_terminate": state == "ready", "file_get": false, "file_put": false])
             XCTAssertEqual((discovery["commands"] as? [String: Bool])?["app_list"], false)
         }
         api.state = "ready"
@@ -212,7 +249,7 @@ final class HostAPICommandTests: XCTestCase {
         XCTAssertEqual((discovery["api_commands"] as? [String: Bool])?["app_list"], false)
         let missing = try await call(executor, ["t": "app_list", "transport": "api"])
         XCTAssertEqual(missing["code"] as? String, "capability_unavailable")
-        for command in ["app_launch", "app_terminate", "shell", "capabilities"] {
+        for command in ["app_install", "shell", "capabilities"] {
             let result = try await call(executor, ["t": command, "transport": "api", "bundle_id": "app"])
             XCTAssertEqual(result["code"] as? String, "unsupported_transport")
         }

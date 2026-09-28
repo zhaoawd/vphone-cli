@@ -58,7 +58,13 @@ final class VPhoneHostCommandExecutor {
                 return Self.response(ok: false, error: "invalid transport", extra: ["code": "invalid_argument"])
             }
             if name == "api" {
-                return await VPhoneHostAPICommands.execute(type, request: json, session: apiSession)
+                let response = await VPhoneHostAPICommands.execute(type, request: json, session: apiSession)
+                guard wantScreen, ["app_launch", "app_terminate"].contains(type),
+                      var result = (try? JSONSerialization.jsonObject(with: response)) as? [String: Any],
+                      result["ok"] as? Bool == true else { return response }
+                try? await Task.sleep(for: .milliseconds(screenDelay))
+                if let image = await captureCompactScreenshot() { result["image"] = image }
+                return (try? JSONSerialization.data(withJSONObject: result)) ?? response
             }
         }
         switch type {

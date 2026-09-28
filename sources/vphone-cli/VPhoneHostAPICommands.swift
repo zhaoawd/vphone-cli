@@ -15,7 +15,7 @@ extension VPhoneAPISession: VPhoneHostAPISession {}
 
 @MainActor
 enum VPhoneHostAPICommands {
-    static let commands = ["app_list", "app_foreground", "file_get", "file_put"]
+    static let commands = ["app_list", "app_foreground", "app_launch", "app_terminate", "file_get", "file_put"]
 
     static func capabilities(_ session: (any VPhoneHostAPISession)?) -> [String: Bool] {
         Dictionary(uniqueKeysWithValues: commands.map { command in
@@ -43,6 +43,14 @@ enum VPhoneHostAPICommands {
             } else { filter = "all" }
             guard ["all", "user", "system", "running"].contains(filter) else { return failure("invalid_argument") }
             params["filter"] = .string(filter)
+        }
+        if command == "app_launch" || command == "app_terminate" {
+            guard let id = request["bundle_id"] as? String, !id.isEmpty, !id.contains("\0") else { return failure("invalid_argument") }
+            params["bundle_id"] = .string(id)
+            if command == "app_launch", let value = request["url"] {
+                guard let url = value as? String, !url.isEmpty, !url.contains("\0") else { return failure("invalid_argument") }
+                params["url"] = .string(url)
+            }
         }
         guard let session, session.snapshot.state == .ready else { return failure("api_not_ready") }
         guard required(command).isSubset(of: session.snapshot.health?.capabilities ?? []) else { return failure("capability_unavailable") }
@@ -100,18 +108,37 @@ enum VPhoneHostAPICommands {
                 return VPhoneHostCommandExecutor.response(ok: true,
                     extra: ["size": size, "data": try file.data().base64EncodedString()])
             }
-            let result = try await session.call(command == "app_list" ? "apps.list" : "apps.foreground",
-                                                params: params, requiring: "apps")
+            let method: String
+            switch command {
+            case "app_list": method = "apps.list"
+            case "app_foreground": method = "apps.foreground"
+            case "app_launch": method = "apps.launch"; submitted = true
+            default: method = "apps.terminate"; submitted = true
+            }
+            let result = try await session.call(method, params: params, requiring: "apps")
             try Task.checkCancellation()
             guard session.snapshot.state == .ready, session.snapshot.generation == generation else {
-                return failure("api_stale_session")
+                return failure("api_stale_session", mayContinue: submitted)
             }
-            let fields = try command == "app_list" ? appList(result) : foreground(result)
+            let fields: [String: Any]
+            switch command {
+            case "app_list": fields = try appList(result)
+            case "app_foreground": fields = try foreground(result)
+            case "app_launch":
+                let value = try object(result)
+                guard case let .bool(verified) = value["frontmost_verified"] else { throw MappingError.invalidResult }
+                fields = try ["pid": pid(value), "frontmost_verified": verified]
+            default:
+                let value = try object(result)
+                guard value["killed"] == params["bundle_id"], case let .bool(stopped) = value["already_stopped"],
+                      case let .array(pids) = value["pids"] else { throw MappingError.invalidResult }
+                fields = try ["already_stopped": stopped, "pids": pids.map { try pid(["pid": $0]) }]
+            }
             return VPhoneHostCommandExecutor.response(ok: true, extra: fields)
         } catch is CancellationError {
             return failure("command_cancelled", mayContinue: submitted)
         } catch is MappingError {
-            return failure("api_protocol")
+            return failure("api_protocol", mayContinue: submitted)
         } catch let error as VPhoneAPIError {
             let codes = ["not_ready": "api_not_ready", "unsupported_capability": "capability_unavailable",
                          "stale_session": "api_stale_session", "disconnected": "api_disconnected",

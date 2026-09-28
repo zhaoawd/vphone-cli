@@ -222,6 +222,10 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Unexpected foreground parameters')
                     result = {'bundle_id': 'loopback.app', 'name': 'Loopback',
                               'pid': 42, 'source': 'fixture', 'verified': False}
+                elif host_commands and value['method'] in ('apps.launch', 'apps.terminate'):
+                    assert value['params'] == {'bundle_id': 'loopback.app'}
+                    result = ({'pid': 42, 'frontmost_verified': False} if value['method'] == 'apps.launch'
+                              else {'killed': 'loopback.app', 'pids': [42], 'already_stopped': False})
                 self.frame({'type': 'response', 'id': value['id'], 'result': result})
             return
         first = self.read_frame()

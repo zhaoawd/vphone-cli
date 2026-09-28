@@ -45,3 +45,5 @@ socket 权限设为 0600。接收连接后使用 `getpeereid` 检查对端有效
 2026-09-29，第十一批新增 `transport:"api"` 的 file_get：内联 1 MiB、流式保存 64 MiB、120 秒期限、每会话四个下载及排他目标发布，详见[API 文件下载记录](p2_api_files_integration_2026-09-29.md)。经典路径行为保留。
 
 2026-09-29，第十二批增加显式 API `file_put`：内联 1 MiB、文件 64 MiB、私有来源快照、客户机身份与长度校验、暂存原子替换及失败后的 `operation_may_continue`。见[上传记录](p2_api_upload_integration_2026-09-29.md)。
+
+2026-09-29，显式 API 增加 `app_launch`/`app_terminate`：验证 bundle_id、可选 url、PID/前台验证或终止结果；保留 screen/delay 的截图行为。提交后取消、错误或响应字段无效均可返回 `operation_may_continue:true`；不推断客户机操作已撤销。安装和其余未映射命令继续明确拒绝。
