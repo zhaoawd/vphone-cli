@@ -3,6 +3,23 @@ import Testing
 @testable import VPhoneAPIKit
 
 struct APIWireTests {
+    @Test func validatesOptionalProcessIdentityAndAcceptsLegacyHealth() throws {
+        var object: [String: Any] = ["status": "ok", "api_version": 1,
+            "binary_hash": String(repeating: "a", count: 64), "capabilities": ["files"]]
+        func decode() throws -> VPhoneAPIHealth {
+            try VPhoneAPIHealth.decode(JSONSerialization.data(withJSONObject: object),
+                requiredCapabilities: [], expectedBinaryHash: nil)
+        }
+        #expect(try decode().instanceID == nil)
+        let id = UUID()
+        object["instance_id"] = id.uuidString.lowercased()
+        #expect(try decode().instanceID == id.uuidString)
+        for invalid: Any in ["invalid", 42, NSNull()] {
+            object["instance_id"] = invalid
+            #expect(throws: (any Error).self) { try decode() }
+        }
+    }
+
     @Test func jsonRoundTripAndNullResult() throws {
         let value: VPhoneJSONValue = .object(["n": .null, "b": .bool(true), "a": .array([.number(3), .string("中文")])])
         #expect(try JSONDecoder().decode(VPhoneJSONValue.self, from: JSONEncoder().encode(value)) == value)

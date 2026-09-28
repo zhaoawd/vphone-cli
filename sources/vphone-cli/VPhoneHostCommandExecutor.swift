@@ -1,11 +1,13 @@
 import CoreFoundation
 import Foundation
 import VPhoneCore
+import VPhoneAPIKit
 
 /// JSON command semantics, independent of sockets and AppKit views.
 @MainActor
 final class VPhoneHostCommandExecutor {
     enum BootMode: String { case normal, dfu }
+    private let apiSession: (any VPhoneHostAPISession)?
     private let bootMode: BootMode
     private let control: (any VPhoneHostGuest)?
     private let cameraServer: (any VPhoneHostCamera)?
@@ -16,8 +18,10 @@ final class VPhoneHostCommandExecutor {
          camera: (any VPhoneHostCamera)? = nil,
          location: (any VPhoneHostLocation)? = nil,
          screen: (any VPhoneHostScreen)? = nil,
+         apiSession: (any VPhoneHostAPISession)? = nil,
          bootMode: BootMode = .normal) {
         self.bootMode = bootMode
+        self.apiSession = bootMode == .normal ? apiSession : nil
         self.control = bootMode == .normal ? control : nil
         cameraServer = bootMode == .normal ? camera : nil
         locationProvider = bootMode == .normal ? location : nil
@@ -49,6 +53,14 @@ final class VPhoneHostCommandExecutor {
             return Self.response(ok: false, error: "delay must be between 0 and 60000 ms", extra: ["code": "invalid_argument"])
         }
         if Task.isCancelled { return Self.response(ok: false, error: "command cancelled", extra: ["code": "command_cancelled"]) }
+        if let transport = json["transport"] {
+            guard let name = transport as? String, ["classic", "api"].contains(name) else {
+                return Self.response(ok: false, error: "invalid transport", extra: ["code": "invalid_argument"])
+            }
+            if name == "api" {
+                return await VPhoneHostAPICommands.execute(type, request: json, session: apiSession)
+            }
+        }
         switch type {
         case "capabilities":
             return Self.response(ok: true, extra: capabilitySnapshot())
@@ -933,7 +945,7 @@ final class VPhoneHostCommandExecutor {
         commands["camera_present"] = cameraServer?.isConnected == true && caps.contains("vcam_receipt_v3")
         commands["camera_status"] = cameraServer != nil
         commands["camera_stop"] = cameraServer != nil
-        return ["protocol_version": 1, "boot_mode": bootMode.rawValue, "guest_connected": connected,
+        var result: [String: Any] = ["protocol_version": 1, "boot_mode": bootMode.rawValue, "guest_connected": connected,
                 "guest_capabilities": caps, "screen_available": visible,
                 "commands": commands,
                 "limits": ["request_bytes": HostControlIO.maximumRequestBytes,
@@ -941,6 +953,12 @@ final class VPhoneHostCommandExecutor {
                            "host_file_bytes": HostControlIO.maximumFileBytes,
                            "connections": HostControlIO.maximumConnections,
                            "command_timeout_ms": VPhoneHostCommandService.defaultTimeoutMilliseconds]]
+        if let apiSession, let data = try? JSONEncoder().encode(apiSession.snapshot),
+           let snapshot = try? JSONSerialization.jsonObject(with: data) {
+            result["api_session"] = snapshot
+            result["api_commands"] = VPhoneHostAPICommands.capabilities(apiSession)
+        }
+        return result
     }
 
     /// Command-local state, confined to the main actor.

@@ -1,4 +1,5 @@
 import Foundation
+import VPhoneAPIKit
 import XCTest
 import VPhoneCore
 @testable import vphone_cli
@@ -148,6 +149,25 @@ final class HostCommandExecutorTests: XCTestCase {
         let data = try JSONSerialization.data(withJSONObject: fields)
         let result = await executor.execute(data)
         return try XCTUnwrap(JSONSerialization.jsonObject(with: result) as? [String: Any])
+    }
+
+    func testAPISessionDiscoveryPreservesClassicCapabilities() async throws {
+        let client = try VPhoneAPIClient(baseURL: URL(string: "http://127.0.0.1:1")!)
+        let session = VPhoneAPISession(client: client, vmInstanceID: "runtime-fixture")
+        let executor = VPhoneHostCommandExecutor(apiSession: session)
+        let idle = try await call(executor, ["t": "capabilities"])
+        let api = try XCTUnwrap(idle["api_session"] as? [String: Any])
+        XCTAssertEqual(api["state"] as? String, "idle")
+        XCTAssertEqual(api["vmInstanceID"] as? String, "runtime-fixture")
+        XCTAssertEqual(idle["guest_connected"] as? Bool, false)
+        XCTAssertEqual((idle["commands"] as? [String: Bool])?["shell"], false)
+        session.stop()
+        let stopped = try await call(executor, ["t": "capabilities"])
+        XCTAssertEqual((stopped["api_session"] as? [String: Any])?["state"] as? String, "stopped")
+        let disabled = try await call(VPhoneHostCommandExecutor(), ["t": "capabilities"])
+        XCTAssertNil(disabled["api_session"])
+        let dfu = try await call(VPhoneHostCommandExecutor(apiSession: session, bootMode: .dfu), ["t": "capabilities"])
+        XCTAssertNil(dfu["api_session"])
     }
 
     func testWithoutViewReportsCapabilitiesAndRejectsUnavailableOperations() async throws {

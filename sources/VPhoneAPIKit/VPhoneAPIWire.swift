@@ -63,11 +63,12 @@ enum VPhoneAPIWire {
     }
 }
 
-public struct VPhoneAPIHealth: Sendable, Equatable {
+public struct VPhoneAPIHealth: Codable, Sendable, Equatable {
     public let apiVersion: Int
     public let binaryHash: String
     public let capabilities: Set<String>
     public let ios: String?
+    public let instanceID: String?
 
     static func decode(_ data: Data, requiredCapabilities: Set<String>, expectedBinaryHash: String?) throws -> Self {
         let value = try VPhoneAPIWire.object(data)
@@ -89,6 +90,13 @@ public struct VPhoneAPIHealth: Sendable, Equatable {
         }
         let ios: String?
         if case let .string(version) = value["ios"] { ios = version } else { ios = nil }
-        return Self(apiVersion: 1, binaryHash: hash, capabilities: capabilities, ios: ios)
+        let instanceID: String?
+        if let instance = value["instance_id"] {
+            guard case let .string(id) = instance, let uuid = UUID(uuidString: id) else {
+                throw VPhoneAPIWire.invalidEnvelope()
+            }
+            instanceID = uuid.uuidString
+        } else { instanceID = nil }
+        return Self(apiVersion: 1, binaryHash: hash, capabilities: capabilities, ios: ios, instanceID: instanceID)
     }
 }

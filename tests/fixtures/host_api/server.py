@@ -6,11 +6,20 @@ from pathlib import Path
 import struct
 import sys
 import time
+import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 root = Path(sys.argv[1])
 token = '1234567890abcdef'
 behind_proxy = '--behind-proxy' in sys.argv[2:]
+host_commands = '--host-commands' in sys.argv[2:]
+managed = '--managed-session' in sys.argv[2:] or host_commands
+health = {'status': 'ok', 'api_version': 1, 'binary_hash': 'a' * 64,
+          'capabilities': ['files'], 'ios': '26.0'}
+if managed:
+    health.update(instance_id=str(uuid.uuid4()), capabilities=['files', 'session_identity'])
+if host_commands:
+    health['capabilities'].append('apps')
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -65,8 +74,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(b'10000\r\n' + chunk + b'\r\n')
             self.wfile.write(b'0\r\n\r\n')
             return
-        self.reply(200, {'status': 'ok', 'api_version': 1, 'binary_hash': 'a' * 64,
-                         'capabilities': ['files'], 'ios': '26.0'})
+        self.reply(200, health)
 
     def do_POST(self):
         if not self.authorized():
@@ -114,7 +122,23 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Connection', 'Upgrade')
         self.send_header('Sec-WebSocket-Accept', accept)
         self.end_headers()
-        self.frame({'type': 'event', 'event': 'connected', 'data': {'api_version': 1}})
+        self.frame({'type': 'event', 'event': 'connected', 'data': health if managed else {'api_version': 1}})
+        if managed:
+            while value := self.read_frame():
+                result = health if value['method'] == 'agent.health' else value['method']
+                if host_commands and value['method'] == 'apps.list':
+                    if value['params'] != {'filter': 'user'}:
+                        raise ValueError('Unexpected mapped app filter')
+                    result = {'apps': [{'bundle_id': 'loopback.app', 'name': 'Loopback',
+                                       'type': 'user', 'state': 'running', 'pid': 42,
+                                       'path': '/Applications/Loopback.app', 'data_path': '/data/loopback'}]}
+                elif host_commands and value['method'] == 'apps.foreground':
+                    if value['params']:
+                        raise ValueError('Unexpected foreground parameters')
+                    result = {'bundle_id': 'loopback.app', 'name': 'Loopback',
+                              'pid': 42, 'source': 'fixture', 'verified': False}
+                self.frame({'type': 'response', 'id': value['id'], 'result': result})
+            return
         first = self.read_frame()
         second = self.read_frame()
         for value in [second, first]:

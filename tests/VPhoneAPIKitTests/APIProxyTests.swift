@@ -124,6 +124,37 @@ final class APIProxyTests: XCTestCase {
         await socket.close()
     }
 
+    func testManagedSessionThroughAuthenticatedRelayAndProxyStop() async throws {
+        let fixture = try await APIHTTPFixture(behindProxy: true, managedSession: true)
+        defer { fixture.stop() }
+        let port = fixture.port
+        let proxy = try VPhoneAPIProxy(token: token) { completion in
+            DispatchQueue.global().async {
+                completion(Result { try VPhoneAPISocket(takingOwnership: proxyTCP(port)) })
+            }
+        }
+        defer { proxy.stop() }
+        let client = try VPhoneAPIClient(baseURL: proxy.start(port: 0), token: token, timeout: 5)
+        let session = VPhoneAPISession(client: client, vmInstanceID: "proxy-runtime")
+        defer { session.stop() }
+        session.start()
+        var deadline = ContinuousClock.now + .seconds(5)
+        while session.snapshot.state != .ready, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        XCTAssertEqual(session.snapshot.state, .ready)
+        let result = try await session.call("files.list", requiring: "files")
+        XCTAssertEqual(result, .string("files.list"))
+        proxy.stop()
+        deadline = ContinuousClock.now + .seconds(5)
+        while session.snapshot.state == .ready, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        XCTAssertEqual(session.snapshot.state, .reconnecting)
+        XCTAssertNil(session.snapshot.health)
+        XCTAssertNil(session.snapshot.generation)
+    }
+
     func testRejectedHeadersNeverConnectToGuest() throws {
         let connector = ProxyConnectorFixture()
         let proxy = try VPhoneAPIProxy(token: token, connector: connector.append)

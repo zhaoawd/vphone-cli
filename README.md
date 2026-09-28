@@ -258,8 +258,8 @@ wire protocol version. Guest runtime acceptance is still pending.
 HTTP endpoint. It provides API v1 health checks, bounded JSON RPC, and a
 WebSocket client with correlated requests, deadlines and cancellation. Tokens
 are passed explicitly as Bearer headers; redirects are refused. Creating a
-client does not start a listener. File streaming APIs and host command mapping
-remain pending. See the
+client does not start a listener. File streaming APIs and the remaining host command mappings
+are pending. See the
 [host API foundation report](research/p2_host_api_integration_2026-09-28.md).
 
 `boot --api-listen 127.0.0.1:8765` (also available on `vm launch`) explicitly
@@ -272,6 +272,26 @@ select the candidate daemon, and existing GUI/Unix-socket commands still use
 credentials, bounds connections and write waits, and closes clients when the
 boot process stops. No proxy listens unless this option is supplied. See the
 [proxy integration report](research/p2_api_proxy_integration_2026-09-28.md).
+
+The opt-in proxy also starts a managed API session. It requires the candidate's
+`session_identity` capability and matches HTTP health with the WebSocket hello
+(instance UUID, SHA-256, API version and capabilities), then checks health on
+that socket every three seconds. Failures clear readiness and trigger a fresh
+handshake; submitted operations are never replayed. Unix-socket `capabilities`
+adds `api_session` for discovery; classic command availability remains separate.
+The SHA is self-reported unless a library caller supplies an expected hash.
+Older API daemons can still use the raw proxy but cannot establish this managed
+session. See the [session report](research/p2_api_session_integration_2026-09-28.md).
+
+Unix-socket callers can explicitly select the API session for two read-only
+commands: `{"t":"app_list","transport":"api","filter":"user"}` and
+`{"t":"app_foreground","transport":"api"}`. List filters are `all` (default),
+`user`, `system`, and `running`. Foreground results preserve the daemon's
+`verified` boolean; a positive PID does not imply verification. Discovery via
+`{"t":"capabilities"}` adds `api_commands` alongside classic `commands`.
+Omitting `transport` keeps classic routing; API failures never fall back.
+Other commands are rejected on the API route. See the
+[read-only command report](research/p2_api_commands_integration_2026-09-29.md).
 
 Guest daemon payloads are built and signed with `make vphoned` (also run by
 `make build`). Development output is `.build/guest`; packaged output is

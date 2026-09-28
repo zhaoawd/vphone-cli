@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import VPhoneAPIKit
 
-private final class APISocketFixture: VPhoneAPIWebSocketTransport, @unchecked Sendable {
+final class APISocketFixture: VPhoneAPIWebSocketTransport, @unchecked Sendable {
     private let lock = NSLock()
     private var inbox: [Data] = []
     private var waiter: CheckedContinuation<Data, any Error>?

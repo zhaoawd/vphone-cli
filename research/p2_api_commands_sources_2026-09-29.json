@@ -1,0 +1,93 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "base_commit": "6845e1c",
+  "prerequisite": "ninth batch in same commit; historical snapshot in p2_api_session_sources_2026-09-28.json",
+  "scope": "explicit read-only app_list/app_foreground host mapping and API command discovery; no daemon or firmware changes",
+  "upstream_references": [
+    {
+      "revision": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+      "path": "VPhoneDaemon/Daemon/GuestAPI.swift",
+      "blob": "9d19c812c4ae3d0155c3838266eec2314147d665",
+      "sha256": "fa9bfae30127a696c4620f53d04a89ec3518ae4f7cc980f71d0bf5af2ad017f8"
+    }
+  ],
+  "dependency_references": [
+    {
+      "revision": "74843a56df54936c3949239a4ffb3ddcbe37dee4",
+      "path": "Sources/IcliSystem/Apps.swift",
+      "blob": "50acbca3a51eb0f399df7f61e4a5477fb7ef2b47",
+      "sha256": "6922caf2059ef57b541c5d50f8bbe01412f72f884737dedc87463e4a512f09d3"
+    },
+    {
+      "revision": "74843a56df54936c3949239a4ffb3ddcbe37dee4",
+      "path": "Sources/IcliSystemPrivate/LaunchServices.m",
+      "blob": "bd03b20776b1d2c058e190db2acce5bcb4768e10",
+      "sha256": "5d49bedf848f7e50a1d77a590ce9613e5fadd58505868267bae212bc43db64aa"
+    }
+  ],
+  "local_contract_references": [
+    {
+      "revision": "6845e1c",
+      "path": "sources/vphone-cli/VPhoneControl.swift",
+      "blob": "fcd6c99e627c1a5b8e106d1b8572164b8d6fee30",
+      "sha256": "7eb82812f7e591e0f9a28d8319a011c586d26d475888e65517c7f2af391de720"
+    },
+    {
+      "revision": "6845e1c",
+      "path": "scripts/vphoned/vphoned_apps.m",
+      "blob": "3df3a49e274fc9a8013745c7ca8a1203518bfc15",
+      "sha256": "16167f6a299cd54dac35d5fec58b012c70b37d2c468c0d8fb99ecba5990fd3a3"
+    }
+  ],
+  "local_files": [
+    {
+      "path": "README.md",
+      "sha256": "a4e63b29fc78d2832a7ae6a57ef0f8c0325744dc0a05fd6ac6cecbe6413e6ff6"
+    },
+    {
+      "path": "research/0_binary_patch_comparison.md",
+      "sha256": "98690dbc1ead97a6864aceeca0ce25fbef4fa734a518c3b4a279de9381bfa867"
+    },
+    {
+      "path": "research/upstream_implementation_plan.md",
+      "sha256": "26a3db94262f451b0e33faf93a35f8c4890e4685776fa24d8c01d9c1ab047003"
+    },
+    {
+      "path": "research/host_control_protocol_e1_2026-09-11.md",
+      "sha256": "4ebcca0b37daed25175827bcf35d64543e75179e4dde3873a3a915d5e114b7b6"
+    },
+    {
+      "path": "research/p2_api_commands_integration_2026-09-29.md",
+      "sha256": "c0a5bfd07075d0aed5537ead365888453f69894bc00e338035e6c7ef4098676d"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneHostAPICommands.swift",
+      "sha256": "02dd437d4265e190eb4c1aed1b39c1476e793380997537679dcf8d4fb06686e8"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneHostCommandExecutor.swift",
+      "sha256": "f226c9a24e8da72346ea5830b3f67b51b65269f47862c5294d799cfe133666c1"
+    },
+    {
+      "path": "tests/VPhoneCLITests/HostAPICommandTests.swift",
+      "sha256": "4cd77dd347af6138a33f593fd493cf0ab4949175ac81d471c777b37416b8ab33"
+    },
+    {
+      "path": "tests/VPhoneCLITests/HostControlLifecycleTests.swift",
+      "sha256": "0560a1990d062bf8a4b7cea404565f394db493246f3d093272ce869c302ce328"
+    },
+    {
+      "path": "tests/fixtures/host_api/server.py",
+      "sha256": "9270269f87b5591b125a552c3fe9d14da403fa6a57d19f1f9f0de4d8b455c40c"
+    }
+  ],
+  "logs": {
+    "make-build.log": "75dcf019ee009db3c7d39615680d6fc6e6719f3062583ebaed32d6062dd7e2cd",
+    "make-test-swift-rerun.log": "661b8455e6957fd867e48ea6d43519eb3beb16c424aa0eff89f2a27f743bd51c",
+    "make-test-swift.log": "c4aacac6f7bc792f457f5e0ce98d9ddb08268ad02bdd5c0a4407b34828fed89a",
+    "test-api-commands-final.log": "b3b3c66a58774f310a7e34664199fd26d31f30911290dcbf1e519971d3813909",
+    "test-api-commands.log": "cd837359f5a19e57772e037cb3d94833224bb64a19fb2a7361a5e07acbe8ca44",
+    "test-host-initial.log": "55faec2c77433d645f7dd564b5566d3184cd5ba8fcf65f9554b77968a474132e",
+    "test-process-runner.log": "71f7d89e8033ea8f5a1707d5bb3bc0d144bd606599290dc2bc428790296e17ae"
+  }
+}

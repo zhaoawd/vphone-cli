@@ -13,7 +13,7 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
 
     func handlerAdded(context: ChannelHandlerContext) {
         hub.add(context.channel)
-        let hello = APIReply.json(["type": "event", "event": "connected", "data": ["api_version": 1]])
+        let hello = APIReply.json(["type": "event", "event": "connected", "data": GuestAPI.health()])
         Self.send(hello.data, on: context.channel)
     }
 

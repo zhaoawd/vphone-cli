@@ -38,6 +38,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var locationProvider: VPhoneLocationProvider?
     private var hostControl: VPhoneHostControl?
     private var apiProxy: VPhoneAPIProxy?
+    private var apiSession: VPhoneAPISession?
     private var cameraServer: VPhoneCameraServer?
     private var sigintSource: DispatchSourceSignal?
     private var hostSleepActivity: NSObjectProtocol?
@@ -144,6 +145,13 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                     let proxy = try VPhoneAPIProxy(token: apiOptions.token, connector: VPhoneAPIVSockConnector.make(device: device))
                     let url = try proxy.start(port: apiOptions.port)
                     apiProxy = proxy
+                    if let vmLock {
+                        let session = VPhoneAPISession(
+                            client: try VPhoneAPIClient(baseURL: url, token: apiOptions.token, timeout: 5),
+                            vmInstanceID: vmLock.state.instanceID)
+                        apiSession = session
+                        session.start()
+                    }
                     print("[api] proxy listening on \(url.absoluteString); guest VSOCK 1339; token from VPHONE_API_TOKEN")
                 }
                 control.connect(device: device)
@@ -285,7 +293,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         // discovery: vphoned and its guest capabilities are not running there.
         let executor = VPhoneHostCommandExecutor(
             control: control, camera: cameraServer, location: locationProvider,
-            screen: hostScreen, bootMode: cli.dfu ? .dfu : .normal)
+            screen: hostScreen, apiSession: apiSession, bootMode: cli.dfu ? .dfu : .normal)
         let hc = VPhoneHostControl(
             socketPath: options.configURL.deletingLastPathComponent()
                 .appendingPathComponent("vphone.sock").path,
@@ -416,6 +424,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {
+        apiSession?.stop()
         apiProxy?.stop()
         hostControl?.stop()
         control?.close()

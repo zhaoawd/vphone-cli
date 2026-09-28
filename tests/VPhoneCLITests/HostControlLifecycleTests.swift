@@ -5,7 +5,7 @@ import VPhoneCore
 @testable import vphone_cli
 
 @MainActor
-private final class ControlEndpoint {
+final class ControlEndpoint {
     let directory: URL
     let path: String
     let server: VPhoneHostControl

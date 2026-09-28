@@ -1,5 +1,13 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-29 P2 read-only host app commands
+
+Added explicit API routing for Unix-socket app_list and app_foreground, with capability discovery, field/error mapping and cancellation/generation checks. Classic routing remains the default. Tests cover contract failures and a real Unix-socket-to-loopback-WebSocket path. No daemon, firmware/kernel/DSC patch or installation changes in this batch; real VM acceptance remains skipped. See the [tenth-batch report](p2_api_commands_integration_2026-09-29.md).
+
+## 2026-09-28 P2 managed API session
+
+Added VM-runtime-scoped API sessions with HTTP/WebSocket identity agreement, SHA/capability checks, heartbeat, reconnect and additive Unix-socket discovery. The inactive candidate daemon now declares a process UUID, session capability and read-only health RPC. These are local API v1 extensions to fixed upstream 2.0.8. Firmware/kernel/DSC patch logic and installed classic payload selection are unchanged. Real VM acceptance remains skipped. See the [ninth-batch report](p2_api_session_integration_2026-09-28.md).
+
 ## 2026-09-28 P2 opt-in API proxy
 
 Added an explicit loopback TCP-to-VSOCK 1339 proxy to boot/vm launch. The proxy adapts the fixed upstream request gate, checks one token and local Host/no Origin before connecting, strips credentials, and bounds admission, connection attempts, relay buffers and writes. Host-only tests exercise HTTP/WebSocket forwarding and socket lifecycle. No daemon installation, firmware patch, kernel/DSC logic, or default 1337 control behavior changes. Real VM acceptance remains skipped. See the [eighth-batch report](p2_api_proxy_integration_2026-09-28.md).

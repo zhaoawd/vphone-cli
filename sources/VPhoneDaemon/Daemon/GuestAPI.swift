@@ -50,9 +50,11 @@ enum GuestAPI {
             "api_version": 1,
             "status": "ok",
             "binary_hash": binaryHash,
+            "instance_id": APISessionIdentity.instanceID,
             "ios": "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)",
             "ip": ip ?? "",
             "capabilities": [
+                APISessionIdentity.capability,
                 "touch",
                 "hid",
                 "apps",
@@ -87,6 +89,8 @@ enum GuestAPI {
 
     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
         switch method {
+        case "agent.health":
+            return health()
         case "device.snapshot":
             var snapshot = try collectDeviceSnapshot()
             snapshot["jailbreak"] = jailbreakInfo()

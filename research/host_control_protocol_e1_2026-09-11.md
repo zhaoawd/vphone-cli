@@ -39,3 +39,5 @@ socket 权限设为 0600。接收连接后使用 `getpeereid` 检查对端有效
 2026-09-12 核对：提交 `0eaec95` 的 [GitHub CI](https://github.com/zhaoawd/vphone-cli/actions/runs/34572983931) 已完成，结论为 success。此次仅查询远端结果，没有重新运行本地测试。
 
 2026-09-12，E2 已新增命令执行期限、协作取消和迟到结果处理。上述 E1 时点的命令生命周期限制由[E2 记录](host_control_e2_2026-09-12.md)补充；底层操作是否停止仍需区分。
+
+2026-09-29，第十批新增显式 `transport:"api"` 的应用列表与前台查询，以及 `api_commands` 能力字段；默认路由和 E1 连接权限继续保留。参数、字段与错误映射见[只读 API 命令记录](p2_api_commands_integration_2026-09-29.md)。
