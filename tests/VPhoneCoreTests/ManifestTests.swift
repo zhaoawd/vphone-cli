@@ -3,6 +3,27 @@ import Foundation
 import Testing
 
 struct ManifestTests {
+    @Test func versionedManifestIsRejectedAndReportedWithoutRewriting() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let bundle = root.appendingPathComponent("versioned")
+        try FileManager.default.createDirectory(at: bundle, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let config = bundle.appendingPathComponent("config.plist")
+        try sampleManifest().write(to: config)
+        var plist = try #require(PropertyListSerialization.propertyList(from: Data(contentsOf: config), format: nil) as? [String: Any])
+        for value: Any in [2, 99, "2", true] {
+            plist["schemaVersion"] = value
+            let bytes = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
+            try bytes.write(to: config)
+            #expect(throws: (any Error).self) { try VPhoneBundle.load(at: bundle) }
+            let scan = try VPhoneLibrary(root: root).scan()
+            #expect(scan.bundles.isEmpty)
+            #expect(scan.skipped.count == 1)
+            #expect(scan.skipped.first?.reason.contains("schema") == true)
+            #expect(try Data(contentsOf: config) == bytes)
+        }
+    }
+
     private func sampleManifest() -> VPhoneVirtualMachineManifest {
         VPhoneVirtualMachineManifest(
             cpuCount: 8,

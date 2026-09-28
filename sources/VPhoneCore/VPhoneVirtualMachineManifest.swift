@@ -7,6 +7,7 @@ public enum VPhoneManifestError: Error {
     case loadFailed(path: String, underlying: Error)
     case parseFailed(path: String, underlying: Error)
     case writeFailed(path: String, underlying: Error)
+    case unsupportedSchema(path: String, found: String)
 }
 
 extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
@@ -15,6 +16,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
         case let .loadFailed(path, underlying): "Failed to load manifest from \(path): \(underlying)"
         case let .parseFailed(path, underlying): "Failed to parse manifest at \(path): \(underlying)"
         case let .writeFailed(path, underlying): "Failed to write manifest to \(path): \(underlying)"
+        case let .unsupportedSchema(path, found): "VM manifest at \(path) declares schema \(found). This backend supports legacy manifests without schemaVersion; the v2 runtime integration is not yet available. Use a matching runtime; this command has not upgraded the VM."
         }
     }
     public var errorDescription: String? { description }
@@ -177,6 +179,13 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
 
         let decoder = PropertyListDecoder()
         do {
+            // A v2 plist shares many field names with the legacy layout. Do not
+            // silently decode it as legacy and later erase its schema marker.
+            let plist = try PropertyListSerialization.propertyList(from: data, format: nil)
+            if let value = (plist as? [String: Any])?["schemaVersion"] {
+                throw VPhoneManifestError.unsupportedSchema(path: url.path,
+                    found: (value as? Int).map(String.init) ?? "invalid")
+            }
             return try decoder.decode(VPhoneVirtualMachineManifest.self, from: data)
         } catch {
             throw VPhoneManifestError.parseFailed(path: url.path, underlying: error)
