@@ -2,17 +2,18 @@ import Foundation
 import Testing
 @testable import VPhoneAPIKit
 
-private final class APIHTTPFixture {
+final class APIHTTPFixture {
     let process = Process()
     let directory: URL
     let port: Int
 
-    init() async throws {
+    init(behindProxy: Bool = false) async throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("vphone-api-\(UUID())")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         process.executableURL = root.appendingPathComponent(".venv/bin/python3")
         process.arguments = [root.appendingPathComponent("tests/fixtures/host_api/server.py").path, directory.path]
+        if behindProxy { process.arguments?.append("--behind-proxy") }
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
         try process.run()

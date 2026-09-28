@@ -12,6 +12,8 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
     @Flag(name: .customLong("headless"), help: "Boot without a VM window or menu bar") var headless = false
     @Option(name: [.customShort("V"), .long], help: "Firmware variant") var variant: String?
     @Flag(name: .customLong("no-vphoned"), help: "Do not stage/use vphoned") var noVphoned = false
+    @Option(help: "Expose candidate guest API on 127.0.0.1:PORT; requires VPHONE_API_TOKEN")
+    var apiListen: String?
     @Option(help: "Kernel GDB debug stub port on host (omit for system-assigned; valid: 6000...65535)")
     var kernelDebugPort: Int?
     @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
@@ -25,7 +27,16 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         return ["--vphoned-bin", payload.path]
     }
 
+    func apiProxyArguments() -> [String] {
+        apiListen.map { ["--api-listen", $0] } ?? []
+    }
+
+    mutating func validate() throws {
+        try VPhoneAPIProxyOptions.validate(listen: apiListen, dfu: dfu, noVphoned: noVphoned)
+    }
+
     func run() throws {
+        _ = try VPhoneAPIProxyOptions.resolve(listen: apiListen)
         let v = VPhoneVerbosity(count: verboseCount)
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
@@ -72,7 +83,7 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
             }
         }
 
-        var args = ["--config", bundle.configURL.path] + guestPayloadArguments(resources: resources)
+        var args = ["--config", bundle.configURL.path] + guestPayloadArguments(resources: resources) + apiProxyArguments()
         if dfu { args.append("--dfu") }
         if headless { args.append("--headless") }
         if let variant { args += ["--variant", variant] }

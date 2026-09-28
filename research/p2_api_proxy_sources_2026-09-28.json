@@ -1,0 +1,101 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "base_commit": "a0af165",
+  "scope": "opt-in IPv4 loopback TCP to VSOCK 1339 proxy; no candidate daemon activation or real VM acceptance",
+  "upstream_references": [
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/Support/VPhoneAPIRequestGate.swift",
+      "blob": "65ff45fc41014ec4ffe8ba13701c68d88b963068",
+      "sha256": "ff8510cfe736b19c8be97165474fd6751dcea5bb41196a312600f2894001999b"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneAPIProxy.swift",
+      "blob": "e25f45f2ae683d488140c4b31da4056d9f288989",
+      "sha256": "a9ee3a534a55320a1ced002458ff713108e8d340cc701086ab05d769e9aface2"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "blob": "d6002c85089f8361d36708aa5a5ac9a6e2f218da",
+      "sha256": "9342a8b6863906cb2088be56495fbd4679d47a1d29f226530b5002eb5835026d"
+    }
+  ],
+  "adaptations": {
+    "VPhoneAPIRequestGate": "imported and hardened; unique credentials, Host/Origin, framing and credential stripping",
+    "VPhoneAPIProxy": "local POSIX/Dispatch implementation of the upstream relay design; no new NIO dependency"
+  },
+  "local_files": [
+    {
+      "path": "Package.swift",
+      "sha256": "9139384bae66b6cf542957c6247e15474a598409017f3ca40c7d7df3bb86e079"
+    },
+    {
+      "path": "README.md",
+      "sha256": "34a46c981d6c7429fcb22ead6e1d27d768872b8a3fa2ede00dcecfe01f587d34"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+      "sha256": "3f2d069d55f1d806ae76c2e7cc7aa8d9d777fb3bb9206b0170f6c36fb5d8ef69"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIProxy.swift",
+      "sha256": "4bad6cf7140998b9afd8f8ab8ca8bcacde40c0e6868a8df2a4fc414dd7f72bbe"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIRequestGate.swift",
+      "sha256": "38b654fafd302a8887578fa5d888097956e0f7696ae3bd56348a20cceb8f437b"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPISocket.swift",
+      "sha256": "bd9d0280058fc4b7fd48d7f699a1400878cb9c185a63d9b152db4e577029ebbe"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneAPIProxyOptions.swift",
+      "sha256": "a1c34dcc73737501ee92ff0b6e4bb8abefcaf5c6a5179c30abdf7537c4923720"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneAPIVSockConnector.swift",
+      "sha256": "536c03e889a456e091113b03f3dccd6ddec61d85d413ac37253cc21606532ef3"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneAppDelegate.swift",
+      "sha256": "aef48d2806c6f66effd08965323627019e6f04b3e52365c8e55432b5a6153688"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCLI.swift",
+      "sha256": "9a08e69dfa8e0fdbf84e5b23c614a1a0bf2ab5ef463ed9f8fdffcebdacea2395"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+      "sha256": "7f0e1cdf22447c0eec24a8053f4d04d4d49898bfddf66cee4d3bf310d66b9231"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIHTTPTests.swift",
+      "sha256": "1bfa3feb23192268e8336fdf5223d2b298891d46988a5bef87e9394c32275733"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIProxyTests.swift",
+      "sha256": "3844c407e7aca45e94d567aecc2b467a084b3a0d6eaf58f554e40c5cbdb54a31"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIRequestGateTests.swift",
+      "sha256": "c01acfaf88f027b095fb8cfda3a1fc463a927eb8c3509244858f558ca410643a"
+    },
+    {
+      "path": "tests/VPhoneCLITests/APIProxyCLITests.swift",
+      "sha256": "ba56a71bd6cc937b84699e4192c8565c4a5afae4764a0d52bddf3fbef54836c1"
+    },
+    {
+      "path": "tests/fixtures/host_api/server.py",
+      "sha256": "dd104c91f88b5ca2d751615b9a129aaaf8687ca7ce7ad22f3e43a6044324f39d"
+    }
+  ],
+  "license": "dependencies/licenses/daemon-api/VPhoneDaemon-MIT.txt",
+  "logs": {
+    "build-debug-before-connector-fix.log": "aa70a202484c6637640c143f75a71c43479f17f2e475b23761a8d60e470ed7cf",
+    "make-build.log": "e369a2f44282d748c3685017cbf0e72adde10eb52f0b4d9b596d54a841d8e2b4",
+    "make-test-swift-final.log": "02a52f1c2d13f13ab020e548e3837cdafd2d6a7c9964a51f117e2aafe381f7d9",
+    "make-test.log": "005c5a5b935467d71f2d82ceb173cadd24a6a13d59be9b37a8401e6addc8b222",
+    "test-proxy-fd-final.log": "a10fbb8b23df79bb7726a046660c9496f5251f7d49dcc33d309d927e113b916e",
+    "test-proxy.log": "6a47796edbc805fea79cabdffd7e38f8838baaa40bd6e6e7fdc0ab3d830f6df9"
+  }
+}

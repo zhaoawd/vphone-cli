@@ -1,5 +1,10 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-28 P2 opt-in API proxy
+
+Added an explicit loopback TCP-to-VSOCK 1339 proxy to boot/vm launch. The proxy adapts the fixed upstream request gate, checks one token and local Host/no Origin before connecting, strips credentials, and bounds admission, connection attempts, relay buffers and writes. Host-only tests exercise HTTP/WebSocket forwarding and socket lifecycle. No daemon installation, firmware patch, kernel/DSC logic, or default 1337 control behavior changes. Real VM acceptance remains skipped. See the [eighth-batch report](p2_api_proxy_integration_2026-09-28.md).
+
+
 ## 2026-09-28 P2 host HTTP/WebSocket foundation
 
 Added the independent `VPhoneAPIKit` SwiftPM library, adapting the fixed upstream API v1 value types and client contract. Health/capability/hash checks, bounded HTTP RPC, WebSocket response correlation, deadlines, cancellation and connection generation have host-only tests, including a real loopback HTTP/WebSocket fixture. No firmware, kernel/DSC patch, daemon payload, installation target or default VM control path changes in this batch. VSOCK/proxy and business command integration remain pending. See the [seventh-batch report](p2_host_api_integration_2026-09-28.md).

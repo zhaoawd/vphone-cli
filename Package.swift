@@ -87,6 +87,7 @@ let package = Package(
                 .product(name: "Dynamic", package: "Dynamic"),
                 "FirmwarePatcher",
                 "VPhoneCore",
+                "VPhoneAPIKit",
                 "VPhoneSign",
                 "VPhoneRestore",
                 "VPhoneArchiveKit",

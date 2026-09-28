@@ -48,6 +48,9 @@ struct VPhoneBootCLI: ParsableCommand {
     @Flag(name: .customLong("headless"), help: "Boot without a VM window or menu bar")
     var headless: Bool = false
 
+    @Option(help: "Expose the candidate guest API on 127.0.0.1:PORT (0 selects a port). Requires VPHONE_API_TOKEN; no daemon installation.")
+    var apiListen: String?
+
     @Option(help: "Kernel GDB debug stub port on host (omit for system-assigned port; valid: 6000...65535)")
     var kernelDebugPort: Int?
 
@@ -87,6 +90,7 @@ struct VPhoneBootCLI: ParsableCommand {
     }
 
     mutating func validate() throws {
+        try VPhoneAPIProxyOptions.validate(listen: apiListen, dfu: dfu, noVphoned: noVphoned)
         if dfu, let packageURL = installPackageURL {
             throw ValidationError(
                 "`--install-ipa` is unavailable with `--dfu` because DFU mode does not start the guest control channel: \(packageURL.path)"

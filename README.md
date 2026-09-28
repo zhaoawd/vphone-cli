@@ -257,10 +257,21 @@ wire protocol version. Guest runtime acceptance is still pending.
 `VPhoneAPIKit` is an independent SwiftPM library for an explicitly supplied
 HTTP endpoint. It provides API v1 health checks, bounded JSON RPC, and a
 WebSocket client with correlated requests, deadlines and cancellation. Tokens
-are passed explicitly as Bearer headers; redirects are refused. It does not
-start a host proxy or connect to VSOCK, and is not wired into the default CLI.
-File streaming and host command mapping remain pending. See the
+are passed explicitly as Bearer headers; redirects are refused. Creating a
+client does not start a listener. File streaming APIs and host command mapping
+remain pending. See the
 [host API foundation report](research/p2_host_api_integration_2026-09-28.md).
+
+`boot --api-listen 127.0.0.1:8765` (also available on `vm launch`) explicitly
+enables a loopback TCP proxy to guest VSOCK 1339. Port `0` selects an available
+port. Set `VPHONE_API_TOKEN` to 16–256 URL-unreserved characters before launch;
+the proxy never prints the token. This option requires an already installed API
+daemon and is unavailable with `--dfu` or `--no-vphoned`. It does not install or
+select the candidate daemon, and existing GUI/Unix-socket commands still use
+1337. The proxy checks the initial request's token, Host and Origin, strips
+credentials, bounds connections and write waits, and closes clients when the
+boot process stops. No proxy listens unless this option is supplied. See the
+[proxy integration report](research/p2_api_proxy_integration_2026-09-28.md).
 
 Guest daemon payloads are built and signed with `make vphoned` (also run by
 `make build`). Development output is `.build/guest`; packaged output is

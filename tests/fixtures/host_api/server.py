@@ -10,6 +10,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 root = Path(sys.argv[1])
 token = '1234567890abcdef'
+behind_proxy = '--behind-proxy' in sys.argv[2:]
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -27,8 +28,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def authorized(self):
+        if behind_proxy:
+            return self.headers.get('Authorization') is None and self.headers.get('Host') == 'vphoned'
+        return self.headers.get('Authorization') == 'Bearer ' + token
+
     def do_GET(self):
-        if self.headers.get('Authorization') != 'Bearer ' + token:
+        if not self.authorized():
             return self.reply(401, {'error': 'unauthorized'})
         if self.path.startswith('/redirect/'):
             self.send_response(302)
@@ -63,7 +69,7 @@ class Handler(BaseHTTPRequestHandler):
                          'capabilities': ['files'], 'ios': '26.0'})
 
     def do_POST(self):
-        if self.headers.get('Authorization') != 'Bearer ' + token:
+        if not self.authorized():
             return self.reply(401, {'error': 'unauthorized'})
         request = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
         result = {'type': 'response', 'id': request['id'], 'result': request['params']}

@@ -2,6 +2,7 @@ import AppKit
 import Foundation
 import Virtualization
 import VPhoneCore
+import VPhoneAPIKit
 
 // MARK: - Exit status
 
@@ -36,6 +37,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var appWindowController: VPhoneAppWindowController?
     private var locationProvider: VPhoneLocationProvider?
     private var hostControl: VPhoneHostControl?
+    private var apiProxy: VPhoneAPIProxy?
     private var cameraServer: VPhoneCameraServer?
     private var sigintSource: DispatchSourceSignal?
     private var hostSleepActivity: NSObjectProtocol?
@@ -73,6 +75,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private func startVirtualMachine() async throws {
+        let apiOptions = try VPhoneAPIProxyOptions.resolve(listen: cli.apiListen)
         // Acquire before reading or mutating the manifest and opening VM storage.
         vmLock = try VPhoneVMLock(directory: cli.config.resolvingSymlinksInPath().deletingLastPathComponent(),
                                   operation: cli.dfu
@@ -137,6 +140,12 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             cameraServer = camServer
 
             if let device = vm.virtualMachine.socketDevices.first as? VZVirtioSocketDevice {
+                if let apiOptions {
+                    let proxy = try VPhoneAPIProxy(token: apiOptions.token, connector: VPhoneAPIVSockConnector.make(device: device))
+                    let url = try proxy.start(port: apiOptions.port)
+                    apiProxy = proxy
+                    print("[api] proxy listening on \(url.absoluteString); guest VSOCK 1339; token from VPHONE_API_TOKEN")
+                }
                 control.connect(device: device)
                 camServer.connect(device: device)
             }
@@ -407,6 +416,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {
+        apiProxy?.stop()
         hostControl?.stop()
         control?.close()
         if let hostSleepActivity {

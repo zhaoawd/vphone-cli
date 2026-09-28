@@ -1,6 +1,6 @@
 import Foundation
 
-/// An explicit HTTP endpoint client. This library does not create a listener,
+/// An explicit HTTP endpoint client. This client does not create a listener,
 /// connect to VSOCK, install a daemon, or change the classic guest protocol.
 public struct VPhoneAPIClient: Sendable {
     public let baseURL: URL
