@@ -4,7 +4,7 @@
 
 本计划依据 [上游与本地仓库对比分析](upstream_comparison.md)，选择性吸收上游模块，同时保留本地多变体、检查点续跑、自动化合约和补丁约束。当前目标更新为上游 `2.0.8`。新增 P1c 启动状态修正，并将 API 认证、核心包校验、应用层定位、guest 同步和管理器生命周期纳入实施范围。P4 提供基础 SystemHook，P6 仅处理可选 Irisin 环境。
 
-P1c 已在独立副本上通过连续启动与 clone 启动；真实导入及导入后启动仍未通过，2026-09-28 按用户要求跳过该验收并继续其他整合。P1a 目录更新和 P1b EXP 相机 DSC 预检查已应用，验证结果见 [P1a/P1b 整合记录](p1ab_integration_2026-09-28.md)。P2 已接入原生签名/归档库、可选原生 VM 传输和 IPSW 检查/缓存接口；P0 其余检查和 P2 其余模块、P3–P8 尚未完成。P1a/P1b/P1c 和 P2 已完成部分的代码、测试与研究记录纳入本次整合提交。
+P1c 已在独立副本上通过连续启动与 clone 启动；真实导入及导入后启动仍未通过，2026-09-28 按用户要求跳过该验收并继续其他整合。P1a 目录更新和 P1b EXP 相机 DSC 预检查已应用，验证结果见 [P1a/P1b 整合记录](p1ab_integration_2026-09-28.md)。P2 已接入原生签名/归档库、可选原生 VM 传输、IPSW 检查/缓存及 Restore 库/离线检查接口；P0 其余检查和 P2 其余模块、P3–P8 尚未完成。P1a/P1b/P1c 和 P2 前三批的代码、测试与研究记录已纳入 `614b6f6`；第四批 Restore 变更按用户要求纳入本次独立提交。
 
 ## 1. 固定输入
 
@@ -102,7 +102,7 @@ P0 检查项及剩余工作：
 
 ### P2：构建基础、资源及原生库
 
-**当前状态（2026-09-28）**：VPhoneSign 和 VPhoneArchiveKit、SwiftPM 目标与显式 CLI 已接入。归档库采用固定 ArchiveKit 依赖，覆盖权限、链接、路径检查、排他输出和稀疏文件往返；具体验证见 [P2 第一批签名记录](p2_sign_integration_2026-09-28.md)及 [P2 第二批归档记录](p2_archive_integration_2026-09-28.md)。原有 build/CFW 签名路径保留。VM 传输已通过可选 native 后端接线，默认仍为 system-tar；IPSW 缓存和本地检查接口已接入，固件准备脚本尚未切换。详见 [P2 第三批记录](p2_transfer_integration_2026-09-28.md)。Restore、daemon/guest 和新 bundle 布局仍待迁入；P2 保持部分完成。
+**当前状态（2026-09-28）**：VPhoneSign 和 VPhoneArchiveKit、SwiftPM 目标与显式 CLI 已接入。归档库采用固定 ArchiveKit 依赖，覆盖权限、链接、路径检查、排他输出和稀疏文件往返；具体验证见 [P2 第一批签名记录](p2_sign_integration_2026-09-28.md)及 [P2 第二批归档记录](p2_archive_integration_2026-09-28.md)。原有 build/CFW 签名路径保留。VM 传输已通过可选 native 后端接线，默认仍为 system-tar；IPSW 缓存和本地检查接口已接入，固件准备脚本尚未切换。详见 [P2 第三批记录](p2_transfer_integration_2026-09-28.md)。Restore 三层库与固定依赖已迁入，新增 `restore-inspect` 离线检查，原生恢复尚未接入执行阶段；详见 [P2 第四批记录](p2_restore_integration_2026-09-28.md)。daemon/guest 和新 bundle 布局仍待迁入；P2 保持部分完成。
 
 依赖 P0。先保持本地现有路径可构建，再引入对应模块；不得先删除 Package.swift、Makefile 或现有测试。
 
@@ -235,7 +235,7 @@ Launchpad 配套检查分三类显示：宿主 Core Bundle 最低版本、VM sch
 | P1c | 代码、测试、构建、连续启动和 clone 启动通过 | 真实导出成功；真实导入及导入后启动未完成，本轮按用户要求跳过；应用业务数据仍待验收 |
 | P1a | 实现与回归完成，纳入本次提交 | catalog 25 条，清单一致性、CLI JSON 和菜单选择通过；新组合仅为 code_selectable |
 | P1b | 实现与无固件回归完成，纳入本次提交 | 17 项合成 DSC 测试通过；真实 DSC 验收未完成 |
-| P2 | 部分完成 | Sign/Archive 库、CLI、可选原生 VM 传输和 IPSW 缓存接口已接入；原生固件准备、Restore、daemon/guest 和 bundle 布局待迁入 |
+| P2 | 部分完成 | Sign/Archive/Restore 库、显式 CLI、可选原生 VM 传输和 IPSW 缓存接口已接入；原生恢复执行、原生固件准备、daemon/guest 和 bundle 布局待完成 |
 | P3–P8 | 待执行 | 按本计划依赖推进，不整体合并 |
 
 此前已运行原工程测试、本地签名构建及独立副本启动。2026-09-28 按用户要求跳过 P1c 真实导入及导入后启动验收，继续 P1a/P1b 和剩余 P0 取证。上游 2.x 构建、恢复及完整融合尚未完成。
@@ -281,3 +281,5 @@ Launchpad 配套检查分三类显示：宿主 Core Bundle 最低版本、VM sch
 | 2026-09-28 | 按用户要求提交已完成的 P1/P2 整合代码、测试与研究记录；真实 VM 导入及导入后启动仍跳过 | 本次整合提交；验收范围不变 |
 
 [history-plan]: https://github.com/zhaoawd/vphone-cli/blob/9489ab296e3c1d345f936135b370d51da7a3c65d/research/upstream_implementation_plan_2026-09-24.md
+
+| 2026-09-28 | P2 第四批接入 Restore 库、固定依赖及离线检查；保留现有 Python 恢复执行和 DFU owner 检查 | [P2 第四批记录](p2_restore_integration_2026-09-28.md) |

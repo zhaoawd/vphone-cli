@@ -1,0 +1,664 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "licenses": "Swift integration: upstream MIT; vendored C retains per-file notices and COPYING; dependency notices in scripts/licenses",
+  "files": [
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRecoveryCore/COPYING",
+      "upstream_blob": "f166cc57b2783565bc48e8999103c572fca4c0e4",
+      "upstream_sha256": "a1a33180d02960ab1c5de36cf20b1a2f0fe9888d83826ad263da5db52f1b183b",
+      "local_path": "sources/MobileRecoveryCore/COPYING",
+      "local_sha256": "a1a33180d02960ab1c5de36cf20b1a2f0fe9888d83826ad263da5db52f1b183b",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRecoveryCore/Include/libirecovery.h",
+      "upstream_blob": "7c3323c65a63c067915efe6ceff7f662b257342c",
+      "upstream_sha256": "9162b0b9e5cf1ecb5e8619082fc5b43af1f418804fce96c1686e197effc02684",
+      "local_path": "sources/MobileRecoveryCore/Include/libirecovery.h",
+      "local_sha256": "9162b0b9e5cf1ecb5e8619082fc5b43af1f418804fce96c1686e197effc02684",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRecoveryCore/Include/module.modulemap",
+      "upstream_blob": "b098dfc543ba993f9ca33251ed19b291c09ac037",
+      "upstream_sha256": "33743d767584c7eab1242a8ac3182e04f17973c5906f4a1d628882832ed50dcd",
+      "local_path": "sources/MobileRecoveryCore/Include/module.modulemap",
+      "local_sha256": "33743d767584c7eab1242a8ac3182e04f17973c5906f4a1d628882832ed50dcd",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRecoveryCore/config.h",
+      "upstream_blob": "07252885837a2f5563666e075a7a09be6f9111ea",
+      "upstream_sha256": "7f8d105a582d4b9363de2421e00d7ddc0d30032ad3e53019100f13a33715cb2f",
+      "local_path": "sources/MobileRecoveryCore/config.h",
+      "local_sha256": "7f8d105a582d4b9363de2421e00d7ddc0d30032ad3e53019100f13a33715cb2f",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRecoveryCore/libirecovery.c",
+      "upstream_blob": "7728917415acb88346d1d296b8b27d7e98e2b9cb",
+      "upstream_sha256": "86abe30aa6329d435f2a4f59c356dd57af1a3146c3dde0bbd6effac8f9928322",
+      "local_path": "sources/MobileRecoveryCore/libirecovery.c",
+      "local_sha256": "86abe30aa6329d435f2a4f59c356dd57af1a3146c3dde0bbd6effac8f9928322",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Bridge/vphone_restore_bridge.c",
+      "upstream_blob": "d9b4c1651c9880be69cb4695f1b9b3518f088da9",
+      "upstream_sha256": "726c1d061b12a4c5dac4e1847ce9550f9a62e2ae8a034bf68e984e3a1366384e",
+      "local_path": "sources/MobileRestoreCore/Bridge/vphone_restore_bridge.c",
+      "local_sha256": "15436c6fe9058a852976ea16ba82ebe88d95485415c850d8aa71134e1dff4e5a",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Bridge/vphone_zip_stub.c",
+      "upstream_blob": "3016ba52eb40de0b38e67ca923722d5c2bff2980",
+      "upstream_sha256": "fb4774ce9c9c673d42ffb92d519b60d6ac5e4540cd56c00cad648d4655dba66a",
+      "local_path": "sources/MobileRestoreCore/Bridge/vphone_zip_stub.c",
+      "local_sha256": "fb4774ce9c9c673d42ffb92d519b60d6ac5e4540cd56c00cad648d4655dba66a",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Bridge/zip.h",
+      "upstream_blob": "ad58b53940cb086fee6f220e3829ede88f8fe429",
+      "upstream_sha256": "78c4a8be584b6ae8b77a5a44244167ae385cec5c7cbe2a3b6d03140e26bae1f7",
+      "local_path": "sources/MobileRestoreCore/Bridge/zip.h",
+      "local_sha256": "78c4a8be584b6ae8b77a5a44244167ae385cec5c7cbe2a3b6d03140e26bae1f7",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/COPYING",
+      "upstream_blob": "65c5ca88a67c30becee01c5a8816d964b03862f9",
+      "upstream_sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "local_path": "sources/MobileRestoreCore/COPYING",
+      "local_sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/common.c",
+      "upstream_blob": "4a38dd46c19414b369f1dc2f2f49d614c1281bf8",
+      "upstream_sha256": "7a8f19a72227836098ae97ecd58c725088a66cc3a7c31f51aa16a04a4edfcfc3",
+      "local_path": "sources/MobileRestoreCore/Core/common.c",
+      "local_sha256": "7a8f19a72227836098ae97ecd58c725088a66cc3a7c31f51aa16a04a4edfcfc3",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/common.h",
+      "upstream_blob": "3bb648aeb0a5aad36a420662f56446bba3bfe923",
+      "upstream_sha256": "5a5930ce10aa0ca8868a5de2c657098e2393dee0dbf227560f9c0ecf039d023a",
+      "local_path": "sources/MobileRestoreCore/Core/common.h",
+      "local_sha256": "5a5930ce10aa0ca8868a5de2c657098e2393dee0dbf227560f9c0ecf039d023a",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/deviceinterfaced.c",
+      "upstream_blob": "050da2999fd4eb96aa7c41b9d6efcc29d44a4749",
+      "upstream_sha256": "dfc99be80d68b7dd8bdf9d553cedf8cb6aa09af0640b5eaf0d835660ec2b1feb",
+      "local_path": "sources/MobileRestoreCore/Core/deviceinterfaced.c",
+      "local_sha256": "dfc99be80d68b7dd8bdf9d553cedf8cb6aa09af0640b5eaf0d835660ec2b1feb",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/deviceinterfaced.h",
+      "upstream_blob": "c8623ad93be08409d1e6d2024f4c54517e4bcfff",
+      "upstream_sha256": "134441718726c43247774494ea76ad8cf2ee2bebd200515d369a9a09fbe15eff",
+      "local_path": "sources/MobileRestoreCore/Core/deviceinterfaced.h",
+      "local_sha256": "134441718726c43247774494ea76ad8cf2ee2bebd200515d369a9a09fbe15eff",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/idevicerestore.c",
+      "upstream_blob": "bffd3284afeb83f307d7c7df757ca4ec04791a21",
+      "upstream_sha256": "e2fa76cc1e16c570471b7c09e5bb3f04cfcaccee1663dc8acf3c61eb81c57333",
+      "local_path": "sources/MobileRestoreCore/Core/idevicerestore.c",
+      "local_sha256": "e2fa76cc1e16c570471b7c09e5bb3f04cfcaccee1663dc8acf3c61eb81c57333",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/idevicerestore.h",
+      "upstream_blob": "ce8686f3a84bf47bcd28b041b9c1015b50d00c1d",
+      "upstream_sha256": "9359aa871d0c4a0f193aab839a8aa58c1fce444a14b27709d81954aed58b59fd",
+      "local_path": "sources/MobileRestoreCore/Core/idevicerestore.h",
+      "local_sha256": "9359aa871d0c4a0f193aab839a8aa58c1fce444a14b27709d81954aed58b59fd",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/locking.c",
+      "upstream_blob": "05f0e4f6859e339957922ab23b0210df3ee9a3c8",
+      "upstream_sha256": "1c7acdcfa3927be9f9084cc34f8443890126fa195abc0beabe71490cce09b349",
+      "local_path": "sources/MobileRestoreCore/Core/locking.c",
+      "local_sha256": "1c7acdcfa3927be9f9084cc34f8443890126fa195abc0beabe71490cce09b349",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/locking.h",
+      "upstream_blob": "d5b07ec56acbe5b16a26d4d85c41e6bf3ef19157",
+      "upstream_sha256": "294acafa9e892a3e7796108e9471891bb1a5a6d206db49dbda6688efa30afdad",
+      "local_path": "sources/MobileRestoreCore/Core/locking.h",
+      "local_sha256": "294acafa9e892a3e7796108e9471891bb1a5a6d206db49dbda6688efa30afdad",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/log.c",
+      "upstream_blob": "1238cb469687669afa3d7970d1000d44a017645c",
+      "upstream_sha256": "c1b63f312f91f54e1f5ecfde4ef5374986bc6a50b321f904b3e396c69195c9cb",
+      "local_path": "sources/MobileRestoreCore/Core/log.c",
+      "local_sha256": "c1b63f312f91f54e1f5ecfde4ef5374986bc6a50b321f904b3e396c69195c9cb",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Core/log.h",
+      "upstream_blob": "046a8d25430b820f99367c8de057602b0f3b83ac",
+      "upstream_sha256": "95195f662e13bef513e73f88bcf7b0ab966eebba51dfdffad1d8c67885c7ced8",
+      "local_path": "sources/MobileRestoreCore/Core/log.h",
+      "local_sha256": "95195f662e13bef513e73f88bcf7b0ab966eebba51dfdffad1d8c67885c7ced8",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Containers/fls.c",
+      "upstream_blob": "67f4355b804ff1f462123dc529bd0cf1266f2b6d",
+      "upstream_sha256": "883cac463d0685e6d941105a64ce0da18792e123fb78e76e88fca64a4229448e",
+      "local_path": "sources/MobileRestoreCore/Firmware/Containers/fls.c",
+      "local_sha256": "883cac463d0685e6d941105a64ce0da18792e123fb78e76e88fca64a4229448e",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Containers/fls.h",
+      "upstream_blob": "2db9029e7773ac8fb204d26ffec5868994e327f0",
+      "upstream_sha256": "ffc73cfdbb854d672b7116ab5b9c595e31dd30865dd6ac1120c33bd136b4b710",
+      "local_path": "sources/MobileRestoreCore/Firmware/Containers/fls.h",
+      "local_sha256": "ffc73cfdbb854d672b7116ab5b9c595e31dd30865dd6ac1120c33bd136b4b710",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Containers/ftab.c",
+      "upstream_blob": "325f14fd71c3241b13ce7d5c9fc0fc44441c5c5d",
+      "upstream_sha256": "f5bac2122f15d6a8e0f6eed0720739bcced93fc94755a42866067e19cf33678f",
+      "local_path": "sources/MobileRestoreCore/Firmware/Containers/ftab.c",
+      "local_sha256": "f5bac2122f15d6a8e0f6eed0720739bcced93fc94755a42866067e19cf33678f",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Containers/ftab.h",
+      "upstream_blob": "d5d4d9284171c3a26be5c689e60852b1b449ee6c",
+      "upstream_sha256": "0851b2d8f1bea123cfcd338d13449414a2eded384bd23fe137c0a17fc88c5856",
+      "local_path": "sources/MobileRestoreCore/Firmware/Containers/ftab.h",
+      "local_sha256": "0851b2d8f1bea123cfcd338d13449414a2eded384bd23fe137c0a17fc88c5856",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Containers/mbn.c",
+      "upstream_blob": "8d9f7a48da0686e19477b2d60657a2f009b0c59c",
+      "upstream_sha256": "b3afbb2358a4fe4c7f9b2743f4493dc45362a89efdc1c9956ffcc50cf8ce41f1",
+      "local_path": "sources/MobileRestoreCore/Firmware/Containers/mbn.c",
+      "local_sha256": "b3afbb2358a4fe4c7f9b2743f4493dc45362a89efdc1c9956ffcc50cf8ce41f1",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Containers/mbn.h",
+      "upstream_blob": "ff44797809977b89f89edfa3962fe1ba9a6f7a37",
+      "upstream_sha256": "664d05bd5c36766a5fd98f2da58a58fca9d5b3b1cfe7f7e10aca4a41bd976123",
+      "local_path": "sources/MobileRestoreCore/Firmware/Containers/mbn.h",
+      "local_sha256": "664d05bd5c36766a5fd98f2da58a58fca9d5b3b1cfe7f7e10aca4a41bd976123",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Images/ace3.c",
+      "upstream_blob": "ace62ac17264cfe7a250bf91bcfdf9e69a214e7e",
+      "upstream_sha256": "17dc30feef12792b5b149cbf5f62d419943f5fde5a9e6921f3fd2155938e1bb4",
+      "local_path": "sources/MobileRestoreCore/Firmware/Images/ace3.c",
+      "local_sha256": "17dc30feef12792b5b149cbf5f62d419943f5fde5a9e6921f3fd2155938e1bb4",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Images/ace3.h",
+      "upstream_blob": "6c93e1e2221ba97d8ccc674374a5754710ee8ce1",
+      "upstream_sha256": "0dcaae0ffaf60b5215f4869f617af2b53ed4d83444b7dc7a6e82837eba573552",
+      "local_path": "sources/MobileRestoreCore/Firmware/Images/ace3.h",
+      "local_sha256": "0dcaae0ffaf60b5215f4869f617af2b53ed4d83444b7dc7a6e82837eba573552",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Images/img3.c",
+      "upstream_blob": "f18b0afede694936674a021a95b65945de7e87ce",
+      "upstream_sha256": "2e67bdf8a6092b59f70907730a478386117557fbd3ff80d788ec43005d60a7bf",
+      "local_path": "sources/MobileRestoreCore/Firmware/Images/img3.c",
+      "local_sha256": "2e67bdf8a6092b59f70907730a478386117557fbd3ff80d788ec43005d60a7bf",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Images/img3.h",
+      "upstream_blob": "b8e30e9d6c1250516611e13daf3ec068efc07841",
+      "upstream_sha256": "693c904f865d23e4548be70303406bb8456ac2695fcd39a982d1076ee6d9dd34",
+      "local_path": "sources/MobileRestoreCore/Firmware/Images/img3.h",
+      "local_sha256": "693c904f865d23e4548be70303406bb8456ac2695fcd39a982d1076ee6d9dd34",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Images/img4.c",
+      "upstream_blob": "843d21359b2dd28fb183a4b95e5c7b8edc0af76e",
+      "upstream_sha256": "6a153eb208cf470cab1ce2e74aef11b8d9c896cbba57327972d7a2a8895e43db",
+      "local_path": "sources/MobileRestoreCore/Firmware/Images/img4.c",
+      "local_sha256": "6a153eb208cf470cab1ce2e74aef11b8d9c896cbba57327972d7a2a8895e43db",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Firmware/Images/img4.h",
+      "upstream_blob": "1c5ef36b80f95df01768b60f62ebde1b0dec0cb5",
+      "upstream_sha256": "bba4d5bf9190a64b2c06952dbba05596edac596d982517a934b4f9341d8ac5b1",
+      "local_path": "sources/MobileRestoreCore/Firmware/Images/img4.h",
+      "local_sha256": "bba4d5bf9190a64b2c06952dbba05596edac596d982517a934b4f9341d8ac5b1",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Include/module.modulemap",
+      "upstream_blob": "3adc0e9b8d3cd86f86e64dd541c1490c6529368c",
+      "upstream_sha256": "8b16ec901fd81a5395cbd20faff647ae4e13eab5058ab2df40aa74e27549c6c7",
+      "local_path": "sources/MobileRestoreCore/Include/module.modulemap",
+      "local_sha256": "8b16ec901fd81a5395cbd20faff647ae4e13eab5058ab2df40aa74e27549c6c7",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Include/vphone_restore_bridge.h",
+      "upstream_blob": "8c22959848eb14d3d070612d49c9fbd2fd91c0b7",
+      "upstream_sha256": "291d9ff27e28f71c88d472cab1502da8726ad65ad480cd3c68e7f681b45aa80d",
+      "local_path": "sources/MobileRestoreCore/Include/vphone_restore_bridge.h",
+      "local_sha256": "291d9ff27e28f71c88d472cab1502da8726ad65ad480cd3c68e7f681b45aa80d",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/dfu.c",
+      "upstream_blob": "6ba23e7f17c27a0ba9fef4a220329478dcda2b95",
+      "upstream_sha256": "bef6bd4683dd61ee56944c0dfb65d4bac09dc11f1dac771a91362d6ef128ac94",
+      "local_path": "sources/MobileRestoreCore/Recovery/dfu.c",
+      "local_sha256": "bef6bd4683dd61ee56944c0dfb65d4bac09dc11f1dac771a91362d6ef128ac94",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/dfu.h",
+      "upstream_blob": "7b1d092fc558312a06eb3aa542ee5dfb36a199d7",
+      "upstream_sha256": "63c983814a9718aec756568fe8a379c68648785993f2395a15263c5d73e1f25f",
+      "local_path": "sources/MobileRestoreCore/Recovery/dfu.h",
+      "local_sha256": "63c983814a9718aec756568fe8a379c68648785993f2395a15263c5d73e1f25f",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/limera1n.c",
+      "upstream_blob": "f20528713ceac0d15c7bcf6c5760796cca023d26",
+      "upstream_sha256": "9f0d6a4dc7bb71d8d6bdc0e1b94382c49dc64a9647917c3112aef943f6df5942",
+      "local_path": "sources/MobileRestoreCore/Recovery/limera1n.c",
+      "local_sha256": "9f0d6a4dc7bb71d8d6bdc0e1b94382c49dc64a9647917c3112aef943f6df5942",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/limera1n.h",
+      "upstream_blob": "592d8d8b2a12abfb12709452f8ff11b1cd0b6d94",
+      "upstream_sha256": "528081d7d344ba2adde1ba2cd3b4d9accf42814a9395026fee0a4aae6fd9248f",
+      "local_path": "sources/MobileRestoreCore/Recovery/limera1n.h",
+      "local_sha256": "528081d7d344ba2adde1ba2cd3b4d9accf42814a9395026fee0a4aae6fd9248f",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/limera1n_payload.h",
+      "upstream_blob": "e3117a1f8107092247908b134036f94b9bf7d4cb",
+      "upstream_sha256": "1fe6166c9f700d4c1e2e118a402e37e436f2d48f6e6c5fa69d8841c196398c8a",
+      "local_path": "sources/MobileRestoreCore/Recovery/limera1n_payload.h",
+      "local_sha256": "1fe6166c9f700d4c1e2e118a402e37e436f2d48f6e6c5fa69d8841c196398c8a",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/normal.c",
+      "upstream_blob": "7d689e1dfd5b043f81f9374359b07ca3946dc5b7",
+      "upstream_sha256": "63f15f7e4e23eb7783138e931382c539831cea3edea2a5c5acb6aec80e354f99",
+      "local_path": "sources/MobileRestoreCore/Recovery/normal.c",
+      "local_sha256": "63f15f7e4e23eb7783138e931382c539831cea3edea2a5c5acb6aec80e354f99",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/normal.h",
+      "upstream_blob": "d3d7b0cddebad6f69672ea91a334f93dd9328a58",
+      "upstream_sha256": "db075c24585a62ecd9f14cea53d5fe20c42007e339cb145fa62db7faf14772b5",
+      "local_path": "sources/MobileRestoreCore/Recovery/normal.h",
+      "local_sha256": "db075c24585a62ecd9f14cea53d5fe20c42007e339cb145fa62db7faf14772b5",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/recovery.c",
+      "upstream_blob": "b843f1ed6812c33c0c1ae63597f5d851ea9d7df9",
+      "upstream_sha256": "ad1a48f8710fe015b0f3ae3a46c6f204c54cb61d302f39219cf84be15656e826",
+      "local_path": "sources/MobileRestoreCore/Recovery/recovery.c",
+      "local_sha256": "ad1a48f8710fe015b0f3ae3a46c6f204c54cb61d302f39219cf84be15656e826",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Recovery/recovery.h",
+      "upstream_blob": "d7413e0cbc571bd849757457fabf84f7be000d5a",
+      "upstream_sha256": "dcb16fe864bd9f0b94009d798db2572e6f6dedc85b269f368f807cfeb50bbc9e",
+      "local_path": "sources/MobileRestoreCore/Recovery/recovery.h",
+      "local_sha256": "dcb16fe864bd9f0b94009d798db2572e6f6dedc85b269f368f807cfeb50bbc9e",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/asr.c",
+      "upstream_blob": "1bd6559851021ceb125a859f70c25fc7c2d7a941",
+      "upstream_sha256": "4e6bb8494e9232dfd490dd5922b10179605ad84a7d16b153f0e2783ac9f8c7a1",
+      "local_path": "sources/MobileRestoreCore/Transfer/asr.c",
+      "local_sha256": "4e6bb8494e9232dfd490dd5922b10179605ad84a7d16b153f0e2783ac9f8c7a1",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/asr.h",
+      "upstream_blob": "52e8d75d1070225fe93b703ff7ea4c0204986281",
+      "upstream_sha256": "f1cc4481f4f6851fe65ed15216bb7b6bbacaae9834902bd77c1fc477b27d0526",
+      "local_path": "sources/MobileRestoreCore/Transfer/asr.h",
+      "local_sha256": "f1cc4481f4f6851fe65ed15216bb7b6bbacaae9834902bd77c1fc477b27d0526",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/download.c",
+      "upstream_blob": "0b6b076badd65d88fd03874777a67383529264d1",
+      "upstream_sha256": "b648d22304c7c52a76eaf8e0972a68d525208fef76900402181d64ba94c6a9fe",
+      "local_path": "sources/MobileRestoreCore/Transfer/download.c",
+      "local_sha256": "b648d22304c7c52a76eaf8e0972a68d525208fef76900402181d64ba94c6a9fe",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/download.h",
+      "upstream_blob": "bbb5aa080487595bbc97f97a0f49de107f74e15b",
+      "upstream_sha256": "8d68ea2adb6cb6257a38c7cb2696267df44f09508902daff044d38dc49bfed12",
+      "local_path": "sources/MobileRestoreCore/Transfer/download.h",
+      "local_sha256": "8d68ea2adb6cb6257a38c7cb2696267df44f09508902daff044d38dc49bfed12",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/fdr.c",
+      "upstream_blob": "1c9fcb37132e5be59a2cbada8087369e465eeadc",
+      "upstream_sha256": "56b99894837f6de9710708fdca2763fe7d17134c59eed313841f50deb2decb5c",
+      "local_path": "sources/MobileRestoreCore/Transfer/fdr.c",
+      "local_sha256": "56b99894837f6de9710708fdca2763fe7d17134c59eed313841f50deb2decb5c",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/fdr.h",
+      "upstream_blob": "c10fd6c4f3ae76430179dac04814cc3615421df3",
+      "upstream_sha256": "68c4186a87e7785ea0128019f80c5d355b7a69e85a143428d883e2b4c0e44885",
+      "local_path": "sources/MobileRestoreCore/Transfer/fdr.h",
+      "local_sha256": "68c4186a87e7785ea0128019f80c5d355b7a69e85a143428d883e2b4c0e44885",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/ipsw.c",
+      "upstream_blob": "60482b6fa91e57ae4a4dc3db8814d4e82963a29e",
+      "upstream_sha256": "22a8e2b3e187f2ffa14ef6be851d0d5339606ed7f3a2616c27c364023ca66da7",
+      "local_path": "sources/MobileRestoreCore/Transfer/ipsw.c",
+      "local_sha256": "22a8e2b3e187f2ffa14ef6be851d0d5339606ed7f3a2616c27c364023ca66da7",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/ipsw.h",
+      "upstream_blob": "b22e614f4b2f5d54f74c7dd7b7cbd62693053e71",
+      "upstream_sha256": "9863af4425924cbbdbc8a675e852ec8007b975b2af0ca1b1b6fb6239de5ebc5c",
+      "local_path": "sources/MobileRestoreCore/Transfer/ipsw.h",
+      "local_sha256": "9863af4425924cbbdbc8a675e852ec8007b975b2af0ca1b1b6fb6239de5ebc5c",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/restore.c",
+      "upstream_blob": "903fa6090686a7dd8c4fdb0fe13f74015b24b909",
+      "upstream_sha256": "973d5f21fa5ce3320b8064f4822c796b020c858231f394b1cc20610563d30029",
+      "local_path": "sources/MobileRestoreCore/Transfer/restore.c",
+      "local_sha256": "973d5f21fa5ce3320b8064f4822c796b020c858231f394b1cc20610563d30029",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/Transfer/restore.h",
+      "upstream_blob": "763331dd7f9ea22159209c39e24e19f3ff82c914",
+      "upstream_sha256": "51edaae9c50523a749e9c66aa347228415126493d4763e8374a53361c7ddde78",
+      "local_path": "sources/MobileRestoreCore/Transfer/restore.h",
+      "local_sha256": "51edaae9c50523a749e9c66aa347228415126493d4763e8374a53361c7ddde78",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/config.h",
+      "upstream_blob": "41056cfe2065348ee01328854385fa928ad1e688",
+      "upstream_sha256": "5a5e92944b6daf9139d258908cda6433c5f683285b3b6b25162586508ebd17a1",
+      "local_path": "sources/MobileRestoreCore/config.h",
+      "local_sha256": "5a5e92944b6daf9139d258908cda6433c5f683285b3b6b25162586508ebd17a1",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/MobileRestoreCore/endianness.h",
+      "upstream_blob": "972e51b1a27d73393768ae6d3761cf9bc2add6b7",
+      "upstream_sha256": "e1ac8bc16c6dae7acfcaebe6d5c0f52e8d0cf5caf6fb378049f9e19c6dcebf80",
+      "local_path": "sources/MobileRestoreCore/endianness.h",
+      "local_sha256": "e1ac8bc16c6dae7acfcaebe6d5c0f52e8d0cf5caf6fb378049f9e19c6dcebf80",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Recovery/VPhoneRecoveryProbe.swift",
+      "upstream_blob": "cee6fece4d70cdeb2b2971d82b7eb8420af67d30",
+      "upstream_sha256": "c572d458b763be6d175efbd7dd6f2c5cd6ded2ddc677506334d0d5ab68e1324a",
+      "local_path": "sources/VPhoneRestore/Recovery/VPhoneRecoveryProbe.swift",
+      "local_sha256": "56466af691bcc557e424d847cbba725cd3588f2fb6dae8dab635ba584f9daeee",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Restore/VPhoneRestoreIdentity.swift",
+      "upstream_blob": "c81202e524dace5436bbb073817007fba62d08aa",
+      "upstream_sha256": "6c1a0967b3d1ba1565dbba34719000d248ea32ea97a776ec14dcd266de201da9",
+      "local_path": "sources/VPhoneRestore/Restore/VPhoneRestoreIdentity.swift",
+      "local_sha256": "6c1a0967b3d1ba1565dbba34719000d248ea32ea97a776ec14dcd266de201da9",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Restore/VPhoneRestoreLayout.swift",
+      "upstream_blob": "b469e0a9a4ee06c2d85ca895574f5eb2581cb1b8",
+      "upstream_sha256": "515d5f51d8d661d10141a204c9719960dc322ec91db0195bf636165e1a6d4889",
+      "local_path": "sources/VPhoneRestore/Restore/VPhoneRestoreLayout.swift",
+      "local_sha256": "7324fcb22ac885220a748445abcecbedaef74eacd23b3d0703544c04170a79ef",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Restore/VPhoneRestoreOptions.swift",
+      "upstream_blob": "4b435909805d7f2dd68d019926ff09bbaa2f7b1c",
+      "upstream_sha256": "e82e18ce0e2f337787847662d2a6c3e4aac2f0b8231d05048239531e21f64277",
+      "local_path": "sources/VPhoneRestore/Restore/VPhoneRestoreOptions.swift",
+      "local_sha256": "e82e18ce0e2f337787847662d2a6c3e4aac2f0b8231d05048239531e21f64277",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Restore/VPhoneRestoreRunner.swift",
+      "upstream_blob": "38517cfff16dd4ee1025d43b47e2a4bc3eaaf8f2",
+      "upstream_sha256": "fd3c2692feaea9bb30356a06c0207495fd20aa483c979c77f3868a77de555526",
+      "local_path": "sources/VPhoneRestore/Restore/VPhoneRestoreRunner.swift",
+      "local_sha256": "5b0a399b0c847857e253d8a96c68aa7de15ba9d26fa21e60a87b9b95e8951bcd",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Restore/VPhoneRestoreService.swift",
+      "upstream_blob": "c8cab9b2acd731dd51ac32d59a9daa0cc4c4e290",
+      "upstream_sha256": "1e2659c2a82758b1048b92f71a1470b8bf266c0f2157f02c39f6c090ac283d7c",
+      "local_path": "sources/VPhoneRestore/Restore/VPhoneRestoreService.swift",
+      "local_sha256": "09fe2761e1d8b6e6c7d9f8960552c0df45584e56e60bc36f2c9af2fdadb13b12",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Restore/VPhoneRestoreTicket.swift",
+      "upstream_blob": "915ec08b9a0e080cb234d629695b7d747d49f073",
+      "upstream_sha256": "14fb08c8dab7092232cc21e45d544143ec16f798a17607396f4c16e20a7e5635",
+      "local_path": "sources/VPhoneRestore/Restore/VPhoneRestoreTicket.swift",
+      "local_sha256": "bc669ccd82546c88bdbd784465ae7cede5585fa7231878a461dc38c05e7cc19d",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Support/VPhoneRestoreBackendError.swift",
+      "upstream_blob": "ce4605433e1fe6d8aeb88cf7bfef4d3de0edd96e",
+      "upstream_sha256": "cc7e1644c6292d7ab3fb75d720210aa439d8441d3b2cef8a2679767c22e8e4d4",
+      "local_path": "sources/VPhoneRestore/Support/VPhoneRestoreBackendError.swift",
+      "local_sha256": "6e49b76f0f79ee7aa758cd99abab6b645bbdb62ee7de178a138aa29663787707",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestore/Support/VPhoneRestoreEvent.swift",
+      "upstream_blob": "a75d1b608e6cb8efc0dbd09ee92a9f690d04168e",
+      "upstream_sha256": "eb151a00a296550479830339c6398808f669d5b42e72927ca20dfbaef947f784",
+      "local_path": "sources/VPhoneRestore/Support/VPhoneRestoreEvent.swift",
+      "local_sha256": "eb151a00a296550479830339c6398808f669d5b42e72927ca20dfbaef947f784",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/RestoreEventTests.swift",
+      "upstream_blob": "2e4764b4038c246064decd5d48cfd00c575d08e4",
+      "upstream_sha256": "fe3ae1d97389de3cb2192eab0b93021870d5826eb88fa276fc6ea9a87171ee21",
+      "local_path": "tests/VPhoneRestoreTests/RestoreEventTests.swift",
+      "local_sha256": "fe3ae1d97389de3cb2192eab0b93021870d5826eb88fa276fc6ea9a87171ee21",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/RestoreIdentityTests.swift",
+      "upstream_blob": "332b2ab3cdfc28999a5fb499b134e606872f5fcb",
+      "upstream_sha256": "5d93ccba3cd82e45f1c64e7199f3492fc5ab9e3e5b6eabaea744c1df9acd61c2",
+      "local_path": "tests/VPhoneRestoreTests/RestoreIdentityTests.swift",
+      "local_sha256": "5d93ccba3cd82e45f1c64e7199f3492fc5ab9e3e5b6eabaea744c1df9acd61c2",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/RestoreLayoutTests.swift",
+      "upstream_blob": "f8a609298e517815d43f14eeea02e52c02fd4ef1",
+      "upstream_sha256": "eae3923cc2e4197bf031b5a67ca6d0bb5e07b4d60d578269ce5551fec7fd1dc2",
+      "local_path": "tests/VPhoneRestoreTests/RestoreLayoutTests.swift",
+      "local_sha256": "eae3923cc2e4197bf031b5a67ca6d0bb5e07b4d60d578269ce5551fec7fd1dc2",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/RestoreOptionsTests.swift",
+      "upstream_blob": "c8c317545c5eed3ad5664482df2271b6d91b6f6d",
+      "upstream_sha256": "89ad384f8524fbcb2fd70c88bbb7990190b8290c053b1c9df762257ca84d892e",
+      "local_path": "tests/VPhoneRestoreTests/RestoreOptionsTests.swift",
+      "local_sha256": "89ad384f8524fbcb2fd70c88bbb7990190b8290c053b1c9df762257ca84d892e",
+      "modified": false
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/RestoreRunnerTests.swift",
+      "upstream_blob": "1afd41215e8d8f466ae44a230461c3bd1082b14a",
+      "upstream_sha256": "04b650646563edb1c00a393dfd4b45d9a7f546ec6deff449f24de5a52edafb9a",
+      "local_path": "tests/VPhoneRestoreTests/RestoreRunnerTests.swift",
+      "local_sha256": "a83a071f284b61daec65e3f02e75c24c76c3adcaca4ab3ffade41e1f51259b77",
+      "modified": true
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneRestore/VPhoneRestoreTests/RestoreTicketTests.swift",
+      "upstream_blob": "b6f740a44d4a125817dde8740c79465ec78afdce",
+      "upstream_sha256": "ad434a4018d5dc814e9747913496371674799b2fb0e3bcc5531859f6deb03013",
+      "local_path": "tests/VPhoneRestoreTests/RestoreTicketTests.swift",
+      "local_sha256": "bf95d0e57e5c678c8c0abb6069795965fe812e3afbaea4c11c57689b3a9f37f1",
+      "modified": true
+    }
+  ],
+  "dependencies": [
+    {
+      "package": "AppleMobileDeviceLibrary",
+      "revision": "553a0bf1b55812b1a08c727b1a3084e88871343b",
+      "binary_artifacts": [
+        {
+          "url": "https://github.com/Lakr233/AppleMobileDeviceLibrary/releases/download/storage.46A6477C-63BC-448A-8EB1-D7A06EC9407D/libimobiledevice.xcframework.zip",
+          "sha256": "0c321521e60f22fad4ce0bf696905163e5f4e81d8bd430ac1df269173f6cde26"
+        },
+        {
+          "url": "https://github.com/Lakr233/AppleMobileDeviceLibrary/releases/download/storage.46A6477C-63BC-448A-8EB1-D7A06EC9407D/libimobiledevice_glue.xcframework.zip",
+          "sha256": "de7aa1fecc2dca79769e79ab5f1409e3aaf962cccddddfa15641acd333c45405"
+        },
+        {
+          "url": "https://github.com/Lakr233/AppleMobileDeviceLibrary/releases/download/storage.46A6477C-63BC-448A-8EB1-D7A06EC9407D/libplist.xcframework.zip",
+          "sha256": "56fa88f3bd1f847ab8f4053728f93c099ee78032d8cf5b4c38c210a270b22125"
+        },
+        {
+          "url": "https://github.com/Lakr233/AppleMobileDeviceLibrary/releases/download/storage.46A6477C-63BC-448A-8EB1-D7A06EC9407D/libtatsu.xcframework.zip",
+          "sha256": "1459bedc1c9b5f203d5932efc61d023bf8d547928041025d3beab72a2073ad15"
+        },
+        {
+          "url": "https://github.com/Lakr233/AppleMobileDeviceLibrary/releases/download/storage.46A6477C-63BC-448A-8EB1-D7A06EC9407D/libusbmuxd.xcframework.zip",
+          "sha256": "8e4cdd0c30b081d822444118b5ec0c1a452d65f838a1da67d3379f59e3a811d7"
+        }
+      ],
+      "package_swift_sha256": "6f61bd9a70b568757733f0b75a7960770231ea5ad7654f7bf7b442df192f522a"
+    },
+    {
+      "package": "openssl-spm",
+      "revision": "9f3b525d960fe71e534482310e96cd9c4f2faa17",
+      "binary_artifacts": [
+        {
+          "url": "https://github.com/Lakr233/openssl-spm/releases/download/storage.3.6.2/libssl.xcframework.zip",
+          "sha256": "329249e8b9ce544aeb698f4adce009d963438ff0ce26a06c7ea152764d362b86"
+        }
+      ],
+      "package_swift_sha256": "dd079631a5a03ba4f108c1855abf5b100acb5d8c6558ba5e326113d259f97a72"
+    }
+  ],
+  "local_integration_files": [
+    {
+      "path": "Package.swift",
+      "sha256": "eccc6340e3a4d332ffe0993a054e7825b264eb2a5e05af04ab7598493d0ef8ad"
+    },
+    {
+      "path": "Package.resolved",
+      "sha256": "8ec7fc111e1c962e417a94211bc2fb1c821948e798fd734d5ee65e6c540bfe46"
+    },
+    {
+      "path": "scripts/check_bundle.py",
+      "sha256": "f3a710399b02d46e322e77a02d7284376a36dcbfc6fdd2eec8f26ad45e370519"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCLI.swift",
+      "sha256": "f5b3628100015cec373931d6590311d70cf5c27a30cba72dac8c80b5192b356e"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneRestoreInspectCLI.swift",
+      "sha256": "e00a01dfe58d2133aa347868c96c8bc82983b72f0234edcc8248911ab661c61a"
+    },
+    {
+      "path": "tests/VPhoneCLITests/RestoreInspectCLITests.swift",
+      "sha256": "cd3c6c59791a4d82a4ea209e298185e9008975ce524fffe3c23f3b1b4f40af85"
+    },
+    {
+      "path": "tests/VPhoneRestoreTests/RestoreSafetyTests.swift",
+      "sha256": "47b87c5645eacb72e91a0a3510e6326bf955584408927ab08fd33d7008371d25"
+    },
+    {
+      "path": "scripts/licenses/MobileRecoveryCore.txt",
+      "sha256": "a1a33180d02960ab1c5de36cf20b1a2f0fe9888d83826ad263da5db52f1b183b"
+    },
+    {
+      "path": "scripts/licenses/MobileRestoreCore.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    {
+      "path": "scripts/licenses/GPL-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "scripts/licenses/OpenSSL-SPM.txt",
+      "sha256": "aa086b0a6f1539df31bd9347a73f9d49eff0b54fc6f2cd7ae0a6fe711c82a2ad"
+    },
+    {
+      "path": "scripts/licenses/libimobiledevice-LGPL-2.1.txt",
+      "sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+    },
+    {
+      "path": "scripts/licenses/AppleMobileDeviceLibrary.txt",
+      "sha256": "5dffb6c45faaa71f6c393255b135145cc17f0b07e968a705ef58f9c68aeb112d"
+    },
+    {
+      "path": "scripts/licenses/AppleMobileDeviceLibrary-NOTICES.txt",
+      "sha256": "87639a172ba7b4eb8f60e6dc9f8f08d4325fcbd372dc91f2fb5d4ab507c81f24"
+    },
+    {
+      "path": "scripts/licenses/OpenSSL.txt",
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+    }
+  ],
+  "limits": [
+    "Pinned binary archives have checksums; AppleMobileDeviceLibrary build scripts do not pin their component source revisions. Exact component commits are not established.",
+    "No USB, TSS, restore, boot or real firmware validation in this batch."
+  ]
+}

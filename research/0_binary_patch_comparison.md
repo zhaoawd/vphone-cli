@@ -1,5 +1,10 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-28 P2 native Restore foundations
+
+Imported MobileRecoveryCore, MobileRestoreCore and VPhoneRestore from fixed upstream `2.0.8 / 9d218de`, with pinned AppleMobileDeviceLibrary and OpenSSL dependencies. Added read-only `restore-inspect` for directory selection and bounded plist/gzip ticket inspection. Local changes reject ambiguous ticket selection, unknown probe modes and oversized/trailing ticket data. Existing Python restore execution and DFU ownership checks remain in use. Firmware patch bytes and variant defaults are unchanged. Validation and limitations are recorded in the [fourth-batch report](p2_restore_integration_2026-09-28.md); no USB/TSS/restore or real VM acceptance was performed.
+
+
 ## 2026-09-28 P2 native transfer and IPSW interfaces
 
 Added opt-in native VM export/import behind the existing bundle and library locks; the default remains system-tar. Both import backends validate manifest paths and links before exclusive publication from private staging. IPSW cache and local `fw inspect` interfaces now read bounded BuildManifest data and validate source pairing. Firmware patch bytes, variant defaults, firmware preparation and CFW installation backends are unchanged. Fixture interoperability, cache tests and CLI evidence are recorded in the [third-batch report](p2_transfer_integration_2026-09-28.md); real VM import/boot acceptance remains skipped.

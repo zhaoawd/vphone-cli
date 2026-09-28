@@ -9,6 +9,10 @@ let package = Package(
     ],
     products: [],
     dependencies: [
+        .package(url: "https://github.com/Lakr233/AppleMobileDeviceLibrary.git",
+                 revision: "553a0bf1b55812b1a08c727b1a3084e88871343b"),
+        .package(url: "https://github.com/Lakr233/openssl-spm.git",
+                 revision: "9f3b525d960fe71e534482310e96cd9c4f2faa17"),
         .package(url: "https://github.com/Lakr233/libarchive.xcframework.git",
                  revision: "82687c75e530917b7fbeb15cd5f9369524637155"),
         .package(path: "vendor/swift-argument-parser"),
@@ -18,6 +22,30 @@ let package = Package(
         .package(path: "vendor/MachOKit"),
     ],
     targets: [
+        .target(
+            name: "MobileRecoveryCore",
+            dependencies: [.product(name: "AppleMobileDeviceLibrary", package: "AppleMobileDeviceLibrary")],
+            path: "sources/MobileRecoveryCore", exclude: ["COPYING"],
+            publicHeadersPath: "Include",
+            cSettings: [.define("HAVE_CONFIG_H", to: "1"), .define("IRECV_STATIC", to: "1"), .headerSearchPath(".")],
+            linkerSettings: [.linkedFramework("IOKit"), .linkedFramework("CoreFoundation")]
+        ),
+        .target(
+            name: "MobileRestoreCore",
+            dependencies: ["MobileRecoveryCore", .product(name: "AppleMobileDeviceLibrary", package: "AppleMobileDeviceLibrary")],
+            path: "sources/MobileRestoreCore", exclude: ["COPYING"],
+            publicHeadersPath: "Include",
+            cSettings: [.define("HAVE_CONFIG_H", to: "1"), .define("IRECV_STATIC", to: "1"),
+                        .define("IDEVICERESTORE_NOMAIN", to: "1"),
+                        .headerSearchPath("."), .headerSearchPath("Core"), .headerSearchPath("Transfer"),
+                        .headerSearchPath("Firmware"), .headerSearchPath("Firmware/Images"),
+                        .headerSearchPath("Firmware/Containers"), .headerSearchPath("Recovery"), .headerSearchPath("Bridge")],
+            linkerSettings: [.linkedLibrary("curl"), .linkedLibrary("z")]
+        ),
+        .target(name: "VPhoneRestore", dependencies: ["MobileRecoveryCore", "MobileRestoreCore"],
+                path: "sources/VPhoneRestore", linkerSettings: [.linkedLibrary("z")]),
+        .testTarget(name: "VPhoneRestoreTests", dependencies: ["VPhoneRestore", "MobileRestoreCore"],
+                    path: "tests/VPhoneRestoreTests"),
         .target(
             name: "VPhoneArchiveKit",
             dependencies: [.product(name: "ArchiveKit", package: "libarchive.xcframework")],
@@ -54,6 +82,7 @@ let package = Package(
                 "FirmwarePatcher",
                 "VPhoneCore",
                 "VPhoneSign",
+                "VPhoneRestore",
                 "VPhoneArchiveKit",
             ],
             path: "sources/vphone-cli",

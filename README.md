@@ -246,6 +246,14 @@ vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw -
 
 Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. Firmware preparation and CFW installation retain their current backends.
 
+`restore-inspect /path/to/vm --ticket /path/to/ticket.shsh --ecid 0x123 --json`
+checks for one real `iPhone*_Restore` directory and an optional plist dictionary ticket
+(plain or gzip, at most 32 MiB encoded/decoded). It does not access USB or TSS,
+validate Apple signatures or ticket/device association, or establish restore readiness.
+The native Restore libraries are compiled for offline validation; the existing
+`restore` command retains its Python backend and DFU ownership checks.
+
+
 ## FAQ
 
 **`zsh: killed ./vphone-cli`** — AMFI/debug restrictions aren't bypassed; see [Prerequisites](#prerequisites) (`amfi_get_out_of_my_way=1` or `amfidont`).
