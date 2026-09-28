@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import VPhoneArchiveKit
 
 public enum VPhoneBundleOpsError: Error, Equatable {
     case tarFailed(String)
@@ -178,52 +179,73 @@ public enum VPhoneBundleOps {
     }
 
     // MARK: - Clone
-
-    /// Clone a bundle with a fast APFS copy-on-write clone (fallback: recursive
-    /// copy), then reset the boot-identity artifacts so the clone comes up as a
-    /// fresh device on next boot. NOTE: SEPStorage is copied as-is — cloning an
-    /// already-restored VM may need a re-restore for a fully clean identity.
+    /// Copy a stopped VM's complete persistent boot state, retaining its device
+    /// identity (NVRAM, machine identifier, SEP storage and tickets stay together).
+    /// This is not a new independent device: use create/restore for that purpose.
+    /// Prefer APFS CoW; omit only host runtime state and the control socket.
     public static func clone(
         bundleNamed name: String, to newName: String, in library: VPhoneLibrary
     ) throws -> VPhoneBundle {
+        try clone(bundleNamed: name, to: newName, in: library, copyDirectory: {
+            try VPhoneCloneCopy.copy(from: $0, to: $1, excludingRootNames: $2)
+        })
+    }
+
+    /// Test seams for forced non-APFS copying, failed copies and a destination
+    /// collision immediately before publication. No global mutable test hooks.
+    static func clone(
+        bundleNamed name: String, to newName: String, in library: VPhoneLibrary,
+        copyDirectory: (URL, URL, Set<String>) throws -> Void,
+        afterNameCheck: (() throws -> Void)? = nil
+    ) throws -> VPhoneBundle {
         try requireValidName(newName)
         let src = try library.bundle(named: name).url
-        // Cloning a running VM is refused: `Disk.img` would be copied mid-write.
-        // There is no verified consistent-snapshot path, so there is no opt-out.
+        // Keep the existing source lock for the full snapshot and publication.
+        // Running VMs remain refused; there is no live-snapshot opt-out.
         return try VPhoneBundleGuard.withBundleLock(
             directory: src, operation: VPhoneVMOperation.clone
         ) { _ in
             let dst = library.url(forName: newName)
             let fm = FileManager.default
-            if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: newName) }
-
-            // APFS CoW clone; fall back to a plain recursive copy off-APFS.
-            if clonefile(src.path, dst.path, 0) != 0 {
-                // EEXIST means the name was taken between the check and here, by
-                // somebody else's bundle — never delete it, report the collision.
-                guard errno != EEXIST else { throw VPhoneLibraryError.alreadyExists(name: newName) }
-                try? fm.removeItem(at: dst)  // clear this call's partial clonefile output
-                try fm.copyItem(at: src, to: dst)
+            if try VPhoneCloneCopy.exists(at: dst) {
+                throw VPhoneLibraryError.alreadyExists(name: newName)
             }
-            try resetIdentity(inBundleAt: dst)
-            return try VPhoneBundle.load(at: dst)
+            // Only an exclusively created private directory may be rolled back.
+            // Never clean up the final name after a failed clone or EEXIST.
+            let staging = library.root.appendingPathComponent(".clone-\(UUID().uuidString)")
+            try fm.createDirectory(at: staging, withIntermediateDirectories: false,
+                                   attributes: [.posixPermissions: 0o700])
+            defer { try? fm.removeItem(at: staging) }
+            let payload = staging.appendingPathComponent("payload")
+            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock"])
+            let staged = try VPhoneBundle.load(at: payload)
+            // As in importArchive, copying happens privately, then name checking
+            // and publication use the library lock. Slow copies do not monopolize it.
+            return try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
+                if try VPhoneCloneCopy.exists(at: dst) {
+                    throw VPhoneLibraryError.alreadyExists(name: newName)
+                }
+                try afterNameCheck?()
+                do {
+                    try fm.moveItem(at: payload, to: dst)
+                } catch let error as NSError
+                    where (error.domain == NSCocoaErrorDomain && error.code == NSFileWriteFileExistsError)
+                    || (error.domain == NSPOSIXErrorDomain && error.code == Int(EEXIST))
+                {
+                    throw VPhoneLibraryError.alreadyExists(name: newName)
+                }
+                return VPhoneBundle(url: dst, manifest: staged.manifest)
+            }
         }
-    }
-
-    private static func resetIdentity(inBundleAt dir: URL) throws {
-        let fm = FileManager.default
-        for name in ["nvram.bin", "udid-prediction.txt", VPhoneVMRuntimeState.filename] {
-            let u = dir.appendingPathComponent(name)
-            if fm.fileExists(atPath: u.path) { try fm.removeItem(at: u) }
-        }
-        let entries = try fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)
-        for u in entries where u.pathExtension == "shsh" { try fm.removeItem(at: u) }
-        let configURL = dir.appendingPathComponent("config.plist")
-        let manifest = try VPhoneVirtualMachineManifest.load(from: configURL)
-        try manifest.updating(machineIdentifier: Data()).write(to: configURL)
     }
 
     // MARK: - Export / Import
+
+    /// Native transfer remains opt-in until real-VM acceptance is complete.
+    public enum ArchiveBackend: String, CaseIterable, Sendable {
+        case systemTar = "system-tar"
+        case native
+    }
 
     /// Compression preset for `export`. Both import transparently — `importArchive`
     /// auto-detects the compressor when it extracts. `threads=0` → all cores.
@@ -255,14 +277,16 @@ public enum VPhoneBundleOps {
     /// When `to` is an existing directory, the archive is written inside it as
     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.
     ///
-    /// Runs as a two-stage `tar` pipeline (uncompressed producer → compressing
+    /// The default runs as a two-stage `tar` pipeline (uncompressed producer → compressing
     /// consumer via bsdtar's `@-`) so `progress` can be driven off the
     /// uncompressed byte stream: it is called with `(bytesDone, totalBytes)`,
     /// where `totalBytes` is the bundle's on-disk logical size (minus excludes).
+    /// The opt-in native backend packs in process and counts hardlinks once.
     @discardableResult
     public static func export(
         bundleNamed name: String, to outFile: URL, includeIPSW: Bool,
         compression: ExportCompression = .fast, in library: VPhoneLibrary,
+        backend: ArchiveBackend = .systemTar,
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> URL {
         let bundle = try library.bundle(named: name)
@@ -273,19 +297,31 @@ public enum VPhoneBundleOps {
         ) { _ in
             try exportLocked(
                 bundle: bundle, name: name, to: outFile, includeIPSW: includeIPSW,
-                compression: compression, in: library, progress: progress)
+                compression: compression, in: library, backend: backend, progress: progress)
         }
     }
 
     private static func exportLocked(
         bundle: VPhoneBundle, name: String, to outFile: URL, includeIPSW: Bool,
-        compression: ExportCompression, in library: VPhoneLibrary,
+        compression: ExportCompression, in library: VPhoneLibrary, backend: ArchiveBackend,
         progress: ((Int64, Int64) -> Void)?
     ) throws -> URL {
         var isDir: ObjCBool = false
         let outFile = FileManager.default.fileExists(atPath: outFile.path, isDirectory: &isDir) && isDir.boolValue
             ? outFile.appendingPathComponent("\(name).\(compression.fileExtension)")
             : outFile
+
+        if backend == .native {
+            var excludes = exportExcludePatterns
+            if !includeIPSW { excludes.append("*_Restore*") }
+            let total = progress == nil ? 0 : VPhoneNativeTransfer.logicalSize(of: bundle.url, excluding: excludes)
+            try VPhoneArchiveWriter.create(
+                archive: outFile, from: bundle.url, topLevel: name, format: .gnutar,
+                compression: compression == .fast ? .zstd(level: 3) : .xz(level: 9),
+                excluding: excludes, bytesPacked: { progress?($0, total) })
+            progress?(total, total)
+            return outFile
+        }
 
         // gnutar (not the bsdtar-default pax): pax extended headers make the
         // consumer's `@-` reader misbid the stream as mtree ("Line too long")
@@ -331,13 +367,14 @@ public enum VPhoneBundleOps {
     /// Extracts (auto-detecting gzip/zstd/xz) into a private staging dir, then
     /// promotes the single top-level bundle to the library. Extracting first
     /// means the archive is decompressed once; `progress` is called with
-    /// `(bytesDone, totalBytes)` as the compressed file is fed into `tar -x`,
+    /// `(bytesDone, totalBytes)` as the compressed file is consumed by the backend,
     /// where `totalBytes` is the archive's size on disk.
     public static func importArchive(
         from inFile: URL, name: String?, in library: VPhoneLibrary,
+        backend: ArchiveBackend = .systemTar,
         progress: ((Int64, Int64) -> Void)? = nil
     ) throws -> VPhoneBundle {
-        try importArchive(from: inFile, name: name, in: library, progress: progress, afterNameCheck: nil)
+        try importArchive(from: inFile, name: name, in: library, backend: backend, progress: progress, afterNameCheck: nil)
     }
 
     /// `afterNameCheck` is a testing seam: it runs between the destination-name
@@ -345,13 +382,14 @@ public enum VPhoneBundleOps {
     /// library-lock lifetime.
     static func importArchive(
         from inFile: URL, name: String?, in library: VPhoneLibrary,
-        progress: ((Int64, Int64) -> Void)?, afterNameCheck: (() -> Void)?
+        backend: ArchiveBackend = .systemTar,
+        progress: ((Int64, Int64) -> Void)?, afterNameCheck: (() throws -> Void)?
     ) throws -> VPhoneBundle {
         let fm = FileManager.default
         // Fail fast when the destination name is already known (explicit rename).
         if let name {
             try requireValidName(name)
-            if fm.fileExists(atPath: library.url(forName: name).path) {
+            if try VPhoneCloneCopy.exists(at: library.url(forName: name)) {
                 throw VPhoneLibraryError.alreadyExists(name: name)
             }
         }
@@ -361,16 +399,29 @@ public enum VPhoneBundleOps {
         // validated destination name is ever placed into the library.
         try fm.createDirectory(at: library.root, withIntermediateDirectories: true)
         let staging = library.root.appendingPathComponent(".import-\(UUID().uuidString)")
-        try fm.createDirectory(at: staging, withIntermediateDirectories: true)
+        try fm.createDirectory(at: staging, withIntermediateDirectories: false,
+                               attributes: [.posixPermissions: 0o700])
         defer { try? fm.removeItem(at: staging) }
+        // An archive may carry a '.' directory header and alter its extraction
+        // root's mode. Keep an untouched private parent around that root.
+        let contents = staging.appendingPathComponent("contents")
+        try fm.createDirectory(at: contents, withIntermediateDirectories: false,
+                               attributes: [.posixPermissions: 0o700])
 
         let total = progress != nil ? fileByteSize(inFile) : 0
-        let err = try VPhoneProcessRunner.runCountingTarPipe(
-            producerArgs: nil, sourceFile: inFile, consumerArgs: ["-xf", "-", "-C", staging.path]
-        ) { done in progress?(done, total) }
-        if let err { throw VPhoneBundleOpsError.tarFailed(err) }
+        if backend == .native {
+            try VPhoneArchiveExtractor.extract(
+                inFile, into: contents, options: .intoHostDirectory,
+                bytesRead: { progress?(min($0, total), total) })
+        } else {
+            // Recreate holes from zero blocks, including archives without sparse metadata.
+            let err = try VPhoneProcessRunner.runCountingTarPipe(
+                producerArgs: nil, sourceFile: inFile, consumerArgs: ["-xSf", "-", "-C", contents.path]
+            ) { done in progress?(done, total) }
+            if let err { throw VPhoneBundleOpsError.tarFailed(err) }
+        }
 
-        let entries = try fm.contentsOfDirectory(atPath: staging.path)
+        let entries = try fm.contentsOfDirectory(atPath: contents.path)
         guard entries.count == 1, let archived = entries.first else {
             throw VPhoneBundleOpsError.badArchive(
                 "expected a single top-level bundle directory, found \(entries.sorted())")
@@ -378,21 +429,27 @@ public enum VPhoneBundleOps {
         let finalName = name ?? archived
         try requireValidName(finalName)
         let dst = library.url(forName: finalName)
-        let extracted = staging.appendingPathComponent(archived)
-        guard fm.fileExists(atPath: extracted.appendingPathComponent("config.plist").path) else {
+        let extracted = contents.appendingPathComponent(archived)
+        guard VPhoneNativeTransfer.fileType(at: extracted) == S_IFDIR,
+              VPhoneNativeTransfer.fileType(at: extracted.appendingPathComponent("config.plist")) == S_IFREG else {
             throw VPhoneBundleOpsError.badArchive(
                 "archive did not contain a valid bundle (\(archived)/config.plist)")
         }
         // Parse the manifest while the bundle is still in staging: a bundle that
         // fails to load must never occupy its library name.
         let staged = try VPhoneBundle.load(at: extracted)
+        try VPhoneNativeTransfer.validate(staged)
         // Extraction ran outside the lock (it only writes into the private
         // staging dir); the name check and the placement are one lock lifetime.
         try VPhoneBundleGuard.withLibraryLock(root: library.root) { _ in
-            if fm.fileExists(atPath: dst.path) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
-            afterNameCheck?()
-            try fm.moveItem(at: extracted, to: dst)
+            if try VPhoneCloneCopy.exists(at: dst) { throw VPhoneLibraryError.alreadyExists(name: finalName) }
+            try afterNameCheck?()
+            guard renamex_np(extracted.path, dst.path, UInt32(RENAME_EXCL)) == 0 else {
+                if errno == EEXIST { throw VPhoneLibraryError.alreadyExists(name: finalName) }
+                throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+            }
         }
+        progress?(total, total)
         return VPhoneBundle(url: dst, manifest: staged.manifest)
     }
 

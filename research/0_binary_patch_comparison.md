@@ -1,5 +1,33 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-28 P2 native transfer and IPSW interfaces
+
+Added opt-in native VM export/import behind the existing bundle and library locks; the default remains system-tar. Both import backends validate manifest paths and links before exclusive publication from private staging. IPSW cache and local `fw inspect` interfaces now read bounded BuildManifest data and validate source pairing. Firmware patch bytes, variant defaults, firmware preparation and CFW installation backends are unchanged. Fixture interoperability, cache tests and CLI evidence are recorded in the [third-batch report](p2_transfer_integration_2026-09-28.md); real VM import/boot acceptance remains skipped.
+
+## 2026-09-28 P2 native archive entrypoints
+
+Imported the Archive portion of VPhoneArchiveKit and explicit `archive` commands from fixed upstream `2.0.8 / 9d218de`, using pinned ArchiveKit `82687c7`. Local adaptations preserve permission policy, reject path traversal, publish new outputs exclusively, resolve hardlink member reads and enable sparse extraction. Firmware patch bytes, variant defaults, VM transfer and CFW archive backends remain unchanged. Small-fixture validation and the 16 MiB sparse-allocation limitation are recorded in the [P2 archive report](p2_archive_integration_2026-09-28.md). This does not establish real VM import or boot acceptance.
+
+## 2026-09-28 P2 native signing entrypoints
+
+Imported VPhoneSign and its fixed upstream corpus from `2.0.8 / 9d218de` as a separate SwiftPM target with explicit `sign` and `dump-entitlements` CLI commands. Existing firmware patch bytes, variants, CFW signing scripts and guest installation paths are unchanged. File signing uses private staging and refuses symlinks; the native signer has not replaced ldid in the installation pipeline. Frozen signing parity, local CMS verification and ordinary host execution are recorded in the [P2 integration report](p2_sign_integration_2026-09-28.md); these do not establish guest/VM acceptance.
+
+## 2026-09-28 P1a catalog and P1b camera DSC preflight
+
+The catalog adds iOS 26.6.2/23G90 and 27.0 RC/24A435 from upstream `9c23c8adcd4b362120988ab9d228b959bcc23ae3`, both paired with cloudOS 26.4. All five variants remain only `code_selectable` for these additions; upstream Tested Environments rows are not local acceptance evidence.
+
+The EXP Python camera patcher now plans all six sites before writes, recognises its exact existing output, and fills mixed original/patched inputs. Invalid sites fail before any write unless the explicit prologue override is used; short or overlapping inputs and incomplete signature slots still fail. It checks written bytes and SHA-256 page slots, includes existing sites when re-attesting after interruption, and covers both pages of a boundary-spanning patch. Replacement instructions and the six-site scope are unchanged. AVF-only and dry-run remain available. Write/hash failures propagate without rollback; the EXP installer still logs camera failures and continues.
+
+The full `make test` passes: 369 Python tests (including 17 new synthetic DSC tests), 497 Swift Testing tests, and 145 XCTest cases (3 skipped, no failures), plus both archive relay memory checks. CLI JSON reports all 25 catalog pairings and both new menu selections pass. Real DSC and EXP runtime validation remain outstanding. P1c real import and post-import boot acceptance are skipped at the user's request, retaining their unverified status. See the [P1a/P1b record](p1ab_integration_2026-09-28.md) for source mapping, regression results, and limits.
+
+## 2026-09-26 P1c host state integration
+
+Applied the first-batch host NVRAM and stopped-VM clone changes. Existing NVRAM is opened without recreation; clones retain persistent boot identity while omitting root host runtime state and the default control socket. Firmware patch logic, variant defaults, patch counts and previous firmware acceptance results are unchanged. Real VM repeat boot and stopped-clone boot passed on isolated copies after a temporary, single-CDHash AMFI allowance. Export/import acceptance is not complete. macOS unit/integration results and the remaining VM acceptance are recorded in [the P1c integration report](p1c_batch1_2026-09-26.md).
+
+The follow-up import change uses `bsdtar -S` to recreate holes from zero blocks. A 256 MiB regression fixture verifies byte equality, logical size, and reduced allocation through the real export/import entrypoints. The resumed Swift suite passes 496 tests plus 145 XCTest cases (3 skipped). Real-VM results and the limits of this allocation behavior are tracked in [the import acceptance record](p1c_import_acceptance_2026-09-26.md); this remains a host-only change. The archive relay now drains Foundation autoreleased buffers per chunk. Isolated 1 GiB tests of both real relay input paths fail above 1 GiB RSS before the change and pass below 9 MiB afterward; the check is included in `make test_swift`.
+
+The final real import attempt exhausted the configured free-space margin and did not publish a VM. The host subsequently panicked at 2026-09-26 19:01:26 +08:00 after a logd watchdog timeout, with LOW swap space recorded. Import-related storage pressure is the leading suspected contributor; the logd blocking mechanism is unconfirmed. The temporary guard waited only for the CLI parent and did not establish that tar and disk writes had stopped. Real import/boot acceptance remains incomplete; see the [incident analysis](p1c_host_panic_2026-09-26.md).
+
 > **EXP is a JB superset.** Everything in the baseline tables below that is `Y`
 > for JB is also `Y` for EXP. The columns are kept at three variants to avoid
 > noise — the only place EXP and JB diverge is the **Experimental additions**

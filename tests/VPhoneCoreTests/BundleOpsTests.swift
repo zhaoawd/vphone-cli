@@ -1,4 +1,5 @@
 @testable import VPhoneCore
+import Darwin
 import Foundation
 import Testing
 
@@ -172,7 +173,7 @@ struct BundleOpsTests {
         }
     }
 
-    @Test func cloneCopiesBundleAndResetsIdentity() throws {
+    @Test func cloneCopiesBundleAndPreservesIdentity() throws {
         let root = try makeRoot()
         defer { try? FileManager.default.removeItem(at: root) }
         let rom = try fakeROM(); let seprom = try fakeROM()
@@ -188,17 +189,18 @@ struct BundleOpsTests {
         try Data([5]).write(to: src.url.appendingPathComponent("ABC123.shsh"))
         let withID = src.manifest.updating(machineIdentifier: Data([9, 9]))
         try withID.write(to: src.configURL)
-
         let clone = try VPhoneBundleOps.clone(bundleNamed: "src", to: "dst", in: lib)
-
         // Copy happened (disk + ROMs present in the clone).
         #expect(fm.fileExists(atPath: clone.url.appendingPathComponent("Disk.img").path))
         #expect(fm.fileExists(atPath: clone.url.appendingPathComponent("AVPBooter.vresearch1.bin").path))
-        // Identity artifacts cleared in the clone.
-        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("nvram.bin").path))
-        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("udid-prediction.txt").path))
-        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("ABC123.shsh").path))
-        #expect(clone.manifest.machineIdentifier.isEmpty)
+        // Persistent identity must stay consistent with the copied SEP storage.
+        #expect(clone.manifest.machineIdentifier == Data([9, 9]))
+        for name in ["config.plist", "nvram.bin", "udid-prediction.txt", "ABC123.shsh", "SEPStorage"] {
+            #expect(try Data(contentsOf: clone.url.appendingPathComponent(name)) ==
+                    Data(contentsOf: src.url.appendingPathComponent(name)))
+        }
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent(VPhoneVMRuntimeState.filename).path))
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent("vphone.sock").path))
         // Original untouched.
         #expect(fm.fileExists(atPath: src.url.appendingPathComponent("nvram.bin").path))
         #expect(try lib.bundle(named: "src").manifest.machineIdentifier == Data([9, 9]))
@@ -243,6 +245,36 @@ struct BundleOpsTests {
         #expect(imported.manifest.cpuCount == 8)
         #expect(imported.manifest.memorySize == 4096 * 1024 * 1024)
         #expect(try lib2.bundle(named: "copy").manifest.cpuCount == 8)
+    }
+
+    @Test func importPreservesSparseDiskBytesAndLogicalSize() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let rom = try fakeROM(); let seprom = try fakeROM()
+        defer { try? FileManager.default.removeItem(at: rom); try? FileManager.default.removeItem(at: seprom) }
+        let lib = VPhoneLibrary(root: root)
+        let source = try VPhoneBundleOps.create(
+            .init(name: "sparse", cpuCount: 2, memoryMB: 2048, diskSizeGB: 1,
+                  romSource: rom, sepromSource: seprom), in: lib)
+        let disk = source.url.appendingPathComponent("Disk.img")
+        // Use a large fixture: 32 MiB retained full allocation on the test host.
+        let size = 256 * 1024 * 1024
+        var expected = Data(count: size)
+        // Nonzero bytes cross a block boundary; zero regions include the tail.
+        for offset in [0, 4095, 4096, size / 2, size - 8193] {
+            expected[offset] = 0xA5
+        }
+        // A dense source also covers old archives without sparse metadata.
+        try expected.write(to: disk)
+        let archive = root.appendingPathComponent("sparse.tzst")
+        try VPhoneBundleOps.export(bundleNamed: "sparse", to: archive, includeIPSW: false, in: lib)
+        let imported = try VPhoneBundleOps.importArchive(from: archive, name: "copy", in: lib)
+        let restored = imported.url.appendingPathComponent("Disk.img")
+        #expect(try Data(contentsOf: restored) == expected)
+        var restoredInfo = stat()
+        #expect(stat(restored.path, &restoredInfo) == 0)
+        #expect(restoredInfo.st_size == size)
+        #expect(restoredInfo.st_blocks * 512 < size / 2)
     }
 
     @Test func importRejectsExistingName() throws {

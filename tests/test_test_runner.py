@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "scripts/run_tests.py"
@@ -35,17 +36,19 @@ class TestRunnerTests(unittest.TestCase):
             self.assertIn(f"FIXTURES={(base / 'fixtures').resolve()}", result.stdout)
 
     def test_fast_swift_does_not_inherit_firmware_acceptance_selectors(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            swift = Path(tmp) / "swift"
-            swift.write_text('#!/bin/sh\n[ -z "${VPHONE_C4_PIPELINE_VM+x}${VPHONE_LESS_PIPELINE_VM+x}${VPHONE_TEST_VMDIR+x}" ] || exit 67\n')
-            swift.chmod(0o755)
-            result = subprocess.run(
-                [sys.executable, str(RUNNER), "swift"],
-                env=dict(os.environ, PATH=tmp, VPHONE_C4_PIPELINE_VM="must-not-run",
-                         VPHONE_LESS_PIPELINE_VM="must-not-run", VPHONE_TEST_VMDIR="must-not-run"),
-                capture_output=True, text=True,
-            )
-            self.assertEqual(result.returncode, 0, result.stderr)
+        spec = importlib.util.spec_from_file_location("vphone_test_runner", RUNNER)
+        runner = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(runner)
+        selectors = dict(VPHONE_C4_PIPELINE_VM="must-not-run",
+                         VPHONE_LESS_PIPELINE_VM="must-not-run", VPHONE_TEST_VMDIR="must-not-run")
+        with mock.patch.dict(os.environ, selectors), mock.patch.object(runner, "run") as run:
+            runner.run_swift()
+        self.assertEqual(run.call_count, 2)
+        self.assertEqual(run.call_args_list[0].args[0][0], "swift")
+        self.assertEqual(run.call_args_list[1].args[0][1], ROOT / "scripts/check_tar_pipe_memory.py")
+        for invocation in run.call_args_list:
+            for name in selectors:
+                self.assertNotIn(name, invocation.kwargs["env"])
 
     def test_swift_failure_reaches_the_callers_exit_status(self):
         with tempfile.TemporaryDirectory() as tmp:

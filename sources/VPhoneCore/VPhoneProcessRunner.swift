@@ -216,12 +216,15 @@ public enum VPhoneProcessRunner {
 
         let sink = cIn.fileHandleForWriting
         var total: Int64 = 0
-        while true {
-            guard let chunk = try? source.read(upToCount: 1 << 20), !chunk.isEmpty else { break }
-            do { try sink.write(contentsOf: chunk) } catch { break }  // consumer died; status below
+        // FileHandle reads can leave autoreleased backing storage alive until
+        // the caller's pool drains. Bound its lifetime to one archive chunk.
+        while autoreleasepool(invoking: { () -> Bool in
+            guard let chunk = try? source.read(upToCount: 1 << 20), !chunk.isEmpty else { return false }
+            do { try sink.write(contentsOf: chunk) } catch { return false }  // consumer died; status below
             total += Int64(chunk.count)
             onBytes?(total)
-        }
+            return true
+        }) {}
         try? sink.close()
         try? source.close()
 

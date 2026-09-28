@@ -78,7 +78,7 @@ if [[ -f "$JB_SYSOS_DMG" ]]; then
     # Mount, patch chunks (hv_vmm + camera, same cryptex), unmount.
     # Idempotent: re-running on an already-patched DMG is a no-op
     # (hv_vmm patcher detects already-patched cstrings; camera patcher
-    # refuses pre-patched function entries unless --force is passed).
+    # accepts matching patched entries and verifies their page hashes).
     echo "[*] DSC patches: mounting cached SystemOS DMG..."
     mkdir -p "$JB_MNT_SYSOS"
     sudo ${SUDO_ASKPASS:+-A} hdiutil attach -mountpoint "$JB_MNT_SYSOS" "$JB_SYSOS_DMG" -nobrowse -owners off

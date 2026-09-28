@@ -60,12 +60,14 @@ vphone-cli vm list                         # VM 목록 표시 (스크립팅용 -
 vphone-cli vm info myphone                  # VM 하나 표시
 vphone-cli vm new myphone                   # 빈 번들 생성 (cpu/mem/disk 옵션)
 vphone-cli vm config myphone --cpu 8 --memory 8192
-vphone-cli vm clone myphone myphone-2       # 빠른 APFS 복제, 새로운 기기 식별자
+vphone-cli vm clone myphone myphone-2       # 종료된 VM 상태 복사, 동일한 기기 식별자 유지
 vphone-cli vm export myphone --out myphone.tzst   # zstd fast by default (--max = xz -9); --out 이 디렉토리면 <vm>.tzst/.txz 자동 명명; restore 디렉토리 + 스테이징 파일 건너뜀
 vphone-cli vm import myphone.tzst --name restored
 vphone-cli vm rename myphone iphone16
 vphone-cli vm delete iphone16
 ```
+
+복제본은 원본 VM의 machine identifier, NVRAM, SEP storage, 티켓과 앱 데이터를 유지하며, 호스트 실행 기록과 기본 제어 socket은 제외합니다. 종료된 상태의 복사본이며 독립 기기나 실행 중 스냅샷이 아닙니다. 독립 기기 식별자가 필요하면 새로 생성하고 복원하세요. 동일한 식별자를 가진 복제본의 동시 실행은 별도 검증이 필요합니다.
 
 ### VM 수동 빌드 (`vm create`가 자동화하는 작업)
 
@@ -179,19 +181,23 @@ vphone-amfidont         # 로컬 빌드의 경우 .build/vphone-cli.app/Contents
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.6.1_23G83`   | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_26.6.2_23G90`   | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
 | Mac16,6 26.6.1  | `17,3_27.0_24A5408d`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5418b`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5424a`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5430a`  | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_27.0_24A435`    | `26.4-23E5207q` |
+
+`23G90` 및 `24A435` 행은 [업스트림 커밋 9c23c8a](https://github.com/Lakr233/vphone-cli/commit/9c23c8adcd4b362120988ab9d228b959bcc23ae3)의 테스트 기록입니다. 로컬 검증 상태는 `code_selectable`입니다.
 
 ## 지원 범위
 
 다음은 각 증거 날짜 기준의 실측 범위이며, 모든 버전 조합에 대한 일반적인 지원 보장이 아닙니다. 기기는 모두 `iPhone17,3`입니다.
 
-**펌웨어 호환성 레지스트리 (2026-09-09 기준, 출처 `research/firmware_compatibility.json`)**
-레지스트리에는 23개의 catalog 버전 페어링(정확한 빌드 번호 포함, 18.6.2부터 27.0 beta까지)과 4개의 cloudOS 이미지(26.1 = `23B85`, 26.2 = 빌드 번호 미기록, 26.3 = `23D128`, 26.4 = `23E5207q`)가 등록되어 있습니다. 다섯 가지 변형(less/regular/dev/jb/exp)은 23개 페어링 전체에서 code_selectable입니다(파이프라인에 선택 투입 가능; 패치나 부팅 검증은 수행하지 않음). 패치 바이트 검증(patch_verified)은 less 1, regular 7, dev 7, jb 10, exp 7 조합을 포함합니다. 실기기 능력 검증(capability_verified): jb 3개 조합(27.0 계열 `24A5380h`/`24A5390f`/`24A5408d`, 그중 `24A5408d`는 `--frida`), exp 1개 조합(26.6.1/`23G83` rig-baseline). regular/dev 변형은 아직 완전한 실기기 부팅 증거가 없습니다.
+**펌웨어 호환성 레지스트리 (2026-09-28 기준, 출처 `research/firmware_compatibility.json`)**
+레지스트리에는 25개의 catalog 버전 페어링(정확한 빌드 번호 포함, 18.6.2부터 27.0 RC까지)과 4개의 cloudOS 이미지(26.1 = `23B85`, 26.2 = 빌드 번호 미기록, 26.3 = `23D128`, 26.4 = `23E5207q`)가 등록되어 있습니다. 다섯 가지 변형(less/regular/dev/jb/exp)은 25개 페어링 전체에서 code_selectable입니다(파이프라인에 선택 투입 가능; 패치나 부팅 검증은 수행하지 않음). 패치 바이트 검증(patch_verified)은 less 1, regular 7, dev 7, jb 10, exp 7 조합을 포함합니다. 실기기 능력 검증(capability_verified): jb 3개 조합(27.0 계열 `24A5380h`/`24A5390f`/`24A5408d`, 그중 `24A5408d`는 `--frida`), exp 1개 조합(26.6.1/`23G83` rig-baseline). regular/dev 변형은 아직 완전한 실기기 부팅 증거가 없습니다.
 
 **엔드투엔드 증거 매트릭스 (2026-09-17 기준, 출처 `research/f1_support_matrix_2026-09-17.md`)**
 이번 회차에서는 단계별(S1 생성부터 S12 EXP 전용까지)로 두 조합을 검증했습니다:

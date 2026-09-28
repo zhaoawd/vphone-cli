@@ -60,12 +60,18 @@ vphone-cli vm list                         # list VMs (--json for scripting)
 vphone-cli vm info myphone                  # show one VM
 vphone-cli vm new myphone                   # create an empty bundle (cpu/mem/disk options)
 vphone-cli vm config myphone --cpu 8 --memory 8192
-vphone-cli vm clone myphone myphone-2       # fast APFS clone, fresh device identity
+vphone-cli vm clone myphone myphone-2       # stopped state copy; retains the SAME device identity
 vphone-cli vm export myphone --out myphone.tzst   # zstd fast by default (--max = xz -9); --out may be a dir (auto-names <vm>.tzst/.txz); skips restore dir + staging files
 vphone-cli vm import myphone.tzst --name restored
 vphone-cli vm rename myphone iphone16
 vphone-cli vm delete iphone16
 ```
+
+Cloning retains the source's machine identifier, NVRAM, SEP storage, tickets and
+application data. It is an offline state copy, not an identity-independent new
+device or a live snapshot. Host runtime records and the default control socket are omitted.
+Use a new create/restore workflow for independent device identities. VM boot and
+concurrent use of same-identity clones require separate acceptance testing.
 
 ### Build a VM manually (what `vm create` automates)
 
@@ -179,19 +185,23 @@ vphone-amfidont         # .build/vphone-cli.app/Contents/Resources/vphone-amfido
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.6.1_23G83`   | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_26.6.2_23G90`   | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
 | Mac16,6 26.6.1  | `17,3_27.0_24A5408d`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5418b`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5424a`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5430a`  | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_27.0_24A435`    | `26.4-23E5207q` |
+
+The `23G90` and `24A435` rows are upstream test records from [commit 9c23c8a](https://github.com/Lakr233/vphone-cli/commit/9c23c8adcd4b362120988ab9d228b959bcc23ae3); local verification remains `code_selectable`.
 
 ## Support Scope
 
 The following is the measured scope as of each evidence date, not a general support guarantee for every version combination. All entries use device `iPhone17,3`.
 
-**Firmware compatibility registry (as of 2026-09-09, source `research/firmware_compatibility.json`)**
-The registry records 23 catalog version pairings (with exact build numbers, 18.6.2 through 27.0 beta) and 4 cloudOS images (26.1 = `23B85`, 26.2 = build number not recorded, 26.3 = `23D128`, 26.4 = `23E5207q`). All five variants (less/regular/dev/jb/exp) are code_selectable on all 23 pairings (they can be selected into the pipeline; no patch or boot verification performed). Patch-byte verification (patch_verified) covers less 1, regular 7, dev 7, jb 10, exp 7 combinations. On-device capability verification (capability_verified): jb 3 combinations (27.0 series `24A5380h`/`24A5390f`/`24A5408d`, of which `24A5408d` uses `--frida`), exp 1 combination (26.6.1/`23G83` rig-baseline). The regular and dev variants have no complete on-device boot evidence yet.
+**Firmware compatibility registry (as of 2026-09-28, source `research/firmware_compatibility.json`)**
+The registry records 25 catalog version pairings (with exact build numbers, 18.6.2 through 27.0 RC) and 4 cloudOS images (26.1 = `23B85`, 26.2 = build number not recorded, 26.3 = `23D128`, 26.4 = `23E5207q`). All five variants (less/regular/dev/jb/exp) are code_selectable on all 25 pairings (they can be selected into the pipeline; no patch or boot verification performed). Patch-byte verification (patch_verified) covers less 1, regular 7, dev 7, jb 10, exp 7 combinations. On-device capability verification (capability_verified): jb 3 combinations (27.0 series `24A5380h`/`24A5390f`/`24A5408d`, of which `24A5408d` uses `--frida`), exp 1 combination (26.6.1/`23G83` rig-baseline). The regular and dev variants have no complete on-device boot evidence yet.
 
 **End-to-end evidence matrix (as of 2026-09-17, source `research/f1_support_matrix_2026-09-17.md`)**
 This round verified two combinations step by step (S1 create through S12 EXP-specific):
@@ -202,6 +212,39 @@ This round verified two combinations step by step (S1 create through S12 EXP-spe
 Patch-record counts at the create stage: regular 58, dev 70, jb 152, exp 178, less 26 (P set); jb-frida 157, exp-frida 183 (N set). Known limitations L1–L3 and open questions O1–O3 are not counted as passing and are tracked separately (see `research/f1_known_limits_2026-09-17.json`). The L combination (18.6.2/`22G100`) was not included this round; no IPSW was downloaded and all steps are recorded as not run.
 
 The various patch counts (boot chain / totals / historical method counts) differ between measurement methods; see `research/0_binary_patch_comparison.md` and section 5 of `research/firmware_compatibility.md` for the method notes.
+
+### Native Mach-O signing
+
+The native signer is available as an explicit CLI command. Existing build and CFW scripts still use their current signing tools. Sign a copy when preserving the original is required.
+
+```bash
+vphone-cli sign --apple-adhoc /path/to/copied-arm64-binary
+vphone-cli sign --merge --entitlements /path/to/entitlements.plist /path/to/copied-guest-binary
+vphone-cli dump-entitlements /path/to/binary
+```
+
+`sign` replaces the file in place and preserves its mode. Without `--merge`, existing entitlements are replaced. The signer supports ARM Mach-O files; signature verification does not establish guest execution or VM acceptance.
+
+### Native archives
+
+```bash
+vphone-cli archive create -C /path/to/source -f /path/to/new-output.tzst --zstd
+vphone-cli archive list -f /path/to/new-output.tzst
+vphone-cli archive extract -f /path/to/new-output.tzst -C /path/to/existing-directory
+vphone-cli archive cat -f /path/to/new-output.tzst relative/member.txt
+```
+
+`create` and `decompress` require a new output path; `create` requires it outside the source tree. Extraction detects compression, uses the current user and umask by default, and refuses absolute paths, parent traversal and writes through symlinks. Extraction can replace existing files and does not roll back earlier entries on failure. `-p` restores archived modes and numeric ownership; `--no-overwrite-dir` preserves existing directory metadata. `archive --help` also lists decompression and tree fingerprint commands.
+
+VM transfer retains `system-tar` as the default. The native backend is opt-in while real-VM acceptance remains pending:
+
+```bash
+vphone-cli vm export sample --out /path/to/new-export.tzst --archive-backend native
+vphone-cli vm import /path/to/export.tzst --name sample-copy --archive-backend native
+vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw --json
+```
+
+Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. Firmware preparation and CFW installation retain their current backends.
 
 ## FAQ
 

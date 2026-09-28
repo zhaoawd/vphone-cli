@@ -60,12 +60,14 @@ vphone-cli vm list                         # 列出虚拟机（--json 用于脚�
 vphone-cli vm info myphone                  # 显示某台虚拟机
 vphone-cli vm new myphone                   # 创建一个空 bundle（cpu/内存/磁盘选项）
 vphone-cli vm config myphone --cpu 8 --memory 8192
-vphone-cli vm clone myphone myphone-2       # 快速 APFS 克隆，全新设备标识
+vphone-cli vm clone myphone myphone-2       # 停机状态副本，保留相同设备标识
 vphone-cli vm export myphone --out myphone.tzst   # zstd fast by default（--max = xz -9）；--out 为目录时自动命名 <vm>.tzst/.txz；跳过 restore 目录 + 暂存文件
 vphone-cli vm import myphone.tzst --name restored
 vphone-cli vm rename myphone iphone16
 vphone-cli vm delete iphone16
 ```
+
+克隆保留源 VM 的 machine identifier、NVRAM、SEP storage、票据和应用数据，排除宿主运行记录和默认控制 socket。克隆需要停机，副本保留相同设备身份；独立设备身份应通过新建与恢复流程建立。同身份副本的并发使用需要单独验收。
 
 ### 手动构建虚拟机（`vm create` 自动化的流程）
 
@@ -179,19 +181,23 @@ vphone-amfidont         # 本地构建见 .build/vphone-cli.app/Contents/Resourc
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.6.1_23G83`   | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_26.6.2_23G90`   | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
 | Mac16,6 26.6.1  | `17,3_27.0_24A5408d`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5418b`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5424a`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5430a`  | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_27.0_24A435`    | `26.4-23E5207q` |
+
+`23G90` 和 `24A435` 两行来自[上游提交 9c23c8a](https://github.com/Lakr233/vphone-cli/commit/9c23c8adcd4b362120988ab9d228b959bcc23ae3)的测试记录；本地验证状态仍为 `code_selectable`。
 
 ## 支持范围
 
 以下为截至各证据日期的实测范围，非对全部版本组合的通用支持承诺。设备均为 `iPhone17,3`。
 
-**固件兼容性清单（截至 2026-09-09，来源 `research/firmware_compatibility.json`）**
-清单登记 23 条 catalog 版本配对（含精确构建号，18.6.2 至 27.0 beta）与 4 个 cloudOS 镜像（26.1 = `23B85`、26.2 = 构建号未记录、26.3 = `23D128`、26.4 = `23E5207q`）。五个变体（less/regular/dev/jb/exp）在全部 23 条配对上为 code_selectable（可选择进入流水线，未做补丁或启动验证）。补丁字节验证（patch_verified）覆盖 less 1、regular 7、dev 7、jb 10、exp 7 个组合。真机能力验证（capability_verified）：jb 3 个组合（27.0 系列 `24A5380h`/`24A5390f`/`24A5408d`，其中 `24A5408d` 为 `--frida`），exp 1 个组合（26.6.1/`23G83` rig-baseline）。regular/dev 变体尚无完整真机启动证据。
+**固件兼容性清单（截至 2026-09-28，来源 `research/firmware_compatibility.json`）**
+清单登记 25 条 catalog 版本配对（含精确构建号，18.6.2 至 27.0 RC）与 4 个 cloudOS 镜像（26.1 = `23B85`、26.2 = 构建号未记录、26.3 = `23D128`、26.4 = `23E5207q`）。五个变体（less/regular/dev/jb/exp）在全部 25 条配对上为 code_selectable（可选择进入流水线，未做补丁或启动验证）。补丁字节验证（patch_verified）覆盖 less 1、regular 7、dev 7、jb 10、exp 7 个组合。真机能力验证（capability_verified）：jb 3 个组合（27.0 系列 `24A5380h`/`24A5390f`/`24A5408d`，其中 `24A5408d` 为 `--frida`），exp 1 个组合（26.6.1/`23G83` rig-baseline）。regular/dev 变体尚无完整真机启动证据。
 
 **端到端证据矩阵（截至 2026-09-17，来源 `research/f1_support_matrix_2026-09-17.md`）**
 本轮逐步骤（S1 创建至 S12 EXP 专项）验证两组组合：
@@ -202,6 +208,39 @@ vphone-amfidont         # 本地构建见 .build/vphone-cli.app/Contents/Resourc
 创建阶段补丁记录数：regular 58、dev 70、jb 152、exp 178、less 26（P 组）；jb-frida 157、exp-frida 183（N 组）。已知限制 L1–L3 与未解决问题 O1–O3 不计为通过，单独跟踪（见 `research/f1_known_limits_2026-09-17.json`）。L 组合（18.6.2/`22G100`）本轮未纳入，未下载 IPSW，全部步骤记为未执行。
 
 各口径补丁计数（引导链/总计/历史方法数）之间数值不同，参见 `research/0_binary_patch_comparison.md` 与 `research/firmware_compatibility.md` 第 5 节的口径说明。
+
+### 原生 Mach-O 签名
+
+原生签名库通过显式 CLI 命令调用。构建和 CFW 安装脚本仍使用原有签名工具。需要保留原文件时，应对副本执行签名。
+
+```bash
+vphone-cli sign --apple-adhoc /path/to/copied-arm64-binary
+vphone-cli sign --merge --entitlements /path/to/entitlements.plist /path/to/copied-guest-binary
+vphone-cli dump-entitlements /path/to/binary
+```
+
+`sign` 原地替换文件并保留权限；未指定 `--merge` 时替换已有 entitlements。支持范围为 ARM Mach-O 文件；签名验证通过不代表客户机执行或 VM 验收通过。
+
+### 原生归档
+
+```bash
+vphone-cli archive create -C /path/to/source -f /path/to/new-output.tzst --zstd
+vphone-cli archive list -f /path/to/new-output.tzst
+vphone-cli archive extract -f /path/to/new-output.tzst -C /path/to/existing-directory
+vphone-cli archive cat -f /path/to/new-output.tzst relative/member.txt
+```
+
+`create` 和 `decompress` 要求输出路径不存在；`create` 的输出必须位于源目录树之外。解包自动识别压缩格式，默认使用当前用户和 umask，拒绝绝对路径、父目录穿越以及通过符号链接写入。解包可替换已有文件；失败时不会回滚之前写入的条目。`-p` 恢复归档权限和数字所有者，`--no-overwrite-dir` 保留已有目录的元数据。解压缩和目录指纹命令参见 `archive --help`。
+
+VM 传输默认使用 `system-tar`。原生后端通过参数显式选择，真实 VM 验收尚未完成：
+
+```bash
+vphone-cli vm export sample --out /path/to/new-export.tzst --archive-backend native
+vphone-cli vm import /path/to/export.tzst --name sample-copy --archive-backend native
+vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw --json
+```
+
+原生导出拒绝已有输出文件。两种导入后端均在发布前检查 manifest 路径和链接，并持有库锁完成发布。`fw inspect` 只读取本地 BuildManifest，并可检查 iPhone/cloudOS 配对；不执行解包、恢复或固件真实性验证。固件准备和 CFW 安装保留原有后端。
 
 ## 常见问题
 

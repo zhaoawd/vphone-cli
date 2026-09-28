@@ -10,8 +10,8 @@ struct FirmwarePickerTests {
 
     // MARK: - Catalog integrity
 
-    @Test func catalogHasTwentyThreePairings() {
-        #expect(VPhoneFirmwareCatalog.pairings.count == 23)
+    @Test func catalogHasTwentyFivePairings() {
+        #expect(VPhoneFirmwareCatalog.pairings.count == 25)
     }
 
     @Test func everyPairingIsPopulated() {
@@ -76,6 +76,19 @@ struct FirmwarePickerTests {
         #expect(out.cloudosSource == p.cloudosURL)
     }
 
+    @Test(arguments: ["23G90", "24A435"])
+    func newUpstreamPairingsAreSelectable(build: String) throws {
+        let index = try #require(VPhoneFirmwareCatalog.pairings.firstIndex {
+            $0.iosURL.contains("_\(build)_")
+        })
+        let pairing = VPhoneFirmwareCatalog.pairings[index]
+        let out = try VPhoneFirmwarePicker.resolve(
+            iphone: nil, cloudos: nil, isInteractive: true,
+            read: reader([String(index + 1)]), write: { _ in })
+        #expect(out.iphoneSource == pairing.iosURL)
+        #expect(out.cloudosSource == VPhoneFirmwareCatalog.cloud264)
+    }
+
     // MARK: - Prompt: only one side missing
 
     @Test func iPhoneProvidedPromptsForCloudOSOnly() throws {
@@ -106,7 +119,7 @@ struct FirmwarePickerTests {
             iphone: nil, cloudos: nil, isInteractive: true,
             read: reader(["1"]), write: { lines.append($0) })
         let menu = lines.filter { $0.hasPrefix("  [") }
-        #expect(menu.count == 23)
+        #expect(menu.count == 25)
         // Label text starts in one column regardless of 1- vs 2-digit index.
         let labelStarts = Set(menu.map { $0.range(of: "] ")!.upperBound.utf16Offset(in: $0) })
         #expect(labelStarts.count == 1)

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-09-09",
+  "updated": "2026-09-28",
   "policy": {
     "unlisted_combination_stage": "unverified",
     "stages": [
@@ -175,6 +175,12 @@
         "source": "catalog"
       },
       {
+        "version": "26.6.2",
+        "build": "23G90",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
         "version": "27.0",
         "build": "24A5355q",
         "cloudos_name": "cloudOS 26.4",
@@ -219,6 +225,12 @@
       {
         "version": "27.0",
         "build": "24A5430a",
+        "cloudos_name": "cloudOS 26.4",
+        "source": "catalog"
+      },
+      {
+        "version": "27.0",
+        "build": "24A435",
         "cloudos_name": "cloudOS 26.4",
         "source": "catalog"
       }
@@ -2733,6 +2745,31 @@
       ]
     },
     {
+      "id": "cs-23G90",
+      "ios": {
+        "version": "26.6.2",
+        "build": "23G90"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
       "id": "cs-24A5355q",
       "ios": {
         "version": "27.0",
@@ -2912,6 +2949,31 @@
       "ios": {
         "version": "27.0",
         "build": "24A5430a"
+      },
+      "cloudos": {
+        "version": "26.4",
+        "build": null
+      },
+      "options": [],
+      "stage": "code_selectable",
+      "capabilities": [],
+      "evidence": [],
+      "limitations": [
+        "cloudOS 构建号未记录（catalog 仅记版本名，URL 为 private-cloud-compute 哈希）"
+      ],
+      "variants": [
+        "less",
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ]
+    },
+    {
+      "id": "cs-24A435",
+      "ios": {
+        "version": "27.0",
+        "build": "24A435"
       },
       "cloudos": {
         "version": "26.4",

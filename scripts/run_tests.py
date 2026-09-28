@@ -83,6 +83,8 @@ def run_swift(firmware=False):
     selection = "--filter" if firmware else "--skip"
     run(["swift", "test", "--disable-sandbox", "--cache-path", cache,
          selection, "FirmwareIntegrationTests"], env=env)
+    if not firmware:
+        run([sys.executable, ROOT / "scripts/check_tar_pipe_memory.py"], env=env)
 
 
 def main():

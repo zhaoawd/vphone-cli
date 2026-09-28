@@ -13,6 +13,7 @@ REQUIRED = (
     'scripts/cfw_install.sh', 'scripts/cfw_install_dev.sh',
     'scripts/cfw_install_jb.sh', 'scripts/cfw_install_exp.sh',
     'scripts/lib/cfw_common.sh',
+    'scripts/licenses/libarchive.txt',
     'scripts/boot_host_preflight.sh', 'scripts/pymobiledevice3_bridge.py',
     'scripts/check_python_runtime.py', 'scripts/python_environment.py', 'scripts/patchers/cfw.py',
     'dependencies/python-darwin-arm64-3.13.lock', 'dependencies/python-darwin-arm64-3.14.lock',

@@ -60,12 +60,14 @@ vphone-cli vm list                         # VM の一覧表示（スクリプ�
 vphone-cli vm info myphone                  # 1 つの VM を表示
 vphone-cli vm new myphone                   # 空のバンドルを作成（cpu/mem/disk オプション）
 vphone-cli vm config myphone --cpu 8 --memory 8192
-vphone-cli vm clone myphone myphone-2       # 高速 APFS クローン、新しいデバイスアイデンティティ
+vphone-cli vm clone myphone myphone-2       # 停止中の状態を複製し、同じデバイス識別情報を保持
 vphone-cli vm export myphone --out myphone.tzst   # zstd fast by default (--max = xz -9); --out がディレクトリなら <vm>.tzst/.txz を自動命名; 復元ディレクトリ + ステージングファイルをスキップ
 vphone-cli vm import myphone.tzst --name restored
 vphone-cli vm rename myphone iphone16
 vphone-cli vm delete iphone16
 ```
+
+クローンは元の VM の machine identifier、NVRAM、SEP storage、チケット、アプリデータを保持し、ホストの実行記録と既定の制御 socket を除外します。停止中の状態のコピーであり、独立したデバイスや実行中のスナップショットではありません。独立した識別情報には新規作成と復元を使用してください。同じ識別情報を持つクローンの同時実行は別途検証が必要です。
 
 ### VM を手動でビルドする（`vm create` が自動化する処理）
 
@@ -179,19 +181,23 @@ vphone-amfidont         # ローカルビルドの場合は .build/vphone-cli.ap
 | Mac16,11 27.0b2 | `17,3_26.5.2_23F84`   | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_26.6_23G71`     | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_26.6.1_23G83`   | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_26.6.2_23G90`   | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5380h`  | `26.4-23E5207q` |
 | Mac16,6 26.4.1  | `17,3_27.0_24A5390f`  | `26.4-23E5207q` |
 | Mac16,6 26.6.1  | `17,3_27.0_24A5408d`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5418b`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5424a`  | `26.4-23E5207q` |
 | Mac16,11 27.0b2 | `17,3_27.0_24A5430a`  | `26.4-23E5207q` |
+| Mac16,6 26.6.1  | `17,3_27.0_24A435`    | `26.4-23E5207q` |
+
+`23G90` と `24A435` の行は[上流コミット 9c23c8a](https://github.com/Lakr233/vphone-cli/commit/9c23c8adcd4b362120988ab9d228b959bcc23ae3)のテスト記録です。ローカルの検証状態は `code_selectable` のままです。
 
 ## サポート範囲
 
 以下は各証拠日付時点での実測範囲であり、すべてのバージョンの組み合わせに対する一般的なサポート保証ではありません。デバイスはすべて `iPhone17,3` です。
 
-**ファームウェア互換性レジストリ（2026-09-09 時点、出典 `research/firmware_compatibility.json`）**
-レジストリには 23 件の catalog バージョンペア（正確なビルド番号付き、18.6.2 から 27.0 beta まで）と 4 つの cloudOS イメージ（26.1 = `23B85`、26.2 = ビルド番号未記録、26.3 = `23D128`、26.4 = `23E5207q`）が登録されています。5 つのバリアント（less/regular/dev/jb/exp）は全 23 ペアで code_selectable です（パイプラインに選択して投入可能。パッチや起動の検証は未実施）。パッチバイト検証（patch_verified）は less 1、regular 7、dev 7、jb 10、exp 7 の組み合わせをカバーします。実機能力検証（capability_verified）: jb 3 組み合わせ（27.0 系列 `24A5380h`/`24A5390f`/`24A5408d`、うち `24A5408d` は `--frida`）、exp 1 組み合わせ（26.6.1/`23G83` rig-baseline）。regular/dev バリアントには完全な実機起動の証拠はまだありません。
+**ファームウェア互換性レジストリ（2026-09-28 時点、出典 `research/firmware_compatibility.json`）**
+レジストリには 25 件の catalog バージョンペア（正確なビルド番号付き、18.6.2 から 27.0 RC まで）と 4 つの cloudOS イメージ（26.1 = `23B85`、26.2 = ビルド番号未記録、26.3 = `23D128`、26.4 = `23E5207q`）が登録されています。5 つのバリアント（less/regular/dev/jb/exp）は全 25 ペアで code_selectable です（パイプラインに選択して投入可能。パッチや起動の検証は未実施）。パッチバイト検証（patch_verified）は less 1、regular 7、dev 7、jb 10、exp 7 の組み合わせをカバーします。実機能力検証（capability_verified）: jb 3 組み合わせ（27.0 系列 `24A5380h`/`24A5390f`/`24A5408d`、うち `24A5408d` は `--frida`）、exp 1 組み合わせ（26.6.1/`23G83` rig-baseline）。regular/dev バリアントには完全な実機起動の証拠はまだありません。
 
 **エンドツーエンド証拠マトリクス（2026-09-17 時点、出典 `research/f1_support_matrix_2026-09-17.md`）**
 今回はステップごと（S1 作成から S12 EXP 専用まで）に 2 つの組み合わせを検証しました:

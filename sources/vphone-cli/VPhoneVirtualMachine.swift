@@ -125,10 +125,14 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
             print("[vphone] Warning: failed to resolve ECID from machineIdentifier")
         }
 
-        let auxStorage = try VZMacAuxiliaryStorage(
-            creatingStorageAt: options.nvramURL,
-            hardwareModel: hwModel,
-            options: .allowOverwrite
+        let auxStorage = try VPhoneNVRAMStorage.openOrCreate(
+            at: options.nvramURL,
+            openExisting: { VZMacAuxiliaryStorage(url: $0) },
+            createNew: {
+                try VZMacAuxiliaryStorage(
+                    creatingStorageAt: $0, hardwareModel: hwModel, options: []
+                )
+            }
         )
         platform.auxiliaryStorage = auxStorage
         platform.hardwareModel = hwModel

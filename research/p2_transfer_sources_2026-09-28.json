@@ -1,0 +1,68 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "license": "MIT (repository-root LICENSE)",
+  "files": [
+    {
+      "upstream_path": "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift",
+      "upstream_blob": "1284c3a021c284a729483dd12c5816822ee50e8c",
+      "upstream_sha256": "f5a5cdbee20da9fdb28bbfe80a738fc12b318858329364bfa27e9904f82138b4",
+      "local_path": "sources/VPhoneCore/VPhoneIPSWCache.swift",
+      "local_sha256": "ba61507478e1cb638cd0c46ab276cb57c592d4be45a36458ec58ffd6b0ab66ba",
+      "adaptation": "ported API; local permission, publication, cancellation and bounded manifest handling"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneArchiveKitTests/IPSWCacheTests.swift",
+      "upstream_blob": "6135ead36accbe85d659e453aca1101ab50f610f",
+      "upstream_sha256": "8fdfb52c8a873edfeefc8cf92a9b01f406b1d5227bad1ee93c14ba40ade1fe67",
+      "local_path": "tests/VPhoneCoreTests/IPSWCacheTests.swift",
+      "local_sha256": "5b107aadcf6ffe8349c42686afedef62d648547917aa14477a45bfea797a7bfa",
+      "adaptation": "4 upstream tests plus local regression tests"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBundleTransfer.swift",
+      "upstream_blob": "51be1e9bfe87d089b5c8680819e022730f859b83",
+      "upstream_sha256": "c6b68b9974185eb38a857f76e16e37e1911afe4e8d55043903a282a93ce677a5",
+      "local_path": "sources/VPhoneCore/VPhoneNativeTransfer.swift",
+      "local_sha256": "c55487d597e5f35a996aaaf88a9dc90f21914c61caf89d4cae8028489e686b6c",
+      "adaptation": "partial adaptation of logical-size accounting and import validation; local lock/publication remain in VPhoneBundleOps"
+    }
+  ],
+  "local_integration_files": [
+    {
+      "path": "Package.swift",
+      "sha256": "56e3357f03b242d370647f3dc8bde08b6d5002061a3650b2d4fd3b9f323da656"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneBundleOps.swift",
+      "sha256": "8b02f2f7adb56efa0db89dc61764f92270d27b0aef32e206a88a75a845561072"
+    },
+    {
+      "path": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
+      "sha256": "d8dd28916cc0359ed5c1ba47573895612aeb9cd97c36af1d5c4b85a8b5178ad7"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMTransferCLI.swift",
+      "sha256": "f9f9b360e4c64fed653f056c58c4f49f9c80b190356f94edceb68448c0977696"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneFWCLI.swift",
+      "sha256": "30aebcefef7d3b3e7a41e7a201180fbe75f2a11ccf81b1e48d6ae25e02579885"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneFWInspectCLI.swift",
+      "sha256": "b96ccd2d59b58ffd874341ebb3e909316b933fcc89f530f72e645bb2fcab159e"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/NativeTransferTests.swift",
+      "sha256": "c06b8fcfda9233b804a436877c877b373e2af0cfaa38b6fe5dde226cf5826b4d"
+    },
+    {
+      "path": "tests/VPhoneCLITests/NativeTransferCLITests.swift",
+      "sha256": "2129b4614387d6d43586d6502d5637a8cb5ef67f954108d11a4a3532d6b15d54"
+    }
+  ],
+  "archive_dependency_revision": "82687c75e530917b7fbeb15cd5f9369524637155",
+  "previous_batch_snapshot": "research/p2_archive_sources_2026-09-28.json",
+  "default_vm_archive_backend": "system-tar",
+  "real_vm_import_acceptance": "skipped at user request"
+}

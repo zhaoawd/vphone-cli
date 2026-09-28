@@ -1,6 +1,6 @@
 # 固件兼容性清单（C1）
 
-日期：2026-09-09。
+更新日期：2026-09-28。
 
 机器可读真源：[`research/firmware_compatibility.json`](firmware_compatibility.json)（`schema_version: 1`）。
 格式校验：[`tests/test_firmware_compatibility.py`](../tests/test_firmware_compatibility.py)（Python unittest，`make test` 自动发现）。
@@ -20,10 +20,10 @@
 
 ## 2. 固件（firmware）
 
-- `firmware.ios`：23 条 catalog 配对（iPhone17,3，含精确构建号；构建号从 IPSW URL 解析）。每条附推荐 `cloudos_name`。
+- `firmware.ios`：25 条 catalog 配对（iPhone17,3，含精确构建号；构建号从 IPSW URL 解析）。每条附推荐 `cloudos_name`。
 - `firmware.cloudos`：4 个 cloudOS 镜像（按 major）。catalog **不含 cloudOS 构建号**（URL 为 private-cloud-compute 哈希）。已知构建号来自证据/测试脚本：26.1→`23B85`、26.3→`23D128`、26.4→`23E5207q`；26.2 构建号未记录（`build: null`，`build_known: false`）。
 
-> 说明：`c1_inventory.md` 记为「24 条 catalog 配对」，实测 `VPhoneFirmwareCatalog.pairings` 为 **23** 条（15 条 18.6.2–26.6.1 + 8 条 iOS 27 beta）。本清单以 23 为准；Swift 一致性测试直接从 catalog 解析，自动跟随代码。
+> 2026-09-28 从上游 `9c23c8a` 增加 26.6.2/23G90 与 27.0 RC/24A435，catalog 从 23 条增至 25 条。两条新增组合在五个变体上均仅记为 `code_selectable`；上游测试记录不提升本地验证状态。Swift 一致性测试直接核对 catalog 与清单。
 
 ## 3. 四阶段（stage）
 
@@ -67,19 +67,19 @@ CFW 安装脚本用 `N/7` 阶段标记（`scripts/cfw_install.sh`，base=7 阶�
 
 此外 iBSS/iBEC/LLB 存在 Summary 表与 Migration parity 两套 record 计数（iBEC 4 vs 7、LLB 6 vs 13、iBSS base 2 vs 4），JSON 中这些组件 `record_count` 保留 `summary` 键并在 `note` 记录差异，`method_count` 记 `null`（含义待确认）。
 
-## 6. 当前覆盖（combinations，共 38 条）
+## 6. 当前覆盖（combinations，共 40 条）
 
 按变体 × 阶段统计的组合条数（`variants: [...]` 数组按其中每个变体分别计入）：
 
 | 变体 \ 阶段 | code_selectable | patch_verified | boot_verified | capability_verified |
 | --- | --: | --: | --: | --: |
-| less | 23 | 1 | 0 | 0 |
-| regular | 23 | 7 | 0 | 0 |
-| dev | 23 | 7 | 0 | 0 |
-| jb | 23 | 10 | 0 | 3 |
-| exp | 23 | 7 | 0 | 1 |
+| less | 25 | 1 | 0 | 0 |
+| regular | 25 | 7 | 0 | 0 |
+| dev | 25 | 7 | 0 | 0 |
+| jb | 25 | 10 | 0 | 3 |
+| exp | 25 | 7 | 0 | 1 |
 
-- `code_selectable`：23 条 bulk 组合，每条 `variants: ["less","regular","dev","jb","exp"]`，cloudOS 构建号 `null`（catalog 仅版本）。
+- `code_selectable`：25 条 bulk 组合，每条 `variants: ["less","regular","dev","jb","exp"]`，cloudOS 构建号 `null`（catalog 仅版本）。
 - `patch_verified`：26.1(`23B85`)/cloudOS 26.1(`23B85`) 与 26.3(`23D127`)/cloudOS 26.3(`23D128`) 的 regular/dev/jb 字节 parity（2026-03-10）；26.5(`23F77`) jb 合成组件 83 records 与 main byte-identical（2026-07-20）。
 - `patch_verified` 新增 `pv-261-c3-bootchain-20260910`：26.1 / 23B85 精确配对的 regular/dev/jb/exp 非 less 引导链生产流水线、必要集合及落盘 payload 验证通过（2026-09-10）；宿主 AVPBooter 为 macOS 26.5.1 / 25F80，不含磁盘镜像有效性、恢复或启动。历史 `pv-261-parity` 条目保留。详见 [精确引导链验收](c3_full_pipeline_acceptance_2026-09-10.md)。
 - `capability_verified`：
