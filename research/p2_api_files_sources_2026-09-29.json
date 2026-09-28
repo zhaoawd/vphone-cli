@@ -1,0 +1,218 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "base_commit": "3bfa613",
+  "scope": "bounded API file downloads, response identity, private staging and exclusive host publication; no daemon activation",
+  "upstream_references": [
+    {
+      "path": "VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "blob": "885ba480b5d1b152721ab05d485828dca61be175",
+      "sha256": "dbba6e93553b470f5dbfc13ccc92fe0cca6b29099fffb1bf7b3645f559629038"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "blob": "d6002c85089f8361d36708aa5a5ac9a6e2f218da",
+      "sha256": "9342a8b6863906cb2088be56495fbd4679d47a1d29f226530b5002eb5835026d"
+    }
+  ],
+  "local_files": [
+    {
+      "path": "README.md",
+      "sha256": "7ae7ee0eec5c895b04088fee459dc257792d2595979c46fe67d8a2ce921720cb"
+    },
+    {
+      "path": "research/0_binary_patch_comparison.md",
+      "sha256": "09d250ea0b069a4c0f38566112658e3fc6d6750dc98a353c54763c876675429b"
+    },
+    {
+      "path": "research/upstream_implementation_plan.md",
+      "sha256": "97a52ffbe199ca96ede8e5f4c06cff1acc2ef57ae8ce87ea5a2f122cf14d0911"
+    },
+    {
+      "path": "research/host_control_protocol_e1_2026-09-11.md",
+      "sha256": "fb6ec75dfd241940deea58cd78b30f716ca880075965ad5928a71466196c5341"
+    },
+    {
+      "path": "research/p2_api_files_integration_2026-09-29.md",
+      "sha256": "4f3f4682552661d09053d4a2efb8e1100f9595cec2c3fbb76d3651b9f64b8715"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+      "sha256": "5a0e8cfc1e6f8ef37ca6796238fc24ddf1c184dea9497a08f8f1d9cb9bc6eca2"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPISession.swift",
+      "sha256": "179a7267b823894dfd9e7afa84b41cb39ec6b0c11735c2f0a0d855b1a4279b23"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIDownload.swift",
+      "sha256": "06c6b5110e52cf35921aa0b5d48cf6d25d9aebcff94f4d5278382cbc3c2f863d"
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sha256": "cbc40c44f6527400a3d448a7c5f5ed58509ecb14f6f429c94e3525da30ae1e5f"
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sha256": "ae95710a5095e223933410d66e6e64bfe27fa18ab8e4886698de378658c8b211"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneHostAPICommands.swift",
+      "sha256": "5f7106f41ff633819d9f921858d7e871741eaabcc5d2e0a748886ccdad38b968"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIDownloadTests.swift",
+      "sha256": "572afee6d17587728606b1722f0cca4bb6adccf3d7af41b51e0659deb32efcb2"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIProxyTests.swift",
+      "sha256": "e42f24fd1e6d9503662f92eecec02b469fea78209d072478710c63bd21fc52b8"
+    },
+    {
+      "path": "tests/VPhoneCLITests/HostAPICommandTests.swift",
+      "sha256": "019a4fa32c6cbdd6b61a0e7c094c889aeddc66d16e375ae55da466daf7d21d80"
+    },
+    {
+      "path": "tests/fixtures/host_api/server.py",
+      "sha256": "4fec48ec738bf289449f16e68db5cc5f6e2b4b6b26edb86ffae9cf9ff6590445"
+    }
+  ],
+  "candidate_manifest": {
+    "activated": false,
+    "api_version": 1,
+    "architecture": "arm64",
+    "deployment_target": "15.0",
+    "dynamic_libraries": [
+      "/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 4424.1.101)",
+      "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 4424.1.101)",
+      "/usr/lib/libsqlite3.dylib (compatibility version 9.0.0, current version 381.0.0)",
+      "/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9126.4.27)",
+      "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)",
+      "/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 1965.4.3)",
+      "/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 61901.102.2)",
+      "/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)",
+      "/System/Library/Frameworks/AVFoundation.framework/AVFoundation (compatibility version 1.0.0, current version 2.0.0)",
+      "/System/Library/Frameworks/CoreLocation.framework/CoreLocation (compatibility version 1.0.0, current version 3072.0.46)",
+      "/usr/lib/libz.1.dylib (compatibility version 1.0.0, current version 1.2.12)",
+      "/usr/lib/libbz2.1.0.dylib (compatibility version 1.0.0, current version 1.0.8)",
+      "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+      "/usr/lib/libxml2.2.dylib (compatibility version 10.0.0, current version 10.9.0)",
+      "/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)",
+      "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
+      "/System/Library/Frameworks/CryptoKit.framework/CryptoKit (compatibility version 1.0.0, current version 1.0.0)",
+      "/System/Library/Frameworks/Vision.framework/Vision (compatibility version 1.0.0, current version 9.5.4)",
+      "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
+      "/usr/lib/swift/libswiftAVFoundation.dylib (compatibility version 1.0.0, current version 2410.24.1, weak)",
+      "/usr/lib/swift/libswiftAccelerate.dylib (compatibility version 1.0.0, current version 77.100.2, weak)",
+      "/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)",
+      "/usr/lib/swift/libswiftCoreAudio.dylib (compatibility version 1.0.0, current version 411.255.0, weak)",
+      "/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0)",
+      "/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 2.2.0, weak)",
+      "/usr/lib/swift/libswiftCoreMIDI.dylib (compatibility version 1.0.0, current version 6.0.0, weak)",
+      "/usr/lib/swift/libswiftCoreMedia.dylib (compatibility version 1.0.0, current version 3305.24.1, weak)",
+      "/usr/lib/swift/libswiftDarwin.dylib (compatibility version 1.0.0, current version 377.100.15)",
+      "/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32)",
+      "/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 372.14.0, weak)",
+      "/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 10.0.0, weak)",
+      "/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0, weak)",
+      "/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 5.0.0, weak)",
+      "/usr/lib/swift/libswiftSpatial.dylib (compatibility version 1.0.0, current version 1.0.0, weak)",
+      "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 879.4.10, weak)",
+      "/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.100.15, weak)",
+      "/usr/lib/swift/libswift_Concurrency.dylib (compatibility version 0.0.0, current version 0.0.0, weak)",
+      "/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1082.0.0, weak)",
+      "/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 23.0.0, weak)",
+      "/usr/lib/swift/libswiftFoundation.dylib (compatibility version 1.0.0, current version 1.0.0)",
+      "/usr/lib/swift/libswiftUIKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)",
+      "@rpath/libswiftCompatibilitySpan.dylib (compatibility version 0.0.0, current version 0.0.0, weak)",
+      "/usr/lib/swift/libswiftCoreGraphics.dylib (compatibility version 1.0.0, current version 120.100.0)"
+    ],
+    "files_sha256": {
+      "vphoned": "8ce42a291dd0892aa2ce83d5d0f1e1a87984f0377b800fe3f256248642e292af",
+      "vphoned.entitlements.plist": "0fc0734159f78e9b3085959d159dba4e238a48762fa5cf39b392f5c8a1b50bb3",
+      "vphoned.plist": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67"
+    },
+    "pins": [
+      {
+        "identity": "icli",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/owngoal-dev/icli.git",
+        "state": {
+          "revision": "74843a56df54936c3949239a4ffb3ddcbe37dee4",
+          "version": "0.6.9"
+        }
+      },
+      {
+        "identity": "libarchive.xcframework",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/Lakr233/libarchive.xcframework.git",
+        "state": {
+          "revision": "82687c75e530917b7fbeb15cd5f9369524637155",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "identity": "swift-argument-parser",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-argument-parser.git",
+        "state": {
+          "revision": "46989693916f56d1186bd59ac15124caef896560",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-atomics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "revision": "0442cb5a3f98ab802acb777929fdb446bda11a34",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-collections",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+          "version": "1.6.0"
+        }
+      },
+      {
+        "identity": "swift-nio",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "revision": "34d486b01cd891297ac615e40d5999536a1e138d",
+          "version": "2.83.0"
+        }
+      },
+      {
+        "identity": "swift-system",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-system.git",
+        "state": {
+          "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+          "version": "1.8.1"
+        }
+      }
+    ],
+    "platform": "IOS",
+    "role": "isolated-api-daemon-candidate",
+    "runtime_validated": false,
+    "schema_version": 1,
+    "vsock_port": 1339
+  },
+  "logs": {
+    "make-build-final.log": "f82e5d5044d0085276f4b3eff34836f378534f8ca8d9860c7f71e5948a8aeb35",
+    "make-build.log": "415b1a8c98a7a1b9ecca65baab712062526d4532832585ffa642c613944d1838",
+    "make-daemon-api-build.log": "02168fdb5b0930ce93798cf0fde9aa2a36526bcc39acdba62761969fb6dea05c",
+    "make-test-swift-rerun.log": "7ed92b8ee9a5cdf66ca748e2c9bfe47479a59fa3bd6e265131ca0162e2a76a6f",
+    "make-test-swift.log": "67410261d59a2ed43cf384adcf8766cbf616ad22566e808f12d8696cb991225b",
+    "swift-hang-sample.txt": "2773947c185efef04e2afa6662b143d71aabd3d708c4ed8098125fa8f030051a",
+    "test-download-final.log": "661ee8a8966c38a8f755cacb6ad9f01d17690931b189e1f8ed841be8240ef3d7",
+    "test-download.log": "79b387b4ec754ea77cbe3a43445f1cae53a5858f5401012af492d4ed6e8d2264",
+    "test-files-final.log": "664b21eacc99a8a5b3e37a66451b14a0439b4bee88a7b4927cd662a8bc3a3e37",
+    "test-http-isolated.log": "9551982e3f2bb8854bbfc91c312166086de25f99cf03d88376736c3943d7fbdf",
+    "test-initial.log": "2d2d76a1da346f156d5aed3e04e204fd84cd330f39bb97d6a22de831f8d5afbd"
+  }
+}

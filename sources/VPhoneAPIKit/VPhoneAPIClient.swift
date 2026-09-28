@@ -51,6 +51,63 @@ public struct VPhoneAPIClient: Sendable {
         return try VPhoneAPIWire.result(response)
     }
 
+    public func downloadFile(path: String, instanceID: String, binaryHash: String,
+                             maximumBytes: Int, stagingDirectory: URL, timeout: TimeInterval? = nil) async throws -> VPhoneAPIDownload {
+        let deadline = timeout ?? self.timeout
+        guard path.hasPrefix("/"), !path.contains("\0"), UUID(uuidString: instanceID) != nil,
+              deadline.isFinite, deadline > 0, deadline <= 130,
+              (0...64 * 1024 * 1024).contains(maximumBytes), stagingDirectory.isFileURL,
+              binaryHash.utf8.count == 64,
+              binaryHash.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }) else {
+            throw VPhoneAPIError(code: "configuration", message: "Invalid download parameters")
+        }
+        try Task.checkCancellation()
+        var request = request(path: "v1/files/content")
+        request.timeoutInterval = deadline
+        var url = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!
+        url.queryItems = [URLQueryItem(name: "path", value: path)]
+        url.percentEncodedQuery = url.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        request.url = url.url!
+        request.setValue("identity", forHTTPHeaderField: "Accept-Encoding")
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Accept")
+        return try await VPhoneAPIFileExchange(download: VPhoneAPIDownload(directory: stagingDirectory),
+            maximumBytes: maximumBytes, instanceID: instanceID, binaryHash: binaryHash)
+            .run(request, session: session, timeout: deadline)
+    }
+
+    public func uploadFile(_ source: VPhoneAPIUpload, path: String, permissions: String,
+                           instanceID: String, binaryHash: String, timeout: TimeInterval = 120) async throws {
+        guard timeout.isFinite, timeout > 0, timeout <= 130,
+              path.hasPrefix("/"), !path.hasSuffix("/"), !path.contains("\0"),
+              UUID(uuidString: instanceID) != nil, binaryHash.utf8.count == 64,
+              binaryHash.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }),
+              !permissions.isEmpty, permissions.count <= 4,
+              permissions.utf8.allSatisfy({ (48...55).contains($0) }),
+              let mode = UInt16(permissions, radix: 8), mode <= 0o777 else {
+            throw VPhoneAPIError(code: "configuration", message: "Invalid upload parameters")
+        }
+        try Task.checkCancellation()
+        var request = request(path: "v1/files/content")
+        var url = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!
+        url.queryItems = [URLQueryItem(name: "path", value: path), URLQueryItem(name: "mode", value: permissions)]
+        url.percentEncodedQuery = url.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        request.url = url.url!
+        request.httpMethod = "PUT"
+        request.timeoutInterval = timeout
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        request.setValue(String(source.size), forHTTPHeaderField: "Content-Length")
+        request.setValue(instanceID, forHTTPHeaderField: "X-Vphone-Instance-ID")
+        request.setValue(binaryHash, forHTTPHeaderField: "X-Vphone-Binary-Hash")
+        let reply = try await VPhoneAPIHTTPExchange().run(request, session: session, timeout: timeout, uploadFile: source.file)
+        guard reply.status == 200 else { throw httpError(reply.status) }
+        let object = try VPhoneAPIWire.object(reply.data)
+        guard case let .object(result) = object["result"], result["path"] == .string(path),
+              result["size"] == .number(Double(source.size)),
+              case let .string(instance) = result["instance_id"], UUID(uuidString: instance) == UUID(uuidString: instanceID),
+              result["binary_hash"] == .string(binaryHash) else { throw VPhoneAPIWire.invalidEnvelope() }
+        try Task.checkCancellation()
+    }
+
     /// Each socket has its own generation and pending requests. Call close()
     /// when finished; create a new socket after a disconnect instead of reusing it.
     public func openWebSocket() -> VPhoneAPIWebSocket {

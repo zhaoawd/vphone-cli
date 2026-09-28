@@ -7,6 +7,7 @@ import struct
 import sys
 import time
 import uuid
+from urllib.parse import urlsplit, parse_qs
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 root = Path(sys.argv[1])
@@ -17,7 +18,7 @@ managed = '--managed-session' in sys.argv[2:] or host_commands
 health = {'status': 'ok', 'api_version': 1, 'binary_hash': 'a' * 64,
           'capabilities': ['files'], 'ios': '26.0'}
 if managed:
-    health.update(instance_id=str(uuid.uuid4()), capabilities=['files', 'session_identity'])
+    health.update(instance_id=str(uuid.uuid4()), capabilities=['files', 'session_identity', 'file_download_identity', 'file_upload_identity'])
 if host_commands:
     health['capabilities'].append('apps')
 
@@ -45,6 +46,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.authorized():
             return self.reply(401, {'error': 'unauthorized'})
+        if urlsplit(self.path).path == '/v1/files/content':
+            return self.download()
         if self.path.startswith('/redirect/'):
             self.send_response(302)
             self.send_header('Location', '/followed/v1/health')
@@ -75,6 +78,88 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(b'0\r\n\r\n')
             return
         self.reply(200, health)
+
+    def download(self):
+        query = parse_qs(urlsplit(self.path).query)
+        assert set(query) == {'path'} and len(query['path']) == 1
+        path = query['path'][0]
+        (root / 'download-path').write_text(path)
+        if path == '/redirect-file':
+            self.send_response(302)
+            self.send_header('Location', '/followed/v1/health')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return
+        if path == '/missing':
+            return self.reply(404, {'error': 'missing'})
+        chunked = path.startswith('/chunked/')
+        count = int(path.rsplit('/', 1)[1]) if path.startswith(('/bytes/', '/chunked/')) else 256
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/plain' if path == '/wrong-type' else 'application/octet-stream')
+        self.send_header('X-Vphone-Instance-ID', str(uuid.uuid4()) if path == '/wrong-instance' else health['instance_id'])
+        self.send_header('X-Vphone-Binary-Hash', 'b' * 64 if path == '/wrong-hash' else health['binary_hash'])
+        if chunked:
+            self.send_header('Transfer-Encoding', 'chunked')
+        else:
+            self.send_header('Content-Length', str(count))
+        self.send_header('Connection', 'close')
+        self.end_headers()
+        if path.startswith('/slow-file'):
+            self.wfile.write(b'x')
+            self.wfile.flush()
+            (root / ('started-' + path[1:])).write_text('1')
+            time.sleep(5)
+            return
+        if path == '/short':
+            self.wfile.write(b'short')
+            return
+        chunk = bytes(range(256)) * 256
+        while count:
+            data = chunk[:min(count, len(chunk))]
+            if chunked:
+                self.wfile.write(f'{len(data):x}\r\n'.encode() + data + b'\r\n')
+            else:
+                self.wfile.write(data)
+            count -= len(data)
+        if chunked:
+            self.wfile.write(b'0\r\n\r\n')
+
+    def do_PUT(self):
+        if not self.authorized():
+            return self.reply(401, {'error': 'unauthorized'})
+        if self.headers.get('X-Vphone-Instance-ID', '').lower() != health['instance_id'].lower() or self.headers.get('X-Vphone-Binary-Hash') != health['binary_hash']:
+            return self.reply(409, {'error': 'identity'})
+        query = parse_qs(urlsplit(self.path).query)
+        path = query['path'][0]
+        size = int(self.headers['Content-Length'])
+        if size > 64 * 1024 * 1024:
+            return self.reply(413, {'error': 'limit'})
+        if path == '/redirect-upload':
+            self.send_response(307)
+            self.send_header('Connection', 'close')
+            self.send_header('Location', '/followed/v1/health')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return
+        temporary = root / ('upload-' + str(uuid.uuid4()))
+        try:
+            with temporary.open('wb') as stream:
+                remaining = size
+                while remaining:
+                    data = self.rfile.read(min(65536, remaining))
+                    if not data:
+                        return
+                    stream.write(data)
+                    remaining -= len(data)
+            temporary.replace(root / 'uploaded')
+            (root / 'uploaded-mode').write_text(query['mode'][0])
+            if path == '/lost-reply':
+                self.close_connection = True
+                return
+            self.reply(200, {'result': {'path': path, 'size': size,
+                'instance_id': health['instance_id'], 'binary_hash': health['binary_hash']}})
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def do_POST(self):
         if not self.authorized():

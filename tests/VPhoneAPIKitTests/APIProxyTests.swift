@@ -145,6 +145,8 @@ final class APIProxyTests: XCTestCase {
         XCTAssertEqual(session.snapshot.state, .ready)
         let result = try await session.call("files.list", requiring: "files")
         XCTAssertEqual(result, .string("files.list"))
+        let download = try await session.downloadFile(path: "/bytes/256", maximumBytes: 1024, stagingDirectory: fixture.directory)
+        XCTAssertEqual(try download.data(), Data(UInt8.min...UInt8.max))
         proxy.stop()
         deadline = ContinuousClock.now + .seconds(5)
         while session.snapshot.state == .ready, ContinuousClock.now < deadline {

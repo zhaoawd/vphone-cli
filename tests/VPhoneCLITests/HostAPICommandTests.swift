@@ -20,6 +20,10 @@ private final class HostAPISessionFake: VPhoneHostAPISession {
             return try! JSONDecoder().decode(VPhoneAPISession.Snapshot.self, from: JSONSerialization.data(withJSONObject: value))
         }
     }
+    func uploadFile(_ source: VPhoneAPIUpload, path: String, permissions: String) async throws { throw URLError(.unsupportedURL) }
+    func downloadFile(path: String, maximumBytes: Int, stagingDirectory: URL) async throws -> VPhoneAPIDownload {
+        throw URLError(.unsupportedURL)
+    }
     func call(_ method: String, params: [String: VPhoneJSONValue], requiring capability: String?) async throws -> VPhoneJSONValue {
         calls.append((method, params, capability))
         if let handler { return try await handler() }
@@ -81,6 +85,55 @@ final class HostAPICommandTests: XCTestCase {
         let foreground = try await endpoint.request(["t": "app_foreground", "transport": "api"])
         XCTAssertEqual(foreground["verified"] as? Bool, false)
         XCTAssertEqual(foreground["pid"] as? Int, 42)
+        XCTAssertEqual((discovery["api_commands"] as? [String: Bool])?["file_get"], true)
+        let inline = try await endpoint.request(["t": "file_get", "transport": "api", "path": "/bytes/256"])
+        XCTAssertEqual(inline["size"] as? Int, 256)
+        XCTAssertEqual(Data(base64Encoded: try XCTUnwrap(inline["data"] as? String)), Data(UInt8.min...UInt8.max))
+        let save = directory.appendingPathComponent("saved-download").path
+        let saved = try await endpoint.request(["t": "file_get", "transport": "api", "path": "/bytes/2097152", "save": save])
+        XCTAssertEqual(saved["ok"] as? Bool, true)
+        XCTAssertEqual(saved["path"] as? String, save)
+        XCTAssertEqual(saved["size"] as? Int, 2097152)
+        let duplicate = try await endpoint.request(["t": "file_get", "transport": "api", "path": "/bytes/0", "save": save])
+        XCTAssertEqual(duplicate["code"] as? String, "destination_exists")
+        XCTAssertEqual(try FileManager.default.attributesOfItem(atPath: save)[.size] as? Int, 2097152)
+        for (path, destination) in [("/bytes/1048577", nil), ("/bytes/67108865", save + "-large")] as [(String, String?)] {
+            var request: [String: Any] = ["t": "file_get", "transport": "api", "path": path]
+            request["save"] = destination
+            let rejected = try await endpoint.request(request)
+            XCTAssertEqual(rejected["code"] as? String, "file_too_large")
+        }
+        for fields: [String: Any] in [["path": "relative"], ["path": "/x", "save": 1],
+                                      ["path": "/x", "save": "relative"], ["path": "/x", "save": "/tmp/"]] {
+            var request: [String: Any] = ["t": "file_get", "transport": "api"]
+            request.merge(fields) { _, value in value }
+            let invalid = try await endpoint.request(request)
+            XCTAssertEqual(invalid["code"] as? String, "invalid_argument")
+        }
+        XCTAssertFalse(FileManager.default.fileExists(atPath: save + "-large"))
+        XCTAssertFalse(try FileManager.default.contentsOfDirectory(atPath: directory.path).contains { $0.hasPrefix(".vphone-download-") })
+        XCTAssertEqual((discovery["api_commands"] as? [String: Bool])?["file_put"], true)
+        for fields: [String: Any] in [["data_b64": "AP8B", "load": "/missing", "perm": "640"],
+                                      ["load": save, "perm": "600"], ["data_b64": ""]] {
+            var request: [String: Any] = ["t": "file_put", "transport": "api", "path": "/中文+ upload"]
+            request.merge(fields) { _, value in value }
+            let uploaded = try await endpoint.request(request)
+            XCTAssertEqual(uploaded["ok"] as? Bool, true)
+            let expected = try fields["data_b64"].flatMap { Data(base64Encoded: $0 as! String) } ?? Data(contentsOf: URL(fileURLWithPath: save))
+            XCTAssertEqual(uploaded["size"] as? Int, expected.count)
+            XCTAssertEqual(try Data(contentsOf: directory.appendingPathComponent("uploaded")), expected)
+        }
+        for fields: [String: Any] in [["data_b64": "!"], ["data_b64": 1], ["load": "relative"],
+                                      ["data_b64": "", "perm": "4755"], ["data_b64": "", "perm": 644]] {
+            var request: [String: Any] = ["t": "file_put", "transport": "api", "path": "/x"]
+            request.merge(fields) { _, value in value }
+            let invalid = try await endpoint.request(request)
+            XCTAssertEqual(invalid["code"] as? String, "invalid_argument")
+            XCTAssertNil(invalid["operation_may_continue"])
+        }
+        let ambiguous = try await endpoint.request(["t": "file_put", "transport": "api", "path": "/lost-reply", "data_b64": "AA=="])
+        XCTAssertEqual(ambiguous["ok"] as? Bool, false)
+        XCTAssertEqual(ambiguous["operation_may_continue"] as? Bool, true)
         session.stop()
         let stopped = try await endpoint.request(["t": "app_list", "transport": "api"])
         XCTAssertEqual(stopped["code"] as? String, "api_not_ready")
@@ -150,7 +203,7 @@ final class HostAPICommandTests: XCTestCase {
             api.state = state
             let discovery = try await call(executor, ["t": "capabilities"])
             XCTAssertEqual(discovery["api_commands"] as? [String: Bool],
-                           ["app_list": state == "ready", "app_foreground": state == "ready"])
+                           ["app_list": state == "ready", "app_foreground": state == "ready", "file_get": false, "file_put": false])
             XCTAssertEqual((discovery["commands"] as? [String: Bool])?["app_list"], false)
         }
         api.state = "ready"
@@ -159,7 +212,7 @@ final class HostAPICommandTests: XCTestCase {
         XCTAssertEqual((discovery["api_commands"] as? [String: Bool])?["app_list"], false)
         let missing = try await call(executor, ["t": "app_list", "transport": "api"])
         XCTAssertEqual(missing["code"] as? String, "capability_unavailable")
-        for command in ["app_launch", "app_terminate", "shell", "file_put", "file_get", "capabilities"] {
+        for command in ["app_launch", "app_terminate", "shell", "capabilities"] {
             let result = try await call(executor, ["t": command, "transport": "api", "bundle_id": "app"])
             XCTAssertEqual(result["code"] as? String, "unsupported_transport")
         }

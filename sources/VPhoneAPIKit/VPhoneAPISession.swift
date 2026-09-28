@@ -22,6 +22,9 @@ public final class VPhoneAPISession {
     private var monitor: Task<Void, Never>?
     private var socket: VPhoneAPIWebSocket?
     private var runID: UUID?
+    private var fileClient: VPhoneAPIClient?
+    private var uploads: [UUID: Task<Void, any Error>] = [:]
+    private var downloads: [UUID: Task<VPhoneAPIDownload, any Error>] = [:]
 
     struct Timing: Sendable {
         var handshake: Duration = .seconds(5)
@@ -34,6 +37,7 @@ public final class VPhoneAPISession {
         self.init(vmInstanceID: vmInstanceID, requiredCapabilities: requiredCapabilities,
                   expectedBinaryHash: expectedBinaryHash, probe: { try await client.health() },
                   connect: { client.openWebSocket() })
+        fileClient = client
     }
 
     init(vmInstanceID: String, requiredCapabilities: Set<String> = [], expectedBinaryHash: String? = nil,
@@ -75,6 +79,45 @@ public final class VPhoneAPISession {
         let value = try await socket.call(method, params: params)
         guard snapshot.state == .ready, snapshot.generation == generation else { throw Self.error("stale_session") }
         return value
+    }
+
+    public func downloadFile(path: String, maximumBytes: Int, stagingDirectory: URL) async throws -> VPhoneAPIDownload {
+        guard snapshot.state == .ready, let health = snapshot.health, let instanceID = health.instanceID else {
+            throw Self.error("not_ready")
+        }
+        guard health.capabilities.isSuperset(of: ["files", "file_download_identity"]), let fileClient else {
+            throw Self.error("unsupported_capability")
+        }
+        guard downloads.count < 4 else { throw Self.error("busy") }
+        try Task.checkCancellation()
+        let generation = snapshot.generation
+        let id = UUID()
+        let operation = Task {
+            try await fileClient.downloadFile(path: path, instanceID: instanceID, binaryHash: health.binaryHash,
+                                              maximumBytes: maximumBytes, stagingDirectory: stagingDirectory, timeout: 120)
+        }
+        downloads[id] = operation
+        defer { downloads.removeValue(forKey: id) }
+        let result = try await withTaskCancellationHandler { try await operation.value } onCancel: { operation.cancel() }
+        try Task.checkCancellation()
+        guard snapshot.state == .ready, snapshot.generation == generation else { throw Self.error("stale_session") }
+        return result
+    }
+
+    public func uploadFile(_ source: VPhoneAPIUpload, path: String, permissions: String) async throws {
+        guard snapshot.state == .ready, let health = snapshot.health, let instanceID = health.instanceID else { throw Self.error("not_ready") }
+        guard health.capabilities.isSuperset(of: ["files", "file_upload_identity"]), let fileClient else { throw Self.error("unsupported_capability") }
+        guard uploads.count < 4 else { throw Self.error("busy") }
+        try Task.checkCancellation()
+        let generation = snapshot.generation
+        let id = UUID()
+        let operation = Task { try await fileClient.uploadFile(source, path: path, permissions: permissions,
+            instanceID: instanceID, binaryHash: health.binaryHash) }
+        uploads[id] = operation
+        defer { uploads.removeValue(forKey: id) }
+        try await withTaskCancellationHandler { try await operation.value } onCancel: { operation.cancel() }
+        try Task.checkCancellation()
+        guard snapshot.state == .ready, snapshot.generation == generation else { throw Self.error("stale_session") }
     }
 
     private func run(_ id: UUID) async {
@@ -139,6 +182,10 @@ public final class VPhoneAPISession {
 
     private func transition(_ state: Snapshot.State, generation: UUID? = nil,
                             health: VPhoneAPIHealth? = nil, errorCode: String? = nil) {
+        if state != .ready {
+            for operation in downloads.values { operation.cancel() }
+            for operation in uploads.values { operation.cancel() }
+        }
         snapshot = Snapshot(vmInstanceID: snapshot.vmInstanceID, state: state,
                             generation: generation, health: health, errorCode: errorCode)
     }

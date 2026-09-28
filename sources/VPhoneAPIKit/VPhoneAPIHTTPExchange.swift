@@ -12,10 +12,12 @@ final class VPhoneAPIHTTPExchange: NSObject, URLSessionDataDelegate, @unchecked 
     private var status: Int?
     private var data = Data()
 
-    func run(_ request: URLRequest, session: URLSession, timeout: TimeInterval) async throws -> Response {
+    func run(_ request: URLRequest, session: URLSession, timeout: TimeInterval, uploadFile: URL? = nil) async throws -> Response {
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
-                let task = session.dataTask(with: request)
+                let task: URLSessionDataTask
+                if let uploadFile { task = session.uploadTask(with: request, fromFile: uploadFile) }
+                else { task = session.dataTask(with: request) }
                 task.delegate = self
                 let timer = DispatchWorkItem { [weak self] in
                     self?.finish(.failure(VPhoneAPIError(

@@ -14,7 +14,7 @@ enum GuestFileTransfer {
     }
 
     static func download(path: String, fileIO: NonBlockingFileIO, channel: Channel) {
-        let fd = open(path, O_RDONLY)
+        let fd = open(path, O_RDONLY | O_NONBLOCK | O_CLOEXEC)
         guard fd >= 0 else {
             GuestHyperTextHandler.send(APIWire.error("File could not be opened", status: 404), on: channel)
             return
@@ -28,6 +28,8 @@ enum GuestFileTransfer {
             let region = try FileRegion(fileHandle: handle)
             var headers = HTTPHeaders()
             headers.add(name: "Content-Type", value: "application/octet-stream")
+            headers.add(name: "X-Vphone-Instance-ID", value: APISessionIdentity.instanceID)
+            headers.add(name: "X-Vphone-Binary-Hash", value: GuestAPI.binaryHash)
             headers.add(name: "Content-Length", value: String(region.readableBytes))
             headers.add(name: "Connection", value: "close")
             channel.write(
@@ -61,39 +63,36 @@ enum GuestFileTransfer {
 
 final class GuestFileUpload: @unchecked Sendable {
     private let destination: String
-    private let temporary: String
+    private let transaction: APIFileUploadTransaction
     private let handle: NIOFileHandle
     private let fileIO: NonBlockingFileIO
-    private var offset: Int64 = 0
     private var writes: EventLoopFuture<Void>
     private var pendingWrites = 0
     private let onCommit: ((String) throws -> Void)?
-    private let mode: mode_t
 
     init(
         destination: String,
         fileIO: NonBlockingFileIO,
         channel: Channel,
         mode: mode_t = 0o644,
+        expectedBytes: Int64? = nil,
         onCommit: ((String) throws -> Void)? = nil,
     ) throws {
-        let parent = (destination as NSString).deletingLastPathComponent
-        try FileManager.default.createDirectory(atPath: parent, withIntermediateDirectories: true)
-        let temporary = destination + ".vphoned-" + UUID().uuidString + ".tmp"
-        let fd = open(temporary, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0o600)
-        guard fd >= 0 else { throw GuestAPIError.operationFailed("Could not create upload file") }
+        let transaction = try APIFileUploadTransaction(destination: destination, expectedBytes: expectedBytes, mode: mode)
+        let fd = dup(transaction.descriptor)
+        guard fd >= 0 else { throw GuestAPIError.operationFailed("Could not duplicate upload file") }
         self.destination = destination
-        self.temporary = temporary
+        self.transaction = transaction
         handle = NIOFileHandle(_deprecatedTakingOwnershipOfDescriptor: fd)
         self.fileIO = fileIO
         writes = channel.eventLoop.makeSucceededFuture(())
         self.onCommit = onCommit
-        self.mode = mode
     }
 
     func append(_ buffer: ByteBuffer, channel: Channel) {
-        let start = offset
-        offset += Int64(buffer.readableBytes)
+        let start: Int64
+        do { start = try transaction.reserve(buffer.readableBytes) }
+        catch { transaction.cancel(); channel.close(promise: nil); return }
         pendingWrites += 1
         _ = channel.setOption(ChannelOptions.autoRead, value: false)
         writes = writes.flatMap { [fileIO, handle] in
@@ -117,25 +116,23 @@ final class GuestFileUpload: @unchecked Sendable {
                 case let .failure(error): throw error
                 case .success: break
                 }
-                guard chmod(temporary, mode) == 0 else {
-                    throw GuestAPIError.operationFailed("Could not set upload permissions")
-                }
-                guard rename(temporary, destination) == 0 else {
-                    throw GuestAPIError.operationFailed("Could not replace destination file")
-                }
+                guard channel.isActive else { transaction.cancel(); return }
+                try transaction.commit()
                 try onCommit?(destination)
-                GuestHyperTextHandler.send(.json(["result": ["path": destination, "size": offset]]), on: channel)
+                GuestHyperTextHandler.send(.json(["result": ["path": destination, "size": transaction.size,
+                    "instance_id": APISessionIdentity.instanceID, "binary_hash": GuestAPI.binaryHash]]), on: channel)
             } catch {
-                unlink(temporary)
+                transaction.cancel()
                 GuestHyperTextHandler.send(APIWire.error(String(describing: error), status: 500), on: channel)
             }
         }
     }
 
+    func cancel() { transaction.cancel() }
+
     deinit {
         if handle.isOpen {
             try? handle.close()
         }
-        unlink(temporary)
     }
 }

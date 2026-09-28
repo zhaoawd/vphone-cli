@@ -14,7 +14,6 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
     private var body = Data()
     private var exceededLimit = false
     private var upload: GuestFileUpload?
-    private var uploadError: (any Error)?
     private let maximumJSONBody = 1 << 20
 
     init(hub: APIEventHub, fileIO: NonBlockingFileIO) {
@@ -29,7 +28,6 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
             body.removeAll(keepingCapacity: true)
             exceededLimit = false
             upload = nil
-            uploadError = nil
             // Refuse before an upload stages any file in the guest.
             if let refusal = Self.refusal(for: request) {
                 head = nil
@@ -39,6 +37,20 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
             let requestPath = request.uri.split(separator: "?", maxSplits: 1).first
             if request.method == .PUT, requestPath == "/v1/files/content" || requestPath == "/v1/clipboard/image" {
                 do {
+                    var expectedBytes: Int64?
+                    if requestPath == "/v1/files/content" {
+                        guard request.headers["X-Vphone-Instance-ID"].count == 1,
+                              request.headers["X-Vphone-Binary-Hash"].count == 1,
+                              request.headers["Content-Length"].count == 1,
+                              request.headers["Transfer-Encoding"].isEmpty else {
+                            throw GuestAPIError.invalidRequest("Upload identity and length are required")
+                        }
+                        expectedBytes = try APIFileUploadTransaction.validateIdentity(
+                            instance: request.headers.first(name: "X-Vphone-Instance-ID"),
+                            hash: request.headers.first(name: "X-Vphone-Binary-Hash"),
+                            length: request.headers.first(name: "Content-Length"),
+                            expectedInstance: APISessionIdentity.instanceID, expectedHash: GuestAPI.binaryHash)
+                    }
                     upload = try GuestFileUpload(
                         destination: requestPath == "/v1/clipboard/image"
                             ? "/var/root/Library/Caches/vphoned-clipboard-image"
@@ -46,13 +58,18 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
                         fileIO: fileIO,
                         channel: context.channel,
                         mode: Self.uploadMode(from: request.uri),
+                        expectedBytes: expectedBytes,
                         onCommit: requestPath == "/v1/clipboard/image"
                             ? { path in
                                 _ = try setClipboardImage(Data(contentsOf: URL(fileURLWithPath: path)))
                                 unlink(path)
                             } : nil,
                     )
-                } catch { uploadError = error }
+                } catch {
+                    head = nil
+                    Self.send(APIWire.error("Invalid upload request"), on: context.channel)
+                    return
+                }
             }
         case var .body(buffer):
             guard head != nil else { return }
@@ -74,11 +91,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
             let path = head.uri.split(separator: "?", maxSplits: 1).first.map(String.init) ?? head.uri
             if path == "/v1/files/content" || path == "/v1/clipboard/image" {
                 if head.method == .PUT {
-                    if let uploadError {
-                        Self.send(APIWire.error(String(describing: uploadError)), on: context.channel)
-                    } else {
-                        upload?.finish(channel: context.channel)
-                    }
+                    upload?.finish(channel: context.channel)
                     upload = nil
                 } else if head.method == .GET, path == "/v1/clipboard/image" {
                     do {
@@ -286,6 +299,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
     }
 
     func channelInactive(context: ChannelHandlerContext) {
+        upload?.cancel()
         upload = nil
         context.fireChannelInactive()
     }

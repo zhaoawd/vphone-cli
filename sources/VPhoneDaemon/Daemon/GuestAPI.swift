@@ -60,6 +60,8 @@ enum GuestAPI {
                 "apps",
                 "url",
                 "files",
+                "file_download_identity",
+                "file_upload_identity",
                 "clipboard",
                 "location",
                 "keychain",

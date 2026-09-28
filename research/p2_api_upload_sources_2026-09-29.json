@@ -1,0 +1,146 @@
+{
+  "upstream_revision": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "local_base": "3bfa61337f5faa429ca82a2c6d0d9a80d611ea26",
+  "files_sha256": {
+    "sources/VPhoneAPIKit/VPhoneAPIUpload.swift": "b8aa1ce4eae6af4ebf5bd69e526644ec46659549401d51061e253c37f602582d",
+    "sources/VPhoneAPIKit/VPhoneAPIDownload.swift": "8178c9d10fa6817e8aa63c9f743edc967f2c61af546312701fe75fa62f7f15a7",
+    "sources/VPhoneAPIKit/VPhoneAPIClient.swift": "91b0c26b13830ed4e82cfaf34465d51933190ff93177ae7a92bf15280433a0f6",
+    "sources/VPhoneAPIKit/VPhoneAPIHTTPExchange.swift": "bf7ea29873fe1316ae1241170379986db4c1c6f347ce24e85d1c026870848cec",
+    "sources/VPhoneAPIKit/VPhoneAPISession.swift": "dd0915e4252be4da1d4d5afcc41759d697a7be78b6db94accd50ad81815a0029",
+    "sources/VPhoneDaemon/Daemon/Wire/APIFileUploadTransaction.swift": "ba5185f4f8b930bd642d259b0e8ba85ee1e07f95228be6f9f97f3b019bb8a418",
+    "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift": "62c96f2819c269dd288f689122b0f24c50e047c05c5fff7e850e30a134218d24",
+    "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift": "8ce971eba30267bc30b6fcf1b1d87ed9183957143ec32ef0e42e7d3ad4331ba9",
+    "sources/VPhoneDaemon/Daemon/GuestAPI.swift": "5c29a947f9cc9be02aad68dd1f54d72526e609a24e365a6a30fe29c3d2636cf1",
+    "sources/vphone-cli/VPhoneHostAPICommands.swift": "15ab02f89fc6ca9a9d169abdb9b168a0741360e3dc6e58b824c9b6d97788b3b7",
+    "tests/VPhoneAPIKitTests/APIUploadTests.swift": "eadd48bd0e96dd788b8ed9d6060a61fdc922a4c7172f596cc36903b1395c4ca1",
+    "tests/VPhoneDaemonWireTests/APIFileUploadTests.swift": "7e9d97b768fab342ebd611539ff07eab4e191f6144f0e0ed0870ae4ef68be8e1",
+    "tests/VPhoneCLITests/HostAPICommandTests.swift": "c2a25ccc2e37b88f852cac7422f31d1fbc1652d284085911a10b479685f6e46a",
+    "tests/fixtures/host_api/server.py": "a1c60a21e1f476369b5e71f27ca1000ca1ef5e219cf5b06031f80d89eb97298d"
+  },
+  "candidate_manifest": {
+    "activated": false,
+    "api_version": 1,
+    "architecture": "arm64",
+    "deployment_target": "15.0",
+    "dynamic_libraries": [
+      "/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 4424.1.101)",
+      "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 4424.1.101)",
+      "/usr/lib/libsqlite3.dylib (compatibility version 9.0.0, current version 381.0.0)",
+      "/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9126.4.27)",
+      "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)",
+      "/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 1965.4.3)",
+      "/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 61901.102.2)",
+      "/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)",
+      "/System/Library/Frameworks/AVFoundation.framework/AVFoundation (compatibility version 1.0.0, current version 2.0.0)",
+      "/System/Library/Frameworks/CoreLocation.framework/CoreLocation (compatibility version 1.0.0, current version 3072.0.46)",
+      "/usr/lib/libz.1.dylib (compatibility version 1.0.0, current version 1.2.12)",
+      "/usr/lib/libbz2.1.0.dylib (compatibility version 1.0.0, current version 1.0.8)",
+      "/usr/lib/libiconv.2.dylib (compatibility version 7.0.0, current version 7.0.0)",
+      "/usr/lib/libxml2.2.dylib (compatibility version 10.0.0, current version 10.9.0)",
+      "/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)",
+      "/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)",
+      "/System/Library/Frameworks/CryptoKit.framework/CryptoKit (compatibility version 1.0.0, current version 1.0.0)",
+      "/System/Library/Frameworks/Vision.framework/Vision (compatibility version 1.0.0, current version 9.5.4)",
+      "/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)",
+      "/usr/lib/swift/libswiftAVFoundation.dylib (compatibility version 1.0.0, current version 2410.24.1, weak)",
+      "/usr/lib/swift/libswiftAccelerate.dylib (compatibility version 1.0.0, current version 77.100.2, weak)",
+      "/usr/lib/swift/libswiftCore.dylib (compatibility version 0.0.0, current version 0.0.0)",
+      "/usr/lib/swift/libswiftCoreAudio.dylib (compatibility version 1.0.0, current version 411.255.0, weak)",
+      "/usr/lib/swift/libswiftCoreFoundation.dylib (compatibility version 1.0.0, current version 120.100.0)",
+      "/usr/lib/swift/libswiftCoreImage.dylib (compatibility version 1.0.0, current version 2.2.0, weak)",
+      "/usr/lib/swift/libswiftCoreMIDI.dylib (compatibility version 1.0.0, current version 6.0.0, weak)",
+      "/usr/lib/swift/libswiftCoreMedia.dylib (compatibility version 1.0.0, current version 3305.24.1, weak)",
+      "/usr/lib/swift/libswiftDarwin.dylib (compatibility version 1.0.0, current version 377.100.15)",
+      "/usr/lib/swift/libswiftDispatch.dylib (compatibility version 1.0.0, current version 1542.100.32)",
+      "/usr/lib/swift/libswiftMetal.dylib (compatibility version 1.0.0, current version 372.14.0, weak)",
+      "/usr/lib/swift/libswiftOSLog.dylib (compatibility version 1.0.0, current version 10.0.0, weak)",
+      "/usr/lib/swift/libswiftObjectiveC.dylib (compatibility version 1.0.0, current version 951.7.0, weak)",
+      "/usr/lib/swift/libswiftQuartzCore.dylib (compatibility version 1.0.0, current version 5.0.0, weak)",
+      "/usr/lib/swift/libswiftSpatial.dylib (compatibility version 1.0.0, current version 1.0.0, weak)",
+      "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib (compatibility version 1.0.0, current version 879.4.10, weak)",
+      "/usr/lib/swift/libswiftXPC.dylib (compatibility version 1.0.0, current version 128.100.15, weak)",
+      "/usr/lib/swift/libswift_Concurrency.dylib (compatibility version 0.0.0, current version 0.0.0, weak)",
+      "/usr/lib/swift/libswiftos.dylib (compatibility version 1.0.0, current version 1082.0.0, weak)",
+      "/usr/lib/swift/libswiftsimd.dylib (compatibility version 1.0.0, current version 23.0.0, weak)",
+      "/usr/lib/swift/libswiftFoundation.dylib (compatibility version 1.0.0, current version 1.0.0)",
+      "/usr/lib/swift/libswiftUIKit.dylib (compatibility version 1.0.0, current version 1.0.0, weak)",
+      "@rpath/libswiftCompatibilitySpan.dylib (compatibility version 0.0.0, current version 0.0.0, weak)",
+      "/usr/lib/swift/libswiftCoreGraphics.dylib (compatibility version 1.0.0, current version 120.100.0)"
+    ],
+    "files_sha256": {
+      "vphoned": "f789418fcb91cdb079193f104b55dc8ec7e28dd6a1922e10373c7d17b2944553",
+      "vphoned.entitlements.plist": "0fc0734159f78e9b3085959d159dba4e238a48762fa5cf39b392f5c8a1b50bb3",
+      "vphoned.plist": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67"
+    },
+    "pins": [
+      {
+        "identity": "icli",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/owngoal-dev/icli.git",
+        "state": {
+          "revision": "74843a56df54936c3949239a4ffb3ddcbe37dee4",
+          "version": "0.6.9"
+        }
+      },
+      {
+        "identity": "libarchive.xcframework",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/Lakr233/libarchive.xcframework.git",
+        "state": {
+          "revision": "82687c75e530917b7fbeb15cd5f9369524637155",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "identity": "swift-argument-parser",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-argument-parser.git",
+        "state": {
+          "revision": "46989693916f56d1186bd59ac15124caef896560",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-atomics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "revision": "0442cb5a3f98ab802acb777929fdb446bda11a34",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-collections",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+          "version": "1.6.0"
+        }
+      },
+      {
+        "identity": "swift-nio",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "revision": "34d486b01cd891297ac615e40d5999536a1e138d",
+          "version": "2.83.0"
+        }
+      },
+      {
+        "identity": "swift-system",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-system.git",
+        "state": {
+          "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+          "version": "1.8.1"
+        }
+      }
+    ],
+    "platform": "IOS",
+    "role": "isolated-api-daemon-candidate",
+    "runtime_validated": false,
+    "schema_version": 1,
+    "vsock_port": 1339
+  }
+}

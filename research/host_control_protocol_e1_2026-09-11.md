@@ -41,3 +41,7 @@ socket 权限设为 0600。接收连接后使用 `getpeereid` 检查对端有效
 2026-09-12，E2 已新增命令执行期限、协作取消和迟到结果处理。上述 E1 时点的命令生命周期限制由[E2 记录](host_control_e2_2026-09-12.md)补充；底层操作是否停止仍需区分。
 
 2026-09-29，第十批新增显式 `transport:"api"` 的应用列表与前台查询，以及 `api_commands` 能力字段；默认路由和 E1 连接权限继续保留。参数、字段与错误映射见[只读 API 命令记录](p2_api_commands_integration_2026-09-29.md)。
+
+2026-09-29，第十一批新增 `transport:"api"` 的 file_get：内联 1 MiB、流式保存 64 MiB、120 秒期限、每会话四个下载及排他目标发布，详见[API 文件下载记录](p2_api_files_integration_2026-09-29.md)。经典路径行为保留。
+
+2026-09-29，第十二批增加显式 API `file_put`：内联 1 MiB、文件 64 MiB、私有来源快照、客户机身份与长度校验、暂存原子替换及失败后的 `operation_may_continue`。见[上传记录](p2_api_upload_integration_2026-09-29.md)。

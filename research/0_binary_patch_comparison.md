@@ -1,5 +1,13 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-29 P2 API file uploads
+
+Added explicit API file_put with bounded private source snapshots, request identity and length validation, guest staging/backpressure/atomic replacement, and cancellation uncertainty reporting. Candidate daemon only; no guest installation or firmware/kernel/DSC patch changes. See the [upload record](p2_api_upload_integration_2026-09-29.md).
+
+## 2026-09-29 P2 bounded API file downloads
+
+Added explicit API file_get routing with 1 MiB inline/64 MiB streamed-save limits, private staging and exclusive publication. Managed downloads validate HTTP daemon identity and connection generation, have deadlines and cancellation, and refuse redirects. The inactive candidate adds identity response headers and nonblocking regular-file checks. Firmware/kernel/DSC patch logic and default installation choices are unchanged. Real VM acceptance remains skipped. See the [eleventh-batch report](p2_api_files_integration_2026-09-29.md).
+
 ## 2026-09-29 P2 read-only host app commands
 
 Added explicit API routing for Unix-socket app_list and app_foreground, with capability discovery, field/error mapping and cancellation/generation checks. Classic routing remains the default. Tests cover contract failures and a real Unix-socket-to-loopback-WebSocket path. No daemon, firmware/kernel/DSC patch or installation changes in this batch; real VM acceptance remains skipped. See the [tenth-batch report](p2_api_commands_integration_2026-09-29.md).

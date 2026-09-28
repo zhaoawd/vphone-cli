@@ -258,7 +258,7 @@ wire protocol version. Guest runtime acceptance is still pending.
 HTTP endpoint. It provides API v1 health checks, bounded JSON RPC, and a
 WebSocket client with correlated requests, deadlines and cancellation. Tokens
 are passed explicitly as Bearer headers; redirects are refused. Creating a
-client does not start a listener. File streaming APIs and the remaining host command mappings
+client does not start a listener. File uploads and the remaining host command mappings
 are pending. See the
 [host API foundation report](research/p2_host_api_integration_2026-09-28.md).
 
@@ -283,15 +283,31 @@ The SHA is self-reported unless a library caller supplies an expected hash.
 Older API daemons can still use the raw proxy but cannot establish this managed
 session. See the [session report](research/p2_api_session_integration_2026-09-28.md).
 
-Unix-socket callers can explicitly select the API session for two read-only
+Unix-socket callers can explicitly select the API session for read-only app
 commands: `{"t":"app_list","transport":"api","filter":"user"}` and
 `{"t":"app_foreground","transport":"api"}`. List filters are `all` (default),
 `user`, `system`, and `running`. Foreground results preserve the daemon's
 `verified` boolean; a positive PID does not imply verification. Discovery via
 `{"t":"capabilities"}` adds `api_commands` alongside classic `commands`.
 Omitting `transport` keeps classic routing; API failures never fall back.
-Other commands are rejected on the API route. See the
+Other app commands are rejected on the API route. See the
 [read-only command report](research/p2_api_commands_integration_2026-09-29.md).
+
+`{"t":"file_get","transport":"api","path":"/guest/file"}` downloads up to
+1 MiB inline. Add `"save":"/absolute/host/file"` to stream up to 64 MiB into a
+private staged file, then publish it exclusively. Existing destinations are
+never overwritten on this route. The session requires `files` and
+`file_download_identity`; response identity and generation are checked before
+publication. Downloads have a 120-second deadline and a four-per-session limit.
+See the [file download report](research/p2_api_files_integration_2026-09-29.md).
+
+`{"t":"file_put","transport":"api","path":"/guest/file","load":"/absolute/host/file","perm":"644"}`
+uploads a private snapshot of a regular host file (up to 64 MiB). Use `data_b64`
+for inline bytes up to 1 MiB. The session requires `file_upload_identity`;
+identity and exact length are checked before atomic replacement in the guest.
+Errors after submission include `operation_may_continue:true`. Cancellation or
+response loss does not prove the guest did not write the file. See the
+[upload report](research/p2_api_upload_integration_2026-09-29.md).
 
 Guest daemon payloads are built and signed with `make vphoned` (also run by
 `make build`). Development output is `.build/guest`; packaged output is
