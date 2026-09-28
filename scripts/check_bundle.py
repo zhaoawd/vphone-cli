@@ -26,7 +26,10 @@ REQUIRED = (
     'scripts/resources/cfw_input.tar.zst', 'scripts/resources/cfw_jb_input.tar.zst',
     'scripts/resources/cfw_dev/rpcserver_ios', 'scripts/vphoned/signcert.p12',
     'tools/apfs_snap_rename.py', '.tools/bin/trustcache', '.tools/bin/insert_dylib',
-    'vphoned.signed', 'vphone-amfidont',
+    'guest-resources/vphoned', 'guest-resources/vphoned-less',
+    'guest-resources/vphoned.plist', 'guest-resources/vphoned.entitlements.plist',
+    'guest-resources/manifest.json', 'vphone-amfidont',
+    'scripts/check_guest_payloads.py',
 )
 
 
@@ -42,7 +45,7 @@ def check_resources(bundle):
         path = bundle / 'Contents/MacOS' / name
         if not path.is_file() or not os.access(path, os.X_OK) or not path.resolve().is_relative_to(bundle.resolve()):
             raise ValueError(f'Missing executable: {path}')
-    for name in ('.tools/bin/trustcache', '.tools/bin/insert_dylib', 'vphoned.signed', 'vphone-amfidont'):
+    for name in ('.tools/bin/trustcache', '.tools/bin/insert_dylib', 'guest-resources/vphoned', 'guest-resources/vphoned-less', 'vphone-amfidont'):
         if not os.access(resources / name, os.X_OK):
             raise ValueError(f'Resource is not executable: {name}')
     return resources
@@ -56,6 +59,9 @@ def main():
     bundle = args.bundle.resolve()
     resources = check_resources(bundle)
     subprocess.run(['codesign', '--verify', '--strict', '--verbose=2', str(bundle)], check=True)
+    subprocess.run([os.sys.executable, str(resources / 'scripts/check_guest_payloads.py'),
+                    str(resources / 'guest-resources'), '--ldid',
+                    str(bundle / 'Contents/MacOS/ldid')], check=True)
     binary = bundle / 'Contents/MacOS/vphone-cli'
     signed = subprocess.check_output(['codesign', '-d', '--entitlements', '-', '--xml', str(binary)])
     actual = plistlib.loads(signed)

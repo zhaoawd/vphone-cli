@@ -246,6 +246,23 @@ vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw -
 
 Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. Firmware preparation and CFW installation retain their current backends.
 
+`make daemon_api_build` independently cross-compiles the fixed upstream
+HTTP/WebSocket daemon and proxy. It uses its own pinned Xcode dependency graph
+and writes a signed candidate under `.build/daemon-api-v2/candidate`.
+This target does not install, launch, bundle or select the candidate. The default
+host and guest continue using the existing vsock 1337 protocol. Candidate API
+requests use `api_version: 1` on vsock 1339; the build directory name is not a
+wire protocol version. Guest runtime acceptance is still pending.
+
+Guest daemon payloads are built and signed with `make vphoned` (also run by
+`make build`). Development output is `.build/guest`; packaged output is
+`Contents/Resources/guest-resources`. Regular/dev/JB/EXP installation and host
+auto-update use `vphoned`; the less pipeline uses the separate `vphoned-less`.
+Installers copy these signed files without compiling or signing them again.
+`resources --json` shows the selected paths. `boot --vphoned-bin PATH` remains
+an explicit override. A missing packaged payload requires rebuilding the app;
+VM-local `.vphoned.signed` is a staging copy, not the distribution source.
+
 `restore-inspect /path/to/vm --ticket /path/to/ticket.shsh --ecid 0x123 --json`
 checks for one real `iPhone*_Restore` directory and an optional plist dictionary ticket
 (plain or gzip, at most 32 MiB encoded/decoded). It does not access USB or TSS,

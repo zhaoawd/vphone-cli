@@ -199,6 +199,11 @@ elif name == 'python-stub':
         for name in ("cfw_install.sh", "cfw_install_dev.sh", "cfw_install_jb.sh", "cfw_install_exp.sh", "cache_systemos.py", "vm_lock.py"):
             shutil.copyfile(ROOT / "scripts" / name, scripts / name)
         shutil.copytree(ROOT / "scripts/lib", scripts / "lib")
+        guest = self.base / ".build/guest"
+        guest.mkdir(parents=True)
+        (guest / "vphoned").write_bytes(b"presigned fixture; never executed")
+        (guest / "vphoned").chmod(0o755)
+        (guest / "vphoned.plist").write_bytes(b"launchd fixture")
         overlay = scripts / "resources/cfw_dev"
         overlay.mkdir(parents=True)
         (overlay / "rpcserver_ios").write_bytes(b"overlay")

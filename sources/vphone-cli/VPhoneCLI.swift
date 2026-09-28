@@ -51,8 +51,14 @@ struct VPhoneBootCLI: ParsableCommand {
     @Option(help: "Kernel GDB debug stub port on host (omit for system-assigned port; valid: 6000...65535)")
     var kernelDebugPort: Int?
 
-    @Option(help: "Path to signed vphoned binary for guest auto-update")
-    var vphonedBin: String = ".vphoned.signed"
+    @Option(help: "Override the packaged signed vphoned used for guest auto-update")
+    var vphonedBin: String?
+
+    var guestBinaryURL: URL {
+        if let vphonedBin { return URL(fileURLWithPath: vphonedBin) }
+        let resources = VPhoneResources.resolve()
+        return variant == .less ? resources.vphonedLess : resources.vphoned
+    }
 
     @Option(name: [.customShort("V"), .long], help: "Firmware variant to execute.")
     var variant: PatchFirmwareCLI.VariantOption = .regular

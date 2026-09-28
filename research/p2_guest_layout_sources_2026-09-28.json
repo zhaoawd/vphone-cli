@@ -1,0 +1,184 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "previous_restore_commit": "f546d2f",
+  "adaptation": "Local adaptation of guest resource layout and prebuilt-payload policy. Upstream daemon/proxy/guest-component implementation is not imported in this batch.",
+  "upstream_references": [
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestBinaries.swift",
+      "blob": "cea86004cc7884baa0569129fe435d4434a2dd84",
+      "sha256": "2bc02e1c4aa2706a2b82dec6bcdbc7e7a61745e9fb3d46ba5ad644b94358070f"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/Firmware/VPhoneResources.swift",
+      "blob": "d1f6f1ecd3a4706e2d583efd43d9a877229463ea",
+      "sha256": "8ab41b137b81bf74e42a7a9c234071c45f583dbd40e994c89153834da637ad5a"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneVirtualization/Build/StageBundle.sh",
+      "blob": "1e5e2ae039ba1449a8991f960e1b11cbcc0f3e2f",
+      "sha256": "1f2314ce90acf5e4e2db727e137be8d13e1e5ff07c2aab60ac4766c9ad7db987"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/main.swift",
+      "blob": "c197cfc91da1120784a85ffd26b0b08727b959f1",
+      "sha256": "115b2f95df5ada1c8311183ca56ea123a738ecdfb4450c7904593fbe2de46614"
+    },
+    {
+      "path": "VPhoneDaemon/Native/vphoned_proxy.c",
+      "blob": "cbb58a907e8664eb0f9cd3cbc7fb3c9c20606506",
+      "sha256": "a01db472b4d88a35d48c3d0211c990deca8a74e7543820440a0b86005794dc7d"
+    },
+    {
+      "path": "VPhoneGuestComponents/README.md",
+      "blob": "434327662554212ddb5ce54e986f3aa3d748360b",
+      "sha256": "1019fd67569633cc25b32b49dcd765e80034b68a6bc24cfae4b991427976bd09"
+    }
+  ],
+  "local_files": [
+    {
+      "path": "Makefile",
+      "sha256": "78a14f31e8fa91956b708a4e24cf3bd15ff50ff51e4cf0df33da6b313281e16d"
+    },
+    {
+      "path": "README.md",
+      "sha256": "501072395d412a90edc101ec542a043c6aaa5538c9af5ee5d20a286ff0d8c74e"
+    },
+    {
+      "path": "scripts/build.sh",
+      "sha256": "7c982ce3a0279ab8b5236b12108009b8a6876b562fc450fc2dc2e86f0b6d05ef"
+    },
+    {
+      "path": "scripts/build_guest_payloads.sh",
+      "sha256": "a9e409c4abf0d5773171b172f38da63d1057709379e1980cda9c0ef4e0f0c62f"
+    },
+    {
+      "path": "scripts/cfw_install.sh",
+      "sha256": "05fc1e92f738eddf142708be274d7886d2fe6bad7b93107bc0104973771cad6d"
+    },
+    {
+      "path": "scripts/cfw_install_dev.sh",
+      "sha256": "afd49071b966511666713ab22737ce8dafde1009cad5733cbc91becb40151074"
+    },
+    {
+      "path": "scripts/check_bundle.py",
+      "sha256": "3981fb6ffb84c6cad0efbb628f2b4aa07afc5fcdd28b8a37c6a00e965d972fe0"
+    },
+    {
+      "path": "scripts/check_guest_payloads.py",
+      "sha256": "01b3f0093188d8d2a2e167b34af971c636ff8ec2ad0ef82cf937441555c31a56"
+    },
+    {
+      "path": "scripts/lib/cfw_common.sh",
+      "sha256": "b9a5bc1ac9fb83ec35cd68fe9bd35c44a8d09d9f23d6a5c70cb33a5939221986"
+    },
+    {
+      "path": "scripts/vphoned/Makefile",
+      "sha256": "26f2d48d722032158a16a62d411d664c762bbaa5fb66a114acc237b3afa7367a"
+    },
+    {
+      "path": "sources/FirmwarePatcher/Filesystem/CryptexFilesystemPatcher.swift",
+      "sha256": "e7da6e7711bc7eb0fd49926d367e4cc6a7cab20c72aa7732906ebdecc4cdb74a"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneLaunchLayout.swift",
+      "sha256": "44a672be7a652d13e9686395c6b7c4b13db3c7f1066cedb9bb2580aa86c63237"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneResources.swift",
+      "sha256": "3daaa5cbafcec67679c9c75bdd884e18ff8873bf68881f3711a8a5f00073acb9"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneAppDelegate.swift",
+      "sha256": "2de578474232d767345295f91a0c901dc1a27474776335d6115e9bae4ecd538d"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCLI.swift",
+      "sha256": "40e7444a87c9f2695cb8650f17d0285e0f1bbd6dc49c32f313ec273e3d06776d"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneResourcesCLI.swift",
+      "sha256": "1444f3c5985ce109b14fac5bab6d3f28ca1e001d44b3885cd29a76f815ca6bd1"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+      "sha256": "353eed7eef64a15fc353d5bb716aa11bf890dd02a62d3202d6d72a9c44282575"
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/GuestPayloadInstallTests.swift",
+      "sha256": "347d7ba153b335efb42e373abf83235112eafe27a42203601483c3fa66697637"
+    },
+    {
+      "path": "tests/VPhoneCLITests/GuestResourceCLITests.swift",
+      "sha256": "6bbfec5405cd6927673fa023f3168cdc6653d3a86ba99b56a3a7510f99a97cc5"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/LaunchLayoutTests.swift",
+      "sha256": "c8c7b92428f5f7ca4092dd132200035920cf1833ba27cedc47e3a1c95c507fa1"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/ResourcesTests.swift",
+      "sha256": "6753d4d7a2fa5793cccdd09b03bfb212f322d1abe3307dc88c26ab00c81a6239"
+    },
+    {
+      "path": "tests/test_guest_payloads.py",
+      "sha256": "5cb3967a993f17aa1d6615398b3e182419baf9e9c3657ce4cc5eeba7322cddfc"
+    },
+    {
+      "path": "tests/test_systemos_cache.py",
+      "sha256": "bac4b03f9cc38e262eb27a4605c37ec2d8b022dca84b6c22d1430f1dc8533e0d"
+    }
+  ],
+  "guest_payload_manifest": {
+    "architecture": "arm64",
+    "deployment_target": "15.0",
+    "entitlements_match": true,
+    "files_sha256": {
+      "vphoned": "b4b93f5eaa1d5dd0b899e2511a1194f195ec599957b8ad9c020578a76926c53b",
+      "vphoned-less": "b506ee07b32d66a32c07aeffac89bcfd834f30bee4a8e05e76723e5613b4d87a",
+      "vphoned.entitlements.plist": "6e9f81cbe95e9db165141ce81126fdefb3b8fe5f188e1fa7dfa1b14cacb87a82",
+      "vphoned.plist": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67"
+    },
+    "forbidden_swift_imports": [],
+    "platform": "IOS",
+    "runtime_validated": false,
+    "schema_version": 1
+  },
+  "guest_sources_sha256": {
+    "scripts/vphoned/entitlements.plist": "6e9f81cbe95e9db165141ce81126fdefb3b8fe5f188e1fa7dfa1b14cacb87a82",
+    "scripts/vphoned/unarchive.h": "e0b54e38a68755a1359830691778c54454830de6e4d998bff7b43086ea286302",
+    "scripts/vphoned/unarchive.m": "282807272145b71c82b5b834b9891f6adfcf8d49d17e3f9e7e370e5a0e0f97d7",
+    "scripts/vphoned/vphoned.m": "1eb57b50a235bc60876f11870edb6ea93de1c3b637a0adfe049fb2bff7f63648",
+    "scripts/vphoned/vphoned.plist": "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67",
+    "scripts/vphoned/vphoned_accessibility.h": "c290b3afbd5423c46f6b87d0ea8c62715bf2228bfb54cc0f5eaa2fc3b21829d4",
+    "scripts/vphoned/vphoned_accessibility.m": "b012d3890c3a6bc9b6191c51139acce19332b49cc6bab8a77d32288d2bce796c",
+    "scripts/vphoned/vphoned_apps.h": "caf4b3594a41c3602cdb32967bb362c254b845d8e87d57477c182e5f0d7f9922",
+    "scripts/vphoned/vphoned_apps.m": "16167f6a299cd54dac35d5fec58b012c70b37d2c468c0d8fb99ecba5990fd3a3",
+    "scripts/vphoned/vphoned_clipboard.h": "d35febc4e57110d76c91788362a4a6d296a63ad1d45af65b91088f8aab7ced54",
+    "scripts/vphoned/vphoned_clipboard.m": "328426b28791cba849e181e8e427ad2df12d06ec0c91ab18381282ca8c499e1f",
+    "scripts/vphoned/vphoned_devmode.h": "e6a7c4936f73c1e5ecc1eb8858b56d4feb28c6340c72e154f5bec77ddfa894fc",
+    "scripts/vphoned/vphoned_devmode.m": "6921faaaee5505d389fdb9413f7454f17fb35e483f7c67e0930dbef4bc3d30a8",
+    "scripts/vphoned/vphoned_files.h": "8f1187bf790fc7799565535bd5f220c26e647e38dd17949bbf8c3b664ff38efd",
+    "scripts/vphoned/vphoned_files.m": "f456055b28829d0b809bed76da9377f78838fe5ea99068357a85caeb29cc0bab",
+    "scripts/vphoned/vphoned_hid.h": "72cfc8975bcc12d32ebb1b74afbc19003da329760298615f17db131e83fa6cee",
+    "scripts/vphoned/vphoned_hid.m": "46a735cb31365f5a2fc4833a202e44fca48215a47a14365fcb74c9e14f973f45",
+    "scripts/vphoned/vphoned_install.h": "e3497886ffc7034c2b5c5a185f7900d078c81b6a9ffa6822674172c85823a060",
+    "scripts/vphoned/vphoned_install.m": "6dcecc4cc1516c14c2ec2718e39491898eeb53844da16c1dc1f18ba23e6d7384",
+    "scripts/vphoned/vphoned_keychain.h": "f50483984fd7c0b88a44a82dce864d969a0d379142dec186935e7bc1e27329ce",
+    "scripts/vphoned/vphoned_keychain.m": "9bbbce2df6c2ae93a647116a1353ae394ec6eb0afeed3379f505de5c57225d27",
+    "scripts/vphoned/vphoned_location.h": "0c8dccdb6e931a4b0efbc75b06878964d3dc9594c5c6d1fcf77ab8d6fc775832",
+    "scripts/vphoned/vphoned_location.m": "dff33afc083e1b64e83709878e7f9515ee2985885fa5469c8b771efa7c2fa38c",
+    "scripts/vphoned/vphoned_notify.h": "d78b3264221e502d2916def4374f91379335bd755274abef3f99976c50bab80b",
+    "scripts/vphoned/vphoned_notify.m": "42c776cdbdfbde5727d33a6c60fb474fd7e40e3d239fedf0fd214e90e72afc85",
+    "scripts/vphoned/vphoned_protocol.h": "cf499fb43828c13d7462dfcbc6db127db682b3f83c6571a5348c63a0bf4e40a8",
+    "scripts/vphoned/vphoned_protocol.m": "81e46267327d9f1db1bb29c8ee447f2acb25aee21427989714e4357532beabe1",
+    "scripts/vphoned/vphoned_settings.h": "c78072f438d89138698e21cc2e69ab70fef98a85064b1913179a441aa28f9ce9",
+    "scripts/vphoned/vphoned_settings.m": "10ad483bc28d4b9db6e4c0624347370fa19125aa8f7b2771be91636df94253da",
+    "scripts/vphoned/vphoned_shell.h": "b9d458567af540f1537345a9b4573fff757a3e70167b135b37cf8361c4600317",
+    "scripts/vphoned/vphoned_shell.m": "e3e82926e6c98b7c1e12d478cce0f91bc8cf76d762f24eb74be0346df1b5497a",
+    "scripts/vphoned/vphoned_url.h": "ed98d88594ca65b15f6d2501bc285ef284f3bd591b6cc2a255e63429735ad66f",
+    "scripts/vphoned/vphoned_url.m": "c3fd08af6a068d4c9c417755ba12915dbd47a3bf00c76ed0d0f033eab19daf66",
+    "scripts/vphoned/vphoned_vcam.h": "3164ce465946e2e4b7f6d268aebaa86f8d24157475c7611e0543f8b1aa46a771",
+    "scripts/vphoned/vphoned_vcam.m": "d95a9964b5364fae84b79926b671b6742f327f0b35caaf5263deb0f255b13541"
+  },
+  "runtime_validated": false
+}

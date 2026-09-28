@@ -22,6 +22,9 @@ let package = Package(
         .package(path: "vendor/MachOKit"),
     ],
     targets: [
+        .target(name: "VPhoneDaemonWire", path: "sources/VPhoneDaemon/Daemon/Wire"),
+        .testTarget(name: "VPhoneDaemonWireTests", dependencies: ["VPhoneDaemonWire"],
+                    path: "tests/VPhoneDaemonWireTests"),
         .target(
             name: "MobileRecoveryCore",
             dependencies: [.product(name: "AppleMobileDeviceLibrary", package: "AppleMobileDeviceLibrary")],

@@ -31,6 +31,7 @@ VM_DIR="$(cd "$VM_DIR" && pwd)"
 
 source "$SCRIPT_DIR/lib/cfw_common.sh"
 cfw_require_runtime_and_lock
+GUEST_RESOURCES="$(cfw_guest_resources)"
 
 : "${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
 
@@ -345,38 +346,7 @@ echo ""
 echo "[7/7] Installing LaunchDaemons..."
 
 # Install vphoned (vsock HID injector daemon)
-VPHONED_SRC="$SCRIPT_DIR/vphoned"
-VPHONED_BIN="$VPHONED_SRC/vphoned"
-VPHONED_SRCS=("$VPHONED_SRC"/*.m)
-needs_vphoned_build=0
-if [[ ! -f "$VPHONED_BIN" ]]; then
-    needs_vphoned_build=1
-else
-    for src in "${VPHONED_SRCS[@]}"; do
-        if [[ "$src" -nt "$VPHONED_BIN" ]]; then
-            needs_vphoned_build=1
-            break
-        fi
-    done
-fi
-if [[ "$needs_vphoned_build" == "1" ]]; then
-    echo "  Building vphoned for arm64..."
-    xcrun -sdk iphoneos clang -arch arm64 -Os -fobjc-arc \
-        -I"$VPHONED_SRC" \
-        -I"$VPHONED_SRC/vendor/libarchive" \
-        -o "$VPHONED_BIN" "${VPHONED_SRCS[@]}" \
-        -larchive \
-        -lsqlite3 \
-        -framework Foundation \
-        -framework Security \
-        -framework CoreServices
-fi
-cp "$VPHONED_BIN" "$TEMP_DIR/vphoned"
-ldid_sign_ent "$TEMP_DIR/vphoned" "$VPHONED_SRC/entitlements.plist"
-cp -R "$TEMP_DIR/vphoned" "$MNT1/usr/bin/vphoned"
-/bin/chmod 0755 $MNT1/usr/bin/vphoned
-# Keep a copy of the signed binary for host-side auto-update
-cp "$TEMP_DIR/vphoned" "$VM_DIR/.vphoned.signed"
+cfw_stage_vphoned "$GUEST_RESOURCES"
 echo "  [+] vphoned installed (signed copy at .vphoned.signed)"
 
 # Send daemon plists (overwrite on re-run)
@@ -390,7 +360,7 @@ for plist in bash.plist dropbear.plist trollvnc.plist rpcserver_ios.plist; do
     cp -R "$plist_src" "$MNT1/System/Library/LaunchDaemons/"
     /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/$plist
 done
-cp -R "$VPHONED_SRC/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/"
+cp -R "$GUEST_RESOURCES/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/"
 /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/vphoned.plist
 
 # Always patch launchd.plist from .bak (original)
@@ -401,7 +371,7 @@ if ! [[ -e "$MNT1/System/Library/xpc/launchd.plist.bak" ]]; then
 fi
 
 cp "$MNT1/System/Library/xpc/launchd.plist.bak" "$TEMP_DIR/launchd.plist"
-cp "$VPHONED_SRC/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/"
+cp "$GUEST_RESOURCES/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/"
 "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-daemons "$TEMP_DIR/launchd.plist" "$INPUT_DIR/jb/LaunchDaemons"
 cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
 /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist

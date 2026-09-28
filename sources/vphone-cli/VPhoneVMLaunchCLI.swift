@@ -19,6 +19,12 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
     @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
     var verboseCount: Int
 
+    func guestPayloadArguments(resources: VPhoneResources) -> [String] {
+        guard !dfu && !noVphoned else { return [] }
+        let payload = variant == "less" ? resources.vphonedLess : resources.vphoned
+        return ["--vphoned-bin", payload.path]
+    }
+
     func run() throws {
         let v = VPhoneVerbosity(count: verboseCount)
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
@@ -58,7 +64,7 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
                 directory: bundle.url, operation: VPhoneVMOperation.stageVphoned
             ) { _ in
                 do {
-                    _ = try layout.stageVphoned(into: bundle)
+                    _ = try layout.stageVphoned(into: bundle, less: variant == "less")
                 } catch {
                     FileHandle.standardError.write(Data(
                         "warning: could not stage vphoned into \(bundle.name): \(error)\n".utf8))
@@ -66,7 +72,7 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
             }
         }
 
-        var args = ["--config", bundle.configURL.path]
+        var args = ["--config", bundle.configURL.path] + guestPayloadArguments(resources: resources)
         if dfu { args.append("--dfu") }
         if headless { args.append("--headless") }
         if let variant { args += ["--variant", variant] }

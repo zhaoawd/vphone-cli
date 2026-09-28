@@ -95,4 +95,12 @@ struct ResourcesTests {
             #expect(r.pythonIsUsable(devVenv) == true)
         }
     }
+    @Test func guestPathsDoNotFallBackFromInstalledBundle() {
+        let app = VPhoneResources(base: URL(fileURLWithPath: "/tmp/Test.app/Contents/Resources"))
+        #expect(app.vphoned.path == "/tmp/Test.app/Contents/Resources/guest-resources/vphoned")
+        #expect(app.vphonedLess.lastPathComponent == "vphoned-less")
+        #expect(app.vphonedLaunchdPlist.lastPathComponent == "vphoned.plist")
+        let dev = VPhoneResources(base: URL(fileURLWithPath: "/tmp/repo"))
+        #expect(dev.vphoned.path == "/tmp/repo/.build/guest/vphoned")
+    }
 }

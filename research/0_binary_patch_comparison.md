@@ -1,5 +1,15 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-28 P2 isolated upstream API daemon build
+
+Imported fixed upstream VPhoneDaemon/native proxy and its camera protocol header into an isolated iOS build. `make daemon_api_build` pins the daemon's dependency graph and produces a signed, inactive candidate. The shared signer is cross-compiled from the existing local implementation; request decoding and proxy lifecycle have firmware-free tests. Default host/guest transport, installed daemon payloads and kernel/DSC patch logic remain unchanged by this batch. See the [sixth-batch report](p2_daemon_api_integration_2026-09-28.md) for validation and unverified guest behavior.
+
+
+## 2026-09-28 P2 pre-signed guest payload layout
+
+Regular/dev/JB/EXP installation and host auto-update now share the pre-signed local vphoned under `guest-resources`; the less pipeline uses a separately compiled `LESS=1` payload. Build-time checks cover arm64/IOS/minos 15.0, forbidden Swift imports, entitlement equality and artifact hashes. Installers no longer compile or re-sign these daemon payloads. Kernel/DSC patch logic and variant selection are unchanged; daemon build metadata and resulting payload bytes change. The upstream SwiftNIO daemon/proxy and remaining guest components have not been substituted. See the [fifth-batch report](p2_guest_layout_integration_2026-09-28.md) for fixture validation and unverified VM behavior.
+
+
 ## 2026-09-28 P2 native Restore foundations
 
 Imported MobileRecoveryCore, MobileRestoreCore and VPhoneRestore from fixed upstream `2.0.8 / 9d218de`, with pinned AppleMobileDeviceLibrary and OpenSSL dependencies. Added read-only `restore-inspect` for directory selection and bounded plist/gzip ticket inspection. Local changes reject ambiguous ticket selection, unknown probe modes and oversized/trailing ticket data. Existing Python restore execution and DFU ownership checks remain in use. Firmware patch bytes and variant defaults are unchanged. Validation and limitations are recorded in the [fourth-batch report](p2_restore_integration_2026-09-28.md); no USB/TSS/restore or real VM acceptance was performed.

@@ -139,3 +139,30 @@ cleanup_on_exit() {
     safe_detach "$CFW_HOST_MNT/mnt_sysos" 2>/dev/null || true
     safe_detach "$CFW_HOST_MNT/mnt_appos" 2>/dev/null || true
 }
+
+# Select the same pre-signed payloads used by host auto-update. Never compile
+# or sign the daemon inside an installed app during CFW installation.
+cfw_guest_resources() {
+    local base="${SCRIPT_DIR:h}" guest
+    if [[ "${base:t}" == Resources && "${base:h:t}" == Contents ]]; then
+        guest="$base/guest-resources"
+    else
+        guest="$base/.build/guest"
+    fi
+    [[ -d "$guest" && ! -L "$guest" ]] || die "Missing guest resources: $guest. Run make vphoned."
+    local name
+    for name in vphoned vphoned.plist; do
+        [[ -f "$guest/$name" && ! -L "$guest/$name" && -s "$guest/$name" ]] \
+            || die "Missing regular guest payload: $guest/$name. Run make vphoned."
+    done
+    [[ -x "$guest/vphoned" ]] || die "Guest daemon is not executable: $guest/vphoned"
+    print -r -- "$guest"
+}
+
+cfw_stage_vphoned() {
+    local guest="$1"
+    cp "$guest/vphoned" "$TEMP_DIR/vphoned"
+    cp "$TEMP_DIR/vphoned" "$MNT1/usr/bin/vphoned"
+    /bin/chmod 0755 "$MNT1/usr/bin/vphoned"
+    cp "$TEMP_DIR/vphoned" "$VM_DIR/.vphoned.signed"
+}

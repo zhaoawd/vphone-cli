@@ -121,7 +121,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         let control = VPhoneControl(variant: options.variant)
         self.control = control
         if !cli.dfu {
-            let vphonedURL = URL(fileURLWithPath: cli.vphonedBin)
+            let vphonedURL = cli.guestBinaryURL
             if FileManager.default.fileExists(atPath: vphonedURL.path) {
                 control.guestBinaryURL = vphonedURL
             }

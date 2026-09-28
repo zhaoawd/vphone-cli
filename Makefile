@@ -34,7 +34,7 @@ BINARY      := .build/release/vphone-cli
 PATCHER_BINARY := .build/debug/vphone-cli
 BUNDLE      := .build/vphone-cli.app
 BUNDLE_BIN  := $(BUNDLE)/Contents/MacOS/vphone-cli
-VPHONED_SIGNED := .build/vphoned.signed
+VPHONED_SIGNED := .build/guest/vphoned
 INFO_PLIST  := sources/Info.plist
 ENTITLEMENTS := sources/vphone.entitlements
 VENV        := .venv
@@ -269,20 +269,15 @@ bundle:
 check_bundle:
 	python3 $(SCRIPTS)/check_bundle.py $(BUNDLE)
 
+# Build the isolated upstream API daemon; never selects it for VM installation.
+.PHONY: daemon_api_build
+daemon_api_build:
+	zsh $(SCRIPTS)/build_daemon_api.sh
+
 # Cross-compile + sign vphoned daemon for iOS arm64 (requires ldid)
 .PHONY: vphoned
 vphoned:
-	@command -v ldid >/dev/null 2>&1 \
-		|| (echo "Error: ldid not found. Run: brew install ldid-procursus" && exit 1)
-	$(MAKE) -C $(SCRIPTS)/vphoned GIT_HASH=$(GIT_HASH)
-	@echo "=== Signing vphoned ==="
-	@mkdir -p $(dir $(VPHONED_SIGNED))
-	cp $(SCRIPTS)/vphoned/vphoned $(VPHONED_SIGNED)
-	ldid \
-		-S$(SCRIPTS)/vphoned/entitlements.plist \
-		-M "-K$(SCRIPTS)/vphoned/signcert.p12" \
-		$(VPHONED_SIGNED)
-	@echo "  signed → $(VPHONED_SIGNED)"
+	zsh $(SCRIPTS)/build_guest_payloads.sh
 
 # ═══════════════════════════════════════════════════════════════════
 # VM management

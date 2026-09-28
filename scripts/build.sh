@@ -56,29 +56,19 @@ echo "  bundled → ${BUNDLE}"
 
 # --- vphoned guest daemon (cross-compiled + signed for iOS arm64) ---
 if [[ "$BUILD_VPHONED" -eq 1 ]]; then
-  command -v ldid >/dev/null 2>&1 \
-    || { echo "Error: ldid not found. Run: brew install ldid-procursus" >&2; exit 1; }
-  echo "=== Building vphoned ==="
-  make -C scripts/vphoned GIT_HASH="$GIT_HASH"
-  echo "=== Signing vphoned ==="
-  mkdir -p .build
-  cp scripts/vphoned/vphoned .build/vphoned.signed
-  ldid \
-    -Sscripts/vphoned/entitlements.plist \
-    -M "-Kscripts/vphoned/signcert.p12" \
-    .build/vphoned.signed
-  echo "  signed → .build/vphoned.signed"
+  zsh "$SCRIPT_DIR/build_guest_payloads.sh"
 fi
 
 # --- Bundle the standalone runtime mini-repo into Contents/Resources ---
 RES="${BUNDLE}/Contents/Resources"
 echo "=== Bundling runtime assets → ${RES} ==="
-rm -rf "${RES}/scripts" "${RES}/tools" "${RES}/.tools" "${RES}/vphoned.signed"
+rm -rf "${RES}/scripts" "${RES}/tools" "${RES}/.tools" "${RES}/guest-resources"
 mkdir -p "${RES}/scripts" "${RES}/tools" "${RES}/.tools/bin"
 # Mirror scripts/ EXCEPT the make-coupled orchestrator, toolchain source, caches.
 rsync -a \
   --exclude 'setup_machine.sh' \
   --exclude 'repos' \
+  --exclude 'vphoned/vphoned' \
   --exclude '__pycache__' \
   --exclude '.git' \
   --exclude '.build' \
@@ -90,11 +80,11 @@ for t in trustcache insert_dylib; do
   if [[ -x ".tools/bin/$t" ]]; then cp -f ".tools/bin/$t" "${RES}/.tools/bin/$t"
   else echo "Error: .tools/bin/$t missing — run ./scripts/setup_tools.sh first" >&2; exit 1; fi
 done
-if [[ ! -s .build/vphoned.signed ]]; then
-  echo "Error: signed vphoned missing; omit --no-vphoned to build it" >&2
-  exit 1
-fi
-cp -f .build/vphoned.signed "${RES}/vphoned.signed"
+python3 "$SCRIPT_DIR/check_guest_payloads.py" .build/guest
+mkdir -p "${RES}/guest-resources"
+for name in vphoned vphoned-less vphoned.plist vphoned.entitlements.plist manifest.json; do
+  cp -f ".build/guest/$name" "${RES}/guest-resources/$name"
+done
 # requirements.txt lets the app provision its own ~/.vphone/venv on first run
 # (see VPhoneResources.pythonExecutable) — the app carries no venv itself.
 cp -f requirements.txt "${RES}/requirements.txt"
@@ -108,7 +98,7 @@ cp -f README.md "${RES}/README.md"
 # Homebrew `binary` symlink exposes it on PATH.
 cp -f scripts/vphone-amfidont "${RES}/vphone-amfidont"
 chmod +x "${RES}/vphone-amfidont"
-echo "  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, vphoned.signed, requirements.txt, debs.list, README.md, vphone-amfidont"
+echo "  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont"
 
 python3 "$SCRIPT_DIR/record_build_dependencies.py" "$BUNDLE"
 
@@ -122,6 +112,6 @@ echo ""
 echo "=== Build complete ==="
 echo "  binary : ${BINARY}"
 echo "  bundle : ${BUNDLE}"
-[[ "$BUILD_VPHONED" -eq 1 ]] && echo "  vphoned: .build/vphoned.signed"
+echo "  guest  : .build/guest/{vphoned,vphoned-less}"
 echo ""
 echo "Run: ${BINARY} --help"

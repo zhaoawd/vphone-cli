@@ -18,7 +18,8 @@ public struct VPhoneLaunchLayout: Sendable {
 
     /// Copy the built vphoned into the bundle if present and different.
     @discardableResult
-    public func stageVphoned(into bundle: VPhoneBundle) throws -> Bool {
+    public func stageVphoned(into bundle: VPhoneBundle, less: Bool = false) throws -> Bool {
+        let vphoned = less ? resources.vphonedLess : resources.vphoned
         let fm = FileManager.default
         guard fm.fileExists(atPath: vphoned.path) else { return false }
         let dst = bundle.url.appendingPathComponent(".vphoned.signed")

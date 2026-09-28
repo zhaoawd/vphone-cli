@@ -87,17 +87,23 @@ public struct VPhoneResources: Sendable {
             resourceArchivesDir.appendingPathComponent("cfw_jb_input.tar.zst"),
             toolsBinDir.appendingPathComponent("trustcache"),
             toolsBinDir.appendingPathComponent("insert_dylib"),
-            vphoned,
+            vphoned, vphonedLess, vphonedLaunchdPlist,
         ]
     }
 
-    public var vphoned: URL {
-        let bundled = base.appendingPathComponent("vphoned.signed")
-        if FileManager.default.fileExists(atPath: bundled.path) { return bundled }
-        // Dev fallback: build.sh stages the signed daemon under .build (a
-        // gitignored build-output dir) rather than cluttering the repo root.
-        return base.appendingPathComponent(".build/vphoned.signed")
+    /// Installed payloads have one canonical location; never fall back from a
+    /// broken app bundle to a development or VM-local daemon.
+    public var guestResources: URL {
+        if base.lastPathComponent == "Resources",
+           base.deletingLastPathComponent().lastPathComponent == "Contents" {
+            return base.appendingPathComponent("guest-resources")
+        }
+        return base.appendingPathComponent(".build/guest")
     }
+
+    public var vphoned: URL { guestResources.appendingPathComponent("vphoned") }
+    public var vphonedLess: URL { guestResources.appendingPathComponent("vphoned-less") }
+    public var vphonedLaunchdPlist: URL { guestResources.appendingPathComponent("vphoned.plist") }
 
     // MARK: - Cache dirs
 

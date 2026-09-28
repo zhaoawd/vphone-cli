@@ -47,7 +47,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     public let noBinpack: Bool
     public let noVphoned: Bool
     let vphoneCliDirectory = URL(filePath: "./")
-    let resources = VPhoneResources.resolve()
+    let resources: VPhoneResources
     
     var buildManiest: Data
     var rebuiltData: Data?
@@ -56,12 +56,13 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     
     // MARK: - Init
     
-    public init(buildManiest: Data, restoreDir: URL, verbose: Bool = true, noBinpack: Bool = false, noVphoned: Bool = false) {
+    public init(buildManiest: Data, restoreDir: URL, verbose: Bool = true, noBinpack: Bool = false, noVphoned: Bool = false, resources: VPhoneResources = .resolve()) {
         self.buildManiest = buildManiest
         self.restoreDir = restoreDir
         self.verbose = verbose
         self.noBinpack = noBinpack
         self.noVphoned = noVphoned
+        self.resources = resources
     }
     
     deinit {
@@ -225,7 +226,6 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     
     func injectLaunchDaemons(targetMount: String, cfwInput: URL, vphoned: Bool = true, cfw: Bool = true) throws {
         let target = URL.init(filePath: targetMount)
-        let scriptDir = resources.scriptsDir
 
         let tmpDir = try createTmpDir()
         let launchdPath = tmpDir.appending(path: "launchd.plist")
@@ -235,8 +235,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         try FileManager.default.moveItem(at: launchdOgPath, to: launchdPath)
         
         if vphoned {
-            let vphonedSrc = scriptDir.appendingPathComponent("vphoned")
-            let vphonedLaunchdPlist = vphonedSrc.appending(path: "vphoned.plist")
+            let vphonedLaunchdPlist = resources.vphonedLaunchdPlist
             try FileManager.default.copyItem(at: vphonedLaunchdPlist,
                                              to: target.appending(path: "System/Library/LaunchDaemons/vphoned.plist"))
             try FileManager.default.copyItem(at: vphonedLaunchdPlist, to: launchDaemonsPath.appending(path: vphonedLaunchdPlist.lastPathComponent))
@@ -272,57 +271,15 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     
     func addVphoned(targetMount: String, cfwInput: URL) throws {
         let target = URL.init(filePath: targetMount)
-        let scriptDir = resources.scriptsDir
-        let vphonedSrc = scriptDir.appendingPathComponent("vphoned")
-        // vphonedSrc (bundled source) is read-only inside a packaged .app, so the
-        // compiled binary must land in a writable temp dir, not next to the source.
-        let buildDir = try createTmpDir()
-        let vphonedBin = buildDir.appendingPathComponent("vphoned")
-
-        try buildVphoned(vphonedSrc: vphonedSrc, vphonedBin: vphonedBin)
-        defer { try? FileManager.default.removeItem(at: vphonedBin) }
-        
-        // Sign
+        let source = resources.vphonedLess
+        guard FileManager.default.isExecutableFile(atPath: source.path) else {
+            throw PatcherError.invalidFormat("Missing signed less daemon: \(source.path). Run make vphoned.")
+        }
         let targetBin = target.appending(path: "/usr/bin/vphoned")
-        try FileManager.default.copyItem(at: vphonedBin, to: targetBin)
-        let signingCertificatePath = cfwInput.appending(path: "cfw_input/signcert.p12")
-        _ = try runProcess("/opt/homebrew/bin/ldid", [
-            "-S\(vphonedSrc.appendingPathComponent("entitlements.plist").path)",
-            "-M", "-K\(signingCertificatePath.path)",
-            targetBin.path
-        ])
-        _ = try runProcess("/bin/chmod", ["0755", targetBin.path])
+        try Data(contentsOf: source).write(to: targetBin, options: .atomic)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: targetBin.path)
     }
-    
-    func buildVphoned(vphonedSrc: URL, vphonedBin: URL) throws {
-        let srcURLs = try FileManager.default.contentsOfDirectory(
-            at: vphonedSrc,
-            includingPropertiesForKeys: [.contentModificationDateKey],
-            options: [.skipsHiddenFiles]
-        ).filter { $0.pathExtension == "m" }
 
-        var args = [
-            "-sdk", "iphoneos", "clang",
-            "-arch", "arm64",
-            "-Os",
-            "-fobjc-arc",
-            "-I\(vphonedSrc.path)",
-            "-I\(vphonedSrc.appendingPathComponent("vendor/libarchive").path)",
-            "-DLESS=1",
-            "-o", vphonedBin.path
-        ]
-        args.append(contentsOf: srcURLs.map { $0.path })
-        args.append(contentsOf: [
-            "-larchive",
-            "-lsqlite3",
-            "-framework", "Foundation",
-            "-framework", "Security",
-            "-framework", "CoreServices"
-        ])
-        
-        _ = try runProcess("/usr/bin/xcrun", args)
-    }
-    
     func addGpuDriver(targetMount: String, cfwInput: URL) throws {
         let target = URL.init(filePath: targetMount)
 

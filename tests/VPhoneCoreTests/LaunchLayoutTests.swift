@@ -132,12 +132,13 @@ struct LaunchLayoutTests {
         #expect(VPhoneBootProcessLocator.canonicalConfigPath("relative/config.plist") == "relative/config.plist")
     }
 
-    @Test func stageVphonedCopiesWhenSourceExists() throws {
+    @Test(arguments: [false, true]) func stageVphonedCopiesWhenSourceExists(less: Bool) throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(
-            at: root.appendingPathComponent(".build"), withIntermediateDirectories: true)
+            at: root.appendingPathComponent(".build/guest"), withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
-        try Data([1, 2, 3]).write(to: root.appendingPathComponent(".build/vphoned.signed"))
+        let name = less ? "vphoned-less" : "vphoned"
+        try Data([1, 2, 3]).write(to: root.appendingPathComponent(".build/guest/\(name)"))
 
         let bundleDir = root.appendingPathComponent("bundle")
         try FileManager.default.createDirectory(at: bundleDir, withIntermediateDirectories: true)
@@ -147,17 +148,17 @@ struct LaunchLayoutTests {
         let bundle = VPhoneBundle(url: bundleDir, manifest: manifest)
 
         let layout = VPhoneLaunchLayout(projectRoot: root)
-        #expect(try layout.stageVphoned(into: bundle) == true)
+        #expect(try layout.stageVphoned(into: bundle, less: less) == true)
         #expect(FileManager.default.fileExists(atPath: bundleDir.appendingPathComponent(".vphoned.signed").path))
         // Second call is a no-op (already identical).
-        #expect(try layout.stageVphoned(into: bundle) == false)
+        #expect(try layout.stageVphoned(into: bundle, less: less) == false)
     }
 
     @Test func stageVphonedReturnsFalseWhenSourceAbsent() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
-        // No .build/vphoned.signed created → source absent.
+        // No .build/guest/vphoned created → source absent.
         let bundleDir = root.appendingPathComponent("bundle")
         try FileManager.default.createDirectory(at: bundleDir, withIntermediateDirectories: true)
         let manifest = VPhoneVirtualMachineManifest(
@@ -172,9 +173,9 @@ struct LaunchLayoutTests {
     @Test func stageVphonedOverwritesStaleDestination() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(
-            at: root.appendingPathComponent(".build"), withIntermediateDirectories: true)
+            at: root.appendingPathComponent(".build/guest"), withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
-        try Data([9, 9, 9, 9]).write(to: root.appendingPathComponent(".build/vphoned.signed"))
+        try Data([9, 9, 9, 9]).write(to: root.appendingPathComponent(".build/guest/vphoned"))
 
         let bundleDir = root.appendingPathComponent("bundle")
         try FileManager.default.createDirectory(at: bundleDir, withIntermediateDirectories: true)
