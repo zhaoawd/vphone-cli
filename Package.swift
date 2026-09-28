@@ -7,7 +7,7 @@ let package = Package(
     platforms: [
         .macOS(.v15),
     ],
-    products: [],
+    products: [.library(name: "VPhoneAPIKit", targets: ["VPhoneAPIKit"])],
     dependencies: [
         .package(url: "https://github.com/Lakr233/AppleMobileDeviceLibrary.git",
                  revision: "553a0bf1b55812b1a08c727b1a3084e88871343b"),
@@ -22,6 +22,9 @@ let package = Package(
         .package(path: "vendor/MachOKit"),
     ],
     targets: [
+        .target(name: "VPhoneAPIKit", path: "sources/VPhoneAPIKit"),
+        .testTarget(name: "VPhoneAPIKitTests", dependencies: ["VPhoneAPIKit"],
+                    path: "tests/VPhoneAPIKitTests"),
         .target(name: "VPhoneDaemonWire", path: "sources/VPhoneDaemon/Daemon/Wire"),
         .testTarget(name: "VPhoneDaemonWireTests", dependencies: ["VPhoneDaemonWire"],
                     path: "tests/VPhoneDaemonWireTests"),

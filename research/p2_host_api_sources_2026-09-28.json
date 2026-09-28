@@ -1,0 +1,93 @@
+{
+  "upstream_sha": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "base_commit": "2efd925",
+  "scope": "independent host API v1 library; no CLI, VSOCK, listener, daemon or firmware activation",
+  "upstream_references": [
+    {
+      "path": "VPhoneKit/VPhoneExternalAccessKit/VPhoneAPIClient.swift",
+      "blob": "c8ff369701cd5b06ecc2e6307d7009c5513c0211",
+      "sha256": "016463b25ca7fe8544b88d05aa00d75ed2d8916ef6cfaa8618da952fdb5a67c6"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/APIWire.swift",
+      "blob": "dae8b71d9b1b5b1daa3771f3b786cb75ecfc5122",
+      "sha256": "b44279e2b751956cb55a5e1f3a8920a8dd9dd8a85d2b732c8eb89ead3458f032"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/GuestAPI.swift",
+      "blob": "9d19c812c4ae3d0155c3838266eec2314147d665",
+      "sha256": "fa9bfae30127a696c4620f53d04a89ec3518ae4f7cc980f71d0bf5af2ad017f8"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "blob": "51a527655a82518ca11ba6882a53f609e72b9e83",
+      "sha256": "da8893a99554c7ac0fbd03587174bcb52e23d36f7e736a149a4571c1c0db55d3"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/Support/VPhoneAPIRequestGate.swift",
+      "blob": "65ff45fc41014ec4ffe8ba13701c68d88b963068",
+      "sha256": "ff8510cfe736b19c8be97165474fd6751dcea5bb41196a312600f2894001999b"
+    }
+  ],
+  "extracted_source": {
+    "upstream_path": "VPhoneKit/VPhoneExternalAccessKit/VPhoneAPIClient.swift",
+    "local_path": "sources/VPhoneAPIKit/VPhoneAPIValue.swift",
+    "prefix_bytes": 2150,
+    "sha256": "71700122432333b1428b8f707f42da57fc126faae181e4c1aabf04a63f43bddc",
+    "unchanged_prefix": true
+  },
+  "local_files": [
+    {
+      "path": "Package.swift",
+      "sha256": "102bda1837c1ba8173e33e9e504a8a1d34eeee026607a2079e92102cbe90b66c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "4bc2fb24319aded13943cac334df43cb20d7b51206e3dcb3fd748c4f3cce8f53"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+      "sha256": "73e216b379cdbbc25405a4489509a5c2900d0235fed4817c7afc0c98c248a1f6"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIHTTPExchange.swift",
+      "sha256": "72f276895492394cf934ebab4c4dd609b9e157ba9d31eff0aafd9c6125a6d859"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIValue.swift",
+      "sha256": "71700122432333b1428b8f707f42da57fc126faae181e4c1aabf04a63f43bddc"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIWebSocket.swift",
+      "sha256": "45245323095f482c3e5acce6ca5d5093ec89119a2ba0d73b1c02f64d2cd59c4b"
+    },
+    {
+      "path": "sources/VPhoneAPIKit/VPhoneAPIWire.swift",
+      "sha256": "08db421baa039493ca85464c7a402cd1521a838d91d60759930a8a9964b2203f"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIHTTPTests.swift",
+      "sha256": "461ea852b3fbca785d3bed0ce36ac795d4fe7d841f6d94639257026d6191b5b1"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIWebSocketTests.swift",
+      "sha256": "cabb85fc38c9947078e17abf397087ed012e93484181ad40f56bc3d8597985f4"
+    },
+    {
+      "path": "tests/VPhoneAPIKitTests/APIWireTests.swift",
+      "sha256": "6cc56b5c35f8bffd605730023ba2b31b65459d9b0f5cd4d3376e20cdb54d6a7a"
+    },
+    {
+      "path": "tests/fixtures/host_api/server.py",
+      "sha256": "fb6668068371af7f81b72f06a6d2ce131e492d8f9ee9baa6d2f7d898fe6cf6cb"
+    }
+  ],
+  "license": "dependencies/licenses/daemon-api/VPhoneDaemon-MIT.txt",
+  "validation_logs": {
+    "build-kit.log": "50bf01ee5b2e2ac004e85d8d69a9b434d4733e6d0982f029ef0332ff572b4d73",
+    "make-build.log": "fc13f505b7dcff9ca0d67d6976d5d4097e9376019761dd38ee7263b11561b257",
+    "make-test-swift.log": "0c4de47f050bf3af4bccd73d490cf668449d9e799c20b94134ae2d91aa397e91",
+    "test-http-limits-before-fixture-fix.log": "c16253f8aad97aba4e173236f2f8f396b515fdbd26c2707e77e53dc9af21372a",
+    "test-kit.log": "01d0c366ff3d6b4fe56043ff60d21151e3c00521bec3bc6a4e3189a9f3055873"
+  }
+}

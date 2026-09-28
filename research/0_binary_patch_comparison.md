@@ -1,5 +1,10 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-28 P2 host HTTP/WebSocket foundation
+
+Added the independent `VPhoneAPIKit` SwiftPM library, adapting the fixed upstream API v1 value types and client contract. Health/capability/hash checks, bounded HTTP RPC, WebSocket response correlation, deadlines, cancellation and connection generation have host-only tests, including a real loopback HTTP/WebSocket fixture. No firmware, kernel/DSC patch, daemon payload, installation target or default VM control path changes in this batch. VSOCK/proxy and business command integration remain pending. See the [seventh-batch report](p2_host_api_integration_2026-09-28.md).
+
+
 ## 2026-09-28 P2 isolated upstream API daemon build
 
 Imported fixed upstream VPhoneDaemon/native proxy and its camera protocol header into an isolated iOS build. `make daemon_api_build` pins the daemon's dependency graph and produces a signed, inactive candidate. The shared signer is cross-compiled from the existing local implementation; request decoding and proxy lifecycle have firmware-free tests. Default host/guest transport, installed daemon payloads and kernel/DSC patch logic remain unchanged by this batch. See the [sixth-batch report](p2_daemon_api_integration_2026-09-28.md) for validation and unverified guest behavior.
