@@ -447,7 +447,7 @@ struct CreateLiveStagesTests {
         let bytes = try recordRequirement(w)
         let error = VPhoneCreateRunError.toolChanged(recorded: String(repeating: "a", count: 64), current: String(repeating: "b", count: 64))
         let lines = VPhoneCreateOrchestrator.recoveryHintLines(name: "vm", bundleURL: w.bundle, error: error)
-        #expect(lines.first?.hasPrefix("[-] vm create --resume refused: the vphone-cli executable differs") == true)
+        #expect(lines.first?.hasPrefix("[-] vm create --resume refused: the CLI/VM toolchain differs") == true)
         #expect(lines.first?.hasSuffix("the checkpoint was not changed (overall: recovery_required).") == true)
         #expect(lines.dropFirst().first == "    action: to continue with this build: vphone-cli vm create --resume vm --accept-tool-change")
         #expect(!lines.contains { $0.hasPrefix("    recovery required:") })
@@ -473,7 +473,7 @@ struct CreateLiveStagesTests {
             (.verificationFailed(stage: .cfw, detail: "gone"), "completed stage cfw no longer passes verification"),
             (.recoveryRequired(requirement), "recovery required (live_state, stage restore)"),
             (.optionsChanged(["variant affects patch, already succeeded"]), "options differ"),
-            (.toolChanged(recorded: "a", current: "b"), "executable differs"),
+            (.toolChanged(recorded: "a", current: "b"), "toolchain differs"),
             (.contractChanged(recorded: 1, current: 2), "stage contract version changed"),
             (.invalidRestart("cfw is after the next unfinished stage patch"), "invalid --restart-from"),
             (.sourceRequired("pass --iphone-source again"), "firmware source must be supplied again"),

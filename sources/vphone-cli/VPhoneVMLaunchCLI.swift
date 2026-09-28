@@ -43,18 +43,14 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
         let layout = VPhoneLaunchLayout(resources: resources)
 
-        // The running executable is BOTH what we boot from and what preflight
-        // should check — a bundled .app is its own boot binary.
-        let bootBinary = VPhoneResources.runningExecutable()
+        let bootBinary = VPhoneResources.vmExecutable()
         guard FileManager.default.isExecutableFile(atPath: bootBinary.path) else {
             FileHandle.standardError.write(Data(
                 "error: \(bootBinary.path) not found — build it first (make build/bundle).\n".utf8))
             throw ExitCode(1)
         }
 
-        // Host preflight — same gate make boot applies. Point it at THIS binary
-        // (VPHONE_CLI_BIN) so it checks the vphone-cli we're running, not a dev
-        // .build/release path that doesn't exist inside the bundled .app.
+        // Keep the existing environment key, but check the actual VM executable.
         var preflightArgs = ["--assert-bootable"]
         if variant == "less" { preflightArgs.append("--less") }
         var preflightEnv = ProcessInfo.processInfo.environment

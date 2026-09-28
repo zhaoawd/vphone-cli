@@ -20,7 +20,7 @@ class BundleValidationTests(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b'fixture')
             path.chmod(0o755)
-        for name in ('vphone-cli', 'ldid'):
+        for name in ('vphone-cli', 'vphone-vm', 'ldid'):
             path = self.bundle / 'Contents/MacOS' / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b'fixture')

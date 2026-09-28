@@ -79,7 +79,14 @@ public struct VPhoneDiagnosticProbes: Sendable {
 
     public static func live() -> VPhoneDiagnosticProbes {
         let environment = ProcessInfo.processInfo.environment
-        let executable = VPhoneResources.runningExecutable()
+        let executable = VPhoneResources.vmExecutable()
+        let signature = try? VPhoneProcessRunner.runCapturing(URL(fileURLWithPath: "/usr/bin/codesign"),
+            ["-d", "--entitlements", "-", "--xml", executable.path], timeout: 5)
+        let entitlements: [String: Any]? = signature.flatMap { result in
+            guard result.succeeded, let data = result.stdout.data(using: .utf8) else { return nil }
+            return (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any]
+        }
+        let entitlementValues = entitlements?.compactMapValues { $0 as? Bool }
         return VPhoneDiagnosticProbes(
             environment: environment,
             operatingSystemVersion: { ProcessInfo.processInfo.operatingSystemVersion },
@@ -93,9 +100,8 @@ public struct VPhoneDiagnosticProbes: Sendable {
                 try? VPhoneProcessRunner.runCapturing(executable, args, env: env, timeout: timeout)
             },
             hasEntitlement: { key in
-                guard let task = SecTaskCreateFromSelf(nil) else { return nil }
-                let value = SecTaskCopyValueForEntitlement(task, key as CFString, nil)
-                return (value as? Bool) == true
+                guard let entitlementValues else { return nil }
+                return entitlementValues[key] == true
             },
             executableURL: { executable },
             findExecutable: { name in
@@ -329,17 +335,17 @@ public struct VPhoneDiagnostics: Sendable {
             case false?: missing.append(key)
             case nil:
                 return .init(.environment, .signingEntitlements, .unknown,
-                             "the entitlements of this process could not be read", evidence: evidence)
+                             "the paired VM executable entitlements could not be read", evidence: evidence)
             }
         }
         guard missing.isEmpty else {
             evidence["missing"] = missing.joined(separator: ", ")
             return .init(.environment, .signingEntitlements, .error,
-                         "this vphone-cli binary lacks the private virtualization entitlements; it can diagnose but not boot",
+                         "the paired VM executable lacks the private virtualization entitlements",
                          evidence: evidence, action: "make build (then run .build/vphone-cli.app/Contents/MacOS/vphone-cli)")
         }
         return .init(.environment, .signingEntitlements, .ok,
-                     "running with the virtualization entitlements, so this host allowed the signed binary to launch",
+                     "the paired VM executable contains the required entitlements; execution admission is not tested",
                      evidence: evidence)
     }
 

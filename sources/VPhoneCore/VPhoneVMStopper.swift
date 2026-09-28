@@ -228,7 +228,7 @@ public struct VPhoneVMStopper {
     }
 
     private func noTargetDetail() -> String {
-        var detail = "no vphone-cli boot process is running for it"
+        var detail = "no recognized VM boot process is running for it"
         if let record = readRecord(), let holder = identity(record.pid), !holder.isZombie {
             detail = "it is held by pid \(record.pid) running operation \"\(record.operation)\""
             if record.isBootOperation { detail += " (instance \(record.instanceID))" }

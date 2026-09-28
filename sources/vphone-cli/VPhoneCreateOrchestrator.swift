@@ -319,7 +319,7 @@ public struct VPhoneCreateOrchestrator {
         let executable = selfExecutable
         return VPhoneCreateRunner(
             executor: stages, verifier: stages, prober: VPhoneCreateLiveProber.live(resources: resources),
-            toolFingerprint: { try? VPhoneCreateDigest.sha256(fileAt: executable).digest },
+            toolFingerprint: { try? VPhoneCreateDigest.toolchain(cli: executable) },
             keepArtifacts: runtime.keepArtifacts)
     }
 
@@ -442,7 +442,7 @@ public struct VPhoneCreateOrchestrator {
                 recreate,
             ])
         case let .toolChanged(recorded, current):
-            return ("the vphone-cli executable differs from the one recorded in the checkpoint "
+            return ("the CLI/VM toolchain differs from the one recorded in the checkpoint "
                 + "(\(recorded.map { String($0.prefix(12)) } ?? "unknown") -> \(current.map { String($0.prefix(12)) } ?? "unknown"))", [
                 "to continue with this build: \(command) --accept-tool-change",
                 "or resume with the build whose SHA-256 is recorded in the checkpoint",

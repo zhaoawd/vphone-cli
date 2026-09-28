@@ -34,12 +34,12 @@ done
 
 cd "$PROJECT_ROOT"
 
-# The caller (vphone-cli) passes VPHONE_CLI_BIN = the running binary, so we
-# check THAT — the bundled .app's Contents/MacOS/vphone-cli, not a dev
+# The caller passes VPHONE_CLI_BIN = the paired VM executable, so we
+# check the bundled .app's Contents/MacOS/vphone-vm, not a dev
 # .build/release path that doesn't exist inside the bundle. Falls back to the
 # dev layout for standalone/`make` invocation.
-RELEASE_BIN="${VPHONE_CLI_BIN:-${PROJECT_ROOT}/.build/release/vphone-cli}"
-DEBUG_BIN="${PROJECT_ROOT}/.build/debug/vphone-cli"
+RELEASE_BIN="${VPHONE_CLI_BIN:-${PROJECT_ROOT}/.build/release/vphone-vm}"
+DEBUG_BIN="${PROJECT_ROOT}/.build/debug/vphone-vm"
 ENTITLEMENTS="${PROJECT_ROOT}/sources/vphone.entitlements"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/vphone-preflight.XXXXXX")"
 TMP_SIGNED_DEBUG="${TMP_DIR}/vphone-cli.debug.signed"
@@ -195,7 +195,7 @@ if (( ASSERT_BOOTABLE == 1 )); then
   if (( RELEASE_HELP_RC != 0 )); then
     (( QUIET == 0 )) && {
       echo ""
-      echo "Error: signed release vphone-cli is not launchable on this host (exit $RELEASE_HELP_RC)." >&2
+      echo "Error: signed release VM executable is not launchable on this host (exit $RELEASE_HELP_RC)." >&2
     }
     exit "$RELEASE_HELP_RC"
   fi

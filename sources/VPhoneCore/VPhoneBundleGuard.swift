@@ -164,7 +164,7 @@ public struct VPhoneBundleGuard: Sendable {
         guard bootPIDs(configURL).contains(record.pid) else {
             throw VPhoneBundleGuardError.dfuSessionRequired(
                 bundle: name,
-                detail: "pid \(record.pid) is not a vphone-cli --config process for this bundle")
+                detail: "pid \(record.pid) is not a recognized VM --config process for this bundle")
         }
         return record
     }

@@ -3,6 +3,35 @@ import Foundation
 import Testing
 
 struct LaunchLayoutTests {
+    @Test func toolchainFingerprintIncludesBothExecutables() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cli = directory.appendingPathComponent("vphone-cli")
+        let vm = directory.appendingPathComponent("vphone-vm")
+        try Data("command".utf8).write(to: cli)
+        #expect(throws: (any Error).self) { try VPhoneCreateDigest.toolchain(cli: cli) }
+        try Data("runtime".utf8).write(to: vm)
+        let original = try VPhoneCreateDigest.toolchain(cli: cli)
+        try Data("runtime2".utf8).write(to: vm)
+        let changed = try VPhoneCreateDigest.toolchain(cli: cli)
+        #expect(original != changed)
+        try Data("command2".utf8).write(to: cli)
+        #expect(try VPhoneCreateDigest.toolchain(cli: cli) != changed)
+    }
+
+    @Test func pairedRuntimeAndProcessIdentity() {
+        let cli = URL(fileURLWithPath: "/Applications/vPhone.app/Contents/MacOS/vphone-cli")
+        #expect(VPhoneResources.vmExecutable(executable: cli).path == "/Applications/vPhone.app/Contents/MacOS/vphone-vm")
+        let processes = """
+        101 /Applications/vPhone.app/Contents/MacOS/vphone-vm --config /vms/a/config.plist --dfu
+        102 /Applications/vPhone.app/Contents/MacOS/vphone-vm --config /vms/b/config.plist
+        103 /Applications/vPhone.app/Contents/MacOS/vphone-cli vm launch a
+        104 /tmp/vphone-vm-other --config /vms/a/config.plist
+        """
+        #expect(VPhoneBootProcessLocator.parsePIDs(processes, configPaths: ["/vms/a/config.plist"]) == [101])
+    }
+
     @Test func resolvesArtifactPaths() {
         let layout = VPhoneLaunchLayout(projectRoot: URL(fileURLWithPath: "/proj"))
         #expect(layout.preflightScript.path == "/proj/scripts/boot_host_preflight.sh")

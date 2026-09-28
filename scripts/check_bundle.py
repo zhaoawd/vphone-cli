@@ -41,7 +41,7 @@ def check_resources(bundle):
             raise ValueError(f'Missing or empty bundle resource: {name}')
         if not path.resolve().is_relative_to(resources.resolve()):
             raise ValueError(f'Resource escapes the bundle: {name}')
-    for name in ('vphone-cli', 'ldid'):
+    for name in ('vphone-cli', 'vphone-vm', 'ldid'):
         path = bundle / 'Contents/MacOS' / name
         if not path.is_file() or not os.access(path, os.X_OK) or not path.resolve().is_relative_to(bundle.resolve()):
             raise ValueError(f'Missing executable: {path}')
@@ -63,12 +63,15 @@ def main():
                     str(resources / 'guest-resources'), '--ldid',
                     str(bundle / 'Contents/MacOS/ldid')], check=True)
     binary = bundle / 'Contents/MacOS/vphone-cli'
-    signed = subprocess.check_output(['codesign', '-d', '--entitlements', '-', '--xml', str(binary)])
-    actual = plistlib.loads(signed)
     expected = plistlib.loads((Path(__file__).resolve().parents[1] / 'sources/vphone.entitlements').read_bytes())
-    for key, value in expected.items():
-        if actual.get(key) != value:
-            raise ValueError(f'Incorrect signed entitlement: {key}')
+    for name in ('vphone-vm',):
+        executable = bundle / 'Contents/MacOS' / name
+        subprocess.run(['codesign', '--verify', '--strict', str(executable)], check=True)
+        signed = subprocess.check_output(['codesign', '-d', '--entitlements', '-', '--xml', str(executable)])
+        actual = plistlib.loads(signed)
+        for key, value in expected.items():
+            if actual.get(key) != value:
+                raise ValueError(f'Incorrect signed entitlement in {name}: {key}')
     if args.execute:
         with tempfile.TemporaryDirectory(prefix='vphone-bundle-') as temp:
             link = Path(temp) / 'vphone-cli'

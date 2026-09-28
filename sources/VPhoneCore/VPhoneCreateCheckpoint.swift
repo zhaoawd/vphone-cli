@@ -481,6 +481,13 @@ public enum VPhoneCreateJSON {
 }
 
 public enum VPhoneCreateDigest {
+    /// Both independently replaceable executables affect creation and resume.
+    public static func toolchain(cli: URL) throws -> String {
+        let command = try sha256(fileAt: cli).digest
+        let runtime = try sha256(fileAt: VPhoneResources.vmExecutable(executable: cli)).digest
+        return sha256(Data("vphone-toolchain-v1\ncli=\(command)\nvm=\(runtime)\n".utf8))
+    }
+
     public static func sha256(_ data: Data) -> String {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }

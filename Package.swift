@@ -7,7 +7,11 @@ let package = Package(
     platforms: [
         .macOS(.v15),
     ],
-    products: [.library(name: "VPhoneAPIKit", targets: ["VPhoneAPIKit"])],
+    products: [
+        .library(name: "VPhoneAPIKit", targets: ["VPhoneAPIKit"]),
+        .executable(name: "vphone-cli", targets: ["VPhoneCommandEntry"]),
+        .executable(name: "vphone-vm", targets: ["VPhoneVMEntry"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/Lakr233/AppleMobileDeviceLibrary.git",
                  revision: "553a0bf1b55812b1a08c727b1a3084e88871343b"),
@@ -80,7 +84,9 @@ let package = Package(
                 .linkedFramework("Virtualization"),
             ]
         ),
-        .executableTarget(
+        .executableTarget(name: "VPhoneCommandEntry", dependencies: ["vphone-cli"], path: "sources/VPhoneCommandEntry"),
+        .executableTarget(name: "VPhoneVMEntry", dependencies: ["vphone-cli"], path: "sources/VPhoneVMEntry"),
+        .target(
             name: "vphone-cli",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),

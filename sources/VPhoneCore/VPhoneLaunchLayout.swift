@@ -52,14 +52,14 @@ public enum VPhoneLsof {
 
 // MARK: - VPhoneBootProcessLocator
 
-/// Locates the vphone-cli boot process of a bundle from `ps -axo pid=,command=`
+/// Locates the vphone-vm or legacy vphone-cli boot process of a bundle from `ps -axo pid=,command=`
 /// output.
 ///
 /// The bundle's disk image is opened by the Virtualization.framework helper
 /// process, not by vphone-cli, so a file holder lookup (`lsof Disk.img`) names
 /// the helper and never the process that owns the VM lifecycle. The boot process
 /// is instead identified by its own command line: it is always spawned as
-/// `<vphone-cli binary> --config <bundle>/config.plist [...]`.
+/// `<VM binary> --config <bundle>/config.plist [...]`.
 ///
 /// Pure string-in / PIDs-out so it can be unit-tested like `VPhoneLsof.parsePIDs`.
 public enum VPhoneBootProcessLocator {
@@ -103,7 +103,7 @@ public enum VPhoneBootProcessLocator {
             let fields = line.split(whereSeparator: \.isWhitespace).map(String.init)
             guard fields.count >= 2, let pid = Int32(fields[0]), pid > 0 else { continue }
             let argv = Array(fields.dropFirst())
-            guard isVPhoneCLIExecutable(argv[0]),
+            guard isVPhoneBootExecutable(argv[0]),
                   hasConfigArgument(argv, matching: { wanted.contains($0) || canonical.contains(canonicalConfigPath($0)) })
             else { continue }
             guard seen.insert(pid).inserted else { continue }
@@ -127,10 +127,10 @@ public enum VPhoneBootProcessLocator {
         return url.standardizedFileURL.path
     }
 
-    /// True for both the dev binary (`.build/release/vphone-cli`) and the
-    /// bundled one (`vPhone.app/Contents/MacOS/vphone-cli`).
-    static func isVPhoneCLIExecutable(_ token: String) -> Bool {
-        token.split(separator: "/").last.map(String.init) == "vphone-cli"
+    /// Accept the paired runtime and the legacy CLI boot executable.
+    static func isVPhoneBootExecutable(_ token: String) -> Bool {
+        guard let name = token.split(separator: "/").last.map(String.init) else { return false }
+        return name == "vphone-cli" || name == "vphone-vm"
     }
 
     /// Requires an exact `--config <path>` (or `--config=<path>`) token pair, so

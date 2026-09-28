@@ -42,6 +42,12 @@ public struct VPhoneResources: Sendable {
         return URL(fileURLWithPath: CommandLine.arguments[0]).resolvingSymlinksInPath()
     }
 
+    /// Resolve the paired runtime in SwiftPM and app layouts without a fallback.
+    public static func vmExecutable(executable: URL? = nil) -> URL {
+        (executable ?? runningExecutable()).resolvingSymlinksInPath()
+            .deletingLastPathComponent().appendingPathComponent("vphone-vm")
+    }
+
     public static func resolve(executablePath: String? = nil) -> VPhoneResources {
         let exe = executablePath.map { URL(fileURLWithPath: $0).resolvingSymlinksInPath() }
             ?? runningExecutable()

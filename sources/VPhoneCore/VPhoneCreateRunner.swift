@@ -114,7 +114,7 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
         case let .optionsChanged(lines):
             "options differ from the checkpoint and affect stages that already ran: " + lines.joined(separator: "; ")
         case let .toolChanged(recorded, current):
-            "vphone-cli executable changed since the checkpoint (\(recorded ?? "unknown") -> \(current ?? "unknown")); "
+            "CLI/VM toolchain changed since the checkpoint (\(recorded ?? "unknown") -> \(current ?? "unknown")); "
                 + "pass --accept-tool-change to resume with this build"
         case let .contractChanged(recorded, current):
             "stage contract version changed (\(recorded) -> \(current)); this checkpoint cannot be resumed"

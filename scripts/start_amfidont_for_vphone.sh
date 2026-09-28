@@ -10,8 +10,8 @@ set -euo pipefail
 
 SCRIPT_DIR="${0:A:h}"
 PROJECT_ROOT="${SCRIPT_DIR:h}"
-RELEASE_BIN="${PROJECT_ROOT}/.build/release/vphone-cli"
-BUNDLE_BIN="${PROJECT_ROOT}/.build/vphone-cli.app/Contents/MacOS/vphone-cli"
+RELEASE_BIN="${PROJECT_ROOT}/.build/release/vphone-vm"
+BUNDLE_BIN="${PROJECT_ROOT}/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
 
 find_amfidont() {
   if [[ -n "${AMFIDONT:-}" ]]; then

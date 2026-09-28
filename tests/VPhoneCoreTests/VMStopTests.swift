@@ -19,12 +19,12 @@ private final class StopFixture {
     let shim: URL
     private var children: [Process] = []
 
-    init() throws {
+    init(executableName: String = "vphone-cli") throws {
         root = FileManager.default.temporaryDirectory
             .appendingPathComponent("vmstop-\(UUID().uuidString)")
         bundle = root.appendingPathComponent("vm")
         try FileManager.default.createDirectory(at: bundle, withIntermediateDirectories: true)
-        shim = root.appendingPathComponent("vphone-cli")
+        shim = root.appendingPathComponent(executableName)
         try FileManager.default.createSymbolicLink(
             at: shim, withDestinationURL: URL(fileURLWithPath: "/bin/sh"))
         try Data("disk".utf8).write(to: diskURL)
@@ -155,8 +155,8 @@ struct VMStopTests {
 
     // MARK: Target selection
 
-    @Test func locatorFindsTheFakeBootProcess() throws {
-        let fixture = try StopFixture()
+    @Test(arguments: ["vphone-cli", "vphone-vm"]) func locatorFindsTheFakeBootProcess(executableName: String) throws {
+        let fixture = try StopFixture(executableName: executableName)
         defer { fixture.terminateAll() }
         let boot = try fixture.spawnBoot("true")
 
@@ -166,8 +166,8 @@ struct VMStopTests {
         #expect(found == [boot.processIdentifier])
     }
 
-    @Test func neverSignalsAnotherProgramHoldingTheDiskImage() throws {
-        let fixture = try StopFixture()
+    @Test(arguments: ["vphone-cli", "vphone-vm"]) func neverSignalsAnotherProgramHoldingTheDiskImage(executableName: String) throws {
+        let fixture = try StopFixture(executableName: executableName)
         defer { fixture.terminateAll() }
         let holder = try fixture.spawnPlain("exec 3< \"$1\"; trap '' INT", [fixture.diskURL.path])
         // `sh` only aborts a script on SIGINT when its foreground child was

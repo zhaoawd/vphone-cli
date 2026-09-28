@@ -17,6 +17,7 @@ PROJECT_ROOT="${SCRIPT_DIR:h}"
 cd "$PROJECT_ROOT"
 
 BINARY=".build/release/vphone-cli"
+VM_BINARY=".build/release/vphone-vm"
 BUNDLE=".build/vphone-cli.app"
 BUNDLE_BIN="${BUNDLE}/Contents/MacOS/vphone-cli"
 INFO_PLIST="sources/Info.plist"
@@ -40,7 +41,8 @@ echo "enum VPhoneBuildInfo { static let commitHash = \"${GIT_HASH}\" }" >> "$BUI
 swift build -c release --force-resolved-versions
 
 echo "=== Signing with entitlements ==="
-codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BINARY"
+codesign --force --sign - "$BINARY"
+codesign --force --sign - --entitlements "$ENTITLEMENTS" "$VM_BINARY"
 echo "  signed OK → ${BINARY}"
 
 # --- Bundle (.app used for GUI boot) ---
@@ -48,6 +50,7 @@ echo "=== Bundling ${BUNDLE} ==="
 rm -rf "$BUNDLE"
 mkdir -p "${BUNDLE}/Contents/MacOS" "${BUNDLE}/Contents/Resources"
 cp -f "$BINARY" "$BUNDLE_BIN"
+cp -f "$VM_BINARY" "${BUNDLE}/Contents/MacOS/vphone-vm"
 cp -f "$INFO_PLIST" "${BUNDLE}/Contents/Info.plist"
 cp -f "sources/AppIcon.icns" "${BUNDLE}/Contents/Resources/AppIcon.icns"
 cp -f "$(command -v ldid)" "${BUNDLE}/Contents/MacOS/ldid"
@@ -104,7 +107,7 @@ python3 "$SCRIPT_DIR/record_build_dependencies.py" "$BUNDLE"
 
 # Seal the final resource tree only after every runtime asset is staged.
 echo "=== Signing ${BUNDLE} (final Resources) ==="
-codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BUNDLE"
+codesign --force --sign - "$BUNDLE"
 python3 "$SCRIPT_DIR/check_bundle.py" "$BUNDLE"
 echo "  resealed and verified OK"
 
