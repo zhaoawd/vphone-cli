@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-09-29 P2 isolated guest components
+
+Added fixed-source LaunchHook, SystemHook, location/camera libraries and GPU compiler plugin candidates with separate build metadata, source hashes and host C checks. Their 64-byte camera header is incompatible with the local 256-byte publish header; candidates are not installed or activated. Existing firmware/kernel/DSC patches and variant defaults remain in place. See the [component record](p2_guest_components_integration_2026-09-29.md).
+
 ## 2026-09-29 P2 API file uploads
 
 Added explicit API file_put with bounded private source snapshots, request identity and length validation, guest staging/backpressure/atomic replacement, and cancellation uncertainty reporting. Candidate daemon only; no guest installation or firmware/kernel/DSC patch changes. See the [upload record](p2_api_upload_integration_2026-09-29.md).

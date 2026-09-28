@@ -43,8 +43,9 @@ class TestRunnerTests(unittest.TestCase):
                          VPHONE_LESS_PIPELINE_VM="must-not-run", VPHONE_TEST_VMDIR="must-not-run")
         with mock.patch.dict(os.environ, selectors), mock.patch.object(runner, "run") as run:
             runner.run_swift()
-        self.assertEqual(run.call_count, 2)
+        self.assertEqual(run.call_count, 3)
         self.assertEqual(run.call_args_list[0].args[0][0], "swift")
+        self.assertEqual(run.call_args_list[2].args[0], ["make", "test_guest_components"])
         self.assertEqual(run.call_args_list[1].args[0][1], ROOT / "scripts/check_tar_pipe_memory.py")
         for invocation in run.call_args_list:
             for name in selectors:
