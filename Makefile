@@ -75,6 +75,7 @@ help:
 	@echo "Build:"
 	@echo "  make preview_docs DOC=research/project_status_2026-09-11.md  Local Markdown preview"
 	@echo "  make build                   Build + sign the complete vphone-cli.app"
+	@echo "  make helper_candidate        Build isolated helper; requires signing team/identity for registration"
 	@echo "  make check_bundle            Verify complete resources, signature and entitlements"
 	@echo "  make vphoned                 Cross-compile + sign vphoned for iOS"
 	@echo "  make clean                   Remove build/tooling artifacts only"
@@ -251,6 +252,10 @@ clean:
 .PHONY: build patcher_build bundle
 
 build: bundle
+
+.PHONY: helper_candidate
+helper_candidate:
+	/bin/zsh scripts/build_helper_candidate.sh
 
 patcher_build: $(PATCHER_BINARY)
 

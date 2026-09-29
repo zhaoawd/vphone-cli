@@ -58,14 +58,14 @@ P1c 已在独立副本上通过连续启动与 clone 启动；真实导入及导
 
 ### P0：基线、测试清单与环境
 
-已完成：2.0.8 tag/完整 SHA、53/47 增量计数、关键源码核对及本地状态问题定位。本批重新模拟 `bc3bfa8 × 9d218de`，得到 243 个未合并路径；共同祖先不变。Python 基线 352 项通过，Swift Testing 基线 474 项通过，另有 XCTest 145 项、3 项跳过、0 失败。工具链与夹具已复查，默认夹具仍缺 17 文件。
+已完成：2.0.8 tag/完整 SHA、53/47 增量计数、关键源码核对及本地状态问题定位。本批重新模拟 `bc3bfa8 × 9d218de`，得到 243 个未合并路径；共同祖先不变。Python 基线 352 项通过，Swift Testing 基线 474 项通过，另有 XCTest 145 项、3 项跳过、0 失败。默认夹具最初缺 17 文件；9 月 29 日已从原有固定固件缓存恢复并通过 13 项固件测试，来源和范围见 [剩余阶段进展](upstream_remaining_progress_2026-09-29.md)。
 
 P0 检查项及剩余工作：
 
 1. 本批沙箱内 `make test` 受进程/socket 限制失败；在正常宿主权限下分别重跑 `make test_python` 与 `make test_swift` 均通过。后续阶段继续区分环境问题、原有失败与变更回归。
 2. 将旧计划涉及的测试目标与当前 Xcode schemes 对应，保留 `FirmwareIntegrationTests` 和快速测试隔离、Python suite、F1/F2/F3 工具。
 3. 为每个迁移模块记录上游 SHA/路径、本地入口、保留合约、依赖版本/许可证、测试和真实验收状态。
-4. 准备独立 VM 测试 bundle 和固定固件组合。默认 `ipsws/patch_refactor_input` 本批检查仍缺 17 个文件；配置完整 `VPHONE_TEST_FIXTURES` 后重跑存在性检查。缺夹具时继续无固件工作，真实二进制对比保持未验收。
+4. 准备独立 VM 测试 bundle 和固定固件组合。9 月 29 日 `ipsws/patch_refactor_input` 的 17 个夹具文件已恢复；13 项固件对比测试及 PCC 23B85 的 regular/dev/jb/exp 流水线已通过。less、其他固件组合及真实恢复/启动尚未验收，不能由当前夹具结果推导通过。
 5. 固定版本共同祖先及合并模拟已在临时裸仓库完成；完整目录职责映射、上游单一补丁集到本地五变体的清单、最终相机 ABI 和 DSC 差异核对仍待补齐。
 6. 建立版本台账：Launchpad/Core Bundle/guest 版本、源码 SHA、产物 URL 与 SHA-256、签名及收据、VM schema、固件 build、已有 bootstrap。停机保存完整 VM 状态与匹配宿主程序，覆盖 Disk.img、NVRAM、machine identifier、SEPStorage、SHSH 等实际存在的状态。
 
@@ -121,7 +121,7 @@ P0 检查项及剩余工作：
 
 ### P3：VM 进程、提权、生命周期与恢复
 
-2026-09-29：独立 VM executable 和本地生命周期适配见 [P3 实施记录](p3_vm_process_integration_2026-09-29.md)；显式原生 Restore 后端已接入检查点，见 [原生恢复记录](p3_native_restore_integration_2026-09-29.md)。Core Bundle 受控安装、收据与签名复核已接入显式 CLI，见 [存储记录](p3_core_bundle_store_2026-09-29.md)；XPC 调用者授权、helper 注册与真实恢复/启动验收仍待完成。
+2026-09-29：独立 VM executable 和本地生命周期适配见 [P3 实施记录](p3_vm_process_integration_2026-09-29.md)；显式原生 Restore 后端已接入检查点，见 [原生恢复记录](p3_native_restore_integration_2026-09-29.md)。Core Bundle 受控安装、收据与签名复核已接入显式 CLI，见 [存储记录](p3_core_bundle_store_2026-09-29.md)；同团队 XPC 与管理员授权代码、独立签名 helper 候选已接入，见 [helper 记录](p3_helper_xpc_2026-09-29.md)。真实注册等待系统持久化授权，CFW 受控入口与真实恢复/启动验收仍待完成。
 
 依赖 P2。迁入 `vphone-vm` 进程，配套修改 `VPhoneLaunchLayout`、`VPhoneVMStopper`、`VPhoneBundleGuard`、DFU owner、资源定位和 doctor。CLI 父进程不冒充 VM 身份；实际 VM 子进程持锁并在退出后释放。
 

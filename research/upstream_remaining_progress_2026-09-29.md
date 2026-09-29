@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | P0 | 固定 SHA 的 597 个源码/工程路径清单；同名候选路径及 SHA-256；相机 64/256 字节 ABI 差异 | 五变体逐补丁语义/二进制对比、完整 VM 备份、配套版本台账 |
 | P2 | API 上传/下载；6 个 guest dylib 独立构建、签名和清单；保留 classic 安装路径 | 完整 Core Bundle/Launchpad/helper 布局及运行时装载 |
-| P3 | 独立 VM executable、CLI exec 转交、停止/DFU 身份、签名分离、双程序检查点指纹；显式原生 Restore 后端接线 | helper/收据及受控安装；真实恢复与 VM 生命周期 |
+| P3 | 独立 VM executable、CLI exec 转交、停止/DFU 身份、签名分离、双程序检查点指纹；显式原生 Restore 后端接线 | helper 真实注册/授权、CFW 受控入口；真实恢复与 VM 生命周期 |
 | P4 | 明确拒绝带 schemaVersion 的配置被旧后端误读；扫描返回原因且不改写配置 | 显式新建 v2 bundle、原生 prepare/CFW、配套恢复镜像及验收 |
 | P5 | 显式 API app_launch/app_terminate；保留前台验证、屏幕响应及失败后的操作不确定性 | IPA/TIPA、shell、输入、定位 owner 协议、相机 v3、其余接口与业务验收 |
 | P6 | 固定组件候选和宿主 loader-link 测试提供部分前置输入 | Irisin 固定 release、可信安装/卸载范围、Rootless/RootHide 与 tweak 实测 |
@@ -30,7 +30,7 @@
 | VPhoneDaemon | sources/VPhoneDaemon | 1339 候选，未安装；本地增加身份和文件事务 |
 | VPhoneExternalAccessKit | VPhoneAPIKit + HostAPICommands | 本地显式协议适配，不能宣称 SDK 产品等价 |
 | VPhoneGuestComponents | 同名 sources 子目录 | 输出隔离；camera ABI 尚未统一 |
-| VPhoneLaunchpad/Helper/Shared | 尚未迁入 | 不把 CLI app 当作完成 Launchpad 融合 |
+| VPhoneLaunchpad/Helper/Shared | helper 安装/验证子集已迁入，Launchpad 未迁入 | helper 使用独立服务标识；不把 CLI app 当作完成 Launchpad 融合 |
 
 上游五个测试 scheme 分别为 FirmwarePatcherTests、VPhoneSignTests、VPhoneRestoreTests、VPhoneArchiveKitTests、VPhoneCoreKitTests。本地前三个名称对应 SwiftPM 目标；ArchiveKit 为本地 VPhoneArchiveKitTests；CoreKit 对应的保留合约由 VPhoneCoreTests 验证，不能据同类模块名认为测试内容完全相同。`FirmwareIntegrationTests` 始终独立于 fast suite，Python suite 与 F1/F2/F3 工具保留。daemon 的 Wire 测试在 SwiftPM 执行，iOS 候选由 Xcode 独立构建。
 
@@ -100,3 +100,13 @@ Python 391 项通过；修正资源型 bundle 夹具的签名顺序后，完整 
 本批没有注册系统 helper、安装生产 Core Bundle、修改 AMFI 或运行 VM。下一项仍为 XPC 调用者身份与管理员授权、helper 注册及 CFW 受控操作接线；v2 镜像和真实恢复/启动验收尚未完成。
 
 代码提交 `d0efbf4`；其 `make build` 与资源/签名/entitlements 校验通过。签名 CLI 的新增帮助返回 0，非 root 安装请求在读归档前返回 64。新的产物与日志摘要见 [Core Bundle 构建记录](upstream_core_bundle_artifacts_2026-09-29.json)，VM cdhash 为 `e8bd850394e4b8bd6af78461a1e0178312ef3954`，不沿用旧产物的 AMFI 执行准入结论。
+
+## Helper XPC、签名候选与导入空间复核
+
+新增 `VPhoneHelperKit`、独立 daemon 和显式 CLI，限定同团队客户端与 helper 身份；安装请求复核管理员授权，再调用共享 root 存储。固定接口仅包含版本、Core Bundle 安装和验证。已构建与验证 Team ID `3AA3QL69MQ` 的独立签名候选；CFW 原生受控入口尚未接入。
+
+串行 Swift 全套 738 项 / 105 suites、XCTest 178 项（3 项跳过）、Python 391 项及客体 124 项检查通过；默认调度的全量测试仍出现时间相关失败，原因未查明，专项重跑通过不能替代默认全量结果。`make build` 与候选签名验证通过。具体失败及验证范围见 [helper 记录](p3_helper_xpc_2026-09-29.md)。
+
+持久注册被自动审批拒绝，等待用户对安装特权服务与授权规则的具体授权。尚未注册、安装生产 Core Bundle 或运行 VM。固定上游发布 Core Bundle 已下载并核对发布摘要，解压后的完整签名验证通过，可作为后续安装验收输入。
+
+P1c 旧导出包仍在，16.48 GiB，完整 SHA-256 与原记录一致。此前跳过的是实际导入及导入后启动。此次初始空闲约 53.41 GiB，后续约 55 GiB，仍低于约 80 GiB 验收预算，未重试导入；需额外空间或有足够空间的外置 APFS 卷。保留 `vm-2607` 和既有导出归档。
