@@ -121,7 +121,7 @@ P0 检查项及剩余工作：
 
 ### P3：VM 进程、提权、生命周期与恢复
 
-2026-09-29：独立 VM executable 和本地生命周期适配见 [P3 实施记录](p3_vm_process_integration_2026-09-29.md)；显式原生 Restore 后端已接入检查点，见 [原生恢复记录](p3_native_restore_integration_2026-09-29.md)。helper 与真实恢复/启动验收仍待完成。
+2026-09-29：独立 VM executable 和本地生命周期适配见 [P3 实施记录](p3_vm_process_integration_2026-09-29.md)；显式原生 Restore 后端已接入检查点，见 [原生恢复记录](p3_native_restore_integration_2026-09-29.md)。Core Bundle 受控安装、收据与签名复核已接入显式 CLI，见 [存储记录](p3_core_bundle_store_2026-09-29.md)；XPC 调用者授权、helper 注册与真实恢复/启动验收仍待完成。
 
 依赖 P2。迁入 `vphone-vm` 进程，配套修改 `VPhoneLaunchLayout`、`VPhoneVMStopper`、`VPhoneBundleGuard`、DFU owner、资源定位和 doctor。CLI 父进程不冒充 VM 身份；实际 VM 子进程持锁并在退出后释放。
 

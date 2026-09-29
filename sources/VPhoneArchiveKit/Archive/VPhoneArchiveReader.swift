@@ -19,13 +19,22 @@ public enum VPhoneArchiveReader {
         public let modified: Date?
         /// Where a symlink points, unresolved.
         public let linkTarget: String?
+        public let fileType: mode_t
+        public let hardlinkTarget: String?
     }
 
     /// Every member, in the order the archive stores them.
     public static func entries(of archive: URL) throws -> [Entry] {
+        try entries(of: archive, maximumEntries: nil)
+    }
+
+    public static func entries(of archive: URL, maximumEntries: Int?) throws -> [Entry] {
         try withReader(archive) { reader in
             var found: [Entry] = []
             while let entry = try nextHeader(reader, archive: archive) {
+                if let maximumEntries, found.count >= maximumEntries {
+                    throw VPhoneArchiveError.readFailed(path: archive.path, reason: "archive entry limit exceeded")
+                }
                 found.append(makeEntry(entry))
                 archive_read_data_skip(reader)
             }
@@ -160,6 +169,8 @@ public enum VPhoneArchiveReader {
             gid: Int(archive_entry_gid(entry)),
             modified: mtime,
             linkTarget: archive_entry_symlink(entry).map { String(cString: $0) },
+            fileType: fileType,
+            hardlinkTarget: archive_entry_hardlink(entry).map { String(cString: $0) },
         )
     }
 }

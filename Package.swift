@@ -27,6 +27,10 @@ let package = Package(
     ],
     targets: [
         .target(name: "VPhoneAPIKit", path: "sources/VPhoneAPIKit"),
+        .target(name: "VPhoneBundleStore", dependencies: ["VPhoneArchiveKit"],
+                path: "sources/VPhoneBundleStore", linkerSettings: [.linkedFramework("Security")]),
+        .testTarget(name: "VPhoneBundleStoreTests", dependencies: ["VPhoneBundleStore", "VPhoneArchiveKit"],
+                    path: "tests/VPhoneBundleStoreTests"),
         .testTarget(name: "VPhoneAPIKitTests", dependencies: ["VPhoneAPIKit"],
                     path: "tests/VPhoneAPIKitTests"),
         .target(name: "VPhoneDaemonWire", path: "sources/VPhoneDaemon/Daemon/Wire"),
@@ -97,6 +101,7 @@ let package = Package(
                 "VPhoneSign",
                 "VPhoneRestore",
                 "VPhoneArchiveKit",
+                "VPhoneBundleStore",
             ],
             path: "sources/vphone-cli",
             linkerSettings: [

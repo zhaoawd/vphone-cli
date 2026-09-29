@@ -90,3 +90,11 @@ PCC 26.1 / 23B85 在独立测试目录执行 regular/dev/jb/exp 四变体完整�
 新增证据：`remaining-regression.log`、`native-restore-tests-final.log`、`firmware-variants.log` 及 `firmware-variants/23B85/*/report.json`。本批提交为 `37e5518` 和 `b31f109`。这些测试均未恢复或启动 VM；v2 镜像、helper 安装和其余上游阶段继续保持未完成。
 
 `b31f109` 的 `make build` 和 bundle 签名/资源/entitlements 校验通过；138 个脚本语法检查通过。打包 CLI 的 create 帮助包含原生后端选项；native worker 对 ECID 0 返回 64，在临时 bundle 中未产生文件。产物与日志摘要见 [本批产物记录](upstream_native_restore_artifacts_2026-09-29.json)。新 VM cdhash 为 `775621e731b754b9d8a1862b77fbbd114353b5d9`；本轮未对它执行 AMFI 放行或 VM 启动，此前旧产物的执行准入证据不适用于它。
+
+## Core Bundle 受控安装与收据
+
+已新增独立 `VPhoneBundleStore` 模块及显式 `core-bundle install` / `verify` CLI。生产安装要求 root，使用固定系统存储、描述符归档快照、摘要与签名校验、排他发布和收据 cdhash 复核；拒绝同版本覆盖、危险链接、可写存储和扩展 ACL。详见 [P3 存储记录](p3_core_bundle_store_2026-09-29.md)。
+
+Python 391 项通过；修正资源型 bundle 夹具的签名顺序后，完整 Swift 回归 725 项 / 102 suites 通过，XCTest 178 项完成（3 项跳过、0 失败），归档内存及客户机组件后置检查通过。额外以 `umask 077` 运行 23 项存储、CLI 和进程 runner 测试通过。首次回归失败及修正证据保留在记录中。
+
+本批没有注册系统 helper、安装生产 Core Bundle、修改 AMFI 或运行 VM。下一项仍为 XPC 调用者身份与管理员授权、helper 注册及 CFW 受控操作接线；v2 镜像和真实恢复/启动验收尚未完成。
