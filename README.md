@@ -285,8 +285,9 @@ wire protocol version. Guest runtime acceptance is still pending.
 HTTP endpoint. It provides API v1 health checks, bounded JSON RPC, and a
 WebSocket client with correlated requests, deadlines and cancellation. Tokens
 are passed explicitly as Bearer headers; redirects are refused. Creating a
-client does not start a listener. File uploads and the remaining host command mappings
-are pending. See the
+client does not start a listener. Bounded file uploads/downloads and explicit
+application list, foreground, launch and termination mappings are implemented;
+the remaining host command mappings and guest runtime acceptance are pending. See the
 [host API foundation report](research/p2_host_api_integration_2026-09-28.md).
 
 `boot --api-listen 127.0.0.1:8765` (also available on `vm launch`) explicitly

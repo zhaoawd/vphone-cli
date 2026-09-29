@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | P0 | 固定 SHA 的 597 个源码/工程路径清单；同名候选路径及 SHA-256；相机 64/256 字节 ABI 差异 | 五变体逐补丁语义/二进制对比、完整 VM 备份、配套版本台账 |
 | P2 | API 上传/下载；6 个 guest dylib 独立构建、签名和清单；保留 classic 安装路径 | 完整 Core Bundle/Launchpad/helper 布局及运行时装载 |
-| P3 | 独立 VM executable、CLI exec 转交、停止/DFU 身份、签名分离、双程序检查点指纹 | 原生 Restore 阶段接线、helper/收据及受控安装；真实 VM 生命周期 |
+| P3 | 独立 VM executable、CLI exec 转交、停止/DFU 身份、签名分离、双程序检查点指纹；显式原生 Restore 后端接线 | helper/收据及受控安装；真实恢复与 VM 生命周期 |
 | P4 | 明确拒绝带 schemaVersion 的配置被旧后端误读；扫描返回原因且不改写配置 | 显式新建 v2 bundle、原生 prepare/CFW、配套恢复镜像及验收 |
 | P5 | 显式 API app_launch/app_terminate；保留前台验证、屏幕响应及失败后的操作不确定性 | IPA/TIPA、shell、输入、定位 owner 协议、相机 v3、其余接口与业务验收 |
 | P6 | 固定组件候选和宿主 loader-link 测试提供部分前置输入 | Irisin 固定 release、可信安装/卸载范围、Rootless/RootHide 与 tweak 实测 |
@@ -50,7 +50,7 @@
 
 提交：`d57de8e` 文件传输、`c493d0a` guest 候选构建、`dc1af20` VM 进程、`b6ba71a` schema 边界、`f502e04` 应用 API 映射。最初完整回归发现测试 runner 调用数量和工具变更提示断言未同步，已修正并复验；不归因于运行环境。
 
-下一项实现是原生 Restore 在现有 checkpoint runner 中的显式后端接线，以及 Core Bundle/helper 的受控安装和收据检查。实际恢复仍需独立 bundle、明确 ECID/UDID、可用固件、空间和宿主执行准入。随后继续 P4 的 v2 prepare/CFW；不能直接把候选载荷覆盖到现有 VM。
+原生 Restore 在现有 checkpoint runner 中的显式后端接线已完成，见 [P3 原生恢复记录](p3_native_restore_integration_2026-09-29.md)。下一项实现是 Core Bundle/helper 的受控安装和收据检查。实际恢复仍需独立 bundle、明确 ECID/UDID、空间核算和宿主执行准入。随后继续 P4 的 v2 prepare/CFW；不能直接把候选载荷覆盖到现有 VM。
 
 ## AMFI 临时执行准入验证
 
@@ -78,3 +78,15 @@
 新增 `scripts/prepare_firmware_fixtures.py`，从已核对的 PCC 26.1 / 23B85 缓存提取输入，在临时目录中运行固定提交 `08eb9d260f6494549220c3109eafd18da9fa75f4` 的 Python 参考实现。AVPBooter 来自当前宿主 Virtualization.framework，摘要单独记录。Python 实现不恢复到生产脚本目录；输出目录已存在时拒绝覆盖。`provenance.json` 记录来源、工具包版本及 17 文件摘要。
 
 首次对比发现历史导出脚本使用 `IBootPatcher` 默认大写标签，与当时 `fw_patch.py` 显式传入的 `Loaded iBSS` / `Loaded iBEC` 不同；生成器改为实际入口参数。AVP 使用真实 `patch_avpbooter` 的写入记录，未使用历史导出器的另一套锚点。没有修改当前 Swift 补丁字节，也没有用 Swift 输出生成参考结果。最终 `make test_firmware`：13 项、11 suites 全部通过；普通内核 28 条、JB 内核 84 条逐字节匹配。该结果只覆盖本批固定输入，不证明恢复、启动或所有固件组合可用。
+
+## 显式原生恢复与本轮回归
+
+`vm create --restore-backend native` 已接入，默认 Python 路径及旧检查点编码保持兼容。身份限制、隔离子进程、超时/取消、重跑规则及未验证范围见 [P3 原生恢复记录](p3_native_restore_integration_2026-09-29.md)。
+
+完整无固件回归：Python 388 项、Swift Testing 711 项/100 suites、XCTest 178 项通过（其中 3 项跳过）；归档内存检查、RootHide loader-link 检查和 124 项相机 data-plane 检查通过。后补的 3 项夹具生成拒绝路径测试单独通过。最后调整 worker 继承信号处理后，91 项相关 Swift 测试复跑通过。
+
+PCC 26.1 / 23B85 在独立测试目录执行 regular/dev/jb/exp 四变体完整补丁流水线，结构化报告均通过；分别为 29/34/68/88 个方法、58/70/152/178 条字节记录。less 是独立的根权限/ramdisk 路径，本轮没有执行，不从上述四变体推导通过。其他 cloudOS 版本未下载、未测试。
+
+新增证据：`remaining-regression.log`、`native-restore-tests-final.log`、`firmware-variants.log` 及 `firmware-variants/23B85/*/report.json`。本批提交为 `37e5518` 和 `b31f109`。这些测试均未恢复或启动 VM；v2 镜像、helper 安装和其余上游阶段继续保持未完成。
+
+`b31f109` 的 `make build` 和 bundle 签名/资源/entitlements 校验通过；138 个脚本语法检查通过。打包 CLI 的 create 帮助包含原生后端选项；native worker 对 ECID 0 返回 64，在临时 bundle 中未产生文件。产物与日志摘要见 [本批产物记录](upstream_native_restore_artifacts_2026-09-29.json)。新 VM cdhash 为 `775621e731b754b9d8a1862b77fbbd114353b5d9`；本轮未对它执行 AMFI 放行或 VM 启动，此前旧产物的执行准入证据不适用于它。
