@@ -1,0 +1,159 @@
+{
+  "reference_revision": "08eb9d260f6494549220c3109eafd18da9fa75f4",
+  "reference_entrypoints": {
+    "avpbooter": "fw_patch.patch_avpbooter",
+    "iboot_labels": [
+      "Loaded iBSS",
+      "Loaded iBEC",
+      "Loaded LLB"
+    ]
+  },
+  "reference_sources_sha256": {
+    "scripts/dtree.py": "173b3fb9d8252127bbad0b80e00b800a3c5b39df356d9eef5dba3c17c5c4ee05",
+    "scripts/export_patch_reference.py": "b76c91cef748842095fb332fe1d4a72813bc997f35000e6740f7547970a2c552",
+    "scripts/export_patch_reference_all.py": "29b87b6a0e386c76b62517ea1c65acd2f6018d0da602542718ee9bd76b21b078",
+    "scripts/fw_manifest.py": "f9e725e4c3978dd6ffb65657d8a46dd34c0890e6f23846df0b7086e7cde30b75",
+    "scripts/fw_patch.py": "312d8361d06d775b9bf6ee4ef8684ee3000cd89d470bd3aeb819c4b763a637e0",
+    "scripts/fw_patch_dev.py": "9c14d558518117d9429646c671e2569eb6cef667b82432f83013d67c7c1d62b1",
+    "scripts/fw_patch_jb.py": "d8c12b2091e51a3da1f88d655da60f01c9f4724f9559c2f6b3855fbb0e17a424",
+    "scripts/patchers/__init__.py": "2b718f8c8e4e1e59c18ad7afbac7dd6384cde5f76003287f2455c5816307617d",
+    "scripts/patchers/cfw.py": "c33ca63a6fa9c0b6f63da91f08e4dcb1dc9149e63ac66af849f3444a938b93f4",
+    "scripts/patchers/cfw_asm.py": "e2aede49397ef48043f53c346ce8b5537df1c60c5de7219861993ecf8cae299e",
+    "scripts/patchers/cfw_daemons.py": "155499633127e36545cff17395ea6b171c96202c49c2087e92fbae72ae5dc71c",
+    "scripts/patchers/cfw_patch_cache_loader.py": "deb789cb85e565a873b4d224ac070c6b6beb13fc68b2704050443075e85f872b",
+    "scripts/patchers/cfw_patch_jetsam.py": "c9796d3b34a6220da2bce29a1d367ae14505fdce89901688393e6827d2854b6d",
+    "scripts/patchers/cfw_patch_mobileactivationd.py": "57d69943a6c4ac1b0b7cf4f22b54ce9005d5378bc6abbbcc466133a7501e03a5",
+    "scripts/patchers/cfw_patch_seputil.py": "f6184e9c1be05b71d852ab51601a8484979bbdbe03ca5ada979bbfa4ab984391",
+    "scripts/patchers/iboot.py": "5fa17cc00bacc9338e93add3b513f08e9fac5faca994621936ef363c97ee0f6f",
+    "scripts/patchers/iboot_jb.py": "3b7f3bfc35045224af9ae34f6e300ca5060ab72ba3e9e4cf6ddb01c444369f41",
+    "scripts/patchers/kernel.py": "8a064a85bbcd356b78c80e887d40ac1b431e1bbcd5eda788bd5cfd2ec9231367",
+    "scripts/patchers/kernel_asm.py": "3727e56651fb9f2e7a28d761d7791d3b3155c1eb072479fa01799476a04e2fa4",
+    "scripts/patchers/kernel_base.py": "b89fce9807fe079a4b905200fa71c665112344b1a0e66ec11eee510906ca3353",
+    "scripts/patchers/kernel_jb.py": "4cc6f025eef85d2814772543e7d90e089d73c34ab5f24e05e25743683e41d6ba",
+    "scripts/patchers/kernel_jb_base.py": "4aa61e92710e09d33d4fe7acca152a6d2f973e653491e8b4c239c4be5c39698d",
+    "scripts/patchers/kernel_jb_patch_amfi_execve.py": "f2fe4c82c72c0bea3c06513518f9543a6cf59df112dcacd9ad1e3ed9ea45e5e3",
+    "scripts/patchers/kernel_jb_patch_amfi_trustcache.py": "27df21ce277171ffd1f9e627369928d29e3c67730a23cd328e22e182dd37bdad",
+    "scripts/patchers/kernel_jb_patch_bsd_init_auth.py": "bbc08634c7f792f6e48036f6993e7cbd155e912cd9a4d53319cf61b5d8016782",
+    "scripts/patchers/kernel_jb_patch_cred_label.py": "68e35091774a3dfc66f29301bfc8425aed866acfd7e1a9506e52461731126aea",
+    "scripts/patchers/kernel_jb_patch_dounmount.py": "e14c9805a532b183a5705ce87d82c5237858a21003b5735ba5b17f1d864026e5",
+    "scripts/patchers/kernel_jb_patch_hook_cred_label.py": "28afb292b516e290231cf7d2bdf0a23cb202b2c5e35ef6972887f5e1924be4c9",
+    "scripts/patchers/kernel_jb_patch_iouc_macf.py": "e2270491ccae07066bdd5bdb1fe31351476a1b320f149d6c86fd382d32c092ee",
+    "scripts/patchers/kernel_jb_patch_kcall10.py": "828a064e69b0263697f978b63b51d2886054d8f90b4a33f628064947fd13564d",
+    "scripts/patchers/kernel_jb_patch_load_dylinker.py": "22c3e37ef4522c44794549929c1ea7ad089bc4dfda83fe2bfed8cbc97ffcd054",
+    "scripts/patchers/kernel_jb_patch_mac_mount.py": "8603f486cf834d3a560bb09a2e757873d2ae688880e7b6c6494d66d03dbe5ac1",
+    "scripts/patchers/kernel_jb_patch_nvram.py": "bf2ef82f53ed00dd7c0bf444c58bb23c5e2b15ca6aaaa05a24cbf8c540e017e8",
+    "scripts/patchers/kernel_jb_patch_port_to_map.py": "c1138247df81ad1b8df8faf0b9f9ea3e241bfa284c09797215caeae224714d8c",
+    "scripts/patchers/kernel_jb_patch_post_validation.py": "c0f6a6d47aae5d455cd37ca508c5a60acb205e5790a1ec23703be4c446ff05bb",
+    "scripts/patchers/kernel_jb_patch_proc_pidinfo.py": "2d429554afdc81c6c142287e171b2efa754ba9a8c7eec8764a7b9b818c08f733",
+    "scripts/patchers/kernel_jb_patch_proc_security.py": "68b626121d16240c62860d430e622a3b4759d1873f9d629245fa737d5e9110fb",
+    "scripts/patchers/kernel_jb_patch_sandbox_extended.py": "f3220dda922ca80e6ac92f8228aea4c16c4c302b7c4a0c314e671b944f1f4c36",
+    "scripts/patchers/kernel_jb_patch_secure_root.py": "078ab6ec69e4b65983392260195fc74335e251f86ffe9dbafd03fbe836d64746",
+    "scripts/patchers/kernel_jb_patch_shared_region.py": "e8bf6f29226f39ad5c500b9eec342fc3eb2a66aed7e1e5c227413e575b398557",
+    "scripts/patchers/kernel_jb_patch_spawn_persona.py": "0707246d55378a520848066a76a4ace2c84c9886afb8bed248832cb9c2dca545",
+    "scripts/patchers/kernel_jb_patch_syscallmask.py": "b1ad6c51423d843761c580ed812308494cd557140ec219c33bbcc570ff71eabf",
+    "scripts/patchers/kernel_jb_patch_task_conversion.py": "ff7a491b9ab91b940b0759b41f27330cf75d7ddd0f609c365f0fdcd2f82a0f13",
+    "scripts/patchers/kernel_jb_patch_task_for_pid.py": "59ae5b97a038e6b27d3891b3ab58a4baadf98d638cf0961ad4ea827f5d2a9e03",
+    "scripts/patchers/kernel_jb_patch_thid_crash.py": "7f3bc8a06c69ee09a90526870961f4ed3c581c327273f3adbba61f868ef92dfc",
+    "scripts/patchers/kernel_jb_patch_vm_fault.py": "d791653cdf64083ffb7d1df4849b75f9a644a9e1cf484ef6a7758a0eb31e43f4",
+    "scripts/patchers/kernel_jb_patch_vm_protect.py": "c3020c645b57b642179cedec1b091de2f9172c7857ba4972e56702ba6a44b33e",
+    "scripts/patchers/kernel_patch_apfs_graft.py": "f59f911a76698e2b1cec7bf5c0896c9c7df956d17a26b0e26fc50c4a953c48d1",
+    "scripts/patchers/kernel_patch_apfs_mount.py": "fdd096007c9b04580893ab11bacc91706ed2cb3d052d01326d15de509ea29951",
+    "scripts/patchers/kernel_patch_apfs_seal.py": "ca4cdacd0fb50bbc0ff926f92a175c1d82cfcdf63c4ceb6822db980157b66fc3",
+    "scripts/patchers/kernel_patch_apfs_snapshot.py": "275007eb642b623704571fd4d42ec9529f4d02888fd9848f41b9a4bbfebb20e5",
+    "scripts/patchers/kernel_patch_bsd_init.py": "cb066b0d3c87e9d418fbfe6bc8bf0aa81c228c0ba98818353604a6879e3a2476",
+    "scripts/patchers/kernel_patch_debugger.py": "9a696c230f6ab6343d158a04481d6824dab533ead372bfdf8c97fed436e65342",
+    "scripts/patchers/kernel_patch_dyld_policy.py": "2470aac25b8a4e0a3c28e95f34ac64c4f0763ea82e52a3e2c34dbd697b9f4c44",
+    "scripts/patchers/kernel_patch_launch_constraints.py": "c4e73570211750507db6a61bab54e555816229d19c5d82f62c5aaae31afd43b4",
+    "scripts/patchers/kernel_patch_post_validation.py": "b713f7d4092f39456e903cb53343b48fdb5654a409b1772e002aa8634f2af794",
+    "scripts/patchers/kernel_patch_sandbox.py": "f780e37ff3253fb603d368aa36c80a68a99d1086d641446d11010bc9495af76a",
+    "scripts/patchers/txm.py": "f549c9e9e6aa16b581cda6d760e930bd0cd5aa1419d0e183e15de9aa5f14ca78",
+    "scripts/patchers/txm_dev.py": "059f0df7bb60982d1fc4a6e764dd08b60f4e38fe934d5d6bce8e2645abbb5c14",
+    "scripts/ramdisk_build.py": "c44c7343a4010a5f7f662c0707c10b31b33a8552f987e12adecd72bd689541ff",
+    "scripts/vm_manifest.py": "712b40af44f061af395d3506052616378b0cbf03977bc9e5a7eec4c2704b1da5"
+  },
+  "pcc_ipsw": {
+    "path": "/Users/qcz3840/.vphone/ipsws/399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw",
+    "sha256": "399b664dd623358c3de118ffc114e42dcd51c9309e751d43bc949b98f4e31349"
+  },
+  "avpbooter": {
+    "path": "/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources/AVPBooter.vresearch1.bin",
+    "sha256": "301bc973b56e86a9906bb6002d008015a57c9e07b5f191260717b97a62589072"
+  },
+  "version": "26.1",
+  "build": "23B85",
+  "packages": {
+    "pyimg4": "0.8.8",
+    "capstone": "5.0.9",
+    "keystone-engine": "0.9.2"
+  },
+  "files": {
+    "raw_payloads/avpbooter.bin": {
+      "sha256": "301bc973b56e86a9906bb6002d008015a57c9e07b5f191260717b97a62589072",
+      "bytes": 335688
+    },
+    "raw_payloads/ibss.bin": {
+      "sha256": "05791887d9df9388b622a98e5378114e2124969a1c7dd66706ddc295818cf6e8",
+      "bytes": 605312
+    },
+    "raw_payloads/ibec.bin": {
+      "sha256": "05791887d9df9388b622a98e5378114e2124969a1c7dd66706ddc295818cf6e8",
+      "bytes": 605312
+    },
+    "raw_payloads/llb.bin": {
+      "sha256": "05791887d9df9388b622a98e5378114e2124969a1c7dd66706ddc295818cf6e8",
+      "bytes": 605312
+    },
+    "raw_payloads/txm.bin": {
+      "sha256": "ec68dc5a1ec77d8399365f7164e0384539c75e06ed9555f793ce5ff34a9c1db6",
+      "bytes": 458784
+    },
+    "raw_payloads/kernelcache.bin": {
+      "sha256": "b6846048f3a60eab5f360fcc0f3dcb5198aa0476c86fb06eb42f6267cdbfcae0",
+      "bytes": 43991040
+    },
+    "reference_patches/avpbooter.json": {
+      "sha256": "321578246a28789436dc6999d9eff593c285f0324aa51339c99f8bd79783bfaa",
+      "bytes": 170
+    },
+    "reference_patches/ibss.json": {
+      "sha256": "41a784bed1043b53dabae93b2e15d6fa0a68f02bae2446a20928c90871163ed3",
+      "bytes": 671
+    },
+    "reference_patches/ibec.json": {
+      "sha256": "c24777735640fee3d920dd126414b1cb1903e74595360a0f757f4cafef38bd2a",
+      "bytes": 1222
+    },
+    "reference_patches/llb.json": {
+      "sha256": "635ef9640dc8531766263c10325280b4b9bb7792497650bb09f23f05c165828e",
+      "bytes": 2205
+    },
+    "reference_patches/txm.json": {
+      "sha256": "e3d0308905ab5c7a9762824cce1f4dbd5241a824a4df0059f3187cc7abd06436",
+      "bytes": 175
+    },
+    "reference_patches/txm_dev.json": {
+      "sha256": "2246c60083ac084ae9fac9b6179b088ce0faf734da80159c811f11b2c5b11d28",
+      "bytes": 2280
+    },
+    "reference_patches/kernelcache.json": {
+      "sha256": "02bf23092a44f5245995f8bc9bf7a8b265682c7d661c71f5e82a965e6c09ea16",
+      "bytes": 5151
+    },
+    "reference_patches/ibss_jb.json": {
+      "sha256": "d0fa5aa86cf815924e46c03b7508cd1c1db3e348351837bf05eb82f61329362d",
+      "bytes": 162
+    },
+    "reference_patches/kernelcache_jb.json": {
+      "sha256": "103174f74244f475d053878dd92b423647fa0c6ca79bce698284f93a651e53da",
+      "bytes": 18022
+    },
+    "Firmware/dfu/iBSS.vresearch101.RELEASE.im4p": {
+      "sha256": "5e316c5a5a6463cd9f3231d883e6ff1f1aae81e0e3bf14aae6afe102fb2f39e6",
+      "bytes": 303270
+    },
+    "Firmware/txm.iphoneos.research.im4p": {
+      "sha256": "3912f361973d70090b1f15a6e4ec64bd12e457a06d73555ec8880b76c861aa3a",
+      "bytes": 161043
+    }
+  }
+}

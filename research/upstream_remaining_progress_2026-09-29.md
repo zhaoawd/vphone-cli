@@ -36,7 +36,7 @@
 
 ## 实际阻塞与未验证范围
 
-- `make test_fixtures` 失败：默认目录缺全部 17 个要求文件，固件测试未执行。已向用户询问可用输入路径。
+- 最初 `make test_fixtures` 因缺 17 个文件失败；本轮后续找到原始缓存并生成夹具，存在性检查及 13 项固件测试通过，详情见后文。
 - 本轮检查数据卷约有 37 GiB 空闲。该数值不证明足够新镜像恢复、完整状态备份或最终磁盘验收；未删除 VM 或用户数据。
 - 新签名 CLI 的 `--help` 退出 0，VM 程序 `--help` 被 SIGKILL。amfid 日志明确为 `AppleMobileFileIntegrityError Code=-424`：ad-hoc 签名包含受限 entitlements。随后用户明确授权对当前 VM cdhash 临时放行；执行结果见下文。
 - 缺少可运行的新 v2 镜像，因此 Hook 加载、Irisin、Metal、相机、定位和应用行为均没有本轮真实证据。
@@ -59,3 +59,22 @@
 相同产物的 `vphone-vm --help` 退出码由此前的 -9 变为 0，stdout/stderr 为空。本项证明该命令在临时放行期间成功退出，不证明 VM 启动、恢复或客户机行为通过验收。检查结束后已停止本次 amfidont 进程，工具报告从 amfid 分离；后续真实验收可在相同授权范围内按需再次启用。重新构建后必须重新核对 cdhash，不能将本次验证归于新产物。
 
 检查记录：`research/artifacts/upstream-remaining-2026-09-29/vm-execution-authorized.json`。固件夹具、新 v2 镜像和空间条件仍需解决。
+
+## 原始固件缓存核对
+
+2026-09-29 在 `/Users/qcz3840/.vphone/ipsws` 找到两份原始固件，无需重新下载这组 26.1 输入：
+
+- `iPhone17,3_26.1_23B85_Restore.ipsw`：10,778,507,403 字节，SHA-256 `8b72a4f0394ef49d63346eaf37a442751f70c5ec49ae0db7843c5e3b843cd85b`，与 Apple CDN HTTP 响应的摘要一致。
+- `399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw`：935,422,803 字节，SHA-256 `399b664dd623358c3de118ffc114e42dcd51c9309e751d43bc949b98f4e31349`，与 Apple CDN 地址中的摘要一致。
+
+两份 ZIP 的 BuildManifest 均可读取，版本为 26.1 / 23B85。此前缺少 `ipsws/patch_refactor_input` 的检查结果只适用于夹具目录，不证明原始固件不存在。本次未重新下载，也未解包恢复镜像。当时待完成的是夹具提取、参考记录来源确认，以及独立 v2 镜像的创建和验收；夹具已在后续步骤补齐，见下一节。此批数据不代表其他版本组合均具备输入。
+
+检查证据：`research/artifacts/upstream-remaining-2026-09-29/firmware-cache-check.json`。本次磁盘检查约 35 GiB 空闲；待清理的 VM 目录报告分配量约 21 GiB 和 28 GiB，APFS 共享块使这两个数值不能直接作为可释放空间之和。
+
+## 已授权 VM 清理与固件夹具恢复
+
+用户明确确认后，持有三个目录的独占锁并检查打开文件，删除 `vm-2607-rig2`、`vm-2607-p1c-20260926` 和空目录 `vm-p1c-import-validation`。占用检查排除清理进程自身用于持锁的目录描述符，未排除其他进程。`vm-2607` 保留，其根级文件 inode、大小和 mtime 未变；未重新计算整个磁盘内容摘要。可用空间从 37,666,824,192 增至 62,267,236,352 字节，本次观测增加 24,600,412,160 字节（约 22.9 GiB）。原始固件缓存和既有研究记录保留。证据为 `vm-cleanup.json`。
+
+新增 `scripts/prepare_firmware_fixtures.py`，从已核对的 PCC 26.1 / 23B85 缓存提取输入，在临时目录中运行固定提交 `08eb9d260f6494549220c3109eafd18da9fa75f4` 的 Python 参考实现。AVPBooter 来自当前宿主 Virtualization.framework，摘要单独记录。Python 实现不恢复到生产脚本目录；输出目录已存在时拒绝覆盖。`provenance.json` 记录来源、工具包版本及 17 文件摘要。
+
+首次对比发现历史导出脚本使用 `IBootPatcher` 默认大写标签，与当时 `fw_patch.py` 显式传入的 `Loaded iBSS` / `Loaded iBEC` 不同；生成器改为实际入口参数。AVP 使用真实 `patch_avpbooter` 的写入记录，未使用历史导出器的另一套锚点。没有修改当前 Swift 补丁字节，也没有用 Swift 输出生成参考结果。最终 `make test_firmware`：13 项、11 suites 全部通过；普通内核 28 条、JB 内核 84 条逐字节匹配。该结果只覆盖本批固定输入，不证明恢复、启动或所有固件组合可用。
