@@ -59,7 +59,7 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             let new = Self.historyEntries(bundleURL).subtracting(before).sorted()
             return ["patch_records": "\(count)", "firmware_transaction_archives": new.joined(separator: ",")]
         case .restore:
-            return try orchestrator.runRestorePhase(bundleURL: bundleURL, verbosity: v)
+            return try orchestrator.runRestorePhase(bundleURL: bundleURL, verbosity: v, backend: options.effectiveRestoreBackend)
         case .cfw:
             print("[*] Waiting 5s for cleanup before CFW install...")
             Thread.sleep(forTimeInterval: 5)
@@ -158,6 +158,10 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             return .verified(artifacts: artifacts, evidence: ["firmware_transaction": archive])
 
         case .restore:
+            let recordedBackend = evidence["restore_backend"] ?? "python"
+            guard recordedBackend == context.options.effectiveRestoreBackend.rawValue else {
+                return .rejected("restore evidence backend does not match checkpoint options")
+            }
             guard evidence["restore_update_exit"] == "0", let ecid = evidence["ecid"] else {
                 return .rejected("no restore-update exit status")
             }
@@ -338,7 +342,8 @@ struct VPhoneCreateLiveProber: VPhoneCreateStateProber {
             }
             let bridgePIDs = ps.split(whereSeparator: \.isNewline).compactMap { line -> String? in
                 let text = String(line)
-                guard text.contains("pymobiledevice3_bridge.py"), text.contains("restore-"),
+                guard (text.contains("pymobiledevice3_bridge.py") && text.contains("restore-"))
+                        || text.contains("native-restore-worker"),
                       text.localizedCaseInsensitiveContains(ecid) else { return nil }
                 return text.split(whereSeparator: \.isWhitespace).first.map(String.init)
             }

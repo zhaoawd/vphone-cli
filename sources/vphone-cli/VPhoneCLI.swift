@@ -11,7 +11,7 @@ struct VPhoneCLI: ParsableCommand {
             VPhoneBootCLI.self, PatchFirmwareCLI.self, PatchComponentCLI.self, VPhoneVMCommand.self,
             VPhoneFWCommand.self, VPhoneRestoreCommand.self, VPhoneCFWCommand.self, VPhoneSetupCommand.self, VPhoneResourcesCommand.self, VPhoneDoctorCommand.self,
             VPhoneSignCommand.self, VPhoneDumpEntitlementsCommand.self,
-            VPhoneArchiveCommand.self, VPhoneRestoreInspectCommand.self,
+            VPhoneArchiveCommand.self, VPhoneRestoreInspectCommand.self, VPhoneNativeRestoreWorker.self,
         ],
         defaultSubcommand: VPhoneBootCLI.self
     )

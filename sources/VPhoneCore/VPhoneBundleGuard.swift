@@ -57,7 +57,7 @@ public struct VPhoneBundleGuard: Sendable {
         identity: @escaping @Sendable (pid_t) -> VPhoneProcessIdentity? = { VPhoneProcessInfo.identity(of: $0) },
         bootPIDs: @escaping @Sendable (URL) -> [pid_t] = { configURL in
             guard let ps = try? VPhoneProcessRunner.runCapturing(
-                URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="]) else { return [] }
+                URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="], timeout: 5), ps.succeeded else { return [] }
             return VPhoneBootProcessLocator.parsePIDs(ps.stdout, configURL: configURL)
         }
     ) {

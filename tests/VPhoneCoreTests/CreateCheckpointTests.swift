@@ -792,6 +792,28 @@ private let allStages = VPhoneCreateStage.allCases
         #expect(resumed.inputsDigest == resumed.effectiveOptions.digest)
     }
 
+    @Test func restoreBackendChangeRequiresRestartAfterRestoreHasRun() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        f.fake.setFault(.cfw, .beforeExecution)
+        #expect(throws: VPhoneCreateRunError.self) { try f.create(f.runner()) }
+        let before = f.checkpointBytes()
+        f.fake.resetCalls()
+        #expect {
+            try f.runner().resume(bundleURL: f.bundle, request: .init(overrides: .init(restoreBackend: .native)))
+        } throws: { error in
+            guard case let VPhoneCreateRunError.optionsChanged(lines) = error else { return false }
+            return lines.contains { $0.contains("restore_backend") }
+        }
+        #expect(f.fake.executed.isEmpty)
+        #expect(f.checkpointBytes() == before)
+        let resumed = try f.runner().resume(bundleURL: f.bundle, request: .init(
+            overrides: .init(restoreBackend: .native), restartFrom: .restore))
+        #expect(resumed.effectiveOptions.effectiveRestoreBackend == .native)
+        #expect(f.fake.executed.first == .restore)
+        let kept = try f.runner().resume(bundleURL: f.bundle, request: .init())
+        #expect(kept.effectiveOptions.effectiveRestoreBackend == .native)
+    }
+
     @Test func variantChangeBeforePatchRecomputesApplicability() throws {
         let f = try Fixture(); defer { f.cleanup() }
         f.fake.setFault(.patch, .beforeExecution)

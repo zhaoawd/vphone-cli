@@ -3,6 +3,7 @@ import Foundation
 import VPhoneCore
 
 extension VPhoneCreateStage: ExpressibleByArgument {}
+extension VPhoneRestoreBackend: ExpressibleByArgument {}
 
 struct VPhoneVMCreateCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -16,6 +17,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
             + "`vm create --resume <name>` re-verifies completed stages and continues; "
             + "`vm create-status <name>` shows the checkpoint without changing anything.")
 
+    @Option(help: "Restore backend: python (default) or native (experimental); preserved on resume")
+    var restoreBackend: VPhoneRestoreBackend?
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "new VM name (with --resume: the existing VM to continue)") var name: String
     @Flag(help: "Continue an interrupted create of an existing VM from its checkpoint") var resume = false
@@ -59,7 +62,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
                 overrides: .init(
                     variant: variant, iphoneSource: iphoneSource, cloudosSource: cloudosSource,
                     spoofBuild: spoofBuild, forceDscMaxSlide: forceDSCMaxSlide ? true : nil,
-                    enableFrida: frida ? true : nil, diskSizeGb: diskSize),
+                    enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend),
                 restartFrom: restartFrom, acceptToolChange: acceptToolChange,
                 sudoPassword: sudoPassword, rootPopup: rootPopup, interactive: interactive,
                 verbosity: VPhoneVerbosity(count: verboseCount), keepArtifacts: keepArtifacts))
@@ -74,7 +77,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
             enableFrida: frida, rootPopup: rootPopup,
             interactive: interactive, diskSizeGB: diskSize ?? 64,
             verbosity: VPhoneVerbosity(count: verboseCount),
-            keepArtifacts: keepArtifacts))
+            keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python))
     }
 }
 

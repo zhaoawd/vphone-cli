@@ -246,6 +246,33 @@ vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw -
 
 Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. Firmware preparation and CFW installation retain their current backends.
 
+The create pipeline also offers an explicit experimental native restore backend:
+
+```bash
+vphone-cli vm create sample --restore-backend native --iphone-source /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw
+vphone-cli vm create --resume sample
+```
+
+Python remains the default. The backend is recorded in the checkpoint; resume
+keeps the recorded choice. Changing a backend after restore has run requires an
+explicit `--restart-from restore` and repeats the erase operation. Native probe,
+ticket and restore run as supervised child processes bound to the bundle's
+ECID, UDID and DFU instance. This option does not select the v2 manifest or
+install the API daemon. Native restore runtime acceptance remains pending.
+
+Offline Python/Swift comparison fixtures for the pinned PCC 26.1 / 23B85
+baseline can be prepared from the existing IPSW cache:
+
+```bash
+.venv/bin/python3 scripts/prepare_firmware_fixtures.py --pcc-ipsw /path/to/pcc-26.1.ipsw
+make test_fixtures test_firmware
+```
+
+Preparation refuses a different archive digest or an existing output directory.
+It records the historical Python reference revision, dependency versions and
+input/output hashes in `ipsws/patch_refactor_input/provenance.json`. Firmware
+comparisons do not boot or restore a VM.
+
 `make daemon_api_build` independently cross-compiles the fixed upstream
 HTTP/WebSocket daemon and proxy. It uses its own pinned Xcode dependency graph
 and writes a signed candidate under `.build/daemon-api-v2/candidate`.

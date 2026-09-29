@@ -529,6 +529,15 @@ struct CreateLiveStagesTests {
         #expect(isBusy(prober(lockHeld: true).0.probe(.restore, context: w.context())))
     }
 
+    @Test func restoreReprobeRefusesWhileNativeWorkerRuns() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        try writeIdentity(w)
+        let ps = "4242 /app/vphone-cli native-restore-worker --bundle /vm --ecid 0x0011223344556677 --operation restore\n"
+        #expect(isBusy(prober(ps: ps).0.probe(.restore, context: w.context())))
+        let other = ps.replacingOccurrences(of: "0011223344556677", with: "8877665544332211")
+        #expect(!isBusy(prober(ps: other).0.probe(.restore, context: w.context())))
+    }
+
     @Test func restoreReprobeRefusesWhileBridgeProcessRuns() throws {
         let w = try Workspace(); defer { w.cleanup() }
         try writeIdentity(w)

@@ -133,6 +133,7 @@ public struct VPhoneCreateOrchestrator {
         public var diskSizeGB: UInt64
         public var verbosity: VPhoneVerbosity
         public var keepArtifacts: Bool
+        public var restoreBackend: VPhoneRestoreBackend
 
         public init(
             name: String,
@@ -149,7 +150,7 @@ public struct VPhoneCreateOrchestrator {
             memoryMB: UInt64 = 8192,
             diskSizeGB: UInt64 = 64,
             verbosity: VPhoneVerbosity = .quiet,
-            keepArtifacts: Bool = false
+            keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python
         ) {
             self.name = name
             self.variant = variant
@@ -166,6 +167,7 @@ public struct VPhoneCreateOrchestrator {
             self.diskSizeGB = diskSizeGB
             self.verbosity = verbosity
             self.keepArtifacts = keepArtifacts
+            self.restoreBackend = restoreBackend
         }
     }
 
@@ -222,7 +224,7 @@ public struct VPhoneCreateOrchestrator {
             variant: options.variant, iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource,
             spoofBuild: options.spoofBuild, forceDscMaxSlide: options.forceDSCMaxSlide,
             enableFrida: options.enableFrida, cpuCount: options.cpuCount, memoryMb: options.memoryMB,
-            diskSizeGb: options.diskSizeGB)
+            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend)
         let runtime = VPhoneCreateRuntime(
             sudoEnvExtras: sudo.envExtras, rootPopup: options.rootPopup, interactive: options.interactive,
             verbosity: options.verbosity, keepArtifacts: options.keepArtifacts)
@@ -707,7 +709,7 @@ public struct VPhoneCreateOrchestrator {
     // MARK: - restore phase
 
     /// Returns the evidence the restore verifier checks.
-    func runRestorePhase(bundleURL: URL, verbosity v: VPhoneVerbosity) throws -> [String: String] {
+    func runRestorePhase(bundleURL: URL, verbosity v: VPhoneVerbosity, backend: VPhoneRestoreBackend = .python) throws -> [String: String] {
         let configURL = bundleURL.appendingPathComponent("config.plist")
         print("[*] Starting DFU boot in background...")
         // Guest serial is never teed during `vm create` (echo: false); the
@@ -717,12 +719,12 @@ public struct VPhoneCreateOrchestrator {
             selfExecutable, ["--config", configURL.path, "--dfu"], cwd: bundleURL, echo: false)
         try dfu.start()
         return try Self.withStoppedChild(dfu, "DFU boot process") {
-            try restoreWithDFU(dfu, bundleURL: bundleURL, verbosity: v)
+            try restoreWithDFU(dfu, bundleURL: bundleURL, verbosity: v, backend: backend)
         }
     }
 
     private func restoreWithDFU(
-        _ dfu: VPhoneManagedProcess, bundleURL: URL, verbosity v: VPhoneVerbosity
+        _ dfu: VPhoneManagedProcess, bundleURL: URL, verbosity v: VPhoneVerbosity, backend: VPhoneRestoreBackend
     ) throws -> [String: String] {
         guard case .matched = dfu.waitForOutput(matching: "VM lock acquired", timeout: 30) else {
             throw VPhoneCreateError.bootLockNotAcquired
@@ -731,26 +733,36 @@ public struct VPhoneCreateOrchestrator {
         let (udid, ecid) = try loadDeviceIdentity(bundleURL: bundleURL)
         print("[+] Device identity loaded: UDID=\(udid) ECID=0x\(ecid)")
 
-        try waitForRecovery(ecid: ecid, verbosity: v)
+        if backend == .native {
+            let owner = try VPhoneBundleGuard.requireDFUOwner(
+                directory: bundleURL, configURL: bundleURL.appendingPathComponent("config.plist"))
+            for operation in VPhoneNativeRestoreOperation.allCases {
+                try VPhoneNativeRestoreProcess.run(
+                    executable: selfExecutable, bundle: bundleURL, ecid: "0x\(ecid)", udid: udid,
+                    instanceID: owner.instanceID, operation: operation, echo: v.showsToolDetail)
+            }
+        } else {
+            try waitForRecovery(ecid: ecid, verbosity: v)
 
-        let python = try resources.pythonExecutable()
-        let verbosityArgs = pmd3VerbosityArgs(v)
-        print("[*] Fetching SHSH blob...")
-        let shshArgs =
-            [resources.pmd3Bridge.path, "restore-get-shsh", "--vm-dir", ".", "--udid", udid, "--ecid", "0x\(ecid)"]
-            + verbosityArgs
-        trace("spawn \(python.path) \(shshArgs.joined(separator: " "))", v)
-        let shshCode = try VPhoneProcessRunner.runStreaming(python, shshArgs, cwd: bundleURL, echo: v.showsToolDetail)
-        guard shshCode == 0 else { throw VPhoneCreateError.restoreGetSHSHFailed(shshCode) }
+            let python = try resources.pythonExecutable()
+            let verbosityArgs = pmd3VerbosityArgs(v)
+            print("[*] Fetching SHSH blob...")
+            let shshArgs =
+                [resources.pmd3Bridge.path, "restore-get-shsh", "--vm-dir", ".", "--udid", udid, "--ecid", "0x\(ecid)"]
+                + verbosityArgs
+            trace("spawn \(python.path) \(shshArgs.joined(separator: " "))", v)
+            let shshCode = try VPhoneProcessRunner.runStreaming(python, shshArgs, cwd: bundleURL, echo: v.showsToolDetail)
+            guard shshCode == 0 else { throw VPhoneCreateError.restoreGetSHSHFailed(shshCode) }
 
-        print("[*] Restoring...")
-        let restoreArgs =
-            [resources.pmd3Bridge.path, "restore-update", "--vm-dir", ".", "--udid", udid, "--ecid", "0x\(ecid)"]
-            + verbosityArgs
-        trace("spawn \(python.path) \(restoreArgs.joined(separator: " "))", v)
-        let restoreCode = try VPhoneProcessRunner.runStreaming(
-            python, restoreArgs, cwd: bundleURL, echo: v.showsToolDetail)
-        guard restoreCode == 0 else { throw VPhoneCreateError.restoreUpdateFailed(restoreCode) }
+            print("[*] Restoring...")
+            let restoreArgs =
+                [resources.pmd3Bridge.path, "restore-update", "--vm-dir", ".", "--udid", udid, "--ecid", "0x\(ecid)"]
+                + verbosityArgs
+            trace("spawn \(python.path) \(restoreArgs.joined(separator: " "))", v)
+            let restoreCode = try VPhoneProcessRunner.runStreaming(
+                python, restoreArgs, cwd: bundleURL, echo: v.showsToolDetail)
+            guard restoreCode == 0 else { throw VPhoneCreateError.restoreUpdateFailed(restoreCode) }
+        }
 
         recordRestoreVersions(bundleURL: bundleURL)
 
@@ -770,7 +782,7 @@ public struct VPhoneCreateOrchestrator {
         // runRestorePhase stops the DFU process and waits for it to exit on every path.
         return [
             "udid": udid, "ecid": "0x\(ecid)", "restore_get_shsh_exit": "0", "restore_update_exit": "0",
-            "post_restore_dfu_outcome": "\(dfuOutcome)",
+            "post_restore_dfu_outcome": "\(dfuOutcome)", "restore_backend": backend.rawValue,
         ]
     }
 
@@ -794,6 +806,10 @@ public struct VPhoneCreateOrchestrator {
     }
 
     func loadDeviceIdentity(bundleURL: URL, wait: TimeInterval = 30) throws -> (udid: String, ecid: String) {
+        try Self.readDeviceIdentity(bundleURL: bundleURL, wait: wait)
+    }
+
+    static func readDeviceIdentity(bundleURL: URL, wait: TimeInterval = 30) throws -> (udid: String, ecid: String) {
         let predictionFile = bundleURL.appendingPathComponent("udid-prediction.txt")
         let deadline = Date().addingTimeInterval(wait)
         while !FileManager.default.fileExists(atPath: predictionFile.path), Date() < deadline {

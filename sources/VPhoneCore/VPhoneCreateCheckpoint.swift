@@ -60,6 +60,11 @@ public enum VPhoneCreateOverallStatus: String, Codable, Sendable {
 
 // MARK: - Options
 
+public enum VPhoneRestoreBackend: String, Codable, Sendable {
+    case python
+    case native
+}
+
 /// A firmware source as recorded. URL user info and query are never stored in
 /// clear text; the digest of the full string still identifies it.
 public struct VPhoneCreateSourceRecord: Codable, Equatable, Sendable {
@@ -97,10 +102,15 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     public var cpuCount: UInt
     public var memoryMb: UInt64
     public var diskSizeGb: UInt64
+    // Absent on historical checkpoints. Omit the default when encoding so
+    // their normalized options digest remains unchanged.
+    public var restoreBackend: VPhoneRestoreBackend?
+    public var effectiveRestoreBackend: VPhoneRestoreBackend { restoreBackend ?? .python }
 
     public init(
         variant: String, iphoneSource: String?, cloudosSource: String?, spoofBuild: String?,
-        forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64
+        forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64,
+        restoreBackend: VPhoneRestoreBackend = .python
     ) {
         self.variant = variant
         self.iphoneSource = iphoneSource.map(VPhoneCreateSourceRecord.init)
@@ -111,6 +121,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         self.cpuCount = cpuCount
         self.memoryMb = memoryMb
         self.diskSizeGb = diskSizeGb
+        self.restoreBackend = restoreBackend == .python ? nil : restoreBackend
     }
 
     public var digest: String {
@@ -129,6 +140,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         if cpuCount != other.cpuCount { result.append(("cpu_count", .prepare)) }
         if memoryMb != other.memoryMb { result.append(("memory_mb", .prepare)) }
         if diskSizeGb != other.diskSizeGb { result.append(("disk_size_gb", .prepare)) }
+        if effectiveRestoreBackend != other.effectiveRestoreBackend { result.append(("restore_backend", .restore)) }
         if enableFrida != other.enableFrida { result.append(("enable_frida", .patch)) }
         if spoofBuild != other.spoofBuild { result.append(("spoof_build", .cfw)) }
         if forceDscMaxSlide != other.forceDscMaxSlide { result.append(("force_dsc_max_slide", .cfw)) }

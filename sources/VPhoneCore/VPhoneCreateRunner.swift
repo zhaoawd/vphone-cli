@@ -164,11 +164,12 @@ public struct VPhoneCreateRunner {
         public var forceDscMaxSlide: Bool?
         public var enableFrida: Bool?
         public var diskSizeGb: UInt64?
+        public var restoreBackend: VPhoneRestoreBackend?
 
         public init(
             variant: String? = nil, iphoneSource: String? = nil, cloudosSource: String? = nil,
             spoofBuild: String? = nil, forceDscMaxSlide: Bool? = nil, enableFrida: Bool? = nil,
-            diskSizeGb: UInt64? = nil
+            diskSizeGb: UInt64? = nil, restoreBackend: VPhoneRestoreBackend? = nil
         ) {
             self.variant = variant
             self.iphoneSource = iphoneSource
@@ -177,6 +178,7 @@ public struct VPhoneCreateRunner {
             self.forceDscMaxSlide = forceDscMaxSlide
             self.enableFrida = enableFrida
             self.diskSizeGb = diskSizeGb
+            self.restoreBackend = restoreBackend
         }
     }
 
@@ -292,6 +294,7 @@ public struct VPhoneCreateRunner {
         if let source = overrides.cloudosSource { options.cloudosSource = .init(source) }
         if let spoof = overrides.spoofBuild { options.spoofBuild = spoof }
         if let value = overrides.forceDscMaxSlide { options.forceDscMaxSlide = value }
+        if let value = overrides.restoreBackend { options.restoreBackend = value == .python ? nil : value }
         if let value = overrides.enableFrida { options.enableFrida = value }
         if overrides.iphoneSource == nil, let record = stored.effectiveOptions.iphoneSource, !record.redacted {
             overrides.iphoneSource = record.display
