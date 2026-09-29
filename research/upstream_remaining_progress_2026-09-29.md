@@ -38,7 +38,7 @@
 
 - `make test_fixtures` 失败：默认目录缺全部 17 个要求文件，固件测试未执行。已向用户询问可用输入路径。
 - 本轮检查数据卷约有 37 GiB 空闲。该数值不证明足够新镜像恢复、完整状态备份或最终磁盘验收；未删除 VM 或用户数据。
-- 新签名 CLI 的 `--help` 退出 0，VM 程序 `--help` 被 SIGKILL。amfid 日志明确为 `AppleMobileFileIntegrityError Code=-424`：ad-hoc 签名包含受限 entitlements。没有修改 AMFI 策略，已询问是否允许对最终 VM cdhash 临时放行。
+- 新签名 CLI 的 `--help` 退出 0，VM 程序 `--help` 被 SIGKILL。amfid 日志明确为 `AppleMobileFileIntegrityError Code=-424`：ad-hoc 签名包含受限 entitlements。随后用户明确授权对当前 VM cdhash 临时放行；执行结果见下文。
 - 缺少可运行的新 v2 镜像，因此 Hook 加载、Irisin、Metal、相机、定位和应用行为均没有本轮真实证据。
 - 宿主 app 的 Info.plist 仍为本地 `1.0 / 1`，没有改成 2.0.8；固定上游版本用于来源追踪，不代表本地产物已完整实现该版本。
 
@@ -51,3 +51,11 @@
 提交：`d57de8e` 文件传输、`c493d0a` guest 候选构建、`dc1af20` VM 进程、`b6ba71a` schema 边界、`f502e04` 应用 API 映射。最初完整回归发现测试 runner 调用数量和工具变更提示断言未同步，已修正并复验；不归因于运行环境。
 
 下一项实现是原生 Restore 在现有 checkpoint runner 中的显式后端接线，以及 Core Bundle/helper 的受控安装和收据检查。实际恢复仍需独立 bundle、明确 ECID/UDID、可用固件、空间和宿主执行准入。随后继续 P4 的 v2 prepare/CFW；不能直接把候选载荷覆盖到现有 VM。
+
+## AMFI 临时执行准入验证
+
+用户明确授权后，仅对 `2a6254e342d9cf2e4e32b12519e62c0fa8f30993` 启用 amfidont 临时放行，并启用该匹配对象的 `--spoof-apple`。运行日志确认 `Allow all: False`、路径清单为空、cdhash 清单只有该值，并记录该 cdhash 的验证放行和 isApple 处理。没有添加持久化清单。
+
+相同产物的 `vphone-vm --help` 退出码由此前的 -9 变为 0，stdout/stderr 为空。本项证明该命令在临时放行期间成功退出，不证明 VM 启动、恢复或客户机行为通过验收。检查结束后已停止本次 amfidont 进程，工具报告从 amfid 分离；后续真实验收可在相同授权范围内按需再次启用。重新构建后必须重新核对 cdhash，不能将本次验证归于新产物。
+
+检查记录：`research/artifacts/upstream-remaining-2026-09-29/vm-execution-authorized.json`。固件夹具、新 v2 镜像和空间条件仍需解决。
