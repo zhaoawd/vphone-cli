@@ -33,3 +33,5 @@ XPC 连接身份、Authorization Services 管理员授权、Launchpad 调用、�
 完整回归最终结果：Python 391 项通过；修正测试夹具后，`make test_swift` 的 Swift Testing 725 项 / 102 suites 通过，XCTest 178 项完成（3 项跳过、0 失败）。归档内存检查、RootHide loader-link 检查、相机 data-plane 124 项检查通过。日志分别为 `research/artifacts/upstream-remaining-2026-09-29/core-bundle-regression.log`（首次完整运行，保留两项失败）、`core-bundle-private-umask.log` 和 `core-bundle-swift-final.log`。
 
 完整上游 Core Bundle 发布归档、系统 root 安装、跨 UID 读取及真实 helper/VM 验收尚未执行。当前本地 `make build` 产物仍是既有 app 布局，不能把测试夹具的成功安装记为 v2 分发包验收。
+
+提交 `d0efbf4` 的 `make build` 通过，包含资源、签名与 entitlements 隔离校验。签名 CLI 的新增安装帮助返回 0；普通用户调用安装返回 64，明确要求 sudo，未打开归档或创建系统存储。产物摘要和日志摘要见 [构建记录](upstream_core_bundle_artifacts_2026-09-29.json)。新 VM cdhash 为 `e8bd850394e4b8bd6af78461a1e0178312ef3954`，本批未对其执行 AMFI 放行或 VM 启动。

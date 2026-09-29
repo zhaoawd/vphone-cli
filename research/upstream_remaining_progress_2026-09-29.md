@@ -98,3 +98,5 @@ PCC 26.1 / 23B85 在独立测试目录执行 regular/dev/jb/exp 四变体完整�
 Python 391 项通过；修正资源型 bundle 夹具的签名顺序后，完整 Swift 回归 725 项 / 102 suites 通过，XCTest 178 项完成（3 项跳过、0 失败），归档内存及客户机组件后置检查通过。额外以 `umask 077` 运行 23 项存储、CLI 和进程 runner 测试通过。首次回归失败及修正证据保留在记录中。
 
 本批没有注册系统 helper、安装生产 Core Bundle、修改 AMFI 或运行 VM。下一项仍为 XPC 调用者身份与管理员授权、helper 注册及 CFW 受控操作接线；v2 镜像和真实恢复/启动验收尚未完成。
+
+代码提交 `d0efbf4`；其 `make build` 与资源/签名/entitlements 校验通过。签名 CLI 的新增帮助返回 0，非 root 安装请求在读归档前返回 64。新的产物与日志摘要见 [Core Bundle 构建记录](upstream_core_bundle_artifacts_2026-09-29.json)，VM cdhash 为 `e8bd850394e4b8bd6af78461a1e0178312ef3954`，不沿用旧产物的 AMFI 执行准入结论。
