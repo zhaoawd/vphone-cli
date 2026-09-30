@@ -1,8 +1,10 @@
 """Run the imported proxy/worker lifecycle on macOS with disposable host workers."""
+import errno
 import os
 from pathlib import Path
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -31,9 +33,11 @@ class DaemonProxyTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.ready = Path(self.temp.name) / 'ready'
 
-    def start(self, action='wait', pending=False):
+    def start(self, action='wait', pending=False, ignore_child=False):
         env = dict(os.environ, VPHONE_PROXY_TEST_ACTION=action, VPHONE_PROXY_TEST_READY=str(self.ready),
-                   VPHONE_PROXY_TEST_PENDING='1' if pending else '0')
+                   VPHONE_PROXY_TEST_PENDING='1' if pending else '0',
+                   VPHONE_PROXY_TEST_PORT=str(self.ready.with_name('port')),
+                   VPHONE_PROXY_TEST_IGNORE_CHLD='1' if ignore_child else '0')
         process = subprocess.Popen([str(self.binary)], env=env, start_new_session=True,
                                    stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
         self.addCleanup(self.cleanup_process, process)
@@ -48,8 +52,14 @@ class DaemonProxyTests(unittest.TestCase):
             pass
         process.communicate(timeout=5)
 
-    def wait_workers(self, count=1):
-        deadline = time.monotonic() + 6
+    @staticmethod
+    def stop_and_read_log(process):
+        process.terminate()
+        _, log = process.communicate(timeout=5)
+        return log
+
+    def wait_workers(self, count=1, timeout=6):
+        deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             pids = [int(p) for p in self.ready.read_text().split()] if self.ready.exists() else []
             if len(pids) >= count:
@@ -112,3 +122,60 @@ class DaemonProxyTests(unittest.TestCase):
         process = self.start('crash', pending=True)
         self.assertEqual(process.wait(timeout=4), 1)
         self.assertEqual(len(self.wait_workers()), 1)
+
+    # Upstream 2e2ed0a8: fixed one-second retry and a logged reason per exit.
+
+    def test_restart_delay_stays_one_second(self):
+        started = time.monotonic()
+        process = self.start('crash')
+        # Exponential backoff (1, 2, 4 s) needs about 7 s for the fourth worker.
+        pids = self.wait_workers(4, timeout=5)
+        elapsed = time.monotonic() - started
+        self.stop_and_read_log(process)
+        self.assertEqual(len(set(pids[:4])), 4)
+        self.assertGreaterEqual(elapsed, 2.9, 'Three retries must each pause about one second')
+        self.assertLess(elapsed, 5)
+
+    def test_worker_exit_status_is_logged(self):
+        process = self.start('crash')
+        pids = self.wait_workers(2)
+        log = self.stop_and_read_log(process)
+        self.assertIn(f'vphoned proxy: worker {pids[0]} exited with status 23; retrying', log)
+
+    def test_worker_signal_is_logged(self):
+        process = self.start('signal')
+        pids = self.wait_workers(2)
+        log = self.stop_and_read_log(process)
+        self.assertIn(f'vphoned proxy: worker {pids[0]} killed by signal {signal.SIGKILL.value}; retrying', log)
+
+    def test_waitpid_failure_logs_wait_error_not_later_errno(self):
+        # access() for the pending-update marker sets ENOENT after waitpid fails.
+        process = self.start('crash', ignore_child=True)
+        pids = self.wait_workers(2)
+        log = self.stop_and_read_log(process)
+        self.assertIn(f'vphoned proxy: waitpid {pids[0]} failed: {os.strerror(errno.ECHILD)}; retrying', log)
+        self.assertNotIn(os.strerror(errno.ENOENT), log)
+
+    def assert_port_released(self, port):
+        deadline = time.monotonic() + 4
+        while True:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                try:
+                    probe.bind(('127.0.0.1', port))
+                    return
+                except OSError:
+                    if time.monotonic() >= deadline:
+                        self.fail(f'Worker port {port} is still bound')
+            time.sleep(.03)
+
+    def test_worker_port_is_released_after_proxy_stop_or_death(self):
+        for stop in ('terminate', 'kill'):
+            with self.subTest(stop=stop):
+                self.ready.unlink(missing_ok=True)
+                process = self.start('bind')
+                pid = self.wait_workers()[0]
+                port = int(self.ready.with_name('port').read_text())
+                getattr(process, stop)()
+                process.wait(timeout=5)
+                self.assert_exited(pid)
+                self.assert_port_released(port)

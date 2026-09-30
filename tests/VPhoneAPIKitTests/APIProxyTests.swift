@@ -157,6 +157,53 @@ final class APIProxyTests: XCTestCase {
         XCTAssertNil(session.snapshot.generation)
     }
 
+    /// Upstream 1df6c43c: vphoned no longer closes first, because a guest-side
+    /// close drops reply bytes still queued for host credit. The host must read
+    /// the complete reply and then close, or each guest connection lingers
+    /// until the daemon's 30 s fallback.
+    func testHostClosesAfterCompleteReplyWhenGuestWaitsForPeerClose() async throws {
+        let fixture = try await APIHTTPFixture(behindProxy: true, managedSession: true, waitForPeerClose: true)
+        defer { fixture.stop() }
+        let port = fixture.port
+        let proxy = try VPhoneAPIProxy(token: token) { completion in
+            DispatchQueue.global().async {
+                completion(Result { try VPhoneAPISocket(takingOwnership: proxyTCP(port)) })
+            }
+        }
+        defer { proxy.stop() }
+        let client = try VPhoneAPIClient(baseURL: proxy.start(port: 0), token: token, timeout: 5)
+        let health = try await client.health()
+        let text = String(repeating: "x", count: 512 * 1024)
+        let reply = try await client.call("echo", params: ["value": .string(text)])
+        XCTAssertEqual(reply, .object(["value": .string(text)]))
+        let download = try await client.downloadFile(path: "/bytes/65536", instanceID: XCTUnwrap(health.instanceID),
+            binaryHash: health.binaryHash, maximumBytes: 65536, stagingDirectory: fixture.directory)
+        XCTAssertEqual(try download.data(), Data((0..<65536).map { UInt8($0 % 256) }))
+        let upload = try VPhoneAPIUpload.prepare(data: Data(repeating: 7, count: 32 * 1024))
+        try await client.uploadFile(upload, path: "/peer-close", permissions: "600",
+            instanceID: XCTUnwrap(health.instanceID), binaryHash: health.binaryHash, timeout: 5)
+        let socket = client.openWebSocket()
+        let method = try await socket.call("one")
+        XCTAssertEqual(method, .string("one"))
+        await socket.close()
+
+        let log = fixture.directory.appendingPathComponent("peer-close")
+        var lines: [Substring] = []
+        let deadline = ContinuousClock.now + .seconds(5)
+        while lines.count < 5, ContinuousClock.now < deadline {
+            lines = ((try? String(contentsOf: log, encoding: .utf8)) ?? "").split(separator: "\n")
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        XCTAssertEqual(lines.map { $0.split(separator: " ").prefix(2).joined(separator: " ") }.sorted(), [
+            "GET /v1/events", "GET /v1/files/content", "GET /v1/health", "POST /v1/rpc", "PUT /v1/files/content",
+        ])
+        for line in lines {
+            let seconds = Double(line.split(separator: " ").last ?? "")
+            XCTAssertNotNil(seconds, "Guest fallback closed the connection: \(line)")
+            XCTAssertLessThan(seconds ?? .infinity, 2, "Host close was late: \(line)")
+        }
+    }
+
     func testRejectedHeadersNeverConnectToGuest() throws {
         let connector = ProxyConnectorFixture()
         let proxy = try VPhoneAPIProxy(token: token, connector: connector.append)
