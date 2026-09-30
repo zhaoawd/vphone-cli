@@ -6,6 +6,22 @@
 
 本次 T00 和 T02 完成，其余 30 项均有剩余工作。部分项已有实现与历史验证，状态明确保留。每项实施结束后回填代码提交、实际命令/结果、日志和真实验收；未提交实现记录工作区摘要。
 
+### 2026-10-01 本轮提交（本地，未 push）
+
+在 `8d84bbc` 之上按任务分项提交，每项配 `research/tXX_*_2026-10-01.md` 记录，合并回归 `make test_python`/`make test_swift` 通过（无固件夹具，`make test_firmware` 未执行；真实 VM 未涉及）：
+
+| 提交 | 任务 | 记录 |
+| --- | --- | --- |
+| 39a6d71 | T05 归档 UTF-8 线程局部 locale + T04 签名空间（LC_UUID 移除按用户决定不采用） | t04_t05_sign_archive_2026-10-01.md |
+| 524824f | T06 连接关闭 + T07 vphoned worker 监护 | t06_t07_connection_worker_2026-10-01.md |
+| 3aa8851 | T08 IcliKit 固定 0.7.7（altitude=-1 留到 T20） | t08_iclikit_0_7_7_2026-10-01.md |
+| 5b5fdd7 | T09 补丁 ID/preset 映射（仅文档） | t09_patch_id_mapping_2026-10-01.md |
+| ce8b155 | T10 变体计划 resolver + T11 严格声明 Gate（新增 `fw plan`） | t10_t11_variant_plan_strict_gate_2026-10-01.md |
+| 53edd90 | T24 宿主策略与权限边界（Core Bundle 最低版本 2.2.0；cfw_install_host.sh chown 防护） | t24_host_policy_2026-10-01.md |
+| 5d1bdaf | T20 定位路径重新适配 + 所有权合约（vacc=-1 sentinel 三处一致） | t20_location_2026-10-01.md |
+
+阻塞与待决：T01/T12 等另一台机器未提交的原生 prepare 代码推送后再接；T13（DSC/内核补丁版本条件）本轮派发被安全分类器拦截，需重新界定范围或用户直接处理；T25–T27（Launchpad CLI/UI）本地无 Launchpad target，属较大规模迁入，实施前先确认范围。T20 guest 侧 GuestLocationSimulation.swift 与 libvlocation.m 仅逻辑审查（Xcode/iOS 工具链未构建）。真实 VM 恢复/启动/固件字节对比、helper 注册与生产 Core Bundle 安装继续暂缓。
+
 helper 注册及生产 Core Bundle 安装继续暂缓；P1c 真实导入及导入后启动继续跳过。写盘前要求 T03、T11 和 T15 达到验收条件。独立 UI 工作可以先推进；不能由此跳过 guest 写入的前置条件。
 
 ## 批次与阶段
