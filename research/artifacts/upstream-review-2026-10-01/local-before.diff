@@ -1,0 +1,522 @@
+diff --git a/README.md b/README.md
+index 10150f05..a3bc2787 100644
+--- a/README.md
++++ b/README.md
+@@ -244,7 +244,26 @@ vphone-cli vm import /path/to/export.tzst --name sample-copy --archive-backend n
+ vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw --json
+ ```
+ 
+-Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. Firmware preparation and CFW installation retain their current backends.
++Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. CFW installation retains its current backend.
++
++Classic firmware preparation offers an explicit native backend for two local IPSWs:
++
++```bash
++vphone-cli fw prepare sample --prepare-backend native --iphone-source /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw
++vphone-cli vm create sample --prepare-backend native --iphone-source /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw
++vphone-cli vm create --resume sample
++```
++
++Script preparation remains the default. Checkpoints preserve the preparation backend;
++historical checkpoints use script. Changing it after prepare requires
++`--restart-from prepare`. Native prepare does not support downloads, less or v2/GPU
++setup. Standalone `fw prepare` refuses existing Restore paths. A checkpointed native
++prepare rerun preserves one existing ordinary Restore directory in a hidden
++`.firmware-prepare-backup-*` directory before publishing its replacement; these
++backups remain for explicit operator cleanup. The current Restore tree follows the
++existing stage retention and `--keep-artifacts` rules. Preparation backend selection
++does not change the restore backend. End-to-end VM acceptance for native preparation
++remains pending.
+ 
+ The create pipeline also offers an explicit experimental native restore backend:
+ 
+@@ -254,7 +273,7 @@ vphone-cli vm create --resume sample
+ ```
+ 
+ Python remains the default. The backend is recorded in the checkpoint; resume
+-keeps the recorded choice. Changing a backend after restore has run requires an
++keeps the recorded choice. Changing the restore backend after restore has run requires an
+ explicit `--restart-from restore` and repeats the erase operation. Native probe,
+ ticket and restore run as supervised child processes bound to the bundle's
+ ECID, UDID and DFU instance. This option does not select the v2 manifest or
+diff --git a/docs/README_zh.md b/docs/README_zh.md
+index 7fd5ad3b..212b530f 100644
+--- a/docs/README_zh.md
++++ b/docs/README_zh.md
+@@ -87,6 +87,10 @@ vphone-cli vm launch myphone                            # 6. 首次启动
+ 
+ 要升级到更新的 iOS，把 `fw prepare` 指向一个 IPSW：`--iphone-source /path/to.ipsw --cloudos-source /path/to.ipsw`。
+ 
++`fw prepare` 和 `vm create` 支持显式 `--prepare-backend native`，要求同时提供两份本地 IPSW。默认仍使用脚本后端；原生后端当前只支持 classic 布局，不支持下载、less 或 v2/GPU 准备。检查点记录准备后端，续跑时沿用原选择。prepare 已完成后切换后端，需要 `--restart-from prepare`。
++
++独立 `fw prepare` 拒绝已有 Restore 路径。检查点中的原生 prepare 重跑会在新树生成完成后，将唯一的普通 Restore 目录保留到 `.firmware-prepare-backup-*`，再发布新树。备份由操作员显式清理；当前 Restore 树仍按阶段保留规则和 `--keep-artifacts` 处理。该选项不改变恢复后端；原生 prepare 的完整 VM 创建验收尚未执行。
++
+ ## 恢复
+ 
+ - `vphone-cli doctor [<name>]` —— 对宿主机的只读诊断；给出 VM 名时诊断该 VM（文件、锁、固件事务、恢复状态、创建检查点、宿主控制通道）。不修复任何内容；`--json` 输出机器可读格式。
+diff --git a/research/upstream_implementation_plan.md b/research/upstream_implementation_plan.md
+index 06ccb654..526c7d4e 100644
+--- a/research/upstream_implementation_plan.md
++++ b/research/upstream_implementation_plan.md
+@@ -137,6 +137,8 @@ P0 检查项及剩余工作：
+ 
+ ### P4：新建 v2 镜像、原生固件与最小客户机
+ 
++2026-09-30：显式本地 IPSW 原生 classic prepare 已实现并通过 26.1 实际组件/清单对照；第二批已接入 `vm create` 检查点、后端选项续跑与旧 Restore 树保留，见 [P4 实施记录](p4_native_prepare_2026-09-30.md)。下载、less、GPU/v2 与原生 CFW 尚未接入，默认后端不变。第二批没有执行真实恢复或启动。
++
+ 依赖 P2、P3。先完成上游单一补丁集到本地变体的映射，再通过显式验证入口构建新的 v2 测试组合，不直接把上游包含原 EXP 的 `.jb` 接到本地 JB，不替代默认 create 和既有 VM。该阶段提供 P5 的真实客户机输入，P5 再补齐完整本地控制合约。
+ 
+ 1. manifest 版本诊断覆盖扫描、启动、创建、克隆、导入导出；显示不兼容原因，不静默漏掉旧 bundle。旧格式路径继续存在。
+diff --git a/research/upstream_remaining_progress_2026-09-29.md b/research/upstream_remaining_progress_2026-09-29.md
+index 4e1ff95d..8b59c33b 100644
+--- a/research/upstream_remaining_progress_2026-09-29.md
++++ b/research/upstream_remaining_progress_2026-09-29.md
+@@ -110,3 +110,31 @@ Python 391 项通过；修正资源型 bundle 夹具的签名顺序后，完整
+ 持久注册被自动审批拒绝，等待用户对安装特权服务与授权规则的具体授权。尚未注册、安装生产 Core Bundle 或运行 VM。固定上游发布 Core Bundle 已下载并核对发布摘要，解压后的完整签名验证通过，可作为后续安装验收输入。
+ 
+ P1c 旧导出包仍在，16.48 GiB，完整 SHA-256 与原记录一致。此前跳过的是实际导入及导入后启动。此次初始空闲约 53.41 GiB，后续约 55 GiB，仍低于约 80 GiB 验收预算，未重试导入；需额外空间或有足够空间的外置 APFS 卷。保留 `vm-2607` 和既有导出归档。
++
++
++## 2026-09-30 导出验收与授权范围更新
++
++用户要求暂缓 helper 注册及生产 Core Bundle 安装，继续其他整合并优先验证 VM 导出。此前针对系统持久安装的授权不再作为全面授权使用；后续宿主变更逐项说明并取得针对性授权。
++
++当前 `vm-2607` 的显式原生导出及完整内容比较通过，包括 64 GiB Disk.img；归档约 15.63 GiB。运行中拒绝导出也通过。用户单独授权两次正常关机及临时暂停/恢复对应 autophone Rig Agent。最低可用空间约 73.62 GiB，没有触发用户指定的 10 GiB 暂停阈值。见 [导出验收](vm_export_acceptance_2026-09-30.md)。
++
++该结果补齐本组合的原生导出实机证据，不覆盖导入、导入后启动或完整 P1c/P2 完成条件。helper、原生 CFW、v2 镜像及其余阶段继续保持未完成。
++
++
++## 2026-09-30 原生 classic prepare
++
++新增 `fw prepare --prepare-backend native`，显式读取两份本地 IPSW，持 VM 锁执行独立暂存、组件合并、Swift 清单生成和排他发布。默认仍为脚本后端，不接管 less、下载、v2 GPU/客户机布局或 `vm create` 检查点。
++
++26.1 / 23B85 的真实准备检查通过：182 个输出文件；180 个非生成清单文件共 11,060,157,452 字节按合并规则与源 ZIP 成员逐字节一致，两份生成 plist 与现有 Python 生成器解析结果一致。最低可用空间约 62.18 GiB，未触发 10 GiB 暂停。6 项专项及宿主默认 Swift 全量 744 项通过。见 [P4 第一批记录](p4_native_prepare_2026-09-30.md)。
++
++本批没有打补丁、恢复或启动 VM；P4 仍未完成。下一批接检查点选项、续跑与保留规则，然后处理 GPU/v2 与原生 CFW 的前置条件。
++
++## 2026-09-30 原生 prepare 检查点接入
++
++第二批新增 `vm create --prepare-backend native`，检查点记录准备后端；默认值与历史摘要保持兼容，续跑保留选择。已完成 prepare 后切换后端需要 `--restart-from prepare`。原生重跑在新清单生成完成后保留旧 Restore 树，再排他发布新树；备份由操作员显式清理。当前 Restore 树继续使用阶段保留规则和 `--keep-artifacts`。
++
++专项 90 项通过；完整无固件 Swift 回归为 Swift Testing 753 项 / 107 suites、XCTest 178 项（3 项跳过、0 失败），归档内存、RootHide loader-link 和相机 124 项检查通过。新增相对路径测试的并行 cwd 问题已修正，初次失败及最终通过日志均保留。见 [P4 实施记录](p4_native_prepare_2026-09-30.md)。
++
++本批起始可用空间约 27.7 GiB，未重复真实固件解包，未安装 helper、恢复或启动 VM。下一项为 GPU/compiler plugin 与 v2 的输入和布局接线，随后处理原生 CFW；P4 仍未完成。
++
++第二批 `make build`、完整签名/资源/entitlements 校验和签名 CLI 外部 cwd/符号链接资源定位通过。签名 CLI 的帮助及三项拒绝检查通过；最终可用空间约 27.58 GiB。源码及 CLI/VM 摘要保存在 `research/artifacts/native-prepare-checkpoint-2026-09-30/artifacts.json`。
+diff --git a/sources/VPhoneCore/VPhoneCreateCheckpoint.swift b/sources/VPhoneCore/VPhoneCreateCheckpoint.swift
+index 28874b73..b9e1e569 100644
+--- a/sources/VPhoneCore/VPhoneCreateCheckpoint.swift
++++ b/sources/VPhoneCore/VPhoneCreateCheckpoint.swift
+@@ -60,6 +60,11 @@ public enum VPhoneCreateOverallStatus: String, Codable, Sendable {
+ 
+ // MARK: - Options
+ 
++public enum VPhonePrepareBackend: String, Codable, Sendable {
++    case script
++    case native
++}
++
+ public enum VPhoneRestoreBackend: String, Codable, Sendable {
+     case python
+     case native
+@@ -106,11 +111,13 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
+     // their normalized options digest remains unchanged.
+     public var restoreBackend: VPhoneRestoreBackend?
+     public var effectiveRestoreBackend: VPhoneRestoreBackend { restoreBackend ?? .python }
++    public var prepareBackend: VPhonePrepareBackend?
++    public var effectivePrepareBackend: VPhonePrepareBackend { prepareBackend ?? .script }
+ 
+     public init(
+         variant: String, iphoneSource: String?, cloudosSource: String?, spoofBuild: String?,
+         forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64,
+-        restoreBackend: VPhoneRestoreBackend = .python
++        restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script
+     ) {
+         self.variant = variant
+         self.iphoneSource = iphoneSource.map(VPhoneCreateSourceRecord.init)
+@@ -122,6 +129,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
+         self.memoryMb = memoryMb
+         self.diskSizeGb = diskSizeGb
+         self.restoreBackend = restoreBackend == .python ? nil : restoreBackend
++        self.prepareBackend = prepareBackend == .script ? nil : prepareBackend
+     }
+ 
+     public var digest: String {
+@@ -140,6 +148,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
+         if cpuCount != other.cpuCount { result.append(("cpu_count", .prepare)) }
+         if memoryMb != other.memoryMb { result.append(("memory_mb", .prepare)) }
+         if diskSizeGb != other.diskSizeGb { result.append(("disk_size_gb", .prepare)) }
++        if effectivePrepareBackend != other.effectivePrepareBackend { result.append(("prepare_backend", .prepare)) }
+         if effectiveRestoreBackend != other.effectiveRestoreBackend { result.append(("restore_backend", .restore)) }
+         if enableFrida != other.enableFrida { result.append(("enable_frida", .patch)) }
+         if spoofBuild != other.spoofBuild { result.append(("spoof_build", .cfw)) }
+diff --git a/sources/VPhoneCore/VPhoneCreateRunner.swift b/sources/VPhoneCore/VPhoneCreateRunner.swift
+index 646cf043..36683b2b 100644
+--- a/sources/VPhoneCore/VPhoneCreateRunner.swift
++++ b/sources/VPhoneCore/VPhoneCreateRunner.swift
+@@ -165,11 +165,13 @@ public struct VPhoneCreateRunner {
+         public var enableFrida: Bool?
+         public var diskSizeGb: UInt64?
+         public var restoreBackend: VPhoneRestoreBackend?
++        public var prepareBackend: VPhonePrepareBackend?
+ 
+         public init(
+             variant: String? = nil, iphoneSource: String? = nil, cloudosSource: String? = nil,
+             spoofBuild: String? = nil, forceDscMaxSlide: Bool? = nil, enableFrida: Bool? = nil,
+-            diskSizeGb: UInt64? = nil, restoreBackend: VPhoneRestoreBackend? = nil
++            diskSizeGb: UInt64? = nil, restoreBackend: VPhoneRestoreBackend? = nil,
++            prepareBackend: VPhonePrepareBackend? = nil
+         ) {
+             self.variant = variant
+             self.iphoneSource = iphoneSource
+@@ -179,6 +181,7 @@ public struct VPhoneCreateRunner {
+             self.enableFrida = enableFrida
+             self.diskSizeGb = diskSizeGb
+             self.restoreBackend = restoreBackend
++            self.prepareBackend = prepareBackend
+         }
+     }
+ 
+@@ -295,6 +298,7 @@ public struct VPhoneCreateRunner {
+         if let spoof = overrides.spoofBuild { options.spoofBuild = spoof }
+         if let value = overrides.forceDscMaxSlide { options.forceDscMaxSlide = value }
+         if let value = overrides.restoreBackend { options.restoreBackend = value == .python ? nil : value }
++        if let value = overrides.prepareBackend { options.prepareBackend = value == .script ? nil : value }
+         if let value = overrides.enableFrida { options.enableFrida = value }
+         if overrides.iphoneSource == nil, let record = stored.effectiveOptions.iphoneSource, !record.redacted {
+             overrides.iphoneSource = record.display
+diff --git a/sources/vphone-cli/VPhoneCreateLiveStages.swift b/sources/vphone-cli/VPhoneCreateLiveStages.swift
+index bec6ec75..fa0b1475 100644
+--- a/sources/vphone-cli/VPhoneCreateLiveStages.swift
++++ b/sources/vphone-cli/VPhoneCreateLiveStages.swift
+@@ -50,8 +50,10 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
+             try orchestrator.refreshBootROM(bundleURL: bundleURL)
+             try orchestrator.runFWPrepare(
+                 iphoneSource: context.iphoneSource, cloudosSource: context.cloudosSource, isLess: isLess,
+-                keepArtifacts: runtime.keepArtifacts, bundleURL: bundleURL, verbosity: v)
+-            return ["fw_prepare_exit": "0"]
++                keepArtifacts: runtime.keepArtifacts, bundleURL: bundleURL, verbosity: v,
++                backend: options.effectivePrepareBackend,
++                preserveExistingRestore: !context.checkpoint.record(.prepare).history.isEmpty)
++            return ["fw_prepare_exit": "0", "prepare_backend": options.effectivePrepareBackend.rawValue]
+         case .patch:
+             let before = Self.historyEntries(bundleURL)
+             let count = try orchestrator.runFWPatch(
+@@ -116,6 +118,10 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
+         switch stage {
+         case .prepare:
+             guard evidence["fw_prepare_exit"] == "0" else { return .rejected("no fw prepare exit status") }
++            // Historical prepare evidence did not name the script backend.
++            guard (evidence["prepare_backend"] ?? "script") == context.options.effectivePrepareBackend.rawValue else {
++                return .rejected("prepare evidence backend does not match checkpoint options")
++            }
+             if treeRemoved { return .verified(artifacts: [], evidence: ["restore_tree": "removed by cleanup"]) }
+             guard let tree = Self.restoreTree(bundleURL) else {
+                 return .rejected("expected exactly one iPhone*_Restore directory in the bundle")
+diff --git a/sources/vphone-cli/VPhoneCreateOrchestrator.swift b/sources/vphone-cli/VPhoneCreateOrchestrator.swift
+index 21091aa6..bcd9c959 100644
+--- a/sources/vphone-cli/VPhoneCreateOrchestrator.swift
++++ b/sources/vphone-cli/VPhoneCreateOrchestrator.swift
+@@ -134,6 +134,7 @@ public struct VPhoneCreateOrchestrator {
+         public var verbosity: VPhoneVerbosity
+         public var keepArtifacts: Bool
+         public var restoreBackend: VPhoneRestoreBackend
++        public var prepareBackend: VPhonePrepareBackend
+ 
+         public init(
+             name: String,
+@@ -150,7 +151,8 @@ public struct VPhoneCreateOrchestrator {
+             memoryMB: UInt64 = 8192,
+             diskSizeGB: UInt64 = 64,
+             verbosity: VPhoneVerbosity = .quiet,
+-            keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python
++            keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python,
++            prepareBackend: VPhonePrepareBackend = .script
+         ) {
+             self.name = name
+             self.variant = variant
+@@ -168,6 +170,7 @@ public struct VPhoneCreateOrchestrator {
+             self.verbosity = verbosity
+             self.keepArtifacts = keepArtifacts
+             self.restoreBackend = restoreBackend
++            self.prepareBackend = prepareBackend
+         }
+     }
+ 
+@@ -186,6 +189,13 @@ public struct VPhoneCreateOrchestrator {
+     /// Fresh create: refuses an existing name, creates the bundle, then runs
+     /// every stage through the checkpointed runner.
+     public func run(_ options: Options) throws {
++        var options = options
++        if options.prepareBackend == .native {
++            let sources = try VPhoneNativeFirmwarePreparer.localSources(
++                iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource, isLess: options.variant == "less")
++            options.iphoneSource = sources.iphone.path
++            options.cloudosSource = sources.cloudos.path
++        }
+         // Fail fast on a nested-VM host — PV=3 guest boot can't nest, and the whole
+         // create pipeline (download + patch + restore) is wasted otherwise. Mirrors
+         // the boot_host_preflight gate that `make boot` applied.
+@@ -224,7 +234,7 @@ public struct VPhoneCreateOrchestrator {
+             variant: options.variant, iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource,
+             spoofBuild: options.spoofBuild, forceDscMaxSlide: options.forceDSCMaxSlide,
+             enableFrida: options.enableFrida, cpuCount: options.cpuCount, memoryMb: options.memoryMB,
+-            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend)
++            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend, prepareBackend: options.prepareBackend)
+         let runtime = VPhoneCreateRuntime(
+             sudoEnvExtras: sudo.envExtras, rootPopup: options.rootPopup, interactive: options.interactive,
+             verbosity: options.verbosity, keepArtifacts: options.keepArtifacts)
+@@ -293,6 +303,16 @@ public struct VPhoneCreateOrchestrator {
+         // reloads and validates the checkpoint under its locks.
+         let stored = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint
+         let variant = options.overrides.variant ?? stored.effectiveOptions.variant
++        var overrides = options.overrides
++        let prepareBackend = overrides.prepareBackend ?? stored.effectiveOptions.effectivePrepareBackend
++        if prepareBackend == .native, (options.restartFrom ?? stored.nextStage) == .prepare {
++            let sources = try VPhoneNativeFirmwarePreparer.localSources(
++                iphoneSource: overrides.iphoneSource ?? stored.effectiveOptions.iphoneSource?.display,
++                cloudosSource: overrides.cloudosSource ?? stored.effectiveOptions.cloudosSource?.display,
++                isLess: variant == "less")
++            overrides.iphoneSource = sources.iphone.path
++            overrides.cloudosSource = sources.cloudos.path
++        }
+         let cfwPending = !stored.record(.cfw).status.isDone || options.restartFrom.map { $0 <= .cfw } == true
+         let sudo = try SudoSession(
+             needed: variant != "less" && cfwPending, password: options.sudoPassword, rootPopup: options.rootPopup,
+@@ -307,7 +327,7 @@ public struct VPhoneCreateOrchestrator {
+             checkpoint = try makeRunner(runtime).resume(
+                 bundleURL: bundleURL,
+                 request: .init(
+-                    overrides: options.overrides, restartFrom: options.restartFrom,
++                    overrides: overrides, restartFrom: options.restartFrom,
+                     acceptToolChange: options.acceptToolChange))
+         } catch {
+             Self.printRecoveryHint(name: options.name, bundleURL: bundleURL, error: error)
+@@ -601,8 +621,18 @@ public struct VPhoneCreateOrchestrator {
+ 
+     func runFWPrepare(
+         iphoneSource: String?, cloudosSource: String?, isLess: Bool, keepArtifacts: Bool,
+-        bundleURL: URL, verbosity v: VPhoneVerbosity
++        bundleURL: URL, verbosity v: VPhoneVerbosity,
++        backend: VPhonePrepareBackend = .script, preserveExistingRestore: Bool = false
+     ) throws {
++        if backend == .native {
++            let sources = try VPhoneNativeFirmwarePreparer.localSources(
++                iphoneSource: iphoneSource, cloudosSource: cloudosSource, isLess: isLess)
++            let tree = try VPhoneNativeFirmwarePreparer.prepare(
++                iPhone: sources.iphone, cloudOS: sources.cloudos, bundle: bundleURL,
++                preserveExistingRestore: preserveExistingRestore)
++            print("[+] Classic restore tree ready: \(tree.path)")
++            return
++        }
+         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
+         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
+ 
+diff --git a/sources/vphone-cli/VPhoneFWCLI.swift b/sources/vphone-cli/VPhoneFWCLI.swift
+index 7f9c38f4..2624e0e0 100644
+--- a/sources/vphone-cli/VPhoneFWCLI.swift
++++ b/sources/vphone-cli/VPhoneFWCLI.swift
+@@ -37,12 +37,17 @@ struct VPhoneFWCatalogCommand: ParsableCommand {
+     }
+ }
+ 
++extension VPhonePrepareBackend: ExpressibleByArgument {}
++
+ // MARK: - prepare
+ 
+ struct VPhoneFWPrepareCommand: ParsableCommand {
+     static let configuration = CommandConfiguration(
+         commandName: "prepare", abstract: "Download + merge IPSWs into a VM bundle")
+ 
++    @Option(help: "Preparation backend: script (default) or native (local IPSWs, classic layout only)")
++    var prepareBackend: VPhonePrepareBackend = .script
++
+     @OptionGroup var lib: VPhoneLibraryOption
+     @Argument(help: "VM name") var name: String?
+     @Option(name: .shortAndLong, help: "iPhone IPSW URL or local path") var iphoneSource: String?
+@@ -61,6 +66,19 @@ struct VPhoneFWPrepareCommand: ParsableCommand {
+         let bundle = try lib.library.bundle(named: name)
+         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
+ 
++        if prepareBackend == .native {
++            guard !list, iphoneVersion == nil, iphoneBuild == nil else {
++                throw ValidationError("Native prepare requires two local IPSW paths; selectors, downloads and less are not supported.")
++            }
++            let sources = try VPhoneNativeFirmwarePreparer.localSources(
++                iphoneSource: iphoneSource, cloudosSource: cloudosSource,
++                isLess: ProcessInfo.processInfo.environment["VARIANT"] == "less")
++            let result = try VPhoneNativeFirmwarePreparer.prepare(
++                iPhone: sources.iphone, cloudOS: sources.cloudos, bundle: bundle.url)
++            print("[+] Classic restore tree ready: \(result.path)")
++            return
++        }
++
+         var env = ProcessInfo.processInfo.environment
+         if let iphoneSource { env["IPHONE_SOURCE"] = iphoneSource }
+         if let cloudosSource { env["CLOUDOS_SOURCE"] = cloudosSource }
+diff --git a/sources/vphone-cli/VPhoneVMCreateCLI.swift b/sources/vphone-cli/VPhoneVMCreateCLI.swift
+index aeb04683..4e08d159 100644
+--- a/sources/vphone-cli/VPhoneVMCreateCLI.swift
++++ b/sources/vphone-cli/VPhoneVMCreateCLI.swift
+@@ -19,6 +19,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
+ 
+     @Option(help: "Restore backend: python (default) or native (experimental); preserved on resume")
+     var restoreBackend: VPhoneRestoreBackend?
++    @Option(help: "Preparation backend: script (default) or native (experimental, two local IPSWs, classic layout); preserved on resume")
++    var prepareBackend: VPhonePrepareBackend?
+     @OptionGroup var lib: VPhoneLibraryOption
+     @Argument(help: "new VM name (with --resume: the existing VM to continue)") var name: String
+     @Flag(help: "Continue an interrupted create of an existing VM from its checkpoint") var resume = false
+@@ -62,14 +64,22 @@ struct VPhoneVMCreateCommand: ParsableCommand {
+                 overrides: .init(
+                     variant: variant, iphoneSource: iphoneSource, cloudosSource: cloudosSource,
+                     spoofBuild: spoofBuild, forceDscMaxSlide: forceDSCMaxSlide ? true : nil,
+-                    enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend),
++                    enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend,
++                    prepareBackend: prepareBackend),
+                 restartFrom: restartFrom, acceptToolChange: acceptToolChange,
+                 sudoPassword: sudoPassword, rootPopup: rootPopup, interactive: interactive,
+                 verbosity: VPhoneVerbosity(count: verboseCount), keepArtifacts: keepArtifacts))
+             return
+         }
+         // Prompt for any firmware component not supplied on the command line.
+-        let sources = try VPhoneFirmwareSelection.resolve(iphone: iphoneSource, cloudos: cloudosSource)
++        let sources: VPhoneFirmwareSources
++        if prepareBackend == .native {
++            let local = try VPhoneNativeFirmwarePreparer.localSources(
++                iphoneSource: iphoneSource, cloudosSource: cloudosSource, isLess: variant == "less")
++            sources = .init(iphoneSource: local.iphone.path, cloudosSource: local.cloudos.path)
++        } else {
++            sources = try VPhoneFirmwareSelection.resolve(iphone: iphoneSource, cloudos: cloudosSource)
++        }
+         try orchestrator.run(.init(
+             name: name, variant: variant ?? "regular",
+             iphoneSource: sources.iphoneSource, cloudosSource: sources.cloudosSource,
+@@ -77,7 +87,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
+             enableFrida: frida, rootPopup: rootPopup,
+             interactive: interactive, diskSizeGB: diskSize ?? 64,
+             verbosity: VPhoneVerbosity(count: verboseCount),
+-            keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python))
++            keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python,
++            prepareBackend: prepareBackend ?? .script))
+     }
+ }
+ 
+@@ -157,6 +168,7 @@ struct VPhoneCreateStatusReport: Encodable {
+                 lines.append("overall:  \(checkpoint.overallStatus.rawValue)")
+             }
+             lines.append("variant:  \(checkpoint.effectiveOptions.variant)")
++            lines.append("prepare backend: \(checkpoint.effectiveOptions.effectivePrepareBackend.rawValue)")
+             lines.append("creation: \(checkpoint.creationId)  attempt: \(checkpoint.attemptId)  attempts: \(checkpoint.attempts.count)")
+             for record in checkpoint.stages {
+                 var line = "  \(record.stage.rawValue.padding(toLength: 13, withPad: " ", startingAt: 0)) \(record.status.rawValue)"
+diff --git a/tests/VPhoneCLITests/CreateLiveStagesTests.swift b/tests/VPhoneCLITests/CreateLiveStagesTests.swift
+index f596c3b5..a3ac0293 100644
+--- a/tests/VPhoneCLITests/CreateLiveStagesTests.swift
++++ b/tests/VPhoneCLITests/CreateLiveStagesTests.swift
+@@ -18,10 +18,10 @@ private struct Workspace {
+ 
+     func cleanup() { try? FileManager.default.removeItem(at: bundle.deletingLastPathComponent()) }
+ 
+-    func context(variant: String = "jb") -> VPhoneCreateStageContext {
++    func context(variant: String = "jb", prepareBackend: VPhonePrepareBackend = .script) -> VPhoneCreateStageContext {
+         let options = VPhoneCreateEffectiveOptions(
+             variant: variant, iphoneSource: nil, cloudosSource: nil, spoofBuild: nil, forceDscMaxSlide: false,
+-            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64)
++            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, prepareBackend: prepareBackend)
+         let checkpoint = VPhoneCreateCheckpoint(
+             identity: .init(name: "vm", path: bundle.path, directoryId: "1:2"), options: options,
+             tool: .init(executableSha256: nil, stageContractVersion: 1), now: Date())
+@@ -183,6 +183,24 @@ struct CreateLiveStagesTests {
+         #expect(stages.artifactsRewrittenOnRerun(.cfw).contains("disk_image"))
+     }
+ 
++    @Test func prepareEvidenceMustMatchBackend() throws {
++        let w = try Workspace(); defer { w.cleanup() }
++        let stages = w.stages()
++        let native = w.context(prepareBackend: .native)
++        #expect(isRejected(stages.verify(.prepare, context: native, evidence: ["fw_prepare_exit": "0"])))
++        #expect(isRejected(stages.verify(.prepare, context: native,
++            evidence: ["fw_prepare_exit": "0", "prepare_backend": "script"])))
++        try Data("rom".utf8).write(to: w.bundle.appendingPathComponent("AVPBooter.vresearch1.bin"))
++        for name in ["BuildManifest.plist", "iPhone-BuildManifest.plist"] {
++            try w.writePlist(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"],
++                "iPhone17,3_26.1_23B85_Restore/\(name)")
++        }
++        #expect(isVerified(stages.verify(.prepare, context: native,
++            evidence: ["fw_prepare_exit": "0", "prepare_backend": "native"])))
++        #expect(isRejected(stages.verify(.prepare, context: w.context(),
++            evidence: ["fw_prepare_exit": "0", "prepare_backend": "native"])))
++    }
++
+     // MARK: Status view
+ 
+     @Test func statusReportIsReadOnlyAndShowsStagesAndLiveFacts() throws {
+diff --git a/tests/VPhoneCoreTests/CreateCheckpointTests.swift b/tests/VPhoneCoreTests/CreateCheckpointTests.swift
+index c0fa1fd8..abc66f0f 100644
+--- a/tests/VPhoneCoreTests/CreateCheckpointTests.swift
++++ b/tests/VPhoneCoreTests/CreateCheckpointTests.swift
+@@ -814,6 +814,63 @@ private let allStages = VPhoneCreateStage.allCases
+         #expect(kept.effectiveOptions.effectiveRestoreBackend == .native)
+     }
+ 
++    @Test func prepareBackendChangeRequiresRestartAndResumeKeepsNative() throws {
++        let f = try Fixture(); defer { f.cleanup() }
++        f.fake.setFault(.patch, .beforeExecution)
++        #expect(throws: VPhoneCreateRunError.self) { try f.create(f.runner()) }
++        let before = f.checkpointBytes()
++        f.fake.resetCalls()
++        #expect {
++            try f.runner().resume(bundleURL: f.bundle, request: .init(overrides: .init(prepareBackend: .native)))
++        } throws: { error in
++            guard case let VPhoneCreateRunError.optionsChanged(lines) = error else { return false }
++            return lines.contains { $0.contains("prepare_backend") }
++        }
++        #expect(f.fake.executed.isEmpty)
++        #expect(f.checkpointBytes() == before)
++        f.fake.setFault(.patch, .beforeExecution)
++        #expect(throws: VPhoneCreateRunError.self) {
++            try f.runner(keepArtifacts: true).resume(bundleURL: f.bundle, request: .init(
++                overrides: .init(prepareBackend: .native), restartFrom: .prepare))
++        }
++        let native = try f.load()
++        #expect(native.effectiveOptions.effectivePrepareBackend == .native)
++        #expect(native.record(.prepare).history.count == 1)
++        #expect(native.artifact("restore_tree")?.availability == .available)
++        f.fake.resetCalls()
++        let resumed = try f.runner(keepArtifacts: true).resume(bundleURL: f.bundle)
++        #expect(resumed.effectiveOptions.effectivePrepareBackend == .native)
++        #expect(f.fake.executed.first == .patch)
++        #expect(resumed.artifact("restore_tree")?.availability == .available)
++        let defaulted = try f.runner().resume(bundleURL: f.bundle, request: .init(
++            overrides: .init(prepareBackend: .script), restartFrom: .prepare))
++        #expect(defaulted.effectiveOptions.prepareBackend == nil)
++        #expect(defaulted.effectiveOptions.effectivePrepareBackend == .script)
++        #expect(defaulted.artifact("restore_tree")?.availability == .removed)
++    }
++
++    @Test func nativePrepareFailureCanResume() throws {
++        for fault in [FakeStages.Fault.beforeExecution, .afterExecution, .cancel, .verifierRejects] {
++            let f = try Fixture(); defer { f.cleanup() }
++            var options = Fixture.options()
++            options.prepareBackend = .native
++            f.fake.setFault(.prepare, fault)
++            #expect(throws: VPhoneCreateRunError.self) {
++                try f.runner().create(bundleURL: f.bundle, options: options,
++                    iphoneSource: "/ipsw/iPhone.ipsw", cloudosSource: "/ipsw/cloudOS.ipsw")
++            }
++            let failed = try f.load()
++            #expect(failed.nextStage == .prepare)
++            #expect(failed.record(.prepare).status == (fault == .cancel ? .cancelled : .failed))
++            f.fake.resetCalls()
++            let resumed = try f.runner().resume(bundleURL: f.bundle)
++            #expect(resumed.effectiveOptions.effectivePrepareBackend == .native)
++            #expect(resumed.record(.prepare).history.count == 1)
++            #expect(f.fake.executed.first == .prepare)
++            #expect(resumed.artifact("restore_tree")?.availability == .removed)
++        }
++    }
++
+     @Test func variantChangeBeforePatchRecomputesApplicability() throws {
+         let f = try Fixture(); defer { f.cleanup() }
+         f.fake.setFault(.patch, .beforeExecution)

@@ -1,0 +1,236 @@
+Building for debugging...
+[0/13] Write sources
+[2/13] Write swift-version--1BA0962812E73E12.txt
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[4/15] Emitting module VPhoneCore
+/mnt/data/vphone_batch1/isolated/Sources/VPhoneCore/VPhoneCloneCopy.swift:67:14: error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldMoveItemAt:to:)')
+65 |             })
+66 |         }
+67 |         func fileManager(_ fileManager: FileManager, shouldCopyItemAt srcURL: URL,
+   |              `- error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldMoveItemAt:to:)')
+68 |                          to dstURL: URL) -> Bool {
+69 |             !excludedPaths.contains(srcURL.standardizedFileURL.path)
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: requirement 'fileManager(_:shouldMoveItemAt:to:)' declared here
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldMoveItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: requirement 'fileManager(_:shouldMoveItemAt:to:)' declared here
+3 | 
+
+/mnt/data/vphone_batch1/isolated/Sources/VPhoneCore/VPhoneCloneCopy.swift:67:14: error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldLinkItemAt:to:)')
+65 |             })
+66 |         }
+67 |         func fileManager(_ fileManager: FileManager, shouldCopyItemAt srcURL: URL,
+   |              `- error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldLinkItemAt:to:)')
+68 |                          to dstURL: URL) -> Bool {
+69 |             !excludedPaths.contains(srcURL.standardizedFileURL.path)
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: requirement 'fileManager(_:shouldLinkItemAt:to:)' declared here
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldLinkItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: requirement 'fileManager(_:shouldLinkItemAt:to:)' declared here
+3 | 
+
+/mnt/data/vphone_batch1/isolated/Sources/VPhoneCore/VPhoneCloneCopy.swift:60:25: error: type 'VPhoneCloneCopy.RootItemFilter' does not conform to protocol 'FileManagerDelegate'
+58 |     }
+59 | 
+60 |     private final class RootItemFilter: NSObject, FileManagerDelegate {
+   |                         |- error: type 'VPhoneCloneCopy.RootItemFilter' does not conform to protocol 'FileManagerDelegate'
+   |                         `- note: add stubs for conformance
+61 |         let excludedPaths: Set<String>
+62 |         init(source: URL, excluded: Set<String>) {
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldCopyItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldCopyItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldCopyItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, copyingItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldMoveItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldMoveItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldMoveItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, movingItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldLinkItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldLinkItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldLinkItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, linkingItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldRemoveItemAtPath:)' with type '(FileManager, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldRemoveItemAtPath path: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldRemoveItemAtPath:)' with type '(FileManager, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAtPath:)' with type '(FileManager, any Error, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, removingItemAtPath path: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAtPath:)' with type '(FileManager, any Error, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, copyingItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, movingItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, linkingItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldRemoveItemAt:)' with type '(FileManager, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldRemoveItemAt URL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldRemoveItemAt:)' with type '(FileManager, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAt:)' with type '(FileManager, any Error, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, removingItemAt URL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAt:)' with type '(FileManager, any Error, URL) -> Bool'
+3 | 
+[5/15] Compiling VPhoneCore VPhoneCloneCopy.swift
+/mnt/data/vphone_batch1/isolated/Sources/VPhoneCore/VPhoneCloneCopy.swift:67:14: error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldMoveItemAt:to:)')
+65 |             })
+66 |         }
+67 |         func fileManager(_ fileManager: FileManager, shouldCopyItemAt srcURL: URL,
+   |              `- error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldMoveItemAt:to:)')
+68 |                          to dstURL: URL) -> Bool {
+69 |             !excludedPaths.contains(srcURL.standardizedFileURL.path)
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: requirement 'fileManager(_:shouldMoveItemAt:to:)' declared here
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldMoveItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: requirement 'fileManager(_:shouldMoveItemAt:to:)' declared here
+3 | 
+
+/mnt/data/vphone_batch1/isolated/Sources/VPhoneCore/VPhoneCloneCopy.swift:67:14: error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldLinkItemAt:to:)')
+65 |             })
+66 |         }
+67 |         func fileManager(_ fileManager: FileManager, shouldCopyItemAt srcURL: URL,
+   |              `- error: instance method 'fileManager(_:shouldCopyItemAt:to:)' has different argument labels from those required by protocol 'FileManagerDelegate' ('fileManager(_:shouldLinkItemAt:to:)')
+68 |                          to dstURL: URL) -> Bool {
+69 |             !excludedPaths.contains(srcURL.standardizedFileURL.path)
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: requirement 'fileManager(_:shouldLinkItemAt:to:)' declared here
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldLinkItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: requirement 'fileManager(_:shouldLinkItemAt:to:)' declared here
+3 | 
+
+/mnt/data/vphone_batch1/isolated/Sources/VPhoneCore/VPhoneCloneCopy.swift:60:25: error: type 'VPhoneCloneCopy.RootItemFilter' does not conform to protocol 'FileManagerDelegate'
+58 |     }
+59 | 
+60 |     private final class RootItemFilter: NSObject, FileManagerDelegate {
+   |                         |- error: type 'VPhoneCloneCopy.RootItemFilter' does not conform to protocol 'FileManagerDelegate'
+   |                         `- note: add stubs for conformance
+61 |         let excludedPaths: Set<String>
+62 |         init(source: URL, excluded: Set<String>) {
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldCopyItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldCopyItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldCopyItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, copyingItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldMoveItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldMoveItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldMoveItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, movingItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldLinkItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldLinkItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldLinkItemAtPath:toPath:)' with type '(FileManager, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, linkingItemAtPath srcPath: String, toPath dstPath: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAtPath:toPath:)' with type '(FileManager, any Error, String, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldRemoveItemAtPath:)' with type '(FileManager, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldRemoveItemAtPath path: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldRemoveItemAtPath:)' with type '(FileManager, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAtPath:)' with type '(FileManager, any Error, String) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, removingItemAtPath path: String) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAtPath:)' with type '(FileManager, any Error, String) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, copyingItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:copyingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, movingItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:movingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, linkingItemAt srcURL: URL, to dstURL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:linkingItemAt:to:)' with type '(FileManager, any Error, URL, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldRemoveItemAt:)' with type '(FileManager, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldRemoveItemAt URL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldRemoveItemAt:)' with type '(FileManager, URL) -> Bool'
+3 | 
+
+FoundationEssentials.FileManagerDelegate.fileManager:2:6: note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAt:)' with type '(FileManager, any Error, URL) -> Bool'
+1 | protocol FileManagerDelegate {
+2 | func fileManager(_ fileManager: FileManager, shouldProceedAfterError error: any Error, removingItemAt URL: URL) -> Bool}
+  |      `- note: protocol requires function 'fileManager(_:shouldProceedAfterError:removingItemAt:)' with type '(FileManager, any Error, URL) -> Bool'
+3 | 
+[6/16] Compiling VPhoneCore VPhoneNVRAMStorage.swift
+error: fatalError

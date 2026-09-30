@@ -244,7 +244,26 @@ vphone-cli vm import /path/to/export.tzst --name sample-copy --archive-backend n
 vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw --json
 ```
 
-Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. Firmware preparation and CFW installation retain their current backends.
+Native export refuses existing output files. Both import backends validate the manifest paths and links before publishing under the library lock. `fw inspect` only reads local BuildManifest data and optionally checks the iPhone/cloudOS pairing; it does not extract, restore, or authenticate firmware. CFW installation retains its current backend.
+
+Classic firmware preparation offers an explicit native backend for two local IPSWs:
+
+```bash
+vphone-cli fw prepare sample --prepare-backend native --iphone-source /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw
+vphone-cli vm create sample --prepare-backend native --iphone-source /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw
+vphone-cli vm create --resume sample
+```
+
+Script preparation remains the default. Checkpoints preserve the preparation backend;
+historical checkpoints use script. Changing it after prepare requires
+`--restart-from prepare`. Native prepare does not support downloads, less or v2/GPU
+setup. Standalone `fw prepare` refuses existing Restore paths. A checkpointed native
+prepare rerun preserves one existing ordinary Restore directory in a hidden
+`.firmware-prepare-backup-*` directory before publishing its replacement; these
+backups remain for explicit operator cleanup. The current Restore tree follows the
+existing stage retention and `--keep-artifacts` rules. Preparation backend selection
+does not change the restore backend. End-to-end VM acceptance for native preparation
+remains pending.
 
 The create pipeline also offers an explicit experimental native restore backend:
 
@@ -254,7 +273,7 @@ vphone-cli vm create --resume sample
 ```
 
 Python remains the default. The backend is recorded in the checkpoint; resume
-keeps the recorded choice. Changing a backend after restore has run requires an
+keeps the recorded choice. Changing the restore backend after restore has run requires an
 explicit `--restart-from restore` and repeats the erase operation. Native probe,
 ticket and restore run as supervised child processes bound to the bundle's
 ECID, UDID and DFU instance. This option does not select the v2 manifest or

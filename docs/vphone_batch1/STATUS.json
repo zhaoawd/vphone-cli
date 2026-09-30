@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-26",
+  "deliverable": "P0 verification tooling and P1c candidate implementation",
+  "status": "candidate_ready_for_mac_integration_not_full_acceptance",
+  "user_worktree_modified": false,
+  "project_commits_created": false,
+  "source_baseline": "bc3bfa83ee8d3397e1caa08ce580e24407de17cd",
+  "upstream_reference": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "source_mode": "public fixed-commit excerpts, not a complete checkout",
+  "candidate_changes": {
+    "existing_files": 4,
+    "new_files": 5,
+    "stages": [
+      "nvram",
+      "clone"
+    ]
+  },
+  "executed": {
+    "isolated_swift_helper_tests": {
+      "status": "passed",
+      "tests": 15,
+      "suites": 2,
+      "log": "logs/isolated-delivery-runner.log"
+    },
+    "apply_safety_tests": {
+      "status": "passed",
+      "tests": 9,
+      "fixture": "synthetic temporary Git repositories",
+      "log": "logs/apply-safety-tests.log"
+    },
+    "verifier_linux_guard": {
+      "status": "passed",
+      "expected_exit_code": 2,
+      "log": "logs/verifier-linux-guard.log"
+    },
+    "integration_syntax": {
+      "status": "parse_only_passed",
+      "typechecked": false,
+      "log": "logs/integration-syntax-only.log"
+    }
+  },
+  "not_run": [
+    "real_worktree_git_apply_check",
+    "original_make_test",
+    "original_make_test_swift",
+    "original_make_build",
+    "six_new_project_integration_tests",
+    "real_apfs_clonefile",
+    "Virtualization_API_typecheck_and_run",
+    "complete_vm_backup",
+    "consecutive_vm_starts",
+    "clone_vm_start",
+    "export_import_vm_start",
+    "full_P0_merge_and_fixture_baseline",
+    "variant_and_camera_ABI_review",
+    "CLI_help_and_localized_docs_review"
+  ],
+  "p0_complete": false,
+  "p1c_complete": false,
+  "preserved_documents": [
+    "research/upstream_comparison.md",
+    "research/upstream_implementation_plan.md"
+  ],
+  "cautions": [
+    "No automatic security changes, VM operation, commit or push.",
+    "Native-success branch tested by simulation, not APFS.",
+    "Clone retains the same device identity.",
+    "Source diagnostic runtime record can change when acquiring the source lock."
+  ]
+}

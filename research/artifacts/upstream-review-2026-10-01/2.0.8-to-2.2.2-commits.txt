@@ -1,0 +1,119 @@
+ee8b70ca8a6a7410f04c5064cdde409d5f6030b8 2026-09-27T00:01:44+09:00 VPhoneSign: drop LC_SOURCE_VERSION when the command area has no room
+915177898354d86a63d67b1a3abeedfa4ed92165 2026-09-27T18:46:48+09:00 Keep Launchpad XPC callbacks off the main actor
+2b8ac4c67d32e4619eb1273cecb3a52cfc79fba4 2026-09-27T18:46:48+09:00 Let New Machine choose where a machine is stored
+cd45b8fab2c1fb6f542953335fdd3889492bdb91 2026-09-27T18:48:44+09:00 Fix iOS 26.3 launchd signature space
+374a2c5687faaa1fcf53aadebb288f7b56f2f925 2026-09-27T18:57:51+09:00 Deliver vcam frames to third-party capture clients
+cd013c246f64503cf64d71f74836e244b8ffd764 2026-09-27T19:08:50+09:00 Split the camera hooks into compilation units and fix their leaks
+a23a76541c6891f7a889d27bb49ea6fdcda843e9 2026-09-28T11:51:25+09:00 Fix Launchpad host policy checks on multi-OS Macs
+dae93457df22c357cd542b2c37abac2f9e7d33b5 2026-09-28T12:35:21+09:00 Move Launchpad setup into sheets and install bundles from GitHub Actions
+6fb0636c72cdef6b3fbe97ffbd8bdedb7444dd7f 2026-09-28T12:59:39+09:00 Forward any vphoned method through vphone.sock
+6615c8bcbcffc1f2842de74320cdc562d2512630 2026-09-28T13:27:28+09:00 Open Launchpad populated, add a menu bar mode, detach VMs
+bf61a9eb3ae2e784cdf098f5ca273979fd5e837b 2026-09-28T15:59:08+09:00 Seed the RootHide bootstrap base from vphoned
+b3888c7241f7885f7ee67835d87a55fa6a75c707 2026-09-28T15:59:08+09:00 Seed RootHide PAM loader link
+5b8e643bd85173a3a9b785f74b30e8f4c310c7e1 2026-09-28T15:59:08+09:00 Record the PAM loader link in the RootHide research notes
+835c4db23d277362815ace7d7890e9293ebf527c 2026-09-28T16:04:09+09:00 Share downloaded IPSWs and recovered GPU drivers across machines (#516)
+e3c0d3f1c9aa05357de5f1d74ecf104dc16ea74b 2026-09-28T16:20:45+09:00 Post Darwin notifications from the Controls panel (#517)
+c2175ec017adbd11b7a0689438863236040dda0d 2026-09-28T16:35:25+09:00 Release 2.0.9
+30c8512c89cd4dbeddda5eaaa4f5f11cf084cb58 2026-09-28T19:58:18+09:00 Declare every patch in a patch set and select it with a preset
+b30637a605ff49f3f7f100fe1707b1316d7c2a8d 2026-09-28T19:59:04+09:00 Take the hv_vmm_present concealment out of the default patch selection
+0cafa79186976e70d5e1f8071fd71610103be17b 2026-09-28T20:32:25+09:00 Serve vphone.sock concurrently and in headless launches
+be7f061ecf6a46b7ffe1bf7b8fbaa32832074c6d 2026-09-28T20:48:05+09:00 Add vphone-launchpad-cli, a command line client of the running Launchpad
+b21910e01b5b081791dcc7f78b26aff8acc52d3e 2026-09-28T21:02:50+09:00 Apply the formatter to the daemon, the VM, the IPSW cache and the host policy
+657755eb99fb928354e8cda9e4b11437b813ed4f 2026-09-28T21:03:05+09:00 chore: swift format 6.2
+30654502d1b2d40f673333d650d723f2077cf8e3 2026-09-28T21:03:09+09:00 Merge branch 'main' of https://github.com/Lakr233/vphone-cli
+7a9b4f7ce1109b2cca6b3bc858ac0b9a58865649 2026-09-28T21:04:09+09:00 Fix AMFI escalator on arm64e.x1 hosts (#518)
+03a0fbc90911d8cde38cf3eb218328c2f5999685 2026-09-28T21:06:38+09:00 Keep a patch log in Launchpad and clear restore files after first boot
+de52426425aef22f19f521363fd0c3eda1711a69 2026-09-28T21:09:44+09:00 List the patch log kind in the Launchpad CLI guide
+bd36b5ee64a5d2c211341cac6ee83cf81a33cd41 2026-09-28T21:11:37+09:00 Release 2.1.0
+4e8d7bd7ced6cb58fc4afe99e2e6e49f317c258e 2026-09-28T21:30:29+09:00 Polish Launchpad: multi-select machines, sheet flow, and New Machine
+73bbf18ba0d6b3ece10ddff0d9026194d3e2908f 2026-09-28T21:45:04+09:00 Batch actions, export progress and cancel in Launchpad
+dc4b5340e37b40cc28bbc46fdb843abbc0958ad1 2026-09-28T21:52:33+09:00 Prefilter the two whole-text kernel scans before Capstone
+2e2ed0a890759c457407b2f2990941bb918b125d 2026-09-28T22:00:11+09:00 Restart the vphoned worker every second and log why it exits
+235272673a811814606f7e2067c77b4f83a78261 2026-09-28T22:12:15+09:00 Keep only the camera from EXP and drop the location app hook
+1df6c43cbc81cbb156e4a533e2f836f62d8e4e4d 2026-09-28T22:14:30+09:00 Let the host close vphoned connections so replies are not truncated
+7405d6aaf1159c8ac47f3f4c1559fff4551d3cd6 2026-09-28T22:33:03+09:00 Take icli 0.7.1 so the Services window shows running services
+59903d5bca14ab3153a2000f768bff6b0fc528d3 2026-09-28T23:07:00+09:00 Take icli from 0.7.3 so Setup Assistant counts as the frontmost app
+627497b27fbfff21f321c78a4f6c3aba1921963c 2026-09-28T23:07:00+09:00 Remove the UI Inspector
+addc8c4c3bdf1d2b319f634e3089739f1cb944d9 2026-09-28T23:21:47+09:00 Drop the UI Inspector's strings from the catalog
+9a1018bdd3bc4ac0b0e53685523f1196651ec651 2026-09-29T13:13:49+09:00 Skip holes when scanning Disk.img for the root snapshot
+6a8d2c76696d6f5acf7ee013eb8e2a2ac370e829 2026-09-29T13:13:49+09:00 Size and show VM disks in decimal GB
+cb924c91df81ebbc0de066de99baf4fda6fc8d36 2026-09-29T13:19:43+09:00 Stream IPSW downloads into the cache chunk by chunk
+3e80d0361ba1ebbd808a374558d1fc259de7f694 2026-09-29T13:19:43+09:00 Use decimal disk sizes in the Launchpad preview machines
+da8bed71e1b3a38b8d8a6ac6d39d745dcd7192dd 2026-09-29T13:34:25+09:00 Search and sort the Launchpad machine list
+c3f7910c92f189998d13edc361fd053dc2fdceec 2026-09-29T14:58:00+09:00 Search and sort Launchpad machines, and tidy the patch sheet
+85a4da0d09c269e1b6cb5d5ea3feb2f86d5cd320 2026-09-29T16:30:30+09:00 Release 2.1.1
+30082845ae35fd0d233be95c5b9c9aea37818ae4 2026-09-29T20:26:03+09:00 Split vphone-escalator into files by concern
+0f9a949bd6cd7cbe0777b5e31882c81f63851bb2 2026-09-29T20:26:03+09:00 Fix RootHide /dev, sshd and sudo loader links (#519, #520)
+50e7033d4acaa5d1faaf62cb66141f79e90d1359 2026-09-29T20:27:21+09:00 Release 2.1.2
+905196e7ed9f70c62b60d1e004bbe8372afeb7f0 2026-09-29T21:56:02+09:00 Title the VM window with the VM name and keep Home visible
+94d3d51438abbf8f90e5e3eadd37ea74f41040ad 2026-09-29T21:59:36+09:00 Fix the Home titlebar button's size and slashed icon
+9d3551cfa25e8cb4c49e19847395e50d7a9c0a07 2026-09-29T22:43:59+09:00 Load the bootstrap's LaunchDaemons from vphoned, as RootHide does
+fa8913499c8a116217544d20865938261b19ed5e 2026-09-29T22:43:59+09:00 Require icli 0.7.4 so an unloaded daemon frees its port
+2b253b6eeb474588fc100b674553c26b2e23d44b 2026-09-29T22:43:59+09:00 Show the iOS version and guest address as the window subtitle
+e8f1556bdb9ef7c94098f53d2b54f4d294275a5c 2026-09-29T22:51:11+09:00 Space the window title from the buttons as the buttons are from the edge
+6e1b0cfe411c76643e40237f14e7e8e8fb8983fc 2026-09-29T23:13:35+09:00 Save files dropped on the window to the Files app
+f78a4cabe512edf63fd6d5d2b9d393afaccd86c9 2026-09-29T23:13:35+09:00 Space the title bar in one 12 pt step
+849c4b3c6a23eac1ab3cab33b7bbc949f4fa6300 2026-09-29T23:13:58+09:00 Release 2.1.3
+4be9972aac3494aa176ccffcf5833d710098a842 2026-09-29T23:17:54+09:00 Group the menu bar by what each item acts on
+18964659b818ec8ab365cc49c54e7f7451ea64a5 2026-09-29T23:21:59+09:00 Format Launchpad sources
+8682c98aaaa773f48a2908453ce1a6d93f4d66fb 2026-09-29T23:22:00+09:00 Sync the clipboard on ⌘C, ⌘X and ⌘V, and touch the drawn display
+090df081950d42d971e41a58a9f5e148f825ecbf 2026-09-29T23:35:59+09:00 Reword user-facing errors, app info and Launchpad copy in plain written English
+bc6d007d8b24e6d1f24342d43aa31c447f2d0cbc 2026-09-29T23:39:22+09:00 Turn the window with the guest's interface orientation
+f761a32480d3d3491b8934a9f81a0efd612b2891 2026-09-29T23:43:25+09:00 Release 2.1.4
+a16ea3b973b35309b79517ec976f9eacfb3dad89 2026-09-29T23:49:53+09:00 Animate the turn: the panel and the window move together
+32ce659fa940fb2d9b01873f1d6ce90732f9d855 2026-09-29T23:51:35+09:00 Release 2.1.5
+ab6e5cbee57ed7c01391de8327289386a4463881 2026-09-30T01:29:32+09:00 Rewrite README in all four languages
+107cbd0e644858898d7bf58fa95c743b5dd56dc3 2026-09-30T11:11:44+09:00 Fix macOS 27 CFW disk selection and debugserver seatbelt (#526)
+a0e04c8b1918575bcbecec89c5642e84f929c234 2026-09-30T12:18:44+09:00 Let a free-certificate app launch on a hacktivated guest
+64aa5f6b3e5a3ddeef8e0d8fcc4061fa73a8a4c8 2026-09-30T12:19:31+09:00 Merge branch 'main' of https://github.com/Lakr233/vphone-cli
+8dc821db263745789f3b6f336668d26209d194d8 2026-09-30T12:30:40+09:00 Release 2.1.6
+7f746eedfe79a3e7ec7603cde79f3b803e990489 2026-09-30T13:45:01+09:00 Read and write UTF-8 archive names in the C locale
+16e270459abda3aa5ff5a50de608ff2b11a2b5ba 2026-09-30T13:45:46+09:00 Require icli 0.7.5 so the guest installs IPAs with UTF-8 names
+e8b16dee1d0ae891baf03150f1ea892a0bfda7b7 2026-09-30T13:46:49+09:00 Release 2.1.7
+5922ef11810b05673f15d633b5456ec10ec111be 2026-09-30T15:12:48+09:00 Replay trackpad gestures and Esc as guest touches (#533)
+6d4ca34e76a997ac062f5af2c27bf061857a88ea 2026-09-30T15:15:30+09:00 Take touch2's normalized flag seriously, share the unclamped mapping
+d930e502fa9fce1ef0107d417889a318fcb16c35 2026-09-30T15:20:20+09:00 Remove --force-dsc-maxslide from every command and from Launchpad
+8d7d914f52a3abd2791b3255f5e671aa0f03782f 2026-09-30T15:20:20+09:00 Let Xcode install an app the guest did not get from Apple
+ae5e4531a51fbac2b3cbca14f3e54bce6534e22e 2026-09-30T15:20:20+09:00 Name every patch {component}-{effect}-{name}
+8c5a6c7eb1ff808b0f0f9c154c3c2ba57315ca24 2026-09-30T15:21:54+09:00 chore: swift format
+5b0a194de465420c2c6a5ac597216d8fef0e67ac 2026-09-30T15:25:20+09:00 Record the two MISFix patches in the patch comparison
+b323fc4ec761d995a9af881be10041edbcde978f 2026-09-30T15:55:39+09:00 Call it custom firmware, not jb, everywhere the project owns the name
+f3cac9db17250fca1c3a84e30a0869381f19260e 2026-09-30T16:17:23+09:00 Say when a CFW install did not finish, and give Core Bundle installs their own sheet
+1727e16dac4a8e8720808ff4776ccfa9367aa973 2026-09-30T16:18:21+09:00 chore: xcode updates
+2aaafaf2ad64dc5835bdcb2a9688e3ff201d04e6 2026-09-30T16:22:16+09:00 Set the UDID misagent sees from the VM's Device menu
+5f729179df5485690b9f45698f0c3a51326a74b5 2026-09-30T17:41:48+09:00 Spell the patch comparison's identifiers the new way
+5b0b16d6bae6e7f7dd3476f0860d9c0a82f23f37 2026-09-30T17:46:43+09:00 Refuse a VM's state without printing boot's usage
+a3d2382e2ecab8789c25c289e3a499003ef6b154 2026-09-30T17:58:06+09:00 Re-patch the firmware originals, so fw patch can be run again
+fe3cf50c6b782c838acded31f9eb6cb7f080db98 2026-09-30T18:08:04+09:00 Stop editing the shared cache to accept an online-authorized profile
+2c122958587bbd4b190df3645919b4d2b700cbdf 2026-09-30T18:10:20+09:00 Recommend one bootstrap pass for the first package install
+ad9ee8ecab26e76698d6115a61fc12909f4d7073 2026-09-30T18:15:14+09:00 Focus the machine table when it appears (#535)
+61f76f0b4af3ab964ee86b22f8b05edf3b4362f7 2026-09-30T18:26:16+09:00 Read the MIS failure code where 24A435 derives it, and gate the patch to 18/26
+922e78f895263a53e31ff8bfcbfb218b46afc39f 2026-09-30T18:28:11+09:00 Fall through to the next libmisfix config when one cannot be read
+3cd176ea1834c887e0d47912c4805627d8b17a2b 2026-09-30T18:41:05+09:00 Restart installd too when the profile UDID changes
+1b3189077556cfe5b456b7bf7e366c72b6a4a567 2026-09-30T18:41:07+09:00 Take icli 0.7.6 so IPAs zipped on a Mac install
+b7a7498a14ababd78e544e939a1f7bed1881396b 2026-09-30T18:41:23+09:00 Let libmisfix say which MobileGestalt queries it actually sees
+d44a0e9423f7fc8a8ec1779e25af69112abbe17d 2026-09-30T18:52:21+09:00 Insert libmisfix from SystemHook, chosen by the spawned process's path
+c9057eebe437014505df9ae020811310ca8a76b0 2026-09-30T18:52:40+09:00 Give libmisfix a positive control, not just a query log
+ce7b42d21f6ed642da64fc58aa5e599d155ac599 2026-09-30T18:52:40+09:00 Restart the MIS daemons when an environment update replaces their hook
+37745690a8963030b6feaaa0fa234cb02d7e235b 2026-09-30T18:54:58+09:00 Let Launchpad update a stopped machine's guest environment
+2debf877dcc95998fa30f22b8511d0f9679d92fa 2026-09-30T18:57:27+09:00 Add cfw update-environment, for a VM whose restore tree is gone
+9abcc600db08e76bf808a99e4149e8da00f8ab98 2026-09-30T19:13:45+09:00 Name the caller in every libmisfix diagnostic line
+c68e2c8428a28de21fdd8453cecc4da0ed136f4f 2026-09-30T19:35:03+09:00 Correct what libmisfix claims, and probe whether a detour is possible
+4da0847af52bfdd06f2a50f283a5756734b0e739 2026-09-30T19:36:11+09:00 Let the VM window skip Setup Assistant on an activated guest
+ff45654955343f368dd173936a51d1fa7e0fca0f 2026-09-30T19:39:14+09:00 Have the probe answer both halves of what a detour needs
+0ba2b55d3bdb46cb052b3dc48b3e7da1d7ab1fd9 2026-09-30T19:40:25+09:00 Let the probe run in installd and nowhere else
+c53733b9c54ef1c9b9c284d0a3da7ba09a540f08 2026-09-30T19:46:04+09:00 Record that an interpose does not cross the shared cache
+b54aa01843f94e5a48e748c850f41b3652d703e0 2026-09-30T19:59:26+09:00 Never hold write and execute at once, and add the detour
+d0269bc9b67d0495e188129f4e0a5238a3943a5a 2026-09-30T20:05:04+09:00 Expect the restore errors the code actually reports
+b40c8e5b0e18c7bfdc1851641c6c823b052cc168 2026-09-30T20:12:13+09:00 Let the keychain browser read, edit and delete an item
+5f2c03052733c966159113a3595c649adb2eff1c 2026-09-30T20:12:22+09:00 Give both screenshot items a key equivalent
+ca6c09932bf238377a226bdf73883c3ac4dd7ea1 2026-09-30T21:17:52+09:00 Let Xcode install a real IPA on a guest no profile names
+2b42bf2bae494e82816c00547ed8333565693c43 2026-09-30T21:26:42+09:00 Install an ad-hoc signed app by turning on the switch that exists
+3d4e5528bc0a9837328a65083c99db6e4c8b2537 2026-09-30T21:52:34+09:00 Record that devicectl cannot install onto a vphone guest
+7a413718d57304d5fd6ada1e502375543e86de21 2026-09-30T22:18:21+09:00 Let SpringBoard carry libmisfix so a signed app launches on 27.0
+1c19bb41da161b004383519f8c14a0d2f334c33c 2026-09-30T22:46:10+09:00 Give libmisfix one route: the spawn hooks, SpringBoard included
+2bacd69b7cae17000177ef0b56a4b6b792ccac03 2026-09-30T22:48:06+09:00 Release 2.2.1
+1df4088c7444e68c142afdfd6e26416a78d825ac 2026-09-30T23:19:53+09:00 Read the host location through an app so macOS asks for it
+e48e6f4a3b64bd198752b0df5b08d6a9fcc0cb98 2026-09-30T23:19:53+09:00 Take icli 0.7.7 so a Mac fix without altitude reaches the guest
+88120ff04354d854df37b32d08141dff452feb98 2026-09-30T23:36:55+09:00 Tell the host the configured UDID, not only the profile check
+d3403e510fd1126e9d99e7686f39465e5ab586e8 2026-09-30T23:37:30+09:00 Release 2.2.2

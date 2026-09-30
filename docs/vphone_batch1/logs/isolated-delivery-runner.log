@@ -1,0 +1,74 @@
+ISOLATED SUBSET ONLY: not make test, not APFS/Virtualization or VM acceptance.
+Building for debugging...
+[0/13] Write sources
+[2/13] Write swift-version--1BA0962812E73E12.txt
+[4/15] Emitting module VPhoneCore
+[5/15] Compiling VPhoneCore VPhoneCloneCopy.swift
+[6/16] Compiling VPhoneCore VPhoneNVRAMStorage.swift
+[7/17] Wrapping AST for VPhoneCore for debugging
+[9/19] Compiling VPhoneCoreTests CloneCopyTests.swift
+[10/19] Emitting module VPhoneCoreTests
+[11/20] Compiling VPhoneCoreTests NVRAMStorageTests.swift
+[12/21] /tmp/vphone-batch1-isolated-cyy7fu_2/.build/x86_64-unknown-linux-gnu/debug/VPhoneBatch1IsolatedPackageDiscoveredTests.derived/all-discovered-tests.swift
+[13/21] Write sources
+[14/21] Wrapping AST for VPhoneCoreTests for debugging
+[16/23] Emitting module VPhoneBatch1IsolatedPackageDiscoveredTests
+[17/23] Compiling VPhoneBatch1IsolatedPackageDiscoveredTests VPhoneCoreTests.swift
+[18/24] Compiling VPhoneBatch1IsolatedPackageDiscoveredTests all-discovered-tests.swift
+[19/25] /tmp/vphone-batch1-isolated-cyy7fu_2/.build/x86_64-unknown-linux-gnu/debug/VPhoneBatch1IsolatedPackageTests.derived/runner.swift
+[20/25] Write sources
+[21/25] Wrapping AST for VPhoneBatch1IsolatedPackageDiscoveredTests for debugging
+[23/27] Emitting module VPhoneBatch1IsolatedPackageTests
+[24/27] Compiling VPhoneBatch1IsolatedPackageTests runner.swift
+[25/28] Wrapping AST for VPhoneBatch1IsolatedPackageTests for debugging
+[26/28] Write Objects.LinkFileList
+[27/28] Linking VPhoneBatch1IsolatedPackageTests.xctest
+Build complete! (8.60s)
+Test Suite 'All tests' started at 2026-09-26 02:42:00.808
+Test Suite 'debug.xctest' started at 2026-09-26 02:42:00.810
+Test Suite 'debug.xctest' passed at 2026-09-26 02:42:00.810
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' passed at 2026-09-26 02:42:00.810
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+◇ Suite NVRAMStorageTests started.
+◇ Suite CloneCopyTests started.
+◇ Test rejectsNonFileURL() started.
+◇ Test existingDestinationIsNeverRemoved() started.
+◇ Test propagatesCreationFailureWithoutRetry() started.
+◇ Test propagatesNonENOENTInspectionFailure() started.
+◇ Test rejectsBothSymlinkKinds(dangling:) started.
+◇ Test removesOnlyOwnedPartialOutputBeforeFallback() started.
+◇ Test openFailureNeverFallsBackToCreation() started.
+◇ Test forcedNonAPFSFallbackPreservesPersistentState() started.
+◇ Test rejectsDirectoryAndFIFO(fifo:) started.
+◇ Test racingCreatorIsNotOverwritten() started.
+◇ Test EEXISTAfterCheckDoesNotDeleteCompetingOutput() started.
+◇ Test successfulNativeBranchCleansOnlyDestinationRuntime() started.
+◇ Test createsOnlyOnceAcrossRepeatedOpens() started.
+◇ Test omitsRealUnixSocketBeforeFallbackCopy() started.
+◇ Test danglingDestinationSymlinkIsAConflict() started.
+◇ Test case passing 1 argument dangling → false to rejectsBothSymlinkKinds(dangling:) started.
+◇ Test case passing 1 argument dangling → true to rejectsBothSymlinkKinds(dangling:) started.
+◇ Test case passing 1 argument fifo → false to rejectsDirectoryAndFIFO(fifo:) started.
+◇ Test case passing 1 argument fifo → true to rejectsDirectoryAndFIFO(fifo:) started.
+✔ Test rejectsNonFileURL() passed after 0.002 seconds.
+✔ Test propagatesCreationFailureWithoutRetry() passed after 0.002 seconds.
+✔ Test propagatesNonENOENTInspectionFailure() passed after 0.002 seconds.
+✔ Test rejectsBothSymlinkKinds(dangling:) with 2 test cases passed after 0.002 seconds.
+✔ Test openFailureNeverFallsBackToCreation() passed after 0.002 seconds.
+✔ Test removesOnlyOwnedPartialOutputBeforeFallback() passed after 0.002 seconds.
+✔ Test EEXISTAfterCheckDoesNotDeleteCompetingOutput() passed after 0.002 seconds.
+✔ Test existingDestinationIsNeverRemoved() passed after 0.003 seconds.
+✔ Test rejectsDirectoryAndFIFO(fifo:) with 2 test cases passed after 0.002 seconds.
+✔ Test forcedNonAPFSFallbackPreservesPersistentState() passed after 0.003 seconds.
+✔ Test createsOnlyOnceAcrossRepeatedOpens() passed after 0.002 seconds.
+✔ Test danglingDestinationSymlinkIsAConflict() passed after 0.002 seconds.
+✔ Test successfulNativeBranchCleansOnlyDestinationRuntime() passed after 0.003 seconds.
+✔ Test omitsRealUnixSocketBeforeFallbackCopy() passed after 0.003 seconds.
+✔ Suite CloneCopyTests passed after 0.004 seconds.
+✔ Test racingCreatorIsNotOverwritten() passed after 0.004 seconds.
+✔ Suite NVRAMStorageTests passed after 0.004 seconds.
+✔ Test run with 15 tests in 2 suites passed after 0.005 seconds.

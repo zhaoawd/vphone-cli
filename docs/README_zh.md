@@ -87,6 +87,10 @@ vphone-cli vm launch myphone                            # 6. 首次启动
 
 要升级到更新的 iOS，把 `fw prepare` 指向一个 IPSW：`--iphone-source /path/to.ipsw --cloudos-source /path/to.ipsw`。
 
+`fw prepare` 和 `vm create` 支持显式 `--prepare-backend native`，要求同时提供两份本地 IPSW。默认仍使用脚本后端；原生后端当前只支持 classic 布局，不支持下载、less 或 v2/GPU 准备。检查点记录准备后端，续跑时沿用原选择。prepare 已完成后切换后端，需要 `--restart-from prepare`。
+
+独立 `fw prepare` 拒绝已有 Restore 路径。检查点中的原生 prepare 重跑会在新树生成完成后，将唯一的普通 Restore 目录保留到 `.firmware-prepare-backup-*`，再发布新树。备份由操作员显式清理；当前 Restore 树仍按阶段保留规则和 `--keep-artifacts` 处理。该选项不改变恢复后端；原生 prepare 的完整 VM 创建验收尚未执行。
+
 ## 恢复
 
 - `vphone-cli doctor [<name>]` —— 对宿主机的只读诊断；给出 VM 名时诊断该 VM（文件、锁、固件事务、恢复状态、创建检查点、宿主控制通道）。不修复任何内容；`--json` 输出机器可读格式。
