@@ -12,7 +12,7 @@ private func quietProbes() -> VPhoneDiagnosticProbes {
     VPhoneDiagnosticProbes(
         environment: [:],
         operatingSystemVersion: { OperatingSystemVersion(majorVersion: 26, minorVersion: 5, patchVersion: 0) },
-        sysctlInt: { $0 == "kern.hv_support" ? 1 : 0 },
+        sysctlInt: { ["kern.hv_support": 1, "hw.optional.arm64": 1][$0] ?? 0 },
         run: { _, _, _, _ in nil },
         hasEntitlement: { _ in true },
         executableURL: { URL(fileURLWithPath: "/x/vphone-cli") },

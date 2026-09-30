@@ -1,6 +1,7 @@
 """Run the host driver with disposable installers and disk-command doubles."""
 import os
 import plistlib
+import re
 from pathlib import Path
 import shutil
 import sys
@@ -48,6 +49,7 @@ exit 0
         self.env = dict(os.environ, TEST_LOG=str(self.root / 'calls'),
                         VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable)
         self.env.pop('SUDO_USER', None)
+        self.env.pop('SUDO_UID', None)
         attach = self.root / 'attach.plist'
         attach.write_bytes(plistlib.dumps({'system-entities': [{'dev-entry': '/dev/disk91'}, {'dev-entry': '/dev/disk91s1'}]}))
         self.env['TEST_ATTACH_PLIST'] = str(attach)
@@ -64,6 +66,11 @@ print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"
 print -r -- "/dev/disk93s1 on $CFW_HOST_MNT/mnt_sysos_hv_vmm (apfs, local)" >> "$TEST_MOUNTS"
 print -r -- '/dev/disk80s1 on /private/tmp/another-task/mnt1 (apfs, local)' >> "$TEST_MOUNTS"
 mkdir -p "$PWD/.cfw_temp/sub" "$PWD/cfw_input"
+if [[ ${LINKED_ENTRIES:-0} == 1 ]]; then
+  print plain > "$PWD/cfw_input/plain"
+  ln "$PWD/Disk.img" "$PWD/cfw_input/linked"
+  ln -s /etc "$PWD/cfw_input/symlink"
+fi
 [[ ${STRAY_FILE:-0} == 1 ]] && print stray > "$CFW_HOST_MNT/mnt1/leftover"
 [[ ${LATE_MOUNT:-0} == 1 ]] && print -r -- "/dev/disk85s1 on $PWD/.cfw_temp/sub (apfs, local)" >> "$TEST_MOUNTS"
 print ready > "$PWD/ready"
@@ -133,7 +140,7 @@ exit ${INSTALL_EXIT:-0}
         vm = self.root / 'vm'
         vm.mkdir()
         (vm / 'mount-table').write_text(f'/dev/disk81s1 on {vm.resolve()}/.cfw_temp/mnt_sysos_hv_vmm (apfs, local)\n')
-        _, proc = self.start(SUDO_USER='test-user')
+        _, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()))
         rc, output = self.finish(proc)
         self.assertNotEqual(rc, 0, output)
         calls = (self.root / 'calls').read_text()
@@ -172,17 +179,54 @@ exit ${INSTALL_EXIT:-0}
         self.assertNotIn('apfs_snap_rename.py', calls)
         self.assertTrue(list(vm.glob('.cfw_mount.*/attach.log')))
 
+    def chowned_paths(self):
+        paths = []
+        for line in (self.root / 'calls').read_text().splitlines():
+            if line.startswith('chown '):
+                prefix = f'chown -h {os.getuid()} '
+                self.assertTrue(line.startswith(prefix), line)
+                # The stub logs "$*"; every argument is an absolute path.
+                paths += re.split(r' (?=/)', line[len(prefix):])
+        return sorted(paths)
+
     def test_ownership_restoration_never_recurses_over_bundle(self):
-        vm, proc = self.start(SUDO_USER='test-user')
+        vm, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()))
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
-        chowns = [l for l in (self.root / 'calls').read_text().splitlines() if l.startswith('chown ')]
         real = vm.resolve()
-        self.assertEqual(sorted(chowns), [f'chown -Rx test-user {real}/.cfw_temp', f'chown -Rx test-user {real}/cfw_input'])
+        self.assertEqual(self.chowned_paths(), [f'{real}/.cfw_temp', f'{real}/.cfw_temp/sub', f'{real}/cfw_input'])
+        self.assertNotIn('chown -R', (self.root / 'calls').read_text())
         self.assertIn('restored ownership', output)
 
+    def test_ownership_restoration_skips_hard_links_and_symlinks(self):
+        # Upstream VPhoneHostFilePermissions skips a regular file with more
+        # than one link: it may name a file outside the VM directory.
+        vm, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()), LINKED_ENTRIES='1')
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        real = vm.resolve()
+        self.assertIn(f'{real}/cfw_input/plain', self.chowned_paths())
+        self.assertNotIn(f'{real}/cfw_input/linked', self.chowned_paths())
+        self.assertNotIn(f'{real}/cfw_input/symlink', self.chowned_paths())
+        self.assertEqual(os.stat(vm / 'Disk.img').st_nlink, 2)
+
+    def test_ownership_restoration_leaves_third_account_entries(self):
+        # Entries owned by neither root nor the invoker keep their owner, and
+        # such a directory is not descended into.
+        _, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid() + 424242))
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        self.assertNotIn('chown ', (self.root / 'calls').read_text())
+
+    def test_ownership_restoration_requires_numeric_invoker_uid(self):
+        _, proc = self.start(SUDO_USER='test-user')
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        self.assertNotIn('chown ', (self.root / 'calls').read_text())
+        self.assertIn('NOT restored: SUDO_UID is missing or not numeric', output)
+
     def test_late_mount_beneath_vm_only_skips_ownership_restore(self):
-        vm, proc = self.start(SUDO_USER='test-user', LATE_MOUNT='1')
+        vm, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()), LATE_MOUNT='1')
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
         calls = (self.root / 'calls').read_text()

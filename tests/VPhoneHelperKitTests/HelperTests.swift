@@ -85,6 +85,44 @@ struct HelperServiceTests {
         withExtendedLifetime(delegate) {}
     }
 
+    /// This test process's own audit token.
+    private static func ownAuditToken() throws -> Data {
+        var token = audit_token_t()
+        var count = mach_msg_type_number_t(MemoryLayout<audit_token_t>.size / MemoryLayout<natural_t>.size)
+        let status = withUnsafeMutablePointer(to: &token) { pointer in
+            pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(TASK_AUDIT_TOKEN), $0, &count)
+            }
+        }
+        try #require(status == KERN_SUCCESS)
+        return withUnsafeBytes(of: &token) { Data($0) }
+    }
+
+    @Test func callerIdentityMismatchNamesTheCaller() throws {
+        let configuration = try VPhoneHelperConfiguration(team: "ABCDEFGHIJ")
+        let token = try Self.ownAuditToken()
+        let reason = try #require(VPhoneHelperListener.callerRejection(auditToken: token, pid: getpid(), uid: geteuid(),
+                                                                        requirement: configuration.connectionRequirement))
+        #expect(reason.contains("caller pid \(getpid()), uid \(geteuid()) does not satisfy the client signing requirement"))
+        #expect(VPhoneHelperListener.callerRejection(auditToken: nil, pid: 7, uid: 8, requirement: configuration.connectionRequirement)
+            == "caller pid 7, uid 8 has no audit token")
+        #expect(VPhoneHelperListener.callerRejection(auditToken: Data([1, 2]), pid: 7, uid: 8, requirement: configuration.connectionRequirement)
+            == "caller pid 7, uid 8 has no audit token")
+    }
+
+    @Test func callerMatchingItsOwnDesignatedRequirementIsAccepted() throws {
+        var me: SecCode?
+        try #require(SecCodeCopySelf([], &me) == errSecSuccess)
+        var staticCode: SecStaticCode?
+        try #require(SecCodeCopyStaticCode(try #require(me), [], &staticCode) == errSecSuccess)
+        var designated: SecRequirement?
+        try #require(SecCodeCopyDesignatedRequirement(try #require(staticCode), [], &designated) == errSecSuccess)
+        var text: CFString?
+        try #require(SecRequirementCopyString(try #require(designated), [], &text) == errSecSuccess)
+        #expect(VPhoneHelperListener.callerRejection(auditToken: try Self.ownAuditToken(), pid: getpid(), uid: geteuid(),
+                                                    requirement: try #require(text) as String) == nil)
+    }
+
     @Test func unauthorizedRequestCannotInstall() async {
         let service = VPhoneHelperService(authorize: { _ in throw VPhoneHelperError("denied") },
             install: { _, _, _ in Issue.record("Install reached before authorization"); return Data() }, verify: { _ in Data() })

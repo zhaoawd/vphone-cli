@@ -42,6 +42,9 @@ public struct VPhoneDiagnosticProbes: Sendable {
     /// Sends one `{"t":"capabilities"}` request (read-only) to a host control socket.
     public var hostControlCapabilities: @Sendable (String) -> HostControlAnswer
     public var freeBytes: @Sendable (URL) -> Int64?
+    /// `csr_get_active_config` of the running kernel. The default answers
+    /// "not probed" so injected probes fall back to `csrutil` output.
+    public var csrActiveConfig: @Sendable () -> VPhoneHostSecurityPolicy.Reading
 
     public init(
         environment: [String: String],
@@ -58,7 +61,8 @@ public struct VPhoneDiagnosticProbes: Sendable {
         libraryLockHeld: @escaping @Sendable (URL) -> Bool,
         processIdentity: @escaping @Sendable (pid_t) -> VPhoneProcessIdentity?,
         hostControlCapabilities: @escaping @Sendable (String) -> HostControlAnswer,
-        freeBytes: @escaping @Sendable (URL) -> Int64?
+        freeBytes: @escaping @Sendable (URL) -> Int64?,
+        csrActiveConfig: @escaping @Sendable () -> VPhoneHostSecurityPolicy.Reading = { .unavailable("not probed") }
     ) {
         self.environment = environment
         self.operatingSystemVersion = operatingSystemVersion
@@ -75,6 +79,7 @@ public struct VPhoneDiagnosticProbes: Sendable {
         self.processIdentity = processIdentity
         self.hostControlCapabilities = hostControlCapabilities
         self.freeBytes = freeBytes
+        self.csrActiveConfig = csrActiveConfig
     }
 
     public static func live() -> VPhoneDiagnosticProbes {
@@ -134,7 +139,8 @@ public struct VPhoneDiagnosticProbes: Sendable {
             freeBytes: { url in
                 let values = try? url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
                 return values?.volumeAvailableCapacityForImportantUsage
-            })
+            },
+            csrActiveConfig: { VPhoneHostSecurityPolicy.activeConfiguration() })
     }
 
     /// One read-only request on the host control socket. The request changes
@@ -247,7 +253,7 @@ public struct VPhoneDiagnostics: Sendable {
     // MARK: Host
 
     public func hostFindings(_ snapshot: Snapshot) -> [VPhoneDiagnosticFinding] {
-        [macOSVersion(), hypervisorSupport(), nestedVirtualization(), sipStatus(), researchGuests(),
+        [macOSVersion(), hostArchitecture(), hypervisorSupport(), nestedVirtualization(), sipStatus(), researchGuests(),
          signing(snapshot), diskSpace(), pythonRuntime(), runtimeResources(), hostTools(),
          libraryLock(), runningVMs(snapshot)]
     }
@@ -260,6 +266,19 @@ public struct VPhoneDiagnostics: Sendable {
                          evidence: ["macos": text])
         }
         return .init(.environment, .macosVersion, .ok, "macOS \(text)", evidence: ["macos": text])
+    }
+
+    /// Upstream Launchpad host setup requires `hw.optional.arm64`; Intel
+    /// hosts have no such sysctl.
+    func hostArchitecture() -> VPhoneDiagnosticFinding {
+        switch probes.sysctlInt("hw.optional.arm64") {
+        case 1: .init(.environment, .hostArchitecture, .ok, "Apple silicon (arm64) host", evidence: ["hw.optional.arm64": "1"])
+        case let value?: .init(.environment, .hostArchitecture, .error, "this host is not Apple silicon; PV=3 VMs require arm64",
+                               evidence: ["hw.optional.arm64": "\(value)"])
+        case nil: .init(.environment, .hostArchitecture, .error,
+                        "hw.optional.arm64 is absent; PV=3 VMs require an Apple silicon (arm64) host",
+                        evidence: ["hw.optional.arm64": "unavailable"])
+        }
     }
 
     func hypervisorSupport() -> VPhoneDiagnosticFinding {
@@ -281,12 +300,25 @@ public struct VPhoneDiagnostics: Sendable {
         }
     }
 
+    /// Active-kernel CSR bits as evidence. SIP severity still follows the
+    /// `csrutil status` text; no severity is derived from other bits.
+    func csrEvidence(_ reading: VPhoneHostSecurityPolicy.Reading) -> [String: String] {
+        switch reading {
+        case let .configuration(value):
+            ["csr_active_config": VPhoneHostSecurityPolicy.hex(value),
+             "csr_allow_task_for_pid": "\(value & VPhoneHostSecurityPolicy.allowTaskForPID != 0)",
+             "csr_allow_research_guests": "\(value & VPhoneHostSecurityPolicy.allowResearchGuests != 0)"]
+        case let .unavailable(reason): ["csr_query": reason]
+        }
+    }
+
     func sipStatus() -> VPhoneDiagnosticFinding {
+        let csr = csrEvidence(probes.csrActiveConfig())
         guard let result = probes.run(URL(fileURLWithPath: "/usr/bin/csrutil"), ["status"], nil, 5),
               !result.timedOut, result.succeeded
-        else { return .init(.environment, .sipStatus, .unknown, "csrutil status could not be run") }
+        else { return .init(.environment, .sipStatus, .unknown, "csrutil status could not be run", evidence: csr) }
         let output = result.stdout
-        var evidence: [String: String] = [:]
+        var evidence = csr
         for line in output.split(whereSeparator: \.isNewline) {
             let parts = line.split(separator: ":", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
             if parts.count == 2, ["enabled", "disabled"].contains(parts[1]) { evidence[parts[0]] = parts[1] }
@@ -301,26 +333,40 @@ public struct VPhoneDiagnostics: Sendable {
                          "SIP is \(custom ? "partially" : "fully") enabled; launching the signed binary depends on an AMFI bypass such as amfidont",
                          evidence: evidence, action: "make amfidont_allow_vphone (or disable SIP from Recovery OS)")
         }
-        return .init(.environment, .sipStatus, .unknown, "csrutil status output was not recognized")
+        return .init(.environment, .sipStatus, .unknown, "csrutil status output was not recognized", evidence: evidence)
     }
 
+    /// The active kernel's CSR_ALLOW_RESEARCH_GUESTS bit decides when the query
+    /// answers; this also covers Macs with several macOS installations, where
+    /// `csrutil allow-research-guests status` asks which one to inspect. Only
+    /// when the query cannot answer does this read `csrutil` output.
     func researchGuests() -> VPhoneDiagnosticFinding {
+        let reading = probes.csrActiveConfig()
+        let csr = csrEvidence(reading)
+        if case let .configuration(value) = reading {
+            if value & VPhoneHostSecurityPolicy.allowResearchGuests != 0 {
+                return .init(.environment, .researchGuests, .ok, "research guests are allowed (active kernel configuration)", evidence: csr)
+            }
+            return .init(.environment, .researchGuests, .error,
+                         "research guests are not allowed: CSR_ALLOW_RESEARCH_GUESTS is clear in the active kernel configuration; PV=3 VMs cannot boot",
+                         evidence: csr, action: "csrutil allow-research-guests enable (from Recovery OS)")
+        }
         guard let result = probes.run(URL(fileURLWithPath: "/usr/bin/csrutil"), ["allow-research-guests", "status"], nil, 5),
               !result.timedOut
-        else { return .init(.environment, .researchGuests, .unknown, "csrutil allow-research-guests status could not be run") }
+        else { return .init(.environment, .researchGuests, .unknown, "csrutil allow-research-guests status could not be run", evidence: csr) }
         let output = result.stdout + result.stderr
         if output.contains("Pick a macOS installation") {
             return .init(.environment, .researchGuests, .unknown,
-                         "several macOS installations are present; run scripts/boot_host_preflight.sh to select one")
+                         "several macOS installations are present; run scripts/boot_host_preflight.sh to select one", evidence: csr)
         }
         if output.contains("status: enabled") {
-            return .init(.environment, .researchGuests, .ok, "research guests are allowed")
+            return .init(.environment, .researchGuests, .ok, "research guests are allowed", evidence: csr)
         }
         if output.contains("status: disabled") {
             return .init(.environment, .researchGuests, .error, "research guests are not allowed; PV=3 VMs cannot boot",
-                         action: "csrutil allow-research-guests enable (from Recovery OS)")
+                         evidence: csr, action: "csrutil allow-research-guests enable (from Recovery OS)")
         }
-        return .init(.environment, .researchGuests, .unknown, "csrutil allow-research-guests status output was not recognized")
+        return .init(.environment, .researchGuests, .unknown, "csrutil allow-research-guests status output was not recognized", evidence: csr)
     }
 
     func signing(_ snapshot: Snapshot) -> VPhoneDiagnosticFinding {
