@@ -328,9 +328,9 @@ struct VPhoneMachOImage {
         // every other command, so the command area is laid out again rather
         // than patched in place. For a linker-produced file the command was
         // last anyway and nothing moves.
-        let carried = commands.filter { $0.command != UInt32(LC_CODE_SIGNATURE) }
+        var carried = commands.filter { $0.command != UInt32(LC_CODE_SIGNATURE) }
         let commandSize = MemoryLayout<linkedit_data_command>.size
-        let rebuilt = carried.reduce(0) { $0 + $1.size } + commandSize
+        var rebuilt = carried.reduce(0) { $0 + $1.size } + commandSize
 
         // Whatever holds content has to start after the commands. The check
         // comes before anything is written: a section over them is exactly
@@ -340,6 +340,25 @@ struct VPhoneMachOImage {
                 + (segment.sections.isEmpty && segment.fileSize > 0 ? [segment.fileOffset] : [])
         }
         let firstContent = content.filter { $0 > 0 }.min() ?? 0
+        // Upstream ee8b70ca. An earlier pipeline step may have spent the
+        // header padding already: the CFW launchd injection removes
+        // LC_CODE_SIGNATURE and uses that slot and the padding for
+        // LC_LOAD_WEAK_DYLIB, which leaves no room for the fresh
+        // LC_CODE_SIGNATURE (iOS 18.6.2: 16 bytes of padding). A file with
+        // room is laid out as before, so ldid parity is unchanged.
+        //
+        // LC_SOURCE_VERSION is 16 informational bytes and is dropped.
+        if UInt64(Self.headerSize + max(rebuilt, commandsSize)) > firstContent,
+           carried.contains(where: { $0.command == UInt32(LC_SOURCE_VERSION) })
+        {
+            carried.removeAll { $0.command == UInt32(LC_SOURCE_VERSION) }
+            rebuilt = carried.reduce(0) { $0 + $1.size } + commandSize
+        }
+        // Upstream cd45b8fa also drops LC_UUID when the area still does not
+        // fit. Not adopted here on purpose: host dyld refuses a main
+        // executable without LC_UUID ("missing LC_UUID load command"), and
+        // what the guest's dyld does with such a launchd is not verified. A
+        // file with no room left after this step fails below with noRoom.
         guard UInt64(Self.headerSize + max(rebuilt, commandsSize)) <= firstContent,
               firstContent <= UInt64(codeEnd)
         else {

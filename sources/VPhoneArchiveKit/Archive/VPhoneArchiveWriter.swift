@@ -50,9 +50,13 @@ public enum VPhoneArchiveWriter {
             throw VPhoneArchiveError.writeFailed(path: archive.path, reason: "invalid top-level archive path")
         }
         return try VPhoneArchiveOutput.publish(to: archive) { temporary in
-            try createFile(archive: temporary, from: resolvedRoot, topLevel: topLevel,
-                           format: format, compression: compression, excluding: patterns,
-                           progress: progress, bytesPacked: bytesPacked, isCancelled: isCancelled)
+            // Names read from disk and written to pax headers are converted
+            // through this thread's LC_CTYPE; see withArchiveLocale.
+            try withArchiveLocale {
+                try createFile(archive: temporary, from: resolvedRoot, topLevel: topLevel,
+                               format: format, compression: compression, excluding: patterns,
+                               progress: progress, bytesPacked: bytesPacked, isCancelled: isCancelled)
+            }
         }
     }
 
