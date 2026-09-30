@@ -213,6 +213,30 @@ final class HostAPICommandTests: XCTestCase {
         }
     }
 
+    /// T08: IcliKit 0.7.2+ reports Setup Assistant through the RunningBoard role
+    /// fallback (`source: runningboard`); with no focal app it still reports an
+    /// unverified SpringBoard row (`source: unavailable`). The daemon forwards
+    /// both shapes from `frontmostApp()`; the host keeps each field unchanged.
+    func testForegroundKeepsIcliKitRunningBoardAndUnavailableShapes() async throws {
+        let api = HostAPISessionFake()
+        let executor = VPhoneHostCommandExecutor(apiSession: api)
+        let rows: [(String, String, Double, String, Bool)] = [
+            ("com.apple.purplebuddy", "Setup", 88, "runningboard", true),
+            ("com.apple.springboard", "Home Screen", 0, "unavailable", false),
+        ]
+        for (bundleID, name, pid, source, verified) in rows {
+            api.result = .object(["bundle_id": .string(bundleID), "name": .string(name),
+                "pid": .number(pid), "source": .string(source), "verified": .bool(verified)])
+            let result = try await call(executor, ["t": "app_foreground", "transport": "api"])
+            XCTAssertEqual(result["ok"] as? Bool, true)
+            XCTAssertEqual(result["bundle_id"] as? String, bundleID)
+            XCTAssertEqual(result["name"] as? String, name)
+            XCTAssertEqual(result["pid"] as? Int, Int(pid))
+            XCTAssertEqual(result["source"] as? String, source)
+            XCTAssertEqual(result["verified"] as? Bool, verified)
+        }
+    }
+
     func testExplicitRouteDoesNotChangeClassicOrFallback() async throws {
         let api = HostAPISessionFake()
         let guest = HostGuestFake()

@@ -6,12 +6,14 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import re
 import subprocess
 
 from check_guest_payloads import output, validate_metadata
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / 'sources/VPhoneDaemon'
+XCODE_PROJECT = PROJECT / 'VPhoneDaemon.xcodeproj/project.pbxproj'
 LOCK = PROJECT / 'VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
 EXPECTED = ROOT / 'dependencies/daemon-api-pins.json'
 
@@ -29,6 +31,24 @@ def pin_map(pins):
 def check_pins(actual, expected):
     if pin_map(actual) != pin_map(expected):
         raise ValueError('API daemon dependencies differ from the fixed upstream pins')
+
+
+REMOTE_REFERENCE = re.compile(
+    r'isa = XCRemoteSwiftPackageReference;\s*repositoryURL = "([^"]+)";\s*requirement = \{([^}]*)\};')
+
+
+def check_project_requirements(project_text, pins):
+    """Every remote package in the Xcode project must be an exact pin of its resolved version."""
+    versions = {pin['location']: pin['state'].get('version') for pin in pins}
+    references = REMOTE_REFERENCE.findall(project_text)
+    if not references:
+        raise ValueError('API daemon project declares no remote package requirements')
+    for location, body in references:
+        fields = dict(re.findall(r'(\w+) = ([^;]+);', body))
+        if location not in versions:
+            raise ValueError(f'API daemon project package is not pinned: {location}')
+        if fields.get('kind') != 'exactVersion' or fields.get('version') != versions[location]:
+            raise ValueError(f'API daemon project requirement differs from its pin: {location}')
 
 
 def check_checkouts(pins, checkouts):
@@ -88,6 +108,7 @@ def main():
     args = parser.parse_args()
     pins = json.loads(LOCK.read_text())['pins']
     check_pins(pins, json.loads(EXPECTED.read_text())['pins'])
+    check_project_requirements(XCODE_PROJECT.read_text(), pins)
     if args.checkouts:
         check_checkouts(pins, args.checkouts)
     if args.candidate:
