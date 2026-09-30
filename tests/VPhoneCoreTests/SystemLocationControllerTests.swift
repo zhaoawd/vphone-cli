@@ -2223,4 +2223,43 @@ final class SystemLocationControllerTests: XCTestCase {
         }
         XCTAssertTrue(guest.activations.isEmpty)
     }
+
+    func testFixedSourceAcceptsUnknownAltitudeAndDeliversSentinel() async throws {
+        let guest = FakeSystemLocationGuestAdapter()
+        let controller = VPhoneSystemLocationController(adapter: guest)
+
+        let unknownAltitude = VPhoneSystemLocationFix(
+            producerSequence: 0,
+            latitude: 31.2, longitude: 118.8, altitude: 0,
+            horizontalAccuracy: 5, verticalAccuracy: -1,
+            speed: 10, course: 90, timestamp: 1_700_000_000)
+        _ = try await controller.setFixed(
+            owner: "dashboard",
+            fix: unknownAltitude,
+            heartbeatSeconds: 1)
+
+        XCTAssertEqual(guest.deliveries.count, 1)
+        XCTAssertEqual(guest.deliveries.first?.fix.verticalAccuracy, -1)
+    }
+
+    func testFixedSourceRejectsNonSentinelNegativeVerticalAccuracy() async throws {
+        let guest = FakeSystemLocationGuestAdapter()
+        let controller = VPhoneSystemLocationController(adapter: guest)
+
+        let invalidAltitude = VPhoneSystemLocationFix(
+            producerSequence: 0,
+            latitude: 31.2, longitude: 118.8, altitude: 0,
+            horizontalAccuracy: 5, verticalAccuracy: -2,
+            speed: 10, course: 90, timestamp: 1_700_000_000)
+        do {
+            _ = try await controller.setFixed(
+                owner: "dashboard",
+                fix: invalidAltitude,
+                heartbeatSeconds: 1)
+            XCTFail("vacc == -2 should be rejected before guest activation")
+        } catch let error as VPhoneSystemLocationError {
+            XCTAssertEqual(error.code, "invalid_location_source")
+        }
+        XCTAssertTrue(guest.activations.isEmpty)
+    }
 }

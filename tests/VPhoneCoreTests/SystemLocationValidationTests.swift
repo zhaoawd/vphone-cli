@@ -26,7 +26,17 @@ final class SystemLocationValidationTests: XCTestCase {
         XCTAssertNil(error(course: -1))
         XCTAssertNil(error(speed: -1))
         XCTAssertNotNil(error(speed: -2))
-        XCTAssertNotNil(error(verticalAccuracy: -1))
+    }
+
+    func testUnknownAltitudeSentinelAccepted() {
+        // vacc == -1 is the CoreLocation / IcliKit 0.7.7 sentinel for an unknown
+        // altitude. Only exactly -1 is accepted; 0 and other negatives stay
+        // rejected so the sentinel cannot mask an invalid accuracy.
+        XCTAssertNil(error(verticalAccuracy: -1))
+        XCTAssertNotNil(error(verticalAccuracy: 0))
+        XCTAssertNotNil(error(verticalAccuracy: -2))
+        XCTAssertNotNil(error(verticalAccuracy: -0.5))
+        XCTAssertNotNil(error(verticalAccuracy: -1.0000001))
     }
 
     func testLatitudeAndLongitudeRangeRejected() {

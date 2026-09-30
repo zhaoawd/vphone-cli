@@ -30,7 +30,8 @@ enum GuestLocationSimulation {
         guard point.latitude.isFinite, (-90 ... 90).contains(point.latitude),
               point.longitude.isFinite, (-180 ... 180).contains(point.longitude),
               point.altitude.isFinite, point.horizontalAccuracy.isFinite, point.horizontalAccuracy >= 0,
-              point.verticalAccuracy.isFinite, point.verticalAccuracy >= 0,
+              point.verticalAccuracy.isFinite,
+              point.verticalAccuracy >= 0 || point.verticalAccuracy == -1,
               point.speed.isFinite, point.course.isFinite
         else { throw GuestAPIError.invalidRequest("invalid location coordinates or accuracy") }
 

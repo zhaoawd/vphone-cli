@@ -29,7 +29,8 @@ static CLLocation *vphoneLocation(void) {
         !isfinite(longitude.doubleValue) || fabs(longitude.doubleValue) > 180 ||
         !isfinite(altitude.doubleValue) || !isfinite(horizontalAccuracy.doubleValue) ||
         horizontalAccuracy.doubleValue < 0 || !isfinite(verticalAccuracy.doubleValue) ||
-        verticalAccuracy.doubleValue < 0 || !isfinite(speed.doubleValue) || !isfinite(course.doubleValue)) return nil;
+        (verticalAccuracy.doubleValue < 0 && verticalAccuracy.doubleValue != -1) ||
+        !isfinite(speed.doubleValue) || !isfinite(course.doubleValue)) return nil;
 
     return [[CLLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(latitude.doubleValue, longitude.doubleValue)
                                            altitude:altitude.doubleValue

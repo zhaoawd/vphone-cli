@@ -26,8 +26,8 @@ public enum VPhoneSystemLocationValidation {
         if horizontalAccuracy <= 0 {
             return "hacc must be > 0: \(horizontalAccuracy)"
         }
-        if verticalAccuracy <= 0 {
-            return "vacc must be > 0: \(verticalAccuracy)"
+        if verticalAccuracy != -1 && verticalAccuracy <= 0 {
+            return "vacc must be > 0 or -1 for unknown altitude: \(verticalAccuracy)"
         }
         if speed != -1 && speed < 0 {
             return "speed must be -1 or >= 0: \(speed)"

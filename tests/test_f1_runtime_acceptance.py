@@ -194,9 +194,10 @@ class RuntimeFixture(HostControlFixture):
             return "timestamp must be > 0"
         if not -90 <= request["lat"] <= 90 or not -180 <= request["lon"] <= 180:
             return "lat/lon out of range"
-        for key in ("hacc", "vacc"):
-            if key in request and not request[key] > 0:
-                return f"{key} must be > 0"
+        if "hacc" in request and not request["hacc"] > 0:
+            return "hacc must be > 0"
+        if "vacc" in request and request["vacc"] != -1 and not request["vacc"] > 0:
+            return "vacc must be > 0 or -1 for unknown altitude"
         if sequence != 0:
             return "fixed source producer_sequence must be 0"
         if not 0.01 <= heartbeat <= 86400:
