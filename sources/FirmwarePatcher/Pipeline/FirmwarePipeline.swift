@@ -249,6 +249,11 @@ public final class FirmwarePipeline {
             }
             trace.stage = .validateOutput
             trace.component = nil
+            // Strict declaration gate (T11): every committed record must belong to a
+            // declaration this variant enables. Runs on the staged output before commit,
+            // so a violation leaves the original firmware untouched (the transaction
+            // records the failure like any other pre-commit error).
+            try PatchDeclarationGate.enforce(report: report, variant: variant.rawValue, gates: report.gates)
             if variant == .less { try Self.validateManifest(in: staged.findRestoreDirectory()) }
             trace.stage = .commit
             let archive = try transaction.commit()

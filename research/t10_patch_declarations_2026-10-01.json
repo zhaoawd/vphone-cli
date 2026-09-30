@@ -1,0 +1,2680 @@
+{
+  "schema": "patch_declaration_catalog/1",
+  "generatedFrom": "research/t09_patch_id_mapping_2026-10-01.json",
+  "upstreamTag": "upstream-2.2.3",
+  "declarations": [
+    {
+      "id": "avpbooter-boot-dgst_bypass",
+      "title": "AVPBooter digest bypass",
+      "coverage": "swift",
+      "swiftSteps": [
+        "avpbooter.AVPBooterPatcher.patchDGSTBypass"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "avpbooter-boot-dgst_bypass"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibss-cfw-serial_label",
+      "title": "iBSS serial label",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibss.IBootPatcher.patchSerialLabels"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibss-cfw-serial_label"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibss-boot-image4_callback",
+      "title": "iBSS image-4 callback",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibss.IBootPatcher.patchImage4Callback"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibss-boot-image4_callback"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibss-boot-skip_generate_nonce",
+      "title": "iBSS nonce generation skip",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibss.IBootJBPatcher.patchSkipGenerateNonce"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibss-boot-skip_generate_nonce"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibec-cfw-serial_label",
+      "title": "iBEC serial label",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibec.IBootPatcher.patchSerialLabels"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibec-cfw-serial_label"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibec-boot-image4_callback",
+      "title": "iBEC image-4 callback",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibec.IBootPatcher.patchImage4Callback"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibec-boot-image4_callback"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibec-boot-boot_args",
+      "title": "iBEC boot arguments",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibec.IBootPatcher.patchBootArgs"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibec-boot-boot_args"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "ibec-boot-bootx_precondition",
+      "title": "iBEC bootx precondition",
+      "coverage": "swift",
+      "swiftSteps": [
+        "ibec.IBootPatcher.patchBootxPrecondition"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "ibec-boot-bootx_precondition"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "llb-cfw-serial_label",
+      "title": "LLB serial label",
+      "coverage": "swift",
+      "swiftSteps": [
+        "llb.IBootPatcher.patchSerialLabels"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "llb-cfw-serial_label"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "llb-boot-image4_callback",
+      "title": "LLB image-4 callback",
+      "coverage": "swift",
+      "swiftSteps": [
+        "llb.IBootPatcher.patchImage4Callback"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "llb-boot-image4_callback"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "llb-boot-boot_args",
+      "title": "LLB boot arguments",
+      "coverage": "swift",
+      "swiftSteps": [
+        "llb.IBootPatcher.patchBootArgs"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "llb-boot-boot_args"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "llb-boot-rootfs",
+      "title": "LLB root filesystem checks",
+      "coverage": "swift",
+      "swiftSteps": [
+        "llb.IBootPatcher.patchRootfssBypass"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "llb-boot-rootfs"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "llb-boot-panic_bypass",
+      "title": "LLB panic bypass",
+      "coverage": "swift",
+      "swiftSteps": [
+        "llb.IBootPatcher.patchPanicBypass"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "llb-boot-panic_bypass"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "txm-boot-trustcache_bypass",
+      "title": "TXM trust cache bypass",
+      "coverage": "swift",
+      "swiftSteps": [
+        "txm.TXMPatcher.patchTrustcacheBypass",
+        "txm.TXMDevPatcher.patchTrustcacheBypass"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "txm-boot-trustcache_bypass"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "txm-cfw-get_task_allow",
+      "title": "TXM get-task-allow",
+      "coverage": "swift",
+      "swiftSteps": [
+        "txm.TXMDevPatcher.patchGetTaskAllowForceTrue"
+      ],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "txm-cfw-get_task_allow"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "txm-cfw-debugger_entitlement",
+      "title": "TXM debugger entitlement",
+      "coverage": "swift",
+      "swiftSteps": [
+        "txm.TXMDevPatcher.patchDebuggerEntitlementForceTrue"
+      ],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "txm-cfw-debugger_entitlement"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "txm-boot-developer_mode_bypass",
+      "title": "TXM developer mode",
+      "coverage": "swift",
+      "swiftSteps": [
+        "txm.TXMDevPatcher.patchDeveloperModeBypass"
+      ],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "txm-boot-developer_mode_bypass"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "txm-boot-selector24_bypass",
+      "title": "TXM selector 24 bypass",
+      "coverage": "swift",
+      "swiftSteps": [
+        "txm.TXMDevPatcher.patchSelector24ForcePass"
+      ],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "txm-boot-selector24_bypass"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "txm-boot-sel42_29",
+      "title": "TXM selector 42/29 shellcode",
+      "coverage": "swift",
+      "swiftSteps": [
+        "txm.TXMDevPatcher.patchSelector42_29Shellcode"
+      ],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "txm-boot-sel42_29"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-serial_number",
+      "title": "Serial number",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.serial_number"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-serial_number"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-home_button_type",
+      "title": "Home button type",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.home_button_type"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-home_button_type"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-artwork_device_subtype",
+      "title": "Artwork device subtype",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.artwork_device_subtype"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-artwork_device_subtype"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-island_notch_location",
+      "title": "Island notch location",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.island_notch_location"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-island_notch_location"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-target_sub_type",
+      "title": "Target sub type",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.target_sub_type"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-target_sub_type"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-compatible_secondary",
+      "title": "Compatible list",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.compatible_secondary"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-compatible_secondary"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-product_fdr_product_type",
+      "title": "FDR product type",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.fdr_product_type"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-product_fdr_product_type"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-product_sub_product_type",
+      "title": "Sub product type",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.sub_product_type"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-product_sub_product_type"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-product_unique_model",
+      "title": "Unique model code",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.unique_model"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-product_unique_model"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-product_gestalt_variants_rename",
+      "title": "Gestalt variants",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.gestalt_variants_rename"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-product_gestalt_variants_rename"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-arm_io_device_type",
+      "title": "SoC device type",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.device_type"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-arm_io_device_type"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-exp-arm_io_soc_generation",
+      "title": "SoC generation",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.soc_generation"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-exp-arm_io_soc_generation"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-product_front_cam_offset",
+      "title": "Front camera offset",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.front_cam_offset"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-product_front_cam_offset"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-product_rear_cam_offset",
+      "title": "Rear camera offset",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.rear_cam_offset"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-product_rear_cam_offset"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-product_camera_node",
+      "title": "Camera node",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.camera_node"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-product_camera_node"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-product_facetime_node",
+      "title": "FaceTime node",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.facetime_node"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-product_facetime_node"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-product_audio_node",
+      "title": "Audio node",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.audio_node"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-product_audio_node"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-product_iopm_node",
+      "title": "Power management node",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.product.iopm_node"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-product_iopm_node"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-arm_io_smc_stub",
+      "title": "SMC stub",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.smc_stub"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-arm_io_smc_stub"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-arm_io_smc_iop_smc_nub_stub",
+      "title": "SMC nub stub",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.smc.iop_smc_nub_stub"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-arm_io_smc_iop_smc_nub_stub"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-arm_io_smc_ext_charger_camera_driver",
+      "title": "SMC charger and camera driver",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.smc.smc_ext_charger_camera_driver"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-arm_io_smc_ext_charger_camera_driver"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-arm_io_isp_camera_flags",
+      "title": "ISP camera flags",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.isp_camera_flags"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-arm_io_isp_camera_flags"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "devicetree-cfw-arm_io_isp_rtb_camera_flags",
+      "title": "ISP RTB camera flags",
+      "coverage": "swift",
+      "swiftSteps": [
+        "devicetree.DeviceTreePatcher.arm_io.ispRtb_camera_flags"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "devicetree-cfw-arm_io_isp_rtb_camera_flags"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "dyld-boot-iomfb_force_kern",
+      "title": "IOMFB force kernel swap",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-boot-iomfb_force_kern"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-boot-iomfb_swapend",
+      "title": "IOMFB swap-end size",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-boot-iomfb_swapend"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-exp-hv_vmm",
+      "title": "Shared cache hypervisor strings",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-exp-hv_vmm"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-watchdogd-exp-hv_vmm_cache",
+      "title": "watchdogd hypervisor cache",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-watchdogd-exp-hv_vmm_cache"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "preboot-exp-devicetree_identity",
+      "title": "Preboot device tree identity",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "preboot-exp-devicetree_identity"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-cfw-camera",
+      "title": "Camera shared cache symbols",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-cfw-camera"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-boot-maxslide",
+      "title": "Shared cache max slide",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-boot-maxslide"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-boot-lsd_embedded_reg",
+      "title": "lsd registration entitlement",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-boot-lsd_embedded_reg"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-boot-xpc_lwcr",
+      "title": "XPC lightweight code requirements",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-boot-xpc_lwcr"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-boot-lockdown_mode",
+      "title": "Lockdown mode sysctl gate",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "dyld-boot-lockdown_mode"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "dyld-exp-mis_trust_auth",
+      "title": "MIS online authorization",
+      "coverage": "notImplemented",
+      "swiftSteps": [],
+      "variants": [],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "n/a",
+      "upstreamIDs": [
+        "dyld-exp-mis_trust_auth"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability( iOSBase: .oneOf([.major(18), .major(26)]), )",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "note": "本地未实现（T18 libmisfix 范围）；任何变体选择它 resolver 拒绝。"
+    },
+    {
+      "id": "system-seputil-boot-gigalocker_uuid",
+      "title": "seputil Gigalocker UUID",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-seputil-boot-gigalocker_uuid"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-diskimagesiod-cfw-is_mount_complete",
+      "title": "diskimagesiod mount completion",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-diskimagesiod-cfw-is_mount_complete"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+      "title": "launchd cache loader gate",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-launchd_cache_loader-boot-unsecure_cache_gate"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-mobileactivationd-boot-should_hactivate",
+      "title": "mobileactivationd activation",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-mobileactivationd-boot-should_hactivate"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-launchd-boot-jetsam_panic_guard_bypass",
+      "title": "launchd jetsam panic guard",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-launchd-boot-jetsam_panic_guard_bypass"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-debugserver-cfw-install",
+      "title": "debugserver",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-debugserver-cfw-install"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-campo-cfw-entitlements",
+      "title": "Campo entitlements",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-campo-cfw-entitlements"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-gigalocker-boot-rename",
+      "title": "Gigalocker rename",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-gigalocker-boot-rename"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-extensions-boot-gpu_bundle",
+      "title": "GPU driver bundle",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-extensions-boot-gpu_bundle"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-vphoned-boot-install",
+      "title": "vphoned",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp",
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-vphoned-boot-install"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "system-launchdaemons-boot-environment",
+      "title": "Guest environment",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-launchdaemons-boot-environment"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "uncertain"
+    },
+    {
+      "id": "system-systemversion-cfw-build_version",
+      "title": "Reported build version",
+      "coverage": "guest",
+      "swiftSteps": [],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "guest",
+      "upstreamIDs": [
+        "system-systemversion-cfw-build_version"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "status": "mapped"
+    },
+    {
+      "id": "kernel-boot-apfs_root_snapshot",
+      "title": "APFS root snapshot",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsRootSnapshot"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-apfs_root_snapshot"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-apfs_seal_broken",
+      "title": "APFS broken seal",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsSealBroken"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-apfs_seal_broken"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-apfs_graft",
+      "title": "APFS graft",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsGraft"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-apfs_graft"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-apfs_vfsop_mount",
+      "title": "APFS mount entry check",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsMount"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-apfs_vfsop_mount"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-apfs_mount_upgrade_checks",
+      "title": "APFS mount upgrade checks",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsMount"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-apfs_mount_upgrade_checks"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-handle_fsioc_graft",
+      "title": "APFS graft ioctl",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsMount"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-handle_fsioc_graft"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-handle_get_dev_by_role",
+      "title": "APFS device-by-role gates",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchApfsMount"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-handle_get_dev_by_role"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-bsd_init_rootvp",
+      "title": "bsd_init root vnode",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchBsdInitRootvp"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-bsd_init_rootvp"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-post_validation",
+      "title": "Post-validation checks",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchPostValidationNOP",
+        "kernelcache.KernelPatcher.patchPostValidationCMP"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-post_validation"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-launch_constraints",
+      "title": "Launch constraints",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchLaunchConstraints"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-launch_constraints"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-dyld_policy",
+      "title": "dyld loading policy",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchDyldPolicy"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-dyld_policy"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-debugger",
+      "title": "Debugger check",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchDebugger"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-debugger"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-sandbox_file_check_mmap",
+      "title": "Sandbox: file_check_mmap",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchSandbox"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-sandbox_file_check_mmap"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-sandbox_mount_check_mount",
+      "title": "Sandbox: mount_check_mount",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchSandbox"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-sandbox_mount_check_mount"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-sandbox_mount_check_remount",
+      "title": "Sandbox: mount_check_remount",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchSandbox"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-sandbox_mount_check_remount"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-sandbox_mount_check_umount",
+      "title": "Sandbox: mount_check_umount",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchSandbox"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-sandbox_mount_check_umount"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-sandbox_vnode_check_rename",
+      "title": "Sandbox: vnode_check_rename",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchSandbox"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-sandbox_vnode_check_rename"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-thread_guard_violation",
+      "title": "Mach port guard violation",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelPatcher.patchExcGuardBehavior"
+      ],
+      "variants": [
+        "regular",
+        "dev",
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "excGuardActive",
+      "upstreamIDs": [
+        "kernel-boot-thread_guard_violation"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-amfi_trustcache",
+      "title": "AMFI trust cache",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchAmfiCdhashInTrustcache"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-amfi_trustcache"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-post_validation_unsigned",
+      "title": "Unsigned post-validation",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchPostValidationAdditional"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-post_validation_unsigned"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-cred_label_update_execve",
+      "title": "Credential label on execve",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchCredLabelUpdateExecve"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-cred_label_update_execve"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-hook_cred_label",
+      "title": "Credential label hook",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchHookCredLabelUpdateExecve"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-hook_cred_label"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-amfi_execve",
+      "title": "AMFI execve kill",
+      "coverage": "swift",
+      "swiftSteps": [],
+      "variants": [],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-amfi_execve"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "note": "上游声明 bootEssential，但两侧 orchestrator 均无调用者；本地不执行，required=false。"
+    },
+    {
+      "id": "kernel-boot-load_dylinker",
+      "title": "Dynamic linker policy",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchLoadDylinker"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-load_dylinker"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-task_conversion_eval",
+      "title": "Task conversion evaluation",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchTaskConversionEvalInternal"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-task_conversion_eval"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-task_for_pid",
+      "title": "task_for_pid",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchTaskForPid"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-task_for_pid"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-port_to_map",
+      "title": "Port to map conversion",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchConvertPortToMap"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-port_to_map"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-proc_pidinfo",
+      "title": "proc_pidinfo guards",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchProcPidinfo"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-proc_pidinfo"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-proc_security_policy",
+      "title": "Process security policy",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchProcSecurityPolicy"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-proc_security_policy"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-spawn_validate_persona",
+      "title": "Spawn persona validation",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchSpawnValidatePersona"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-spawn_validate_persona"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-thid_should_crash",
+      "title": "Thread identity crash",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchThidShouldCrash"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-thid_should_crash"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-vm_map_protect",
+      "title": "vm_map_protect",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchVmMapProtect"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-vm_map_protect"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-vm_fault_enter_prepare",
+      "title": "vm_fault_enter_prepare",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchVmFaultEnterPrepare"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-vm_fault_enter_prepare"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-shared_region_map",
+      "title": "Shared region mapping",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchSharedRegionMap"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-shared_region_map"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-bsd_init_auth",
+      "title": "bsd_init imageboot gate",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchBsdInitAuth"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-bsd_init_auth"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-io_secure_bsd_root",
+      "title": "Secure BSD root",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchIoSecureBsdRoot"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-io_secure_bsd_root"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-mac_mount",
+      "title": "MACF mount flags",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchMacMount"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-mac_mount"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-dounmount",
+      "title": "dounmount cleanup",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchDounmount"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-dounmount"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-cfw-nvram_verify_permission",
+      "title": "NVRAM permission check",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchNvramVerifyPermission"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-cfw-nvram_verify_permission"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-sandbox_ext",
+      "title": "Extended sandbox hooks",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchSandboxHooksExtended"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-sandbox_ext"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-iouc_macf_gate",
+      "title": "IOUserClient MACF gate",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchIoucFailedMacf"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-iouc_macf_gate"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-iouc_sandbox_gate",
+      "title": "IOUserClient sandbox gate",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchIoucFailedSandbox"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "iosBaseIs27",
+      "upstreamIDs": [
+        "kernel-boot-iouc_sandbox_gate"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-kcall10",
+      "title": "Kernel call syscall",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchKcall10"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-kcall10"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-syscallmask",
+      "title": "Per-process syscall mask",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchSyscallmaskApplyToProc"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-boot-syscallmask"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-di2",
+      "title": "DiskImages2 client ABI",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchDiskImages2ClientAbi"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "iosBaseIs27",
+      "upstreamIDs": [
+        "kernel-boot-di2"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-exec_security_policy_kill",
+      "title": "Exec security policy kill",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchExecSecurityPolicyKill"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "iosBaseIs27",
+      "upstreamIDs": [
+        "kernel-boot-exec_security_policy_kill"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-container_manager_upcall_force_success",
+      "title": "Container manager upcall",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchContainerManagerUpcall"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "iosBaseIs27",
+      "upstreamIDs": [
+        "kernel-boot-container_manager_upcall_force_success"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-iomfb_swapend",
+      "title": "IOMFB swap-end sizes",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchIomfbSwapEndVariableSize",
+        "kernelcache.KernelJBPatcher.patchIomfbSwapEndHandlerSize"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "iosBaseIs27",
+      "upstreamIDs": [
+        "kernel-boot-iomfb_swapend"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-boot-fpfs_scoped_open",
+      "title": "FileProvider scoped open",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchFpfsScopedVnodeOpen"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "iosBaseIs27",
+      "upstreamIDs": [
+        "kernel-boot-fpfs_scoped_open"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(iOSBase: .major(27))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-exp-frida_thread_set_state_entitlement_flag",
+      "title": "thread_set_state entitlement",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchThreadSetStateEntitlementFlag"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "frida",
+      "required": false,
+      "versionRule": "cloudOSFridaCapable",
+      "upstreamIDs": [
+        "kernel-exp-frida_thread_set_state_entitlement_flag"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(cloudOS: .atLeast(major: 26, minor: 4))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-exp-frida_vm_map_delete_immutable_code",
+      "title": "Immutable code deletion",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelJBPatcher.patchVmMapDeleteImmutableCode"
+      ],
+      "variants": [
+        "jb",
+        "exp"
+      ],
+      "optIn": "frida",
+      "required": false,
+      "versionRule": "cloudOSFridaCapable",
+      "upstreamIDs": [
+        "kernel-exp-frida_vm_map_delete_immutable_code"
+      ],
+      "upstreamApplicability": "VPhonePatchApplicability(cloudOS: .atLeast(major: 26, minor: 4))",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "kernel-exp-hv_vmm",
+      "title": "hv_vmm_present sysctl",
+      "coverage": "swift",
+      "swiftSteps": [
+        "kernelcache.KernelEXPPatcher.patchHvVmmRename"
+      ],
+      "variants": [
+        "exp"
+      ],
+      "optIn": "none",
+      "required": false,
+      "versionRule": "always",
+      "upstreamIDs": [
+        "kernel-exp-hv_vmm"
+      ],
+      "upstreamApplicability": ".always (default)",
+      "requires": [],
+      "conflicts": [],
+      "after": []
+    },
+    {
+      "id": "filesystem-less-cryptex_merge",
+      "title": "less Cryptex filesystem merge",
+      "coverage": "swift",
+      "swiftSteps": [
+        "filesystem.CryptexFilesystemPatcher.patchCryptexFilesystem"
+      ],
+      "variants": [
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [],
+      "upstreamApplicability": "local_only (上游 less 无声明)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "note": "上游 less 变体同名组件但无 patch set 声明；本地 local_only。"
+    },
+    {
+      "id": "manifest-less-hash_rewrite",
+      "title": "less Manifest hash rewrite",
+      "coverage": "swift",
+      "swiftSteps": [
+        "manifest.ManifestHashPatcher.patchManifestHash"
+      ],
+      "variants": [
+        "less"
+      ],
+      "optIn": "none",
+      "required": true,
+      "versionRule": "always",
+      "upstreamIDs": [],
+      "upstreamApplicability": "local_only (上游 less 无声明)",
+      "requires": [],
+      "conflicts": [],
+      "after": [],
+      "note": "上游 less 变体同名组件但无 patch set 声明；本地 local_only。"
+    }
+  ]
+}

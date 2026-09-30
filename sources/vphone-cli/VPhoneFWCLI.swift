@@ -8,7 +8,7 @@ struct VPhoneFWCommand: ParsableCommand {
         commandName: "fw",
         abstract: "Firmware pipeline: prepare (download/merge IPSWs) and patch",
         subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self,
-                      VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self])
+                      VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self, VPhoneFWPlanCommand.self])
 }
 
 // MARK: - catalog
@@ -251,5 +251,97 @@ struct VPhoneFWRecordCompareCommand: ParsableCommand {
             print(comparison.render(), terminator: "")
         }
         if !comparison.allSame { throw ExitCode(1) }
+    }
+}
+
+// MARK: - declared variant plan (read-only, T10/T11)
+
+/// Read-only resolver entry: prints the declared patch plan for one or all variants under a
+/// modeled gate snapshot. It patches nothing and touches no VM; the gate values are supplied
+/// by flags and mirror `FirmwarePipeline.gateSnapshot`.
+struct VPhoneFWPlanCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "plan",
+        abstract: "Resolve and print the declared patch plan for a variant (read-only; patches nothing)",
+        discussion: """
+        Joins the pipeline's live steps with the declaration catalog (T10) and reports, per
+        variant, the selected declarations and those excluded by version, opt-in or variant,
+        plus the guest-side (uncovered this round) and not-implemented declarations. Gate
+        values come from --base-os / --frida / --force-exc-guard, modeling the run without a VM.
+        """)
+
+    @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp | less")
+    var variant: PatchFirmwareCLI.VariantOption = .regular
+    @Flag(name: .customLong("all"), help: "Resolve every variant instead of one.")
+    var all = false
+    @Option(name: .customLong("base-os"), help: "Modeled iPhone base major: 18 | 26 | 27 (default 26).")
+    var baseOS: String = "26"
+    @Flag(name: .customLong("base-unknown"), help: "Model an unreadable base ProductVersion (strict: required version-gated declarations become indeterminate).")
+    var baseUnknown = false
+    @Flag(name: .customLong("frida"), help: "Model the --frida opt-in (jb/exp only).")
+    var frida = false
+    @Flag(name: .customLong("no-cloudos-frida-capable"), help: "Model a cloudOS kernel below 26.4 (Frida steps unavailable).")
+    var noCloudFridaCapable = false
+    @Flag(name: .customLong("force-exc-guard"), help: "Model the forced EXC_GUARD disable.")
+    var forceExcGuard = false
+    @Option(name: .customLong("select"), parsing: .upToNextOption, help: "Explicitly select declaration id(s) (repeatable); unknown or not-implemented ids are refused.")
+    var select: [String] = []
+    @Option(name: .customLong("block"), parsing: .upToNextOption, help: "Explicitly block declaration id(s) (repeatable).")
+    var block: [String] = []
+    @Flag(help: "Emit JSON.") var json = false
+
+    func gates(for pipelineVariant: FirmwarePipeline.Variant) -> PatchGateSnapshot {
+        let is18 = !baseUnknown && baseOS == "18"
+        let is27 = !baseUnknown && baseOS == "27"
+        let cloudCapable = !noCloudFridaCapable
+        let excGuardActive = pipelineVariant == .dev || is18 || forceExcGuard
+        return PatchGateSnapshot(
+            variant: pipelineVariant.rawValue,
+            iosBaseIs18: is18, iosBaseIs27: is27,
+            cloudOSIsFridaCapable: cloudCapable,
+            forceExcGuard: forceExcGuard, enableFrida: frida,
+            excGuardActive: excGuardActive, applyIOS27: is27,
+            applyFrida: frida && cloudCapable)
+    }
+
+    func run() throws {
+        let variants: [FirmwarePipeline.Variant] = all
+            ? [.regular, .dev, .jb, .exp, .less]
+            : [variant.pipelineVariant]
+        var plans: [VariantPlanResolver.VariantPlan] = []
+        for v in variants {
+            let plan = try VariantPlanResolver.resolve(
+                variant: v, gates: gates(for: v), baseVersionKnown: !baseUnknown,
+                select: Set(select), block: Set(block))
+            plans.append(plan)
+        }
+        if json {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+            let data = try encoder.encode(all ? plans : [plans[0]])
+            print(String(decoding: data, as: UTF8.self))
+            return
+        }
+        for plan in plans { printPlan(plan) }
+    }
+
+    private func printPlan(_ plan: VariantPlanResolver.VariantPlan) {
+        print("== variant \(plan.variant)  (upstream \(plan.upstreamTag)) ==")
+        print("   gates: \(plan.gates.summary)")
+        func section(_ title: String, _ entries: [VariantPlanResolver.Entry]) {
+            guard !entries.isEmpty else { return }
+            print("   \(title) (\(entries.count)):")
+            for entry in entries {
+                let req = entry.required ? " *required" : ""
+                print("     - \(entry.id)\(req)  [\(entry.reason)]")
+            }
+        }
+        section("selected", plan.selected)
+        section("excluded: version", plan.excludedByVersion)
+        section("excluded: opt-in", plan.excludedByOptIn)
+        section("excluded: variant", plan.excludedByVariant)
+        section("guest (uncovered this round)", plan.guestUncovered)
+        section("not implemented", plan.notImplemented)
+        print("   selected swift steps: \(plan.enabledStepIDs.count)")
     }
 }

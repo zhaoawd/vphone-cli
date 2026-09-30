@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-01 声明层与变体计划（T10/T11）
+
+Swift 补丁步骤的声明层映射、五变体计划解析与严格写入门见 `research/t10_t11_variant_plan_strict_gate_2026-10-01.md`；声明数据 `sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalogData.swift`（可读副本 `research/t10_patch_declarations_2026-10-01.json`），只读入口 `vphone-cli fw plan`。本轮未新增或改动二进制补丁，本文既有计数不变。
+
 ## 2026-09-29 VM runtime split, schema boundary and API app actions
 
 Added a paired VM executable with separate signing, boot exec handoff, legacy/new process identity matching and combined CLI/VM checkpoint fingerprints. Versioned manifests are refused by the legacy backend without rewriting them. Explicit API launch/terminate preserves foreground verification and reports post-submission uncertainty. No firmware/kernel/DSC patch bytes or default guest payloads changed. The new VM executable is rejected by AMFI for restricted entitlements; real VM acceptance remains incomplete. See [runtime details](p3_vm_process_integration_2026-09-29.md) and [remaining stage status](upstream_remaining_progress_2026-09-29.md).
