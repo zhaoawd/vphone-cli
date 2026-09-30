@@ -15,7 +15,11 @@ token = '1234567890abcdef'
 behind_proxy = '--behind-proxy' in sys.argv[2:]
 host_commands = '--host-commands' in sys.argv[2:]
 managed = '--managed-session' in sys.argv[2:] or host_commands
-health = {'status': 'ok', 'api_version': 1, 'binary_hash': 'a' * 64,
+# Emulates upstream 1df6c43c vphoned: after the last reply, keep the connection
+# until the host closes it (fallback 10 s) and record how long that took.
+wait_for_peer = '--wait-for-peer-close' in sys.argv[2:]
+PEER_CLOSE_FALLBACK = 10
+health ={'status': 'ok', 'api_version': 1, 'binary_hash': 'a' * 64,
           'capabilities': ['files'], 'ios': '26.0'}
 if managed:
     health.update(instance_id=str(uuid.uuid4()), capabilities=['files', 'session_identity', 'file_download_identity', 'file_upload_identity'])
@@ -28,6 +32,28 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, *args):
         pass
+
+    def handle(self):
+        super().handle()
+        if wait_for_peer:
+            self.await_peer_close()
+
+    def await_peer_close(self):
+        # Later bytes are discarded; only the peer's EOF ends the connection.
+        started = time.monotonic()
+        self.connection.settimeout(PEER_CLOSE_FALLBACK)
+        outcome = 'timeout'
+        try:
+            while self.connection.recv(65536):
+                pass
+            outcome = f'{time.monotonic() - started:.3f}'
+        except TimeoutError:
+            pass
+        except OSError:
+            outcome = f'{time.monotonic() - started:.3f}'
+        with (root / 'peer-close').open('a') as log:
+            path = urlsplit(getattr(self, 'path', '')).path or '-'
+            log.write(f'{getattr(self, "command", None) or "-"} {path} {outcome}\n')
 
     def reply(self, status, value):
         data = json.dumps(value).encode()
@@ -185,6 +211,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def read_frame(self):
         header = self.rfile.read(2)
+        if len(header) == 2 and header[0] & 15 == 8 and wait_for_peer:
+            # Echo the close instead of closing the socket first.
+            self.wfile.write(b'\x88\x02\x03\xe8')
+            self.wfile.flush()
         if len(header) != 2 or header[0] & 15 == 8:
             return None
         size = header[1] & 127
@@ -207,6 +237,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Connection', 'Upgrade')
         self.send_header('Sec-WebSocket-Accept', accept)
         self.end_headers()
+        self.close_connection = True  # No HTTP request follows the WebSocket.
         self.frame({'type': 'event', 'event': 'connected', 'data': health if managed else {'api_version': 1}})
         if managed:
             while value := self.read_frame():

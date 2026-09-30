@@ -1,6 +1,7 @@
 import copy
 import importlib.util
 from pathlib import Path
+import plistlib
 import sys
 import unittest
 
@@ -38,3 +39,13 @@ class DaemonAPIBuildTests(unittest.TestCase):
     def test_duplicate_pins_are_rejected(self):
         with self.assertRaisesRegex(ValueError, 'Duplicate'):
             module.check_pins(self.pins + self.pins, self.pins)
+
+    def test_launchd_plist_restarts_quickly_and_keeps_proxy_log(self):
+        # Upstream 2e2ed0a8: proxy exit reasons reach a file, launchd restarts
+        # the proxy after one second, and boot-time throttling does not apply.
+        plist = plistlib.loads((module.PROJECT / 'Configuration/vphoned.plist').read_bytes())
+        self.assertEqual(plist, {
+            'Label': 'com.vphone.vphoned', 'ProgramArguments': ['/usr/bin/vphoned'],
+            'RunAtLoad': True, 'KeepAlive': True, 'ThrottleInterval': 1, 'ProcessType': 'Interactive',
+            'StandardOutPath': '/var/log/vphoned.log', 'StandardErrorPath': '/var/log/vphoned.log',
+        })

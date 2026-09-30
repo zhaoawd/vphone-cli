@@ -7,6 +7,7 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
     typealias OutboundOut = WebSocketFrame
 
     private let hub: APIEventHub
+    private var closing = false
     init(hub: APIEventHub) {
         self.hub = hub
     }
@@ -19,6 +20,8 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let frame = unwrapInboundIn(data)
+        // Frames decoded after a close frame are not executed.
+        guard !closing else { return }
         switch frame.opcode {
         case .text:
             var buffer = frame.unmaskedData
@@ -36,7 +39,16 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
             let pong = WebSocketFrame(fin: true, opcode: .pong, data: frame.unmaskedData)
             context.writeAndFlush(wrapOutboundOut(pong), promise: nil)
         case .connectionClose:
-            context.close(promise: nil)
+            // Echo the close and let the host drop the connection, so replies
+            // still queued ahead of this frame reach it. Events are not sent
+            // after the close frame.
+            closing = true
+            let channel = context.channel
+            hub.remove(channel)
+            let echo = WebSocketFrame(fin: true, opcode: .connectionClose, data: frame.unmaskedData)
+            context.writeAndFlush(wrapOutboundOut(echo)).whenComplete { _ in
+                channel.closeAfterPeer()
+            }
         default:
             break
         }

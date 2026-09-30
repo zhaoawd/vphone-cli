@@ -7,7 +7,7 @@ final class APIHTTPFixture {
     let directory: URL
     let port: Int
 
-    init(behindProxy: Bool = false, managedSession: Bool = false) async throws {
+    init(behindProxy: Bool = false, managedSession: Bool = false, waitForPeerClose: Bool = false) async throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("vphone-api-\(UUID())")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -15,6 +15,7 @@ final class APIHTTPFixture {
         process.arguments = [root.appendingPathComponent("tests/fixtures/host_api/server.py").path, directory.path]
         if managedSession { process.arguments?.append("--managed-session") }
         if behindProxy { process.arguments?.append("--behind-proxy") }
+        if waitForPeerClose { process.arguments?.append("--wait-for-peer-close") }
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
         try process.run()

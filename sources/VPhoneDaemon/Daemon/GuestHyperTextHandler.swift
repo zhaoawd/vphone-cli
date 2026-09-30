@@ -14,6 +14,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
     private var body = Data()
     private var exceededLimit = false
     private var upload: GuestFileUpload?
+    private var requestStarted = false
     private let maximumJSONBody = 1 << 20
 
     init(hub: APIEventHub, fileIO: NonBlockingFileIO) {
@@ -24,6 +25,15 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         switch unwrapInboundIn(data) {
         case let .head(request):
+            // The host proxy checks only the first request head on a
+            // connection, and replies no longer close the connection first.
+            // A later request is answered with an error and not executed.
+            guard !requestStarted else {
+                head = nil
+                Self.send(APIWire.error("One request per connection"), on: context.channel)
+                return
+            }
+            requestStarted = true
             head = request
             body.removeAll(keepingCapacity: true)
             exceededLimit = false
@@ -288,7 +298,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
             buffer.writeBytes(reply.data)
             channel.write(HTTPServerResponsePart.body(.byteBuffer(buffer)), promise: nil)
             channel.writeAndFlush(HTTPServerResponsePart.end(nil)).whenComplete { _ in
-                channel.close(promise: nil)
+                channel.closeAfterPeer()
             }
         }
         if channel.eventLoop.inEventLoop {
