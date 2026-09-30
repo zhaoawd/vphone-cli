@@ -64,6 +64,7 @@ public enum VPhoneDiagnosticCode: String, Codable, CaseIterable, Sendable {
     case researchGuests = "research_guests"
     case signingEntitlements = "signing_entitlements"
     case diskSpace = "disk_space"
+    case hostArchitecture = "host_architecture"
     // dependency
     case pythonRuntime = "python_runtime"
     case runtimeResources = "runtime_resources"

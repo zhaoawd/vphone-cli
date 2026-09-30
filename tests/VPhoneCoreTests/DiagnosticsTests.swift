@@ -57,7 +57,7 @@ private func healthyProbes() -> VPhoneDiagnosticProbes {
     VPhoneDiagnosticProbes(
         environment: [:],
         operatingSystemVersion: { OperatingSystemVersion(majorVersion: 26, minorVersion: 5, patchVersion: 0) },
-        sysctlInt: { $0 == "kern.hv_support" ? 1 : 0 },
+        sysctlInt: { ["kern.hv_support": 1, "hw.optional.arm64": 1][$0] ?? 0 },
         run: { executable, args, _, _ in
             if args.contains("allow-research-guests") {
                 return VPhoneProcessResult(exitCode: 0, stdout: "Allow Research Guests status: enabled\n", stderr: "")
@@ -184,7 +184,7 @@ struct DiagnosticsReportTests {
         #expect(VPhoneDiagnosticSeverity.allCases.map(\.rawValue) == ["ok", "warning", "unknown", "error"])
         #expect(VPhoneDiagnosticCode.allCases.map(\.rawValue) == [
             "macos_version", "hypervisor_support", "nested_virtualization", "sip_status", "research_guests",
-            "signing_entitlements", "disk_space", "python_runtime", "runtime_resources", "host_tools",
+            "signing_entitlements", "disk_space", "host_architecture", "python_runtime", "runtime_resources", "host_tools",
             "library_root", "bundle_unreadable", "vm_not_found", "vm_manifest_invalid", "vm_files",
             "create_checkpoint_absent", "create_checkpoint_invalid", "create_succeeded", "create_incomplete",
             "create_interrupted", "create_stage_failed", "create_cancelled", "create_completed_unverified",
@@ -318,6 +318,69 @@ struct DiagnosticsHostTests {
         #expect(sip.severity == .warning)
         #expect(sip.evidence["Kext Signing"] == "enabled")
         #expect(find(findings, .researchGuests)?.severity == .unknown)
+    }
+
+    // MARK: T24 host policy (upstream a23a765: csr_get_active_config on multi-OS Macs)
+
+    @Test func hostArchitectureRequiresArm64() throws {
+        let workspace = try DiagnosticsWorkspace()
+        var probes = healthyProbes()
+        for (value, severity, evidence) in [(Int?.some(1), VPhoneDiagnosticSeverity.ok, "1"), (0, .error, "0"), (nil, .error, "unavailable")] {
+            probes.sysctlInt = { $0 == "hw.optional.arm64" ? value : 1 }
+            let finding = try #require(find(workspace.diagnostics(probes).hostFindings(.init(processList: "", attachedImages: [])),
+                                            .hostArchitecture))
+            #expect(finding.category == .environment)
+            #expect(finding.severity == severity)
+            #expect(finding.evidence["hw.optional.arm64"] == evidence)
+            if severity == .error { #expect(finding.message.contains("require")) }
+        }
+    }
+
+    @Test func researchGuestsFollowActiveKernelConfigurationOnMultiOSHosts() throws {
+        let workspace = try DiagnosticsWorkspace()
+        var probes = healthyProbes()
+        // csrutil on a Mac with several installations asks which one to inspect.
+        probes.run = { executable, args, _, _ in
+            if args.contains("allow-research-guests") {
+                return VPhoneProcessResult(exitCode: 0, stdout: "Pick a macOS installation:\n1. Macintosh HD\n2. Other\n", stderr: "")
+            }
+            return executable.path == "/usr/bin/csrutil"
+                ? VPhoneProcessResult(exitCode: 0, stdout: "System Integrity Protection status: disabled.\n", stderr: "") : nil
+        }
+        let snapshot = VPhoneDiagnostics.Snapshot(processList: "", attachedImages: [])
+
+        probes.csrActiveConfig = { .configuration(0x1004) }
+        var guests = try #require(find(workspace.diagnostics(probes).hostFindings(snapshot), .researchGuests))
+        #expect(guests.severity == .ok)
+        #expect(guests.evidence["csr_active_config"] == "0x00001004")
+        #expect(guests.evidence["csr_allow_research_guests"] == "true")
+        let sip = try #require(find(workspace.diagnostics(probes).hostFindings(snapshot), .sipStatus))
+        #expect(sip.severity == .ok)
+        #expect(sip.evidence["csr_allow_task_for_pid"] == "true")
+
+        // Unrelated bits cannot stand in for the research-guest bit.
+        probes.csrActiveConfig = { .configuration(0x8000_0004) }
+        guests = try #require(find(workspace.diagnostics(probes).hostFindings(snapshot), .researchGuests))
+        #expect(guests.severity == .error)
+        #expect(guests.message.contains("CSR_ALLOW_RESEARCH_GUESTS is clear"))
+        #expect(guests.suggestedAction?.contains("allow-research-guests enable") == true)
+
+        // Without the query the csrutil prompt stays unknown and names why.
+        probes.csrActiveConfig = { .unavailable("csr_get_active_config is unavailable") }
+        guests = try #require(find(workspace.diagnostics(probes).hostFindings(snapshot), .researchGuests))
+        #expect(guests.severity == .unknown)
+        #expect(guests.message.contains("several macOS installations"))
+        #expect(guests.evidence["csr_query"] == "csr_get_active_config is unavailable")
+    }
+
+    @Test func csrQueryFailuresAreReportedNotGuessed() {
+        #expect(VPhoneHostSecurityPolicy.activeConfiguration(query: nil) == .unavailable("csr_get_active_config is unavailable"))
+        let ready: VPhoneHostSecurityPolicy.CSRQuery = { $0.pointee = 0x1004; return 0 }
+        #expect(VPhoneHostSecurityPolicy.activeConfiguration(query: ready) == .configuration(0x1004))
+        // A failed call that still filled a permitted value grants nothing.
+        let failed: VPhoneHostSecurityPolicy.CSRQuery = { $0.pointee = 0x1004; errno = EIO; return -1 }
+        #expect(VPhoneHostSecurityPolicy.activeConfiguration(query: failed)
+            == .unavailable("csr_get_active_config failed (status -1, errno \(EIO))"))
     }
 
     @Test func missingPythonRuntimeIsDependencyError() throws {

@@ -109,24 +109,42 @@ public struct VPhoneCoreBundleStore: Sendable {
         try secureTree(directory, normalize: false)
         let receiptURL = directory.appendingPathComponent("receipt.json")
         let info = try requireEntry(receiptURL, type: S_IFREG)
-        guard info.st_size > 0, info.st_size <= 65536 else { throw VPhoneBundleStoreError("Invalid receipt size.") }
-        let receipt = try VPhoneBundleReceipt.decode(Data(contentsOf: receiptURL))
-        guard receipt.version == version,
-              Set(receipt.cdhashes.keys) == Set(VPhoneBundleExecutable.allCases.map(\.rawValue)) else {
-            throw VPhoneBundleStoreError("Core Bundle receipt identity mismatch.")
+        guard info.st_size > 0, info.st_size <= 65536 else {
+            throw VPhoneBundleStoreError("Invalid Core Bundle receipt size \(info.st_size) (1–65536 bytes): \(receiptURL.path)")
         }
-        try requireHex(receipt.sha256, length: 64)
+        let receipt: VPhoneBundleReceipt
+        do { receipt = try VPhoneBundleReceipt.decode(Data(contentsOf: receiptURL)) } catch {
+            throw VPhoneBundleStoreError("Invalid Core Bundle receipt: expected JSON with version, sha256, installedAt and cdhashes: \(receiptURL.path)")
+        }
+        try Self.requireReceipt(receipt, version: version)
         let bundle = directory.appendingPathComponent("VPhone.bundle")
         try requireBundleLayout(bundle, version: version)
         try VPhoneBundleCodeSignature.verify(bundle)
         for executable in VPhoneBundleExecutable.allCases {
             let expected = receipt.cdhashes[executable.rawValue]!
-            try requireHex(expected, length: 40)
-            guard try VPhoneBundleCodeSignature.cdhash(executableURL(bundle, executable)) == expected else {
-                throw VPhoneBundleStoreError("Installed \(executable.rawValue) cdhash differs from its receipt.")
+            let actual = try VPhoneBundleCodeSignature.cdhash(executableURL(bundle, executable))
+            guard actual == expected else {
+                throw VPhoneBundleStoreError("Installed \(executable.rawValue) cdhash \(actual) differs from its receipt (\(expected)).")
             }
         }
         return receipt
+    }
+
+    /// Receipt fields checked before any signature work, one reason per failure.
+    static func requireReceipt(_ receipt: VPhoneBundleReceipt, version: String) throws {
+        guard receipt.version == version else {
+            throw VPhoneBundleStoreError("Core Bundle receipt version \(VPhoneBundleVersion.quoted(receipt.version)) does not match installed version \(version).")
+        }
+        let required = VPhoneBundleExecutable.allCases.map(\.rawValue).sorted()
+        guard receipt.cdhashes.keys.sorted() == required else {
+            throw VPhoneBundleStoreError("Core Bundle receipt cdhashes must name exactly \(required.joined(separator: ", ")); found: \(receipt.cdhashes.keys.sorted().map(VPhoneBundleVersion.quoted).joined(separator: ", ")).")
+        }
+        guard isHex(receipt.sha256, length: 64) else {
+            throw VPhoneBundleStoreError("Core Bundle receipt sha256 is not 64 lowercase hexadecimal digits.")
+        }
+        for name in required where !isHex(receipt.cdhashes[name]!, length: 40) {
+            throw VPhoneBundleStoreError("Core Bundle receipt cdhash for \(name) is not 40 lowercase hexadecimal digits.")
+        }
     }
 
     private func requireBundleLayout(_ bundle: URL, version: String) throws {
@@ -137,15 +155,18 @@ public struct VPhoneCoreBundleStore: Sendable {
         let info = try requireEntry(plist, type: S_IFREG)
         guard info.st_size > 0, info.st_size <= 1 << 20 else { throw VPhoneBundleStoreError("Invalid Core Bundle Info.plist size.") }
         let value = try PropertyListSerialization.propertyList(from: Data(contentsOf: plist), format: nil)
-        guard let properties = value as? [String: Any], let actual = properties["CFBundleShortVersionString"] as? String,
-              actual == version || actual + "-local" == version else {
-            throw VPhoneBundleStoreError("Core Bundle Info.plist version mismatch.")
+        guard let properties = value as? [String: Any], let actual = properties["CFBundleShortVersionString"] as? String else {
+            throw VPhoneBundleStoreError("Core Bundle Info.plist version mismatch: CFBundleShortVersionString is missing.")
+        }
+        guard actual == VPhoneBundleVersion.release(of: version) else {
+            throw VPhoneBundleStoreError("Core Bundle Info.plist version mismatch: CFBundleShortVersionString \(VPhoneBundleVersion.quoted(actual)), requested \(version).")
         }
         try VPhoneBundleVersion.require(actual)
         for name in VPhoneBundleExecutable.allCases.map(\.rawValue) + ["vphone-escalator"] {
             let file = bundle.appendingPathComponent("Contents/MacOS/\(name)")
             let info = try requireEntry(file, type: S_IFREG)
             guard info.st_mode & 0o111 != 0 else { throw VPhoneBundleStoreError("Not executable: \(file.path)") }
+            try VPhoneMachOArchitectures.requireAppleSilicon(file)
         }
     }
 
@@ -286,13 +307,22 @@ public struct VPhoneCoreBundleStore: Sendable {
         return try body()
     }
 
+    /// Read-only: reports the first property that fails and never repairs it.
     @discardableResult
     private func requireEntry(_ url: URL, type: mode_t) throws -> stat {
         var info = stat()
-        guard lstat(url.path, &info) == 0, info.st_mode & S_IFMT == type, info.st_uid == owner,
-              info.st_mode & 0o7022 == 0, type != S_IFREG || info.st_nlink == 1 else {
-            throw VPhoneBundleStoreError("Unsafe ownership, type, links, or permissions: \(url.path)")
-        }
+        guard lstat(url.path, &info) == 0 else { throw failure("inspect", url) }
+        let expected = type == S_IFDIR ? "directory" : "regular file"
+        let reason: String? = if info.st_mode & S_IFMT != type {
+            "type is not a \(expected)\(info.st_mode & S_IFMT == S_IFLNK ? " (symbolic link)" : "")"
+        } else if info.st_uid != owner {
+            "owner uid \(info.st_uid), expected \(owner)"
+        } else if info.st_mode & 0o7022 != 0 {
+            "mode \(String(info.st_mode & 0o7777, radix: 8)) has group/other write or setuid/setgid/sticky bits"
+        } else if type == S_IFREG, info.st_nlink != 1 {
+            "\(info.st_nlink) hard links, expected 1"
+        } else { nil }
+        if let reason { throw VPhoneBundleStoreError("Unsafe ownership, type, links, or permissions: \(url.path): \(reason)") }
         try requireNoACL(url)
         return info
     }
@@ -319,9 +349,16 @@ public struct VPhoneCoreBundleStore: Sendable {
             var info = stat()
             guard lstat(url.path, &info) == 0 else { throw failure("inspect tree", url) }
             let type = info.st_mode & S_IFMT
-            guard info.st_mode & 0o7000 == 0, info.st_uid == owner,
-                  type == S_IFDIR || type == S_IFREG || type == S_IFLNK,
-                  type != S_IFREG || info.st_nlink == 1 else { throw VPhoneBundleStoreError("Unsafe bundle entry: \(url.path)") }
+            let reason: String? = if !(type == S_IFDIR || type == S_IFREG || type == S_IFLNK) {
+                "not a directory, regular file or symbolic link"
+            } else if info.st_uid != owner {
+                "owner uid \(info.st_uid), expected \(owner)"
+            } else if info.st_mode & 0o7000 != 0 {
+                "setuid/setgid/sticky mode \(String(info.st_mode & 0o7777, radix: 8))"
+            } else if type == S_IFREG, info.st_nlink != 1 {
+                "\(info.st_nlink) hard links, expected 1"
+            } else { nil }
+            if let reason { throw VPhoneBundleStoreError("Unsafe bundle entry: \(url.path): \(reason)") }
             try requireNoACL(url)
             if type == S_IFLNK {
                 let target = try FileManager.default.destinationOfSymbolicLink(atPath: url.path)
@@ -334,7 +371,7 @@ public struct VPhoneCoreBundleStore: Sendable {
                     throw failure("normalize bundle permissions", url)
                 }
             } else if info.st_mode & 0o022 != 0 {
-                throw VPhoneBundleStoreError("Writable installed bundle entry: \(url.path)")
+                throw VPhoneBundleStoreError("Writable installed bundle entry: \(url.path): mode \(String(info.st_mode & 0o7777, radix: 8))")
             }
             if type == S_IFDIR {
                 for name in try FileManager.default.contentsOfDirectory(atPath: url.path) {
@@ -347,9 +384,13 @@ public struct VPhoneCoreBundleStore: Sendable {
     }
 
     private func requireHex(_ value: String, length: Int) throws {
-        guard value.utf8.count == length, value.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }) else {
+        guard Self.isHex(value, length: length) else {
             throw VPhoneBundleStoreError("Invalid \(length)-digit hexadecimal digest.")
         }
+    }
+
+    static func isHex(_ value: String, length: Int) -> Bool {
+        value.utf8.count == length && value.utf8.allSatisfy { (48...57).contains($0) || (97...102).contains($0) }
     }
 
     private func failure(_ operation: String, _ url: URL) -> VPhoneBundleStoreError {

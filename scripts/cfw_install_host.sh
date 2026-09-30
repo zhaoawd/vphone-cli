@@ -215,14 +215,31 @@ fi
 # appeared beneath the VM directory meanwhile (not from this invocation, whose
 # mounts were released by cleanup) only downgrades the ownership step to a
 # warning. Never fail a finished install here, and never chown across it.
+# Only the owner changes; no mode is widened (upstream VPhoneHostFilePermissions
+# chmods 0777, which this project does not adopt). As in upstream's descriptor
+# walk, the walk stays on one device (-x), follows no symbolic link (find -P;
+# chown -h never follows one either), changes only directories and regular
+# files with a single link, and only when root or the invoker owns them. A
+# hard link could name a file outside the VM directory, and an entry of a third
+# account is not the invoker's to receive; both keep their owner, and a third
+# account's directory is not descended into.
+restore_invoker_ownership() {
+  local target="$1"
+  find -x "$target" \( -type d ! -user 0 ! -user "$SUDO_UID" -prune \) -o \
+    \( \( -type d -o \( -type f -links 1 \) \) \( -user 0 -o -user "$SUDO_UID" \) \
+       -exec chown -h "$SUDO_UID" {} + \)
+}
+
 if [[ -n "${SUDO_USER:-}" ]]; then
-  if assert_no_vm_mounts; then
+  if [[ ! "${SUDO_UID:-}" =~ '^[0-9]+$' ]]; then
+    echo "[!] ownership of host-side artifacts NOT restored: SUDO_UID is missing or not numeric" >&2
+  elif assert_no_vm_mounts; then
     for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input; do
       [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
-      chown -Rx "$SUDO_USER" "$VM_DIR/$artifact"
+      restore_invoker_ownership "$VM_DIR/$artifact"
     done
     [[ -e "$PROJ/scripts/vphoned/vphoned" ]] && chown "$SUDO_USER" "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
-    echo "[*] restored ownership of host-side artifacts to $SUDO_USER"
+    echo "[*] restored ownership of host-side artifacts to $SUDO_USER (hard-linked files and other accounts' entries left as found)"
   else
     echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $SUDO_USER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input}" >&2
   fi

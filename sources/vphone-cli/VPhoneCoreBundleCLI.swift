@@ -18,7 +18,7 @@ struct VPhoneCoreBundleInstallCommand: ParsableCommand {
         discussion: "Supply a SHA-256 from a trusted source. Ad hoc signatures verify integrity, not publisher identity. This command does not change AMFI policy or activate a VM."
     )
 
-    @Option(help: "Bundle version, at least 2.0.8; local builds may use -local")
+    @Option(help: "Bundle version, at least 2.2.0; X.Y.Z-local for a local build, X.Y.Z-ci.<commit> for a CI artifact")
     var version: String
 
     @Option(help: "Archive containing VPhone.bundle", transform: URL.init(fileURLWithPath:))
