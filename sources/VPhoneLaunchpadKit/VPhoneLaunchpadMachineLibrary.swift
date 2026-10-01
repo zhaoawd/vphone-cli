@@ -1,13 +1,15 @@
 import Foundation
 import Observation
 
-/// The VM library, listed through `vphone-cli vm list --json`. B1 is
-/// read-only: it lists machines and shows their run state, and runs no
-/// command that changes a machine.
+/// The VM library, listed through `vphone-cli vm list --json`, started with
+/// `vm launch` and stopped with `vm stop`. Launchpad never takes or probes a
+/// VM lock: `vphone-vm` holds it, and the CLI refuses conflicting work
+/// itself.
 ///
 /// Machines can live in several libraries: the default one, and folders in
 /// the `VPhoneLaunchpadLibraryRoots` default. Each library is listed with its
-/// own `--library-root`.
+/// own `--library-root`, and every action on a machine passes the root it was
+/// listed from.
 @MainActor
 @Observable
 public final class VPhoneLaunchpadMachineLibrary {
@@ -26,12 +28,25 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// is not among them.
     public private(set) var addedRoots: [String]
     public var selection: Set<Path> = []
+    /// When Launchpad started each machine it still holds a `vm launch` for.
+    public private(set) var startedAt: [Path: Date] = [:]
+    /// Machines whose console printed a panic line since Launchpad last
+    /// started them. The text itself stays in the log file.
+    public private(set) var panicked: Set<Path> = []
+    /// What Launchpad is doing to a machine right now (`Stopping…`).
+    public private(set) var activities: [Path: String] = [:]
+    public var actionError: VPhoneLaunchpadError?
 
     /// The default library, canonical.
     public let libraryRoot: String
+    /// Where console logs go: `~/Library/Logs/vphone-cli-launchpad`.
+    public let logsDirectory: URL
     private let defaults: UserDefaults
     private let runStateReader: VPhoneLaunchpadRunStateReader
     private var commandLine: VPhoneLaunchpadCommandLine?
+    /// The `vm launch` children this Launchpad started. Signals go only to
+    /// these.
+    private var launched: [Path: VPhoneLaunchpadChildProcess] = [:]
     private var isRefreshing = false
     private var monitor: Task<Void, Never>?
     private var lastReportedCount: Int?
@@ -39,10 +54,12 @@ public final class VPhoneLaunchpadMachineLibrary {
     public init(
         defaults: UserDefaults = .standard,
         libraryRoot: String = VPhoneLaunchpadMachineLocations.defaultRoot,
+        logsDirectory: URL = VPhoneLaunchpadIdentity.logsDirectory(),
         runStateReader: VPhoneLaunchpadRunStateReader = .live
     ) {
         self.defaults = defaults
         self.libraryRoot = libraryRoot
+        self.logsDirectory = logsDirectory
         self.runStateReader = runStateReader
         addedRoots = VPhoneLaunchpadMachineLocations.addedRoots(
             from: defaults.stringArray(forKey: Self.addedRootsKey) ?? [],
@@ -60,13 +77,44 @@ public final class VPhoneLaunchpadMachineLibrary {
         machines.filter { selection.contains($0.id) }
     }
 
+    /// The selected machine when exactly one is selected.
+    public var selected: VPhoneLaunchpadMachine? {
+        let selected = selectedMachines
+        return selected.count == 1 ? selected[0] : nil
+    }
+
     /// True while machines from more than one library are listed.
     public var spansLibraries: Bool {
         Set(machines.map(\.libraryRoot)).count > 1
     }
 
+    /// The process list's view of a machine; also running while a
+    /// `vm launch` this Launchpad started has not exited, since its VM
+    /// process is not up yet while `vm launch` runs the host preflight.
     public func state(of machine: Path) -> VPhoneLaunchpadRunState {
-        runStates[machine] ?? .stopped
+        let listed = runStates[machine] ?? .stopped
+        if !listed.isRunning, launched[machine]?.isRunning == true {
+            return .running(instanceID: nil)
+        }
+        return listed
+    }
+
+    public func canStart(_ machine: Path) -> Bool {
+        commandLine != nil && activities[machine] == nil && state(of: machine) == .stopped
+    }
+
+    public func canStop(_ machine: Path) -> Bool {
+        commandLine != nil && activities[machine] == nil && state(of: machine).isRunning
+    }
+
+    /// The `vm launch` child this Launchpad holds for `machine`, until it exits.
+    func launchedProcess(_ machine: Path) -> VPhoneLaunchpadChildProcess? {
+        launched[machine]
+    }
+
+    /// The machine's console log. Every start from Launchpad replaces it.
+    public func consoleLog(_ machine: Path) -> URL {
+        VPhoneLaunchpadMachineLocations.consoleLog(machine, defaultRoot: libraryRoot, logsDirectory: logsDirectory)
     }
 
     // MARK: - Locations
@@ -150,8 +198,81 @@ public final class VPhoneLaunchpadMachineLibrary {
             lastReportedCount = machines.count
             // Diagnostic line for the smoke check, written unbuffered; machine
             // names are not printed.
-            let line = "[launchpad] listed \(machines.count) machines from \(roots.count) libraries\n"
-            FileHandle.standardOutput.write(Data(line.utf8))
+            Self.diagnostic("listed \(machines.count) machines from \(roots.count) libraries")
         }
+    }
+
+    // MARK: - Start and stop
+
+    /// `vm launch <name> --library-root <root> [--headless]`, detached: the
+    /// child gets its own session and writes to the machine's console log,
+    /// so it keeps running after Launchpad quits. Returns at once.
+    public func start(_ machine: Path, headless: Bool = false) {
+        guard let commandLine, canStart(machine) else {
+            return
+        }
+        var arguments = ["vm", "launch", machine.name] + machine.libraryArguments
+        if headless {
+            arguments.append("--headless")
+        }
+        let log = consoleLog(machine)
+        panicked.remove(machine)
+        do {
+            let child = try commandLine.start(arguments, logFile: log) { [weak self] line in
+                if VPhoneLaunchpadConsoleLog.isPanic(line) {
+                    Task { @MainActor in self?.panicked.insert(machine) }
+                }
+            }
+            launched[machine] = child
+            startedAt[machine] = Date()
+            Self.diagnostic("vm launch started, pid \(child.processIdentifier)")
+            Task { [weak self] in
+                let status = await child.wait()
+                Self.diagnostic("vm launch pid \(child.processIdentifier) exited with status \(status)")
+                guard let self else {
+                    return
+                }
+                if launched[machine] === child {
+                    launched[machine] = nil
+                    startedAt[machine] = nil
+                    VPhoneLaunchpadConsoleLog.append(VPhoneLaunchpadConsoleLog.exitLine(status: status), to: log)
+                }
+                await refresh()
+            }
+        } catch {
+            actionError = VPhoneLaunchpadError(
+                String(localized: "Unable to Start \(machine.name)"), detail: error.localizedDescription)
+        }
+    }
+
+    /// `vm stop <name> --library-root <root>`, which finds and signals the
+    /// machine's VM process itself. Afterwards, and only when a `vm launch`
+    /// this Launchpad started for the machine is still running, that child
+    /// gets SIGINT. No other process is signalled from here.
+    public func stop(_ machine: Path) async {
+        guard let commandLine, activities[machine] == nil else {
+            return
+        }
+        activities[machine] = String(localized: "Stopping…")
+        defer { activities[machine] = nil }
+        do {
+            let result = try await commandLine.run(["vm", "stop", machine.name] + machine.libraryArguments)
+            if !result.succeeded {
+                actionError = VPhoneLaunchpadError(String(localized: "Unable to Stop \(machine.name)"), detail: result.tail)
+            }
+        } catch {
+            actionError = VPhoneLaunchpadError(
+                String(localized: "Unable to Stop \(machine.name)"), detail: error.localizedDescription)
+        }
+        launched[machine]?.interrupt()
+        await refresh()
+    }
+
+    // MARK: - Diagnostics
+
+    /// One unbuffered stdout line for smoke checks. Never carries a machine
+    /// name or path.
+    nonisolated static func diagnostic(_ text: String) {
+        FileHandle.standardOutput.write(Data("[launchpad] \(text)\n".utf8))
     }
 }

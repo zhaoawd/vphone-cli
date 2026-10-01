@@ -63,6 +63,11 @@ class LaunchpadStringsTests(unittest.TestCase):
         self.assertIn('Bridged to %@', found)
         self.assertNotIn('not a key', found)
 
+    def test_labeled_content_title_is_a_key(self):
+        (self.sources / 'Inspector.swift').write_text('LabeledContent("Started") { Text(verbatim: time) }\n')
+        found = module.extract_literals([self.sources])
+        self.assertIn('Started', found)
+
     def test_stale_key(self):
         self.strings['Unused'] = entry('未使用', 'Unused')
         issues, _ = self.run_check()

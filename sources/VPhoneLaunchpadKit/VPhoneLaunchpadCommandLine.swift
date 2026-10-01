@@ -58,7 +58,7 @@ public struct VPhoneLaunchpadCommandResult: Sendable {
 // MARK: - History
 
 /// Every command Launchpad runs, shown so it can be copied into a terminal.
-/// The history view arrives in B3; B1 records into it.
+/// The history view arrives in B3; B1 and B2 record into it.
 @MainActor
 @Observable
 public final class VPhoneLaunchpadCommandHistory {
@@ -140,6 +140,26 @@ public struct VPhoneLaunchpadCommandLine {
             history.finish(entry, status: status)
         }
         return VPhoneLaunchpadCommandResult(status: status, lines: collector.lines)
+    }
+
+    /// Starts a long-running command (`vm launch`) and returns at once. Its
+    /// output goes to `logFile`, so it outlives Launchpad. `onLine` runs on
+    /// the reader thread: a guest console can print faster than the main
+    /// actor should wake for.
+    public func start(
+        _ arguments: [String],
+        logFile: URL,
+        onLine: @escaping @Sendable (String) -> Void
+    ) throws -> VPhoneLaunchpadChildProcess {
+        let entry = history.record(Self.display(arguments))
+        let child = try VPhoneLaunchpadChildProcess(
+            executable: executable, arguments: arguments, logFile: logFile, onLine: onLine)
+        let history = history
+        Task {
+            let status = await child.wait()
+            history.finish(entry, status: status)
+        }
+        return child
     }
 }
 

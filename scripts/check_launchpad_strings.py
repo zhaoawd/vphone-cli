@@ -32,7 +32,7 @@ DEFAULT_INFO_PLIST = ROOT / 'sources/VPhoneLaunchpad-Info.plist'
 
 # Call sites whose first unlabeled string literal is a localization key.
 CALL_SITE = re.compile(
-    r'(?<![\w])(?:Text|Button|Label|Toggle|Menu|Section|TableColumn|ContentUnavailableView|'
+    r'(?<![\w])(?:Text|Button|Label|LabeledContent|Toggle|Menu|Section|TableColumn|ContentUnavailableView|'
     r'LocalizedStringKey|LocalizedStringResource|navigationTitle|help|alert|confirmationDialog)'
     r'\(\s*(?=")'
 )

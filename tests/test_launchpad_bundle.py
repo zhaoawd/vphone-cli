@@ -106,7 +106,8 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
 
 
 class LaunchpadB1BoundaryTests(unittest.TestCase):
-    """B1 is read-only and runs only the embedded toolchain (T26 design 4, 5.2, 11.1)."""
+    """B1/B2 boundaries: list, launch and stop through the embedded toolchain only
+    (T26 design 4, 5.1, 5.2, 11.1)."""
 
     FORBIDDEN = {
         r'VPhoneVMLockProbe\.': 'lock probe',
@@ -115,15 +116,18 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         r'VPhoneVMLock\(': 'VM lock',
         r'lsof': 'lsof',
         r'"create-status"': 'create-status',
-        r'"launch"|"stop"|"new"|"create"|"delete"|"rename"|"clone"|"config"|"export"|"import"': 'VM-changing command',
+        r'"new"|"create"|"delete"|"rename"|"clone"|"config"|"export"|"import"|"--dfu"': 'VM-changing command',
         r'"cfw"|"install-bundle"|"verify-bundle"|"register"|"install"': 'privileged or install command',
         r'--sudo-password|--root-popup': 'privileged option',
         r'VPhoneHelper|SMAppService|SMJobBless|ServiceManagement|EPExecutionPolicy': 'helper or execution policy',
         r'control\.sock|vphone\.sock|NWListener|bind\(': 'control socket',
-        r'posix_spawn': 'detached spawn',
         r'ProcessInfo\.processInfo\.environment|getenv\(': 'environment lookup',
         r'VPhoneHostControl': 'host control',
+        r'SIGTERM|killpg\(': 'signal other than SIGINT to a single child',
     }
+    # Only the child process type spawns detached children and sends signals.
+    CHILD_PROCESS = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift'
+    CONFINED = {r'posix_spawn': 'detached spawn', r'\bkill\(': 'kill'}
 
     # B5: the read-only command names appear only in the command whitelist.
     READ_ONLY_COMMANDS = r'"doctor"|"helper"|"core-bundle"'
@@ -139,6 +143,9 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
             if path != self.WHITELIST:
                 self.assertIsNone(re.search(self.READ_ONLY_COMMANDS, code),
                                   f'read-only command name outside the whitelist in {path.relative_to(ROOT)}')
+            if path != self.CHILD_PROCESS:
+                for pattern, what in self.CONFINED.items():
+                    self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
 
     def test_b5_whitelist_builds_only_read_only_commands(self):
         code = re.sub(r'//.*', '', self.WHITELIST.read_text(encoding='utf-8'))
@@ -150,11 +157,21 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
             ('helper', 'status'),
         ])
 
-    def test_only_vm_list_is_run(self):
-        runs = []
+    def test_signals_reach_only_the_own_child(self):
+        code = re.sub(r'//.*', '', self.CHILD_PROCESS.read_text())
+        self.assertEqual(sorted(re.findall(r'\bkill\(([^)]*)\)', code)),
+                         ['detachedPID, SIGINT', 'process.processIdentifier, SIGINT'])
+
+    def test_only_vm_list_stop_and_launch_are_run(self):
+        runs, starts = [], []
         for path, text in launchpad_swift().items():
             runs += re.findall(r'\.run\(\s*\[([^\]]*)\]', text)
-        self.assertEqual([re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs], [['vm', 'list', '--json']])
+            starts += re.findall(r'commandLine\.start\(\s*(\w+)', text)
+        self.assertEqual(sorted(re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs),
+                         [['vm', 'list', '--json'], ['vm', 'stop']])
+        self.assertEqual(starts, ['arguments'])
+        library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
+        self.assertIn('var arguments = ["vm", "launch", machine.name] + machine.libraryArguments', library)
 
     def test_executable_comes_only_from_the_embedded_app(self):
         toolchain = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift').read_text()
