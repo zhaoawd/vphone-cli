@@ -9,7 +9,9 @@ runs, without root and with the real hdiutil/diskutil/mount_apfs:
   2. a copy of cfw_install_host.sh --update-environment with only its sudo
      re-exec disabled (as the driver tests do): publishes the staged copy;
   3. check-vm again: already_current; the previous disk in .cfw-history keeps
-     the original SHA-256 and inode.
+     the original SHA-256 and inode;
+  4. check-vm --report (the form cfw_install_host.sh --check-environment uses
+     as root): the result file says already_current, mode 0600, this user.
 
 Never touches a VM directory; everything lives in one temporary directory.
 """
@@ -82,7 +84,8 @@ def check(vm, stage):
 def driver_copy(temp):
     scripts = temp / 'scripts'
     scripts.mkdir()
-    for name in ('vm_lock.py', 'cfw_disk_txn.py', 'cfw_env_update.py', 'guest_environment.json'):
+    for name in ('vm_lock.py', 'cfw_disk_txn.py', 'sparse_file.py', 'cfw_env_update.py',
+                 'guest_environment.json'):
         shutil.copyfile(ROOT / 'scripts' / name, scripts / name)
     driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()
     guard = 'if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then'
@@ -126,6 +129,18 @@ def main():
         second = check(vm, stage)
         assert second['classification'] == 'already_current', second
         print('PASS check-vm after publication: already_current')
+
+        # 4. The result-file form used by the elevated check (here unprivileged).
+        caller = temp / 'caller'
+        caller.mkdir(mode=0o700)
+        report_path = caller / 'report.json'
+        run(sys.executable, str(ROOT / 'scripts/cfw_env_update.py'), 'check-vm', str(vm), '--components', str(stage),
+            '--report', str(report_path), '--owner', f'{os.getuid()}:{os.getgid()}')
+        result = json.loads(report_path.read_text())
+        info = report_path.stat()
+        assert result['exit_code'] == 0 and result['report']['classification'] == 'already_current', result
+        assert (info.st_mode & 0o777, info.st_uid) == (0o600, os.getuid()), info
+        print(f'PASS check-vm --report: exit_code 0, already_current, mode 0600, owner uid {info.st_uid}')
         assert f' on {temp}' not in run('/sbin/mount').stdout
     finally:
         info = plistlib.loads(run('hdiutil', 'info', '-plist').stdout.encode())

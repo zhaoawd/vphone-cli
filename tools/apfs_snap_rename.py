@@ -20,12 +20,17 @@
 # Disk.img has far less written; reading its holes returns zeros. SEEK_DATA is
 # used only where it is reliable. A decmpfs (UF_COMPRESSED) file answers
 # SEEK_DATA and SEEK_HOLE with ENXIO, which reads as "all hole" (T03), and
-# HFS+ answers ENOTTY (T15); both fall back to reading every window.
+# HFS+ answers ENOTTY (T15); both fall back to reading every window. The rule
+# (holes_reliable) is shared with scripts/cfw_disk_txn.py through
+# scripts/sparse_file.py; the app bundle keeps tools/ next to scripts/.
 import errno
 import os
-import stat
+from pathlib import Path
 import struct
 import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'scripts'))
+from sparse_file import holes_reliable  # noqa: E402
 
 BS = 4096
 OLD_PREFIX = b"com.apple.os.update-"          # 20 bytes
@@ -45,26 +50,13 @@ def cksum(block):
     return c1 | (c2 << 32)
 
 
-def holes_reliable(fd):
-    """Whether SEEK_DATA/SEEK_HOLE describe this file's contents."""
-    info = os.fstat(fd)
-    if info.st_flags & stat.UF_COMPRESSED:
-        return False
-    try:
-        os.lseek(fd, 0, os.SEEK_HOLE)
-    except OSError:
-        # decmpfs: ENXIO; HFS+: ENOTTY; others: EINVAL/ENOTSUP.
-        return False
-    return True
-
-
 def next_data(fd, offset):
     """Offset of the next data at or after offset, None when only hole remains,
     or offset itself when the volume cannot say (that window is read)."""
     try:
         return os.lseek(fd, offset, os.SEEK_DATA)
     except OSError as error:
-        if error.errno == errno.ENXIO:
+        if error.errno == errno.ENXIO and (offset > 0 or os.fstat(fd).st_blocks == 0):
             return None
         return offset
 

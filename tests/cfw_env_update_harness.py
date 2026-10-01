@@ -11,7 +11,8 @@ Usage:
   cfw_env_update_harness.py umount MOUNTPOINT
 
 CFW_ENV_FAULTS (comma list): replace-second (the second library replacement
-fails with EIO, after the first one was written).
+fails with EIO, after the first one was written); mount-hang (check-vm runs
+the production mount with a tool that does not return and a 1 s limit).
 """
 import errno
 import importlib.util
@@ -88,7 +89,37 @@ def install_doubles(env):
         with open(mount_table(), 'a') as stream:
             stream.write(f'{device} on {mountpoint} ({flags})\n')
 
-    env.mount_volume = mount_volume
+    # check-vm attaches, locates, unmounts and detaches by itself (absolute
+    # tool paths); apply leaves those steps to the driver's shell doubles.
+    def attach_readonly(image):
+        log(f'harness attach -readonly {image}')
+        Path(str(mount_table()) + '.attached').write_text(str(image))
+        return '/dev/disk91'
+
+    def system_volume(base):
+        log(f'harness locate {base}')
+        return '/dev/disk92s1'
+
+    def unmount_double(mountpoint):
+        log(f'harness unmount {mountpoint}')
+        umount(mountpoint)
+
+    def detach(base):
+        log(f'harness detach {base}')
+        Path(str(mount_table()) + '.attached').unlink(missing_ok=True)
+
+    env.attach_readonly, env.system_volume = attach_readonly, system_volume
+    env.unmount, env.detach = unmount_double, detach
+    if 'mount-hang' in faults:
+        # The production mount_volume and run_tool with a mount tool that
+        # never returns and a 1 s mount limit.
+        slow = Path(os.environ['TEST_LOG']).parent / 'slow-mount'
+        slow.write_text('#!/bin/sh\nexec /bin/sleep 30\n')
+        slow.chmod(0o755)
+        env.MOUNT_APFS = str(slow)
+        env.STAGE_TIMEOUTS['mount'] = 1
+    else:
+        env.mount_volume = mount_volume
     if 'replace-second' in faults:
         real = env.replace_file
         calls = []

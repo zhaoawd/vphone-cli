@@ -24,11 +24,19 @@ libmisfix.dylib (upstream 2.2.3) is reported as upstream_only; it never fails
 the check and is never replaced (T18).
 
 Commands:
-  check-vm VM_DIR [--components DIR]
+  check-vm VM_DIR [--components DIR] [--report FILE [--owner UID[:GID]]]
       Read-only. Holds the VM directory lock (flock, no record written) and a
       read-only descriptor on Disk.img, attaches it read-only, mounts the
       System volume read-only outside the bundle, prints a JSON report.
-      Exit 0 classified; 2 input error; 4 VM busy; 5 disk access failed.
+      Exit 0 classified; 2 input error; 4 VM busy; 5 disk access failed (the
+      message names the stage: attach, locate, mount, read, unmount, detach
+      or verify, and the next step). Each disk tool runs under a per-stage
+      limit (STAGE_TIMEOUTS). With --report (cfw_install_host.sh
+      --check-environment, which vphone-cli runs as root through sudo or
+      --root-popup), the result, including a failure and its exit code, is
+      written to FILE instead of stdout: a new file in a directory that UID
+      (the invoker) or, without --owner, this process owns and that group and
+      others cannot write; the file is mode 0600 and owned by UID[:GID].
   apply --device DEV --mount DIR --report FILE [--components DIR] VM_DIR
       Run by cfw_install_host.sh --update-environment on the staged copy of
       Disk.img (T15 transaction). Mounts DEV read-write at DIR, re-checks,
@@ -58,8 +66,23 @@ import cfw_disk_txn  # noqa: E402
 
 MANIFEST = SCRIPT_DIR / 'guest_environment.json'
 SCHEMA = 'vphone.guest-environment-eligibility/1'
+RESULT_SCHEMA = 'vphone.guest-environment-check-result/1'
 DISK = 'Disk.img'
-TOOL_TIMEOUT = 180
+
+HDIUTIL = '/usr/bin/hdiutil'
+DISKUTIL = '/usr/sbin/diskutil'
+MOUNT_APFS = '/sbin/mount_apfs'
+UMOUNT = '/sbin/umount'
+
+# Seconds per disk-tool stage. Basis (research/t16_offline_update_eligibility_
+# 2026-10-01.md, follow-up section): on this host (macOS 27, 2026-10-01) a
+# normal user attached, located, mounted read-only, unmounted and detached
+# disposable raw APFS images of 64 MiB and 2 GiB in at most 0.29 s per step
+# (5 runs each; mount at most 0.007 s). The previous single limit was 180 s,
+# and an unprivileged mount of a real VM System volume used all of it without
+# returning. 30 s is about 100 times the slowest measured step and ends a
+# blocked step within half a minute.
+STAGE_TIMEOUTS = {'attach': 30, 'locate': 30, 'mount': 30, 'unmount': 30, 'detach': 30}
 
 LC_REQ_DYLD = 0x80000000
 DYLIB_COMMANDS = {0xC, 0x18 | LC_REQ_DYLD, 0x1F | LC_REQ_DYLD, 0x20, 0x23 | LC_REQ_DYLD}
@@ -78,7 +101,31 @@ class Busy(Refused):
 
 
 class DiskAccess(Exception):
-    pass
+    """A disk step failed; stage is attach, locate, mount, read, unmount, detach or verify."""
+
+    def __init__(self, stage, message, advice=None):
+        super().__init__(message)
+        self.stage = stage
+        self.advice = advice or stage_advice(stage)
+
+
+def stage_advice(stage):
+    if stage == 'mount' and os.geteuid() != 0:
+        return ('this user could not mount the System volume read-only; run the check as root: '
+                'vphone-cli cfw update-environment <name> --check (sudo), or add --root-popup for the macOS '
+                'authentication dialog')
+    return {
+        'attach': 'check that Disk.img is a raw disk image that no other process has attached (hdiutil info), '
+                  'then rerun the check',
+        'locate': 'the attached image has no APFS volume named System; check that this VM was restored',
+        'mount': 'check `mount` and `hdiutil info` for a leftover of this check and the system log '
+                 '(log show --last 5m --predicate \'process == "mount_apfs"\'), then rerun the check',
+        'read': 'a file on the read-only System volume could not be read; run the check as root '
+                '(vphone-cli cfw update-environment <name> --check, or with --root-popup) or inspect the volume',
+        'unmount': "unmount the check's mountpoint (umount, then diskutil unmount force) before starting the VM",
+        'detach': 'detach the image (hdiutil info; hdiutil detach <disk>, then -force) before starting the VM',
+        'verify': 'Disk.img changed while it was attached read-only; stop whatever wrote it and rerun the check',
+    }.get(stage)
 
 
 def now():
@@ -366,20 +413,24 @@ def activation(changed, manifest):
 
 # MARK: - Disk access (replaced by the test harness)
 
-def run_tool(arguments):
+def run_tool(arguments, stage):
+    limit = STAGE_TIMEOUTS[stage]
+    command = ' '.join(map(str, arguments))
     try:
-        result = subprocess.run(arguments, capture_output=True, timeout=TOOL_TIMEOUT)
-    except (OSError, subprocess.TimeoutExpired) as error:
-        raise DiskAccess(f'{arguments[0]}: {error}')
+        result = subprocess.run(arguments, capture_output=True, timeout=limit)
+    except subprocess.TimeoutExpired:
+        raise DiskAccess(stage, f'{command} timed out after {limit} s and was stopped')
+    except OSError as error:
+        raise DiskAccess(stage, f'{arguments[0]}: {error}')
     if result.returncode != 0:
-        raise DiskAccess(f'{" ".join(arguments[:2])} exited with {result.returncode}: '
-                         f'{result.stderr.decode(errors="replace").strip()}')
+        raise DiskAccess(stage, f'{command} exited with {result.returncode}: '
+                                f'{result.stderr.decode(errors="replace").strip()}')
     return result.stdout
 
 
 def attach_readonly(image):
-    output = run_tool(['/usr/bin/hdiutil', 'attach', '-readonly', '-nomount', '-plist',
-                       '-imagekey', 'diskimage-class=CRawDiskImage', str(image)])
+    output = run_tool([HDIUTIL, 'attach', '-readonly', '-nomount', '-plist',
+                       '-imagekey', 'diskimage-class=CRawDiskImage', str(image)], 'attach')
     entities = plistlib.loads(output).get('system-entities', [])
     devices = [entry.get('dev-entry', '') for entry in entities]
     bases = {device for device in devices if device.startswith('/dev/disk') and device[9:].isdigit()}
@@ -389,41 +440,44 @@ def attach_readonly(image):
         bases &= physical
     if len(bases) != 1:
         for device in bases:
-            subprocess.run(['/usr/bin/hdiutil', 'detach', device], capture_output=True, timeout=TOOL_TIMEOUT)
-        raise DiskAccess(f'no unique base disk in hdiutil output: {sorted(bases)}')
+            try:
+                subprocess.run([HDIUTIL, 'detach', device], capture_output=True, timeout=STAGE_TIMEOUTS['detach'])
+            except subprocess.TimeoutExpired:
+                print(f'[!] stage detach: hdiutil detach {device} timed out; detach it manually', file=sys.stderr)
+        raise DiskAccess('attach', f'no unique base disk in hdiutil output: {sorted(bases)}')
     return bases.pop()
 
 
 def system_volume(base):
-    info = plistlib.loads(run_tool(['/usr/sbin/diskutil', 'info', '-plist', f'{base}s1']))
+    info = plistlib.loads(run_tool([DISKUTIL, 'info', '-plist', f'{base}s1'], 'locate'))
     container = info.get('APFSContainerReference')
     if not container:
-        raise DiskAccess(f'{base}s1 is not an APFS physical store')
-    listing = plistlib.loads(run_tool(['/usr/sbin/diskutil', 'apfs', 'list', '-plist', container]))
+        raise DiskAccess('locate', f'{base}s1 is not an APFS physical store')
+    listing = plistlib.loads(run_tool([DISKUTIL, 'apfs', 'list', '-plist', container], 'locate'))
     for item in listing.get('Containers', []):
         for volume in item.get('Volumes', []):
             if volume.get('Name') == 'System' or 'System' in volume.get('Roles', []):
                 return '/dev/' + volume['DeviceIdentifier']
-    raise DiskAccess(f'no System volume in container {container}')
+    raise DiskAccess('locate', f'no System volume in container {container}')
 
 
 def mount_volume(device, mountpoint, readonly=False):
     options = 'rdonly,nobrowse' if readonly else 'rw,nobrowse'
-    run_tool(['/sbin/mount_apfs', '-o', options, device, str(mountpoint)])
+    run_tool([MOUNT_APFS, '-o', options, device, str(mountpoint)], 'mount')
 
 
 def unmount(mountpoint):
     try:
-        run_tool(['/sbin/umount', str(mountpoint)])
+        run_tool([UMOUNT, str(mountpoint)], 'unmount')
     except DiskAccess:
-        run_tool(['/sbin/umount', '-f', str(mountpoint)])
+        run_tool([UMOUNT, '-f', str(mountpoint)], 'unmount')
 
 
 def detach(base):
     try:
-        run_tool(['/usr/bin/hdiutil', 'detach', base])
+        run_tool([HDIUTIL, 'detach', base], 'detach')
     except DiskAccess:
-        run_tool(['/usr/bin/hdiutil', 'detach', '-force', base])
+        run_tool([HDIUTIL, 'detach', '-force', base], 'detach')
 
 
 # MARK: - check-vm
@@ -466,7 +520,7 @@ def check_vm(vm, components):
                               'mtime_ns': before['mtime_ns'], 'sample': before['sample'], 'attach': 'read-only',
                               'unchanged': unchanged}
             if not unchanged:
-                raise DiskAccess(f'{disk} changed during the read-only check')
+                raise DiskAccess('verify', f'{disk} changed during the read-only check')
             return report
         finally:
             os.close(fd)
@@ -481,27 +535,65 @@ def assess_without_disk(vm, components, manifest):
     return report
 
 
+def announce_mount(device, mountpoint):
+    limit = STAGE_TIMEOUTS['mount']
+    if os.geteuid() == 0:
+        print(f'[*] mount: {device} read-only at {mountpoint} (limit {limit} s)', file=sys.stderr)
+        return
+    print(f'[*] mount: {device} read-only at {mountpoint} as uid {os.geteuid()} (limit {limit} s). If this user '
+          'may not mount it, the check stops at stage mount; run it as root with '
+          'vphone-cli cfw update-environment <name> --check (sudo) or add --root-popup', file=sys.stderr)
+
+
+def release(base, mountpoint, mounted, strict):
+    """Unmount, remove the mountpoint, detach. strict: raise the first failure;
+    otherwise (an earlier error is propagating) only report it."""
+    failure = None
+    if mounted:
+        try:
+            unmount(mountpoint)
+        except DiskAccess as error:
+            failure = error
+            print(f'[!] stage unmount: {error}; mountpoint {mountpoint} retained', file=sys.stderr)
+    if mountpoint is not None and failure is None:
+        try:
+            mountpoint.rmdir()
+        except OSError as error:
+            print(f'[!] mountpoint {mountpoint} retained: {error}', file=sys.stderr)
+    try:
+        detach(base)
+    except DiskAccess as error:
+        failure = failure or error
+        print(f'[!] stage detach: {error}; {base} may still be attached', file=sys.stderr)
+    if strict and failure is not None:
+        raise failure
+
+
 def assess_disk(disk, fd, vm, components, manifest):
     base = attach_readonly(disk)
+    mountpoint, mounted = None, False
     try:
         held, named = os.fstat(fd), os.lstat(disk)
         if (held.st_dev, held.st_ino) != (named.st_dev, named.st_ino):
-            raise DiskAccess(f'{disk} was replaced while it was attached')
+            raise DiskAccess('attach', f'{disk} was replaced while it was attached')
         device = system_volume(base)
+        # Outside the bundle: the system temporary directory of this process.
         mountpoint = Path(tempfile.mkdtemp(prefix='vphone-env-check.'))
+        announce_mount(device, mountpoint)
         try:
             mount_volume(device, mountpoint, readonly=True)
-            try:
-                report = assess(mountpoint, vm, components, manifest)
-            finally:
-                unmount(mountpoint)
-        finally:
-            try:
-                mountpoint.rmdir()
-            except OSError as error:
-                print(f'[!] mountpoint {mountpoint} retained: {error}', file=sys.stderr)
-    finally:
-        detach(base)
+            mounted = True
+        except DiskAccess:
+            mounted = os.path.ismount(mountpoint)   # a stopped mount_apfs may have mounted it
+            raise
+        try:
+            report = assess(mountpoint, vm, components, manifest)
+        except OSError as error:
+            raise DiskAccess('read', f'reading the mounted System volume failed: {error}')
+    except BaseException:
+        release(base, mountpoint, mounted, strict=False)
+        raise
+    release(base, mountpoint, mounted, strict=True)
     report['disk_read'] = True
     report['system_volume'] = device
     return report
@@ -628,10 +720,118 @@ def compare_identity(report_path, vm):
     return 0
 
 
+# MARK: - Result file for an elevated check
+
+def parse_owner(text):
+    """'UID[:GID]' (decimal) -> (uid, gid or None); None for no owner."""
+    if text is None:
+        return None
+    uid, _, gid = text.partition(':')
+    if not uid.isdigit() or (gid and not gid.isdigit()):
+        raise Refused(f'--owner {text!r} is not UID[:GID]')
+    return int(uid), int(gid) if gid else None
+
+
+def open_destination(path, owner):
+    """(directory descriptor, name) for a new result file.
+
+    The directory is the caller's private directory: owned by the invoker
+    (owner) or, without one, by this process; not writable by group or others;
+    not a symbolic link. The name must not exist yet. Checked before the disk
+    is touched; the file is created later with O_EXCL beneath the same
+    descriptor, so a renamed or replaced directory cannot redirect the write.
+    """
+    path = Path(path)
+    if not path.is_absolute() or path.name in ('', '.', '..'):
+        raise Refused(f'report path {path} must be an absolute file path')
+    expected = owner[0] if owner else os.geteuid()
+    directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    try:
+        info = os.fstat(directory)
+        if info.st_uid != expected:
+            raise Refused(f'report directory {path.parent} has owner uid {info.st_uid}, not the invoker uid {expected}')
+        if info.st_mode & 0o022:
+            raise Refused(f'report directory {path.parent} is writable by group or others '
+                          f'(mode {stat.S_IMODE(info.st_mode):04o})')
+        try:
+            os.stat(path.name, dir_fd=directory, follow_symlinks=False)
+        except FileNotFoundError:
+            return directory, path.name
+        raise Refused(f'report path {path} already exists')
+    except BaseException:
+        os.close(directory)
+        raise
+
+
+def write_result(destination, owner, result):
+    directory, name = destination
+    data = (json.dumps(result, indent=2, sort_keys=True) + '\n').encode()
+    fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600, dir_fd=directory)
+    try:
+        view = memoryview(data)
+        while view:
+            view = view[os.write(fd, view):]
+        if owner:
+            os.fchown(fd, owner[0], -1 if owner[1] is None else owner[1])
+        os.fchmod(fd, 0o600)
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 # MARK: - CLI
 
 def default_components():
     return SCRIPT_DIR.parent / load_manifest()['candidate_stage']
+
+
+def run_check_vm(vm, components):
+    """(exit code, report or None, error or None); errors are also printed."""
+    try:
+        return 0, check_vm(vm, components), None
+    except Busy as error:
+        print(f'[-] {error}', file=sys.stderr)
+        return 4, None, {'kind': 'busy', 'stage': None, 'message': str(error),
+                         'advice': 'stop the VM or wait for the other operation, then rerun the check'}
+    except DiskAccess as error:
+        print(f'[-] disk access failed at stage {error.stage}: {error}', file=sys.stderr)
+        if error.advice:
+            print(f'    next: {error.advice}', file=sys.stderr)
+        return 5, None, {'kind': 'disk_access', 'stage': error.stage, 'message': str(error), 'advice': error.advice}
+    except (Refused, OSError, ValueError) as error:
+        print(f'[-] check-vm: {error}', file=sys.stderr)
+        return 2, None, {'kind': 'input', 'stage': None, 'message': str(error), 'advice': None}
+
+
+def check_command(args):
+    if args.report is None:
+        if args.owner is not None:
+            print('[-] check-vm: --owner requires --report', file=sys.stderr)
+            return 2
+        code, report, _ = run_check_vm(args.vm, Path(args.components))
+        if report is not None:
+            print(json.dumps(report, indent=2, sort_keys=True))
+        return code
+    try:
+        owner = parse_owner(args.owner)
+        destination = open_destination(args.report, owner)
+    except (Refused, OSError) as error:
+        print(f'[-] check-vm: report {args.report}: {error}', file=sys.stderr)
+        return 2
+    try:
+        code, report, error = run_check_vm(args.vm, Path(args.components))
+        result = {'schema': RESULT_SCHEMA, 'exit_code': code, 'report': report, 'error': error,
+                  'checked_as_uid': os.geteuid()}
+        try:
+            write_result(destination, owner, result)
+        except OSError as failure:
+            print(f'[-] check-vm: could not write the report {args.report}: {failure}', file=sys.stderr)
+            return 2
+    finally:
+        os.close(destination[0])
+    print(f'[*] check result (exit {code}) written to {args.report}'
+          + (f' for uid {owner[0]}' if owner else ''), file=sys.stderr)
+    return code
 
 
 def main(argv):
@@ -640,6 +840,8 @@ def main(argv):
     check = commands.add_parser('check-vm')
     check.add_argument('vm')
     check.add_argument('--components')
+    check.add_argument('--report')
+    check.add_argument('--owner')
     run = commands.add_parser('apply')
     run.add_argument('vm')
     run.add_argument('--device', required=True)
@@ -652,23 +854,18 @@ def main(argv):
     args = parser.parse_args(argv)
     if getattr(args, 'components', None) is None and args.command != 'identity':
         args.components = os.environ.get('VPHONE_GUEST_COMPONENTS') or str(default_components())
+    if args.command == 'check-vm':
+        return check_command(args)
     try:
-        if args.command == 'check-vm':
-            report = check_vm(args.vm, Path(args.components))
-            print(json.dumps(report, indent=2, sort_keys=True))
-            return 0
         if args.command == 'apply':
             return apply(args)
         return compare_identity(args.compare, Path(args.vm))
-    except Busy as error:
-        print(f'[-] {error}', file=sys.stderr)
-        return 4
     except DiskAccess as error:
-        print(f'[-] disk access failed: {error}', file=sys.stderr)
+        print(f'[-] disk access failed at stage {error.stage}: {error}', file=sys.stderr)
         return 5
     except (Refused, OSError, ValueError) as error:
         print(f'[-] {args.command}: {error}', file=sys.stderr)
-        return 2 if args.command == 'check-vm' else 1
+        return 1
 
 
 if __name__ == '__main__':

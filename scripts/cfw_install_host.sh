@@ -17,6 +17,7 @@
 #
 # Usage: cfw_install_host.sh [--variant regular|dev|jb|exp] [vm_dir]
 #        cfw_install_host.sh --update-environment vm_dir
+#        cfw_install_host.sh --check-environment --report /abs/new-file vm_dir
 # Runs as root (mount_apfs/chown/cp to owners-honored mounts); re-execs under
 # sudo automatically (honors SUDO_ASKPASS for non-interactive use). Artifacts it
 # creates go back to VPHONE_INVOKER_UID[:VPHONE_INVOKER_GID] (set by vphone-cli)
@@ -28,23 +29,37 @@
 # already exist and differ from the candidates in VPHONE_GUEST_COMPONENTS
 # (default .build/guest-components-v2/stage). No variant installer, patch or
 # snapshot flip runs, and the recorded variant is not touched.
+#
+# --check-environment (T16 follow-up) runs only the read-only eligibility check
+# as root and writes its JSON result to --report; see the block after PY below.
 set -euo pipefail
 SCRIPT_DIR="${0:a:h}"
 PROJ="${SCRIPT_DIR:h}"
 
 VARIANT=exp
 MODE=install
+REPORT=""
 VM_DIR="$PROJ/vm"
 while (( $# )); do
   case "$1" in
     --variant) VARIANT="$2"; shift 2 ;;
-    --update-environment) MODE=environment; shift ;;
+    --update-environment|--check-environment)
+      [[ "$MODE" == install ]] || { echo "[-] --update-environment and --check-environment are exclusive" >&2; exit 1; }
+      [[ "$1" == --update-environment ]] && MODE=environment || MODE=check
+      shift ;;
+    --report) (( $# >= 2 )) || { echo "[-] --report needs a file path" >&2; exit 1; }; REPORT="$2"; shift 2 ;;
     -*) echo "[-] unknown option: $1" >&2; exit 1 ;;
     *)         VM_DIR="$1";  shift ;;
   esac
 done
 
-if [[ "$MODE" == environment ]]; then
+if [[ "$MODE" == check ]]; then
+  [[ "$REPORT" == /* ]] || { echo "[-] --check-environment requires --report with an absolute file path" >&2; exit 1; }
+  INSTALLER=""
+  MODE_ARGS=(--check-environment --report "$REPORT")
+elif [[ -n "$REPORT" ]]; then
+  echo "[-] --report is only valid with --check-environment" >&2; exit 1
+elif [[ "$MODE" == environment ]]; then
   INSTALLER=""
   MODE_ARGS=(--update-environment)
 else
@@ -115,6 +130,28 @@ else
 fi
 export PATH="$P"
 PY="${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}"
+
+# --check-environment: the read-only eligibility check, run as root because a
+# normal user may not mount a VM's System volume (real host, 2026-10-01). It
+# takes no lock record, creates nothing in the VM directory and changes no
+# owner there: cfw_env_update.py check-vm holds the directory flock, attaches
+# Disk.img read-only, mounts read-only beneath the system temporary directory,
+# unmounts and detaches, and writes its result to REPORT, a new file in the
+# caller's private directory, owned by the invoker. The invoker comes from the
+# same variables as above; the owner of the report directory, not of the
+# bundle, must match it (checked by check-vm before the disk is touched).
+if [[ "$MODE" == check ]]; then
+  OWNER_ARGS=()
+  if [[ -n "$INVOKER_SOURCE" ]] && (( INVOKER_UID != 0 )); then
+    OWNER_ARGS=(--owner "$INVOKER_UID${INVOKER_GID:+:$INVOKER_GID}")
+  fi
+  echo "[*] read-only guest environment check as uid ${EUID:-$(id -u)}: vm=$VM_DIR report=$REPORT"
+  # No root-owned __pycache__ beside the scripts.
+  export PYTHONDONTWRITEBYTECODE=1
+  exec "$PY" "$SCRIPT_DIR/cfw_env_update.py" check-vm \
+    --components "${VPHONE_GUEST_COMPONENTS:-$PROJ/.build/guest-components-v2/stage}" \
+    --report "$REPORT" "${OWNER_ARGS[@]}" "$VM_DIR"
+fi
 
 # Acquire after sudo, which may close inherited descriptors. The re-executed
 # operation tree must prove possession of the directory descriptor.

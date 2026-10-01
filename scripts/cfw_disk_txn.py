@@ -40,6 +40,10 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import vm_lock  # noqa: E402
+# Hole-aware ranges; a decmpfs file, an ENOTTY/ENXIO/other seek error is read in
+# full, never taken for zeros (scripts/sparse_file.py, shared with
+# tools/apfs_snap_rename.py).
+from sparse_file import data_ranges  # noqa: E402,F401
 
 DISK = 'Disk.img'
 RECORD = 'transaction.json'
@@ -94,27 +98,6 @@ def move_exclusive(source, destination):
     if _libc.renamex_np(os.fsencode(source), os.fsencode(destination), RENAME_EXCL) != 0:
         code = ctypes.get_errno()
         raise OSError(code, os.strerror(code))
-
-
-def data_ranges(fd, size):
-    """Allocated ranges via SEEK_DATA/SEEK_HOLE; the whole file when unsupported."""
-    offset = 0
-    while offset < size:
-        try:
-            start = os.lseek(fd, offset, os.SEEK_DATA)
-        except OSError as error:
-            if error.errno == errno.ENXIO:
-                return
-            # HFS+ reports ENOTTY (observed on macOS 27); treat as one data range.
-            if error.errno in (errno.EINVAL, errno.ENOTSUP, errno.ENOTTY):
-                yield offset, size
-                return
-            raise
-        if start >= size:
-            return
-        end = min(os.lseek(fd, start, os.SEEK_HOLE), size)
-        yield start, end
-        offset = end
 
 
 def feed_zeros(digest, count):

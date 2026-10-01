@@ -24,8 +24,9 @@ class HostDriverFixture(unittest.TestCase):
         scripts = self.root / 'scripts'
         scripts.mkdir()
         shutil.copyfile(ROOT / "scripts/vm_lock.py", scripts / "vm_lock.py")
-        if (ROOT / "scripts/cfw_disk_txn.py").exists():
-            shutil.copyfile(ROOT / "scripts/cfw_disk_txn.py", scripts / "cfw_disk_txn.py")
+        for name in ("cfw_disk_txn.py", "sparse_file.py"):
+            if (ROOT / "scripts" / name).exists():
+                shutil.copyfile(ROOT / "scripts" / name, scripts / name)
         driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()
         # Only bypass privilege escalation; no real disk commands are permitted.
         guard = 'if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then'

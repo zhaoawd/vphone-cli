@@ -14,6 +14,7 @@ from pathlib import Path
 import plistlib
 import re
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -406,6 +407,9 @@ class CheckVMTests(Fixture):
         super().setUp()
         self.calls = []
         env = self.env
+        self.production = {name: getattr(env, name) for name in
+                           ('attach_readonly', 'system_volume', 'mount_volume', 'unmount', 'detach')}
+        self.err = io.StringIO()
 
         def attach_readonly(image):
             self.calls.append(('attach', str(image), 'readonly'))
@@ -417,6 +421,7 @@ class CheckVMTests(Fixture):
 
         def mount_volume(device, mountpoint, readonly=False):
             self.calls.append(('mount', device, readonly))
+            self.err_at_mount = self.err.getvalue()
             with tarfile.open(self.vm / 'Disk.img') as archive:
                 archive.extractall(mountpoint, filter='tar')
 
@@ -437,11 +442,25 @@ class CheckVMTests(Fixture):
         (self.vm / 'Disk.img').write_bytes(tar_of(system))
         return self.vm
 
-    def run_check(self):
-        out, err = io.StringIO(), io.StringIO()
-        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-            code = self.env.main(['check-vm', str(self.vm), '--components', str(self.stage)])
-        return code, out.getvalue(), err.getvalue()
+    def run_check(self, *extra):
+        out = io.StringIO()
+        self.err = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(self.err):
+            code = self.env.main(['check-vm', str(self.vm), '--components', str(self.stage), *extra])
+        return code, out.getvalue(), self.err.getvalue()
+
+    def tool(self, name, body):
+        """An executable standing in for a disk tool (absolute path, as in production)."""
+        path = self.root / name
+        path.write_text('#!/bin/sh\n' + body + '\n')
+        path.chmod(0o755)
+        return str(path)
+
+    def private_dir(self, name='caller', mode=0o700):
+        path = self.root / name
+        path.mkdir()
+        path.chmod(mode)
+        return path
 
     def test_check_reads_a_stopped_vm_without_writing_its_disk(self):
         versions = {name: 'v2' for name in LOCAL}
@@ -495,10 +514,118 @@ class CheckVMTests(Fixture):
         self.assertEqual(json.loads(out)['classification'], 'not_applicable')
         self.assertEqual(self.calls, [])
 
+    # MARK: stages, limits and the unprivileged notice (2026-10-01 follow-up)
+
+    def test_mount_timeout_names_the_stage_and_releases_the_image(self):
+        # Real host, 2026-10-01: an unprivileged mount_apfs of the System
+        # volume did not return for 180 s. The limit is now per stage and the
+        # error names the stage and the next step.
+        self.make_vm()
+        argv = self.root / 'mount-argv'
+        self.env.mount_volume = self.production['mount_volume']
+        self.env.MOUNT_APFS = self.tool('slow-mount', f'echo "$@" > "{argv}"\nexec /bin/sleep 30')
+        self.env.STAGE_TIMEOUTS['mount'] = 1
+        started = time.monotonic()
+        code, out, err = self.run_check()
+        elapsed = time.monotonic() - started
+        self.assertEqual(code, 5, err)
+        self.assertLess(elapsed, 10)
+        self.assertEqual(out, '')
+        self.assertIn('stage mount', err)
+        self.assertIn('timed out after 1 s', err)
+        self.assertIn('--root-popup', err)
+        self.assertEqual([call[0] for call in self.calls], ['attach', 'locate', 'detach'])
+        mountpoint = Path(argv.read_text().split()[-1])
+        self.assertTrue(argv.read_text().startswith('-o rdonly,nobrowse '))
+        self.assertFalse(mountpoint.exists())
+        self.assertNotIn(self.vm, mountpoint.parents)
+
+    def test_unprivileged_check_announces_the_mount_and_its_limit_first(self):
+        if os.geteuid() == 0:
+            self.skipTest('the notice is for unprivileged runs')
+        self.make_vm()
+        code, out, err = self.run_check()
+        self.assertEqual(code, 0, err)
+        self.assertIn(f'as uid {os.geteuid()}', self.err_at_mount)
+        self.assertIn(f'limit {self.env.STAGE_TIMEOUTS["mount"]} s', self.err_at_mount)
+        self.assertIn('--root-popup', self.err_at_mount)
+
+    def test_attach_failure_names_the_attach_stage(self):
+        self.make_vm()
+        self.env.attach_readonly = self.production['attach_readonly']
+        self.env.HDIUTIL = self.tool('failing-hdiutil', 'echo "hdiutil: attach failed - Resource busy" >&2\nexit 1')
+        code, out, err = self.run_check()
+        self.assertEqual(code, 5, err)
+        self.assertIn('stage attach', err)
+        self.assertIn('Resource busy', err)
+        self.assertEqual(self.calls, [])
+
+    def test_read_failure_on_the_mounted_volume_names_the_read_stage(self):
+        self.make_vm()
+
+        def assess(*_args, **_kwargs):
+            raise PermissionError(13, 'Permission denied', '/mnt/usr/lib/libcamfix.dylib')
+        self.env.assess = assess
+        code, out, err = self.run_check()
+        self.assertEqual(code, 5, err)
+        self.assertIn('stage read', err)
+        self.assertEqual([call[0] for call in self.calls], ['attach', 'locate', 'mount', 'unmount', 'detach'])
+
+    # MARK: report file for an elevated check
+
+    def test_report_file_carries_the_result_to_the_caller(self):
+        self.make_vm()
+        caller = self.private_dir()
+        report = caller / 'report.json'
+        code, out, err = self.run_check('--report', str(report), '--owner', f'{os.getuid()}:{os.getgid()}')
+        self.assertEqual(code, 0, err)
+        self.assertNotIn('"classification"', out)   # the caller prints the report
+        info = os.lstat(report)
+        self.assertEqual((stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid), (0o600, os.getuid(), os.getgid()))
+        result = json.loads(report.read_text())
+        self.assertEqual(result['exit_code'], 0)
+        self.assertIsNone(result['error'])
+        self.assertEqual(result['report']['classification'], 'offline_update')   # v1 disk, v2 candidates
+        self.assertEqual(os.listdir(caller), ['report.json'])
+
+    def test_report_file_records_a_failure_with_its_exit_code(self):
+        vm = self.make_vm()
+        fd = os.open(vm, os.O_RDONLY)
+        self.addCleanup(os.close, fd)
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        report = self.private_dir() / 'report.json'
+        code, out, err = self.run_check('--report', str(report))
+        self.assertEqual(code, 4, err)
+        result = json.loads(report.read_text())
+        self.assertEqual((result['exit_code'], result['report']), (4, None))
+        self.assertEqual(result['error']['kind'], 'busy')
+
+    def test_report_destination_must_be_new_and_private(self):
+        self.make_vm()
+        caller = self.private_dir()
+        existing = caller / 'existing.json'
+        existing.write_text('keep')
+        target = self.root / 'elsewhere'
+        target.write_text('keep')
+        (caller / 'link.json').symlink_to(target)
+        shared = self.private_dir('shared', 0o777)
+        cases = [(existing, ()), (caller / 'link.json', ()), (shared / 'report.json', ()),
+                 (caller / 'report.json', ('--owner', str(os.getuid() + 1)))]
+        for path, extra in cases:
+            with self.subTest(path=path.name, extra=extra):
+                code, out, err = self.run_check('--report', str(path), *extra)
+                self.assertEqual(code, 2, err)
+                self.assertEqual(self.calls, [])   # refused before the disk is touched
+        self.assertEqual((existing.read_text(), target.read_text()), ('keep', 'keep'))
+        self.assertFalse((shared / 'report.json').exists())
+        self.assertFalse((caller / 'report.json').exists())
+
 
 # MARK: - Root driver: replacement through the T15 transaction
 
-class DriverUpdateTests(HostDriverFixture):
+class EnvironmentDriverFixture(HostDriverFixture):
+    """Driver copy whose cfw_env_update.py runs under tests/cfw_env_update_harness.py."""
+
     def setUp(self):
         super().setUp()
         scripts = self.root / 'scripts'
@@ -542,6 +669,8 @@ class DriverUpdateTests(HostDriverFixture):
         versions['launchdhook-vphone.dylib'] = 'v1'
         return versions
 
+
+class DriverUpdateTests(EnvironmentDriverFixture):
     def test_update_publishes_only_the_target_libraries_and_keeps_identity(self):
         vm, source = self.make_vm(self.offline_versions())
         disk = vm / 'Disk.img'
@@ -630,6 +759,165 @@ class DriverUpdateTests(HostDriverFixture):
         self.assertFalse(list(vm.glob('.cfw_disk.*')))
         self.assertEqual((os.stat(disk).st_ino, sha(disk.read_bytes())), original)
         self.assertFalse((self.root / 'calls').exists())
+
+
+# MARK: - Elevated read-only check through the driver (sudo and root-popup)
+
+class ElevatedCheckTests(EnvironmentDriverFixture):
+    """`--check-environment` on the driver copy whose sudo re-exec is disabled.
+
+    The sudo path is the driver's environment after `sudo -E` (SUDO_USER,
+    SUDO_UID, SUDO_GID); the root-popup path is the bare environment of
+    `do shell script` with the variables vphone-cli writes inline
+    (VPHONE_INVOKER_UID/GID, SUDO_USER, VPHONE_PYTHON, VPHONE_GUEST_COMPONENTS).
+    Nothing runs as root; attach, mount, unmount and detach are harness doubles.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.caller = self.root / 'caller'
+        self.caller.mkdir(mode=0o700)
+        self.report = self.caller / 'report.json'
+        self.mounts = self.root / 'mount-table'
+        self.tmpdir = self.root / 'tmp'
+        self.tmpdir.mkdir()
+
+    def run_check(self, vm, bare=False, args=None, **env):
+        base = self.bare_env() if bare else dict(self.env, TMPDIR=str(self.tmpdir))
+        base.pop('PYTHONDONTWRITEBYTECODE', None)   # the driver sets it for the root check
+        base.update(TEST_ENV_HARNESS=self.env['TEST_ENV_HARNESS'], VPHONE_GUEST_COMPONENTS=str(self.stage),
+                    TEST_MOUNTS=str(self.mounts))
+        base.update(env)
+        command = ['/bin/zsh', str(self.driver)] + (args if args is not None else
+                                                     ['--check-environment', '--report', str(self.report)]) + [str(vm)]
+        started = time.monotonic()
+        proc = subprocess.run(command, env=base, capture_output=True, timeout=60)
+        return proc.returncode, (proc.stdout + proc.stderr).decode(), time.monotonic() - started
+
+    def snapshot(self, vm):
+        disk = vm / 'Disk.img'
+        info = os.stat(disk)
+        return sorted(os.listdir(vm)), (info.st_ino, info.st_size, info.st_mtime_ns, sha(disk.read_bytes())), \
+            self.bundle_digests(vm)
+
+    def calls(self):
+        path = self.root / 'calls'
+        return path.read_text() if path.exists() else ''
+
+    def assert_read_only_and_clean(self, vm, before):
+        self.assertEqual(self.snapshot(vm), before)   # no record, lock file, staging or mount dir in the bundle
+        for name in ('.vphone-runtime.json', '.cfw-history'):
+            self.assertFalse((vm / name).exists())
+        self.assertFalse(list(vm.glob('.cfw_disk.*')) + list(vm.glob('.cfw_mount.*')))
+        calls = self.calls()
+        self.assertNotIn('vm_lock.py', calls)
+        self.assertNotIn('cfw_disk_txn.py', calls)
+        self.assertFalse([line for line in calls.splitlines() if line.startswith(('chown ', 'hdiutil ', 'diskutil '))])
+        self.assertIn('harness attach -readonly ', calls)
+        self.assertIn('harness detach /dev/disk91', calls)
+        self.assertEqual(self.mounts.read_text() if self.mounts.exists() else '', '')
+        for line in calls.splitlines():
+            if line.startswith('harness mount '):
+                self.assertTrue(line.startswith('harness mount ro '), line)
+                mountpoint = Path(line.split()[-1])
+                self.assertFalse(mountpoint.exists())
+                self.assertNotIn(vm.resolve(), mountpoint.resolve().parents)
+        self.assertFalse(list(self.tmpdir.iterdir()))
+        self.assertFalse((self.root / 'scripts/__pycache__').exists())   # nothing written beside the scripts
+
+    def assert_report_returned(self, owner):
+        info = os.lstat(self.report)
+        self.assertEqual((stat.S_IMODE(info.st_mode), info.st_uid, info.st_gid), (0o600, os.getuid(), os.getgid()))
+        self.assertIn(f'--owner {owner}', self.calls())
+        self.assertEqual(os.listdir(self.caller), ['report.json'])
+        return json.loads(self.report.read_text())
+
+    def test_sudo_path_check_is_read_only_and_returns_the_report(self):
+        vm, _ = self.make_vm(self.offline_versions())
+        before = self.snapshot(vm)
+        rc, output, _ = self.run_check(vm, **self.sudo_invoker())
+        self.assertEqual(rc, 0, output)
+        result = self.assert_report_returned(f'{os.getuid()}:{os.getgid()}')
+        self.assertEqual(result['exit_code'], 0)
+        self.assertEqual(result['report']['classification'], 'offline_update')
+        self.assertEqual(sorted(result['report']['replace']), ['launchdhook-vphone.dylib', 'libvlocation.dylib'])
+        self.assertTrue(result['report']['disk']['unchanged'])
+        self.assertIn('harness mount ro /dev/disk92s1 ', self.calls())
+        self.assert_read_only_and_clean(vm, before)
+
+    def test_root_popup_path_check_is_read_only_and_returns_the_report(self):
+        vm, _ = self.make_vm({name: 'v2' for name in LOCAL}, omit=('libcamfix.dylib',))
+        before = self.snapshot(vm)
+        rc, output, _ = self.run_check(vm, bare=True, SUDO_USER='test-user',
+                                       VPHONE_INVOKER_UID=str(os.getuid()), VPHONE_INVOKER_GID=str(os.getgid()))
+        self.assertEqual(rc, 0, output)
+        result = self.assert_report_returned(f'{os.getuid()}:{os.getgid()}')
+        self.assertEqual(result['report']['classification'], 'full_migration_required')
+        self.assertIn('/usr/lib/libcamfix.dylib is missing', result['report']['reasons'])
+        self.assert_read_only_and_clean(vm, before)
+
+    def test_sudo_reexec_keeps_the_check_arguments(self):
+        # The real guard: a non-root run re-executes itself under sudo -E with
+        # the same mode arguments. sudo is replaced by a recorder.
+        vm, _ = self.make_vm(self.offline_versions())
+        driver = self.root / 'scripts/reexec_probe.sh'
+        source = (ROOT / 'scripts/cfw_install_host.sh').read_text()
+        line = 'exec sudo ${SUDO_ASKPASS:+-A} -E /bin/zsh "$0" "${MODE_ARGS[@]}" "$VM_DIR"'
+        self.assertIn(line, source)
+        driver.write_text(source.replace('if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then', 'if true; then').replace(
+            line, 'exec "$TEST_PYTHON" -c "import json,sys; print(json.dumps(sys.argv[1:]))" /bin/zsh "$0" '
+                  '"${MODE_ARGS[@]}" "$VM_DIR"'))
+        proc = subprocess.run(['/bin/zsh', str(driver), '--check-environment', '--report', str(self.report), str(vm)],
+                              env=self.env, capture_output=True, text=True, timeout=30)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(json.loads(proc.stdout)[2:], ['--check-environment', '--report', str(self.report), str(vm)])
+
+    def test_mount_timeout_is_reported_with_its_stage_and_cleaned_up(self):
+        vm, _ = self.make_vm(self.offline_versions())
+        before = self.snapshot(vm)
+        rc, output, elapsed = self.run_check(vm, CFW_ENV_FAULTS='mount-hang', **self.sudo_invoker())
+        self.assertEqual(rc, 5, output)
+        self.assertLess(elapsed, 30)
+        result = self.assert_report_returned(f'{os.getuid()}:{os.getgid()}')
+        self.assertEqual((result['exit_code'], result['report']), (5, None))
+        self.assertEqual((result['error']['kind'], result['error']['stage']), ('disk_access', 'mount'))
+        self.assertIn('timed out after 1 s', result['error']['message'])
+        self.assertTrue(result['error']['advice'])
+        self.assertIn('stage mount', output)
+        calls = self.calls()
+        self.assertIn('harness detach /dev/disk91', calls)
+        self.assertNotIn('harness mount ', calls)   # the production mount ran and was stopped
+        self.assertEqual(self.snapshot(vm), before)
+        self.assertEqual(self.mounts.read_text() if self.mounts.exists() else '', '')
+        self.assertFalse(list(self.tmpdir.iterdir()))
+
+    def test_report_directory_not_owned_by_the_invoker_is_refused(self):
+        vm, _ = self.make_vm(self.offline_versions())
+        before = self.snapshot(vm)
+        rc, output, _ = self.run_check(vm, bare=True, VPHONE_INVOKER_UID=str(os.getuid() + 1),
+                                       VPHONE_INVOKER_GID=str(os.getgid()))
+        self.assertEqual(rc, 2, output)
+        self.assertIn('owner', output)
+        self.assertFalse(self.report.exists())
+        self.assertNotIn('harness attach', self.calls())
+        self.assertEqual(self.snapshot(vm), before)
+
+    def test_malformed_invoker_or_arguments_are_refused_before_any_access(self):
+        vm, _ = self.make_vm(self.offline_versions())
+        before = self.snapshot(vm)
+        cases = [
+            (dict(bare=True, VPHONE_INVOKER_UID='501x'), None, 2),
+            ({}, ['--check-environment'], 1),
+            ({}, ['--report', str(self.report)], 1),
+            ({}, ['--check-environment', '--report', str(self.report), '--update-environment'], 1),
+        ]
+        for env, args, code in cases:
+            with self.subTest(env=env, args=args):
+                rc, output, _ = self.run_check(vm, args=args, **env)
+                self.assertEqual(rc, code, output)
+                self.assertFalse(self.report.exists())
+                self.assertNotIn('cfw_env_update.py', self.calls())
+                self.assertEqual(self.snapshot(vm), before)
 
 
 if __name__ == '__main__':
