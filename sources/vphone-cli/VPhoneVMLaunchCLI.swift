@@ -58,8 +58,12 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         let pre = try VPhoneProcessRunner.runCapturing(
             URL(fileURLWithPath: "/bin/zsh"), [layout.preflightScript.path] + preflightArgs,
             cwd: resources.base, env: preflightEnv)
-        if !pre.stdout.isEmpty { print(pre.stdout, terminator: "") }
+        // The preflight report is host diagnostics. Print it only when the VM
+        // executable fails to start or run (here, or after the child exits);
+        // a normal stop must not repeat it.
+        let hostDiagnostics = pre.stdout
         guard pre.succeeded else {
+            Self.printHostDiagnostics(hostDiagnostics)
             FileHandle.standardError.write(Data(pre.stderr.utf8))
             throw ExitCode(pre.exitCode == 0 ? 1 : pre.exitCode)
         }
@@ -95,8 +99,16 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         child.arguments = args
         child.currentDirectoryURL = bundle.url
         // `vm launch` always streams the guest serial console (inherits our
-        // stdio); it is intentionally not gated on verbosity.
-        try child.run()
+        // stdio); it is intentionally not gated on verbosity. Flush our own
+        // buffered stdout first so it stays ahead of the child's output when
+        // stdout is a file or pipe.
+        fflush(stdout)
+        do {
+            try child.run()
+        } catch {
+            Self.printHostDiagnostics(hostDiagnostics)
+            throw error
+        }
 
         // Forward SIGINT to the child so Ctrl+C stops the VM cleanly.
         let sigint = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
@@ -105,7 +117,25 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         sigint.resume()
 
         child.waitUntilExit()
+        if Self.childFailed(reason: child.terminationReason, status: child.terminationStatus) {
+            Self.printHostDiagnostics(hostDiagnostics)
+        }
         throw ExitCode(child.terminationStatus)
+    }
+
+    // MARK: - Host diagnostics
+
+    /// A normal stop (SIGINT/`vm stop` → `Guest stopped`) exits 0. A non-zero
+    /// exit (for example AMFI's 137) or termination by a signal counts as a
+    /// failure to start or run, and gets the preflight report.
+    static func childFailed(reason: Process.TerminationReason, status: Int32) -> Bool {
+        !(reason == .exit && status == 0)
+    }
+
+    static func printHostDiagnostics(_ text: String) {
+        guard !text.isEmpty else { return }
+        print(text, terminator: "")
+        fflush(stdout)
     }
 }
 
