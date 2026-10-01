@@ -35,7 +35,6 @@ struct VPhoneVMCreateCommand: ParsableCommand {
     @Option(name: .shortAndLong, help: "sudo password for the CFW host-mount install (via askpass; never logged)")
     var sudoPassword: String?
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
-    @Flag(name: .customLong("force-dsc-maxslide"), help: "Zero the dyld cache maxSlide on non-27 bases (opt-in DSC-map fit)") var forceDSCMaxSlide = false
     @Flag(name: .customLong("frida"), help: "Opt in to Frida Stalker support: install re.frida.server (latest GitHub release) + jb/exp kernel relaxations") var frida = false
     @Flag(name: .customLong("root-popup"), help: "Elevate the CFW host-mount via macOS's native authentication dialog (osascript) instead of a sudo prompt") var rootPopup = false
     @Flag(help: "Prompt at first-boot stages instead of running non-interactively") var interactive = false
@@ -63,7 +62,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
                 name: name,
                 overrides: .init(
                     variant: variant, iphoneSource: iphoneSource, cloudosSource: cloudosSource,
-                    spoofBuild: spoofBuild, forceDscMaxSlide: forceDSCMaxSlide ? true : nil,
+                    spoofBuild: spoofBuild,
                     enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend,
                     prepareBackend: prepareBackend),
                 restartFrom: restartFrom, acceptToolChange: acceptToolChange,
@@ -83,7 +82,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
         try orchestrator.run(.init(
             name: name, variant: variant ?? "regular",
             iphoneSource: sources.iphoneSource, cloudosSource: sources.cloudosSource,
-            sudoPassword: sudoPassword, spoofBuild: spoofBuild, forceDSCMaxSlide: forceDSCMaxSlide,
+            sudoPassword: sudoPassword, spoofBuild: spoofBuild,
             enableFrida: frida, rootPopup: rootPopup,
             interactive: interactive, diskSizeGB: diskSize ?? 64,
             verbosity: VPhoneVerbosity(count: verboseCount),

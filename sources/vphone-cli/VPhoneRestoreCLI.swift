@@ -127,7 +127,6 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     @Argument(help: "VM name") var name: String?
     @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp") var variant: String = "exp"
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
-    @Flag(name: .customLong("force-dsc-maxslide"), help: "Zero the dyld cache maxSlide on non-27 bases (opt-in DSC-map fit)") var forceDSCMaxSlide = false
     @Flag(name: .customLong("root-popup"), help: "Elevate via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
     @Flag(name: .customLong("keep-artifacts"), help: "Keep the extracted CFW input dirs (cfw_input/, cfw_jb_input/) after install (default: removed to save space)") var keepArtifacts = false
     @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
@@ -156,7 +155,6 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
             "VPHONE_DEBS_DIR": resources.debsCacheDir.path,
         ]
         if let spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
-        if forceDSCMaxSlide { scriptEnv["FORCE_DSC_MAXSLIDE"] = "1" }
         if keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
 
         let args = [resources.cfwInstallHostScript.path, "--variant", variant, bundle.url.path]

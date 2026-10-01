@@ -50,6 +50,7 @@ exit 0
                         VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable)
         self.env.pop('SUDO_USER', None)
         self.env.pop('SUDO_UID', None)
+        self.env.pop('FORCE_DSC_MAXSLIDE', None)
         attach = self.root / 'attach.plist'
         attach.write_bytes(plistlib.dumps({'system-entities': [{'dev-entry': '/dev/disk91'}, {'dev-entry': '/dev/disk91s1'}]}))
         self.env['TEST_ATTACH_PLIST'] = str(attach)
@@ -60,6 +61,7 @@ exit 0
         for variant in ('', '_dev', '_jb', '_exp'):
             (scripts / f'cfw_install{variant}.sh').write_text('''#!/bin/zsh
 print -r -- "${CFW_HOST_MNT:-missing}" > "$PWD/run-dir"
+print -r -- "${0:t} ${FORCE_DSC_MAXSLIDE-<unset>}" > "$PWD/installer-env"
 [[ -n ${CFW_HOST_MNT:-} && -d $CFW_HOST_MNT ]] || exit 72
 mkdir -p "$CFW_HOST_MNT/mnt1" "$CFW_HOST_MNT/mnt_sysos_hv_vmm"
 print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"
@@ -79,11 +81,11 @@ exit ${INSTALL_EXIT:-0}
 ''')
         self.driver = scripts / 'cfw_install_host.sh'
 
-    def start(self, name='vm', **env):
+    def start(self, name='vm', variant='exp', **env):
         vm = self.root / name
         vm.mkdir(exist_ok=True)
         (vm / 'Disk.img').touch()
-        proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', 'exp', str(vm)],
+        proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
                                     env=dict(self.env, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
             try:
@@ -280,6 +282,25 @@ exit ${INSTALL_EXIT:-0}
         _, p = self.start(INSTALL_EXIT='37', FAIL_CLEANUP='1')
         rc, output = self.finish(p)
         self.assertEqual(rc, 37, output)
+
+    def test_removed_force_dsc_maxslide_is_reported_and_not_forwarded(self):
+        # T13a: the opt-in is gone; every variant reports it and no installer sees it.
+        notice = '[!] FORCE_DSC_MAXSLIDE has been removed'
+        installers = {'regular': 'cfw_install.sh', 'dev': 'cfw_install_dev.sh',
+                      'jb': 'cfw_install_jb.sh', 'exp': 'cfw_install_exp.sh'}
+        for variant, installer in installers.items():
+            for value in ('1', '0'):
+                with self.subTest(variant=variant, value=value):
+                    vm, p = self.start(f'vm-{variant}-{value}', variant=variant, FORCE_DSC_MAXSLIDE=value)
+                    rc, output = self.finish(p)
+                    self.assertEqual(rc, 0, output)
+                    self.assertEqual(output.count(notice), 1, output)
+                    self.assertEqual((vm / 'installer-env').read_text().strip(), f'{installer} <unset>')
+        vm, p = self.start('vm-unset', variant='regular')
+        rc, output = self.finish(p)
+        self.assertEqual(rc, 0, output)
+        self.assertNotIn('FORCE_DSC_MAXSLIDE', output)
+        self.assertEqual((vm / 'installer-env').read_text().strip(), 'cfw_install.sh <unset>')
 
 
 if __name__ == '__main__':

@@ -63,6 +63,15 @@ if ! "$PY" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR"; then
   exec "$PY" "$SCRIPT_DIR/vm_lock.py" "$VM_DIR" cfw -- /bin/zsh "$0" --variant "$VARIANT" "$VM_DIR"
 fi
 
+# FORCE_DSC_MAXSLIDE (non-27 maxSlide opt-in) is removed (T13a, upstream d930e50).
+# Report it for every variant and keep it from the installers; patch-dsc-maxslide
+# decides from the cache header on a 27.* base.
+if [[ -n "${FORCE_DSC_MAXSLIDE:-}" ]]; then
+  echo "[!] FORCE_DSC_MAXSLIDE has been removed and is ignored (value: $FORCE_DSC_MAXSLIDE)." >&2
+  echo "    On an iOS 27.* base, patch-dsc-maxslide zeroes maxSlide when the cache overflows the kernel shared region; other bases keep their slide." >&2
+  unset FORCE_DSC_MAXSLIDE
+fi
+
 if lsof "$IMG" >/dev/null 2>&1; then
   echo "[-] $IMG is in use — stop the VM first." >&2; exit 1
 fi
@@ -186,7 +195,6 @@ echo "[*] running $INSTALLER (files placed on host mounts)..."
 # via env: an expansion-produced ${VAR:+NAME=val} isn't parsed as a shell assignment.
 ( cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" \
     ${SPOOF_BUILD:+SPOOF_BUILD="$SPOOF_BUILD"} \
-    ${FORCE_DSC_MAXSLIDE:+FORCE_DSC_MAXSLIDE="$FORCE_DSC_MAXSLIDE"} \
     ${VPHONE_FRIDA:+VPHONE_FRIDA="$VPHONE_FRIDA"} \
     zsh "$SCRIPT_DIR/$INSTALLER" . )
 

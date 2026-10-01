@@ -47,9 +47,11 @@ Commands:
         Zero the dyld_cache_header maxSlide when the userland cache would overflow
         the vphone600 26.x kernel's 6 GiB shared region (cache span + maxSlide >
         0x180000000, e.g. iOS 27.0). Lets the cache map at slide 0 so launchd's dyld
-        can map libSystem. Self-gating (no-op if it already fits); no re-attest needed
-        (header field, not a cs_validate'd code page). --force zeroes maxSlide even
-        when the cache fits (non-27 opt-in).
+        can map libSystem. Self-gating (no-op if it already fits or maxSlide is
+        already 0); a header that fails the dyld_cache_header checks is an error and
+        nothing is written. No re-attest needed (header field, not a cs_validate'd
+        code page). --force zeroes maxSlide even when the cache fits; it is for
+        running this command by hand, and cfw_install.sh never passes it.
 
     patch-lsd-embedded-reg <chunks_dir> [--dry-run]
         Force lsd's -[_LSDModifyClient clientIsEntitledForEmbeddedRegistrationOperations]

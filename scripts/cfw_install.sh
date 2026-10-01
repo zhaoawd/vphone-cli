@@ -232,9 +232,11 @@ esac
 #    fixed 6 GiB shared region. The kernel reserves the cache's mapped span PLUS the
 #    cache-header maxSlide (512 MiB); iOS 27.0 (~5.95 GiB span + 512 MiB) overflows
 #    0x180000000, so _shared_region_map_and_slide returns ENOMEM, dyld cannot map
-#    libSystem, and launchd (pid 1) panics at boot. Zero maxSlide so the cache maps
-#    at slide 0. (The patcher also self-gates on the actual span, but older userlands
-#    fit with full slide and never need it — so it is not run there at all.)
+#    libSystem, and launchd (pid 1) panics at boot. The patcher decides from the
+#    cache header: it zeroes maxSlide only when sharedRegionSize + maxSlide exceeds
+#    the region, skips a cache that fits or is already at 0, and fails without
+#    writing on a header it cannot corroborate. Older userlands fit with full slide,
+#    so it is not run there at all (same 27.* gate as upstream 2.2.3).
 #  - lsd embedded-registration gate: opens lsd's containerized-registration path so
 #    the iOS-27 vpregister first-boot tool can register JB apps (uicache's
 #    registerApplicationDictionary is a no-op stub on 27). Not needed on 26.x/18.x,
@@ -244,10 +246,9 @@ esac
 #    that our JB code-signing environment produces. That crash-loops every daemon which
 #    pins an entitlement peer-requirement (intelligencetasksd/searchpartyd/transparencyd/
 #    bluetoothd/...). Absent on 26.x/18.x libxpc (self-gating patcher no-ops there).
-# FORCE_DSC_MAXSLIDE=1 (default 0): opt in to zeroing maxSlide on non-27 bases,
-# whose caches fit and would otherwise self-gate to a no-op (--force bypasses that).
+# The FORCE_DSC_MAXSLIDE=1 opt-in (non-27 `--force`) is removed (T13a, upstream
+# d930e50); cfw_install_host.sh reports it when set. This script never passes --force.
 DSC_DIR="$MNT1/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld"
-FORCE_DSC_MAXSLIDE="${FORCE_DSC_MAXSLIDE:-0}"
 case "$IOS_VERSION" in
     27.*)
         if [[ -d "$DSC_DIR" ]]; then
@@ -259,12 +260,6 @@ case "$IOS_VERSION" in
             "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-xpc-lwcr "$DSC_DIR"
             echo "  [*] Patching os_lockdown_mode_enabled (missing MAC sysctl -> launchd abort)..."
             "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-lockdown-mode "$DSC_DIR"
-        fi
-        ;;
-    *)
-        if [[ "$FORCE_DSC_MAXSLIDE" == "1" && -d "$DSC_DIR" ]]; then
-            echo "  [*] Forcing dyld cache maxSlide=0 (opt-in FORCE_DSC_MAXSLIDE=1; base iOS ${IOS_VERSION:-unknown})..."
-            "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-dsc-maxslide "$DSC_DIR" --force
         fi
         ;;
 esac
