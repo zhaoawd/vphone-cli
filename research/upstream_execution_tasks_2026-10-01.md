@@ -11,8 +11,9 @@
 分支 `codex/handoff-20261001`，基线 `e8d825b`。以 `upstream_handoff_2026-10-01.md` 的顺序执行。
 
 - 已完成：第 1 项，修改前两项新增回归失败；修改后 Python 559 项、相关 Swift 9 项通过。
-- 进行中：第 2 项，新增 clone 断言已在修改前失败。
-- 待办：B1–B5；真实验收批准闸门；后续依赖任务。
+- 已完成：第 2 项，新增 clone 断言修改前失败；修改后 `make test_swift` 退出 0。
+- 进行中：B1，T16 检查点层级和 v2 记录判定已复现，实施中。
+- 待办：B2–B5；真实验收批准闸门；后续依赖任务。
 - 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；不执行真实 VM 验收。
 - 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。
 

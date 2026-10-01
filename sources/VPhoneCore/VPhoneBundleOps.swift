@@ -237,7 +237,8 @@ public enum VPhoneBundleOps {
                                    attributes: [.posixPermissions: 0o700])
             defer { try? fm.removeItem(at: staging) }
             let payload = staging.appendingPathComponent("payload")
-            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock"])
+            // Rollback records belong to the source bundle, not its clone.
+            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock", ".cfw-history"])
             let staged = try VPhoneBundle.load(at: payload)
             // As in importArchive, copying happens privately, then name checking
             // and publication use the library lock. Slow copies do not monopolize it.
