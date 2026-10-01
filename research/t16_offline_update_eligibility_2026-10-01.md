@@ -292,3 +292,13 @@ Swift 命令环境同 `scripts/run_tests.py`（`--disable-sandbox --cache-path .
 - 64 GiB 真实磁盘上各阶段的耗时；真实 `Disk.img` 是否会被 decmpfs 压缩（T14 记录的条件仍未验证）。
 - HFS+ 卷上的真实运行（`ENOTTY` 只用替身覆盖）。
 - 不带 `--check` 的流程中，`cfw_install_host.sh --update-environment` 的 sudo 路径仍经 `runStreaming` 启动（本节未改）；`--check` 的 sudo 路径改用 `runForeground`。两者在真实终端中的差异未验证。
+
+## 10. 提权只读检查的真实复核（2026-10-01）
+
+用户授权由主会话执行。CLI 为 T16 后续修复 worktree 的调试构建（含 `94e39a0`）。
+
+- 命令：`vphone-cli cfw update-environment lp-b4-accept2 -l /Users/kolar/vphone-b4-accept --check --root-popup`。macOS 认证对话框出现，用户输入密码；检查以 uid 0 运行。
+- 结果：退出 0；`classification: full_migration_required`；`bootstrap.kind: none`；`launchdhook-vphone.dylib`、`SystemHook-vphone.dylib`、`libvcamcaptured.dylib`、`libcamfix.dylib`、`libvlocation.dylib` 均为 `missing`；`libmisfix.dylib` 为 `upstream_only_absent`；首条原因为 "launchd has no environment load command (classic install without the v2 environment)"；`disk.unchanged: true`。与第 9 节预期一致。
+- 只读复核：检查前后 `Disk.img` 的 inode/size/mtime（147451698 / 68719476736 / 1790859187）、身份文件 SHA-256、bundle 的 `ls -la` 列表均一致；`hdiutil info` 中无该磁盘，无 `vphone-env-check` 挂载与临时目录，脚本目录下无 root 所有的 `__pycache__`。
+- 发现的缺陷：`--check` 的 stdout 在 JSON 之前输出两行进度文字（`[*] read-only guest environment check as uid 0 ...` 与 `[cfw] the read-only check runs as root ...`），直接解析 stdout 会失败。应改为输出到 stderr。
+- 未覆盖：sudo 路径（非 root-popup）；`offline_update` 类在真实 VM 上的替换（需要带 v2 环境的 VM）。
