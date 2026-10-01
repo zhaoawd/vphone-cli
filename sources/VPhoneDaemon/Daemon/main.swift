@@ -13,7 +13,7 @@ if mode != 1 {
 }
 
 guard vp_native_watch_proxy() == 0 else { exit(1) }
-vp_vcam_start()
+if vp_native_vcam_enabled() { vp_vcam_start() }
 GuestIrisinInstaller.refreshBootstrapOnStartup()
 
 let group = MultiThreadedEventLoopGroup(numberOfThreads: 2)

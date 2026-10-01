@@ -342,7 +342,7 @@ enum GuestAPI {
             )
         case "agent.apply_update":
             let expected = try string(params, "sha256")
-            let cache = "/var/root/Library/Caches/vphoned"
+            let cache = "/var/root/Library/Caches/vphoned-api"
             let next = cache + ".next"
             let data = try Data(contentsOf: URL(fileURLWithPath: next), options: .mappedIfSafe)
             let actual = sha256Hex(data)
@@ -352,7 +352,7 @@ enum GuestAPI {
             }
             guard rename(next, cache) == 0 else { throw GuestAPIError.operationFailed("Could not install update") }
             try Data(expected.utf8).write(
-                to: URL(fileURLWithPath: "/var/root/Library/Caches/vphoned.api-v2"),
+                to: URL(fileURLWithPath: "/var/root/Library/Caches/vphoned-api.api-v2"),
                 options: .atomic,
             )
             DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) { exit(0) }

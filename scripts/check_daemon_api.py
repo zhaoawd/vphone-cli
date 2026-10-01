@@ -68,7 +68,7 @@ def check_checkouts(pins, checkouts):
 def inspect_candidate(directory, ldid, pins):
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError('Candidate directory must be a real directory')
-    names = ['vphoned', 'vphoned.plist', 'vphoned.entitlements.plist']
+    names = ['vphoned', 'vphoned-api.plist', 'vphoned.entitlements.plist']
     digests = {}
     for name in names:
         path = directory / name
@@ -78,7 +78,7 @@ def inspect_candidate(directory, ldid, pins):
     policy = plistlib.loads((PROJECT / 'Configuration/VPhoneDaemon.entitlements').read_bytes())
     if plistlib.loads((directory / 'vphoned.entitlements.plist').read_bytes()) != policy:
         raise ValueError('Candidate policy differs from the source entitlements')
-    if (directory / 'vphoned.plist').read_bytes() != (PROJECT / 'Configuration/vphoned.plist').read_bytes():
+    if (directory / 'vphoned-api.plist').read_bytes() != (PROJECT / 'Configuration/vphoned-api.plist').read_bytes():
         raise ValueError('Candidate launchd plist differs from the source')
     binary = directory / 'vphoned'
     if not os.access(binary, os.X_OK):

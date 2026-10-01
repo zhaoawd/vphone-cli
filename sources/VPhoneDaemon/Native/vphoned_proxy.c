@@ -16,8 +16,13 @@
 
 extern char **environ;
 
+bool vp_native_vcam_enabled(void) {
+    const char *value = getenv("VPHONED_VCAM");
+    return !value || strcmp(value, "off") != 0;
+}
+
 static volatile sig_atomic_t stopping = 0;
-static const char *pending_update = "/var/root/Library/Caches/vphoned.api-v2.pending";
+static const char *pending_update = "/var/root/Library/Caches/vphoned-api.api-v2.pending";
 
 static void request_stop(int signal_number) {
     stopping = signal_number;

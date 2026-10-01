@@ -15,7 +15,7 @@ python3 "$SCRIPT_DIR/check_daemon_api.py" --checkouts "$output/Xcode/SourcePacka
 stage="$output/candidate"
 mkdir -p "$stage"
 cp "$output/Xcode/Build/Products/Release-iphoneos/vphoned" "$stage/vphoned"
-cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/vphoned.plist" "$stage/vphoned.plist"
+cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/vphoned-api.plist" "$stage/vphoned-api.plist"
 cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements" "$stage/vphoned.entitlements.plist"
 ldid -S"$stage/vphoned.entitlements.plist" -M "-K$SCRIPT_DIR/vphoned/signcert.p12" "$stage/vphoned"
 python3 "$SCRIPT_DIR/check_daemon_api.py" --candidate "$stage" --record

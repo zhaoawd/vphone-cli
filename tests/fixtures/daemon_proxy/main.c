@@ -38,6 +38,10 @@ static int bind_loopback(const char *path) {
 }
 
 int main(void) {
+    if (getenv("VPHONE_PROXY_TEST_VCAM")) {
+        printf("%d\n", vp_native_vcam_enabled());
+        return 0;
+    }
     int mode = vp_native_process_mode();
     if (mode < 0) return 64;
     if (mode == 0) {
