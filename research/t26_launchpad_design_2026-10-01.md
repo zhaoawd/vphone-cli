@@ -429,6 +429,14 @@ amfidont：`scripts/start_amfidont_for_vphone.sh` 以 `--path "$PROJECT_ROOT"` �
 4. 是否把 Launchpad 纳入 `make build` 与 CI `bundle` 任务。推荐 B1 只提供 `make launchpad`，B6 后再决定。纳入后 `make build` 产物与 CI 时长变化。
 5. B2、B4 的真实 VM 验收（启动/停止/关闭管理器后行为；真实创建、取消与 resume）需要运行 VM、下载固件并启用 amfidont，请在对应批次单独授权。
 
+### 11.1 用户决定（2026-10-01）
+
+1. 采用本地专用 bundle 标识与独立数据目录，B1 同步修改 `VPhoneHelperConfiguration` 允许客户端列表；helper 注册仍暂缓。
+2. 不迁入 `vphone-launchpad-cli` 与 app 级控制 socket；guest 控制只经各 VM 的 `vphone.sock`。
+3. 语言范围为 en 与 zh-Hans。
+4. B1 只提供 `make launchpad`；是否并入 `make build` 与 CI bundle 任务在 B6 后决定。
+5. B2、B4 的真实 VM 验收在对应批次单独授权。
+
 ## 12. 事实、推断与待验证汇总
 
 事实：第 1 节、第 3.1 节 E1–E13、5.2 与 5.3 中标注为事实的内容，均有命令或源码位置。
