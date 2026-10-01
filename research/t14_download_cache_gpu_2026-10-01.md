@@ -247,7 +247,7 @@ worktree 环境：`.venv` 链接主仓库；初始化 `vendor/*` 子模块；生
 A 部分遗留的决定：
 
 6. 是否恢复跨运行续传。需要把 partial 与来源绑定（例如按来源摘要命名并加锁），属于第二种 partial 规则。
-7. 旧缓存是否提供显式“认领”入口：用研究记录中的 SHA-256（例如 `upstream_remaining_progress_2026-09-29.md:69-70`）核对后写入标记，避免重新下载约 11.7 GB。
+7. 旧缓存是否提供显式“认领”入口：用研究记录中的 SHA-256（例如 `upstream_remaining_progress_2026-09-29.md:69-70`）核对后写入标记，避免重新下载约 11.7 GB。（用户已决定采用；实现见 §12。）
 8. PCC URL 路径中的 64 位十六进制是否作为 Apple 提供的摘要强制核对。依据只有一个样本（`399b664d…`），未确认 URL 规则。
 9. 是否采用上游十进制磁盘创建（§6）。
 10. 导出是否排除 `.firmware-prepare-*` 与 `.firmware-prepare-backup-*`（§2）。
@@ -259,3 +259,136 @@ A 部分遗留的决定：
 - `cfw_disk_txn.py` 的 decmpfs 问题未修改（§5）。
 - `ExtractPermissionsTests` 的并行竞态未修复（§8）。
 - 未修改执行清单与实施计划。
+
+## 12. 旧缓存认领
+
+日期：2026-10-01。基线 `f524a0f`。用户决定：只在用户显式运行命令时，对已有缓存写完成标记。
+
+### 12.1 命令
+
+```
+vphone-cli fw cache list [--cache-dir <dir>] [--json]
+vphone-cli fw cache adopt <file|dir|名称> [--source <url|该文件路径>] [--expect-sha256 <hex>] [--cache-dir <dir>]
+```
+
+- 默认缓存目录为 `VPhoneResources.ipswCacheDir`，即 `fw prepare` 传给脚本的 `IPSW_DIR`（`$VPHONE_ROOT/ipsws` 或 `~/.vphone/ipsws`）。
+- 参数不含 `/` 时按缓存目录内的名称解析。
+- 实现：`sources/VPhoneCore/VPhoneIPSWCacheAdoption.swift`；CLI：`sources/vphone-cli/VPhoneFWCacheCLI.swift`。
+
+### 12.2 规则
+
+标记格式与写入沿用 §3：`format` 为 `vphone-ipsw-cache/1`；持缓存目录 `flock`（`VPhoneBundleGuard.withLibraryLock`，等待上限 600 秒，与 Python 辅助脚本一致）；标记先写临时文件、`fsync`，再 `rename`（`VPhoneIPSWCache.writeMarkerJSON`，下载发布也改用该函数）。没有新增第二套标记或锁。
+
+文件条目：
+
+1. 只接受缓存目录的直接子项。父目录按 realpath 比较；条目本身用 `lstat` 判断。拒绝符号链接、以 `.` 开头的名称（partial、标记、丢弃中的目录）、子目录中的文件、`..` 路径与缓存目录本身。
+2. 来源：
+   - `--source <url>`：该 URL 按 `fw_prepare.sh` 或 `resolve` 的命名规则得到的缓存名之一必须等于文件名（iPhone 用 URL 末段；cloudOS 用 `derive_cache_ipsw_name`，Swift 实现为 `scriptCacheName`；`resolve` 用 `cacheName(for:)`）。否则拒绝，因为 prepare 不会在该名称下查找此来源。
+   - 不给 `--source`：在 `VPhoneFirmwareCatalog` 的 URL 中查找缓存名等于文件名的唯一一项；没有则拒绝并提示给出 `--source`。标记记录 `adoption.source_from = "catalog"`。
+   - `--source <该文件自身路径>`：用于 prepare 以本地路径接收该文件的情况。标记的 `source` 为 `ipsw_cache_entry.py identify` 的同一结构（realpath、device、inode、size、mtime_ns）。其他本地文件作为来源时拒绝。
+3. 若已有格式正确、且与文件当前 size/inode/mtime 一致的标记：来源相同则不改动并报告 `alreadyUsable`（不重新计算摘要；若给了 `--expect-sha256` 则与标记中的值比较）；来源不同则拒绝，标记不变。下载写入的标记保留，不改写为 adopted。
+4. 用 `VPhoneIPSWCache.inspect`（`fw inspect` 使用的同一函数）读取 BuildManifest，失败则拒绝。来源末段为 `<product>_<version>_<build>_Restore.ipsw` 时，BuildManifest 的产品、版本和 build 必须一致。
+5. 在锁内流式计算完整 SHA-256（8 MiB 块，`F_NOCACHE`，`O_NOFOLLOW`，打开后 `fstat` 核对 inode）。进度输出到 stderr：终端上为单行进度条，否则每 10% 一行。计算前后 size/inode/mtime 不一致则拒绝。
+6. `--expect-sha256` 与结果不一致则拒绝。URL 路径中有 64 位十六进制段（PCC cloudOS URL 形式）时，与结果比较，不一致则拒绝；来源由 catalog 推断时同样比较。
+7. 标记在 §3 字段之外增加：`adopted: true`、`source_verified: false`、`adoption`（`at`、`source_from`、`checks`、`note`）、`manifest`（`version`、`build`、`product_types`、`device_classes`）。Swift `entryProblem` 与 Python `file_problem` 不读这些字段，判定规则不变。
+
+目录条目（解包缓存 `X`，对应 `X.ipsw`）：
+
+1. `X.ipsw` 必须已有可用的文件标记（下载或认领；size/inode/mtime 与标记一致），否则拒绝并提示先认领 IPSW。
+2. 已有目录标记且 `parent` 与 IPSW 标记一致时不改动；`parent` 不同时拒绝。
+3. 用 `VPhoneArchiveReader.entries` 列出 IPSW 成员，逐项比较名称、类型和大小；目录中不在 IPSW 内的文件（`.DS_Store` 除外）导致拒绝。不对目录内容计算摘要。
+4. 标记为 §3 的目录标记（`parent.size`、`parent.sha256` 取自 IPSW 标记），另加 `adopted`、`source_verified`、`adoption`。
+
+`list`：只读目录项与标记，不取锁、不计算摘要、不删除。状态：`downloaded`、`copied`、`adopted`、`stale`（标记后文件改变）、`unmarked`、`foreign-marker`、`partial`（附写入进程是否存在）、`orphan-marker`、`symlink`；目录为 `extracted`、`adopted`、`stale`、`unmarked`。
+
+prepare 输出：`ipsw_cache_entry.py check` 与 `check-dir` 对 adopted 条目在 stdout 输出 `adopted; source not verified by download`；`fw_prepare.sh` 的 `fetch`、`extract` 输出 `==> Cached: <名称> (adopted; source not verified by download)`。Swift `resolve` 接受 adopted 条目，不输出该说明（产品代码中没有 `resolve` 的远程调用方，见 §2）。
+
+不自动扫描、不自动认领、不删除文件。
+
+### 12.3 认领过程中发现的问题与修改
+
+事实：`fw_prepare.sh` 的 `fetch` 在本地来源与缓存条目是同一文件时（例如 `--iphone-source ~/.vphone/ipsws/iPhone17,3_26.6.1_23G82_Restore.ipsw`，iPhone 条目名取来源末段），条目没有标记会先 `discard` 删除该文件，随后复制失败。改动前脚本对此用例的输出为 `Discarding cached iPhone_Restore.ipsw (no completion marker)`、`Copying …`、`ERROR: [Errno 2] No such file or directory`，文件被删除（`python-before.log`）。
+
+修改：`fetch` 在本地来源与输出为同一文件（`-ef`）且条目不可用时停止，不删除，提示运行 `vphone-cli fw cache adopt '<条目>' --source '<条目>'`。
+
+推断：F1 记录中 23G82 以本地路径指定（`research/f1_p_matrix_run_2026-09-17.md:106`）。若在 `f524a0f` 上以同样方式运行 `vm create`，该 11,254,333,223 字节文件会被删除。`vm create` 把 `--iphone-source` 原样传入 `IPHONE_SOURCE`（`VPhoneCreateOrchestrator.swift:659`），未在真实运行中验证。
+
+### 12.4 测试
+
+| 文件 | 内容 |
+| --- | --- |
+| `tests/VPhoneCoreTests/IPSWCacheAdoptionTests.swift`（新，12 项） | 认领成功与标记字段、进度回调、条目不被改写；Python `check` 接受并输出 adopted；`resolve` 使用 adopted 条目且不发请求；重复认领不重新计算、标记字节不变、不同 `--expect-sha256` 拒绝、同名另一 URL 拒绝；下载标记保留、命名不符的 URL 拒绝；`--expect-sha256` 不符与格式错误拒绝；PCC URL 摘要不符拒绝、相符通过；非 IPSW 与 BuildManifest 和文件名不符拒绝；符号链接、partial、缓存外路径、`..`、子目录、缓存目录本身拒绝且目录内容不变；catalog 推断来源、23G82 无来源拒绝、以自身路径为来源可用且 Python `check` 接受、其他本地文件拒绝；cloudOS 26.1 与 26.4 catalog URL 的脚本缓存名等于实际缓存中的文件名；解包目录在 IPSW 未认领时拒绝、成员截断或多余文件拒绝、认领后 Python `check-dir` 接受；`list` 各状态、名称与 mtime 不变、改动后为 `stale` |
+| `tests/test_fw_prepare_partials.py`（16 → 20 项） | adopted IPSW 被使用并标注；adopted 解包目录被使用并标注；本地来源即无标记缓存条目时不删除；以自身路径认领的条目被使用并标注 |
+
+### 12.5 命令与结果
+
+日志在 `research/artifacts/t14-adopt-2026-10-01/`（Git 忽略）。swift 命令环境同 §8。
+
+| 命令 | 结果 |
+| --- | --- |
+| 改动前 `swift test --filter IPSWCacheAdoptionTests`（源码临时恢复为 `f524a0f`） | 退出 1；编译失败：`'AdoptionError' is not a member type of enum 'VPhoneCore.VPhoneIPSWCache'`（`swift-before.log`）。源码随后恢复 |
+| 改动前 `FW_PREPARE_SCRIPT=<f524a0f 脚本>`，辅助脚本临时恢复为 `f524a0f`，`.venv/bin/python3 -B -m unittest tests.test_fw_prepare_partials` | `Ran 20 tests`，`FAILED (failures=4)`：新增 4 项全部失败（3 项缺少 adopted 标注；1 项文件被删除）（`python-before.log`）。辅助脚本随后恢复（`cmp` 一致） |
+| 改动后同一 Python 命令 | `Ran 20 tests`，`OK` |
+| 改动后 `swift test --filter IPSWCacheAdoptionTests` | 12 项 / 1 suite 通过 |
+| `swift test --filter "IPSWCacheAdoptionTests\|IPSWCacheTests\|FWInspect\|NativeFirmwarePrepareTests"` | 29 项 / 2 suites 通过；13 项 / 1 suite 通过 |
+| `bash -n scripts/fw_prepare.sh`；`scripts/check_scripts.py` 3 个文件 | 通过 |
+| `swift build --product vphone-cli` | 退出 0；新文件无警告 |
+| CLI 合成缓存（`VPHONE_ROOT` 指向 `.build/adopt-smoke`，13 条命令，`cli-smoke.txt`） | 目录在 IPSW 认领前拒绝；SHA 不符拒绝；catalog 推断认领成功；重复认领 `nothing changed`；目录认领成功；PCC URL 摘要认领成功（`checks: build-manifest, url-digest`）；23G82 无来源拒绝、以自身路径认领成功；非 IPSW、符号链接、partial、`/etc/hosts` 拒绝；`list` 显示 adopted/partial/symlink/unmarked |
+| 4 GiB 合成 IPSW 认领（`cli-rate.txt`） | `hashed in 1.5 s`（约 2.9 GB/s）。文件刚写入，数据可能在页缓存中 |
+| `make test_python` | `Ran 533 tests`，`OK (skipped=1)`；跳过项为 `test_daemon_api_icli`（IcliKit checkout 缺失） |
+| `make test_swift` | 退出 0。Swift Testing 11 次运行：37/5、75/7、152/34、14/2、9/2、366/41、104/23、18/1、38/5、28/4、176/31（测试/suite），共 1017 项、155 suites 通过；XCTest 4 个包 93、95、24、5 项，3 项跳过，0 失败；`check_tar_pipe_memory` 峰值 RSS 7,880,704 / 9,125,888 字节；`test_guest_components` `124 checks, 0 failures` |
+
+### 12.6 给用户的操作说明
+
+前提：使用包含本提交的 `vphone-cli`（`make build` 后的签名 app；签名产物需按既有 amfidont 流程放行）。运行时不要同时运行 `vm create` 或 `fw prepare`：认领在计算摘要期间持有缓存目录锁，Swift `resolve` 等锁上限为 10 秒，Python 辅助脚本为 600 秒。
+
+`~/.vphone/ipsws` 中 4 个条目（§7）的命令：
+
+```
+vphone-cli fw cache list
+
+# iPhone 26.1/23B85：来源由 catalog 推断（fw_prepare.sh 默认来源）；摘要来自 upstream_remaining_progress_2026-09-29.md:69
+vphone-cli fw cache adopt 'iPhone17,3_26.1_23B85_Restore.ipsw' \
+  --expect-sha256 8b72a4f0394ef49d63346eaf37a442751f70c5ec49ae0db7843c5e3b843cd85b
+
+# cloudOS 26.1：来源由 catalog 推断；与 URL 中的摘要比较（已有记录：一致）
+vphone-cli fw cache adopt 399b664dd623358c3de118ffc114e42dcd51c9309e751d43-727c4f5e2432.ipsw
+
+# cloudOS 26.4：来源由 catalog 推断；与 URL 中的摘要 c0ecdb4b…8b64 比较（是否一致未知）
+vphone-cli fw cache adopt c0ecdb4b310cf5239ab2b248dd3098eec297dc5aa3bbe6ad-b80d96a0b616.ipsw
+
+# iPhone 26.6.1/23G82：不在 catalog；按 F1 的用法以本地路径作为来源
+vphone-cli fw cache adopt 'iPhone17,3_26.6.1_23G82_Restore.ipsw' \
+  --source "$HOME/.vphone/ipsws/iPhone17,3_26.6.1_23G82_Restore.ipsw"
+
+vphone-cli fw cache list
+```
+
+说明：
+
+- 23G82 以自身路径认领后，只有以同一路径作为 `--iphone-source` 的 prepare 会使用它。若以 Apple URL 作为来源，需改用 `--source <该 URL>`；该 URL 本次未查到（离线）。
+- 26.1 iPhone 的 `--expect-sha256` 值记录于另一台主机（`/Users/qcz3840/.vphone/ipsws`），大小与本机条目相同（10,778,507,403 字节）。若命令报告摘要不一致，条目不会被认领；可去掉 `--expect-sha256` 后认领（标记仍为来源未经下载校验），或让 prepare 重新下载。
+- cloudOS 26.4 若报告与 URL 摘要不一致，该条目不能认领；原因可能是条目内容不同，或该 URL 段不是 SHA-256（§10.6 第 8 项未确认）。此时由 prepare 重新下载（1,199,454,323 字节）。
+- 认领只写 `.<名称>.vphone-complete`，不移动、不改写、不删除 IPSW。撤销认领：删除对应的 `.vphone-complete` 文件，条目回到 §7 的状态。
+
+预计耗时（推断）：4 个条目共 24,167,717,752 字节。合成文件实测约 2.9 GB/s（可能含页缓存），按此约 9 秒；若受磁盘读取限制，按 400 MB/s 约 1 分钟。未在真实文件上测量。
+
+### 12.7 事实、推断与未验证
+
+事实：
+
+- 认领写入的标记被 Swift `entryProblem`、`resolve` 和 Python `check`/`check-dir` 接受；`fw_prepare.sh` 的 `fetch`/`extract` 对其输出 adopted 标注（测试覆盖）。
+- 认领命令在测试与合成缓存中不删除、不移动、不改写条目；`list` 不改变目录项与 mtime。
+- 改动前脚本在“本地来源即无标记缓存条目”时删除该文件（测试复现）；改动后停止并保留文件。
+
+推断：
+
+- 认领后 prepare 对 4 个条目的判定为可用，不重新下载约 24.2 GB（其中默认 26.1 组合约 11.7 GB）。依据是标记规则与测试，未在真实缓存上运行。
+
+未验证：
+
+- 未读写 `~/.vphone/ipsws` 中的真实文件；4 个真实条目的 SHA-256、BuildManifest 内容和认领结果未知。
+- cloudOS 26.4 URL 中的十六进制段是否为该文件的 SHA-256。
+- 真实大文件（约 11 GB）的认领耗时与进度显示。
+- 签名 app 中的 CLI 运行（只运行了 `.build/debug/vphone-cli`）。
+- 解包目录认领只比较成员名称、类型和大小，不比较内容；未在真实解包目录上运行。

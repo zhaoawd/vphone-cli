@@ -12,6 +12,7 @@ The functions under test are taken from the script and run with stand-in
 commands. Downloads use a local HTTP server with Range support and injected
 faults; no test reaches the network.
 """
+import hashlib
 import http.server
 import json
 import os
@@ -341,6 +342,70 @@ class FWPreparePartialTests(unittest.TestCase):
         self.assertIn('is not a complete IPSW', output)
         self.assertFalse(self.zip.exists())
         self.assertFalse(self.marker(self.zip).exists())
+
+    # MARK: - Adopted entries (vphone-cli fw cache adopt)
+
+    ADOPTED = 'adopted; source not verified by download'
+
+    def write_adopted_marker(self, entry, source):
+        """The marker VPhoneIPSWCacheAdoption.swift writes for a file entry."""
+        info = os.stat(entry)
+        self.marker(entry).write_text(json.dumps({
+            'format': 'vphone-ipsw-cache/1', 'kind': 'file', 'source': source,
+            'size': info.st_size, 'sha256': hashlib.sha256(entry.read_bytes()).hexdigest(),
+            'file': {'inode': info.st_ino, 'mtime_ns': info.st_mtime_ns},
+            'adopted': True, 'source_verified': False,
+            'adoption': {'at': '2026-10-01T00:00:00Z', 'source_from': 'argument', 'checks': ['build-manifest']},
+            'manifest': {'version': '26.1', 'build': '23B85', 'product_types': ['iPhone17,3'], 'device_classes': []},
+        }, sort_keys=True))
+
+    def test_adopted_ipsw_is_used_and_labelled(self):
+        make_ipsw(self.zip)
+        url = 'https://updates.example.invalid/iPhone_Restore.ipsw'
+        self.write_adopted_marker(self.zip, {'url': url})
+        self.stub('curl', 'echo "curl must not run" >&2; exit 9\n')
+        before = self.zip.read_bytes()
+        rc, output = self.fetch(url, stubs=True)
+        self.assertEqual(rc, 0, output)
+        self.assertIn(f'==> Cached: iPhone_Restore.ipsw ({self.ADOPTED})', output)
+        self.assertEqual(self.zip.read_bytes(), before)
+
+    def test_adopted_extraction_is_used_and_labelled(self):
+        self.cached_zip()
+        parent = json.loads(self.marker(self.zip).read_text())
+        with zipfile.ZipFile(self.zip) as archive:
+            archive.extractall(self.cache)
+        (self.cache / MARKER).write_text(json.dumps({
+            'format': 'vphone-ipsw-cache/1', 'kind': 'directory',
+            'parent': {'size': parent['size'], 'sha256': parent['sha256']},
+            'adopted': True, 'source_verified': False,
+        }))
+        self.stub('unzip', 'echo "unzip must not run" >&2; exit 9\n')
+        rc, output = self.finish(self.run_harness('extract', str(self.zip), str(self.cache), 'iPhone_Restore', stubs=True))
+        self.assertEqual(rc, 0, output)
+        self.assertIn(f'==> Cached: iPhone_Restore ({self.ADOPTED})', output)
+        self.assert_complete_extraction(self.work / 'iPhone_Restore')
+
+    def test_unmarked_cache_entry_given_as_its_own_local_source_is_kept(self):
+        # fw prepare given ~/.vphone/ipsws/<name>.ipsw by path: source and entry
+        # are one file. Discarding the unmarked entry would delete the source.
+        make_ipsw(self.zip)
+        before = self.zip.read_bytes()
+        rc, output = self.fetch(self.zip)
+        self.assertNotEqual(rc, 0, output)
+        self.assertIn('vphone-cli fw cache adopt', output)
+        self.assertTrue(self.zip.exists(), 'the local source was deleted')
+        self.assertEqual(self.zip.read_bytes(), before)
+        self.assertFalse(self.marker(self.zip).exists())
+
+    def test_cache_entry_adopted_as_its_own_local_source_is_used(self):
+        make_ipsw(self.zip)
+        identity = json.loads(subprocess.check_output([sys.executable, '-B', str(HELPER), 'identify', str(self.zip)]))
+        self.write_adopted_marker(self.zip, identity)
+        self.stub('cp', 'echo "cp must not run" >&2; exit 9\n')
+        rc, output = self.fetch(self.zip, stubs=True)
+        self.assertEqual(rc, 0, output)
+        self.assertIn(f'==> Cached: iPhone_Restore.ipsw ({self.ADOPTED})', output)
 
     # MARK: - Downloads (local HTTP server)
 

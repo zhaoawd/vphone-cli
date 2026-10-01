@@ -25,6 +25,13 @@ implements the same rule and the same marker format.
 - Publishing, discarding and the marker write hold flock(2) on the cache
   directory itself, the lock VPhoneLibraryLock takes, so a reader never sees a
   published entry before its marker.
+- `vphone-cli fw cache adopt` (VPhoneIPSWCacheAdoption.swift) writes the same
+  markers for entries that existed before markers did, only when a user runs
+  it. It hashes the file in place and adds `"adopted": true`,
+  `"source_verified": false`, `adoption` and `manifest` fields; readers ignore
+  fields they do not use. An adopted entry is usable under the same rule;
+  check and check-dir print `adopted; source not verified by download` on
+  stdout for it.
 
 Usage:
   ipsw_cache_entry.py check FILE --source SRC
@@ -58,6 +65,7 @@ DIRECTORY_MARKER = '.vphone-extract-complete'
 LOCK_TIMEOUT = 600.0
 CHUNK = 8 << 20
 RENAME_EXCL = 0x00000004
+ADOPTED_NOTE = 'adopted; source not verified by download'
 
 _libc = ctypes.CDLL(ctypes.util.find_library('c'), use_errno=True)
 _libc.renamex_np.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint]
@@ -381,6 +389,8 @@ def main(argv=None):
             if problem:
                 print(f'{args.entry}: {problem}', file=sys.stderr)
                 return 1
+            if file_marker(args.entry).get('adopted') is True:
+                print(ADOPTED_NOTE)
         elif args.command == 'identify':
             print(json.dumps(source_identity(args.source), sort_keys=True))
         elif args.command == 'discard':
@@ -393,6 +403,8 @@ def main(argv=None):
             if problem:
                 print(f'{args.entry}: {problem}', file=sys.stderr)
                 return 1
+            if (read_json(Path(args.entry) / DIRECTORY_MARKER) or {}).get('adopted') is True:
+                print(ADOPTED_NOTE)
         elif args.command == 'discard-dir':
             discard_directory(args.entry, args.parent)
         elif args.command == 'publish-dir':

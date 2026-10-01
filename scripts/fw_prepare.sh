@@ -391,15 +391,23 @@ cache_entry() {
 # fetched again. Copies and downloads go to this run's partial file and are
 # published with the marker once complete; an interrupted transfer is never
 # found under the IPSW name and is not resumed by a later run.
+#
+# An entry adopted with `vphone-cli fw cache adopt` is usable; `check` prints
+# that its source was not verified by a download, and the Cached line says so.
+# A local source that is itself the cache entry (a file given by its path in
+# IPSW_DIR) is never discarded: that would delete the source.
 fetch() {
-    local src="$1" out="$2"
+    local src="$1" out="$2" note
     remove_stale_partials "$out"
-    if cache_entry check "$out" --source "$src" 2>/dev/null; then
-        echo "==> Cached: ${out##*/}"
+    if note="$(cache_entry check "$out" --source "$src" 2>/dev/null)"; then
+        echo "==> Cached: ${out##*/}${note:+ (${note})}"
         return
     fi
     if is_local "$src" && [[ ! -f "$src" ]]; then
         die "Local IPSW not found: $src"
+    fi
+    if is_local "$src" && [[ "$src" -ef "$out" ]]; then
+        die "${out##*/} is in the IPSW cache without a completion marker and is also the local source; it was not deleted. Run: vphone-cli fw cache adopt '$out' --source '$out'"
     fi
     cache_entry discard "$out" --source "$src" || die "cannot discard the cached ${out##*/}"
     local partial identity
@@ -457,10 +465,10 @@ remove_stale_partials() {
 EXTRACT_MARKER=".vphone-extract-complete"
 
 extract() {
-    local zip="$1" cache="$2" out="$3"
+    local zip="$1" cache="$2" out="$3" note
     remove_stale_partials "$cache"
-    if cache_entry check-dir "$cache" --parent "$zip" 2>/dev/null; then
-        echo "==> Cached: ${cache##*/}"
+    if note="$(cache_entry check-dir "$cache" --parent "$zip" 2>/dev/null)"; then
+        echo "==> Cached: ${cache##*/}${note:+ (${note})}"
     else
         cache_entry discard-dir "$cache" --parent "$zip" || die "cannot discard the extraction $cache"
         echo "==> Extracting ${zip##*/} ..."

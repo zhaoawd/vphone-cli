@@ -16,7 +16,9 @@ import VPhoneArchiveKit
 ///   mtime;
 /// - an entry without a marker, with another source, or changed since the
 ///   marker was written is removed and downloaded again. Nothing is reused by
-///   its file name alone.
+///   its file name alone;
+/// - `vphone-cli fw cache adopt` writes the same marker for an existing entry
+///   when a user runs it (VPhoneIPSWCacheAdoption.swift), flagged `adopted`.
 ///
 /// Downloads stream chunk by chunk into the partial file (upstream cb924c91).
 /// A transfer that fails part way resumes with `Range` and `If-Range` when the
@@ -242,8 +244,13 @@ public enum VPhoneIPSWCache {
             "size": size, "sha256": sha256,
             "file": ["inode": UInt64(info.st_ino), "mtime_ns": mtimeNanoseconds(info)],
         ]
+        try writeMarkerJSON(marker, to: markerURL(for: entry))
+    }
+
+    /// Writes a marker to a temporary name next to `destination`, syncs it and
+    /// renames it into place. The caller holds the cache directory lock.
+    static func writeMarkerJSON(_ marker: [String: Any], to destination: URL) throws {
         let data = try JSONSerialization.data(withJSONObject: marker, options: [.sortedKeys])
-        let destination = markerURL(for: entry)
         let temporary = destination.deletingLastPathComponent()
             .appendingPathComponent("\(destination.lastPathComponent).partial.\(getpid())")
         let fd = open(temporary.path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o600)
@@ -264,7 +271,7 @@ public enum VPhoneIPSWCache {
         }
     }
 
-    private static func mtimeNanoseconds(_ info: stat) -> Int64 {
+    static func mtimeNanoseconds(_ info: stat) -> Int64 {
         Int64(info.st_mtimespec.tv_sec) * 1_000_000_000 + Int64(info.st_mtimespec.tv_nsec)
     }
 
