@@ -134,7 +134,7 @@ if __name__ == "__main__":
     from patchers.cfw_patch_camera_dsc import apply_all_camera_patches
     from patchers.cfw_patch_watchdogd import patch_watchdogd
     from patchers.cfw_patch_diskimagesiod import patch_diskimagesiod
-    from patchers.cfw_daemons import parse_cryptex_paths, inject_daemons, patch_dropbear_plist
+    from patchers.cfw_daemons import parse_cryptex_paths, inject_daemons, inject_daemon, patch_dropbear_plist
 else:
     from .cfw_patch_seputil import patch_seputil
     from .cfw_patch_cache_loader import patch_launchd_cache_loader
@@ -150,7 +150,7 @@ else:
     from .cfw_patch_camera_dsc import apply_all_camera_patches
     from .cfw_patch_watchdogd import patch_watchdogd
     from .cfw_patch_diskimagesiod import patch_diskimagesiod
-    from .cfw_daemons import parse_cryptex_paths, inject_daemons, patch_dropbear_plist
+    from .cfw_daemons import parse_cryptex_paths, inject_daemons, inject_daemon, patch_dropbear_plist
 
 
 def main():
@@ -302,6 +302,12 @@ def main():
             sys.exit(1)
         inject_daemons(sys.argv[2], sys.argv[3])
 
+    elif cmd == "inject-daemon":
+        if len(sys.argv) != 5:
+            print("Usage: cfw.py inject-daemon <launchd.plist> <daemon.plist> <launchd_key>")
+            sys.exit(1)
+        inject_daemon(sys.argv[2], sys.argv[3], sys.argv[4])
+
     elif cmd == "patch-dropbear-plist":
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-dropbear-plist <dropbear.plist>")
@@ -334,7 +340,7 @@ def main():
         print("Commands: cryptex-paths, patch-seputil, patch-launchd-cache-loader, patch-camera-dsc,")
         print("          patch-mobileactivationd, patch-launchd-jetsam,")
         print("          patch-hv-vmm-dsc, patch-iomfb-swapend, patch-iomfb-force-kern, patch-dsc-maxslide, patch-lsd-embedded-reg, patch-xpc-lwcr, patch-lockdown-mode, patch-watchdogd,")
-        print("          patch-diskimagesiod, inject-daemons, patch-dropbear-plist, inject-dylib")
+        print("          patch-diskimagesiod, inject-daemons, inject-daemon, patch-dropbear-plist, inject-dylib")
         sys.exit(1)
 
 

@@ -1207,3 +1207,9 @@ The legacy export helper's uppercase iBoot defaults initially produced four labe
 `make test_firmware` passed 13 tests in 11 suites. Patch comparisons: AVPBooter 1, iBSS 4, iBEC 7, LLB 13, TXM 1, TXM dev 12, kernel base 28, iBSS JB 1, kernel JB 84. IM4P payload/repack checks and the diagnostic kernel test also passed. This is offline evidence for the recorded inputs, not VM restore/boot acceptance. See `research/artifacts/upstream-remaining-2026-09-29/firmware-comparison-final.log`.
 
 The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 methods / 58 records, dev 34 / 70, jb 68 / 152, exp 88 / 178. Runs used isolated copies under `research/artifacts/upstream-remaining-2026-09-29/firmware-variants`, without booting a VM. The less pipeline and other cloudOS builds were not run in this batch. Structured reports and gate output are retained there.
+
+## 2026-10-02 — v2 环境 B3 的 launchd 修改范围
+
+新增离线 v2 profile 安装器，仅接受 regular。首次安装对暂存 System 卷的 `/sbin/launchd` 添加 `LC_LOAD_WEAK_DYLIB /vh`，保留原 entitlements 后用已有 ldid/证书流程重签；重装已有加载命令时不重复注入。库、别名和 API 守护进程属于用户态安装范围，regular 的内核、TXM、DSC、设备树补丁集合未改变。
+
+合成目录树安装后判定 already_current；真实 insert_dylib 对 clang 编译的 macOS 合成文件添加弱加载命令的测试通过。这些证据不建立真实 iOS launchd 可启动或 regular 内核可加载该库的结论；R4 与 D6 仍待用户授权后的真实验收。拒绝条件、写入范围和验证限制见 [B3 记录](v2_guest_environment_b3_2026-10-02.md)。
