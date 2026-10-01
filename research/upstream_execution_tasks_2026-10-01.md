@@ -24,6 +24,23 @@
 
 T12 剩余部分提交为 1853c07（记录 t12_original_rerun_2026-10-01.md）：patch 阶段证据记录 `patch_selection_sha256`，续跑时由当前构建重新解析，选择变化时拒绝并提示 `--restart-from prepare`。用户决定（2026-10-01）：独立 `fw patch` 不支持从原件重跑，由 `vm create` 检查点流程重新生成；`.firmware-history/<id>/backup/` 与 `.firmware-prepare-backup-*` 的空间增长在 T30 增加显式清理命令处理，不自动删除。
 
+### 2026-10-01 第三轮提交（已推送，HEAD 2b0dd89）
+
+| 提交 | 任务 | 记录 |
+| --- | --- | --- |
+| aee9e9b | T13a dyld cache maxSlide 决策对齐上游 d930e50：删除 `FORCE_DSC_MAXSLIDE` 与 `--force-dsc-maxslide`，保留 `27.*` 安装门，补齐六项头部校验 | t13a_dsc_maxslide_option_2026-10-01.md |
+| 427146c | T27 删除无调用者的 `accessibilityTree`；本地无 Inspector 菜单/快捷键/字符串 | t25_t27_host_control_2026-10-01.md |
+| 8351415 | T25 主机控制并发、`rpc` 方法转发（123 方法表，拒绝拆分手势、绕过定位所有权、组件替换的方法）、多 VM `target` 身份 | t25_t27_host_control_2026-10-01.md |
+| 53942a4、32a6d7e、0e3d3a0 | T26 Launchpad 引入设计与用户决定 | t26_launchpad_design_2026-10-01.md |
+| e5890c8 | T26 B1 最小只读 Launchpad（本地 bundle 标识 `com.vphone.cli.launchpad`，内嵌工具链 cdhash 校验，`make launchpad`） | t26_b1_launchpad_2026-10-01.md |
+| bc56e78 | T26 B5 宿主检查与 Core Bundle 只读面板（只读命令白名单，安装/注册入口禁用） | t26_b5_launchpad_2026-10-01.md |
+| 539773c | T26 B2 启动、停止、控制台日志 | t26_b2_launchpad_2026-10-01.md |
+| 7105b60 | T26 B3 离线编辑与命令历史 | t26_b3_launchpad_2026-10-01.md |
+| b4730c2 | T26 B4 新建机器与创建检查点视图 | t26_b4_launchpad_2026-10-01.md |
+| 2b0dd89 | T26 B6 菜单栏、Dock 策略与收尾 | t26_b6_launchpad_2026-10-01.md |
+
+T13b（MIS/libmisfix 相关提交）按用户决定并入 T18。T26 各批均未执行界面点击（不使用合成输入），真实 VM 启停（B2）与真实创建/取消/续跑（B4）需用户授权后另行验收；B2 验收已准备 `~/.vphone/VMs/lp-b2-accept`（`rig-baseline` 的 APFS 克隆，4 核/4 GB），等待用户操作。zh-Hans 字符串 128 条标 `needs_review`。是否把 Launchpad 组装加入 CI bundle 任务由用户决定（建议见 B6 记录第 11 节）。
+
 阻塞与待决：T13（DSC/内核补丁版本条件）本轮派发被安全分类器拦截，需重新界定范围或用户直接处理；T25–T27（Launchpad CLI/UI）本地无 Launchpad target，属较大规模迁入，实施前先确认范围。T20 guest 侧 GuestLocationSimulation.swift 与 libvlocation.m 仅逻辑审查（Xcode/iOS 工具链未构建）。真实 VM 恢复/启动/固件字节对比、helper 注册与生产 Core Bundle 安装继续暂缓。
 
 helper 注册及生产 Core Bundle 安装继续暂缓；P1c 真实导入及导入后启动继续跳过。写盘前要求 T03、T11 和 T15 达到验收条件。独立 UI 工作可以先推进；不能由此跳过 guest 写入的前置条件。
