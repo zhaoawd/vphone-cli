@@ -4,6 +4,13 @@ import VPhoneCore
 
 extension VPhoneCreateStage: ExpressibleByArgument {}
 extension VPhoneRestoreBackend: ExpressibleByArgument {}
+extension VPhoneGuestEnvironmentProfile: ExpressibleByArgument {
+    func validateVariant(_ variant: String) throws {
+        guard self != .v2 || variant == "regular" else {
+            throw ValidationError("guest environment v2 supports only variant regular")
+        }
+    }
+}
 
 struct VPhoneVMCreateCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -21,6 +28,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
     var restoreBackend: VPhoneRestoreBackend?
     @Option(help: "Preparation backend: script (default) or native (experimental, two local IPSWs, classic layout); preserved on resume")
     var prepareBackend: VPhonePrepareBackend?
+    @Option(help: "Guest environment: classic (default) or v2 (regular only); preserved on resume")
+    var guestEnvironment: VPhoneGuestEnvironmentProfile?
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "new VM name (with --resume: the existing VM to continue)") var name: String
     @Flag(help: "Continue an interrupted create of an existing VM from its checkpoint") var resume = false
@@ -46,6 +55,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
     var verboseCount: Int
 
     func validate() throws {
+        try guestEnvironment?.validateVariant(variant ?? "regular")
         if !resume, restartFrom != nil || acceptToolChange {
             throw ValidationError("--restart-from and --accept-tool-change require --resume")
         }
@@ -86,7 +96,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
                     variant: variant, iphoneSource: iphoneSource, cloudosSource: cloudosSource,
                     spoofBuild: spoofBuild,
                     enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend,
-                    prepareBackend: prepareBackend),
+                    prepareBackend: prepareBackend, guestEnvironment: guestEnvironment),
                 restartFrom: restartFrom, acceptToolChange: acceptToolChange,
                 sudoPassword: sudoPassword, rootPopup: rootPopup, interactive: interactive,
                 verbosity: VPhoneVerbosity(count: verboseCount), keepArtifacts: keepArtifacts))
@@ -109,7 +119,7 @@ struct VPhoneVMCreateCommand: ParsableCommand {
             interactive: interactive, diskSizeGB: diskSize ?? 64,
             verbosity: VPhoneVerbosity(count: verboseCount),
             keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python,
-            prepareBackend: prepareBackend ?? .script))
+            prepareBackend: prepareBackend ?? .script, guestEnvironment: guestEnvironment ?? .classic))
     }
 }
 
@@ -189,6 +199,7 @@ struct VPhoneCreateStatusReport: Encodable {
                 lines.append("overall:  \(checkpoint.overallStatus.rawValue)")
             }
             lines.append("variant:  \(checkpoint.effectiveOptions.variant)")
+            lines.append("guest environment: \(checkpoint.effectiveOptions.effectiveGuestEnvironment.rawValue)")
             lines.append("prepare backend: \(checkpoint.effectiveOptions.effectivePrepareBackend.rawValue)")
             lines.append("creation: \(checkpoint.creationId)  attempt: \(checkpoint.attemptId)  attempts: \(checkpoint.attempts.count)")
             for record in checkpoint.stages {

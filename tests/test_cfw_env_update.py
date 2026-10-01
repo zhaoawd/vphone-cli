@@ -250,6 +250,7 @@ class AssessTests(Fixture):
         report = self.assess(system, make_bundle(self.root / 'vm', variant='regular'))
         self.assertEqual(report['classification'], 'full_migration_required')
         self.assertEqual(report['bootstrap']['kind'], 'none')
+        self.assertIn('vm create <name> --variant regular --guest-environment v2', report['migration'])
 
     def test_unknown_bootstrap_requires_full_migration(self):
         system = make_system(self.root / 'sys', self.current_versions(),

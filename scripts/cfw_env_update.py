@@ -411,9 +411,8 @@ def assess(root, vm, components, manifest=None):
     if reasons:
         report['classification'] = 'full_migration_required'
         report['migration'] = ('A stopped-VM replacement only swaps libraries that already exist. Create a new VM '
-                               'whose CFW install places every environment library in /usr/lib, the /vh alias and '
-                               'the launchd /vh load command, and validate it as a separate copy; this VM is left '
-                               'unchanged.')
+                               'with vm create <name> --variant regular --guest-environment v2 and validate it as a '
+                               'separate copy; this VM is left unchanged.')
         return report
     if expected is None:
         raise Refused(report['candidates']['error'])

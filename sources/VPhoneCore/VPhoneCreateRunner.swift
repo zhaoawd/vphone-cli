@@ -172,12 +172,13 @@ public struct VPhoneCreateRunner {
         public var diskSizeGb: UInt64?
         public var restoreBackend: VPhoneRestoreBackend?
         public var prepareBackend: VPhonePrepareBackend?
+        public var guestEnvironment: VPhoneGuestEnvironmentProfile?
 
         public init(
             variant: String? = nil, iphoneSource: String? = nil, cloudosSource: String? = nil,
             spoofBuild: String? = nil, forceDscMaxSlide: Bool? = nil, enableFrida: Bool? = nil,
             diskSizeGb: UInt64? = nil, restoreBackend: VPhoneRestoreBackend? = nil,
-            prepareBackend: VPhonePrepareBackend? = nil
+            prepareBackend: VPhonePrepareBackend? = nil, guestEnvironment: VPhoneGuestEnvironmentProfile? = nil
         ) {
             self.variant = variant
             self.iphoneSource = iphoneSource
@@ -188,6 +189,7 @@ public struct VPhoneCreateRunner {
             self.diskSizeGb = diskSizeGb
             self.restoreBackend = restoreBackend
             self.prepareBackend = prepareBackend
+            self.guestEnvironment = guestEnvironment
         }
     }
 
@@ -279,6 +281,13 @@ public struct VPhoneCreateRunner {
         // 2. Load, validate, identity.
         let (stored, storedData) = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL)
         try verifyIdentity(stored, bundleURL: bundleURL)
+        if stored.effectiveOptions.effectiveGuestEnvironment == .v2, request.overrides.guestEnvironment == .classic {
+            throw VPhoneCreateRunError.optionsChanged(["v2 cannot be changed to classic; create a new VM"])
+        }
+        let profile = request.overrides.guestEnvironment ?? stored.effectiveOptions.effectiveGuestEnvironment
+        if profile == .v2, (request.overrides.variant ?? stored.effectiveOptions.variant) != "regular" {
+            throw VPhoneCreateRunError.optionsChanged(["guest environment v2 supports only variant regular"])
+        }
         // Disk allocation happens before the checkpoint's prepare stage and
         // is never repeated by resume, even with --restart-from prepare.
         if let size = request.overrides.diskSizeGb, size != stored.effectiveOptions.diskSizeGb {
@@ -313,6 +322,7 @@ public struct VPhoneCreateRunner {
         if let value = overrides.forceDscMaxSlide { options.forceDscMaxSlide = value }
         if let value = overrides.restoreBackend { options.restoreBackend = value == .python ? nil : value }
         if let value = overrides.prepareBackend { options.prepareBackend = value == .script ? nil : value }
+        if let value = overrides.guestEnvironment { options.guestEnvironment = value == .classic ? nil : value }
         if let value = overrides.enableFrida { options.enableFrida = value }
         if overrides.iphoneSource == nil, let record = stored.effectiveOptions.iphoneSource, !record.redacted {
             overrides.iphoneSource = record.display

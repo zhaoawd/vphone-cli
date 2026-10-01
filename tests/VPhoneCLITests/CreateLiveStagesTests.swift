@@ -19,10 +19,11 @@ private struct Workspace {
 
     func cleanup() { try? FileManager.default.removeItem(at: bundle.deletingLastPathComponent()) }
 
-    func context(variant: String = "jb", prepareBackend: VPhonePrepareBackend = .script) -> VPhoneCreateStageContext {
+    func context(variant: String = "jb", prepareBackend: VPhonePrepareBackend = .script,
+                 guestEnvironment: VPhoneGuestEnvironmentProfile = .classic) -> VPhoneCreateStageContext {
         let options = VPhoneCreateEffectiveOptions(
             variant: variant, iphoneSource: nil, cloudosSource: nil, spoofBuild: nil, forceDscMaxSlide: false,
-            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, prepareBackend: prepareBackend)
+            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, prepareBackend: prepareBackend, guestEnvironment: guestEnvironment)
         let checkpoint = VPhoneCreateCheckpoint(
             identity: .init(name: "vm", path: bundle.path, directoryId: "1:2"), options: options,
             tool: .init(executableSha256: nil, stageContractVersion: 1), now: Date())
@@ -110,6 +111,66 @@ private final class LockHolder: @unchecked Sendable {
 }
 
 struct CreateLiveStagesTests {
+    @Test func v2CFWVerifierRejectsMissingEnvironmentEvidence() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        let manifest = VPhoneVirtualMachineManifest(cpuCount: 1, memorySize: 1024 * 1024,
+            romImages: .init(avpBooter: "rom", avpSEPBooter: "sep"))
+        try manifest.write(to: w.bundle.appendingPathComponent("config.plist"))
+        let bundle = VPhoneBundle(url: w.bundle, manifest: manifest)
+        try VPhoneRestoreInfo(ios: .init(version: "26.1", build: "23B85"),
+            cloudOS: .init(version: "26.1", build: "23B85"), variant: "regular", guestEnvironment: .v2)
+            .write(toBundle: bundle)
+        let outcome = w.stages().verify(.cfw, context: w.context(variant: "regular", guestEnvironment: .v2),
+                                       evidence: ["cfw_install_exit": "0"])
+        #expect(isRejected(outcome))
+    }
+
+    @Test func v2InstallationEvidenceRequiresMatchingPublishedTransaction() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        let path = ".cfw-history/install-1/guest-environment-install.json"
+        let report: [String: Any] = ["schema": "vphone.guest-environment-install/1", "profile": "v2",
+            "variant": "regular", "transaction_id": "install-1", "result": "installed",
+            "assessment_after": ["classification": "already_current"]]
+        let url = w.bundle.appendingPathComponent(path)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let bytes = try JSONSerialization.data(withJSONObject: report)
+        try bytes.write(to: url)
+        let transaction = url.deletingLastPathComponent().appendingPathComponent("transaction.json")
+        try JSONSerialization.data(withJSONObject: ["id": "install-1", "status": "published"]).write(to: transaction)
+        let evidence = ["cfw_transaction_id": "install-1", "guest_environment_report": path,
+                        "guest_environment_report_sha256": VPhoneCreateDigest.sha256(bytes)]
+        #expect(try VPhoneGuestEnvironmentInstallEvidence.validate(w.bundle, variant: "regular", evidence: evidence) == path)
+        let manifest = VPhoneVirtualMachineManifest(cpuCount: 1, memorySize: 1024 * 1024,
+            romImages: .init(avpBooter: "rom", avpSEPBooter: "sep"))
+        try manifest.write(to: w.bundle.appendingPathComponent("config.plist"))
+        let bundle = VPhoneBundle(url: w.bundle, manifest: manifest)
+        let info = VPhoneRestoreInfo(ios: .init(version: "26.1", build: "23B85"),
+            cloudOS: .init(version: "26.1", build: "23B85"), variant: "regular", guestEnvironment: .v2)
+        try info.write(toBundle: bundle)
+        var stageEvidence = evidence
+        stageEvidence["cfw_install_exit"] = "0"
+        #expect(isVerified(w.stages().verify(.cfw, context: w.context(variant: "regular", guestEnvironment: .v2), evidence: stageEvidence)))
+        try VPhoneRestoreInfo(ios: info.ios, cloudOS: info.cloudOS, variant: "regular").write(toBundle: bundle)
+        #expect(isRejected(w.stages().verify(.cfw, context: w.context(variant: "regular", guestEnvironment: .v2), evidence: stageEvidence)))
+        #expect(throws: (any Error).self) {
+            try VPhoneGuestEnvironmentInstallEvidence.validate(w.bundle, variant: "dev", evidence: evidence)
+        }
+        var wrong = evidence
+        wrong["guest_environment_report_sha256"] = "wrong"
+        #expect(throws: (any Error).self) {
+            try VPhoneGuestEnvironmentInstallEvidence.validate(w.bundle, variant: "regular", evidence: wrong)
+        }
+        try JSONSerialization.data(withJSONObject: ["id": "install-1", "status": "staged"]).write(to: transaction)
+        #expect(throws: (any Error).self) {
+            try VPhoneGuestEnvironmentInstallEvidence.validate(w.bundle, variant: "regular", evidence: evidence)
+        }
+        try FileManager.default.removeItem(at: url)
+        try FileManager.default.createSymbolicLink(at: url, withDestinationURL: transaction)
+        #expect(throws: (any Error).self) {
+            try VPhoneGuestEnvironmentInstallEvidence.validate(w.bundle, variant: "regular", evidence: evidence)
+        }
+    }
+
     // MARK: Verifier
 
     @Test func jbFinalizeIsNeverVerifiedFromAPrintedHint() throws {

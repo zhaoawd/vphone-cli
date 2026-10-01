@@ -126,6 +126,8 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
     @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp") var variant: String = "exp"
+    @Option(help: "Guest environment: classic (default) or v2 (regular only; recorded v2 VM required)")
+    var guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
     @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
     @Flag(name: .customLong("root-popup"), help: "Elevate via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
     @Flag(name: .customLong("keep-artifacts"), help: "Keep the extracted CFW input dirs (cfw_input/, cfw_jb_input/) after install (default: removed to save space)") var keepArtifacts = false
@@ -134,6 +136,16 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
     @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
     var verboseCount: Int
 
+    mutating func validate() throws {
+        try guestEnvironment.validateVariant(variant)
+    }
+
+    static func validateRecordedEnvironment(requested: VPhoneGuestEnvironmentProfile, recorded: VPhoneGuestEnvironmentProfile) throws {
+        guard requested == recorded else {
+            throw ValidationError("guest environment differs from restore-info.json; migration is not supported by cfw install")
+        }
+    }
+
     func run() throws {
         let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
         guard ["regular", "dev", "jb", "exp"].contains(variant) else {
@@ -141,6 +153,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
         }
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
+        try Self.validateRecordedEnvironment(requested: guestEnvironment, recorded: VPhoneRestoreInfo.load(fromBundle: bundle)?.effectiveGuestEnvironment ?? .classic)
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
 
         // Env the bundled scripts read: rides along via `sudo -E` by default;
@@ -157,7 +170,13 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
         if let spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
         if keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
 
-        let args = [resources.cfwInstallHostScript.path, "--variant", variant, bundle.url.path]
+        if guestEnvironment == .v2 {
+            scriptEnv["VPHONE_GUEST_COMPONENTS"] = ProcessInfo.processInfo.environment["VPHONE_GUEST_COMPONENTS"] ?? resources.guestComponentsStage.path
+            scriptEnv["VPHONE_API_DAEMON"] = ProcessInfo.processInfo.environment["VPHONE_API_DAEMON"] ?? resources.daemonAPICandidate.path
+        }
+        var args = [resources.cfwInstallHostScript.path, "--variant", variant]
+        if guestEnvironment == .v2 { args += ["--guest-environment", "v2"] }
+        args.append(bundle.url.path)
         // Both paths carry VPHONE_INVOKER_UID/GID so the driver returns the
         // artifacts it creates as root (the popup sets no SUDO_UID).
         let invocation = VPhoneCreateOrchestrator.cfwInvocation(
@@ -182,7 +201,7 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
             let recorded: Void? = try? VPhoneBundleGuard.withBundleLock(
                 directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
             ) { lock in
-                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock),
+                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock, guestEnvironment: guestEnvironment),
                    info.variant != nil {
                     print("[cfw] recorded variant \(variant), device \(info.device ?? "?")")
                 }

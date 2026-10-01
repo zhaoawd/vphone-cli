@@ -197,6 +197,24 @@ private let allStages = VPhoneCreateStage.allCases
 // MARK: - Tests
 
 @Suite struct CreateCheckpointTests {
+    @Test func v2ResumeCannotDowngradeToClassicEvenWhenCFWRestarts() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        f.fake.setFault(.cfw, .beforeExecution)
+        var options = Fixture.options("regular")
+        options.guestEnvironment = .v2
+        #expect(throws: VPhoneCreateRunError.self) {
+            try f.runner().create(bundleURL: f.bundle, options: options,
+                                  iphoneSource: "/ipsw/iPhone.ipsw", cloudosSource: "/ipsw/cloudOS.ipsw")
+        }
+        let original = try #require(f.checkpointBytes())
+        f.fake.setFault(.cfw, nil)
+        #expect(throws: VPhoneCreateRunError.self) {
+            try f.runner().resume(bundleURL: f.bundle, request: .init(
+                overrides: .init(guestEnvironment: .classic), restartFrom: .cfw))
+        }
+        #expect(f.checkpointBytes() == original)
+    }
+
     // MARK: Fresh create
 
     @Test func freshCreateRecordsEveryStageAndOverallStatus() throws {
