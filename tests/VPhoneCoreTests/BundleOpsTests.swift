@@ -32,6 +32,9 @@ struct BundleOpsTests {
         let disk = bundle.url.appendingPathComponent("Disk.img")
         let size = (try FileManager.default.attributesOfItem(atPath: disk.path)[.size] as? NSNumber)?.int64Value
         #expect(size == Int64(64 * 1024 * 1024 * 1024))
+        // T14: the displayed size is the size given at creation (not 68).
+        #expect(VPhoneDiskSize.gigabytes(bytes: try #require(size)) == 64)
+        #expect(VPhoneDiskSize.gigabytes(bytes: 64_000_000_000) == 59)
         #expect(FileManager.default.fileExists(atPath: bundle.url.appendingPathComponent("SEPStorage").path))
         #expect(FileManager.default.fileExists(atPath: bundle.url.appendingPathComponent("AVPBooter.vresearch1.bin").path))
     }

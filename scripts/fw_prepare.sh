@@ -316,6 +316,38 @@ print("\t".join(selected + (status,)))
 PY
 }
 
+# Writes this run's own partial file, so it never meets a file from another
+# run or another source. A transfer that breaks part way is continued with
+# `-C -` (a Range request from the partial's length) by the next attempt;
+# curl's own --retry starts over instead. Client HTTP errors are final; server
+# errors, timeouts and dropped connections are retried. A server that refuses
+# the range (curl 33, HTTP 416) gets a fresh transfer from byte 0.
+CURL_ATTEMPTS="${CURL_ATTEMPTS:-5}"
+CURL_RETRY_DELAY="${CURL_RETRY_DELAY:-2}"
+
+curl_download() {
+    local src="$1" out="$2" attempt=1 rc code
+    while true; do
+        rc=0
+        code="$(curl --fail --location --progress-bar -C - -w '%{http_code}' -o "$out" "$src")" || rc=$?
+        [[ $rc -eq 0 ]] && return 0
+        case "$rc:$code" in
+            33:*|22:416) rm -f "$out" ;;                            # range refused: start over
+            22:5??|22:408|22:429) ;;                                # server side: retry
+            22:*) echo "==> HTTP $code from $src" >&2; return "$rc" ;;
+            6:*|7:*|18:*|28:*|35:*|52:*|55:*|56:*|92:*) ;;          # network: retry and resume
+            *) return "$rc" ;;
+        esac
+        if [[ $attempt -ge $CURL_ATTEMPTS ]]; then
+            echo "==> Download failed after $attempt attempts (curl $rc); run again to retry" >&2
+            return "$rc"
+        fi
+        echo "==> Download interrupted (curl $rc, HTTP ${code:-none}); attempt $((attempt + 1)) of $CURL_ATTEMPTS resumes" >&2
+        sleep "$((CURL_RETRY_DELAY * attempt))"
+        attempt=$((attempt + 1))
+    done
+}
+
 download_file() {
     local src="$1" out="$2"
     if command -v aria2c >/dev/null 2>&1; then
@@ -340,11 +372,7 @@ download_file() {
             -o "$file" \
             "$src"
     elif command -v curl >/dev/null 2>&1; then
-        local rc=0
-        curl --fail --location --progress-bar -C - -o "$out" "$src" || rc=$?
-        # 33 = HTTP range error — typically means file is already fully downloaded
-        [[ $rc -eq 33 ]] && return 0
-        return $rc
+        curl_download "$src" "$out"
     elif command -v wget >/dev/null 2>&1; then
         wget --no-check-certificate --show-progress -c -O "$out" "$src"
     else
@@ -352,72 +380,66 @@ download_file() {
     fi
 }
 
+cache_entry() {
+    "$PYTHON3" "$SCRIPT_DIR/ipsw_cache_entry.py" "$@"
+}
+
+# A cached IPSW is reused only when its completion marker names this source
+# (the URL, or the local file's path, inode, size and mtime) and the file still
+# matches the marker; see scripts/ipsw_cache_entry.py. Anything else under the
+# name, including a cache written before markers existed, is discarded and
+# fetched again. Copies and downloads go to this run's partial file and are
+# published with the marker once complete; an interrupted transfer is never
+# found under the IPSW name and is not resumed by a later run.
 fetch() {
     local src="$1" out="$2"
-    if [[ -f "$out" ]]; then
-        if is_local "$src"; then
-            echo "==> Skipping: '$out' already exists."
-            return
-        fi
-        # File exists — could be partial (interrupted) or complete.
-        # Attempt to resume; curl -C - is a no-op on a fully-downloaded file.
-        local local_size
-        local_size=$(wc -c < "$out" | tr -d ' ')
-        echo "==> Found existing ${out##*/} (${local_size} bytes), resuming ..."
-        local rc=0
-        download_file "$src" "$out" || rc=$?
-        if [[ $rc -eq 0 ]]; then
-            return
-        fi
-        # curl exit 22 = HTTP error; with -C - on a complete file the server
-        # returns 416 which --fail maps to exit 22.  Verify via content-length.
-        if [[ $rc -eq 22 ]]; then
-            local remote_size
-            remote_size=$(curl -sI --location "$src" | awk 'tolower($1)=="content-length:"{v=$2} END{print v}' | tr -d '\r')
-            if [[ -n "$remote_size" && "$local_size" -ge "$remote_size" ]]; then
-                echo "==> Already fully downloaded (${local_size} bytes)."
-                return
-            fi
-        fi
-        echo "==> Resume failed; retrying full download ..."
-        rm -f "$out"
+    remove_stale_partials "$out"
+    if cache_entry check "$out" --source "$src" 2>/dev/null; then
+        echo "==> Cached: ${out##*/}"
+        return
     fi
+    if is_local "$src" && [[ ! -f "$src" ]]; then
+        die "Local IPSW not found: $src"
+    fi
+    cache_entry discard "$out" --source "$src" || die "cannot discard the cached ${out##*/}"
+    local partial identity
+    partial="$(partial_path "$out")"
+    rm -f "$partial"
     if is_local "$src"; then
-        [[ -f "$src" ]] || die "Local IPSW not found: $src"
         echo "==> Copying ${src##*/} ..."
-        # A local copy is never resumed: an interrupted copy must not be
-        # taken for the IPSW by the "already exists" check above.
-        remove_stale_partials "$out"
-        local partial
-        partial="$(partial_path "$out")"
-        rm -f "$partial"
+        identity="$(cache_entry identify "$src")" || die "cannot read $src"
         cp "$src" "$partial"
-        mv -f "$partial" "$out"
+        cache_entry publish "$out" "$partial" --source "$src" --expect-source "$identity" \
+            --require-member BuildManifest.plist || die "cannot cache the copy of '$src'"
     else
         echo "==> Downloading ${out##*/} ..."
-        if ! download_file "$src" "$out"; then
-            # Keep partial file on disk so the next run can resume
-            die "Failed to download '$src'"
-        fi
+        download_file "$src" "$partial" || die "Failed to download '$src'"
+        cache_entry publish "$out" "$partial" --source "$src" \
+            --require-member BuildManifest.plist || die "the download of '$src' is not a complete IPSW"
     fi
 }
 
 # Partial outputs. A cancelled `vm create` ends this script and its children
-# (SIGINT, then SIGKILL), possibly mid-copy or mid-unzip. The IPSW cache is
-# shared between VMs and reused by name, so an interrupted write must never be
-# found under the final name: copies and extractions are written to
-# `.<name>.partial.<pid>` next to it and renamed into place only when complete.
-# A partial whose process no longer exists is removed on the next run.
+# (SIGINT, then SIGKILL), possibly mid-copy, mid-download or mid-unzip. The
+# IPSW cache is shared between VMs, so an interrupted write must never be found
+# under the final name: copies, downloads and extractions are written to
+# `.<name>.partial.<pid>` next to it and published with a completion marker
+# only when complete. A partial whose process no longer exists is removed on
+# the next run.
 partial_path() {
     local target="$1"
     printf '%s/.%s.partial.%s\n' "${target%/*}" "${target##*/}" "$$"
 }
 
+# Names are `.<name>.partial.[<tag>.]<pid>`; the last component is the writer's
+# pid (aria2c adds `.aria2` for its control file). VPhoneIPSWCache applies the
+# same rule to the partials it writes.
 remove_stale_partials() {
     local target="$1" partial pid
     shopt -s nullglob
     for partial in "${target%/*}/.${target##*/}.partial."*; do
-        pid="${partial##*.}"
+        pid="${partial%.aria2}"
+        pid="${pid##*.}"
         if [[ "$pid" =~ ^[0-9]+$ ]] && ps -p "$pid" >/dev/null 2>&1; then
             continue
         fi
@@ -427,21 +449,20 @@ remove_stale_partials() {
     shopt -u nullglob
 }
 
-# An extracted cache is complete only with this marker, written last. A cache
-# directory without it (an unzip interrupted before this change, or one that
-# was not written by this script) is discarded and extracted again.
+# An extracted cache is complete only with this marker, written last. It names
+# the SHA-256 and size of the cached IPSW it came from (ipsw_cache_entry.py). A
+# cache directory without it (an unzip interrupted before B4, or a marker from
+# before T14 that names no IPSW), or extracted from another IPSW of the same
+# name, is discarded and extracted again.
 EXTRACT_MARKER=".vphone-extract-complete"
 
 extract() {
     local zip="$1" cache="$2" out="$3"
     remove_stale_partials "$cache"
-    if [[ -d "$cache" && ! -L "$cache" && -f "$cache/$EXTRACT_MARKER" ]]; then
+    if cache_entry check-dir "$cache" --parent "$zip" 2>/dev/null; then
         echo "==> Cached: ${cache##*/}"
     else
-        if [[ -e "$cache" || -L "$cache" ]]; then
-            echo "==> Discarding incomplete extraction ${cache##*/} (no completion marker)"
-            rm -rf "$cache"
-        fi
+        cache_entry discard-dir "$cache" --parent "$zip" || die "cannot discard the extraction $cache"
         echo "==> Extracting ${zip##*/} ..."
         local partial
         partial="$(partial_path "$cache")"
@@ -449,13 +470,10 @@ extract() {
         mkdir -p "$partial"
         unzip -oq "$zip" -d "$partial"
         chmod -R u+w "$partial"
-        : > "$partial/$EXTRACT_MARKER"
-        # rename(2) publishes the whole tree at once and fails when another
-        # run published a non-empty cache meanwhile; that cache is then used.
-        if ! "$PYTHON3" -c 'import os, sys; os.rename(sys.argv[1], sys.argv[2])' "$partial" "$cache" 2>/dev/null; then
-            [[ -f "$cache/$EXTRACT_MARKER" ]] || die "cannot publish the extraction of ${zip##*/} as $cache"
-            rm -rf "$partial"
-        fi
+        # Writes the marker, then renames the whole tree into place under the
+        # cache lock. A complete cache another run published meanwhile is used.
+        cache_entry publish-dir "$cache" "$partial" --parent "$zip" \
+            || die "cannot publish the extraction of ${zip##*/} as $cache"
     fi
     rm -rf "$out"
     echo "==> Cloning ${cache##*/} → ${out##*/} ..."

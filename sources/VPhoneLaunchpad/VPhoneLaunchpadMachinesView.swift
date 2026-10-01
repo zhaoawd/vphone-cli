@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import VPhoneCore
 import VPhoneLaunchpadKit
 
 // MARK: - Machines
@@ -502,8 +503,8 @@ struct VPhoneLaunchpadMachinesView: View {
         megabytes % 1024 == 0 ? "\(megabytes / 1024) GB" : "\(megabytes) MB"
     }
 
+    /// The unit the creation stepper and `vm list` use (VPhoneDiskSize).
     static func disk(_ bytes: Int64) -> String {
-        // Decimal, as iOS and the creation stepper count it.
-        "\(bytes / 1_000_000_000) GB"
+        "\(VPhoneDiskSize.gigabytes(bytes: bytes)) GB"
     }
 }

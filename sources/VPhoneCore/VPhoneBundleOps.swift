@@ -7,6 +7,26 @@ public enum VPhoneBundleOpsError: Error, Equatable {
     case badArchive(String)
 }
 
+/// The unit of `--disk-size`, the Launchpad stepper and every disk size the
+/// CLI and Launchpad display. `create` makes N × 2^30 bytes; displays divide
+/// by the same unit so the number shown is the number given at creation.
+///
+/// Upstream 6a8d2c7 creates N × 10^9 bytes and displays bytes / 10^9 (the unit
+/// iOS reports). Adopting it changes the bytes of new disks, which T14 did
+/// not do; until then, dividing by 10^9 would show a 64 disk as 68.
+public enum VPhoneDiskSize {
+    public static let bytesPerGB: UInt64 = 1 << 30
+
+    public static func bytes(gigabytes: UInt64) -> UInt64 {
+        gigabytes * bytesPerGB
+    }
+
+    /// Whole units, rounded down, for display.
+    public static func gigabytes(bytes: Int64) -> Int64 {
+        bytes / Int64(bytesPerGB)
+    }
+}
+
 public enum VPhoneBundleOps {
     public struct NewBundleSpec: Sendable {
         public var name: String
@@ -79,7 +99,7 @@ public enum VPhoneBundleOps {
                 fm.createFile(atPath: disk.path, contents: nil)
                 let handle = try FileHandle(forWritingTo: disk)
                 do {
-                    try handle.truncate(atOffset: spec.diskSizeGB * 1024 * 1024 * 1024)
+                    try handle.truncate(atOffset: VPhoneDiskSize.bytes(gigabytes: spec.diskSizeGB))
                     try handle.close()
                 } catch {
                     try? handle.close()

@@ -196,4 +196,78 @@ struct ArchiveSafetyTests {
             #expect(info.st_blocks * 512 < info.st_size / 2)
         }
     }
+
+    /// T03: on a decmpfs (UF_COMPRESSED) file, lseek(SEEK_DATA) and SEEK_HOLE
+    /// fail with ENXIO, which a sparse scan reads as "all hole". A VM bundle
+    /// holds such a file (AVPSEPBooter.vresearch1.bin). Every archive format
+    /// must still carry its bytes, not zeros.
+    @Test(arguments: [VPhoneArchiveFormat.gnutar, .pax, .ustar])
+    func decmpfsCompressedFileKeepsItsBytes(format: VPhoneArchiveFormat) throws {
+        try withScratch { (root: URL) throws -> Void in
+            let source = root.appendingPathComponent("source")
+            let destination = root.appendingPathComponent("destination")
+            for directory in [source, destination] {
+                try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
+            }
+            var content = Data()
+            for index in 0 ..< 8 {
+                content.append(Data(repeating: UInt8(0x41 + index), count: 4096))
+                content.append(Data(repeating: 0, count: 4096))
+            }
+            let input = source.appendingPathComponent("booter.bin")
+            try DecmpfsFixture.write(content, to: input)
+            var info = stat()
+            try #require(lstat(input.path, &info) == 0)
+            try #require(info.st_flags & UInt32(UF_COMPRESSED) != 0, "fixture is not decmpfs-compressed")
+            let fd = open(input.path, O_RDONLY)
+            try #require(fd >= 0)
+            errno = 0
+            let data = lseek(fd, 0, SEEK_DATA)
+            let seekError = errno
+            close(fd)
+            // The condition this test exists for (observed on macOS 27).
+            #expect(data < 0 && seekError == ENXIO, "fixture no longer reproduces SEEK_DATA ENXIO")
+
+            let archive = root.appendingPathComponent("decmpfs.tar")
+            try VPhoneArchiveWriter.create(archive: archive, from: source, format: format)
+            #expect(try VPhoneArchiveReader.readMember("booter.bin", from: archive) == content)
+            try VPhoneArchiveExtractor.extract(archive, into: destination, options: .intoHostDirectory)
+            #expect(try Data(contentsOf: destination.appendingPathComponent("booter.bin")) == content)
+        }
+    }
+}
+
+/// A decmpfs type 3 file (zlib stream in the `com.apple.decmpfs` xattr), made
+/// the way afsctool does: empty data fork, xattr, then UF_COMPRESSED.
+enum DecmpfsFixture {
+    static func write(_ content: Data, to url: URL) throws {
+        guard FileManager.default.createFile(atPath: url.path, contents: nil) else {
+            throw POSIXError(.EIO)
+        }
+        var value = Data()
+        value.append(contentsOf: [0x66, 0x70, 0x6D, 0x63]) // "fpmc", little-endian 'cmpf'
+        var type = UInt32(3).littleEndian
+        value.append(Data(bytes: &type, count: 4))
+        var size = UInt64(content.count).littleEndian
+        value.append(Data(bytes: &size, count: 8))
+        value.append(try zlib(content))
+        let status = value.withUnsafeBytes { bytes in
+            setxattr(url.path, "com.apple.decmpfs", bytes.baseAddress, bytes.count, 0, XATTR_SHOWCOMPRESSION)
+        }
+        guard status == 0, chflags(url.path, UInt32(UF_COMPRESSED)) == 0 else {
+            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+        }
+    }
+
+    /// RFC 1950 framing around the raw deflate stream NSData produces.
+    private static func zlib(_ content: Data) throws -> Data {
+        let deflated = try (content as NSData).compressed(using: .zlib) as Data
+        var a: UInt32 = 1, b: UInt32 = 0
+        for byte in content {
+            a = (a + UInt32(byte)) % 65521
+            b = (b + a) % 65521
+        }
+        var checksum = ((b << 16) | a).bigEndian
+        return Data([0x78, 0x9C]) + deflated + Data(bytes: &checksum, count: 4)
+    }
 }
