@@ -68,6 +68,15 @@ class LaunchpadStringsTests(unittest.TestCase):
         found = module.extract_literals([self.sources])
         self.assertIn('Started', found)
 
+    def test_form_control_titles_are_keys(self):
+        (self.sources / 'Settings.swift').write_text(
+            'Stepper("CPU: \\(cpu) cores", value: $cpu)\n'
+            'Picker("Mode", selection: $network) { }\n'
+            'TextField("Interface", text: $name, prompt: Text("First available"))\n')
+        found = module.extract_literals([self.sources])
+        for key in ('CPU: %@ cores', 'Mode', 'Interface', 'First available'):
+            self.assertIn(key, found)
+
     def test_stale_key(self):
         self.strings['Unused'] = entry('未使用', 'Unused')
         issues, _ = self.run_check()

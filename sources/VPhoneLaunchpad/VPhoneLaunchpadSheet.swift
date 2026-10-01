@@ -1,15 +1,17 @@
 import SwiftUI
 
-/// The frame of the Host Setup and Core Bundle sheets: a title over a rule,
-/// the content, and a rule over the buttons. Same layout as upstream
-/// `VPhoneLaunchpadSheet` (B3 brings that file for the machine sheets), with
-/// the design system's background, monospace type and 1px rules.
-struct VPhoneLaunchpadPanelFrame<Content: View, Accessory: View, Actions: View>: View {
+/// The frame every sheet shares (upstream `VPhoneLaunchpadSheet`): a title
+/// over a rule, the content, and a rule over the buttons. A sheet's toolbar
+/// shows no title, so the sheet draws its own head. B5 introduced the same
+/// layout as `VPhoneLaunchpadPanelFrame`; B3 merges the two, so Host Setup,
+/// Core Bundle, the console and the machine sheets share one frame with the
+/// design system's background, monospace type and 1px rules.
+struct VPhoneLaunchpadSheet<Content: View, Accessory: View, Actions: View>: View {
     let title: Text
     @ViewBuilder let content: Content
     /// Secondary buttons or status, on the leading side of the footer.
     @ViewBuilder let accessory: Accessory
-    /// The closing button, on the trailing side of the footer.
+    /// Cancel and confirm, or the closing button, on the trailing side.
     @ViewBuilder let actions: Actions
 
     init(
@@ -30,6 +32,7 @@ struct VPhoneLaunchpadPanelFrame<Content: View, Accessory: View, Actions: View>:
                 title
                     .font(.headline)
                     .lineLimit(1)
+                    .truncationMode(.middle)
                 Spacer()
             }
             .padding(.horizontal, VPhoneLaunchpadTheme.sectionGap)
@@ -58,6 +61,16 @@ struct VPhoneLaunchpadPanelFrame<Content: View, Accessory: View, Actions: View>:
         Rectangle()
             .fill(VPhoneLaunchpadTheme.border)
             .frame(height: VPhoneLaunchpadTheme.borderWidth)
+    }
+}
+
+extension VPhoneLaunchpadSheet where Accessory == EmptyView {
+    init(
+        _ title: Text,
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder actions: () -> Actions
+    ) {
+        self.init(title, content: content, accessory: { EmptyView() }, actions: actions)
     }
 }
 

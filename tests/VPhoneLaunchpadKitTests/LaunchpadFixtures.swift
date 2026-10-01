@@ -14,6 +14,14 @@ final class LaunchpadTemporaryDirectory {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     }
 
+    /// A short name (`<prefix>-<8 hex>`), for libraries whose machines'
+    /// `vphone.sock` paths must fit `sun_path`.
+    init(short prefix: String) throws {
+        url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(prefix)-\(UUID().uuidString.prefix(8))", isDirectory: true)
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    }
+
     deinit {
         try? FileManager.default.removeItem(at: url)
     }

@@ -57,8 +57,8 @@ public struct VPhoneLaunchpadCommandResult: Sendable {
 
 // MARK: - History
 
-/// Every command Launchpad runs, shown so it can be copied into a terminal.
-/// The history view arrives in B3; B1 and B2 record into it.
+/// Every command Launchpad runs, shown so it can be copied into a terminal
+/// (Recent Commands). The periodic `vm list` is not recorded.
 @MainActor
 @Observable
 public final class VPhoneLaunchpadCommandHistory {

@@ -13,7 +13,7 @@ struct VPhoneLaunchpadHostSetupView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VPhoneLaunchpadPanelFrame(Text("Host Setup")) {
+        VPhoneLaunchpadSheet(Text("Host Setup")) {
             Form {
                 summarySection
                 helperSection

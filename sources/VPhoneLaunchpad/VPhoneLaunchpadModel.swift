@@ -2,9 +2,9 @@ import Foundation
 import Observation
 import VPhoneLaunchpadKit
 
-/// Owns the embedded toolchain check, the machine library and the read-only
-/// Host Setup and Core Bundle panels (B5). There is no helper client and no
-/// control socket.
+/// Owns the embedded toolchain check, the machine library, the command
+/// history and the panels: read-only Host Setup and Core Bundle (B5) and
+/// Recent Commands (B3). There is no helper client and no control socket.
 @MainActor
 @Observable
 final class VPhoneLaunchpadModel {
@@ -51,14 +51,30 @@ final class VPhoneLaunchpadModel {
 
     // MARK: - Panels
 
-    /// Opens a panel named on the command line (`-VPhoneLaunchpadOpenPanel
-    /// hostSetup|coreBundle`), for the UI smoke check. Only the arguments
-    /// domain is read, so nothing persists.
+    /// Opens the panels named on the command line, for the UI smoke check:
+    /// `-VPhoneLaunchpadOpenPanel hostSetup|coreBundle|commandHistory`, or a
+    /// comma-separated list such as `hostSetup,commandHistory`. Each later
+    /// panel opens once the commands the earlier one ran have finished, so
+    /// Recent Commands shows them. Only the arguments domain is read, so
+    /// nothing persists.
     private func openRequestedPanel() {
         let arguments = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
-        guard let name = arguments["VPhoneLaunchpadOpenPanel"] as? String,
-              let panel = VPhoneLaunchpadPanel(rawValue: name)
-        else { return }
-        panels.present(panel)
+        guard let names = arguments["VPhoneLaunchpadOpenPanel"] as? String else {
+            return
+        }
+        let requested = names.split(separator: ",").compactMap { VPhoneLaunchpadPanel(rawValue: String($0)) }
+        guard let first = requested.first else {
+            return
+        }
+        panels.present(first)
+        Task {
+            for next in requested.dropFirst() {
+                try? await Task.sleep(for: .seconds(1))
+                while history.entries.contains(where: { $0.status == nil }) || host?.isChecking == true {
+                    try? await Task.sleep(for: .milliseconds(250))
+                }
+                panels.present(next)
+            }
+        }
     }
 }

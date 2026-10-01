@@ -5,15 +5,29 @@ import VPhoneLaunchpadKit
 // MARK: - Machines
 
 /// The machine list: search, column sorting, an empty state, the inspector,
-/// start and stop, and the console. Settings, rename, clone, export, import
-/// and delete arrive in B3.
+/// start and stop, the console, and the offline edits of B3 (settings,
+/// rename, clone, export, import and delete), each through `vphone-cli vm`.
 struct VPhoneLaunchpadMachinesView: View {
     typealias MachinePath = VPhoneLaunchpadMachinePath
 
-    /// The console sheet's machine.
-    struct ConsoleSheet: Identifiable {
-        let machine: MachinePath
-        var id: MachinePath { machine }
+    enum Sheet: Identifiable {
+        case settings([VPhoneLaunchpadMachine])
+        case rename(MachinePath)
+        case clone(MachinePath)
+        case export([MachinePath])
+        case delete([MachinePath])
+        case console(MachinePath)
+
+        var id: String {
+            switch self {
+            case let .settings(machines): "settings-\(machines.map(\.path.url.path).joined(separator: "|"))"
+            case let .rename(machine): "rename-\(machine.url.path)"
+            case let .clone(machine): "clone-\(machine.url.path)"
+            case let .export(machines): "export-\(machines.map(\.url.path).joined(separator: "|"))"
+            case let .delete(machines): "delete-\(machines.map(\.url.path).joined(separator: "|"))"
+            case let .console(machine): "console-\(machine.url.path)"
+            }
+        }
     }
 
     @Environment(VPhoneLaunchpadModel.self) private var model
@@ -21,7 +35,7 @@ struct VPhoneLaunchpadMachinesView: View {
     /// Empty keeps the order `vm list` returns; a header click replaces it.
     @State private var sortOrder: [KeyPathComparator<VPhoneLaunchpadMachine>] = []
     @State private var showsInspector = true
-    @State private var console: ConsoleSheet?
+    @State private var sheet: Sheet?
     /// The table appears only once `vm list` returns, after the window has
     /// picked its first responder, so nothing focuses it by itself.
     @FocusState private var tableIsFocused: Bool
@@ -59,7 +73,7 @@ struct VPhoneLaunchpadMachinesView: View {
             Group {
                 if let machine = library.selected {
                     VPhoneLaunchpadMachineInspector(machine: machine) { path in
-                        console = ConsoleSheet(machine: path)
+                        sheet = .console(path)
                     }
                 } else if library.selection.count > 1 {
                     ContentUnavailableView("\(library.selection.count) Machines Selected", systemImage: "iphone")
@@ -73,8 +87,12 @@ struct VPhoneLaunchpadMachinesView: View {
             .toolbar { inspectorToolbar }
         }
         .toolbar { toolbar }
-        .sheet(item: $console) { sheet in
-            VPhoneLaunchpadConsoleView(machine: sheet.machine, url: library.consoleLog(sheet.machine))
+        .sheet(item: $sheet) { sheet in
+            sheetContent(sheet)
+                .environment(model)
+        }
+        .task(id: library.hasListed) {
+            openRequestedSheet()
         }
         .alert(
             library.actionError?.message ?? "",
@@ -97,6 +115,25 @@ struct VPhoneLaunchpadMachinesView: View {
     private var toolbar: some ToolbarContent {
         ToolbarItem(placement: .automatic) {
             Spacer()
+        }
+        if let activity = library.globalActivity {
+            ToolbarItem(placement: .automatic) {
+                Label {
+                    Text(verbatim: activity)
+                } icon: {
+                    VPhoneLaunchpadStatusIcon(status: .running)
+                }
+                .labelStyle(.titleAndIcon)
+            }
+        }
+        ToolbarItem(placement: .automatic) {
+            Button {
+                chooseImport()
+            } label: {
+                Label("Import…", systemImage: "square.and.arrow.down")
+            }
+            .help("Import a machine archive into the default library")
+            .disabled(library.globalActivity != nil)
         }
         ToolbarItem(placement: .automatic) {
             VPhoneLaunchpadSearchField(text: $filter, prompt: String(localized: "Search machines"))
@@ -170,10 +207,25 @@ struct VPhoneLaunchpadMachinesView: View {
     }
 
     /// The same actions in the toolbar menu and the table's context menu.
+    /// Settings, export and delete take several machines, and need every one
+    /// of them stopped and idle; rename and clone take one. The CLI still
+    /// decides: a machine whose bundle lock is held is refused, and the
+    /// refusal is shown.
     @ViewBuilder
     private func machineActions(_ machines: [VPhoneLaunchpadMachine]) -> some View {
         let startable = machines.filter { library.canStart($0.path) }
         let stoppable = machines.filter { library.canStop($0.path) }
+        let editable = !machines.isEmpty && machines.allSatisfy { library.canEdit($0.path) }
+        // Only while one of them is exporting or waiting to.
+        let exporting = machines.filter { library.exports[$0.path] != nil }
+        if !exporting.isEmpty {
+            Button("Cancel Export") {
+                for machine in exporting {
+                    library.cancelExport(machine.path)
+                }
+            }
+            Divider()
+        }
         Button("Start") { start(startable) }
             .disabled(startable.isEmpty)
         Button("Start Headless") { start(startable, headless: true) }
@@ -181,8 +233,19 @@ struct VPhoneLaunchpadMachinesView: View {
         Button("Stop") { stop(stoppable) }
             .disabled(stoppable.isEmpty)
         Divider()
+        Button("Settings…") { sheet = .settings(machines) }
+            .disabled(!editable)
         if machines.count == 1, let machine = machines.first {
-            Button("Open Console") { console = ConsoleSheet(machine: machine.path) }
+            Button("Rename…") { sheet = .rename(machine.path) }
+                .disabled(!editable)
+            Button("Clone…") { sheet = .clone(machine.path) }
+                .disabled(!editable)
+        }
+        Button("Export…") { sheet = .export(machines.map(\.path)) }
+            .disabled(!editable)
+        Divider()
+        if machines.count == 1, let machine = machines.first {
+            Button("Open Console") { sheet = .console(machine.path) }
             Button("Show Console Log in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting([library.consoleLog(machine.path)])
             }
@@ -191,6 +254,9 @@ struct VPhoneLaunchpadMachinesView: View {
         Button("Show in Finder") {
             NSWorkspace.shared.activateFileViewerSelecting(machines.map(\.path.url))
         }
+        Divider()
+        Button("Delete…", role: .destructive) { sheet = .delete(machines.map(\.path)) }
+            .disabled(!editable)
     }
 
     // MARK: - Table
@@ -216,8 +282,9 @@ struct VPhoneLaunchpadMachinesView: View {
             TableColumn("State") { machine in
                 VPhoneLaunchpadMachineStateLabel(
                     state: library.state(of: machine.path),
-                    activity: library.activities[machine.path],
-                    panicked: library.panicked.contains(machine.path)
+                    activity: library.activity(of: machine.path),
+                    panicked: library.panicked.contains(machine.path),
+                    indeterminate: library.isExporting(machine.path)
                 )
             }
             .width(min: 150, ideal: 160)
@@ -260,7 +327,69 @@ struct VPhoneLaunchpadMachinesView: View {
                 Label("No Machines", systemImage: "iphone")
             } description: {
                 Text(library.listError ?? String(localized: "Machines in \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))) appear here."))
+            } actions: {
+                Button("Import…") { chooseImport() }
+                    .disabled(library.globalActivity != nil)
             }
+        }
+    }
+
+    // MARK: - Sheets
+
+    @ViewBuilder
+    private func sheetContent(_ sheet: Sheet) -> some View {
+        switch sheet {
+        case let .settings(machines):
+            VPhoneLaunchpadMachineSettingsView(machines: machines)
+        case let .rename(path):
+            VPhoneLaunchpadNameSheet(action: .rename, machine: path)
+        case let .clone(path):
+            VPhoneLaunchpadNameSheet(action: .clone, machine: path)
+        case let .export(paths):
+            VPhoneLaunchpadExportView(machines: paths)
+        case let .delete(paths):
+            VPhoneLaunchpadDeleteView(machines: paths)
+        case let .console(path):
+            VPhoneLaunchpadConsoleView(machine: path, url: library.consoleLog(path))
+        }
+    }
+
+    /// `vm import <archive> --library-root <default library>`; the machine
+    /// keeps the archive's own name.
+    private func chooseImport() {
+        let library = library
+        let panel = NSOpenPanel()
+        panel.title = String(localized: "Import Machine")
+        panel.message = String(localized: "Choose an exported machine archive (.tzst or .txz). It is imported into \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))).")
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.present { url in
+            Task { await library.importArchive(url) }
+        }
+    }
+
+    /// Opens a sheet named on the command line (`-VPhoneLaunchpadOpenSheet
+    /// settingsSheet|renameSheet|cloneSheet|exportSheet|deleteSheet` for the
+    /// first machine, or `settingsAll`, `exportAll`, `deleteAll` for every
+    /// listed machine) once machines are listed, for the UI smoke check. Only
+    /// the arguments domain is read, so nothing persists; opening a sheet runs
+    /// no command.
+    private func openRequestedSheet() {
+        let arguments = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
+        guard library.hasListed, sheet == nil, let name = arguments["VPhoneLaunchpadOpenSheet"] as? String,
+              let first = library.selected ?? library.machines.first
+        else { return }
+        let all = library.machines
+        switch name {
+        case "settingsSheet": sheet = .settings([first])
+        case "renameSheet": sheet = .rename(first.path)
+        case "cloneSheet": sheet = .clone(first.path)
+        case "exportSheet": sheet = .export([first.path])
+        case "deleteSheet": sheet = .delete([first.path])
+        case "settingsAll": sheet = .settings(all)
+        case "exportAll": sheet = .export(all.map(\.path))
+        case "deleteAll": sheet = .delete(all.map(\.path))
+        default: break
         }
     }
 

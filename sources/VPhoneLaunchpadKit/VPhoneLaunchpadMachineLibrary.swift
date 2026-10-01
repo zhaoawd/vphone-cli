@@ -2,9 +2,10 @@ import Foundation
 import Observation
 
 /// The VM library, listed through `vphone-cli vm list --json`, started with
-/// `vm launch` and stopped with `vm stop`. Launchpad never takes or probes a
-/// VM lock: `vphone-vm` holds it, and the CLI refuses conflicting work
-/// itself.
+/// `vm launch`, stopped with `vm stop`, and edited offline with `vm config`,
+/// `rename`, `clone`, `delete`, `export` and `import`. Launchpad never takes
+/// or probes a VM lock: `vphone-vm` holds it, and the CLI refuses
+/// conflicting work itself.
 ///
 /// Machines can live in several libraries: the default one, and folders in
 /// the `VPhoneLaunchpadLibraryRoots` default. Each library is listed with its
@@ -100,7 +101,32 @@ public final class VPhoneLaunchpadMachineLibrary {
     }
 
     public func canStart(_ machine: Path) -> Bool {
-        commandLine != nil && activities[machine] == nil && state(of: machine) == .stopped
+        commandLine != nil && activities[machine] == nil && exports[machine] == nil && state(of: machine) == .stopped
+    }
+
+    /// Settings, rename, clone, export and delete are offered for a stopped
+    /// machine with nothing else under way. The CLI decides: it refuses a
+    /// machine whose bundle lock is held, and that refusal is shown.
+    public func canEdit(_ machine: Path) -> Bool {
+        canStart(machine)
+    }
+
+    /// The text that takes the place of a machine's state: an action under
+    /// way (`Stopping…`, `Exporting…`), or an export waiting its turn.
+    public func activity(of machine: Path) -> String? {
+        if let activity = activities[machine] {
+            return activity
+        }
+        if exports[machine]?.isWaiting == true {
+            return String(localized: "Waiting to export…")
+        }
+        return nil
+    }
+
+    /// True while `vm export` runs for `machine`. The CLI prints no progress
+    /// lines to a pipe, so progress is shown as indeterminate.
+    public func isExporting(_ machine: Path) -> Bool {
+        exports[machine]?.isRunning == true
     }
 
     public func canStop(_ machine: Path) -> Bool {
@@ -266,6 +292,183 @@ public final class VPhoneLaunchpadMachineLibrary {
         }
         launched[machine]?.interrupt()
         await refresh()
+    }
+
+    // MARK: - Edits
+
+    /// `vm config` for each machine, with only the edited fields, so values
+    /// the machines do not share are left alone.
+    public func configure(_ machines: [Path], _ settings: VPhoneLaunchpadEditCommand.Settings) async {
+        for machine in machines {
+            await perform(String(localized: "Saving settings…"), on: machine,
+                          VPhoneLaunchpadEditCommand.config(machine, settings),
+                          failure: String(localized: "Unable to Save Settings for \(machine.name)"))
+        }
+    }
+
+    public func rename(_ machine: Path, to newName: String) async {
+        let renamed = await perform(String(localized: "Renaming…"), on: machine,
+                                    VPhoneLaunchpadEditCommand.rename(machine, to: newName),
+                                    failure: String(localized: "Unable to Rename \(machine.name)"))
+        if renamed {
+            selection = [Path(libraryRoot: machine.libraryRoot, name: newName)]
+        }
+    }
+
+    public func clone(_ machine: Path, as newName: String) async {
+        let cloned = await perform(String(localized: "Cloning…"), on: machine,
+                                   VPhoneLaunchpadEditCommand.clone(machine, as: newName),
+                                   failure: String(localized: "Unable to Clone \(machine.name)"))
+        if cloned {
+            selection = [Path(libraryRoot: machine.libraryRoot, name: newName)]
+        }
+    }
+
+    /// `vm delete --force` for each machine, after the confirmation sheet.
+    /// Launchpad removes no file itself.
+    public func delete(_ machines: [Path]) async {
+        for machine in machines {
+            await perform(String(localized: "Deleting…"), on: machine,
+                          VPhoneLaunchpadEditCommand.delete(machine),
+                          failure: String(localized: "Unable to Delete \(machine.name)"))
+        }
+    }
+
+    /// Imports an archive into the default library under its own name.
+    public func importArchive(_ archive: URL) async {
+        await perform(String(localized: "Importing \(archive.lastPathComponent)…"), on: nil,
+                      VPhoneLaunchpadEditCommand.importArchive(archive, into: libraryRoot),
+                      failure: String(localized: "Unable to Import \(archive.lastPathComponent)"))
+    }
+
+    // MARK: - Export
+
+    /// An export queued or under way. `task` is nil while it waits its turn.
+    public struct Export {
+        public let destination: URL
+        public fileprivate(set) var startedAt: Date?
+        fileprivate var task: Task<Void, Never>?
+
+        public var isWaiting: Bool {
+            task == nil
+        }
+
+        public var isRunning: Bool {
+            task != nil
+        }
+    }
+
+    public private(set) var exports: [Path: Export] = [:]
+
+    /// Exports each machine to its destination file, one at a time: each
+    /// export reads a whole disk image. Without `replacing`, a destination
+    /// that already exists is refused for that machine (a folder chosen for
+    /// several machines); with it, the user has agreed to replace the file
+    /// (the save panel asked).
+    public func export(
+        _ items: [(machine: Path, destination: URL)], densest: Bool, includeIPSW: Bool, replacing: Bool
+    ) async {
+        var queued: [(machine: Path, destination: URL)] = []
+        for item in items where exports[item.machine] == nil {
+            if !replacing, VPhoneLaunchpadExportOutput.exists(item.destination) {
+                actionError = VPhoneLaunchpadError(
+                    String(localized: "Unable to Export \(item.machine.name)"),
+                    detail: String(localized: "\(item.destination.path) already exists."))
+                continue
+            }
+            exports[item.machine] = Export(destination: item.destination)
+            queued.append(item)
+        }
+        for item in queued {
+            // Cancelled while it waited.
+            guard exports[item.machine] != nil else {
+                continue
+            }
+            let task = Task {
+                await runExport(item.machine, to: item.destination, densest: densest, includeIPSW: includeIPSW)
+            }
+            exports[item.machine]?.task = task
+            exports[item.machine]?.startedAt = Date()
+            await task.value
+            exports[item.machine] = nil
+        }
+    }
+
+    /// Stops an export under way (SIGINT to its `vm export` child), or takes
+    /// a waiting one out of the queue.
+    public func cancelExport(_ machine: Path) {
+        guard let export = exports[machine] else {
+            return
+        }
+        if let task = export.task {
+            task.cancel()
+        } else {
+            exports[machine] = nil
+        }
+    }
+
+    private func runExport(_ machine: Path, to destination: URL, densest: Bool, includeIPSW: Bool) async {
+        let existedBefore = VPhoneLaunchpadExportOutput.exists(destination)
+        await perform(String(localized: "Exporting…"), on: machine,
+                      VPhoneLaunchpadEditCommand.export(machine, to: destination, densest: densest, includeIPSW: includeIPSW),
+                      failure: String(localized: "Unable to Export \(machine.name)"))
+        // `vm export` writes the archive in place, so a cancelled one leaves
+        // a partial file behind. Only a file this export created is removed.
+        if Task.isCancelled {
+            VPhoneLaunchpadExportOutput.removeCancelled(destination, existedBefore: existedBefore)
+        }
+    }
+
+    // MARK: - Running edits
+
+    /// Import's activity, which belongs to no machine.
+    public private(set) var globalActivity: String?
+
+    /// Runs one edit command with `activity` shown in place of the machine's
+    /// state. A failure is reported with `failure` as the title and the
+    /// output's last lines, where `vphone-cli` names the reason (a held
+    /// bundle lock reads `VM '<name>' is busy: ...`). A cancelled command is
+    /// not reported. False unless the command ran and exited 0.
+    @discardableResult
+    private func perform(
+        _ activity: String, on machine: Path?, _ command: VPhoneLaunchpadEditCommand?, failure: String
+    ) async -> Bool {
+        guard let commandLine else {
+            return false
+        }
+        guard let command else {
+            actionError = VPhoneLaunchpadError(failure, detail: String(localized: "Launchpad cannot pass this name or path to vphone-cli."))
+            return false
+        }
+        if let machine, activities[machine] != nil {
+            return false
+        }
+        if let machine {
+            activities[machine] = activity
+        } else {
+            globalActivity = activity
+        }
+        defer {
+            if let machine {
+                activities[machine] = nil
+            } else {
+                globalActivity = nil
+            }
+        }
+        var succeeded = false
+        do {
+            let result = try await commandLine.run(command)
+            succeeded = result.succeeded && !Task.isCancelled
+            if !result.succeeded, !Task.isCancelled {
+                actionError = VPhoneLaunchpadError(failure, detail: result.tail)
+            }
+        } catch {
+            actionError = VPhoneLaunchpadError(failure, detail: error.localizedDescription)
+        }
+        // A new task: a cancelled export's own cancellation would interrupt
+        // the `vm list` children of this refresh.
+        await Task { await self.refresh() }.value
+        return succeeded
     }
 
     // MARK: - Diagnostics

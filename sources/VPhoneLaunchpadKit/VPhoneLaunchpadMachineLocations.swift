@@ -100,6 +100,16 @@ public enum VPhoneLaunchpadMachineLocations {
         return logsDirectory.appendingPathComponent("\(stem)\(suffix).log")
     }
 
+    /// `vphone-vm` binds the machine's control socket at
+    /// `<machine>/vphone.sock`; a path longer than `sun_path` cannot be
+    /// bound. Rename and clone offer only names whose socket path fits.
+    public static func socketPathFits(root: String, name: String) -> Bool {
+        let path = URL(fileURLWithPath: root, isDirectory: true)
+            .appendingPathComponent(name, isDirectory: true)
+            .appendingPathComponent("vphone.sock").path
+        return path.utf8CString.count <= MemoryLayout.size(ofValue: sockaddr_un().sun_path)
+    }
+
     /// Added libraries from a stored list: absolute, canonical, not the
     /// default library, each once, in stored order.
     public static func addedRoots(from stored: [String], defaultRoot: String) -> [String] {

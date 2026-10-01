@@ -106,17 +106,18 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
 
 
 class LaunchpadB1BoundaryTests(unittest.TestCase):
-    """B1/B2 boundaries: list, launch and stop through the embedded toolchain only
-    (T26 design 4, 5.1, 5.2, 11.1)."""
+    """B1/B2/B3/B5 boundaries: list, launch, stop and the offline edits through the
+    embedded toolchain only (T26 design 4, 5.1, 5.2, 9, 11.1)."""
 
     FORBIDDEN = {
         r'VPhoneVMLockProbe\.': 'lock probe',
         r'isRunLockHeld\(': 'run lock probe',
         r'\bflock\(': 'flock',
         r'VPhoneVMLock\(': 'VM lock',
+        r'VPhoneBundleGuard|VPhoneBundleOps': 'bundle lock or bundle operation outside the CLI',
         r'lsof': 'lsof',
         r'"create-status"': 'create-status',
-        r'"new"|"create"|"delete"|"rename"|"clone"|"config"|"export"|"import"|"--dfu"': 'VM-changing command',
+        r'"new"|"create"|"--dfu"': 'VM-changing command',
         r'"cfw"|"install-bundle"|"verify-bundle"|"register"|"install"': 'privileged or install command',
         r'--sudo-password|--root-popup': 'privileged option',
         r'VPhoneHelper|SMAppService|SMJobBless|ServiceManagement|EPExecutionPolicy': 'helper or execution policy',
@@ -133,19 +134,64 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
     READ_ONLY_COMMANDS = r'"doctor"|"helper"|"core-bundle"'
     WHITELIST = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadReadOnlyCommand.swift'
 
+    # B3: the offline edit commands, `--force` and file removal appear only in the
+    # edit command file; file removal only in the cancelled-export cleanup.
+    EDIT_COMMANDS = r'"config"|"rename"|"clone"|"delete"|"export"|"import"|"--force"'
+    EDIT_FILE = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift'
+    FILE_REMOVAL = r'removeItem\(|\bunlink\(|\brmdir\(|trashItem|(?<![.\w])remove\(|removefile\('
+    # B3: rename and clone measure `<machine>/vphone.sock` against `sun_path`; the
+    # path is only measured, never opened or bound.
+    LOCATIONS = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift'
+    SOCKET_LENGTH = '.appendingPathComponent("vphone.sock").path\n        return path.utf8CString.count <= ' \
+                    'MemoryLayout.size(ofValue: sockaddr_un().sun_path)'
+
     def test_sources_stay_within_b1(self):
         sources = launchpad_swift()
         self.assertTrue(sources)
         for path, text in sources.items():
             code = re.sub(r'//.*', '', text)  # comments may name what is avoided
+            if path == self.LOCATIONS:
+                self.assertEqual(code.count(self.SOCKET_LENGTH), 1)
+                code = code.replace(self.SOCKET_LENGTH, '')
             for pattern, what in self.FORBIDDEN.items():
                 self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
             if path != self.WHITELIST:
                 self.assertIsNone(re.search(self.READ_ONLY_COMMANDS, code),
                                   f'read-only command name outside the whitelist in {path.relative_to(ROOT)}')
+            if path != self.EDIT_FILE:
+                self.assertIsNone(re.search(self.EDIT_COMMANDS, code),
+                                  f'edit command name outside the edit command file in {path.relative_to(ROOT)}')
+                self.assertIsNone(re.search(self.FILE_REMOVAL, code), f'file removal in {path.relative_to(ROOT)}')
             if path != self.CHILD_PROCESS:
                 for pattern, what in self.CONFINED.items():
                     self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
+
+    def test_b3_edit_file_builds_only_the_offline_edits(self):
+        code = re.sub(r'//.*', '', self.EDIT_FILE.read_text(encoding='utf-8'))
+        arrays = [re.findall(r'"([^"]*)"', body) for body in re.findall(r'\[("[^\]]*)\]', code)]
+        built = sorted({tuple(a) for a in arrays if a and a[0] == 'vm'})
+        self.assertEqual(built, [
+            ('vm', 'clone'), ('vm', 'config'), ('vm', 'delete', '--force'), ('vm', 'export', '--out'),
+            ('vm', 'import', '--library-root'), ('vm', 'rename'),
+        ])
+        # `--force` only skips the CLI's stdin prompt, and only for delete.
+        self.assertEqual(re.findall(r'\[[^\]]*"--force"[^\]]*\]', code),
+                         ['["vm", "delete", machine.name, "--force"]'])
+        # Every machine command carries its library root.
+        for verb in ('config', 'rename', 'clone', 'delete', 'export'):
+            self.assertRegex(code, rf'\["vm", "{verb}"[^\]]*\] \+ machine\.libraryArguments')
+        self.assertIn('["vm", "import", archive.path, "--library-root", libraryRoot]', code)
+        # The value exists only through the factories.
+        self.assertIn('private init(_ kind: Kind, _ arguments: [String])', code)
+
+    def test_b3_only_a_cancelled_export_removes_a_file(self):
+        code = re.sub(r'//.*', '', self.EDIT_FILE.read_text(encoding='utf-8'))
+        self.assertEqual(re.findall(self.FILE_REMOVAL, code), ['unlink('])
+        cleanup = code.split('public static func removeCancelled', 1)[1]
+        self.assertRegex(cleanup, r'guard !existedBefore, lstat\(url\.path, &info\) == 0, info\.st_mode & S_IFMT == S_IFREG')
+        library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
+        self.assertEqual(library.count('removeCancelled('), 1)
+        self.assertRegex(library, r'if Task\.isCancelled \{\s*VPhoneLaunchpadExportOutput\.removeCancelled\(destination, existedBefore: existedBefore\)')
 
     def test_b5_whitelist_builds_only_read_only_commands(self):
         code = re.sub(r'//.*', '', self.WHITELIST.read_text(encoding='utf-8'))
@@ -163,13 +209,16 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
                          ['detachedPID, SIGINT', 'process.processIdentifier, SIGINT'])
 
     def test_only_vm_list_stop_and_launch_are_run(self):
-        runs, starts = [], []
+        runs, starts, typed = [], [], []
         for path, text in launchpad_swift().items():
             runs += re.findall(r'\.run\(\s*\[([^\]]*)\]', text)
             starts += re.findall(r'commandLine\.start\(\s*(\w+)', text)
+            typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*\)', text)
         self.assertEqual(sorted(re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs),
                          [['vm', 'list', '--json'], ['vm', 'stop']])
         self.assertEqual(starts, ['arguments'])
+        # B3/B5: everything else runs a whitelisted command value.
+        self.assertEqual(sorted(typed), ['command', 'command', 'command'])
         library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
         self.assertIn('var arguments = ["vm", "launch", machine.name] + machine.libraryArguments', library)
 

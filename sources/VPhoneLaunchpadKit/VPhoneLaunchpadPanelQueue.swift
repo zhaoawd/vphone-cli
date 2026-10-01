@@ -3,10 +3,12 @@ import Observation
 
 // MARK: - Panels
 
-/// The sheets over the machine list.
+/// The sheets over the machine list that belong to no machine.
 public enum VPhoneLaunchpadPanel: String, Identifiable, Sendable, CaseIterable {
     case hostSetup
     case coreBundle
+    /// Recent Commands (B3), opened from the inspector.
+    case commandHistory
 
     public var id: Self {
         self

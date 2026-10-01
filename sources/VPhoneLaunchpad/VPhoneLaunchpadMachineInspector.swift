@@ -5,14 +5,33 @@ import VPhoneLaunchpadKit
 // MARK: - State label
 
 /// A machine's run state as the table and the inspector show it. An
-/// activity Launchpad runs on the machine (`Stopping…`) takes the place of
-/// the state; a panic line in the console turns the icon amber.
+/// activity Launchpad runs on the machine (`Stopping…`, `Exporting…`) takes
+/// the place of the state; a panic line in the console turns the icon
+/// amber. `indeterminate` draws an indeterminate bar beside the activity:
+/// `vm export` prints no progress lines to a pipe.
 struct VPhoneLaunchpadMachineStateLabel: View {
     let state: VPhoneLaunchpadRunState
     var activity: String?
     var panicked = false
+    var indeterminate = false
 
     var body: some View {
+        if indeterminate, let activity {
+            HStack(spacing: VPhoneLaunchpadTheme.unit) {
+                ProgressView()
+                    .progressViewStyle(.linear)
+                    .controlSize(.small)
+                    .frame(width: 48)
+                Text(verbatim: activity).lineLimit(1)
+            }
+            .help(Text(verbatim: activity))
+        } else {
+            label
+        }
+    }
+
+    @ViewBuilder
+    private var label: some View {
         let (status, text, instance): (VPhoneLaunchpadStatus, String, String?) = if let activity {
             (.running, activity, nil)
         } else {
@@ -54,9 +73,13 @@ struct VPhoneLaunchpadMachineInspector: View {
                 LabeledContent("State") {
                     VPhoneLaunchpadMachineStateLabel(
                         state: library.state(of: machine.path),
-                        activity: library.activities[machine.path],
-                        panicked: library.panicked.contains(machine.path)
+                        activity: library.activity(of: machine.path),
+                        panicked: library.panicked.contains(machine.path),
+                        indeterminate: library.isExporting(machine.path)
                     )
+                }
+                if let export = library.exports[machine.path] {
+                    value(LocalizedStringKey("Export to"), VPhoneLaunchpadMachineLocations.abbreviated(export.destination))
                 }
                 if let started = library.startedAt[machine.path] {
                     LabeledContent("Started") {
@@ -114,6 +137,9 @@ struct VPhoneLaunchpadMachineInspector: View {
                     }
                 }
                 value(LocalizedStringKey("Log"), VPhoneLaunchpadMachineLocations.abbreviated(library.consoleLog(machine.path)))
+                // Every command Launchpad ran, for all machines, to copy into
+                // a terminal.
+                Button("Recent Commands") { model.panels.present(.commandHistory) }
             }
         }
         .formStyle(.grouped)

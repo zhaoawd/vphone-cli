@@ -13,7 +13,7 @@ struct VPhoneLaunchpadCoreBundleView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VPhoneLaunchpadPanelFrame(Text("Core Bundle")) {
+        VPhoneLaunchpadSheet(Text("Core Bundle")) {
             Form {
                 toolchainSection
                 installSection

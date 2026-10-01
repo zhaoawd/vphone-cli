@@ -55,6 +55,8 @@ struct VPhoneLaunchpadRootView: View {
             }
         case (.coreBundle, _):
             EmptyView()
+        case (.commandHistory, _):
+            VPhoneLaunchpadCommandHistoryView(history: model.history)
         }
     }
 

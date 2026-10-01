@@ -10,41 +10,25 @@ struct VPhoneLaunchpadConsoleView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("\(machine.name) Console")
-                    .font(.headline)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                Spacer()
-            }
-            .padding(.horizontal, VPhoneLaunchpadTheme.sectionGap)
-            .padding(.vertical, VPhoneLaunchpadTheme.padding)
-
+        VPhoneLaunchpadSheet(Text("\(machine.name) Console")) {
             VPhoneLaunchpadLogView(url: url)
                 .frame(minWidth: 820, maxWidth: .infinity, minHeight: 480, maxHeight: .infinity)
                 .overlay(Rectangle().strokeBorder(VPhoneLaunchpadTheme.border, lineWidth: VPhoneLaunchpadTheme.borderWidth))
-                .padding(.horizontal, VPhoneLaunchpadTheme.sectionGap)
-
-            HStack(spacing: VPhoneLaunchpadTheme.unit) {
-                Text(verbatim: VPhoneLaunchpadMachineLocations.abbreviated(url))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.head)
-                    .textSelection(.enabled)
-                    .help(Text(verbatim: url.path))
-                Spacer(minLength: VPhoneLaunchpadTheme.sectionGap)
-                Button("Show in Finder") {
-                    NSWorkspace.shared.activateFileViewerSelecting([url])
-                }
-                .disabled(!FileManager.default.fileExists(atPath: url.path))
-                Button("Close") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
+                .padding(VPhoneLaunchpadTheme.sectionGap)
+        } accessory: {
+            Text(verbatim: VPhoneLaunchpadMachineLocations.abbreviated(url))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.head)
+                .textSelection(.enabled)
+                .help(Text(verbatim: url.path))
+        } actions: {
+            Button("Show in Finder") {
+                NSWorkspace.shared.activateFileViewerSelecting([url])
             }
-            .padding(.horizontal, VPhoneLaunchpadTheme.sectionGap)
-            .padding(.vertical, VPhoneLaunchpadTheme.padding)
+            .disabled(!FileManager.default.fileExists(atPath: url.path))
+            Button("Close") { dismiss() }
+                .keyboardShortcut(.cancelAction)
         }
-        .background(VPhoneLaunchpadTheme.background)
-        .fontDesign(.monospaced)
     }
 }
