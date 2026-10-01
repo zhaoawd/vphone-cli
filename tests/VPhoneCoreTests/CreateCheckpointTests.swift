@@ -814,6 +814,63 @@ private let allStages = VPhoneCreateStage.allCases
         #expect(kept.effectiveOptions.effectiveRestoreBackend == .native)
     }
 
+    @Test func prepareBackendChangeRequiresRestartAndResumeKeepsNative() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        f.fake.setFault(.patch, .beforeExecution)
+        #expect(throws: VPhoneCreateRunError.self) { try f.create(f.runner()) }
+        let before = f.checkpointBytes()
+        f.fake.resetCalls()
+        #expect {
+            try f.runner().resume(bundleURL: f.bundle, request: .init(overrides: .init(prepareBackend: .native)))
+        } throws: { error in
+            guard case let VPhoneCreateRunError.optionsChanged(lines) = error else { return false }
+            return lines.contains { $0.contains("prepare_backend") }
+        }
+        #expect(f.fake.executed.isEmpty)
+        #expect(f.checkpointBytes() == before)
+        f.fake.setFault(.patch, .beforeExecution)
+        #expect(throws: VPhoneCreateRunError.self) {
+            try f.runner(keepArtifacts: true).resume(bundleURL: f.bundle, request: .init(
+                overrides: .init(prepareBackend: .native), restartFrom: .prepare))
+        }
+        let native = try f.load()
+        #expect(native.effectiveOptions.effectivePrepareBackend == .native)
+        #expect(native.record(.prepare).history.count == 1)
+        #expect(native.artifact("restore_tree")?.availability == .available)
+        f.fake.resetCalls()
+        let resumed = try f.runner(keepArtifacts: true).resume(bundleURL: f.bundle)
+        #expect(resumed.effectiveOptions.effectivePrepareBackend == .native)
+        #expect(f.fake.executed.first == .patch)
+        #expect(resumed.artifact("restore_tree")?.availability == .available)
+        let defaulted = try f.runner().resume(bundleURL: f.bundle, request: .init(
+            overrides: .init(prepareBackend: .script), restartFrom: .prepare))
+        #expect(defaulted.effectiveOptions.prepareBackend == nil)
+        #expect(defaulted.effectiveOptions.effectivePrepareBackend == .script)
+        #expect(defaulted.artifact("restore_tree")?.availability == .removed)
+    }
+
+    @Test func nativePrepareFailureCanResume() throws {
+        for fault in [FakeStages.Fault.beforeExecution, .afterExecution, .cancel, .verifierRejects] {
+            let f = try Fixture(); defer { f.cleanup() }
+            var options = Fixture.options()
+            options.prepareBackend = .native
+            f.fake.setFault(.prepare, fault)
+            #expect(throws: VPhoneCreateRunError.self) {
+                try f.runner().create(bundleURL: f.bundle, options: options,
+                    iphoneSource: "/ipsw/iPhone.ipsw", cloudosSource: "/ipsw/cloudOS.ipsw")
+            }
+            let failed = try f.load()
+            #expect(failed.nextStage == .prepare)
+            #expect(failed.record(.prepare).status == (fault == .cancel ? .cancelled : .failed))
+            f.fake.resetCalls()
+            let resumed = try f.runner().resume(bundleURL: f.bundle)
+            #expect(resumed.effectiveOptions.effectivePrepareBackend == .native)
+            #expect(resumed.record(.prepare).history.count == 1)
+            #expect(f.fake.executed.first == .prepare)
+            #expect(resumed.artifact("restore_tree")?.availability == .removed)
+        }
+    }
+
     @Test func variantChangeBeforePatchRecomputesApplicability() throws {
         let f = try Fixture(); defer { f.cleanup() }
         f.fake.setFault(.patch, .beforeExecution)

@@ -60,6 +60,11 @@ public enum VPhoneCreateOverallStatus: String, Codable, Sendable {
 
 // MARK: - Options
 
+public enum VPhonePrepareBackend: String, Codable, Sendable {
+    case script
+    case native
+}
+
 public enum VPhoneRestoreBackend: String, Codable, Sendable {
     case python
     case native
@@ -106,11 +111,13 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     // their normalized options digest remains unchanged.
     public var restoreBackend: VPhoneRestoreBackend?
     public var effectiveRestoreBackend: VPhoneRestoreBackend { restoreBackend ?? .python }
+    public var prepareBackend: VPhonePrepareBackend?
+    public var effectivePrepareBackend: VPhonePrepareBackend { prepareBackend ?? .script }
 
     public init(
         variant: String, iphoneSource: String?, cloudosSource: String?, spoofBuild: String?,
         forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64,
-        restoreBackend: VPhoneRestoreBackend = .python
+        restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script
     ) {
         self.variant = variant
         self.iphoneSource = iphoneSource.map(VPhoneCreateSourceRecord.init)
@@ -122,6 +129,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         self.memoryMb = memoryMb
         self.diskSizeGb = diskSizeGb
         self.restoreBackend = restoreBackend == .python ? nil : restoreBackend
+        self.prepareBackend = prepareBackend == .script ? nil : prepareBackend
     }
 
     public var digest: String {
@@ -140,6 +148,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         if cpuCount != other.cpuCount { result.append(("cpu_count", .prepare)) }
         if memoryMb != other.memoryMb { result.append(("memory_mb", .prepare)) }
         if diskSizeGb != other.diskSizeGb { result.append(("disk_size_gb", .prepare)) }
+        if effectivePrepareBackend != other.effectivePrepareBackend { result.append(("prepare_backend", .prepare)) }
         if effectiveRestoreBackend != other.effectiveRestoreBackend { result.append(("restore_backend", .restore)) }
         if enableFrida != other.enableFrida { result.append(("enable_frida", .patch)) }
         if spoofBuild != other.spoofBuild { result.append(("spoof_build", .cfw)) }

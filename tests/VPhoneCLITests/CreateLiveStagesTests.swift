@@ -18,10 +18,10 @@ private struct Workspace {
 
     func cleanup() { try? FileManager.default.removeItem(at: bundle.deletingLastPathComponent()) }
 
-    func context(variant: String = "jb") -> VPhoneCreateStageContext {
+    func context(variant: String = "jb", prepareBackend: VPhonePrepareBackend = .script) -> VPhoneCreateStageContext {
         let options = VPhoneCreateEffectiveOptions(
             variant: variant, iphoneSource: nil, cloudosSource: nil, spoofBuild: nil, forceDscMaxSlide: false,
-            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64)
+            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, prepareBackend: prepareBackend)
         let checkpoint = VPhoneCreateCheckpoint(
             identity: .init(name: "vm", path: bundle.path, directoryId: "1:2"), options: options,
             tool: .init(executableSha256: nil, stageContractVersion: 1), now: Date())
@@ -181,6 +181,24 @@ struct CreateLiveStagesTests {
         #expect(stages.artifactsRewrittenOnRerun(.patch).isEmpty)
         #expect(stages.artifactsRewrittenOnRerun(.prepare) == ["restore_tree", "avpbooter"])
         #expect(stages.artifactsRewrittenOnRerun(.cfw).contains("disk_image"))
+    }
+
+    @Test func prepareEvidenceMustMatchBackend() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        let stages = w.stages()
+        let native = w.context(prepareBackend: .native)
+        #expect(isRejected(stages.verify(.prepare, context: native, evidence: ["fw_prepare_exit": "0"])))
+        #expect(isRejected(stages.verify(.prepare, context: native,
+            evidence: ["fw_prepare_exit": "0", "prepare_backend": "script"])))
+        try Data("rom".utf8).write(to: w.bundle.appendingPathComponent("AVPBooter.vresearch1.bin"))
+        for name in ["BuildManifest.plist", "iPhone-BuildManifest.plist"] {
+            try w.writePlist(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"],
+                "iPhone17,3_26.1_23B85_Restore/\(name)")
+        }
+        #expect(isVerified(stages.verify(.prepare, context: native,
+            evidence: ["fw_prepare_exit": "0", "prepare_backend": "native"])))
+        #expect(isRejected(stages.verify(.prepare, context: w.context(),
+            evidence: ["fw_prepare_exit": "0", "prepare_backend": "native"])))
     }
 
     // MARK: Status view

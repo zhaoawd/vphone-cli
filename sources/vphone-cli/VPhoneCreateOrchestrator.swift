@@ -134,6 +134,7 @@ public struct VPhoneCreateOrchestrator {
         public var verbosity: VPhoneVerbosity
         public var keepArtifacts: Bool
         public var restoreBackend: VPhoneRestoreBackend
+        public var prepareBackend: VPhonePrepareBackend
 
         public init(
             name: String,
@@ -150,7 +151,8 @@ public struct VPhoneCreateOrchestrator {
             memoryMB: UInt64 = 8192,
             diskSizeGB: UInt64 = 64,
             verbosity: VPhoneVerbosity = .quiet,
-            keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python
+            keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python,
+            prepareBackend: VPhonePrepareBackend = .script
         ) {
             self.name = name
             self.variant = variant
@@ -168,6 +170,7 @@ public struct VPhoneCreateOrchestrator {
             self.verbosity = verbosity
             self.keepArtifacts = keepArtifacts
             self.restoreBackend = restoreBackend
+            self.prepareBackend = prepareBackend
         }
     }
 
@@ -186,6 +189,13 @@ public struct VPhoneCreateOrchestrator {
     /// Fresh create: refuses an existing name, creates the bundle, then runs
     /// every stage through the checkpointed runner.
     public func run(_ options: Options) throws {
+        var options = options
+        if options.prepareBackend == .native {
+            let sources = try VPhoneNativeFirmwarePreparer.localSources(
+                iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource, isLess: options.variant == "less")
+            options.iphoneSource = sources.iphone.path
+            options.cloudosSource = sources.cloudos.path
+        }
         // Fail fast on a nested-VM host — PV=3 guest boot can't nest, and the whole
         // create pipeline (download + patch + restore) is wasted otherwise. Mirrors
         // the boot_host_preflight gate that `make boot` applied.
@@ -224,7 +234,7 @@ public struct VPhoneCreateOrchestrator {
             variant: options.variant, iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource,
             spoofBuild: options.spoofBuild, forceDscMaxSlide: options.forceDSCMaxSlide,
             enableFrida: options.enableFrida, cpuCount: options.cpuCount, memoryMb: options.memoryMB,
-            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend)
+            diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend, prepareBackend: options.prepareBackend)
         let runtime = VPhoneCreateRuntime(
             sudoEnvExtras: sudo.envExtras, rootPopup: options.rootPopup, interactive: options.interactive,
             verbosity: options.verbosity, keepArtifacts: options.keepArtifacts)
@@ -293,6 +303,16 @@ public struct VPhoneCreateOrchestrator {
         // reloads and validates the checkpoint under its locks.
         let stored = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint
         let variant = options.overrides.variant ?? stored.effectiveOptions.variant
+        var overrides = options.overrides
+        let prepareBackend = overrides.prepareBackend ?? stored.effectiveOptions.effectivePrepareBackend
+        if prepareBackend == .native, (options.restartFrom ?? stored.nextStage) == .prepare {
+            let sources = try VPhoneNativeFirmwarePreparer.localSources(
+                iphoneSource: overrides.iphoneSource ?? stored.effectiveOptions.iphoneSource?.display,
+                cloudosSource: overrides.cloudosSource ?? stored.effectiveOptions.cloudosSource?.display,
+                isLess: variant == "less")
+            overrides.iphoneSource = sources.iphone.path
+            overrides.cloudosSource = sources.cloudos.path
+        }
         let cfwPending = !stored.record(.cfw).status.isDone || options.restartFrom.map { $0 <= .cfw } == true
         let sudo = try SudoSession(
             needed: variant != "less" && cfwPending, password: options.sudoPassword, rootPopup: options.rootPopup,
@@ -307,7 +327,7 @@ public struct VPhoneCreateOrchestrator {
             checkpoint = try makeRunner(runtime).resume(
                 bundleURL: bundleURL,
                 request: .init(
-                    overrides: options.overrides, restartFrom: options.restartFrom,
+                    overrides: overrides, restartFrom: options.restartFrom,
                     acceptToolChange: options.acceptToolChange))
         } catch {
             Self.printRecoveryHint(name: options.name, bundleURL: bundleURL, error: error)
@@ -601,8 +621,18 @@ public struct VPhoneCreateOrchestrator {
 
     func runFWPrepare(
         iphoneSource: String?, cloudosSource: String?, isLess: Bool, keepArtifacts: Bool,
-        bundleURL: URL, verbosity v: VPhoneVerbosity
+        bundleURL: URL, verbosity v: VPhoneVerbosity,
+        backend: VPhonePrepareBackend = .script, preserveExistingRestore: Bool = false
     ) throws {
+        if backend == .native {
+            let sources = try VPhoneNativeFirmwarePreparer.localSources(
+                iphoneSource: iphoneSource, cloudosSource: cloudosSource, isLess: isLess)
+            let tree = try VPhoneNativeFirmwarePreparer.prepare(
+                iPhone: sources.iphone, cloudOS: sources.cloudos, bundle: bundleURL,
+                preserveExistingRestore: preserveExistingRestore)
+            print("[+] Classic restore tree ready: \(tree.path)")
+            return
+        }
         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
 

@@ -50,8 +50,10 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             try orchestrator.refreshBootROM(bundleURL: bundleURL)
             try orchestrator.runFWPrepare(
                 iphoneSource: context.iphoneSource, cloudosSource: context.cloudosSource, isLess: isLess,
-                keepArtifacts: runtime.keepArtifacts, bundleURL: bundleURL, verbosity: v)
-            return ["fw_prepare_exit": "0"]
+                keepArtifacts: runtime.keepArtifacts, bundleURL: bundleURL, verbosity: v,
+                backend: options.effectivePrepareBackend,
+                preserveExistingRestore: !context.checkpoint.record(.prepare).history.isEmpty)
+            return ["fw_prepare_exit": "0", "prepare_backend": options.effectivePrepareBackend.rawValue]
         case .patch:
             let before = Self.historyEntries(bundleURL)
             let count = try orchestrator.runFWPatch(
@@ -116,6 +118,10 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
         switch stage {
         case .prepare:
             guard evidence["fw_prepare_exit"] == "0" else { return .rejected("no fw prepare exit status") }
+            // Historical prepare evidence did not name the script backend.
+            guard (evidence["prepare_backend"] ?? "script") == context.options.effectivePrepareBackend.rawValue else {
+                return .rejected("prepare evidence backend does not match checkpoint options")
+            }
             if treeRemoved { return .verified(artifacts: [], evidence: ["restore_tree": "removed by cleanup"]) }
             guard let tree = Self.restoreTree(bundleURL) else {
                 return .rejected("expected exactly one iPhone*_Restore directory in the bundle")

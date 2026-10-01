@@ -37,11 +37,16 @@ struct VPhoneFWCatalogCommand: ParsableCommand {
     }
 }
 
+extension VPhonePrepareBackend: ExpressibleByArgument {}
+
 // MARK: - prepare
 
 struct VPhoneFWPrepareCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "prepare", abstract: "Download + merge IPSWs into a VM bundle")
+
+    @Option(help: "Preparation backend: script (default) or native (local IPSWs, classic layout only)")
+    var prepareBackend: VPhonePrepareBackend = .script
 
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
@@ -60,6 +65,19 @@ struct VPhoneFWPrepareCommand: ParsableCommand {
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
+
+        if prepareBackend == .native {
+            guard !list, iphoneVersion == nil, iphoneBuild == nil else {
+                throw ValidationError("Native prepare requires two local IPSW paths; selectors, downloads and less are not supported.")
+            }
+            let sources = try VPhoneNativeFirmwarePreparer.localSources(
+                iphoneSource: iphoneSource, cloudosSource: cloudosSource,
+                isLess: ProcessInfo.processInfo.environment["VARIANT"] == "less")
+            let result = try VPhoneNativeFirmwarePreparer.prepare(
+                iPhone: sources.iphone, cloudOS: sources.cloudos, bundle: bundle.url)
+            print("[+] Classic restore tree ready: \(result.path)")
+            return
+        }
 
         var env = ProcessInfo.processInfo.environment
         if let iphoneSource { env["IPHONE_SOURCE"] = iphoneSource }

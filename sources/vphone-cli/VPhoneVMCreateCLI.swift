@@ -19,6 +19,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
 
     @Option(help: "Restore backend: python (default) or native (experimental); preserved on resume")
     var restoreBackend: VPhoneRestoreBackend?
+    @Option(help: "Preparation backend: script (default) or native (experimental, two local IPSWs, classic layout); preserved on resume")
+    var prepareBackend: VPhonePrepareBackend?
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "new VM name (with --resume: the existing VM to continue)") var name: String
     @Flag(help: "Continue an interrupted create of an existing VM from its checkpoint") var resume = false
@@ -62,14 +64,22 @@ struct VPhoneVMCreateCommand: ParsableCommand {
                 overrides: .init(
                     variant: variant, iphoneSource: iphoneSource, cloudosSource: cloudosSource,
                     spoofBuild: spoofBuild, forceDscMaxSlide: forceDSCMaxSlide ? true : nil,
-                    enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend),
+                    enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend,
+                    prepareBackend: prepareBackend),
                 restartFrom: restartFrom, acceptToolChange: acceptToolChange,
                 sudoPassword: sudoPassword, rootPopup: rootPopup, interactive: interactive,
                 verbosity: VPhoneVerbosity(count: verboseCount), keepArtifacts: keepArtifacts))
             return
         }
         // Prompt for any firmware component not supplied on the command line.
-        let sources = try VPhoneFirmwareSelection.resolve(iphone: iphoneSource, cloudos: cloudosSource)
+        let sources: VPhoneFirmwareSources
+        if prepareBackend == .native {
+            let local = try VPhoneNativeFirmwarePreparer.localSources(
+                iphoneSource: iphoneSource, cloudosSource: cloudosSource, isLess: variant == "less")
+            sources = .init(iphoneSource: local.iphone.path, cloudosSource: local.cloudos.path)
+        } else {
+            sources = try VPhoneFirmwareSelection.resolve(iphone: iphoneSource, cloudos: cloudosSource)
+        }
         try orchestrator.run(.init(
             name: name, variant: variant ?? "regular",
             iphoneSource: sources.iphoneSource, cloudosSource: sources.cloudosSource,
@@ -77,7 +87,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
             enableFrida: frida, rootPopup: rootPopup,
             interactive: interactive, diskSizeGB: diskSize ?? 64,
             verbosity: VPhoneVerbosity(count: verboseCount),
-            keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python))
+            keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python,
+            prepareBackend: prepareBackend ?? .script))
     }
 }
 
@@ -157,6 +168,7 @@ struct VPhoneCreateStatusReport: Encodable {
                 lines.append("overall:  \(checkpoint.overallStatus.rawValue)")
             }
             lines.append("variant:  \(checkpoint.effectiveOptions.variant)")
+            lines.append("prepare backend: \(checkpoint.effectiveOptions.effectivePrepareBackend.rawValue)")
             lines.append("creation: \(checkpoint.creationId)  attempt: \(checkpoint.attemptId)  attempts: \(checkpoint.attempts.count)")
             for record in checkpoint.stages {
                 var line = "  \(record.stage.rawValue.padding(toLength: 13, withPad: " ", startingAt: 0)) \(record.status.rawValue)"
