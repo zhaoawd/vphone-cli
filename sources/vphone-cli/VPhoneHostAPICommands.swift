@@ -140,17 +140,22 @@ enum VPhoneHostAPICommands {
         } catch is MappingError {
             return failure("api_protocol", mayContinue: submitted)
         } catch let error as VPhoneAPIError {
-            let codes = ["not_ready": "api_not_ready", "unsupported_capability": "capability_unavailable",
-                         "stale_session": "api_stale_session", "disconnected": "api_disconnected",
-                         "timeout": "api_timeout", "busy": "api_busy", "protocol": "api_protocol",
-                         "response_too_large": "api_response_too_large", "event_overflow": "api_disconnected",
-                         "file_too_large": "file_too_large", "destination_exists": "destination_exists",
-                         "file_io": "io_error", "identity_mismatch": "api_stale_session", "http": "api_http"]
             // Stable host codes; never expose arbitrary guest error text.
-            return failure(codes[error.code] ?? "api_guest_error", mayContinue: submitted)
+            return failure(hostCode(forAPIError: error.code) ?? "api_guest_error", mayContinue: submitted)
         } catch {
             return failure("api_transport", mayContinue: submitted)
         }
+    }
+
+    /// Host code for an API session or transport error; nil for guest errors.
+    static func hostCode(forAPIError code: String) -> String? {
+        let codes = ["not_ready": "api_not_ready", "unsupported_capability": "capability_unavailable",
+                     "stale_session": "api_stale_session", "disconnected": "api_disconnected",
+                     "timeout": "api_timeout", "busy": "api_busy", "protocol": "api_protocol",
+                     "response_too_large": "api_response_too_large", "event_overflow": "api_disconnected",
+                     "file_too_large": "file_too_large", "destination_exists": "destination_exists",
+                     "file_io": "io_error", "identity_mismatch": "api_stale_session", "http": "api_http"]
+        return codes[code]
     }
 
     private enum MappingError: Error { case invalidResult }

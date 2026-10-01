@@ -47,14 +47,46 @@ final class ControlEndpoint {
     }
 
     func request(_ fields: [String: Any]) async throws -> [String: Any] {
+        try decodeResponse(await rawRequest(fields))
+    }
+
+    /// The response line, for tests that keep a request open in a Task.
+    /// Blocking socket I/O runs on a GCD thread: many simultaneous clients
+    /// would otherwise occupy the cooperative pool and delay their own writes
+    /// past the server's request read deadline.
+    func rawRequest(_ fields: [String: Any]) async throws -> Data {
         let data = try JSONSerialization.data(withJSONObject: fields)
         let fd = try connectClient()
         defer { close(fd) }
-        let response = try await Task.detached {
-            HostControlIO.writeResponse(data + Data([10]), to: fd)
-            return try XCTUnwrap(HostControlIO.readRequest(fd))
-        }.value
-        return try XCTUnwrap(JSONSerialization.jsonObject(with: response) as? [String: Any])
+        return try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global().async {
+                HostControlIO.writeResponse(data + Data([10]), to: fd)
+                // A closed connection is an error, not a recorded XCTest failure,
+                // so a test can accept EOF where the server may close.
+                continuation.resume(with: Result {
+                    guard let line = try HostControlIO.readRequest(fd) else { throw CocoaError(.fileReadCorruptFile) }
+                    return line
+                })
+            }
+        }
+    }
+}
+
+func decodeResponse(_ data: Data) throws -> [String: Any] {
+    try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+}
+
+/// Polls a main-actor condition; fails instead of hanging the suite.
+@MainActor
+func waitUntil(_ condition: () -> Bool, timeout: Duration = .seconds(10),
+               file: StaticString = #filePath, line: UInt = #line) async throws {
+    let deadline = ContinuousClock.now + timeout
+    while !condition() {
+        guard ContinuousClock.now < deadline else {
+            XCTFail("condition not reached within \(timeout)", file: file, line: line)
+            throw CancellationError()
+        }
+        try await Task.sleep(for: .milliseconds(5))
     }
 }
 
@@ -175,6 +207,169 @@ final class HostControlLifecycleTests: XCTestCase {
                                     executor: .init())
         XCTAssertThrowsError(try long.start())
         long.stop()
+    }
+
+    // MARK: - Concurrent clients
+
+    /// A command that has not returned and a peer that has not finished its
+    /// request line do not delay other clients of the same socket.
+    func testSlowCommandAndSlowPeerDoNotBlockOtherClients() async throws {
+        let guest = HostGuestFake()
+        let gate = HostTestGate()
+        guest.shellGate = gate
+        let endpoint = try ControlEndpoint(executor: .init(control: guest))
+        defer { endpoint.clean() }
+        try endpoint.server.start()
+        let slowCommand = Task { try await endpoint.rawRequest(["t": "shell", "cmd": "sleep"]) }
+        try await waitUntil { gate.waiting > 0 }
+        let slowPeer = try endpoint.connectClient()
+        defer { close(slowPeer) }
+        HostControlIO.writeResponse(Data("{\"t\":\"capab".utf8), to: slowPeer)
+
+        let started = ContinuousClock.now
+        let tasks = (0..<8).map { index in
+            let command = index.isMultiple(of: 2) ? "capabilities" : "app_list"
+            return Task { try await endpoint.rawRequest(["t": command]) }
+        }
+        var others: [Data] = []
+        for task in tasks { others.append(try await task.value) }
+        XCTAssertEqual(others.count, 8)
+        XCTAssertTrue(try others.allSatisfy { try decodeResponse($0)["ok"] as? Bool == true })
+        // Well below the 5 s request read deadline that the slow peer holds.
+        XCTAssertLessThan(ContinuousClock.now - started, .seconds(3))
+        XCTAssertEqual(guest.shellCalls, 1)
+
+        gate.open()
+        let finished = try decodeResponse(await slowCommand.value)
+        XCTAssertEqual(finished["ok"] as? Bool, true)
+        XCTAssertEqual(finished["stdout"] as? String, "out")
+    }
+
+    func testConnectionsBeyondTheLimitAreClosedWithoutAffectingAcceptedOnes() async throws {
+        let guest = HostGuestFake()
+        let gate = HostTestGate()
+        guest.shellGate = gate
+        let endpoint = try ControlEndpoint(executor: .init(control: guest))
+        defer { endpoint.clean() }
+        try endpoint.server.start()
+        let held = (0..<HostControlIO.maximumConnections).map { _ in
+            Task { try await endpoint.rawRequest(["t": "shell", "cmd": "hold"]) }
+        }
+        try await waitUntil { gate.waiting == HostControlIO.maximumConnections }
+        let extra = try endpoint.connectClient()
+        defer { close(extra) }
+        let refused = try await Task.detached { try HostControlIO.readRequest(extra, timeout: 2) }.value
+        XCTAssertNil(refused)
+        gate.open()
+        for request in held {
+            let result = try decodeResponse(await request.value)
+            XCTAssertEqual(result["ok"] as? Bool, true)
+        }
+        let after = try await endpoint.request(["t": "capabilities"])
+        XCTAssertEqual(after["ok"] as? Bool, true)
+    }
+
+    // MARK: - Multiple VMs
+
+    /// Two VM sockets with their own guests: a request names its VM and boot,
+    /// and a request meant for the other VM changes nothing on this one.
+    func testRequestsReachOnlyTheSocketOwnerAndWrongTargetIsRefused() async throws {
+        let guestA = HostGuestFake()
+        let guestB = HostGuestFake()
+        let targetA = VPhoneHostTarget(vm: "vm-a", instanceID: "boot-a1", pid: 101, processStartedAt: 1.0)
+        let targetB = VPhoneHostTarget(vm: "vm-b", instanceID: "boot-b1", pid: 202, processStartedAt: 2.0)
+        let a = try ControlEndpoint(executor: .init(control: guestA, target: targetA))
+        let b = try ControlEndpoint(executor: .init(control: guestB, target: targetB))
+        defer { a.clean(); b.clean() }
+        try a.server.start()
+        try b.server.start()
+
+        let discoveryA = try await a.request(["t": "capabilities"])
+        XCTAssertEqual((discoveryA["target"] as? [String: Any])?["vm"] as? String, "vm-a")
+        let wrongName = try await a.request(["t": "file_put", "path": "/x", "data_b64": "eA==",
+                                             "target": ["vm": "vm-b"]])
+        XCTAssertEqual(wrongName["code"] as? String, "target_mismatch")
+        XCTAssertNil(guestA.uploaded)
+        XCTAssertNil(guestB.uploaded)
+        let wrongBoot = try await b.request(["t": "shell", "cmd": "id",
+                                             "target": ["vm": "vm-b", "instance_id": "boot-a1"]])
+        XCTAssertEqual(wrongBoot["code"] as? String, "target_mismatch")
+        XCTAssertEqual(guestA.shellCalls + guestB.shellCalls, 0)
+
+        let rightB = try await b.request(["t": "file_put", "path": "/x", "data_b64": "eA==",
+                                          "target": ["vm": "vm-b", "instance_id": "boot-b1"]])
+        XCTAssertEqual(rightB["ok"] as? Bool, true)
+        XCTAssertEqual(guestB.uploaded?.0, "/x")
+        XCTAssertNil(guestA.uploaded)
+    }
+
+    /// After the owner exits the path refuses connections; it never reaches
+    /// another VM. A crashed owner's leftover socket file refuses as well.
+    func testExitedTargetRefusesConnectionsAndStopCancelsInFlightCommands() async throws {
+        let guest = HostGuestFake()
+        let gate = HostTestGate()
+        guest.shellGate = gate
+        let target = VPhoneHostTarget(vm: "vm-a", instanceID: "boot-a1", pid: 101, processStartedAt: 1.0)
+        let endpoint = try ControlEndpoint(executor: .init(control: guest, target: target))
+        defer { endpoint.clean() }
+        try endpoint.server.start()
+        let inFlight = Task { () -> Data? in
+            try? await endpoint.rawRequest(["t": "shell", "cmd": "hold"])
+        }
+        try await waitUntil { gate.waiting > 0 }
+        endpoint.server.stop()
+        // Either the cancellation reply or a closed connection; never success.
+        if let stopped = await inFlight.value {
+            XCTAssertEqual(try decodeResponse(stopped)["code"] as? String, "command_cancelled")
+        }
+        XCTAssertThrowsError(try endpoint.connectClient())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: endpoint.path))
+
+        // A crashed process leaves the socket file without a listener.
+        let leftover = socket(AF_UNIX, SOCK_STREAM, 0)
+        var address = endpoint.address()
+        let bound = withUnsafePointer(to: &address) { pointer in
+            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                Darwin.bind(leftover, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
+            }
+        }
+        close(leftover)
+        XCTAssertEqual(bound, 0)
+        XCTAssertThrowsError(try endpoint.connectClient())
+        gate.open()
+        XCTAssertEqual(guest.shellCalls, 1)
+    }
+
+    /// The restarted VM binds the same path with a new boot instance. A client
+    /// that still holds the old boot's identity is refused; the new boot's
+    /// guest receives nothing from it.
+    func testRestartedVMRejectsRequestsBoundToThePreviousBoot() async throws {
+        let oldGuest = HostGuestFake()
+        let first = try ControlEndpoint(executor: .init(control: oldGuest, target: .init(
+            vm: "vm-a", instanceID: "boot-1", pid: 101, processStartedAt: 1.0)))
+        defer { first.clean() }
+        try first.server.start()
+        let before = try await first.request(["t": "capabilities"])
+        let oldIdentity = try XCTUnwrap(before["target"] as? [String: Any])
+        first.server.stop()
+
+        let newGuest = HostGuestFake()
+        let restarted = VPhoneHostControl(socketPath: first.path, executor: .init(control: newGuest, target: .init(
+            vm: "vm-a", instanceID: "boot-2", pid: 303, processStartedAt: 3.0)))
+        defer { restarted.stop() }
+        try restarted.start()
+        let stale = try await first.request(["t": "shell", "cmd": "id", "target": oldIdentity])
+        XCTAssertEqual(stale["code"] as? String, "target_mismatch")
+        XCTAssertEqual((stale["target"] as? [String: Any])?["instance_id"] as? String, "boot-2")
+        let byPID = try await first.request(["t": "shell", "cmd": "id",
+                                             "target": ["vm": "vm-a", "pid": 101]])
+        XCTAssertEqual(byPID["code"] as? String, "target_mismatch")
+        XCTAssertEqual(newGuest.shellCalls + oldGuest.shellCalls, 0)
+        let current = try await first.request(["t": "shell", "cmd": "id",
+                                               "target": ["vm": "vm-a", "instance_id": "boot-2"]])
+        XCTAssertEqual(current["ok"] as? Bool, true)
+        XCTAssertEqual(newGuest.shellCalls, 1)
+        XCTAssertEqual(oldGuest.shellCalls, 0)
     }
 
     func testStopClosesSlowClientsAndDoesNotAffectAnotherEndpoint() async throws {

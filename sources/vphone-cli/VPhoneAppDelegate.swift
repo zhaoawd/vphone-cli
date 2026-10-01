@@ -293,7 +293,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         // discovery: vphoned and its guest capabilities are not running there.
         let executor = VPhoneHostCommandExecutor(
             control: control, camera: cameraServer, location: locationProvider,
-            screen: hostScreen, apiSession: apiSession, bootMode: cli.dfu ? .dfu : .normal)
+            screen: hostScreen, apiSession: apiSession, bootMode: cli.dfu ? .dfu : .normal,
+            target: vmLock.map { VPhoneHostTarget(lock: $0.state) })
         let hc = VPhoneHostControl(
             socketPath: options.configURL.deletingLastPathComponent()
                 .appendingPathComponent("vphone.sock").path,

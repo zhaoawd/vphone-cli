@@ -91,6 +91,13 @@ final class HostAPICommandTests: XCTestCase {
         let terminated = try await endpoint.request(["t": "app_terminate", "transport": "api", "bundle_id": "loopback.app", "screen": false])
         XCTAssertEqual(terminated["ok"] as? Bool, true)
         XCTAssertEqual(terminated["pids"] as? [Int], [42])
+        // T25 rpc over the same managed WebSocket: the fixture echoes the method name.
+        XCTAssertEqual((discovery["commands"] as? [String: Bool])?["rpc"], true)
+        let searched = try await endpoint.request(["t": "rpc", "method": "apps.search", "params": ["query": "x"]])
+        XCTAssertEqual(searched["ok"] as? Bool, true)
+        XCTAssertEqual(searched["result"] as? String, "apps.search")
+        let undeclared = try await endpoint.request(["t": "rpc", "method": "clipboard.get"])
+        XCTAssertEqual(undeclared["code"] as? String, "capability_unavailable")
         XCTAssertEqual((discovery["api_commands"] as? [String: Bool])?["file_get"], true)
         let inline = try await endpoint.request(["t": "file_get", "transport": "api", "path": "/bytes/256"])
         XCTAssertEqual(inline["size"] as? Int, 256)

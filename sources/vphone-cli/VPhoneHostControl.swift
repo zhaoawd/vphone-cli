@@ -178,28 +178,28 @@ final class VPhoneHostControl {
         }
     }
 
-    // This box is written once before signal() and read only after wait().
-    private final class Reply: @unchecked Sendable { var data = Data() }
-
-    nonisolated static func handleClient(_ fd: Int32, service: VPhoneHostCommandService, clients: Clients? = nil) {
-        defer { if let clients { clients.closeClient(fd) } else { close(fd) } }
+    /// Reads one request on the calling worker thread, then returns that thread
+    /// while the command awaits on the main actor. The response is written and
+    /// the descriptor closed on another worker, so a slow command or a slow
+    /// peer holds only its own connection slot, not a thread or other clients.
+    nonisolated static func handleClient(_ fd: Int32, service: VPhoneHostCommandService, clients: Clients? = nil,
+                                         completion: (@Sendable () -> Void)? = nil) {
+        let finish: @Sendable (Data?) -> Void = { response in
+            if let response { HostControlIO.writeResponse(response + Data([10]), to: fd) }
+            if let clients { clients.closeClient(fd) } else { close(fd) }
+            completion?()
+        }
         let request: Data
         do {
-            guard let data = try HostControlIO.readRequest(fd) else { return }
+            guard let data = try HostControlIO.readRequest(fd) else { return finish(nil) }
             request = data
         } catch {
-            let response = VPhoneHostCommandExecutor.response(ok: false, error: "\(error)",
-                extra: ["code": (error as? HostControlIO.Failure)?.rawValue ?? "io_error"])
-            HostControlIO.writeResponse(response + Data([10]), to: fd)
-            return
+            return finish(VPhoneHostCommandExecutor.response(ok: false, error: "\(error)",
+                extra: ["code": (error as? HostControlIO.Failure)?.rawValue ?? "io_error"]))
         }
-        let reply = Reply()
-        let completed = DispatchSemaphore(value: 0)
         Task { @MainActor in
-            reply.data = await service.submit(request)
-            completed.signal()
+            let reply = await service.submit(request)
+            DispatchQueue.global(qos: .userInitiated).async { finish(reply) }
         }
-        completed.wait()
-        HostControlIO.writeResponse(reply.data + Data([10]), to: fd)
     }
 }

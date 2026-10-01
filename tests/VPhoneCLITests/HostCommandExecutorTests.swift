@@ -4,6 +4,26 @@ import XCTest
 import VPhoneCore
 @testable import vphone_cli
 
+/// Holds callers until opened; opening releases current and later waiters.
+@MainActor
+final class HostTestGate {
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+    private(set) var isOpen = false
+    private(set) var waiting = 0
+
+    func wait() async {
+        guard !isOpen else { return }
+        waiting += 1
+        await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func open() {
+        isOpen = true
+        for waiter in waiters { waiter.resume() }
+        waiters = []
+    }
+}
+
 @MainActor
 final class HostGuestFake: VPhoneHostGuest {
     var isConnected = true
@@ -16,12 +36,18 @@ final class HostGuestFake: VPhoneHostGuest {
     var cameraIDProvider: (() -> String)?
     var shellArgs: (String, String?, Int?)?
     var text: String?
+    var shellCalls = 0
+    var hidPresses: [UInt32] = []
+    /// When set, runShell waits for it, so a test can hold one command open.
+    var shellGate: HostTestGate?
     func check() throws { if let failure { throw failure } }
-    func sendHIDPress(page: UInt32, usage: UInt32) {}
+    func sendHIDPress(page: UInt32, usage: UInt32) { hidPresses.append(usage) }
     func clipboardSet(text: String) async throws { try check(); self.text = text }
     func runShell(command: String, cwd: String?, timeoutMs: Int?) async throws -> VPhoneControl.ShellResult {
         try check()
+        shellCalls += 1
         shellArgs = (command, cwd, timeoutMs)
+        await shellGate?.wait()
         return .init(stdout: "out", stderr: "err", exitCode: 7, timedOut: false, truncated: true)
     }
     func downloadFile(path: String) async throws -> Data { try check(); return Data([0, 255, 10]) }

@@ -13,14 +13,18 @@ final class VPhoneHostCommandExecutor {
     private let cameraServer: (any VPhoneHostCamera)?
     private let locationProvider: (any VPhoneHostLocation)?
     private let screen: (any VPhoneHostScreen)?
+    private let target: VPhoneHostTarget?
+    let inputQueue = VPhoneHostInputQueue()
 
     init(control: (any VPhoneHostGuest)? = nil,
          camera: (any VPhoneHostCamera)? = nil,
          location: (any VPhoneHostLocation)? = nil,
          screen: (any VPhoneHostScreen)? = nil,
          apiSession: (any VPhoneHostAPISession)? = nil,
-         bootMode: BootMode = .normal) {
+         bootMode: BootMode = .normal,
+         target: VPhoneHostTarget? = nil) {
         self.bootMode = bootMode
+        self.target = target
         self.apiSession = bootMode == .normal ? apiSession : nil
         self.control = bootMode == .normal ? control : nil
         cameraServer = bootMode == .normal ? camera : nil
@@ -36,6 +40,18 @@ final class VPhoneHostCommandExecutor {
     func execute(_ data: Data) async -> Data {
         guard let json = try? HostControlIO.decodeRequest(data), let type = json["t"] as? String else {
             return Self.response(ok: false, error: "invalid JSON", extra: ["code": "invalid_json"])
+        }
+        // Refuse before any command runs when the client expects another VM or
+        // an earlier boot of this one (stale socket path after a restart).
+        switch VPhoneHostTarget.check(json["target"], against: target) {
+        case .match: break
+        case .invalid:
+            return Self.response(ok: false, error: "target must be an object of vm, instance_id, pid, process_started_at",
+                                 extra: ["code": "invalid_argument"])
+        case .mismatch:
+            var extra: [String: Any] = ["code": "target_mismatch", "operation_may_continue": false]
+            if let target { extra["target"] = target.fields }
+            return Self.response(ok: false, error: "request target does not match this VM process", extra: extra)
         }
         guard bootMode != .dfu || type == "capabilities" else {
             return Self.response(ok: false, error: "command unavailable in DFU mode",
@@ -53,6 +69,9 @@ final class VPhoneHostCommandExecutor {
             return Self.response(ok: false, error: "delay must be between 0 and 60000 ms", extra: ["code": "invalid_argument"])
         }
         if Task.isCancelled { return Self.response(ok: false, error: "command cancelled", extra: ["code": "command_cancelled"]) }
+        if type == "rpc" {
+            return await forward(json, screenDelay: screenDelay)
+        }
         if let transport = json["transport"] {
             guard let name = transport as? String, ["classic", "api"].contains(name) else {
                 return Self.response(ok: false, error: "invalid transport", extra: ["code": "invalid_argument"])
@@ -109,7 +128,13 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no active VM view"
                     return
                 }
-                guard await screen.tap(x: x, y: y) else {
+                let injected = await inputQueue.run(cancelled: Bool?.none) { await screen.tap(x: x, y: y) }
+                guard let injected else {
+                    result.error = "command cancelled"
+                    result.code = "command_cancelled"
+                    return
+                }
+                guard injected else {
                     result.error = "gesture queue is full"
                     result.code = "gesture_busy"
                     return
@@ -141,10 +166,15 @@ final class VPhoneHostCommandExecutor {
                     result.error = "no active VM view"
                     return
                 }
-                guard await screen.swipe(
-                    fromX: x1, fromY: y1, toX: x2, toY: y2,
-                    durationMs: durationMs
-                ) else {
+                let injected = await inputQueue.run(cancelled: Bool?.none) {
+                    await screen.swipe(fromX: x1, fromY: y1, toX: x2, toY: y2, durationMs: durationMs)
+                }
+                guard let injected else {
+                    result.error = "command cancelled"
+                    result.code = "command_cancelled"
+                    return
+                }
+                guard injected else {
                     result.error = "gesture queue is full"
                     result.code = "gesture_busy"
                     return
@@ -173,7 +203,14 @@ final class VPhoneHostCommandExecutor {
             default: nil
             }
             guard let key = hidKey else {
-                return Self.response(ok: false, error: "unknown key: \(name)")
+                // Keyboard names and modifier combinations (return, cmd+v) are
+                // served by the API daemon's input.key; without an API session
+                // the classic channel has only the four hardware keys.
+                guard apiSession != nil, json["transport"] as? String != "classic" else {
+                    return Self.response(ok: false, error: "unknown key: \(name)")
+                }
+                return await forward(["method": "input.key", "params": ["name": name]],
+                                     screenDelay: screenDelay, wantScreen: wantScreen)
             }
             let result = ResultBox()
 
@@ -182,14 +219,24 @@ final class VPhoneHostCommandExecutor {
                     result.error = "guest not connected"
                     return
                 }
-                ctl.sendHIDPress(page: key.page, usage: key.usage)
+                let sent = await inputQueue.run(cancelled: false) {
+                    ctl.sendHIDPress(page: key.page, usage: key.usage)
+                    return true
+                }
+                guard sent else {
+                    result.error = "command cancelled"
+                    result.code = "command_cancelled"
+                    return
+                }
                 result.ok = true
                 if wantScreen {
                     try? await Task.sleep(nanoseconds: UInt64(screenDelay) * 1_000_000)
                     result.imageBase64 = await captureCompactScreenshot()
                 }
             }()
-            return Self.response(ok: result.ok, error: result.error, image: result.imageBase64)
+            var keyExtra: [String: Any] = [:]
+            if let code = result.code { keyExtra["code"] = code }
+            return Self.response(ok: result.ok, error: result.error, image: result.imageBase64, extra: keyExtra)
 
         case "type":
             guard let text = json["text"] as? String else {
@@ -964,7 +1011,63 @@ final class VPhoneHostCommandExecutor {
             result["api_session"] = snapshot
             result["api_commands"] = VPhoneHostAPICommands.capabilities(apiSession)
         }
+        let rpcMethods = VPhoneHostRPC.availableMethods(apiSession)
+        commands["rpc"] = !rpcMethods.isEmpty
+        result["commands"] = commands
+        result["rpc_methods"] = rpcMethods
+        if let target { result["target"] = target.fields }
         return result
+    }
+
+    // MARK: - Method Forwarding
+
+    /// `{"t":"rpc","method":...,"params":{...}}` through the API session. Only
+    /// methods in `VPhoneHostRPC.methods` whose capability the guest declared
+    /// are called; input methods wait for earlier socket input.
+    private func forward(_ json: [String: Any], screenDelay: Int, wantScreen: Bool? = nil) async -> Data {
+        let plan: VPhoneHostRPC.Plan
+        switch VPhoneHostRPC.plan(json) {
+        case let .success(value):
+            plan = value
+        case .failure(.invalidArgument):
+            return Self.response(ok: false, error: "rpc requires a method string and an optional params object",
+                                 extra: ["code": "invalid_argument"])
+        case .failure(.unsupportedTransport):
+            return Self.response(ok: false, error: "rpc is served only by the API transport",
+                                 extra: ["code": "unsupported_transport"])
+        case .failure(.unsupportedMethod):
+            return Self.response(ok: false, error: "method is not forwarded by this host",
+                                 extra: ["code": "unsupported_method", "method": json["method"] ?? ""])
+        case let .failure(.notForwardable(reason)):
+            return Self.response(ok: false, error: reason,
+                                 extra: ["code": "method_not_forwardable", "method": json["method"] ?? ""])
+        }
+        let session = apiSession
+        let outcome: Result<Data, VPhoneHostRPC.Failure>
+        if plan.entry.input {
+            outcome = await inputQueue.run(cancelled: .failure(.init(code: "command_cancelled"))) {
+                await VPhoneHostRPC.call(plan, session: session)
+            }
+        } else {
+            outcome = await VPhoneHostRPC.call(plan, session: session)
+        }
+        switch outcome {
+        case let .failure(failure):
+            var extra = failure.fields
+            extra["method"] = plan.method
+            return Self.response(ok: false, error: failure.code, extra: extra)
+        case let .success(data):
+            guard let value = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) else {
+                return Self.response(ok: false, error: "api_protocol",
+                                     extra: ["code": "api_protocol", "operation_may_continue": true, "method": plan.method])
+            }
+            var image: String?
+            if wantScreen ?? (json["screen"] as? Bool ?? false), !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(screenDelay))
+                image = await captureCompactScreenshot()
+            }
+            return Self.response(ok: true, image: image, extra: ["method": plan.method, "result": value])
+        }
     }
 
     /// Command-local state, confined to the main actor.
