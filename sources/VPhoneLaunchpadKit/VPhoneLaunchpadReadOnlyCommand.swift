@@ -45,6 +45,16 @@ public struct VPhoneLaunchpadReadOnlyCommand: Equatable, Sendable {
         return Self(.coreBundleVerify, ["core-bundle", "verify", "--version", version])
     }
 
+    /// doctor's exit status when its worst finding is a warning (0 ok,
+    /// 3 warning, 4 unknown, 5 error).
+    public static let doctorWarningStatus: Int32 = 3
+
+    /// Exit statuses Recent Commands shows as a warning rather than a
+    /// failure: doctor's 3. Every other non-zero status is a failure.
+    public var warningStatuses: Set<Int32> {
+        kind == .doctor ? [Self.doctorWarningStatus] : []
+    }
+
     /// True only for the exact argument shapes the factories produce.
     public static func isAllowed(_ arguments: [String]) -> Bool {
         switch arguments.count {
@@ -78,7 +88,7 @@ public extension VPhoneLaunchpadCommandLine {
             throw VPhoneLaunchpadError("Refused a command outside the read-only list.",
                                        detail: Self.display(command.arguments))
         }
-        return try await run(command.arguments)
+        return try await run(command.arguments, warningStatuses: command.warningStatuses)
     }
 }
 

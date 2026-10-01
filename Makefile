@@ -77,8 +77,10 @@ help:
 	@echo "  make build                   Build + sign the complete vphone-cli.app"
 	@echo "  make helper_candidate        Build isolated helper; requires signing team/identity for registration"
 	@echo "  make check_bundle            Verify complete resources, signature and entitlements"
-	@echo "  make launchpad               Build vphone-cli.app, then assemble .build/vphone-launchpad.app around it (read-only, B1)"
+	@echo "  make launchpad               Build vphone-cli.app, then assemble .build/vphone-launchpad.app around it (T26)"
 	@echo "  make check_launchpad         Verify Launchpad Info.plist, embedded toolchain cdhashes, signature, languages"
+	@echo "  make test_launchpad_cli      Run Launchpad tests against its embedded vphone-cli (offline/read-only, temporary"
+	@echo "                               library roots; needs make launchpad; not part of make test or CI)"
 	@echo "  make vphoned                 Cross-compile + sign vphoned for iOS"
 	@echo "  make clean                   Remove build/tooling artifacts only"
 	@echo "    Options: CLEAN_VM=1        Also remove VM_DIR=$(VM_DIR) after confirmation"
@@ -288,6 +290,13 @@ launchpad: bundle
 check_launchpad:
 	python3 $(SCRIPTS)/check_launchpad_bundle.py $(LAUNCHPAD_APP) --reference $(BUNDLE)
 	python3 $(SCRIPTS)/check_launchpad_strings.py
+
+# RealCLIEditTests and RealCLICreateTests with the app's embedded vphone-cli:
+# offline edits and read-only create commands in temporary library roots.
+# Not part of `test`, `test_swift` or CI; build with `make launchpad` first.
+.PHONY: test_launchpad_cli
+test_launchpad_cli:
+	zsh $(SCRIPTS)/run_launchpad_cli_tests.sh
 
 # Build the isolated upstream API daemon; never selects it for VM installation.
 .PHONY: daemon_api_build

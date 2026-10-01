@@ -35,7 +35,9 @@ struct VPhoneLaunchpadCommandHistoryView: View {
     private var table: some View {
         Table(entries, selection: $selection) {
             TableColumn(Text(verbatim: "")) { entry in
-                VPhoneLaunchpadStatusIcon(status: entry.status.map { $0 == 0 ? .passed : .failed } ?? .running)
+                // doctor exit 3 (worst finding a warning) is amber; any
+                // other non-zero status is red.
+                VPhoneLaunchpadStatusIcon(status: Self.status(entry.outcome))
                     .help(entry.status.map { Text("Exit status \($0)") } ?? Text("Running"))
             }
             .width(16)
@@ -60,6 +62,15 @@ struct VPhoneLaunchpadCommandHistoryView: View {
         .onCopyCommand {
             let text = commands(selection)
             return text.isEmpty ? [] : [NSItemProvider(object: text as NSString)]
+        }
+    }
+
+    static func status(_ outcome: VPhoneLaunchpadCommandOutcome) -> VPhoneLaunchpadStatus {
+        switch outcome {
+        case .running: .running
+        case .succeeded: .passed
+        case .warning: .warning
+        case .failed: .failed
         }
     }
 

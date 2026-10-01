@@ -61,6 +61,10 @@ struct VPhoneLaunchpadMachinesView: View {
         return matching.sorted(using: sortOrder)
     }
 
+    private var minimumWidth: CGFloat {
+        Column.tableWidth(spansLibraries: library.spansLibraries) + (showsInspector ? Column.inspector : 0)
+    }
+
     var body: some View {
         @Bindable var library = library
         Group {
@@ -72,6 +76,9 @@ struct VPhoneLaunchpadMachinesView: View {
                 table(selection: $library.selection)
             }
         }
+        // At least as wide as the columns (B2: with the inspector open the
+        // table scrolled sideways and cut off Disk).
+        .frame(minWidth: Column.tableWidth(spansLibraries: library.spansLibraries))
         // A hidden machine stays out of the selection, so Start, Stop and the
         // inspector act only on rows the table shows.
         .onChange(of: filter) {
@@ -92,11 +99,15 @@ struct VPhoneLaunchpadMachinesView: View {
                     ContentUnavailableView("No Selection", systemImage: "iphone")
                 }
             }
-            .inspectorColumnWidth(min: 300, ideal: 360, max: 520)
+            .inspectorColumnWidth(min: Column.inspector, ideal: 360, max: 520)
             .fontDesign(.monospaced)
             // The toggle belongs to the inspector's own toolbar section.
             .toolbar { inspectorToolbar }
         }
+        // The window's minimum is the columns plus the inspector, and a
+        // narrower window grows to it.
+        .preference(key: VPhoneLaunchpadMinimumWidthKey.self, value: minimumWidth)
+        .background(VPhoneLaunchpadWindowMinimumWidth(width: minimumWidth))
         .toolbar { toolbar }
         .sheet(item: $sheet, onDismiss: sheetDidDismiss) { sheet in
             sheetContent(sheet)
@@ -286,7 +297,7 @@ struct VPhoneLaunchpadMachinesView: View {
     private func table(selection: Binding<Set<MachinePath>>) -> some View {
         Table(rows, selection: selection, sortOrder: $sortOrder) {
             TableColumn("Name", value: \.name)
-                .width(min: 90, ideal: 110)
+                .width(min: 80, ideal: Column.name)
             if library.spansLibraries {
                 TableColumn("Location", value: \.libraryRoot) { machine in
                     Text(verbatim: VPhoneLaunchpadMachineLocations.volumeName(machine.libraryRoot))
@@ -295,12 +306,12 @@ struct VPhoneLaunchpadMachinesView: View {
                         .help(Text(verbatim: VPhoneLaunchpadMachineLocations.abbreviated(
                             URL(fileURLWithPath: machine.libraryRoot, isDirectory: true))))
                 }
-                .width(min: 80, ideal: 110)
+                .width(min: 70, ideal: Column.location)
             }
             TableColumn("iOS", value: \.iosVersion) { machine in
                 Text(verbatim: machine.restoreInfo.map { "\($0.ios.version) (\($0.ios.build))" } ?? "—")
             }
-            .width(min: 110, ideal: 120)
+            .width(min: 100, ideal: Column.ios)
             TableColumn("State") { machine in
                 VPhoneLaunchpadMachineStateLabel(
                     state: library.state(of: machine.path),
@@ -309,19 +320,19 @@ struct VPhoneLaunchpadMachinesView: View {
                     indeterminate: library.isExporting(machine.path)
                 )
             }
-            .width(min: 150, ideal: 160)
+            .width(min: 120, ideal: Column.state)
             TableColumn("CPU", value: \.cpuCount) { machine in
                 Text(verbatim: "\(machine.cpuCount)").monospacedDigit()
             }
-            .width(40)
+            .width(Column.cpu)
             TableColumn("Memory", value: \.memoryMB) { machine in
                 Text(verbatim: Self.memory(machine.memoryMB)).monospacedDigit()
             }
-            .width(72)
+            .width(Column.memory)
             TableColumn("Disk", value: \.diskSizeBytes) { machine in
                 Text(verbatim: Self.disk(machine.diskSizeBytes)).monospacedDigit()
             }
-            .width(72)
+            .width(Column.disk)
         }
         .contextMenu(forSelectionType: MachinePath.self) { paths in
             machineActions(library.machines.filter { paths.contains($0.path) })
@@ -439,6 +450,35 @@ struct VPhoneLaunchpadMachinesView: View {
         case "deleteAll": sheet = .delete(all.map(\.path))
         case "creationSheet", "resumeSheet": sheet = .creation(first.path)
         default: break
+        }
+    }
+
+    // MARK: - Column widths
+
+    /// The table lays its columns out at their ideal widths and scrolls
+    /// sideways rather than shrink them (B2 screenshot at 1100 pt, B6
+    /// baseline at 900 pt with the inspector open). The list therefore asks
+    /// for at least the sum of those widths, and the window's minimum adds
+    /// the inspector's, so the window grows instead of the table scrolling.
+    enum Column {
+        static let name: CGFloat = 110
+        static let location: CGFloat = 90
+        static let ios: CGFloat = 110
+        static let state: CGFloat = 140
+        static let cpu: CGFloat = 40
+        static let memory: CGFloat = 72
+        static let disk: CGFloat = 72
+        /// The inspector column's minimum.
+        static let inspector: CGFloat = 300
+        /// Per column: the cell spacing measured in the B6 baseline
+        /// screenshot (header text 127 pt apart for 110 pt columns).
+        static let spacing: CGFloat = 17
+        /// Leading and trailing inset around the columns.
+        static let inset: CGFloat = 24
+
+        static func tableWidth(spansLibraries: Bool) -> CGFloat {
+            let widths = [name, ios, state, cpu, memory, disk] + (spansLibraries ? [location] : [])
+            return widths.reduce(0, +) + spacing * CGFloat(widths.count) + inset
         }
     }
 

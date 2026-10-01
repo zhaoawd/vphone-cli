@@ -57,6 +57,16 @@ public struct VPhoneLaunchpadCommandResult: Sendable {
 
 // MARK: - History
 
+/// How Recent Commands shows a command's exit status.
+public enum VPhoneLaunchpadCommandOutcome: Equatable, Sendable {
+    case running
+    case succeeded
+    /// A non-zero status the command defines as a warning (`doctor` exits 3
+    /// when its worst finding is a warning).
+    case warning
+    case failed
+}
+
 /// Every command Launchpad runs, shown so it can be copied into a terminal
 /// (Recent Commands). The periodic `vm list` is not recorded.
 @MainActor
@@ -66,15 +76,29 @@ public final class VPhoneLaunchpadCommandHistory {
         public let id = UUID()
         public let date = Date()
         public let text: String
+        /// Non-zero statuses that mean "finished with warnings", not failure.
+        public var warningStatuses: Set<Int32> = []
         public var status: Int32?
+
+        /// Running until it exits; 0 succeeded; a warning status is a
+        /// warning; any other status failed.
+        public var outcome: VPhoneLaunchpadCommandOutcome {
+            guard let status else {
+                return .running
+            }
+            if status == 0 {
+                return .succeeded
+            }
+            return warningStatuses.contains(status) ? .warning : .failed
+        }
     }
 
     public private(set) var entries: [Entry] = []
 
     public init() {}
 
-    public func record(_ text: String) -> UUID {
-        let entry = Entry(text: text)
+    public func record(_ text: String, warningStatuses: Set<Int32> = []) -> UUID {
+        let entry = Entry(text: text, warningStatuses: warningStatuses)
         entries.append(entry)
         if entries.count > 200 {
             entries.removeFirst(entries.count - 200)
@@ -120,12 +144,14 @@ public struct VPhoneLaunchpadCommandLine {
 
     /// Runs to completion. Cancelling the calling task sends SIGINT to this
     /// child. `onLine` runs on the reader thread, never on the main actor.
+    /// `warningStatuses` only changes how Recent Commands shows the exit.
     public func run(
         _ arguments: [String],
         recordInHistory: Bool = true,
+        warningStatuses: Set<Int32> = [],
         onLine: (@Sendable (String) -> Void)? = nil
     ) async throws -> VPhoneLaunchpadCommandResult {
-        let entry = recordInHistory ? history.record(Self.display(arguments)) : nil
+        let entry = recordInHistory ? history.record(Self.display(arguments), warningStatuses: warningStatuses) : nil
         let collector = VPhoneLaunchpadLineCollector()
         let child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments) { line in
             collector.append(line)

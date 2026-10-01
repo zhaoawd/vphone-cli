@@ -11,6 +11,8 @@ import VPhoneLaunchpadKit
 struct VPhoneLaunchpadHostSetupView: View {
     let host: VPhoneLaunchpadHostSetup
     @Environment(\.dismiss) private var dismiss
+    /// Launchpad's own setting (B6), not a host change.
+    @AppStorage(VPhoneLaunchpadMenuBar.key) private var showsInMenuBar = false
 
     var body: some View {
         VPhoneLaunchpadSheet(Text("Host Setup")) {
@@ -18,6 +20,7 @@ struct VPhoneLaunchpadHostSetupView: View {
                 summarySection
                 helperSection
                 amfiSection
+                menuBarSection
                 findingSections
             }
             .formStyle(.grouped)
@@ -149,6 +152,18 @@ struct VPhoneLaunchpadHostSetupView: View {
             Text("Privileged helper")
         } footer: {
             Text(verbatim: VPhoneLaunchpadDeferral.helperRegistration)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - Menu bar
+
+    /// Upstream places this toggle in Host Setup too.
+    private var menuBarSection: some View {
+        Section {
+            Toggle("Keep in Menu Bar", isOn: $showsInMenuBar)
+        } footer: {
+            Text("Closing the window keeps Launchpad in the menu bar, where you can start and stop machines. The Dock icon appears only while a window or the menu is open.")
                 .foregroundStyle(.secondary)
         }
     }

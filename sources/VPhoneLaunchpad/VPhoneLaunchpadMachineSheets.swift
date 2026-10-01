@@ -323,8 +323,17 @@ struct VPhoneLaunchpadDeleteView: View {
         } actions: {
             Button("Cancel") { dismiss() }
                 .keyboardShortcut(.cancelAction)
-            Button("Delete", role: .destructive) { delete() }
-                .disabled(commands.contains { $0 == nil })
+            // The destructive role drew no red (B3 screenshot), and a tinted
+            // prominent button draws grey in a window that is not key (B6
+            // smoke), so the title itself is red. No keyboard shortcut:
+            // Return does not delete.
+            Button(role: .destructive) {
+                delete()
+            } label: {
+                Text("Delete")
+                    .foregroundStyle(VPhoneLaunchpadTheme.failed)
+            }
+            .disabled(commands.contains { $0 == nil })
         }
         .frame(width: 560)
         .fixedSize(horizontal: false, vertical: true)

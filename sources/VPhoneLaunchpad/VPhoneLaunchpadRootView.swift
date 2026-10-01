@@ -5,6 +5,8 @@ import VPhoneLaunchpadKit
 
 struct VPhoneLaunchpadRootView: View {
     @Environment(VPhoneLaunchpadModel.self) private var model
+    /// The machine list's minimum width (B6), at least 720.
+    @State private var minimumWidth: CGFloat = 720
 
     var body: some View {
         @Bindable var panels = model.panels
@@ -13,7 +15,10 @@ struct VPhoneLaunchpadRootView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             VPhoneLaunchpadToolchainBar(state: model.toolchain)
         }
-        .frame(minWidth: 720, minHeight: 360)
+        .frame(minWidth: minimumWidth, minHeight: 360)
+        .onPreferenceChange(VPhoneLaunchpadMinimumWidthKey.self) { width in
+            minimumWidth = max(720, width)
+        }
         .background(VPhoneLaunchpadTheme.background)
         .fontDesign(.monospaced)
         .navigationTitle("Machines")

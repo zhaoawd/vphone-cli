@@ -296,6 +296,37 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         for workflow in (ROOT / '.github/workflows').glob('*.yml'):
             self.assertNotIn('launchpad', workflow.read_text(), workflow.name)
         self.assertNotIn('launchpad', (ROOT / 'scripts/build.sh').read_text())
+        # B6: the embedded-CLI tests have their own target, outside `test` and `test_swift`.
+        self.assertRegex(makefile, r'\ntest_launchpad_cli:\n\tzsh \$\(SCRIPTS\)/run_launchpad_cli_tests\.sh\n')
+        for target in ('test', 'test_python', 'test_swift'):
+            recipe = re.search(rf'\n{target}:[^\n]*\n((?:\t[^\n]*\n)*)', makefile)
+            self.assertIsNotNone(recipe, target)
+            self.assertNotIn('launchpad', recipe.group(0), target)
+        self.assertNotIn('RealCLI', (ROOT / 'scripts/run_tests.py').read_text())
+
+    # B6: the menu bar menu opens the window, starts or stops a machine and quits.
+    MENU_BAR = ROOT / 'sources/VPhoneLaunchpad/VPhoneLaunchpadMenuBarMenu.swift'
+    MENU_BAR_KIT = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMenuBar.swift'
+
+    def test_b6_menu_bar_offers_only_open_start_stop_and_quit(self):
+        code = re.sub(r'//.*', '', self.MENU_BAR.read_text(encoding='utf-8'))
+        menu = code.split('struct VPhoneLaunchpadMenuBarMenu', 1)[1].split('enum VPhoneLaunchpadMainWindow', 1)[0]
+        self.assertEqual(sorted(set(re.findall(r'Button\("([^"]*)"', menu))),
+                         ['Open Launchpad', 'Quit', 'Start', 'Start Headless', 'Stop'])
+        self.assertEqual(re.findall(r'Button\((?!")', menu), [])
+        # Machine actions go through the library's menu entry point only.
+        self.assertEqual(re.findall(r'library\.(\w+)\(', menu), ['performMenuBarAction'])
+        for avoided in ('panels', 'sheet', 'present(', 'Edit', 'Create', 'import', 'Import', 'delete', 'export'):
+            self.assertNotIn(avoided, menu)
+        kit = re.sub(r'//.*', '', self.MENU_BAR_KIT.read_text(encoding='utf-8'))
+        perform = kit.split('func performMenuBarAction', 1)[1]
+        self.assertEqual(re.findall(r'\b(start|stop)\(([^)]*)\)', perform),
+                         [('start', 'machine'), ('start', 'machine, headless: true'), ('stop', 'machine')])
+        self.assertIn('guard canStop(machine) else', perform)
+        # Closing the last window quits unless menu bar mode is on.
+        app = (ROOT / 'sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift').read_text()
+        self.assertRegex(app, r'applicationShouldTerminateAfterLastWindowClosed\(_: NSApplication\) -> Bool \{\s*'
+                              r'VPhoneLaunchpadMenuBar\.terminatesAfterLastWindowClosed\(\)\s*\}')
 
 
 if __name__ == '__main__':
