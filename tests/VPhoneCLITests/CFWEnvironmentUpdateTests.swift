@@ -162,3 +162,48 @@ struct CFWEnvironmentElevatedCheckTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: base.path).isEmpty)
     }
 }
+
+/// Exercise stdout/stderr in a separate CLI process; the driver is a stand-in,
+/// so this check never elevates or opens a real VM disk.
+struct CFWEnvironmentOutputTests {
+    @Test func checkStdoutContainsOnlyJSON() throws {
+        let fm = FileManager.default
+        let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent()
+        let root = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? fm.removeItem(at: root) }
+        let scripts = root.appendingPathComponent("scripts")
+        let bundle = root.appendingPathComponent("library/testvm")
+        try fm.createDirectory(at: scripts, withIntermediateDirectories: true)
+        try fm.createDirectory(at: bundle, withIntermediateDirectories: true)
+        try VPhoneVirtualMachineManifest(cpuCount: 1, memorySize: 1024 * 1024,
+            romImages: .init(avpBooter: "rom", avpSEPBooter: "sep"))
+            .write(to: bundle.appendingPathComponent("config.plist"))
+        try "import sys; sys.exit(0)\n".write(to: scripts.appendingPathComponent("check_python_runtime.py"),
+                                             atomically: true, encoding: .utf8)
+        try #"""
+        #!/bin/zsh
+        set -euo pipefail
+        [[ "$1" == --check-environment && "$2" == --report ]]
+        print -r -- '{"exit_code":0,"error":null,"report":{"classification":"already_current"}}' > "$3"
+        """#.write(to: scripts.appendingPathComponent("cfw_install_host.sh"), atomically: true, encoding: .utf8)
+        let process = Process()
+        process.executableURL = repo.appendingPathComponent(".build/debug/vphone-cli")
+        process.arguments = ["cfw", "update-environment", "testvm", "--check", "-l",
+                             root.appendingPathComponent("library").path, "--project-root", root.path]
+        var env = ProcessInfo.processInfo.environment
+        env["VPHONE_PYTHON"] = repo.appendingPathComponent(".venv/bin/python3").path
+        process.environment = env
+        let stdout = Pipe(), stderr = Pipe()
+        process.standardOutput = stdout
+        process.standardError = stderr
+        try process.run()
+        process.waitUntilExit()
+        let output = stdout.fileHandleForReading.readDataToEndOfFile()
+        let errors = String(decoding: stderr.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        #expect(process.terminationStatus == 0, "\(errors)")
+        let report = try JSONSerialization.jsonObject(with: output) as? [String: Any]
+        #expect(report?["classification"] as? String == "already_current")
+        #expect(errors.contains("[cfw] the read-only check runs as root:"))
+    }
+}

@@ -302,3 +302,18 @@ Swift 命令环境同 `scripts/run_tests.py`（`--disable-sandbox --cache-path .
 - 只读复核：检查前后 `Disk.img` 的 inode/size/mtime（147451698 / 68719476736 / 1790859187）、身份文件 SHA-256、bundle 的 `ls -la` 列表均一致；`hdiutil info` 中无该磁盘，无 `vphone-env-check` 挂载与临时目录，脚本目录下无 root 所有的 `__pycache__`。
 - 发现的缺陷：`--check` 的 stdout 在 JSON 之前输出两行进度文字（`[*] read-only guest environment check as uid 0 ...` 与 `[cfw] the read-only check runs as root ...`），直接解析 stdout 会失败。应改为输出到 stderr。
 - 未覆盖：sudo 路径（非 root-popup）；`offline_update` 类在真实 VM 上的替换（需要带 v2 环境的 VM）。
+
+## 11. `--check` 输出修复（Codex，2026-10-01）
+
+问题：第 10 节记录的两行进度文字写入 stdout，使 JSON 解析失败。
+
+修改：`cfw_install_host.sh` 的检查进度使用 `>&2`；CLI 的提权提示写入 `FileHandle.standardError`。报告仍通过 stdout 输出。
+
+复现与验证：
+
+- 新增 `ElevatedCheckTests.test_check_progress_is_on_stderr_and_stdout_is_empty`。修改前检查退出 0，但 stdout 非空，断言失败。修改后 `make test_python`：559 项通过（139.884 秒）。
+- 新增 `CFWEnvironmentOutputTests.checkStdoutContainsOnlyJSON`。独立 CLI 进程运行，驱动为不提权的替身。修改前报告 JSON 解析报 `Invalid value around line 1, column 1`；修改后报告为 `already_current`，进度文字出现在 stderr。
+- `swift test --disable-sandbox --cache-path .build/test-cache --filter CFWEnvironment`：9 项测试通过。
+- `zsh -n scripts/cfw_install_host.sh`、`git diff --check`：通过。
+
+限制：未运行真实 sudo 或 root-popup，未挂载真实 VM 磁盘。Python 测试需要 `ps` 进程查询权限；受限运行先因该权限失败，获准运行后才取得上述修改前失败证据。

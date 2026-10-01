@@ -832,6 +832,18 @@ class ElevatedCheckTests(EnvironmentDriverFixture):
         self.assertEqual(os.listdir(self.caller), ['report.json'])
         return json.loads(self.report.read_text())
 
+    def test_check_progress_is_on_stderr_and_stdout_is_empty(self):
+        vm, _ = self.make_vm(self.offline_versions())
+        env = dict(self.env, TMPDIR=str(self.tmpdir), TEST_MOUNTS=str(self.mounts),
+                   VPHONE_GUEST_COMPONENTS=str(self.stage), **self.sudo_invoker())
+        proc = subprocess.run(['/bin/zsh', str(self.driver), '--check-environment',
+                               '--report', str(self.report), str(vm)], env=env,
+                              capture_output=True, text=True, timeout=60)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(proc.stdout, '')
+        self.assertIn('[*] read-only guest environment check as uid', proc.stderr)
+        self.assertEqual(json.loads(self.report.read_text())['report']['classification'], 'offline_update')
+
     def test_sudo_path_check_is_read_only_and_returns_the_report(self):
         vm, _ = self.make_vm(self.offline_versions())
         before = self.snapshot(vm)
