@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "vphone-cli",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v15),
     ],
@@ -12,6 +13,7 @@ let package = Package(
         .executable(name: "vphone-cli", targets: ["VPhoneCommandEntry"]),
         .executable(name: "vphone-vm", targets: ["VPhoneVMEntry"]),
         .executable(name: "vphone-helper", targets: ["VPhoneHelperEntry"]),
+        .executable(name: "vphone-launchpad", targets: ["VPhoneLaunchpad"]),
     ],
     dependencies: [
         .package(url: "https://github.com/Lakr233/AppleMobileDeviceLibrary.git",
@@ -148,6 +150,26 @@ let package = Package(
             name: "VPhoneCoreTests",
             dependencies: ["VPhoneCore"],
             path: "tests/VPhoneCoreTests"
+        ),
+        // Local Launchpad (T26). The Kit holds read-only data, process and
+        // toolchain code; the app is assembled by scripts/build_launchpad.sh.
+        .target(
+            name: "VPhoneLaunchpadKit",
+            dependencies: ["VPhoneCore"],
+            path: "sources/VPhoneLaunchpadKit",
+            linkerSettings: [.linkedFramework("Security")]
+        ),
+        .executableTarget(
+            name: "VPhoneLaunchpad",
+            dependencies: ["VPhoneLaunchpadKit"],
+            path: "sources/VPhoneLaunchpad",
+            resources: [.process("Localizable.xcstrings"), .process("InfoPlist.xcstrings")],
+            linkerSettings: [.linkedFramework("AppKit"), .linkedFramework("SwiftUI")]
+        ),
+        .testTarget(
+            name: "VPhoneLaunchpadKitTests",
+            dependencies: ["VPhoneLaunchpadKit", "VPhoneCore"],
+            path: "tests/VPhoneLaunchpadKitTests"
         ),
     ]
 )

@@ -23,7 +23,7 @@ def requirement(identifier):
     return f'anchor apple generic and identifier "{identifier}" and certificate leaf[subject.OU] = "{team}"'
 info = {'CFBundleIdentifier': label, 'CFBundleVersion': '1', 'CFBundleShortVersionString': '2.0.8',
         'VPhoneHelperSigningTeam': team, 'SMAuthorizedClients':
-        [requirement(name) for name in ['com.vphone.cli', 'com.vphone.launchpad']] if team else []}
+        [requirement(name) for name in ['com.vphone.cli', 'com.vphone.cli.launchpad']] if team else []}
 (stage/'Helper-Info.plist').write_bytes(plistlib.dumps(info))
 (stage/'Helper-Launchd.plist').write_bytes(plistlib.dumps({'Label': label, 'MachServices': {label: True}}))
 PY

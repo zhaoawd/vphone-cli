@@ -29,6 +29,37 @@ struct HelperConfigurationTests {
         #expect(throws: (any Error).self) { try VPhoneHelperConfiguration.fromClientInfo(client) }
     }
 
+    /// The local Launchpad (`com.vphone.cli.launchpad`) is an allowed client;
+    /// upstream `com.vphone.launchpad` is not.
+    @Test func allowedClientsAreTheCLIAndLocalLaunchpad() throws {
+        let configuration = try VPhoneHelperConfiguration(team: "ABCDEFGHIJ")
+        #expect(VPhoneHelperIdentity.clientIdentifiers == ["com.vphone.cli", "com.vphone.cli.launchpad"])
+        #expect(configuration.clientRequirements == [
+            "anchor apple generic and identifier \"com.vphone.cli\" and certificate leaf[subject.OU] = \"ABCDEFGHIJ\"",
+            "anchor apple generic and identifier \"com.vphone.cli.launchpad\" and certificate leaf[subject.OU] = \"ABCDEFGHIJ\"",
+        ])
+        #expect(!configuration.connectionRequirement.contains("\"com.vphone.launchpad\""))
+        var client: [String: Any] = ["VPhoneHelperSigningTeam": configuration.team,
+            "SMPrivilegedExecutables": [VPhoneHelperIdentity.label: configuration.helperRequirement]]
+        for identifier in VPhoneHelperIdentity.clientIdentifiers {
+            client["CFBundleIdentifier"] = identifier
+            #expect(try VPhoneHelperConfiguration.fromClientInfo(client).team == configuration.team)
+        }
+        for identifier in ["com.vphone.launchpad", "com.vphone.cli.launchpad.other", ""] {
+            client["CFBundleIdentifier"] = identifier
+            #expect(throws: (any Error).self) { try VPhoneHelperConfiguration.fromClientInfo(client) }
+        }
+        // Helper metadata listing the upstream Launchpad instead is refused.
+        let upstream = ["com.vphone.cli", "com.vphone.launchpad"].map {
+            "anchor apple generic and identifier \"\($0)\" and certificate leaf[subject.OU] = \"ABCDEFGHIJ\""
+        }
+        let info: [String: Any] = ["VPhoneHelperSigningTeam": configuration.team,
+                                   "CFBundleIdentifier": VPhoneHelperIdentity.label,
+                                   "CFBundleVersion": VPhoneHelperIdentity.protocolVersion,
+                                   "SMAuthorizedClients": upstream]
+        #expect(throws: (any Error).self) { try VPhoneHelperConfiguration.fromHelperInfo(info) }
+    }
+
     @Test func unrelatedCodeCannotSatisfyHelperIdentity() throws {
         let configuration = try VPhoneHelperConfiguration(team: "ABCDEFGHIJ")
         #expect(throws: (any Error).self) {

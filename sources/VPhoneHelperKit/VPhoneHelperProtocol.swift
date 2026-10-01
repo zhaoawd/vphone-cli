@@ -13,6 +13,10 @@ public enum VPhoneHelperIdentity {
     public static let label = "com.vphone.cli.helper"
     public static let privilegedRight = label + ".privileged"
     public static let protocolVersion = "1"
+    /// Bundle identifiers allowed to call the helper: the CLI app and the
+    /// local Launchpad. Upstream `com.vphone.launchpad` is deliberately not
+    /// among them; the local Launchpad uses its own identifier (T26).
+    public static let clientIdentifiers = ["com.vphone.cli", "com.vphone.cli.launchpad"]
 }
 
 /// No command, shell, executable path, AMFI or legacy CFW verb is exposed.
@@ -28,7 +32,7 @@ public struct VPhoneHelperConfiguration: Sendable {
     public let team: String
     public var helperRequirement: String { Self.requirement(identifier: VPhoneHelperIdentity.label, team: team) }
     public var clientRequirements: [String] {
-        ["com.vphone.cli", "com.vphone.launchpad"].map { Self.requirement(identifier: $0, team: team) }
+        VPhoneHelperIdentity.clientIdentifiers.map { Self.requirement(identifier: $0, team: team) }
     }
     public var connectionRequirement: String { clientRequirements.map { "(\($0))" }.joined(separator: " or ") }
 
@@ -53,7 +57,7 @@ public struct VPhoneHelperConfiguration: Sendable {
         let configuration = try Self(team: info["VPhoneHelperSigningTeam"] as? String ?? "")
         guard let requirements = info["SMPrivilegedExecutables"] as? [String: String],
               requirements[VPhoneHelperIdentity.label] == configuration.helperRequirement,
-              ["com.vphone.cli", "com.vphone.launchpad"].contains(info["CFBundleIdentifier"] as? String ?? "") else {
+              VPhoneHelperIdentity.clientIdentifiers.contains(info["CFBundleIdentifier"] as? String ?? "") else {
             throw VPhoneHelperError("Client metadata does not pin the expected signed helper.")
         }
         return configuration

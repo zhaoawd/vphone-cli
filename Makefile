@@ -77,6 +77,8 @@ help:
 	@echo "  make build                   Build + sign the complete vphone-cli.app"
 	@echo "  make helper_candidate        Build isolated helper; requires signing team/identity for registration"
 	@echo "  make check_bundle            Verify complete resources, signature and entitlements"
+	@echo "  make launchpad               Build vphone-cli.app, then assemble .build/vphone-launchpad.app around it (read-only, B1)"
+	@echo "  make check_launchpad         Verify Launchpad Info.plist, embedded toolchain cdhashes, signature, languages"
 	@echo "  make vphoned                 Cross-compile + sign vphoned for iOS"
 	@echo "  make clean                   Remove build/tooling artifacts only"
 	@echo "    Options: CLEAN_VM=1        Also remove VM_DIR=$(VM_DIR) after confirmation"
@@ -275,6 +277,17 @@ bundle:
 .PHONY: check_bundle
 check_bundle:
 	python3 $(SCRIPTS)/check_bundle.py $(BUNDLE)
+
+# Local Launchpad (T26). Not part of `build`; embeds the checked vphone-cli.app.
+LAUNCHPAD_APP := .build/vphone-launchpad.app
+
+.PHONY: launchpad check_launchpad
+launchpad: bundle
+	zsh $(SCRIPTS)/build_launchpad.sh
+
+check_launchpad:
+	python3 $(SCRIPTS)/check_launchpad_bundle.py $(LAUNCHPAD_APP) --reference $(BUNDLE)
+	python3 $(SCRIPTS)/check_launchpad_strings.py
 
 # Build the isolated upstream API daemon; never selects it for VM installation.
 .PHONY: daemon_api_build
