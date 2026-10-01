@@ -143,6 +143,9 @@ enum VPhoneNativeRestoreProcess {
             process.standardError = FileHandle.nullDevice
         }
         try process.run()
+        // vm create's cancellation also reaches the worker's descendants.
+        let untrack = VPhoneProcessRunner.track(process, arguments)
+        defer { untrack() }
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
         while process.isRunning, !cancelled.isCancelled, !shouldCancel(), ProcessInfo.processInfo.systemUptime < deadline {
             Thread.sleep(forTimeInterval: 0.05)

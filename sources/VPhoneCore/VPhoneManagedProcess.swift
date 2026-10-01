@@ -92,7 +92,38 @@ public final class VPhoneManagedProcess: @unchecked Sendable {
             }
         }
 
+        // Registered with vm create's cancellation as a VM process: on SIGINT
+        // it shuts the guest down, which takes longer than a tool's grace.
+        let registration = Registration()
+        process.terminationHandler = { _ in registration.end() }
         try process.run()
+        registration.begin(VPhoneProcessRunner.track(process, process.arguments ?? [], kind: .virtualMachine))
+    }
+
+    /// Unregisters once, whichever of `begin` (after `run`) and `end` (the
+    /// termination handler) comes last.
+    private final class Registration: @unchecked Sendable {
+        private let lock = NSLock()
+        private var untrack: (() -> Void)?
+        private var ended = false
+
+        func begin(_ untrack: @escaping () -> Void) {
+            let run: Bool = lock.withLock {
+                if ended { return true }
+                self.untrack = untrack
+                return false
+            }
+            if run { untrack() }
+        }
+
+        func end() {
+            let untrack: (() -> Void)? = lock.withLock {
+                ended = true
+                defer { self.untrack = nil }
+                return self.untrack
+            }
+            untrack?()
+        }
     }
 
     /// Poll (~50 ms) until a captured line matches `regex`, the process exits

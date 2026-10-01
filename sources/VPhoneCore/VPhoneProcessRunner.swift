@@ -33,6 +33,21 @@ public enum VPhoneProcessRunner {
         func take() -> Data { lock.lock(); defer { lock.unlock() }; return data }
     }
 
+    /// Registers a started child with `VPhoneChildCancellation.current` (bound
+    /// by `vm create`); returns the matching unregistration. Foundation starts
+    /// the child in a new process group, so a signal to this process's group
+    /// does not reach it; the controller forwards it.
+    public static func track(
+        _ process: Process, _ args: [String], kind: VPhoneChildCancellation.ChildKind = .tool
+    ) -> () -> Void {
+        guard let controller = VPhoneChildCancellation.current else { return {} }
+        let label = ([process.executableURL?.lastPathComponent ?? "child"]
+            + args.prefix(1).map { URL(fileURLWithPath: $0).lastPathComponent }).joined(separator: " ")
+        let token = controller.register(
+            pid: process.processIdentifier, label: label, kind: kind, isRunning: { process.isRunning })
+        return { controller.unregister(token) }
+    }
+
     /// Run `executable args` to completion, capturing stdout/stderr.
     /// Throws only if the process cannot be launched; a nonzero exit is
     /// returned in the result, not thrown.
@@ -82,7 +97,9 @@ public enum VPhoneProcessRunner {
         }
 
         try process.run()
+        let untrack = track(process, args)
         process.waitUntilExit()
+        untrack()
         group.wait()
 
         return VPhoneProcessResult(
@@ -114,6 +131,8 @@ public enum VPhoneProcessRunner {
         process.standardOutput = pipes[0]
         process.standardError = pipes[1]
         try process.run()
+        let untrack = track(process, process.arguments ?? [])
+        defer { untrack() }
         for pipe in pipes { try? pipe.fileHandleForWriting.close() }
         let deadline = ProcessInfo.processInfo.systemUptime + max(0, timeout)
         var output = [Data(), Data()]
@@ -267,7 +286,9 @@ public enum VPhoneProcessRunner {
         // When echo is true: no pipe redirection → child inherits our stdio (live streaming).
 
         try process.run()
+        let untrack = track(process, args)
         process.waitUntilExit()
+        untrack()
         return process.terminationStatus
     }
 
@@ -306,7 +327,11 @@ public enum VPhoneProcessRunner {
         if isatty(ttyFD) == 0 {
             let fd = open("/dev/tty", O_RDWR)
             guard fd >= 0 else {
-                try process.run(); process.waitUntilExit(); return process.terminationStatus
+                try process.run()
+                let untrack = track(process, args)
+                process.waitUntilExit()
+                untrack()
+                return process.terminationStatus
             }
             ttyFD = fd
             openedTTY = true
@@ -324,6 +349,8 @@ public enum VPhoneProcessRunner {
         }
 
         try process.run()
+        let untrack = track(process, args)
+        defer { untrack() }
         _ = tcsetpgrp(ttyFD, process.processIdentifier)   // hand the tty to the child
         process.waitUntilExit()
         if savedFg > 0 { _ = tcsetpgrp(ttyFD, savedFg) }  // take it back

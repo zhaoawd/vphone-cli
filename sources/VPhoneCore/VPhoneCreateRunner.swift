@@ -88,6 +88,9 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
     case stageFailed(stage: VPhoneCreateStage, detail: String)
     case stageCancelled(stage: VPhoneCreateStage, detail: String)
     case checkpointWriteFailed(write: String, original: String?)
+    /// SIGINT/SIGTERM stopped the run. The stage stays `running` in the
+    /// checkpoint, so the overall status is `interrupted` and resume reprobes it.
+    case interrupted(stage: VPhoneCreateStage, signal: Int32)
 
     public var description: String {
         switch self {
@@ -128,6 +131,9 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
             "stage \(stage.rawValue) cancelled: \(detail)"
         case let .checkpointWriteFailed(write, original):
             "checkpoint write failed: \(write)" + (original.map { " (while recording: \($0))" } ?? "")
+        case let .interrupted(stage, signal):
+            "interrupted by \(VPhoneChildCancellation.name(of: signal)) during stage \(stage.rawValue); "
+                + "the stage stays running in the checkpoint (overall: interrupted)"
         }
     }
 
@@ -142,7 +148,7 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
              .verificationFailed, .recoveryRequired, .optionsChanged, .toolChanged, .contractChanged,
              .invalidRestart, .sourceRequired:
             true
-        case .io, .artifactMissing, .stageFailed, .stageCancelled, .checkpointWriteFailed:
+        case .io, .artifactMissing, .stageFailed, .stageCancelled, .checkpointWriteFailed, .interrupted:
             false
         }
     }
@@ -206,6 +212,10 @@ public struct VPhoneCreateRunner {
     public var now: () -> Date
     public var log: (String) -> Void
     public var keepArtifacts: Bool
+    /// Signal-driven cancellation of the run (`vm create` binds one). Once it
+    /// is requested no further stage starts, and the stage that was running
+    /// is left `running` instead of being recorded as failed.
+    public var cancellation: VPhoneChildCancellation?
 
     public init(
         executor: any VPhoneCreateStageExecutor,
@@ -216,7 +226,8 @@ public struct VPhoneCreateRunner {
         bundleLockHeld: @escaping (URL) -> Bool = { VPhoneVMLockProbe.isLockHeld(directory: $0) },
         now: @escaping () -> Date = Date.init,
         log: @escaping (String) -> Void = { print($0) },
-        keepArtifacts: Bool = false
+        keepArtifacts: Bool = false,
+        cancellation: VPhoneChildCancellation? = nil
     ) {
         self.executor = executor
         self.verifier = verifier
@@ -227,6 +238,7 @@ public struct VPhoneCreateRunner {
         self.now = now
         self.log = log
         self.keepArtifacts = keepArtifacts
+        self.cancellation = cancellation
     }
 
     // MARK: Fresh create
@@ -457,12 +469,22 @@ public struct VPhoneCreateRunner {
             }
             checkpoint.updatedAt = started
             try commit(store, checkpoint, original: nil)
+            // A signal between stages stops here: the stage just recorded as
+            // running is the interrupted one.
+            if let signal = cancellation?.requestedSignal {
+                throw interrupt(store: store, checkpoint: &checkpoint, stage: stage, signal: signal)
+            }
             log("\n=== \(stage.rawValue) ===")
 
             let evidence: [String: String]
             do {
                 evidence = try executor.execute(stage, context: context(bundleURL: bundleURL, checkpoint: checkpoint, overrides: overrides))
             } catch {
+                // The failure is the signal's effect on the stage's children;
+                // the stage stays running (overall interrupted) for resume to reprobe.
+                if let signal = cancellation?.requestedSignal {
+                    throw interrupt(store: store, checkpoint: &checkpoint, stage: stage, signal: signal)
+                }
                 let cancelled = error is CancellationError
                 try recordFailure(
                     store: store, checkpoint: &checkpoint, stage: stage, overrides: overrides,
@@ -529,6 +551,30 @@ public struct VPhoneCreateRunner {
             try reclaimArtifacts(store: store, checkpoint: &checkpoint, overrides: overrides)
         }
         return checkpoint
+    }
+
+    /// Waits for every stage process to end, then notes the interruption on
+    /// the stage, which stays `running`: the overall status is `interrupted`
+    /// and resume reprobes the stage. The note is best effort.
+    private func interrupt(
+        store: VPhoneCreateCheckpointStore, checkpoint: inout VPhoneCreateCheckpoint, stage: VPhoneCreateStage,
+        signal: Int32
+    ) -> VPhoneCreateRunError {
+        let settled = cancellation?.settle() ?? true
+        let at = now()
+        let when = ISO8601DateFormatter().string(from: at)
+        checkpoint.update(stage) {
+            $0.error = "interrupted by \(VPhoneChildCancellation.name(of: signal)) at \(when); "
+                + (settled ? "every stage process ended before vm create exited"
+                    : "some stage processes were still running when vm create exited")
+        }
+        checkpoint.updatedAt = at
+        do {
+            try commit(store, checkpoint, original: "interruption of \(stage.rawValue)")
+        } catch {
+            log("[!] the interruption of \(stage.rawValue) could not be noted in the checkpoint: \(error)")
+        }
+        return .interrupted(stage: stage, signal: signal)
     }
 
     private func recordFailure(

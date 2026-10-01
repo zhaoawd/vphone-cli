@@ -144,7 +144,14 @@ public final class VPhoneCreateCheckpointStore {
         let data = try VPhoneCreateJSON.encoder.encode(checkpoint)
         let lock = try hooks.acquireBundleLock(bundleURL)
         defer { withExtendedLifetime(lock) {} }
-        try writeDurably(data, to: fileURL, checkpoint: checkpoint)
+        try Self.exitDeferred { try writeDurably(data, to: fileURL, checkpoint: checkpoint) }
+    }
+
+    /// A cancelled `vm create` that exits by itself waits for a write in
+    /// progress (`VPhoneChildCancellation.withExitDeferred`).
+    private static func exitDeferred(_ body: () throws -> Void) throws {
+        guard let cancellation = VPhoneChildCancellation.current else { return try body() }
+        try cancellation.withExitDeferred(body)
     }
 
     /// Keeps the previous checkpoint bytes before a new attempt replaces them.
@@ -158,7 +165,7 @@ public final class VPhoneCreateCheckpointStore {
         }
         let lock = try hooks.acquireBundleLock(bundleURL)
         defer { withExtendedLifetime(lock) {} }
-        try writeDurably(data, to: url, checkpoint: checkpoint)
+        try Self.exitDeferred { try writeDurably(data, to: url, checkpoint: checkpoint) }
         return relative
     }
 

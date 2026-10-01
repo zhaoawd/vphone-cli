@@ -385,7 +385,14 @@ fetch() {
     if is_local "$src"; then
         [[ -f "$src" ]] || die "Local IPSW not found: $src"
         echo "==> Copying ${src##*/} ..."
-        cp "$src" "$out"
+        # A local copy is never resumed: an interrupted copy must not be
+        # taken for the IPSW by the "already exists" check above.
+        remove_stale_partials "$out"
+        local partial
+        partial="$(partial_path "$out")"
+        rm -f "$partial"
+        cp "$src" "$partial"
+        mv -f "$partial" "$out"
     else
         echo "==> Downloading ${out##*/} ..."
         if ! download_file "$src" "$out"; then
@@ -395,16 +402,60 @@ fetch() {
     fi
 }
 
+# Partial outputs. A cancelled `vm create` ends this script and its children
+# (SIGINT, then SIGKILL), possibly mid-copy or mid-unzip. The IPSW cache is
+# shared between VMs and reused by name, so an interrupted write must never be
+# found under the final name: copies and extractions are written to
+# `.<name>.partial.<pid>` next to it and renamed into place only when complete.
+# A partial whose process no longer exists is removed on the next run.
+partial_path() {
+    local target="$1"
+    printf '%s/.%s.partial.%s\n' "${target%/*}" "${target##*/}" "$$"
+}
+
+remove_stale_partials() {
+    local target="$1" partial pid
+    shopt -s nullglob
+    for partial in "${target%/*}/.${target##*/}.partial."*; do
+        pid="${partial##*.}"
+        if [[ "$pid" =~ ^[0-9]+$ ]] && ps -p "$pid" >/dev/null 2>&1; then
+            continue
+        fi
+        echo "==> Removing interrupted ${partial##*/}"
+        rm -rf "$partial"
+    done
+    shopt -u nullglob
+}
+
+# An extracted cache is complete only with this marker, written last. A cache
+# directory without it (an unzip interrupted before this change, or one that
+# was not written by this script) is discarded and extracted again.
+EXTRACT_MARKER=".vphone-extract-complete"
+
 extract() {
     local zip="$1" cache="$2" out="$3"
-    if [[ -d "$cache" && -n "$(ls -A "$cache" 2>/dev/null)" ]]; then
+    remove_stale_partials "$cache"
+    if [[ -d "$cache" && ! -L "$cache" && -f "$cache/$EXTRACT_MARKER" ]]; then
         echo "==> Cached: ${cache##*/}"
     else
-        rm -rf "$cache"
+        if [[ -e "$cache" || -L "$cache" ]]; then
+            echo "==> Discarding incomplete extraction ${cache##*/} (no completion marker)"
+            rm -rf "$cache"
+        fi
         echo "==> Extracting ${zip##*/} ..."
-        mkdir -p "$cache"
-        unzip -oq "$zip" -d "$cache"
-        chmod -R u+w "$cache"
+        local partial
+        partial="$(partial_path "$cache")"
+        rm -rf "$partial"
+        mkdir -p "$partial"
+        unzip -oq "$zip" -d "$partial"
+        chmod -R u+w "$partial"
+        : > "$partial/$EXTRACT_MARKER"
+        # rename(2) publishes the whole tree at once and fails when another
+        # run published a non-empty cache meanwhile; that cache is then used.
+        if ! "$PYTHON3" -c 'import os, sys; os.rename(sys.argv[1], sys.argv[2])' "$partial" "$cache" 2>/dev/null; then
+            [[ -f "$cache/$EXTRACT_MARKER" ]] || die "cannot publish the extraction of ${zip##*/} as $cache"
+            rm -rf "$partial"
+        fi
     fi
     rm -rf "$out"
     echo "==> Cloning ${cache##*/} → ${out##*/} ..."
@@ -412,6 +463,7 @@ extract() {
     # second copy of the extracted IPSW (~11.5 GB for an iPhone restore).
     # cp falls back to copyfile(2) where the target cannot be cloned.
     cp -Rc "$cache" "$out"
+    rm -f "$out/$EXTRACT_MARKER"
 }
 
 download_apfs_sealvolume() {

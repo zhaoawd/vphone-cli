@@ -52,6 +52,28 @@ struct VPhoneVMCreateCommand: ParsableCommand {
     }
 
     func run() throws {
+        // SIGINT/SIGTERM (Ctrl-C, Launchpad's Stop Creating, which signals this
+        // process's group only) are forwarded to the stage's children; the
+        // running stage stays `running` (overall interrupted) and the command
+        // exits 128 + signal after every stage process has ended.
+        let cancellation = VPhoneChildCancellation()
+        cancellation.install()
+        do {
+            try VPhoneChildCancellation.$current.withValue(cancellation) { try runCreate() }
+            cancellation.complete()
+        } catch {
+            guard let signal = cancellation.requestedSignal else {
+                cancellation.complete()
+                throw error
+            }
+            cancellation.settle()
+            cancellation.complete()
+            FileHandle.standardError.write(Data("Error: \(error)\n".utf8))
+            throw ExitCode(128 + signal)
+        }
+    }
+
+    private func runCreate() throws {
         let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
         let selfExe = VPhoneResources.runningExecutable()
         let orchestrator = VPhoneCreateOrchestrator(

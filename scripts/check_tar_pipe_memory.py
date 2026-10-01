@@ -44,9 +44,14 @@ def main():
         main_swift = work / "main.swift"
         main_swift.write_text(HARNESS)
         binary = work / "relay"
+        # VPhoneProcessRunner registers its children with vm create's
+        # cancellation controller, which needs the process table and the
+        # shutdown grace; nothing else from VPhoneCore is compiled in.
+        sources = ["VPhoneProcessRunner.swift", "VPhoneChildCancellation.swift",
+                   "VPhoneProcessIdentity.swift", "VPhoneShutdownPolicy.swift"]
         subprocess.run([
             "swiftc", "-swift-version", "6", "-O",
-            str(ROOT / "sources/VPhoneCore/VPhoneProcessRunner.swift"),
+            *(str(ROOT / "sources/VPhoneCore" / name) for name in sources),
             str(main_swift), "-o", str(binary),
         ], check=True, timeout=120)
         failures = []

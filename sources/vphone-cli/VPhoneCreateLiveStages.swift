@@ -126,7 +126,11 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             return try orchestrator.runRestorePhase(bundleURL: bundleURL, verbosity: v, backend: options.effectiveRestoreBackend)
         case .cfw:
             print("[*] Waiting 5s for cleanup before CFW install...")
-            Thread.sleep(forTimeInterval: 5)
+            if let cancellation = VPhoneChildCancellation.current {
+                try cancellation.sleep(5)
+            } else {
+                Thread.sleep(forTimeInterval: 5)
+            }
             try orchestrator.runCFWInstall(options: options, runtime: runtime, bundleURL: bundleURL)
             return ["cfw_install_exit": "0"]
         case .firstBoot:

@@ -244,6 +244,8 @@ public struct VPhoneCreateOrchestrator {
                 bundleURL: bundle.url, options: effective,
                 iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource)
         } catch {
+            // Every stage process has exited before the hint says so.
+            VPhoneChildCancellation.current?.settle()
             let file = bundle.url.appendingPathComponent(VPhoneCreateCheckpointStore.directoryName)
                 .appendingPathComponent(VPhoneCreateCheckpointStore.fileName)
             if FileManager.default.fileExists(atPath: file.path) {
@@ -330,6 +332,7 @@ public struct VPhoneCreateOrchestrator {
                     overrides: overrides, restartFrom: options.restartFrom,
                     acceptToolChange: options.acceptToolChange))
         } catch {
+            VPhoneChildCancellation.current?.settle()
             Self.printRecoveryHint(name: options.name, bundleURL: bundleURL, error: error)
             throw error
         }
@@ -342,7 +345,7 @@ public struct VPhoneCreateOrchestrator {
         return VPhoneCreateRunner(
             executor: stages, verifier: stages, prober: VPhoneCreateLiveProber.live(resources: resources),
             toolFingerprint: { try? VPhoneCreateDigest.toolchain(cli: executable) },
-            keepArtifacts: runtime.keepArtifacts)
+            keepArtifacts: runtime.keepArtifacts, cancellation: VPhoneChildCancellation.current)
     }
 
     // MARK: - outcome
@@ -406,6 +409,13 @@ public struct VPhoneCreateOrchestrator {
                 "    and resume: vphone-cli vm create --resume \(name)",
             ]
             return lines
+        case let VPhoneCreateRunError.interrupted(stage, signal):
+            return [
+                "[-] vm create stopped by \(VPhoneChildCancellation.name(of: signal)) during \(stage.rawValue); "
+                    + "its processes have exited and \(stage.rawValue) stays running in the checkpoint "
+                    + "(overall: \(checkpoint?.overallStatus.rawValue ?? "interrupted")).",
+                inspect, resume,
+            ]
         case VPhoneCreateRunError.runInProgress:
             return [
                 "[-] vm create --resume refused: another vm create or resume of \(name) is running; \(unchanged).",
@@ -502,7 +512,7 @@ public struct VPhoneCreateOrchestrator {
                 "resume again with --iphone-source / --cloudos-source",
             ])
         case .runInProgress, .bundleBusy, .recoveryRequired, .io, .artifactMissing, .stageFailed, .stageCancelled,
-             .checkpointWriteFailed:
+             .checkpointWriteFailed, .interrupted:
             return nil
         }
     }
@@ -845,6 +855,7 @@ public struct VPhoneCreateOrchestrator {
         let predictionFile = bundleURL.appendingPathComponent("udid-prediction.txt")
         let deadline = Date().addingTimeInterval(wait)
         while !FileManager.default.fileExists(atPath: predictionFile.path), Date() < deadline {
+            try VPhoneChildCancellation.current?.throwIfRequested()
             Thread.sleep(forTimeInterval: 1)
         }
         guard FileManager.default.fileExists(atPath: predictionFile.path) else {
@@ -882,13 +893,18 @@ public struct VPhoneCreateOrchestrator {
         print("[*] Waiting for recovery/DFU endpoint...")
         let python = try resources.pythonExecutable()
         for _ in 1...90 {
+            try VPhoneChildCancellation.current?.throwIfRequested()
             let result = try? VPhoneProcessRunner.runCapturing(
                 python, [resources.pmd3Bridge.path, "recovery-probe", "--ecid", "0x\(ecid)", "--timeout", "2"])
             if result?.succeeded == true {
                 print("[+] Device endpoint is reachable")
                 return
             }
-            Thread.sleep(forTimeInterval: 2)
+            if let cancellation = VPhoneChildCancellation.current {
+                try cancellation.sleep(2)
+            } else {
+                Thread.sleep(forTimeInterval: 2)
+            }
         }
         trace("recovery-probe: exhausted 90 retries", v)
         throw VPhoneCreateError.recoveryTimeout
@@ -940,6 +956,21 @@ public struct VPhoneCreateOrchestrator {
         let args = [resources.cfwInstallHostScript.path, "--variant", options.variant, bundleURL.path]
         let invocation = Self.cfwInvocation(
             scriptEnv: scriptEnv, sudoEnvExtras: sudoEnvExtras, rootPopup: runtime.rootPopup)
+        // The driver runs as root: this process cannot signal it, and stopping
+        // its user-owned parent (osascript, sudo) would leave it running and
+        // holding the bundle lock. A cancellation waits for it to finish.
+        let code: Int32 = try VPhoneChildCancellation.deferring("the CFW install") {
+            try spawnCFWDriver(args: args, invocation: invocation, sudoEnvExtras: sudoEnvExtras, verbosity: v)
+        }
+        guard code == 0 else { throw VPhoneCreateError.cfwInstallFailed(code) }
+        print("[+] CFW installed (\(options.variant)).")
+        recordCFWVariant(options.variant, bundleURL: bundleURL)
+    }
+
+    private func spawnCFWDriver(
+        args: [String], invocation: (usePopup: Bool, env: [String: String]), sudoEnvExtras: [String: String],
+        verbosity v: VPhoneVerbosity
+    ) throws -> Int32 {
         let code: Int32
         if invocation.usePopup {
             trace("osascript admin-privileges /bin/zsh \(args.joined(separator: " "))", v)
@@ -962,8 +993,10 @@ public struct VPhoneCreateOrchestrator {
                     URL(fileURLWithPath: "/bin/zsh"), args, env: env, echo: v.showsToolDetail)
             }
         }
-        guard code == 0 else { throw VPhoneCreateError.cfwInstallFailed(code) }
-        print("[+] CFW installed (\(options.variant)).")
+        return code
+    }
+
+    private func recordCFWVariant(_ variant: String, bundleURL: URL) {
         // The install script released its lock on exit; take a fresh cfw-record
         // lock to record the variant (see recordVariant's doc). A busy lock only
         // skips the bookkeeping here; the cfw verifier then reports the missing record.
@@ -971,9 +1004,9 @@ public struct VPhoneCreateOrchestrator {
             try? VPhoneBundleGuard.withBundleLock(
                 directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
             ) { lock in
-                if let info = try? VPhoneRestoreInfo.recordVariant(options.variant, toBundle: bundle, holding: lock),
+                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock),
                    info.variant != nil {
-                    print("[+] Recorded variant \(options.variant), device \(info.device ?? "?")")
+                    print("[+] Recorded variant \(variant), device \(info.device ?? "?")")
                 }
             }
         }
