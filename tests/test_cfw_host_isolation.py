@@ -78,6 +78,8 @@ print -r -- "/dev/disk92s1 on $CFW_HOST_MNT/mnt1 (apfs, local)" > "$TEST_MOUNTS"
 print -r -- "/dev/disk93s1 on $CFW_HOST_MNT/mnt_sysos_hv_vmm (apfs, local)" >> "$TEST_MOUNTS"
 print -r -- '/dev/disk80s1 on /private/tmp/another-task/mnt1 (apfs, local)' >> "$TEST_MOUNTS"
 mkdir -p "$PWD/.cfw_temp/sub" "$PWD/cfw_input"
+print signed > "$PWD/.vphoned.signed"
+print -r -- "${SUDO_UID-<unset>} ${SUDO_USER-<unset>}" > "$PWD/installer-sudo-env"
 if [[ ${LINKED_ENTRIES:-0} == 1 ]]; then
   print plain > "$PWD/cfw_input/plain"
   ln "$PWD/Disk.img" "$PWD/cfw_input/linked"
@@ -98,13 +100,30 @@ exit ${INSTALL_EXIT:-0}
 ''')
         self.driver = scripts / 'cfw_install_host.sh'
 
-    def start(self, name='vm', variant='exp', **env):
+    # Variables the doubles and the driver need on the authentication-dialog
+    # path, where vphone-cli passes every variable inline (see bare_env).
+    INLINE_KEYS = ('TEST_LOG', 'VPHONE_PYTHON', 'VPHONE_KEEP_ARTIFACTS', 'TEST_PYTHON', 'TEST_TXN_HARNESS',
+                   'TEST_ATTACH_PLIST', 'ZDOTDIR')
+
+    def bare_env(self):
+        """Environment of `do shell script ... with administrator privileges`.
+
+        `--root-popup` elevates through osascript, whose shell starts with a
+        bare environment: no SUDO_USER/SUDO_UID/SUDO_GID and only the variables
+        vphone-cli writes inline (VPhoneProcessRunner.runWithAdminPrivileges).
+        """
+        env = {key: self.env[key] for key in self.INLINE_KEYS}
+        env['PATH'] = '/usr/bin:/bin:/usr/sbin:/sbin'
+        return env
+
+    def start(self, name='vm', variant='exp', bare=False, **env):
         vm = self.root / name
         vm.mkdir(exist_ok=True)
         if not (vm / 'Disk.img').exists():
             (vm / 'Disk.img').touch()
+        base = self.bare_env() if bare else self.env
         proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
-                                    env=dict(self.env, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
             try:
                 os.killpg(proc.pid, signal.SIGKILL)
@@ -163,7 +182,7 @@ class HostIsolationTests(HostDriverFixture):
         vm = self.root / 'vm'
         vm.mkdir()
         (vm / 'mount-table').write_text(f'/dev/disk81s1 on {vm.resolve()}/.cfw_temp/mnt_sysos_hv_vmm (apfs, local)\n')
-        _, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()))
+        _, proc = self.start(**self.sudo_invoker())
         rc, output = self.finish(proc)
         self.assertNotEqual(rc, 0, output)
         calls = (self.root / 'calls').read_text()
@@ -202,35 +221,138 @@ class HostIsolationTests(HostDriverFixture):
         self.assertNotIn('apfs_snap_rename.py', calls)
         self.assertTrue(list(vm.glob('.cfw_mount.*/attach.log')))
 
-    def chowned_paths(self):
+    OWNER = f'{os.getuid()}:{os.getgid()}'
+
+    def sudo_invoker(self, uid=None):
+        """Variables sudo sets for the re-executed driver (`make cfw_install`, or
+        vphone-cli's sudo path, which also passes VPHONE_INVOKER_UID/GID)."""
+        return dict(SUDO_USER='test-user', SUDO_UID=str(os.getuid() if uid is None else uid), SUDO_GID=str(os.getgid()))
+
+    def popup_invoker(self, uid=None):
+        """Variables vphone-cli writes inline on the --root-popup path. SUDO_USER
+        is forwarded for scripts/fetch_debs.sh; SUDO_UID and SUDO_GID are not."""
+        return dict(SUDO_USER='test-user', VPHONE_INVOKER_UID=str(os.getuid() if uid is None else uid),
+                    VPHONE_INVOKER_GID=str(os.getgid()))
+
+    def calls(self):
+        log = self.root / 'calls'
+        return log.read_text() if log.exists() else ''
+
+    def chowned_paths(self, owner=OWNER):
         paths = []
-        for line in (self.root / 'calls').read_text().splitlines():
+        for line in self.calls().splitlines():
             if line.startswith('chown '):
-                prefix = f'chown -h {os.getuid()} '
+                prefix = f'chown -h {owner} '
                 self.assertTrue(line.startswith(prefix), line)
                 # The stub logs "$*"; every argument is an absolute path.
                 paths += re.split(r' (?=/)', line[len(prefix):])
         return sorted(paths)
 
-    def test_ownership_restoration_never_recurses_over_bundle(self):
-        vm, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()))
-        rc, output = self.finish(proc)
-        self.assertEqual(rc, 0, output)
+    def returned_artifacts(self, vm, published=True):
+        """Every path the driver must hand back: install artifacts and the
+        archived transaction record, never the bundle root or Disk.img."""
         real = vm.resolve()
-        # T15: the transaction record and the previous Disk.img are kept in
-        # .cfw-history/<id>; the published Disk.img and the bundle root are not touched.
         record = next(vm.glob('.cfw-history/*')).name
         history = f'{real}/.cfw-history'
-        self.assertEqual(self.chowned_paths(), sorted([
-            f'{real}/.cfw_temp', f'{real}/.cfw_temp/sub', f'{real}/cfw_input', history,
-            f'{history}/{record}', f'{history}/{record}/Disk.img', f'{history}/{record}/transaction.json']))
-        self.assertNotIn('chown -R', (self.root / 'calls').read_text())
+        paths = [f'{real}/.vphoned.signed', f'{real}/.cfw_temp', f'{real}/.cfw_temp/sub', f'{real}/cfw_input',
+                 history, f'{history}/{record}', f'{history}/{record}/transaction.json']
+        if published:
+            # T15: the previous Disk.img is kept in the record directory.
+            paths.append(f'{history}/{record}/Disk.img')
+        return sorted(paths)
+
+    def test_ownership_restoration_never_recurses_over_bundle(self):
+        vm, proc = self.start(**self.sudo_invoker())
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        # The published Disk.img and the bundle root are not touched.
+        self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm))
+        self.assertNotIn('chown -R', self.calls())
         self.assertIn('restored ownership', output)
+
+    def test_root_popup_path_returns_artifacts_without_sudo_variables(self):
+        # The authentication dialog sets no SUDO_* variable; the uid and gid
+        # vphone-cli passes inline decide the owner.
+        vm, proc = self.start(bare=True, **self.popup_invoker())
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        self.assertEqual((vm / 'installer-sudo-env').read_text().strip(), '<unset> test-user')
+        self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm))
+        self.assertIn('restored ownership', output)
+        self.assertNotIn('NOT restored', output)
+
+    def test_explicit_invoker_takes_precedence_over_sudo(self):
+        vm, proc = self.start(**dict(self.sudo_invoker(uid=os.getuid() + 424242), **self.popup_invoker()))
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm))
+
+    def test_failed_install_returns_artifacts_on_both_elevation_paths(self):
+        for path, bare, invoker in (('sudo', False, self.sudo_invoker()), ('popup', True, self.popup_invoker())):
+            with self.subTest(path=path):
+                log = self.root / 'calls'
+                log.unlink(missing_ok=True)
+                vm, proc = self.start(f'vm-fail-{path}', bare=bare, INSTALL_EXIT='37', **invoker)
+                rc, output = self.finish(proc)
+                self.assertEqual(rc, 37, output)
+                # Nothing was published: the record holds transaction.json only.
+                self.assertFalse(list(vm.glob('.cfw-history/*/Disk.img')))
+                self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm, published=False))
+
+    def test_interrupted_install_returns_artifacts(self):
+        vm, proc = self.start(bare=True, INSTALL_SLEEP='30', **self.popup_invoker())
+        deadline = time.monotonic() + 15
+        while not (vm / 'ready').exists() and time.monotonic() < deadline:
+            time.sleep(0.02)
+        self.assertTrue((vm / 'ready').exists())
+        os.killpg(proc.pid, signal.SIGINT)
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 130, output)
+        self.assertEqual(self.chowned_paths(), self.returned_artifacts(vm, published=False))
+
+    def test_malformed_invoker_ids_are_refused_before_any_change(self):
+        cases = [
+            ('popup-uid-text', True, dict(VPHONE_INVOKER_UID='kolar', VPHONE_INVOKER_GID='20')),
+            ('popup-uid-negative', True, dict(VPHONE_INVOKER_UID='-1', VPHONE_INVOKER_GID='20')),
+            ('popup-uid-leading-zero', True, dict(VPHONE_INVOKER_UID='0501', VPHONE_INVOKER_GID='20')),
+            ('popup-gid-text', True, dict(VPHONE_INVOKER_UID=str(os.getuid()), VPHONE_INVOKER_GID='staff')),
+            ('sudo-uid-text', False, dict(SUDO_USER='test-user', SUDO_UID='501;id')),
+        ]
+        for name, bare, invoker in cases:
+            with self.subTest(case=name):
+                vm, proc = self.start(f'vm-{name}', bare=bare, **invoker)
+                rc, output = self.finish(proc)
+                self.assertEqual(rc, 2, output)
+                self.assertIn('refusing before any change', output)
+                self.assertNotIn('hdiutil attach', self.calls())
+                self.assertNotIn('chown ', self.calls())
+                self.assertFalse(list(vm.glob('.cfw_disk.*')) + list(vm.glob('.cfw_mount.*')))
+                self.assertFalse((vm / '.cfw-history').exists())
+
+    def test_root_invoker_leaves_owners_unchanged(self):
+        _, proc = self.start(bare=True, VPHONE_INVOKER_UID='0', VPHONE_INVOKER_GID='0')
+        rc, output = self.finish(proc)
+        self.assertEqual(rc, 0, output)
+        self.assertNotIn('chown ', self.calls())
+        self.assertIn('NOT restored: the invoker is root', output)
+
+    def test_invoker_that_does_not_own_the_bundle_receives_nothing(self):
+        # The uid is validated against the bundle directory's owner; the
+        # artifacts of another account's bundle are not given to the invoker.
+        for path, bare, invoker in (('sudo', False, self.sudo_invoker(uid=os.getuid() + 424242)),
+                                    ('popup', True, self.popup_invoker(uid=os.getuid() + 424242))):
+            with self.subTest(path=path):
+                _, proc = self.start(f'vm-other-{path}', bare=bare, **invoker)
+                rc, output = self.finish(proc)
+                self.assertEqual(rc, 0, output)
+                self.assertNotIn('chown ', self.calls())
+                self.assertIn(f'does not own', output)
+                self.assertIn('NOT restored', output)
 
     def test_ownership_restoration_skips_hard_links_and_symlinks(self):
         # Upstream VPhoneHostFilePermissions skips a regular file with more
         # than one link: it may name a file outside the VM directory.
-        vm, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()), LINKED_ENTRIES='1')
+        vm, proc = self.start(LINKED_ENTRIES='1', **self.sudo_invoker())
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
         real = vm.resolve()
@@ -243,23 +365,15 @@ class HostIsolationTests(HostDriverFixture):
         self.assertEqual(os.stat(previous).st_nlink, 2)
         self.assertNotIn(str(previous.resolve()), self.chowned_paths())
 
-    def test_ownership_restoration_leaves_third_account_entries(self):
-        # Entries owned by neither root nor the invoker keep their owner, and
-        # such a directory is not descended into.
-        _, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid() + 424242))
-        rc, output = self.finish(proc)
-        self.assertEqual(rc, 0, output)
-        self.assertNotIn('chown ', (self.root / 'calls').read_text())
-
-    def test_ownership_restoration_requires_numeric_invoker_uid(self):
+    def test_ownership_restoration_requires_a_known_invoker(self):
         _, proc = self.start(SUDO_USER='test-user')
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
-        self.assertNotIn('chown ', (self.root / 'calls').read_text())
-        self.assertIn('NOT restored: SUDO_UID is missing or not numeric', output)
+        self.assertNotIn('chown ', self.calls())
+        self.assertIn('NOT restored: invoker uid unknown', output)
 
     def test_late_mount_beneath_vm_only_skips_ownership_restore(self):
-        vm, proc = self.start(SUDO_USER='test-user', SUDO_UID=str(os.getuid()), LATE_MOUNT='1')
+        vm, proc = self.start(LATE_MOUNT='1', **self.sudo_invoker())
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
         calls = (self.root / 'calls').read_text()

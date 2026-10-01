@@ -17,7 +17,9 @@
 #
 # Usage: cfw_install_host.sh [--variant regular|dev|jb|exp] [vm_dir]
 # Runs as root (mount_apfs/chown/cp to owners-honored mounts); re-execs under
-# sudo automatically (honors SUDO_ASKPASS for non-interactive use).
+# sudo automatically (honors SUDO_ASKPASS for non-interactive use). Artifacts it
+# creates go back to VPHONE_INVOKER_UID[:VPHONE_INVOKER_GID] (set by vphone-cli)
+# or SUDO_UID[:SUDO_GID]; see the invoker block below.
 set -euo pipefail
 SCRIPT_DIR="${0:a:h}"
 PROJ="${SCRIPT_DIR:h}"
@@ -48,6 +50,43 @@ unset SUDO_ASKPASS   # already root: host_hdiutil/pre-step use plain sudo/hdiuti
 VM_DIR="$(cd "$VM_DIR" && pwd -P)"
 IMG="$VM_DIR/Disk.img"
 [[ -f "$IMG" && ! -L "$IMG" ]] || { echo "[-] no Disk.img (regular file) at $IMG" >&2; exit 1; }
+
+# The account the root-created artifacts are returned to. vphone-cli passes
+# VPHONE_INVOKER_UID/GID on both of its elevation paths: the sudo re-exec
+# (sudo -E keeps them) and --root-popup, whose `do shell script ... with
+# administrator privileges` shell has no SUDO_* variables. A direct sudo run
+# (make cfw_install) falls back to sudo's SUDO_UID/SUDO_GID. The value is
+# never derived from the bundle; it is only compared with the owner of the
+# bundle directory. A malformed value is refused before anything changes; a
+# root invoker, an unknown invoker or one that does not own the bundle leaves
+# every owner unchanged, with a warning.
+INVOKER_SOURCE="" INVOKER_UID="" INVOKER_GID="" INVOKER_GID_SOURCE=""
+if [[ -n "${VPHONE_INVOKER_UID:-}" ]]; then
+  INVOKER_SOURCE=VPHONE_INVOKER_UID INVOKER_UID="$VPHONE_INVOKER_UID"
+  INVOKER_GID_SOURCE=VPHONE_INVOKER_GID INVOKER_GID="${VPHONE_INVOKER_GID:-}"
+elif [[ -n "${SUDO_UID:-}" ]]; then
+  INVOKER_SOURCE=SUDO_UID INVOKER_UID="$SUDO_UID"
+  INVOKER_GID_SOURCE=SUDO_GID INVOKER_GID="${SUDO_GID:-}"
+fi
+DECIMAL_ID='^(0|[1-9][0-9]{0,9})$'
+if [[ -n "$INVOKER_SOURCE" && ! "$INVOKER_UID" =~ $DECIMAL_ID ]]; then
+  echo "[-] $INVOKER_SOURCE is not a decimal uid ('$INVOKER_UID'); refusing before any change" >&2
+  exit 2
+fi
+if [[ -n "$INVOKER_GID" && ! "$INVOKER_GID" =~ $DECIMAL_ID ]]; then
+  echo "[-] $INVOKER_GID_SOURCE is not a decimal gid ('$INVOKER_GID'); refusing before any change" >&2
+  exit 2
+fi
+INVOKER_OWNER="" HANDBACK_SKIP=""
+if [[ -z "$INVOKER_SOURCE" ]]; then
+  HANDBACK_SKIP="invoker uid unknown (neither VPHONE_INVOKER_UID nor SUDO_UID is set)"
+elif (( INVOKER_UID == 0 )); then
+  HANDBACK_SKIP="the invoker is root"
+elif [[ "$(/usr/bin/stat -f %u "$VM_DIR")" != "$INVOKER_UID" ]]; then
+  HANDBACK_SKIP="$INVOKER_SOURCE=$INVOKER_UID does not own $VM_DIR (owner uid $(/usr/bin/stat -f %u "$VM_DIR"))"
+else
+  INVOKER_OWNER="$INVOKER_UID${INVOKER_GID:+:$INVOKER_GID}"
+fi
 
 # Host-side install toolchain (gnu-tar/ipsw/aea/ldid/zstd + venv python).
 # VPHONE_PYTHON overrides the venv python (e.g. a bundled .app has no .venv);
@@ -93,12 +132,55 @@ assert_no_vm_mounts() {
 assert_no_vm_mounts
 
 # Only root's and the invoker's entries change owner; see the ownership note
-# near the end of this script.
+# above hand_back_artifacts.
 restore_invoker_ownership() {
   local target="$1"
-  find -x "$target" \( -type d ! -user 0 ! -user "$SUDO_UID" -prune \) -o \
-    \( \( -type d -o \( -type f -links 1 \) \) \( -user 0 -o -user "$SUDO_UID" \) \
-       -exec chown -h "$SUDO_UID" {} + \)
+  find -x "$target" \( -type d ! -user 0 ! -user "$INVOKER_UID" -prune \) -o \
+    \( \( -type d -o \( -type f -links 1 \) \) \( -user 0 -o -user "$INVOKER_UID" \) \
+       -exec chown -h "$INVOKER_OWNER" {} + \)
+}
+
+# The whole install runs as root (owners-honored mounts / chown / cp). Hand the
+# host-side artifacts it created (vm/.vphoned.signed, vm/.cfw_temp, extracted
+# cfw_input/cfw_jb_input, the .cfw-history transaction records, the vphoned
+# build) back to the invoking user on success, failure and interruption, so the
+# user can read and delete them (vm delete) and later user-run steps that
+# rewrite vm/.vphoned.signed don't hit "Permission denied".
+# A mount beneath the VM directory (a retained mount of a failed cleanup, or one
+# that appeared meanwhile) only downgrades this step to a warning; never chown
+# across it, and never fail the install here.
+# Only the owner changes; no mode is widened (upstream VPhoneHostFilePermissions
+# chmods 0777, which this project does not adopt): a transaction record
+# directory stays 0700, which its new owner can read and remove. As in
+# upstream's descriptor walk, the walk stays on one device (-x), follows no
+# symbolic link (find -P; chown -h never follows one either), changes only
+# directories and regular files with a single link, and only when root or the
+# invoker owns them. A hard link could name a file outside the VM directory,
+# and an entry of a third account is not the invoker's to receive; both keep
+# their owner, and a third account's directory is not descended into.
+hand_back_artifacts() {
+  local artifact failed=0
+  if [[ -z "$INVOKER_OWNER" ]]; then
+    echo "[!] ownership of host-side artifacts NOT restored: $HANDBACK_SKIP" >&2
+    return 0
+  fi
+  if ! assert_no_vm_mounts; then
+    echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $INVOKER_OWNER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input,.cfw-history}" >&2
+    return 0
+  fi
+  for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history; do
+    [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
+    restore_invoker_ownership "$VM_DIR/$artifact" || failed=1
+  done
+  if [[ -f "$PROJ/scripts/vphoned/vphoned" && ! -L "$PROJ/scripts/vphoned/vphoned" ]]; then
+    restore_invoker_ownership "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
+  fi
+  if (( failed )); then
+    echo "[!] ownership of some host-side artifacts NOT restored to uid $INVOKER_UID; inspect $VM_DIR" >&2
+  else
+    echo "[*] restored ownership of host-side artifacts to uid $INVOKER_UID (hard-linked files and other accounts' entries left as found)"
+  fi
+  return 0
 }
 
 # T15 disk transaction. This process holds a read-only descriptor on the
@@ -118,13 +200,9 @@ txn() {
 # Record an unpublished run: remove the copy (kept when its mounts could not be
 # released), verify the original, archive the record in .cfw-history.
 txn_abort() {
-  local code="$1" retain="$2" record
+  local code="$1" retain="$2"
   [[ "$TXN_STATE" != published && -d "$CFW_DISK_WORK" ]] || return 0
-  record=$(txn finish --exit-code "$code" ${retain:+--retain-staged}) || return 1
-  if [[ -n "${SUDO_USER:-}" && "${SUDO_UID:-}" =~ '^[0-9]+$' ]]; then
-    [[ "$record" == "$VM_DIR/.cfw-history/"* ]] && record="$VM_DIR/.cfw-history"
-    [[ -d "$record" && ! -L "$record" ]] && restore_invoker_ownership "$record"
-  fi
+  txn finish --exit-code "$code" ${retain:+--retain-staged} >/dev/null || return 1
   return 0
 }
 
@@ -219,6 +297,7 @@ finish() {
   if ! txn_abort "$original" "$retain"; then
     (( original != 0 )) || original=1
   fi
+  hand_back_artifacts || true
   exit "$original"
 }
 trap finish EXIT
@@ -275,37 +354,8 @@ if [[ -z "${VPHONE_KEEP_ARTIFACTS:-}" ]]; then
   rm -rf "${VM_DIR:?}/cfw_input" "${VM_DIR:?}/cfw_jb_input"
 fi
 
-# The whole install ran as root (owners-honored mounts / chown / cp). Hand the
-# host-side artifacts it created (vm/.vphoned.signed, vm/.cfw_temp, extracted
-# cfw_input/cfw_jb_input, the vphoned build) back to the invoking user, so the
-# subsequent user-run steps (make boot / setup_machine first boot, which rewrite
-# vm/.vphoned.signed) don't hit "Permission denied".
-# The install is complete and the snapshot flipped by now; a mount that
-# appeared beneath the VM directory meanwhile (not from this invocation, whose
-# mounts were released by cleanup) only downgrades the ownership step to a
-# warning. Never fail a finished install here, and never chown across it.
-# Only the owner changes; no mode is widened (upstream VPhoneHostFilePermissions
-# chmods 0777, which this project does not adopt). As in upstream's descriptor
-# walk, the walk stays on one device (-x), follows no symbolic link (find -P;
-# chown -h never follows one either), changes only directories and regular
-# files with a single link, and only when root or the invoker owns them. A
-# hard link could name a file outside the VM directory, and an entry of a third
-# account is not the invoker's to receive; both keep their owner, and a third
-# account's directory is not descended into.
-# restore_invoker_ownership is defined before the disk transaction starts.
-if [[ -n "${SUDO_USER:-}" ]]; then
-  if [[ ! "${SUDO_UID:-}" =~ '^[0-9]+$' ]]; then
-    echo "[!] ownership of host-side artifacts NOT restored: SUDO_UID is missing or not numeric" >&2
-  elif assert_no_vm_mounts; then
-    for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history; do
-      [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
-      restore_invoker_ownership "$VM_DIR/$artifact"
-    done
-    [[ -e "$PROJ/scripts/vphoned/vphoned" ]] && chown "$SUDO_USER" "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
-    echo "[*] restored ownership of host-side artifacts to $SUDO_USER (hard-linked files and other accounts' entries left as found)"
-  else
-    echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $SUDO_USER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input,.cfw-history}" >&2
-  fi
-fi
+# The install is complete and the snapshot flipped by now. The failure and
+# interruption paths hand back the same artifacts from the finish trap.
+hand_back_artifacts || true
 
 echo "[+] host-mode CFW install complete. Boot with: make boot"

@@ -896,6 +896,30 @@ public struct VPhoneCreateOrchestrator {
 
     // MARK: - CFW install
 
+    /// How the CFW host driver is elevated and which environment it gets.
+    ///
+    /// `--sudo-password` (askpass) wins over `--root-popup`. The popup's
+    /// `do shell script` shell starts with a bare environment, so `env` holds
+    /// only the script variables; the sudo path adds them to this process's
+    /// environment, which `sudo -E` keeps. Both carry the invoker's uid and
+    /// gid (`VPhoneInvoker`): sudo also sets SUDO_UID, the popup sets nothing.
+    /// SUDO_USER is forwarded on the popup path for scripts/fetch_debs.sh.
+    static func cfwInvocation(
+        scriptEnv: [String: String], sudoEnvExtras: [String: String], rootPopup: Bool,
+        processEnvironment: [String: String] = ProcessInfo.processInfo.environment,
+        invoker: [String: String] = VPhoneInvoker.environment(), userName: String = NSUserName()
+    ) -> (usePopup: Bool, env: [String: String]) {
+        var scriptEnv = scriptEnv.merging(invoker) { _, new in new }
+        if rootPopup && sudoEnvExtras["SUDO_ASKPASS"] == nil {
+            scriptEnv["SUDO_USER"] = userName
+            return (true, scriptEnv)
+        }
+        var env = processEnvironment
+        for (key, value) in scriptEnv { env[key] = value }
+        for (key, value) in sudoEnvExtras { env[key] = value }
+        return (false, env)
+    }
+
     func runCFWInstall(options: VPhoneCreateEffectiveOptions, runtime: VPhoneCreateRuntime, bundleURL: URL) throws {
         let v = runtime.verbosity
         let sudoEnvExtras = runtime.sudoEnvExtras
@@ -914,20 +938,17 @@ public struct VPhoneCreateOrchestrator {
         if runtime.keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
 
         let args = [resources.cfwInstallHostScript.path, "--variant", options.variant, bundleURL.path]
-        // --sudo-password (askpass) wins over --root-popup.
-        let usePopup = runtime.rootPopup && sudoEnvExtras["SUDO_ASKPASS"] == nil
+        let invocation = Self.cfwInvocation(
+            scriptEnv: scriptEnv, sudoEnvExtras: sudoEnvExtras, rootPopup: runtime.rootPopup)
         let code: Int32
-        if usePopup {
-            // Forward SUDO_USER (sudo would set it) so the script's chown-back runs.
-            scriptEnv["SUDO_USER"] = NSUserName()
+        if invocation.usePopup {
             trace("osascript admin-privileges /bin/zsh \(args.joined(separator: " "))", v)
             code = try VPhoneProcessRunner.runWithAdminPrivileges(
-                URL(fileURLWithPath: "/bin/zsh"), args, env: scriptEnv, echo: v.showsToolDetail)
+                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail)
         } else {
-            var env = ProcessInfo.processInfo.environment
-            for (key, value) in scriptEnv { env[key] = value }
-            for (key, value) in sudoEnvExtras { env[key] = value }
-            let envKeys = (["VPHONE_PYTHON", "IPSW_DIR", "VPHONE_SEAL_DIR"] + sudoEnvExtras.keys.sorted()).joined(separator: ", ")
+            let env = invocation.env
+            let envKeys = (["VPHONE_PYTHON", "IPSW_DIR", "VPHONE_SEAL_DIR", VPhoneInvoker.uidKey, VPhoneInvoker.gidKey]
+                + sudoEnvExtras.keys.sorted()).joined(separator: ", ")
             trace("spawn /bin/zsh \(args.joined(separator: " ")) (env keys: \(envKeys))", v)
             // With an askpass credential sudo is non-interactive → honor verbosity.
             // Without one, sudo must prompt on the terminal → run as a foreground

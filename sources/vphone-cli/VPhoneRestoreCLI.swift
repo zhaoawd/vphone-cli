@@ -158,20 +158,20 @@ struct VPhoneCFWInstallCommand: ParsableCommand {
         if keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
 
         let args = [resources.cfwInstallHostScript.path, "--variant", variant, bundle.url.path]
+        // Both paths carry VPHONE_INVOKER_UID/GID so the driver returns the
+        // artifacts it creates as root (the popup sets no SUDO_UID).
+        let invocation = VPhoneCreateOrchestrator.cfwInvocation(
+            scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup)
         let code: Int32
-        if rootPopup {
-            // Forward SUDO_USER (sudo would set it) so the script's chown-back runs.
-            scriptEnv["SUDO_USER"] = NSUserName()
+        if invocation.usePopup {
             code = try VPhoneProcessRunner.runWithAdminPrivileges(
-                URL(fileURLWithPath: "/bin/zsh"), args, env: scriptEnv, echo: v.showsToolDetail)
+                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail)
         } else {
-            var env = ProcessInfo.processInfo.environment
-            for (key, value) in scriptEnv { env[key] = value }
             if v.tracesInternals {
-                print("[trace] spawning: /bin/zsh \(args.joined(separator: " ")) (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR)")
+                print("[trace] spawning: /bin/zsh \(args.joined(separator: " ")) (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR, \(VPhoneInvoker.uidKey), \(VPhoneInvoker.gidKey))")
             }
             code = try VPhoneProcessRunner.runStreaming(
-                URL(fileURLWithPath: "/bin/zsh"), args, env: env, echo: v.showsToolDetail)
+                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail)
         }
         if code == 0 {
             // The CFW install script released its own lock when it exited, so a

@@ -337,19 +337,63 @@ public enum VPhoneProcessRunner {
     public static func runWithAdminPrivileges(
         _ executable: URL, _ args: [String], env: [String: String] = [:], echo: Bool = true
     ) throws -> Int32 {
+        var tty: String?
+        if echo, isatty(STDOUT_FILENO) != 0, let name = ttyname(STDOUT_FILENO) { tty = String(cString: name) }
+        let source = adminPrivilegesScript(executable, args, env: env, tty: tty)
+        return try runStreaming(URL(fileURLWithPath: "/usr/bin/osascript"), ["-e", source], echo: echo)
+    }
+
+    /// The `/bin/sh` command `runWithAdminPrivileges` hands to `do shell script`:
+    /// `KEY='value' … 'executable' 'arg' …`, optionally redirected to `tty`.
+    public static func adminPrivilegesCommand(
+        _ executable: URL, _ args: [String], env: [String: String], tty: String? = nil
+    ) -> String {
         func shQuote(_ s: String) -> String { "'" + s.replacingOccurrences(of: "'", with: "'\\''") + "'" }
         var tokens = env.sorted { $0.key < $1.key }.map { "\($0.key)=\(shQuote($0.value))" }
         tokens.append(shQuote(executable.path))
         tokens += args.map(shQuote)
         var command = tokens.joined(separator: " ")
-        if echo, isatty(STDOUT_FILENO) != 0, let tty = ttyname(STDOUT_FILENO) {
-            command += " > \(shQuote(String(cString: tty))) 2>&1"
-        }
+        if let tty { command += " > \(shQuote(tty)) 2>&1" }
+        return command
+    }
+
+    /// AppleScript source for `osascript -e`.
+    public static func adminPrivilegesScript(
+        _ executable: URL, _ args: [String], env: [String: String], tty: String? = nil
+    ) -> String {
         // Escape the /bin/sh command for the AppleScript string literal (\ then ").
-        let appleEscaped = command
+        let appleEscaped = adminPrivilegesCommand(executable, args, env: env, tty: tty)
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
-        let source = "do shell script \"\(appleEscaped)\" with administrator privileges"
-        return try runStreaming(URL(fileURLWithPath: "/usr/bin/osascript"), ["-e", source], echo: echo)
+        return "do shell script \"\(appleEscaped)\" with administrator privileges"
+    }
+}
+
+// MARK: - VPhoneInvoker
+
+/// The account a privileged child (the CFW host driver) works for.
+///
+/// sudo tells its command who invoked it through SUDO_UID/SUDO_GID; the macOS
+/// authentication dialog (`do shell script … with administrator privileges`)
+/// tells it nothing. vphone-cli therefore passes the ids explicitly on every
+/// elevation path, and `scripts/cfw_install_host.sh` returns the artifacts it
+/// creates as root to that account after checking that it owns the bundle.
+public enum VPhoneInvoker {
+    public static let uidKey = "VPHONE_INVOKER_UID"
+    public static let gidKey = "VPHONE_INVOKER_GID"
+
+    /// The real uid/gid of this process. When this process already runs as
+    /// root under sudo, sudo's numeric SUDO_UID/SUDO_GID name the invoker
+    /// instead; plain root passes 0, which the driver treats as "keep owners".
+    public static func environment(
+        uid: uid_t = getuid(), gid: gid_t = getgid(),
+        processEnvironment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> [String: String] {
+        if uid == 0, let sudoUID = processEnvironment["SUDO_UID"].flatMap(UInt32.init), sudoUID != 0 {
+            var result = [uidKey: String(sudoUID)]
+            if let sudoGID = processEnvironment["SUDO_GID"].flatMap(UInt32.init) { result[gidKey] = String(sudoGID) }
+            return result
+        }
+        return [uidKey: String(uid), gidKey: String(gid)]
     }
 }
