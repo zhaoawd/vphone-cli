@@ -137,6 +137,12 @@ jobs:
           zsh scripts/build_runtime_tools.sh
           make build
           make check_bundle
+      # Static only: assemble the app around the bundle just built and check
+      # its layout, manifest, signature and strings. Nothing in it is run here.
+      - name: Assemble and check Launchpad
+        run: |
+          zsh scripts/build_launchpad.sh
+          make check_launchpad
       - name: Build isolated API and guest component candidates
         run: |
           make daemon_api_build guest_components_build

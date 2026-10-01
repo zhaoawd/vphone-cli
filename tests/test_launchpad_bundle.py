@@ -293,9 +293,27 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         makefile = (ROOT / 'Makefile').read_text()
         self.assertRegex(makefile, r'\nbuild: bundle\n')
         self.assertRegex(makefile, r'\nlaunchpad: bundle\n')
-        for workflow in (ROOT / '.github/workflows').glob('*.yml'):
-            self.assertNotIn('launchpad', workflow.read_text(), workflow.name)
+        # CI assembles and checks Launchpad statically in the bundle job, after
+        # `make build` and `make check_bundle`, and nothing else: no
+        # `make launchpad` (a second bundle build), no `test_launchpad_cli`
+        # (runs the embedded binaries), no UI smoke.
+        allowed = ['zsh scripts/build_launchpad.sh', 'make check_launchpad']
+        for workflow in sorted((ROOT / '.github/workflows').glob('*.yml')):
+            lines = [line.strip() for line in workflow.read_text().splitlines()]
+            mentions = [line for line in lines
+                        if 'launchpad' in line.lower() and not line.startswith(('#', '- name:'))]
+            if workflow.name != 'checks.yml':
+                self.assertEqual(mentions, [], workflow.name)
+                continue
+            self.assertEqual(mentions, allowed, workflow.name)
+            job = re.split(r'\n  \S', workflow.read_text().split('\n  bundle:\n', 1)[1], maxsplit=1)[0]
+            commands = [line.strip() for line in job.splitlines()]
+            order = [commands.index(command) for command in ('make build', 'make check_bundle', *allowed)]
+            self.assertEqual(order, sorted(order), 'bundle job order')
         self.assertNotIn('launchpad', (ROOT / 'scripts/build.sh').read_text())
+        build = re.search(r'\nbundle:[^\n]*\n((?:\t[^\n]*\n)*)', makefile)
+        self.assertIsNotNone(build)
+        self.assertNotIn('launchpad', build.group(0))
         # B6: the embedded-CLI tests have their own target, outside `test` and `test_swift`.
         self.assertRegex(makefile, r'\ntest_launchpad_cli:\n\tzsh \$\(SCRIPTS\)/run_launchpad_cli_tests\.sh\n')
         for target in ('test', 'test_python', 'test_swift'):
