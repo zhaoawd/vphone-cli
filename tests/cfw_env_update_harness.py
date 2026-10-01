@@ -71,9 +71,12 @@ def umount(mountpoint):
 
 
 def load(script):
-    spec = importlib.util.spec_from_file_location('cfw_env_update', script)
+    sys.path.insert(0, str(Path(script).parent))
+    sys.path.append(str(Path(__file__).resolve().parents[1] / 'scripts'))
+    name = Path(script).stem
+    spec = importlib.util.spec_from_file_location(name, script)
     module = importlib.util.module_from_spec(spec)
-    sys.modules['cfw_env_update'] = module
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -136,5 +139,29 @@ if __name__ == '__main__':
     if sys.argv[1] == 'umount':
         sys.exit(umount(sys.argv[2]))
     module = load(sys.argv[1])
-    install_doubles(module)
+    if Path(sys.argv[1]).stem == 'cfw_env_install':
+        import plistlib
+        import subprocess
+        from test_cfw_env_update import macho, LC_LOAD_DYLIB, LC_LOAD_WEAK_DYLIB
+        install_doubles(module.environment)
+        def signer(args):
+            log('harness install tool ' + ' '.join(args))
+            output = plistlib.dumps({'original-entitlement': True}) if '-e' in args else b''
+            if 'inject-dylib' in args:
+                Path(args[-2]).write_bytes(macho([(LC_LOAD_DYLIB, '/usr/lib/libSystem.B.dylib'),
+                                                (LC_LOAD_WEAK_DYLIB, '/vh')], filetype=2, tag=b'injected'))
+            return subprocess.CompletedProcess(args, 0, output, b'')
+        real_install = module.install_mounted
+        def install(*args, **kwargs):
+            return real_install(*args, **kwargs, owner=(os.getuid(), os.getgid()), runner=signer)
+        module.install_mounted = install
+        if 'install-second' in os.environ.get('CFW_ENV_FAULTS', '').split(','):
+            write = module.atomic_write
+            def atomic_write(path, data, mode, owner):
+                if path.name == 'SystemHook-vphone.dylib':
+                    raise OSError(errno.EIO, 'second library write failure')
+                return write(path, data, mode, owner)
+            module.atomic_write = atomic_write
+    else:
+        install_doubles(module)
     sys.exit(module.main(sys.argv[2:]))

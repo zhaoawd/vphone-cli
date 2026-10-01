@@ -12,7 +12,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tests.test_cfw_env_update import LOCAL, make_bundle, make_stage, make_system, macho, sha, tree, LC_LOAD_DYLIB, LC_LOAD_WEAK_DYLIB
+from tests.test_cfw_env_update import LOCAL, make_bundle, make_stage, make_system, macho, sha, tree, LC_LOAD_DYLIB, LC_LOAD_WEAK_DYLIB, EnvironmentDriverFixture, tar_of, tree_of_tar
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -242,3 +242,106 @@ class InstallTests(unittest.TestCase):
         record = json.loads(self.report.read_text())
         self.assertEqual(record['result'], 'failed')
         self.assertIn('unmount', record['error'])
+
+
+class V2DriverTests(EnvironmentDriverFixture):
+    def setUp(self):
+        super().setUp()
+        shutil.copyfile(ROOT / 'scripts/cfw_env_install.py', self.root / 'scripts/cfw_env_install.py')
+        stub = self.root / '.tools/bin/stub'
+        text = stub.read_text().replace('[[ "$1" == */cfw_env_update.py ]]',
+                                       '[[ "$1" == */cfw_env_update.py || "$1" == */cfw_env_install.py ]]')
+        text = '\n'.join('   if [[ "$1" == */apfs_snap_rename.py ]]; then [[ ${FAIL_SNAP:-0} == 1 ]] && exit 5; exit 0; fi'
+                         if 'if [[ "$1" == */apfs_snap_rename.py ]]' in line else line for line in text.splitlines()) + '\n'
+        stub.write_text(text)
+        (self.root / 'scripts/cfw_install.sh').write_text('#!/bin/zsh\nprint classic-installer >> "$TEST_LOG"\n')
+        self.daemon = self.root / 'daemon'
+        self.daemon.mkdir()
+        (self.daemon / 'vphoned').write_bytes(macho(filetype=2, tag=b'api'))
+        (self.daemon / 'vphoned').chmod(0o755)
+        config = ROOT / 'sources/VPhoneDaemon/Configuration'
+        shutil.copyfile(config / 'vphoned-api.plist', self.daemon / 'vphoned-api.plist')
+        shutil.copyfile(config / 'VPhoneDaemon.entitlements', self.daemon / 'vphoned.entitlements.plist')
+        (self.daemon / 'manifest.json').write_text(json.dumps({'schema_version': 1,
+            'files_sha256': {p.name: sha(p.read_bytes()) for p in self.daemon.iterdir()}}))
+        self.env['VPHONE_API_DAEMON'] = str(self.daemon)
+
+    def new_vm(self):
+        vm = make_bundle(self.root / 'vm', variant='regular', checkpoint_variant='regular')
+        (vm / '.create-checkpoint/checkpoint.json').write_text(json.dumps({'effective_options':
+            {'variant': 'regular', 'guest_environment': 'v2'}}))
+        system = make_system(self.root / 'system', omit=LOCAL, alias=None, launchd_loads=())
+        (vm / 'Disk.img').write_bytes(tar_of(system))
+        (vm / 'cfw_input').mkdir()
+        (vm / 'cfw_input/signcert.p12').write_bytes(b'test certificate')
+        return vm, tree(system)
+
+    def run_install(self, vm, args=None, **env):
+        return subprocess.run(['/bin/zsh', str(self.driver), *(args or ['--variant', 'regular', '--guest-environment', 'v2']),
+                               str(vm)], env=dict(self.env, TEST_MOUNTS=str(vm / 'mount-table'), **env),
+                              capture_output=True, text=True, timeout=60)
+
+    def test_v2_install_publishes_one_transaction_and_preserves_previous_disk(self):
+        vm, previous = self.new_vm()
+        original = (vm / 'Disk.img').read_bytes()
+        result = self.run_install(vm)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        history = list(vm.glob('.cfw-history/*'))
+        self.assertEqual(len(history), 1)
+        self.assertEqual((history[0] / 'Disk.img').read_bytes(), original)
+        report = json.loads((history[0] / 'guest-environment-install.json').read_text())
+        transaction = json.loads((history[0] / 'transaction.json').read_text())
+        self.assertEqual(report['result'], 'installed')
+        self.assertEqual(report['transaction_id'], transaction['id'])
+        self.assertEqual(report['assessment_after']['classification'], 'already_current')
+        after = tree_of_tar((vm / 'Disk.img').read_bytes(), self.scratch)
+        self.assertEqual(after['usr/lib/libcamfix.dylib'][1], sha((self.stage / 'camfix/libcamfix.dylib').read_bytes()))
+        self.assertEqual(after['usr/bin/vphoned'], previous['usr/bin/vphoned'])
+        calls = (self.root / 'calls').read_text().splitlines()
+        self.assertEqual(sum('apfs_snap_rename.py' in line for line in calls), 1)
+        self.assertEqual(sum(line == 'classic-installer' for line in calls), 1)
+
+    def test_recorded_v2_install_without_opt_in_refuses_before_tools(self):
+        vm, _ = self.new_vm()
+        info = vm / 'restore-info.json'
+        document = json.loads(info.read_text())
+        document['guest_environment'] = 'v2'
+        info.write_text(json.dumps(document))
+        original = (vm / 'Disk.img').read_bytes()
+        result = self.run_install(vm, args=['--variant', 'regular'])
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('--guest-environment v2', result.stderr)
+        self.assertFalse((self.root / 'calls').exists())
+        self.assertEqual((vm / 'Disk.img').read_bytes(), original)
+
+    def test_failed_v2_install_keeps_original_inode_bytes_and_mtime(self):
+        vm, _ = self.new_vm()
+        disk = vm / 'Disk.img'
+        original = (disk.stat().st_ino, disk.stat().st_mtime_ns, sha(disk.read_bytes()))
+        result = self.run_install(vm, CFW_ENV_FAULTS='install-second')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual((disk.stat().st_ino, disk.stat().st_mtime_ns, sha(disk.read_bytes())), original)
+        self.assertFalse(list(vm.glob('.cfw-history/*/Disk.img')))
+        report = json.loads(next(vm.glob('.cfw-history/*/guest-environment-install.json')).read_text())
+        self.assertEqual(report['result'], 'failed')
+        self.assertNotIn('apfs_snap_rename.py', (self.root / 'calls').read_text())
+
+    def test_unsupported_v2_variants_and_modes_refuse_without_tools(self):
+        vm, _ = self.new_vm()
+        cases = [['--variant', variant, '--guest-environment', 'v2'] for variant in ('dev', 'jb', 'exp', 'less')]
+        cases += [['--update-environment', '--guest-environment', 'v2'], ['--variant', 'regular', '--guest-environment', 'other']]
+        for args in cases:
+            with self.subTest(args=args):
+                result = self.run_install(vm, args=args)
+                self.assertEqual(result.returncode, 1)
+                self.assertFalse((self.root / 'calls').exists())
+                self.assertFalse((vm / '.cfw-history').exists())
+
+    def test_classic_install_does_not_call_environment_installer(self):
+        vm, _ = self.new_vm()
+        result = self.run_install(vm, args=['--variant', 'regular'])
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = (self.root / 'calls').read_text()
+        self.assertNotIn('cfw_env_install.py', calls)
+        self.assertNotIn('guest-environment-install.json', calls)
+        self.assertEqual(sum('apfs_snap_rename.py' in line for line in calls.splitlines()), 1)
