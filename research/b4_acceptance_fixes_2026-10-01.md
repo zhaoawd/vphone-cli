@@ -220,3 +220,20 @@ CLI（`83dcb5d`）：
 - 下载（curl/aria2c 续传）被中断后的部分文件仍按原设计保留续传，未改。
 - `fw_prepare.sh` 以 root 运行（less）时 partial 与缓存目录的所有权。
 - `scripts/patchers/__pycache__` 在 root CFW 后写入应用包（D4 记录的另一 root 残留）不在本次范围，未处理。
+
+## 9. 真实环境复核（2026-10-01，修复后构建 0bf0df0）
+
+宿主 macOS 27.0（26A428）。Launchpad 与内嵌 `vphone-cli` 在 B2 worktree 由 `0bf0df0` 构建（`embedded-toolchain.json` gitHash `0bf0df0`）。被测机器 `~/vphone-b4-accept/lp-b4-accept2`（regular，本地 iPhone 26.1 23B85 与 cloudOS 26.1 IPSW）。用户授权由我直接执行：以 Launchpad 内嵌的同一 `vphone-cli`、新会话启动 `vm create`（与 Launchpad 分离启动一致），取消按 Launchpad 方式向创建进程组发送 SIGINT。Launchpad 界面层（按钮、创建视图）本轮未覆盖。
+
+| 项目 | 结果 | 证据 |
+| --- | --- | --- |
+| 修复前取消（prepare，构建 a653938，经 Launchpad Stop Creating） | 失败（复现问题 2） | 第 1 节：`fw_prepare.sh`/`unzip` 自成进程组，create 退出后成为孤儿约 30 s，检查点 prepare 仍 `running` |
+| 工具变化 | 通过 | 续跑被拒绝：`toolchain differs ... (7a2981a01294 -> 3c45d37ecb82); the checkpoint was not changed (overall: interrupted)`；加 `--accept-tool-change` 后续跑 |
+| restore 阶段取消 | 通过 | `kill -INT -<create pgid>` 后 10.3 s 内 create、DFU `vphone-vm`、Python 恢复进程全部结束；无 ppid=1 残留；`create-status`：`restore running — interrupted by SIGINT ...; every stage process ended before vm create exited`，`overall: interrupted`，`bundle lock held: false`；无运行记录与 socket |
+| 续跑至完成 | 通过 | `Setup completed: every applicable stage succeeded and was verified.` |
+| `--root-popup` 认证对话框 | 出现并等待输入 | `osascript` 自 20:34:50 等待，用户输入密码后 CFW 于 20:51 开始 |
+| 所有权交还（问题 1） | 通过 | bundle 内 root 所有文件 0 个；`.cfw-history`、事务目录（0700）、`.vphoned.signed` 均为调用用户所有 |
+| 残留（问题 3） | 通过 | 完成后无 `.vphone-runtime.json` 与 `vphone.sock` |
+| T15 真实写盘 | 通过 | `transaction.json`：`method: clone`；stage/pre-mount/pre-install/pre-publish 四次检查 passed；`publish_method: renamex_np RENAME_SWAP`；`after_swap.previous_is_original/published_is_staged: true`；`original_check.unchanged: true`（dev/inode/size/mtime 与 sampled:66 SHA-256 一致）；原盘 inode 146632508 保留于 `.cfw-history/20261001T125129Z-bnDHAVYM/Disk.img`，发布盘 inode 147451698 |
+
+未覆盖：prepare、cfw（认证对话框显示时与认证后）、首启/验证启动期间的取消；Launchpad ⌘Q 退出确认（G8）；sudo 路径（非 root-popup）的所有权交还；root 驱动运行中的取消。修复前留下的 `~/vphone-b4-accept/lp-b4-accept`（含 root 所有的 `.cfw-history` 与 `.vphoned.signed`）需用户以 sudo 处理。上一次（修复前构建）CFW 阶段没有出现认证对话框，原因未查明；待验证假设：系统沿用了缓存的管理员授权。
