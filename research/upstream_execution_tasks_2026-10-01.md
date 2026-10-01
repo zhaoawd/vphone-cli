@@ -22,6 +22,8 @@
 
 原生 prepare 代码由另一台机器以 `prepare.patch`（基线 8d84bbc，SHA-256 `44bd38e8dcd6e95e6b249193c399d489990897334d38b4656605fc064ea86e7b`，11 个文件逐个 SHA-256 核对一致）移交，在 10025f4 上直接应用无冲突，提交为 75647d6。合并树上 `make test_swift` 退出 0（无失败，3 项跳过），`make build` 退出 0 且 bundle 签名/entitlements 校验通过；签名前的 release CLI 中 `fw prepare`/`vm create` 含 `--prepare-backend`，`fw plan` 正常。T01 的保存目标由 Git 提交满足；T12 已有实现入库，a3d2382e 对照与剩余范围仍待完成。本次未重新执行 26.1 真实组件对照或 VM 操作。
 
+T12 剩余部分提交为 1853c07（记录 t12_original_rerun_2026-10-01.md）：patch 阶段证据记录 `patch_selection_sha256`，续跑时由当前构建重新解析，选择变化时拒绝并提示 `--restart-from prepare`。用户决定（2026-10-01）：独立 `fw patch` 不支持从原件重跑，由 `vm create` 检查点流程重新生成；`.firmware-history/<id>/backup/` 与 `.firmware-prepare-backup-*` 的空间增长在 T30 增加显式清理命令处理，不自动删除。
+
 阻塞与待决：T13（DSC/内核补丁版本条件）本轮派发被安全分类器拦截，需重新界定范围或用户直接处理；T25–T27（Launchpad CLI/UI）本地无 Launchpad target，属较大规模迁入，实施前先确认范围。T20 guest 侧 GuestLocationSimulation.swift 与 libvlocation.m 仅逻辑审查（Xcode/iOS 工具链未构建）。真实 VM 恢复/启动/固件字节对比、helper 注册与生产 Core Bundle 安装继续暂缓。
 
 helper 注册及生产 Core Bundle 安装继续暂缓；P1c 真实导入及导入后启动继续跳过。写盘前要求 T03、T11 和 T15 达到验收条件。独立 UI 工作可以先推进；不能由此跳过 guest 写入的前置条件。
@@ -365,7 +367,7 @@ T00 已完成 → T01 保存变动 → T02 已完成、随实现持续回填 →
 
 - 阶段与状态：P8；待执行。
 - 前置依赖：T03、T11、T15、T28、T29。
-- 执行范围与产出：运行适用 make test/test_fixtures/test_firmware；用最终产物执行 F1/F2/F3、恢复/启动及已声明业务场景。
+- 执行范围与产出：运行适用 make test/test_fixtures/test_firmware；用最终产物执行 F1/F2/F3、恢复/启动及已声明业务场景。增加显式清理命令，处理补丁事务备份 `.firmware-history/<id>/backup/` 与 prepare 旧树备份 `.firmware-prepare-backup-*`（2026-10-01 T12 决定；只删除操作员指定的条目，不自动删除）。
 - 验收条件：所有必需组合有通过/失败/未验证结果；默认调度历史时间相关问题有明确处置。
 - 保护与回退：保留固件/fast 隔离；导入、helper 暂缓项目保持未验收，不以单项重跑代替全量。
 - 当前证据：历史验证见剩余阶段与 prepare 记录；本轮仅文档校验
