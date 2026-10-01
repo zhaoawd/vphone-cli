@@ -1,3 +1,4 @@
+import FirmwarePatcher
 import Foundation
 import Testing
 import VPhoneCore
@@ -154,6 +155,100 @@ struct CreateLiveStagesTests {
         try Data(#"{"phase":"committed","options":{"variant":"jb"}}"#.utf8).write(to: journal)
         try FileManager.default.createDirectory(at: w.bundle.appendingPathComponent(".firmware-transaction"), withIntermediateDirectories: false)
         #expect(isRejected(stages.verify(.patch, context: w.context(), evidence: evidence)))
+    }
+
+    // MARK: Patch selection identity (T12)
+
+    private func gates(_ variant: String, base27: Bool = false, frida: Bool = false) -> PatchGateSnapshot {
+        PatchGateSnapshot(
+            variant: variant, iosBaseIs18: false, iosBaseIs27: base27, cloudOSIsFridaCapable: true,
+            forceExcGuard: false, enableFrida: frida, excGuardActive: variant == "dev",
+            applyIOS27: base27, applyFrida: frida)
+    }
+
+    /// A committed transaction archive with the `report.json` the pipeline writes before commit.
+    private func writeCommittedArchive(_ w: Workspace, id: String, variant: String, report: PatchGateSnapshot?) throws {
+        let archive = w.bundle.appendingPathComponent(".firmware-history/\(id)")
+        try FileManager.default.createDirectory(at: archive, withIntermediateDirectories: true)
+        try Data(#"{"phase":"committed","options":{"variant":"\#(variant)"}}"#.utf8)
+            .write(to: archive.appendingPathComponent("journal.json"))
+        if let report {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            try encoder.encode(PatchRunReport(variant: variant, gates: report, components: [], ablation: []))
+                .write(to: archive.appendingPathComponent("report.json"))
+        }
+    }
+
+    @Test func patchSelectionIdentityFollowsTheResolvedPlan() throws {
+        let digest = VPhoneCreatePatchSelection.digest
+        let jb = try digest("jb", gates("jb"))
+        let again = try digest("jb", gates("jb"))
+        #expect(jb == again)
+        #expect(jb.count == 64)
+        // Each input of the T10/T11 plan changes the identity: variant, version gate, frida opt-in.
+        let others = [
+            try digest("exp", gates("exp")),
+            try digest("jb", gates("jb", base27: true)),
+            try digest("jb", gates("jb", frida: true)),
+        ]
+        #expect(!others.contains(jb))
+        #expect(Set(others).count == others.count)
+        let regular = try digest("regular", gates("regular")), dev = try digest("dev", gates("dev"))
+        #expect(regular != dev)
+        // The identity is the resolved plan's enabled declaration and step sets, not a second list.
+        let plan = try VariantPlanResolver.resolve(variant: .jb, gates: gates("jb"))
+        let text = try VPhoneCreatePatchSelection.identityText(plan)
+        #expect(text.contains("declarations=" + plan.selected.map(\.id).sorted().joined(separator: ",") + "\n"))
+        #expect(text.contains("steps=" + plan.enabledSteps.sorted().joined(separator: ",") + "\n"))
+        #expect(jb == VPhoneCreateDigest.sha256(Data(text.utf8)))
+        #expect(throws: (any Error).self) { try digest("unknown", gates("unknown")) }
+    }
+
+    @Test func patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        try Data("rom".utf8).write(to: w.bundle.appendingPathComponent("AVPBooter.vresearch1.bin"))
+        try writeCommittedArchive(w, id: "abc", variant: "jb", report: gates("jb"))
+        var stages = w.stages()
+        let recorded = try stages.patchSelectionIdentity(bundleURL: w.bundle, archive: "abc")
+        let expected = try VPhoneCreatePatchSelection.digest(variant: "jb", gates: gates("jb"))
+        #expect(recorded == expected)
+        let evidence = ["firmware_transaction_archives": "abc", "patch_records": "10",
+                        VPhoneCreatePatchSelection.evidenceKey: recorded]
+        #expect(isVerified(stages.verify(.patch, context: w.context(), evidence: evidence)))
+
+        // A build whose catalog resolves the recorded variant and gates differently.
+        stages.patchSelectionDigest = { _, _ in String(repeating: "f", count: 64) }
+        guard case let .rejected(reason) = stages.verify(.patch, context: w.context(), evidence: evidence) else {
+            Issue.record("changed selection was not rejected")
+            return
+        }
+        #expect(reason.contains("patch selection changed since the patch stage ran"))
+        #expect(reason.contains(String(recorded.prefix(12)) + " -> ffffffffffff"))
+
+        // Evidence written before T12 carries no identity; it is not compared.
+        var historical = evidence
+        historical[VPhoneCreatePatchSelection.evidenceKey] = nil
+        #expect(isVerified(stages.verify(.patch, context: w.context(), evidence: historical)))
+
+        // A recorded identity whose report is gone cannot be confirmed.
+        stages = w.stages()
+        try FileManager.default.removeItem(at: w.bundle.appendingPathComponent(".firmware-history/abc/report.json"))
+        #expect(isRejected(stages.verify(.patch, context: w.context(), evidence: evidence)))
+        #expect(isVerified(stages.verify(.patch, context: w.context(), evidence: historical)))
+    }
+
+    @Test func patchVerificationRefusalPointsToPrepareNotPatch() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        _ = try w.writeCheckpoint()
+        let patch = VPhoneCreateOrchestrator.recoveryHintLines(
+            name: "vm", bundleURL: w.bundle, error: VPhoneCreateRunError.verificationFailed(stage: .patch, detail: "patch selection changed"))
+        #expect(patch.first?.contains("completed stage patch no longer passes verification (patch selection changed)") == true)
+        #expect(patch.dropFirst().first?.contains("vphone-cli vm create --resume vm --restart-from prepare") == true)
+        #expect(!patch.contains { $0.contains("--restart-from patch") })
+        let cfw = VPhoneCreateOrchestrator.recoveryHintLines(
+            name: "vm", bundleURL: w.bundle, error: VPhoneCreateRunError.verificationFailed(stage: .cfw, detail: "gone"))
+        #expect(cfw.dropFirst().first?.contains("--restart-from cfw") == true)
     }
 
     @Test func prepareRequiresExactlyOneRestoreTreeWithVersions() throws {

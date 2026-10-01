@@ -1,3 +1,4 @@
+import FirmwarePatcher
 import Foundation
 import VPhoneCore
 
@@ -13,6 +14,59 @@ enum VPhoneCreateArtifact {
     /// Consumers of the restore tree (patch, restore, cfw) plus the stages whose
     /// failure may require a new restore (first_boot, verification).
     static let restoreTreeRetainedUntil: [VPhoneCreateStage] = [.patch, .restore, .cfw, .firstBoot, .verification]
+}
+
+// MARK: - Patch selection identity (T12)
+
+/// Identity of the patch selection a committed patch stage used: the T10/T11
+/// resolved plan (variant, gate snapshot, enabled declarations and steps) for
+/// the variant and gates recorded in the transaction's `report.json`.
+///
+/// The patch stage records it as evidence. When a later resume skips the
+/// patch stage, the verifier resolves the same recorded inputs with the
+/// current build; a different identity means the restore tree holds firmware
+/// patched under another selection. A committed patch rewrites the restore
+/// tree, so the only unpatched input is a new prepare from the IPSW sources.
+/// Evidence written before T12 has no identity and is not compared.
+enum VPhoneCreatePatchSelection {
+    static let evidenceKey = "patch_selection_sha256"
+
+    /// The fields of a committed transaction's `report.json` the identity needs.
+    struct ReportHeader: Decodable {
+        let variant: String
+        let gates: PatchGateSnapshot
+    }
+
+    struct UnknownVariant: Error, CustomStringConvertible {
+        let variant: String
+        var description: String { "unknown patch variant \(variant)" }
+    }
+
+    static func reportHeader(bundleURL: URL, archive: String) throws -> ReportHeader {
+        let url = bundleURL.appendingPathComponent(".firmware-history").appendingPathComponent(archive)
+            .appendingPathComponent("report.json")
+        return try JSONDecoder().decode(ReportHeader.self, from: Data(contentsOf: url))
+    }
+
+    /// SHA-256 of ``identityText(_:)`` for the plan this build resolves.
+    static func digest(variant: String, gates: PatchGateSnapshot) throws -> String {
+        guard let pipelineVariant = FirmwarePipeline.Variant(rawValue: variant) else {
+            throw UnknownVariant(variant: variant)
+        }
+        let plan = try VariantPlanResolver.resolve(variant: pipelineVariant, gates: gates)
+        return VPhoneCreateDigest.sha256(Data(try identityText(plan).utf8))
+    }
+
+    static func identityText(_ plan: VariantPlanResolver.VariantPlan) throws -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let gates = String(decoding: try encoder.encode(plan.gates), as: UTF8.self)
+        return "vphone-patch-selection-v1\n"
+            + "variant=\(plan.variant)\n"
+            + "gates=\(gates)\n"
+            + "declarations=\(plan.selected.map(\.id).sorted().joined(separator: ","))\n"
+            + "steps=\(plan.enabledSteps.sorted().joined(separator: ","))\n"
+    }
 }
 
 // MARK: - VPhoneCreateLiveStages
@@ -32,6 +86,9 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
     /// child killed after restore still held the lock when the verifier ran).
     var lockReleaseTimeout: TimeInterval = VPhoneCreateCheckpointStore.bundleLockRetryTimeout
     var lockPollInterval: TimeInterval = 0.1
+    /// Resolves the patch selection identity of a recorded variant and gate
+    /// snapshot with this build's declaration catalog and pipeline.
+    var patchSelectionDigest: (String, PatchGateSnapshot) throws -> String = VPhoneCreatePatchSelection.digest
 
     let version = "vm-create-live-verifier-1"
 
@@ -59,7 +116,12 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             let count = try orchestrator.runFWPatch(
                 variant: variant, isLess: isLess, enableFrida: options.enableFrida, bundleURL: bundleURL, verbosity: v)
             let new = Self.historyEntries(bundleURL).subtracting(before).sorted()
-            return ["patch_records": "\(count)", "firmware_transaction_archives": new.joined(separator: ",")]
+            var evidence = ["patch_records": "\(count)", "firmware_transaction_archives": new.joined(separator: ",")]
+            // The verifier rejects any other archive count; without exactly one there is no selection to name.
+            if new.count == 1 {
+                evidence[VPhoneCreatePatchSelection.evidenceKey] = try patchSelectionIdentity(bundleURL: bundleURL, archive: new[0])
+            }
+            return evidence
         case .restore:
             return try orchestrator.runRestorePhase(bundleURL: bundleURL, verbosity: v, backend: options.effectiveRestoreBackend)
         case .cfw:
@@ -154,6 +216,21 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             guard (object["options"] as? [String: String])?["variant"] == context.options.variant else {
                 return .rejected("firmware transaction \(archive) was made for another variant")
             }
+            // T12: evidence written before the selection identity existed is not compared.
+            if let recorded = evidence[VPhoneCreatePatchSelection.evidenceKey] {
+                let current: String
+                do {
+                    current = try patchSelectionIdentity(bundleURL: bundleURL, archive: archive)
+                } catch {
+                    return .rejected("patch selection of firmware transaction \(archive) cannot be resolved: \(error)")
+                }
+                guard current == recorded else {
+                    return .rejected(
+                        "patch selection changed since the patch stage ran (\(recorded.prefix(12)) -> \(current.prefix(12))); "
+                            + "the restore tree holds firmware patched under the recorded selection, and only a new prepare "
+                            + "provides unpatched input")
+                }
+            }
             var artifacts: [VPhoneCreateArtifactSpec] = []
             if !treeRemoved, let tree = Self.restoreTree(bundleURL) {
                 artifacts.append(.init(
@@ -230,6 +307,12 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
     }
 
     // MARK: Helpers
+
+    /// Selection identity of a committed transaction, resolved by this build.
+    func patchSelectionIdentity(bundleURL: URL, archive: String) throws -> String {
+        let header = try VPhoneCreatePatchSelection.reportHeader(bundleURL: bundleURL, archive: archive)
+        return try patchSelectionDigest(header.variant, header.gates)
+    }
 
     /// Polls until no process holds the bundle lock. Returns false when the
     /// lock is still held after `lockReleaseTimeout`; never waits longer.

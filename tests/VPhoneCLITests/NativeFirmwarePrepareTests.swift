@@ -1,5 +1,6 @@
 import ArgumentParser
 import Darwin
+import FirmwarePatcher
 import Foundation
 import Testing
 import VPhoneArchiveKit
@@ -258,6 +259,221 @@ struct NativeFirmwarePrepareTests {
             }
         }
     }
+}
+
+// MARK: - T12: patch selection change and regeneration from originals
+
+extension NativeFirmwarePrepareTests {
+    private func options(_ variant: String, phone: URL, cloud: URL) -> VPhoneCreateEffectiveOptions {
+        VPhoneCreateEffectiveOptions(variant: variant, iphoneSource: phone.path, cloudosSource: cloud.path,
+            spoofBuild: nil, forceDscMaxSlide: false, enableFrida: false, cpuCount: 8, memoryMb: 8192,
+            diskSizeGb: 64, prepareBackend: .native)
+    }
+
+    /// Relative path -> SHA-256 of every regular file under `tree`.
+    private func contents(_ tree: URL) throws -> [String: String] {
+        var result: [String: String] = [:]
+        let base = tree.resolvingSymlinksInPath().path + "/"
+        for case let url as URL in FileManager.default.enumerator(at: tree, includingPropertiesForKeys: [.isRegularFileKey])! {
+            guard try url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true else { continue }
+            result[String(url.resolvingSymlinksInPath().path.dropFirst(base.count))] = try VPhoneCreateDigest.sha256(fileAt: url).digest
+        }
+        return result
+    }
+
+    private func checkpointBytes(_ vm: URL) throws -> Data {
+        try Data(contentsOf: vm.appendingPathComponent(".create-checkpoint/checkpoint.json"))
+    }
+
+    @Test func selectionChangeRegeneratesFromOriginalsInsteadOfPatchingTwice() throws {
+        let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
+        let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
+        let vm = root.appendingPathComponent("vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
+        let stages = SyntheticPatchCheckpointStages(bundle: vm)
+        let runner = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, log: { _ in }, keepArtifacts: true)
+        #expect(throws: VPhoneCreateRunError.self) {
+            try runner.create(bundleURL: vm, options: options("regular", phone: phone, cloud: cloud),
+                iphoneSource: phone.path, cloudosSource: cloud.path)
+        }
+        let tree = try #require(VPhoneCreateLiveStages.restoreTree(vm))
+        #expect(try stages.patched(tree) == "cloud|regular")
+        #expect(stages.patchRuns == 1)
+        let first = try VPhoneCreateCheckpointStore.load(bundleURL: vm).checkpoint
+        #expect(first.record(.patch).status == .succeeded)
+        #expect(first.record(.patch).evidence[VPhoneCreatePatchSelection.evidenceKey] != nil)
+
+        // Changing the selection after a committed patch: the patch stage cannot rerun on
+        // the patched tree, so both a plain resume and a patch restart are refused unchanged.
+        let before = try checkpointBytes(vm)
+        for restart in [nil, VPhoneCreateStage.patch] {
+            #expect(throws: VPhoneCreateRunError.self) {
+                try runner.resume(bundleURL: vm, request: .init(overrides: .init(variant: "jb"), restartFrom: restart))
+            }
+            #expect(try checkpointBytes(vm) == before)
+        }
+        #expect(stages.patchRuns == 1)
+        #expect(try stages.patched(tree) == "cloud|regular")
+
+        // Restarting from prepare re-extracts the IPSWs, then patches unpatched input once.
+        #expect(throws: VPhoneCreateRunError.self) {
+            try runner.resume(bundleURL: vm, request: .init(overrides: .init(variant: "jb"), restartFrom: .prepare))
+        }
+        let rerun = try VPhoneCreateCheckpointStore.load(bundleURL: vm).checkpoint
+        #expect(rerun.record(.patch).status == .succeeded)
+        #expect(rerun.record(.restore).status == .failed)
+        #expect(rerun.artifact("restore_tree")?.availability == .available)
+        #expect(stages.prepareRuns == 2 && stages.patchRuns == 2)
+        #expect(try stages.patched(tree) == "cloud|jb")
+        #expect(try String(contentsOf: vm.appendingPathComponent("AVPBooter.vresearch1.bin"), encoding: .utf8) == "synthetic ROM|jb")
+        // The previous patched tree is kept as a backup, not deleted.
+        let backup = try #require(FileManager.default.contentsOfDirectory(at: vm, includingPropertiesForKeys: nil)
+            .first { $0.lastPathComponent.hasPrefix(".firmware-prepare-backup-") })
+        #expect(try stages.patched(backup.appendingPathComponent(tree.lastPathComponent)) == "cloud|regular")
+
+        // The regenerated tree equals a fresh create with the new selection.
+        let fresh = root.appendingPathComponent("fresh")
+        try FileManager.default.createDirectory(at: fresh, withIntermediateDirectories: false)
+        let freshStages = SyntheticPatchCheckpointStages(bundle: fresh)
+        #expect(throws: VPhoneCreateRunError.self) {
+            try VPhoneCreateRunner(executor: freshStages, verifier: freshStages, prober: freshStages, log: { _ in }, keepArtifacts: true)
+                .create(bundleURL: fresh, options: options("jb", phone: phone, cloud: cloud),
+                    iphoneSource: phone.path, cloudosSource: cloud.path)
+        }
+        let freshTree = try #require(VPhoneCreateLiveStages.restoreTree(fresh))
+        #expect(try contents(tree) == contents(freshTree))
+    }
+
+    @Test func acceptedToolChangeWithAnotherSelectionRequiresRegeneration() throws {
+        let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
+        let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
+        let vm = root.appendingPathComponent("vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
+        let stages = SyntheticPatchCheckpointStages(bundle: vm)
+        func runner(tool: String) -> VPhoneCreateRunner {
+            VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, toolFingerprint: { tool },
+                log: { _ in }, keepArtifacts: true)
+        }
+        #expect(throws: VPhoneCreateRunError.self) {
+            try runner(tool: "build-1").create(bundleURL: vm, options: options("jb", phone: phone, cloud: cloud),
+                iphoneSource: phone.path, cloudosSource: cloud.path)
+        }
+        let recorded = try VPhoneCreateCheckpointStore.load(bundleURL: vm).checkpoint
+            .record(.patch).evidence[VPhoneCreatePatchSelection.evidenceKey]
+        let archiveID = try #require(stages.lastArchive)
+        let identity = try stages.live.patchSelectionIdentity(bundleURL: vm, archive: archiveID)
+        #expect(recorded == identity)
+
+        // A new build resolves the same recorded variant and gates to another plan.
+        stages.live.patchSelectionDigest = { _, _ in String(repeating: "e", count: 64) }
+        let before = try checkpointBytes(vm)
+        do {
+            try runner(tool: "build-2").resume(bundleURL: vm, request: .init(acceptToolChange: true))
+            Issue.record("resume with a changed selection was not refused")
+        } catch let VPhoneCreateRunError.verificationFailed(stage, detail) {
+            #expect(stage == .patch)
+            #expect(detail.contains("patch selection changed"))
+        }
+        #expect(try checkpointBytes(vm) == before)
+        #expect(stages.patchRuns == 1)
+
+        // The same new build with an unchanged selection continues past patch.
+        stages.live.patchSelectionDigest = VPhoneCreatePatchSelection.digest
+        #expect(throws: VPhoneCreateRunError.self) {
+            try runner(tool: "build-2").resume(bundleURL: vm, request: .init(acceptToolChange: true))
+        }
+        let resumed = try VPhoneCreateCheckpointStore.load(bundleURL: vm).checkpoint
+        #expect(resumed.attempts.last?.checks["verify.patch"] == "verified")
+        #expect(stages.patchRuns == 1)
+
+        // With the changed selection, prepare regenerates the tree and patch records the new identity.
+        stages.live.patchSelectionDigest = { _, _ in String(repeating: "e", count: 64) }
+        #expect(throws: VPhoneCreateRunError.self) {
+            try runner(tool: "build-3").resume(bundleURL: vm, request: .init(restartFrom: .prepare, acceptToolChange: true))
+        }
+        let regenerated = try VPhoneCreateCheckpointStore.load(bundleURL: vm).checkpoint
+        #expect(regenerated.record(.patch).evidence[VPhoneCreatePatchSelection.evidenceKey] == String(repeating: "e", count: 64))
+        #expect(stages.prepareRuns == 2 && stages.patchRuns == 2)
+        let tree = try #require(VPhoneCreateLiveStages.restoreTree(vm))
+        #expect(try stages.patched(tree) == "cloud|jb")
+    }
+}
+
+/// Real native prepare and the real read-only verifier, with a synthetic ROM and a
+/// synthetic patch stage that, like every real patcher, finds no patch site in bytes
+/// it already patched. It publishes the way a C4 transaction does (new inodes plus
+/// a committed archive with `report.json`) and stops at restore; no VM operation runs.
+private final class SyntheticPatchCheckpointStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerifier, VPhoneCreateStateProber {
+    var live: VPhoneCreateLiveStages
+    var prepareRuns = 0
+    var patchRuns = 0
+    var lastArchive: String?
+    var version: String { live.version }
+
+    struct PatchSiteNotFound: Error {}
+
+    init(bundle: URL) {
+        let orchestrator = VPhoneCreateOrchestrator(library: VPhoneLibrary(root: bundle.deletingLastPathComponent()),
+            resources: VPhoneResources(base: bundle.appendingPathComponent("no-script-resources")),
+            selfExecutable: URL(fileURLWithPath: "/usr/bin/false"))
+        live = VPhoneCreateLiveStages(orchestrator: orchestrator,
+            runtime: .init(sudoEnvExtras: [:], rootPopup: false, interactive: false, verbosity: .quiet, keepArtifacts: true))
+    }
+
+    func patched(_ tree: URL) throws -> String {
+        try String(contentsOf: tree.appendingPathComponent("kernelcache.test"), encoding: .utf8)
+    }
+
+    /// Patch `file` once: unpatched bytes gain `|variant`; anything else has no patch site.
+    private func patchOnce(_ file: URL, pristine: String, variant: String) throws {
+        guard try String(contentsOf: file, encoding: .utf8) == pristine else { throw PatchSiteNotFound() }
+        let staged = file.deletingLastPathComponent().appendingPathComponent(".staged-" + UUID().uuidString)
+        try Data((pristine + "|" + variant).utf8).write(to: staged)
+        guard rename(staged.path, file.path) == 0 else { throw POSIXError(.EIO) }
+    }
+
+    func execute(_ stage: VPhoneCreateStage, context: VPhoneCreateStageContext) throws -> [String: String] {
+        let bundle = context.bundleURL
+        switch stage {
+        case .prepare:
+            prepareRuns += 1
+            // Stands in for refreshBootROM: the pristine ROM is written again before prepare.
+            try Data("synthetic ROM".utf8).write(to: bundle.appendingPathComponent("AVPBooter.vresearch1.bin"))
+            try live.orchestrator.runFWPrepare(iphoneSource: context.iphoneSource, cloudosSource: context.cloudosSource,
+                isLess: false, keepArtifacts: true, bundleURL: bundle, verbosity: .quiet,
+                backend: context.options.effectivePrepareBackend,
+                preserveExistingRestore: !context.checkpoint.record(.prepare).history.isEmpty)
+            return ["fw_prepare_exit": "0", "prepare_backend": context.options.effectivePrepareBackend.rawValue]
+        case .patch:
+            patchRuns += 1
+            let variant = context.options.variant
+            guard let tree = VPhoneCreateLiveStages.restoreTree(bundle) else { throw CocoaError(.fileNoSuchFile) }
+            try patchOnce(bundle.appendingPathComponent("AVPBooter.vresearch1.bin"), pristine: "synthetic ROM", variant: variant)
+            try patchOnce(tree.appendingPathComponent("kernelcache.test"), pristine: "cloud", variant: variant)
+            let id = UUID().uuidString.lowercased()
+            let archive = bundle.appendingPathComponent(".firmware-history/\(id)")
+            try FileManager.default.createDirectory(at: archive, withIntermediateDirectories: true)
+            try Data(#"{"phase":"committed","options":{"variant":"\#(variant)"}}"#.utf8)
+                .write(to: archive.appendingPathComponent("journal.json"))
+            let gates = PatchGateSnapshot(variant: variant, iosBaseIs18: false, iosBaseIs27: false,
+                cloudOSIsFridaCapable: false, forceExcGuard: false, enableFrida: false,
+                excGuardActive: variant == "dev", applyIOS27: false, applyFrida: false)
+            try JSONEncoder().encode(PatchRunReport(variant: variant, gates: gates, components: [], ablation: []))
+                .write(to: archive.appendingPathComponent("report.json"))
+            lastArchive = id
+            return ["patch_records": "2", "firmware_transaction_archives": id,
+                    VPhoneCreatePatchSelection.evidenceKey: try live.patchSelectionIdentity(bundleURL: bundle, archive: id)]
+        default:
+            throw CocoaError(.featureUnsupported)
+        }
+    }
+
+    func artifactsRewrittenOnRerun(_ stage: VPhoneCreateStage) -> Set<String> { live.artifactsRewrittenOnRerun(stage) }
+    func removeArtifact(_ artifact: VPhoneCreateArtifactRecord, context: VPhoneCreateStageContext) -> Bool { false }
+    func verify(_ stage: VPhoneCreateStage, context: VPhoneCreateStageContext, evidence: [String: String]) -> VPhoneCreateVerification {
+        live.verify(stage, context: context, evidence: evidence)
+    }
+    func probe(_ stage: VPhoneCreateStage, context: VPhoneCreateStageContext) -> VPhoneCreateProbeResult { .idle(evidence: "synthetic test") }
 }
 
 /// Real native prepare dispatch and read-only verifier, with a synthetic ROM

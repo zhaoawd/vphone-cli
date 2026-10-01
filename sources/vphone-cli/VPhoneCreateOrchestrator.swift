@@ -483,10 +483,12 @@ public struct VPhoneCreateOrchestrator {
                 "resume without the changed options, or restart from the earliest affected stage with --restart-from",
             ])
         case let .verificationFailed(stage, detail):
-            return ("completed stage \(stage.rawValue) no longer passes verification (\(detail))", [
-                "restart from \(stage.rawValue) or an earlier stage: \(command) --restart-from \(stage.rawValue)",
-                recreate,
-            ])
+            // A committed patch rewrote the restore tree, so a patch restart is
+            // refused as a changed artifact; prepare re-extracts unpatched input.
+            let restart = stage == .patch
+                ? "regenerate the restore tree from the IPSW sources: \(command) --restart-from prepare"
+                : "restart from \(stage.rawValue) or an earlier stage: \(command) --restart-from \(stage.rawValue)"
+            return ("completed stage \(stage.rawValue) no longer passes verification (\(detail))", [restart, recreate])
         case let .identityMismatch(detail):
             return ("the bundle does not match the checkpoint (\(detail))", [
                 "a moved, cloned, imported or recreated bundle cannot be resumed; create the VM again",
