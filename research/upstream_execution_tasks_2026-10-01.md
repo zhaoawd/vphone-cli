@@ -20,7 +20,9 @@
 | 53edd90 | T24 宿主策略与权限边界（Core Bundle 最低版本 2.2.0；cfw_install_host.sh chown 防护） | t24_host_policy_2026-10-01.md |
 | 5d1bdaf | T20 定位路径重新适配 + 所有权合约（vacc=-1 sentinel 三处一致） | t20_location_2026-10-01.md |
 
-阻塞与待决：T01/T12 等另一台机器未提交的原生 prepare 代码推送后再接；T13（DSC/内核补丁版本条件）本轮派发被安全分类器拦截，需重新界定范围或用户直接处理；T25–T27（Launchpad CLI/UI）本地无 Launchpad target，属较大规模迁入，实施前先确认范围。T20 guest 侧 GuestLocationSimulation.swift 与 libvlocation.m 仅逻辑审查（Xcode/iOS 工具链未构建）。真实 VM 恢复/启动/固件字节对比、helper 注册与生产 Core Bundle 安装继续暂缓。
+原生 prepare 代码由另一台机器以 `prepare.patch`（基线 8d84bbc，SHA-256 `44bd38e8dcd6e95e6b249193c399d489990897334d38b4656605fc064ea86e7b`，11 个文件逐个 SHA-256 核对一致）移交，在 10025f4 上直接应用无冲突，提交为 75647d6。合并树上 `make test_swift` 退出 0（无失败，3 项跳过），`make build` 退出 0 且 bundle 签名/entitlements 校验通过；签名前的 release CLI 中 `fw prepare`/`vm create` 含 `--prepare-backend`，`fw plan` 正常。T01 的保存目标由 Git 提交满足；T12 已有实现入库，a3d2382e 对照与剩余范围仍待完成。本次未重新执行 26.1 真实组件对照或 VM 操作。
+
+阻塞与待决：T13（DSC/内核补丁版本条件）本轮派发被安全分类器拦截，需重新界定范围或用户直接处理；T25–T27（Launchpad CLI/UI）本地无 Launchpad target，属较大规模迁入，实施前先确认范围。T20 guest 侧 GuestLocationSimulation.swift 与 libvlocation.m 仅逻辑审查（Xcode/iOS 工具链未构建）。真实 VM 恢复/启动/固件字节对比、helper 注册与生产 Core Bundle 安装继续暂缓。
 
 helper 注册及生产 Core Bundle 安装继续暂缓；P1c 真实导入及导入后启动继续跳过。写盘前要求 T03、T11 和 T15 达到验收条件。独立 UI 工作可以先推进；不能由此跳过 guest 写入的前置条件。
 
