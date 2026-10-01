@@ -291,3 +291,18 @@ recovery: backward: `vphone-cli guest env rollback <vm> T1` copies each backup l
 - v2 环境在现有 VM 上的建立方式（P4 v2 创建，或另定的停机安装流程）；没有它，第二段验收和在线更新的实际使用都无法进行。
 - 是否把 Camera、KFCKnight 等 App 的重新启动加入本命令（目前只输出 `relaunch` 提示）。
 - `environment.loaded` 默认扫描全部进程；客户机上耗时过长时是否改为按清单的加载者限定进程。
+
+## 9. 第一段真实验收尝试（2026-10-01，未完成）
+
+用户授权由主会话执行。宿主产物：B2 worktree 由 `6c7e7f9` 构建的 `vphone-cli.app`；候选 API daemon 为主树 `make daemon_api_build` 产物，`vphoned` SHA-256 `96aea4406824ac52e4bf8362d6659bc396fdcf8bf8d016bee7aa3f9afd5cc3b8`（与第 6 节记录的 `09f96b45…` 不同，构建环境不同，未比较差异）。宿主以 `VPHONE_API_TOKEN=<随机>` 与 `--api-listen 127.0.0.1:0` 启动。
+
+1. regular 副本 `~/vphone-b4-accept/lp-t17-accept`（`lp-b4-accept2` 的 APFS 克隆）：16 s 内经典 daemon 连接；`guest_capabilities` 不含 `shell`，`shell` 请求返回 `guest does not support capability: shell`。原因（事实）：`scripts/vphoned/vphoned.m:534` 仅在 `vp_shell_path()` 非空时声明 `shell`，regular 客户机没有 shell。第 2.1 节方案 B 在 regular 变体上不可用。已 `vm stop`。
+2. exp 副本 `~/.vphone/VMs/rig-t17-accept`（`rig-baseline` 的 APFS 克隆）：30 s 内连接，含 `shell`（`/var/jb/bin/sh`，需设置 `PATH=/var/jb/usr/bin:/var/jb/bin:...`）。`api_session` 为 `reconnecting`、`errorCode: transport`（1339 无监听）。
+   - 经典 `file_put` 上传候选到 `/var/root/vphoned-api/vphoned`（755，客户机内 SHA-256 一致）与改标签 plist（`com.vphone.vphoned.api`）。
+   - `launchctl bootstrap system <plist>`：报 `Service cannot load in requested session`，`launchctl print` 无该服务。
+   - `launchctl load <plist>`（由用户在自己终端执行；主会话的该操作被宿主自动权限检查拒绝）：同样报 `Service cannot load in requested session`。
+   - 候选未运行。原因未查明。待验证假设：launchd 不接受从经典 daemon shell 所在会话加载，或拒绝 `/var/root` 下的 plist / 缺少会话相关键。
+   - 已 `vm stop`；副本中留有 `/var/root/vphoned-api/` 两个文件；系统路径、`/usr/bin/vphoned` 与经典 daemon 未改。
+3. 结论：第一段（API daemon 激活、`guest rpc` 往返、`environment.loaded` 权限与耗时、`env update` 拒绝）未完成。候选 daemon 的激活方式转入 v2 环境安装设计（随环境安装进入系统 LaunchDaemons 路径或按变体选择），不再依赖运行时热加载。
+
+残留：`~/vphone-b4-accept/lp-t17-accept` 与 `~/.vphone/VMs/rig-t17-accept` 两个副本待用户决定保留或删除。
