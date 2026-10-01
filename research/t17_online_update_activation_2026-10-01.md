@@ -305,4 +305,4 @@ recovery: backward: `vphone-cli guest env rollback <vm> T1` copies each backup l
    - 已 `vm stop`；副本中留有 `/var/root/vphoned-api/` 两个文件；系统路径、`/usr/bin/vphoned` 与经典 daemon 未改。
 3. 结论：第一段（API daemon 激活、`guest rpc` 往返、`environment.loaded` 权限与耗时、`env update` 拒绝）未完成。候选 daemon 的激活方式转入 v2 环境安装设计（随环境安装进入系统 LaunchDaemons 路径或按变体选择），不再依赖运行时热加载。
 
-残留：`~/vphone-b4-accept/lp-t17-accept` 与 `~/.vphone/VMs/rig-t17-accept` 两个副本待用户决定保留或删除。
+残留处理：用户确认后，两个副本 `lp-t17-accept` 与 `rig-t17-accept` 已用 `vm delete` 删除（2026-10-01）。
