@@ -115,9 +115,8 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         r'VPhoneVMLock\(': 'VM lock',
         r'lsof': 'lsof',
         r'"create-status"': 'create-status',
-        r'"doctor"': 'doctor',
         r'"launch"|"stop"|"new"|"create"|"delete"|"rename"|"clone"|"config"|"export"|"import"': 'VM-changing command',
-        r'"cfw"|"helper"|"core-bundle"|"install-bundle"|"register"': 'privileged or install command',
+        r'"cfw"|"install-bundle"|"verify-bundle"|"register"|"install"': 'privileged or install command',
         r'--sudo-password|--root-popup': 'privileged option',
         r'VPhoneHelper|SMAppService|SMJobBless|ServiceManagement|EPExecutionPolicy': 'helper or execution policy',
         r'control\.sock|vphone\.sock|NWListener|bind\(': 'control socket',
@@ -126,6 +125,10 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         r'VPhoneHostControl': 'host control',
     }
 
+    # B5: the read-only command names appear only in the command whitelist.
+    READ_ONLY_COMMANDS = r'"doctor"|"helper"|"core-bundle"'
+    WHITELIST = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadReadOnlyCommand.swift'
+
     def test_sources_stay_within_b1(self):
         sources = launchpad_swift()
         self.assertTrue(sources)
@@ -133,6 +136,19 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
             code = re.sub(r'//.*', '', text)  # comments may name what is avoided
             for pattern, what in self.FORBIDDEN.items():
                 self.assertIsNone(re.search(pattern, code), f'{what} in {path.relative_to(ROOT)}')
+            if path != self.WHITELIST:
+                self.assertIsNone(re.search(self.READ_ONLY_COMMANDS, code),
+                                  f'read-only command name outside the whitelist in {path.relative_to(ROOT)}')
+
+    def test_b5_whitelist_builds_only_read_only_commands(self):
+        code = re.sub(r'//.*', '', self.WHITELIST.read_text(encoding='utf-8'))
+        arrays = [re.findall(r'"([^"]*)"', body) for body in re.findall(r'\[("[^\]]*)\]', code)]
+        built = sorted({tuple(a) for a in arrays if a and a[0] in ('doctor', 'helper', 'core-bundle')})
+        self.assertEqual(built, [
+            ('core-bundle', 'verify', '--version'),
+            ('doctor', '--json', '--library-root'),
+            ('helper', 'status'),
+        ])
 
     def test_only_vm_list_is_run(self):
         runs = []

@@ -168,7 +168,8 @@ let package = Package(
         ),
         .testTarget(
             name: "VPhoneLaunchpadKitTests",
-            dependencies: ["VPhoneLaunchpadKit", "VPhoneCore"],
+            // VPhoneBundleStore only to compare the Core Bundle version rules (B5).
+            dependencies: ["VPhoneLaunchpadKit", "VPhoneCore", "VPhoneBundleStore"],
             path: "tests/VPhoneLaunchpadKitTests"
         ),
     ]

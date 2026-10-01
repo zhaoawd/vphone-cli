@@ -7,6 +7,7 @@ struct VPhoneLaunchpadRootView: View {
     @Environment(VPhoneLaunchpadModel.self) private var model
 
     var body: some View {
+        @Bindable var panels = model.panels
         VStack(spacing: 0) {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -16,7 +17,45 @@ struct VPhoneLaunchpadRootView: View {
         .background(VPhoneLaunchpadTheme.background)
         .fontDesign(.monospaced)
         .navigationTitle("Machines")
+        .toolbar {
+            ToolbarItemGroup(placement: .navigation) {
+                panelButton(.hostSetup, title: String(localized: "Host Setup"), systemImage: "checklist")
+                panelButton(.coreBundle, title: String(localized: "Core Bundle"), systemImage: "shippingbox")
+            }
+        }
+        .sheet(item: $panels.current, onDismiss: model.panels.didDismiss) { panel in
+            panelView(panel)
+        }
         .task { await model.start() }
+    }
+
+    // MARK: - Panels (B5)
+
+    /// Enabled once the embedded toolchain is verified: both panels run it.
+    private func panelButton(_ panel: VPhoneLaunchpadPanel, title: String, systemImage: String) -> some View {
+        Button {
+            model.panels.present(panel)
+        } label: {
+            Label(title: { Text(verbatim: title) }, icon: { Image(systemName: systemImage) })
+        }
+        .help(Text(verbatim: title))
+        .disabled(model.host == nil)
+    }
+
+    @ViewBuilder
+    private func panelView(_ panel: VPhoneLaunchpadPanel) -> some View {
+        switch (panel, model.toolchain) {
+        case (.hostSetup, _):
+            if let host = model.host {
+                VPhoneLaunchpadHostSetupView(host: host)
+            }
+        case let (.coreBundle, .verified(toolchain)):
+            if let bundles = model.coreBundle {
+                VPhoneLaunchpadCoreBundleView(toolchain: toolchain, bundles: bundles)
+            }
+        case (.coreBundle, _):
+            EmptyView()
+        }
     }
 
     @ViewBuilder
