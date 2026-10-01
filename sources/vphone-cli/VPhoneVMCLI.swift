@@ -61,7 +61,7 @@ struct VPhoneVMListCommand: ParsableCommand {
             print("(no VMs in \(library.root.path))")
         } else {
             for r in reports {
-                var line = "\(r.name)  \(r.cpuCount) CPU  \(r.memoryMB) MB  \(r.diskSizeBytes / (1024*1024*1024)) GB disk"
+                var line = "\(r.name)  \(r.cpuCount) CPU  \(r.memoryMB) MB  \(VPhoneDiskSize.gigabytes(bytes: r.diskSizeBytes)) GB disk"
                 if let info = r.restoreInfo {
                     line += "  iOS \(info.ios.version) / cloudOS \(info.cloudOS.version)"
                 }

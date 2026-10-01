@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import VPhoneCore
 import VPhoneLaunchpadKit
 
 // MARK: - New Machine
@@ -338,9 +339,10 @@ struct VPhoneLaunchpadNewMachineView: View {
         }
     }
 
-    /// Disk plus roughly 20 GB of IPSWs and the prepared restore tree (upstream).
+    /// Disk plus roughly 20 GB of IPSWs and the prepared restore tree (upstream),
+    /// in the stepper's unit (VPhoneDiskSize).
     private var spaceNote: String {
-        let free = (VPhoneLaunchpadMachineLocations.availableBytes(location) ?? 0) / 1_000_000_000
+        let free = VPhoneDiskSize.gigabytes(bytes: VPhoneLaunchpadMachineLocations.availableBytes(location) ?? 0)
         return String(localized: "Needs about \(diskSizeGB + 20) GB; \(free) GB free.")
     }
 
