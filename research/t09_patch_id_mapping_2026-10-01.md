@@ -156,3 +156,7 @@ grep -rin 'mis_trust_auth\|checkTrustAndAuthorization\|libmisfix\|RespectUppTrus
 ## 9. 与 0_binary_patch_comparison.md 的关系
 
 本任务未新增或改动补丁，仅建立声明层映射，未触及 `research/0_binary_patch_comparison.md`。若后续按 T10/T11 引入本地声明/Gate 或新增补丁，再按 CLAUDE.md 要求同步该文档。
+
+## Codex B1 声明记录（2026-10-01）
+
+`system-launchdaemons-boot-environment` 在本地声明中设为 regular + guestEnvironmentV2 opt-in，包含本地 `/vh` 加载命令说明。库清单与上游的差异继续见 T20/T18，B3 安装器尚未实施，不能据此确认磁盘安装等价。历史 `uncertain` 记录描述原基线；B1 的新范围与测试见 `v2_guest_environment_b1_2026-10-01.md`。

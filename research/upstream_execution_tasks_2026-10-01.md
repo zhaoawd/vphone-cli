@@ -12,8 +12,9 @@
 
 - 已完成：第 1 项，修改前两项新增回归失败；修改后 Python 559 项、相关 Swift 9 项通过。
 - 已完成：第 2 项，新增 clone 断言修改前失败；修改后 `make test_swift` 退出 0。
-- 进行中：B1，T16 检查点层级和 v2 记录判定已复现，实施中。
-- 待办：B2–B5；真实验收批准闸门；后续依赖任务。
+- 已完成：B1，Python 562 项及完整 Swift 测试通过；见 `v2_guest_environment_b1_2026-10-01.md`。
+- 进行中：B2，独立身份一致性测试修改前因新 plist 缺失而失败。
+- 待办：B3–B5；真实验收批准闸门；后续依赖任务。
 - 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；不执行真实 VM 验收。
 - 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。
 

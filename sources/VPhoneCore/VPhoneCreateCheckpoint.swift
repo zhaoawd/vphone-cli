@@ -60,6 +60,11 @@ public enum VPhoneCreateOverallStatus: String, Codable, Sendable {
 
 // MARK: - Options
 
+public enum VPhoneGuestEnvironmentProfile: String, Codable, Sendable {
+    case classic
+    case v2
+}
+
 public enum VPhonePrepareBackend: String, Codable, Sendable {
     case script
     case native
@@ -99,6 +104,8 @@ public struct VPhoneCreateSourceRecord: Codable, Equatable, Sendable {
 /// part of it and may differ between attempts.
 public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     public var variant: String
+    public var guestEnvironment: VPhoneGuestEnvironmentProfile?
+    public var effectiveGuestEnvironment: VPhoneGuestEnvironmentProfile { guestEnvironment ?? .classic }
     public var iphoneSource: VPhoneCreateSourceRecord?
     public var cloudosSource: VPhoneCreateSourceRecord?
     public var spoofBuild: String?
@@ -117,9 +124,11 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     public init(
         variant: String, iphoneSource: String?, cloudosSource: String?, spoofBuild: String?,
         forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64,
-        restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script
+        restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script,
+        guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
     ) {
         self.variant = variant
+        self.guestEnvironment = guestEnvironment == .classic ? nil : guestEnvironment
         self.iphoneSource = iphoneSource.map(VPhoneCreateSourceRecord.init)
         self.cloudosSource = cloudosSource.map(VPhoneCreateSourceRecord.init)
         self.spoofBuild = spoofBuild
@@ -151,6 +160,9 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         if effectivePrepareBackend != other.effectivePrepareBackend { result.append(("prepare_backend", .prepare)) }
         if effectiveRestoreBackend != other.effectiveRestoreBackend { result.append(("restore_backend", .restore)) }
         if enableFrida != other.enableFrida { result.append(("enable_frida", .patch)) }
+        if effectiveGuestEnvironment != other.effectiveGuestEnvironment {
+            result.append(("guest_environment", .cfw))
+        }
         if spoofBuild != other.spoofBuild { result.append(("spoof_build", .cfw)) }
         if forceDscMaxSlide != other.forceDscMaxSlide { result.append(("force_dsc_max_slide", .cfw)) }
         return result
@@ -409,6 +421,9 @@ public struct VPhoneCreateCheckpoint: Codable, Equatable, Sendable {
         guard inputsDigest == effectiveOptions.digest else { throw invalid("inputs_digest does not match effective_options") }
         guard ["regular", "dev", "jb", "exp", "less"].contains(effectiveOptions.variant) else {
             throw invalid("unknown variant \(effectiveOptions.variant)")
+        }
+        guard effectiveOptions.effectiveGuestEnvironment != .v2 || effectiveOptions.variant == "regular" else {
+            throw invalid("guest environment v2 supports only variant regular")
         }
         let names = stages.map(\.stage)
         guard Set(names).count == names.count else { throw invalid("duplicate stage records") }

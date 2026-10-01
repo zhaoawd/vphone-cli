@@ -100,6 +100,7 @@ public enum VariantPlanResolver {
         variant: FirmwarePipeline.Variant,
         gates: PatchGateSnapshot,
         baseVersionKnown: Bool = true,
+        guestEnvironmentV2: Bool = false,
         select: Set<String> = [],
         block: Set<String> = [],
         catalog: [PatchDeclaration] = PatchDeclarationCatalog.all
@@ -142,6 +143,14 @@ public enum VariantPlanResolver {
                 continue
             case .guestStep:
                 if declaration.variants.contains(variantName) {
+                    if declaration.optIn == .guestEnvironmentV2 && !guestEnvironmentV2 {
+                        excludedByOptIn.append(entry(declaration, .excludedByOptIn, "needs guest environment v2 opt-in"))
+                        continue
+                    }
+                    if blocked {
+                        excludedByOptIn.append(entry(declaration, .excludedByOptIn, "blocked by request"))
+                        continue
+                    }
                     guestUncovered.append(entry(declaration, .guestUncovered,
                         "guest Python/zsh step: declaration-only this round, execution not gated"))
                 }

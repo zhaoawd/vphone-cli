@@ -131,7 +131,7 @@ def make_bundle(vm, variant=None, checkpoint_variant=None):
     (vm / 'restore-info.json').write_text(json.dumps(info))
     if checkpoint_variant:
         (vm / '.create-checkpoint').mkdir(exist_ok=True)
-        (vm / '.create-checkpoint/checkpoint.json').write_text(json.dumps({'variant': checkpoint_variant}))
+        (vm / '.create-checkpoint/checkpoint.json').write_text(json.dumps({'effective_options': {'variant': checkpoint_variant}}))
     return vm
 
 
@@ -263,6 +263,46 @@ class AssessTests(Fixture):
         report = self.assess(make_system(self.root / 'sys', self.current_versions(), marker=False))
         self.assertEqual(report['classification'], 'full_migration_required')
         self.assertTrue(any('launchd.plist.bak' in reason for reason in report['reasons']))
+
+    def test_v2_record_matches_v2_disk_without_classic_variant_reason(self):
+        system = make_system(self.root / 'sys', self.current_versions())
+        vm = make_bundle(self.root / 'vm', variant='regular')
+        info = json.loads((vm / 'restore-info.json').read_text())
+        info['guest_environment'] = 'v2'
+        (vm / 'restore-info.json').write_text(json.dumps(info))
+        before = tree(vm)
+        report = self.assess(system, vm)
+        self.assertEqual(report['classification'], 'already_current')
+        self.assertEqual(report['guest_environment_records']['restore_info'], 'v2')
+        self.assertEqual(tree(vm), before)
+
+    def test_checkpoint_v2_record_without_bootstrap_reports_mismatch(self):
+        vm = make_bundle(self.root / 'vm', checkpoint_variant='regular')
+        record = vm / '.create-checkpoint/checkpoint.json'
+        record.write_text(json.dumps({'effective_options': {'variant': 'regular', 'guest_environment': 'v2'}}))
+        system = make_system(self.root / 'sys', self.current_versions(), alias=None, launchd_loads=())
+        report = self.assess(system, vm)
+        self.assertEqual(report['classification'], 'full_migration_required')
+        self.assertEqual(report['guest_environment_records']['checkpoint'], 'v2')
+        self.assertTrue(any('recorded guest environment v2' in reason for reason in report['reasons']))
+
+    def test_api_daemon_evidence_does_not_change_environment_classification(self):
+        vm = make_bundle(self.root / 'vm')
+        system = make_system(self.root / 'sys', self.current_versions())
+        absent = self.assess(system, vm)
+        profile = json.loads(MANIFEST.read_text())['profiles']['v2']['api_daemon']
+        binary = system / profile['program'].lstrip('/')
+        binary.write_bytes(b'api-daemon')
+        plist = system / 'System/Library/xpc/launchd.plist'
+        document = plistlib.loads(plist.read_bytes())
+        document['LaunchDaemons'][profile['launchd_key']] = {'Label': profile['label']}
+        plist.write_bytes(plistlib.dumps(document))
+        present = self.assess(system, vm)
+        self.assertEqual(present['classification'], absent['classification'])
+        self.assertEqual(present['daemon']['sha256'], sha(b'api-daemon'))
+        self.assertTrue(present['daemon']['launchd_key_present'])
+        self.assertFalse(absent['daemon']['launchd_key_present'])
+        self.assertTrue(absent['notes'])
 
     def test_classic_variant_record_on_a_v2_disk_requires_full_migration(self):
         system = make_system(self.root / 'sys', self.current_versions())
