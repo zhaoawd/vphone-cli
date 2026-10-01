@@ -555,6 +555,146 @@ struct ConsoleLogTests {
     }
 }
 
+// MARK: - Console log rotation
+
+@Suite(.timeLimit(.minutes(1)))
+@MainActor
+struct ConsoleLogRotationTests {
+    /// Starts `name` through the library, waits for its first serial line,
+    /// then lets the stand-in exit and waits for the exit line.
+    @MainActor
+    func startAndFinish(_ standIn: LaunchpadStandIn, _ library: VPhoneLaunchpadMachineLibrary, _ name: String) async throws {
+        let machine = standIn.path(name)
+        library.start(machine)
+        let child = try #require(library.launchedProcess(machine))
+        #expect(await eventually { standIn.log(name).contains("serial \(name) 1") })
+        standIn.touch("\(name).exit")
+        _ = await child.wait()
+        #expect(await eventually { standIn.log(name).contains("vm launch exited with status 7") })
+        try FileManager.default.removeItem(atPath: URL(fileURLWithPath: standIn.root).appendingPathComponent("\(name).exit").path)
+        #expect(await eventually { library.launchedProcess(machine) == nil })
+    }
+
+    func read(_ url: URL) -> String? {
+        try? String(contentsOf: url, encoding: .utf8)
+    }
+
+    @Test func previousLogNameKeepsTheStem() {
+        let logs = URL(fileURLWithPath: "/tmp/Logs", isDirectory: true)
+        #expect(VPhoneLaunchpadConsoleLog.previousLog(logs.appendingPathComponent("alpha.log")).lastPathComponent == "alpha.1.log")
+        #expect(VPhoneLaunchpadConsoleLog.previousLog(logs.appendingPathComponent("a.b-1a2b3c4d.log")).lastPathComponent
+            == "a.b-1a2b3c4d.1.log")
+    }
+
+    @Test func firstStartHasNoPreviousLog() async throws {
+        let standIn = try LaunchpadStandIn()
+        try standIn.makeMachines(["alpha"])
+        let library = await standIn.library()
+        let log = library.consoleLog(standIn.path("alpha"))
+        #expect(VPhoneLaunchpadConsoleLog.rotate(log, in: standIn.logs) == .noPreviousLog)
+        try await startAndFinish(standIn, library, "alpha")
+        #expect(!FileManager.default.fileExists(atPath: VPhoneLaunchpadConsoleLog.previousLog(log).path))
+        #expect(standIn.log("alpha").hasPrefix("launch alpha started\n"))
+    }
+
+    @Test func startKeepsThePreviousRunAsDotOne() async throws {
+        let standIn = try LaunchpadStandIn()
+        try standIn.makeMachines(["alpha"])
+        let library = await standIn.library()
+        let alpha = standIn.path("alpha")
+        try await startAndFinish(standIn, library, "alpha")
+        let first = standIn.log("alpha")
+        try await startAndFinish(standIn, library, "alpha")
+        // The console and Show Console Log still use the current log.
+        #expect(library.consoleLog(alpha) == standIn.logs.appendingPathComponent("alpha.log"))
+        #expect(read(standIn.logs.appendingPathComponent("alpha.1.log")) == first)
+        #expect(standIn.log("alpha").hasPrefix("launch alpha started\n"))
+        #expect(standIn.log("alpha").components(separatedBy: "launch alpha started").count == 2)
+    }
+
+    @Test func existingDotOneIsReplaced() async throws {
+        let standIn = try LaunchpadStandIn()
+        try standIn.makeMachines(["alpha"])
+        try FileManager.default.createDirectory(at: standIn.logs, withIntermediateDirectories: true)
+        try "older run\n".write(to: standIn.logs.appendingPathComponent("alpha.1.log"), atomically: true, encoding: .utf8)
+        try "previous run\n".write(to: standIn.logs.appendingPathComponent("alpha.log"), atomically: true, encoding: .utf8)
+        let library = await standIn.library()
+        try await startAndFinish(standIn, library, "alpha")
+        #expect(read(standIn.logs.appendingPathComponent("alpha.1.log")) == "previous run\n")
+        #expect(!standIn.log("alpha").contains("previous run"))
+        let names = try FileManager.default.contentsOfDirectory(atPath: standIn.logs.path).filter { $0.hasPrefix("alpha") }
+        #expect(names.sorted() == ["alpha.1.log", "alpha.log"])
+    }
+
+    @Test func symbolicLinkLogIsNotRotatedAndTheStartGoesOn() async throws {
+        let standIn = try LaunchpadStandIn()
+        try standIn.makeMachines(["alpha"])
+        try FileManager.default.createDirectory(at: standIn.logs, withIntermediateDirectories: true)
+        let target = standIn.temp.url.appendingPathComponent("elsewhere.txt")
+        try "not a log\n".write(to: target, atomically: true, encoding: .utf8)
+        let log = standIn.logs.appendingPathComponent("alpha.log")
+        try FileManager.default.createSymbolicLink(at: log, withDestinationURL: target)
+        #expect(VPhoneLaunchpadConsoleLog.rotate(log, in: standIn.logs) == .failed("alpha.log is a symbolic link"))
+
+        let library = await standIn.library()
+        try await startAndFinish(standIn, library, "alpha")
+        #expect(!FileManager.default.fileExists(atPath: standIn.logs.appendingPathComponent("alpha.1.log").path))
+        #expect(read(target) == "not a log\n")
+        let type = try FileManager.default.attributesOfItem(atPath: log.path)[.type] as? FileAttributeType
+        #expect(type == .typeRegular)
+        let lines = standIn.log("alpha").split(separator: "\n").map(String.init)
+        #expect(lines.first == "Launchpad did not keep the previous console log: alpha.log is a symbolic link")
+        #expect(lines.dropFirst().first == "launch alpha started")
+    }
+
+    @Test func startDoesNotReplaceTheLogOfAMachineNamedDotOne() async throws {
+        let standIn = try LaunchpadStandIn()
+        try standIn.makeMachines(["alpha", "alpha.1"])
+        try FileManager.default.createDirectory(at: standIn.logs, withIntermediateDirectories: true)
+        try "alpha run\n".write(to: standIn.logs.appendingPathComponent("alpha.log"), atomically: true, encoding: .utf8)
+        try "alpha.1 run\n".write(to: standIn.logs.appendingPathComponent("alpha.1.log"), atomically: true, encoding: .utf8)
+        let library = await standIn.library()
+        try await startAndFinish(standIn, library, "alpha")
+        #expect(standIn.log("alpha.1") == "alpha.1 run\n")
+        #expect(standIn.log("alpha").hasPrefix(
+            "Launchpad did not keep the previous console log: alpha.1.log is the console log of another machine\n"))
+    }
+
+    @Test func rotationStaysInTheLogsDirectory() throws {
+        let temp = try LaunchpadTemporaryDirectory("launchpad-rotate")
+        let logs = temp.url.appendingPathComponent("Logs", isDirectory: true)
+        let real = temp.url.appendingPathComponent("Real", isDirectory: true)
+        try FileManager.default.createDirectory(at: real, withIntermediateDirectories: true)
+        try "run\n".write(to: real.appendingPathComponent("alpha.log"), atomically: true, encoding: .utf8)
+        // A logs directory that is a symbolic link is not used.
+        try FileManager.default.createSymbolicLink(at: logs, withDestinationURL: real)
+        let rotation = VPhoneLaunchpadConsoleLog.rotate(logs.appendingPathComponent("alpha.log"), in: logs)
+        guard case let .failed(reason) = rotation else {
+            Issue.record("rotated through a symbolic link: \(rotation)")
+            return
+        }
+        #expect(reason.hasPrefix("cannot open"))
+        #expect(FileManager.default.fileExists(atPath: real.appendingPathComponent("alpha.log").path))
+        // A log outside the logs directory is not touched.
+        let outside = VPhoneLaunchpadConsoleLog.rotate(real.appendingPathComponent("alpha.log"), in: temp.url)
+        #expect(outside == .failed("\(real.appendingPathComponent("alpha.log").path) is not in \(temp.url.standardizedFileURL.path)"))
+        // Another machine's log (a machine named `alpha.1`) is not replaced.
+        try FileManager.default.removeItem(at: logs)
+        try FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
+        try "alpha\n".write(to: logs.appendingPathComponent("alpha.log"), atomically: true, encoding: .utf8)
+        try "alpha.1\n".write(to: logs.appendingPathComponent("alpha.1.log"), atomically: true, encoding: .utf8)
+        let reserved: Set<URL> = [logs.appendingPathComponent("alpha.1.log")]
+        #expect(VPhoneLaunchpadConsoleLog.rotate(logs.appendingPathComponent("alpha.log"), in: logs, reserved: reserved)
+            == .failed("alpha.1.log is the console log of another machine"))
+        #expect(read(logs.appendingPathComponent("alpha.1.log")) == "alpha.1\n")
+        // A directory in place of the log is left alone.
+        try FileManager.default.removeItem(at: logs.appendingPathComponent("alpha.log"))
+        try FileManager.default.createDirectory(at: logs.appendingPathComponent("alpha.log"), withIntermediateDirectories: true)
+        #expect(VPhoneLaunchpadConsoleLog.rotate(logs.appendingPathComponent("alpha.log"), in: logs)
+            == .failed("alpha.log is not a regular file"))
+    }
+}
+
 // MARK: - Log follower
 
 struct LogFollowerTests {

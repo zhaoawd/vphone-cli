@@ -31,12 +31,14 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     /// Starts `executable`. With `logFile`, the child is detached and writes
     /// to a new, empty file at that path (an earlier log there is replaced),
     /// or, with `appendingToLog`, after what the file already holds; `onLine`
-    /// then sees only the new lines.
+    /// then sees only the new lines. `preamble` starts a new file; it is
+    /// ignored when appending.
     init(
         executable: URL,
         arguments: [String],
         logFile: URL? = nil,
         appendingToLog: Bool = false,
+        preamble: String? = nil,
         onLine: @escaping @Sendable (String) -> Void
     ) throws {
         process.executableURL = executable
@@ -49,7 +51,8 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
             // A new file, not a truncated one: a follower still reading the
             // previous run sees the file number change and starts over.
             let keeps = appendingToLog && FileManager.default.fileExists(atPath: logFile.path)
-            guard keeps || FileManager.default.createFile(atPath: logFile.path, contents: nil) else {
+            guard keeps || FileManager.default.createFile(
+                atPath: logFile.path, contents: preamble.map { Data($0.utf8) }) else {
                 throw VPhoneLaunchpadError("Cannot create \(logFile.path)")
             }
             let reader = try FileHandle(forReadingFrom: logFile)

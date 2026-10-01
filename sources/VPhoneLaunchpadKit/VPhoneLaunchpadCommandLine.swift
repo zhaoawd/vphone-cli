@@ -171,15 +171,16 @@ public struct VPhoneLaunchpadCommandLine {
     /// Starts a long-running command (`vm launch`) and returns at once. Its
     /// output goes to `logFile`, so it outlives Launchpad. `onLine` runs on
     /// the reader thread: a guest console can print faster than the main
-    /// actor should wake for.
+    /// actor should wake for. `preamble` is written at the top of the new log.
     public func start(
         _ arguments: [String],
         logFile: URL,
+        preamble: String? = nil,
         onLine: @escaping @Sendable (String) -> Void
     ) throws -> VPhoneLaunchpadChildProcess {
         let entry = history.record(Self.display(arguments))
         let child = try VPhoneLaunchpadChildProcess(
-            executable: executable, arguments: arguments, logFile: logFile, onLine: onLine)
+            executable: executable, arguments: arguments, logFile: logFile, preamble: preamble, onLine: onLine)
         let history = history
         Task {
             let status = await child.wait()

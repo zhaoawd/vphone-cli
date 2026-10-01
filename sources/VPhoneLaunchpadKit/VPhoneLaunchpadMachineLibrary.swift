@@ -155,7 +155,9 @@ public final class VPhoneLaunchpadMachineLibrary {
         launched[machine]
     }
 
-    /// The machine's console log. Every start from Launchpad replaces it.
+    /// The machine's console log. Every start from Launchpad first renames
+    /// the previous one to `<stem>.1.log` (`VPhoneLaunchpadConsoleLog.rotate`),
+    /// then writes a new one here.
     public func consoleLog(_ machine: Path, suffix: String = "") -> URL {
         VPhoneLaunchpadMachineLocations.consoleLog(
             machine, suffix: suffix, defaultRoot: libraryRoot, logsDirectory: logsDirectory)
@@ -260,9 +262,16 @@ public final class VPhoneLaunchpadMachineLibrary {
             arguments.append("--headless")
         }
         let log = consoleLog(machine)
+        // Keep one earlier run. A failure does not stop the start; its
+        // reason opens the new log, where the console shows it.
+        let others = Set(machines.map(\.path).filter { $0 != machine }.map { consoleLog($0) })
+        var preamble: String?
+        if case let .failed(reason) = VPhoneLaunchpadConsoleLog.rotate(log, in: logsDirectory, reserved: others) {
+            preamble = VPhoneLaunchpadConsoleLog.rotationFailureLine(reason) + "\n"
+        }
         panicked.remove(machine)
         do {
-            let child = try commandLine.start(arguments, logFile: log) { [weak self] line in
+            let child = try commandLine.start(arguments, logFile: log, preamble: preamble) { [weak self] line in
                 if VPhoneLaunchpadConsoleLog.isPanic(line) {
                     Task { @MainActor in self?.panicked.insert(machine) }
                 }

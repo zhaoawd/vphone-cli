@@ -30,6 +30,69 @@ public enum VPhoneLaunchpadConsoleLog {
         _ = try? handle.seekToEnd()
         try? handle.write(contentsOf: Data("\n\(line)\n".utf8))
     }
+
+    // MARK: - Rotation
+
+    public enum Rotation: Equatable, Sendable {
+        /// There was no log to keep.
+        case noPreviousLog
+        /// The log is now `previousLog(_:)`.
+        case rotated
+        /// The log was left in place; the start replaces it. The reason is
+        /// shown at the top of the new log.
+        case failed(String)
+    }
+
+    /// `<stem>.1.log` next to `log`: the one earlier run that is kept.
+    public static func previousLog(_ log: URL) -> URL {
+        log.deletingPathExtension().appendingPathExtension("1").appendingPathExtension("log")
+    }
+
+    /// Renames `log` to `previousLog(log)` before a start, replacing an
+    /// earlier one. Works only in `logsDirectory`, which is opened without
+    /// following a symbolic link; the log itself must be a regular file, not
+    /// a symbolic link. `reserved` are logs of other machines that the rename
+    /// must not replace (a machine named `<name>.1`).
+    public static func rotate(_ log: URL, in logsDirectory: URL, reserved: Set<URL> = []) -> Rotation {
+        let directory = logsDirectory.standardizedFileURL
+        let previous = previousLog(log)
+        guard log.deletingLastPathComponent().standardizedFileURL.path == directory.path else {
+            return .failed("\(log.path) is not in \(directory.path)")
+        }
+        let name = log.lastPathComponent
+        let previousName = previous.lastPathComponent
+        if reserved.contains(where: { $0.standardizedFileURL.path == previous.standardizedFileURL.path }) {
+            return .failed("\(previousName) is the console log of another machine")
+        }
+        let descriptor = open(directory.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard descriptor >= 0 else {
+            let code = errno
+            return code == ENOENT ? .noPreviousLog : .failed("cannot open \(directory.path): \(String(cString: strerror(code)))")
+        }
+        defer { close(descriptor) }
+        var info = stat()
+        guard fstatat(descriptor, name, &info, AT_SYMLINK_NOFOLLOW) == 0 else {
+            let code = errno
+            return code == ENOENT ? .noPreviousLog : .failed("cannot read \(name): \(String(cString: strerror(code)))")
+        }
+        switch info.st_mode & S_IFMT {
+        case S_IFREG:
+            break
+        case S_IFLNK:
+            return .failed("\(name) is a symbolic link")
+        default:
+            return .failed("\(name) is not a regular file")
+        }
+        guard renameat(descriptor, name, descriptor, previousName) == 0 else {
+            return .failed("cannot rename \(name) to \(previousName): \(String(cString: strerror(errno)))")
+        }
+        return .rotated
+    }
+
+    /// The first line of a new console log when the previous one was not kept.
+    public static func rotationFailureLine(_ reason: String) -> String {
+        String(localized: "Launchpad did not keep the previous console log: \(reason)")
+    }
 }
 
 // MARK: - Follower
