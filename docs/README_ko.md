@@ -229,6 +229,14 @@ vphone-amfidont         # 로컬 빌드의 경우 .build/vphone-cli.app/Contents
 
 `vphone-cli`는 프로그래밍 방식 제어를 위한 호스트 제어 소켓(`<bundle>/vphone.sock`)을 노출합니다 — 스크린샷, 터치, 스와이프, 하드웨어 키, 클립보드 — 각 동작은 AI 주도 E2E 테스트를 위해 인라인 스크린샷을 반환합니다. 이를 감싸는 MCP 서버는 [vphone-mcp](https://github.com/pluginslab/vphone-mcp)를 참조하세요.
 
+셸에서 VM 이름으로 요청 하나를 보내려면 `vphone-cli guest send`(요청 객체를 그대로 전달) 또는 `vphone-cli guest rpc`(게스트 API 메서드를 래핑, VM은 `--api-listen`으로 시작해야 함)를 사용합니다. 응답 줄은 그대로 출력됩니다. 종료 코드는 `"ok":true`이면 0, 그 밖의 응답 객체이면 1, 유효한 응답이 없으면 2입니다.
+
+```bash
+vphone-cli guest send my-phone '{"t":"capabilities"}'
+vphone-cli guest rpc my-phone device.info
+echo '{"t":"key","name":"home"}' | vphone-cli guest send my-phone -
+```
+
 `--headless`(VM 창 없음)로 VM을 시작하면 능력 스냅샷이 `screen_available=false`를 보고하며, 화면에 의존하는 명령 — 스크린샷, 터치, 스와이프 — 은 사용할 수 없습니다; 하드웨어 키와 클립보드는 계속 사용할 수 있습니다.
 
 ## 감사의 말

@@ -314,7 +314,7 @@ amfidont：`scripts/start_amfidont_for_vphone.sh` 以 `--path "$PROJECT_ROOT"` �
 设计：
 
 - guest 控制只有一种协议：各 VM 的 `<bundle>/vphone.sock`（E1 约束 + T25 扩展）。Launchpad 不实现 `guest.send`、`guest.rpc` 转发。
-- T26 各批次不迁入 `VPhoneLaunchpadControlServer`、`VPhoneLaunchpadControlCommands`、`VPhoneLaunchpadControl`、`VPhoneLaunchpadCLI`。远程或脚本调用使用 `vphone-cli` 管理命令和 `scripts/host_control_client.py`。
+- T26 各批次不迁入 `VPhoneLaunchpadControlServer`、`VPhoneLaunchpadControlCommands`、`VPhoneLaunchpadControl`、`VPhoneLaunchpadCLI`。远程或脚本调用使用 `vphone-cli` 管理命令、`vphone-cli guest send/rpc`（见 [guest_cli_2026-10-01.md](guest_cli_2026-10-01.md)）和 `scripts/host_control_client.py`。
 - 若 T25 决定仍提供 app 级 socket，范围限定为管理命令：`status`、`vm.list`、`vm.start`、`vm.stop`、`vm.log`、`vm.create`/resume/status，均调用 Launchpad 模型中与 UI 相同的方法；不含 `exec`、`bundle.*`、`cfw.*`、`guest.*`。socket 路径与数据目录随第 11 节第 1 项的标识决定。
 
 ## 7. 设计系统

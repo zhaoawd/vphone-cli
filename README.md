@@ -406,6 +406,14 @@ The native Restore libraries are compiled for offline validation; the existing
 
 `vphone-cli` exposes a host control socket (`<bundle>/vphone.sock`) for programmatic control — screenshots, touch, swipes, hardware keys, clipboard — each action returning an inline screenshot for AI-driven E2E testing. See [vphone-mcp](https://github.com/pluginslab/vphone-mcp) for an MCP server wrapping it.
 
+To send one request from a shell, address the VM by name: `vphone-cli guest send` forwards a raw request object and `vphone-cli guest rpc` wraps a guest API method (the VM must be started with `--api-listen`). The response line is printed unchanged; exit status is 0 for `"ok":true`, 1 for any other response object, 2 when no valid response arrived.
+
+```bash
+vphone-cli guest send my-phone '{"t":"capabilities"}'
+vphone-cli guest rpc my-phone device.info
+echo '{"t":"key","name":"home"}' | vphone-cli guest send my-phone -
+```
+
 When a VM is launched with `--headless` (no VM window), the capability snapshot reports `screen_available=false` and the screen-dependent commands — screenshot, touch, and swipe — are unavailable; hardware keys and clipboard remain available.
 
 ## Acknowledgements

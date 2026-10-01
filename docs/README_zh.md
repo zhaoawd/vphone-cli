@@ -266,6 +266,14 @@ vphone-cli fw inspect /path/to/phone.ipsw --cloudos-source /path/to/cloud.ipsw -
 
 `vphone-cli` 暴露了一个宿主控制套接字（`<bundle>/vphone.sock`）用于程序化控制——截图、触控、滑动、硬件按键、剪贴板——每个动作都会返回一张内联截图，用于 AI 驱动的端到端测试。包装它的 MCP 服务器见 [vphone-mcp](https://github.com/pluginslab/vphone-mcp)。
 
+在 shell 中按 VM 名称发送单个请求：`vphone-cli guest send` 原样转发一个请求对象，`vphone-cli guest rpc` 封装一个客户机 API 方法（VM 须以 `--api-listen` 启动）。响应行原样输出；退出码 0 表示 `"ok":true`，1 表示其他响应对象，2 表示没有收到有效响应。
+
+```bash
+vphone-cli guest send my-phone '{"t":"capabilities"}'
+vphone-cli guest rpc my-phone device.info
+echo '{"t":"key","name":"home"}' | vphone-cli guest send my-phone -
+```
+
 当以 `--headless`（无 VM 窗口）启动 VM 时，能力快照报告 `screen_available=false`，依赖屏幕的命令——截图、触控、滑动——不可用；硬件按键与剪贴板仍可用。
 
 ## 致谢
