@@ -2,10 +2,11 @@ import Foundation
 import Observation
 
 /// The VM library, listed through `vphone-cli vm list --json`, started with
-/// `vm launch`, stopped with `vm stop`, and edited offline with `vm config`,
-/// `rename`, `clone`, `delete`, `export` and `import`. Launchpad never takes
-/// or probes a VM lock: `vphone-vm` holds it, and the CLI refuses
-/// conflicting work itself.
+/// `vm launch`, stopped with `vm stop`, edited offline with `vm config`,
+/// `rename`, `clone`, `delete`, `export` and `import`, and created with
+/// `vm create` (`VPhoneLaunchpadCreation`). Launchpad never takes or probes a
+/// VM lock: `vphone-vm` holds it, and the CLI refuses conflicting work
+/// itself.
 ///
 /// Machines can live in several libraries: the default one, and folders in
 /// the `VPhoneLaunchpadLibraryRoots` default. Each library is listed with its
@@ -37,6 +38,9 @@ public final class VPhoneLaunchpadMachineLibrary {
     /// What Launchpad is doing to a machine right now (`Stopping…`).
     public private(set) var activities: [Path: String] = [:]
     public var actionError: VPhoneLaunchpadError?
+    /// Create runs and the checkpoints shown for them, by machine
+    /// (`VPhoneLaunchpadCreation.swift`).
+    public internal(set) var creations: [Path: VPhoneLaunchpadCreation] = [:]
 
     /// The default library, canonical.
     public let libraryRoot: String
@@ -101,7 +105,14 @@ public final class VPhoneLaunchpadMachineLibrary {
     }
 
     public func canStart(_ machine: Path) -> Bool {
-        commandLine != nil && activities[machine] == nil && exports[machine] == nil && state(of: machine) == .stopped
+        commandLine != nil && activities[machine] == nil && exports[machine] == nil
+            && creations[machine]?.isRunning != true && state(of: machine) == .stopped
+    }
+
+    /// The command line monitoring was started with; nil until the embedded
+    /// toolchain is verified.
+    var currentCommandLine: VPhoneLaunchpadCommandLine? {
+        commandLine
     }
 
     /// Settings, rename, clone, export and delete are offered for a stopped
@@ -120,6 +131,9 @@ public final class VPhoneLaunchpadMachineLibrary {
         if exports[machine]?.isWaiting == true {
             return String(localized: "Waiting to export…")
         }
+        if creations[machine]?.isRunning == true {
+            return String(localized: "Creating…")
+        }
         return nil
     }
 
@@ -129,8 +143,11 @@ public final class VPhoneLaunchpadMachineLibrary {
         exports[machine]?.isRunning == true
     }
 
+    /// Not while a create run of this Launchpad uses the machine: its DFU
+    /// and first boots are the create's own; Stop Creating ends them.
     public func canStop(_ machine: Path) -> Bool {
-        commandLine != nil && activities[machine] == nil && state(of: machine).isRunning
+        commandLine != nil && activities[machine] == nil && creations[machine]?.isRunning != true
+            && state(of: machine).isRunning
     }
 
     /// The `vm launch` child this Launchpad holds for `machine`, until it exits.
@@ -139,8 +156,9 @@ public final class VPhoneLaunchpadMachineLibrary {
     }
 
     /// The machine's console log. Every start from Launchpad replaces it.
-    public func consoleLog(_ machine: Path) -> URL {
-        VPhoneLaunchpadMachineLocations.consoleLog(machine, defaultRoot: libraryRoot, logsDirectory: logsDirectory)
+    public func consoleLog(_ machine: Path, suffix: String = "") -> URL {
+        VPhoneLaunchpadMachineLocations.consoleLog(
+            machine, suffix: suffix, defaultRoot: libraryRoot, logsDirectory: logsDirectory)
     }
 
     // MARK: - Locations

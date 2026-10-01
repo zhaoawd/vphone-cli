@@ -2,15 +2,26 @@ import AppKit
 import SwiftUI
 import VPhoneLaunchpadKit
 
-/// A sheet for a machine's console log, which `vm launch` writes. Read only;
-/// the log stays on disk after the sheet closes.
+/// A sheet for a machine's console log, which `vm launch` writes, or its
+/// create log, which `vm create` writes. Read only; the log stays on disk
+/// after the sheet closes.
 struct VPhoneLaunchpadConsoleView: View {
-    let machine: VPhoneLaunchpadMachinePath
+    let title: Text
     let url: URL
     @Environment(\.dismiss) private var dismiss
 
+    init(machine: VPhoneLaunchpadMachinePath, url: URL) {
+        title = Text("\(machine.name) Console")
+        self.url = url
+    }
+
+    init(title: Text, url: URL) {
+        self.title = title
+        self.url = url
+    }
+
     var body: some View {
-        VPhoneLaunchpadSheet(Text("\(machine.name) Console")) {
+        VPhoneLaunchpadSheet(title) {
             VPhoneLaunchpadLogView(url: url)
                 .frame(minWidth: 820, maxWidth: .infinity, minHeight: 480, maxHeight: .infinity)
                 .overlay(Rectangle().strokeBorder(VPhoneLaunchpadTheme.border, lineWidth: VPhoneLaunchpadTheme.borderWidth))

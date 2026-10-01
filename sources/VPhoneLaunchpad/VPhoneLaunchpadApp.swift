@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import VPhoneLaunchpadKit
 
 // MARK: - App
 
@@ -14,6 +15,7 @@ struct VPhoneLaunchpadApp: App {
         Window(Text(verbatim: "vphone-launchpad"), id: "main") {
             VPhoneLaunchpadRootView()
                 .environment(model)
+                .onAppear { delegate.model = model }
         }
         .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
@@ -24,10 +26,16 @@ struct VPhoneLaunchpadApp: App {
 
 // MARK: - App delegate
 
-/// B1 starts no machine and has no menu bar mode, so quitting needs no
-/// confirmation and closing the window quits.
+/// Machines started with `vm launch` keep running when Launchpad quits
+/// (B2). A `vm create` started here would keep running too, in its own
+/// session, with nothing left to show its progress or stop it, so quitting
+/// while one runs asks first; Quit sends SIGINT to each create's process
+/// group (upstream `applicationShouldTerminate`). There is no menu bar mode
+/// yet (B6), so closing the window quits.
 @MainActor
 final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
+    weak var model: VPhoneLaunchpadModel?
+
     func applicationWillFinishLaunching(_: Notification) {
         // The design system is dark only.
         NSApp.appearance = NSAppearance(named: .darkAqua)
@@ -35,5 +43,23 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         true
+    }
+
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
+        guard let library = model?.machines,
+              case let .confirm(machines) = VPhoneLaunchpadQuit.decision(library)
+        else {
+            return .terminateNow
+        }
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Stop Creating Machines?")
+        alert.informativeText = String(localized: "vm create is running for \(machines.joined(separator: ", ")). Quitting sends SIGINT to its process group; the checkpoint then reads interrupted, and Resume continues from it later.")
+        alert.addButton(withTitle: String(localized: "Quit"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        guard alert.runModal() == .alertFirstButtonReturn else {
+            return .terminateCancel
+        }
+        VPhoneLaunchpadQuit.confirmed(library)
+        return .terminateNow
     }
 }

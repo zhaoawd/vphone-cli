@@ -7,14 +7,15 @@ import Foundation
 /// Two output modes:
 /// - A pipe, for commands that finish (`vm list --json`, `vm stop`). Output
 ///   ends when every holder of the pipe has closed it.
-/// - A log file, for `vm launch`. The machine must outlive Launchpad: with a
-///   pipe, quitting the app would close the read end and the next line of
-///   guest serial output would end `vm launch` with SIGPIPE. The child gets
-///   its own session, stdin on /dev/null and stdout and stderr appended to
-///   the file; the file is tailed while the app runs and stays behind as the
-///   machine's console log. The child is also made responsible for itself
-///   (disclaim), so macOS does not attribute it to Launchpad after the app
-///   quits.
+/// - A log file, for `vm launch` and `vm create`. The machine must outlive
+///   Launchpad: with a pipe, quitting the app would close the read end and
+///   the next line of guest serial output would end `vm launch` with
+///   SIGPIPE. The child gets its own session, stdin on /dev/null and stdout
+///   and stderr appended to the file; the file is tailed while the app runs
+///   and stays behind as the machine's console or create log. The child is
+///   also made responsible for itself (disclaim), so macOS does not attribute
+///   it to Launchpad after the app quits. Its session is also its process
+///   group, which `interruptGroup()` signals (T26 B4: cancelling a create).
 public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     private let process = Process()
     /// Set instead of `process` for a detached child.
@@ -28,11 +29,14 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     private var waiters: [CheckedContinuation<Int32, Never>] = []
 
     /// Starts `executable`. With `logFile`, the child is detached and writes
-    /// to a new, empty file at that path (an earlier log there is replaced).
+    /// to a new, empty file at that path (an earlier log there is replaced),
+    /// or, with `appendingToLog`, after what the file already holds; `onLine`
+    /// then sees only the new lines.
     init(
         executable: URL,
         arguments: [String],
         logFile: URL? = nil,
+        appendingToLog: Bool = false,
         onLine: @escaping @Sendable (String) -> Void
     ) throws {
         process.executableURL = executable
@@ -44,10 +48,14 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
                 at: logFile.deletingLastPathComponent(), withIntermediateDirectories: true)
             // A new file, not a truncated one: a follower still reading the
             // previous run sees the file number change and starts over.
-            guard FileManager.default.createFile(atPath: logFile.path, contents: nil) else {
+            let keeps = appendingToLog && FileManager.default.fileExists(atPath: logFile.path)
+            guard keeps || FileManager.default.createFile(atPath: logFile.path, contents: nil) else {
                 throw VPhoneLaunchpadError("Cannot create \(logFile.path)")
             }
             let reader = try FileHandle(forReadingFrom: logFile)
+            if keeps {
+                _ = try reader.seekToEnd()
+            }
             let pid = try Self.spawnDetached(executable: executable, arguments: arguments, logFile: logFile)
             detachedPID = pid
             Thread.detachNewThread { [self] in
@@ -114,6 +122,25 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
             return false
         }
         return kill(process.processIdentifier, SIGINT) == 0
+    }
+
+    /// SIGINT to the detached child's whole process group: the child and
+    /// every process it started that stayed in its group (a create's
+    /// `fw_prepare.sh`, restore tools, DFU `vphone-vm`). The group is the
+    /// child's own session, so Launchpad is not in it. Sent only while the
+    /// child has not been reaped: until then its PID, and with it the group
+    /// ID, cannot name anything else. False when nothing was sent.
+    @discardableResult
+    public func interruptGroup() -> Bool {
+        guard let detachedPID else {
+            return false
+        }
+        lock.lock()
+        defer { lock.unlock() }
+        guard !hasExited else {
+            return false
+        }
+        return killpg(detachedPID, SIGINT) == 0
     }
 
     // MARK: - Detached child

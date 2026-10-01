@@ -5,8 +5,9 @@ import VPhoneLaunchpadKit
 // MARK: - Machines
 
 /// The machine list: search, column sorting, an empty state, the inspector,
-/// start and stop, the console, and the offline edits of B3 (settings,
-/// rename, clone, export, import and delete), each through `vphone-cli vm`.
+/// start and stop, the console, the offline edits of B3 (settings, rename,
+/// clone, export, import and delete), and New Machine with its creation view
+/// (B4), each through `vphone-cli`.
 struct VPhoneLaunchpadMachinesView: View {
     typealias MachinePath = VPhoneLaunchpadMachinePath
 
@@ -17,6 +18,8 @@ struct VPhoneLaunchpadMachinesView: View {
         case export([MachinePath])
         case delete([MachinePath])
         case console(MachinePath)
+        case newMachine
+        case creation(MachinePath)
 
         var id: String {
             switch self {
@@ -26,6 +29,8 @@ struct VPhoneLaunchpadMachinesView: View {
             case let .export(machines): "export-\(machines.map(\.url.path).joined(separator: "|"))"
             case let .delete(machines): "delete-\(machines.map(\.url.path).joined(separator: "|"))"
             case let .console(machine): "console-\(machine.url.path)"
+            case .newMachine: "new-machine"
+            case let .creation(machine): "creation-\(machine.url.path)"
             }
         }
     }
@@ -36,6 +41,10 @@ struct VPhoneLaunchpadMachinesView: View {
     @State private var sortOrder: [KeyPathComparator<VPhoneLaunchpadMachine>] = []
     @State private var showsInspector = true
     @State private var sheet: Sheet?
+    /// Opened after the current sheet has gone (New Machine hands off to the
+    /// creation view), on the next turn of the main actor, as the panel
+    /// queue does (upstream `ded81cb`).
+    @State private var nextSheet: Sheet?
     /// The table appears only once `vm list` returns, after the window has
     /// picked its first responder, so nothing focuses it by itself.
     @FocusState private var tableIsFocused: Bool
@@ -74,6 +83,8 @@ struct VPhoneLaunchpadMachinesView: View {
                 if let machine = library.selected {
                     VPhoneLaunchpadMachineInspector(machine: machine) { path in
                         sheet = .console(path)
+                    } onOpenCreation: { path in
+                        sheet = .creation(path)
                     }
                 } else if library.selection.count > 1 {
                     ContentUnavailableView("\(library.selection.count) Machines Selected", systemImage: "iphone")
@@ -87,7 +98,7 @@ struct VPhoneLaunchpadMachinesView: View {
             .toolbar { inspectorToolbar }
         }
         .toolbar { toolbar }
-        .sheet(item: $sheet) { sheet in
+        .sheet(item: $sheet, onDismiss: sheetDidDismiss) { sheet in
             sheetContent(sheet)
                 .environment(model)
         }
@@ -125,6 +136,14 @@ struct VPhoneLaunchpadMachinesView: View {
                 }
                 .labelStyle(.titleAndIcon)
             }
+        }
+        ToolbarItem(placement: .automatic) {
+            Button {
+                sheet = .newMachine
+            } label: {
+                Label("New Machine…", systemImage: "plus")
+            }
+            .help("Create a machine with vphone-cli vm create")
         }
         ToolbarItem(placement: .automatic) {
             Button {
@@ -243,6 +262,9 @@ struct VPhoneLaunchpadMachinesView: View {
         }
         Button("Export…") { sheet = .export(machines.map(\.path)) }
             .disabled(!editable)
+        if machines.count == 1, let machine = machines.first, library.creations[machine.path] != nil {
+            Button("Show Creation…") { sheet = .creation(machine.path) }
+        }
         Divider()
         if machines.count == 1, let machine = machines.first {
             Button("Open Console") { sheet = .console(machine.path) }
@@ -328,6 +350,7 @@ struct VPhoneLaunchpadMachinesView: View {
             } description: {
                 Text(library.listError ?? String(localized: "Machines in \(VPhoneLaunchpadMachineLocations.abbreviated(URL(fileURLWithPath: library.libraryRoot, isDirectory: true))) appear here."))
             } actions: {
+                Button("New Machine…") { sheet = .newMachine }
                 Button("Import…") { chooseImport() }
                     .disabled(library.globalActivity != nil)
             }
@@ -351,6 +374,22 @@ struct VPhoneLaunchpadMachinesView: View {
             VPhoneLaunchpadDeleteView(machines: paths)
         case let .console(path):
             VPhoneLaunchpadConsoleView(machine: path, url: library.consoleLog(path))
+        case .newMachine:
+            VPhoneLaunchpadNewMachineView { path in
+                nextSheet = .creation(path)
+            }
+        case let .creation(path):
+            VPhoneLaunchpadCreationView(creation: library.creation(for: path))
+        }
+    }
+
+    private func sheetDidDismiss() {
+        guard let next = nextSheet else {
+            return
+        }
+        nextSheet = nil
+        Task { @MainActor in
+            sheet = next
         }
     }
 
@@ -369,16 +408,25 @@ struct VPhoneLaunchpadMachinesView: View {
     }
 
     /// Opens a sheet named on the command line (`-VPhoneLaunchpadOpenSheet
-    /// settingsSheet|renameSheet|cloneSheet|exportSheet|deleteSheet` for the
-    /// first machine, or `settingsAll`, `exportAll`, `deleteAll` for every
-    /// listed machine) once machines are listed, for the UI smoke check. Only
-    /// the arguments domain is read, so nothing persists; opening a sheet runs
-    /// no command.
+    /// settingsSheet|renameSheet|cloneSheet|exportSheet|deleteSheet|
+    /// creationSheet|resumeSheet` for the first machine, `settingsAll`,
+    /// `exportAll`, `deleteAll` for every listed machine, or `newMachine`,
+    /// `newMachineAdvanced`) once machines are listed, for the UI smoke check.
+    /// Only the arguments domain is read, so nothing persists. Opening a
+    /// sheet starts no create: New Machine runs only `fw catalog --json`, and
+    /// the creation view only reads the checkpoint file.
     private func openRequestedSheet() {
         let arguments = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
-        guard library.hasListed, sheet == nil, let name = arguments["VPhoneLaunchpadOpenSheet"] as? String,
-              let first = library.selected ?? library.machines.first
-        else { return }
+        guard library.hasListed, sheet == nil, let name = arguments["VPhoneLaunchpadOpenSheet"] as? String else {
+            return
+        }
+        if name == "newMachine" || name == "newMachineAdvanced" {
+            sheet = .newMachine
+            return
+        }
+        guard let first = library.selected ?? library.machines.first else {
+            return
+        }
         let all = library.machines
         switch name {
         case "settingsSheet": sheet = .settings([first])
@@ -389,6 +437,7 @@ struct VPhoneLaunchpadMachinesView: View {
         case "settingsAll": sheet = .settings(all)
         case "exportAll": sheet = .export(all.map(\.path))
         case "deleteAll": sheet = .delete(all.map(\.path))
+        case "creationSheet", "resumeSheet": sheet = .creation(first.path)
         default: break
         }
     }

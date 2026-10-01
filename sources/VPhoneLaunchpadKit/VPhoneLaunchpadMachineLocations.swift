@@ -110,6 +110,51 @@ public enum VPhoneLaunchpadMachineLocations {
         return path.utf8CString.count <= MemoryLayout.size(ofValue: sockaddr_un().sun_path)
     }
 
+    /// Why New Machine cannot create a machine in `root`, or nil (upstream
+    /// `problem(with:)`). Read-only: `statfs`, `stat` and `access` on the
+    /// root or its nearest existing ancestor; a missing root is created by
+    /// `vm create`. The CFW stage works on the bundle as root, so the volume
+    /// must keep ownership; APFS follows upstream.
+    public static func problem(with root: String) -> String? {
+        let url = URL(fileURLWithPath: root, isDirectory: true)
+        let shown = abbreviated(url)
+        let existing = existingAncestor(of: url)
+        var volume = statfs()
+        guard statfs(existing.path, &volume) == 0 else {
+            return String(localized: "Cannot read the volume of \(shown)")
+        }
+        let type = withUnsafeBytes(of: volume.f_fstypename) { String(decoding: $0.prefix { $0 != 0 }, as: UTF8.self) }
+        guard type == "apfs" else {
+            return String(localized: "\(shown) is not on an APFS volume.")
+        }
+        guard volume.f_flags & UInt32(MNT_IGNORE_OWNERSHIP) == 0 else {
+            return String(localized: "\(shown) is on a volume that ignores ownership. Select the volume in the Finder, choose File > Get Info, and turn off “Ignore ownership on this volume”.")
+        }
+        if existing.path == url.path {
+            var status = stat()
+            guard stat(root, &status) == 0, status.st_mode & S_IFMT == S_IFDIR else {
+                return String(localized: "Cannot read the volume of \(shown)")
+            }
+            guard status.st_uid == getuid() else {
+                return String(localized: "\(shown) is not owned by your user account.")
+            }
+            if FileManager.default.fileExists(atPath: url.appendingPathComponent("config.plist").path) {
+                return String(localized: "\(shown) is a machine. Choose the folder that contains it.")
+            }
+        }
+        guard access(existing.path, W_OK) == 0 else {
+            return String(localized: "You cannot write to \(abbreviated(existing)).")
+        }
+        return nil
+    }
+
+    /// Bytes free for important use on the volume holding `root`.
+    public static func availableBytes(_ root: String) -> Int64? {
+        let url = existingAncestor(of: URL(fileURLWithPath: root, isDirectory: true))
+        return (try? url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
+            .volumeAvailableCapacityForImportantUsage
+    }
+
     /// Added libraries from a stored list: absolute, canonical, not the
     /// default library, each once, in stored order.
     public static func addedRoots(from stored: [String], defaultRoot: String) -> [String] {

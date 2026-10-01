@@ -59,6 +59,7 @@ struct VPhoneLaunchpadMachineStateLabel: View {
 struct VPhoneLaunchpadMachineInspector: View {
     let machine: VPhoneLaunchpadMachine
     let onOpenConsole: (VPhoneLaunchpadMachinePath) -> Void
+    let onOpenCreation: (VPhoneLaunchpadMachinePath) -> Void
     @Environment(VPhoneLaunchpadModel.self) private var model
     /// Nil while the machine has no create checkpoint.
     @State private var creation: Result<VPhoneLaunchpadCreateSummary, VPhoneLaunchpadError>?
@@ -126,6 +127,10 @@ struct VPhoneLaunchpadMachineInspector: View {
 
             if let creation {
                 creationSection(creation)
+            } else if library.creations[machine.path]?.isRunning == true {
+                Section("Create Checkpoint") {
+                    Button("Show Creation…") { onOpenCreation(machine.path) }
+                }
             }
 
             Section("Console") {
@@ -199,6 +204,8 @@ struct VPhoneLaunchpadMachineInspector: View {
                         .foregroundStyle(VPhoneLaunchpadTheme.failed)
                         .textSelection(.enabled)
                 }
+                // Progress, Stop Creating and Resume (`vm create --resume`).
+                Button("Show Creation…") { onOpenCreation(machine.path) }
             case let .failure(error):
                 Label {
                     Text(verbatim: error.message)

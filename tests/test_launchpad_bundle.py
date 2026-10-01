@@ -106,8 +106,8 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
 
 
 class LaunchpadB1BoundaryTests(unittest.TestCase):
-    """B1/B2/B3/B5 boundaries: list, launch, stop and the offline edits through the
-    embedded toolchain only (T26 design 4, 5.1, 5.2, 9, 11.1)."""
+    """B1-B5 boundaries: list, launch, stop, the offline edits and vm create through
+    the embedded toolchain only (T26 design 4, 5.1-5.3, 9, 11.1)."""
 
     FORBIDDEN = {
         r'VPhoneVMLockProbe\.': 'lock probe',
@@ -116,19 +116,27 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         r'VPhoneVMLock\(': 'VM lock',
         r'VPhoneBundleGuard|VPhoneBundleOps': 'bundle lock or bundle operation outside the CLI',
         r'lsof': 'lsof',
-        r'"create-status"': 'create-status',
-        r'"new"|"create"|"--dfu"': 'VM-changing command',
+        r'"new"|"--dfu"': 'VM-changing command',
         r'"cfw"|"install-bundle"|"verify-bundle"|"register"|"install"': 'privileged or install command',
-        r'--sudo-password|--root-popup': 'privileged option',
+        # Launchpad handles no password and never asks for a terminal prompt.
+        r'--sudo-password|--interactive': 'password or interactive option',
         r'VPhoneHelper|SMAppService|SMJobBless|ServiceManagement|EPExecutionPolicy': 'helper or execution policy',
         r'control\.sock|vphone\.sock|NWListener|bind\(': 'control socket',
         r'ProcessInfo\.processInfo\.environment|getenv\(': 'environment lookup',
         r'VPhoneHostControl': 'host control',
-        r'SIGTERM|killpg\(': 'signal other than SIGINT to a single child',
+        r'SIGTERM': 'signal other than SIGINT',
     }
     # Only the child process type spawns detached children and sends signals.
     CHILD_PROCESS = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift'
-    CONFINED = {r'posix_spawn': 'detached spawn', r'\bkill\(': 'kill'}
+    CONFINED = {r'posix_spawn': 'detached spawn', r'\bkill\(': 'kill', r'\bkillpg\(': 'process group signal'}
+
+    # B4: vm create, its resume and status, the firmware catalog and the only
+    # privileged option (`--root-popup`, the system authentication dialog) appear
+    # only in the create command file.
+    CREATE_COMMANDS = (r'"create"|"create-status"|"fw"|"catalog"|--root-popup|"--resume"|"--restart-from"|'
+                       r'"--accept-tool-change"|"--keep-artifacts"')
+    CREATE_FILE = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreateCommand.swift'
+    CREATION = ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift'
 
     # B5: the read-only command names appear only in the command whitelist.
     READ_ONLY_COMMANDS = r'"doctor"|"helper"|"core-bundle"'
@@ -158,6 +166,9 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
             if path != self.WHITELIST:
                 self.assertIsNone(re.search(self.READ_ONLY_COMMANDS, code),
                                   f'read-only command name outside the whitelist in {path.relative_to(ROOT)}')
+            if path != self.CREATE_FILE:
+                self.assertIsNone(re.search(self.CREATE_COMMANDS, code),
+                                  f'create command or option outside the create command file in {path.relative_to(ROOT)}')
             if path != self.EDIT_FILE:
                 self.assertIsNone(re.search(self.EDIT_COMMANDS, code),
                                   f'edit command name outside the edit command file in {path.relative_to(ROOT)}')
@@ -207,18 +218,66 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
         code = re.sub(r'//.*', '', self.CHILD_PROCESS.read_text())
         self.assertEqual(sorted(re.findall(r'\bkill\(([^)]*)\)', code)),
                          ['detachedPID, SIGINT', 'process.processIdentifier, SIGINT'])
+        # B4: the create's process group, only while its leader is unreaped.
+        self.assertEqual(re.findall(r'\bkillpg\(([^)]*)\)', code), ['detachedPID, SIGINT'])
+        group = code.split('public func interruptGroup()', 1)[1].split('// MARK:', 1)[0]
+        self.assertRegex(group, r'guard !hasExited else \{\s*return false\s*\}\s*return killpg\(detachedPID, SIGINT\) == 0')
+
+    def test_b4_create_file_builds_only_create_commands(self):
+        code = re.sub(r'//.*', '', self.CREATE_FILE.read_text(encoding='utf-8'))
+        arrays = [re.findall(r'"([^"]*)"', body) for body in re.findall(r'\[("[^\]]*)\]', code)]
+        built = sorted({tuple(a) for a in arrays if a and a[0] in ('vm', 'fw')})
+        self.assertEqual(built, [
+            ('fw', 'catalog', '--json'), ('vm', 'create'), ('vm', 'create', '--resume'),
+            ('vm', 'create-status', '--json'),
+        ])
+        # Every create and resume carries the system authentication dialog option, once.
+        self.assertEqual(code.count('"--root-popup"'), 2)
+        self.assertEqual(code.count('arguments.append("--root-popup")'), 2)
+        # The tool change is accepted only when the caller passes the confirmation.
+        self.assertEqual(code.count('"--accept-tool-change"'), 1)
+        self.assertRegex(code, r'if acceptToolChange \{\s*arguments\.append\("--accept-tool-change"\)')
+        # less is refused before anything is built.
+        self.assertIn('self != .less', code)
+        self.assertRegex(code, r'guard request\.variant\.isAvailable else \{\s*return \.variantUnavailable')
+        self.assertRegex(code, r'guard let variant = VPhoneLaunchpadCreateVariant\(rawValue: variant\), variant\.isAvailable')
+        # Every machine command names its library root.
+        for start in (r'\["vm", "create", request\.name\] \+ request\.machine\.libraryArguments',
+                      r'\["vm", "create", machine\.name, "--resume"\] \+ machine\.libraryArguments',
+                      r'\["vm", "create-status", machine\.name, "--json"\] \+ machine\.libraryArguments'):
+            self.assertRegex(code, start)
+        self.assertIn('private init(_ kind: Kind, _ arguments: [String])', code)
+
+    def test_b4_status_runs_once_after_the_create_exits(self):
+        sources = launchpad_swift()
+        calls = {path: re.sub(r'//.*', '', text).count('VPhoneLaunchpadCreateCommand.status(')
+                 for path, text in sources.items() if path != self.CREATE_FILE}
+        self.assertEqual({path: n for path, n in calls.items() if n}, {self.CREATION: 1})
+        code = re.sub(r'//.*', '', self.CREATION.read_text(encoding='utf-8'))
+        follow = code.split('private func follow(', 1)[1].split('public func cancel()', 1)[0]
+        self.assertLess(follow.index('while child.isRunning'), follow.index('await waiter.value'))
+        self.assertLess(follow.index('await waiter.value'), follow.index('VPhoneLaunchpadCreateCommand.status('))
+        # The periodic list refresh reads no checkpoint and runs no create command.
+        library = re.sub(r'//.*', '', (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text())
+        refresh = library.split('public func refresh() async {', 1)[1].split('// MARK: - Start and stop', 1)[0]
+        self.assertNotIn('VPhoneLaunchpadCreate', refresh)
+        self.assertNotIn('Checkpoint', refresh)
 
     def test_only_vm_list_stop_and_launch_are_run(self):
-        runs, starts, typed = [], [], []
+        runs, starts, typed, catalog = [], [], [], []
         for path, text in launchpad_swift().items():
             runs += re.findall(r'\.run\(\s*\[([^\]]*)\]', text)
             starts += re.findall(r'commandLine\.start\(\s*(\w+)', text)
             typed += re.findall(r'commandLine\.run\(\s*(\w+)\s*\)', text)
+            catalog += re.findall(r'commandLine\.run\(\s*VPhoneLaunchpadCreateCommand\.(\w+)', text)
         self.assertEqual(sorted(re.findall(r'"([^"]+)"', arguments)[:3] for arguments in runs),
                          [['vm', 'list', '--json'], ['vm', 'stop']])
-        self.assertEqual(starts, ['arguments'])
-        # B3/B5: everything else runs a whitelisted command value.
-        self.assertEqual(sorted(typed), ['command', 'command', 'command'])
+        # B2 `vm launch`; B4 `vm create` and `--resume`, a whitelisted command value.
+        self.assertEqual(sorted(starts), ['arguments', 'command'])
+        # B3/B5: everything else runs a whitelisted command value; B4 adds the
+        # one create-status after a create run and the firmware catalog.
+        self.assertEqual(sorted(typed), ['command', 'command', 'command', 'status'])
+        self.assertEqual(catalog, ['catalog'])
         library = (ROOT / 'sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift').read_text()
         self.assertIn('var arguments = ["vm", "launch", machine.name] + machine.libraryArguments', library)
 

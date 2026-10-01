@@ -2,9 +2,10 @@ import Foundation
 import Observation
 import VPhoneLaunchpadKit
 
-/// Owns the embedded toolchain check, the machine library, the command
-/// history and the panels: read-only Host Setup and Core Bundle (B5) and
-/// Recent Commands (B3). There is no helper client and no control socket.
+/// Owns the embedded toolchain check, the machine library (with its create
+/// runs, B4), the command history and the panels: read-only Host Setup and
+/// Core Bundle (B5) and Recent Commands (B3). There is no helper client and
+/// no control socket.
 @MainActor
 @Observable
 final class VPhoneLaunchpadModel {
@@ -24,6 +25,8 @@ final class VPhoneLaunchpadModel {
     /// Set once the toolchain is verified; the panels run only through it.
     private(set) var host: VPhoneLaunchpadHostSetup?
     private(set) var coreBundle: VPhoneLaunchpadCoreBundle?
+    /// The embedded `vphone-cli`, once verified (New Machine's catalog).
+    private(set) var commandLine: VPhoneLaunchpadCommandLine?
 
     /// Checks the embedded toolchain, then lists machines. Nothing is listed
     /// and no command runs when the check fails.
@@ -39,6 +42,7 @@ final class VPhoneLaunchpadModel {
             toolchain = .verified(verified)
             FileHandle.standardOutput.write(Data("[launchpad] embedded toolchain verified (\(verified.manifest.gitHash))\n".utf8))
             let commandLine = VPhoneLaunchpadCommandLine(toolchain: verified, history: history)
+            self.commandLine = commandLine
             host = VPhoneLaunchpadHostSetup(commandLine: commandLine, libraryRoot: machines.libraryRoot)
             coreBundle = VPhoneLaunchpadCoreBundle(commandLine: commandLine)
             machines.startMonitoring(with: commandLine)
