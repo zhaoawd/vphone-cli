@@ -66,6 +66,7 @@ enum VPhoneHostRPC {
                          "services.disable", "services.remove", "services.signal", "services.load",
                          "services.unload", "launchd.getenv", "launchd.setenv", "launchd.unsetenv"])
         add("environment_update", ["environment.status"])
+        add("environment_activation", ["environment.loaded"])
         return table
     }()
 
@@ -76,7 +77,8 @@ enum VPhoneHostRPC {
         "location.set": "bypasses location owner and generation; use location_source_set or location_stream_*",
         "location.clear": "bypasses location owner and generation; use location_source_stop",
         "agent.apply_update": "guest daemon replacement has its own update transaction",
-        "environment.install": "guest library replacement has its own update transaction",
+        "environment.install": "guest library replacement has its own update transaction; use environment_update",
+        "environment.restore": "guest library replacement has its own update transaction; use environment_rollback",
     ]
 
     // MARK: - Validation

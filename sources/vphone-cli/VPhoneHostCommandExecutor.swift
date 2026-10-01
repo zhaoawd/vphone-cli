@@ -14,6 +14,8 @@ final class VPhoneHostCommandExecutor {
     private let locationProvider: (any VPhoneHostLocation)?
     private let screen: (any VPhoneHostScreen)?
     private let target: VPhoneHostTarget?
+    /// `scripts/guest_environment.json` for the T17 environment commands.
+    private let environmentManifest: URL
     let inputQueue = VPhoneHostInputQueue()
 
     init(control: (any VPhoneHostGuest)? = nil,
@@ -22,9 +24,12 @@ final class VPhoneHostCommandExecutor {
          screen: (any VPhoneHostScreen)? = nil,
          apiSession: (any VPhoneHostAPISession)? = nil,
          bootMode: BootMode = .normal,
-         target: VPhoneHostTarget? = nil) {
+         target: VPhoneHostTarget? = nil,
+         environmentManifest: URL? = nil) {
         self.bootMode = bootMode
         self.target = target
+        self.environmentManifest = environmentManifest
+            ?? VPhoneResources.resolve().scriptsDir.appendingPathComponent("guest_environment.json")
         self.apiSession = bootMode == .normal ? apiSession : nil
         self.control = bootMode == .normal ? control : nil
         cameraServer = bootMode == .normal ? camera : nil
@@ -71,6 +76,13 @@ final class VPhoneHostCommandExecutor {
         if Task.isCancelled { return Self.response(ok: false, error: "command cancelled", extra: ["code": "command_cancelled"]) }
         if type == "rpc" {
             return await forward(json, screenDelay: screenDelay)
+        }
+        // Guest library replacement has its own path; `rpc` refuses
+        // environment.install and environment.restore (T17).
+        if VPhoneGuestEnvironmentUpdater.commands.contains(type) {
+            let outcome = await VPhoneGuestEnvironmentUpdater(session: apiSession, manifestURL: environmentManifest)
+                .execute(type, request: json)
+            return Self.response(ok: outcome.ok, error: outcome.error, extra: outcome.fields)
         }
         if let transport = json["transport"] {
             guard let name = transport as? String, ["classic", "api"].contains(name) else {
@@ -1013,6 +1025,7 @@ final class VPhoneHostCommandExecutor {
         }
         let rpcMethods = VPhoneHostRPC.availableMethods(apiSession)
         commands["rpc"] = !rpcMethods.isEmpty
+        commands.merge(VPhoneGuestEnvironmentUpdater.capabilities(apiSession)) { $1 }
         result["commands"] = commands
         result["rpc_methods"] = rpcMethods
         if let target { result["target"] = target.fields }

@@ -85,6 +85,10 @@ enum GuestAPI {
                 "file_tools",
                 "packages",
                 "environment_update",
+                // T17: install journals with backups, environment.restore.
+                "environment_transaction",
+                // T17: environment.loaded (mapped library copies per process).
+                "environment_activation",
             ],
         ]
     }

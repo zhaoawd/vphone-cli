@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
@@ -28,3 +29,18 @@ typedef struct {
 
 /// Identity and resource usage for one process. Returns false when the process is gone.
 bool vp_process_usage(int pid, VPProcessUsage *usage);
+
+typedef struct {
+    uint32_t device;
+    uint64_t inode;
+    char path[1024];
+} VPMappedFile;
+
+/// Distinct vnode-backed regions of a process (file identity and the path the
+/// kernel reports). Returns the count, or -1 with errno set: EPERM/ESRCH when
+/// the process cannot be inspected, ENOBUFS when `capacity` is too small.
+/// `flavor_used` (optional) receives the proc_pidinfo flavor that answered.
+int vp_process_mapped_files(int pid, VPMappedFile *files, int capacity, int *flavor_used);
+
+/// Test hook: whether the private proc_info mirror has the given layout.
+bool vp_proc_info_layout_matches(size_t size, size_t vnode_offset, size_t path_offset, size_t inode_offset);

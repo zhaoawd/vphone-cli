@@ -19,7 +19,7 @@ struct VPhoneGuestCommand: ParsableCommand {
         without "ok":true (still printed to stdout); 2 no valid response
         (reason on stderr, nothing on stdout).
         """,
-        subcommands: [VPhoneGuestSendCommand.self, VPhoneGuestRPCCommand.self]
+        subcommands: [VPhoneGuestSendCommand.self, VPhoneGuestRPCCommand.self, VPhoneGuestEnvCommand.self]
     )
 }
 
