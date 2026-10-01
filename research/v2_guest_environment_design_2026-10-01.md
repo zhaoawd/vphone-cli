@@ -333,3 +333,13 @@ T17 第一段验收前提调整：原方案 B（经典 `file_put` + `shell` 热�
 - 没有运行任何构建、测试或 VM；第 1 节以外的结论都是设计。
 - 子代理整理的上游与本地事实已逐项抽查以下位置：上游安装器 `:523-665`、`:855-960`、`:1056-1092`；上游 `InjectionEnvironment.h:1-70` 与 `launchdhook-vphone.c:77-110`；`standard.plist:100-117`；本地 `SystemHook-vphone.c`、`launchdhook-vphone.c` 全文；`cfw_env_update.py:215-390`；`cfw_install_host.sh:60-75`、`:380-415`；`VPhoneCreateCheckpoint.swift:8-32`、`:98-135`、`:405-418`；`VPhoneCreateLiveStages.swift:265-278`；`VPhoneVirtualMachineManifest.swift:178-188`；`vphoned.m:505-540`、`:636-650`；`vphoned_native.m:11-14`、`:55-110`；`GuestAPI.swift:343-360`；`VPhoneHostAPICommands.swift:16-20`；`VPhoneHostRPC.swift:75-83`；`vphoned_vcam.h:24-29`；API `vphoned_vcam.m:340-375`；`main.swift:1-30`。其余行号来自子代理报告，未逐一复核。
 - 1.4 节的真实环境发现来自主会话，本文未复核。
+
+## 12. 用户决定（2026-10-01）
+
+- D1：首批只开放 `regular`；`dev` 在 regular 真实验收通过后开放；jb、exp、less 拒绝。
+- D2：新增与 variant 正交的 `--guest-environment classic|v2`，默认 `classic`；不新增 variant 值。
+- D3：v2 VM 中 API 守护进程与经典守护进程并行、持久运行；修改本地 daemon 的标签、程序路径与缓存路径，关闭其 1338 相机监听（与上游不同）。
+- D4：仍安装两个候选相机库，验收时相机记为“不提供”；T16/T17 判定规则不变。
+- D5：已有 classic VM 的迁移命令推迟到 B6，只在命令自建的克隆上执行。
+- D6：待 R4 真实验收结果后再定。
+- 实施顺序：B1–B5 依次实施，随后执行 R1–R9 真实验收（需用户授权的步骤届时单独确认）。
