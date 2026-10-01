@@ -116,7 +116,7 @@ struct VPhoneCFWCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "cfw",
         abstract: "Custom-firmware install (host-mount; VM must be off; re-execs sudo)",
-        subcommands: [VPhoneCFWInstallCommand.self])
+        subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUpdateEnvironmentCommand.self])
 }
 
 struct VPhoneCFWInstallCommand: ParsableCommand {

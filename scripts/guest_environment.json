@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "description": "Guest environment library list for offline eligibility and replacement (scripts/cfw_env_update.py). The API daemon keeps the same names in sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift; tests/test_cfw_env_update.py checks both against this file.",
+  "libraries": [
+    {
+      "name": "launchdhook-vphone.dylib",
+      "stage": "launchhook/launchdhook-vphone.dylib",
+      "guest": "usr/lib/launchdhook-vphone.dylib",
+      "loaded_by": "launchd, through its /vh load command, once per guest boot"
+    },
+    {
+      "name": "SystemHook-vphone.dylib",
+      "stage": "systemhook/SystemHook-vphone.dylib",
+      "guest": "usr/lib/SystemHook-vphone.dylib",
+      "loaded_by": "processes spawned by launchd after launchdhook-vphone inserts it"
+    },
+    {
+      "name": "libvcamcaptured.dylib",
+      "stage": "vcamcaptured/libvcamcaptured.dylib",
+      "guest": "usr/lib/libvcamcaptured.dylib",
+      "loaded_by": "cameracaptured when it starts (SystemHook loads it)"
+    },
+    {
+      "name": "libcamfix.dylib",
+      "stage": "camfix/libcamfix.dylib",
+      "guest": "usr/lib/libcamfix.dylib",
+      "loaded_by": "camera client apps when they start (SystemHook loads it)"
+    },
+    {
+      "name": "libvlocation.dylib",
+      "stage": "locationfix/libvlocation.dylib",
+      "guest": "usr/lib/libvlocation.dylib",
+      "loaded_by": "app processes when they start (SystemHook loads it); kept locally, see research/t20_location_2026-10-01.md"
+    }
+  ],
+  "upstream_only": [
+    {
+      "name": "libmisfix.dylib",
+      "guest": "usr/lib/libmisfix.dylib",
+      "task": "T18",
+      "note": "upstream 2.2.3 environment library; not built or installed locally"
+    }
+  ],
+  "install_marker": "System/Library/xpc/launchd.plist.bak",
+  "launchd": "sbin/launchd",
+  "load_alias": {
+    "path": "vh",
+    "target": "/usr/lib/launchdhook-vphone.dylib",
+    "load_command": "/vh"
+  },
+  "classic_bootstrap": {
+    "path": "b",
+    "load_command": "/b",
+    "note": "jb/exp BaseBin launchdhook alias (scripts/cfw_install_jb.sh, scripts/cfw_install_exp.sh)"
+  },
+  "classic_variants": ["regular", "dev", "jb", "exp"],
+  "not_applicable_variants": ["less"],
+  "candidate_stage": ".build/guest-components-v2/stage"
+}

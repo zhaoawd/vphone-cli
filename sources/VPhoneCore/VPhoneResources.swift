@@ -74,6 +74,10 @@ public struct VPhoneResources: Sendable {
     public var resourceArchivesDir: URL { scriptsDir.appendingPathComponent("resources") }
     public var fwPrepareScript: URL { scriptsDir.appendingPathComponent("fw_prepare.sh") }
     public var cfwInstallHostScript: URL { scriptsDir.appendingPathComponent("cfw_install_host.sh") }
+    /// T16 stopped-VM environment eligibility and replacement.
+    public var cfwEnvUpdateScript: URL { scriptsDir.appendingPathComponent("cfw_env_update.py") }
+    /// Signed guest environment candidates (`make guest_components_build`).
+    public var guestComponentsStage: URL { base.appendingPathComponent(".build/guest-components-v2/stage") }
     public var preflightScript: URL { scriptsDir.appendingPathComponent("boot_host_preflight.sh") }
     public var pmd3Bridge: URL { scriptsDir.appendingPathComponent("pymobiledevice3_bridge.py") }
     public var cfwPy: URL { patchersDir.appendingPathComponent("cfw.py") }

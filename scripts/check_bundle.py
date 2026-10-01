@@ -10,6 +10,7 @@ import tempfile
 REQUIRED = (
     'AppIcon.icns', 'build-dependencies.json', 'requirements.txt', 'debs.list', 'README.md',
     'scripts/fw_prepare.sh', 'scripts/cfw_install_host.sh', 'scripts/cfw_disk_txn.py',
+    'scripts/cfw_env_update.py', 'scripts/guest_environment.json',
     'scripts/cfw_install.sh', 'scripts/cfw_install_dev.sh',
     'scripts/cfw_install_jb.sh', 'scripts/cfw_install_exp.sh',
     'scripts/lib/cfw_common.sh',
