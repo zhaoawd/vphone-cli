@@ -171,16 +171,18 @@ public final class VPhoneManagedProcess: @unchecked Sendable {
     }
 
     /// `interrupt()` (SIGINT), then escalate to an unmaskable `SIGKILL` if
-    /// the process is still running after a ~2 s grace period. `SIGKILL` (not
+    /// the process is still running after `grace` (default 2 s). `SIGKILL` (not
     /// `Process.terminate()`'s `SIGTERM`) is required here: a child that
     /// traps or ignores `SIGTERM` would otherwise survive and hang
     /// `terminate()`/`waitUntilExit()` forever — exactly the kind of
     /// DFU/boot child this class manages.
-    public func terminate() {
+    /// A VM boot process needs a longer grace: on SIGINT it shuts the guest
+    /// down and exits through its cleanup, which removes `vphone.sock`.
+    public func terminate(grace: TimeInterval = 2) {
         guard process.isRunning else { return }
         process.interrupt()
 
-        let deadline = Date().addingTimeInterval(2)
+        let deadline = Date().addingTimeInterval(grace)
         while process.isRunning && Date() < deadline {
             Thread.sleep(forTimeInterval: 0.05)
         }

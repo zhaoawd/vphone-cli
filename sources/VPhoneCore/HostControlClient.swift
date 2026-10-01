@@ -28,6 +28,45 @@ public enum HostControlClient {
         case responseTooLarge(limit: Int)
     }
 
+    // MARK: - Stale socket
+
+    /// Deletes a control socket no process listens on any more: a VM process
+    /// that ends without its cleanup (SIGKILL) leaves `<bundle>/vphone.sock`.
+    /// Only a socket owned by this user whose connection is refused, and only
+    /// while the path still names the inode that was probed. Returns true when
+    /// it was deleted.
+    @discardableResult
+    public static func removeStaleSocket(at socketPath: String) -> Bool {
+        var info = stat()
+        guard lstat(socketPath, &info) == 0, info.st_mode & S_IFMT == S_IFSOCK, info.st_uid == geteuid() else {
+            return false
+        }
+        var address = sockaddr_un()
+        address.sun_family = sa_family_t(AF_UNIX)
+        let path = Array(socketPath.utf8)
+        guard !path.contains(0), path.count < MemoryLayout.size(ofValue: address.sun_path) else { return false }
+        withUnsafeMutableBytes(of: &address.sun_path) { buffer in
+            buffer.copyBytes(from: path)
+            buffer[path.count] = 0
+        }
+        let probe = socket(AF_UNIX, SOCK_STREAM, 0)
+        guard probe >= 0 else { return false }
+        guard fcntl(probe, F_SETFL, O_NONBLOCK) == 0 else { close(probe); return false }
+        let result = withUnsafePointer(to: &address) { pointer in
+            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                connect(probe, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
+            }
+        }
+        let connectError = errno
+        close(probe)
+        guard result < 0, connectError == ECONNREFUSED else { return false }
+        var current = stat()
+        guard lstat(socketPath, &current) == 0, current.st_dev == info.st_dev, current.st_ino == info.st_ino else {
+            return false
+        }
+        return unlink(socketPath) == 0
+    }
+
     // MARK: - Exchange
 
     /// Sends `request` plus LF and returns the response line without its LF.

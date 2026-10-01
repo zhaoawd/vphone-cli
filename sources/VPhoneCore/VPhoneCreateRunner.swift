@@ -250,6 +250,7 @@ public struct VPhoneCreateRunner {
     ) throws -> VPhoneCreateCheckpoint {
         let bundleURL = bundleURL.standardizedFileURL
         let store = try VPhoneCreateCheckpointStore.initialize(bundleURL: bundleURL, hooks: storeHooks)
+        defer { Self.removeRuntimeRecord(bundleURL) }
         let identity = VPhoneCreateBundleIdentity(
             name: bundleURL.lastPathComponent, path: bundleURL.path,
             directoryId: try VPhoneCreateDigest.directoryId(bundleURL),
@@ -270,6 +271,7 @@ public struct VPhoneCreateRunner {
 
         // 1. Occupancy: only one create/resume run, and no other bundle operation.
         let store = try VPhoneCreateCheckpointStore.open(bundleURL: bundleURL, hooks: storeHooks)
+        defer { Self.removeRuntimeRecord(bundleURL) }
         if bundleLockHeld(bundleURL) {
             throw VPhoneCreateRunError.bundleBusy("another process holds the bundle lock of \(bundleURL.path); stop it first")
         }
@@ -629,6 +631,13 @@ public struct VPhoneCreateRunner {
     }
 
     // MARK: Helpers
+
+    /// Every checkpoint write leaves `.vphone-runtime.json` naming this
+    /// process (operation `create-checkpoint`); a run that returns, with or
+    /// without an error, deletes it. Records of other holders are kept.
+    static func removeRuntimeRecord(_ bundleURL: URL) {
+        VPhoneVMLock.removeRecord(directory: bundleURL, operation: VPhoneVMOperation.createCheckpoint)
+    }
 
     private func context(
         bundleURL: URL, checkpoint: VPhoneCreateCheckpoint, overrides: OptionOverrides

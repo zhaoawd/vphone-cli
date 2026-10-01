@@ -1111,10 +1111,19 @@ private let allStages = VPhoneCreateStage.allCases
     /// holder deletes it on release, and readers check the kernel lock and pid
     /// liveness. Checkpoint writes follow the same rule; what must not remain is
     /// the lock itself, on the success path and on a failed write alike.
-    @Test func checkpointWritesReleaseTheBundleLockAndLeaveOnlyADiagnosticRecord() throws {
+    /// B4 acceptance (2026-10-01): a finished create left `.vphone-runtime.json`
+    /// naming its exited pid (operation create-checkpoint). Every checkpoint
+    /// write still releases the bundle lock; a run that returns, with or
+    /// without an error, also deletes the record it wrote.
+    @Test func checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() throws {
         let f = try Fixture(); defer { f.cleanup() }
+        var seen: [String?] = []
+        f.fake.onExecute = { _ in seen.append(VPhoneVMRuntimeState.read(in: f.bundle)?.operation) }
         try f.create(f.runner(), variant: "regular")
-        #expect(VPhoneVMRuntimeState.read(in: f.bundle)?.operation == VPhoneVMOperation.createCheckpoint)
+        // While the run went on, the record named it between stages.
+        #expect(seen.first == VPhoneVMOperation.createCheckpoint)
+        #expect(VPhoneVMRuntimeState.read(in: f.bundle) == nil)
+        #expect(!FileManager.default.fileExists(atPath: f.bundle.appendingPathComponent(VPhoneVMRuntimeState.filename).path))
         #expect(!VPhoneVMLockProbe.isLockHeld(directory: f.bundle))
 
         let g = try Fixture(); defer { g.cleanup() }
@@ -1123,13 +1132,37 @@ private let allStages = VPhoneCreateStage.allCases
             if step == .rename, checkpoint.record(.restore).status == .failed { throw InjectedWriteFailure() }
         }
         #expect(throws: VPhoneCreateRunError.self) { try g.create(g.runner(inject: inject)) }
-        #expect(VPhoneVMRuntimeState.read(in: g.bundle)?.operation == VPhoneVMOperation.createCheckpoint)
+        #expect(VPhoneVMRuntimeState.read(in: g.bundle) == nil)
         #expect(!VPhoneVMLockProbe.isLockHeld(directory: g.bundle))
 
-        // The leftover record does not block the next holder, which replaces it.
-        let vm = try VPhoneVMLock(directory: g.bundle, operation: VPhoneVMOperation.boot)
-        #expect(VPhoneVMRuntimeState.read(in: g.bundle)?.operation == VPhoneVMOperation.boot)
-        withExtendedLifetime(vm) {}
+        // A resume that runs stages removes its record as well.
+        g.fake.resetCalls()
+        try g.runner().resume(bundleURL: g.bundle)
+        #expect(VPhoneVMRuntimeState.read(in: g.bundle) == nil)
+    }
+
+    /// Records written by other processes stay: a run removes only its own.
+    @Test func runKeepsARecordWrittenByAnotherProcess() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        try f.create(f.runner(), variant: "regular")
+        let other = VPhoneVMRuntimeState(
+            bundleIdentifier: "1:2", bundlePath: f.bundle.path, pid: getpid() + 1, instanceID: "OTHER",
+            startedAt: Date(), operation: VPhoneVMOperation.createCheckpoint)
+        try other.write(in: f.bundle)
+        // Nothing to resume: no write, and the other process's record is kept.
+        try f.runner().resume(bundleURL: f.bundle)
+        #expect(VPhoneVMRuntimeState.read(in: f.bundle)?.instanceID == "OTHER")
+        // A holder of the bundle lock keeps its record even when it names this pid.
+        var held: VPhoneVMLock? = try VPhoneVMLock(directory: f.bundle, operation: VPhoneVMOperation.createCheckpoint)
+        #expect(!VPhoneVMLock.removeRecord(directory: f.bundle, operation: VPhoneVMOperation.createCheckpoint))
+        #expect(VPhoneVMRuntimeState.read(in: f.bundle)?.instanceID == held?.state.instanceID)
+        held = nil
+        // Another operation's record is kept.
+        var boot: VPhoneVMLock? = try VPhoneVMLock(directory: f.bundle, operation: VPhoneVMOperation.boot)
+        #expect(boot != nil)
+        boot = nil
+        #expect(!VPhoneVMLock.removeRecord(directory: f.bundle, operation: VPhoneVMOperation.createCheckpoint))
+        #expect(VPhoneVMRuntimeState.read(in: f.bundle)?.operation == VPhoneVMOperation.boot)
     }
 
     @Test func missingCheckpointIsNotResumable() throws {

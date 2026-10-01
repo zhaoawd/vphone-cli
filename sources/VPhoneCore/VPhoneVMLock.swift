@@ -87,4 +87,23 @@ public final class VPhoneVMLock {
         _ = flock(descriptor, LOCK_UN)
         close(descriptor)
     }
+
+    /// Deletes the runtime record when this process wrote it for `operation`
+    /// and no process holds the bundle lock now. The flock is taken (without
+    /// waiting) for the check and the deletion, so a holder that acquires the
+    /// lock afterwards writes its own record and never loses it. Returns true
+    /// when the record was deleted. A record left by a process that ended
+    /// without this step names an exited pid, which every reader treats as stale.
+    @discardableResult
+    public static func removeRecord(directory: URL, operation: String, writtenBy pid: pid_t = getpid()) -> Bool {
+        let directory = directory.resolvingSymlinksInPath().standardizedFileURL
+        let fd = open(directory.path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
+        guard fd >= 0 else { return false }
+        defer { close(fd) }
+        guard flock(fd, LOCK_EX | LOCK_NB) == 0 else { return false }
+        defer { _ = flock(fd, LOCK_UN) }
+        guard let record = VPhoneVMRuntimeState.read(in: directory), record.pid == pid, record.operation == operation
+        else { return false }
+        return unlink(directory.appendingPathComponent(VPhoneVMRuntimeState.filename).path) == 0
+    }
 }

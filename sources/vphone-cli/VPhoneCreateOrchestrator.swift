@@ -366,17 +366,24 @@ public struct VPhoneCreateOrchestrator {
     }
 
     static func printRecoveryHint(name: String, bundleURL: URL, error: Error) {
-        let lines = recoveryHintLines(
-            name: name, bundleURL: bundleURL, error: error,
-            holder: { VPhoneVMRuntimeState.read(in: $0).flatMap { record in
-                guard let identity = VPhoneProcessInfo.identity(of: record.pid), !identity.isZombie else { return nil }
-                return "pid \(record.pid) running operation \"\(record.operation)\""
-            } })
+        let lines = recoveryHintLines(name: name, bundleURL: bundleURL, error: error, holder: { liveHolder($0) })
         guard !lines.isEmpty else { return }
         print("\n" + lines.joined(separator: "\n"))
         // stdout is buffered when redirected; flush so the hint precedes the
         // `Error:` line ArgumentParser writes to stderr afterwards.
         fflush(stdout)
+    }
+
+    /// The runtime record's holder when its pid still runs. A record names
+    /// the last holder and is never proof of a current one: a process that
+    /// ended without deleting its record (SIGKILL, forced exit) left a pid
+    /// that no longer exists, or that the kernel gave to another process.
+    static func liveHolder(_ bundleURL: URL, identity: (pid_t) -> VPhoneProcessIdentity? = VPhoneProcessInfo.identity(of:)) -> String? {
+        guard let record = VPhoneVMRuntimeState.read(in: bundleURL),
+              let process = identity(record.pid), !process.isZombie,
+              process.startedAt <= record.startedAt.timeIntervalSince1970 + 1
+        else { return nil }
+        return "pid \(record.pid) running operation \"\(record.operation)\""
     }
 
     /// The hint printed after a failed create or resume.
@@ -728,11 +735,33 @@ public struct VPhoneCreateOrchestrator {
         return result
     }
 
+    /// SIGINT grace for a VM child, as `vm stop` uses: the boot process asks
+    /// the guest to power off, waits up to `VPhoneShutdownPolicy.gracefulTimeout`,
+    /// force-stops, and exits through `applicationWillTerminate`, which deletes
+    /// `vphone.sock`. The former 2 s grace sent SIGKILL during that shutdown.
+    static let vmStopGrace = TimeInterval(VPhoneShutdownPolicy.defaultStopTimeout)
+
     static func withStoppedChild<T>(
-        _ child: VPhoneManagedProcess, _ label: String, timeout: TimeInterval = childExitTimeout, _ body: () throws -> T
+        _ child: VPhoneManagedProcess, _ label: String, timeout: TimeInterval = childExitTimeout,
+        grace: TimeInterval = vmStopGrace, _ body: () throws -> T
     ) throws -> T {
         try withStoppedChild(
-            label, timeout: timeout, stop: { child.terminate() }, awaitExit: { awaitExit(child, timeout: $0) }, body)
+            label, timeout: timeout,
+            stop: {
+                // A cancelled create has already sent SIGINT; a second one
+                // makes the boot process skip the graceful shutdown.
+                if VPhoneChildCancellation.current?.isRequested != true { child.terminate(grace: grace) }
+            },
+            awaitExit: { awaitExit(child, timeout: $0) }, body)
+    }
+
+    /// Deletes `<bundle>/vphone.sock` when the stage's VM process ended
+    /// without deleting it (SIGKILL); a live listener keeps it.
+    static func removeStaleControlSocket(_ bundleURL: URL) {
+        let socket = bundleURL.appendingPathComponent("vphone.sock").path
+        if HostControlClient.removeStaleSocket(at: socket) {
+            print("[*] Removed \(socket) left by the stopped VM process.")
+        }
     }
 
     /// Bounded wait for a managed child to exit. `VPhoneManagedProcess` only
@@ -760,6 +789,7 @@ public struct VPhoneCreateOrchestrator {
         let dfu = VPhoneManagedProcess(
             selfExecutable, ["--config", configURL.path, "--dfu"], cwd: bundleURL, echo: false)
         try dfu.start()
+        defer { Self.removeStaleControlSocket(bundleURL) }
         return try Self.withStoppedChild(dfu, "DFU boot process") {
             try restoreWithDFU(dfu, bundleURL: bundleURL, verbosity: v, backend: backend)
         }
@@ -1032,6 +1062,7 @@ public struct VPhoneCreateOrchestrator {
         trace("spawn \(selfExecutable.path) \(args.joined(separator: " ")) (guest serial: off)", v)
         let boot = VPhoneManagedProcess(selfExecutable, args, cwd: bundleURL, echo: false)
         try boot.start()
+        defer { Self.removeStaleControlSocket(bundleURL) }
         return try Self.withStoppedChild(boot, "first-boot VM process") {
             try firstBootSession(boot, interactive: interactive, verbosity: v)
         }
@@ -1081,6 +1112,7 @@ public struct VPhoneCreateOrchestrator {
         let vm = VPhoneManagedProcess(
             selfExecutable, ["--config", configURL.path, "--headless"], cwd: bundleURL, echo: false)
         try vm.start()
+        defer { Self.removeStaleControlSocket(bundleURL) }
         try Self.withStoppedChild(vm, "boot-analysis VM process") {
             try analyzeBoot(vm, verbosity: v)
         }
@@ -1113,6 +1145,7 @@ public struct VPhoneCreateOrchestrator {
         print("\n=== Start VM ===")
         let args = ["--config", configURL.path, "--variant", "less"]
         trace("spawn \(selfExecutable.path) \(args.joined(separator: " ")) (echo=\(v.showsToolDetail))", v)
+        defer { Self.removeStaleControlSocket(bundleURL) }
         let code = try VPhoneProcessRunner.runStreaming(
             selfExecutable, args, cwd: bundleURL, echo: v.showsToolDetail)
         guard code == 0 else { throw VPhoneCreateError.lessBootFailed(code) }

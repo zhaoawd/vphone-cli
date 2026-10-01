@@ -180,5 +180,8 @@ struct CreateCancellationEndToEndTests {
         #expect(transcript.contains("stopped by SIGINT during prepare"), "\(transcript)")
         #expect(!VPhoneCreateCheckpointStore.isRunLockHeld(bundleURL: bundle))
         #expect(!VPhoneVMLockProbe.isLockHeld(directory: bundle))
+        // The run removed the runtime record it wrote with its last checkpoint write.
+        #expect(!fm.fileExists(atPath: bundle.appendingPathComponent(VPhoneVMRuntimeState.filename).path),
+                "\(String(describing: VPhoneVMRuntimeState.read(in: bundle)))")
     }
 }
