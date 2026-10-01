@@ -437,6 +437,8 @@ amfidont：`scripts/start_amfidont_for_vphone.sh` 以 `--path "$PROJECT_ROOT"` �
 4. B1 只提供 `make launchpad`；是否并入 `make build` 与 CI bundle 任务在 B6 后决定。
 5. B2、B4 的真实 VM 验收在对应批次单独授权。
 
+B1 之后的决定（2026-10-01）：每次 `make build` 后 `vphone-cli` cdhash 变化，接受由 `make launchpad` 重新组装，`check_launchpad` 用于发现过期产物；SwiftPM 在 `make build` 中同时编译 Launchpad target 保持现状；冒烟检查留下的两个偏好设置文件保留。下一批为 B2、B3、B5；B2 先以替身进程验证，真实 VM 验收另行授权。
+
 ## 12. 事实、推断与待验证汇总
 
 事实：第 1 节、第 3.1 节 E1–E13、5.2 与 5.3 中标注为事实的内容，均有命令或源码位置。
