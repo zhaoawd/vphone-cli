@@ -718,13 +718,13 @@ public struct VPhoneDiagnostics: Sendable {
         }
 
         let residue = ((try? FileManager.default.contentsOfDirectory(atPath: url.path)) ?? [])
-            .filter { $0.hasPrefix(".cfw_mount.") }.sorted()
+            .filter { $0.hasPrefix(".cfw_mount.") || $0.hasPrefix(".cfw_disk.") }.sorted()
         if !residue.isEmpty {
             findings.append(finding(.occupancy, .cfwMountResidue, held ? .ok : .warning,
-                                    held ? "CFW mount directories exist while an operation holds the bundle"
-                                        : "CFW mount directories remain from an earlier install",
+                                    held ? "CFW mount or disk staging directories exist while an operation holds the bundle"
+                                        : "CFW mount or disk staging directories remain from an earlier install",
                                     ["directories": residue.joined(separator: ", ")],
-                                    held ? nil : "check `mount` and `hdiutil info`; detach anything mounted there, then remove the empty directories"))
+                                    held ? nil : "check `mount` and `hdiutil info`; detach anything mounted there, then remove the empty directories; a .cfw_disk.* directory holds an unpublished staged copy (Disk.img itself was not written), see its transaction.json"))
         }
         return Occupancy(findings: findings, holderOperation: holder)
     }

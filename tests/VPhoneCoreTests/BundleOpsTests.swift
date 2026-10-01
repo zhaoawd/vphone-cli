@@ -358,6 +358,11 @@ struct BundleOpsTests {
         try Data([0]).write(to: b.url.appendingPathComponent("cfw_jb_input/f"))
         try fm.createDirectory(at: b.url.appendingPathComponent(".cfw_temp"), withIntermediateDirectories: true)
         try Data([0]).write(to: b.url.appendingPathComponent(".cfw_temp/f"))
+        // T15: unpublished staged copy and the CFW history (previous Disk.img).
+        try fm.createDirectory(at: b.url.appendingPathComponent(".cfw_disk.AbCd1234"), withIntermediateDirectories: true)
+        try Data([0]).write(to: b.url.appendingPathComponent(".cfw_disk.AbCd1234/staged-marker"))
+        try fm.createDirectory(at: b.url.appendingPathComponent(".cfw-history/20261001T000000Z-AbCd1234"), withIntermediateDirectories: true)
+        try Data([0]).write(to: b.url.appendingPathComponent(".cfw-history/20261001T000000Z-AbCd1234/previous-marker"))
 
         let archive = root.appendingPathComponent("orig.tgz")
         try VPhoneBundleOps.export(bundleNamed: "orig", to: archive, includeIPSW: false, in: lib)
@@ -368,6 +373,10 @@ struct BundleOpsTests {
         #expect(!listing.stdout.contains("cfw_input"))
         #expect(!listing.stdout.contains("cfw_jb_input"))
         #expect(!listing.stdout.contains(".cfw_temp"))
+        #expect(!listing.stdout.contains(".cfw_disk."))
+        #expect(!listing.stdout.contains(".cfw-history"))
+        #expect(!listing.stdout.contains("staged-marker"))
+        #expect(!listing.stdout.contains("previous-marker"))
         // The real payload still travels.
         #expect(listing.stdout.contains("Disk.img"))
         #expect(listing.stdout.contains("config.plist"))

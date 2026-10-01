@@ -1,10 +1,15 @@
 #!/bin/zsh
 # cfw_install_host.sh — CFW install by host-mounting the VM's Disk.img.
 #
-# Attaches the VM's Disk.img on the host and hands the container to the variant
-# installer (cfw_install*.sh), which mounts the APFS volumes and places every
-# CFW file directly. Then flips the boot snapshot offline
-# (tools/apfs_snap_rename.py) so the VM boots the live volume.
+# Stages a copy of the VM's Disk.img (APFS clone, else a SHA-256-verified sparse
+# full copy, else refusal; scripts/cfw_disk_txn.py), attaches that copy on the
+# host and hands the container to the variant installer (cfw_install*.sh),
+# which mounts the APFS volumes and places every CFW file directly. Then flips
+# the boot snapshot offline on the copy (tools/apfs_snap_rename.py) so the VM
+# boots the live volume, and publishes the copy over Disk.img with
+# renamex_np(RENAME_SWAP) (two RENAME_EXCL renames where the volume rejects
+# RENAME_SWAP, as HFS+ does). The previous disk is kept in .cfw-history/<id>/.
+# Any failure before publication leaves the original Disk.img unmodified.
 #
 # Prereqs: VM restored (make restore) and powered off; host has gnu-tar, ipsw,
 # aea, ldid, zstd, project venv (make setup_tools). SIP disabled (project
@@ -42,7 +47,7 @@ unset SUDO_ASKPASS   # already root: host_hdiutil/pre-step use plain sudo/hdiuti
 
 VM_DIR="$(cd "$VM_DIR" && pwd -P)"
 IMG="$VM_DIR/Disk.img"
-[[ -f "$IMG" ]] || { echo "[-] no Disk.img at $IMG" >&2; exit 1; }
+[[ -f "$IMG" && ! -L "$IMG" ]] || { echo "[-] no Disk.img (regular file) at $IMG" >&2; exit 1; }
 
 # Host-side install toolchain (gnu-tar/ipsw/aea/ldid/zstd + venv python).
 # VPHONE_PYTHON overrides the venv python (e.g. a bundled .app has no .venv);
@@ -72,10 +77,6 @@ if [[ -n "${FORCE_DSC_MAXSLIDE:-}" ]]; then
   unset FORCE_DSC_MAXSLIDE
 fi
 
-if lsof "$IMG" >/dev/null 2>&1; then
-  echo "[-] $IMG is in use — stop the VM first." >&2; exit 1
-fi
-
 # A previous invocation may have left mounted volumes. Do not change owners or
 # begin another installation until those volumes have been inspected/unmounted.
 assert_no_vm_mounts() {
@@ -91,11 +92,49 @@ assert_no_vm_mounts() {
 }
 assert_no_vm_mounts
 
+# Only root's and the invoker's entries change owner; see the ownership note
+# near the end of this script.
+restore_invoker_ownership() {
+  local target="$1"
+  find -x "$target" \( -type d ! -user 0 ! -user "$SUDO_UID" -prune \) -o \
+    \( \( -type d -o \( -type f -links 1 \) \) \( -user 0 -o -user "$SUDO_UID" \) \
+       -exec chown -h "$SUDO_UID" {} + \)
+}
+
+# T15 disk transaction. This process holds a read-only descriptor on the
+# original Disk.img for its whole run; identity checks compare it with the
+# name, and the busy check excludes this process and the helper only. The
+# original is never opened for writing: CFW goes to the staged copy, which is
+# published by an exchange rename after every step succeeded. Long-running
+# children (hdiutil attach, installers) do not inherit the descriptor.
+exec {DISK_FD}<"$IMG"
+CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
+CFW_STAGED_IMG=""
+TXN_STATE=none
+txn() {
+  local command="$1"; shift
+  "$PY" "$SCRIPT_DIR/cfw_disk_txn.py" "$command" --fd "$DISK_FD" --owner-pid $$ "$@" "$VM_DIR" "$CFW_DISK_WORK"
+}
+# Record an unpublished run: remove the copy (kept when its mounts could not be
+# released), verify the original, archive the record in .cfw-history.
+txn_abort() {
+  local code="$1" retain="$2" record
+  [[ "$TXN_STATE" != published && -d "$CFW_DISK_WORK" ]] || return 0
+  record=$(txn finish --exit-code "$code" ${retain:+--retain-staged}) || return 1
+  if [[ -n "${SUDO_USER:-}" && "${SUDO_UID:-}" =~ '^[0-9]+$' ]]; then
+    [[ "$record" == "$VM_DIR/.cfw-history/"* ]] && record="$VM_DIR/.cfw-history"
+    [[ -d "$record" && ! -L "$record" ]] && restore_invoker_ownership "$record"
+  fi
+  return 0
+}
+
 # One private directory per invocation, including temporary Cryptex mounts.
 # Keep it beneath the VM directory so installer path checks remain applicable.
 CFW_HOST_MNT=$(mktemp -d "$VM_DIR/.cfw_mount.XXXXXXXX")
 export CFW_HOST_MNT
 BASEDISK=""
+CLEANUP_DONE=0
+CLEANUP_FAILED=0
 
 attached_disk() {
   "$PY" -c 'import plistlib,re,sys
@@ -170,9 +209,14 @@ cleanup() {
   return 0
 }
 finish() {
-  local original=$?
+  local original=$? retain=""
   trap - EXIT INT TERM HUP
-  if ! cleanup; then
+  if (( ! CLEANUP_DONE )) && ! cleanup; then
+    (( original != 0 )) || original=1
+    CLEANUP_FAILED=1
+  fi
+  (( CLEANUP_FAILED )) && retain=1
+  if ! txn_abort "$original" "$retain"; then
     (( original != 0 )) || original=1
   fi
   exit "$original"
@@ -182,32 +226,49 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 trap 'exit 129' HUP
 
-echo "[*] host-mode CFW install: variant=$VARIANT vm=$VM_DIR mounts=$CFW_HOST_MNT"
-hdiutil attach -plist -nomount -imagekey diskimage-class=CRawDiskImage "$IMG" > "$CFW_HOST_MNT/attach.log"
+echo "[*] host-mode CFW install: variant=$VARIANT vm=$VM_DIR mounts=$CFW_HOST_MNT staging=$CFW_DISK_WORK"
+# zsh does not run the EXIT trap when ERR_EXIT fires inside a function, so
+# every failing txn call exits explicitly at top level.
+CFW_STAGED_IMG=$(txn stage) || exit $?
+TXN_STATE=staged
+echo "[*] staged copy: $CFW_STAGED_IMG (the original $IMG is not written)"
+txn check --phase pre-mount || exit $?
+hdiutil attach -plist -nomount -imagekey diskimage-class=CRawDiskImage "$CFW_STAGED_IMG" > "$CFW_HOST_MNT/attach.log" {DISK_FD}<&-
 BASEDISK=$(trap - EXIT INT TERM HUP; attached_disk) || { echo "[-] cannot identify attached disk; retaining attach.log" >&2; BASEDISK=""; exit 1; }
 echo "[*] attached image: $BASEDISK"
 CONT=$(diskutil info -plist "${BASEDISK}s1" | /usr/bin/plutil -extract APFSContainerReference raw -o - - 2>/dev/null || true)
 SYS=$(diskutil apfs list "$CONT" 2>/dev/null | awk '/APFS Volume Disk \(Role\):/{for(i=1;i<=NF;i++) if($i ~ /^disk[0-9]+s[0-9]+$/) dev=$i} /Name:.*System \(Case-sensitive\)/{print dev; exit}')
-[[ -n "$CONT" && -n "$SYS" ]] || { echo "[-] System volume not found in $IMG" >&2; exit 1; }
+[[ -n "$CONT" && -n "$SYS" ]] || { echo "[-] System volume not found in $CFW_STAGED_IMG" >&2; exit 1; }
 echo "[*] attached: container=$CONT system=$SYS"
 
+txn check --phase pre-install || exit $?
 echo "[*] running $INSTALLER (files placed on host mounts)..."
 # via env: an expansion-produced ${VAR:+NAME=val} isn't parsed as a shell assignment.
-( cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" \
+( exec {DISK_FD}<&-; cd "$VM_DIR" && env CFW_HOST_CONTAINER="$CONT" _VPHONE_PATH="$P" \
     ${SPOOF_BUILD:+SPOOF_BUILD="$SPOOF_BUILD"} \
     ${VPHONE_FRIDA:+VPHONE_FRIDA="$VPHONE_FRIDA"} \
     zsh "$SCRIPT_DIR/$INSTALLER" . )
 
 if ! cleanup; then
-  trap - EXIT INT TERM HUP
-  echo "[-] CFW cleanup failed; snapshot not changed. System and data volumes may contain partial installation changes." >&2
-  echo "[-] Inspect retained mounts and attach.log, unmount normally, then rerun the same CFW variant. Do not boot a partially installed VM." >&2
+  CLEANUP_DONE=1
+  CLEANUP_FAILED=1
+  echo "[-] CFW cleanup failed; snapshot not changed and nothing published. $IMG was not written; the staged copy may hold partial installation changes." >&2
+  echo "[-] Inspect retained mounts and attach.log, unmount normally, then remove the retained staging directory and rerun the same CFW variant." >&2
   exit 1
 fi
-trap - EXIT INT TERM HUP
+CLEANUP_DONE=1
 
-echo "[*] flipping boot snapshot offline (com.apple.os.update -> live volume)..."
-"$PY" "$PROJ/tools/apfs_snap_rename.py" "$IMG"
+echo "[*] flipping boot snapshot offline on the staged copy (com.apple.os.update -> live volume)..."
+"$PY" "$PROJ/tools/apfs_snap_rename.py" "$CFW_STAGED_IMG"
+
+echo "[*] publishing the staged copy as $IMG (exchange rename)..."
+txn publish || exit $?
+TXN_STATE=published
+trap - EXIT INT TERM HUP
+if ! txn finish --exit-code 0 >/dev/null; then
+  echo "[!] the installed disk is published, but its transaction record or the previous-disk check did not complete; inspect $CFW_DISK_WORK and $VM_DIR/.cfw-history" >&2
+fi
+exec {DISK_FD}<&-
 
 # Drop the extracted CFW input dirs (source .tar.zst re-extracts). VPHONE_KEEP_ARTIFACTS opts out.
 if [[ -z "${VPHONE_KEEP_ARTIFACTS:-}" ]]; then
@@ -231,25 +292,19 @@ fi
 # hard link could name a file outside the VM directory, and an entry of a third
 # account is not the invoker's to receive; both keep their owner, and a third
 # account's directory is not descended into.
-restore_invoker_ownership() {
-  local target="$1"
-  find -x "$target" \( -type d ! -user 0 ! -user "$SUDO_UID" -prune \) -o \
-    \( \( -type d -o \( -type f -links 1 \) \) \( -user 0 -o -user "$SUDO_UID" \) \
-       -exec chown -h "$SUDO_UID" {} + \)
-}
-
+# restore_invoker_ownership is defined before the disk transaction starts.
 if [[ -n "${SUDO_USER:-}" ]]; then
   if [[ ! "${SUDO_UID:-}" =~ '^[0-9]+$' ]]; then
     echo "[!] ownership of host-side artifacts NOT restored: SUDO_UID is missing or not numeric" >&2
   elif assert_no_vm_mounts; then
-    for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input; do
+    for artifact in .vphoned.signed .cfw_temp cfw_input cfw_jb_input .cfw-history; do
       [[ ! -L "$VM_DIR/$artifact" && -e "$VM_DIR/$artifact" ]] || continue
       restore_invoker_ownership "$VM_DIR/$artifact"
     done
     [[ -e "$PROJ/scripts/vphoned/vphoned" ]] && chown "$SUDO_USER" "$PROJ/scripts/vphoned/vphoned" 2>/dev/null || true
     echo "[*] restored ownership of host-side artifacts to $SUDO_USER (hard-linked files and other accounts' entries left as found)"
   else
-    echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $SUDO_USER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input}" >&2
+    echo "[!] ownership of host-side artifacts NOT restored (mount beneath VM directory); unmount it, then: chown -Rx $SUDO_USER $VM_DIR/{.vphoned.signed,.cfw_temp,cfw_input,cfw_jb_input,.cfw-history}" >&2
   fi
 fi
 

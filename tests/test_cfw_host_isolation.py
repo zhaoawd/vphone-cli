@@ -14,7 +14,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-class HostIsolationTests(unittest.TestCase):
+class HostDriverFixture(unittest.TestCase):
+    """Driver copy, disk-command doubles and disposable installers; no tests."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix='cfw host test ')
         self.addCleanup(self.tmp.cleanup)
@@ -22,6 +24,8 @@ class HostIsolationTests(unittest.TestCase):
         scripts = self.root / 'scripts'
         scripts.mkdir()
         shutil.copyfile(ROOT / "scripts/vm_lock.py", scripts / "vm_lock.py")
+        if (ROOT / "scripts/cfw_disk_txn.py").exists():
+            shutil.copyfile(ROOT / "scripts/cfw_disk_txn.py", scripts / "cfw_disk_txn.py")
         driver = (ROOT / 'scripts/cfw_install_host.sh').read_text()
         # Only bypass privilege escalation; no real disk commands are permitted.
         guard = 'if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then'
@@ -33,13 +37,16 @@ class HostIsolationTests(unittest.TestCase):
         stub.write_text('''#!/bin/zsh
 print -r -- "${0:t} $*" >> "$TEST_LOG"
 case "${0:t}:$1" in
- lsof:*) exit 1;;
- hdiutil:attach) if [[ ${BAD_ATTACH:-0} == 1 ]]; then print unexpected-output; else cat "$TEST_ATTACH_PLIST"; fi; exit ${FAIL_ATTACH:-0};;
+ lsof:*) [[ ${REAL_LSOF:-0} == 1 ]] && exec /usr/sbin/lsof "$@"; exit 1;;
+ hdiutil:attach) print -r -- "${@[-1]}" > "$TEST_MOUNTS.attached"; if [[ ${BAD_ATTACH:-0} == 1 ]]; then print unexpected-output; else cat "$TEST_ATTACH_PLIST"; fi; exit ${FAIL_ATTACH:-0};;
  umount:*) if [[ ${TRANSIENT_UMOUNT:-0} == 1 && ! -e "$TEST_MOUNTS.retry" ]]; then touch "$TEST_MOUNTS.retry"; exit 16; fi; [[ ${FAIL_UMOUNT:-0} == 1 ]] && exit 16; "$TEST_PYTHON" -c 'import os,pathlib,sys; p=pathlib.Path(os.environ["TEST_MOUNTS"]); p.write_text("".join(l for l in p.read_text().splitlines(True) if " on "+sys.argv[1]+" (" not in l))' "$1"; exit 0;;
  diskutil:info) [[ ${FAIL_DISCOVERY:-0} == 1 ]] && exit 9; print '<?xml version="1.0"?><plist version="1.0"><dict><key>APFSContainerReference</key><string>disk92</string></dict></plist>'; exit 0;;
  diskutil:apfs) print 'APFS Volume Disk (Role): disk92s1 (System)'; print 'Name: System (Case-sensitive)'; exit 0;;
  hdiutil:detach|diskutil:eject) [[ ${FAIL_CLEANUP:-0} == 1 ]] && exit 1; if [[ -f "$TEST_MOUNTS" ]]; then "$TEST_PYTHON" -c 'import os,pathlib,sys; p=pathlib.Path(os.environ["TEST_MOUNTS"]); p.write_text("".join(l for l in p.read_text().splitlines(True) if " on "+sys.argv[1]+" (" not in l))' "$2"; fi; exit 0;;
- python:*) if [[ "$1" == */vm_lock.py || "$1" == -c ]]; then exec "$TEST_PYTHON" "$@"; fi; exit 0;;
+ python:*) if [[ "$1" == */vm_lock.py || "$1" == -c ]]; then exec "$TEST_PYTHON" "$@"; fi
+   if [[ "$1" == */cfw_disk_txn.py ]]; then exec "$TEST_PYTHON" "$TEST_TXN_HARNESS" "$@"; fi
+   if [[ "$1" == */apfs_snap_rename.py ]]; then [[ ${FAIL_SNAP:-0} == 1 ]] && exit 5; exec "$TEST_PYTHON" -c 'import sys; f=open(sys.argv[1],"r+b"); f.seek(1024); f.write(b"SNAPSHOT-FLIPPED")' "$2"; fi
+   exit 0;;
 esac
 exit 0
 ''')
@@ -47,7 +54,10 @@ exit 0
         for name in ('lsof', 'hdiutil', 'diskutil', 'umount', 'python', 'chown'):
             (bins / name).symlink_to(stub)
         self.env = dict(os.environ, TEST_LOG=str(self.root / 'calls'),
-                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable)
+                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
+                        TEST_TXN_HARNESS=str(ROOT / 'tests/cfw_disk_txn_faults.py'))
+        for name in ('REAL_LSOF', 'FAIL_SNAP', 'CFW_TXN_FAULTS', 'VPHONE_VM_LOCK_FD', 'VPHONE_CFW_LOCK_REEXEC'):
+            self.env.pop(name, None)
         self.env.pop('SUDO_USER', None)
         self.env.pop('SUDO_UID', None)
         self.env.pop('FORCE_DSC_MAXSLIDE', None)
@@ -75,6 +85,13 @@ if [[ ${LINKED_ENTRIES:-0} == 1 ]]; then
 fi
 [[ ${STRAY_FILE:-0} == 1 ]] && print stray > "$CFW_HOST_MNT/mnt1/leftover"
 [[ ${LATE_MOUNT:-0} == 1 ]] && print -r -- "/dev/disk85s1 on $PWD/.cfw_temp/sub (apfs, local)" >> "$TEST_MOUNTS"
+if [[ -f "$TEST_MOUNTS.attached" ]]; then
+  "$TEST_PYTHON" -c 'import sys; f=open(sys.argv[1],"r+b"); f.seek(512); f.write(b"CFW-PATCHED")' "$(<"$TEST_MOUNTS.attached")"
+fi
+if [[ ${REPLACE_ORIGINAL:-0} == 1 ]]; then
+  mv "$PWD/Disk.img" "$PWD/Disk.img.moved"
+  print replacement > "$PWD/Disk.img"
+fi
 print ready > "$PWD/ready"
 sleep ${INSTALL_SLEEP:-0.2}
 exit ${INSTALL_EXIT:-0}
@@ -84,7 +101,8 @@ exit ${INSTALL_EXIT:-0}
     def start(self, name='vm', variant='exp', **env):
         vm = self.root / name
         vm.mkdir(exist_ok=True)
-        (vm / 'Disk.img').touch()
+        if not (vm / 'Disk.img').exists():
+            (vm / 'Disk.img').touch()
         proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
                                     env=dict(self.env, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
@@ -100,6 +118,9 @@ exit ${INSTALL_EXIT:-0}
         out, err = proc.communicate(timeout=30)
         return proc.returncode, (out + err).decode()
 
+
+
+class HostIsolationTests(HostDriverFixture):
     def test_concurrent_runs_use_distinct_directories_and_remove_them(self):
         vm1, p1 = self.start('vm1')
         vm2, p2 = self.start('vm2')
@@ -196,7 +217,13 @@ exit ${INSTALL_EXIT:-0}
         rc, output = self.finish(proc)
         self.assertEqual(rc, 0, output)
         real = vm.resolve()
-        self.assertEqual(self.chowned_paths(), [f'{real}/.cfw_temp', f'{real}/.cfw_temp/sub', f'{real}/cfw_input'])
+        # T15: the transaction record and the previous Disk.img are kept in
+        # .cfw-history/<id>; the published Disk.img and the bundle root are not touched.
+        record = next(vm.glob('.cfw-history/*')).name
+        history = f'{real}/.cfw-history'
+        self.assertEqual(self.chowned_paths(), sorted([
+            f'{real}/.cfw_temp', f'{real}/.cfw_temp/sub', f'{real}/cfw_input', history,
+            f'{history}/{record}', f'{history}/{record}/Disk.img', f'{history}/{record}/transaction.json']))
         self.assertNotIn('chown -R', (self.root / 'calls').read_text())
         self.assertIn('restored ownership', output)
 
@@ -210,7 +237,11 @@ exit ${INSTALL_EXIT:-0}
         self.assertIn(f'{real}/cfw_input/plain', self.chowned_paths())
         self.assertNotIn(f'{real}/cfw_input/linked', self.chowned_paths())
         self.assertNotIn(f'{real}/cfw_input/symlink', self.chowned_paths())
-        self.assertEqual(os.stat(vm / 'Disk.img').st_nlink, 2)
+        # The installer double hard-links the original Disk.img, which T15
+        # keeps as the previous disk in .cfw-history; it keeps its owner.
+        previous = next(vm.glob('.cfw-history/*/Disk.img'))
+        self.assertEqual(os.stat(previous).st_nlink, 2)
+        self.assertNotIn(str(previous.resolve()), self.chowned_paths())
 
     def test_ownership_restoration_leaves_third_account_entries(self):
         # Entries owned by neither root nor the invoker keep their owner, and

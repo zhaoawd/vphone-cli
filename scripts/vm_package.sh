@@ -170,6 +170,8 @@ EXCLUDES=(
     --exclude '.DS_Store'
     --exclude '.gitkeep'
     --exclude '.cfw_temp/'             # CFW build scratch
+    --exclude '.cfw_disk.*/'           # unpublished staged Disk.img copy (T15)
+    --exclude '.cfw-history/'          # CFW records and previous Disk.img kept for rollback (T15)
 )
 if [[ $INCLUDE_RESTORE != 1 ]]; then
     EXCLUDES+=(--exclude '*_Restore*/')   # IPSW restore tree (~10G), only for DFU re-restore

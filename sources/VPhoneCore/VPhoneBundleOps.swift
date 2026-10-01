@@ -271,8 +271,11 @@ public enum VPhoneBundleOps {
     /// Regenerable staging artifacts that never need to travel in an export:
     /// `.vphoned.signed` is re-staged on the next launch, and the CFW install
     /// inputs/temp are consumed at install time (the result already lives in
-    /// `Disk.img`). Always excluded.
-    static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*", "*.vphone-runtime.json"]
+    /// `Disk.img`). `.cfw_disk.*` holds an unpublished staged disk copy and
+    /// `.cfw-history` the host-local CFW transaction records and the previous
+    /// Disk.img kept for rollback (T15). Always excluded.
+    static let exportExcludePatterns = ["*.vphoned.signed", "*cfw_input*", "*cfw_jb_input*", "*.cfw_temp*", "*.cfw_mount.*",
+                                        "*.cfw_disk.*", "*.cfw-history*", "*.vphone-runtime.json"]
 
     /// When `to` is an existing directory, the archive is written inside it as
     /// `<name>.<compression.fileExtension>`. Returns the resolved output URL.

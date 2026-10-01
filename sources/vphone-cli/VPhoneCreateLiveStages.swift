@@ -269,8 +269,8 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
                   VPhoneRestoreInfo.load(fromBundle: bundle)?.variant == context.options.variant
             else { return .rejected("restore-info.json does not record variant \(context.options.variant)") }
             let leftovers = ((try? FileManager.default.contentsOfDirectory(atPath: bundleURL.path)) ?? [])
-                .filter { $0.hasPrefix(".cfw_mount.") }
-            guard leftovers.isEmpty else { return .rejected("CFW mount directories remain: \(leftovers.joined(separator: ", "))") }
+                .filter { $0.hasPrefix(".cfw_mount.") || $0.hasPrefix(".cfw_disk.") }
+            guard leftovers.isEmpty else { return .rejected("CFW mount or disk staging directories remain: \(leftovers.joined(separator: ", "))") }
             return .verified(artifacts: Self.diskArtifacts(bundleURL, includeRestoreInfo: true), evidence: [:])
 
         case .firstBoot:

@@ -650,6 +650,15 @@ struct DiagnosticsVMTests {
         #expect(find(vm(workspace, snapshot: .init(processList: "", attachedImages: nil)), .attachedImages)?.severity == .unknown)
     }
 
+    @Test func retainedCFWDiskStagingDirectoryIsResidue() throws {
+        let workspace = try DiagnosticsWorkspace()
+        let bundle = try workspace.makeBundle()
+        try FileManager.default.createDirectory(at: bundle.appendingPathComponent(".cfw_disk.AbCd1234"), withIntermediateDirectories: true)
+        let finding = try #require(find(vm(workspace, snapshot: .init(processList: "", attachedImages: [])), .cfwMountResidue))
+        #expect(finding.severity == .warning)
+        #expect(finding.evidence["directories"] == ".cfw_disk.AbCd1234")
+    }
+
     @Test func guestRuntimeFindingsForRunningVM() throws {
         let workspace = try DiagnosticsWorkspace()
         let bundle = try workspace.makeBundle()
