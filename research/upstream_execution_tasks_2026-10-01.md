@@ -41,6 +41,10 @@ T12 剩余部分提交为 1853c07（记录 t12_original_rerun_2026-10-01.md）�
 
 T13b（MIS/libmisfix 相关提交）按用户决定并入 T18。T26 各批均未执行界面点击（不使用合成输入），真实 VM 启停（B2）与真实创建/取消/续跑（B4）需用户授权后另行验收；B2 验收已准备 `~/.vphone/VMs/lp-b2-accept`（`rig-baseline` 的 APFS 克隆，4 核/4 GB），等待用户操作。zh-Hans 字符串 128 条标 `needs_review`。是否把 Launchpad 组装加入 CI bundle 任务由用户决定（建议见 B6 记录第 11 节）。
 
+### 2026-10-01 第四、五轮（已推送，HEAD f524a0f 起）
+
+两处修复与 CI 组装（27c5c1b、d6e584f、2d1c96d）；T03 完整备份与恢复副本启动（13a48fc、a653938）；T15 写盘保护（8b5e494）；B4 验收修复（83dcb5d、876b477、0bf0df0）及 B4/T15 真实验收（18ae989，`lp-b4-accept2`）；T16 停机更新资格（f4fb6ed；普通用户只读挂载真实 System 卷超时，后续改为提权检查）；T14 A 部分内容身份缓存、分块下载与稀疏扫描（f524a0f）。用户决定（2026-10-01）：增加显式旧缓存认领命令；T14 B 部分（GPU driver/compiler plugin/v2）推迟到 T17–T19 之后再定；T17 只覆盖本地已有环境库，libmisfix 与 MIS 守护进程重启归 T18。
+
 阻塞与待决：T13（DSC/内核补丁版本条件）本轮派发被安全分类器拦截，需重新界定范围或用户直接处理；T25–T27（Launchpad CLI/UI）本地无 Launchpad target，属较大规模迁入，实施前先确认范围。T20 guest 侧 GuestLocationSimulation.swift 与 libvlocation.m 仅逻辑审查（Xcode/iOS 工具链未构建）。真实 VM 恢复/启动/固件字节对比、helper 注册与生产 Core Bundle 安装继续暂缓。
 
 helper 注册及生产 Core Bundle 安装继续暂缓；P1c 真实导入及导入后启动继续跳过。写盘前要求 T03、T11 和 T15 达到验收条件。独立 UI 工作可以先推进；不能由此跳过 guest 写入的前置条件。
