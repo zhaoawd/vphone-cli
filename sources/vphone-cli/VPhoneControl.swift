@@ -845,16 +845,6 @@ class VPhoneControl {
         }
     }
 
-    // MARK: - Accessibility
-
-    func accessibilityTree(depth: Int = -1) async throws -> [String: Any] {
-        guard guestCaps.contains("accessibility_tree") else {
-            throw ControlError.unsupportedCapability("accessibility_tree")
-        }
-        let (resp, _) = try await sendRequest(["t": "accessibility_tree", "depth": depth])
-        return resp
-    }
-
     // MARK: - Location
 
     func sendLocation(
@@ -1047,7 +1037,7 @@ class VPhoneControl {
         case "shell":
             transferRequestTimeout
         case "devmode", "file_list", "file_delete", "file_rename", "file_mkdir", "keychain_list",
-             "app_list", "app_launch", "open_url", "accessibility_tree":
+             "app_list", "app_launch", "open_url":
             slowRequestTimeout
         default:
             defaultRequestTimeout
