@@ -1221,3 +1221,7 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-02 R4 用户态注入修正候选（未安装）
 
 实际 launchd 的反汇编包含 posix_spawnp 调用，本地 launchdhook 的 interpose 表未覆盖该入口。直接 cameracaptured 路径也不符合既有目标筛选。真实源码和插桩表边界测试修改前两项失败；修正增加 posix_spawnp 插桩及精确相机路径，两种 spawn 共用环境逻辑。Python 590 项通过，iOS 候选检查通过；仅 launchdhook 库摘要变化为 `157beaed8168fa53df58cdcf2d6181152bb4a5409a7ec1b093af21c394073027`，其余四个库不变。未新增 kernel、TXM、DSC 或 MIS 补丁；候选尚未写入客户机，真实因果验证等待批准。后续诊断发现 App 扩展已有 SystemHook 映射，早期无映射结果仅适用于原扫描时刻。详见 `v2_injection_diagnosis_2026-10-02.md`。
+
+### 2026-10-02 launchdhook 修正的真实复核
+
+用户批准后，T16 事务 `20261002T064301Z-rFaRcKXJ` 仅替换 launchdhook，旧盘保留，七项身份摘要在重启前核对一致。重启后原失败反馈两次通过，pid 1 映射新 launchdhook；cameracaptured 的 SystemHook 与 libvcamcaptured 均 current，App 与扩展亦有映射。日志显示相机服务经 xpcproxy 注入。没有增加 kernel/TXM/DSC/MIS 补丁。本次 regular 26.1 组合的 R4 加载复核通过，不证明功能验收或其他组合支持。详见 `v2_injection_diagnosis_2026-10-02.md`。

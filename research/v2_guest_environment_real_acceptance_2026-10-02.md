@@ -47,3 +47,7 @@ R4 processes.list 中 cameracaptured PID 70、SpringBoard PID 34 均运行。Sys
 ## 后续诊断限定（2026-10-02）
 
 用户同意先诊断后，重启只读扫描发现 App 扩展已加载 SystemHook、libcamfix、libvlocation，cameracaptured 仍未映射。原 R4 的 282 进程无映射是早期快照，不代表持续禁止 App 注入。已确认两项本地用户态缺口并构建候选，真实替换未执行；详见 `v2_injection_diagnosis_2026-10-02.md`。D6 的 regular 内核不足假设尚未确认。
+
+## R4 修正后的复核
+
+用户另行批准 T16 单库替换及重启。launchdhook 修正 `e344aa2` 通过事务 `20261002T064301Z-rFaRcKXJ` 发布；重启后原反馈脚本两次通过，pid 1、cameracaptured 与 App 的加载判定通过。T16 的七项身份摘要在更新前后、重启前一致；旧盘保留。故 R4 当前结果为通过（加载范围），此前失败记录保留。没有新增内核补丁。相机/定位功能、R5–R9 剩余要求及 T17 在线更新仍未验证。详见 `v2_injection_diagnosis_2026-10-02.md` 的获批真实验证结果。

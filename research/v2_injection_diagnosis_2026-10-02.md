@@ -67,3 +67,19 @@ VPHONE_PYTHON=/Users/kolar/github/vphone-cli/.venv/bin/python3 \
 ```
 
 先使用同一命令加 --check 确认 replace 范围，再执行写入。旧库 5 项已存在，符合 T16 的只替换策略，不重装 CFW、不修改 launchd 的加载命令。
+
+## 获批真实验证进度
+
+用户批准上述单库 T16 替换及重启复核。先执行 --check，报告 offline_update、replace 仅 launchdhook-vphone.dylib、disk.unchanged true；随后执行普通用户 CLI 的 --root-popup 更新入口，日志 `/tmp/vphone-v2-fix-update.log`。更新正在运行。
+
+## 获批真实验证结果
+
+2026-10-02，用户批准后执行同一候选的 T16 替换。事务 `20261002T064301Z-rFaRcKXJ` status published；environment-update.json result replaced、replaced 仅 launchdhook-vphone.dylib、after.classification already_current、identity_unchanged true。更新前后、重启前核对七项身份文件 SHA-256 均相同（检查点、SHSH、config.plist、nvram.bin、restore-info.json、SEPStorage、udid-prediction.txt）。旧 Disk.img 保留在该归档中。
+
+重启后原 `check_v2_injection.py` 连续两次退出 0，passed:true；pid 1 映射当前 launchdhook，cameracaptured PID 70 映射当前 SystemHook 和 libvcamcaptured；load.source environment.loaded、complete true、uninspected 空。完整环境状态为 already_current，5 个文件均 matches_candidate true。真实 App 路径 /Applications/Setup.app/Setup、/Applications/PosterBoard.app/PosterBoard、/Applications/MomentsUIService.app/MomentsUIService 与多个扩展进程映射 SystemHook，相关 App 的 libcamfix、libvlocation 也有映射。
+
+日志新增 `event=inserted child=70 path=/usr/libexec/xpcproxy status=0`，SystemHook 日志有 `pid=70 path=/usr/libexec/xpcproxy label=com.apple.cameracaptured root=<absent>`。这说明本次相机服务经 xpcproxy 进入 SystemHook。结合实际 launchd 的 spawnp 调用、本地插桩表遗漏、边界回归以及单个 launchdhook 替换后原失败消失，证据支持本次未加载的原因是缺少 posix_spawnp 插桩。直接 cameracaptured 路径的筛选缺口是独立确认的代码问题；本次日志未单独验证该路径。
+
+未添加内核补丁即可在本次 regular 26.1 组合满足 R4 加载判定，不再以本次失败作为 D6 内核不足证据。结论不推广到其他固件、所有进程或定位/相机功能。`application.state: not_verified` 仍保留；没有执行 R5 合约回归或 T17 在线更新。
+
+已执行 vm stop，返回 stopped；仅操作获批测试 VM，候选、旧盘及事务均保留。证据新增至 `research/artifacts/v2-injection-diagnosis-20261002/`，fixed-summary.json 与 evidence-sha256.json 可用于复核。

@@ -317,3 +317,11 @@ Swift 命令环境同 `scripts/run_tests.py`（`--disable-sandbox --cache-path .
 - `zsh -n scripts/cfw_install_host.sh`、`git diff --check`：通过。
 
 限制：未运行真实 sudo 或 root-popup，未挂载真实 VM 磁盘。Python 测试需要 `ps` 进程查询权限；受限运行先因该权限失败，获准运行后才取得上述修改前失败证据。
+
+## 2026-10-02 v2 测试 VM 停机替换成功路径
+
+用户批准对象 `/Users/kolar/vphone-v2-accept-20261002/VMs/lp-v2-accept-20261002`，仅替换 launchdhook 候选并重启复核 R4。提权 --check 为 offline_update，replace 仅 launchdhook-vphone.dylib，disk.unchanged true。普通用户 CLI --root-popup 更新退出 0，事务 `20261002T064301Z-rFaRcKXJ` published，environment-update.json result replaced、after already_current、identity_unchanged true。旧盘保留；七项身份文件在更新前后、重启前核对 SHA-256 不变。
+
+候选 launchdhook `157beaed8168fa53df58cdcf2d6181152bb4a5409a7ec1b093af21c394073027`，其余四个环境库摘要不变。重启后两次原反馈脚本通过，pid 1 映射新 launchdhook，cameracaptured 映射 SystemHook 和 libvcamcaptured；5 个库文件符合候选。测试 VM 已停止。
+
+这验证 T16 对 launchdhook 的真实成功路径，不等于设计 R6 的仅 libcamfix 组合、R7/T17 在线更新、回退或功能验收。详见 `v2_injection_diagnosis_2026-10-02.md`。

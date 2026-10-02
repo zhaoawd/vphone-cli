@@ -19,8 +19,8 @@
 - 已完成：B5，两个 Swift 入口及报告证据校验；Python 581 项、完整 Swift 与客户机组件 124 项通过；见 `v2_guest_environment_b5_2026-10-02.md`。
 - 进行中：2026-10-02 用户已批准独立构建与测试 VM 的 R1–R4；独立工作树 `/private/tmp/vphone-v2-build-20261002`，测试库 `/Users/kolar/vphone-v2-accept-20261002/VMs`。
 - 当前进度：R1–R3 通过；R4 未通过，SystemHook 在完整扫描中 not_mapped，运行中的 cameracaptured 未映射它；原因未查明。按 D6 停止后续验收，测试 VM 已停止并保留。见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
-- 进行中：用户同意注入诊断；发现 launchdhook 未覆盖 posix_spawnp 和直接 cameracaptured，已准备用户态候选及回归。真实候选替换未执行。
-- 待办：批准同一测试 VM 的 T16 替换、重启和原反馈脚本复核；R4 后按结果决定 D6 和后续验收；B6/B7 及后续依赖任务。
+- 已完成：注入诊断与用户态修正 `e344aa2`；590 项 Python 通过。用户批准 T16 单库事务并重启后，两次原复现通过，R4 加载复核通过；测试 VM 已停止，旧盘保留。
+- 待办：R5–R9 剩余范围与 T17 在线成功路径的具体授权；B6/B7 及后续依赖任务。本次 R4 不再支持 D6 内核不足假设。
 - 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；真实 VM 操作仅限本次批准的测试对象。
 - 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。
 
