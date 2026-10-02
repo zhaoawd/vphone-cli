@@ -43,6 +43,25 @@ R7 使用 libvcamcaptured 差异，而非 libcamfix，原因：本地 SystemHook
 
 R5 脚本：`scripts/diagnostics/check_v2_classic_contract.py contracts --output <证据目录>` 保存每次请求与响应、能力、文件回读摘要、定位回执及停止结果、App 能力和触控前截图。检查截图后单独运行 `tap --output <同一目录>`；一次性标记阻止重复点击。固定测试坐标为 WGS84 (31.2304, 121.4737)。脚本通过 `python3 -m py_compile`、`--help` 和 `git diff --check`；尚未取得真实协议结果。App 能力缺失记录 blocked；定位协议通过仍只记录 partial，保留应用读取未验证的限制。
 
-## 批准范围
+## 2026-10-02 前台启动后的实际结果
 
-需明确批准：上述两个测试对象的启动/停止、一次客户机触控（10, 10 像素）、固定定位与测试文件写入、可用时的经典 App 启动、R6 停机替换、R7 在线替换和 cameracaptured 重启、R8 本次事务回退，以及 R9 新建 classic 对照（认证/TSS/磁盘空间）。权限和能力不足时保留 blocked/failed 结果，不改变判定标准。所有 VM、测试文件、日志及备份保留，无删除或发布。
+用户回复前台运行中后，进程参数符合独立工作树/CDHash 范围；签名预检退出 0。测试 VM 带窗口启动，经典连接和 API ready。API token 在启动进程中随机生成，未写入证据。
+
+| 步骤 | 结果 | 证据与限制 |
+| --- | --- | --- |
+| R5 文件 | 通过 | 唯一文件 `/var/mobile/Library/Caches/vphone-r5-be891af1454d2f68.txt` 保留；回读 SHA-256 `810f348e546931e96a859478ee937fcc879eb9f40ae21ec15ee852ef05fe3719` 与写入字节一致 |
+| R5 定位 | 部分通过 | generation `loc-dc31d3c3-c077-485f-93f6-8907d7f828dd` running，WGS84 (31.2304, 121.4737)，delivery sequence 1，有 last_ack_at；只停止本 generation 后 off/null。应用内 CoreLocation 读取未验证 |
+| R5 App | blocked | 经典 commands.app_launch false；未用 API 路径代替经典合约 |
+| R5 截图、触控 | 协议通过 | 已检查触控前截图；仅执行一次 (10,10) 像素 tap，ok true；前后截图均为设置欢迎界面，没有可观察的界面变化，不能据此建立应用响应结论 |
+| R6 | 通过 | 停机事务、already_current 和 7 项身份不变见上文；启动后原 R4 反馈脚本退出 0，complete true，5 库 current，cameracaptured PID 70 映射当前 SystemHook |
+| R7/T17 | 未通过 | environment.install 在可写 remount 阶段失败；journal aborted，libvcamcaptured not_attempted；5 库摘要未变，root_read_only true，没有重启任何进程 |
+| R8 | 未执行 | R7 未替换库，成功回退路径缺少前置条件；不将空回退记为成功路径验收 |
+| R9 | 进行中 | v2 已停止并保留；classic 对照的 6 个适用创建阶段均 succeeded，停机只读检查等待系统认证，经典连接复核待执行 |
+
+R7 journal `18daa2162f7bdba0-f36ab635` 的原始错误：`mount -u -w / exited with status 19712: mount_apfs: volume could not be mounted: Operation not permitted\nmount: / failed with 77`。19712 是 daemon 记录的 waitpid 状态；mount 文本报告退出 77。此证据确认 remount 被拒绝，不能确定拒绝的底层原因。宿主返回 install_failed/api_code invalid_operation，随后只读取得 daemon 状态和完整 journal。没有尝试其他 remount 参数、新增补丁或替代路径。
+
+正式命令：`check_v2_classic_contract.py contracts`、检查 PNG 后 `tap`；`check_v2_injection.py --components <r6-cam-O1/stage>`；`run_v2_environment_acceptance.zsh online-status`、`online-update`；失败后 `guest rpc <vm> environment.status` 与经典 file_get 读取 journal。输出在 `research/artifacts/v2-remaining-20261002/`，summary.json 保存证据摘要；日志 `/tmp/vphone-r5-{contracts,tap,launch-current}.log`、`/tmp/vphone-r7-*.stderr`。在线替换成功、stale 映射、cameracaptured 显式重启、新映射 current 和 R8 成功回退均未验证。
+
+## 已批准范围
+
+用户已批准：上述两个测试对象的启动/停止、一次客户机触控（10, 10 像素）、固定定位与测试文件写入、可用时的经典 App 启动、R6 停机替换、R7 在线替换和 cameracaptured 重启、R8 本次事务回退，以及 R9 新建 classic 对照（认证/TSS/磁盘空间）。权限和能力不足时保留 blocked/failed 结果，不改变判定标准。所有 VM、测试文件、日志及备份保留，无人工清理或发布；创建流水线保留默认临时恢复树清理行为。
