@@ -56,3 +56,11 @@ R7 确认失败于 `mount -u -w /`，目标库未替换。当前证据将未修�
 真实原始内核的内存对照：`VPHONE_DIAG_KERNEL_IM4P=<上述备份> swift test --filter KernelGateDiagnosisTests.regularMountExperimentChangesOnlyTwoAdditionalInstructions` 通过。基础 28 项记录逐项相同，仅新增 `kernelcache_jb.mac_mount.flag_gate` 与 `kernelcache_jb.mac_mount.state_clear`，各 4 字节。完整候选输出等于基础输出加这两项替换；源文件未写入。两个锚点仍由当前映像语义匹配取得，未新增固定偏移。
 
 独立构建目录 `/private/tmp/vphone-v2-mount-build-20261002`；新 VM 名称 `lp-v2-mount-accept-20261002`；分阶段入口 `scripts/diagnostics/run_v2_mount_acceptance.zsh`。环境初始候选沿用 R6 的单库 libcamfix -O1，在线候选沿用 R7 的单库 libvcamcaptured -O1。API token 运行时生成，不写入证据。空间预检 90 GiB；保留旧 VM、旧盘及事务。构建、宿主预检及新 VM 实测结果待回填。
+
+### 独立构建与宿主限制
+
+实现提交 `71e8140`。新工作树固定子模块初始化完成；`make build` 在 `/private/tmp/vphone-v2-mount-build-20261002` 退出 0，签名、客户机 payload 与 bundle 校验通过。`vm create --help` 显示实验入口。基线与更新组件 manifest 复核均通过，仅 `vcamcaptured/libvcamcaptured.dylib` 摘要不同。
+
+新 VM 可执行文件 CDHash `81ccd61bb8502e50f49a70ee1c09da2ce401b73a`。宿主 preflight 和直接 `vphone-vm --help` 均退出 137；`pgrep -fl amfidont` 未发现进程。已请求用户以前台方式启动新目录/CDHash 范围的 amfidont，属于已批准范围的环境操作，未再次申请任务批准。新 VM 未创建，原测试 VM 与用户 VM 未操作。
+
+证据目录 `research/artifacts/v2-mount-20261002/`（Git 忽略）保存构建、失败预检、组件 manifest 校验、测试日志及摘要。`check_v2_mount_result.py` 保存真实验收断言；用此前 R7 失败输出执行 updated 断言时得到预期拒绝。其新 VM 成功断言尚未执行。默认字段省略测试使用实际 snake_case 键复核通过。

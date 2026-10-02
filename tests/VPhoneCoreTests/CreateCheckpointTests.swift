@@ -202,7 +202,7 @@ private let allStages = VPhoneCreateStage.allCases
         var options = Fixture.options("regular")
         options.guestEnvironment = .v2
         let defaultJSON = try VPhoneCreateJSON.encoder.encode(options)
-        #expect(!String(decoding: defaultJSON, as: UTF8.self).contains("experimentalV2RootRemount"))
+        #expect(!String(decoding: defaultJSON, as: UTF8.self).contains("experimental_v2_root_remount"))
         options.experimentalV2RootRemount = true
         #expect(options.changes(to: Fixture.options("regular")).contains {
             $0.field == "experimental_v2_root_remount" && $0.stage == .prepare

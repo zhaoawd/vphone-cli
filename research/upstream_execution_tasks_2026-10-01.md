@@ -430,3 +430,5 @@ T00 已完成 → T01 保存变动 → T02 已完成、随实现持续回填 →
 ### 2026-10-02 MAC mount 对照实验
 
 用户已批准 `t17_mount_rejection_diagnosis_2026-10-02.md` 的独立实验范围。显式 regular-v2 实验入口、记录和恢复验证已实现；测试按失败再实现执行。23B85 原始内核的内存对照通过：基础 28 项不变，仅增加两项 mount 记录。第二次完整 Swift 回归通过；新 VM 的 R1–R4、R7/R8 尚未执行，B7 闸门仍未满足。下一步独立签名构建、宿主预检与创建 `lp-v2-mount-accept-20261002`。
+
+- MAC mount 实验准备 `71e8140`：独立 `make build` 与 bundle 校验通过，基线/更新 manifest 通过。宿主 preflight 和直接 VM `--help` 均 exit 137，当前无 amfidont 进程；已请求用户前台启动新目录/CDHash 范围。验收断言脚本与证据已保存。新 VM 未创建，R1–R4/R7/R8 待环境恢复后执行。
