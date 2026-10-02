@@ -18,7 +18,7 @@
 - 已完成：B4，T15/隔离/环境相关 107 项通过；安装器与驱动 16 项通过。
 - 已完成：B5，两个 Swift 入口及报告证据校验；Python 581 项、完整 Swift 与客户机组件 124 项通过；见 `v2_guest_environment_b5_2026-10-02.md`。
 - 进行中：2026-10-02 用户已批准独立构建与测试 VM 的 R1–R4；独立工作树 `/private/tmp/vphone-v2-build-20261002`，测试库 `/Users/kolar/vphone-v2-accept-20261002/VMs`。
-- 当前阻塞：独立签名构建和候选已通过，preflight 的签名 VM --help 退出 137；等待用户按交接约定启动 amfidont，随后重跑宿主检查。真实 VM 未创建。
+- 当前进度：R1–R3 通过；R4 未通过，SystemHook 在完整扫描中 not_mapped，运行中的 cameracaptured 未映射它；原因未查明。按 D6 停止后续验收，测试 VM 已停止并保留。见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
 - 待办：R4 后按结果决定 D6 和后续验收；B6/B7 及后续依赖任务。
 - 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；真实 VM 操作仅限本次批准的测试对象。
 - 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。

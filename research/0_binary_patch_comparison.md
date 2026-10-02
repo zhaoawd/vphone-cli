@@ -1213,3 +1213,7 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 新增离线 v2 profile 安装器，仅接受 regular。首次安装对暂存 System 卷的 `/sbin/launchd` 添加 `LC_LOAD_WEAK_DYLIB /vh`，保留原 entitlements 后用已有 ldid/证书流程重签；重装已有加载命令时不重复注入。库、别名和 API 守护进程属于用户态安装范围，regular 的内核、TXM、DSC、设备树补丁集合未改变。
 
 合成目录树安装后判定 already_current；真实 insert_dylib 对 clang 编译的 macOS 合成文件添加弱加载命令的测试通过。这些证据不建立真实 iOS launchd 可启动或 regular 内核可加载该库的结论；R4 与 D6 仍待用户授权后的真实验收。拒绝条件、写入范围和验证限制见 [B3 记录](v2_guest_environment_b3_2026-10-02.md)。
+
+### 2026-10-02 v2 regular 真实验收 R1–R4
+
+独立签名产物在测试 VM `lp-v2-accept-20261002` 完成创建、恢复、CFW、首次启动和启动验证。launchd 的 /vh 弱加载命令经离线安装后可启动；R2 只读判定 already_current、bootstrap.kind v2、disk.unchanged true。R3 经典/API daemon 并行连接，API device.info 成功。R4 扫描 282 个进程、无 uninspected，pid 1 映射当前 launchdhook，SystemHook 在所有扫描进程中 not_mapped；运行中的 cameracaptured 未映射它。注入失败原因未查明，不能据此确定 regular 内核补丁不足。按 D6 停止后续验收，未新增任何内核、TXM 或 DSC 补丁。详见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
