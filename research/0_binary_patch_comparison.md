@@ -1217,3 +1217,7 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-02 v2 regular 真实验收 R1–R4
 
 独立签名产物在测试 VM `lp-v2-accept-20261002` 完成创建、恢复、CFW、首次启动和启动验证。launchd 的 /vh 弱加载命令经离线安装后可启动；R2 只读判定 already_current、bootstrap.kind v2、disk.unchanged true。R3 经典/API daemon 并行连接，API device.info 成功。R4 扫描 282 个进程、无 uninspected，pid 1 映射当前 launchdhook，SystemHook 在所有扫描进程中 not_mapped；运行中的 cameracaptured 未映射它。注入失败原因未查明，不能据此确定 regular 内核补丁不足。按 D6 停止后续验收，未新增任何内核、TXM 或 DSC 补丁。详见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
+
+### 2026-10-02 R4 用户态注入修正候选（未安装）
+
+实际 launchd 的反汇编包含 posix_spawnp 调用，本地 launchdhook 的 interpose 表未覆盖该入口。直接 cameracaptured 路径也不符合既有目标筛选。真实源码和插桩表边界测试修改前两项失败；修正增加 posix_spawnp 插桩及精确相机路径，两种 spawn 共用环境逻辑。Python 590 项通过，iOS 候选检查通过；仅 launchdhook 库摘要变化为 `157beaed8168fa53df58cdcf2d6181152bb4a5409a7ec1b093af21c394073027`，其余四个库不变。未新增 kernel、TXM、DSC 或 MIS 补丁；候选尚未写入客户机，真实因果验证等待批准。后续诊断发现 App 扩展已有 SystemHook 映射，早期无映射结果仅适用于原扫描时刻。详见 `v2_injection_diagnosis_2026-10-02.md`。

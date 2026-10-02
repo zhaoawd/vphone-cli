@@ -43,3 +43,7 @@ R4 processes.list 中 cameracaptured PID 70、SpringBoard PID 34 均运行。Sys
 按 D6 闸门未执行 R5–R9、B6/B7、T16/T17 成功路径。已对本次测试 VM 执行 vm stop，保留测试盘、T15 旧盘与所有事务记录。D6 设计选项仍由用户决定：(a) 为 v2 增加 opt-in 内核补丁并逐项验收；(b) 改为 jb 路线（需重审 /b 与 /vh 约束）；(c) 暂停 v2。原因未查明时，新增补丁不能被声明为必要或已验证修复。
 
 原始证据位于 `research/artifacts/v2-accept-20261002/`（Git 忽略），包括检查点、安装报告、事务 JSON、R2 JSON、R3 capabilities/device.info、R4 environment/processes 与日志；summary.json 记录文件摘要。临时日志仍在 `/tmp/vphone-v2-*`。
+
+## 后续诊断限定（2026-10-02）
+
+用户同意先诊断后，重启只读扫描发现 App 扩展已加载 SystemHook、libcamfix、libvlocation，cameracaptured 仍未映射。原 R4 的 282 进程无映射是早期快照，不代表持续禁止 App 注入。已确认两项本地用户态缺口并构建候选，真实替换未执行；详见 `v2_injection_diagnosis_2026-10-02.md`。D6 的 regular 内核不足假设尚未确认。
