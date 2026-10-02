@@ -23,6 +23,7 @@
 - 已准备：R5–R9/T17 计划、R6/R7 单库差异候选和分阶段脚本，见 `v2_remaining_acceptance_plan_2026-10-02.md`。候选已校验，真实写入阶段未执行。
 - 当前批准：用户已批准 R5–R9/T17 的完整具体范围；首次 R5 启动因宿主预检 exit 137 停止，沙箱外复核同样失败，未发现 amfidont 进程。R5 回归脚本已保存，待用户重新启动 amfidont；R6 只读检查等待 macOS 管理员认证。真实写入未执行，见 `v2_remaining_acceptance_plan_2026-10-02.md`。
 - 待办：完成 R5–R9/T17；B6/B7 及后续依赖任务。本次 R4 不再支持 D6 内核不足假设。
+- 最新进度：R6 只读检查与单库停机事务已完成；`20261002T101052Z-Oakm5X1p` published，更新后 already_current，7 项身份文件摘要不变，旧盘保留。启动复核待验证。用户回复已启动 amfidont 后，签名预检仍返回 137，进程检查未发现 amfidont；已请求前台诊断输出，退出原因未查明。R5 将针对 R6 的 libcamfix -O1 候选执行；R7–R9 未执行。
 - 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；真实 VM 操作仅限本次批准的测试对象。
 - 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。
 

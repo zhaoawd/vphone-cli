@@ -2,7 +2,13 @@
 
 日期：2026-10-02。前置：R1–R4 和 launchdhook 的 T16 替换已通过；`aea7315`。本批仅准备候选、脚本和批准范围，未操作客户机。
 
-执行状态（2026-10-02 更新）：用户已批准本文件所列整批范围。首次 R5 窗口启动未通过宿主预检；签名 `vphone-vm --help` 在沙箱外返回 137，进程检查未发现 amfidont。未启动该测试 VM，未执行 R5 客户机写入、定位或触控。已请求用户重新运行独立工作树的 amfidont 启动脚本；此操作不改变本批批准范围。R6 `offline-check` 已发起，macOS 管理员认证尚未完成，尚无检查结果。R6 写入及 R7–R9 未执行。
+执行状态（2026-10-02 更新）：用户已批准本文件所列整批范围。首次 R5 窗口启动未通过宿主预检；签名 `vphone-vm --help` 在沙箱外返回 137，进程检查未发现 amfidont。未启动该测试 VM，未执行 R5 客户机写入、定位或触控。已请求用户重新运行独立工作树的 amfidont 启动脚本；此操作不改变本批批准范围。
+
+用户回复已启动后，沙箱外签名预检仍返回 137；`ps` 与 `pgrep` 未发现 amfidont，CDHash 仍为 `3aa3dfa8a958ecd7e04c726be6a05d3bf2319425`。读取本机 amfidont 0.0.3 源码确认：daemon 父进程不等待子进程就输出启动信息；仓库脚本将输出重定向到 `/dev/null`。因此该启动信息不能建立子进程持续运行的结论。已请求同一目录和 CDHash 的前台 `--verbose` 输出；异常退出原因未查明，没有修改工具、宿主配置或原 VM。
+
+R6 不依赖 VM 启动的部分已执行。只读检查退出 0，判定 `offline_update`，replace 仅 libcamfix，disk.unchanged true。随后 `run_v2_environment_acceptance.zsh offline-update` 退出 0，事务 `20261002T101052Z-Oakm5X1p` 状态 published；报告 replaced 仅 libcamfix，after.classification already_current；7 项 identity_before 与 identity_after 完全相同。逐库比较确认其他库摘要未变，旧 Disk.img 保留。证据为 `research/artifacts/v2-remaining-20261002/r6-{check,environment-update,transaction,summary}.json`（Git 忽略）；日志 `/tmp/vphone-r6-{check,update}.log`。R6 启动后 R4 复核仍未验证，不能将 R6 整项标为通过。
+
+执行顺序调整：因 R5 宿主启动阻塞，先完成上述 R6 停机操作。后续 R5 针对 R6 的 libcamfix -O1 候选执行；同一源码，编译优化设置不同，其运行行为仍须验收。R7–R9 未执行。
 
 ## 对象和边界
 

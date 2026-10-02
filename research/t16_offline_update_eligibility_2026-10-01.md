@@ -1,5 +1,7 @@
 # T16 旧 VM 停机更新资格
 
+2026-10-02 R6 补充：用户已批准的 v2 测试 VM 单库替换通过事务 `20261002T101052Z-Oakm5X1p` 发布，仅 libcamfix 摘要变化；7 项身份文件摘要不变，after.classification already_current，旧盘保留。启动后加载复核受宿主预检 exit 137 阻塞，尚未验证。具体命令、证据与执行顺序见 [R5–R9 记录](v2_remaining_acceptance_plan_2026-10-02.md)。
+
 日期：2026-10-01。基线提交 `18ae989`。范围：上游整合清单 T16 的代码与无 VM 测试。本项没有对任何真实 VM 执行判定或替换，没有读写 `~/.vphone/VMs`、`~/vphone-b4-accept`、`/Volumes/vphone-t03-restore`，没有使用 sudo，没有对 `vm-2607`、`vm-new` 执行命令或发信号。日志位于 `research/artifacts/t16-offline-update-eligibility-2026-10-01/`（Git 忽略）。环境：worktree 的 `.venv` 为指向主仓库 `.venv` 的符号链接；递归初始化 `vendor/*` 子模块；按 Makefile 格式生成被忽略的 `sources/vphone-cli/VPhoneBuildInfo.swift`。
 
 ## 1. 对照表
