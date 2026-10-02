@@ -56,11 +56,13 @@ R5 脚本：`scripts/diagnostics/check_v2_classic_contract.py contracts --output
 | R6 | 通过 | 停机事务、already_current 和 7 项身份不变见上文；启动后原 R4 反馈脚本退出 0，complete true，5 库 current，cameracaptured PID 70 映射当前 SystemHook |
 | R7/T17 | 未通过 | environment.install 在可写 remount 阶段失败；journal aborted，libvcamcaptured not_attempted；5 库摘要未变，root_read_only true，没有重启任何进程 |
 | R8 | 未执行 | R7 未替换库，成功回退路径缺少前置条件；不将空回退记为成功路径验收 |
-| R9 | 进行中 | v2 已停止并保留；classic 对照的 6 个适用创建阶段均 succeeded，停机只读检查等待系统认证，经典连接复核待执行 |
+| R9 | 通过 | classic 的 6 个适用创建阶段均 succeeded；bootstrap none，无 /vh、5 个 v2 库和 API daemon；只读检查 disk.unchanged true；启动后经典连接及文件/location_owned 能力正常，已停止并保留 |
 
 R7 journal `18daa2162f7bdba0-f36ab635` 的原始错误：`mount -u -w / exited with status 19712: mount_apfs: volume could not be mounted: Operation not permitted\nmount: / failed with 77`。19712 是 daemon 记录的 waitpid 状态；mount 文本报告退出 77。此证据确认 remount 被拒绝，不能确定拒绝的底层原因。宿主返回 install_failed/api_code invalid_operation，随后只读取得 daemon 状态和完整 journal。没有尝试其他 remount 参数、新增补丁或替代路径。
 
 正式命令：`check_v2_classic_contract.py contracts`、检查 PNG 后 `tap`；`check_v2_injection.py --components <r6-cam-O1/stage>`；`run_v2_environment_acceptance.zsh online-status`、`online-update`；失败后 `guest rpc <vm> environment.status` 与经典 file_get 读取 journal。输出在 `research/artifacts/v2-remaining-20261002/`，summary.json 保存证据摘要；日志 `/tmp/vphone-r5-{contracts,tap,launch-current}.log`、`/tmp/vphone-r7-*.stderr`。在线替换成功、stale 映射、cameracaptured 显式重启、新映射 current 和 R8 成功回退均未验证。
+
+R9 命令：`create_classic_acceptance.zsh` 退出 0；`check_classic_acceptance.zsh offline <证据目录>` 退出 0，`full_migration_required` 符合 classic 无 v2 环境的预期；headless 启动后 `check_classic_acceptance.zsh runtime <证据目录>` 退出 0；`vm stop` 成功。CFW 事务 `20261002T104724Z-36vfuAXS` published，旧盘保留。原始证据 r9-offline.json、r9-capabilities.json、r9-checkpoint.json、r9-restore-info.json、r9-transaction.json 位于同一证据目录。创建流水线按默认规则清理临时固件恢复树，测试 VM、候选、安装旧盘和验收文件保留。脚本首次运行在 zsh 只读变量 status 赋值时退出，尚未执行检查命令；修正为 check_code 后完成真实断言，不属于产品检查失败。
 
 ## 已批准范围
 
