@@ -2,6 +2,8 @@
 
 日期：2026-10-02。前置：R1–R4 和 launchdhook 的 T16 替换已通过；`aea7315`。本批仅准备候选、脚本和批准范围，未操作客户机。
 
+执行状态（2026-10-02 更新）：用户已批准本文件所列整批范围。首次 R5 窗口启动未通过宿主预检；签名 `vphone-vm --help` 在沙箱外返回 137，进程检查未发现 amfidont。未启动该测试 VM，未执行 R5 客户机写入、定位或触控。已请求用户重新运行独立工作树的 amfidont 启动脚本；此操作不改变本批批准范围。R6 `offline-check` 已发起，macOS 管理员认证尚未完成，尚无检查结果。R6 写入及 R7–R9 未执行。
+
 ## 对象和边界
 
 - v2 对象：`/Users/kolar/vphone-v2-accept-20261002/VMs/lp-v2-accept-20261002`，停机；保留 T15/T16 旧盘。
@@ -32,6 +34,8 @@
 R7 使用 libvcamcaptured 差异，而非 libcamfix，原因：本地 SystemHook 在 cameracaptured 中加载 libvcamcaptured，libcamfix 主要位于 App。只重启 cameracaptured 不能验证 App 的 libcamfix 重新加载。此调整仍仅覆盖原设计已有环境库及相机进程。
 
 脚本：`scripts/diagnostics/run_v2_environment_acceptance.zsh` 分离 offline-check/offline-update/online-update/online-restart/online-status/rollback；`create_classic_acceptance.zsh` 用于 R9。均通过 zsh -n，rollback CLI 参数已核对帮助；未执行真实写入阶段。已有诊断反馈脚本用于 R4，正式回归用保存的步骤和断言，不以一次界面观察替代。
+
+R5 脚本：`scripts/diagnostics/check_v2_classic_contract.py contracts --output <证据目录>` 保存每次请求与响应、能力、文件回读摘要、定位回执及停止结果、App 能力和触控前截图。检查截图后单独运行 `tap --output <同一目录>`；一次性标记阻止重复点击。固定测试坐标为 WGS84 (31.2304, 121.4737)。脚本通过 `python3 -m py_compile`、`--help` 和 `git diff --check`；尚未取得真实协议结果。App 能力缺失记录 blocked；定位协议通过仍只记录 partial，保留应用读取未验证的限制。
 
 ## 批准范围
 

@@ -21,7 +21,8 @@
 - 当前进度：R1–R3 通过；R4 未通过，SystemHook 在完整扫描中 not_mapped，运行中的 cameracaptured 未映射它；原因未查明。按 D6 停止后续验收，测试 VM 已停止并保留。见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
 - 已完成：注入诊断与用户态修正 `e344aa2`；590 项 Python 通过。用户批准 T16 单库事务并重启后，两次原复现通过，R4 加载复核通过；测试 VM 已停止，旧盘保留。
 - 已准备：R5–R9/T17 计划、R6/R7 单库差异候选和分阶段脚本，见 `v2_remaining_acceptance_plan_2026-10-02.md`。候选已校验，真实写入阶段未执行。
-- 待办：R5–R9/T17 具体授权；B6/B7 及后续依赖任务。本次 R4 不再支持 D6 内核不足假设。
+- 当前批准：用户已批准 R5–R9/T17 的完整具体范围；首次 R5 启动因宿主预检 exit 137 停止，沙箱外复核同样失败，未发现 amfidont 进程。R5 回归脚本已保存，待用户重新启动 amfidont；R6 只读检查等待 macOS 管理员认证。真实写入未执行，见 `v2_remaining_acceptance_plan_2026-10-02.md`。
+- 待办：完成 R5–R9/T17；B6/B7 及后续依赖任务。本次 R4 不再支持 D6 内核不足假设。
 - 约束：不操作 `vm-2607`、`vm-new`；不在主仓库运行 `make build`；真实 VM 操作仅限本次批准的测试对象。
 - 验证日志：`/tmp/vphone-step1-{swift-red,swift-green,python-green}.log`；临时日志不属于长期仓库资产，结果写入各任务研究记录。
 
