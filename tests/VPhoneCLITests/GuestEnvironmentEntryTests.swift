@@ -5,6 +5,17 @@ import VPhoneCore
 @testable import vphone_cli
 
 struct GuestEnvironmentEntryTests {
+    @Test func mountExperimentRequiresExplicitRegularV2() throws {
+        let flag = "--experimental-v2-root-remount"
+        _ = try VPhoneVMCreateCommand.parse(["example", "--guest-environment", "v2", flag])
+        _ = try VPhoneVMCreateCommand.parse(["example", "--resume", flag])
+        for options in [[], ["--guest-environment", "classic"], ["--variant", "dev", "--guest-environment", "v2"]] {
+            #expect(throws: (any Error).self) {
+                _ = try VPhoneVMCreateCommand.parse(["example", flag] + options)
+            }
+        }
+    }
+
     @Test func unsupportedV2VariantsAreRejectedBeforeExecution() {
         for variant in ["dev", "jb", "exp", "less"] {
             do {

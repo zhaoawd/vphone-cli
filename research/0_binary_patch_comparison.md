@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-02 regular-v2 MAC mount 实验候选
+
+用户批准独立对照实验。显式 `vm create --guest-environment v2 --experimental-v2-root-remount` 仅为 regular 追加现有 `kernel-boot-mac_mount`，不采用其他 JB 步骤。23B85 原始 vphone600 的内存输出比较通过：默认 regular 的 28 项内核记录逐项相同，实验候选额外两项 4 字节写入，完整输出与预期一致。匹配沿用当前映像语义锚点与 ARM64Encoder，不使用固定地址。默认 regular/classic 选择保持原范围；真实重挂、在线更新及回退尚未验证。详见 [实验记录](t17_mount_rejection_diagnosis_2026-10-02.md)。
+
 ## 2026-10-01 DSC maxSlide 选项层对齐（T13a）
 
 `FORCE_DSC_MAXSLIDE=1` 与 `vm create`、`cfw install` 的 `--force-dsc-maxslide` 已删除，与上游 `d930e50` 一致。`cfw_install.sh` 只在 `27.*` 基线调用 `patch-dsc-maxslide`，且不传 `--force`；是否清零由补丁器按缓存头判断（`sharedRegionSize + maxSlide > 0x180000000` 时清零，已为 0 或可容纳时不写）。补丁器增加与上游 `DyldSharedCacheMaxSlidePatcher.swift` 等价的缓存头校验（0x100 字节头部、`mappingOffset` 覆盖 `maxSlide`、主分块存在文件偏移 0 的映射、`sharedRegionStart` 等于最低映射地址、`sharedRegionSize` 覆盖映射跨度、64 位求和不溢出），校验失败时报错且不写入。`cfw_install_host.sh` 对所有变体识别到旧环境变量时打印已移除提示，并且不再转发。清零写入的字段、字节和写入方式不变；独立命令 `cfw.py patch-dsc-maxslide --force` 保留供手动使用。记录见 `research/t13a_dsc_maxslide_option_2026-10-01.md`。本轮未新增二进制补丁，本文既有计数不变；真实 iOS 27 缓存与启动未验证。

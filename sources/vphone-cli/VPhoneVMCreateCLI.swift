@@ -30,6 +30,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
     var prepareBackend: VPhonePrepareBackend?
     @Option(help: "Guest environment: classic (default) or v2 (regular only); preserved on resume")
     var guestEnvironment: VPhoneGuestEnvironmentProfile?
+    @Flag(help: "Experimental: add only the MAC mount step to regular-v2 firmware; preserved on resume")
+    var experimentalV2RootRemount = false
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "new VM name (with --resume: the existing VM to continue)") var name: String
     @Flag(help: "Continue an interrupted create of an existing VM from its checkpoint") var resume = false
@@ -56,6 +58,11 @@ struct VPhoneVMCreateCommand: ParsableCommand {
 
     func validate() throws {
         try guestEnvironment?.validateVariant(variant ?? "regular")
+        if experimentalV2RootRemount,
+           (!resume && (guestEnvironment != .v2 || (variant ?? "regular") != "regular")
+            || resume && (guestEnvironment == .classic || variant.map { $0 != "regular" } == true)) {
+            throw ValidationError("--experimental-v2-root-remount requires regular with --guest-environment v2")
+        }
         if !resume, restartFrom != nil || acceptToolChange {
             throw ValidationError("--restart-from and --accept-tool-change require --resume")
         }
@@ -96,7 +103,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
                     variant: variant, iphoneSource: iphoneSource, cloudosSource: cloudosSource,
                     spoofBuild: spoofBuild,
                     enableFrida: frida ? true : nil, diskSizeGb: diskSize, restoreBackend: restoreBackend,
-                    prepareBackend: prepareBackend, guestEnvironment: guestEnvironment),
+                    prepareBackend: prepareBackend, guestEnvironment: guestEnvironment,
+                    experimentalV2RootRemount: experimentalV2RootRemount ? true : nil),
                 restartFrom: restartFrom, acceptToolChange: acceptToolChange,
                 sudoPassword: sudoPassword, rootPopup: rootPopup, interactive: interactive,
                 verbosity: VPhoneVerbosity(count: verboseCount), keepArtifacts: keepArtifacts))
@@ -119,7 +127,8 @@ struct VPhoneVMCreateCommand: ParsableCommand {
             interactive: interactive, diskSizeGB: diskSize ?? 64,
             verbosity: VPhoneVerbosity(count: verboseCount),
             keepArtifacts: keepArtifacts, restoreBackend: restoreBackend ?? .python,
-            prepareBackend: prepareBackend ?? .script, guestEnvironment: guestEnvironment ?? .classic))
+            prepareBackend: prepareBackend ?? .script, guestEnvironment: guestEnvironment ?? .classic,
+            experimentalV2RootRemount: experimentalV2RootRemount))
     }
 }
 

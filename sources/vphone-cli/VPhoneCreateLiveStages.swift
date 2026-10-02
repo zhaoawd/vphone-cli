@@ -150,7 +150,8 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
         case .patch:
             let before = Self.historyEntries(bundleURL)
             let count = try orchestrator.runFWPatch(
-                variant: variant, isLess: isLess, enableFrida: options.enableFrida, bundleURL: bundleURL, verbosity: v)
+                variant: variant, isLess: isLess, enableFrida: options.enableFrida,
+                experimentalV2RootRemount: options.experimentalV2RootRemount == true, bundleURL: bundleURL, verbosity: v)
             let new = Self.historyEntries(bundleURL).subtracting(before).sorted()
             var evidence = ["patch_records": "\(count)", "firmware_transaction_archives": new.joined(separator: ",")]
             // The verifier rejects any other archive count; without exactly one there is no selection to name.
@@ -267,6 +268,16 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             }
             guard (object["options"] as? [String: String])?["variant"] == context.options.variant else {
                 return .rejected("firmware transaction \(archive) was made for another variant")
+            }
+            if context.options.experimentalV2RootRemount == true || evidence[VPhoneCreatePatchSelection.evidenceKey] != nil {
+                do {
+                    let header = try VPhoneCreatePatchSelection.reportHeader(bundleURL: bundleURL, archive: archive)
+                    guard (header.gates.experimentalV2RootRemount == true) == (context.options.experimentalV2RootRemount == true) else {
+                        return .rejected("firmware transaction \(archive) has another experimental v2 root remount setting")
+                    }
+                } catch {
+                    return .rejected("firmware transaction \(archive) report is unreadable: \(error)")
+                }
             }
             // T12: evidence written before the selection identity existed is not compared.
             if let recorded = evidence[VPhoneCreatePatchSelection.evidenceKey] {

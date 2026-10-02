@@ -18,6 +18,8 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
     public let excGuardActive: Bool
     public let applyIOS27: Bool
     public let applyFrida: Bool
+    /// Absent on historical/default reports to preserve their selection identity.
+    public let experimentalV2RootRemount: Bool?
 
     public init(
         variant: String,
@@ -28,7 +30,8 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
         enableFrida: Bool,
         excGuardActive: Bool,
         applyIOS27: Bool,
-        applyFrida: Bool
+        applyFrida: Bool,
+        experimentalV2RootRemount: Bool = false
     ) {
         self.variant = variant
         self.iosBaseIs18 = iosBaseIs18
@@ -39,12 +42,14 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
         self.excGuardActive = excGuardActive
         self.applyIOS27 = applyIOS27
         self.applyFrida = applyFrida
+        self.experimentalV2RootRemount = experimentalV2RootRemount ? true : nil
     }
 
     /// Compact one-line description used in `notApplicable` reasons.
     public var summary: String {
         "variant=\(variant) iosBaseIs18=\(iosBaseIs18) iosBaseIs27=\(iosBaseIs27) "
             + "excGuardActive=\(excGuardActive) applyIOS27=\(applyIOS27) applyFrida=\(applyFrida)"
+            + (experimentalV2RootRemount == true ? " experimentalV2RootRemount=true" : "")
     }
 }
 

@@ -106,6 +106,7 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
     public var variant: String
     public var guestEnvironment: VPhoneGuestEnvironmentProfile?
     public var effectiveGuestEnvironment: VPhoneGuestEnvironmentProfile { guestEnvironment ?? .classic }
+    public var experimentalV2RootRemount: Bool?
     public var iphoneSource: VPhoneCreateSourceRecord?
     public var cloudosSource: VPhoneCreateSourceRecord?
     public var spoofBuild: String?
@@ -125,10 +126,11 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         variant: String, iphoneSource: String?, cloudosSource: String?, spoofBuild: String?,
         forceDscMaxSlide: Bool, enableFrida: Bool, cpuCount: UInt, memoryMb: UInt64, diskSizeGb: UInt64,
         restoreBackend: VPhoneRestoreBackend = .python, prepareBackend: VPhonePrepareBackend = .script,
-        guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
+        guestEnvironment: VPhoneGuestEnvironmentProfile = .classic, experimentalV2RootRemount: Bool = false
     ) {
         self.variant = variant
         self.guestEnvironment = guestEnvironment == .classic ? nil : guestEnvironment
+        self.experimentalV2RootRemount = experimentalV2RootRemount ? true : nil
         self.iphoneSource = iphoneSource.map(VPhoneCreateSourceRecord.init)
         self.cloudosSource = cloudosSource.map(VPhoneCreateSourceRecord.init)
         self.spoofBuild = spoofBuild
@@ -160,6 +162,9 @@ public struct VPhoneCreateEffectiveOptions: Codable, Equatable, Sendable {
         if effectivePrepareBackend != other.effectivePrepareBackend { result.append(("prepare_backend", .prepare)) }
         if effectiveRestoreBackend != other.effectiveRestoreBackend { result.append(("restore_backend", .restore)) }
         if enableFrida != other.enableFrida { result.append(("enable_frida", .patch)) }
+        if (experimentalV2RootRemount == true) != (other.experimentalV2RootRemount == true) {
+            result.append(("experimental_v2_root_remount", .prepare))
+        }
         if effectiveGuestEnvironment != other.effectiveGuestEnvironment {
             result.append(("guest_environment", .cfw))
         }

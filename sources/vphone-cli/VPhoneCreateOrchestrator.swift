@@ -136,6 +136,7 @@ public struct VPhoneCreateOrchestrator {
         public var restoreBackend: VPhoneRestoreBackend
         public var prepareBackend: VPhonePrepareBackend
         public var guestEnvironment: VPhoneGuestEnvironmentProfile
+        public var experimentalV2RootRemount: Bool
 
         public init(
             name: String,
@@ -153,7 +154,8 @@ public struct VPhoneCreateOrchestrator {
             diskSizeGB: UInt64 = 64,
             verbosity: VPhoneVerbosity = .quiet,
             keepArtifacts: Bool = false, restoreBackend: VPhoneRestoreBackend = .python,
-            prepareBackend: VPhonePrepareBackend = .script, guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
+            prepareBackend: VPhonePrepareBackend = .script, guestEnvironment: VPhoneGuestEnvironmentProfile = .classic,
+            experimentalV2RootRemount: Bool = false
         ) {
             self.name = name
             self.variant = variant
@@ -173,6 +175,7 @@ public struct VPhoneCreateOrchestrator {
             self.restoreBackend = restoreBackend
             self.prepareBackend = prepareBackend
             self.guestEnvironment = guestEnvironment
+            self.experimentalV2RootRemount = experimentalV2RootRemount
         }
     }
 
@@ -193,6 +196,9 @@ public struct VPhoneCreateOrchestrator {
     public func run(_ options: Options) throws {
         var options = options
         try options.guestEnvironment.validateVariant(options.variant)
+        if options.experimentalV2RootRemount, options.variant != "regular" || options.guestEnvironment != .v2 {
+            throw VPhoneCreateRunError.optionsChanged(["experimental v2 root remount requires regular-v2"])
+        }
         if options.prepareBackend == .native {
             let sources = try VPhoneNativeFirmwarePreparer.localSources(
                 iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource, isLess: options.variant == "less")
@@ -238,7 +244,7 @@ public struct VPhoneCreateOrchestrator {
             spoofBuild: options.spoofBuild, forceDscMaxSlide: options.forceDSCMaxSlide,
             enableFrida: options.enableFrida, cpuCount: options.cpuCount, memoryMb: options.memoryMB,
             diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend, prepareBackend: options.prepareBackend,
-            guestEnvironment: options.guestEnvironment)
+            guestEnvironment: options.guestEnvironment, experimentalV2RootRemount: options.experimentalV2RootRemount)
         let runtime = VPhoneCreateRuntime(
             sudoEnvExtras: sudo.envExtras, rootPopup: options.rootPopup, interactive: options.interactive,
             verbosity: options.verbosity, keepArtifacts: options.keepArtifacts)
@@ -309,6 +315,10 @@ public struct VPhoneCreateOrchestrator {
         // reloads and validates the checkpoint under its locks.
         let stored = try VPhoneCreateCheckpointStore.load(bundleURL: bundleURL).checkpoint
         let variant = options.overrides.variant ?? stored.effectiveOptions.variant
+        if (options.overrides.experimentalV2RootRemount ?? stored.effectiveOptions.experimentalV2RootRemount) == true,
+           variant != "regular" || (options.overrides.guestEnvironment ?? stored.effectiveOptions.effectiveGuestEnvironment) != .v2 {
+            throw VPhoneCreateRunError.optionsChanged(["experimental v2 root remount requires regular-v2"])
+        }
         try (options.overrides.guestEnvironment ?? stored.effectiveOptions.effectiveGuestEnvironment).validateVariant(variant)
         if stored.effectiveOptions.effectiveGuestEnvironment == .v2, options.overrides.guestEnvironment == .classic {
             throw VPhoneCreateRunError.optionsChanged(["v2 cannot be changed to classic; create a new VM"])
@@ -686,6 +696,7 @@ public struct VPhoneCreateOrchestrator {
     @discardableResult
     func runFWPatch(
         variant: PatchFirmwareCLI.VariantOption, isLess: Bool, enableFrida: Bool,
+        experimentalV2RootRemount: Bool = false,
         bundleURL: URL, verbosity v: VPhoneVerbosity
     ) throws -> Int {
         let lock = try VPhoneVMLock(directory: bundleURL, operation: "fw-patch")
@@ -706,7 +717,7 @@ public struct VPhoneCreateOrchestrator {
         let pipeline = FirmwarePipeline(
             vmDirectory: bundleURL, variant: variant.pipelineVariant, verbose: v.showsToolDetail,
             noBinpack: false, noVphoned: false, forceExcGuard: false,
-            enableFrida: enableFrida)
+            enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount)
         let records = try pipeline.patchAll()
         print("[fw patch] applied \(records.count) patches for \(variant.rawValue)")
         return records.count

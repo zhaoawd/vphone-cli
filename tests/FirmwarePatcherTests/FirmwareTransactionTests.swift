@@ -205,6 +205,15 @@ import Testing
         }
     }
 
+    @Test func stagedPipelineRetainsMountExperimentGate() throws {
+        let f = try Fixture()
+        let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false,
+            experimentalV2RootRemount: true, loader: FailingLoader(failRead: true))
+        #expect(throws: (any Error).self) { try pipeline.patchAllStructured() }
+        #expect(pipeline.trace.gates?.experimentalV2RootRemount == true)
+        try f.original()
+    }
+
     @Test(arguments: [true, false]) func pipelineReadAndPartialSaveFailuresRemainRecoverable(_ failRead: Bool) throws {
         let f = try Fixture()
         let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false, loader: FailingLoader(failRead: failRead))

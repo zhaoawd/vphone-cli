@@ -173,12 +173,14 @@ public struct VPhoneCreateRunner {
         public var restoreBackend: VPhoneRestoreBackend?
         public var prepareBackend: VPhonePrepareBackend?
         public var guestEnvironment: VPhoneGuestEnvironmentProfile?
+        public var experimentalV2RootRemount: Bool?
 
         public init(
             variant: String? = nil, iphoneSource: String? = nil, cloudosSource: String? = nil,
             spoofBuild: String? = nil, forceDscMaxSlide: Bool? = nil, enableFrida: Bool? = nil,
             diskSizeGb: UInt64? = nil, restoreBackend: VPhoneRestoreBackend? = nil,
-            prepareBackend: VPhonePrepareBackend? = nil, guestEnvironment: VPhoneGuestEnvironmentProfile? = nil
+            prepareBackend: VPhonePrepareBackend? = nil, guestEnvironment: VPhoneGuestEnvironmentProfile? = nil,
+            experimentalV2RootRemount: Bool? = nil
         ) {
             self.variant = variant
             self.iphoneSource = iphoneSource
@@ -190,6 +192,7 @@ public struct VPhoneCreateRunner {
             self.restoreBackend = restoreBackend
             self.prepareBackend = prepareBackend
             self.guestEnvironment = guestEnvironment
+            self.experimentalV2RootRemount = experimentalV2RootRemount
         }
     }
 
@@ -245,12 +248,20 @@ public struct VPhoneCreateRunner {
 
     // MARK: Fresh create
 
+    private static func validateMountExperiment(_ options: VPhoneCreateEffectiveOptions) throws {
+        if options.experimentalV2RootRemount == true,
+           options.variant != "regular" || options.effectiveGuestEnvironment != .v2 {
+            throw VPhoneCreateRunError.optionsChanged(["experimental v2 root remount requires regular-v2"])
+        }
+    }
+
     /// Starts the checkpoint of a bundle that was just created and runs every stage.
     @discardableResult
     public func create(
         bundleURL: URL, options: VPhoneCreateEffectiveOptions, iphoneSource: String?, cloudosSource: String?
     ) throws -> VPhoneCreateCheckpoint {
         let bundleURL = bundleURL.standardizedFileURL
+        try Self.validateMountExperiment(options)
         let store = try VPhoneCreateCheckpointStore.initialize(bundleURL: bundleURL, hooks: storeHooks)
         defer { Self.removeRuntimeRecord(bundleURL) }
         let identity = VPhoneCreateBundleIdentity(
@@ -324,6 +335,8 @@ public struct VPhoneCreateRunner {
         if let value = overrides.prepareBackend { options.prepareBackend = value == .script ? nil : value }
         if let value = overrides.guestEnvironment { options.guestEnvironment = value == .classic ? nil : value }
         if let value = overrides.enableFrida { options.enableFrida = value }
+        if let value = overrides.experimentalV2RootRemount { options.experimentalV2RootRemount = value ? true : nil }
+        try Self.validateMountExperiment(options)
         if overrides.iphoneSource == nil, let record = stored.effectiveOptions.iphoneSource, !record.redacted {
             overrides.iphoneSource = record.display
         }

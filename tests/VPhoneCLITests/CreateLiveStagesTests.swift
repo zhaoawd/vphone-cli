@@ -20,10 +20,12 @@ private struct Workspace {
     func cleanup() { try? FileManager.default.removeItem(at: bundle.deletingLastPathComponent()) }
 
     func context(variant: String = "jb", prepareBackend: VPhonePrepareBackend = .script,
-                 guestEnvironment: VPhoneGuestEnvironmentProfile = .classic) -> VPhoneCreateStageContext {
+                 guestEnvironment: VPhoneGuestEnvironmentProfile = .classic,
+                 experimentalV2RootRemount: Bool = false) -> VPhoneCreateStageContext {
         let options = VPhoneCreateEffectiveOptions(
             variant: variant, iphoneSource: nil, cloudosSource: nil, spoofBuild: nil, forceDscMaxSlide: false,
-            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, prepareBackend: prepareBackend, guestEnvironment: guestEnvironment)
+            enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, prepareBackend: prepareBackend,
+            guestEnvironment: guestEnvironment, experimentalV2RootRemount: experimentalV2RootRemount)
         let checkpoint = VPhoneCreateCheckpoint(
             identity: .init(name: "vm", path: bundle.path, directoryId: "1:2"), options: options,
             tool: .init(executableSha256: nil, stageContractVersion: 1), now: Date())
@@ -264,6 +266,19 @@ struct CreateLiveStagesTests {
         #expect(text.contains("steps=" + plan.enabledSteps.sorted().joined(separator: ",") + "\n"))
         #expect(jb == VPhoneCreateDigest.sha256(Data(text.utf8)))
         #expect(throws: (any Error).self) { try digest("unknown", gates("unknown")) }
+    }
+
+    @Test func experimentalCheckpointRejectsDefaultPatchArchive() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        try Data("rom".utf8).write(to: w.bundle.appendingPathComponent("AVPBooter.vresearch1.bin"))
+        try writeCommittedArchive(w, id: "abc", variant: "regular", report: gates("regular"))
+        let stages = w.stages()
+        let recorded = try stages.patchSelectionIdentity(bundleURL: w.bundle, archive: "abc")
+        let evidence = ["firmware_transaction_archives": "abc", "patch_records": "28",
+                        VPhoneCreatePatchSelection.evidenceKey: recorded]
+        #expect(isRejected(stages.verify(.patch,
+            context: w.context(variant: "regular", guestEnvironment: .v2, experimentalV2RootRemount: true),
+            evidence: evidence)))
     }
 
     @Test func patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() throws {

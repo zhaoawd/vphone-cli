@@ -38,11 +38,21 @@ R7 确认失败于 `mount -u -w /`，目标库未替换。当前证据将未修�
 
 证据目录 `research/artifacts/v2-remaining-20261002/`（Git 忽略）：t17-firmware-report.json、t17-regular-plan.json、t17-jb-plan.json、t17-kernel-original.raw、t17-mount-wrapper.json、t17-analysis-summary.json、t17-serial-mount-lines.txt。分析没有运行新的固件补丁测试或 VM 对照，不能建立修复结论。
 
-## 待批准的对照实验
+## 已批准的对照实验（2026-10-02）
 
-现有 R5–R9 计划明确不执行新增内核补丁。下面的动作超出该批已批准范围，尚未执行：
+现有 R5–R9 计划明确不执行新增内核补丁。下面的动作原本超出该批范围；用户已单独回复“批准”。实现与准备进行中，真实 VM 对照尚未执行：
 
 1. 在独立构建目录准备实验入口，仅对显式选择的 regular-v2 实验候选增加现有 `kernel-boot-mac_mount` 的两项记录；沿用语义匹配、ARM64Encoder、严格声明与记录，不使用本记录中的偏移作为 patch logic。先写复现/范围断言，再实现并核对只有两项额外内核写入。classic 与默认 regular 选择不变。
 2. 新建隔离 VM `lp-v2-mount-accept-20261002`，继续使用现有 26.1 原件、独立缓存及已验证环境候选。保留当前 v2/classic VM、所有旧盘和事务。新建与恢复涉及认证、TSS 和磁盘空间；新宿主产物预检仍须通过。
 3. 在新 VM 上先验证 R1–R4，再重复单库 R7；只有在线替换成功后，验证旧映射 stale、仅重启 cameracaptured、新映射 current，以及该次 R8 回退。若仍拒绝，保留失败结果，不追加其他补丁。只读恢复失败时按原范围重启该实验 VM，记录实际 root_read_only 状态。
 4. 该实验不迁入其他 JB 补丁，不覆盖 MIS/T18，也不把成功实验自动提升为发布或默认策略。根据实测结果再决定是否纳入 v2 固件设计。
+
+## 实验入口与准备进度
+
+`vm create --guest-environment v2 --experimental-v2-root-remount` 要求 regular-v2。固件流水线只追加现有 MAC mount 步骤，其他 JB 步骤不执行。选项写入有效选项、事务 journal、补丁报告和实验记录；默认值省略，历史检查点与补丁选择摘要的字段保持兼容。续跑保留记录值；改变该设置要求从 prepare 生成新固件。验证器拒绝实验设置与固件报告不一致。
+
+测试按新增范围断言失败、实现、验证执行：补丁计划测试缺少参数时编译失败；命令行测试报告 unknown option；检查点测试缺少字段时编译失败；报告不一致和事务暂存选项丢失均先得到断言失败。实现后相关测试通过。`make test_swift` 第二次运行退出 0。第一次运行同时出现归档权限比较失败与 JB 方法来源对齐失败；第二次归档测试通过，原因未查明；JB 对齐失败由 mount-only 的单独调用改变来源匹配引起，改为调用唯一声明步骤后通过，没有删除或弱化断言。
+
+真实原始内核的内存对照：`VPHONE_DIAG_KERNEL_IM4P=<上述备份> swift test --filter KernelGateDiagnosisTests.regularMountExperimentChangesOnlyTwoAdditionalInstructions` 通过。基础 28 项记录逐项相同，仅新增 `kernelcache_jb.mac_mount.flag_gate` 与 `kernelcache_jb.mac_mount.state_clear`，各 4 字节。完整候选输出等于基础输出加这两项替换；源文件未写入。两个锚点仍由当前映像语义匹配取得，未新增固定偏移。
+
+独立构建目录 `/private/tmp/vphone-v2-mount-build-20261002`；新 VM 名称 `lp-v2-mount-accept-20261002`；分阶段入口 `scripts/diagnostics/run_v2_mount_acceptance.zsh`。环境初始候选沿用 R6 的单库 libcamfix -O1，在线候选沿用 R7 的单库 libvcamcaptured -O1。API token 运行时生成，不写入证据。空间预检 90 GiB；保留旧 VM、旧盘及事务。构建、宿主预检及新 VM 实测结果待回填。
