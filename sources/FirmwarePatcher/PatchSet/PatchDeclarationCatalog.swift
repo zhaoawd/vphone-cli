@@ -105,6 +105,7 @@ public enum PatchDeclarationCatalog {
         case contradictorySelection(id: String)
         case variantMismatch(variant: String, gates: String)
         case partialStepSelection(id: String, step: String, enabled: [String])
+        case unknownReference(id: String, relation: String, target: String)
 
         public var description: String {
             switch self {
@@ -134,6 +135,8 @@ public enum PatchDeclarationCatalog {
                 "plan variant \(variant) does not match gate snapshot variant \(gates)"
             case let .partialStepSelection(id, step, enabled):
                 "declaration \(id) cannot be blocked independently: step \(step) also enables \(enabled.joined(separator: ", "))"
+            case let .unknownReference(id, relation, target):
+                "declaration \(id) has \(relation) reference to unknown declaration \(target)"
             }
         }
     }
@@ -153,10 +156,10 @@ public enum PatchDeclarationCatalog {
             for requirement in declaration.requires where !ids.contains(requirement) {
                 throw CatalogError.missingDependency(id: declaration.id, requires: requirement)
             }
-            for other in declaration.conflicts where ids.contains(other) {
-                // A declared conflict against a present declaration is only an error when
-                // both are enabled; structural check just verifies the id resolves.
-                _ = other
+            for (relation, targets) in [("conflicts", declaration.conflicts), ("after", declaration.after)] {
+                for target in targets where !ids.contains(target) {
+                    throw CatalogError.unknownReference(id: declaration.id, relation: relation, target: target)
+                }
             }
         }
         try checkOrder(declarations)
