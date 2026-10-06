@@ -106,37 +106,14 @@ public enum VPhoneArchiveWriter {
 
         let disk = archive_read_disk_new()
         archive_read_disk_set_standard_lookup(disk)
-        // Clears ARCHIVE_READDISK_MAC_COPYFILE, which archive_read_disk_new
-        // sets. Everything else stays at its default — xattrs, ACLs, file
-        // flags and sparse maps are still read.
-        //
-        // It is not a fidelity choice, it is a side effect: for every file,
-        // copyfile(3) packs the AppleDouble form into a temp file made with a
-        // *relative* mkstemp template, and libarchive's tree walker chdir's
-        // into each directory as it descends — so the temp file is created and
-        // removed inside the directory being read, and that directory's mtime
-        // becomes now. `vm export` would rewrite the mtime of every directory
-        // in the VM bundle it was asked only to read. Measured: 2023 in, the
-        // moment of the export out; `/usr/bin/tar -cf` leaves them alone.
-        //
-        // Nothing is lost that was being kept: no `._` member has ever been
-        // seen in an archive this writes, and both extract presets leave
-        // ARCHIVE_EXTRACT_MAC_METADATA off, so one would come back as a
-        // literal `._` file rather than as metadata.
+        // Read metadata by absolute path without starting libarchive's tree
+        // walker, which temporarily changes the process working directory.
+        // Other threads (including subprocess launches) must keep their cwd.
+        // Disable AppleDouble copyfile packaging as before; ACLs, xattrs,
+        // flags and sparse maps are still read by entry_from_file.
         archive_read_disk_set_behavior(disk, 0)
+        archive_read_disk_set_symlink_physical(disk)
         defer { archive_read_free(disk) }
-
-        // Resolved, and the same resolved path is what libarchive walks — so
-        // the prefix strip below always matches. Passing one form here and
-        // comparing against another is how every member ended up stored under
-        // an absolute path.
-        let resolvedRoot = try VPhoneArchivePaths.resolved(root)
-        guard archive_read_disk_open(disk, resolvedRoot.path) == ARCHIVE_OK else {
-            throw VPhoneArchiveError.cannotOpen(
-                path: resolvedRoot.path,
-                reason: archiveErrorString(disk),
-            )
-        }
 
         // Without a link resolver, every name of a hardlinked file is packed
         // as its own full copy, and unpacking gives back separate files. That
@@ -153,73 +130,59 @@ public enum VPhoneArchiveWriter {
         archive_entry_linkresolver_set_strategy(resolver, archive_format(writer))
         defer { archive_entry_linkresolver_free(resolver) }
 
-        let rootPath = resolvedRoot.path
+        let rootPath = root.path
         var written = 0
         var bytes: Int64 = 0
 
-        while true {
-            if isCancelled?() == true {
-                throw VPhoneArchiveError.cancelled
+        func pack(_ absolute: String) throws {
+            if isCancelled?() == true { throw VPhoneArchiveError.cancelled }
+
+            let relative = VPhoneArchivePaths.relative(absolute, under: rootPath)
+            // Prune an excluded directory before enumerating its children.
+            if !relative.isEmpty, patterns.contains(where: { matches(relative, pattern: $0) }) {
+                return
             }
 
             let entry = archive_entry_new()
             defer { archive_entry_free(entry) }
-
-            let status = archive_read_next_header2(disk, entry)
-            if status == ARCHIVE_EOF {
-                break
-            }
+            archive_entry_set_pathname(entry, absolute)
+            let status = archive_read_disk_entry_from_file(disk, entry, -1, nil)
             guard status == ARCHIVE_OK || status == ARCHIVE_WARN else {
-                throw VPhoneArchiveError.readFailed(
-                    path: root.path,
-                    reason: archiveErrorString(disk),
-                )
+                throw VPhoneArchiveError.readFailed(path: absolute, reason: archiveErrorString(disk))
             }
+            let isDirectory = archive_entry_filetype(entry) == UInt32(S_IFDIR)
 
-            let absolute = archive_entry_pathname(entry).map { String(cString: $0) } ?? ""
-            let relative = VPhoneArchivePaths.relative(absolute, under: rootPath)
-            // An excluded directory is not descended into, so the whole subtree
-            // goes in one decision rather than one fnmatch per file. GNU tar's
-            // --exclude prunes the same way, and `vm export`'s *_Restore*
-            // exclude covers an unpacked IPSW — tens of thousands of files.
-            if !relative.isEmpty, patterns.contains(where: { matches(relative, pattern: $0) }) {
-                continue
-            }
-            archive_read_disk_descend(disk)
-
-            // Without a top-level name the root entry itself is skipped: an
-            // archive of a directory's contents should not carry the directory.
-            guard let stored = storedPath(relative, under: topLevel) else { continue }
-            archive_entry_set_pathname(entry, stored)
-
-            // Turns the second and later names of a hardlinked file into
-            // references to the first. The archive-relative pathname has to be
-            // set before this, or the resolver records absolute paths as the
-            // link targets.
-            var resolved: OpaquePointer? = entry
-            var deferred: OpaquePointer?
-            archive_entry_linkify(resolver, &resolved, &deferred)
-            guard let resolved else { continue }
-
-            guard archive_write_header(writer, resolved) == ARCHIVE_OK else {
-                throw VPhoneArchiveError.writeFailed(
-                    path: stored,
-                    reason: archiveErrorString(writer),
-                )
-            }
-
-            // A hardlink reference comes back with size 0, so this also skips
-            // re-storing contents we have already written once.
-            if archive_entry_size(resolved) > 0 {
-                try copyFile(at: absolute, into: writer, isCancelled: isCancelled) { chunk in
-                    bytes += chunk
-                    bytesPacked?(bytes)
+            // Without a top-level name, omit the root entry but walk its children.
+            if let stored = storedPath(relative, under: topLevel) {
+                archive_entry_set_pathname(entry, stored)
+                // Resolve hardlinks after assigning archive-relative paths.
+                var resolved: OpaquePointer? = entry
+                var deferred: OpaquePointer?
+                archive_entry_linkify(resolver, &resolved, &deferred)
+                if let resolved {
+                    guard archive_write_header(writer, resolved) == ARCHIVE_OK else {
+                        throw VPhoneArchiveError.writeFailed(path: stored, reason: archiveErrorString(writer))
+                    }
+                    if archive_entry_size(resolved) > 0 {
+                        try copyFile(at: absolute, into: writer, isCancelled: isCancelled) { chunk in
+                            bytes += chunk
+                            bytesPacked?(bytes)
+                        }
+                    }
+                    written += 1
+                    progress?(Progress(entriesWritten: written, bytesWritten: bytes, currentPath: stored))
                 }
             }
 
-            written += 1
-            progress?(Progress(entriesWritten: written, bytesWritten: bytes, currentPath: stored))
+            // Only physical directories are descended into; symlink targets
+            // are stored without traversing them.
+            if isDirectory {
+                for name in try FileManager.default.contentsOfDirectory(atPath: absolute) {
+                    try pack((absolute as NSString).appendingPathComponent(name))
+                }
+            }
         }
+        try pack(rootPath)
 
         guard archive_write_close(writer) == ARCHIVE_OK else {
             throw VPhoneArchiveError.writeFailed(path: archive.path, reason: archiveErrorString(writer))

@@ -229,6 +229,9 @@ struct ArchiveSafetyTests {
             #expect(data < 0 && seekError == ENXIO, "fixture no longer reproduces SEEK_DATA ENXIO")
 
             let archive = root.appendingPathComponent("decmpfs.tar")
+            if try ArchiveFixtureOwnership.expectUSTARRefusalIfNeeded(format: format, source: source, archive: archive) {
+                return
+            }
             try VPhoneArchiveWriter.create(archive: archive, from: source, format: format)
             #expect(try VPhoneArchiveReader.readMember("booter.bin", from: archive) == content)
             try VPhoneArchiveExtractor.extract(archive, into: destination, options: .intoHostDirectory)

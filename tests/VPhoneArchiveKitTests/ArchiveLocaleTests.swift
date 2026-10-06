@@ -113,6 +113,10 @@ struct ArchiveLocaleTests {
             }
         }
 
+        if try inLocale("C", {
+            try ArchiveFixtureOwnership.expectUSTARRefusalIfNeeded(format: format, source: source, archive: archive)
+        }) { return }
+
         let (count, entries, first, second) = try inLocale("C") {
             let count = try VPhoneArchiveWriter.create(archive: archive, from: source, format: format)
             let entries = try VPhoneArchiveReader.entries(of: archive)
