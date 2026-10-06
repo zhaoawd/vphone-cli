@@ -1,0 +1,300 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/38] Write swift-version--58304C5D6DBC2206.txt
+[3/34] Compiling download.c
+[3/34] Compiling vphone_zip_stub.c
+[5/34] Compiling deviceinterfaced.c
+[6/34] Compiling asr.c
+[6/34] Compiling fdr.c
+[7/34] Compiling common.c
+[9/34] Compiling ipsw.c
+[10/34] Compiling normal.c
+[11/34] Compiling recovery.c
+[12/34] Compiling limera1n.c
+[13/34] Compiling dfu.c
+[14/34] Compiling img4.c
+[15/34] Compiling img3.c
+[16/34] Compiling ace3.c
+[17/34] Compiling mbn.c
+[18/34] Compiling ftab.c
+[19/34] Compiling restore.c
+[20/34] Compiling fls.c
+[21/34] Compiling log.c
+[22/34] Compiling locking.c
+[23/34] Compiling vphone_restore_bridge.c
+[24/34] Compiling idevicerestore.c
+[25/34] Compiling MobileRecoveryCore libirecovery.c
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/35] Linking vphone-cli
+[31/35] Linking vphone-vm
+[32/35] Applying vphone-cli
+[33/35] Applying vphone-vm
+[34/35] Linking vphone-cliPackageTests
+Build complete! (12.29s)
+Test Suite 'Selected tests' started at 2026-10-06 19:31:47.822.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 19:31:47.824.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 19:31:47.824.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 19:31:47.824.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite HelperServiceTests started.
+◇ Suite "Archive output and extraction safety" started.
+◇ Suite "Archive names in the C locale" started.
+◇ Suite "IPSW cache" started.
+◇ Suite LibraryTests started.
+◇ Suite EditLibraryTests started.
+◇ Suite APIHTTPTests started.
+◇ Suite LocationTests started.
+◇ Suite APIWebSocketTests started.
+◇ Test unauthorizedRequestCannotInstall() started.
+◇ Suite LibraryTests started.
+◇ Test callerIdentityMismatchNamesTheCaller() started.
+◇ Test verificationIsReadOnlyAndPropagatesFailure() started.
+◇ Test replyCompletesOnlyOnce() started.
+◇ Test timeoutIgnoresLateReply() started.
+◇ Test xpcRejectsClientWithoutConfiguredSigningIdentity() started.
+◇ Test cancellingARunInterruptsOnlyItsChild() started.
+◇ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() started.
+◇ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() started.
+◇ Test "non-ASCII names and link targets round trip in the C locale" started.
+◇ Test existingOutputsAndDanglingSymlinksArePreserved() started.
+◇ Test missingAddedLibraryIsSkippedAndFailureKeepsLastListing() started.
+◇ Test listsDefaultAndAddedLibraries() started.
+◇ Test addedLocationPersistsInInjectedDefaults() started.
+◇ Test realHTTPRPCHealthAndProtocolErrors() started.
+◇ Test webSocketRefusesRedirect() started.
+◇ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() started.
+◇ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() started.
+◇ Test preCancelledTaskDoesNotSend() started.
+◇ Test receivesEventsWithoutAnRPC() started.
+◇ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() started.
+◇ Test cancellationAndLateReplyCannotCompleteNextRequest() started.
+◇ Test boundsPendingRequestsAndCloseCompletesWaiters() started.
+◇ Test refusesRedirectAndOversizedResponses() started.
+◇ Test addedRootsAreAbsoluteCanonicalUniqueAndNotTheDefault() started.
+◇ Test correlatesOutOfOrderRepliesAndInterleavedEvents() started.
+◇ Test localIdentityIsSeparateFromUpstream() started.
+◇ Test malformedMessageFailsPendingRequests() started.
+◇ Test remoteErrorOnlyFailsItsMatchingRequest() started.
+◇ Test consoleLogsAreSeparatedPerLibrary() started.
+◇ Test "local source reads manifest without copying" started.
+◇ Test canonicalResolvesSymbolicLinks() started.
+◇ Test defaultRootIsTheCLIDefaultCanonical() started.
+◇ Test case passing 1 argument format → .gnutar to "non-ASCII names and link targets round trip in the C locale" started.
+◇ Test defaultRootHonorsVPHONERoot() started.
+◇ Test defaultRootIsShellSafe() started.
+◇ Test settingsRunOneConfigPerMachineAndAreRecorded() started.
+✔ Test replyCompletesOnlyOnce() passed after 0.001 seconds.
+◇ Test scansOnlyDirsWithManifest() started.
+◇ Test defaultRootHonorsEnvOverride() started.
+◇ Test bundleNamedThrowsWhenMissing() started.
+◇ Test scanReportsCorruptBundlesInsteadOfDropping() started.
+✔ Test existingOutputsAndDanglingSymlinksArePreserved() passed after 0.007 seconds.
+✔ Test verificationIsReadOnlyAndPropagatesFailure() passed after 0.007 seconds.
+✔ Test unauthorizedRequestCannotInstall() passed after 0.007 seconds.
+✔ Test localIdentityIsSeparateFromUpstream() passed after 0.007 seconds.
+✔ Test consoleLogsAreSeparatedPerLibrary() passed after 0.007 seconds.
+✔ Test addedRootsAreAbsoluteCanonicalUniqueAndNotTheDefault() passed after 0.007 seconds.
+✔ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() passed after 0.008 seconds.
+✔ Test defaultRootHonorsVPHONERoot() passed after 0.007 seconds.
+✔ Test canonicalResolvesSymbolicLinks() passed after 0.007 seconds.
+✔ Test defaultRootIsShellSafe() passed after 0.007 seconds.
+✔ Test defaultRootHonorsEnvOverride() passed after 0.007 seconds.
+✔ Test defaultRootIsTheCLIDefaultCanonical() passed after 0.007 seconds.
+✔ Test bundleNamedThrowsWhenMissing() passed after 0.007 seconds.
+✔ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() passed after 0.008 seconds.
+✔ Test preCancelledTaskDoesNotSend() passed after 0.008 seconds.
+✔ Test receivesEventsWithoutAnRPC() passed after 0.008 seconds.
+✔ Suite LocationTests passed after 0.008 seconds.
+◇ Test outputInsideSourceAndInvalidTopLevelAreRefused() started.
+✔ Test scansOnlyDirsWithManifest() passed after 0.008 seconds.
+✔ Test scanReportsCorruptBundlesInsteadOfDropping() passed after 0.010 seconds.
+✔ Test outputInsideSourceAndInvalidTopLevelAreRefused() passed after 0.003 seconds.
+vphone-helper: refused connection: caller pid 45541, uid 2035870432 does not satisfy the client signing requirement (OSStatus -67050: The operation couldn’t be completed. (OSStatus error -67050.))
+✔ Test callerIdentityMismatchNamesTheCaller() passed after 0.012 seconds.
+✔ Suite LibraryTests passed after 0.013 seconds.
+◇ Test publicationRaceDoesNotReplaceCompetingFile() started.
+◇ Test case passing 1 argument format → .pax to "non-ASCII names and link targets round trip in the C locale" started.
+✔ Test malformedMessageFailsPendingRequests() passed after 0.013 seconds.
+✔ Test correlatesOutOfOrderRepliesAndInterleavedEvents() passed after 0.013 seconds.
+✔ Test boundsPendingRequestsAndCloseCompletesWaiters() passed after 0.013 seconds.
+✔ Test timeoutIgnoresLateReply() passed after 0.014 seconds.
+✔ Test publicationRaceDoesNotReplaceCompetingFile() passed after 0.002 seconds.
+◇ Test cancellationWithinOneFileRemovesUnpublishedOutput() started.
+✔ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() passed after 0.016 seconds.
+✔ Test "local source reads manifest without copying" passed after 0.016 seconds.
+◇ Test "chunked download publishes the entry with a content marker" started.
+✔ Test xpcRejectsClientWithoutConfiguredSigningIdentity() passed after 0.018 seconds.
+✔ Suite HelperServiceTests passed after 0.018 seconds.
+✔ Test remoteErrorOnlyFailsItsMatchingRequest() passed after 0.019 seconds.
+✔ Test cancellationAndLateReplyCannotCompleteNextRequest() passed after 0.019 seconds.
+◇ Test case passing 1 argument format → .ustar to "non-ASCII names and link targets round trip in the C locale" started.
+✔ Test addedLocationPersistsInInjectedDefaults() passed after 0.020 seconds.
+✔ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() passed after 0.020 seconds.
+✘ Test "non-ASCII names and link targets round trip in the C locale" recorded an issue with 1 argument format → .ustar at ArchiveLocaleTests.swift:104:6: Caught error: Unable to write to lien-данные (Numeric user ID too large). Check that the folder is writable and has free space, then try again.
+✘ Test "non-ASCII names and link targets round trip in the C locale" with 3 test cases failed after 0.023 seconds with 1 issue.
+◇ Test "a UTF-8 flagged IPA-shaped zip is listed, read and unpacked in the C locale" started.
+✔ Test cancellationWithinOneFileRemovesUnpublishedOutput() passed after 0.010 seconds.
+◇ Test failedDecompressionRemovesStaging() started.
+✔ Test failedDecompressionRemovesStaging() passed after 0.001 seconds.
+◇ Test unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+◇ Test case passing 1 argument path → "/absolute" to unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+✔ Test "a UTF-8 flagged IPA-shaped zip is listed, read and unpacked in the C locale" passed after 0.004 seconds.
+◇ Test "an entry whose name cannot be converted is refused, not written over the destination" started.
+✔ Test "an entry whose name cannot be converted is refused, not written over the destination" passed after 0.001 seconds.
+◇ Test "a missing non-ASCII member is reported by name in the C locale" started.
+✔ Test "a missing non-ASCII member is reported by name in the C locale" passed after 0.003 seconds.
+◇ Test "archive calls restore the calling thread's locale, including on failure" started.
+◇ Test case passing 1 argument path → "../outside" to unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+◇ Test case passing 1 argument path → "nested/../../outside" to unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+✔ Test unsafeMemberAndHardlinkPathsAreRejected(path:) with 3 test cases passed after 0.009 seconds.
+◇ Test extractionDoesNotFollowArchiveSymlinkOutsideDestination() started.
+✔ Test extractionDoesNotFollowArchiveSymlinkOutsideDestination() passed after 0.001 seconds.
+◇ Test readingHardlinksReturnsContentAndRejectsCycles() started.
+✔ Test "archive calls restore the calling thread's locale, including on failure" passed after 0.008 seconds.
+◇ Test "withArchiveLocale changes only the calling thread, and only inside the call" started.
+✔ Test readingHardlinksReturnsContentAndRejectsCycles() passed after 0.004 seconds.
+◇ Test sparseRoundTripPreservesBytesAndLowAllocation() started.
+✔ Test "withArchiveLocale changes only the calling thread, and only inside the call" passed after 0.001 seconds.
+◇ Test "archive calls do not change other threads or the global locale" started.
+✔ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() passed after 0.067 seconds.
+✔ Suite APIWebSocketTests passed after 0.068 seconds.
+✔ Test "archive calls do not change other threads or the global locale" passed after 0.028 seconds.
+✘ Suite "Archive names in the C locale" failed after 0.072 seconds with 1 issue.
+↳ /// Non-ASCII member names and link targets when the calling thread runs in the
+↳ /// "C" locale.
+↳ ///
+↳ /// libarchive converts names through the calling thread's LC_CTYPE. vphone-cli
+↳ /// never calls setlocale(3), so a terminal launch, a Launchpad child and the
+↳ /// root helper all run in "C", whose codeset is US-ASCII. Each test pins its
+↳ /// own thread to "C" with uselocale(3), so the result does not depend on how
+↳ /// the test runner set up its locale.
+✔ Test webSocketRefusesRedirect() passed after 0.280 seconds.
+✔ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() passed after 0.280 seconds.
+✔ Test refusesRedirectAndOversizedResponses() passed after 0.288 seconds.
+✔ Test realHTTPRPCHealthAndProtocolErrors() passed after 0.292 seconds.
+✔ Test deadlineAndCallerCancellationEndHTTPWait() passed after 0.323 seconds.
+✔ Suite APIHTTPTests passed after 0.324 seconds.
+✔ Test cancellingARunInterruptsOnlyItsChild() passed after 0.325 seconds.
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] listed 3 machines from 2 libraries
+✔ Test listsDefaultAndAddedLibraries() passed after 0.581 seconds.
+✔ Test sparseRoundTripPreservesBytesAndLowAllocation() passed after 0.617 seconds.
+◇ Test decmpfsCompressedFileKeepsItsBytes(format:) started.
+◇ Test case passing 1 argument format → .gnutar to decmpfsCompressedFileKeepsItsBytes(format:) started.
+◇ Test case passing 1 argument format → .pax to decmpfsCompressedFileKeepsItsBytes(format:) started.
+◇ Test case passing 1 argument format → .ustar to decmpfsCompressedFileKeepsItsBytes(format:) started.
+✘ Test decmpfsCompressedFileKeepsItsBytes(format:) recorded an issue with 1 argument format → .ustar at ArchiveSafetyTests.swift:204:6: Caught error: Unable to write to booter.bin (Numeric user ID too large). Check that the folder is writable and has free space, then try again.
+✘ Test decmpfsCompressedFileKeepsItsBytes(format:) with 3 test cases failed after 0.012 seconds with 1 issue.
+↳ /// T03: on a decmpfs (UF_COMPRESSED) file, lseek(SEEK_DATA) and SEEK_HOLE
+↳ /// fail with ENXIO, which a sparse scan reads as "all hole". A VM bundle
+↳ /// holds such a file (AVPSEPBooter.vresearch1.bin). Every archive format
+↳ /// must still carry its bytes, not zeros.
+✘ Suite "Archive output and extraction safety" failed after 0.672 seconds with 1 issue.
+✔ Test settingsRunOneConfigPerMachineAndAreRecorded() passed after 0.841 seconds.
+◇ Test aRefusalIsShownWithTheCLIOutput() started.
+✔ Test "chunked download publishes the entry with a content marker" passed after 0.866 seconds.
+◇ Test entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "no-marker" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "other-source" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "modified-after-marker" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "marker-from-before-t14" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+✔ Test entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) with 4 test cases passed after 0.031 seconds.
+◇ Test "marker is the same rule the fw_prepare helper applies" started.
+✔ Test "marker is the same rule the fw_prepare helper applies" passed after 0.278 seconds.
+◇ Test "dropped transfer resumes with Range and If-Range" started.
+[launchpad] listed 1 machines from 2 libraries
+[launchpad] listed 2 machines from 1 libraries
+✔ Test missingAddedLibraryIsSkippedAndFailureKeepsLastListing() passed after 1.411 seconds.
+✔ Suite LibraryTests passed after 1.411 seconds.
+✔ Test "dropped transfer resumes with Range and If-Range" passed after 0.533 seconds.
+◇ Test "a changed entity or a server without ranges restarts from byte zero" started.
+✔ Test aRefusalIsShownWithTheCLIOutput() passed after 1.203 seconds.
+◇ Test renameSelectsTheNewNameAndCloneTheClone() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test "a changed entity or a server without ranges restarts from byte zero" passed after 1.046 seconds.
+◇ Test "server errors are retried and end in a retryable result" started.
+✔ Test "server errors are retried and end in a retryable result" passed after 0.004 seconds.
+◇ Test "a client error is final" started.
+✔ Test "a client error is final" passed after 0.002 seconds.
+◇ Test "refused connections and short bodies end retryable with nothing published" started.
+✔ Test renameSelectsTheNewNameAndCloneTheClone() passed after 0.824 seconds.
+◇ Test deleteRunsVMDeleteForEachMachineAndNothingElse() started.
+✔ Test "refused connections and short bodies end retryable with nothing published" passed after 0.265 seconds.
+◇ Test "content that is not an IPSW is not published" started.
+✔ Test "content that is not an IPSW is not published" passed after 0.003 seconds.
+◇ Test "cancelling a transfer stops it and removes the partial" started.
+✔ Test "cancelling a transfer stops it and removes the partial" passed after 0.281 seconds.
+◇ Test "cancelled before starting and a symlinked entry publish nothing" started.
+✔ Test "cancelled before starting and a symlinked entry publish nothing" passed after 0.001 seconds.
+◇ Test "concurrent downloads publish one entry" started.
+✔ Test "concurrent downloads publish one entry" passed after 0.288 seconds.
+◇ Test "partials of ended processes are removed and live ones kept" started.
+✔ Test "partials of ended processes are removed and live ones kept" passed after 0.023 seconds.
+◇ Test boundedMemberReadAndUnsupportedSourceAreRejected() started.
+✔ Test boundedMemberReadAndUnsupportedSourceAreRejected() passed after 0.002 seconds.
+◇ Test zipIPSWIsInspectedWithoutExtractionOrSourceChanges() started.
+✔ Test zipIPSWIsInspectedWithoutExtractionOrSourceChanges() passed after 0.027 seconds.
+◇ Test "pair check reads each manifest and names the mistake" started.
+✔ Test "pair check reads each manifest and names the mistake" passed after 0.008 seconds.
+✔ Suite "IPSW cache" passed after 3.682 seconds.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test deleteRunsVMDeleteForEachMachineAndNothingElse() passed after 1.887 seconds.
+◇ Test importGoesIntoTheDefaultLibrary() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test importGoesIntoTheDefaultLibrary() passed after 0.861 seconds.
+◇ Test aNameLaunchpadCannotPassRunsNothing() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test aNameLaunchpadCannotPassRunsNothing() passed after 1.101 seconds.
+◇ Test exportsRunOneAtATime() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test exportsRunOneAtATime() passed after 1.651 seconds.
+◇ Test cancellingAWaitingExportTakesItOutOfTheQueue() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test cancellingAWaitingExportTakesItOutOfTheQueue() passed after 1.331 seconds.
+◇ Test cancellingARunningExportRemovesOnlyTheFileItCreated() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test cancellingARunningExportRemovesOnlyTheFileItCreated() passed after 0.777 seconds.
+◇ Test cancellingAnExportOverAnExistingFileLeavesThatFile() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test cancellingAnExportOverAnExistingFileLeavesThatFile() passed after 0.896 seconds.
+◇ Test aFolderExportDoesNotReplaceAnExistingFile() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test aFolderExportDoesNotReplaceAnExistingFile() passed after 0.699 seconds.
+◇ Test historyRecordsEveryEditButNotTheListing() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test historyRecordsEveryEditButNotTheListing() passed after 1.247 seconds.
+✔ Suite EditLibraryTests passed after 13.327 seconds.
+✘ Test run with 84 tests in 10 suites failed after 13.327 seconds with 2 issues.

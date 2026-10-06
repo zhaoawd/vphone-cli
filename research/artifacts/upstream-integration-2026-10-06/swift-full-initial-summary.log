@@ -1,0 +1,44 @@
+✘ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() recorded an issue at APIWebSocketTests.swift:107:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test cancellationAndLateReplyCannotCompleteNextRequest() recorded an issue at APIWebSocketTests.swift:77:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test malformedMessageFailsPendingRequests() recorded an issue at APIWebSocketTests.swift:139:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test boundsPendingRequestsAndCloseCompletesWaiters() recorded an issue at APIWebSocketTests.swift:128:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() recorded an issue at APIWebSocketTests.swift:149:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test correlatesOutOfOrderRepliesAndInterleavedEvents() recorded an issue at APIWebSocketTests.swift:59:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test remoteErrorOnlyFailsItsMatchingRequest() recorded an issue at APIWebSocketTests.swift:159:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 "(null)"
+✘ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() recorded an issue at APIHTTPTests.swift:97:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test refusesRedirectAndOversizedResponses() recorded an issue at APIHTTPTests.swift:64:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test webSocketRefusesRedirect() recorded an issue at APIHTTPTests.swift:88:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test deadlineAndCallerCancellationEndHTTPWait() recorded an issue at APIHTTPTests.swift:74:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test realHTTPRPCHealthAndProtocolErrors() recorded an issue at APIHTTPTests.swift:51:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() failed after 50.058 seconds with 1 issue.
+✘ Test cancellationAndLateReplyCannotCompleteNextRequest() failed after 50.058 seconds with 1 issue.
+✘ Test malformedMessageFailsPendingRequests() failed after 50.058 seconds with 1 issue.
+✘ Test boundsPendingRequestsAndCloseCompletesWaiters() failed after 50.058 seconds with 1 issue.
+✘ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() failed after 50.058 seconds with 1 issue.
+✘ Test correlatesOutOfOrderRepliesAndInterleavedEvents() failed after 50.058 seconds with 1 issue.
+✘ Test remoteErrorOnlyFailsItsMatchingRequest() failed after 50.058 seconds with 1 issue.
+✘ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() failed after 51.393 seconds with 1 issue.
+✘ Test refusesRedirectAndOversizedResponses() failed after 51.393 seconds with 1 issue.
+✘ Test webSocketRefusesRedirect() failed after 51.393 seconds with 1 issue.
+✘ Test deadlineAndCallerCancellationEndHTTPWait() failed after 51.393 seconds with 1 issue.
+✘ Test realHTTPRPCHealthAndProtocolErrors() failed after 51.393 seconds with 1 issue.
+✘ Test "non-ASCII names and link targets round trip in the C locale" recorded an issue with 1 argument format → .ustar at ArchiveLocaleTests.swift:104:6: Caught error: Unable to write to lien-данные (Numeric user ID too large). Check that the folder is writable and has free space, then try again.
+✘ Test "non-ASCII names and link targets round trip in the C locale" with 3 test cases failed after 51.568 seconds with 1 issue.
+✘ Suite APIHTTPTests failed after 51.575 seconds with 5 issues.
+✘ Test cancellingARunInterruptsOnlyItsChild() recorded an issue at LibraryTests.swift:167:9: Expectation failed: (result.status → 0) == (SIGINT → 2)
+✘ Test cancellingARunInterruptsOnlyItsChild() recorded an issue at LibraryTests.swift:168:9: Expectation failed: (Date().timeIntervalSince(started) → 49.48112499713898) < (10 → 10.0)
+✘ Test cancellingARunInterruptsOnlyItsChild() recorded an issue at LibraryTests.swift:170:9: Expectation failed: (history.entries.first?.status → 0) == (SIGINT → 2)
+✘ Test cancellingARunInterruptsOnlyItsChild() failed after 54.936 seconds with 3 issues.
+✘ Test xpcRejectsClientWithoutConfiguredSigningIdentity() recorded an issue at HelperTests.swift:114:13: Expectation failed: !((error.localizedDescription → "Helper timed out; an install may still be running. Verify before retrying.").contains("Helper timed out") → true)
+✘ Test xpcRejectsClientWithoutConfiguredSigningIdentity() failed after 54.939 seconds with 1 issue.
+✘ Suite HelperServiceTests failed after 54.948 seconds with 1 issue.
+✘ Suite APIWebSocketTests failed after 56.330 seconds with 7 issues.
+✘ Suite LibraryTests failed after 56.335 seconds with 3 issues.
+✘ Suite "Archive names in the C locale" failed after 59.430 seconds with 1 issue.
+✘ Test decmpfsCompressedFileKeepsItsBytes(format:) recorded an issue with 1 argument format → .ustar at ArchiveSafetyTests.swift:204:6: Caught error: Unable to write to booter.bin (Numeric user ID too large). Check that the folder is writable and has free space, then try again.
+✘ Test decmpfsCompressedFileKeepsItsBytes(format:) with 3 test cases failed after 0.763 seconds with 1 issue.
+✘ Suite "Archive output and extraction safety" failed after 62.733 seconds with 1 issue.
+✘ Test "a changed entity or a server without ranges restarts from byte zero" recorded an issue at IPSWCacheTests.swift:226:13: Expectation failed: (server.requests.last?.range → nil) != nil
+✘ Test "a changed entity or a server without ranges restarts from byte zero" failed after 1.340 seconds with 1 issue.
+✘ Suite "IPSW cache" failed after 64.354 seconds with 1 issue.
+✘ Test run with 1030 tests in 158 suites failed after 78.795 seconds with 19 issues.

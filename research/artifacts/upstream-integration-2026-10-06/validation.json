@@ -1,0 +1,103 @@
+{
+  "schema": "vphone.upstream-initial-batch-validation/1",
+  "date": "2026-10-06",
+  "scope": "initial bounded batch; not full 47-task acceptance",
+  "base": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "implementation_commits": [
+    "5005f55d7e9191ce1d4be95d608baed395d8ecae",
+    "8d7eda2e0b516da83944674304a95fd5f97f56cc",
+    "ad0e65076f2d561be17b4abc1456587eb0d9aadf"
+  ],
+  "checks": [
+    {
+      "command": "make test_python",
+      "passed": true,
+      "tests": 558,
+      "skipped": 1,
+      "seconds": 295.564,
+      "evidence": "python-full-summary.log"
+    },
+    {
+      "command": "swift test --disable-sandbox --cache-path .build/test-cache --filter 'CFWEnvironment|BundleCloneStateTests|BundleOpsTests|ToolchainTests'",
+      "passed": true,
+      "tests": 52,
+      "suites": 6,
+      "seconds": 36.173,
+      "evidence": "related-swift-final.log"
+    },
+    {
+      "command": ".venv/bin/python -B -m unittest discover -s tests -p test_cfw_env_update.py -k ElevatedCheckTests",
+      "passed": true,
+      "tests": 6,
+      "evidence": "driver-green.log",
+      "before_fix_failures": 4,
+      "before_fix_evidence": "driver-red.log"
+    },
+    {
+      "command": "make test_swift",
+      "passed": false,
+      "tests": 1030,
+      "suites": 158,
+      "issues": 18,
+      "seconds": 70.749,
+      "evidence": "swift-full-final-summary.log"
+    },
+    {
+      "command": "swift test --disable-sandbox --cache-path .build/test-cache --skip 'FirmwareIntegrationTests|CFWEnvironmentCheckOutputTests|cloneOmitsOnlyRootCFWHistory'",
+      "passed": false,
+      "tests": 1028,
+      "suites": 157,
+      "issues": 19,
+      "seconds": 77.176,
+      "evidence": "swift-without-added-tests-summary.log",
+      "purpose": "diagnostic control; no permanent skip"
+    },
+    {
+      "command": "swift test --disable-sandbox --cache-path .build/test-cache --filter 'APIHTTPTests|APIWebSocketTests|HelperServiceTests|LibraryTests|ArchiveLocaleTests|ArchiveSafetyTests|IPSWCacheTests'",
+      "passed": false,
+      "tests": 84,
+      "suites": 10,
+      "issues": 2,
+      "evidence": "swift-failed-suites-recheck.log"
+    },
+    {
+      "command": ".venv/bin/python -B scripts/check_tar_pipe_memory.py",
+      "passed": true,
+      "evidence": "tar-pipe.log"
+    },
+    {
+      "command": "make test_guest_components",
+      "passed": true,
+      "camera_checks": 124,
+      "camera_failures": 0,
+      "evidence": "guest-components.log"
+    },
+    {
+      "command": "zsh -n scripts/cfw_install_host.sh",
+      "passed": true
+    },
+    {
+      "command": "git diff --cached --check -- . ':(exclude)research/artifacts/upstream-integration-2026-10-06/*.log'",
+      "passed": true,
+      "note": "raw log files retain compiler whitespace"
+    }
+  ],
+  "review": {
+    "passes": 1,
+    "important_findings": 1,
+    "finding": "check driver stdout diagnostics",
+    "fix": "ad0e6507",
+    "fix_reproduced_before_and_verified_after": true
+  },
+  "host_uid": 2035870432,
+  "unverified": [
+    "real sudo/admin-popup",
+    "real disk mount",
+    "VM boot",
+    "full upstream integration"
+  ],
+  "blockers": [
+    "referenced plan attachments unavailable",
+    "full Swift suite not passing; causes not fully established"
+  ]
+}

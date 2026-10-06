@@ -1,0 +1,57 @@
+.FFFF.
+======================================================================
+FAIL: test_mount_timeout_is_reported_with_its_stage_and_cleaned_up (test_cfw_env_update.ElevatedCheckTests.test_mount_timeout_is_reported_with_its_stage_and_cleaned_up)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 879, in test_mount_timeout_is_reported_with_its_stage_and_cleaned_up
+    rc, output, elapsed = self.run_check(vm, CFW_ENV_FAULTS='mount-hang', **self.sudo_invoker())
+                          ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 795, in run_check
+    self.assertEqual(proc.stdout, b'', 'the report driver must send diagnostics only to stderr')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'[*] read-only guest environment check as [197 chars]on\n' != b'' : the report driver must send diagnostics only to stderr
+
+======================================================================
+FAIL: test_report_directory_not_owned_by_the_invoker_is_refused (test_cfw_env_update.ElevatedCheckTests.test_report_directory_not_owned_by_the_invoker_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 898, in test_report_directory_not_owned_by_the_invoker_is_refused
+    rc, output, _ = self.run_check(vm, bare=True, VPHONE_INVOKER_UID=str(os.getuid() + 1),
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                   VPHONE_INVOKER_GID=str(os.getgid()))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 795, in run_check
+    self.assertEqual(proc.stdout, b'', 'the report driver must send diagnostics only to stderr')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'[*] read-only guest environment check as [197 chars]on\n' != b'' : the report driver must send diagnostics only to stderr
+
+======================================================================
+FAIL: test_root_popup_path_check_is_read_only_and_returns_the_report (test_cfw_env_update.ElevatedCheckTests.test_root_popup_path_check_is_read_only_and_returns_the_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 852, in test_root_popup_path_check_is_read_only_and_returns_the_report
+    rc, output, _ = self.run_check(vm, bare=True, SUDO_USER='test-user',
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                   VPHONE_INVOKER_UID=str(os.getuid()), VPHONE_INVOKER_GID=str(os.getgid()))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 795, in run_check
+    self.assertEqual(proc.stdout, b'', 'the report driver must send diagnostics only to stderr')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'[*] read-only guest environment check as [197 chars]on\n' != b'' : the report driver must send diagnostics only to stderr
+
+======================================================================
+FAIL: test_sudo_path_check_is_read_only_and_returns_the_report (test_cfw_env_update.ElevatedCheckTests.test_sudo_path_check_is_read_only_and_returns_the_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 839, in test_sudo_path_check_is_read_only_and_returns_the_report
+    rc, output, _ = self.run_check(vm, **self.sudo_invoker())
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_cfw_env_update.py", line 795, in run_check
+    self.assertEqual(proc.stdout, b'', 'the report driver must send diagnostics only to stderr')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: b'[*] read-only guest environment check as [197 chars]on\n' != b'' : the report driver must send diagnostics only to stderr
+
+----------------------------------------------------------------------
+Ran 6 tests in 4.133s
+
+FAILED (failures=4)

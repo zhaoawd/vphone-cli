@@ -1,0 +1,192 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/38] Write swift-version--58304C5D6DBC2206.txt
+[3/34] Compiling download.c
+[4/34] Compiling limera1n.c
+[5/34] Compiling normal.c
+[6/34] Compiling asr.c
+[7/34] Compiling fdr.c
+[7/34] Compiling recovery.c
+[9/34] Compiling ipsw.c
+[10/34] Compiling ace3.c
+[11/34] Compiling img3.c
+[12/34] Compiling dfu.c
+[13/34] Compiling img4.c
+[13/34] Compiling mbn.c
+[15/34] Compiling ftab.c
+[16/34] Compiling fls.c
+[17/34] Compiling restore.c
+[18/34] Compiling locking.c
+[19/34] Compiling log.c
+[20/34] Compiling vphone_zip_stub.c
+[21/34] Compiling deviceinterfaced.c
+[22/34] Compiling common.c
+[23/34] Compiling vphone_restore_bridge.c
+[24/34] Compiling idevicerestore.c
+[25/34] Compiling MobileRecoveryCore libirecovery.c
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/35] Linking vphone-cli
+[31/35] Linking vphone-vm
+[32/35] Applying vphone-cli
+[33/35] Applying vphone-vm
+[34/35] Linking vphone-cliPackageTests
+Build complete! (13.57s)
+Test Suite 'Selected tests' started at 2026-10-06 19:33:40.080.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 19:33:40.081.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 19:33:40.081.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 19:33:40.081.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ToolchainTests started.
+◇ Suite CFWEnvironmentElevatedCheckTests started.
+◇ Suite BundleCloneStateTests started.
+◇ Suite CFWEnvironmentCheckOutputTests started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test reportIsReadAndTheDirectoryRemoved(rootPopup:) started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Suite BundleOpsTests started.
+◇ Suite CFWEnvironmentUpdateTests started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test checkRunsTheDriverInCheckModeWithAReportPath() started.
+◇ Test failureCarriesTheStageAndAdvice() started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test missingReportIsAFailureThatNamesTheElevationStep() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test exportImportRetainsClonedBootState() started.
+◇ Test brokenDestinationSymlinkIsNotAdopted() started.
+◇ Test destinationRaceDoesNotDeleteRival() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test refusesLockedSourceWithoutProducingDestination() started.
+◇ Test failedCopyCleansOnlyPrivateStaging() started.
+◇ Test forcedFallbackKeepsIdentityAndSourceBytes() started.
+◇ Test case passing 1 argument rootPopup → false to reportIsReadAndTheDirectoryRemoved(rootPopup:) started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test case passing 1 argument rootPopup → true to reportIsReadAndTheDirectoryRemoved(rootPopup:) started.
+◇ Test checkKeepsStdoutMachineReadable(exitCode:) started.
+◇ Test case passing 1 argument forceFallback → false to cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test case passing 1 argument forceFallback → true to cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test renameThenDelete() started.
+◇ Test importRejectsExistingName() started.
+◇ Test importRejectsInvalidManifestWithoutPlacingBundle() started.
+◇ Test exportMaxProducesXzAndRoundTrips() started.
+◇ Test createsBundleWithSparseDiskAndManifest() started.
+◇ Test importPreservesSparseDiskBytesAndLogicalSize() started.
+◇ Test cloneRejectsExistingTarget() started.
+◇ Test exportDefaultsToFastZstd() started.
+◇ Test updateConfigPersistsFields() started.
+◇ Test offlineUpdateIsTheOnlyClassificationThatReplaces() started.
+◇ Test exportFastProducesZstdAndRoundTrips() started.
+◇ Test exportExcludesRegenerableStagingFiles() started.
+◇ Test checkFailuresRefuseExceptUnreadableDisk() started.
+◇ Test driverRunsInEnvironmentModeWithoutAVariant() started.
+◇ Test updateConfigPersistsNetwork() started.
+◇ Test importRejectsMultiTopLevelArchive() started.
+◇ Test importWithRenameDoesNotClobberArchivedNameCollision() started.
+◇ Test exportAndImportReportProgress() started.
+◇ Test rejectsDuplicateName() started.
+◇ Test rejectsInvalidNames() started.
+◇ Test updateConfigRejectsBadNetwork() started.
+◇ Test commandIsRegisteredUnderCFW() started.
+◇ Test exportExcludesRestoreDirByDefault() started.
+◇ Test rollsBackPartialBundleOnFailure() started.
+◇ Test exportThenImportRoundTrips() started.
+◇ Test compressionPresetTarArgs() started.
+◇ Test cloneCopiesBundleAndPreservesIdentity() started.
+◇ Test renameRejectsExistingTarget() started.
+◇ Test exportToDirectoryAutoNamesWithExtension() started.
+◇ Test case passing 1 argument exitCode → 0 to checkKeepsStdoutMachineReadable(exitCode:) started.
+◇ Test case passing 1 argument exitCode → 5 to checkKeepsStdoutMachineReadable(exitCode:) started.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 3.676 seconds.
+✔ Test checkRunsTheDriverInCheckModeWithAReportPath() passed after 3.677 seconds.
+✔ Test failureCarriesTheStageAndAdvice() passed after 3.677 seconds.
+✔ Test reportIsReadAndTheDirectoryRemoved(rootPopup:) with 2 test cases passed after 3.677 seconds.
+✔ Test exportImportRetainsClonedBootState() passed after 3.677 seconds.
+✔ Test brokenDestinationSymlinkIsNotAdopted() passed after 3.677 seconds.
+✔ Test destinationRaceDoesNotDeleteRival() passed after 3.677 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 3.677 seconds.
+✔ Test missingReportIsAFailureThatNamesTheElevationStep() passed after 3.677 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 3.677 seconds.
+✔ Test refusesLockedSourceWithoutProducingDestination() passed after 3.677 seconds.
+✔ Test failedCopyCleansOnlyPrivateStaging() passed after 3.677 seconds.
+✔ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) with 2 test cases passed after 3.677 seconds.
+✔ Test forcedFallbackKeepsIdentityAndSourceBytes() passed after 6.189 seconds.
+✔ Test cdhashMatchesCodesign() passed after 18.683 seconds.
+✔ Test rejectsMissingNestedApp() passed after 22.316 seconds.
+✔ Test checkKeepsStdoutMachineReadable(exitCode:) with 2 test cases passed after 22.315 seconds.
+✔ Test renameThenDelete() passed after 20.384 seconds.
+✔ Test importRejectsInvalidManifestWithoutPlacingBundle() passed after 20.383 seconds.
+✔ Test importRejectsExistingName() passed after 20.384 seconds.
+✔ Test createsBundleWithSparseDiskAndManifest() passed after 20.364 seconds.
+✔ Test importPreservesSparseDiskBytesAndLogicalSize() passed after 20.364 seconds.
+✔ Test cloneRejectsExistingTarget() passed after 20.364 seconds.
+✔ Test exportDefaultsToFastZstd() passed after 20.364 seconds.
+✔ Test updateConfigPersistsFields() passed after 20.364 seconds.
+✔ Test offlineUpdateIsTheOnlyClassificationThatReplaces() passed after 20.364 seconds.
+✔ Test exportFastProducesZstdAndRoundTrips() passed after 20.364 seconds.
+✔ Test exportExcludesRegenerableStagingFiles() passed after 20.364 seconds.
+✔ Test checkFailuresRefuseExceptUnreadableDisk() passed after 20.364 seconds.
+✔ Test driverRunsInEnvironmentModeWithoutAVariant() passed after 20.364 seconds.
+✔ Test updateConfigPersistsNetwork() passed after 20.364 seconds.
+✔ Test importRejectsMultiTopLevelArchive() passed after 20.364 seconds.
+✔ Test importWithRenameDoesNotClobberArchivedNameCollision() passed after 20.364 seconds.
+✔ Test exportAndImportReportProgress() passed after 20.364 seconds.
+✔ Test rejectsDuplicateName() passed after 20.145 seconds.
+✔ Test rejectsInvalidNames() passed after 20.145 seconds.
+✔ Test updateConfigRejectsBadNetwork() passed after 20.145 seconds.
+✔ Test commandIsRegisteredUnderCFW() passed after 20.145 seconds.
+✔ Test exportExcludesRestoreDirByDefault() passed after 20.145 seconds.
+✔ Test rollsBackPartialBundleOnFailure() passed after 20.145 seconds.
+✔ Test exportMaxProducesXzAndRoundTrips() passed after 20.384 seconds.
+✔ Test compressionPresetTarArgs() passed after 20.145 seconds.
+✔ Test cloneCopiesBundleAndPreservesIdentity() passed after 20.145 seconds.
+✔ Test renameRejectsExistingTarget() passed after 20.145 seconds.
+✔ Test exportThenImportRoundTrips() passed after 20.145 seconds.
+✔ Suite CFWEnvironmentElevatedCheckTests passed after 22.317 seconds.
+✔ Suite BundleCloneStateTests passed after 22.317 seconds.
+✔ Suite CFWEnvironmentCheckOutputTests passed after 22.317 seconds.
+✔ Suite CFWEnvironmentUpdateTests passed after 22.317 seconds.
+✔ Test rejectsModifiedNestedExecutable() passed after 22.327 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 22.433 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 22.433 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 22.436 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 22.436 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 22.437 seconds.
+✔ Suite ToolchainTests passed after 22.438 seconds.
+✔ Test exportToDirectoryAutoNamesWithExtension() passed after 34.001 seconds.
+✔ Suite BundleOpsTests passed after 36.172 seconds.
+✔ Test run with 52 tests in 6 suites passed after 36.173 seconds.

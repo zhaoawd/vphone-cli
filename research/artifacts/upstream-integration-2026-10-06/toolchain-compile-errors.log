@@ -1,0 +1,339 @@
+[747/847] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[747/847] Write Objects.LinkFileList
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:50:101: note: expanded code originates here
+ 48 |         let fixture = try LaunchpadFixtureApp.make(in: temp.url)
+ 49 |         try FileManager.default.removeItem(at: fixture.helper)
+ 50 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 51 |         #expect(failure.step == .layout)
+ 52 |         #expect(failure.reason.contains("vphone-cli.app"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:50:23: warning: no calls to throwing functions occur within 'try' expression
+ 48 |         let fixture = try LaunchpadFixtureApp.make(in: temp.url)
+ 49 |         try FileManager.default.removeItem(at: fixture.helper)
+ 50 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 52 |         #expect(failure.reason.contains("vphone-cli.app"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:57:98: note: expanded code originates here
+ 55 |     @Test func rejectsAppOutsideAnAppBundle() throws {
+ 56 |         let temp = try LaunchpadTemporaryDirectory()
+ 57 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: temp.url)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: temp.url),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: temp.url)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 58 |         #expect(failure.step == .layout)
+ 59 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:57:23: warning: no calls to throwing functions occur within 'try' expression
+ 55 |     @Test func rejectsAppOutsideAnAppBundle() throws {
+ 56 |         let temp = try LaunchpadTemporaryDirectory()
+ 57 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: temp.url)))
+ 59 |     }
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:67:101: note: expanded code originates here
+ 65 |         try FileManager.default.moveItem(at: fixture.cli, to: elsewhere)
+ 66 |         try FileManager.default.createSymbolicLink(at: fixture.cli, withDestinationURL: elsewhere)
+ 67 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 68 |         #expect(failure.step == .layout)
+ 69 |         #expect(failure.reason.contains("symbolic link"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:67:23: warning: no calls to throwing functions occur within 'try' expression
+ 65 |         try FileManager.default.moveItem(at: fixture.cli, to: elsewhere)
+ 66 |         try FileManager.default.createSymbolicLink(at: fixture.cli, withDestinationURL: elsewhere)
+ 67 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 69 |         #expect(failure.reason.contains("symbolic link"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:79:101: note: expanded code originates here
+ 77 |         try FileManager.default.moveItem(at: helpers, to: elsewhere)
+ 78 |         try FileManager.default.createSymbolicLink(at: helpers, withDestinationURL: elsewhere)
+ 79 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 80 |         #expect(failure.step == .layout)
+ 81 |         #expect(failure.reason.hasPrefix("Contents/Helpers:"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:79:23: warning: no calls to throwing functions occur within 'try' expression
+ 77 |         try FileManager.default.moveItem(at: helpers, to: elsewhere)
+ 78 |         try FileManager.default.createSymbolicLink(at: helpers, withDestinationURL: elsewhere)
+ 79 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 81 |         #expect(failure.reason.hasPrefix("Contents/Helpers:"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:91:101: note: expanded code originates here
+ 89 |         try handle.write(contentsOf: Data([0]))
+ 90 |         try handle.close()
+ 91 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 92 |         #expect(failure.step == .nestedSignature)
+ 93 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:91:23: warning: no calls to throwing functions occur within 'try' expression
+ 89 |         try handle.write(contentsOf: Data([0]))
+ 90 |         try handle.close()
+ 91 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 93 |     }
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:101:101: note: expanded code originates here
+ 99 |         object["gitHash"] = "edited"
+100 |         try JSONSerialization.data(withJSONObject: object).write(to: fixture.manifest)
+101 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+102 |         #expect(failure.step == .outerSignature)
+103 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:101:23: warning: no calls to throwing functions occur within 'try' expression
+ 99 |         object["gitHash"] = "edited"
+100 |         try JSONSerialization.data(withJSONObject: object).write(to: fixture.manifest)
+101 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+103 |     }
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:114:101: note: expanded code originates here
+112 |             ))
+113 |         }
+114 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+115 |         #expect(failure.step == .cdhash)
+116 |         #expect(failure.reason.hasPrefix("vphone-vm:"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:114:23: warning: no calls to throwing functions occur within 'try' expression
+112 |             ))
+113 |         }
+114 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+116 |         #expect(failure.reason.hasPrefix("vphone-vm:"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:126:101: note: expanded code originates here
+124 |             return try JSONSerialization.data(withJSONObject: object)
+125 |         }
+126 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+127 |         #expect(failure.step == .manifest)
+128 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:126:23: warning: no calls to throwing functions occur within 'try' expression
+124 |             return try JSONSerialization.data(withJSONObject: object)
+125 |         }
+126 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+127 |         #expect(failure.step == .manifest)
+128 |     }
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:50:101: note: expanded code originates here
+ 48 |         let fixture = try LaunchpadFixtureApp.make(in: temp.url)
+ 49 |         try FileManager.default.removeItem(at: fixture.helper)
+ 50 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 51 |         #expect(failure.step == .layout)
+ 52 |         #expect(failure.reason.contains("vphone-cli.app"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:50:23: warning: no calls to throwing functions occur within 'try' expression
+ 48 |         let fixture = try LaunchpadFixtureApp.make(in: temp.url)
+ 49 |         try FileManager.default.removeItem(at: fixture.helper)
+ 50 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 52 |         #expect(failure.reason.contains("vphone-cli.app"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:57:98: note: expanded code originates here
+ 55 |     @Test func rejectsAppOutsideAnAppBundle() throws {
+ 56 |         let temp = try LaunchpadTemporaryDirectory()
+ 57 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: temp.url)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: temp.url),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: temp.url)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 58 |         #expect(failure.step == .layout)
+ 59 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:57:23: warning: no calls to throwing functions occur within 'try' expression
+ 55 |     @Test func rejectsAppOutsideAnAppBundle() throws {
+ 56 |         let temp = try LaunchpadTemporaryDirectory()
+ 57 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: temp.url)))
+ 59 |     }
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:67:101: note: expanded code originates here
+ 65 |         try FileManager.default.moveItem(at: fixture.cli, to: elsewhere)
+ 66 |         try FileManager.default.createSymbolicLink(at: fixture.cli, withDestinationURL: elsewhere)
+ 67 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 68 |         #expect(failure.step == .layout)
+ 69 |         #expect(failure.reason.contains("symbolic link"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:67:23: warning: no calls to throwing functions occur within 'try' expression
+ 65 |         try FileManager.default.moveItem(at: fixture.cli, to: elsewhere)
+ 66 |         try FileManager.default.createSymbolicLink(at: fixture.cli, withDestinationURL: elsewhere)
+ 67 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 69 |         #expect(failure.reason.contains("symbolic link"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:79:101: note: expanded code originates here
+ 77 |         try FileManager.default.moveItem(at: helpers, to: elsewhere)
+ 78 |         try FileManager.default.createSymbolicLink(at: helpers, withDestinationURL: elsewhere)
+ 79 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 80 |         #expect(failure.step == .layout)
+ 81 |         #expect(failure.reason.hasPrefix("Contents/Helpers:"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:79:23: warning: no calls to throwing functions occur within 'try' expression
+ 77 |         try FileManager.default.moveItem(at: helpers, to: elsewhere)
+ 78 |         try FileManager.default.createSymbolicLink(at: helpers, withDestinationURL: elsewhere)
+ 79 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 81 |         #expect(failure.reason.hasPrefix("Contents/Helpers:"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:91:101: note: expanded code originates here
+ 89 |         try handle.write(contentsOf: Data([0]))
+ 90 |         try handle.close()
+ 91 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+ 92 |         #expect(failure.step == .nestedSignature)
+ 93 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:91:23: warning: no calls to throwing functions occur within 'try' expression
+ 89 |         try handle.write(contentsOf: Data([0]))
+ 90 |         try handle.close()
+ 91 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+ 93 |     }
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:101:101: note: expanded code originates here
+ 99 |         object["gitHash"] = "edited"
+100 |         try JSONSerialization.data(withJSONObject: object).write(to: fixture.manifest)
+101 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+102 |         #expect(failure.step == .outerSignature)
+103 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:101:23: warning: no calls to throwing functions occur within 'try' expression
+ 99 |         object["gitHash"] = "edited"
+100 |         try JSONSerialization.data(withJSONObject: object).write(to: fixture.manifest)
+101 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+103 |     }
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:114:101: note: expanded code originates here
+112 |             ))
+113 |         }
+114 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+115 |         #expect(failure.step == .cdhash)
+116 |         #expect(failure.reason.hasPrefix("vphone-vm:"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:114:23: warning: no calls to throwing functions occur within 'try' expression
+112 |             ))
+113 |         }
+114 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+116 |         #expect(failure.reason.hasPrefix("vphone-vm:"))
+
+macro expansion #require:2:3: error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:126:101: note: expanded code originates here
+124 |             return try JSONSerialization.data(withJSONObject: object)
+125 |         }
+126 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+    |                           `- note: in expansion of macro 'require' here
+    +--- macro expansion #require --------------------------------------
+    |1 | Testing.__checkFunctionCall((),calling: { 
+    |2 |   failure($1)
+    |  |   `- error: cannot call value of non-function type 'VPhoneLaunchpadToolchain.Failure'
+    |3 | },VPhoneLaunchpadToolchain.verify(appBundle: fixture.app),expression: .__fromFunctionCall(nil,"failure",(nil,.__fromSyntaxNode("VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)"))),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+    +-------------------------------------------------------------------
+127 |         #expect(failure.step == .manifest)
+128 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/ToolchainTests.swift:126:23: warning: no calls to throwing functions occur within 'try' expression
+124 |             return try JSONSerialization.data(withJSONObject: object)
+125 |         }
+126 |         let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+[809/847] Emitting module VPhoneLaunchpadKitTests
+[824/847] Emitting module VPhoneCoreTests
+error: fatalError

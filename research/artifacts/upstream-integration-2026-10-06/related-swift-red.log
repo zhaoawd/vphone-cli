@@ -1,0 +1,309 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/38] Compiling normal.c
+[4/38] Compiling download.c
+[6/38] Compiling fdr.c
+[7/38] Compiling asr.c
+[8/38] Compiling recovery.c
+[9/38] Compiling ipsw.c
+[10/38] Compiling restore.c
+[11/38] Compiling limera1n.c
+[12/38] Compiling dfu.c
+[13/38] Compiling img4.c
+[14/38] Compiling img3.c
+[15/38] Compiling ace3.c
+[16/38] Compiling mbn.c
+[17/38] Compiling ftab.c
+[18/38] Compiling fls.c
+[19/38] Compiling log.c
+[20/38] Compiling locking.c
+[21/38] Compiling common.c
+[22/38] Compiling deviceinterfaced.c
+[23/38] Compiling vphone_zip_stub.c
+[24/38] Compiling idevicerestore.c
+[25/38] Compiling vphone_restore_bridge.c
+[26/38] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Compiling FirmwarePatcherTests ExpStructuredTests.swift
+[29/49] Emitting module FirmwarePatcherTests
+[30/49] Compiling vphone_cli VPhoneEntry.swift
+[31/50] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[32/51] Compiling vphone_cli VPhoneError.swift
+[33/51] Compiling vphone_cli VPhoneDoctorCLI.swift
+[34/51] Compiling vphone_cli VPhoneControlChannel.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[35/51] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[36/51] Compiling vphone_cli VPhoneCoreBundleCLI.swift
+[37/51] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[38/52] Compiling vphone_cli VPhoneBuildInfo.swift
+[39/52] Compiling vphone_cli VPhoneControl.swift
+[40/54] Compiling vphone_cli VPhoneFWCLI.swift
+[41/57] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[42/58] Compiling vphone_cli VPhoneRestoreCLI.swift
+[43/61] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[44/63] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[45/65] Compiling vphone_cli VPhoneVirtualMachine.swift
+[46/67] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[47/69] Compiling vphone_cli VPhoneCLI.swift
+[48/71] Compiling vphone_cli VPhoneHardwareModel.swift
+[49/71] Compiling vphone_cli VPhoneAppDelegate.swift
+[50/75] Compiling vphone_cli VPhoneLocationProvider.swift
+[51/75] Compiling vphone_cli VPhoneMenuApps.swift
+[52/77] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[53/77] Compiling vphone_cli VPhoneKeyHelper.swift
+[54/78] Compiling vphone_cli VPhoneAppBrowserModel.swift
+[55/78] Compiling vphone_cli VPhoneAppBrowserView.swift
+[56/78] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[57/79] Compiling vphone_cli VPhoneFileBrowserView.swift
+[58/79] Compiling vphone_cli VPhoneHostCapabilities.swift
+[59/80] Compiling vphone_cli VPhoneMenuBattery.swift
+[60/80] Compiling vphone_cli VPhoneMenuConnect.swift
+[61/81] Compiling vphone_cli VPhoneKeychainBrowserModel.swift
+[62/81] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[63/82] Compiling vphone_cli VPhoneHostScreenAdapter.swift
+[64/83] Compiling vphone_cli VPhoneMenuLocation.swift
+[65/83] Compiling vphone_cli VPhoneTouchIDMonitor.swift
+[66/83] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[67/83] Compiling vphone_cli VPhoneWindowController.swift
+[68/84] Compiling vphone_cli VPhoneAppWindowController.swift
+[69/84] Compiling vphone_cli VPhoneFileWindowController.swift
+[70/85] Compiling vphone_cli VPhoneKeychainWindowController.swift
+[71/85] Compiling vphone_cli VPhoneMenuCamera.swift
+[72/85] Compiling vphone_cli VPhoneMenuController.swift
+[73/85] Compiling vphone_cli VPhoneMenuKeys.swift
+[74/85] Compiling vphone_cli VPhoneMenuRecord.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[75/85] Compiling vphone_cli VPhoneVMCLI.swift
+[76/85] Compiling vphone_cli VPhoneScreenRecorder.swift
+[77/118] Emitting module VPhoneVMEntry
+[78/118] Compiling VPhoneVMEntry main.swift
+[79/118] Emitting module VPhoneCommandEntry
+[80/118] Compiling VPhoneCommandEntry main.swift
+[80/118] Write Objects.LinkFileList
+[83/118] Compiling FirmwarePatcherTests FirmwarePatcherTests.swift
+[84/121] Compiling FirmwarePatcherTests ArtifactStructuredTests.swift
+[85/121] Compiling FirmwarePatcherTests KernelStructuredMergeTests.swift
+[86/121] Compiling FirmwarePatcherTests KernelStructuredTests.swift
+[86/121] Linking vphone-cli
+[87/121] Linking vphone-vm
+[88/121] Applying vphone-cli
+[89/121] Applying vphone-vm
+[91/121] Compiling VPhoneCLITests NativeTransferCLITests.swift
+[92/121] Compiling VPhoneCLITests PatchComponentResultTests.swift
+[93/121] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[94/121] Compiling VPhoneCLITests RestoreInspectCLITests.swift
+[95/125] Emitting module VPhoneCLITests
+[96/125] Compiling VPhoneCLITests APIProxyCLITests.swift
+[97/125] Compiling VPhoneCLITests ArchiveCLITests.swift
+[98/125] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[99/125] Compiling VPhoneCLITests CFWInvocationTests.swift
+[100/125] Compiling VPhoneCLITests DoctorCLITests.swift
+[101/125] Compiling VPhoneCLITests DyldMaxSlideOptionTests.swift
+[102/125] Compiling VPhoneCLITests GuestCLITests.swift
+[103/125] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[104/125] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[105/125] Compiling VPhoneCLITests GuestTransportTests.swift
+[106/125] Compiling VPhoneCLITests HelperCLITests.swift
+[107/125] Compiling VPhoneCLITests HostAPICommandTests.swift
+[108/125] Compiling VPhoneCLITests SignCLITests.swift
+[109/125] Compiling VPhoneCLITests TouchRouteTests.swift
+[110/125] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[111/125] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[112/125] Compiling VPhoneCLITests HostRPCTests.swift
+[113/125] Compiling VPhoneCLITests LocationValidationTests.swift
+[114/125] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[115/125] Compiling VPhoneCLITests NativeRestoreCLITests.swift
+[116/125] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[117/125] Compiling VPhoneCLITests HostCommandServiceTests.swift
+[118/125] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[119/125] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[120/125] Compiling VPhoneCLITests CoreBundleCLITests.swift
+[121/125] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[122/125] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[123/125] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[124/127] Compiling vphone_cliPackageTests runner.swift
+[125/127] Emitting module vphone_cliPackageTests
+[125/127] Write Objects.LinkFileList
+[126/127] Linking vphone-cliPackageTests
+Build complete! (20.85s)
+Test Suite 'Selected tests' started at 2026-10-06 19:24:15.234.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 19:24:15.236.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 19:24:15.236.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 19:24:15.236.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite BundleOpsTests started.
+◇ Suite BundleCloneStateTests started.
+◇ Suite CFWEnvironmentUpdateTests started.
+◇ Test updateConfigPersistsNetwork() started.
+◇ Test destinationRaceDoesNotDeleteRival() started.
+◇ Suite CFWEnvironmentCheckOutputTests started.
+◇ Test brokenDestinationSymlinkIsNotAdopted() started.
+◇ Suite CFWEnvironmentElevatedCheckTests started.
+◇ Suite ToolchainTests started.
+◇ Test driverRunsInEnvironmentModeWithoutAVariant() started.
+◇ Test checkFailuresRefuseExceptUnreadableDisk() started.
+◇ Test rollsBackPartialBundleOnFailure() started.
+◇ Test exportThenImportRoundTrips() started.
+◇ Test refusesLockedSourceWithoutProducingDestination() started.
+◇ Test offlineUpdateIsTheOnlyClassificationThatReplaces() started.
+◇ Test rejectsInvalidNames() started.
+◇ Test commandIsRegisteredUnderCFW() started.
+◇ Test createsBundleWithSparseDiskAndManifest() started.
+◇ Test exportImportRetainsClonedBootState() started.
+◇ Test updateConfigPersistsFields() started.
+◇ Test exportExcludesRegenerableStagingFiles() started.
+◇ Test failedCopyCleansOnlyPrivateStaging() started.
+◇ Test renameThenDelete() started.
+◇ Test cloneCopiesBundleAndPreservesIdentity() started.
+◇ Test exportAndImportReportProgress() started.
+◇ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test cloneRejectsExistingTarget() started.
+◇ Test exportDefaultsToFastZstd() started.
+◇ Test updateConfigRejectsBadNetwork() started.
+◇ Test rejectsDuplicateName() started.
+◇ Test exportMaxProducesXzAndRoundTrips() started.
+◇ Test importRejectsInvalidManifestWithoutPlacingBundle() started.
+◇ Test importRejectsMultiTopLevelArchive() started.
+◇ Test exportToDirectoryAutoNamesWithExtension() started.
+◇ Test exportExcludesRestoreDirByDefault() started.
+◇ Test importRejectsExistingName() started.
+◇ Test renameRejectsExistingTarget() started.
+◇ Test compressionPresetTarArgs() started.
+◇ Test importWithRenameDoesNotClobberArchivedNameCollision() started.
+◇ Test exportFastProducesZstdAndRoundTrips() started.
+◇ Test forcedFallbackKeepsIdentityAndSourceBytes() started.
+◇ Test importPreservesSparseDiskBytesAndLogicalSize() started.
+◇ Test case passing 1 argument forceFallback → false to cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test case passing 1 argument forceFallback → true to cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+✘ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) recorded an issue with 1 argument forceFallback → false at BundleCloneStateTests.swift:77:9: Expectation failed: !((fm → <NSFileManager: 0x1047b0ab0>).fileExists(atPath: clone.url.appendingPathComponent(".cfw-history").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/1F90DA37-E1AF-4A0A-A615-4ADC8010DEBC/dst/.cfw-history") → true)
+✘ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) recorded an issue with 1 argument forceFallback → true at BundleCloneStateTests.swift:77:9: Expectation failed: !((fm → <NSFileManager: 0x1047b0ab0>).fileExists(atPath: clone.url.appendingPathComponent(".cfw-history").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/796A70F8-59E4-4E72-9EA4-591FCBC50671/dst/.cfw-history") → true)
+◇ Test failureCarriesTheStageAndAdvice() started.
+◇ Test missingReportIsAFailureThatNamesTheElevationStep() started.
+◇ Test reportIsReadAndTheDirectoryRemoved(rootPopup:) started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test checkRunsTheDriverInCheckModeWithAReportPath() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test checkKeepsStdoutMachineReadable(exitCode:) started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+✔ Test driverRunsInEnvironmentModeWithoutAVariant() passed after 6.117 seconds.
+✔ Test checkFailuresRefuseExceptUnreadableDisk() passed after 6.117 seconds.
+✔ Test offlineUpdateIsTheOnlyClassificationThatReplaces() passed after 6.117 seconds.
+✔ Test rejectsInvalidNames() passed after 6.117 seconds.
+✔ Test updateConfigPersistsNetwork() passed after 6.117 seconds.
+✔ Test brokenDestinationSymlinkIsNotAdopted() passed after 6.117 seconds.
+✔ Test createsBundleWithSparseDiskAndManifest() passed after 6.117 seconds.
+✔ Test commandIsRegisteredUnderCFW() passed after 6.117 seconds.
+✔ Test destinationRaceDoesNotDeleteRival() passed after 6.117 seconds.
+✔ Test refusesLockedSourceWithoutProducingDestination() passed after 6.117 seconds.
+✔ Test updateConfigPersistsFields() passed after 6.117 seconds.
+✔ Test rollsBackPartialBundleOnFailure() passed after 6.117 seconds.
+✔ Test renameThenDelete() passed after 6.117 seconds.
+✔ Test failedCopyCleansOnlyPrivateStaging() passed after 6.117 seconds.
+✔ Test cloneCopiesBundleAndPreservesIdentity() passed after 6.117 seconds.
+✔ Test cloneRejectsExistingTarget() passed after 6.117 seconds.
+✔ Test updateConfigRejectsBadNetwork() passed after 6.117 seconds.
+✔ Test rejectsDuplicateName() passed after 6.117 seconds.
+✘ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) with 2 test cases failed after 6.117 seconds with 2 issues.
+✔ Test importRejectsMultiTopLevelArchive() passed after 6.117 seconds.
+✔ Test importRejectsInvalidManifestWithoutPlacingBundle() passed after 6.117 seconds.
+✔ Test exportImportRetainsClonedBootState() passed after 6.117 seconds.
+✔ Test renameRejectsExistingTarget() passed after 6.117 seconds.
+✔ Test exportExcludesRegenerableStagingFiles() passed after 6.117 seconds.
+✔ Test compressionPresetTarArgs() passed after 6.117 seconds.
+✔ Test exportExcludesRestoreDirByDefault() passed after 6.119 seconds.
+◇ Test case passing 1 argument rootPopup → false to reportIsReadAndTheDirectoryRemoved(rootPopup:) started.
+◇ Test case passing 1 argument rootPopup → true to reportIsReadAndTheDirectoryRemoved(rootPopup:) started.
+◇ Test case passing 1 argument exitCode → 0 to checkKeepsStdoutMachineReadable(exitCode:) started.
+◇ Test case passing 1 argument exitCode → 5 to checkKeepsStdoutMachineReadable(exitCode:) started.
+✘ Test checkKeepsStdoutMachineReadable(exitCode:) recorded an issue with 1 argument exitCode → 5 at CFWEnvironmentUpdateTests.swift:212:9: Expectation failed: (result.stderr → "check driver diagnostic
+[cfw] environment check failed at stage mount: fixture failure
+    next: inspect fixture
+").contains("read-only check runs as root")
+✘ Test checkKeepsStdoutMachineReadable(exitCode:) recorded an issue with 1 argument exitCode → 5 at CFWEnvironmentUpdateTests.swift:217:13: Expectation failed: (result.stdout → "[cfw] the read-only check runs as root: sudo asks for your macOS password
+").isEmpty → false
+✘ Test checkKeepsStdoutMachineReadable(exitCode:) recorded an issue with 1 argument exitCode → 0 at CFWEnvironmentUpdateTests.swift:212:9: Expectation failed: (result.stderr → "check driver diagnostic
+").contains("read-only check runs as root")
+✘ Test checkKeepsStdoutMachineReadable(exitCode:) recorded an issue with 1 argument exitCode → 0 at CFWEnvironmentUpdateTests.swift:172:6: Caught error: Error Domain=NSCocoaErrorDomain Code=3840 "Invalid value around line 1, column 1." UserInfo={NSDebugDescription=Invalid value around line 1, column 1., NSJSONSerializationErrorIndex=1}
+✔ Test exportDefaultsToFastZstd() passed after 10.989 seconds.
+✔ Test forcedFallbackKeepsIdentityAndSourceBytes() passed after 20.045 seconds.
+✔ Test exportAndImportReportProgress() passed after 20.045 seconds.
+✔ Test failureCarriesTheStageAndAdvice() passed after 16.668 seconds.
+✔ Test missingReportIsAFailureThatNamesTheElevationStep() passed after 15.349 seconds.
+✔ Test reportIsReadAndTheDirectoryRemoved(rootPopup:) with 2 test cases passed after 15.349 seconds.
+✔ Test exportThenImportRoundTrips() passed after 20.045 seconds.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 15.349 seconds.
+✔ Test checkRunsTheDriverInCheckModeWithAReportPath() passed after 15.349 seconds.
+✔ Test importRejectsExistingName() passed after 20.045 seconds.
+✔ Test importWithRenameDoesNotClobberArchivedNameCollision() passed after 20.045 seconds.
+✔ Test importPreservesSparseDiskBytesAndLogicalSize() passed after 20.045 seconds.
+✔ Test exportFastProducesZstdAndRoundTrips() passed after 20.045 seconds.
+✘ Test checkKeepsStdoutMachineReadable(exitCode:) with 2 test cases failed after 15.349 seconds with 4 issues.
+✔ Test rejectsMissingNestedApp() passed after 15.349 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 15.349 seconds.
+✔ Test cdhashMatchesCodesign() passed after 15.349 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 15.349 seconds.
+✔ Test exportToDirectoryAutoNamesWithExtension() passed after 20.045 seconds.
+✔ Suite CFWEnvironmentUpdateTests passed after 20.046 seconds.
+✘ Suite BundleCloneStateTests failed after 20.046 seconds with 2 issues.
+✔ Suite CFWEnvironmentElevatedCheckTests passed after 20.046 seconds.
+✘ Suite CFWEnvironmentCheckOutputTests failed after 20.046 seconds with 4 issues.
+✔ Test rejectsModifiedNestedExecutable() passed after 15.363 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 15.376 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 15.382 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 14.012 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 14.013 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 14.013 seconds.
+✔ Suite ToolchainTests passed after 20.080 seconds.
+✔ Test exportMaxProducesXzAndRoundTrips() passed after 22.938 seconds.
+✔ Suite BundleOpsTests passed after 22.939 seconds.
+✘ Test run with 52 tests in 6 suites failed after 22.939 seconds with 6 issues.
