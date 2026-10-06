@@ -1,0 +1,63 @@
+{
+  "observed_date": "2026-10-07",
+  "implementation_commit": "0c73f59f5065bca9917a527b44099a23f00b6684",
+  "catalog_tag": "upstream-2.2.3",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "default_swift": {
+    "command": "make test_swift",
+    "make_exit": 2,
+    "xctest": {
+      "tests": 234,
+      "skipped": 3,
+      "failures": 0
+    },
+    "swift_testing": {
+      "tests": 1074,
+      "suites": 166,
+      "issues": 14,
+      "seconds": 61.485
+    },
+    "issues_by_suite": {
+      "APIHTTPTests": 5,
+      "APIWebSocketTests": 7,
+      "LibraryTests": 1,
+      "HelperServiceTests": 1
+    },
+    "tar_pipe_and_guest_steps_this_run": "not executed after Swift failure",
+    "cause": "原因未查明"
+  },
+  "related_modules": {
+    "command": "swift test --disable-sandbox --cache-path .build/test-cache --filter 'FirmwarePatcherTests|VPhoneCLITests.CreateLiveStagesTests'",
+    "exit": 0,
+    "tests": 249,
+    "suites": 39,
+    "seconds": 1.291
+  },
+  "failure_control": {
+    "command": "swift test --disable-sandbox --cache-path .build/test-cache --filter 'VPhoneAPIKitTests|VPhoneLaunchpadKitTests.LibraryTests|VPhoneHelperKitTests.HelperServiceTests'",
+    "exit": 0,
+    "tests": 40,
+    "suites": 6,
+    "seconds": 2.667
+  },
+  "firmware": {
+    "command": "VPHONE_TEST_FIXTURES=/Users/qcz3840/github/vphone-cli/ipsws/patch_refactor_input make test_firmware",
+    "exit": 0,
+    "tests": 15,
+    "suites": 12,
+    "seconds": 39.093,
+    "reference": "existing local Python patches, not fixed upstream binary equivalence",
+    "fixture_manifest": "evidence/T10-firmware-fixture-manifest.json"
+  },
+  "vm_executed": false,
+  "accepted_C1": false,
+  "accepted_C2": false,
+  "remaining": [
+    "fixed target declarations/selection migration",
+    "individual patchID and required aggregate children",
+    "guest execution gate",
+    "stable VM/catalog target/schema/planDigest and legacy persistence",
+    "default full-suite failures",
+    "VM restoration acceptance"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "observed_date": "2026-10-07",
+  "implementation_commit": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+  "catalog_tag": "upstream-2.2.3",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "related_modules": {
+    "tests": 250,
+    "suites": 39,
+    "exit": 0,
+    "seconds": 1.387,
+    "evidence": "evidence/T10-base-parameters-final-module.log"
+  },
+  "firmware": {
+    "tests": 15,
+    "suites": 12,
+    "exit": 0,
+    "seconds": 42.743,
+    "evidence": "evidence/T10-base-final-firmware.log",
+    "reference": "existing local Python reference, not fixed upstream binary equivalence"
+  },
+  "default_swift": {
+    "make_exit": 2,
+    "xctest": {
+      "tests": 234,
+      "skipped": 3,
+      "failures": 0
+    },
+    "swift_testing": {
+      "tests": 1075,
+      "suites": 166,
+      "issues": 2,
+      "seconds": 58.478
+    },
+    "issues": [
+      "HelperServiceTests.xpcRejectsClientWithoutConfiguredSigningIdentity: Helper timed out",
+      "APIHTTPTests.deadlineAndCallerCancellationEndHTTPWait: elapsed 6.621596667 seconds exceeds 1-second assertion"
+    ],
+    "cause": "原因未查明",
+    "diagnostic_sample": "attempted descendant process lookup; no sample file obtained",
+    "tar_pipe_and_guest_steps_this_run": "not executed after Swift failure"
+  },
+  "historical_freeze_validation": "evidence/T10-frozen-validation-summary.json",
+  "vm_executed": false,
+  "accepted_C1": false,
+  "accepted_C2": false,
+  "builds": {
+    "make build": 0,
+    "make launchpad": 0,
+    "make check_bundle check_launchpad": 0
+  },
+  "signed_artifacts": "evidence/T10-base-signed-artifact-manifest.json"
+}

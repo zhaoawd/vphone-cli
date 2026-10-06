@@ -1,0 +1,100 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/36] Compiling locking.c
+[6/36] Compiling asr.c
+[6/36] Compiling download.c
+[8/36] Compiling fdr.c
+[9/38] Compiling ipsw.c
+[10/38] Compiling idevicerestore.c
+[11/38] Compiling recovery.c
+[12/38] Compiling limera1n.c
+[13/38] Compiling normal.c
+[14/38] Compiling dfu.c
+[15/38] Compiling restore.c
+[16/38] Compiling img4.c
+[17/38] Compiling img3.c
+[18/38] Compiling ace3.c
+[19/38] Compiling ftab.c
+[20/38] Compiling mbn.c
+[21/38] Compiling fls.c
+[22/38] Compiling log.c
+[23/38] Compiling deviceinterfaced.c
+[24/38] Compiling vphone_zip_stub.c
+[25/38] Compiling common.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+[29/40] Compiling FirmwarePatcherTests FrozenPipelinePlanTests.swift
+[30/40] Emitting module FirmwarePatcherTests
+[31/40] Compiling vphone_cli VPhoneBuildInfo.swift
+[32/40] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[33/42] Compiling vphone_cli VPhoneDoctorCLI.swift
+[34/42] Compiling vphone_cli VPhoneFWCLI.swift
+[34/42] Write Objects.LinkFileList
+[37/43] Emitting module VPhoneCLITests
+[37/43] Write Objects.LinkFileList
+[38/43] Linking vphone-vm
+[39/43] Linking vphone-cli
+[40/43] Applying vphone-vm
+[41/43] Applying vphone-cli
+[42/43] Linking vphone-cliPackageTests
+Build complete! (10.48s)
+Test Suite 'Selected tests' started at 2026-10-07 00:12:30.601.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 00:12:30.604.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 00:12:30.604.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 00:12:30.604.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FrozenPipelinePlanTests started.
+◇ Suite VersionKnowledgePlanTests started.
+◇ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() started.
+◇ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() started.
+◇ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() started.
+◇ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() started.
+◇ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() started.
+◇ Test transactionJournalContainsTheResolvedPlan() started.
+◇ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+◇ Test case passing 1 argument block → true to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument block → false to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument variant → .dev to knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+◇ Test case passing 1 argument variant → .regular to knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+✔ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() passed after 0.003 seconds.
+✔ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) with 2 test cases passed after 0.003 seconds.
+✔ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() passed after 0.003 seconds.
+✔ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() passed after 0.003 seconds.
+✔ Suite VersionKnowledgePlanTests passed after 0.004 seconds.
+✔ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() passed after 0.010 seconds.
+✔ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() passed after 0.025 seconds.
+✘ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) recorded an issue with 1 argument variant → .regular at FrozenPipelinePlanTests.swift:59:25: Issue recorded
+↳ Unknown base was allowed to commit unresolved boot argument parameters
+✘ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) recorded an issue with 1 argument variant → .dev at FrozenPipelinePlanTests.swift:59:25: Issue recorded
+↳ Unknown base was allowed to commit unresolved boot argument parameters
+✘ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) recorded an issue with 1 argument variant → .regular at FrozenPipelinePlanTests.swift:64:9: Expectation failed: !(FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-history") → file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/c5-5E4A3D21-6AA7-47D5-ACC2-893C19634336/vm/.firmware-history/) → true)
+✘ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) recorded an issue with 1 argument variant → .dev at FrozenPipelinePlanTests.swift:64:9: Expectation failed: !(FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-history") → file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/c5-10D4697C-08B0-43C1-B51B-303C732630F6/vm/.firmware-history/) → true)
+✘ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) with 2 test cases failed after 0.104 seconds with 4 issues.
+✔ Test transactionJournalContainsTheResolvedPlan() passed after 0.104 seconds.
+✘ Suite FrozenPipelinePlanTests failed after 0.105 seconds with 4 issues.
+✘ Test run with 8 tests in 2 suites failed after 0.105 seconds with 4 issues.

@@ -1,0 +1,80 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[5/41] Write swift-version--58304C5D6DBC2206.txt
+[6/41] Compiling fdr.c
+[6/41] Compiling ftab.c
+[7/41] Compiling fls.c
+[7/41] Compiling locking.c
+[10/41] Compiling ipsw.c
+[11/41] Compiling download.c
+[12/41] Compiling normal.c
+[13/41] Compiling asr.c
+[14/41] Compiling recovery.c
+[15/41] Compiling limera1n.c
+[16/41] Compiling img3.c
+[17/41] Compiling dfu.c
+[18/41] Compiling ace3.c
+[19/41] Compiling mbn.c
+[20/41] Compiling img4.c
+[21/41] Compiling restore.c
+[22/41] Compiling vphone_zip_stub.c
+[23/41] Compiling deviceinterfaced.c
+[24/41] Compiling log.c
+[25/41] Compiling common.c
+[26/41] Compiling vphone_restore_bridge.c
+[27/41] Compiling idevicerestore.c
+[28/41] Compiling MobileRecoveryCore libirecovery.c
+[30/43] Emitting module VPhoneHelperKitTests
+[31/43] Compiling VPhoneHelperKitTests HelperTests.swift
+[32/43] Emitting module FirmwarePatcherTests
+[33/43] Compiling FirmwarePatcherTests FrozenPipelinePlanTests.swift
+[34/43] Compiling vphone_cli VPhoneBuildInfo.swift
+[35/43] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[36/45] Compiling vphone_cli VPhoneFWCLI.swift
+[37/45] Compiling vphone_cli VPhoneDoctorCLI.swift
+[37/45] Write Objects.LinkFileList
+[40/45] Linking vphone-cli
+[41/45] Linking vphone-vm
+[42/45] Applying vphone-vm
+[42/45] Applying vphone-cli
+[44/45] Linking vphone-cliPackageTests
+Build complete! (9.98s)
+Test Suite 'Selected tests' started at 2026-10-06 23:32:15.853.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:32:15.856.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:32:15.856.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:32:15.856.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FrozenPipelinePlanTests started.
+◇ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() started.
+◇ Test transactionJournalContainsTheResolvedPlan() started.
+✘ Test transactionJournalContainsTheResolvedPlan() recorded an issue at FrozenPipelinePlanTests.swift:14:24: Expectation failed: (journal["plan"] → nil) as? ([String: Any] → Optional<Any>)
+✘ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() recorded an issue at FrozenPipelinePlanTests.swift:29:25: Issue recorded
+↳ Unknown required version was allowed to create and commit firmware
+✘ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() recorded an issue at FrozenPipelinePlanTests.swift:34:9: Expectation failed: !(FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-history") → file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/c5-5548DB2E-4D31-47E2-89AC-C2335F60D033/vm/.firmware-history/) → true)
+✘ Test transactionJournalContainsTheResolvedPlan() failed after 0.091 seconds with 1 issue.
+✘ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() failed after 0.093 seconds with 2 issues.
+✘ Suite FrozenPipelinePlanTests failed after 0.093 seconds with 3 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.093 seconds with 3 issues.

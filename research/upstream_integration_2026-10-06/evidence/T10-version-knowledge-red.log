@@ -1,0 +1,98 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling download.c
+[5/35] Compiling asr.c
+[6/35] Compiling recovery.c
+[6/35] Compiling deviceinterfaced.c
+[8/35] Compiling fdr.c
+[9/37] Compiling ipsw.c
+[10/37] Compiling limera1n.c
+[11/37] Compiling normal.c
+[12/37] Compiling img3.c
+[13/37] Compiling dfu.c
+[14/37] Compiling img4.c
+[15/37] Compiling ace3.c
+[16/37] Compiling mbn.c
+[17/37] Compiling restore.c
+[18/37] Compiling ftab.c
+[19/37] Compiling locking.c
+[20/37] Compiling log.c
+[21/37] Compiling fls.c
+[22/37] Compiling vphone_zip_stub.c
+[23/37] Compiling common.c
+[24/37] Compiling vphone_restore_bridge.c
+[25/37] Compiling idevicerestore.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling FirmwarePatcherTests VersionKnowledgePlanTests.swift
+[29/38] Emitting module FirmwarePatcherTests
+[30/38] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[30/38] Write Objects.LinkFileList
+[33/58] Emitting module VPhoneCLITests
+[34/60] Compiling VPhoneCLITests HostAPICommandTests.swift
+[35/60] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[36/60] Compiling VPhoneCLITests HostCommandServiceTests.swift
+[37/60] Compiling VPhoneCLITests PatchComponentResultTests.swift
+[38/60] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[39/60] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[40/60] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[41/60] Compiling VPhoneCLITests HostRPCTests.swift
+[42/60] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[43/60] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[44/60] Compiling VPhoneCLITests GuestTransportTests.swift
+[45/60] Compiling VPhoneCLITests APIProxyCLITests.swift
+[46/60] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[47/60] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[48/60] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[49/60] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[50/60] Compiling VPhoneCLITests LocationValidationTests.swift
+[51/60] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[51/60] Linking vphone-vm
+[52/60] Applying vphone-vm
+[53/60] Linking vphone-cli
+[54/60] Applying vphone-cli
+[56/60] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[57/60] Compiling VPhoneCLITests DoctorCLITests.swift
+[58/60] Compiling VPhoneCLITests GuestCLITests.swift
+[58/60] Write Objects.LinkFileList
+[59/60] Linking vphone-cliPackageTests
+Build complete! (12.08s)
+Test Suite 'Selected tests' started at 2026-10-06 23:53:23.965.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:53:23.967.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:53:23.967.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:53:23.967.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VersionKnowledgePlanTests started.
+◇ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() started.
+◇ Test case passing 1 argument block → false to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument block → true to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+✔ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() passed after 0.005 seconds.
+✘ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) recorded an issue with 1 argument block → true at VersionKnowledgePlanTests.swift:7:9: Expectation failed: an error was expected but none was thrown
+✘ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) recorded an issue with 1 argument block → false at VersionKnowledgePlanTests.swift:7:9: Expectation failed: an error was expected but none was thrown
+✘ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) with 2 test cases failed after 0.005 seconds with 2 issues.
+✘ Suite VersionKnowledgePlanTests failed after 0.006 seconds with 2 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.006 seconds with 2 issues.

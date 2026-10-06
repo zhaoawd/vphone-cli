@@ -1,0 +1,840 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/16] Write sources
+[4/16] Write swift-version--58304C5D6DBC2206.txt
+[6/14] Compiling FirmwarePatcher FirmwareTransaction.swift
+[7/14] Emitting module FirmwarePatcher
+[8/14] Compiling FirmwarePatcher FirmwareVersionInputs.swift
+[9/14] Compiling FirmwarePatcher FirmwarePipeline.swift
+[10/18] Compiling FirmwarePatcher VariantPlanResolver.swift
+[11/18] Compiling FirmwarePatcher PatchExperimentRecorder.swift
+[12/18] Compiling FirmwarePatcher PatchExperimentRecord.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[13/18] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[14/86] Compiling FirmwareIntegrationTests StructuredDeclarationGateTests.swift
+[15/86] Compiling FirmwareIntegrationTests IM4PPayloadParityTests.swift
+[16/86] Compiling FirmwareIntegrationTests VerboseJBDebug.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwareIntegrationTests/VerboseJBDebug.swift:12:9: warning: no calls to throwing functions occur within 'try' expression
+10 | 
+11 |         // Initialize patcher state (same as findAll() but without running patches)
+12 |         try patcher.parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+13 |         patcher.buildADRPIndex()
+14 |         patcher.buildBLIndex()
+[17/86] Emitting module FirmwareIntegrationTests
+[18/86] Compiling FirmwareIntegrationTests PatchComparisonTests.swift
+[19/87] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[20/87] Compiling vphone_cli VPhoneHostCommandService.swift
+[21/87] Compiling vphone_cli VPhoneHostControl.swift
+[22/89] Compiling vphone_cli VPhoneResourcesCLI.swift
+[23/89] Compiling vphone_cli VPhoneRestoreCLI.swift
+[24/89] Compiling vphone_cli VPhoneRestoreInspectCLI.swift
+[25/89] Compiling vphone_cli VPhoneSignCLI.swift
+[26/89] Compiling vphone_cli VPhoneVMCLI.swift
+[30/94] Compiling vphone_cli VPhoneHostRPC.swift
+[31/94] Compiling vphone_cli VPhoneHostScreenAdapter.swift
+[32/94] Emitting module FirmwarePatcherTests
+[33/94] Compiling FirmwarePatcherTests PlanSelectionValidationTests.swift
+[34/94] Compiling FirmwarePatcherTests VariantPlanTests.swift
+[35/94] Compiling vphone_cli VPhoneGuestCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[36/94] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[37/94] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[40/94] Compiling vphone_cli VPhoneHostCapabilities.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[41/94] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[42/94] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[43/94] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[44/94] Compiling vphone_cli VPhoneVMSelection.swift
+[45/94] Compiling vphone_cli VPhoneVMTransferCLI.swift
+[46/94] Compiling vphone_cli VPhoneVirtualMachine.swift
+[50/94] Compiling vphone_cli VPhoneMenuConnect.swift
+[51/94] Compiling vphone_cli VPhoneNativeFirmwarePreparer.swift
+[52/94] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[53/94] Compiling vphone_cli VPhoneProgressBar.swift
+[54/94] Compiling vphone_cli VPhoneQuickLookController.swift
+[55/94] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[56/94] Compiling vphone_cli VPhoneCoreBundleCLI.swift
+[57/94] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[58/94] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[59/94] Compiling vphone_cli VPhoneDoctorCLI.swift
+[60/94] Compiling vphone_cli VPhoneFWCLI.swift
+[63/94] Compiling vphone_cli VPhoneFWCacheCLI.swift
+[64/94] Compiling vphone_cli VPhoneFWInspectCLI.swift
+[65/94] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[66/94] Compiling vphone_cli VPhoneFileBrowserView.swift
+[67/94] Compiling vphone_cli VPhoneFirmwareSelection.swift
+[68/94] Compiling vphone_cli VPhoneFrameProducer.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[75/94] Compiling vphone_cli VPhoneAppDelegate.swift
+[76/94] Compiling vphone_cli VPhoneArchiveCLI.swift
+[77/94] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[78/94] Compiling vphone_cli VPhoneCLI.swift
+[79/94] Compiling vphone_cli VPhoneCameraServer.swift
+[80/94] Compiling vphone_cli VPhoneControl.swift
+[80/94] Write Objects.LinkFileList
+[89/94] Linking vphone-cli
+[90/94] Linking vphone-vm
+[91/94] Applying vphone-vm
+[92/94] Applying vphone-cli
+[93/94] Linking vphone-cliPackageTests
+Build complete! (14.43s)
+Test Suite 'Selected tests' started at 2026-10-06 23:49:40.477.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:49:40.478.
+Test Suite 'FirmwareTransactionAcceptanceTests' started at 2026-10-06 23:49:40.478.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testLargeImageDigestUsesBoundedMemory]' started.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testLargeImageDigestUsesBoundedMemory]' passed (0.135 seconds).
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareTransactionAcceptanceTests.swift:26: -[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts] : Test skipped - Set an isolated C4 firmware fixture directory
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts]' skipped (0.002 seconds).
+Test Suite 'FirmwareTransactionAcceptanceTests' passed at 2026-10-06 23:49:40.616.
+	 Executed 2 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.137 (0.137) seconds
+Test Suite 'FirmwareTransactionCrashTests' started at 2026-10-06 23:49:40.616.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareTransactionAcceptanceTests.swift:71: -[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess] : Test skipped - Only invoked by the crash recovery test
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess]' skipped (0.000 seconds).
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testRecoveryAfterProcessExitsWithoutUnwinding]' started.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testRecoveryAfterProcessExitsWithoutUnwinding]' passed (0.137 seconds).
+Test Suite 'FirmwareTransactionCrashTests' passed at 2026-10-06 23:49:40.753.
+	 Executed 2 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.137 (0.137) seconds
+Test Suite 'FullPipelineParityTests' started at 2026-10-06 23:49:40.753.
+Test Case '-[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FullPipelineParityTests.swift:10: -[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch] : Test skipped - Set VPHONE_TEST_PIPELINE_VM to a fresh staged firmware VM directory
+Test Case '-[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch]' skipped (0.000 seconds).
+Test Suite 'FullPipelineParityTests' passed at 2026-10-06 23:49:40.754.
+	 Executed 1 test, with 1 test skipped and 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:49:40.754.
+	 Executed 5 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.275 (0.275) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:49:40.754.
+	 Executed 5 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.275 (0.276) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite KernelStructuredTests started.
+◇ Suite StructuredPatchResultTests started.
+◇ Suite ExpStructuredTests started.
+◇ Suite DeclarationGateTests started.
+◇ Suite CreateLiveStagesTests started.
+➜ Suite KernelGateDiagnosisTests skipped.
+◇ Suite C1AlignmentTests started.
+◇ Suite PlanSelectionValidationTests started.
+◇ Suite ARM64ConstantTests started.
+◇ Suite FrozenStepExecutionTests started.
+➜ Suite LessPipelineAcceptanceTests skipped.
+◇ Suite IBootPatcherIdempotencyTests started.
+◇ Suite FrozenDeclarationGateTests started.
+◇ Suite FrozenPipelinePlanTests started.
+◇ Suite FirmwareVersionInputsTests started.
+◇ Suite KernelJBParityTests started.
+◇ Suite FridaGatingTests started.
+◇ Suite FirmwareTransactionTests started.
+◇ Suite MigratedPatcherParityTests started.
+➜ Suite LessOutputParityTests skipped.
+◇ Suite ArtifactStructuredTests started.
+◇ Suite BinaryBufferTests started.
+◇ Suite PatchExperimentRecordTests started.
+◇ Suite GuestPayloadInstallTests started.
+◇ Suite ARM64EncoderTests started.
+◇ Suite ARM64InstTests started.
+◇ Suite FpfsScopedOpenCaveTests started.
+◇ Suite FirmwarePipelineDataFlowTests started.
+➜ Suite ExpStructuredParityTests skipped.
+◇ Suite VariantPlanTests started.
+➜ Suite KernelStructuredParityTests skipped.
+◇ Suite KernelGateStructuredMergeTests started.
+◇ Suite CatalogReferenceValidationTests started.
+➜ Suite KernelPipelineParityTests skipped.
+◇ Suite KernelJBStructuredTests started.
+➜ Suite LessFilesystemAcceptanceTests skipped.
+◇ Suite FirmwarePipelineTests started.
+➜ Suite DeviceTreeStructuredParityTests skipped.
+◇ Test patchRunReportRoundTripsThroughJSON() started.
+◇ Test jbMethodsMatchManifestAndMissingActiveMethodsFail() started.
+◇ Test legacyPatcherCoverageAndSemantics() started.
+◇ Test baseMethodsMatchCompatibilityManifest() started.
+◇ Test completedUnchangedRecordsAreIdempotent() started.
+◇ Test partialGroupFailsEvenWithAnExistingSuccessfulRecord() started.
+◇ Test unknownAblationIdThrows() started.
+◇ Test patchGroupMissingOneRecordFails() started.
+◇ Test ambiguousFailsEvenWhenOptional() started.
+◇ Test ablatingRequiredStepDoesNotFailComponent() started.
+◇ Test conditionalRuleControlsNotApplicableVsFailed() started.
+◇ Test expRequiresBothOidAndCallersAndAcceptsVerifiedIdempotence() started.
+◇ Test baseKernelMissingMethodsFailIndividually() started.
+◇ Test gateRejectsMultipleOwnersForARecord() started.
+◇ Test knownAblationTargetsCoverMigratedPatchers() started.
+◇ Test disabledConditionalAndAblationNeverWriteDuringDiscovery() started.
+◇ Test requiredMissingFailsComponent() started.
+◇ Test idempotentBecomesAlreadyApplied() started.
+◇ Test optionalMissingBecomesNotApplicableNotFailed() started.
+◇ Test notImplementedSelected() started.
+◇ Test restoreReprobeRefusesWhileBundleLockIsHeld() started.
+◇ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() started.
+◇ Test stuckChildFailsTheStageAfterTheBound() started.
+◇ Test partialSuccessKeepsAppliedResults() started.
+◇ Test missingDependencyWhenTargetNotEnabled() started.
+◇ Test restoreReprobeRefusesWhileNativeWorkerRuns() started.
+◇ Test patchSelectionIdentityFollowsTheResolvedPlan() started.
+◇ Test patchRequiresOneCommittedTransactionForTheVariant() started.
+◇ Test missingDependencyStructural() started.
+◇ Test restoreReprobeRefusesWhileBridgeProcessRuns() started.
+◇ Test gateRejectsANotEnabledRecord() started.
+◇ Test gatePassesForACleanReport() started.
+◇ Test requiredMissingWhenPipelineLacksStep() started.
+◇ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() started.
+◇ Test stageReturnsOnlyAfterItsChildExited() started.
+◇ Test gateRejectsDuplicateRecordIndicesWithinAResult() started.
+◇ Test lessVerificationBootIsUnverified() started.
+◇ Test unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst() started.
+◇ Test unknownDeclarationSelected() started.
+◇ Test everyRefusalBeforeWriteSaysRefusedAndUnchanged() started.
+◇ Test duplicateDeclaration() started.
+◇ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test rerunRewriteDeclarations() started.
+◇ Test realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns() started.
+◇ Test restoreReprobeRefusesWhileDeviceEndpointAnswers() started.
+◇ Test patchVerificationRefusalPointsToPrepareNotPatch() started.
+◇ Test reprobeRefusesWhileBootProcessForBundleRuns() started.
+◇ Test verifierWaitsForARealBundleLockHolderToRelease() started.
+◇ Test versionIndeterminateWhenBaseUnknown() started.
+◇ Test firstBootPromptTimeoutIsUnverified() started.
+◇ Test jbFinalizeIsNeverVerifiedFromAPrintedHint() started.
+◇ Test gateRejectsAnUndeclaredRecord() started.
+◇ Test liveStepUndeclaredWhenCatalogIncomplete() started.
+◇ Test conflictBetweenEnabled() started.
+◇ Test removedArtifactRefusalLeadsWithItsCauseNotStopped() started.
+◇ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() started.
+◇ Test gateRejectsRecordsWithoutAnOwningResult() started.
+◇ Test toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() started.
+◇ Test verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased() started.
+◇ Test gateRejectsInvalidRecordIndices(index:) started.
+◇ Test gateIgnoresNotApplicableAndAblatedResults() started.
+◇ Test prepareRequiresExactlyOneRestoreTreeWithVersions() started.
+◇ Test verifierAcceptsWhenTheLockIsReleasedWithinTheBound() started.
+◇ Test statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock() started.
+◇ Test gateChecksOwnershipForDeclaredFailedSteps() started.
+◇ Test busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint() started.
+◇ Test cfwReprobeRefusesWhileBundleImageIsAttached() started.
+◇ Test cyclicOrder() started.
+◇ Test txmDevStepsEqualManifestMethods() started.
+◇ Test statusReportIsReadOnlyAndShowsStagesAndLiveFacts() started.
+◇ Test txmRegularStepsEqualManifestMethods() started.
+◇ Test patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() started.
+◇ Test restoreReprobeIgnoresOtherDevices() started.
+◇ Test iBootBaseIBSSStepsSubsetOfManifestMethods() started.
+◇ Test cmpW0W0() started.
+◇ Test refusesContradictoryExplicitChoices() started.
+◇ Test allManifestGatesMatchDeclaredRules() started.
+◇ Test movX0_0() started.
+◇ Test llbStepsEqualManifestMethods() started.
+◇ Test movW0_1() started.
+◇ Test ret() started.
+◇ Test prepareEvidenceMustMatchBackend() started.
+◇ Test iBootJBStepsSubsetOfManifestMethods() started.
+◇ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() started.
+◇ Test canBlockARequiredDeclarationOutsideTheVariant() started.
+◇ Test canBlockAllOptionalDeclarationsSharingOneStep() started.
+◇ Test avpBooterStepsEqualManifestMethods() started.
+◇ Test movX0X20() started.
+◇ Test canBlockAnIndependentOptionalStep() started.
+◇ Test movW0_0xA1() started.
+◇ Test refusesBlockingAnApplicableRequiredDeclaration() started.
+◇ Test refusesBlockingOnlyPartOfAnIndivisibleStep() started.
+◇ Test refusesVariantAndGateMismatch() started.
+◇ Test pacibsp() started.
+◇ Test cmpX0X0() started.
+◇ Test nop() started.
+◇ Test retaa() started.
+◇ Test serialLabelsSkipWhenLabelAlreadyPresent() started.
+➜ Test requiredDevExcGuardCompletes() skipped.
+◇ Test strbW0X20_30() started.
+◇ Test movW0_0() started.
+◇ Test serialLabelsDoNotSkipForUnrelatedSingleLabel() started.
+◇ Test movX0_1() started.
+➜ Test requiredJBVmMapProtectCompletes() skipped.
+◇ Test rejectsReportIdentityChanges(_:) started.
+◇ Test rejectsAWritingStepBlockedInTheFrozenPlan() started.
+◇ Test retab() started.
+◇ Test excludedStepDoesNotRunOrModifyBytes() started.
+◇ Test unreadableManifestIsNotClassifiedAsMissing() started.
+◇ Test selectedStepStillRunsAndWrites() started.
+◇ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() started.
+➜ Test completeProductionPipeline() skipped.
+◇ Test iBECStepsEqualManifestMethods() started.
+◇ Test unrecognizedProductVersionIsRejected(_:) started.
+◇ Test acceptsMatchingResolvedPlan() started.
+◇ Test corruptManifestIsRejected(_:) started.
+◇ Test transactionJournalContainsTheResolvedPlan() started.
+◇ Test presentManifestCannotDisappearAfterFreezing() started.
+◇ Test previouslyMissingManifestCannotAppearAfterFreezing() started.
+➜ Test realKernelGateMatrix() skipped.
+◇ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() started.
+◇ Test versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test versionAndDigestComeFromTheSameManifestBytes() started.
+◇ Test iBSSBaseFindAllEqualsStepPath_realData() started.
+◇ Test cloudOSVersionGate() started.
+◇ Test productVersionHasToBeAString() started.
+◇ Test repeatedRecoverySurvivesInterruptionDuringRollback() started.
+◇ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+◇ Test avpBooterFindAllEqualsStepPath_realData() started.
+◇ Test dryAblationRunDoesNotSave() started.
+◇ Test serialLabelsPatchTwoBannerRunsWhenLabelAbsent() started.
+◇ Test externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() started.
+◇ Test kernelFindAllEqualsStepPath_realData() started.
+◇ Test bareAPFSImageResolvesItsPhysicalStore() started.
+◇ Test txmFindAllEqualsStepPath_realData() started.
+◇ Test iBootJBFindAllEqualsStepPath_realData() started.
+◇ Test symlinkInputAndOutputAreRejected() started.
+◇ Test nativeToolOutputIsDrainedAndClosed() started.
+◇ Test llbFindAllEqualsStepPath_realData() started.
+◇ Test committedRecoveryDoesNotRollBackSuccessfulPublication() started.
+◇ Test kernelFindAllEqualsStepPath_syntheticNoMatch() started.
+◇ Test diskFullWhileCopyingOrPreparingCommitKeepsOriginal() started.
+◇ Test txmDevFindAllEqualsStepPath_realData() started.
+◇ Test recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test recoveryValidatesAllEntriesBeforeRestoringAny() started.
+◇ Test existingTransactionAndActiveToolBlockNewWorkAndRecovery() started.
+◇ Test iBECFindAllEqualsStepPath_realData() started.
+◇ Test stagedWritesDoNotAlterOriginalAndCommitPublishesAllFiles() started.
+◇ Test attachedImageFailurePreventsPublication() started.
+◇ Test filesystemFailureAndAblationProduceNoArtifacts() started.
+◇ Test failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() started.
+◇ Test excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test lessManifestChecksEveryReferencedArtifact() started.
+◇ Test corruptJournalCannotTriggerAReplacement() started.
+◇ Test avpBooterFindAllEqualsStepPath_syntheticNoMatch() started.
+◇ Test artifactStepsMatchManifest() started.
+◇ Test lessManifestChecksRetypedIM4PDigest() started.
+◇ Test initialWriteFailureStopsBeforePatching() started.
+◇ Test findAll() started.
+◇ Test lessDryRunRejectsFilesystemSideEffectsBeforeOpeningInputs() started.
+◇ Test deviceTreeMissingPropertyDoesNotHideBehindSuccessfulProperties() started.
+◇ Test deviceTreeAblationOmitsThePropertyDuringRebuild() started.
+◇ Test manifestHashStepRebuildsTheSameBytesAndReportsMissingInput() started.
+◇ Test finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test uncommittedTransactionIsNotSuccessfulOutput() started.
+➜ Test actualManifestAndBootOutputsMatchLegacy() skipped.
+◇ Test identicalRunsInDifferentDirectoriesCompareSame() started.
+◇ Test finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test deviceTreeRebuildMatchesLegacyAndReportsIdempotence() started.
+◇ Test sourceStateListsChangedAddedAndDeletedFiles() started.
+◇ Test killedInitializationWithoutJournalCanBeArchived() started.
+◇ Test requiredFailureAfterPartialSuccessKeepsCompletedParts() started.
+◇ Test lessInstallCopiesItsOwnPresignedPayload() started.
+◇ Test findString() started.
+◇ Test cancellationAfterPartialSuccessKeepsOriginalError() started.
+◇ Test summaryIsRenderedFromTheRecord() started.
+◇ Test recordInsideFirmwareInputIsRejectedBeforePatching() started.
+◇ Test cmpReg64() started.
+◇ Test readWriteU32() started.
+◇ Test fieldAccessors() started.
+◇ Test encodeCmpImmediateW() started.
+◇ Test encodeAddImm12() started.
+◇ Test encodeMovkX() started.
+◇ Test movzW() started.
+◇ Test encodeCmpRegisterX() started.
+◇ Test branchPredicates() started.
+◇ Test readUnalignedValues() started.
+◇ Test corruptAndUnknownRecordsAreRejected() started.
+◇ Test ldrImm64() started.
+◇ Test encodeBLForward() started.
+◇ Test encodeTestBitBranchRoundTrips() started.
+◇ Test changedConditionIsNamed(_:) started.
+◇ Test andRegW() started.
+◇ Test adrp() started.
+◇ Test encodeBOutOfRange() started.
+◇ Test lsrImm7W() started.
+◇ Test typedOperandHelpersExposeRegisterAndImmediate() started.
+◇ Test subImm32() started.
+◇ Test decodeBranchTarget() started.
+◇ Test encodeMovXIsRegisterMove() started.
+◇ Test encodeBBackward() started.
+◇ Test compareAndBranch() started.
+◇ Test encodeADRP() started.
+◇ Test chainedPatchersReceivePreviousPatchedBytes() started.
+➜ Test jbKernelRecordsAndPayloadMatch(ios27:) skipped.
+◇ Test encodeMovzWClearsTSSFCheckEntitlement() started.
+➜ Test expKernelRecordsAndPayloadMatch() skipped.
+◇ Test encodeMrsTpidrEl1() started.
+◇ Test encodeMovXFromZR() started.
+➜ Test fridaKernelRecordsAndPayloadMatch(ios27:) skipped.
+➜ Test baseKernelRecordsAndPayloadMatch(configuration:) skipped.
+◇ Test fridaStepsNeedOptInOnJBAndExp() started.
+◇ Test encodeBForward() started.
+◇ Test expOnlyStepsAreAbsentFromOtherVariants() started.
+◇ Test lessIsResolvedIndependently() started.
+◇ Test excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test encodeBCondEqForward() started.
+◇ Test caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() started.
+◇ Test defaultVariantIsRegular() started.
+◇ Test notImplementedIsAlwaysListedAndNeverSelectable() started.
+◇ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() started.
+◇ Test excGuardManifestRuleMatchesSteps() started.
+◇ Test catalogStructureValidates() started.
+◇ Test refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test encodeLdrImmediateX() started.
+◇ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() started.
+➜ Test baseJBAndEXPComposeWithoutChangingBytes() skipped.
+◇ Test knownConflictAndOrderTargetsMayBeInactive() started.
+◇ Test case passing 1 argument outcome → .ablated to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument outcome → .notApplicable to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument unattributed → false to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 1 argument unattributed → true to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test ablationPrecedesSetupAndLaterStepPreparesOnce() started.
+◇ Test postValidationRecognizesIdempotenceWithoutEmitting() started.
+➜ Test originalDeviceTreeParity(exp:) skipped.
+◇ Test requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test iomfbAmbiguityReportsCountAndWritesNothing() started.
+◇ Test componentAblationIncludesBothKernelPatchers() started.
+◇ Test findFileSupportsGlobPatterns() started.
+◇ Test sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test declarationsMatchOrchestratorAndManifest() started.
+◇ Test case passing 1 argument index → -1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument index → 1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument mismatch → .variant to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .reportGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .resultGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument value → "" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "unknown" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "27.foo" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "26..4" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument data → 13 bytes to corruptManifestIsRejected(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument data → 23 bytes to corruptManifestIsRejected(_:) started.
+➜ Test completeFilesystemAndManifest() skipped.
+◇ Test case passing 1 argument value → "garbage.26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26..4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4.beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument failRead → true to pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+✘ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) recorded an issue with 1 argument failRead → true at FirmwareTransactionTests.swift:208:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “journal.json” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/9F8298DA-E477-49CB-B7CD-84D88E75C5C8/.firmware-transaction/journal.json, NSURL=file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/9F8298DA-E477-49CB-B7CD-84D88E75C5C8/.firmware-transaction/journal.json, NSUnderlyingError=0x76403ac570 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test case passing 1 argument failRead → false to pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+✘ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) recorded an issue with 1 argument failRead → false at FirmwareTransactionTests.swift:208:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “journal.json” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/061C342F-5190-4BE2-9C46-840E728D49AF/.firmware-transaction/journal.json, NSURL=file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/061C342F-5190-4BE2-9C46-840E728D49AF/.firmware-transaction/journal.json, NSUnderlyingError=0x76403acc30 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test case passing 1 argument point → 0 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 1 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 2 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 3 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 4 to recoveryHandlesEveryRenameWindow(_:) started.
+Merging Filesystems
+◇ Test case passing 2 arguments variant → "regular", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "regular", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "dev", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "dev", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "jb", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "jb", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "exp", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "exp", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+[!] fake child did not exit within 0.20s after it was stopped.
+◇ Test case passing 1 argument index → 0 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 1 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 2 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 3 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 0 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 1 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 2 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 3 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument change → .variant to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .forceExcGuard to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .ablation to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .inputByte to changedConditionIsNamed(_:) started.
+◇ Test case passing 2 arguments variant → .regular, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .regular, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .dev, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .dev, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .jb, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .jb, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .exp, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .exp, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 1 argument relation → "requires" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "conflicts" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "after" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+✔ Test patchRunReportRoundTripsThroughJSON() passed after 0.735 seconds.
+✔ Test completedUnchangedRecordsAreIdempotent() passed after 0.735 seconds.
+✔ Test ambiguousFailsEvenWhenOptional() passed after 0.735 seconds.
+✔ Test ablatingRequiredStepDoesNotFailComponent() passed after 0.735 seconds.
+✔ Test conditionalRuleControlsNotApplicableVsFailed() passed after 0.735 seconds.
+✔ Test patchGroupMissingOneRecordFails() passed after 0.735 seconds.
+✔ Test partialGroupFailsEvenWithAnExistingSuccessfulRecord() passed after 0.735 seconds.
+✔ Test legacyPatcherCoverageAndSemantics() passed after 0.735 seconds.
+✔ Test disabledConditionalAndAblationNeverWriteDuringDiscovery() passed after 0.735 seconds.
+✔ Test requiredMissingFailsComponent() passed after 0.735 seconds.
+✔ Test baseKernelMissingMethodsFailIndividually() passed after 0.735 seconds.
+✔ Test idempotentBecomesAlreadyApplied() passed after 0.735 seconds.
+✔ Test expRequiresBothOidAndCallersAndAcceptsVerifiedIdempotence() passed after 0.735 seconds.
+✔ Test optionalMissingBecomesNotApplicableNotFailed() passed after 0.735 seconds.
+✔ Test knownAblationTargetsCoverMigratedPatchers() passed after 0.735 seconds.
+✔ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() passed after 0.735 seconds.
+✔ Test gateRejectsMultipleOwnersForARecord() passed after 0.735 seconds.
+✔ Test partialSuccessKeepsAppliedResults() passed after 0.735 seconds.
+✔ Test restoreReprobeRefusesWhileBundleLockIsHeld() passed after 0.735 seconds.
+✔ Test notImplementedSelected() passed after 0.735 seconds.
+✔ Test jbMethodsMatchManifestAndMissingActiveMethodsFail() passed after 0.736 seconds.
+✔ Test baseMethodsMatchCompatibilityManifest() passed after 0.736 seconds.
+✔ Test missingDependencyStructural() passed after 0.735 seconds.
+✔ Test gateRejectsANotEnabledRecord() passed after 0.735 seconds.
+✔ Test gatePassesForACleanReport() passed after 0.735 seconds.
+✔ Test missingDependencyWhenTargetNotEnabled() passed after 0.735 seconds.
+✔ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() passed after 0.735 seconds.
+✔ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) with 2 test cases passed after 0.735 seconds.
+✔ Test requiredMissingWhenPipelineLacksStep() passed after 0.735 seconds.
+✔ Test gateRejectsDuplicateRecordIndicesWithinAResult() passed after 0.735 seconds.
+✔ Test patchRequiresOneCommittedTransactionForTheVariant() passed after 0.735 seconds.
+✔ Test lessVerificationBootIsUnverified() passed after 0.735 seconds.
+✔ Test restoreReprobeRefusesWhileBridgeProcessRuns() passed after 0.735 seconds.
+✔ Test unknownDeclarationSelected() passed after 0.735 seconds.
+✔ Test duplicateDeclaration() passed after 0.735 seconds.
+✔ Test restoreReprobeRefusesWhileNativeWorkerRuns() passed after 0.736 seconds.
+✔ Test patchSelectionIdentityFollowsTheResolvedPlan() passed after 0.736 seconds.
+◇ Test case passing 2 arguments ios27 → false, frida → false to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → false, frida → true to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → true, frida → false to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → true, frida → true to missingAnchorsRespectGates(ios27:frida:) started.
+✔ Test rerunRewriteDeclarations() passed after 0.740 seconds.
+✔ Test unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst() passed after 0.740 seconds.
+◇ Test case passing 1 argument connectPresent → false to diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test case passing 1 argument connectPresent → true to diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+✔ Test restoreReprobeRefusesWhileDeviceEndpointAnswers() passed after 0.741 seconds.
+✔ Test everyRefusalBeforeWriteSaysRefusedAndUnchanged() passed after 0.741 seconds.
+✔ Test reprobeRefusesWhileBootProcessForBundleRuns() passed after 0.743 seconds.
+✔ Test patchVerificationRefusalPointsToPrepareNotPatch() passed after 0.743 seconds.
+✔ Test versionIndeterminateWhenBaseUnknown() passed after 0.743 seconds.
+✔ Test unknownAblationIdThrows() passed after 0.743 seconds.
+◇ Test case passing 1 argument candidates → 1 to requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test case passing 1 argument candidates → 2 to requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+✔ Test jbFinalizeIsNeverVerifiedFromAPrintedHint() passed after 0.749 seconds.
+✔ Test liveStepUndeclaredWhenCatalogIncomplete() passed after 0.749 seconds.
+✔ Test gateRejectsAnUndeclaredRecord() passed after 0.749 seconds.
+✔ Test conflictBetweenEnabled() passed after 0.749 seconds.
+◇ Test case passing 1 argument malformed → false to sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test case passing 1 argument malformed → true to sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+✔ Test removedArtifactRefusalLeadsWithItsCauseNotStopped() passed after 0.750 seconds.
+✔ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() passed after 0.753 seconds.
+✔ Test gateRejectsRecordsWithoutAnOwningResult() passed after 0.753 seconds.
+✔ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) with 2 test cases passed after 0.754 seconds.
+✔ Test toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() passed after 0.754 seconds.
+✔ Test gateRejectsInvalidRecordIndices(index:) with 2 test cases passed after 0.754 seconds.
+✔ Test gateIgnoresNotApplicableAndAblatedResults() passed after 0.754 seconds.
+✔ Test prepareRequiresExactlyOneRestoreTreeWithVersions() passed after 0.754 seconds.
+✔ Test stageReturnsOnlyAfterItsChildExited() passed after 0.754 seconds.
+✔ Test gateChecksOwnershipForDeclaredFailedSteps() passed after 0.754 seconds.
+✔ Test busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint() passed after 0.754 seconds.
+✔ Test cfwReprobeRefusesWhileBundleImageIsAttached() passed after 0.754 seconds.
+✔ Test cyclicOrder() passed after 0.754 seconds.
+✔ Test txmDevStepsEqualManifestMethods() passed after 0.754 seconds.
+✔ Test statusReportIsReadOnlyAndShowsStagesAndLiveFacts() passed after 0.754 seconds.
+✔ Test txmRegularStepsEqualManifestMethods() passed after 0.754 seconds.
+✔ Test statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock() passed after 0.754 seconds.
+✔ Test restoreReprobeIgnoresOtherDevices() passed after 0.754 seconds.
+✔ Test iBootBaseIBSSStepsSubsetOfManifestMethods() passed after 0.754 seconds.
+✔ Test cmpW0W0() passed after 0.754 seconds.
+✔ Test refusesContradictoryExplicitChoices() passed after 0.754 seconds.
+✔ Test patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() passed after 0.755 seconds.
+✔ Test movX0_0() passed after 0.755 seconds.
+✔ Test llbStepsEqualManifestMethods() passed after 0.755 seconds.
+✔ Test movW0_1() passed after 0.755 seconds.
+✔ Test ret() passed after 0.755 seconds.
+✔ Test allManifestGatesMatchDeclaredRules() passed after 0.755 seconds.
+✔ Test iBootJBStepsSubsetOfManifestMethods() passed after 0.755 seconds.
+✔ Test prepareEvidenceMustMatchBackend() passed after 0.755 seconds.
+✔ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() passed after 0.755 seconds.
+✔ Test canBlockARequiredDeclarationOutsideTheVariant() passed after 0.755 seconds.
+✔ Test canBlockAllOptionalDeclarationsSharingOneStep() passed after 0.755 seconds.
+✔ Test movX0X20() passed after 0.755 seconds.
+✔ Test avpBooterStepsEqualManifestMethods() passed after 0.755 seconds.
+✔ Test movW0_0xA1() passed after 0.755 seconds.
+✔ Test refusesBlockingAnApplicableRequiredDeclaration() passed after 0.755 seconds.
+✔ Test canBlockAnIndependentOptionalStep() passed after 0.755 seconds.
+✔ Test refusesVariantAndGateMismatch() passed after 0.755 seconds.
+✔ Test pacibsp() passed after 0.755 seconds.
+✔ Test cmpX0X0() passed after 0.755 seconds.
+✔ Test nop() passed after 0.755 seconds.
+✔ Test retaa() passed after 0.756 seconds.
+✔ Test serialLabelsSkipWhenLabelAlreadyPresent() passed after 0.755 seconds.
+✔ Test strbW0X20_30() passed after 0.756 seconds.
+✔ Test movW0_0() passed after 0.756 seconds.
+✔ Test serialLabelsDoNotSkipForUnrelatedSingleLabel() passed after 0.756 seconds.
+✔ Test movX0_1() passed after 0.756 seconds.
+✔ Test refusesBlockingOnlyPartOfAnIndivisibleStep() passed after 0.756 seconds.
+✔ Test rejectsReportIdentityChanges(_:) with 3 test cases passed after 0.756 seconds.
+✔ Test rejectsAWritingStepBlockedInTheFrozenPlan() passed after 0.756 seconds.
+✔ Test retab() passed after 0.756 seconds.
+✔ Test unreadableManifestIsNotClassifiedAsMissing() passed after 0.756 seconds.
+✔ Test excludedStepDoesNotRunOrModifyBytes() passed after 0.756 seconds.
+✔ Test selectedStepStillRunsAndWrites() passed after 0.756 seconds.
+✔ Test iBECStepsEqualManifestMethods() passed after 0.756 seconds.
+✔ Test unrecognizedProductVersionIsRejected(_:) with 6 test cases passed after 0.756 seconds.
+✔ Test acceptsMatchingResolvedPlan() passed after 0.756 seconds.
+✔ Test corruptManifestIsRejected(_:) with 2 test cases passed after 0.756 seconds.
+✔ Test firstBootPromptTimeoutIsUnverified() passed after 0.757 seconds.
+✔ Test presentManifestCannotDisappearAfterFreezing() passed after 0.756 seconds.
+✔ Test previouslyMissingManifestCannotAppearAfterFreezing() passed after 0.756 seconds.
+✔ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() passed after 0.756 seconds.
+✔ Test versionFloorDoesNotDropMalformedComponents(_:) with 5 test cases passed after 0.756 seconds.
+✔ Test versionAndDigestComeFromTheSameManifestBytes() passed after 0.756 seconds.
+✔ Test iBSSBaseFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✔ Suite KernelJBParityTests passed after 0.759 seconds.
+✔ Test cloudOSVersionGate() passed after 0.756 seconds.
+✔ Test productVersionHasToBeAString() passed after 0.756 seconds.
+✔ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() passed after 0.756 seconds.
+✔ Test avpBooterFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✘ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) with 2 test cases failed after 0.756 seconds with 2 issues.
+✔ Test dryAblationRunDoesNotSave() passed after 0.756 seconds.
+✔ Test serialLabelsPatchTwoBannerRunsWhenLabelAbsent() passed after 0.756 seconds.
+✔ Test externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() passed after 0.756 seconds.
+✔ Test kernelFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✔ Test bareAPFSImageResolvesItsPhysicalStore() passed after 0.757 seconds.
+✔ Test txmFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✔ Test iBootJBFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✔ Test repeatedRecoverySurvivesInterruptionDuringRollback() passed after 0.757 seconds.
+✔ Test symlinkInputAndOutputAreRejected() passed after 0.756 seconds.
+✔ Test llbFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✔ Test nativeToolOutputIsDrainedAndClosed() passed after 0.756 seconds.
+✔ Test kernelFindAllEqualsStepPath_syntheticNoMatch() passed after 0.756 seconds.
+✔ Test committedRecoveryDoesNotRollBackSuccessfulPublication() passed after 0.756 seconds.
+✔ Test txmDevFindAllEqualsStepPath_realData() passed after 0.756 seconds.
+✔ Test diskFullWhileCopyingOrPreparingCommitKeepsOriginal() passed after 0.757 seconds.
+✔ Test recoveryValidatesAllEntriesBeforeRestoringAny() passed after 0.757 seconds.
+✔ Test recoveryHandlesEveryRenameWindow(_:) with 5 test cases passed after 0.757 seconds.
+✔ Test transactionJournalContainsTheResolvedPlan() passed after 0.757 seconds.
+✔ Test iBECFindAllEqualsStepPath_realData() passed after 0.757 seconds.
+✔ Test existingTransactionAndActiveToolBlockNewWorkAndRecovery() passed after 0.757 seconds.
+✔ Test filesystemFailureAndAblationProduceNoArtifacts() passed after 0.757 seconds.
+✔ Test stagedWritesDoNotAlterOriginalAndCommitPublishesAllFiles() passed after 0.757 seconds.
+✔ Test lessManifestChecksEveryReferencedArtifact() passed after 0.757 seconds.
+✔ Test attachedImageFailurePreventsPublication() passed after 0.757 seconds.
+✔ Test failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() passed after 0.757 seconds.
+✔ Test excGuardPipelineTruthTable(variant:ios18:) with 8 test cases passed after 0.757 seconds.
+✔ Test corruptJournalCannotTriggerAReplacement() passed after 0.757 seconds.
+✔ Test verifierAcceptsWhenTheLockIsReleasedWithinTheBound() passed after 0.758 seconds.
+✔ Test avpBooterFindAllEqualsStepPath_syntheticNoMatch() passed after 0.757 seconds.
+✔ Test stuckChildFailsTheStageAfterTheBound() passed after 0.759 seconds.
+✔ Test lessManifestChecksRetypedIM4PDigest() passed after 0.757 seconds.
+✔ Test artifactStepsMatchManifest() passed after 0.757 seconds.
+✔ Test findAll() passed after 0.757 seconds.
+✔ Test lessDryRunRejectsFilesystemSideEffectsBeforeOpeningInputs() passed after 0.757 seconds.
+✔ Test deviceTreeMissingPropertyDoesNotHideBehindSuccessfulProperties() passed after 0.757 seconds.
+✔ Test deviceTreeAblationOmitsThePropertyDuringRebuild() passed after 0.757 seconds.
+✔ Test manifestHashStepRebuildsTheSameBytesAndReportsMissingInput() passed after 0.757 seconds.
+✔ Test initialWriteFailureStopsBeforePatching() passed after 0.757 seconds.
+✔ Test uncommittedTransactionIsNotSuccessfulOutput() passed after 0.757 seconds.
+✔ Test finalWriteFailureAfterSuccessIsReported(_:) with 4 test cases passed after 0.757 seconds.
+✔ Test verifierWaitsForARealBundleLockHolderToRelease() passed after 0.759 seconds.
+✔ Test deviceTreeRebuildMatchesLegacyAndReportsIdempotence() passed after 0.758 seconds.
+✔ Test finalWriteFailureDoesNotMaskRunError(_:) with 4 test cases passed after 0.757 seconds.
+✔ Test killedInitializationWithoutJournalCanBeArchived() passed after 0.757 seconds.
+✔ Test findString() passed after 0.757 seconds.
+✔ Test lessInstallCopiesItsOwnPresignedPayload() passed after 0.757 seconds.
+✔ Test recordInsideFirmwareInputIsRejectedBeforePatching() passed after 0.757 seconds.
+✔ Test cmpReg64() passed after 0.757 seconds.
+✔ Test readWriteU32() passed after 0.758 seconds.
+✔ Test fieldAccessors() passed after 0.757 seconds.
+✔ Test encodeCmpImmediateW() passed after 0.757 seconds.
+✔ Test encodeAddImm12() passed after 0.757 seconds.
+✔ Test encodeMovkX() passed after 0.757 seconds.
+✔ Test movzW() passed after 0.757 seconds.
+✔ Test encodeCmpRegisterX() passed after 0.757 seconds.
+✔ Test branchPredicates() passed after 0.757 seconds.
+✔ Test readUnalignedValues() passed after 0.757 seconds.
+✔ Test realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns() passed after 0.759 seconds.
+✔ Test ldrImm64() passed after 0.757 seconds.
+✔ Test encodeBLForward() passed after 0.757 seconds.
+✔ Test encodeTestBitBranchRoundTrips() passed after 0.757 seconds.
+✔ Test andRegW() passed after 0.757 seconds.
+✔ Test cancellationAfterPartialSuccessKeepsOriginalError() passed after 0.758 seconds.
+✔ Test requiredFailureAfterPartialSuccessKeepsCompletedParts() passed after 0.758 seconds.
+✔ Test identicalRunsInDifferentDirectoriesCompareSame() passed after 0.758 seconds.
+✔ Test summaryIsRenderedFromTheRecord() passed after 0.758 seconds.
+✔ Test adrp() passed after 0.758 seconds.
+✔ Test encodeBOutOfRange() passed after 0.758 seconds.
+✔ Test lsrImm7W() passed after 0.758 seconds.
+✔ Test subImm32() passed after 0.758 seconds.
+✔ Test typedOperandHelpersExposeRegisterAndImmediate() passed after 0.758 seconds.
+✔ Test decodeBranchTarget() passed after 0.758 seconds.
+✔ Test encodeMovXIsRegisterMove() passed after 0.758 seconds.
+✔ Test encodeBBackward() passed after 0.758 seconds.
+✔ Test compareAndBranch() passed after 0.758 seconds.
+✔ Test encodeADRP() passed after 0.758 seconds.
+✔ Test chainedPatchersReceivePreviousPatchedBytes() passed after 0.758 seconds.
+✔ Test encodeMovzWClearsTSSFCheckEntitlement() passed after 0.758 seconds.
+✔ Test encodeMrsTpidrEl1() passed after 0.758 seconds.
+✔ Test encodeMovXFromZR() passed after 0.758 seconds.
+✔ Test fridaStepsNeedOptInOnJBAndExp() passed after 0.758 seconds.
+✔ Test encodeBForward() passed after 0.758 seconds.
+✔ Test expOnlyStepsAreAbsentFromOtherVariants() passed after 0.758 seconds.
+✔ Test lessIsResolvedIndependently() passed after 0.758 seconds.
+✔ Test encodeBCondEqForward() passed after 0.758 seconds.
+✔ Test excGuardMissingAnchorUsesExecutionGate(variant:force:) with 8 test cases passed after 0.758 seconds.
+✔ Test caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() passed after 0.758 seconds.
+✔ Test defaultVariantIsRegular() passed after 0.758 seconds.
+✔ Test notImplementedIsAlwaysListedAndNeverSelectable() passed after 0.758 seconds.
+✔ Test corruptAndUnknownRecordsAreRejected() passed after 0.758 seconds.
+✔ Test excGuardManifestRuleMatchesSteps() passed after 0.758 seconds.
+✔ Test catalogStructureValidates() passed after 0.758 seconds.
+✔ Test refusesAReferenceToAnUnknownDeclaration(relation:) with 3 test cases passed after 0.758 seconds.
+✔ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() passed after 0.758 seconds.
+✔ Test encodeLdrImmediateX() passed after 0.758 seconds.
+✔ Test knownConflictAndOrderTargetsMayBeInactive() passed after 0.758 seconds.
+✔ Test missingAnchorsRespectGates(ios27:frida:) with 4 test cases passed after 0.739 seconds.
+✔ Test diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) with 2 test cases passed after 0.735 seconds.
+✔ Test ablationPrecedesSetupAndLaterStepPreparesOnce() passed after 0.730 seconds.
+✔ Test postValidationRecognizesIdempotenceWithoutEmitting() passed after 0.730 seconds.
+✔ Test requiredVmProtectDoesNotHideAmbiguity(candidates:) with 2 test cases passed after 0.665 seconds.
+✔ Test iomfbAmbiguityReportsCountAndWritesNothing() passed after 0.665 seconds.
+✔ Test componentAblationIncludesBothKernelPatchers() passed after 0.662 seconds.
+✔ Test findFileSupportsGlobPatterns() passed after 0.662 seconds.
+✔ Test sandboxPartialFailurePreservesSuccessfulWrites(malformed:) with 2 test cases passed after 0.662 seconds.
+✔ Test declarationsMatchOrchestratorAndManifest() passed after 0.659 seconds.
+✔ Suite StructuredPatchResultTests passed after 0.762 seconds.
+✔ Suite KernelStructuredTests passed after 0.762 seconds.
+✔ Suite ExpStructuredTests passed after 0.762 seconds.
+✔ Suite DeclarationGateTests passed after 0.762 seconds.
+✔ Suite C1AlignmentTests passed after 0.762 seconds.
+✔ Suite ARM64ConstantTests passed after 0.762 seconds.
+✔ Suite PlanSelectionValidationTests passed after 0.763 seconds.
+✔ Suite IBootPatcherIdempotencyTests passed after 0.763 seconds.
+✔ Suite FrozenDeclarationGateTests passed after 0.763 seconds.
+✔ Suite FirmwareVersionInputsTests passed after 0.763 seconds.
+✔ Suite FrozenStepExecutionTests passed after 0.763 seconds.
+✔ Suite MigratedPatcherParityTests passed after 0.763 seconds.
+✔ Suite FridaGatingTests passed after 0.763 seconds.
+✔ Suite FrozenPipelinePlanTests passed after 0.763 seconds.
+✘ Suite FirmwareTransactionTests failed after 0.763 seconds with 2 issues.
+✔ Suite ArtifactStructuredTests passed after 0.763 seconds.
+✔ Suite BinaryBufferTests passed after 0.763 seconds.
+✔ Suite GuestPayloadInstallTests passed after 0.763 seconds.
+✔ Suite ARM64InstTests passed after 0.763 seconds.
+✔ Suite ARM64EncoderTests passed after 0.763 seconds.
+✔ Suite FirmwarePipelineDataFlowTests passed after 0.763 seconds.
+✔ Suite KernelGateStructuredMergeTests passed after 0.763 seconds.
+✔ Suite FpfsScopedOpenCaveTests passed after 0.763 seconds.
+✔ Suite CatalogReferenceValidationTests passed after 0.763 seconds.
+✔ Suite KernelJBStructuredTests passed after 0.763 seconds.
+✔ Suite FirmwarePipelineTests passed after 0.763 seconds.
+✔ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() passed after 0.770 seconds.
+✔ Suite VariantPlanTests passed after 0.773 seconds.
+✔ Test changedConditionIsNamed(_:) with 4 test cases passed after 0.886 seconds.
+✔ Test sourceStateListsChangedAddedAndDeletedFiles() passed after 1.226 seconds.
+✔ Suite PatchExperimentRecordTests passed after 1.229 seconds.
+✔ Test verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased() passed after 1.344 seconds.
+✔ Suite CreateLiveStagesTests passed after 1.346 seconds.
+✘ Test run with 241 tests in 38 suites failed after 1.346 seconds with 2 issues.

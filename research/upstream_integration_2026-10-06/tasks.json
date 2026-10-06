@@ -889,11 +889,12 @@
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "Historical VM/backup paths absent on current host; controlled VM path and capacity required. User will clear disk space.",
-      "current_environment_note": "可用空间复查约 58 GiB；停机测试 VM 和备份目标路径仍待用户提供，实际容量须按选定 VM 复算。",
-      "current_capacity_bytes": 59902742528,
+      "blocked_reason": "Historical VM/backup paths absent; controlled stopped test VM path and backup destination have not been provided. Free space has been recovered; actual required capacity remains unknown.",
+      "current_environment_note": "可用空间复查约 57.41 GiB；停机测试 VM 和备份目标路径仍待用户提供，实际容量须按选定 VM 复算。",
+      "current_capacity_bytes": 61641699328,
       "current_result": "用户已清理磁盘；历史验收 VM 与备份不存在，本轮停机测试 VM 路径及备份目标目录仍未提供。",
-      "available_capacity_gib": 55.79
+      "available_capacity_gib": 57.41,
+      "capacity_observed_date": "2026-10-07"
     },
     {
       "id": "T04",
@@ -1232,7 +1233,7 @@
       "dependencies": [
         "T09"
       ],
-      "status": "selection_graph_and_record_checks_validated_frozen_plan_pending",
+      "status": "swift_frozen_plan_execution_validated_remaining_gates_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/PatchSet/VPhonePatchGate.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift",
@@ -1264,14 +1265,20 @@
           "sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalog.swift",
           "tests/FirmwarePatcherTests/PlanSelectionValidationTests.swift",
           "tests/FirmwarePatcherTests/CatalogReferenceValidationTests.swift",
-          "tests/FirmwareIntegrationTests/StructuredDeclarationGateTests.swift"
+          "tests/FirmwareIntegrationTests/StructuredDeclarationGateTests.swift",
+          "tests/FirmwarePatcherTests/FrozenDeclarationGateTests.swift",
+          "tests/FirmwarePatcherTests/FrozenPipelinePlanTests.swift",
+          "tests/FirmwarePatcherTests/FrozenStepExecutionTests.swift",
+          "tests/FirmwarePatcherTests/VersionKnowledgePlanTests.swift"
         ]
       },
       "implementation_commits": [
         "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff",
         "b6eb1873ab85586330f598302cff82a43e3186ec",
         "4fd8dc87b5ff8eb14bae4f0f0ea53ae15a58fd78",
-        "6327738f3e5bc760d9f92f083e9109477e98161b"
+        "6327738f3e5bc760d9f92f083e9109477e98161b",
+        "0c73f59f5065bca9917a527b44099a23f00b6684",
+        "8777bc7e47795939badf222fbc4bbe7d8e3e6584"
       ],
       "verification_evidence": [
         "evidence/T10-ownership-red.log",
@@ -1286,15 +1293,41 @@
         "evidence/T10-references-green.log",
         "evidence/T10-firmware-comparison.log",
         "evidence/T10-firmware-gate.log",
-        "evidence/T10-firmware-fixture-manifest.json"
+        "evidence/T10-firmware-fixture-manifest.json",
+        "evidence/T10-frozen-plan-red.log",
+        "evidence/T10-frozen-gate-red.log",
+        "evidence/T10-frozen-step-red.log",
+        "evidence/T10-version-knowledge-red.log",
+        "evidence/T10-cloud-knowledge-red.log",
+        "evidence/T10-frozen-final-module.log",
+        "evidence/T10-frozen-final-firmware.log",
+        "evidence/T10-frozen-default-swift.log",
+        "evidence/T10-frozen-failure-control.log",
+        "evidence/T10-frozen-validation-summary.json",
+        "evidence/T10-frozen-bundle-build.log",
+        "evidence/T10-frozen-launchpad-build.log",
+        "evidence/T10-frozen-final-bundle-check.log",
+        "evidence/T10-frozen-signed-artifact-manifest.json",
+        "evidence/T10-base-parameters-red.log",
+        "evidence/T10-base-parameters-green.log",
+        "evidence/T10-base-parameters-final-module.log",
+        "evidence/T10-base-final-firmware.log",
+        "evidence/T10-base-default-swift.log",
+        "evidence/T10-base-test-driver.json",
+        "evidence/T10-base-validation-summary.json",
+        "evidence/T10-base-bundle-build.log",
+        "evidence/T10-base-launchpad-build.log",
+        "evidence/T10-base-final-bundle-check.log",
+        "evidence/T10-base-build-driver.json",
+        "evidence/T10-base-signed-artifact-manifest.json"
       ],
       "historical_evidence": [],
-      "current_result": "记录归属校验保留；新增拒绝相互矛盾的 select/block、variant/gates 不一致、有效范围内关闭必需声明、组合步骤部分关闭及不存在的 conflicts/after 引用。225 项 Swift Testing / 34 个 suite 通过；真实固件 14 项 / 12 个 suite 通过，含六组实际 boot-chain record 的归属 Gate。",
+      "current_result": "Swift 写入路径在 staging 前解析一次计划，执行和提交使用同一 gates/步骤集合。提交拒绝计划外写入和报告/结果身份改变；未知必需基线条件及启用 Frida 时未知 cloudOS 在建事务前拒绝。250 项模块 / 39 suites、15 项固件 / 12 suites 通过；当前 catalog 119 项，固定目标 141 项未接入。 所有实际写入还要求基线已识别，覆盖 iBEC/LLB 参数依赖；只读 dev/强制激活判断保留。",
       "remaining_work": [
-        "C1 冻结计划成为实际执行输入",
+        "固定目标声明与 T09 显式选择迁移；可写 CLI 选择接口尚未接入",
         "按单个声明和实际 patchID 校验组合步骤，核验单个必需补丁缺失",
         "guest Python/zsh 写入接入同一计划",
-        "默认完整测试、固定上游目标的二进制等价比较、真实 VM 验收；现有固件对照只覆盖本地历史 Python 参考"
+        "默认完整测试、固定上游二进制等价及真实 VM 验收；现有固件对照只覆盖本地历史 Python 参考"
       ]
     },
     {
@@ -1311,7 +1344,7 @@
       "dependencies": [
         "T10"
       ],
-      "status": "source_review_in_progress",
+      "status": "transaction_plan_input_evidence_validated_c2_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
@@ -1331,18 +1364,45 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "interfaces_reviewed_implementation_pending",
+        "state": "transaction_evidence_slice_validated_c2_pending",
         "paths": [
           "sources/vphone-cli/VPhoneFWCLI.swift",
           "sources/vphone-cli/VPhoneCreateLiveStages.swift",
           "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
-          "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift"
+          "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+          "sources/FirmwarePatcher/Pipeline/FirmwareVersionInputs.swift",
+          "tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift"
         ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
+      "implementation_commits": [
+        "0c73f59f5065bca9917a527b44099a23f00b6684",
+        "8777bc7e47795939badf222fbc4bbe7d8e3e6584"
+      ],
+      "verification_evidence": [
+        "evidence/T11-version-inputs-red.log",
+        "evidence/T11-version-inputs-green.log",
+        "evidence/T11-frozen-input-final.log",
+        "evidence/T10-frozen-final-module.log",
+        "evidence/T10-base-parameters-red.log",
+        "evidence/T10-base-parameters-green.log",
+        "evidence/T10-base-parameters-final-module.log",
+        "evidence/T10-base-final-firmware.log",
+        "evidence/T10-base-default-swift.log",
+        "evidence/T10-base-test-driver.json",
+        "evidence/T10-base-validation-summary.json",
+        "evidence/T10-base-bundle-build.log",
+        "evidence/T10-base-launchpad-build.log",
+        "evidence/T10-base-final-bundle-check.log",
+        "evidence/T10-base-build-driver.json",
+        "evidence/T10-base-signed-artifact-manifest.json"
+      ],
       "historical_evidence": [],
-      "current_result": "现有 fw plan 只读输出与 create 的 selection SHA 可复用；尚未形成绑定 VM 身份、输入摘要、catalog/target、schema 的持久化 C2 计划。上游 selection/plan/receipt 的 try? 回退不能直接用于本地严格入口。"
+      "current_result": "现有事务 journal 保存本次解析计划和两份版本 manifest 的原始字节 SHA/版本；暂存输入必须匹配，读取拒绝损坏、权限拒绝及无法识别版本。历史缺新字段 journal 保留恢复。未形成完整 C2 持久化计划，记录不作为重新执行授权。",
+      "remaining_work": [
+        "绑定稳定 VM 身份、mode、build/digest、catalog/固定 target、schema 与 planDigest",
+        "missing/corrupt/unsupported/已识别 legacy 分别表达，禁止解码失败后宽松默认",
+        "复用原记录做原子迁移，绑定磁盘/generation，迁移备份与恢复验收"
+      ]
     },
     {
       "id": "T12",
@@ -1988,7 +2048,17 @@
         "evidence/T24-launchpad-localizations.json",
         "evidence/T24-launchpad-helper-artifacts.json",
         "evidence/T24-helper-configuration-rejection.log",
-        "evidence/T24-final-bundle-checks.log"
+        "evidence/T24-final-bundle-checks.log",
+        "evidence/T10-frozen-validation-summary.json",
+        "evidence/T10-frozen-bundle-build.log",
+        "evidence/T10-frozen-launchpad-build.log",
+        "evidence/T10-frozen-final-bundle-check.log",
+        "evidence/T10-frozen-signed-artifact-manifest.json",
+        "evidence/T10-base-bundle-build.log",
+        "evidence/T10-base-launchpad-build.log",
+        "evidence/T10-base-final-bundle-check.log",
+        "evidence/T10-base-build-driver.json",
+        "evidence/T10-base-signed-artifact-manifest.json"
       ],
       "historical_evidence": [],
       "current_result": "已审查 policy、实际调用方和 helper 专用协议。隔离 CLI/VM Bundle 与 Launchpad 编译、资源及签名检查通过；修复 SwiftPM 未编译 xcstrings 导致的 Launchpad 打包失败。41 项相关 Python 测试通过。50 项宿主 Swift 子集仍有一项 XPC 超时；原因未查明。",
@@ -3407,17 +3477,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "0531b903208d6ac497d85c58597f302b0e646407",
-  "latest_validation_limitation": {
-    "full_serial": "interrupted_after_cleanup_stall",
-    "exit_code": 143,
-    "sampled_location": "APIHTTPFixture.stop -> NSConcreteTask.waitUntilExit",
-    "observed_live_child_count": 0,
-    "cause": "原因未查明；日志最后一行未反映采样时正在运行的测试",
-    "targeted_firmware_patcher": "225 Swift Testing tests / 34 suites passed (FirmwarePatcher + CreateLiveStages)",
-    "default_make_test_swift": "prior run still has 16 issues; not accepted",
-    "real_firmware": "14 tests / 12 suites passed against existing local reference fixtures; not fixed upstream binary equivalence or VM behavior",
-    "host_subset": "50 tests / 7 suites / 1 XPC timeout; cause unknown",
-    "bundle": "make build and Launchpad static bundle checks passed; runtime not tested"
-  }
+  "latest_implementation_head": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+  "latest_validation_limitation": "2026-10-07 最终 8777bc7e 默认 make test_swift：XCTest 234/3 跳过/0 失败，Swift Testing 1075/166、2 issues（helper XPC 超时、HTTP 取消耗时断言）。此前 0c73 为 14 issues，相关套件定向对照 40/6 通过；原因未查明。真实 VM 路径及备份目录仍缺失。"
 }

@@ -1,0 +1,65 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[6/15] Emitting module FirmwarePatcher
+[7/15] Compiling FirmwarePatcher StructuredPatcher.swift
+[8/16] Compiling FirmwarePatcher FirmwarePipeline.swift
+[9/28] Compiling FirmwareIntegrationTests StructuredDeclarationGateTests.swift
+[10/28] Emitting module FirmwareIntegrationTests
+[11/28] Compiling FirmwarePatcherTests FrozenStepExecutionTests.swift
+[12/29] Compiling FirmwarePatcherTests LessFilesystemAcceptanceTests.swift
+[13/29] Compiling FirmwarePatcherTests LessOutputParityTests.swift
+[14/29] Compiling FirmwarePatcherTests KernelStructuredTests.swift
+[15/29] Compiling FirmwarePatcherTests ExpStructuredTests.swift
+[16/29] Compiling FirmwarePatcherTests ArtifactStructuredTests.swift
+[17/29] Emitting module FirmwarePatcherTests
+[18/29] Compiling FirmwarePatcherTests KernelJBParityTests.swift
+[19/29] Compiling FirmwarePatcherTests KernelStructuredMergeTests.swift
+[20/29] Compiling vphone_cli VPhoneCLI.swift
+[21/29] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[21/29] Write Objects.LinkFileList
+[24/29] Linking vphone-cli
+[25/29] Linking vphone-vm
+[26/29] Applying vphone-vm
+[26/29] Applying vphone-cli
+[28/29] Linking vphone-cliPackageTests
+Build complete! (8.68s)
+Test Suite 'Selected tests' started at 2026-10-06 23:39:18.712.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:39:18.712.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:39:18.713.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:39:18.713.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FrozenStepExecutionTests started.
+◇ Test excludedStepDoesNotRunOrModifyBytes() started.
+◇ Test selectedStepStillRunsAndWrites() started.
+✔ Test selectedStepStillRunsAndWrites() passed after 0.004 seconds.
+✘ Test excludedStepDoesNotRunOrModifyBytes() recorded an issue at FrozenStepExecutionTests.swift:34:9: Expectation failed: (patcher.runs → 1) == 0
+✘ Test excludedStepDoesNotRunOrModifyBytes() recorded an issue at FrozenStepExecutionTests.swift:35:9: Expectation failed: (output.data → 1 bytes) == (Data([0]) → 1 bytes)
+± inserted [1], removed [0]
+✘ Test excludedStepDoesNotRunOrModifyBytes() recorded an issue at FrozenStepExecutionTests.swift:36:9: Expectation failed: (output.report.records → [  0x000000: 00 → 01  [serial.fixture]]).isEmpty → false
+✘ Test excludedStepDoesNotRunOrModifyBytes() recorded an issue at FrozenStepExecutionTests.swift:37:9: Expectation failed: (output.report.results.first?.outcome → .applied) == .notApplicable
+✘ Test excludedStepDoesNotRunOrModifyBytes() recorded an issue at FrozenStepExecutionTests.swift:28:6: Caught error: Patch verification failed: declaration gate rejected 1 violation(s) before commit: ibss.IBootPatcher.patchSerialLabels [notEnabled]: step is absent from the frozen plan
+✘ Test excludedStepDoesNotRunOrModifyBytes() failed after 0.008 seconds with 5 issues.
+✘ Suite FrozenStepExecutionTests failed after 0.009 seconds with 5 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.009 seconds with 5 issues.

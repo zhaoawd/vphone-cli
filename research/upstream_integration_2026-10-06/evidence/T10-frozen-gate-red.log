@@ -1,0 +1,101 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/36] Compiling ftab.c
+[6/36] Compiling locking.c
+[6/36] Compiling deviceinterfaced.c
+[8/36] Compiling log.c
+[9/38] Compiling ipsw.c
+[10/38] Compiling idevicerestore.c
+[11/38] Compiling asr.c
+[12/38] Compiling download.c
+[13/38] Compiling recovery.c
+[13/38] Compiling fdr.c
+[15/38] Compiling normal.c
+[16/38] Compiling limera1n.c
+[17/38] Compiling restore.c
+[18/38] Compiling img4.c
+[19/38] Compiling dfu.c
+[20/38] Compiling ace3.c
+[21/38] Compiling img3.c
+[22/38] Compiling mbn.c
+[23/38] Compiling fls.c
+[24/38] Compiling vphone_zip_stub.c
+[25/38] Compiling common.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+[29/38] Compiling FirmwarePatcher PatchDeclarationGate.swift
+[30/38] Emitting module FirmwarePatcher
+[31/41] Emitting module FirmwarePatcherTests
+[32/41] Compiling FirmwarePatcherTests FrozenDeclarationGateTests.swift
+[33/41] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[33/41] Write Objects.LinkFileList
+[36/47] Compiling VPhoneCLITests DoctorCLITests.swift
+[37/47] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[38/47] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[39/47] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[40/47] Compiling VPhoneCLITests APIProxyCLITests.swift
+[41/47] Emitting module VPhoneCLITests
+[41/47] Write Objects.LinkFileList
+[42/47] Linking vphone-cli
+[43/47] Linking vphone-vm
+[44/47] Applying vphone-cli
+[45/47] Applying vphone-vm
+[46/47] Linking vphone-cliPackageTests
+Build complete! (14.18s)
+Test Suite 'Selected tests' started at 2026-10-06 23:37:01.709.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:37:01.712.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:37:01.712.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:37:01.712.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FrozenDeclarationGateTests started.
+◇ Test acceptsMatchingResolvedPlan() started.
+◇ Test rejectsReportIdentityChanges(_:) started.
+◇ Test rejectsAWritingStepBlockedInTheFrozenPlan() started.
+◇ Test case passing 1 argument mismatch → .reportGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .variant to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .resultGates to rejectsReportIdentityChanges(_:) started.
+✔ Test acceptsMatchingResolvedPlan() passed after 0.003 seconds.
+✘ Test rejectsReportIdentityChanges(_:) recorded an issue with 1 argument mismatch → .reportGates at FrozenDeclarationGateTests.swift:32:9: Expectation failed: !((PatchDeclarationGate.violations(in: report, plan: plan) → []).isEmpty → true → true)
+✘ Test rejectsReportIdentityChanges(_:) recorded an issue with 1 argument mismatch → .variant at FrozenDeclarationGateTests.swift:32:9: Expectation failed: !((PatchDeclarationGate.violations(in: report, plan: plan) → []).isEmpty → true → true)
+✘ Test rejectsReportIdentityChanges(_:) recorded an issue with 1 argument mismatch → .resultGates at FrozenDeclarationGateTests.swift:32:9: Expectation failed: !((PatchDeclarationGate.violations(in: report, plan: plan) → []).isEmpty → true → true)
+✘ Test rejectsAWritingStepBlockedInTheFrozenPlan() recorded an issue at FrozenDeclarationGateTests.swift:11:9: Expectation failed: !((PatchDeclarationGate.violations(in: report, plan: plan) → []).isEmpty → true → true)
+✘ Test rejectsReportIdentityChanges(_:) recorded an issue with 1 argument mismatch → .reportGates at FrozenDeclarationGateTests.swift:33:9: Expectation failed: an error was expected but none was thrown
+✘ Test rejectsReportIdentityChanges(_:) recorded an issue with 1 argument mismatch → .variant at FrozenDeclarationGateTests.swift:33:9: Expectation failed: an error was expected but none was thrown
+✘ Test rejectsReportIdentityChanges(_:) recorded an issue with 1 argument mismatch → .resultGates at FrozenDeclarationGateTests.swift:33:9: Expectation failed: an error was expected but none was thrown
+✘ Test rejectsAWritingStepBlockedInTheFrozenPlan() recorded an issue at FrozenDeclarationGateTests.swift:12:9: Expectation failed: an error was expected but none was thrown
+✘ Test rejectsAWritingStepBlockedInTheFrozenPlan() failed after 0.004 seconds with 2 issues.
+✘ Test rejectsReportIdentityChanges(_:) with 3 test cases failed after 0.004 seconds with 6 issues.
+✘ Suite FrozenDeclarationGateTests failed after 0.004 seconds with 8 issues.
+✘ Test run with 3 tests in 1 suite failed after 0.004 seconds with 8 issues.

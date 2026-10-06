@@ -1,0 +1,79 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/43] Write sources
+[7/43] Write swift-version--58304C5D6DBC2206.txt
+[9/18] Emitting module FirmwarePatcher
+[10/18] Compiling FirmwarePatcher FirmwarePipeline.swift
+[11/31] Compiling FirmwareIntegrationTests StructuredDeclarationGateTests.swift
+[12/31] Emitting module FirmwareIntegrationTests
+[13/31] Compiling FirmwarePatcherTests PlanSelectionValidationTests.swift
+[14/31] Compiling FirmwarePatcherTests FrozenStepExecutionTests.swift
+[15/31] Compiling FirmwarePatcherTests FrozenDeclarationGateTests.swift
+[16/31] Compiling FirmwarePatcherTests VariantPlanTests.swift
+[17/32] Compiling vphone_cli VPhoneFWCLI.swift
+[18/32] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[19/32] Compiling FirmwarePatcherTests FrozenPipelinePlanTests.swift
+[20/32] Compiling FirmwarePatcherTests CatalogReferenceValidationTests.swift
+[21/32] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[22/32] Compiling FirmwarePatcherTests VersionKnowledgePlanTests.swift
+[23/32] Emitting module FirmwarePatcherTests
+[24/32] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[24/32] Linking vphone-cli
+[25/32] Linking vphone-vm
+[26/32] Applying vphone-vm
+[26/32] Applying vphone-cli
+[29/32] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[30/32] Emitting module VPhoneCLITests
+[30/32] Write Objects.LinkFileList
+[31/32] Linking vphone-cliPackageTests
+Build complete! (9.54s)
+Test Suite 'Selected tests' started at 2026-10-06 23:59:00.379.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:59:00.380.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:59:00.380.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:59:00.380.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VersionKnowledgePlanTests started.
+◇ Suite FrozenPipelinePlanTests started.
+◇ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() started.
+◇ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() started.
+◇ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() started.
+◇ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() started.
+◇ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() started.
+◇ Test case passing 1 argument block → false to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test transactionJournalContainsTheResolvedPlan() started.
+◇ Test case passing 1 argument block → true to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+✔ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) with 2 test cases passed after 0.003 seconds.
+✔ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() passed after 0.003 seconds.
+✔ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() passed after 0.003 seconds.
+✘ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() recorded an issue at VersionKnowledgePlanTests.swift:21:9: Expectation failed: an error was expected but none was thrown
+✘ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() failed after 0.003 seconds with 1 issue.
+✘ Suite VersionKnowledgePlanTests failed after 0.004 seconds with 1 issue.
+✘ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() recorded an issue at FrozenPipelinePlanTests.swift:47:13: Expectation failed: (String(describing: error) → "File not found: Filesystem not found. Searched:
+    /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/c5-0C78EABD-AD42-48E9-9846-AA712CDF522C/vm/.firmware-transaction/stage/iPhone17,3_26.1_23B85_Restore/BuildManifest.plist").contains("cloudOS version is unknown")
+✘ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() recorded an issue at FrozenPipelinePlanTests.swift:49:9: Expectation failed: !(FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-transaction") → file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/c5-0C78EABD-AD42-48E9-9846-AA712CDF522C/vm/.firmware-transaction/) → true)
+✔ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() passed after 0.022 seconds.
+✘ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() failed after 0.025 seconds with 2 issues.
+✔ Test transactionJournalContainsTheResolvedPlan() passed after 0.108 seconds.
+✘ Suite FrozenPipelinePlanTests failed after 0.108 seconds with 2 issues.
+✘ Test run with 7 tests in 2 suites failed after 0.108 seconds with 3 issues.

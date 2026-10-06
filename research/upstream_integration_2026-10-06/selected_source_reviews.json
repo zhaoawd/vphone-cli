@@ -160,6 +160,50 @@
         "默认并行宿主 XPC 超时诊断、实际 signed helper 接受/拒绝与生命周期验收",
         "运行依赖的完整传递闭包验证、真实 Launchpad/VM 验收"
       ]
+    },
+    {
+      "tasks": [
+        "T10",
+        "T11"
+      ],
+      "observed_date": "2026-10-07",
+      "commit": "0c73f59f5065bca9917a527b44099a23f00b6684",
+      "scope": "frozen Swift transaction execution and manifest input binding",
+      "result": "249 模块测试、15 固件测试通过；一次解析的 gates/步骤集合用于执行和提交；同一 manifest 字节用于版本与摘要，暂存输入重核对。现有 journal 保存证据并保留原恢复流程。",
+      "evidence": [
+        "evidence/T10-frozen-final-module.log",
+        "evidence/T10-frozen-final-firmware.log",
+        "evidence/T10-frozen-default-swift.log",
+        "evidence/T10-frozen-failure-control.log"
+      ],
+      "limitations": [
+        "当前 catalog 119 项，固定目标 141 项未接入；可写 CLI 显式选择迁移未接入",
+        "组合步骤单个 patchID 与必需项、guest Gate 尚未实现",
+        "C2 稳定 VM/schema/catalog target/planDigest 和兼容导入尚未实现",
+        "完整默认运行 14 issues，定向对照 40 项通过；原因未查明",
+        "本地 Python 参考不是固定上游二进制等价；未操作现有 VM"
+      ]
+    },
+    {
+      "tasks": [
+        "T10",
+        "T11"
+      ],
+      "observed_date": "2026-10-07",
+      "commit": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+      "scope": "base-version knowledge for all writer boot-argument parameters",
+      "result": "iBEC/LLB extraBootArgs 在所有模式均依赖 iosBaseIs18；未知基线实际写入在建事务前拒绝，保留只读 resolver 独立激活判断。250 项相关模块与 15 项固件测试通过。",
+      "evidence": [
+        "evidence/T10-base-parameters-red.log",
+        "evidence/T10-base-parameters-final-module.log",
+        "evidence/T10-base-final-firmware.log",
+        "evidence/T10-base-default-swift.log"
+      ],
+      "limitations": [
+        "完整默认测试仍有 2 issues；与此前 14 issues 差异的原因未查明",
+        "采样未取得文件，不建立新的堆栈证据",
+        "旧元数据导入及完整 C1/C2 接受条件未满足"
+      ]
     }
   ]
 }

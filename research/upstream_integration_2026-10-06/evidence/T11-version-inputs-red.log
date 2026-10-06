@@ -1,0 +1,72 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/15] Write sources
+[3/15] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling FirmwarePatcherTests FirmwareVersionInputsTests.swift
+[6/7] Emitting module FirmwarePatcherTests
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (4.07s)
+Test Suite 'Selected tests' started at 2026-10-06 23:47:52.397.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 23:47:52.398.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 23:47:52.398.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 23:47:52.398.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareVersionInputsTests started.
+◇ Test presentManifestCannotDisappearAfterFreezing() started.
+◇ Test unreadableManifestIsNotClassifiedAsMissing() started.
+◇ Test productVersionHasToBeAString() started.
+◇ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() started.
+◇ Test corruptManifestIsRejected(_:) started.
+◇ Test versionAndDigestComeFromTheSameManifestBytes() started.
+◇ Test previouslyMissingManifestCannotAppearAfterFreezing() started.
+◇ Test unrecognizedProductVersionIsRejected(_:) started.
+◇ Test versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument data → 23 bytes to corruptManifestIsRejected(_:) started.
+◇ Test case passing 1 argument data → 13 bytes to corruptManifestIsRejected(_:) started.
+✘ Test previouslyMissingManifestCannotAppearAfterFreezing() recorded an issue at FirmwareVersionInputsTests.swift:41:9: Expectation failed: an error was expected but none was thrown
+✘ Test productVersionHasToBeAString() recorded an issue at FirmwareVersionInputsTests.swift:77:9: Expectation failed: an error was expected but none was thrown
+✘ Test corruptManifestIsRejected(_:) recorded an issue with 1 argument data → 23 bytes at FirmwareVersionInputsTests.swift:56:9: Expectation failed: an error was expected but none was thrown
+✘ Test corruptManifestIsRejected(_:) recorded an issue with 1 argument data → 13 bytes at FirmwareVersionInputsTests.swift:56:9: Expectation failed: an error was expected but none was thrown
+✘ Test versionAndDigestComeFromTheSameManifestBytes() recorded an issue at FirmwareVersionInputsTests.swift:21:9: Expectation failed: (inputs.baseVersion → nil) == "26.1"
+◇ Test case passing 1 argument value → "" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "unknown" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "27.foo" to unrecognizedProductVersionIsRejected(_:) started.
+✘ Test unreadableManifestIsNotClassifiedAsMissing() recorded an issue at FirmwareVersionInputsTests.swift:65:9: Expectation failed: an error was expected but none was thrown
+✘ Test presentManifestCannotDisappearAfterFreezing() recorded an issue at FirmwareVersionInputsTests.swift:49:9: Expectation failed: an error was expected but none was thrown
+✘ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() recorded an issue at FirmwareVersionInputsTests.swift:34:9: Expectation failed: an error was expected but none was thrown
+✘ Test unrecognizedProductVersionIsRejected(_:) recorded an issue with 1 argument value → "" at FirmwareVersionInputsTests.swift:71:9: Expectation failed: an error was expected but none was thrown
+◇ Test case passing 1 argument value → "26..4" to unrecognizedProductVersionIsRejected(_:) started.
+✘ Test unrecognizedProductVersionIsRejected(_:) recorded an issue with 1 argument value → "unknown" at FirmwareVersionInputsTests.swift:71:9: Expectation failed: an error was expected but none was thrown
+✘ Test versionAndDigestComeFromTheSameManifestBytes() recorded an issue at FirmwareVersionInputsTests.swift:24:9: Expectation failed: (inputs.manifests.first { $0.name == "iPhone-BuildManifest.plist" }?.sha256 → nil) == (SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() → "eac2a7964d87d300fe4d7869be388a517826dd3b81db0ee22fe06c1c8e4063b8")
+✘ Test unrecognizedProductVersionIsRejected(_:) recorded an issue with 1 argument value → "27.foo" at FirmwareVersionInputsTests.swift:71:9: Expectation failed: an error was expected but none was thrown
+◇ Test case passing 1 argument value → "garbage.26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26..4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4.beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to unrecognizedProductVersionIsRejected(_:) started.
+✘ Test versionFloorDoesNotDropMalformedComponents(_:) recorded an issue with 1 argument value → "+26.4" at FirmwareVersionInputsTests.swift:82:9: Expectation failed: !(FirmwarePipeline.productVersionAtLeast((value → "+26.4"), 26, 4) → true)
+◇ Test case passing 1 argument value → "26.4-beta" to unrecognizedProductVersionIsRejected(_:) started.
+✘ Test versionFloorDoesNotDropMalformedComponents(_:) recorded an issue with 1 argument value → "garbage.26.4" at FirmwareVersionInputsTests.swift:82:9: Expectation failed: !(FirmwarePipeline.productVersionAtLeast((value → "garbage.26.4"), 26, 4) → true)
+✘ Test versionFloorDoesNotDropMalformedComponents(_:) recorded an issue with 1 argument value → "26..4" at FirmwareVersionInputsTests.swift:82:9: Expectation failed: !(FirmwarePipeline.productVersionAtLeast((value → "26..4"), 26, 4) → true)
+✘ Test versionFloorDoesNotDropMalformedComponents(_:) recorded an issue with 1 argument value → "26.4.beta" at FirmwareVersionInputsTests.swift:82:9: Expectation failed: !(FirmwarePipeline.productVersionAtLeast((value → "26.4.beta"), 26, 4) → true)
+✘ Test previouslyMissingManifestCannotAppearAfterFreezing() failed after 0.004 seconds with 1 issue.
+✘ Test productVersionHasToBeAString() failed after 0.004 seconds with 1 issue.
+✘ Test corruptManifestIsRejected(_:) with 2 test cases failed after 0.004 seconds with 2 issues.
+✘ Test presentManifestCannotDisappearAfterFreezing() failed after 0.004 seconds with 1 issue.
+✘ Test unreadableManifestIsNotClassifiedAsMissing() failed after 0.004 seconds with 1 issue.
+✘ Test versionAndDigestComeFromTheSameManifestBytes() failed after 0.004 seconds with 2 issues.
+✘ Test versionFloorDoesNotDropMalformedComponents(_:) with 5 test cases failed after 0.004 seconds with 4 issues.
+✘ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() failed after 0.004 seconds with 1 issue.
+✘ Test unrecognizedProductVersionIsRejected(_:) recorded an issue with 1 argument value → "26..4" at FirmwareVersionInputsTests.swift:71:9: Expectation failed: an error was expected but none was thrown
+✘ Test unrecognizedProductVersionIsRejected(_:) recorded an issue with 1 argument value → "+26.4" at FirmwareVersionInputsTests.swift:71:9: Expectation failed: an error was expected but none was thrown
+✘ Test unrecognizedProductVersionIsRejected(_:) recorded an issue with 1 argument value → "26.4-beta" at FirmwareVersionInputsTests.swift:71:9: Expectation failed: an error was expected but none was thrown
+✘ Test unrecognizedProductVersionIsRejected(_:) with 6 test cases failed after 0.004 seconds with 6 issues.
+✘ Suite FirmwareVersionInputsTests failed after 0.005 seconds with 19 issues.
+✘ Test run with 9 tests in 1 suite failed after 0.005 seconds with 19 issues.
