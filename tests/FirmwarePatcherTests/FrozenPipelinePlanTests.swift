@@ -50,4 +50,18 @@ import Testing
         #expect(!FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-history")))
     }
 
+    @Test(arguments: [FirmwarePipeline.Variant.dev, .regular])
+    func knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_ variant: FirmwarePipeline.Variant) throws {
+        let fixture = try PatchExperimentRecordTests.Fixture()
+        try FileManager.default.removeItem(at: fixture.restore.appendingPathComponent("iPhone-BuildManifest.plist"))
+        do {
+            _ = try fixture.run(variant: variant, forceExcGuard: variant == .regular)
+            Issue.record("Unknown base was allowed to commit unresolved boot argument parameters")
+        } catch {
+            #expect(String(describing: error).contains("base version is unknown"))
+        }
+        #expect(!FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-transaction")))
+        #expect(!FirmwareTransaction.exists(fixture.vm.appendingPathComponent(".firmware-history")))
+    }
+
 }

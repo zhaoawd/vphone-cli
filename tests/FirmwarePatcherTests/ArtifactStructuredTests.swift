@@ -106,6 +106,9 @@ struct ArtifactStructuredTests {
         let bytes = Data(repeating: 0, count: 0x400)
         let input = dir.appendingPathComponent("AVPBooter.fixture.bin")
         try bytes.write(to: input)
+        let manifest = try PropertyListSerialization.data(
+            fromPropertyList: ["ProductVersion": "26.1"], format: .xml, options: 0)
+        try manifest.write(to: dir.appendingPathComponent("FixtureRestore/iPhone-BuildManifest.plist"))
         let pipeline = FirmwarePipeline(vmDirectory: dir, variant: .dev, verbose: false)
         // Later component inputs deliberately do not exist: accessing them would throw.
         let report = try pipeline.patchAllStructured()

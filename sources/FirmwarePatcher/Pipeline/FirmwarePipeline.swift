@@ -246,6 +246,11 @@ public final class FirmwarePipeline {
         let plan = try VariantPlanResolver.resolve(
             variant: variant, gates: gates, baseVersionKnown: baseVersionKnown,
             cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil)
+        // Every variant's iBEC/LLB boot arguments depend on the iPhone base,
+        // even when EXC_GUARD activation is independently known (dev/forced).
+        guard baseVersionKnown else {
+            throw PatcherError.invalidFormat("iPhone base version is unknown; boot argument parameters cannot be resolved")
+        }
         executionPlan = plan
         let roots = try transactionRoots()
         trace.stage = .stageInputs
