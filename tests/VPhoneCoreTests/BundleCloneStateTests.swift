@@ -58,6 +58,32 @@ struct BundleCloneStateTests {
         try noStaging(root)
     }
 
+    @Test(arguments: [false, true]) func cloneOmitsOnlyRootCFWHistory(forceFallback: Bool) throws {
+        let (root, lib, src) = try fixture()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let fm = FileManager.default
+        let history = src.url.appendingPathComponent(".cfw-history/transaction-a")
+        let nested = src.url.appendingPathComponent("notes/.cfw-history")
+        for directory in [history, nested] {
+            try fm.createDirectory(at: directory, withIntermediateDirectories: true)
+            try Data("retained source history".utf8).write(to: directory.appendingPathComponent("record"))
+        }
+        let before = try snapshot(src)
+        let clone = try VPhoneBundleOps.clone(bundleNamed: "src", to: "dst", in: lib,
+            copyDirectory: { source, destination, exclusions in
+                try VPhoneCloneCopy.copy(from: source, to: destination, excludingRootNames: exclusions,
+                    cloneDirectory: forceFallback ? { _, _ in ENOTSUP } : VPhoneCloneCopy.nativeClone)
+            })
+        #expect(!fm.fileExists(atPath: clone.url.appendingPathComponent(".cfw-history").path))
+        #expect(try Data(contentsOf: clone.url.appendingPathComponent("notes/.cfw-history/record"))
+            == Data("retained source history".utf8))
+        #expect(try Data(contentsOf: history.appendingPathComponent("record"))
+            == Data("retained source history".utf8))
+        #expect(try snapshot(clone) == before)
+        #expect(try snapshot(src) == before)
+        try noStaging(root)
+    }
+
     @Test func refusesLockedSourceWithoutProducingDestination() throws {
         let (root, lib, src) = try fixture()
         defer { try? FileManager.default.removeItem(at: root) }

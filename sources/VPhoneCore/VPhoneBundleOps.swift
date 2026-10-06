@@ -202,7 +202,7 @@ public enum VPhoneBundleOps {
     /// Copy a stopped VM's complete persistent boot state, retaining its device
     /// identity (NVRAM, machine identifier, SEP storage and tickets stay together).
     /// This is not a new independent device: use create/restore for that purpose.
-    /// Prefer APFS CoW; omit only host runtime state and the control socket.
+    /// Prefer APFS CoW; omit host runtime state, the control socket and CFW rollback history.
     public static func clone(
         bundleNamed name: String, to newName: String, in library: VPhoneLibrary
     ) throws -> VPhoneBundle {
@@ -237,7 +237,7 @@ public enum VPhoneBundleOps {
                                    attributes: [.posixPermissions: 0o700])
             defer { try? fm.removeItem(at: staging) }
             let payload = staging.appendingPathComponent("payload")
-            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock"])
+            try copyDirectory(src, payload, [VPhoneVMRuntimeState.filename, "vphone.sock", ".cfw-history"])
             let staged = try VPhoneBundle.load(at: payload)
             // As in importArchive, copying happens privately, then name checking
             // and publication use the library lock. Slow copies do not monopolize it.
