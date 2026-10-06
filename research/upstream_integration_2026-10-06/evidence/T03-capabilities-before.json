@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-10-06T16:46:57.123573+00:00",
+  "request": {
+    "t": "capabilities",
+    "screen": false
+  },
+  "response": {
+    "screen_available": true,
+    "guest_connected": true,
+    "limits": {
+      "connections": 16,
+      "request_bytes": 2097152,
+      "host_file_bytes": 67108864,
+      "inline_file_bytes": 1048576,
+      "command_timeout_ms": 180000
+    },
+    "boot_mode": "normal",
+    "commands": {
+      "app_launch": true,
+      "ipa_install": true,
+      "app_list": true,
+      "type": true,
+      "camera_status": true,
+      "app_foreground": true,
+      "tap": true,
+      "location_stop": true,
+      "file_put": true,
+      "location_source_stop": true,
+      "location_stream_push": true,
+      "app_terminate": true,
+      "camera_stop": true,
+      "camera_present": true,
+      "swipe": true,
+      "location": true,
+      "key": true,
+      "capabilities": true,
+      "open_url": true,
+      "location_source_control": true,
+      "file_get": true,
+      "location_source_set": true,
+      "location_source_status": true,
+      "location_stream_start": true,
+      "screenshot": true,
+      "shell": true
+    },
+    "protocol_version": 1,
+    "guest_capabilities": [
+      "hid",
+      "devmode",
+      "file",
+      "keychain",
+      "location",
+      "location_owned",
+      "ipa_install",
+      "clipboard",
+      "apps_v2",
+      "apps",
+      "app_launch",
+      "url",
+      "settings",
+      "shell",
+      "touch",
+      "touch_edge",
+      "vcam_status",
+      "vcam_receipt_v3"
+    ],
+    "ok": true
+  }
+}

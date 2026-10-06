@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-06T16:46:57.535420+00:00",
+  "request": {
+    "t": "shell",
+    "cmd": "sw_vers; uptime; df -k /private/var",
+    "timeout_ms": 10000,
+    "screen": false
+  },
+  "response": {
+    "truncated": false,
+    "code": 0,
+    "stdout": "Filesystem   1024-blocks     Used Available Capacity iused     ifree %iused  Mounted on\n/dev/disk2s2    60560216  4271028  40983028    10%   53209 409830280    0%   /private/var\n",
+    "timed_out": false,
+    "stderr": "/var/jb/bin/sh: 1: sw_vers: not found\n/var/jb/bin/sh: 1: uptime: not found\n",
+    "ok": true
+  }
+}

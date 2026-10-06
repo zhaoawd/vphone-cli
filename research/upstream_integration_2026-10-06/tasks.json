@@ -861,7 +861,7 @@
         "T01",
         "T02"
       ],
-      "status": "blocked",
+      "status": "in_progress",
       "upstream_paths": [
         "VPhoneKit/VPhoneCoreKit/VirtualMachine/"
       ],
@@ -885,16 +885,30 @@
         "paths": []
       },
       "implementation_commits": [],
-      "verification_evidence": [],
+      "verification_evidence": [
+        "evidence/T03-preparation-summary.json",
+        "evidence/T03-host-preflight-before.log",
+        "evidence/T03-controlled-copy.py",
+        "evidence/T03-copy-probe.json",
+        "evidence/T03-copy-lock-refusal.json",
+        "evidence/T03-copy-space-refusal.json",
+        "evidence/T03-capacity-history-before.json",
+        "evidence/T03-input-bindings-before.json",
+        "evidence/T03-capabilities-before.json",
+        "evidence/T03-guest-data-hashes-before.json",
+        "evidence/T03-test-marker-before.json"
+      ],
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "Historical VM/backup paths absent; controlled stopped test VM path and backup destination have not been provided. Free space has been recovered; actual required capacity remains unknown.",
-      "current_environment_note": "可用空间复查约 57.41 GiB；停机测试 VM 和备份目标路径仍待用户提供，实际容量须按选定 VM 复算。",
-      "current_capacity_bytes": 61641699328,
-      "current_result": "用户已清理磁盘；历史验收 VM 与备份不存在，本轮停机测试 VM 路径及备份目标目录仍未提供。",
-      "available_capacity_gib": 57.41,
-      "capacity_observed_date": "2026-10-07"
+      "blocked_reason": "Signed candidate --help exited 137; temporary system amfid debugging is awaiting separate user authorization. Keep vm-new running until fresh startup prerequisites are confirmed.",
+      "current_environment_note": "用户已指定 vm-new；它当前运行，客户机连接正常。备份目标拟为项目 vm.backups，停止后才执行复制。",
+      "current_capacity_bytes": 60620800000,
+      "current_result": "已保存运行基线、宿主/客户机载荷摘要并验证复制脚本的准备检查；专用客户机测试文件已创建。未停止原 VM，未制作实际备份，未启动恢复副本。",
+      "available_capacity_gib": 56.46,
+      "capacity_observed_date": "2026-10-07",
+      "selected_vm_path": "/Users/qcz3840/github/vphone-cli/vm-new",
+      "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups"
     },
     {
       "id": "T04",

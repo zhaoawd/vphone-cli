@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-06T16:51:16.278376+00:00",
+  "request": {
+    "t": "shell",
+    "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; command -v sha256sum; command -v shasum; if command -v sha256sum >/dev/null 2>&1; then sha256sum /System/Library/CoreServices/SystemVersion.plist /private/var/mobile/Library/Preferences/com.apple.springboard.plist; elif command -v shasum >/dev/null 2>&1; then shasum -a 256 /System/Library/CoreServices/SystemVersion.plist /private/var/mobile/Library/Preferences/com.apple.springboard.plist; else exit 127; fi",
+    "timeout_ms": 10000,
+    "screen": false
+  },
+  "response": {
+    "truncated": false,
+    "code": 0,
+    "stdout": "/var/jb/usr/bin/sha256sum\n2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4  /System/Library/CoreServices/SystemVersion.plist\n7ed6cc7b5c91769ba179bcda4f5945171d8b24c2969d22d6466f99c6b7aabdf1  /private/var/mobile/Library/Preferences/com.apple.springboard.plist\n",
+    "timed_out": false,
+    "stderr": "",
+    "ok": true
+  }
+}

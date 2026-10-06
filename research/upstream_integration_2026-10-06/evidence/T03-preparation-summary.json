@@ -1,0 +1,25 @@
+{
+  "vm_path": "/Users/qcz3840/github/vphone-cli/vm-new",
+  "source_process_pid": 29288,
+  "source_running": true,
+  "source_stopped_by_this_run": false,
+  "backup_created": false,
+  "restored_boot_accepted": false,
+  "amfidont_started_by_this_run": false,
+  "candidate_implementation_commit": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+  "candidate_vm_cdhash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+  "candidate_signed_help_exit_code": 137,
+  "app_list_ok": true,
+  "app_count": 235,
+  "known_acceptance_apps": [
+    "com.apple.Preferences",
+    "com.apple.mobilesafari"
+  ],
+  "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups",
+  "copy_probe_result": "passed: ordinary-read hashes, sparse allocation, compressed source, runtime exclusion, lock refusal, free-space refusal; final probe passed including zero-write refusal",
+  "automatic_review": {
+    "rejected_action": "download full SpringBoard preferences for host-side hashing",
+    "reason": "private preferences may contain sensitive user data; specific export not explicitly authorized",
+    "safer_action_result": "approved and completed: calculate SHA-256 inside guest and return hashes only"
+  }
+}
