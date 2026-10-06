@@ -94,12 +94,15 @@ public enum VariantPlanResolver {
     /// Resolve `variant` under `gates`. `baseVersionKnown` is false when the iPhone base
     /// `ProductVersion` could not be read (the gates then read as not-18/not-27); a required
     /// version-gated declaration then resolves to `versionIndeterminate` instead of silently
-    /// dropping. `select` / `block` are explicit per-run overrides (empty on the default
+    /// dropping. `cloudOSVersionKnown` likewise prevents an active cloudOS-gated
+    /// declaration from treating an unknown version as below its floor.
+    /// `select` / `block` are explicit per-run overrides (empty on the default
     /// path); an unknown or not-implemented id in `select` is refused.
     public static func resolve(
         variant: FirmwarePipeline.Variant,
         gates: PatchGateSnapshot,
         baseVersionKnown: Bool = true,
+        cloudOSVersionKnown: Bool = true,
         select: Set<String> = [],
         block: Set<String> = [],
         catalog: [PatchDeclaration] = PatchDeclarationCatalog.all
@@ -162,6 +165,15 @@ public enum VariantPlanResolver {
                     "not in variant \(variantName) (\(declaration.variants.sorted().joined(separator: ",")))"))
                 continue
             }
+            // A request cannot resolve an unknown required version condition. EXC_GUARD
+            // is already known active for dev/forced runs, independent of the base version.
+            if declaration.required, !baseVersionKnown,
+               declaration.optIn != .frida || gates.enableFrida,
+               let rule = declaration.versionRule,
+               rule == .iosBaseIs18 || rule == .iosBaseIs27
+                    || (rule == .excGuardActive && !gates.excGuardActive) {
+                throw PatchDeclarationCatalog.CatalogError.versionIndeterminate(id: declaration.id, rule: rule)
+            }
             if blocked {
                 excludedByOptIn.append(entry(declaration, .excludedByOptIn, "blocked by request"))
                 continue
@@ -170,10 +182,9 @@ public enum VariantPlanResolver {
                 excludedByOptIn.append(entry(declaration, .excludedByOptIn, "needs --frida opt-in"))
                 continue
             }
-            // Required version-gated declaration with an unreadable base version.
-            if declaration.required, !baseVersionKnown,
-               let rule = declaration.versionRule, rule == .iosBaseIs18 || rule == .iosBaseIs27 {
-                throw PatchDeclarationCatalog.CatalogError.versionIndeterminate(id: declaration.id, rule: rule)
+            if !cloudOSVersionKnown, declaration.versionRule == .cloudOSFridaCapable {
+                throw PatchDeclarationCatalog.CatalogError.versionIndeterminate(
+                    id: declaration.id, rule: .cloudOSFridaCapable)
             }
             if PatchDeclarationCatalog.ruleHolds(declaration, gates) {
                 selected.append(entry(declaration, .selected, dispositionReason(declaration)))

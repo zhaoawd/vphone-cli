@@ -17,6 +17,9 @@ final class FirmwareTransaction {
         let id: String
         let vmPath: String
         let options: [String: String]
+        /// Resolution for this transaction; absent in historical journals.
+        let plan: VariantPlanResolver.VariantPlan?
+        let versionInputs: FirmwareVersionInputs?
         var phase: Phase = .building
         var entries: [Entry]
         var failure: String?
@@ -44,6 +47,8 @@ final class FirmwareTransaction {
     private let fm = FileManager.default
 
     init(vmDirectory: URL, inputs: [URL], options: [String: String],
+         plan: VariantPlanResolver.VariantPlan? = nil,
+         versionInputs: FirmwareVersionInputs? = nil,
          inject: @escaping (Event) throws -> Void = { _ in },
          mounts: @escaping (URL, Bool) throws -> Void = FirmwareTransaction.checkMounts) throws {
         self.vmDirectory = vmDirectory.standardizedFileURL.resolvingSymlinksInPath()
@@ -63,7 +68,7 @@ final class FirmwareTransaction {
             throw Self.error("Firmware transaction requires distinct inputs")
         }
         journal = Journal(id: UUID().uuidString.lowercased(), vmPath: self.vmDirectory.path,
-                          options: options, entries: entries)
+                          options: options, plan: plan, versionInputs: versionInputs, entries: entries)
         // mkdir is exclusive. Never reuse another run's transaction directory.
         guard mkdir(root.path, 0o700) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         try Self.syncDirectory(self.vmDirectory)

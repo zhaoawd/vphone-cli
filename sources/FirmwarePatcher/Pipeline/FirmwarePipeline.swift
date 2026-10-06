@@ -85,6 +85,9 @@ public final class FirmwarePipeline {
     let enableFrida: Bool
     let loader: any FirmwareLoader
     private var transaction: FirmwareTransaction?
+    private var executionPlan: VariantPlanResolver.VariantPlan?
+    private var versionInputs: FirmwareVersionInputs?
+    private var baseVersionKnown = false
 
     /// Progress of the most recent run (C5). Shared with the staged pipeline so a
     /// failure keeps the stage, completed component reports and transaction.
@@ -149,6 +152,19 @@ public final class FirmwarePipeline {
     /// restore directory plus the gate snapshot used for necessity-rule evaluation.
     private func prepare() throws -> (restoreDir: URL, gates: PatchGateSnapshot) {
         let restoreDir = try findRestoreDirectory()
+        if let plan = executionPlan {
+            guard let versionInputs else {
+                throw PatcherError.invalidFormat("Frozen plan has no version input snapshot")
+            }
+            try versionInputs.validate(in: restoreDir)
+            // Staged execution consumes the preflight snapshot. Do not resolve again
+            // from a manifest a filesystem/manifest patcher may subsequently rewrite.
+            iosBaseIs18 = plan.gates.iosBaseIs18
+            iosBaseIs27 = plan.gates.iosBaseIs27
+            cloudOSIsFridaCapable = plan.gates.cloudOSIsFridaCapable
+            log("[*] Frozen gates: \(plan.gates.summary)")
+            return (restoreDir, plan.gates)
+        }
 
         log("[*] VM directory:      \(vmDirectory.path)")
         log("[*] Restore directory: \(restoreDir.path)")
@@ -156,9 +172,12 @@ public final class FirmwarePipeline {
         // Detect the iPhone base iOS version (from the pre-hybrid manifest that
         // fw_prepare preserves — the live BuildManifest.plist reads the cloudOS
         // version, not the base). iOS 18 bases need the skywalk-netagent boot-arg.
-        let baseVersion = Self.readBaseProductVersion(restoreDir)
-        iosBaseIs18 = baseVersion?.hasPrefix("18.") ?? false
-        iosBaseIs27 = baseVersion?.hasPrefix("27.") ?? false
+        let inputs = try FirmwareVersionInputs.read(in: restoreDir)
+        versionInputs = inputs
+        let baseVersion = inputs.baseVersion
+        baseVersionKnown = baseVersion != nil
+        iosBaseIs18 = FirmwareVersionInputs.components(baseVersion)?.first == 18
+        iosBaseIs27 = FirmwareVersionInputs.components(baseVersion)?.first == 27
         let baseGateNote = iosBaseIs18 ? "  (enabling iOS-18 netagent boot-arg)"
             : iosBaseIs27 ? "  (enabling iOS-27 JB kernel patches)" : ""
         log("[*] iPhone base iOS:   \(baseVersion ?? "unknown")\(baseGateNote)")
@@ -166,7 +185,7 @@ public final class FirmwarePipeline {
         // Frida Stalker kernel patches only apply on cloudOS 26.4+ (where the shapes
         // were validated); older kernels are left untouched. The Frida deb install is
         // separate and version-independent.
-        let cloudOSVersion = Self.readCloudOSProductVersion(restoreDir)
+        let cloudOSVersion = inputs.cloudOSVersion
         cloudOSIsFridaCapable = Self.productVersionAtLeast(cloudOSVersion, 26, 4)
         if enableFrida {
             log("[*] cloudOS kernel:    \(cloudOSVersion ?? "unknown")"
@@ -206,6 +225,8 @@ public final class FirmwarePipeline {
     /// (missing files, unreadable payloads, unknown ablation ids).
     public func patchAllStructured(ablate ablateValues: [String] = [], allowOutput: Bool = true) throws -> PatchRunReport {
         trace = FirmwareRunTrace()
+        executionPlan = nil
+        versionInputs = nil
         trace.stage = .preflight
         guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
             throw PatcherError.invalidFormat("Pending firmware transaction; run patch-firmware --recover first")
@@ -221,20 +242,26 @@ public final class FirmwarePipeline {
             return report
         }
         trace.stage = .prepare
-        _ = try prepare()
+        let (_, gates) = try prepare()
+        let plan = try VariantPlanResolver.resolve(
+            variant: variant, gates: gates, baseVersionKnown: baseVersionKnown,
+            cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil)
+        executionPlan = plan
         let roots = try transactionRoots()
         trace.stage = .stageInputs
         let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots, options: [
             "variant": variant.rawValue, "noBinpack": String(noBinpack), "noVphoned": String(noVphoned),
             "forceExcGuard": String(forceExcGuard), "frida": String(enableFrida),
             "ablate": ablateValues.joined(separator: ","),
-        ])
+        ], plan: plan, versionInputs: versionInputs)
         trace.transaction = transaction
         do {
             let staged = FirmwarePipeline(vmDirectory: transaction.stage, variant: variant, verbose: verbose,
                 noBinpack: noBinpack, noVphoned: noVphoned, forceExcGuard: forceExcGuard,
                 enableFrida: enableFrida, loader: loader)
             staged.transaction = transaction
+            staged.executionPlan = plan
+            staged.versionInputs = versionInputs
             staged.trace = trace
             if variant == .less {
                 let restore = try staged.findRestoreDirectory()
@@ -253,7 +280,7 @@ public final class FirmwarePipeline {
             // declaration this variant enables. Runs on the staged output before commit,
             // so a violation leaves the original firmware untouched (the transaction
             // records the failure like any other pre-commit error).
-            try PatchDeclarationGate.enforce(report: report, variant: variant.rawValue, gates: report.gates)
+            try PatchDeclarationGate.enforce(report: report, plan: plan)
             if variant == .less { try Self.validateManifest(in: staged.findRestoreDirectory()) }
             trace.stage = .commit
             let archive = try transaction.commit()
@@ -394,7 +421,8 @@ public final class FirmwarePipeline {
                 componentName: component.name,
                 patcherFactories: component.patcherFactories,
                 gates: gates,
-                ablate: ablate
+                ablate: ablate,
+                enabledSteps: executionPlan?.enabledStepIDs
             )
             componentReports.append(contentsOf: reports)
             logStructuredReports(reports)
@@ -530,7 +558,8 @@ public final class FirmwarePipeline {
         componentName: String,
         patcherFactories: [(Data, Bool) -> any Patcher],
         gates: PatchGateSnapshot,
-        ablate: Set<String>
+        ablate: Set<String>,
+        enabledSteps: Set<String>? = nil
     ) throws -> (Data, [ComponentReport]) {
         var currentData = rawData
         var reports: [ComponentReport] = []
@@ -544,7 +573,8 @@ public final class FirmwarePipeline {
                     componentName: componentName,
                     gates: gates,
                     ablate: ablate,
-                    fallback: input
+                    fallback: input,
+                    enabledSteps: enabledSteps
                 )
                 reports.append(report)
                 currentData = data
@@ -839,7 +869,7 @@ public final class FirmwarePipeline {
 
     /// Dotted `ProductVersion` >= major.minor, compared numerically. nil is false.
     static func productVersionAtLeast(_ version: String?, _ major: Int, _ minor: Int) -> Bool {
-        guard let parts = version?.split(separator: ".").compactMap({ Int($0) }),
+        guard let parts = FirmwareVersionInputs.components(version),
               let vMajor = parts.first else { return false }
         return vMajor != major ? vMajor > major : (parts.count > 1 ? parts[1] : 0) >= minor
     }

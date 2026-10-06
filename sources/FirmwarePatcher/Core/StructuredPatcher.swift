@@ -48,13 +48,15 @@ public protocol StructuredPatcher: Patcher {
 public enum StructuredExecution {
     /// Execute `patcher`'s steps against `gates`, honoring the `ablate` set. Records
     /// from non-ablated steps are collected; `commit` writes them to the buffer.
+    /// `enabledSteps` is the optional preflight plan boundary, checked before `run`.
     /// Returns the component report and the patched payload.
     public static func run(
         patcher: any StructuredPatcher,
         componentName: String,
         gates: PatchGateSnapshot,
         ablate: Set<String>,
-        fallback: Data
+        fallback: Data,
+        enabledSteps: Set<String>? = nil
     ) -> (report: ComponentReport, data: Data) {
         var results: [PatchResult] = []
 
@@ -77,6 +79,15 @@ public enum StructuredExecution {
                     id: step.id, requirement: step.requirement.kind, rule: rule,
                     outcome: .notApplicable,
                     reason: "rule \(rule.rawValue) false for this input: \(gates.summary)",
+                    recordIndices: [], gates: gates
+                ))
+                continue
+            }
+
+            if let enabledSteps, !enabledSteps.contains(step.id.description) {
+                results.append(PatchResult(
+                    id: step.id, requirement: step.requirement.kind, rule: step.requirement.rule,
+                    outcome: .notApplicable, reason: "not selected in frozen plan",
                     recordIndices: [], gates: gates
                 ))
                 continue

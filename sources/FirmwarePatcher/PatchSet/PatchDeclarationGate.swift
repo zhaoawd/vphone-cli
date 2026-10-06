@@ -25,6 +25,7 @@ public enum PatchDeclarationGate {
             case duplicateRecordOwnership
             case unattributedRecord
             case unexpectedRecords
+            case planMismatch
         }
 
         public let step: String
@@ -102,6 +103,42 @@ public enum PatchDeclarationGate {
         return found
     }
 
+    /// Write-side validation against the resolver snapshot used by this run. The
+    /// caller supplies a freshly resolved plan, not an unvalidated decoded plan.
+    public static func violations(
+        in report: PatchRunReport,
+        plan: VariantPlanResolver.VariantPlan
+    ) -> [Violation] {
+        var found = violations(in: report, variant: plan.variant, gates: plan.gates)
+        if report.variant != plan.variant || report.gates != plan.gates {
+            found.append(Violation(step: "run", kind: .planMismatch,
+                detail: "report variant or gates differ from the frozen plan"))
+        }
+        for component in report.components {
+            for result in component.results {
+                let step = result.id.description
+                if result.gates != plan.gates {
+                    found.append(Violation(step: step, kind: .planMismatch,
+                        detail: "result gates differ from the frozen plan"))
+                }
+                guard !result.recordIndices.isEmpty
+                    || result.outcome == .applied || result.outcome == .alreadyApplied else { continue }
+                if !plan.enabledStepIDs.contains(step) {
+                    found.append(Violation(step: step, kind: .notEnabled,
+                        detail: "step is absent from the frozen plan"))
+                }
+            }
+        }
+        return found
+    }
+
+    public static func enforce(
+        report: PatchRunReport,
+        plan: VariantPlanResolver.VariantPlan
+    ) throws {
+        try reject(violations(in: report, plan: plan))
+    }
+
     /// Throw when record ownership is invalid or an owning step is not enabled. Called before commit,
     /// so a violation leaves the original firmware unchanged.
     public static func enforce(
@@ -109,7 +146,10 @@ public enum PatchDeclarationGate {
         variant: String,
         gates: PatchGateSnapshot
     ) throws {
-        let violations = violations(in: report, variant: variant, gates: gates)
+        try reject(violations(in: report, variant: variant, gates: gates))
+    }
+
+    private static func reject(_ violations: [Violation]) throws {
         guard violations.isEmpty else {
             let detail = violations
                 .map { "\($0.step) [\($0.kind.rawValue)]: \($0.detail)" }

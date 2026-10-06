@@ -207,6 +207,12 @@ import Testing
 
     @Test(arguments: [true, false]) func pipelineReadAndPartialSaveFailuresRemainRecoverable(_ failRead: Bool) throws {
         let f = try Fixture()
+        // This test exercises loader I/O after valid preflight, not malformed metadata.
+        let manifest = try PropertyListSerialization.data(fromPropertyList: ["ProductVersion": "26.1"],
+            format: .binary, options: 0)
+        for name in ["BuildManifest.plist", "iPhone-BuildManifest.plist"] {
+            try manifest.write(to: f.restore.appendingPathComponent(name))
+        }
         let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false, loader: FailingLoader(failRead: failRead))
         #expect(throws: (any Error).self) {
             try pipeline.patchAllStructured(ablate: ["avpbooter"], allowOutput: true)
@@ -218,6 +224,9 @@ import Testing
         #expect(journal.failure != nil)
         #expect(try f.recover() != nil)
         try f.original()
+        for name in ["BuildManifest.plist", "iPhone-BuildManifest.plist"] {
+            #expect(try Data(contentsOf: f.restore.appendingPathComponent(name)) == manifest)
+        }
         #expect(try f.recover() == nil)
     }
 
