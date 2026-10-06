@@ -19,7 +19,6 @@ TOOLCHAIN=".build/vphone-cli.app"
 APP=".build/vphone-launchpad.app"
 HELPER="${APP}/Contents/Helpers/vphone-cli.app"
 INFO_PLIST="sources/VPhoneLaunchpad-Info.plist"
-RESOURCE_BUNDLE="vphone-cli_VPhoneLaunchpad.bundle"
 BUNDLE_ID="com.vphone.cli.launchpad"
 GIT_HASH="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
@@ -40,9 +39,17 @@ echo "=== Building vphone-launchpad (${GIT_HASH}) ==="
 swift build -c release --force-resolved-versions --product vphone-launchpad
 BIN_DIR="$(swift build -c release --show-bin-path)"
 BINARY="${BIN_DIR}/vphone-launchpad"
-LPROJ_DIR="${BIN_DIR}/${RESOURCE_BUNDLE}/Contents/Resources"
 [[ -x "$BINARY" ]] || { print -u2 -- "Missing ${BINARY}"; exit 1; }
-[[ -d "$LPROJ_DIR" ]] || { print -u2 -- "Missing compiled catalogs in ${LPROJ_DIR}"; exit 1; }
+# SwiftPM may copy .xcstrings without compiling them. Compile the validated
+# source catalogs explicitly; do not depend on the SwiftPM resource layout.
+python3 "$SCRIPT_DIR/check_launchpad_strings.py"
+LPROJ_DIR=".build/launchpad-localizations"
+rm -rf "$LPROJ_DIR"
+mkdir -p "$LPROJ_DIR"
+for catalog in Localizable InfoPlist; do
+  xcrun xcstringstool compile "sources/VPhoneLaunchpad/${catalog}.xcstrings" \
+    --output-directory "$LPROJ_DIR" --language en --language zh-Hans
+done
 
 # --- Assemble ---
 echo "=== Assembling ${APP} ==="
@@ -51,8 +58,8 @@ mkdir -p "${APP}/Contents/MacOS" "${APP}/Contents/Resources" "${APP}/Contents/He
 cp -f "$BINARY" "${APP}/Contents/MacOS/vphone-launchpad"
 cp -f "$INFO_PLIST" "${APP}/Contents/Info.plist"
 cp -f sources/AppIcon.icns "${APP}/Contents/Resources/AppIcon.icns"
-# SwiftPM compiles the catalogs into its resource bundle. Bundle.main and
-# SwiftUI look in the app's own Resources, so the .lproj folders go there.
+# Bundle.main and SwiftUI look in the app's Resources, so copy the compiled
+# .lproj folders there before sealing the outer signature.
 for lproj in "$LPROJ_DIR"/*.lproj(N); do
   cp -R "$lproj" "${APP}/Contents/Resources/"
 done
