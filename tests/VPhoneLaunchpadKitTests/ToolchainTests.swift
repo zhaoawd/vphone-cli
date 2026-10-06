@@ -3,7 +3,7 @@ import Testing
 @testable import VPhoneLaunchpadKit
 
 struct ToolchainTests {
-    private func failure(_ result: Result<VPhoneLaunchpadToolchain, VPhoneLaunchpadToolchain.Failure>) -> VPhoneLaunchpadToolchain.Failure? {
+    private func verificationFailure(_ result: Result<VPhoneLaunchpadToolchain, VPhoneLaunchpadToolchain.Failure>) -> VPhoneLaunchpadToolchain.Failure? {
         if case let .failure(failure) = result {
             return failure
         }
@@ -47,14 +47,14 @@ struct ToolchainTests {
         let temp = try LaunchpadTemporaryDirectory()
         let fixture = try LaunchpadFixtureApp.make(in: temp.url)
         try FileManager.default.removeItem(at: fixture.helper)
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .layout)
         #expect(failure.reason.contains("vphone-cli.app"))
     }
 
     @Test func rejectsAppOutsideAnAppBundle() throws {
         let temp = try LaunchpadTemporaryDirectory()
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: temp.url)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: temp.url)))
         #expect(failure.step == .layout)
     }
 
@@ -64,7 +64,7 @@ struct ToolchainTests {
         let elsewhere = temp.url.appendingPathComponent("vphone-cli")
         try FileManager.default.moveItem(at: fixture.cli, to: elsewhere)
         try FileManager.default.createSymbolicLink(at: fixture.cli, withDestinationURL: elsewhere)
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .layout)
         #expect(failure.reason.contains("symbolic link"))
     }
@@ -76,7 +76,7 @@ struct ToolchainTests {
         let elsewhere = temp.url.appendingPathComponent("Helpers")
         try FileManager.default.moveItem(at: helpers, to: elsewhere)
         try FileManager.default.createSymbolicLink(at: helpers, withDestinationURL: elsewhere)
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .layout)
         #expect(failure.reason.hasPrefix("Contents/Helpers:"))
     }
@@ -88,7 +88,7 @@ struct ToolchainTests {
         try handle.seekToEnd()
         try handle.write(contentsOf: Data([0]))
         try handle.close()
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .nestedSignature)
     }
 
@@ -98,7 +98,7 @@ struct ToolchainTests {
         var object = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: fixture.manifest)) as? [String: Any])
         object["gitHash"] = "edited"
         try JSONSerialization.data(withJSONObject: object).write(to: fixture.manifest)
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .outerSignature)
     }
 
@@ -111,7 +111,7 @@ struct ToolchainTests {
                 vphoneVM: .init(cdhash: String(repeating: "0", count: 40))
             ))
         }
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .cdhash)
         #expect(failure.reason.hasPrefix("vphone-vm:"))
     }
@@ -123,7 +123,7 @@ struct ToolchainTests {
             object["schema"] = "upstream.core-bundle"
             return try JSONSerialization.data(withJSONObject: object)
         }
-        let failure = try #require(failure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
+        let failure = try #require(verificationFailure(VPhoneLaunchpadToolchain.verify(appBundle: fixture.app)))
         #expect(failure.step == .manifest)
     }
 }
