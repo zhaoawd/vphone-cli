@@ -102,6 +102,9 @@ public enum PatchDeclarationCatalog {
         case notImplementedSelected(id: String)
         case versionIndeterminate(id: String, rule: PatchRule)
         case requiredMissing(variant: String, id: String)
+        case contradictorySelection(id: String)
+        case variantMismatch(variant: String, gates: String)
+        case partialStepSelection(id: String, step: String, enabled: [String])
 
         public var description: String {
             switch self {
@@ -125,6 +128,12 @@ public enum PatchDeclarationCatalog {
                 "declaration \(id) needs version rule \(rule.rawValue), but the base version is unknown"
             case let .requiredMissing(variant, id):
                 "required declaration \(id) is not enabled for variant \(variant)"
+            case let .contradictorySelection(id):
+                "declaration \(id) is both explicitly selected and blocked"
+            case let .variantMismatch(variant, gates):
+                "plan variant \(variant) does not match gate snapshot variant \(gates)"
+            case let .partialStepSelection(id, step, enabled):
+                "declaration \(id) cannot be blocked independently: step \(step) also enables \(enabled.joined(separator: ", "))"
             }
         }
     }

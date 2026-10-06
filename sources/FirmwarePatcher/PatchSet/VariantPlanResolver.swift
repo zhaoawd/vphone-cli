@@ -105,13 +105,20 @@ public enum VariantPlanResolver {
         catalog: [PatchDeclaration] = PatchDeclarationCatalog.all
     ) throws -> VariantPlan {
         try PatchDeclarationCatalog.validateStructure(catalog)
+        guard gates.variant == variant.rawValue else {
+            throw PatchDeclarationCatalog.CatalogError.variantMismatch(
+                variant: variant.rawValue, gates: gates.variant)
+        }
 
         let byID = Dictionary(uniqueKeysWithValues: catalog.map { ($0.id, $0) })
         // Explicit selection must name real, implemented declarations.
-        for id in select.union(block) where byID[id] == nil {
+        for id in select.union(block).sorted() where byID[id] == nil {
             throw PatchDeclarationCatalog.CatalogError.unknownDeclaration(id: id)
         }
-        for id in select where byID[id]?.coverage == .notImplemented {
+        if let id = select.intersection(block).sorted().first {
+            throw PatchDeclarationCatalog.CatalogError.contradictorySelection(id: id)
+        }
+        for id in select.sorted() where byID[id]?.coverage == .notImplemented {
             throw PatchDeclarationCatalog.CatalogError.notImplementedSelected(id: id)
         }
 
@@ -189,8 +196,28 @@ public enum VariantPlanResolver {
         where declaration.coverage == .swift && declaration.required && !declaration.swiftSteps.isEmpty {
             guard declaration.variants.contains(variantName),
                   PatchDeclarationCatalog.ruleHolds(declaration, gates) else { continue }
-            if !declaration.swiftSteps.contains(where: liveSet.contains) {
+            if !enabledIDs.contains(declaration.id)
+                || !declaration.swiftSteps.contains(where: liveSet.contains) {
                 throw PatchDeclarationCatalog.CatalogError.requiredMissing(variant: variantName, id: declaration.id)
+            }
+        }
+
+        // One local step can implement several declarations. A block cannot suppress
+        // only one of them while another keeps that indivisible step enabled. Refuse
+        // this choice until the implementation can execute those declarations separately.
+        let selectedByStep = Dictionary(grouping: selected.flatMap { entry in
+            entry.swiftSteps.map { (step: $0, id: entry.id) }
+        }, by: \.step)
+        for declaration in catalog.sorted(by: { $0.id < $1.id })
+        where declaration.coverage == .swift && block.contains(declaration.id)
+            && declaration.variants.contains(variantName)
+            && PatchDeclarationCatalog.ruleHolds(declaration, gates)
+            && (declaration.optIn != .frida || gates.enableFrida) {
+            for step in declaration.swiftSteps.sorted() where liveSet.contains(step) {
+                if let enabled = selectedByStep[step], !enabled.isEmpty {
+                    throw PatchDeclarationCatalog.CatalogError.partialStepSelection(
+                        id: declaration.id, step: step, enabled: enabled.map(\.id).sorted())
+                }
             }
         }
 
