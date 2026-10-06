@@ -63,14 +63,14 @@ class DaemonAPIBuildTests(unittest.TestCase):
             with self.subTest(label=label), self.assertRaises(ValueError):
                 module.check_project_requirements(text, self.pins)
 
-    def test_repository_daemon_graph_pins_iclikit_0_7_7(self):
-        # T08: upstream 2.2.3 (a969cd5d) daemon lockfile; the project keeps an
+    def test_repository_daemon_graph_pins_iclikit_0_7_16(self):
+        # T08: fixed upstream 2d21d21 daemon lockfile; the project keeps an
         # exact requirement where upstream uses upToNextMajorVersion.
         pins = json.loads(module.LOCK.read_text())['pins']
         module.check_pins(pins, json.loads(module.EXPECTED.read_text())['pins'])
         module.check_project_requirements(module.XCODE_PROJECT.read_text(), pins)
         icli = next(pin for pin in pins if pin['identity'] == 'icli')
-        self.assertEqual(icli['state'], {'revision': '9e9a6ca940ac4142771eb34cf7e052e35a7b7987', 'version': '0.7.7'})
+        self.assertEqual(icli['state'], {'revision': '702990b59ca412ad975f9f0ea5dafe95c30fac21', 'version': '0.7.16'})
 
     def test_launchd_plist_restarts_quickly_and_keeps_proxy_log(self):
         # Upstream 2e2ed0a8: proxy exit reasons reach a file, launchd restarts
