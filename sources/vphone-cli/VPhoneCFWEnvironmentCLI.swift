@@ -238,9 +238,10 @@ struct VPhoneCFWUpdateEnvironmentCommand: ParsableCommand {
     /// `--check` for a non-root caller: the check runs as root and its
     /// report (or failure) is printed here. Always ends with ExitCode.
     func runElevatedCheck(resources: VPhoneResources, bundle: URL, scriptEnv: [String: String]) throws -> Never {
-        print(rootPopup
+        let notice = rootPopup
             ? "[cfw] the read-only check runs as root: macOS asks for an administrator password"
-            : "[cfw] the read-only check runs as root: sudo asks for your macOS password")
+            : "[cfw] the read-only check runs as root: sudo asks for your macOS password"
+        FileHandle.standardError.write(Data((notice + "\n").utf8))
         let zsh = URL(fileURLWithPath: "/bin/zsh")
         let outcome = try VPhoneElevatedEnvironmentCheck.run(
             resources: resources, bundle: bundle, scriptEnv: scriptEnv, rootPopup: rootPopup

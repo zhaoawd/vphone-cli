@@ -145,7 +145,7 @@ if [[ "$MODE" == check ]]; then
   if [[ -n "$INVOKER_SOURCE" ]] && (( INVOKER_UID != 0 )); then
     OWNER_ARGS=(--owner "$INVOKER_UID${INVOKER_GID:+:$INVOKER_GID}")
   fi
-  echo "[*] read-only guest environment check as uid ${EUID:-$(id -u)}: vm=$VM_DIR report=$REPORT"
+  echo "[*] read-only guest environment check as uid ${EUID:-$(id -u)}: vm=$VM_DIR report=$REPORT" >&2
   # No root-owned __pycache__ beside the scripts.
   export PYTHONDONTWRITEBYTECODE=1
   exec "$PY" "$SCRIPT_DIR/cfw_env_update.py" check-vm \

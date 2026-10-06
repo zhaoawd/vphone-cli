@@ -162,3 +162,60 @@ struct CFWEnvironmentElevatedCheckTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: base.path).isEmpty)
     }
 }
+
+/// Run the real CLI with a report-writing driver in a temporary resource tree.
+/// The stand-in never elevates privileges, mounts a disk or contacts a guest.
+struct CFWEnvironmentCheckOutputTests {
+    static let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        .deletingLastPathComponent().deletingLastPathComponent()
+
+    @Test(arguments: [Int32(0), Int32(5)])
+    func checkKeepsStdoutMachineReadable(exitCode: Int32) throws {
+        let fm = FileManager.default
+        let root = fm.temporaryDirectory.appendingPathComponent("cfw-output-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: root) }
+        let scripts = root.appendingPathComponent("scripts")
+        try fm.createDirectory(at: scripts, withIntermediateDirectories: true)
+        try fm.createSymbolicLink(at: scripts.appendingPathComponent("check_python_runtime.py"),
+            withDestinationURL: Self.repo.appendingPathComponent("scripts/check_python_runtime.py"))
+        let driver = scripts.appendingPathComponent("cfw_install_host.sh")
+        try #"""
+        #!/bin/zsh
+        set -euo pipefail
+        [[ "$1" == --check-environment && "$2" == --report ]]
+        if [[ "$CHECK_TEST_EXIT" == 0 ]]; then
+          /bin/cat > "$3" <<'JSON'
+        {"exit_code":0,"error":null,"report":{"classification":"already_current","reasons":[]}}
+        JSON
+        else
+          /bin/cat > "$3" <<'JSON'
+        {"exit_code":5,"report":null,"error":{"stage":"mount","message":"fixture failure","advice":"inspect fixture"}}
+        JSON
+        fi
+        echo "check driver diagnostic" >&2
+        exit "$CHECK_TEST_EXIT"
+        """#.write(to: driver, atomically: true, encoding: .utf8)
+        let library = VPhoneLibrary(root: root.appendingPathComponent("VMs"))
+        let rom = root.appendingPathComponent("rom.bin")
+        try Data([1]).write(to: rom)
+        _ = try VPhoneBundleOps.create(.init(name: "test", cpuCount: 2, memoryMB: 2048,
+            diskSizeGB: 0, romSource: rom, sepromSource: rom), in: library)
+        let result = try VPhoneProcessRunner.runCapturing(
+            Self.repo.appendingPathComponent(".build/debug/vphone-cli"),
+            ["cfw", "update-environment", "test", "--check", "--library-root", library.root.path,
+             "--project-root", root.path],
+            env: ["VPHONE_PYTHON": Self.repo.appendingPathComponent(".venv/bin/python3").path,
+                  "CHECK_TEST_EXIT": String(exitCode)], timeout: 20)
+        #expect(!result.timedOut)
+        #expect(result.exitCode == exitCode)
+        #expect(result.stderr.contains("check driver diagnostic"))
+        #expect(result.stderr.contains("read-only check runs as root"))
+        if exitCode == 0 {
+            let report = try JSONSerialization.jsonObject(with: Data(result.stdout.utf8)) as? [String: Any]
+            #expect(report?["classification"] as? String == "already_current")
+        } else {
+            #expect(result.stdout.isEmpty)
+            #expect(result.stderr.contains("stage mount"))
+        }
+    }
+}

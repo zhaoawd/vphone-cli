@@ -792,7 +792,8 @@ class ElevatedCheckTests(EnvironmentDriverFixture):
                                                      ['--check-environment', '--report', str(self.report)]) + [str(vm)]
         started = time.monotonic()
         proc = subprocess.run(command, env=base, capture_output=True, timeout=60)
-        return proc.returncode, (proc.stdout + proc.stderr).decode(), time.monotonic() - started
+        self.assertEqual(proc.stdout, b'', 'the report driver must send diagnostics only to stderr')
+        return proc.returncode, proc.stderr.decode(), time.monotonic() - started
 
     def snapshot(self, vm):
         disk = vm / 'Disk.img'
