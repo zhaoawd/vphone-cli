@@ -1,0 +1,92 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/15] Write sources
+[3/15] Write swift-version--58304C5D6DBC2206.txt
+[5/11] Emitting module FirmwarePatcher
+[6/11] Compiling FirmwarePatcher PatchDeclarationGate.swift
+[7/17] Emitting module FirmwarePatcherTests
+[8/17] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[9/17] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[9/17] Write Objects.LinkFileList
+[12/17] Linking vphone-vm
+[13/17] Linking vphone-cli
+[14/17] Applying vphone-vm
+[14/17] Applying vphone-cli
+[16/17] Linking vphone-cliPackageTests
+Build complete! (7.08s)
+Test Suite 'Selected tests' started at 2026-10-06 21:41:17.964.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 21:41:17.966.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 21:41:17.966.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 21:41:17.966.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite DeclarationGateTests started.
+◇ Test gatePassesForACleanReport() started.
+◇ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged() started.
+◇ Test missingDependencyWhenTargetNotEnabled() started.
+◇ Test gateRejectsMultipleOwnersForARecord() started.
+◇ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() started.
+◇ Test liveStepUndeclaredWhenCatalogIncomplete() started.
+◇ Test missingDependencyStructural() started.
+◇ Test gateIgnoresNotApplicableAndAblatedResults() started.
+◇ Test gateRejectsANotEnabledRecord() started.
+◇ Test requiredMissingWhenPipelineLacksStep() started.
+◇ Test unknownDeclarationSelected() started.
+◇ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() started.
+◇ Test gateRejectsRecordsWithoutAnOwningResult() started.
+◇ Test versionIndeterminateWhenBaseUnknown() started.
+◇ Test gateRejectsDuplicateRecordIndicesWithinAResult() started.
+◇ Test notImplementedSelected() started.
+◇ Test gateRejectsAnUndeclaredRecord() started.
+◇ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test gateRejectsInvalidRecordIndices(index:) started.
+◇ Test conflictBetweenEnabled() started.
+◇ Test cyclicOrder() started.
+◇ Test duplicateDeclaration() started.
+◇ Test case passing 1 argument outcome → .ablated to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument index → -1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument outcome → .notApplicable to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument index → 1 to gateRejectsInvalidRecordIndices(index:) started.
+✔ Test gateIgnoresNotApplicableAndAblatedResults() passed after 0.002 seconds.
+✔ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() passed after 0.003 seconds.
+✔ Test gatePassesForACleanReport() passed after 0.003 seconds.
+✔ Test gateRejectsANotEnabledRecord() passed after 0.003 seconds.
+✔ Test gateRejectsMultipleOwnersForARecord() passed after 0.003 seconds.
+✔ Test missingDependencyStructural() passed after 0.003 seconds.
+✔ Test gateRejectsDuplicateRecordIndicesWithinAResult() passed after 0.002 seconds.
+✔ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() passed after 0.003 seconds.
+✔ Test gateRejectsRecordsWithoutAnOwningResult() passed after 0.003 seconds.
+✔ Test gateRejectsAnUndeclaredRecord() passed after 0.002 seconds.
+✔ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) with 2 test cases passed after 0.003 seconds.
+✔ Test gateRejectsInvalidRecordIndices(index:) with 2 test cases passed after 0.003 seconds.
+✔ Test unknownDeclarationSelected() passed after 0.003 seconds.
+✔ Test liveStepUndeclaredWhenCatalogIncomplete() passed after 0.003 seconds.
+✔ Test missingDependencyWhenTargetNotEnabled() passed after 0.003 seconds.
+✔ Test cyclicOrder() passed after 0.002 seconds.
+✔ Test versionIndeterminateWhenBaseUnknown() passed after 0.003 seconds.
+✔ Test duplicateDeclaration() passed after 0.002 seconds.
+✔ Test requiredMissingWhenPipelineLacksStep() passed after 0.003 seconds.
+✔ Test notImplementedSelected() passed after 0.003 seconds.
+✔ Test conflictBetweenEnabled() passed after 0.003 seconds.
+✔ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged() passed after 0.099 seconds.
+✔ Suite DeclarationGateTests passed after 0.099 seconds.
+✔ Test run with 22 tests in 1 suite passed after 0.099 seconds.

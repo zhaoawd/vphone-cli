@@ -889,7 +889,8 @@
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "Historical VM/backup paths absent on current host; controlled VM path and capacity required. User will clear disk space."
+      "blocked_reason": "Historical VM/backup paths absent on current host; controlled VM path and capacity required. User will clear disk space.",
+      "current_environment_note": "可用空间复查约 58 GiB；停机测试 VM 和备份目标路径仍待用户提供，实际容量须按选定 VM 复算。"
     },
     {
       "id": "T04",
@@ -1173,7 +1174,7 @@
         "T02",
         "T24"
       ],
-      "status": "pending_local_audit",
+      "status": "declaration_audit_in_progress",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift",
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
@@ -1194,12 +1195,25 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "metadata_audited_semantics_pending",
+        "paths": [
+          "research/t09_patch_id_mapping_2026-10-01.json",
+          "research/t10_patch_declarations_2026-10-01.json",
+          "sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalogData.swift"
+        ]
       },
       "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "verification_evidence": [
+        "T09_declaration_delta.json",
+        "evidence/T09-paravirt-declaration-preset.diff"
+      ],
+      "historical_evidence": [],
+      "current_result": "目标 141 个声明、比 2.2.3 新增 24 个、无删除；standard/experimental 版本门前分别新增 23/24 个选中 ID。当前运行目录未改动。",
+      "remaining_work": [
+        "重验旧映射的实现与五模式适用性",
+        "中间 ID、旧点号 ID 和预设的迁移预览、备份、原子提交及幂等",
+        "T24 模式与行为策略对账"
+      ]
     },
     {
       "id": "T10",
@@ -1215,7 +1229,7 @@
       "dependencies": [
         "T09"
       ],
-      "status": "pending_local_audit",
+      "status": "record_ownership_fix_validated_plan_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/PatchSet/VPhonePatchGate.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift",
@@ -1237,12 +1251,33 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "partial_repair_validated",
+        "paths": [
+          "sources/FirmwarePatcher/PatchSet/VariantPlanResolver.swift",
+          "sources/FirmwarePatcher/PatchSet/PatchDeclarationGate.swift",
+          "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+          "sources/FirmwarePatcher/Core/StructuredPatcher.swift",
+          "tests/FirmwarePatcherTests/DeclarationGateTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff"
+      ],
+      "verification_evidence": [
+        "evidence/T10-ownership-red.log",
+        "evidence/T10-ownership-green.log",
+        "evidence/T10-firmware-free.log",
+        "evidence/T10-full-serial-interrupted.log",
+        "evidence/T10-serial-stall.sample.txt"
+      ],
+      "historical_evidence": [],
+      "current_result": "补齐 component.records 与 result.recordIndices 的唯一归属、索引边界和 outcome 一致性；失败结果发出的记录也检查步骤声明。模块 Swift Testing 185 项、31 个 suite 通过；XCTest 5 项、3 跳过、0 失败。",
+      "remaining_work": [
+        "C1 冻结计划成为实际执行输入",
+        "按单个声明和实际 patchID 校验组合步骤，核验单个必需补丁缺失",
+        "guest Python/zsh 写入接入同一计划",
+        "本轮完整测试与真实固件/VM 验收"
+      ]
     },
     {
       "id": "T11",
@@ -1258,7 +1293,7 @@
       "dependencies": [
         "T10"
       ],
-      "status": "pending_local_audit",
+      "status": "source_review_in_progress",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
@@ -1278,12 +1313,18 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "interfaces_reviewed_implementation_pending",
+        "paths": [
+          "sources/vphone-cli/VPhoneFWCLI.swift",
+          "sources/vphone-cli/VPhoneCreateLiveStages.swift",
+          "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
+          "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift"
+        ]
       },
       "implementation_commits": [],
       "verification_evidence": [],
-      "historical_evidence": []
+      "historical_evidence": [],
+      "current_result": "现有 fw plan 只读输出与 create 的 selection SHA 可复用；尚未形成绑定 VM 身份、输入摘要、catalog/target、schema 的持久化 C2 计划。上游 selection/plan/receipt 的 try? 回退不能直接用于本地严格入口。"
     },
     {
       "id": "T12",
@@ -3291,5 +3332,14 @@
       "cost": "跨 keychain group 的上游能力尚未纳入；T41 需单独审查与验证"
     }
   ],
-  "latest_implementation_head": "c7234c9b5cbe2171decc933089ff1f9b87a8c32f"
+  "latest_implementation_head": "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff",
+  "latest_validation_limitation": {
+    "full_serial": "interrupted_after_cleanup_stall",
+    "exit_code": 143,
+    "sampled_location": "APIHTTPFixture.stop -> NSConcreteTask.waitUntilExit",
+    "observed_live_child_count": 0,
+    "cause": "原因未查明；日志最后一行未反映采样时正在运行的测试",
+    "targeted_firmware_patcher": "185 Swift Testing tests / 31 suites passed; XCTest 5 tests / 3 skipped / 0 failures",
+    "default_make_test_swift": "prior run still has 16 issues; not accepted"
+  }
 }

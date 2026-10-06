@@ -89,6 +89,44 @@
       "task": "T07",
       "state": "partial_review",
       "result": "proxy 目标逻辑仅差保存 waitpid errno 与来源注释；plist 字节相同；升级后监听确认和每 VM 更新策略仍需审查"
+    },
+    {
+      "tasks": [
+        "T09"
+      ],
+      "scope": "declaration IDs and shipped plist selections only",
+      "evidence": "T09_declaration_delta.json",
+      "result": "117 -> 141 IDs; +24, no removals; preserve current five modes and explicit choices",
+      "limitations": [
+        "same ID does not establish semantic equivalence",
+        "version gates not evaluated",
+        "migration not implemented"
+      ]
+    },
+    {
+      "tasks": [
+        "T10"
+      ],
+      "scope": "component-local record ownership in existing Swift gate",
+      "commit": "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff",
+      "evidence": "evidence/T10-firmware-free.log",
+      "result": "reject unattributed/invalid/duplicate indices and records from non-writing outcomes; check declaration of failed owners too",
+      "limitations": [
+        "still checks step-to-declaration binding, not individual patchID equivalence",
+        "frozen execution input and guest gate pending",
+        "full serial run interrupted in APIHTTP cleanup"
+      ]
+    },
+    {
+      "tasks": [
+        "T11"
+      ],
+      "scope": "existing resolver/create identity versus target preset store",
+      "result": "reuse selection identity and transaction artifacts; C2 schema/VM/input/target binding and typed persistence errors remain unimplemented",
+      "limitations": [
+        "do not copy upstream try? fallback to default or empty receipt",
+        "machineIdentifier alone requires clone/legacy identity review before adoption"
+      ]
     }
   ]
 }
