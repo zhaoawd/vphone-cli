@@ -1,0 +1,94 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "archive_paths": [
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveError.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveError.swift",
+      "upstream_sha256": "5e655716f6225ec2a24e7f338bd4b33ceb2574c42020f63cda53e17ca597ff89",
+      "local_sha256": "a236d8f6bcdd9bab751bcadf6036d100057887ef6cce9a66620ade8809a14339",
+      "identical_bytes": false,
+      "diff_lines": 11
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift",
+      "upstream_sha256": "efb17edc2cd82f33c07ce041b45aa8acf66091cdee5ae5d1b2090ad2371be6b1",
+      "local_sha256": "19ab5ccd85a69ef546bbec0f8b212fd519758551b29cce026f9049f9af2cb7eb",
+      "identical_bytes": false,
+      "diff_lines": 61
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveLocale.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveLocale.swift",
+      "upstream_sha256": "eb5014bf57f8f0b7b5bde7f03cc7d623c0b2c644b54bcc9b7fdff160f0ba09a4",
+      "local_sha256": "b88cce1a6bbfa4fc6dea238ea43ea39a2e41e37d9fb58ffdc7fb19adbea46ed9",
+      "identical_bytes": false,
+      "diff_lines": 42
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveOptions.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveOptions.swift",
+      "upstream_sha256": "372a92b1fddd8b3a318533c4f7a829a8c133d04964d2e57e2702e1f0f79a69c7",
+      "local_sha256": "bb5797620bb3ef439b94ff9db83777109229c3a289a3c86683a91b07f93d8c86",
+      "identical_bytes": false,
+      "diff_lines": 10
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchivePaths.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchivePaths.swift",
+      "upstream_sha256": "ed7d3d963820e986b026e6dc312492998aa2f01e9f8bc8306b75315c3a88f230",
+      "local_sha256": "ed7d3d963820e986b026e6dc312492998aa2f01e9f8bc8306b75315c3a88f230",
+      "identical_bytes": true,
+      "diff_lines": 0
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
+      "upstream_sha256": "962a78d6a58e1310036da6253436f77affe6517b8a7b0ee8a252d1a4b50e4ffb",
+      "local_sha256": "3f3bf66d4eecdb475daa07399ad7dc4196436fab21a1374771dcc9a84260d9d0",
+      "identical_bytes": false,
+      "diff_lines": 93
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveWriter.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneArchiveWriter.swift",
+      "upstream_sha256": "7ae70d3365d5fe38ce10a2012f62576e2eff6614e1259aa129b9af2e0d074505",
+      "local_sha256": "81ea3b0d3af1c7600cd1db4c0e97d43de356742d78e895f1e5a6617b159be690",
+      "identical_bytes": false,
+      "diff_lines": 281
+    },
+    {
+      "upstream": "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneTreeFingerprint.swift",
+      "local": "sources/VPhoneArchiveKit/Archive/VPhoneTreeFingerprint.swift",
+      "upstream_sha256": "0a1b04b5e913d928cc448e4ab24a489eea8078feeda5b0dea46f24587c9c5774",
+      "local_sha256": "6f9924461338848429ab351b6d11186c7f17935e04f94d0b344936c058061985",
+      "identical_bytes": false,
+      "diff_lines": 15
+    }
+  ],
+  "reviews": [
+    {
+      "task": "T04",
+      "state": "reviewed_intentional_delta",
+      "paths": [
+        "sources/VPhoneSign/MachO/VPhoneMachOImage.swift"
+      ],
+      "result": "目标文件唯一逻辑差异为不回收 LC_UUID；保留已有用户决定；签名定向测试通过"
+    },
+    {
+      "task": "T05",
+      "state": "reviewed_with_new_fix",
+      "result": "UTF-8 线程 locale 已存在；本地原子发布、路径和条目限制等保护保留；新增不改变进程 cwd 的遍历修复"
+    },
+    {
+      "task": "T06",
+      "state": "partial_review",
+      "result": "目标五类 closeAfterPeer 调用已在本地；宿主走 TCP 代理，需实际 VSOCK 验收；APIWire 的命令失败扩展字段是另一项未迁入差异"
+    },
+    {
+      "task": "T07",
+      "state": "partial_review",
+      "result": "proxy 目标逻辑仅差保存 waitpid errno 与来源注释；plist 字节相同；升级后监听确认和每 VM 更新策略仍需审查"
+    }
+  ]
+}

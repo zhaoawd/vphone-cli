@@ -1,0 +1,3182 @@
+{
+  "schema_version": 1,
+  "document_revision": 2,
+  "date": "2026-10-06",
+  "title": "vphone-cli 固定上游整合任务台账",
+  "status": "plan_revised_implementation_not_executed",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "historical_scope_start": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "previous_target": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+  "release_anchor": "f9ea9015a82d29187d4b65cc15883d9bdc37a21c",
+  "documents": {
+    "plan": "vphone_upstream_merge_plan_2026-10-06_2d21d21.md",
+    "todo": "vphone_upstream_execution_TODO_2026-10-06_2d21d21.md",
+    "ledger": "vphone_upstream_integration_tasks_2026-10-06_2d21d21.json"
+  },
+  "source_audit": {
+    "retrieval": "Official upstream Git objects and immutable source reads; no access to the live local fork.",
+    "repository": "https://github.com/Lakr233/vphone-cli",
+    "git_version": "git version 2.51.1",
+    "observed_date": "2026-10-06",
+    "ancestor_checks_passed": true,
+    "ranges": [
+      {
+        "name": "historical_2_0_8_to_2_2_3",
+        "from": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+        "to": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+        "commits": 124,
+        "non_merge_commits": 122,
+        "reproduction_commands": [
+          "git rev-list --count 9d218dedf58d4b19db5e51c8b584c1f14a96eee3..a969cd5d9206932dc1a2797348027fbc7d0ee347",
+          "git rev-list --no-merges --count 9d218dedf58d4b19db5e51c8b584c1f14a96eee3..a969cd5d9206932dc1a2797348027fbc7d0ee347"
+        ]
+      },
+      {
+        "name": "increment_2_2_3_to_target",
+        "from": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+        "to": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+        "commits": 218,
+        "non_merge_commits": 158,
+        "reproduction_commands": [
+          "git rev-list --count a969cd5d9206932dc1a2797348027fbc7d0ee347..2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+          "git rev-list --no-merges --count a969cd5d9206932dc1a2797348027fbc7d0ee347..2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+        ]
+      },
+      {
+        "name": "total_2_0_8_to_target",
+        "from": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+        "to": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+        "commits": 342,
+        "non_merge_commits": 280,
+        "reproduction_commands": [
+          "git rev-list --count 9d218dedf58d4b19db5e51c8b584c1f14a96eee3..2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+          "git rev-list --no-merges --count 9d218dedf58d4b19db5e51c8b584c1f14a96eee3..2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+        ]
+      }
+    ],
+    "incremental_diff": {
+      "from": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+      "to": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "rename_threshold": "50%",
+      "path_count": 357,
+      "status_counts": {
+        "M": 200,
+        "A": 157
+      },
+      "insertions": 46978,
+      "deletions": 2067,
+      "source_suffix_counts": {
+        ".swift": 230,
+        ".c": 18,
+        ".m": 12,
+        ".h": 12,
+        ".py": 0,
+        ".sh": 8
+      },
+      "source_suffix_total": 280,
+      "exclusions": [],
+      "reproduction_commands": [
+        "git diff --find-renames=50% --name-status a969cd5d9206932dc1a2797348027fbc7d0ee347 2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+        "git diff --find-renames=50% --numstat a969cd5d9206932dc1a2797348027fbc7d0ee347 2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+        "git diff --find-renames=50% --shortstat a969cd5d9206932dc1a2797348027fbc7d0ee347 2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+      ]
+    },
+    "local_baseline": {
+      "status": "not_observed_this_revision",
+      "historical_head": "ef6f408",
+      "historical_worktree": "/Users/qcz3840/github/vphone-cli",
+      "actual_head": null,
+      "actual_merge_base": null
+    }
+  },
+  "task_counts": {
+    "total": 47,
+    "required": 46,
+    "optional": 1
+  },
+  "preserved_local_constraints": [
+    "regular/dev/jb/exp/less",
+    "Hook/auth/Irisin",
+    "strict paths and permissions",
+    "prepare/checkpoints",
+    "recoverable transactions"
+  ],
+  "default_exclusions": [
+    "T45 120 Hz / FPS experiment",
+    "root loading external executable patchsets",
+    "restoring DSC ASLR",
+    "unverified device/firmware combinations"
+  ],
+  "implementation_authorization_this_turn": false,
+  "historical_evidence_policy": "Preserve date/SHA/fixture of earlier passing work; do not overwrite history or assume current target is verified.",
+  "state_rules": {
+    "initial": "pending_local_audit",
+    "accepted_requires": "actual evidence covering acceptance criteria; record nonapplicable gates with reasons",
+    "pipeline": [
+      "pending_local_audit",
+      "pending",
+      "in_progress",
+      "implemented",
+      "built",
+      "vm_verified",
+      "accepted"
+    ],
+    "other": [
+      "blocked",
+      "not_applicable",
+      "deferred_optional",
+      "deferred"
+    ]
+  },
+  "contracts": [
+    {
+      "id": "C1",
+      "name": "模式与冻结计划",
+      "tasks": "T09–T10",
+      "requirement": "输入真实 mode、OS/build、选择和声明；输出经过依赖/冲突/必需项校验的计划。每个实际 patch record 必须归属于被允许声明。"
+    },
+    {
+      "id": "C2",
+      "name": "持久化与兼容导入",
+      "tasks": "T11",
+      "requirement": "计划绑定 VM、mode、输入来源、schema 和 digest；missing、corrupt、unsupported、legacy 分开。未知状态不取得写盘资格。"
+    },
+    {
+      "id": "C3",
+      "name": "原件与 generation",
+      "tasks": "T12–T14",
+      "requirement": "可信原始输入与派生产物分开，generation 绑定固件、设备、GPU 和计划；新 generation 提交前保留旧原件。"
+    },
+    {
+      "id": "C4",
+      "name": "离线提交事务",
+      "tasks": "T15",
+      "requirement": "锁、可信路径、clone/完整副本、写入读回、卸载、磁盘发布及记录持久化形成可恢复事务；任一步失败均有确定恢复动作。"
+    },
+    {
+      "id": "C5",
+      "name": "旧 VM 更新资格",
+      "tasks": "T16、T33–T35",
+      "requirement": "返回可直接更新、需先更新 kernel、需迁移、需重建或拒绝及原因；根据真实布局与证据判定，不根据版本名称猜测。"
+    },
+    {
+      "id": "C6",
+      "name": "在线安装与激活",
+      "tasks": "T17",
+      "requirement": "验证事务能力与完整响应，区分 legacy；文件安装、进程加载和业务验收分开。自动/手动写入受每 VM 操作规则约束，pending_activation/pending_recovery 是有效状态。"
+    },
+    {
+      "id": "C7",
+      "name": "分组件应用事实",
+      "tasks": "T32",
+      "requirement": "复用 Receipt/manifest，记录 desired、planned、generated、committed、activated、accepted；实际命中和读回证据不得由 enabled 集合替代。"
+    },
+    {
+      "id": "C8",
+      "name": "DSC 与内核共享区域",
+      "tasks": "T35",
+      "requirement": "内核更新校验候选 kernel+当前 DSC，环境更新校验已证明安装 kernel+候选 DSC。使用真实 base/size/mapping/effective maxSlide；证据缺失拒绝写入。"
+    },
+    {
+      "id": "C9",
+      "name": "连接代际和自动行为",
+      "tasks": "T36–T39",
+      "requirement": "instance 区分重连与 daemon 生命周期；异步操作绑定 generation，无可靠标识时停用相应自动行为；副作用结果未知先读回，不按 request ID 盲目重试。"
+    },
+    {
+      "id": "C10",
+      "name": "四层来源与兼容性",
+      "tasks": "T07、T24、T40、T29",
+      "requirement": "分别记录 host Bundle、guest environment、kernel、其他 boot chain 和同步策略；版本下限、series 支持策略、协议、ABI、固件分别判断，切 host 不自动授权改 guest。"
+    }
+  ],
+  "adjustments": [
+    {
+      "area": "范围和终点",
+      "previous": "2.0.8→2.2.3；124/122 为待复算预期",
+      "revised": "终点固定到 2d21d21；保留历史段和新增段，实测总范围 342/280",
+      "reason": "旧工作仍需核对，新增 218 个提交不能替代历史欠项。T00–T02"
+    },
+    {
+      "area": "实施方式",
+      "previous": "按能力整合、保留本地定制",
+      "revised": "继续保留，并增加逐提交处置、最终状态复核和合并提交解决内容审查",
+      "reason": "本地 squash/重实现无需重复；被后续修正的中间状态不重复引入。T02"
+    },
+    {
+      "area": "依赖目标",
+      "previous": "IcliKit 0.7.7",
+      "revised": "候选固定为 0.7.16 / 702990b…；其他锁文件按实际目标对齐",
+      "reason": "新增能力依赖调用和 entitlements，不能只更新版本数字。T08"
+    },
+    {
+      "area": "补丁账本",
+      "previous": "计划、模式、applied 和 generation",
+      "revised": "复用上游 Receipt/Drift/Undo，补足实际命中、读回、提交与激活证据",
+      "reason": "无需另建平行补丁框架，也不能把计划等同磁盘事实。T09–T12、T32–T35"
+    },
+    {
+      "area": "内核与旧机升级",
+      "previous": "重点为环境更新",
+      "revised": "加入保留数据的 update-kernel、共享区域校验、撤销与 legacy 资格判定",
+      "reason": "新环境可能要求旧 kernel 尚未具备的前提。T15–T17、T33–T35"
+    },
+    {
+      "area": "宿主检查",
+      "previous": "T24 位于较后管理阶段",
+      "revised": "T24 移入 M1；每 VM Bundle 绑定 T40 前置",
+      "reason": "新写盘和管理入口先遵守本地权限、身份及版本来源契约。"
+    },
+    {
+      "area": "原件和事务",
+      "previous": "保留本地 prepare/checkpoint、clone/备份保护",
+      "revised": "加强跨文件恢复日志、新 generation 发布、no-op 补证据和单项必需补丁验证",
+      "reason": "上游有可复用能力，也有不能照搬的宽松失败分支。T12–T17、T32"
+    },
+    {
+      "area": "控制能力",
+      "previous": "响应、输入、定位、应用和 Inspector",
+      "revised": "追加 instance/unlock、有序关机、AX nested、触摸复制，并列出混合版本降级",
+      "reason": "旧 daemon 能响应基础 API，不代表理解新语义。T36–T39"
+    },
+    {
+      "area": "网络和设备",
+      "previous": "原配置与原固件路径",
+      "revised": "加入 tunnel、每机网络、iPad/多 iPhone 身份路径并保留旧配置解释",
+      "reason": "新增字段缺失的默认值要逐项迁移，目录出现机型不代表本地支持。T41、T44"
+    },
+    {
+      "area": "媒体和 Hook",
+      "previous": "相机、定位、RootHide/Irisin 配套",
+      "revised": "音频/麦克风与 DeviceTree、kernel、HAL、路由、Hook、权限成组交付",
+      "reason": "单个 dylib 更新不足以构成新媒体链；本地门控继续有效。T20–T22、T42–T43"
+    },
+    {
+      "area": "console 与 UI",
+      "previous": "2.2.3 的管理界面尾项",
+      "revised": "保留旧项并追加输出 ACK、分块性能和当前设置/创建流程",
+      "reason": "基础日志正确性可早验收；UI 完成依赖后端真实状态。T25–T27、T46"
+    },
+    {
+      "area": "实验范围",
+      "previous": "实验开关受模式约束",
+      "revised": "120 Hz/FPS 独立 T45 默认延后；外部 root patchset、恢复 DSC ASLR 不纳入本轮",
+      "reason": "主线验收可收敛，后续启用需独立证据，不默认扩大安全或支持范围。"
+    }
+  ],
+  "phases": {
+    "M0": "基线 对账和恢复点",
+    "M1": "基础修复 宿主约束和版本绑定",
+    "M2": "补丁契约 原件准备和 Hook 策略",
+    "M3": "写盘事务 环境 内核和固件适配",
+    "M4": "客户机控制与既有功能链",
+    "M5": "网络 媒体与管理入口",
+    "M6": "文档与不可变发布候选",
+    "M7": "组合回归 恢复和签收"
+  },
+  "verification_profiles": {
+    "baseline": "git status --short --branch；git rev-parse HEAD；git merge-base HEAD TARGET；固定范围 rev-list/diff。只读结果逐项归档。",
+    "patch": "xcodebuild -project VPhoneExecutable/VPhoneCommand/VPhoneCommand.xcodeproj -scheme FirmwarePatcherTests -destination 'platform=macOS,arch=arm64' test",
+    "sign": "xcodebuild -project VPhoneExecutable/VPhoneCommand/VPhoneCommand.xcodeproj -scheme VPhoneSignTests -destination 'platform=macOS,arch=arm64' test",
+    "core": "xcodebuild -project VPhoneKit/VPhoneKit.xcodeproj -scheme VPhoneCoreKitTests -destination 'platform=macOS,arch=arm64' test",
+    "archive": "xcodebuild -project VPhoneKit/VPhoneKit.xcodeproj -scheme VPhoneArchiveKitTests -destination 'platform=macOS,arch=arm64' test",
+    "hierarchy": "VPhoneDaemon/Tests/run-hierarchy-tests.sh（按该脚本声明的解释器运行）",
+    "daemon": "按实际 guest 目标构建 vphoned scheme；在 T02 登记该工程要求的 SDK/目的地，并以 guest 的 runtime hash 验证部署结果。",
+    "guest": "按已映射 GuestComponents Makefile/测试入口构建并验证 ABI；guest 联测单独登记。",
+    "host": "按本地已核实 Launchpad 构建及测试入口验证；纯界面部分用实际操作记录，不虚构 test scheme。",
+    "bundle": "xcodebuild -workspace VPhone.xcworkspace -scheme VPhone -configuration Debug -destination 'platform=macOS,arch=arm64' -derivedDataPath .build/XcodeBundle build",
+    "protocol": "由 T02 定位现有 transport/daemon 测试入口；增加本任务列明的契约用例，记录确切命令、request/response 和进程结果。",
+    "vm": "仅在 T03 的受控 VM 副本执行本任务验收；记录 host/guest/kernel/build/模式、命令、日志和恢复点。",
+    "docs": "验证接口示例、任务引用、路径、状态与最终代码；不为文档格式编辑另写产品测试。"
+  },
+  "mixed_version_matrix": [
+    {
+      "case": "旧 host + 旧 daemon",
+      "behavior": "保留用户当前可用组合及恢复点",
+      "acceptance": "作为原有功能基线，记录真实版本/摘要，不能以历史 SHA 代替。"
+    },
+    {
+      "case": "新 host + 旧 daemon",
+      "behavior": "冻结自动 daemon/environment 同步后，验证基础 API；新能力探测后启用",
+      "acceptance": "先后 hash 不变；缺 screen_unlock/system_shutdown 则禁用；AX nested 验证格式；无 instance 不跨重连复用基线。"
+    },
+    {
+      "case": "旧 host + 新 daemon",
+      "behavior": "冻结自动同步后验证既有请求与默认响应；显式回退单独测试",
+      "acceptance": "无法禁止改写的旧 host 不计纯兼容通过；复验 flat 默认、基础输入、升级确认及认证。"
+    },
+    {
+      "case": "新 host + 新 daemon",
+      "behavior": "新能力按配置和前提开放",
+      "acceptance": "host/guest 载荷、ABI、entitlements、激活与每机来源均相符。"
+    },
+    {
+      "case": "新 Launcher + 旧/新 Core Bundle",
+      "behavior": "区分代码版本下限与本地支持矩阵",
+      "acceptance": "上游代码要求 Bundle >=2.6.0；同 major.minor 作为默认支持策略，不能由版本下限推定任意更高 series 都兼容。"
+    },
+    {
+      "case": "新 Bundle + 旧 guest/kernel",
+      "behavior": "仅改变宿主运行绑定，显示其他层仍旧或未知",
+      "acceptance": "不自动写 guest/Preboot，不把“已安装新 Bundle”展示成整机已升级。"
+    },
+    {
+      "case": "旧 VM 无 receipt/undo",
+      "behavior": "分类为 legacy/unknown，完成只读识别后决定迁移路线",
+      "acceptance": "已选配置、版本号或当前文件名均不是实际应用证据；无可信撤销源不承诺关闭旧补丁。"
+    },
+    {
+      "case": "新 kernel + 旧其他 boot chain",
+      "behavior": "仅在已验证固件组合内允许",
+      "acceptance": "update-kernel 保留 IM4M，其他 boot chain 版本保持原来源；启动和数据回归必须通过。"
+    }
+  ],
+  "verification_matrix": [
+    {
+      "area": "历史与本地保留",
+      "cases": "真实 HEAD/WIP；五模式；Hook/auth/Irisin；已通过 prepare/checkpoint/导入导出",
+      "acceptance": "旧行为有基线；等价项不重写；历史结果与当前复验分列。"
+    },
+    {
+      "area": "签名与归档",
+      "cases": "Mach-O 空间/损坏头；中文/日文/emoji；链接与越界路径；大文件和坏包",
+      "acceptance": "正确结果或明确拒绝；无目标目录外写入；失败不覆盖有效产物。"
+    },
+    {
+      "area": "补丁选择",
+      "cases": "旧 ID；显式 off；缺声明/冲突/环；五模式；坏 schema；单项 boot-essential 未命中",
+      "acceptance": "可解释迁移；unknown 拒绝写盘；其他补丁成功不能掩盖必需项失败。"
+    },
+    {
+      "area": "原件和缓存",
+      "cases": "A→A、A→B→A；新输入失败；GPU/v2；并发/截断/取消/坏缓存",
+      "acceptance": "generation 对应正确；旧原件保留；缓存不混入 VM 身份和凭据。"
+    },
+    {
+      "area": "磁盘事务",
+      "cases": "VM 忙；锁竞争；clone/容量/挂载失败；磁盘交换和 receipt 写入前后中断",
+      "acceptance": "无原盘降级；恢复日志可决定一致状态；实际恢复后能启动并读回数据。"
+    },
+    {
+      "area": "旧 VM 迁移",
+      "cases": "完整/不完整安装；缺 loader/lib；坏/缺 receipt；有/无 undo；共享区不兼容",
+      "acceptance": "正确进入更新、先更新 kernel、受控迁移或拒绝；无备份不报已撤销。"
+    },
+    {
+      "area": "kernel/DSC",
+      "cases": "唯一/零/多 Preboot 候选；IM4M；6/7 GiB；缩回而 DSC 超界；不同 generation；0/多命中",
+      "acceptance": "拟提交组合兼容；缩回不兼容时提交前拒绝；实际字节与记录一致，不靠版本推定。"
+    },
+    {
+      "area": "在线更新",
+      "cases": "旧能力/缺字段/未知组件；多文件部分失败；成功后丢回复；与 Stop 交错；旧库仍加载",
+      "acceptance": "契约识别严格；文件、激活、业务验收分离；结果未知先读回；批次可恢复。"
+    },
+    {
+      "area": "协议与 lifecycle",
+      "cases": "大响应/慢读/取消；worker/proxy 退出；冻结自动更新的新旧组合；instance 变更后晚响应",
+      "acceptance": "兼容测试没有改写 guest；无孤儿连接；升级确认可靠；旧任务不在新实例生效。"
+    },
+    {
+      "area": "解锁/停止/AX/剪贴板",
+      "cases": "Setup Assistant、手动/自动 unlock；accepted/实际 stopped；nested/flat；触摸 Copy/慢响应/切窗",
+      "acceptance": "能力不足明确降级；未验证密码路径如实标记；snapshot ID 不作稳定选择器；旧剪贴板不回流。"
+    },
+    {
+      "area": "原有 guest 功能",
+      "cases": "apps.install 与实际 installd 分测；UDID set/clear/reboot；定位 fresh readback；RootHide/Irisin",
+      "acceptance": "权限、身份、包状态和目标应用保持；各链路独立证明。"
+    },
+    {
+      "area": "Bundle 与管理",
+      "cases": "缺绑定/坏签名/owner；多 VM/同名；clone/export；批量失败/取消；Launcher series",
+      "acceptance": "定位正确、来源准确、版本不静默漂移；半成品不标成功。"
+    },
+    {
+      "area": "设备与网络",
+      "cases": "原 iPhone；声明支持 iPad/新 iPhone；2x/3x；NAT/tunnel/bridged/none；MAC/IP/转发/mDNS",
+      "acceptance": "按实测组合声明支持；缺省字段不无意变更旧机行为；无意外 LAN 暴露和跨 VM 清理。"
+    },
+    {
+      "area": "媒体与 Hook",
+      "cases": "预览/拍照；44.1/48 kHz；录放/双工；权限拒绝；重复启停；代码页失败",
+      "acceptance": "按完整组件组合稳定工作；进程/线程/保护状态可恢复；原五模式策略保持。"
+    },
+    {
+      "area": "console 和恢复",
+      "cases": "随机分块/尾行/ANSI/panic/并发/轮换；ACK 超时/XPC 断开/writer 失败/立即退出；分层和整组恢复",
+      "acceptance": "接收、writer 排空和退出分开证明；每类恢复边界明确；至少一次整组恢复成功。"
+    }
+  ],
+  "old_task_mapping": [
+    {
+      "old_task": "T00",
+      "old_title": "采集真实本地和上游固定基线",
+      "revised_task": "T00",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T01",
+      "old_title": "保存未提交工作并建立适配起点",
+      "revised_task": "T01",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T02",
+      "old_title": "对账原计划和本地等价实现",
+      "revised_task": "T02",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T03",
+      "old_title": "验证容量、VM 一致备份及迁移 fixture",
+      "revised_task": "T03",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T04",
+      "old_title": "适配原生签名空间修复",
+      "revised_task": "T04",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T05",
+      "old_title": "接入 UTF-8 归档并保留路径安全",
+      "revised_task": "T05",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T06",
+      "old_title": "迁入完整响应和关闭时序修复",
+      "revised_task": "T06",
+      "related_new_tasks": [
+        "T37"
+      ]
+    },
+    {
+      "old_task": "T07",
+      "old_title": "适配 worker 重试和升级退出语义",
+      "revised_task": "T07",
+      "related_new_tasks": [
+        "T36",
+        "T37"
+      ]
+    },
+    {
+      "old_task": "T08",
+      "old_title": "锁定 IcliKit 0.7.7 并对照接口",
+      "revised_task": "T08",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T09",
+      "old_title": "建立补丁 ID／预设迁移清单",
+      "revised_task": "T09",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T10",
+      "old_title": "实现 VariantPolicy 和严格执行 Gate",
+      "revised_task": "T10",
+      "related_new_tasks": [
+        "T32",
+        "T35"
+      ]
+    },
+    {
+      "old_task": "T11",
+      "old_title": "实现计划持久化、迁移与 fail-closed",
+      "revised_task": "T11",
+      "related_new_tasks": [
+        "T32",
+        "T33",
+        "T35"
+      ]
+    },
+    {
+      "old_task": "T12",
+      "old_title": "把固件原件纳入 generation／检查点",
+      "revised_task": "T12",
+      "related_new_tasks": [
+        "T34"
+      ]
+    },
+    {
+      "old_task": "T13",
+      "old_title": "适配原生 prepare 的 GPU/v2 与原件生命周期",
+      "revised_task": "T13",
+      "related_new_tasks": [
+        "T44"
+      ]
+    },
+    {
+      "old_task": "T14",
+      "old_title": "实现共享 IPSW/GPU 缓存边界",
+      "revised_task": "T14",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T15",
+      "old_title": "强化 CFW 写盘事务及锁",
+      "revised_task": "T15",
+      "related_new_tasks": [
+        "T32",
+        "T33",
+        "T34",
+        "T35"
+      ]
+    },
+    {
+      "old_task": "T16",
+      "old_title": "实现停机环境更新资格和旧 VM 路由",
+      "revised_task": "T16",
+      "related_new_tasks": [
+        "T33",
+        "T34"
+      ]
+    },
+    {
+      "old_task": "T17",
+      "old_title": "实现在线环境替换与实际激活状态",
+      "revised_task": "T17",
+      "related_new_tasks": [
+        "T32"
+      ]
+    },
+    {
+      "old_task": "T18",
+      "old_title": "整合 MISFix 与应用安装／启动",
+      "revised_task": "T18",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T19",
+      "old_title": "整合 UDID、宿主识别与回退",
+      "revised_task": "T19",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T20",
+      "old_title": "改造定位链路并隔离旧 Hook",
+      "revised_task": "T20",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T21",
+      "old_title": "核对并适配 RootHide／Irisin 基础设施",
+      "revised_task": "T21",
+      "related_new_tasks": [
+        "T43"
+      ]
+    },
+    {
+      "old_task": "T22",
+      "old_title": "按最终组件组合适配相机",
+      "revised_task": "T22",
+      "related_new_tasks": [
+        "T42",
+        "T43"
+      ]
+    },
+    {
+      "old_task": "T23",
+      "old_title": "整合输入、多指、旋转及 headless",
+      "revised_task": "T23",
+      "related_new_tasks": [
+        "T36",
+        "T38",
+        "T39",
+        "T44",
+        "T45"
+      ]
+    },
+    {
+      "old_task": "T24",
+      "old_title": "复核宿主安全与构建实物",
+      "revised_task": "T24",
+      "related_new_tasks": [
+        "T40",
+        "T42",
+        "T43"
+      ]
+    },
+    {
+      "old_task": "T25",
+      "old_title": "整合 Launchpad CLI 和批量管理",
+      "revised_task": "T25",
+      "related_new_tasks": [
+        "T37",
+        "T40",
+        "T41",
+        "T46"
+      ]
+    },
+    {
+      "old_task": "T26",
+      "old_title": "迁入最新 2.2.3 的界面尾部修复",
+      "revised_task": "T26",
+      "related_new_tasks": [
+        "T44",
+        "T45",
+        "T46"
+      ]
+    },
+    {
+      "old_task": "T27",
+      "old_title": "整理 UI Inspector 和遗留入口",
+      "revised_task": "T27",
+      "related_new_tasks": [
+        "T36",
+        "T38",
+        "T39",
+        "T40"
+      ]
+    },
+    {
+      "old_task": "T28",
+      "old_title": "同步 API 文档与执行台账",
+      "revised_task": "T28",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T29",
+      "old_title": "完成组合兼容与发布候选检查",
+      "revised_task": "T29",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T30",
+      "old_title": "执行集成回归与故障注入",
+      "revised_task": "T30",
+      "related_new_tasks": []
+    },
+    {
+      "old_task": "T31",
+      "old_title": "演练整组回滚并签收",
+      "revised_task": "T31",
+      "related_new_tasks": []
+    }
+  ],
+  "topological_order_example": [
+    "T00",
+    "T01",
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T09",
+    "T10",
+    "T11",
+    "T12",
+    "T14",
+    "T13",
+    "T32",
+    "T15",
+    "T33",
+    "T35",
+    "T43",
+    "T34",
+    "T44",
+    "T16",
+    "T17",
+    "T21",
+    "T18",
+    "T19",
+    "T40",
+    "T20",
+    "T22",
+    "T23",
+    "T37",
+    "T41",
+    "T46",
+    "T25",
+    "T26",
+    "T38",
+    "T27",
+    "T36",
+    "T39",
+    "T42",
+    "T28",
+    "T29",
+    "T30",
+    "T31",
+    "T45"
+  ],
+  "tasks": [
+    {
+      "id": "T00",
+      "title": "冻结上游目标并采集真实本地基线",
+      "phase": "M0",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T00"
+      ],
+      "previous_title": "采集真实本地和上游固定基线",
+      "dependencies": [],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "AGENTS.md"
+      ],
+      "interface_contract": "产出 baseline.json：实际 localHEAD、工作区分类、mergeBase、固定 upstreamTarget、三段提交范围、工具版本；历史 SHA 不作为当前本地状态。",
+      "steps": [
+        "在实际仓库读取本地 AGENTS 和文档约定；记录 pwd、git status、remote 和分支，不改变现有工作区。",
+        "验证 9d218de、a969cd5、2d21d21 对象及祖先关系；获取对象时使用独立 upstream remote，不覆盖 origin。",
+        "分别采集上游历史段、上游新增段、本地分叉及未提交变更；记录未跟踪文件清单和需要保留的忽略文件。",
+        "登记 macOS、Xcode、实际构建/测试入口和可用 VM fixture；main 再前移只另列增量。"
+      ],
+      "acceptance": [
+        "固定目标必须是完整 2d21d21 SHA；本地 HEAD、merge-base 来自实际命令。",
+        "124/122、218/158、342/280 三组提交统计可复算；357/280 文件统计只属于新增段。",
+        "没有把历史 ef6f408 或旧验收描述冒充当前本地检查。"
+      ],
+      "rollback": "只读采集不改变源码或 VM；对象缺失时停止后续移植，不更换目标凑数。",
+      "verification_profiles": [
+        "baseline"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T01",
+      "title": "保存本地工作并建立隔离整合分支",
+      "phase": "M0",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T01"
+      ],
+      "previous_title": "保存未提交工作并建立适配起点",
+      "dependencies": [
+        "T00"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [],
+      "interface_contract": "产出可恢复的 localBaseline 与 integration/upstream-20261006-2d21d21 工作分支；分支名为建议，存在时先核对归属。",
+      "steps": [
+        "按 prepare、检查点、测试、文档等语义保存已跟踪修改，并备份需要保留的未跟踪实际内容。",
+        "先扫描拟提交列表，排除 VM、IPSW、凭据、导出包及个人配置；不使用 git add .。",
+        "从保存后的本地基线创建隔离 worktree/checkout，验证原工作目录保持原有内容。",
+        "记录本地恢复引用和内容备份；尚未验证的本地修改保留 WIP 身份。"
+      ],
+      "acceptance": [
+        "源码保存点包含暂存、未暂存及所需未跟踪内容；diff 清单与备份相符。",
+        "隔离分支基于实际本地基线，不基于纯上游目标重建而遗漏定制。"
+      ],
+      "rollback": "回到本地保存点或取回内容备份；不自动 reset、clean、删除旧分支或推送远端。",
+      "verification_profiles": [
+        "baseline"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T02",
+      "title": "建立能力对账和逐提交处置台账",
+      "phase": "M0",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T02"
+      ],
+      "previous_title": "对账原计划和本地等价实现",
+      "dependencies": [
+        "T00",
+        "T01"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [],
+      "interface_contract": "产出 capability-ledger 与 local-path-map；每项上游能力有本地位置、处置决定、依赖和验证入口。",
+      "steps": [
+        "对原 T00–T31、当前本地代码及上游最终状态逐项判定 equivalent、adapt、new、superseded、deferred 或 unknown。",
+        "将上游 342 个提交纳入历史范围核对；优先细审新增 158 个非合并提交，并检查合并提交是否另含冲突解决。",
+        "为每个准备实施的任务解析真实本地修改/新增/测试路径和模块所有者，冻结其接口映射。",
+        "保留原通过记录及其 SHA/fixture 范围；受此次改动影响的项目新增复验要求，不抹掉历史状态。"
+      ],
+      "acceptance": [
+        "所有原任务都有去向；已等价实现可通过复验交付，不重复开发。",
+        "任一进入实施的任务都能定位真实文件和测试入口；unknown 不能转成缺失或已完成。",
+        "格式化、文档、发布元数据和被后续修正替代的提交都有明确处置理由。"
+      ],
+      "rollback": "只更新处置台账；不凭提交数量自动批量 cherry-pick。",
+      "verification_profiles": [
+        "baseline"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T03",
+      "title": "验证停机一致备份和迁移样本",
+      "phase": "M0",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T03"
+      ],
+      "previous_title": "验证容量、VM 一致备份及迁移 fixture",
+      "dependencies": [
+        "T01",
+        "T02"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneKit/VPhoneCoreKit/VirtualMachine/"
+      ],
+      "interface_contract": "产出恢复清单：VM 身份、固件、磁盘、NVRAM/SEP、配置、原件、计划、receipt、guest 载荷和宿主版本。",
+      "steps": [
+        "选择现有稳定 VM 作为受控样本，确认停止、无磁盘写入者并记录容量需求。",
+        "制作保身份恢复点；另行创建需要并发运行的测试克隆并处理其身份与网络冲突。",
+        "在测试位置执行一次真实恢复并验证启动、通信、目标应用和关键数据。",
+        "列出五模式策略 fixture 和实际声明支持的固件/新建/迁移组合。"
+      ],
+      "acceptance": [
+        "至少一个恢复点经过实际恢复，不只验证导出命令成功。",
+        "恢复与克隆的身份策略分开；无唯一原件或唯一备份先删除腾空间。"
+      ],
+      "rollback": "保留原 VM 和已验证恢复点；失败样本隔离，停止写盘批次。",
+      "verification_profiles": [
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T04",
+      "title": "复核并适配 Mach O 签名空间修复",
+      "phase": "M1",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T04"
+      ],
+      "previous_title": "适配原生签名空间修复",
+      "dependencies": [
+        "T02"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneSign/MachO/VPhoneMachOImage.swift"
+      ],
+      "interface_contract": "输入受支持 Mach-O，输出可验证的签名结果或明确错误；回收顺序保留 LC_SOURCE_VERSION 后 LC_UUID 的规则。",
+      "steps": [
+        "检查本地是否已有等价实现，固定失败样本和原二进制来源。",
+        "对照目标源码最小移入空间与边界修复，保留本地严格解析。",
+        "运行签名测试并核验实际打包产物，记录会丢失 UUID 的条件。"
+      ],
+      "acceptance": [
+        "空间足够时不删除 load command；两级回收后仍不足必须拒绝。",
+        "损坏头、异常 size 和支持架构边界不产生越界写入。"
+      ],
+      "rollback": "独立代码提交与签名产物回退；原始二进制保持可恢复。",
+      "verification_profiles": [
+        "sign"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T05",
+      "title": "接入 UTF8 归档并保持路径保护",
+      "phase": "M1",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T05"
+      ],
+      "previous_title": "接入 UTF-8 归档并保留路径安全",
+      "dependencies": [
+        "T02"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveLocale.swift",
+        "VPhoneKit/VPhoneArchiveKit/"
+      ],
+      "interface_contract": "归档接口保留同步线程 locale 范围、受控解包目的地及原子发布行为。",
+      "steps": [
+        "对账已有导入导出和第一批验证记录，定位未覆盖调用点。",
+        "移入 UTF-8 包装及错误路径；不在依赖线程 locale 的范围跨 await。",
+        "复验多语言名称、链接、坏包、并发和导入失败清理。"
+      ],
+      "acceptance": [
+        "中文、日文、emoji 名称和内容往返一致。",
+        "路径穿越、越界链接及损坏包无法写出目标目录；失败不覆盖有效 VM。"
+      ],
+      "rollback": "保留原归档及临时导入隔离；仅回退本批代码。",
+      "verification_profiles": [
+        "archive"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T06",
+      "title": "接入完整响应与连接关闭修复",
+      "phase": "M1",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T06"
+      ],
+      "previous_title": "迁入完整响应和关闭时序修复",
+      "dependencies": [
+        "T02"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/APIWire.swift",
+        "VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+        "VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+        "VPhoneDaemon/Daemon/GuestAPI.swift"
+      ],
+      "interface_contract": "HTTP、文件、WebSocket/代理明确区分响应完整、对端关闭和超时回收；复用现有认证及消息关联。",
+      "steps": [
+        "先用大响应、慢读和提前断线用例复现本地现状，已修复则保留证据。",
+        "成组适配上游发送收尾和连接回收，覆盖 VSOCK/代理两端。",
+        "确认异常、取消和超时都能释放连接及 staging 文件。",
+        "区分请求关联 ID 与幂等性；已可能产生副作用但丢失回复时记 unknown outcome，先读回再决定恢复或重试。"
+      ],
+      "acceptance": [
+        "8/16 KiB 边界及更大合法响应长度/摘要完整。",
+        "无双方等待 EOF、提前 reset 截断、遗留 fd 或跨请求串包。",
+        "安装成功后丢回复不会仅凭同一 request ID 自动重发写操作。"
+      ],
+      "rollback": "host/guest/proxy 通信实现按兼容组合回退。",
+      "verification_profiles": [
+        "protocol"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T07",
+      "title": "接入 worker 重试与升级确认",
+      "phase": "M1",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T07"
+      ],
+      "previous_title": "适配 worker 重试和升级退出语义",
+      "dependencies": [
+        "T06"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Native/vphoned_proxy.c",
+        "VPhoneDaemon/Daemon/",
+        "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift"
+      ],
+      "interface_contract": "worker 崩溃、proxy 结束、正常升级与监听成功确认分别记录；退出不等于升级成功。",
+      "steps": [
+        "对照上游 proxy/worker/plist 与本地监督进程，不重复创建第二套重启器。",
+        "适配退出原因、固定重试及父子进程回收；保留本地限流和日志约束。",
+        "验证新 binary 监听成功后才确认，失败缓存可回退。",
+        "先于 probe 自动 agent.apply_update 固定每 VM 同步/回退策略；绑定其他 Bundle 或 hash 不同本身不授权改写 guest。"
+      ],
+      "acceptance": [
+        "崩溃、信号退出、proxy 消失和升级失败均无孤儿端口。",
+        "新 worker 不可用时不会无界循环重启旧/坏 binary。",
+        "禁止改写 guest 的兼容连接前后 daemon hash 不变；显式更新路线另验升级确认。"
+      ],
+      "rollback": "proxy、worker、plist 和已确认 binary 配套恢复。",
+      "verification_profiles": [
+        "protocol"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T08",
+      "title": "将 IcliKit 候选调整为固定 0.7.16",
+      "phase": "M1",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T08"
+      ],
+      "previous_title": "锁定 IcliKit 0.7.7 并对照接口",
+      "dependencies": [
+        "T02",
+        "T06",
+        "T07"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/Daemon/"
+      ],
+      "interface_contract": "固定 IcliKit 0.7.16 / 702990b59ca412ad975f9f0ea5dafe95c30fac21；其他依赖按目标锁文件逐项对账。",
+      "steps": [
+        "把旧 0.7.7 目标替换为 0.7.16 的兼容评估，核对工作区内所有锁文件与实际编译链接版本。",
+        "适配本地实际调用和新增 entitlement，保留旧 API 的明确降级。",
+        "验证 NaN/非 UTF-8 序列化、截图重复调用、worker、location、rotation、RootHide service 和 timezone。"
+      ],
+      "acceptance": [
+        "锁文件、构建和运行 daemon 来源一致；仅改版本号不算完成。",
+        "重复调用不出现逐次持续累积的已知泄漏；旧 guest 不因 host 新依赖被误认升级。"
+      ],
+      "rollback": "恢复旧锁文件及完整 daemon/载荷组合，不单独换回一项依赖。",
+      "verification_profiles": [
+        "daemon",
+        "protocol"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T09",
+      "title": "修订补丁 ID 预设与旧配置迁移",
+      "phase": "M2",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T09"
+      ],
+      "previous_title": "建立补丁 ID／预设迁移清单",
+      "dependencies": [
+        "T02",
+        "T24"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift",
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+        "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/"
+      ],
+      "interface_contract": "版本化 ID 映射保留显式用户选择；regular/exp 与 standard/experimental 不做名称等同。",
+      "steps": [
+        "列出本地已使用 ID、上游新旧声明、模式适用性和默认值变化。",
+        "处理 extended/experimental、旧点号 ID 及 kernel-exp-paravirt_user_clients 的后续更名，保留显式开关意图。",
+        "迁移先输出差异预览并保存原文件，再原子提交；未知或歧义映射停止执行。"
+      ],
+      "acceptance": [
+        "一对一、拆分、合并、移除均有明确决定；迁移幂等。",
+        "显式关闭不会因新默认开启而丢失；未知/重复 ID 不降级为全部启用。"
+      ],
+      "rollback": "恢复迁移前选择和版本；该任务不写固件或 guest。",
+      "verification_profiles": [
+        "patch"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T10",
+      "title": "复用声明体系并强化五模式执行 Gate",
+      "phase": "M2",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T10"
+      ],
+      "previous_title": "实现 VariantPolicy 和严格执行 Gate",
+      "dependencies": [
+        "T09"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/PatchSet/VPhonePatchGate.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift"
+      ],
+      "interface_contract": "C1：resolve(mode, OS, selection, catalog) 产生冻结计划；执行只接受该计划允许的声明和实际 patch records。此为逻辑接口，T02 映射本地类型。",
+      "steps": [
+        "冻结本地五模式的允许/禁止和 Hook/auth/Irisin 行为矩阵。",
+        "将上游声明接入已有策略；所有新入口读取真实模式，消除移植路径中的硬编码 .jb。",
+        "拒绝未声明 record、依赖缺失、冲突、环和不可判定版本；启动必需项逐项核验。"
+      ],
+      "acceptance": [
+        "五模式策略测试均通过，用户 override 不越过模式约束。",
+        "单个必需补丁缺失时，即使同一 patcher 其他补丁成功也不得放行。",
+        "外部可执行 patchset 默认关闭，root 不加载其代码。"
+      ],
+      "rollback": "按入口关闭新能力并保留既有模式路径；不让半套 Gate 接入写盘链。",
+      "verification_profiles": [
+        "patch"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T11",
+      "title": "修订计划持久化和损坏状态处理",
+      "phase": "M2",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T11"
+      ],
+      "previous_title": "实现计划持久化、迁移与 fail-closed",
+      "dependencies": [
+        "T10"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
+      ],
+      "interface_contract": "C2：冻结计划绑定 VM 身份、mode、输入 build/digest、catalog/target、schema 和 planDigest；缺失、损坏、未知 schema 分别表达。",
+      "steps": [
+        "复用已有计划和 manifest，补足来源与 digest，避免另起一套平行配置源。",
+        "将未知旧 VM 导入单独识别流程，禁止读取/解码失败后采用宽松默认。",
+        "原子保存新计划并保留旧版本，检查计划与磁盘/generation 对应。"
+      ],
+      "acceptance": [
+        "缺失、权限拒绝、坏 plist、不支持 schema、VM 不匹配各有确定错误。",
+        "只有已识别并记录边界的 legacy 可使用兼容路线；默认不能写盘。"
+      ],
+      "rollback": "恢复原记录；未知 applied 状态保留 unknown，不猜测为空或已应用。",
+      "verification_profiles": [
+        "patch"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T12",
+      "title": "将 FirmwareOriginals 接入既有 generation 和检查点",
+      "phase": "M2",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T12"
+      ],
+      "previous_title": "把固件原件纳入 generation／检查点",
+      "dependencies": [
+        "T03",
+        "T11"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineOriginals.swift",
+        "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift"
+      ],
+      "interface_contract": "C3：原始输入、派生产物、临时 restore tree 分开；generation 绑定 IPSW/build/device/GPU/planDigest。",
+      "steps": [
+        "核对现有 prepare/checkpoint 原件管理，识别可直接复用部分。",
+        "只从可信原始组件生成补丁；同名文件不代表同一固件。",
+        "新 generation 验证并提交前保留旧 Originals；按真实依赖决定清理。"
+      ],
+      "acceptance": [
+        "A→A、A→B→A 和中断续跑使用正确原件；坏原件不能成为新来源。",
+        "旧 generation 在新输入失败或取消后仍可恢复。"
+      ],
+      "rollback": "切回前一 generation；仅隔离本次临时产物。",
+      "verification_profiles": [
+        "patch",
+        "core"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T13",
+      "title": "接入原生 prepare GPU 和 staging 提交",
+      "phase": "M2",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T13"
+      ],
+      "previous_title": "适配原生 prepare 的 GPU/v2 与原件生命周期",
+      "dependencies": [
+        "T12",
+        "T14"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Manifest/FirmwareManifest.swift",
+        "VPhoneKit/VPhoneCoreKit/Firmware/VPhonePCCGPUDriver.swift"
+      ],
+      "interface_contract": "复用本地 prepare/checkpoint，源校验、提取合并、GPU 获取、完成发布分阶段记录。",
+      "steps": [
+        "核对 classic 与 GPU/v2 的实际本地入口，保留历史已通过范围。",
+        "在 staging 完成 IPSW 配对、vphone600 identity、GPU 和组件校验。",
+        "修正上游早期删除 FirmwareOriginals 的接入方式，完整提交新 generation 后才退休旧来源。"
+      ],
+      "acceptance": [
+        "错误配对、错误 GPU、缺少组件和新输入取消均不发布半成品。",
+        "classic 的通过记录不替代 GPU/v2；checkpoint 指纹不符时不继续旧阶段。"
+      ],
+      "rollback": "恢复旧配置和 generation；失败挂载先卸载再清理 staging。",
+      "verification_profiles": [
+        "patch",
+        "core",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T14",
+      "title": "复用共享 IPSW GPU 缓存并保留权限边界",
+      "phase": "M2",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T14"
+      ],
+      "previous_title": "实现共享 IPSW/GPU 缓存边界",
+      "dependencies": [
+        "T02",
+        "T05",
+        "T24"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift",
+        "VPhoneKit/VPhoneCoreKit/Firmware/VPhoneResources.swift"
+      ],
+      "interface_contract": "缓存只共享可验证原始归档和派生 GPU 工件；VM 身份、SEP、NVRAM、SHSH、认证不共享。",
+      "steps": [
+        "统一来源身份、缓存 key、长度/digest/manifest 校验和受控 cache 根。",
+        "处理同源并发、专属 partial、取消和原子发布；保留本地 IPSW 入口。",
+        "分别核对 remote ZIP Range 与整包下载续传，按实际实现描述能力。"
+      ],
+      "acceptance": [
+        "截断、坏缓存、同名不同来源、并发和取消不污染有效归档。",
+        "不递归放宽为 0777，不因时间阈值删除其他活跃任务文件。"
+      ],
+      "rollback": "隔离坏工件、删除本任务 partial，保留有效缓存和 VM 资产。",
+      "verification_profiles": [
+        "archive",
+        "core"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T15",
+      "title": "强化离线写盘事务及崩溃恢复",
+      "phase": "M3",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T15"
+      ],
+      "previous_title": "强化 CFW 写盘事务及锁",
+      "dependencies": [
+        "T03",
+        "T04",
+        "T11",
+        "T24",
+        "T32"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+        "VPhoneKit/VPhoneCoreKit/Process/VPhoneConfinedDirectory.swift"
+      ],
+      "interface_contract": "C4：VM 锁覆盖验证到提交；prepareCommit、publish、recover 管理磁盘、receipt、配置的可恢复一致状态，复用本地现有事务。",
+      "steps": [
+        "核验 VM 停止、磁盘身份/owner/链接/路径和容量，并持久化恢复记录。",
+        "在 clone 或经验证完整副本上修改；两者不可用时拒绝，不降级写原盘。",
+        "完成写入、读回和卸载后提交；磁盘交换与 receipt 更新之间用日志恢复，不能声称多文件天然原子。",
+        "在提交前后关键点注入中断并验证恢复选择。"
+      ],
+      "acceptance": [
+        "VM 忙、owner 不符、symlink/hardlink 风险、clone 不可用均不误写原盘。",
+        "写入、卸载、磁盘交换、receipt 写入失败后都能恢复明确一致状态。",
+        "挂载未退出时不递归清理；旧副本在完整验收前保留。"
+      ],
+      "rollback": "依事务日志恢复磁盘、配置和 receipt；状态无法证明时停止自动重试。",
+      "verification_profiles": [
+        "core",
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T16",
+      "title": "修订旧 VM 停机环境更新资格",
+      "phase": "M3",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T16"
+      ],
+      "previous_title": "实现停机环境更新资格和旧 VM 路由",
+      "dependencies": [
+        "T08",
+        "T12",
+        "T15",
+        "T33",
+        "T35",
+        "T43",
+        "T34",
+        "T44"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+        "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift",
+        "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift"
+      ],
+      "interface_contract": "C5：eligibility 返回可替换、需受控迁移、需重建或拒绝及理由；缺少 loader/必需库不能作为成功跳过。",
+      "steps": [
+        "按完整安装、计划、原件、内核证明、载荷和加载路径分类旧 VM。",
+        "按模式生成 guest 载荷集合，保留认证、密码、包和身份；通过统一事务应用/撤销。",
+        "核验必需组件并提交 Guest receipt，记录首次启动和激活需求。",
+        "消费 T44 的 board 原件恢复结果；缺必要 tree 不接受 repair 已完成。旧 26.x/18.x guest 的 paravirt kernel 前提未具备时，路由 T34 或待迁移。",
+        "拟更新 DSC 使用已安装并证明有效的 kernel 区域校验，不能只验证当前旧 DSC。"
+      ],
+      "acceptance": [
+        "无完整安装、缺 libmisfix 或加载路径、坏计划分别正确路由。",
+        "旧 VM 无撤销资料时不宣称关闭成功；必需组件失败不提交整批成功状态。",
+        "新媒体前提、原始 board tree 或实际 kernel 证明缺失时，不把库文件更新视为整机升级完成。"
+      ],
+      "rollback": "恢复环境、相关 Preboot repair、Guest receipt 和磁盘状态；重建另行作为明确迁移决策。",
+      "verification_profiles": [
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T17",
+      "title": "接入在线更新并区分文件安装与实际激活",
+      "phase": "M3",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T17"
+      ],
+      "previous_title": "实现在线环境替换与实际激活状态",
+      "dependencies": [
+        "T07",
+        "T08",
+        "T16",
+        "T32"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+        "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift",
+        "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift"
+      ],
+      "interface_contract": "C6：staged → files_installed → processes_activated → acceptance_passed；失败/待激活另列，不能由单个 reboot_required 字段推定完成。",
+      "steps": [
+        "从目标 host/guest 源码共同确认真实白名单、大小与摘要规则，继续修复旧文档与代码差异。",
+        "把逐文件替换接入可恢复批次，保存旧文件及挂载状态；不引入任意路径上传。",
+        "按实际加载进程给出激活动作；未执行所需重启时保留 pending_activation。",
+        "连接恢复后核对实际 daemon/库/进程版本和业务能力。",
+        "在线批次契约有可验证支持标识或已核实版本映射；只有 legacy environment_update 的 daemon 走明确兼容/停机路线。",
+        "请求绑定 T16 产生的模式允许集合与计划；严格校验 requested/installed 集合和阶段字段，staging 路径仍受本地允许范围限制。",
+        "统一自动 sync、手动更新、bootstrap 和 shutdown 的每 VM 写操作冲突规则；绑定 operation/generation，不扩大为所有 API 全局串行。",
+        "混合版本测试禁用自动同步，显式更新/回退另测，记录前后 daemon/库 hash 和 instance。"
+      ],
+      "acceptance": [
+        "未知库、错误 hash、断线、部分写入及只读挂载恢复失败均可诊断和恢复。",
+        "SpringBoard/launchd 等仍加载旧库时不标全部生效；不无条件扩大 respring/reboot 行为。",
+        "缺字段、重复/未知组件或安装集合不一致是 protocol error/unknown outcome，不能默认空数组或 false 后报成功。",
+        "安装成功但回复丢失、更新与 Stop 交错、自动/手动同步竞争均有确定状态和恢复路径。"
+      ],
+      "rollback": "恢复整组文件与配置；进程尚未恢复时保留 pending_recovery，不报全部回退完成。",
+      "verification_profiles": [
+        "protocol",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T18",
+      "title": "保留 MISFix 安装启动并补齐应用注册",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T18"
+      ],
+      "previous_title": "整合 MISFix 与应用安装／启动",
+      "dependencies": [
+        "T04",
+        "T11",
+        "T16",
+        "T17",
+        "T21"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+        "VPhoneDaemon/Daemon/",
+        "VPhoneGuestComponents/"
+      ],
+      "interface_contract": "安装、扩展注册、启动和前台确认分开报告；apps.install 与 installd 路径分别验证。",
+      "steps": [
+        "核对已有 MIS/Hook 目标进程和签名逻辑，保留模式限制并避免重复注入。",
+        "接入 .appex 注册、应用刷新及错误对象透传，核对实际 bootstrap 布局。",
+        "分别验收 vphoned 安装路径和项目实际需要的 installd 路径。",
+        "bootstrap refresh 使用 T21 已确认布局的 fixture；独立 MIS/installd 调查可以提前做。"
+      ],
+      "acceptance": [
+        "安装被接受、安装完成、扩展注册和真正启动均有独立证据。",
+        "apps.install 通过不作为 installd Hook 通过；devicectl 既有限制不写成已解决。",
+        "缺 bootstrap 时拒绝/禁用刷新，不退回系统 /Applications；按支持范围验证 RootHide/rootless 的实际目录。",
+        "受控 .appex 的 provider 能被系统发现并启动；App 本体前台成功不能替代扩展运行。"
+      ],
+      "rollback": "恢复载荷/Hook/配置组合并保护已有 App 数据。",
+      "verification_profiles": [
+        "daemon",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T19",
+      "title": "保留 UDID 与宿主识别独立验收",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T19"
+      ],
+      "previous_title": "整合 UDID、宿主识别与回退",
+      "dependencies": [
+        "T18"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/",
+        "VPhoneKit/VPhoneCoreKit/VirtualMachine/",
+        "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/"
+      ],
+      "interface_contract": "身份 set/clear、guest 读回、USB/宿主重新枚举、重启恢复分开；测试身份与克隆身份不混用。",
+      "steps": [
+        "保留原身份、信任关系和本地允许范围，核对目标身份实现。",
+        "适配设置/清除及重启重应用，更新调用方状态。",
+        "在 guest、宿主发现和实际使用链路分别读回。"
+      ],
+      "acceptance": [
+        "set/clear/reboot 后身份按设计一致；失败可恢复原值。",
+        "一次 API 成功不代替宿主识别/信任验证；不扩大可修改身份范围。"
+      ],
+      "rollback": "恢复原 UDID/配置并重新验证宿主信任。",
+      "verification_profiles": [
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T20",
+      "title": "保留定位主线并核验真实权限归属",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T20"
+      ],
+      "previous_title": "改造定位链路并隔离旧 Hook",
+      "dependencies": [
+        "T08",
+        "T16",
+        "T17",
+        "T24",
+        "T40"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneLocationProvider.swift",
+        "VPhoneDaemon/Daemon/",
+        "VPhoneExecutable/VPhoneVirtualization/LocationHelperProcess/main.swift"
+      ],
+      "interface_contract": "宿主授权/位置来源、guest set/clear、fresh simulated readback 分别报告；legacy 路径显式识别。",
+      "steps": [
+        "核对 VPhoneLocation 打包及本地旧定位 Hook 使用范围，保留其他 Hook。",
+        "分别核实 launcher、vphone-vm、VPhoneLocation.app 的权限职责；定位以 helper 的签名、usage strings 和真实授权状态验收，不从 launcher 存在推定。",
+        "验证无权限、无坐标、无海拔、helper 退出、重连及 guest 未 ready。"
+      ],
+      "acceptance": [
+        "位置来源与新鲜模拟读回可证明；更换 Bundle 不造成错误授权归属。",
+        "只替换明确被取代的定位路径，保留本地必要 legacy 条件。",
+        "普通/直接 CLI 启动、Bundle 切换和不同本地构建均核实授权；VM/管道结束后 helper 正确退出。"
+      ],
+      "rollback": "恢复已有位置方案及对应载荷/配置；避免新旧默认混装。",
+      "verification_profiles": [
+        "core",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T21",
+      "title": "保留 RootHide Irisin 和既有认证状态",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T21"
+      ],
+      "previous_title": "核对并适配 RootHide／Irisin 基础设施",
+      "dependencies": [
+        "T08",
+        "T16",
+        "T43"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneGuestComponents/",
+        "VPhoneDaemon/Daemon/"
+      ],
+      "interface_contract": "bootstrap 更新是幂等补缺；密码、SSH host keys、包状态、认证配置和模式策略继续保持。",
+      "steps": [
+        "对照原本地布局与上游 service/首次包安装逻辑，列明实际需要补入的项。",
+        "接入 IcliKit service 兼容和必要基础初始化，不覆盖用户已有状态。",
+        "分别验证新 VM、已有 bootstrap、重复执行和工具不齐。"
+      ],
+      "acceptance": [
+        "已修改密码、host keys 和包状态不丢失；重复运行不重置环境。",
+        "本地 Irisin/认证/模式门控保持原允许范围。"
+      ],
+      "rollback": "按变更清单只撤销本批新内容；恢复原权限和配置。",
+      "verification_profiles": [
+        "daemon",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T22",
+      "title": "按组合适配相机并纳入新稳定性修正",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T22"
+      ],
+      "previous_title": "按最终组件组合适配相机",
+      "dependencies": [
+        "T06",
+        "T11",
+        "T16",
+        "T17",
+        "T43"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneGuestComponents/VCamCaptured/",
+        "VPhoneGuestComponents/CamFix/",
+        "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/"
+      ],
+      "interface_contract": "相机交付覆盖 host 帧生产、公共 ABI、guest 消费、资源及部署；运行时代码页修改归入 T43 策略。",
+      "steps": [
+        "保留本地帧生命周期、消费回执及 ABI 约束，按目标最终组件组合对账。",
+        "合入 capture/GPU prewarm 等配套修正，避免只更新一个 Hook。",
+        "验证系统和第三方预览、拍照、取消、格式/颜色/时间戳及进程重启。"
+      ],
+      "acceptance": [
+        "预览可见与拍照数据正确分别验收；帧/回执不串 VM。",
+        "重复开关和目标持续场景无未解释内存增长或 cameracaptured 竞态。"
+      ],
+      "rollback": "host、guest、公共头、资源和配置整组恢复。",
+      "verification_profiles": [
+        "guest",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T23",
+      "title": "扩展输入旋转键盘和 headless 控制",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T23"
+      ],
+      "previous_title": "整合输入、多指、旋转及 headless",
+      "dependencies": [
+        "T06",
+        "T08",
+        "T11",
+        "T44"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+        "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift",
+        "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneVirtualMachineKeySender.swift"
+      ],
+      "interface_contract": "整次手势绑定 VM、坐标空间和旋转版本；键盘设置缺失维持本地已核实旧行为。",
+      "steps": [
+        "保留 input.touch_sequence 真实契约，对账本地队列和 headless 路由。",
+        "接入旋转后的手势映射、特殊键和每 VM 硬件键盘开关。",
+        "对正常输入补齐回归，120 Hz 另由可选 T45 处理。"
+      ],
+      "acceptance": [
+        "多指、归一化/点坐标、旋转中输入、取消和并发无丢失结束事件。",
+        "iPad 2x/iPhone 3x、键盘开关和 headless 按声明组合有效，不臆造 RPC。"
+      ],
+      "rollback": "保留旧协议兼容；终止未完成手势，恢复旧配置解释。",
+      "verification_profiles": [
+        "core",
+        "protocol",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T24",
+      "title": "前置宿主安全构建与 launcher 约束",
+      "phase": "M1",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T24"
+      ],
+      "previous_title": "复核宿主安全与构建实物",
+      "dependencies": [
+        "T02"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "AGENTS.md",
+        "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpadLauncher/VPhoneLaunchpadLauncherProcess.swift",
+        "VPhoneExecutable/VPhoneVirtualization/Resources/",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Command/VPhoneLaunchpadChildProcess.swift"
+      ],
+      "interface_contract": "宿主入口继续限制身份、路径、owner 和专用 verb；launcher 与 Bundle 不能成为通用特权执行入口。",
+      "steps": [
+        "将宿主安全审查从原后段移到所有写盘/新入口之前；核对本地与上游 AGENTS 冲突，保留本地多模式和严格权限。",
+        "适配 root-owned Bundle store、签名/receipt 核验；分别确认 launcher、VM 和定位 helper 的权限职责。",
+        "按实际工程构建，核验架构 slice、entitlements、资源和运行依赖闭包。",
+        "审查 throughLauncher 的 direct fallback：合法开发构建缺 launcher 可按原普通规则运行，违反身份/路径/权限门槛不得借 fallback 绕过。"
+      ],
+      "acceptance": [
+        "旧 helper、owner 错误、链接替换、共享可写路径和未知 verb 均正确拒绝。",
+        "产物的运行依赖可验证；不把上游 0777 策略或单一 JB 文档覆盖本地约束。",
+        "同时核对 policy 和调用方 fallback；实际负责授权的 app/helper 的 entitlement、usage description 和签名完整。"
+      ],
+      "rollback": "保留旧签名应用/helper/Bundle 组合及原启动路线。",
+      "verification_profiles": [
+        "core",
+        "host",
+        "bundle"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T25",
+      "title": "扩展 Launchpad CLI 与批量操作状态",
+      "phase": "M5",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T25"
+      ],
+      "previous_title": "整合 Launchpad CLI 和批量管理",
+      "dependencies": [
+        "T05",
+        "T15",
+        "T23",
+        "T24",
+        "T34",
+        "T37",
+        "T40",
+        "T41",
+        "T44",
+        "T46"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Control/VPhoneLaunchpadControlCommands.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
+        "Documents/Guides/launchpad-cli.md"
+      ],
+      "interface_contract": "UI/CLI 共用目标 VM 解析与操作状态；成功按每台机器及实际事务结果报告。",
+      "steps": [
+        "保留跨 library 的稳定 VM 标识和仅修改显式字段的旧规则。",
+        "接入 per-VM Bundle、网络、设备、内核更新和有序停止入口，固定整个创建流程的版本。",
+        "验证批量部分失败、断连、取消、导出半成品和后台生命周期。"
+      ],
+      "acceptance": [
+        "同名机器不误操作；一台失败不覆盖其他机器状态或日志。",
+        "取消不会把半成品标成功，重试遵守原事务和恢复入口。"
+      ],
+      "rollback": "关闭新增入口或回退管理层；按每台 VM 的实际写入集合分别恢复。",
+      "verification_profiles": [
+        "host",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T26",
+      "title": "保留旧 UI 尾项并接入目标管理界面",
+      "phase": "M5",
+      "priority": "P2",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T26"
+      ],
+      "previous_title": "迁入最新 2.2.3 的界面尾部修复",
+      "dependencies": [
+        "T25",
+        "T40"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadModel.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/"
+      ],
+      "interface_contract": "原 2.2.3 sheet/翻译/菜单尾项继续可追溯；新增创建/设置分页、确认与进度按最终能力接入。",
+      "steps": [
+        "逐项保留 ded81cb–caebc24 的原处理记录，对照目标最终实现消除过时补丁。",
+        "接入最新设置、后台启动和进度/关闭交互，保留本地新增文案。",
+        "检查连续切换、快速操作、取消、创建中关闭和支持语言。"
+      ],
+      "acceptance": [
+        "界面状态与真实任务阶段一致；按钮出现不代表后端能力已具备。",
+        "不误删本地字符串，纯 UI 变更不夹带固件或权限修改。"
+      ],
+      "rollback": "独立 UI 提交回退，不触发 guest 更新。",
+      "verification_profiles": [
+        "host"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T27",
+      "title": "修订 Inspector 及旧自动化入口去留",
+      "phase": "M5",
+      "priority": "P2",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T27"
+      ],
+      "previous_title": "整理 UI Inspector 和遗留入口",
+      "dependencies": [
+        "T08",
+        "T23",
+        "T25",
+        "T38",
+        "T40"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineInspector.swift",
+        "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/",
+        "Research/vphoned_http_api.md"
+      ],
+      "interface_contract": "Inspector 显示实际来源与待应用状态；旧 ui.* / ui.ocr 调用方逐项迁移，不因上游删面板而删除接口。",
+      "steps": [
+        "核对本地真实调用方，分别决定保留、替代、隔离和移除。",
+        "接入 wanted/planned/applied 与四层来源，分别显示绑定来源、实际运行来源和待执行更新，未知状态如实显示。",
+        "如果展示 AX 层级，保留诊断/partial 属性，拒绝把 snapshot ID 当点击选择器。"
+      ],
+      "acceptance": [
+        "无孤立引用；旧业务调用不被界面清理无意破坏。",
+        "缺 Bundle、旧 guest、无 receipt 及能力不支持均有准确状态。"
+      ],
+      "rollback": "保留必要旧入口或隔离开关，恢复旧 UI 不回写假升级状态。",
+      "verification_profiles": [
+        "host",
+        "protocol"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T28",
+      "title": "同步接口文档来源与执行证据",
+      "phase": "M6",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T28"
+      ],
+      "previous_title": "同步 API 文档与执行台账",
+      "dependencies": [
+        "T04",
+        "T05",
+        "T06",
+        "T07",
+        "T08",
+        "T09",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T17",
+        "T18",
+        "T19",
+        "T20",
+        "T21",
+        "T22",
+        "T23",
+        "T24",
+        "T25",
+        "T26",
+        "T27",
+        "T32",
+        "T33",
+        "T34",
+        "T35",
+        "T36",
+        "T37",
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42",
+        "T43",
+        "T44",
+        "T46"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "Research/vphoned_http_api.md",
+        "Documents/Guides/launchpad-cli.md",
+        "Research/0_binary_patch_comparison.md"
+      ],
+      "interface_contract": "API/配置/补丁/交付路径与真实代码一致；历史事实、当前实现和已验证组合有独立证据。",
+      "steps": [
+        "以最终代码更新方法、capability、参数、权限、超时、重试及旧 guest 行为。",
+        "维护补丁对照研究记录、旧任务映射、版本来源和支持矩阵；不在仓库根创建 TODO.md。",
+        "从每项任务回填实际 commit、测试、VM/恢复证据；解释未支持和可选项目。"
+      ],
+      "acceptance": [
+        "白名单与响应结构来自 host/guest 同版本源码；没有四库/五库等过时文档差异。",
+        "已分析、已实现、已构建、已运行及已接受不混记。"
+      ],
+      "rollback": "保留历史版本及其验收范围；文档回退不改变 VM 状态。",
+      "verification_profiles": [
+        "docs"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T29",
+      "title": "组装发布候选并检查版本组合",
+      "phase": "M6",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T29"
+      ],
+      "previous_title": "完成组合兼容与发布候选检查",
+      "dependencies": [
+        "T28"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhone.xcworkspace/",
+        "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
+        "VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist"
+      ],
+      "interface_contract": "候选绑定本地 SHA 和 upstream SHA；宿主、guest 环境、kernel、其他 boot chain 分别给出来源和兼容要求。",
+      "steps": [
+        "按固定锁文件和源码构建完整候选，检查所有资源、权限和签名实物。",
+        "区分 Core Bundle >=2.6.0 的代码门槛、同 major.minor series 的默认支持策略，以及 host/daemon/ABI/固件的不同兼容维度。",
+        "混合版本分别跑禁止改写 guest 的纯兼容测试和显式升级/回退，记录连接前后 daemon/库 hash 与 instance，形成不可变候选。"
+      ],
+      "acceptance": [
+        "本地版本号不冒充官方功能等价；未实现能力不借版本号绕过门槛。",
+        "旧/新组合按矩阵兼容或明确拒绝；T45 默认关闭且不计入已支持。",
+        "未验证更高 series 不借版本下限宣称支持；合法 local/CI 后缀正确解析，同 series 不同 patch 不要求版本数字完全相同。",
+        "纯兼容测试组合没有被自动同步悄然改写。"
+      ],
+      "rollback": "保留上一完整候选；更改候选后按影响范围重新验收。",
+      "verification_profiles": [
+        "bundle",
+        "host",
+        "protocol"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T30",
+      "title": "执行声明范围的集成回归和故障注入",
+      "phase": "M7",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T30"
+      ],
+      "previous_title": "执行集成回归与故障注入",
+      "dependencies": [
+        "T03",
+        "T29"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [],
+      "interface_contract": "按 fixture、模式、固件、host/guest/ABI 组合记录 pass/fail/not_run/not_applicable，未测不能计通过。",
+      "steps": [
+        "在受控测试副本执行方案中的策略、迁移、控制、网络和媒体矩阵。",
+        "覆盖提交中断、能力缺失、旧配置、旧 receipt、Bundle 混用和实际启动。",
+        "汇总用户关键应用/数据/身份及各任务残余风险，决定候选是否可签收。"
+      ],
+      "acceptance": [
+        "所有声明支持的必需场景无未解释失败。",
+        "不要求无意义全排列，但每个纳入支持的组合都有实际证据。"
+      ],
+      "rollback": "失败回到对应恢复点，关闭受影响能力，不在唯一原 VM 上继续试错。",
+      "verification_profiles": [
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T31",
+      "title": "完成整组恢复演练与整合签收",
+      "phase": "M7",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "revised_existing",
+      "old_task_mapping": [
+        "T31"
+      ],
+      "previous_title": "演练整组回滚并签收",
+      "dependencies": [
+        "T30"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [],
+      "interface_contract": "恢复单位包含代码/Bundle、guest 文件、kernel/Preboot、配置、receipt/undo、身份和数据；最终证据与候选一致。",
+      "steps": [
+        "分别演练仅宿主回退、环境回退、kernel/磁盘回退，并确认各自边界。",
+        "在恢复后重新验证启动、通信、目标应用、关键数据及身份/信任。",
+        "记录接受范围、未支持范围和下一轮基线；独立评审后整合到本地目标分支。"
+      ],
+      "acceptance": [
+        "至少一次真实整组恢复通过；仅切回旧 Bundle 不被视为 guest/kernel 已恢复。",
+        "签收依据包含实际代码、工件与 VM 证据；合并、部署、对外发布状态分别记录。"
+      ],
+      "rollback": "验收前不清理唯一备份或原件；失败保留上一可用组合。",
+      "verification_profiles": [
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T32",
+      "title": "接入分组件 Receipt 并增加实际应用证据",
+      "phase": "M2",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T10",
+        "T11",
+        "T15",
+        "T17"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T10",
+        "T11"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift",
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+      ],
+      "interface_contract": "C7：desired/planned/generated/committed/activated/accepted 分开；Receipt 兼容上游语义，实际字节证明绑定同一 VM、generation、plan 和事务。",
+      "steps": [
+        "复用上游 PatchReceipt/Drift 与本地 manifest，补齐最小验证字段，避免双重权威账本。",
+        "记录实际命中与已验证输入/输出，不直接复制 plan.enabled 为 applied。",
+        "缺 receipt 保留 unknown；no-op 仅在重新验证输出后可补证据，不能借无变化跳过状态核对。"
+      ],
+      "acceptance": [
+        "部分失败、缺关键 record、坏 receipt 和写入失败不标全成功。",
+        "kernel 更新只登记 kernel，Guest 更新只登记 Guest；不能抬升其他启动链版本。",
+        "权限沿用本地约束，拒绝未授权改写；缺旧证据不自动推断 applied。"
+      ],
+      "rollback": "恢复旧记录及关联证明；无法证实的部分标 unknown。",
+      "verification_profiles": [
+        "patch"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T33",
+      "title": "接入 guest 补丁撤销并界定旧 VM 边界",
+      "phase": "M3",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T11",
+        "T15",
+        "T16"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T15",
+        "T32"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheUndoLogTests.swift",
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+      ],
+      "interface_contract": "撤销只使用已验证、绑定正确 generation 的原始字节或 .bak；缺证据时报告 not_revertible。",
+      "steps": [
+        "接入 DSC undo、Mach-O 及 Preboot repair 备份规则，检查首次备份未包含旧补丁。",
+        "在事务内执行关闭/再开启，并恢复需要的代码签名页状态。",
+        "对旧 VM 无 undo、共享修改页、部分失败逐项报告真实结果。"
+      ],
+      "acceptance": [
+        "on→off→on 可复验；错误 generation/字节拒绝恢复。",
+        "缺备份不宣称已撤销；异常中途写入不能仅凭 prior-live 推定原状态未变。"
+      ],
+      "rollback": "依事务恢复原磁盘和 undo/receipt；无法证明状态时隔离样本。",
+      "verification_profiles": [
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T34",
+      "title": "接入保留数据的离线 kernel 更新",
+      "phase": "M3",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T12",
+        "T15",
+        "T16"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T12",
+        "T15",
+        "T32",
+        "T35"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwarePostRestoreDeviceTree.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareKernelcacheSwapTests.swift"
+      ],
+      "interface_contract": "update-kernel 消费可信原件/计划/实际模式，在事务内替换唯一 Preboot kernelcache；保留目标 IM4M 和其他启动链来源。",
+      "steps": [
+        "成组接入 fdb0093 与 04a13e4 的最终行为，读取本地实际模式和版本来源。",
+        "核验 Originals 或用户预生成 restore 产物、krnl 类型、目标 IMG4/IM4M、唯一 Preboot 候选。",
+        "生成并读回 kernel 补丁证据，只修改 Preboot kernelcache 后提交 kernel receipt。",
+        "在测试 VM 重启验证新内核、应用数据及重复更新。",
+        "提交前用候选 kernel 区域与当前 guest DSC 实际 mapping/effective maxSlide 校验拟提交组合。"
+      ],
+      "acceptance": [
+        "原件缺失、类型/来源不符、零/多候选均不提交。",
+        "IM4M 原字节与关键数据保留；重复同输入一致，失败可恢复。",
+        "执行成功与新内核实际启动分开记录；不把它扩展为所有 boot-chain 更新。",
+        "7 GiB 缩回 6 GiB 而当前 DSC 超界时提交前拒绝，不改磁盘/receipt；不同 generation 不复用旧 kernel 证明。"
+      ],
+      "rollback": "恢复原 kernel IMG4、磁盘副本、kernel receipt 和关联选择；其余启动链保持对应原状态。",
+      "verification_profiles": [
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T35",
+      "title": "成组接入共享区域检查与扩容证明",
+      "phase": "M3",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T10",
+        "T11",
+        "T15"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T10",
+        "T11",
+        "T32",
+        "T03"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Memory/KernelCustomFirmwarePatchSharedRegionSize.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheMaxSlidePatcher.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/Kernel/KernelCustomFirmwarePatchSharedRegionSizeTests.swift"
+      ],
+      "interface_contract": "C8：依据已验证实际 kernel 的 base/size 与最终 DSC mapping/effective maxSlide 判断兼容；没有证据返回 unknown/reject。",
+      "steps": [
+        "接入 31b1385 与 ea76afa，保持具体 iOS/cloudOS 适用性，单项 boot-essential 命中为强制条件。",
+        "移除无 receipt 就按 iOS 27 推定 7 GiB 的本地接入行为；对安装内核或可信关联证明读回核验。",
+        "校验拟提交组合：T34 用候选 kernel+当前 DSC，T16 用已证明安装 kernel+候选 DSC；只把受支持旧格式明确路由 legacy。",
+        "验证 6/7 GiB、缓存越界、非零/零 slide、0/多命中及未知 kernel。"
+      ],
+      "acceptance": [
+        "只扩大虚拟地址共享区域，不把 VM RAM 或磁盘容量变化当作修复。",
+        "其他 kernel 补丁成功不能掩盖扩容未命中；未知区域不得按 7 GiB 放行。",
+        "保持现有 maxSlide 策略，恢复 DSC ASLR 不纳入本轮默认目标。"
+      ],
+      "rollback": "撤回该候选能力并保留拒绝不兼容输入的检查；回退 kernel 与 DSC 必须保持兼容组合。",
+      "verification_profiles": [
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T36",
+      "title": "接入 daemon 实例标识与可选启动解锁",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T07",
+        "T23",
+        "T27"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T06",
+        "T07",
+        "T08",
+        "T23"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+        "VPhoneDaemon/Native/vphoned_unlock.m",
+        "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlSystem.swift"
+      ],
+      "interface_contract": "C9：health.instance 区分启动和重连；手动 unlock 与默认关闭的自动 unlock 分开。",
+      "steps": [
+        "接入 screen.unlock 状态机、能力声明和默认关闭配置，保留调用方已知密码输入语义。",
+        "使用可信 instance 与 Setup Assistant 状态决定自动流程，带入启动早期观察和重试。",
+        "缺 screen_unlock 禁用；有该能力但缺可靠 instance 时保留手动入口、跳过自动解锁。"
+      ],
+      "acceptance": [
+        "cold boot、熄屏、亮屏锁定、已解锁、respring/userspace reboot 均按实际状态处理。",
+        "同 instance 重连不再次解锁；勾选设置不立即解锁当前 VM。",
+        "密码路径未实测时仍标未验证，不扩大为绕过密码功能。",
+        "停止、换实例或关闭功能后，旧实例的异步解锁任务失效。"
+      ],
+      "rollback": "关闭自动解锁并恢复原连接/输入行为，保留手动控制。",
+      "verification_profiles": [
+        "protocol",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T37",
+      "title": "接入有序关机和可观察停止回退",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T06",
+        "T07",
+        "T25"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T06",
+        "T07",
+        "T24",
+        "T40"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Native/vphoned_power.m",
+        "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift"
+      ],
+      "interface_contract": "system.shutdown 复用 auth/force/root；accepted、VM stopped、disk free 分开；记录 graceful 或 host fallback。",
+      "steps": [
+        "接入 guest halt、system_shutdown capability 和菜单条件。",
+        "Launchpad Stop 先请求关机，再观察退出并按目标超时策略回退；保留直接 CLI stop 语义。",
+        "更新备份/更新调用方，实际停止且磁盘释放后才进入写盘。"
+      ],
+      "acceptance": [
+        "无认证/force/权限时拒绝；连接因关机中断时以 VM 实际状态判断。",
+        "旧 guest、DFU、panic、未 ready 和超时均有明确 fallback 结果。",
+        "更新与 Stop 冲突按每 VM 写操作规则处理，不在更新提交中途无条件终止。"
+      ],
+      "rollback": "恢复原停止入口；已停止 VM 不因 UI 回退自动启动。",
+      "verification_profiles": [
+        "protocol",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T38",
+      "title": "接入原生 AX 嵌套诊断及旧 guest 识别",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T23",
+        "T27"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T08",
+        "T23",
+        "T24"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+        "VPhoneDaemon/Native/vphoned_ax_hierarchy.m",
+        "VPhoneDaemon/Tests/HierarchyTests.m",
+        "Research/vphoned_http_api.md"
+      ],
+      "interface_contract": "ui.tree {nested:true} 保留 flat 默认；必须验证 format/relationship_source/action_eligible，ui_inspection 或 HTTP 200 不足以证明 nested 支持。",
+      "steps": [
+        "成组接入 native 父子查询、entitlements、接口锁、限额和前台 PID 前后检查。",
+        "带入 AX switch 恢复、readiness retry 和 partial/error 元数据。",
+        "调用方识别旧 daemon 忽略 nested 返回 flat 的情况，明确降级，不把 snapshot ID 当点击 selector。"
+      ],
+      "acceptance": [
+        "循环/共享节点、父关系冲突、无 frame、前台变化和超限都有诊断结果。",
+        "新旧 daemon 响应格式识别正确；private API 超时不被承诺为硬实时。"
+      ],
+      "rollback": "关闭 nested 能力，保留既有 flat/action 接口。",
+      "verification_profiles": [
+        "hierarchy",
+        "protocol",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T39",
+      "title": "增补触摸复制和窗口失焦剪贴板同步",
+      "phase": "M4",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T23",
+        "T27"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T06",
+        "T23",
+        "T36"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift",
+        "VPhoneKit/VPhoneCoreKit/Support/VPhoneClipboardTransfer.swift",
+        "VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift"
+      ],
+      "interface_contract": "只同步本次可靠基线后的 guest Copy；保留既有 Cmd C/X/V 与文本 1 MiB、图片 16 MiB 限制。",
+      "steps": [
+        "复用已有键盘同步，仅接入 fe46ee2 的 focus/连接基线和 guest change count 增量。",
+        "带入 instance/generation、paste/type 后基线和晚响应淘汰；图片第二段 await 返回后再次核验实例、代际及宿主剪贴板状态。",
+        "旧 guest 缺 instance 时不跨重连复用计数，无可靠基线时退回原键盘同步。"
+      ],
+      "acceptance": [
+        "长按 Copy、图片、快速切窗、慢响应、重启和 automation type 不回流旧内容。",
+        "不会把 Mac rich text 的 plain-text 回流无意覆盖原内容；无能力时停用。"
+      ],
+      "rollback": "关闭失焦同步，保留原 Cmd C/X/V 行为。",
+      "verification_profiles": [
+        "core",
+        "protocol",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T40",
+      "title": "接入每机 Bundle 绑定与四层版本来源",
+      "phase": "M1",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T24",
+        "T25",
+        "T27"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T02",
+        "T05",
+        "T24"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/"
+      ],
+      "interface_contract": "C10：分别记录 host Bundle、guest environment、kernel、其他 boot chain；更换绑定只改变被明确执行的层。",
+      "steps": [
+        "接入 per-VM binding 和整个创建流程固定版本，旧机器首次迁移前保存原解释和绑定。",
+        "安装新 Bundle 不切换现有机器；缺失/损坏绑定不静默选默认执行。",
+        "区分 Core Bundle >=2.6.0 代码门槛与同 major.minor 默认支持策略，跨 series 需另有验证；记录 clone/export/rename 后来源。",
+        "固定每 VM daemon/environment 同步和降级策略；切绑定和 host 回退不自动授权 guest 改写。"
+      ],
+      "acceptance": [
+        "新 host 旧 guest/旧 kernel 混合状态准确可见。",
+        "只做 update-kernel 不更新其他 boot-chain 来源；缺 Bundle 时拒绝并说明恢复路径。",
+        "不同本地构建可并存，不覆盖正在使用的产物。",
+        "不同本地构建可并存，合法 local/CI 后缀正确解析；同 series 不同 patch 不要求版本数字相同。",
+        "绑定改变、纯兼容连接、显式升级/回退的前后 guest hash 和 instance 均可追踪。"
+      ],
+      "rollback": "恢复原绑定和配置；guest/kernel 已变更时另行执行其恢复，不声称切绑定已完成回滚。",
+      "verification_profiles": [
+        "core",
+        "host"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T41",
+      "title": "接入 tunnel 和每机网络配置",
+      "phase": "M5",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T25"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T06",
+        "T08",
+        "T24",
+        "T40",
+        "T16",
+        "T17"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneKit/VPhoneCoreKit/Support/VPhoneNetworking.swift",
+        "VPhoneKit/VPhoneCoreKit/Network/VPhoneUserspaceNetwork.swift",
+        "VPhoneKit/VPhoneCoreKit/Network/VPhonePortForwarder.swift",
+        "VPhoneDaemon/Native/vphoned_network.m",
+        "Documents/Guides/networking.md"
+      ],
+      "interface_contract": "网络计划统一解释 mode、MAC、IP、gateway/DNS、转发和名称；旧字段缺省先按本地旧行为迁移。",
+      "steps": [
+        "接入 tunnel 及固定地址/端口/mDNS 配置，检查本地原网络模式和监听边界。",
+        "明确 resolvesMacName=nil 的上游行为差异，旧机器按原行为显式保存；配置失败原子回退。",
+        "验证并发 VM、克隆 MAC、端口冲突、停止释放和权限受约束的 lease 清理。",
+        "host tunnel/配置规划可先实现；guest 设置生效等待 T16/T17 交付，新 host+旧 guest 无能力时仅记待应用，重连后核对实际值。"
+      ],
+      "acceptance": [
+        "NAT/tunnel/bridged/none 按支持范围测试，模式切换需重启的语义清楚。",
+        "无意外 LAN 监听；TCP/UDP、固定 IP 与宿主路由场景实际可用。",
+        "不把 guest 手设网络当作本工具配置清除。",
+        "tunnel 仅 IPv4、公网 ICMP 不转发，端口默认 loopback；返回 DHCP 只撤销本工具写入的配置。"
+      ],
+      "rollback": "恢复本机原网络配置和转发；不改全局宿主路由，不误清其他 VM lease。",
+      "verification_profiles": [
+        "core",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T42",
+      "title": "成组整合音频麦克风及权限链",
+      "phase": "M5",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T22",
+        "T24"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T16",
+        "T17",
+        "T22",
+        "T24",
+        "T35",
+        "T40",
+        "T43",
+        "T44"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareVirtualAudioGraphConfigurations.swift",
+        "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneHostAudioLatencySync.swift",
+        "VPhoneGuestComponents/VCamCaptured/"
+      ],
+      "interface_contract": "音频交付包含 DeviceTree/kernel 前提、HAL 插件、VirtualAudio 路由、host 权限与延迟、capture Hook 和激活。",
+      "steps": [
+        "按机型/OS 确定完整组件集合，接入上游最终时钟/ring/采样率/路由实现。",
+        "整合麦克风仅在录音期间采集、音量/静音和权限拒绝行为。",
+        "与相机及 Hook 组合验证重复启停、双工、进程重启和环境更新。",
+        "与 T44 共用 productType、board、guest build、cloudOS/kernel、模式、环境版本、新建/迁移矩阵，媒体另记录采样率与录放/双工。"
+      ],
+      "acceptance": [
+        "44.1/48 kHz、播放/录音/双工、音量/静音和重复启停按支持矩阵通过。",
+        "权限拒绝不崩溃，不因仅更新 dylib 就宣布旧 VM 具备新音频链。",
+        "原 iPhone 的音频结果不代替 iPad/其他候选机型验证。"
+      ],
+      "rollback": "按音频完整写入集合恢复载荷、路由、DeviceTree repair、配置和激活状态。",
+      "verification_profiles": [
+        "guest",
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T43",
+      "title": "逐项适配 Hook 门控和运行时修补",
+      "phase": "M2",
+      "priority": "P0",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T21",
+        "T22",
+        "T24"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T02",
+        "T09",
+        "T10",
+        "T24",
+        "T03"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+        "VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+        "VPhoneGuestComponents/SystemHook/SystemHook-vphone.c",
+        "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+        "VPhoneGuestComponents/Tests/InjectionEnvironmentTests.c",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Sandbox/KernelCustomFirmwarePatchParavirtUserClients.swift"
+      ],
+      "interface_contract": "每个 Hook 记录目标进程、系统/模式条件、加载阶段、禁用路径和部署要求；本地 auth/Irisin 门控继续生效。",
+      "steps": [
+        "区分必要稳定性修复和功能放宽，列出 no-haptics、battery、volume lookup、capture、GPU 及代码页修改。",
+        "按本地策略适配服务查找例外；不把按服务名放行描述为已验证请求者身份。",
+        "成组移入 VCam 代码页竞态修复与线程恢复/指令缓存处理，验证异常退出路径。",
+        "明确负责 26.x/18.x 的 paravirt IOUC kernel 适配与模式默认：实际匹配 ApplePar/AppleVid/AppleVir/IOSurfac 八字节前缀，不误写成四个精确类名。",
+        "前置交付只接受策略、注入和代码修补错误路径；相机/音频完整部署结果由 T22/T42/T30 回填，避免与 T16 形成循环等待。"
+      ],
+      "acceptance": [
+        "五模式和 safe/禁用路径保持原策略；不增加通用 sandbox/认证旁路。",
+        "运行时修补错误路径可恢复线程与内存保护状态；完整相机重启结果归 T22/T42/T30，不能在本前置任务提前宣称。"
+      ],
+      "rollback": "恢复相应 Hook 与加载配置；新功能默认关闭直至组合验证完成。",
+      "verification_profiles": [
+        "guest",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T44",
+      "title": "接入设备固件身份与旧 board 原件恢复",
+      "phase": "M3",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T13",
+        "T23",
+        "T26"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T09",
+        "T10",
+        "T13",
+        "T35",
+        "T15"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDevice.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DeviceTree/DeviceTreeGuestDevicePatches.swift",
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Manifest/FirmwareManifest.swift",
+        "Documents/Guides/iphone-models.md",
+        "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift",
+        "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+      ],
+      "interface_contract": "设备目录、restore 身份、运行时 board identity 和屏幕参数分开；目录列出不等于启动验证。",
+      "steps": [
+        "保留原 iPhone 路径作为回归基线，接入指定 device/board 的来源解析。",
+        "区分 guest DeviceTree 与 RestoreDeviceTree，接入屏幕比例和相关 board 属性。",
+        "按明确配对验证生成物与启动前输入，旧字段保持原设备解释；完整创建/启动归 T30，使用 T16/T17 已交付环境。",
+        "接入 recoverBoardDeviceTree：从匹配 productType/version/build 的 IPSW manifest/member 恢复原始 board tree，受控查找缓存并按调用者权限读写、绑定 generation。"
+      ],
+      "acceptance": [
+        "多板 IPSW 不选错设备，restore 检查与运行身份不串用。",
+        "iPad 2x/iPhone 3x 与原机型的映射、生成物分别验证；整机启动和媒体由 T30 对共同矩阵回填，未测机型保持候选。",
+        "旧 VM 无 restore/board 原件但有正确 IPSW 时可恢复；错误 IPSW、来源不明或缺必要 tree 不报 repair 已完成。"
+      ],
+      "rollback": "恢复原设备配置、generation、DeviceTree 及启动链组合；不只改名称字段回退。",
+      "verification_profiles": [
+        "core",
+        "patch"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T45",
+      "title": "隔离实验性 120 Hz 与 FPS 功能",
+      "phase": "M5",
+      "priority": "P2",
+      "required_for_release": false,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T23",
+        "T26"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T10",
+        "T23",
+        "T34",
+        "T44"
+      ],
+      "status": "deferred_optional",
+      "upstream_paths": [
+        "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Drivers/KernelCustomFirmwarePatchDisplayRefresh.swift",
+        "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist"
+      ],
+      "interface_contract": "可选后续任务；本轮默认关闭 120 Hz，普通发布的关闭行为由 T10/T23 验收。",
+      "steps": [
+        "在实验分支独立接入 FPS 显示和 kernel-exp-display_refresh_120hz，保持选择可解释。",
+        "通过已验证 update-kernel 投递，并记录宿主显示器与 guest pacing。",
+        "需要纳入支持范围时重新开启该任务，补足启用/撤销与性能证据后才宣传。"
+      ],
+      "acceptance": [
+        "默认配置不启用；关闭恢复原 timing。",
+        "不保证任意宿主达到 120 FPS；未实施不阻断普通功能候选。"
+      ],
+      "rollback": "关闭选项并恢复原 kernel 及记录。",
+      "verification_profiles": [
+        "patch",
+        "vm"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    },
+    {
+      "id": "T46",
+      "title": "独立接入 console 性能与输出完成确认",
+      "phase": "M1",
+      "priority": "P1",
+      "required_for_release": true,
+      "origin": "new_scope",
+      "old_task_mapping": [
+        "T25",
+        "T26"
+      ],
+      "previous_title": null,
+      "dependencies": [
+        "T02",
+        "T24"
+      ],
+      "status": "pending_local_audit",
+      "upstream_paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLineReader.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/",
+        "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift",
+        "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadLogWriter.swift",
+        "VPhoneLaunchpad/Configuration/Version.xcconfig"
+      ],
+      "interface_contract": "按操作保留完整日志、顺序与退出状态；性能修复不改变 panic 识别和文本内容语义。",
+      "steps": [
+        "合入 helper 输出完成 ACK/归属与 console 分块扫描、批量写入最终实现。",
+        "对随机切块、大量行、ANSI、并发操作和日志轮换比较输出等价。",
+        "记录本地吞吐和 UI 响应基线，仅报告本地实测收益。",
+        "接入完整 helper/client 协议版本；区分 callback 已接收、异步 writer 已排空和进程退出，必要时补可验证 drain 完成契约。"
+      ],
+      "acceptance": [
+        "退出前尾部完整，一次操作不写入另一台机器日志。",
+        "panic 识别与换行语义不退化，取消/轮换保持可追踪。",
+        "ACK 缺失/30 秒超时、XPC 断线、写入失败、尾部后立即退出应用均不误报日志完整；旧 helper 升级或明确拒绝。"
+      ],
+      "rollback": "独立代码回退；保留已有日志，避免与媒体/固件变更混合。",
+      "verification_profiles": [
+        "host"
+      ],
+      "local_mapping": {
+        "state": "resolve_in_T02",
+        "paths": []
+      },
+      "implementation_commits": [],
+      "verification_evidence": [],
+      "historical_evidence": []
+    }
+  ],
+  "primary_sources": [
+    {
+      "key": "target",
+      "title": "固定整合目标",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+    },
+    {
+      "key": "release",
+      "title": "2.6.1 发布锚点",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/f9ea9015a82d29187d4b65cc15883d9bdc37a21c"
+    },
+    {
+      "key": "agents",
+      "title": "上游工程和构建约定",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/AGENTS.md"
+    },
+    {
+      "key": "installer",
+      "title": "CFW 安装器最终实现",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+    },
+    {
+      "key": "prepare",
+      "title": "prepare 和原件发布",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift"
+    },
+    {
+      "key": "receipts",
+      "title": "补丁计划和 Receipt 存储",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift"
+    },
+    {
+      "key": "drift",
+      "title": "补丁差异判定",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
+    },
+    {
+      "key": "kernel",
+      "title": "Kernel patcher 执行和 records",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift"
+    },
+    {
+      "key": "pipeline",
+      "title": "固件流水线成功判定",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipeline.swift"
+    },
+    {
+      "key": "shared",
+      "title": "共享区域扩容补丁",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Memory/KernelCustomFirmwarePatchSharedRegionSize.swift"
+    },
+    {
+      "key": "shared_check",
+      "title": "共享区域兼容检查提交",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/31b138545da0ab99e0a9d340cc65e8cf2dda3c0b"
+    },
+    {
+      "key": "shared_expand",
+      "title": "共享区域扩容提交",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/ea76afacb6861e92695613ccfc43f4aa8583e8a9"
+    },
+    {
+      "key": "undo",
+      "title": "DSC 撤销记录",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift"
+    },
+    {
+      "key": "kernel_swap",
+      "title": "离线 kernel 更新",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/fdb00934c34ed188d8a883b286c0f445e9f11535"
+    },
+    {
+      "key": "kernel_originals",
+      "title": "基于原件重打补丁和管理入口",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/04a13e47c74ce9dcb01863ff4ded8b1c98f4366c"
+    },
+    {
+      "key": "receipt_commit",
+      "title": "Receipt 和撤销集成",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/a153e9ddc46d1af522acb167fff4b9518eebcd1f"
+    },
+    {
+      "key": "icli",
+      "title": "daemon 的精确依赖锁",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+    },
+    {
+      "key": "guest_env",
+      "title": "guest 在线环境 API",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/Daemon/GuestAPI%2BEnvironment.swift"
+    },
+    {
+      "key": "guest_contract",
+      "title": "环境载荷公共描述",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift"
+    },
+    {
+      "key": "guest_control",
+      "title": "连接探测和自动 daemon 更新",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift"
+    },
+    {
+      "key": "control_env",
+      "title": "宿主自动同步与环境响应解析",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift"
+    },
+    {
+      "key": "api_execution",
+      "title": "API 并发执行",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/Daemon/GuestAPI.swift"
+    },
+    {
+      "key": "board_tree",
+      "title": "按固件来源恢复 board DeviceTree",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift"
+    },
+    {
+      "key": "paravirt",
+      "title": "paravirt IOUC kernel 补丁",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Sandbox/KernelCustomFirmwarePatchParavirtUserClients.swift"
+    },
+    {
+      "key": "api",
+      "title": "guest HTTP API 文档",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/Research/vphoned_http_api.md"
+    },
+    {
+      "key": "hierarchy",
+      "title": "原生 AX 层级接口",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/Daemon/GuestAPI%2BHierarchy.swift"
+    },
+    {
+      "key": "hierarchy_native",
+      "title": "AX 原生查询实现",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/Native/vphoned_ax_hierarchy.m"
+    },
+    {
+      "key": "unlock",
+      "title": "屏幕解锁状态机",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneDaemon/Daemon/GuestScreenUnlock.swift"
+    },
+    {
+      "key": "clipboard",
+      "title": "触摸复制和失焦同步",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/fe46ee2f65cc35d7559139f393c9427370265459"
+    },
+    {
+      "key": "shutdown_guest",
+      "title": "guest 有序关机",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/58c069f92331663ef6191701e40c3c2eff0cab98"
+    },
+    {
+      "key": "shutdown_host",
+      "title": "宿主停止流程",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/8af70697cce947f8c222bc43dcda74e03d6aee05"
+    },
+    {
+      "key": "binding",
+      "title": "每 VM Bundle 绑定",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/9205fd25fd2346829efc1fef88b16b18db349688"
+    },
+    {
+      "key": "bundle_store",
+      "title": "Bundle 安装和兼容检查",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift"
+    },
+    {
+      "key": "launcher",
+      "title": "稳定 launcher",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/53ce50672e2339898c7463904b12038d2d04b33f"
+    },
+    {
+      "key": "launcher_policy",
+      "title": "launcher 路径及操作约束",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift"
+    },
+    {
+      "key": "child_process",
+      "title": "launcher 调用方和直接执行回退",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneLaunchpad/VPhoneLaunchpad/Command/VPhoneLaunchpadChildProcess.swift"
+    },
+    {
+      "key": "location_helper",
+      "title": "独立定位 helper 的授权",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneExecutable/VPhoneVirtualization/LocationHelperProcess/main.swift"
+    },
+    {
+      "key": "network",
+      "title": "每机网络配置",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneKit/VPhoneCoreKit/Support/VPhoneNetworking.swift"
+    },
+    {
+      "key": "tunnel",
+      "title": "用户态网络 tunnel",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/ef93c2970de86693461aa6f7e52f356f7efe2b94"
+    },
+    {
+      "key": "network_config",
+      "title": "地址和转发设置",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/9ab69f8813bfb0d38697685329cbbcf0c6121381"
+    },
+    {
+      "key": "devices",
+      "title": "设备和固件身份扩展",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/80db5ac16419bde153f140a0cbeb92e66fb45724"
+    },
+    {
+      "key": "audio",
+      "title": "virtio 音频实现",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/9ad39f1c2298a9658a47bd45e6e3ff812d0ce911"
+    },
+    {
+      "key": "mic",
+      "title": "麦克风接入",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/5daa03ee957cfc389a421058000b66e951a7e0f6"
+    },
+    {
+      "key": "capture",
+      "title": "采集链配套",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/571e2ad0e33aea8895ef3e6b58648a3c3f3bc8b3"
+    },
+    {
+      "key": "vcam",
+      "title": "VCam 运行时修补竞态修复",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/f5f34505d5e3653140d76289a2efeabc33102d77"
+    },
+    {
+      "key": "volume",
+      "title": "音量服务查找例外",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/50694721e73437fefbd2abde2bff001352a8f40f"
+    },
+    {
+      "key": "120hz",
+      "title": "实验性显示刷新补丁",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/141e114966c433fd2bbd3565129b04d0dfef30c4"
+    },
+    {
+      "key": "console_ack",
+      "title": "helper 输出完成确认",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/5ecee05d30b685d43b0e1a2ec66ea7f2259fac02"
+    },
+    {
+      "key": "console_perf",
+      "title": "console 分块处理性能修复",
+      "url": "https://github.com/Lakr233/vphone-cli/commit/da1179396997ddbaaf7198cdf9946ae6b0a56de3"
+    },
+    {
+      "key": "helper_service",
+      "title": "helper 输出 ACK 等待",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift"
+    },
+    {
+      "key": "log_writer",
+      "title": "异步日志写入",
+      "url": "https://github.com/Lakr233/vphone-cli/blob/2d21d21fbdd4f51f013616273ceda9b35a3e0789/VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadLogWriter.swift"
+    }
+  ]
+}

@@ -1,0 +1,299 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/39] Compiling log.c
+[5/39] Compiling ace3.c
+[5/39] Compiling locking.c
+[5/39] Compiling ftab.c
+[8/39] Compiling mbn.c
+[9/39] Compiling fls.c
+[10/39] Compiling img3.c
+[11/39] Compiling fdr.c
+[12/39] Compiling asr.c
+[13/39] Compiling normal.c
+[14/39] Compiling recovery.c
+[15/39] Compiling ipsw.c
+[16/39] Compiling download.c
+[17/39] Compiling limera1n.c
+[18/39] Compiling img4.c
+[19/39] Compiling dfu.c
+[20/39] Compiling restore.c
+[21/39] Compiling idevicerestore.c
+[22/39] Compiling deviceinterfaced.c
+[23/39] Compiling vphone_zip_stub.c
+[24/39] Compiling common.c
+[25/39] Compiling vphone_restore_bridge.c
+[26/39] Compiling MobileRecoveryCore libirecovery.c
+[28/40] Compiling VPhoneArchiveKitTests ArchiveLocaleTests.swift
+[29/40] Emitting module VPhoneArchiveKitTests
+[30/40] Compiling VPhoneArchiveKitTests ArchiveSafetyTests.swift
+[31/40] Compiling VPhoneArchiveKitTests ArchiveFixtureOwnership.swift
+[32/40] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[32/40] Write Objects.LinkFileList
+[35/40] Linking vphone-vm
+[36/40] Linking vphone-cli
+[37/40] Applying vphone-vm
+[38/40] Applying vphone-cli
+[39/40] Linking vphone-cliPackageTests
+Build complete! (8.65s)
+Test Suite 'Selected tests' started at 2026-10-06 21:12:13.697.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 21:12:13.699.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 21:12:13.699.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 21:12:13.699.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Entitlements" started.
+◇ Suite "Signature styles and failure" started.
+◇ Suite SignCLITests started.
+◇ Suite "Load command space and damaged load commands" started.
+◇ Suite VPhoneSignIntegrationTests started.
+◇ Suite "Archive round trips and path safety" started.
+◇ Suite "Extraction: --no-overwrite-dir" started.
+◇ Suite "Extraction permissions" started.
+◇ Suite "Archive names in the C locale" started.
+◇ Suite "VPhoneSign is byte-identical to ldid" started.
+◇ Suite "Archive output and extraction safety" started.
+◇ Suite ArchiveWorkingDirectoryTests started.
+◇ Test signingCommandsAreRegistered() started.
+◇ Test conflictingSignatureStylesAreRefused() started.
+◇ Test "a binary plist is refused rather than read as XML" started.
+◇ Test "a truncated Mach-O is refused rather than signed over garbage" started.
+◇ Test "a Data slice that does not start at zero signs the same as a copy" started.
+◇ Test "a damaged load command is refused and the file is unchanged" started.
+◇ Test "an x86_64 slice is refused rather than signed on a guess" started.
+◇ Test "the XML writer keeps the order libplist keeps, not Foundation's" started.
+◇ Test "with room left, LC_SOURCE_VERSION and LC_UUID are kept" started.
+◇ Test "the constructed inputs have exactly the room they claim" started.
+◇ Test "dump matches ldid -e byte for byte" started.
+◇ Test "the Apple ad-hoc style sets the flag and writes the empty wrapper" started.
+◇ Test "what ldid's DER has no room for is refused, as ldid refuses it" started.
+◇ Test "an <integer> the two libplists disagree about is refused" started.
+◇ Test "with no room and no LC_SOURCE_VERSION, LC_UUID is kept and signing fails" started.
+◇ Test "a merge replaces a key where it stands and appends a new one" started.
+◇ Test "something that only starts like a fat Mach-O is refused" started.
+◇ Test "the Apple ad-hoc style passes codesign --verify" started.
+◇ Test "executable segment flags follow the entitlements" started.
+◇ Test "a file this signed reads back the entitlements it was given" started.
+◇ Test "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test "after a drop the signature verifies and carries the entitlements" started.
+◇ Test "with no room and nothing to drop, signing fails and the file is unchanged" started.
+◇ Test "a file that is not a Mach-O is refused" started.
+◇ Test repositoryIdentityProducesVerifiableCMS() started.
+◇ Test appleAdHocExecutableRunsOnHost() started.
+◇ Test "a read-only file is signed and keeps its mode" started.
+◇ Test existingSiblingTemporaryIsPreserved() started.
+◇ Test "an unset identifier defaults to the file's name, as ldid does" started.
+◇ Test "ldid -S -M over a binary's own entitlements, which is what cfw_install calls" started.
+◇ Test malformedPKCS12IsRefused() started.
+◇ Test "ldid -I<identifier>" started.
+◇ Test symbolicLinkIsRefusedWithoutChangingItsTarget() started.
+◇ Test "ldid -S" started.
+◇ Test "ldid -S<entitlements>" started.
+◇ Test "signing an already-signed file is idempotent" started.
+◇ Test "ldid -S<entitlements> -M over a binary's own entitlements" started.
+◇ Test "with no room, LC_SOURCE_VERSION is dropped and LC_UUID is kept" started.
+◇ Test "an existing directory keeps its own permissions" started.
+◇ Test "host preset never restores setuid" started.
+◇ Test "tar round trip preserves contents, nesting and symlinks" started.
+◇ Test "non-ASCII names and link targets round trip in the C locale" started.
+◇ Test writingArchivesKeepsTheProcessWorkingDirectory() started.
+◇ Test "ldid -S<entitlements> -M over a seeded signature" started.
+◇ Test case passing 1 argument damage → .zeroSize to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .sizeNotMultipleOfEight to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .sizePastCommandArea to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .moreCommandsThanFit to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .commandAreaPastFile to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .signaturePastFile to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .shortSignatureCommand to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .segmentWithTooManySections to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument damage → .stringTablePastSignature to "a damaged load command is refused and the file is unchanged" started.
+◇ Test case passing 1 argument spelling → "42abc" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument value → "<date>2020-01-01T00:00:00Z</date>" to "what ldid's DER has no room for is refused, as ldid refuses it" started.
+◇ Test case passing 1 argument spelling → "abc" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument value → "<real>1.5</real>" to "what ldid's DER has no room for is refused, as ldid refuses it" started.
+◇ Test case passing 1 argument spelling → "" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument spelling → "08" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument spelling → "99999999999999999999999" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument spelling → "-18446744073709551615" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument spelling → "0x" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument spelling → "--1" to "an <integer> the two libplists disagree about is refused" started.
+◇ Test case passing 1 argument spelling → "0" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "-1" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "007" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "0x10" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "0777" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "0X1F" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "+42" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "-0" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "-0x10" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "1" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "42" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "128" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "256" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "2033844765" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "4014732562" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "9223372036854775807" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "-9223372036854775808" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "9223372036854775808" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "18446744073709551615" to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument spelling → "  42  " to "every <integer> ldid takes is carried the way ldid carries it" started.
+◇ Test case passing 1 argument compression → .none to "tar round trip preserves contents, nesting and symlinks" started.
+◇ Test existingOutputsAndDanglingSymlinksArePreserved() started.
+◇ Test case passing 1 argument format → .gnutar to "non-ASCII names and link targets round trip in the C locale" started.
+✔ Test "an x86_64 slice is refused rather than signed on a guess" passed after 0.093 seconds.
+✔ Test "a binary plist is refused rather than read as XML" passed after 0.093 seconds.
+✔ Test "the XML writer keeps the order libplist keeps, not Foundation's" passed after 0.093 seconds.
+✔ Test "a truncated Mach-O is refused rather than signed over garbage" passed after 0.093 seconds.
+✔ Test "a Data slice that does not start at zero signs the same as a copy" passed after 0.093 seconds.
+✔ Test "a damaged load command is refused and the file is unchanged" with 9 test cases passed after 0.093 seconds.
+✔ Test "with room left, LC_SOURCE_VERSION and LC_UUID are kept" passed after 0.093 seconds.
+✔ Test "the constructed inputs have exactly the room they claim" passed after 0.093 seconds.
+✔ Test "an <integer> the two libplists disagree about is refused" with 8 test cases passed after 0.093 seconds.
+✔ Test "what ldid's DER has no room for is refused, as ldid refuses it" with 2 test cases passed after 0.093 seconds.
+✔ Test "something that only starts like a fat Mach-O is refused" passed after 0.093 seconds.
+✔ Test "executable segment flags follow the entitlements" passed after 0.093 seconds.
+✔ Test "a merge replaces a key where it stands and appends a new one" passed after 0.093 seconds.
+✔ Test "with no room and no LC_SOURCE_VERSION, LC_UUID is kept and signing fails" passed after 0.093 seconds.
+✔ Test "the Apple ad-hoc style sets the flag and writes the empty wrapper" passed after 0.093 seconds.
+✔ Test "with no room and nothing to drop, signing fails and the file is unchanged" passed after 0.093 seconds.
+✔ Test "a file that is not a Mach-O is refused" passed after 0.093 seconds.
+✔ Test "dump matches ldid -e byte for byte" passed after 0.094 seconds.
+✔ Test conflictingSignatureStylesAreRefused() passed after 0.094 seconds.
+✔ Test signingCommandsAreRegistered() passed after 0.094 seconds.
+✔ Test "a file this signed reads back the entitlements it was given" passed after 0.094 seconds.
+✔ Test existingSiblingTemporaryIsPreserved() passed after 0.093 seconds.
+✔ Test "every <integer> ldid takes is carried the way ldid carries it" with 20 test cases passed after 0.094 seconds.
+✔ Test "an unset identifier defaults to the file's name, as ldid does" passed after 0.094 seconds.
+✔ Test "a read-only file is signed and keeps its mode" passed after 0.094 seconds.
+✔ Test malformedPKCS12IsRefused() passed after 0.094 seconds.
+✔ Test symbolicLinkIsRefusedWithoutChangingItsTarget() passed after 0.094 seconds.
+✔ Test "ldid -I<identifier>" passed after 0.094 seconds.
+✔ Test "ldid -S" passed after 0.094 seconds.
+✔ Test "ldid -S<entitlements>" passed after 0.094 seconds.
+✔ Test "with no room, LC_SOURCE_VERSION is dropped and LC_UUID is kept" passed after 0.094 seconds.
+✔ Test "an existing directory keeps its own permissions" passed after 0.094 seconds.
+✔ Test "host preset never restores setuid" passed after 0.094 seconds.
+✔ Test "signing an already-signed file is idempotent" passed after 0.094 seconds.
+✔ Test "ldid -S -M over a binary's own entitlements, which is what cfw_install calls" passed after 0.096 seconds.
+✔ Test existingOutputsAndDanglingSymlinksArePreserved() passed after 0.012 seconds.
+◇ Test case passing 1 argument compression → .zstd(level: 3) to "tar round trip preserves contents, nesting and symlinks" started.
+◇ Test case passing 1 argument format → .pax to "non-ASCII names and link targets round trip in the C locale" started.
+✔ Suite "Entitlements" passed after 0.109 seconds.
+✔ Suite SignCLITests passed after 0.109 seconds.
+✔ Test "ldid -S<entitlements> -M over a binary's own entitlements" passed after 0.108 seconds.
+◇ Test case passing 1 argument compression → .xz(level: 1) to "tar round trip preserves contents, nesting and symlinks" started.
+◇ Test "without the flag, the archive's permissions win — the behaviour we must not have" started.
+◇ Test "exact permissions is opt in" started.
+◇ Test outputInsideSourceAndInvalidTopLevelAreRefused() started.
+◇ Test case passing 1 argument format → .ustar to "non-ASCII names and link targets round trip in the C locale" started.
+✔ Test "without the flag, the archive's permissions win — the behaviour we must not have" passed after 0.015 seconds.
+✔ Test "exact permissions is opt in" passed after 0.015 seconds.
+✔ Test outputInsideSourceAndInvalidTopLevelAreRefused() passed after 0.012 seconds.
+◇ Test case passing 1 argument compression → .gzip(level: 1) to "tar round trip preserves contents, nesting and symlinks" started.
+✔ Test repositoryIdentityProducesVerifiableCMS() passed after 0.133 seconds.
+◇ Test "skipping a directory header still writes the files under it" started.
+◇ Test "host extraction matches plain system tar" started.
+◇ Test publicationRaceDoesNotReplaceCompetingFile() started.
+✔ Test "skipping a directory header still writes the files under it" passed after 0.005 seconds.
+✔ Test "tar round trip preserves contents, nesting and symlinks" with 4 test cases passed after 0.139 seconds.
+✔ Test publicationRaceDoesNotReplaceCompetingFile() passed after 0.003 seconds.
+◇ Test "an existing regular file is still replaced" started.
+◇ Test "the compressor actually ran" started.
+◇ Test cancellationWithinOneFileRemovesUnpublishedOutput() started.
+✔ Test "an existing regular file is still replaced" passed after 0.007 seconds.
+✔ Test "non-ASCII names and link targets round trip in the C locale" with 3 test cases passed after 0.149 seconds.
+✔ Test "the compressor actually ran" passed after 0.015 seconds.
+◇ Test "a directory that does not exist yet is created normally" started.
+◇ Test "a UTF-8 flagged IPA-shaped zip is listed, read and unpacked in the C locale" started.
+◇ Test "member paths are relative, even when the source is reached through a symlink" started.
+✔ Test "host extraction matches plain system tar" passed after 0.026 seconds.
+✔ Test cancellationWithinOneFileRemovesUnpublishedOutput() passed after 0.010 seconds.
+✔ Test "ldid -S<entitlements> -M over a seeded signature" passed after 0.162 seconds.
+✔ Suite "VPhoneSign is byte-identical to ldid" passed after 0.163 seconds.
+◇ Test "host extraction strips setuid setgid and sticky" started.
+◇ Test failedDecompressionRemovesStaging() started.
+✔ Test "a directory that does not exist yet is created normally" passed after 0.005 seconds.
+✔ Test "a UTF-8 flagged IPA-shaped zip is listed, read and unpacked in the C locale" passed after 0.005 seconds.
+◇ Test "a symlink standing where a directory would go is replaced, not followed" started.
+◇ Test "an entry whose name cannot be converted is refused, not written over the destination" started.
+✔ Test failedDecompressionRemovesStaging() passed after 0.003 seconds.
+✔ Test "an entry whose name cannot be converted is refused, not written over the destination" passed after 0.002 seconds.
+◇ Test unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+◇ Test "a missing non-ASCII member is reported by name in the C locale" started.
+◇ Test case passing 1 argument path → "/absolute" to unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+✔ Test "member paths are relative, even when the source is reached through a symlink" passed after 0.010 seconds.
+✔ Test "host extraction strips setuid setgid and sticky" passed after 0.007 seconds.
+◇ Test "hardlinks survive as hardlinks" started.
+◇ Test "guest preset keeps exact modes" started.
+✔ Test "a symlink standing where a directory would go is replaced, not followed" passed after 0.009 seconds.
+✔ Test "a missing non-ASCII member is reported by name in the C locale" passed after 0.006 seconds.
+✔ Suite "Extraction: --no-overwrite-dir" passed after 0.174 seconds.
+◇ Test case passing 1 argument path → "../outside" to unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+◇ Test "archive calls restore the calling thread's locale, including on failure" started.
+✔ Test "guest preset keeps exact modes" passed after 0.006 seconds.
+✔ Suite "Extraction permissions" passed after 0.177 seconds.
+◇ Test case passing 1 argument path → "nested/../../outside" to unsafeMemberAndHardlinkPathsAreRejected(path:) started.
+✔ Test unsafeMemberAndHardlinkPathsAreRejected(path:) with 3 test cases passed after 0.012 seconds.
+◇ Test extractionDoesNotFollowArchiveSymlinkOutsideDestination() started.
+✔ Test extractionDoesNotFollowArchiveSymlinkOutsideDestination() passed after 0.002 seconds.
+◇ Test readingHardlinksReturnsContentAndRejectsCycles() started.
+✔ Test "hardlinks survive as hardlinks" passed after 0.013 seconds.
+◇ Test "a tree fingerprint notices what diff -r would miss" started.
+✔ Test "archive calls restore the calling thread's locale, including on failure" passed after 0.009 seconds.
+◇ Test "withArchiveLocale changes only the calling thread, and only inside the call" started.
+✔ Test readingHardlinksReturnsContentAndRejectsCycles() passed after 0.003 seconds.
+◇ Test sparseRoundTripPreservesBytesAndLowAllocation() started.
+✔ Test "a tree fingerprint notices what diff -r would miss" passed after 0.002 seconds.
+◇ Test "exclusions are applied" started.
+✔ Test "withArchiveLocale changes only the calling thread, and only inside the call" passed after 0.002 seconds.
+◇ Test "archive calls do not change other threads or the global locale" started.
+✔ Test "exclusions are applied" passed after 0.006 seconds.
+◇ Test "packing does not modify the tree it reads" started.
+✔ Test "packing does not modify the tree it reads" passed after 0.005 seconds.
+◇ Test "a single member can be read without unpacking" started.
+✔ Test "a single member can be read without unpacking" passed after 0.007 seconds.
+◇ Test "decompress unwraps a single stream without unpacking it" started.
+✔ Test "archive calls do not change other threads or the global locale" passed after 0.026 seconds.
+✔ Suite "Archive names in the C locale" passed after 0.214 seconds.
+✔ Test "decompress unwraps a single stream without unpacking it" passed after 0.013 seconds.
+◇ Test "a member that escapes the destination is refused" started.
+✔ Test "a member that escapes the destination is refused" passed after 0.003 seconds.
+✔ Suite "Archive round trips and path safety" passed after 0.223 seconds.
+✔ Test writingArchivesKeepsTheProcessWorkingDirectory() passed after 0.522 seconds.
+✔ Suite ArchiveWorkingDirectoryTests passed after 0.523 seconds.
+✔ Test sparseRoundTripPreservesBytesAndLowAllocation() passed after 0.685 seconds.
+◇ Test decmpfsCompressedFileKeepsItsBytes(format:) started.
+◇ Test case passing 1 argument format → .gnutar to decmpfsCompressedFileKeepsItsBytes(format:) started.
+◇ Test case passing 1 argument format → .pax to decmpfsCompressedFileKeepsItsBytes(format:) started.
+◇ Test case passing 1 argument format → .ustar to decmpfsCompressedFileKeepsItsBytes(format:) started.
+✔ Test decmpfsCompressedFileKeepsItsBytes(format:) with 3 test cases passed after 0.015 seconds.
+✔ Suite "Archive output and extraction safety" passed after 0.887 seconds.
+✔ Test "the Apple ad-hoc style passes codesign --verify" passed after 0.974 seconds.
+✔ Suite "Signature styles and failure" passed after 0.974 seconds.
+✔ Test appleAdHocExecutableRunsOnHost() passed after 1.155 seconds.
+✔ Suite VPhoneSignIntegrationTests passed after 1.155 seconds.
+✔ Test "after a drop the signature verifies and carries the entitlements" passed after 2.011 seconds.
+✔ Suite "Load command space and damaged load commands" passed after 2.011 seconds.
+✔ Test run with 78 tests in 12 suites passed after 2.012 seconds.

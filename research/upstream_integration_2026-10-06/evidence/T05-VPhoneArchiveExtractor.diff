@@ -1,0 +1,61 @@
+--- upstream/VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift
++++ sources/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift
+@@ -36,6 +36,8 @@
+         bytesRead: ((Int64) -> Void)? = nil,
+         isCancelled: (() -> Bool)? = nil,
+     ) throws -> Int {
++        // Member names and link targets are converted through this thread's
++        // LC_CTYPE; see withArchiveLocale.
+         try withArchiveLocale {
+             try unpack(
+                 archive,
+@@ -106,16 +108,22 @@
+                 )
+             }
+ 
+-            // A name libarchive could not convert comes back NULL. Treated as
+-            // "", it would resolve to the destination itself and pass the
+-            // containment check below.
++            // A name libarchive could not convert comes back NULL. Read as "",
++            // it would resolve to the destination itself and pass the
++            // containment check below, and the entry would be written over the
++            // destination directory.
+             guard let rawPath = archive_entry_pathname(entry) else {
+                 throw VPhoneArchiveError.readFailed(
+                     path: archive.path,
+-                    reason: archiveErrorString(reader),
++                    reason: "member name cannot be converted: \(archiveErrorString(reader))",
+                 )
+             }
+             let memberPath = String(cString: rawPath)
++            guard !memberPath.hasPrefix("/"),
++                  !memberPath.split(separator: "/").contains("..") else {
++                throw VPhoneArchiveError.pathEscapesDestination(
++                    member: memberPath, destination: destinationPath)
++            }
+             let target = resolvedDestination.appendingPathComponent(memberPath)
+ 
+             // libarchive's SECURE_* flags already refuse absolute paths and
+@@ -148,6 +156,11 @@
+             // what the link says.
+             if let rawLink = archive_entry_hardlink(entry) {
+                 let linkPath = String(cString: rawLink)
++                guard !linkPath.hasPrefix("/"),
++                      !linkPath.split(separator: "/").contains("..") else {
++                    throw VPhoneArchiveError.pathEscapesDestination(
++                        member: linkPath, destination: destinationPath)
++                }
+                 let linkTarget = resolvedDestination.appendingPathComponent(linkPath)
+                 let resolvedLink = linkTarget.standardized.path
+                 guard resolvedLink.hasPrefix(destinationPath + "/") else {
+@@ -199,6 +212,10 @@
+             bytesRead?(archive_filter_bytes(reader, -1))
+         }
+ 
++        guard archive_write_close(writer) == ARCHIVE_OK else {
++            throw VPhoneArchiveError.writeFailed(
++                path: destinationPath, reason: archiveErrorString(writer))
++        }
+         return written
+     }
+ 

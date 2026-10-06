@@ -1,0 +1,17 @@
+test_repository_daemon_graph_pins_iclikit_0_7_16 (tests.test_daemon_api_build.DaemonAPIBuildTests.test_repository_daemon_graph_pins_iclikit_0_7_16) ... FAIL
+
+======================================================================
+FAIL: test_repository_daemon_graph_pins_iclikit_0_7_16 (tests.test_daemon_api_build.DaemonAPIBuildTests.test_repository_daemon_graph_pins_iclikit_0_7_16)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_api_build.py", line 73, in test_repository_daemon_graph_pins_iclikit_0_7_16
+    self.assertEqual(icli['state'], {'revision': '702990b59ca412ad975f9f0ea5dafe95c30fac21', 'version': '0.7.16'})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'revision': '9e9a6ca940ac4142771eb34cf7e052e35a7b7987', 'version': '0.7.7'} != {'revision': '702990b59ca412ad975f9f0ea5dafe95c30fac21', 'version': '0.7.16'}
+- {'revision': '9e9a6ca940ac4142771eb34cf7e052e35a7b7987', 'version': '0.7.7'}
++ {'revision': '702990b59ca412ad975f9f0ea5dafe95c30fac21', 'version': '0.7.16'}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

@@ -1,0 +1,1481 @@
+[
+  {
+    "id": "T00",
+    "title": "冻结上游目标并采集真实本地基线",
+    "dependencies": [],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "AGENTS.md"
+    ],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T01",
+    "title": "保存本地工作并建立隔离整合分支",
+    "dependencies": [
+      "T00"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T02",
+    "title": "建立能力对账和逐提交处置台账",
+    "dependencies": [
+      "T00",
+      "T01"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T03",
+    "title": "验证停机一致备份和迁移样本",
+    "dependencies": [
+      "T01",
+      "T02"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneCore/VPhoneBootPatterns.swift",
+      "sources/VPhoneCore/VPhoneLaunchLayout.swift",
+      "sources/VPhoneCore/VPhoneLibrary.swift",
+      "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
+      "sources/vphone-cli/VPhoneGuestEnvironment.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestLauncher.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachinePicker.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestBinaries.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDevice.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneDisplayOrientation.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneBootCommand.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneDisplayGeometry.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift"
+    ]
+  },
+  {
+    "id": "T04",
+    "title": "复核并适配 Mach O 签名空间修复",
+    "dependencies": [
+      "T02"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneSign/MachO/VPhoneMachOImage.swift"
+    ],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T05",
+    "title": "接入 UTF8 归档并保持路径保护",
+    "dependencies": [
+      "T02"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveError.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveLocale.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveOptions.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchivePaths.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveWriter.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneTreeFingerprint.swift",
+      "sources/VPhoneCore/VPhoneIPSWCache.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBundleTransfer.swift",
+      "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift"
+    ]
+  },
+  {
+    "id": "T06",
+    "title": "接入完整响应与连接关闭修复",
+    "dependencies": [
+      "T02"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift"
+    ],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T07",
+    "title": "接入 worker 重试与升级确认",
+    "dependencies": [
+      "T06"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
+      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
+      "sources/VPhoneDaemon/Native/vphoned_proxy.c"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+FilesApp.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+AudioLatency.swift",
+      "VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "VPhoneDaemon/Daemon/GuestStaticNames.swift",
+      "VPhoneDaemon/Daemon/GuestVirtualAudioProduct.swift",
+      "VPhoneDaemon/Daemon/GuestLockScreenIdle.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+LaunchDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Release.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Firmware.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift"
+    ]
+  },
+  {
+    "id": "T08",
+    "title": "将 IcliKit 候选调整为固定 0.7.16",
+    "dependencies": [
+      "T02",
+      "T06",
+      "T07"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
+      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
+      "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+FilesApp.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+AudioLatency.swift",
+      "VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "VPhoneDaemon/Daemon/GuestStaticNames.swift",
+      "VPhoneDaemon/Daemon/GuestVirtualAudioProduct.swift",
+      "VPhoneDaemon/Daemon/GuestLockScreenIdle.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+LaunchDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Release.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Firmware.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift"
+    ]
+  },
+  {
+    "id": "T09",
+    "title": "修订补丁 ID 预设与旧配置迁移",
+    "dependencies": [
+      "T02",
+      "T24"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift",
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist"
+    ]
+  },
+  {
+    "id": "T10",
+    "title": "复用声明体系并强化五模式执行 Gate",
+    "dependencies": [
+      "T09"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/PatchSet/VPhonePatchGate.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift"
+    ]
+  },
+  {
+    "id": "T11",
+    "title": "修订计划持久化和损坏状态处理",
+    "dependencies": [
+      "T10"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
+    ]
+  },
+  {
+    "id": "T12",
+    "title": "将 FirmwareOriginals 接入既有 generation 和检查点",
+    "dependencies": [
+      "T03",
+      "T11"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineOriginals.swift",
+      "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift"
+    ]
+  },
+  {
+    "id": "T13",
+    "title": "接入原生 prepare GPU 和 staging 提交",
+    "dependencies": [
+      "T12",
+      "T14"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/FirmwarePatcher/Manifest/FirmwareManifest.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift",
+      "VPhoneKit/VPhoneCoreKit/Firmware/VPhonePCCGPUDriver.swift"
+    ]
+  },
+  {
+    "id": "T14",
+    "title": "复用共享 IPSW GPU 缓存并保留权限边界",
+    "dependencies": [
+      "T02",
+      "T05",
+      "T24"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneCore/VPhoneIPSWCache.swift",
+      "sources/VPhoneCore/VPhoneResources.swift"
+    ],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T15",
+    "title": "强化离线写盘事务及崩溃恢复",
+    "dependencies": [
+      "T03",
+      "T04",
+      "T11",
+      "T24",
+      "T32"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+      "VPhoneKit/VPhoneCoreKit/Process/VPhoneConfinedDirectory.swift"
+    ]
+  },
+  {
+    "id": "T16",
+    "title": "修订旧 VM 停机环境更新资格",
+    "dependencies": [
+      "T08",
+      "T12",
+      "T15",
+      "T33",
+      "T35",
+      "T43",
+      "T34",
+      "T44"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/vphone-cli/VPhoneGuestEnvironment.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+      "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift"
+    ]
+  },
+  {
+    "id": "T17",
+    "title": "接入在线更新并区分文件安装与实际激活",
+    "dependencies": [
+      "T07",
+      "T08",
+      "T16",
+      "T32"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/vphone-cli/VPhoneGuestEnvironment.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift"
+    ]
+  },
+  {
+    "id": "T18",
+    "title": "保留 MISFix 安装启动并补齐应用注册",
+    "dependencies": [
+      "T04",
+      "T11",
+      "T16",
+      "T17",
+      "T21"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/Info.plist",
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
+      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.m",
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.plist",
+      "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+      "sources/VPhoneGuestComponents/GraphicLoader/main.mm",
+      "sources/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+      "sources/VPhoneGuestComponents/Makefile",
+      "sources/VPhoneGuestComponents/README.md",
+      "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+      "sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.c",
+      "sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.h",
+      "sources/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c",
+      "sources/VPhoneGuestComponents/Tests/RootHideLoaderLinksTests.c",
+      "sources/VPhoneGuestComponents/Tests/VCamDataPlaneTests.c",
+      "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameProtocol.h",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.m",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.plist",
+      "sources/VPhoneGuestComponents/VCamDataPlane/vcam_dataplane.c",
+      "sources/VPhoneGuestComponents/VCamDataPlane/vcam_dataplane.h"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+FilesApp.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+AudioLatency.swift",
+      "VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "VPhoneDaemon/Daemon/GuestStaticNames.swift",
+      "VPhoneDaemon/Daemon/GuestVirtualAudioProduct.swift",
+      "VPhoneDaemon/Daemon/GuestLockScreenIdle.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+LaunchDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Release.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Firmware.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift",
+      "VPhoneGuestComponents/Tests/VirtIOSoundConverterTests.c",
+      "VPhoneGuestComponents/Tests/InjectionEnvironmentTests.c",
+      "VPhoneGuestComponents/Tests/VirtIOSoundClockTests.c",
+      "VPhoneGuestComponents/Tests/VCamPrewarmScanTests.c",
+      "VPhoneGuestComponents/Tests/VirtIOSoundLatencyTests.c",
+      "VPhoneGuestComponents/Tests/VirtIOSoundTests.c",
+      "VPhoneGuestComponents/MISFix/MISFixSignature.c",
+      "VPhoneGuestComponents/MISFix/MISFixConfig.h",
+      "VPhoneGuestComponents/MISFix/MISFixDetour.h",
+      "VPhoneGuestComponents/MISFix/MISFixInstallPolicy.c",
+      "VPhoneGuestComponents/MISFix/MISFixConfig.c",
+      "VPhoneGuestComponents/MISFix/MISFixInterpose.h",
+      "VPhoneGuestComponents/MISFix/MISFixDeviceIdentity.c",
+      "VPhoneGuestComponents/MISFix/MISFixProfileScope.c",
+      "VPhoneGuestComponents/MISFix/MISFixDetour.c",
+      "VPhoneGuestComponents/MISFix/libmisfix.plist",
+      "VPhoneGuestComponents/VCamCaptured/VCamCapturedPrivate.h",
+      "VPhoneGuestComponents/HapticsFix/libhapticsfix.c",
+      "VPhoneGuestComponents/BatteryHealthFix/libbatteryhealthfix.c",
+      "VPhoneGuestComponents/CamFix/CamFixPrivate.h",
+      "VPhoneGuestComponents/CamFix/CamFixSupport.m",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.h",
+      "VPhoneGuestComponents/VirtIOSound/AudioServerDriver.tbd",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundAudioServerDriver.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.c",
+      "VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m",
+      "VPhoneGuestComponents/CamFix/Preview/CamFixPreviewLayers.m",
+      "VPhoneGuestComponents/CamFix/Preview/CamFixGraphTap.m",
+      "VPhoneGuestComponents/CamFix/Device/CamFixActiveFormat.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixCapturePhoto.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixPhotoSynthesis.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixMomentCapture.m",
+      "VPhoneGuestComponents/CamFix/Session/CamFixSessionGuards.m",
+      "VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneSource.m",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneRemix.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamViewfinderHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrameReceiver.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrames.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImage.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImageResolution.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSinkObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamHooks.h",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSessionHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillSink.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticStreams.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticDevice.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceInstallation.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSynthetic.h",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceBacking.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.c",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamGPUPrewarm.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.h"
+    ]
+  },
+  {
+    "id": "T19",
+    "title": "保留 UDID 与宿主识别独立验收",
+    "dependencies": [
+      "T18"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneAPIKit/VPhoneAPIProxy.swift",
+      "sources/VPhoneCore/VPhoneBootPatterns.swift",
+      "sources/VPhoneCore/VPhoneLaunchLayout.swift",
+      "sources/VPhoneCore/VPhoneLibrary.swift",
+      "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
+      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
+      "sources/vphone-cli/VPhoneGuestEnvironment.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+FilesApp.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+AudioLatency.swift",
+      "VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "VPhoneDaemon/Daemon/GuestStaticNames.swift",
+      "VPhoneDaemon/Daemon/GuestVirtualAudioProduct.swift",
+      "VPhoneDaemon/Daemon/GuestLockScreenIdle.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+LaunchDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Release.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Firmware.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestLauncher.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachinePicker.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestBinaries.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDevice.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneDisplayOrientation.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneBootCommand.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneDisplayGeometry.swift",
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlDeviceIdentity.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlSystem.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlSetupAssistant.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlKeychain.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlApps.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift"
+    ]
+  },
+  {
+    "id": "T20",
+    "title": "保留定位主线并核验真实权限归属",
+    "dependencies": [
+      "T08",
+      "T16",
+      "T17",
+      "T24",
+      "T40"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneCommandEntry/main.swift",
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
+      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
+      "sources/VPhoneHelperEntry/main.swift",
+      "sources/VPhoneVMEntry/main.swift",
+      "sources/vphone-cli/VPhoneLocationProvider.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+FilesApp.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+AudioLatency.swift",
+      "VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "VPhoneDaemon/Daemon/GuestStaticNames.swift",
+      "VPhoneDaemon/Daemon/GuestVirtualAudioProduct.swift",
+      "VPhoneDaemon/Daemon/GuestLockScreenIdle.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+LaunchDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Release.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Firmware.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift"
+    ]
+  },
+  {
+    "id": "T21",
+    "title": "保留 RootHide Irisin 和既有认证状态",
+    "dependencies": [
+      "T08",
+      "T16",
+      "T43"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/Info.plist",
+      "sources/VPhoneDaemon/Daemon/APIWire.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
+      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.m",
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.plist",
+      "sources/VPhoneGuestComponents/GraphicLoader/README.md",
+      "sources/VPhoneGuestComponents/GraphicLoader/main.mm",
+      "sources/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+      "sources/VPhoneGuestComponents/Makefile",
+      "sources/VPhoneGuestComponents/README.md",
+      "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+      "sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.c",
+      "sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.h",
+      "sources/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c",
+      "sources/VPhoneGuestComponents/Tests/RootHideLoaderLinksTests.c",
+      "sources/VPhoneGuestComponents/Tests/VCamDataPlaneTests.c",
+      "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameProtocol.h",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.m",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.plist",
+      "sources/VPhoneGuestComponents/VCamDataPlane/vcam_dataplane.c",
+      "sources/VPhoneGuestComponents/VCamDataPlane/vcam_dataplane.h"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneGuestComponents/Tests/VirtIOSoundConverterTests.c",
+      "VPhoneGuestComponents/Tests/InjectionEnvironmentTests.c",
+      "VPhoneGuestComponents/Tests/VirtIOSoundClockTests.c",
+      "VPhoneGuestComponents/Tests/VCamPrewarmScanTests.c",
+      "VPhoneGuestComponents/Tests/VirtIOSoundLatencyTests.c",
+      "VPhoneGuestComponents/Tests/VirtIOSoundTests.c",
+      "VPhoneGuestComponents/MISFix/MISFixSignature.c",
+      "VPhoneGuestComponents/MISFix/MISFixConfig.h",
+      "VPhoneGuestComponents/MISFix/MISFixDetour.h",
+      "VPhoneGuestComponents/MISFix/MISFixInstallPolicy.c",
+      "VPhoneGuestComponents/MISFix/MISFixConfig.c",
+      "VPhoneGuestComponents/MISFix/MISFixInterpose.h",
+      "VPhoneGuestComponents/MISFix/MISFixDeviceIdentity.c",
+      "VPhoneGuestComponents/MISFix/MISFixProfileScope.c",
+      "VPhoneGuestComponents/MISFix/MISFixDetour.c",
+      "VPhoneGuestComponents/MISFix/libmisfix.plist",
+      "VPhoneGuestComponents/VCamCaptured/VCamCapturedPrivate.h",
+      "VPhoneGuestComponents/HapticsFix/libhapticsfix.c",
+      "VPhoneGuestComponents/BatteryHealthFix/libbatteryhealthfix.c",
+      "VPhoneGuestComponents/CamFix/CamFixPrivate.h",
+      "VPhoneGuestComponents/CamFix/CamFixSupport.m",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.h",
+      "VPhoneGuestComponents/VirtIOSound/AudioServerDriver.tbd",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundAudioServerDriver.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.h",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.c",
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.c",
+      "VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m",
+      "VPhoneGuestComponents/CamFix/Preview/CamFixPreviewLayers.m",
+      "VPhoneGuestComponents/CamFix/Preview/CamFixGraphTap.m",
+      "VPhoneGuestComponents/CamFix/Device/CamFixActiveFormat.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixCapturePhoto.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixPhotoSynthesis.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixMomentCapture.m",
+      "VPhoneGuestComponents/CamFix/Session/CamFixSessionGuards.m",
+      "VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneSource.m",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneRemix.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamViewfinderHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrameReceiver.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrames.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImage.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImageResolution.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSinkObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamHooks.h",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSessionHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillSink.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticStreams.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticDevice.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceInstallation.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSynthetic.h",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceBacking.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.c",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamGPUPrewarm.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.h",
+      "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+FilesApp.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+AudioLatency.swift",
+      "VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "VPhoneDaemon/Daemon/GuestStaticNames.swift",
+      "VPhoneDaemon/Daemon/GuestVirtualAudioProduct.swift",
+      "VPhoneDaemon/Daemon/GuestLockScreenIdle.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+LaunchDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Release.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Payload.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller+Firmware.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideDaemons.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
+      "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift"
+    ]
+  },
+  {
+    "id": "T22",
+    "title": "按组合适配相机并纳入新稳定性修正",
+    "dependencies": [
+      "T06",
+      "T11",
+      "T16",
+      "T17",
+      "T43"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.m",
+      "sources/VPhoneGuestComponents/CamFix/libcamfix.plist",
+      "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameProtocol.h",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.m",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.plist",
+      "sources/vphone-cli/VPhoneCameraServer.swift",
+      "sources/vphone-cli/VPhoneFrameProducer.swift",
+      "sources/vphone-cli/VPhoneLocationProvider.swift",
+      "sources/vphone-cli/VPhoneScreenRecorder.swift",
+      "sources/vphone-cli/VPhoneTouchIDMonitor.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneGuestComponents/VCamCaptured/VCamCapturedPrivate.h",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneSource.m",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneRemix.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamViewfinderHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrameReceiver.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrames.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImage.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImageResolution.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSinkObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamHooks.h",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSessionHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillSink.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticStreams.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticDevice.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceInstallation.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSynthetic.h",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceBacking.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.c",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamGPUPrewarm.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.h",
+      "VPhoneGuestComponents/CamFix/CamFixPrivate.h",
+      "VPhoneGuestComponents/CamFix/CamFixSupport.m",
+      "VPhoneGuestComponents/CamFix/Frame/CamFixFrameSource.m",
+      "VPhoneGuestComponents/CamFix/Preview/CamFixPreviewLayers.m",
+      "VPhoneGuestComponents/CamFix/Preview/CamFixGraphTap.m",
+      "VPhoneGuestComponents/CamFix/Device/CamFixActiveFormat.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixCapturePhoto.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixPhotoSynthesis.m",
+      "VPhoneGuestComponents/CamFix/Photo/CamFixMomentCapture.m",
+      "VPhoneGuestComponents/CamFix/Session/CamFixSessionGuards.m",
+      "VPhoneGuestComponents/CamFix/Session/CamFixVideoDelivery.m",
+      "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneHostAudioLatencySync.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneTimeZoneSync.swift"
+    ]
+  },
+  {
+    "id": "T23",
+    "title": "扩展输入旋转键盘和 headless 控制",
+    "dependencies": [
+      "T06",
+      "T08",
+      "T11",
+      "T44"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneVirtualMachineKeySender.swift"
+    ]
+  },
+  {
+    "id": "T24",
+    "title": "前置宿主安全构建与 launcher 约束",
+    "dependencies": [
+      "T02"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "AGENTS.md",
+      "sources/Info.plist",
+      "sources/VPhoneLaunchpad/InfoPlist.xcstrings",
+      "sources/VPhoneLaunchpad/Localizable.xcstrings",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpadLauncher/VPhoneLaunchpadLauncherProcess.swift",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/VPhoneLocation.Info.plist",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/VPhoneVirtualization.entitlements",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist"
+    ]
+  },
+  {
+    "id": "T25",
+    "title": "扩展 Launchpad CLI 与批量操作状态",
+    "dependencies": [
+      "T05",
+      "T15",
+      "T23",
+      "T24",
+      "T34",
+      "T37",
+      "T40",
+      "T41",
+      "T44",
+      "T46"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneLaunchpad/VPhoneLaunchpad/Control/VPhoneLaunchpadControlCommands.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
+      "Documents/Guides/launchpad-cli.md"
+    ]
+  },
+  {
+    "id": "T26",
+    "title": "保留旧 UI 尾项并接入目标管理界面",
+    "dependencies": [
+      "T25",
+      "T40"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneLaunchpad/Localizable.xcstrings",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadConsoleView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadChangeBundleView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchCatalog.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchSettingsView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineAdvancedView.swift"
+    ]
+  },
+  {
+    "id": "T27",
+    "title": "修订 Inspector 及旧自动化入口去留",
+    "dependencies": [
+      "T08",
+      "T23",
+      "T25",
+      "T38",
+      "T40"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+      "sources/vphone-cli/VPhoneAppBrowserModel.swift",
+      "sources/vphone-cli/VPhoneAppBrowserView.swift",
+      "sources/vphone-cli/VPhoneAppWindowController.swift",
+      "sources/vphone-cli/VPhoneFileBrowserModel.swift",
+      "sources/vphone-cli/VPhoneFileBrowserView.swift",
+      "sources/vphone-cli/VPhoneFileWindowController.swift",
+      "sources/vphone-cli/VPhoneKeychainBrowserModel.swift",
+      "sources/vphone-cli/VPhoneKeychainBrowserView.swift",
+      "sources/vphone-cli/VPhoneKeychainItem.swift",
+      "sources/vphone-cli/VPhoneKeychainWindowController.swift",
+      "sources/vphone-cli/VPhoneMenuApps.swift",
+      "sources/vphone-cli/VPhoneMenuBattery.swift",
+      "sources/vphone-cli/VPhoneMenuCamera.swift",
+      "sources/vphone-cli/VPhoneMenuController.swift",
+      "sources/vphone-cli/VPhoneMenuLocation.swift",
+      "sources/vphone-cli/VPhoneMenuRecord.swift",
+      "sources/vphone-cli/VPhoneQuickLookController.swift",
+      "sources/vphone-cli/VPhoneRemoteFile.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneApplication.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneVirtualMachineKeySender.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneHostHotKeys.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneLocalization.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneVirtualMachineWindowController.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/VPhoneAlert.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhonePanelShared.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/VPhoneGuestPanelsWindowController.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestToolsWindowController.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestClipboardView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestPreferencesView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestPreferenceEntry.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestToolsShared.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestClipboardModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/GuestTools/VPhoneGuestPreferencesModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuFeatures.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuDiagnostics.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuUDID.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuSetupAssistant.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuBootstrap.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuData.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuDevice.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Browsers/Apps/VPhoneAppDetail.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Browsers/Apps/VPhoneAppInfoView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Browsers/Apps/VPhoneAppRecord.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Processes/VPhoneProcessesModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Processes/VPhoneProcessMemorySummary.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Processes/VPhoneProcessSignal.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Processes/VPhoneProcessRow.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Processes/VPhoneProcessesView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/DeviceInfo/VPhoneDeviceNetworkAddress.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/DeviceInfo/VPhoneDeviceInfoModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/DeviceInfo/VPhoneDeviceInfoSection.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/DeviceInfo/VPhoneDeviceInfoView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/CrashLogs/VPhoneCrashReportContent.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/CrashLogs/VPhoneCrashLogsModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/CrashLogs/VPhoneCrashReport.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/CrashLogs/VPhoneCrashLogsView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/CrashLogs/VPhoneCrashReportTextView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsKey.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsNotification.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsOrientation.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsVolumeCategory.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsButton.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsModifier.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsSetting.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Controls/VPhoneControlsModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Services/VPhoneServicesModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Services/VPhoneServiceDetailView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Services/VPhoneServiceAction.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Services/VPhoneServiceRow.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Services/VPhoneServicesView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Console/VPhoneConsoleModel.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Console/VPhoneConsoleView.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Panels/Console/VPhoneConsoleEntry.swift",
+      "Research/vphoned_http_api.md"
+    ]
+  },
+  {
+    "id": "T28",
+    "title": "同步接口文档来源与执行证据",
+    "dependencies": [
+      "T04",
+      "T05",
+      "T06",
+      "T07",
+      "T08",
+      "T09",
+      "T10",
+      "T11",
+      "T12",
+      "T13",
+      "T14",
+      "T15",
+      "T16",
+      "T17",
+      "T18",
+      "T19",
+      "T20",
+      "T21",
+      "T22",
+      "T23",
+      "T24",
+      "T25",
+      "T26",
+      "T27",
+      "T32",
+      "T33",
+      "T34",
+      "T35",
+      "T36",
+      "T37",
+      "T38",
+      "T39",
+      "T40",
+      "T41",
+      "T42",
+      "T43",
+      "T44",
+      "T46"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "research/0_binary_patch_comparison.md"
+    ],
+    "unmapped_upstream_paths": [
+      "Research/vphoned_http_api.md",
+      "Documents/Guides/launchpad-cli.md"
+    ]
+  },
+  {
+    "id": "T29",
+    "title": "组装发布候选并检查版本组合",
+    "dependencies": [
+      "T28"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "Package.resolved",
+      "sources/Info.plist",
+      "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhone.xcworkspace/contents.xcworkspacedata",
+      "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift"
+    ]
+  },
+  {
+    "id": "T30",
+    "title": "执行声明范围的集成回归和故障注入",
+    "dependencies": [
+      "T03",
+      "T29"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T31",
+    "title": "完成整组恢复演练与整合签收",
+    "dependencies": [
+      "T30"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": []
+  },
+  {
+    "id": "T32",
+    "title": "接入分组件 Receipt 并增加实际应用证据",
+    "dependencies": [
+      "T10",
+      "T11"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift",
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+    ]
+  },
+  {
+    "id": "T33",
+    "title": "接入 guest 补丁撤销并界定旧 VM 边界",
+    "dependencies": [
+      "T15",
+      "T32"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheUndoLogTests.swift",
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+    ]
+  },
+  {
+    "id": "T34",
+    "title": "接入保留数据的离线 kernel 更新",
+    "dependencies": [
+      "T12",
+      "T15",
+      "T32",
+      "T35"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwarePostRestoreDeviceTree.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareKernelcacheSwapTests.swift"
+    ]
+  },
+  {
+    "id": "T35",
+    "title": "成组接入共享区域检查与扩容证明",
+    "dependencies": [
+      "T10",
+      "T11",
+      "T32",
+      "T03"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Memory/KernelCustomFirmwarePatchSharedRegionSize.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/Patchers/DyldSharedCacheMaxSlidePatcher.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/Kernel/KernelCustomFirmwarePatchSharedRegionSizeTests.swift"
+    ]
+  },
+  {
+    "id": "T36",
+    "title": "接入 daemon 实例标识与可选启动解锁",
+    "dependencies": [
+      "T06",
+      "T07",
+      "T08",
+      "T23"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+      "VPhoneDaemon/Native/vphoned_unlock.m",
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlSystem.swift"
+    ]
+  },
+  {
+    "id": "T37",
+    "title": "接入有序关机和可观察停止回退",
+    "dependencies": [
+      "T06",
+      "T07",
+      "T24",
+      "T40"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Native/vphoned_power.m"
+    ]
+  },
+  {
+    "id": "T38",
+    "title": "接入原生 AX 嵌套诊断及旧 guest 识别",
+    "dependencies": [
+      "T08",
+      "T23",
+      "T24"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
+      "VPhoneDaemon/Native/vphoned_ax_hierarchy.m",
+      "VPhoneDaemon/Tests/HierarchyTests.m",
+      "Research/vphoned_http_api.md"
+    ]
+  },
+  {
+    "id": "T39",
+    "title": "增补触摸复制和窗口失焦剪贴板同步",
+    "dependencies": [
+      "T06",
+      "T23",
+      "T36"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift",
+      "VPhoneKit/VPhoneCoreKit/Support/VPhoneClipboardTransfer.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/VPhoneHostAutomationServer.swift"
+    ]
+  },
+  {
+    "id": "T40",
+    "title": "接入每机 Bundle 绑定与四层版本来源",
+    "dependencies": [
+      "T02",
+      "T05",
+      "T24"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadConsoleView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadChangeBundleView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchCatalog.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchSettingsView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineAdvancedView.swift"
+    ]
+  },
+  {
+    "id": "T41",
+    "title": "接入 tunnel 和每机网络配置",
+    "dependencies": [
+      "T06",
+      "T08",
+      "T24",
+      "T40",
+      "T16",
+      "T17"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneCore/VPhoneNetworking.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneKit/VPhoneCoreKit/Network/VPhoneUserspaceNetwork.swift",
+      "VPhoneKit/VPhoneCoreKit/Network/VPhonePortForwarder.swift",
+      "VPhoneDaemon/Native/vphoned_network.m",
+      "Documents/Guides/networking.md"
+    ]
+  },
+  {
+    "id": "T42",
+    "title": "成组整合音频麦克风及权限链",
+    "dependencies": [
+      "T16",
+      "T17",
+      "T22",
+      "T24",
+      "T35",
+      "T40",
+      "T43",
+      "T44"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameProtocol.h",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.m",
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.plist"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareVirtualAudioGraphConfigurations.swift",
+      "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneHostAudioLatencySync.swift",
+      "VPhoneGuestComponents/VCamCaptured/VCamCapturedPrivate.h",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneSource.m",
+      "VPhoneGuestComponents/VCamCaptured/Microphone/VCamMicrophoneRemix.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamViewfinderHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrameReceiver.m",
+      "VPhoneGuestComponents/VCamCaptured/Frames/VCamFrames.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImage.h",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamImageResolution.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSinkObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamHooks.h",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillObservation.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamSessionHooks.m",
+      "VPhoneGuestComponents/VCamCaptured/Hooks/VCamStillSink.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticStreams.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSyntheticDevice.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceInstallation.m",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSynthetic.h",
+      "VPhoneGuestComponents/VCamCaptured/Synthetic/VCamSourceBacking.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.c",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamGPUPrewarm.m",
+      "VPhoneGuestComponents/VCamCaptured/Prewarm/VCamPrewarmScan.h"
+    ]
+  },
+  {
+    "id": "T43",
+    "title": "逐项适配 Hook 门控和运行时修补",
+    "dependencies": [
+      "T02",
+      "T09",
+      "T10",
+      "T24",
+      "T03"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+      "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+      "sources/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+      "VPhoneGuestComponents/Tests/InjectionEnvironmentTests.c",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Sandbox/KernelCustomFirmwarePatchParavirtUserClients.swift"
+    ]
+  },
+  {
+    "id": "T44",
+    "title": "接入设备固件身份与旧 board 原件恢复",
+    "dependencies": [
+      "T09",
+      "T10",
+      "T13",
+      "T35",
+      "T15"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/FirmwarePatcher/Manifest/FirmwareManifest.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDevice.swift",
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DeviceTree/DeviceTreeGuestDevicePatches.swift",
+      "Documents/Guides/iphone-models.md",
+      "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift",
+      "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift"
+    ]
+  },
+  {
+    "id": "T45",
+    "title": "隔离实验性 120 Hz 与 FPS 功能",
+    "dependencies": [
+      "T10",
+      "T23",
+      "T34",
+      "T44"
+    ],
+    "disposition": "deferred",
+    "reason": "原方案默认延后",
+    "paths": [],
+    "unmapped_upstream_paths": [
+      "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Drivers/KernelCustomFirmwarePatchDisplayRefresh.swift",
+      "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist"
+    ]
+  },
+  {
+    "id": "T46",
+    "title": "独立接入 console 性能与输出完成确认",
+    "dependencies": [
+      "T02",
+      "T24"
+    ],
+    "disposition": "unknown",
+    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "paths": [
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadConsoleView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLineReader.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift"
+    ],
+    "unmapped_upstream_paths": [
+      "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadChangeBundleView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchCatalog.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadPatchSettingsView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineAdvancedView.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadHelperProtocol.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadLogWriter.swift",
+      "VPhoneLaunchpad/Configuration/Version.xcconfig"
+    ]
+  }
+]

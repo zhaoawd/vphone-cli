@@ -1,0 +1,23 @@
+test_failed_worker_is_restarted_and_stop_reaps_child (tests.test_daemon_proxy.DaemonProxyTests.test_failed_worker_is_restarted_and_stop_reaps_child) ... ok
+test_invalid_worker_arguments_are_rejected (tests.test_daemon_proxy.DaemonProxyTests.test_invalid_worker_arguments_are_rejected) ... ok
+test_pending_update_failure_returns_to_launchd_without_retry (tests.test_daemon_proxy.DaemonProxyTests.test_pending_update_failure_returns_to_launchd_without_retry) ... ok
+test_proxy_death_closes_liveness_pipe_and_worker_exits (tests.test_daemon_proxy.DaemonProxyTests.test_proxy_death_closes_liveness_pipe_and_worker_exits) ... ok
+test_proxy_sigterm_stops_worker (tests.test_daemon_proxy.DaemonProxyTests.test_proxy_sigterm_stops_worker) ... ok
+test_restart_delay_stays_one_second (tests.test_daemon_proxy.DaemonProxyTests.test_restart_delay_stays_one_second) ... ok
+test_stop_escalates_for_worker_ignoring_term_and_pipe (tests.test_daemon_proxy.DaemonProxyTests.test_stop_escalates_for_worker_ignoring_term_and_pipe) ... ok
+test_successful_worker_stops_proxy_without_retry (tests.test_daemon_proxy.DaemonProxyTests.test_successful_worker_stops_proxy_without_retry) ... ok
+test_waitpid_failure_logs_wait_error_not_later_errno (tests.test_daemon_proxy.DaemonProxyTests.test_waitpid_failure_logs_wait_error_not_later_errno) ... ok
+test_worker_exit_status_is_logged (tests.test_daemon_proxy.DaemonProxyTests.test_worker_exit_status_is_logged) ... ok
+test_worker_port_is_released_after_proxy_stop_or_death (tests.test_daemon_proxy.DaemonProxyTests.test_worker_port_is_released_after_proxy_stop_or_death) ... ok
+test_worker_signal_is_logged (tests.test_daemon_proxy.DaemonProxyTests.test_worker_signal_is_logged) ... ok
+test_changed_revision_version_location_and_extra_package_are_rejected (tests.test_daemon_api_build.DaemonAPIBuildTests.test_changed_revision_version_location_and_extra_package_are_rejected) ... ok
+test_duplicate_pins_are_rejected (tests.test_daemon_api_build.DaemonAPIBuildTests.test_duplicate_pins_are_rejected) ... ok
+test_exact_pins_are_accepted (tests.test_daemon_api_build.DaemonAPIBuildTests.test_exact_pins_are_accepted) ... ok
+test_launchd_plist_restarts_quickly_and_keeps_proxy_log (tests.test_daemon_api_build.DaemonAPIBuildTests.test_launchd_plist_restarts_quickly_and_keeps_proxy_log) ... ok
+test_project_requirement_must_be_exact_resolved_version (tests.test_daemon_api_build.DaemonAPIBuildTests.test_project_requirement_must_be_exact_resolved_version) ... ok
+test_repository_daemon_graph_pins_iclikit_0_7_7 (tests.test_daemon_api_build.DaemonAPIBuildTests.test_repository_daemon_graph_pins_iclikit_0_7_7) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 13.859s
+
+OK

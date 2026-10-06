@@ -1,0 +1,11 @@
+--- upstream/VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveError.swift
++++ sources/VPhoneArchiveKit/Archive/VPhoneArchiveError.swift
+@@ -22,7 +22,7 @@
+         case let .memberNotFound(member, archive):
+             "\(archive) does not contain '\(member)'."
+         case let .pathEscapesDestination(member, destination):
+-            "Unable to unpack '\(member)' because it points outside \(destination). The archive may be damaged or unsafe. Nothing was written."
++            "Unable to unpack '\(member)' because it points outside \(destination). Earlier entries may already have been extracted."
+         case let .destinationNotWritable(path):
+             "Unable to write to \(path). Check that the folder is writable and try again."
+         case .cancelled:

@@ -1,0 +1,10 @@
+--- upstream/VPhoneKit/VPhoneArchiveKit/Archive/VPhoneArchiveOptions.swift
++++ sources/VPhoneArchiveKit/Archive/VPhoneArchiveOptions.swift
+@@ -145,6 +145,7 @@
+         var flags = ARCHIVE_EXTRACT_SECURE_SYMLINKS
+             | ARCHIVE_EXTRACT_SECURE_NODOTDOT
+             | ARCHIVE_EXTRACT_TIME
++            | ARCHIVE_EXTRACT_SPARSE
+ 
+         // ARCHIVE_EXTRACT_PERM is `tar -p`, and it is a decision, not a
+         // fidelity dial. With it, archive_write_disk restores the stored mode
