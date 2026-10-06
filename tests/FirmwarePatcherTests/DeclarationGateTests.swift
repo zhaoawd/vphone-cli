@@ -32,13 +32,22 @@ import Testing
             applyIOS27: base27, applyFrida: false)
     }
 
-    static func report(step: String, outcome: OutcomeKind, variant: String) -> PatchRunReport {
+    static func record(component: String = "avpbooter") -> PatchRecord {
+        PatchRecord(patchID: "fixture", component: component, fileOffset: 0,
+            originalBytes: Data([0]), patchedBytes: Data([1]), description: "gate fixture")
+    }
+
+    static func report(
+        step: String, outcome: OutcomeKind, variant: String,
+        indices: [Int]? = nil, records: [PatchRecord]? = nil
+    ) -> PatchRunReport {
         let g = gates(variant)
         let id = try! JSONDecoder().decode(PatchID.self, from: Data("\"\(step)\"".utf8))
+        let writes = outcome == .applied
         let result = PatchResult(id: id, requirement: .required, rule: nil, outcome: outcome,
-            reason: nil, recordIndices: outcome == .applied ? [0] : [], gates: g)
+            reason: nil, recordIndices: indices ?? (writes ? [0] : []), gates: g)
         let component = ComponentReport(component: id.component, coverage: .structured,
-            results: [result], records: [])
+            results: [result], records: records ?? (writes ? [record(component: id.component)] : []))
         return PatchRunReport(variant: variant, gates: g, components: [component], ablation: [])
     }
 
@@ -165,9 +174,86 @@ import Testing
         #expect(PatchDeclarationGate.violations(in: report, variant: "regular", gates: report.gates).isEmpty)
     }
 
+    @Test func gateRejectsRecordsWithoutAnOwningResult() {
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .applied, variant: "regular", indices: [])
+        #expect(throws: (any Error).self) {
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        }
+    }
+
+    @Test(arguments: [-1, 1]) func gateRejectsInvalidRecordIndices(index: Int) {
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .applied, variant: "regular", indices: [index])
+        #expect(throws: (any Error).self) {
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        }
+    }
+
+    @Test func gateRejectsDuplicateRecordIndicesWithinAResult() {
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .applied, variant: "regular", indices: [0, 0])
+        #expect(throws: (any Error).self) {
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        }
+    }
+
+    @Test func gateRejectsMultipleOwnersForARecord() {
+        let clean = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .applied, variant: "regular")
+        let component = ComponentReport(component: "avpbooter", coverage: .structured,
+            results: clean.components[0].results + clean.components[0].results,
+            records: clean.components[0].records)
+        let report = PatchRunReport(variant: "regular", gates: clean.gates,
+            components: [component], ablation: [])
+        #expect(throws: (any Error).self) {
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        }
+    }
+
+    @Test func gateRejectsAnUndeclaredFailedStepThatEmittedRecords() {
+        let report = Self.report(step: "made.UpPatcher.doesNotExist", outcome: .failed,
+            variant: "regular", indices: [0], records: [Self.record(component: "made")])
+        #expect(throws: (any Error).self) {
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        }
+    }
+
+    @Test(arguments: [OutcomeKind.ablated, .notApplicable])
+    func gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome: OutcomeKind) {
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: outcome, variant: "regular", indices: [0], records: [Self.record()])
+        #expect(throws: (any Error).self) {
+            try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        }
+    }
+
+    @Test func gateAllowsAnAlreadyAppliedStepWithoutRecords() throws {
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .alreadyApplied, variant: "regular")
+        try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+    }
+
+    @Test func gateAllowsMultipleRecordsOwnedByOneDeclaredStep() throws {
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .applied, variant: "regular", indices: [0, 1],
+            records: [Self.record(), Self.record()])
+        try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+    }
+
+    @Test func gateChecksOwnershipForDeclaredFailedSteps() throws {
+        // Discovery can emit records before failing; ownership remains valid. Required
+        // failure rejection is the pipeline's separate check, before this gate.
+        let report = Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+            outcome: .failed, variant: "regular", indices: [0], records: [Self.record()])
+        try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
+        #expect(report.failedRequired.count == 1)
+    }
+
     // MARK: - Byte invariance (reject before commit)
 
-    @Test func rejectionBeforeCommitLeavesOriginalBytesUnchanged() throws {
+    @Test(arguments: [false, true])
+    func rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed: Bool) throws {
         let fm = FileManager.default
         let root = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let restore = root.appendingPathComponent("FixtureRestore")
@@ -182,12 +268,15 @@ import Testing
         // Stage a patched copy (as the pipeline would before the gate runs).
         try Data("patched boot".utf8).write(to: transaction.stage.appendingPathComponent(boot.lastPathComponent))
 
-        // A rejecting report (undeclared step). Mirror patchAllStructured's do/catch: the gate
-        // throws before commit, the transaction records the failure, and nothing is published.
-        let report = Self.report(step: "made.UpPatcher.doesNotExist", outcome: .applied, variant: "regular")
+        // Mirror patchAllStructured's do/catch for both an undeclared step and an
+        // unattributed record: the gate throws before the staged bytes are published.
+        let report = unattributed
+            ? Self.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass",
+                outcome: .applied, variant: "regular", indices: [])
+            : Self.report(step: "made.UpPatcher.doesNotExist", outcome: .applied, variant: "regular")
         do {
             try PatchDeclarationGate.enforce(report: report, variant: "regular", gates: report.gates)
-            Issue.record("gate should have rejected the undeclared record")
+            Issue.record("gate should have rejected the report")
         } catch {
             transaction.recordFailure(error)
         }
