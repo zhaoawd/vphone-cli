@@ -1,0 +1,146 @@
+{
+  "task": "T24",
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "local_head": "0531b903208d6ac497d85c58597f302b0e646407",
+  "scope": "policy/call-site/source resource review; no helper registration, permission grant, or VM operation",
+  "upstream_sources": [
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
+      "sha256": "c25f700812b17bf86eb1a96e936ebedf6fcbc5ed9730c2be1baedc9511fc32d2",
+      "bytes": 5212
+    },
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadLauncher/VPhoneLaunchpadLauncherProcess.swift",
+      "sha256": "a5fcb0c95d16c2f845a0c1d6326a78bc468b4517801427e22428ec20cae5350a",
+      "bytes": 5993
+    },
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Command/VPhoneLaunchpadChildProcess.swift",
+      "sha256": "0e2b4232e463263f762c8d6b60f6cb5b02a121dde739066bcaf9fd58f34f15dc",
+      "bytes": 9660
+    },
+    {
+      "path": "VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist",
+      "sha256": "0ae67b5aa4351a587d0a6169ab1c3f21cb7dbd42267c7d7bf04827592113eb3f",
+      "bytes": 2953
+    },
+    {
+      "path": "VPhoneLaunchpad/Resources/VPhoneLaunchpad.entitlements",
+      "sha256": "372efda459d1c30f002b0f2a2f6665ce6f2d7cf5080f7d43f1b48bbcbe008d90",
+      "bytes": 971
+    }
+  ],
+  "local_sources": [
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "sha256": "5ca26738e8252ddc4b21b5733c216896fc642c4b06c9809092d6c4a34f652d44",
+      "bytes": 10065
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+      "sha256": "2f3b6af95d555dfddd9effb973c71c666a24e7848ca31959047e30cc523918e5",
+      "bytes": 7094
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift",
+      "sha256": "9caefd0eba48d6aa64e4ee5d2eb967871cef3a24a07d2be573a1218079947b09",
+      "bytes": 8188
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+      "sha256": "c6d23b5ef25121ba6606bf1ae137b08df44a8bde4ab177607c52f65eb44ac155",
+      "bytes": 6421
+    },
+    {
+      "path": "sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift",
+      "sha256": "5dd9b7616da3856569eab253fb097073555ec84ac6f4810c9a2c6ec360a73e36",
+      "bytes": 20799
+    },
+    {
+      "path": "sources/VPhoneHelperKit/VPhoneHelperService.swift",
+      "sha256": "56d43eb2ae0d553219ccd5ca21120c0b0dd96da3c42c19269459e5e31bad4aa6",
+      "bytes": 6394
+    },
+    {
+      "path": "sources/VPhoneHelperKit/VPhoneHelperClient.swift",
+      "sha256": "f614beeace9283704c348adcadae4ae6dbe4ce85cac1440aaaa840989ebac30d",
+      "bytes": 7844
+    },
+    {
+      "path": "sources/VPhoneHelperKit/VPhoneHelperAuthorization.swift",
+      "sha256": "f2dfad60490ae8df791e623974c2acf54911df376ab886b433a9c8c264c2831f",
+      "bytes": 3582
+    },
+    {
+      "path": "sources/VPhoneLaunchpad-Info.plist",
+      "sha256": "e30205d28cd6a269ab88001f7dc35b8195871a9d3ce0ef6612dd20317b9fa7a9",
+      "bytes": 1110
+    },
+    {
+      "path": "sources/Info.plist",
+      "sha256": "18adccc66735ea3816990583ddcd4e77deb8e47f3632653651a595b9ec29ef52",
+      "bytes": 1041
+    },
+    {
+      "path": "sources/vphone.entitlements",
+      "sha256": "657fabfa12fceb85931fec7c432f2472c269bce8ae2297591c1dc0d2a7161fe0",
+      "bytes": 588
+    },
+    {
+      "path": "scripts/build_launchpad.sh",
+      "sha256": "4be9cece0a6608d7cd3891aa9ea96afcb318b802b1e5978caed01ecdac47bf43",
+      "bytes": 4389
+    }
+  ],
+  "findings": [
+    {
+      "subject": "launcher",
+      "result": "本地没有上游独立 launcher target 或 throughLauncher 路径。当前 detached child 直接运行经过嵌入工具链验证的 executable。",
+      "evidence": [
+        "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+        "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift"
+      ]
+    },
+    {
+      "subject": "local_toolchain",
+      "result": "public CommandLine 入口只接受已验证的嵌入工具链；验证包括真实路径组件、内外签名、manifest schema 和两项 cdhash。",
+      "limitation": "这是本地嵌入 app 的信任链，不建立与 root-owned store launcher 的等价性。"
+    },
+    {
+      "subject": "upstream_fallback",
+      "result": "固定目标 throughLauncher 同时在缺 launcher、不可执行 launcher 和 policy check 失败时返回原始 command。",
+      "decision": "不得直接移植该合并回退；后续应区分合法普通开发入口与策略拒绝，策略拒绝不能转为直接启动。"
+    },
+    {
+      "subject": "core_bundle_selection",
+      "result": "本地 Core Bundle 面板只列出并核验版本，注释记录 2026-09-30 的只读决定；当前 App 仍只运行嵌入工具链。",
+      "remaining": "结合 T40 每台 VM 的 Bundle 绑定与 T25 管理入口范围适配安装、选择和 root-owned 路线，再连接 launcher。"
+    },
+    {
+      "subject": "helper_roles",
+      "result": "本地 root helper 使用 audit token 和签名要求核验 caller；专用协议限定 Bundle install/verify，install 另验证管理员 authorization form；生产 store 不接受环境路径覆盖。",
+      "limitation": "本轮没有安装、注册或运行实际 root helper。"
+    },
+    {
+      "subject": "privacy_resources",
+      "result": "当前 Launchpad Info.plist 没有 location/microphone usage description，构建脚本以 ad hoc、无 entitlement 签名；CLI Info.plist 已有 location usage descriptions，CLI entitlement 已有 location。固定上游 Launchpad 增加 location/microphone 声明与 entitlement。",
+      "remaining": "按实际授权进程与责任链适配，不直接把 helper、launcher、location 角色视为同一授权主体；真实权限行为未验证。"
+    }
+  ],
+  "validation": {
+    "host_subset": "50 tests / 7 suites / 1 issue; XPC identity rejection timed out",
+    "standalone_probe": "1 test passed; interruption and invalidation events observed",
+    "same_subset_with_probe": "50 tests / 7 suites / 1 issue; listener logged signature refusal, no closing event before timeout; invalidation logged during cleanup",
+    "cause": "原因未查明；未提交探测代码或修改超时时间",
+    "bundle_build": "make build passed after isolated metadata and fixed resource setup",
+    "launchpad_build": "red: only raw xcstrings; explicit Xcode compile repair; signed bundle and 546 translation units passed",
+    "python": "41 related tests passed",
+    "helper_candidate": "ad hoc unconfigured candidate built; check-configuration refused with exit 78; not registered",
+    "direct_external_host_libraries": [
+      "/opt/homebrew/opt/openssl@3/lib/libcrypto.3.dylib",
+      "/opt/homebrew/opt/libplist/lib/libplist-2.0.4.dylib"
+    ],
+    "dependency_limit": "direct libraries exist and are hashed; transitive closure and privacy/runtime acceptance pending"
+  },
+  "state": "partial_source_review_runtime_and_launcher_integration_pending"
+}

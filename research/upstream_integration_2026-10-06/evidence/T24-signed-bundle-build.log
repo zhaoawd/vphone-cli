@@ -1,0 +1,463 @@
+zsh scripts/build.sh
+=== Building vphone-cli (6327738f) ===
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for production...
+[2/180] Write sources
+[2/180] Copying InfoPlist.xcstrings
+[2/180] Copying Localizable.xcstrings
+[2/180] Copying libusbmuxd.a
+[2/180] Write sources
+[2/180] Copying libplist.a
+[2/180] Copying libimobiledevice_glue.a
+[2/180] Write sources
+[2/180] Copying libssl.a
+[2/180] Copying libtatsu.a
+[2/180] Write sources
+[2/180] Copying libimobiledevice.a
+[2/180] Write sources
+[29/180] Compiling MachOKitC mach-o-linux.c
+[30/180] Write swift-version--58304C5D6DBC2206.txt
+[31/180] Write sources
+[32/180] Copying Info.plist
+[33/180] Copying libarchive.framework
+[34/182] Compiling XtensaModule.c
+[35/182] Compiling utils.c
+[36/182] Compiling XtensaMapping.c
+[37/182] Compiling XtensaInstPrinter.c
+[38/186] Compiling cs.c
+[39/187] Compiling XtensaDisassembler.c
+[40/187] Write sources
+[41/187] Compiling XCoreModule.c
+[43/187] Compiling OpenSSL OpenSSL.swift
+[43/187] Compiling XCoreMapping.c
+[44/187] Compiling XCoreInstPrinter.c
+[45/187] Compiling X86Module.c
+[46/187] Compiling XCoreDisassembler.c
+[47/187] Compiling X86IntelInstPrinter.c
+[48/187] Compiling X86InstPrinterCommon.c
+[49/187] Compiling X86Mapping.c
+[50/187] Compiling X86Disassembler.c
+[51/187] Compiling X86DisassemblerDecoder.c
+[52/187] Compiling WASMModule.c
+[53/187] Compiling X86ATTInstPrinter.c
+[55/187] Compiling VPhoneDaemonWire APIFileUploadTransaction.swift
+[55/187] Compiling WASMMapping.c
+[56/187] Compiling WASMInstPrinter.c
+[57/187] Compiling WASMDisassembler.c
+[58/187] Compiling TriCoreModule.c
+[59/187] Compiling TriCoreMapping.c
+[60/187] Compiling TriCoreInstPrinter.c
+[61/187] Compiling TMS320C64xModule.c
+[62/187] Compiling TMS320C64xMapping.c
+[63/187] Compiling TriCoreDisassembler.c
+[64/187] Compiling TMS320C64xInstPrinter.c
+[65/187] Compiling SystemZModule.c
+[66/187] Compiling SystemZMCTargetDesc.c
+[67/187] Compiling TMS320C64xDisassembler.c
+[69/187] Compiling FileIO ConcatenatedMemoryMappedFile.swift
+[69/187] Compiling SystemZDisassemblerExtension.c
+[71/187] Compiling Dynamic Dynamic.swift
+[71/187] Compiling SystemZInstPrinter.c
+[72/187] Compiling SystemZMapping.c
+[73/187] Compiling SparcModule.c
+[74/187] Compiling SparcDisassemblerExtension.c
+[75/187] Compiling SparcInstPrinter.c
+[76/187] Compiling SparcMapping.c
+[77/187] Compiling SHModule.c
+[78/187] Compiling SHInstPrinter.c
+[79/187] Compiling RISCVModule.c
+[80/187] Compiling SparcDisassembler.c
+[81/187] Compiling RISCVDisassemblerExtension.c
+[82/187] Compiling RISCVInstPrinter.c
+[83/187] Compiling SHDisassembler.c
+[84/187] Compiling RISCVBaseInfo.c
+[85/187] Compiling PPCModule.c
+[86/187] Compiling RISCVMapping.c
+[87/187] Compiling PPCInstPrinter.c
+[89/187] Compiling Img4tool Crypto.swift
+[89/187] Compiling PPCMapping.c
+[90/187] Compiling MipsModule.c
+[91/187] Compiling SystemZDisassembler.c
+[92/187] Compiling MipsInstPrinter.c
+[93/187] Compiling MOS65XXModule.c
+[94/187] Compiling RISCVDisassembler.c
+[95/187] Compiling MipsMapping.c
+[96/187] Compiling MOS65XXDisassembler.c
+[97/187] Compiling M68KModule.c
+[98/187] Compiling M68KInstPrinter.c
+[99/187] Compiling PPCDisassembler.c
+[100/187] Compiling M680XModule.c
+[101/187] Compiling M680XInstPrinter.c
+[102/187] Compiling LoongArchModule.c
+[103/187] Compiling LoongArchDisassemblerExtension.c
+[104/187] Compiling LoongArchInstPrinter.c
+[105/187] Compiling HPPAModule.c
+[106/187] Compiling LoongArchMapping.c
+[107/187] Compiling M680XDisassembler.c
+[108/187] Compiling HPPAMapping.c
+[109/187] Compiling HPPAInstPrinter.c
+[110/187] Compiling LoongArchDisassembler.c
+[111/187] Compiling EVMMapping.c
+[112/187] Compiling EVMModule.c
+[113/187] Compiling EVMInstPrinter.c
+[114/187] Compiling BPFModule.c
+[115/187] Compiling EVMDisassembler.c
+[116/187] Compiling BPFMapping.c
+[117/187] Compiling M68KDisassembler.c
+[118/187] Compiling BPFInstPrinter.c
+[119/187] Compiling AlphaModule.c
+[120/187] Compiling BPFDisassembler.c
+[121/187] Compiling AlphaMapping.c
+[122/187] Compiling AlphaInstPrinter.c
+[123/187] Compiling HPPADisassembler.c
+[124/187] Compiling ARMModule.c
+[125/187] Compiling AlphaDisassembler.c
+[126/187] Compiling ARMDisassemblerExtension.c
+[127/187] Compiling ARMBaseInfo.c
+[128/187] Compiling ARCModule.c
+[129/187] Compiling ARCInstPrinter.c
+[130/187] Compiling ARCMapping.c
+[131/187] Compiling ARMInstPrinter.c
+[132/187] Compiling AArch64Module.c
+[133/187] Compiling ARCDisassembler.c
+[133/187] Compiling ARMMapping.c
+[135/187] Compiling AArch64DisassemblerExtension.c
+[136/187] Compiling MipsDisassembler.c
+[137/187] Compiling SStream.c
+[138/187] Compiling AArch64BaseInfo.c
+[139/187] Compiling MCRegisterInfo.c
+[140/187] Compiling AArch64InstPrinter.c
+[141/187] Compiling Mapping.c
+[142/187] Compiling MCInstrDesc.c
+[143/187] Write sources
+[146/187] Compiling MCInstPrinter.c
+[147/187] Compiling AArch64Mapping.c
+[148/187] Write sources
+[151/187] Compiling MCInst.c
+[153/191] Compiling ArchiveKit ArchiveKit.swift
+[154/192] Compiling BinaryParseSupport BinaryParseSupport.swift
+[155/193] Compiling AppleMobileDeviceLibrary AppleMobileDeviceLibrary.swift
+[155/193] Compiling AArch64Disassembler.c
+[157/193] Compiling ArgumentParserToolInfo ToolInfo.swift
+[158/193] Compiling FileIOBinary FileIOBinary.swift
+[158/193] Compiling ARMDisassembler.c
+[160/193] Compiling VPhoneAPIKit VPhoneAPIClient.swift
+[160/196] Compiling fdr.c
+[161/196] Compiling download.c
+[162/196] Compiling ipsw.c
+[163/196] Compiling asr.c
+[164/196] Compiling recovery.c
+[165/196] Compiling normal.c
+[166/196] Compiling limera1n.c
+[167/196] Compiling restore.c
+[168/196] Compiling dfu.c
+[169/196] Compiling img4.c
+[170/196] Compiling img3.c
+[171/196] Compiling ace3.c
+[172/196] Compiling mbn.c
+[173/196] Compiling ftab.c
+[174/196] Compiling fls.c
+[175/196] Compiling log.c
+[176/196] Compiling locking.c
+[177/196] Compiling deviceinterfaced.c
+[178/196] Compiling common.c
+[179/196] Compiling vphone_zip_stub.c
+[180/196] Compiling vphone_restore_bridge.c
+[181/196] Compiling idevicerestore.c
+[183/196] Compiling VPhoneSign VPhoneSignDER.swift
+[183/196] Compiling MobileRecoveryCore libirecovery.c
+[185/197] Compiling VPhoneArchiveKit VPhoneArchiveError.swift
+[186/197] Compiling Capstone CapstoneError.swift
+[187/199] Compiling VPhoneRestore VPhoneRecoveryProbe.swift
+[188/199] Compiling VPhoneBundleStore VPhoneBundleCodeSignature.swift
+[189/200] Compiling VPhoneHelperKit VPhoneHelperAuthorization.swift
+[190/201] Compiling VPhoneHelperEntry main.swift
+[190/201] Write Objects.LinkFileList
+[191/201] Linking vphone-helper
+[193/201] Compiling ArgumentParser BashCompletionsGenerator.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[194/201] Compiling MachOKit AotCache+CodeFragments.swift
+[195/201] Compiling VPhoneCore HostControlClient.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:125:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+123 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+124 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+125 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+126 |         }
+127 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[196/203] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[197/204] Compiling VPhoneLaunchpad VPhoneLaunchpadApp.swift
+[197/204] Write Objects.LinkFileList
+[198/204] Linking vphone-launchpad
+[200/204] Compiling FirmwarePatcher ARM64Constants.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[201/205] Compiling vphone_cli VPhoneAPIProxyOptions.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[202/207] Compiling VPhoneVMEntry main.swift
+[203/207] Compiling VPhoneCommandEntry main.swift
+[203/207] Write Objects.LinkFileList
+[205/207] Linking vphone-cli
+[205/207] Linking vphone-vm
+Build complete! (131.60s)
+=== Signing with entitlements ===
+.build/release/vphone-cli: replacing existing signature
+.build/release/vphone-vm: replacing existing signature
+  signed OK → .build/release/vphone-cli
+=== Bundling .build/vphone-cli.app ===
+.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+  bundled → .build/vphone-cli.app
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc  \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"6327738f"' \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest/vphoned unarchive.m vphoned.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc -DLESS=1 \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"6327738f"' \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest/vphoned-less unarchive.m vphoned.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+=== Bundling runtime assets → .build/vphone-cli.app/Contents/Resources ===
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/record_build_dependencies.py", line 21, in <module>
+    'submodules': output('git', 'submodule', 'status', '--recursive'),
+                  ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/record_build_dependencies.py", line 15, in output
+    return subprocess.check_output(args, cwd=root, text=True, stderr=subprocess.STDOUT).strip()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '('git', 'submodule', 'status', '--recursive')' returned non-zero exit status 128.
+make: *** [bundle] Error 1

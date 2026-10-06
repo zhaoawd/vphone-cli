@@ -1,0 +1,161 @@
+python3 scripts/run_tests.py firmware
+Fixture preflight: 17 nonempty files in /Users/qcz3840/github/vphone-cli/ipsws/patch_refactor_input; firmware tests not executed yet.
++ swift test --disable-sandbox --cache-path /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/test-cache --filter FirmwareIntegrationTests
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/38] Write swift-version--58304C5D6DBC2206.txt
+[3/34] Compiling locking.c
+[4/34] Compiling download.c
+[5/34] Compiling recovery.c
+[6/34] Compiling normal.c
+[7/34] Compiling asr.c
+[8/34] Compiling fdr.c
+[9/34] Compiling ipsw.c
+[10/34] Compiling limera1n.c
+[11/34] Compiling ace3.c
+[12/34] Compiling dfu.c
+[13/34] Compiling img3.c
+[14/34] Compiling img4.c
+[15/34] Compiling mbn.c
+[16/34] Compiling ftab.c
+[17/34] Compiling log.c
+[18/34] Compiling restore.c
+[19/34] Compiling fls.c
+[20/34] Compiling vphone_zip_stub.c
+[21/34] Compiling deviceinterfaced.c
+[22/34] Compiling common.c
+[23/34] Compiling vphone_restore_bridge.c
+[24/34] Compiling idevicerestore.c
+[25/34] Compiling MobileRecoveryCore libirecovery.c
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/35] Linking vphone-vm
+[31/35] Linking vphone-cli
+[32/35] Applying vphone-cli
+[32/35] Applying vphone-vm
+[34/35] Linking vphone-cliPackageTests
+Build complete! (13.13s)
+Test Suite 'Selected tests' started at 2026-10-06 22:15:14.276.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 22:15:14.277.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 22:15:14.277.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 22:15:14.278.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VerboseJBDebug started.
+◇ Suite TXMComparisonTests started.
+◇ Suite KernelcacheJBComparisonTests started.
+◇ Suite IBSSJBComparisonTests started.
+◇ Suite IBECComparisonTests started.
+◇ Suite LLBComparisonTests started.
+◇ Suite IBSSComparisonTests started.
+◇ Test debugFailingPatches() started.
+◇ Test compareTXM() started.
+◇ Suite IM4PPayloadParityTests started.
+◇ Test compareIBEC() started.
+◇ Suite AVPBooterComparisonTests started.
+◇ Test compareKernelcacheJB() started.
+◇ Suite TXMDevComparisonTests started.
+◇ Test compareIBSSJB() started.
+◇ Test savingTXMIM4PPreservesPAYPTrailer() started.
+◇ Suite KernelcacheComparisonTests started.
+◇ Test ibssIM4PPayloadMatchesRawAndJBPatcherFindsNoncePatch() started.
+◇ Test savingIBSSIM4PRoundTripsPayload() started.
+◇ Test compareIBSS() started.
+◇ Test compareAVPBooter() started.
+◇ Test compareLLB() started.
+◇ Test compareTXMDev() started.
+  ✓ txm: all 1 patches match exactly
+◇ Test compareKernelcache() started.
+  ✓ avpbooter: all 1 patches match exactly
+  ✓ ibss: all 4 patches match exactly
+✔ Test savingIBSSIM4PRoundTripsPayload() passed after 1.678 seconds.
+✔ Test savingTXMIM4PPreservesPAYPTrailer() passed after 1.679 seconds.
+✔ Test compareTXM() passed after 1.679 seconds.
+  ✓ llb: all 13 patches match exactly
+✔ Test compareAVPBooter() passed after 4.792 seconds.
+✔ Test compareIBSS() passed after 4.792 seconds.
+✔ Test compareLLB() passed after 4.792 seconds.
+✔ Suite TXMComparisonTests passed after 4.793 seconds.
+✔ Suite AVPBooterComparisonTests passed after 4.793 seconds.
+✔ Suite IBSSComparisonTests passed after 4.793 seconds.
+✔ Suite LLBComparisonTests passed after 4.793 seconds.
+  ✓ ibec: all 7 patches match exactly
+✔ Test compareIBEC() passed after 9.156 seconds.
+✔ Suite IBECComparisonTests passed after 9.156 seconds.
+✔ Test ibssIM4PPayloadMatchesRawAndJBPatcherFindsNoncePatch() passed after 10.623 seconds.
+✔ Suite IM4PPayloadParityTests passed after 10.623 seconds.
+  ✓ ibss_jb: all 1 patches match exactly
+✔ Test compareIBSSJB() passed after 10.732 seconds.
+✔ Suite IBSSJBComparisonTests passed after 10.732 seconds.
+[*] Symbol table: 0 symbols resolved
+  [*] _panic at foff 0x12F6814 (8502 callers)
+=== HOOK CRED LABEL ===
+
+[JB] _hook_cred_label_update_execve: faithful upstream C23
+  ✓ txm_dev: all 12 patches match exactly
+✔ Test compareTXMDev() passed after 11.122 seconds.
+✔ Suite TXMDevComparisonTests passed after 11.122 seconds.
+  [+] mac_policy_conf at foff 0xA54428, mpc_ops -> 0xA54488
+  [+] hook cred-label wrapper ops[18] entry 0xA54518 -> 0x23B9B64
+  ✓ kernelcache: all 28 patches match exactly
+✔ Test compareKernelcache() passed after 12.250 seconds.
+✔ Suite KernelcacheComparisonTests passed after 12.274 seconds.
+  [+] vfs_context_current body at 0xB756DC (prologue shape)
+  [+] vnode_getattr at 0xCC91B4 (via BL at 0x14BC8D8)
+  0xA54518: .byte 0x64, 0x9b, 0x3b, 0x02 → .byte 0x20, 0x17, 0xab, 0x00  [retarget ops[18] to faithful C23 cave [_hook_cred_label_update_execve]]
+  0xAB1720: udf #0 → nop   [faithful upstream C23 cave (vnode getattr -> uid/gid/P_SUGID fixup -> wrapper)]
+Result: matched
+
+=== TASK CONVERSION ===
+
+[JB] task_conversion_eval_internal: cmp xzr,xzr
+  0xB01194: cmp x9, x0 → cmp xzr, xzr  [cmp xzr,xzr [_task_conversion_eval_internal]]
+Result: matched
+
+=== BSD INIT AUTH ===
+
+[JB] _bsd_init: ignore FSIOC_KERNEL_ROOTAUTH failure
+  0xF6D960: cbnz w0, 0xf6dbc8 → nop   [NOP cbnz (rootvp auth) [_bsd_init]]
+Result: matched
+
+=== IOUC MACF ===
+
+[JB] IOUC MACF gate: branch-level deny bypass
+  [+] IOUC MACF gate fn=0x12570C0, bl=0x1257A94, cbz=0x1257A98, allow=0x1257B0C
+  0x1257A98: cbz w0, 0x1257b0c → b 0x1257b0c  [b #0x74 [IOUC MACF deny → allow]]
+Result: matched
+✔ Test debugFailingPatches() passed after 23.836 seconds.
+✔ Suite VerboseJBDebug passed after 23.836 seconds.
+  ✓ kernelcache_jb: all 84 patches match exactly
+✔ Test compareKernelcacheJB() passed after 30.339 seconds.
+✔ Suite KernelcacheJBComparisonTests passed after 30.339 seconds.
+✔ Test run with 13 tests in 11 suites passed after 30.339 seconds.

@@ -890,7 +890,10 @@
         "research/t03_vm_backup_2026-10-01.md"
       ],
       "blocked_reason": "Historical VM/backup paths absent on current host; controlled VM path and capacity required. User will clear disk space.",
-      "current_environment_note": "可用空间复查约 58 GiB；停机测试 VM 和备份目标路径仍待用户提供，实际容量须按选定 VM 复算。"
+      "current_environment_note": "可用空间复查约 58 GiB；停机测试 VM 和备份目标路径仍待用户提供，实际容量须按选定 VM 复算。",
+      "current_capacity_bytes": 59902742528,
+      "current_result": "用户已清理磁盘；历史验收 VM 与备份不存在，本轮停机测试 VM 路径及备份目标目录仍未提供。",
+      "available_capacity_gib": 55.79
     },
     {
       "id": "T04",
@@ -1212,7 +1215,7 @@
       "remaining_work": [
         "重验旧映射的实现与五模式适用性",
         "中间 ID、旧点号 ID 和预设的迁移预览、备份、原子提交及幂等",
-        "T24 模式与行为策略对账"
+        "T24 宿主入口约束审查和本地五模式语义矩阵对账"
       ]
     },
     {
@@ -1229,7 +1232,7 @@
       "dependencies": [
         "T09"
       ],
-      "status": "record_ownership_fix_validated_plan_pending",
+      "status": "selection_graph_and_record_checks_validated_frozen_plan_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/PatchSet/VPhonePatchGate.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift",
@@ -1257,26 +1260,41 @@
           "sources/FirmwarePatcher/PatchSet/PatchDeclarationGate.swift",
           "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
           "sources/FirmwarePatcher/Core/StructuredPatcher.swift",
-          "tests/FirmwarePatcherTests/DeclarationGateTests.swift"
+          "tests/FirmwarePatcherTests/DeclarationGateTests.swift",
+          "sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalog.swift",
+          "tests/FirmwarePatcherTests/PlanSelectionValidationTests.swift",
+          "tests/FirmwarePatcherTests/CatalogReferenceValidationTests.swift",
+          "tests/FirmwareIntegrationTests/StructuredDeclarationGateTests.swift"
         ]
       },
       "implementation_commits": [
-        "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff"
+        "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff",
+        "b6eb1873ab85586330f598302cff82a43e3186ec",
+        "4fd8dc87b5ff8eb14bae4f0f0ea53ae15a58fd78",
+        "6327738f3e5bc760d9f92f083e9109477e98161b"
       ],
       "verification_evidence": [
         "evidence/T10-ownership-red.log",
         "evidence/T10-ownership-green.log",
         "evidence/T10-firmware-free.log",
         "evidence/T10-full-serial-interrupted.log",
-        "evidence/T10-serial-stall.sample.txt"
+        "evidence/T10-serial-stall.sample.txt",
+        "evidence/T10-selection-red.log",
+        "evidence/T10-selection-green.log",
+        "evidence/T10-selection-module.log",
+        "evidence/T10-references-red.log",
+        "evidence/T10-references-green.log",
+        "evidence/T10-firmware-comparison.log",
+        "evidence/T10-firmware-gate.log",
+        "evidence/T10-firmware-fixture-manifest.json"
       ],
       "historical_evidence": [],
-      "current_result": "补齐 component.records 与 result.recordIndices 的唯一归属、索引边界和 outcome 一致性；失败结果发出的记录也检查步骤声明。模块 Swift Testing 185 项、31 个 suite 通过；XCTest 5 项、3 跳过、0 失败。",
+      "current_result": "记录归属校验保留；新增拒绝相互矛盾的 select/block、variant/gates 不一致、有效范围内关闭必需声明、组合步骤部分关闭及不存在的 conflicts/after 引用。225 项 Swift Testing / 34 个 suite 通过；真实固件 14 项 / 12 个 suite 通过，含六组实际 boot-chain record 的归属 Gate。",
       "remaining_work": [
         "C1 冻结计划成为实际执行输入",
         "按单个声明和实际 patchID 校验组合步骤，核验单个必需补丁缺失",
         "guest Python/zsh 写入接入同一计划",
-        "本轮完整测试与真实固件/VM 验收"
+        "默认完整测试、固定上游目标的二进制等价比较、真实 VM 验收；现有固件对照只覆盖本地历史 Python 参考"
       ]
     },
     {
@@ -1905,7 +1923,7 @@
       "dependencies": [
         "T02"
       ],
-      "status": "pending_local_audit",
+      "status": "partial_source_review_and_build_validated_launcher_pending",
       "upstream_paths": [
         "AGENTS.md",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
@@ -1932,12 +1950,54 @@
         "bundle"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "source_reviewed_build_fix_validated",
+        "paths": [
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+          "sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift",
+          "sources/VPhoneHelperKit/VPhoneHelperService.swift",
+          "sources/VPhoneHelperKit/VPhoneHelperClient.swift",
+          "sources/VPhoneHelperKit/VPhoneHelperAuthorization.swift",
+          "sources/VPhoneLaunchpad-Info.plist",
+          "sources/Info.plist",
+          "sources/vphone.entitlements",
+          "scripts/build_launchpad.sh"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "0531b903208d6ac497d85c58597f302b0e646407"
+      ],
+      "verification_evidence": [
+        "T24_host_entry_review.json",
+        "evidence/T24-host-policy.log",
+        "evidence/T24-xpc-close-probe.log",
+        "evidence/T24-xpc-close-under-load.log",
+        "evidence/T24-signed-bundle-build.log",
+        "evidence/T24-signed-bundle-rebuild.log",
+        "evidence/T24-complete-bundle-build.log",
+        "evidence/T24-launchpad-build.log",
+        "evidence/T24-launchpad-build-green.log",
+        "evidence/T24-bundle-python.log",
+        "evidence/T24-helper-candidate-build.log",
+        "evidence/T24-build-tool-inputs.json",
+        "evidence/T24-worktree-submodule-pointer.json",
+        "evidence/T24-resource-submodule-inputs.json",
+        "evidence/T24-signed-artifact-manifest.json",
+        "evidence/T24-launchpad-localizations.json",
+        "evidence/T24-launchpad-helper-artifacts.json",
+        "evidence/T24-helper-configuration-rejection.log",
+        "evidence/T24-final-bundle-checks.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "已审查 policy、实际调用方和 helper 专用协议。隔离 CLI/VM Bundle 与 Launchpad 编译、资源及签名检查通过；修复 SwiftPM 未编译 xcstrings 导致的 Launchpad 打包失败。41 项相关 Python 测试通过。50 项宿主 Swift 子集仍有一项 XPC 超时；原因未查明。",
+      "remaining_work": [
+        "独立 launcher 与 root-owned Bundle 选择/绑定按 T40/T25 接入，策略拒绝不得直接回退",
+        "核验真实授权主体的 location/microphone usage description 与 entitlement、签名责任链",
+        "默认并行宿主 XPC 超时诊断、实际 signed helper 接受/拒绝与生命周期验收",
+        "运行依赖的完整传递闭包验证、真实 Launchpad/VM 验收"
+      ]
     },
     {
       "id": "T25",
@@ -3330,16 +3390,34 @@
       "id": "R05",
       "decision": "T08 对齐七个依赖 pin 并补入七个具体 entitlement；保留本地 keychain-access-groups 范围",
       "cost": "跨 keychain group 的上游能力尚未纳入；T41 需单独审查与验证"
+    },
+    {
+      "id": "R06",
+      "decision": "原附件使用 Txx 标题；手动提取确切任务细目，保留原文格式与摘要",
+      "cost": "技能自动提取器不直接识别该标题；部分实现不标记为整项验收"
+    },
+    {
+      "id": "R07",
+      "decision": "T10 先拒绝无效选择与不存在的关系目标；组合步骤未拆分时拒绝单个声明的部分关闭",
+      "cost": "尚未提供组合步骤内部独立开关，也未形成完整冻结执行计划"
+    },
+    {
+      "id": "R08",
+      "decision": "T24 在打包前显式编译现有 xcstrings；隔离构建输入固定到当前 Gitlink，复制独立文件",
+      "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "3e60b639b3de84e2d3ad2dabcfa64631a6d4fdff",
+  "latest_implementation_head": "0531b903208d6ac497d85c58597f302b0e646407",
   "latest_validation_limitation": {
     "full_serial": "interrupted_after_cleanup_stall",
     "exit_code": 143,
     "sampled_location": "APIHTTPFixture.stop -> NSConcreteTask.waitUntilExit",
     "observed_live_child_count": 0,
     "cause": "原因未查明；日志最后一行未反映采样时正在运行的测试",
-    "targeted_firmware_patcher": "185 Swift Testing tests / 31 suites passed; XCTest 5 tests / 3 skipped / 0 failures",
-    "default_make_test_swift": "prior run still has 16 issues; not accepted"
+    "targeted_firmware_patcher": "225 Swift Testing tests / 34 suites passed (FirmwarePatcher + CreateLiveStages)",
+    "default_make_test_swift": "prior run still has 16 issues; not accepted",
+    "real_firmware": "14 tests / 12 suites passed against existing local reference fixtures; not fixed upstream binary equivalence or VM behavior",
+    "host_subset": "50 tests / 7 suites / 1 XPC timeout; cause unknown",
+    "bundle": "make build and Launchpad static bundle checks passed; runtime not tested"
   }
 }

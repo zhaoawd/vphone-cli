@@ -1,0 +1,207 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/14] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.25s)
+Test Suite 'Selected tests' started at 2026-10-06 22:25:53.315.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 22:25:53.316.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 22:25:53.316.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 22:25:53.316.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CoreBundleStoreTests started.
+◇ Suite HelperConfigurationTests started.
+◇ Suite CoreBundleRuleTests started.
+◇ Suite ToolchainTests started.
+◇ Test absentStoreRunsNoCommand() started.
+◇ Suite HelperServiceTests started.
+◇ Test refreshVerifiesEachVersionAndNothingElse() started.
+◇ Test requiresExactMetadataAndCompilableRequirements() started.
+◇ Suite CoreBundleVerifyMappingTests started.
+◇ Suite CoreBundleStoreTests started.
+◇ Test rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test listingSkipsHiddenEntriesAndReportsAbsentOrUnusableRoots() started.
+◇ Test unrelatedCodeCannotSatisfyHelperIdentity() started.
+◇ Test allowedClientsAreTheCLIAndLocalLaunchpad() started.
+◇ Test storePathAndMinimumMatchTheStore() started.
+◇ Test weakenedAuthorizationRulesAreRejected() started.
+◇ Test malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test case passing 1 argument team → "" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test case passing 1 argument team → "-" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test case passing 1 argument team → "ABCDE" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test case passing 1 argument team → "abcdefghij" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test case passing 1 argument team → "ABCDEFGHIJ
+" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test case passing 1 argument team → "ABC" or true" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test case passing 1 argument team → "$(id)" to rejectsUnconfiguredOrInjectedTeam(_:) started.
+◇ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() started.
+◇ Test verificationIsReadOnlyAndPropagatesFailure() started.
+◇ Test unauthorizedRequestCannotInstall() started.
+◇ Test replyCompletesOnlyOnce() started.
+◇ Test xpcRejectsClientWithoutConfiguredSigningIdentity() started.
+◇ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() started.
+◇ Test timeoutIgnoresLateReply() started.
+◇ Test callerIdentityMismatchNamesTheCaller() started.
+◇ Test refusalsCarryTheCLIReason() started.
+◇ Test case passing 1 argument size → 0 to malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) started.
+◇ Test case passing 1 argument size → 1 to malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) started.
+◇ Test receiptPrintedByVerifyDecodes() started.
+◇ Test case passing 1 argument size → 33 to malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) started.
+◇ Test case passing 1 argument size → 1024 to malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) started.
+◇ Test case passing 1 argument size → 31 to malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) started.
+[launchpad] core bundle store: absent
+◇ Test case passing 1 argument name → "2.2.3" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.0-local" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-ci.abcdef0" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "10.0.0-ci.0123456789abcdef0123456789abcdef01234567" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.0.8" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "1.0.0-local" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "x" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3.4" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "v2.2.3" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-beta" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-ci.ABCDEF0" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-ci.abc" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3-local-local" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "../2.2.3" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3/.." to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "--help" to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "2.2.3 " to nameFilterMatchesTheStoreFormat(_:) started.
+◇ Test case passing 1 argument name → "1234567890.0.0" to nameFilterMatchesTheStoreFormat(_:) started.
+✔ Test rejectsUnconfiguredOrInjectedTeam(_:) with 7 test cases passed after 2.073 seconds.
+✔ Test storePathAndMinimumMatchTheStore() passed after 2.073 seconds.
+vphone-helper: refused connection: caller pid 72034, uid 2035870432 does not satisfy the client signing requirement (OSStatus -67050: The operation couldn’t be completed. (OSStatus error -67050.))
+✔ Test allowedClientsAreTheCLIAndLocalLaunchpad() passed after 2.092 seconds.
+✔ Test weakenedAuthorizationRulesAreRejected() passed after 2.092 seconds.
+✔ Test malformedExternalFormFailsBeforeAuthorizationDatabaseAccess(_:) with 5 test cases passed after 2.092 seconds.
+✔ Test requiresExactMetadataAndCompilableRequirements() passed after 2.093 seconds.
+✔ Test unrelatedCodeCannotSatisfyHelperIdentity() passed after 2.093 seconds.
+✔ Test nameFilterMatchesTheStoreFormat(_:) with 20 test cases passed after 2.093 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 2.093 seconds.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 2.092 seconds.
+✔ Test rejectsMissingNestedApp() passed after 2.093 seconds.
+◇ Test installsSignedBundleAndVerifiesReceipt() started.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 2.093 seconds.
+✔ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() passed after 2.091 seconds.
+✔ Test replyCompletesOnlyOnce() passed after 2.091 seconds.
+✔ Test timeoutIgnoresLateReply() passed after 2.232 seconds.
+✔ Test callerIdentityMismatchNamesTheCaller() passed after 2.233 seconds.
+✔ Test refusalsCarryTheCLIReason() passed after 2.233 seconds.
+✔ Test receiptPrintedByVerifyDecodes() passed after 2.233 seconds.
+✔ Test absentStoreRunsNoCommand() passed after 2.235 seconds.
+✔ Suite HelperConfigurationTests passed after 2.691 seconds.
+✔ Suite CoreBundleRuleTests passed after 2.691 seconds.
+✔ Test verificationIsReadOnlyAndPropagatesFailure() passed after 2.689 seconds.
+✔ Test unauthorizedRequestCannotInstall() passed after 2.689 seconds.
+✔ Test cdhashMatchesCodesign() passed after 2.690 seconds.
+✔ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() passed after 2.689 seconds.
+✔ Test installsSignedBundleAndVerifiesReceipt() passed after 0.597 seconds.
+✔ Suite CoreBundleVerifyMappingTests passed after 2.691 seconds.
+◇ Test acceptsUpstreamResourceBundleLayout() started.
+✔ Test acceptsUpstreamResourceBundleLayout() passed after 0.301 seconds.
+✔ Test listingSkipsHiddenEntriesAndReportsAbsentOrUnusableRoots() passed after 2.992 seconds.
+[launchpad] core bundle store: 3 entries, 1 verified
+◇ Test invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "../2.0.8", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+✔ Test refreshVerifiesEachVersionAndNothingElse() passed after 2.996 seconds.
+◇ Test case passing 2 arguments version → "2.0.8/other", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+✔ Suite CoreBundleStoreTests passed after 2.999 seconds.
+◇ Test case passing 2 arguments version → "2.0.8
+", reason → "Invalid Core Bundle version "2.0.8\n"" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8-local/", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "-2.0.8", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "9999999999999999999999.0.0", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-ci.XYZ1234", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-ci.abc", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-beta", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.1.9-local", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.1.7-ci.0123abc", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+✔ Test invalidVersionRefusedBeforeStoreCreation(_:_:) with 12 test cases passed after 0.036 seconds.
+◇ Test versionNamesFollowUpstreamStoreSuffixes() started.
+✔ Test versionNamesFollowUpstreamStoreSuffixes() passed after 0.001 seconds.
+◇ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() started.
+✔ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() passed after 0.425 seconds.
+◇ Test digestMismatchLeavesNoPublishedVersion() started.
+✔ Test digestMismatchLeavesNoPublishedVersion() passed after 0.375 seconds.
+◇ Test duplicateInstallPreservesOriginalReceiptAndModes() started.
+✔ Test duplicateInstallPreservesOriginalReceiptAndModes() passed after 0.433 seconds.
+◇ Test refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "digest" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "old-version" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "plist-version" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "x86_64" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "non-regular" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✔ Test refusedInstallLeavesExistingStoreUnchanged(_:) with 5 test cases passed after 2.595 seconds.
+◇ Test productionStoreRefusesNonRootBeforeAnyHostAccess() started.
+✔ Test productionStoreRefusesNonRootBeforeAnyHostAccess() passed after 0.001 seconds.
+◇ Test receiptFieldsAreRefusedWithSeparateReasons() started.
+✔ Test receiptFieldsAreRefusedWithSeparateReasons() passed after 0.001 seconds.
+◇ Test machOReaderReportsSlices() started.
+✔ Test machOReaderReportsSlices() passed after 0.001 seconds.
+◇ Test refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "receipt" to refusesModifiedInstallation(_:) started.
+✘ Test xpcRejectsClientWithoutConfiguredSigningIdentity() recorded an issue at HelperTests.swift:120:13: Expectation failed: !((error.localizedDescription → "Helper timed out; an install may still be running. Verify before retrying.").contains("Helper timed out") → true)
+✘ Test xpcRejectsClientWithoutConfiguredSigningIdentity() failed after 7.096 seconds with 1 issue.
+✘ Suite HelperServiceTests failed after 7.098 seconds with 1 issue.
+✔ Test rejectsModifiedNestedExecutable() passed after 7.104 seconds.
+XPC rejection fixture: connection invalidated
+✔ Test rejectsUnknownManifestSchema() passed after 7.174 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 7.175 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 7.176 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 7.177 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 7.180 seconds.
+✔ Suite ToolchainTests passed after 7.180 seconds.
+◇ Test case passing 1 argument mutation → "receipt-version" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "cdhash" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "resource" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "binary" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "writable" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "acl" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "hardlink" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "symlink" to refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "resigned" to refusesModifiedInstallation(_:) started.
+✔ Test refusesModifiedInstallation(_:) with 10 test cases passed after 4.551 seconds.
+◇ Test rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "absolute" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "climb" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "indirect-climb" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "hardlink" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "setuid" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "fifo" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "wrong-version" to rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "unsigned" to rejectsUnsafeArchive(_:) started.
+✔ Test rejectsUnsafeArchive(_:) with 8 test cases passed after 0.099 seconds.
+◇ Test rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "symlink" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "writable" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "acl" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "lock-symlink" to rejectsUnsafeStore(_:) started.
+✔ Test rejectsUnsafeStore(_:) with 4 test cases passed after 1.589 seconds.
+◇ Test heldLeaseRefusesConcurrentInstall() started.
+✔ Test heldLeaseRefusesConcurrentInstall() passed after 0.456 seconds.
+◇ Test descriptorCopyIgnoresSharedSeekOffset() started.
+✔ Test descriptorCopyIgnoresSharedSeekOffset() passed after 0.426 seconds.
+◇ Test rejectsNonRegularDescriptor() started.
+✔ Test rejectsNonRegularDescriptor() passed after 0.004 seconds.
+◇ Test archiveReaderEntryLimit() started.
+✔ Test archiveReaderEntryLimit() passed after 0.376 seconds.
+✔ Suite CoreBundleStoreTests passed after 14.365 seconds.
+✘ Test run with 50 tests in 7 suites failed after 14.365 seconds with 1 issue.

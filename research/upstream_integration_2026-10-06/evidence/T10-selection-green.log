@@ -1,0 +1,59 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/15] Write sources
+[3/15] Write swift-version--58304C5D6DBC2206.txt
+[5/12] Emitting module FirmwarePatcher
+[6/12] Compiling FirmwarePatcher VariantPlanResolver.swift
+[7/12] Compiling FirmwarePatcher PatchDeclarationCatalog.swift
+[8/17] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[9/17] Emitting module FirmwarePatcherTests
+[10/18] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[10/18] Write Objects.LinkFileList
+[13/18] Linking vphone-cli
+[14/18] Linking vphone-vm
+[15/18] Applying vphone-vm
+[15/18] Applying vphone-cli
+[17/18] Linking vphone-cliPackageTests
+Build complete! (7.20s)
+Test Suite 'Selected tests' started at 2026-10-06 22:09:28.495.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-06 22:09:28.496.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-06 22:09:28.496.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-06 22:09:28.496.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite PlanSelectionValidationTests started.
+◇ Test refusesContradictoryExplicitChoices() started.
+◇ Test canBlockARequiredDeclarationOutsideTheVariant() started.
+◇ Test canBlockAnIndependentOptionalStep() started.
+◇ Test refusesVariantAndGateMismatch() started.
+◇ Test refusesBlockingOnlyPartOfAnIndivisibleStep() started.
+◇ Test canBlockAllOptionalDeclarationsSharingOneStep() started.
+◇ Test refusesBlockingAnApplicableRequiredDeclaration() started.
+✔ Test refusesContradictoryExplicitChoices() passed after 0.002 seconds.
+✔ Test refusesVariantAndGateMismatch() passed after 0.002 seconds.
+✔ Test refusesBlockingAnApplicableRequiredDeclaration() passed after 0.002 seconds.
+✔ Test canBlockARequiredDeclarationOutsideTheVariant() passed after 0.003 seconds.
+✔ Test canBlockAllOptionalDeclarationsSharingOneStep() passed after 0.003 seconds.
+✔ Test canBlockAnIndependentOptionalStep() passed after 0.003 seconds.
+✔ Test refusesBlockingOnlyPartOfAnIndivisibleStep() passed after 0.003 seconds.
+✔ Suite PlanSelectionValidationTests passed after 0.003 seconds.
+✔ Test run with 7 tests in 1 suite passed after 0.003 seconds.

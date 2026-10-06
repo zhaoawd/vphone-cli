@@ -127,6 +127,39 @@
         "do not copy upstream try? fallback to default or empty receipt",
         "machineIdentifier alone requires clone/legacy identity review before adoption"
       ]
+    },
+    {
+      "tasks": [
+        "T10"
+      ],
+      "scope": "plan selection and catalog relation validation; actual boot-chain record Gate",
+      "commits": [
+        "b6eb1873ab85586330f598302cff82a43e3186ec",
+        "4fd8dc87b5ff8eb14bae4f0f0ea53ae15a58fd78",
+        "6327738f3e5bc760d9f92f083e9109477e98161b"
+      ],
+      "result": "记录归属校验保留；新增拒绝相互矛盾的 select/block、variant/gates 不一致、有效范围内关闭必需声明、组合步骤部分关闭及不存在的 conflicts/after 引用。225 项 Swift Testing / 34 个 suite 通过；真实固件 14 项 / 12 个 suite 通过，含六组实际 boot-chain record 的归属 Gate。",
+      "limitations": [
+        "C1 冻结计划成为实际执行输入",
+        "按单个声明和实际 patchID 校验组合步骤，核验单个必需补丁缺失",
+        "guest Python/zsh 写入接入同一计划",
+        "默认完整测试、固定上游目标的二进制等价比较、真实 VM 验收；现有固件对照只覆盖本地历史 Python 参考"
+      ]
+    },
+    {
+      "tasks": [
+        "T24"
+      ],
+      "scope": "host call-site and policy review; isolated signed artifact build",
+      "evidence": "T24_host_entry_review.json",
+      "commit": "0531b903208d6ac497d85c58597f302b0e646407",
+      "result": "已审查 policy、实际调用方和 helper 专用协议。隔离 CLI/VM Bundle 与 Launchpad 编译、资源及签名检查通过；修复 SwiftPM 未编译 xcstrings 导致的 Launchpad 打包失败。41 项相关 Python 测试通过。50 项宿主 Swift 子集仍有一项 XPC 超时；原因未查明。",
+      "limitations": [
+        "独立 launcher 与 root-owned Bundle 选择/绑定按 T40/T25 接入，策略拒绝不得直接回退",
+        "核验真实授权主体的 location/microphone usage description 与 entitlement、签名责任链",
+        "默认并行宿主 XPC 超时诊断、实际 signed helper 接受/拒绝与生命周期验收",
+        "运行依赖的完整传递闭包验证、真实 Launchpad/VM 验收"
+      ]
     }
   ]
 }

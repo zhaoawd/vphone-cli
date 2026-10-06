@@ -1,0 +1,102 @@
+{
+  "directory": "/Users/qcz3840/github/vphone-cli/ipsws/patch_refactor_input",
+  "purpose": "current local Swift/Python comparison inputs; does not establish fixed-upstream binary equivalence",
+  "files": [
+    {
+      "path": "raw_payloads/avpbooter.bin",
+      "sha256": "301bc973b56e86a9906bb6002d008015a57c9e07b5f191260717b97a62589072",
+      "bytes": 335688
+    },
+    {
+      "path": "raw_payloads/ibss.bin",
+      "sha256": "05791887d9df9388b622a98e5378114e2124969a1c7dd66706ddc295818cf6e8",
+      "bytes": 605312
+    },
+    {
+      "path": "raw_payloads/ibec.bin",
+      "sha256": "05791887d9df9388b622a98e5378114e2124969a1c7dd66706ddc295818cf6e8",
+      "bytes": 605312
+    },
+    {
+      "path": "raw_payloads/llb.bin",
+      "sha256": "05791887d9df9388b622a98e5378114e2124969a1c7dd66706ddc295818cf6e8",
+      "bytes": 605312
+    },
+    {
+      "path": "raw_payloads/txm.bin",
+      "sha256": "ec68dc5a1ec77d8399365f7164e0384539c75e06ed9555f793ce5ff34a9c1db6",
+      "bytes": 458784
+    },
+    {
+      "path": "raw_payloads/kernelcache.bin",
+      "sha256": "b6846048f3a60eab5f360fcc0f3dcb5198aa0476c86fb06eb42f6267cdbfcae0",
+      "bytes": 43991040
+    },
+    {
+      "path": "reference_patches/avpbooter.json",
+      "sha256": "321578246a28789436dc6999d9eff593c285f0324aa51339c99f8bd79783bfaa",
+      "bytes": 170
+    },
+    {
+      "path": "reference_patches/ibss.json",
+      "sha256": "41a784bed1043b53dabae93b2e15d6fa0a68f02bae2446a20928c90871163ed3",
+      "bytes": 671
+    },
+    {
+      "path": "reference_patches/ibec.json",
+      "sha256": "c24777735640fee3d920dd126414b1cb1903e74595360a0f757f4cafef38bd2a",
+      "bytes": 1222
+    },
+    {
+      "path": "reference_patches/llb.json",
+      "sha256": "635ef9640dc8531766263c10325280b4b9bb7792497650bb09f23f05c165828e",
+      "bytes": 2205
+    },
+    {
+      "path": "reference_patches/txm.json",
+      "sha256": "e3d0308905ab5c7a9762824cce1f4dbd5241a824a4df0059f3187cc7abd06436",
+      "bytes": 175
+    },
+    {
+      "path": "reference_patches/txm_dev.json",
+      "sha256": "2246c60083ac084ae9fac9b6179b088ce0faf734da80159c811f11b2c5b11d28",
+      "bytes": 2280
+    },
+    {
+      "path": "reference_patches/kernelcache.json",
+      "sha256": "02bf23092a44f5245995f8bc9bf7a8b265682c7d661c71f5e82a965e6c09ea16",
+      "bytes": 5151
+    },
+    {
+      "path": "reference_patches/ibss_jb.json",
+      "sha256": "d0fa5aa86cf815924e46c03b7508cd1c1db3e348351837bf05eb82f61329362d",
+      "bytes": 162
+    },
+    {
+      "path": "reference_patches/kernelcache_jb.json",
+      "sha256": "103174f74244f475d053878dd92b423647fa0c6ca79bce698284f93a651e53da",
+      "bytes": 18022
+    },
+    {
+      "path": "Firmware/dfu/iBSS.vresearch101.RELEASE.im4p",
+      "sha256": "5e316c5a5a6463cd9f3231d883e6ff1f1aae81e0e3bf14aae6afe102fb2f39e6",
+      "bytes": 303270
+    },
+    {
+      "path": "Firmware/txm.iphoneos.research.im4p",
+      "sha256": "3912f361973d70090b1f15a6e4ec64bd12e457a06d73555ec8880b76c861aa3a",
+      "bytes": 161043
+    },
+    {
+      "path": "BuildManifest.plist",
+      "sha256": "efd6505f051ff82e795ed7d651afda26402c142f4ec195a6157d25f620fc6523",
+      "bytes": 349914
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "12171ca5bf37f115ff261a9386590d615e4d3b83c412f8245cfd0de419e321c9",
+      "bytes": 10420
+    }
+  ],
+  "suite_entrypoint": "make test_firmware"
+}
