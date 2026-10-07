@@ -61,6 +61,7 @@ final class VPhoneCameraServer {
     private var producer: VPhoneFrameProducer?
     private var timer: DispatchSourceTimer?
     private var connectionAttemptToken: UInt64 = 0
+    private var framePending = false
 
     private let sendQueue = DispatchQueue(
         label: "com.vphone.camera.send", qos: .userInteractive)
@@ -80,10 +81,8 @@ final class VPhoneCameraServer {
         device = nil
         connectionAttemptToken &+= 1
         stopStreaming()
-        if connectionFD >= 0 {
-            close(connectionFD)
-            connectionFD = -1
-        }
+        connectionFD = -1
+        // Virtualization.framework closes its original descriptor.
         connection = nil
         if isConnected {
             isConnected = false
@@ -250,7 +249,14 @@ final class VPhoneCameraServer {
             guard let self else { return }
             guard let producer = self.producer else { return }
             let fd = self.connectionFD
-            guard fd >= 0 else { return }
+            guard fd >= 0, !self.framePending else { return }
+            guard let lease = VPhoneCameraWriteLease.acquire(fd) else { self.handleDisconnect(); return }
+            var timeout = timeval(tv_sec: 5, tv_usec: 0)
+            guard fcntl(lease.fileDescriptor, F_SETNOSIGPIPE, 1) != -1,
+                  setsockopt(lease.fileDescriptor, SOL_SOCKET, SO_SNDTIMEO, &timeout,
+                             socklen_t(MemoryLayout<timeval>.size)) == 0 else { self.handleDisconnect(); return }
+            self.framePending = true
+            let connectionToken = self.connectionAttemptToken
             self.wireFrameIndex &+= 1
             let fi = self.wireFrameIndex
             let gen = self.currentGeneration
@@ -259,14 +265,17 @@ final class VPhoneCameraServer {
             let fence = self.fence
             let tokenSnapshot = fence.token.load(ordering: .relaxed)
             let q = self.producerQueue
-            q.async {
+            q.async { [weak self] in
+                defer {
+                    Task { @MainActor [weak self] in self?.framePending = false }
+                }
                 // Generation fence (§8.3): if a source/generation switch landed
                 // after this tick was scheduled, drop the stale frame rather
                 // than send an old QR under a new generation.
                 if fence.token.load(ordering: .relaxed) != tokenSnapshot { return }
                 guard let frame = producer.nextFrame() else { return }
                 if fence.token.load(ordering: .relaxed) != tokenSnapshot { return }
-                let ok = Self.send(fd: fd, frame: frame,
+                let ok = Self.send(fd: lease.fileDescriptor, frame: frame,
                                    generation: gen, role: role, frameIndex: fi, presentationID: presentationID)
                 if !ok {
                     Task { @MainActor [weak self] in
@@ -298,14 +307,12 @@ final class VPhoneCameraServer {
     /// killing its server-side socket while the host is streaming.
     private func handleDisconnect() {
         print("[camera] disconnect detected, will reconnect")
-        let oldFD = connectionFD
         connectionFD = -1
         connection = nil
         if isConnected {
             isConnected = false
             onConnectionStateChange?(false)
         }
-        if oldFD >= 0 { close(oldFD) }
         // Note: streaming timer continues running but ticks no-op until
         // connectionFD becomes valid again.
         attemptConnect()
