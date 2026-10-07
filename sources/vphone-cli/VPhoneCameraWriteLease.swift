@@ -9,5 +9,10 @@ final class VPhoneCameraWriteLease: Sendable {
         let owned = fcntl(descriptor, F_DUPFD_CLOEXEC, 0)
         return owned >= 0 ? VPhoneCameraWriteLease(owned) : nil
     }
+    static func isCurrent(failedDescriptor: Int32, failedConnection: UInt64, failedSource: UInt64,
+                          currentDescriptor: Int32, currentConnection: UInt64, currentSource: UInt64) -> Bool {
+        failedDescriptor >= 0 && failedDescriptor == currentDescriptor &&
+            failedConnection == currentConnection && failedSource == currentSource
+    }
     deinit { close(fileDescriptor) }
 }

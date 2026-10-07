@@ -280,9 +280,10 @@ final class VPhoneCameraServer {
                 if !ok {
                     Task { @MainActor [weak self] in
                         guard let self else { return }
-                        // Avoid double-handling if a parallel write already
-                        // dropped the connection.
-                        if self.connectionFD == fd {
+                        if VPhoneCameraWriteLease.isCurrent(
+                            failedDescriptor: fd, failedConnection: connectionToken, failedSource: tokenSnapshot,
+                            currentDescriptor: self.connectionFD, currentConnection: self.connectionAttemptToken,
+                            currentSource: fence.token.load(ordering: .relaxed)) {
                             self.handleDisconnect()
                         }
                     }

@@ -3,6 +3,13 @@ import XCTest
 @testable import vphone_cli
 
 final class CameraWriteLeaseTests: XCTestCase {
+    func testLateFailureCannotDisconnectANewConnectionOrSource() {
+        XCTAssertTrue(VPhoneCameraWriteLease.isCurrent(failedDescriptor: 7, failedConnection: 1, failedSource: 2, currentDescriptor: 7, currentConnection: 1, currentSource: 2))
+        XCTAssertFalse(VPhoneCameraWriteLease.isCurrent(failedDescriptor: 7, failedConnection: 1, failedSource: 2, currentDescriptor: 7, currentConnection: 3, currentSource: 2))
+        XCTAssertFalse(VPhoneCameraWriteLease.isCurrent(failedDescriptor: 7, failedConnection: 1, failedSource: 2, currentDescriptor: 7, currentConnection: 1, currentSource: 4))
+        XCTAssertFalse(VPhoneCameraWriteLease.isCurrent(failedDescriptor: 7, failedConnection: 1, failedSource: 2, currentDescriptor: -1, currentConnection: 1, currentSource: 2))
+    }
+
     func testQueuedWriterKeepsOriginalPipeAfterDescriptorNumberIsReused() throws {
         var old = [Int32](repeating: -1, count: 2), new = old
         XCTAssertEqual(pipe(&old), 0); XCTAssertEqual(pipe(&new), 0)
