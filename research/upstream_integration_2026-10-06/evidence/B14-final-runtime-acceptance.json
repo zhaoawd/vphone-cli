@@ -1,0 +1,516 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "capabilities",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        }
+      },
+      "response": {
+        "commands": {
+          "environment_rollback": true,
+          "camera_status": true,
+          "ipa_install": true,
+          "location_source_control": true,
+          "location_stream_push": true,
+          "camera_present": true,
+          "location_source_status": true,
+          "key": true,
+          "file_get": true,
+          "app_foreground": true,
+          "app_list": true,
+          "swipe": true,
+          "environment_update": true,
+          "app_terminate": true,
+          "tap": true,
+          "file_put": true,
+          "location_stop": true,
+          "capabilities": true,
+          "app_launch": true,
+          "shell": true,
+          "location_stream_start": true,
+          "environment_status": true,
+          "camera_stop": true,
+          "type": true,
+          "location_source_stop": true,
+          "location": true,
+          "screenshot": true,
+          "location_source_set": true,
+          "rpc": true,
+          "open_url": true
+        },
+        "rpc_methods": [
+          "accessibility.tree",
+          "agent.health",
+          "apps.binary",
+          "apps.data_dir",
+          "apps.foreground",
+          "apps.handlers",
+          "apps.info",
+          "apps.install",
+          "apps.launch",
+          "apps.list",
+          "apps.network_policy",
+          "apps.open_url",
+          "apps.refresh",
+          "apps.register",
+          "apps.registration",
+          "apps.search",
+          "apps.terminate",
+          "apps.uninstall",
+          "apps.unregister",
+          "apps.unregister_dir",
+          "apps.url_schemes",
+          "audio.state",
+          "audio.volume",
+          "bootstrap.firmware",
+          "bootstrap.inspect",
+          "bootstrap.install",
+          "bootstrap.status",
+          "bootstrap.uninstall",
+          "clipboard.clear",
+          "clipboard.get",
+          "clipboard.set",
+          "developer_mode.enable",
+          "developer_mode.status",
+          "device.basebin",
+          "device.environment",
+          "device.info",
+          "device.ioreg",
+          "device.network",
+          "device.screen",
+          "device.snapshot",
+          "diagnostics.self_test",
+          "display.brightness",
+          "display.rotation",
+          "display.rotation_lock",
+          "environment.loaded",
+          "environment.status",
+          "files.chmod",
+          "files.chown",
+          "files.copy",
+          "files.find",
+          "files.list",
+          "files.mkdir",
+          "files.plist",
+          "files.plist_set",
+          "files.read",
+          "files.remove",
+          "files.rename",
+          "files.symlink",
+          "files.write",
+          "input.button",
+          "input.double_tap",
+          "input.drag",
+          "input.hid",
+          "input.key",
+          "input.long_press",
+          "input.paste",
+          "input.swipe",
+          "input.tap",
+          "input.touch_sequence",
+          "input.type",
+          "keychain.add",
+          "keychain.database",
+          "keychain.delete",
+          "keychain.get",
+          "keychain.list",
+          "keychain.update",
+          "launchd.getenv",
+          "launchd.setenv",
+          "launchd.unsetenv",
+          "location.current",
+          "logs.crash",
+          "logs.crashes",
+          "logs.syslog",
+          "memory.jetsam",
+          "memory.pressure",
+          "network.capture",
+          "packages.compare",
+          "packages.info",
+          "packages.list",
+          "packages.repos",
+          "packages.status",
+          "packages.tweaks",
+          "power.low_power_mode",
+          "processes.kill",
+          "processes.list",
+          "screen.screenshot",
+          "screen.unlock",
+          "security.ssl_killswitch",
+          "services.disable",
+          "services.disabled",
+          "services.dump",
+          "services.enable",
+          "services.list",
+          "services.load",
+          "services.print",
+          "services.remove",
+          "services.signal",
+          "services.start",
+          "services.status",
+          "services.stop",
+          "services.unload",
+          "settings.delete",
+          "settings.get",
+          "settings.set",
+          "system.reboot",
+          "system.respring",
+          "system.shutdown",
+          "system.system_apps",
+          "system.uicache",
+          "ui.describe",
+          "ui.element_at",
+          "ui.ocr",
+          "ui.tap_element",
+          "ui.tree",
+          "ui.wait",
+          "ui.wait_gone"
+        ],
+        "target": {
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9",
+          "vm": "vm-new",
+          "process_started_at": 1791392845.031055
+        },
+        "guest_connected": true,
+        "api_session": {
+          "generation": "B66CF69C-A664-42E5-9257-490E140E3EA6",
+          "state": "ready",
+          "health": {
+            "setupPending": false,
+            "capabilities": [
+              "environment_activation",
+              "touch",
+              "ipa_install",
+              "screenshot",
+              "file_tools",
+              "location",
+              "input_gestures",
+              "audio",
+              "session_identity",
+              "ui_inspection",
+              "clipboard",
+              "app_details",
+              "display",
+              "files",
+              "apps",
+              "logs",
+              "file_upload_identity",
+              "packages",
+              "system_control",
+              "services",
+              "port_forward",
+              "processes",
+              "network_capture",
+              "environment_update",
+              "device_info",
+              "screen_unlock",
+              "file_download_identity",
+              "system_shutdown",
+              "keychain",
+              "bootstrap_install",
+              "url",
+              "hid",
+              "environment_transaction",
+              "bootstrap_uninstall"
+            ],
+            "binaryHash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+            "ios": "26.1.0",
+            "instanceID": "BFC08178-9E34-46DB-895F-F620D7FC8871",
+            "apiVersion": 1
+          },
+          "vmInstanceID": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        },
+        "limits": {
+          "request_bytes": 2097152,
+          "connections": 16,
+          "command_timeout_ms": 180000,
+          "inline_file_bytes": 1048576,
+          "host_file_bytes": 67108864
+        },
+        "ok": true,
+        "api_commands": {
+          "app_terminate": true,
+          "app_foreground": true,
+          "file_get": true,
+          "app_list": true,
+          "file_put": true,
+          "app_launch": true
+        },
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "boot_mode": "normal",
+        "screen_available": true,
+        "protocol_version": 1
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        },
+        "method": "agent.health",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "instance_id": "BFC08178-9E34-46DB-895F-F620D7FC8871",
+          "capabilities": [
+            "session_identity",
+            "touch",
+            "hid",
+            "apps",
+            "url",
+            "files",
+            "file_download_identity",
+            "file_upload_identity",
+            "clipboard",
+            "location",
+            "keychain",
+            "ipa_install",
+            "bootstrap_install",
+            "bootstrap_uninstall",
+            "port_forward",
+            "screenshot",
+            "screen_unlock",
+            "device_info",
+            "display",
+            "audio",
+            "input_gestures",
+            "ui_inspection",
+            "processes",
+            "services",
+            "logs",
+            "network_capture",
+            "app_details",
+            "system_control",
+            "system_shutdown",
+            "file_tools",
+            "packages",
+            "environment_update",
+            "environment_transaction",
+            "environment_activation"
+          ],
+          "status": "ok",
+          "ios": "26.1.0",
+          "setup_pending": false,
+          "name": "vphoned",
+          "api_version": 1,
+          "ip": "fe80::103c:5a1f:d2f9:99b6%en0",
+          "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749"
+        },
+        "method": "agent.health",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        },
+        "method": "system.shutdown",
+        "params": {
+          "force": false
+        }
+      },
+      "response": {
+        "guest_code": "invalid_operation",
+        "method": "system.shutdown",
+        "operation_may_continue": true,
+        "error": "api_guest_error",
+        "ok": false,
+        "code": "api_guest_error"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84587,
+          "instance_id": "09F69011-7199-40F7-BDF6-1894709D42D9"
+        },
+        "method": "clipboard.get",
+        "params": {}
+      },
+      "response": {
+        "method": "clipboard.get",
+        "result": {
+          "method": "uipasteboard",
+          "has_text": false,
+          "change_count": 0,
+          "types": [],
+          "has_image": false,
+          "text": "",
+          "items": 0
+        },
+        "ok": true
+      }
+    }
+  ],
+  "HTTP_authentication": [
+    {
+      "case": "missing",
+      "status": 401,
+      "body": {
+        "type": "response",
+        "id": null,
+        "error": {
+          "code": "unauthorized",
+          "message": "Missing or wrong API token"
+        }
+      }
+    },
+    {
+      "case": "incorrect",
+      "status": 401,
+      "body": {
+        "type": "response",
+        "id": null,
+        "error": {
+          "code": "unauthorized",
+          "message": "Missing or wrong API token"
+        }
+      }
+    },
+    {
+      "case": "prior_boot",
+      "status": 401,
+      "body": {
+        "type": "response",
+        "id": null,
+        "error": {
+          "code": "unauthorized",
+          "message": "Missing or wrong API token"
+        }
+      }
+    },
+    {
+      "case": "current",
+      "status": 200,
+      "body": {
+        "api_version": 1,
+        "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+        "capabilities": [
+          "session_identity",
+          "touch",
+          "hid",
+          "apps",
+          "url",
+          "files",
+          "file_download_identity",
+          "file_upload_identity",
+          "clipboard",
+          "location",
+          "keychain",
+          "ipa_install",
+          "bootstrap_install",
+          "bootstrap_uninstall",
+          "port_forward",
+          "screenshot",
+          "screen_unlock",
+          "device_info",
+          "display",
+          "audio",
+          "input_gestures",
+          "ui_inspection",
+          "processes",
+          "services",
+          "logs",
+          "network_capture",
+          "app_details",
+          "system_control",
+          "system_shutdown",
+          "file_tools",
+          "packages",
+          "environment_update",
+          "environment_transaction",
+          "environment_activation"
+        ],
+        "instance_id": "BFC08178-9E34-46DB-895F-F620D7FC8871",
+        "ios": "26.1.0",
+        "ip": "fe80::103c:5a1f:d2f9:99b6%en0",
+        "name": "vphoned",
+        "setup_pending": false,
+        "status": "ok"
+      }
+    }
+  ],
+  "second_VM_instance": "09F69011-7199-40F7-BDF6-1894709D42D9",
+  "API_instance": "BFC08178-9E34-46DB-895F-F620D7FC8871",
+  "classic_daemon_and_cache_preserved": true,
+  "original_guest_clipboard_still_empty": true,
+  "password_supplied": false
+}

@@ -542,3 +542,33 @@ vm-new 的宿主继续为 B09 源码 `2387af20`、PID 92943、instance `068574F6
 签名 helper 的 TeamIdentifier 为 `3AA3QL69MQ`，CDHash 为 `30ce6ce220a60617b6ae42066372bf3ac2e8ebe6`，严格签名检查与 --check-configuration 返回 0。系统服务 com.vphone.cli.helper、对应 PrivilegedHelperTools/LaunchDaemons 路径不存在；正确 authorization right com.vphone.cli.helper.privileged 只读查询返回 NO (-60005)。初次查错 right 名称的记录保留，不能用作正确名称的基线。没有注册 helper、写授权数据库或操作 amfid。旧授权只覆盖 B09 CDHash `52b10bcbce6db82de6afa83b801eb95da55246c7`，新 VM 的临时 AMFI 授权及系统 helper 注册需要明确的新授权。
 
 追加前核对原 577 份已提交证据及 3 份不可变输入，8 个上游参考的固定 SHA 字节和 54 个本地提交文件摘要通过。原依赖、步骤、接口、验收与回退条件不变；上游语义提交覆盖台账不变。47 项仍为 2 项 accepted、42 项部分推进、T30/T31 待本地对账、T45 可选延期，44 项必选未验收。主仓库 HEAD e8d825b3 且干净，vm-2607 未操作。证据入口：`evidence/B13-summary.json`、`evidence/B13-final-partition-results.json`、`evidence/B13-artifact-manifest.json`、`evidence/B13-final-state.json`。
+
+
+### 2026-10-08 B14：授权后的真实宿主与系统 helper 验收
+
+用户回复“授权”后，执行前一轮列出的两项临时安全操作。VM 仅允许冻结 CDHash `6ae3461ec4dae85f9375bdba4f8b7052ea9257ff`，独立空配置、paths=[]、allow_all=false、spoof_apple=true。helper 仅注册 com.vphone.cli.helper，TeamIdentifier `3AA3QL69MQ`、CDHash `30ce6ce220a60617b6ae42066372bf3ac2e8ebe6`，right 为 com.vphone.cli.helper.privileged。没有改变实现源码或重新构建，所有实际工件仍来自 `55fd8ef5`；工作分支起点为末尾空行修正提交 `bcc1f871`。
+
+旧 B09 VM92943/instance068574F6 正常 SIGINT 停机，原 daemon 执行关机，父驱动退出0，磁盘释放。随后制作 `/Users/qcz3840/github/vphone-cli/vm.backups/b14-vm-new-stopped-20261008`：65 个文件逐一摘要一致，源元数据变化项为空；方法为同 APFS 卷 clonefile 写时复制，不证明物理介质独立。该检查点位于本轮配置修改之前。
+
+| 对象 | 实际结果 | 未完成范围 |
+| --- | --- | --- |
+| T36 新宿主启动 | 首次70577/E7F7D876 使用 CLI unlock flag；第二次84587/09F69011 仅持久设置且无 amfid helper；两次未发送手动 RPC 的观察均 unlocked | userspace reboot、密码路径、完整 guest cohort 与依赖；没有密码绕过结论 |
+| T36 设置与菜单 | off/on 写入false/true；当前锁定实例在启用后仍 locked/off；同 guest API instance 的12秒暂停/恢复中观察到 reconnecting，恢复后仍锁定；手动菜单立即重测 unlocked；CLI config 成功，无 API 的 launch 拒绝64 | 第一次延迟菜单观察仍锁定，直接 RPC 成功，原因未查明；重测通过不证明第一次现象的原因 |
+| T37 实际停止 | 菜单与生产 CLI 两次均 apiAccepted、Guest stopped、父退出0、磁盘释放，未触发超时强停 | 新代码的旧 guest/DFU/panic/未ready/超时、更新/备份冲突及完整 root/权限负向矩阵 |
+| T39 实际剪贴板 | 测试文本/RTF已准备；立即解锁与 guest tap 后 Settings 搜索激活；CUA Cmd V 未确认传入文本，guest仍items0/types[]/change_count0 | Cmd V 原因未查明；Cmd C/X、长按Copy、图片、快速切窗、慢响应、type及重启；API图片第二次await接入仍待实现 |
+| T40 实际拒绝 | 已停机vm-new请求缺失2.6.0 Bundle，拒绝且没有 binding/backup/config变化；两次新host配旧guest摘要保持 | 缺Bundle恢复提示仍为通用错误；实际多Bundle/创建冻结/kernel-only来源及显式环境升级/回退 |
+| T46 系统 helper | 正常签名CLI注册成功，root68514、协议2、安装字节一致；管理员规则user/admin/authenticate-user=true/allow-root=false/shared=false/timeout300；两客户端收到各自输出和缺Store错误 | 没有成功安装或验证Bundle；真实完整文件writer排空与fsync/close、UI退出、全部操作集与VM吞吐未验收 |
+
+首次 VM instance 为 `E7F7D876-BA0B-4E08-BD53-B1F48E877AD4`，API instance 为 `963EA9A0-3DFA-45DF-B950-8C0A79031E9C`；第二次分别为 `09F69011-7199-40F7-BDF6-1894709D42D9` 与 `BFC08178-9E34-46DB-895F-F620D7FC8871`。第二次没有CLI unlock flag，由持久设置启用；没有再次启动amfid helper。两次均显式 --no-vphoned-update，独立临时 API-only daemon 沿用 `/var/root/vphone-b13-api/vphoned`，未部署现代64字节相机/shared-components，保留classic256字节协议和原Irisin/Hook边界。实际 /usr/bin/vphoned 和cache均为240352字节，SHA-256保持306ed42b…1401f9001。
+
+第二次HTTP缺失/错误/上次启动token/当前token分别返回401/401/401/200，force:false关机拒绝。菜单 Stop 没有由观察驱动另发信号。生产 CLI Stop 核对 instance09F69011 后只向84587发送SIGINT，宿主执行API guest-first并正常退出，两次均记录 apiAccepted。accepted、Guest stopped和磁盘无占用分别以不同证据核对，未将请求接受当作关机完成。
+
+系统helper通过正常 `sudo -n frozen-helper-client helper register` 路径安装。两条并发签名客户端各执行 verify-bundle 2.6.0，实际Store不存在，因此两次都是错误结果。根据冻结源码的 streaming 路径，底层操作错误回复发生在 output.finish ACK 成功之后；这是实现与运行响应结合的推断，未单独捕获ACK遥测，不能记为成功Bundle安装或完整writer实际持久化验收。ad hoc同bundleIdentifier客户端返回connection interrupted，未获版本；具体拒绝原因未单独捕获。没有创建或安装尚未完成的Bundle。
+
+Mac原剪贴板全部items/types/data保存至本机0600临时备份，没有把值写入证据。测试文本和RTF在Cmd V后保持；原内容恢复后逐项读回一致，原changeCount无法恢复。guest原clipboard为空，前后仍为空。测试内容未进入搜索框，剪贴板真实接入不记为通过。原生截图还出现黑色或锁屏画面，不能独立证明当前状态；窗口焦点或键盘路由尚未确定。CUA操作记录标明为人工转录，原始工具输出在本聊天历史中。
+
+临时amfid驱动SIGINT未退出，核对同一PID69847完整身份后SIGTERM清理，终端会话退出1；没有清理完成/正常detach日志，不宣称finally成功。采样确认driver/debugserver消失，amfid当时PPID1。最终amfid未运行，系统job明确为JETSAM_REASON_MEMORY_IDLE_EXIT，未强制重启该系统服务。签名helper的root文件属性、原始缺失基线、摘要与rule核对后，bootout服务，移除本轮right和两个root安装文件；最终service不存在、right为NO(-60005)、安装文件不存在。没有修改持久安全配置；没有声称清除了AMFI缓存。csrutil显示Custom Configuration，authenticated-root查询为No macOS installations found，不能据此确认该项状态。
+
+最终vm-new已停机。持VM目录协作锁且磁盘无占用时恢复原config字节；config、原classic载荷、UDID预测以及AVPBooter/AVPSEPBooter/restore-info摘要与检查点匹配。B09/B13冻结工件共1206文件再次校验，严格签名检查通过。Mac私有剪贴板备份、guest空剪贴板备份以及已停止三个服务器的临时token已清理；未注册的guest临时API工件保留供后续验收，不会作为launchd job启动。当前磁盘正常启动/关机的数据变化未回滚，不宣称整个Disk.img恢复到检查点。
+
+本轮未重跑Swift/Python/固件套件，没有把B13结果计作新的测试通过；B13默认完整Swift失败与最终串行等待继续保留。本轮主要验证真实宿主和注册后的XPC行为。五项仍有原合同未满足，保持部分推进；47项仍为2项accepted、42项部分推进、T30/T31待本地对账、T45可选延期，44项必选未验收。原760份证据、3份输入、全部原任务依赖/步骤/接口/验收/回退与语义提交覆盖台账保持不变。主仓库e8d825b3干净，vm-2607未操作。证据入口：`evidence/B14-summary.json`、`evidence/B14-final-state.json`、`evidence/B14-helper-probe.json`、`evidence/B14-stop-result.json`、`evidence/B14-second-stop.json`。

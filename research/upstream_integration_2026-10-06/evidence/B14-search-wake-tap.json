@@ -1,0 +1,51 @@
+[
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 70577,
+        "instance_id": "E7F7D876-BA0B-4E08-BD53-B1F48E877AD4"
+      },
+      "method": "screen.unlock",
+      "params": {
+        "timeout": 10
+      }
+    },
+    "response": {
+      "method": "screen.unlock",
+      "result": {
+        "locked": false,
+        "screen_off": false,
+        "was_screen_off": true,
+        "was_locked": true
+      },
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 70577,
+        "instance_id": "E7F7D876-BA0B-4E08-BD53-B1F48E877AD4"
+      },
+      "method": "input.tap",
+      "params": {
+        "x": 200,
+        "y": 882
+      }
+    },
+    "response": {
+      "ok": true,
+      "method": "input.tap",
+      "result": {
+        "x": 200,
+        "y": 882
+      }
+    }
+  }
+]

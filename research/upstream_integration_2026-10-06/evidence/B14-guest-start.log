@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b14-guest-start.py", line 3, in <module>
+    vm=Path('/Users/qcz3840/github/vphone-cli/vm-new');runtime=json.loads((vm/'.vphone-runtime.json').read_text());target={'vm':'vm-new','pid':70577,'instance_id':runtime['instance_id']};assert runtime['pid']==70577
+                                                                                                                                                                   ~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'instance_id'

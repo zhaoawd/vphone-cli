@@ -1,0 +1,74 @@
+{
+  "observations": [
+    {
+      "name": "helper-status",
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "status"
+      ],
+      "returncode": 0,
+      "stdout": "helper protocol: 2\n",
+      "stderr": ""
+    },
+    {
+      "name": "helper-verify-1",
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.0"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Verifying Core Bundle 2.6.0\nUnable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\nError: Unable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\n"
+    },
+    {
+      "name": "helper-verify-2",
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.0"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Verifying Core Bundle 2.6.0\nUnable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\nError: Unable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\n"
+    },
+    {
+      "name": "helper-launchd",
+      "command": [
+        "/bin/launchctl",
+        "print",
+        "system/com.vphone.cli.helper"
+      ],
+      "returncode": 0,
+      "stdout": "system/com.vphone.cli.helper = {\n\tactive count = 2\n\tpath = /Library/LaunchDaemons/com.vphone.cli.helper.plist\n\ttype = LaunchDaemon\n\tstate = running\n\n\tprogram = /Library/PrivilegedHelperTools/com.vphone.cli.helper\n\targuments = {\n\t\t/Library/PrivilegedHelperTools/com.vphone.cli.helper\n\t}\n\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tXPC_SERVICE_NAME => com.vphone.cli.helper\n\t}\n\n\tdomain = system\n\tminimum runtime = 10\n\texit timeout = 5\n\truns = 1\n\tpid = 68514\n\timmediate reason = ipc (mach)\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit code = (never exited)\n\n\tendpoints = {\n\t\t\"com.vphone.cli.helper\" = {\n\t\t\tport = 0xb3357\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t}\n\n\tresource coalition = {\n\t\tID = 65853\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tjetsam coalition = {\n\t\tID = 65854\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tspawn type = daemon (3)\n\tjetsam priority = 40\n\tjetsam memory limit (active) = (unlimited)\n\tjetsam memory limit (inactive) = (unlimited)\n\tjetsamproperties category = daemon\n\tjetsam thread limit = 32\n\tcpumon = default\n\tjob state = running\n\tsanitizer flags = 0x0\n\n\tproperties = \n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "helper-rule",
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 0,
+      "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n\t<key>allow-root</key>\n\t<false/>\n\t<key>authenticate-user</key>\n\t<true/>\n\t<key>class</key>\n\t<string>user</string>\n\t<key>created</key>\n\t<real>813083576.36083198</real>\n\t<key>default-prompt</key>\n\t<dict>\n\t\t<key></key>\n\t\t<string>Install verified VPhone Core Bundles</string>\n\t</dict>\n\t<key>group</key>\n\t<string>admin</string>\n\t<key>identifier</key>\n\t<string>com.vphone.cli.helper</string>\n\t<key>modified</key>\n\t<real>813083576.36083198</real>\n\t<key>requirement</key>\n\t<string>identifier \"com.vphone.cli.helper\" and anchor apple generic and certificate leaf[subject.CN] = \"Apple Development: QingLiang Zhao (Y4CD942RX6)\" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>\n\t<key>session-owner</key>\n\t<false/>\n\t<key>shared</key>\n\t<false/>\n\t<key>timeout</key>\n\t<integer>300</integer>\n\t<key>tries</key>\n\t<integer>10000</integer>\n\t<key>version</key>\n\t<integer>1</integer>\n</dict>\n</plist>\n",
+      "stderr": "YES (0)\n"
+    }
+  ],
+  "installed_helper_matches_frozen_bytes": true,
+  "helper_sha256": "728b03532d1792cf2ef54077ac98cbcece910a55b367d00af1e3178e383b60ce",
+  "service_registered": true,
+  "root_helper_running": true,
+  "protocol": 2,
+  "two_real_signed_clients_received_streamed_missing_store_errors": true,
+  "verification_successful_bundle_claimed": false,
+  "Bundle_installed": false,
+  "authorization_rule_intact": true,
+  "ACK_inference": "Streaming service sends operation error only after output.finish acknowledgement; both clients received underlying store error, not ACK/transport timeout."
+}

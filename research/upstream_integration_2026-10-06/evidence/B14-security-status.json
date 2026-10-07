@@ -1,0 +1,25 @@
+{
+  "observations": [
+    {
+      "command": [
+        "/usr/bin/csrutil",
+        "status"
+      ],
+      "returncode": 0,
+      "stdout": "System Integrity Protection status: unknown (Custom Configuration).\n\nConfiguration:\n\tApple Internal: disabled\n\tKext Signing: enabled\n\tFilesystem Protections: enabled\n\tDebugging Restrictions: disabled\n\tDTrace Restrictions: enabled\n\tNVRAM Protections: enabled\n\tBaseSystem Verification: enabled\n\tBoot-arg Restrictions: enabled\n\tKernel Integrity Protections: enabled\n\tAuthenticated Root Requirement: enabled\n\nThis is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/csrutil",
+        "authenticated-root",
+        "status"
+      ],
+      "returncode": 71,
+      "stdout": "",
+      "stderr": "csrutil: No macOS installations found\n"
+    }
+  ],
+  "persistent_security_configuration_written": false,
+  "authenticated_root_status_confirmed": false
+}
