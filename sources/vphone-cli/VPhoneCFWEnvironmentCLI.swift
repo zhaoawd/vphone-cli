@@ -37,11 +37,19 @@ enum VPhoneEnvironmentDecision: Equatable {
         else {
             return .refuse(classification: nil, reasons: ["the eligibility check returned no classification"], exitCode: 2)
         }
+        func malformed() -> Self {
+            .refuse(classification: classification, reasons: ["the eligibility report has missing, malformed or contradictory fields"], exitCode: 2)
+        }
+        if let reasons = report["reasons"], !(reasons is [String]) { return malformed() }
         let reasons = report["reasons"] as? [String] ?? []
         switch classification {
         case "offline_update":
-            return .replace(libraries: report["replace"] as? [String] ?? [])
+            guard reasons.isEmpty, let libraries = report["replace"] as? [String], !libraries.isEmpty,
+                  Set(libraries).count == libraries.count,
+                  libraries.allSatisfy({ $0.range(of: "^[A-Za-z0-9_-][A-Za-z0-9_.-]*\\.dylib$", options: .regularExpression) != nil }) else { return malformed() }
+            return .replace(libraries: libraries)
         case "already_current":
+            guard reasons.isEmpty, let libraries = report["replace"] as? [String], libraries.isEmpty else { return malformed() }
             return .nothingToDo
         default:
             var details = reasons

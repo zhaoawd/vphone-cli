@@ -34,6 +34,25 @@ struct CFWEnvironmentUpdateTests {
             == .refuse(classification: "not_applicable", reasons: ["recorded variant less installs no CFW"], exitCode: 3))
     }
 
+    @Test func malformedOrContradictoryEligibilityNeverAuthorizesReplacementOrSuccess() throws {
+        let reports: [[String: Any]] = [
+            ["classification": "offline_update"],
+            ["classification": "offline_update", "replace": []],
+            ["classification": "offline_update", "replace": [1]],
+            ["classification": "offline_update", "replace": ["libcamfix.dylib", "libcamfix.dylib"]],
+            ["classification": "offline_update", "replace": ["../../outside.dylib"]],
+            ["classification": "offline_update", "replace": ["libcamfix.dylib"], "reasons": ["missing loader"]],
+            ["classification": "offline_update", "replace": ["libcamfix.dylib"], "reasons": 42],
+            ["classification": "already_current", "replace": ["libcamfix.dylib"]],
+            ["classification": "already_current"]
+        ]
+        for report in reports {
+            let text = String(decoding: try JSONSerialization.data(withJSONObject: report), as: UTF8.self)
+            let decision = VPhoneEnvironmentDecision.decide(checkStatus: 0, stdout: text, stderr: "")
+            guard case .refuse(_, _, 2) = decision else { Issue.record("invalid eligibility accepted: \(text)"); continue }
+        }
+    }
+
     @Test func checkFailuresRefuseExceptUnreadableDisk() {
         #expect(VPhoneEnvironmentDecision.decide(checkStatus: 4, stdout: "", stderr: "[-] VM lock held\n")
             == .refuse(classification: nil, reasons: ["[-] VM lock held"], exitCode: 4))
