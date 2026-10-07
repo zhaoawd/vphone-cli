@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-07",
+  "task_accepted": false,
+  "implementation_commit": "7e0503df4be0408108e3a4ca14597dee4cecc0c3",
+  "runtime_source_head": "2387af2015f3e86dbddca43d9ba1a9b06344c4b0",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "T42": {
+    "state": "audio_algorithms_source_pinned_host_verified_full_chain_pending",
+    "algorithm_modules": [
+      "Ring",
+      "Clock",
+      "Converter",
+      "Filter",
+      "Latency",
+      "Protocol"
+    ],
+    "source_files": 12,
+    "host_harnesses": 4,
+    "local_fix": {
+      "function": "VPVirtIOSoundLatencyPeriods",
+      "before": "uint64 addition overflows before ceiling and UInt32 saturation",
+      "reproduced_failures": 2,
+      "after": "quotient plus nonzero remainder, then existing saturation",
+      "test": "testPeriodsSaturateBeforeAdditionOverflow"
+    },
+    "verification": {
+      "guest_component_host_checks_pass": true,
+      "sanitized_harnesses_passed": 4,
+      "sanitizers": [
+        "AddressSanitizer",
+        "UndefinedBehaviorSanitizer"
+      ],
+      "thread_sanitizer_run": false,
+      "iphoneos_arm64e_objects_compiled": 6,
+      "HAL_driver_linked": false,
+      "Python_tests": 571,
+      "Python_seconds": 268.152,
+      "Python_pass": true
+    },
+    "not_implemented": [
+      "HAL plugin/build/package",
+      "VirtualAudio routes and microphone chain",
+      "DeviceTree/kernel qualification",
+      "host TCC and capture lifetime",
+      "host latency sync",
+      "full combination deployment/update/rollback",
+      "real playback/recording/duplex/mute/permission-denial/device matrix"
+    ],
+    "deployed": false,
+    "existing_six_component_stage_verified": true,
+    "existing_camera_ABI_and_five_library_environment_unchanged": true
+  },
+  "T03_diagnosis": {
+    "latest_screen": "Home screen observed; no direct unlock transition proven",
+    "programmatic_Settings_launch": "uiopen ok but no pid",
+    "standard_Settings_icon_tap": "request ok; no corresponding PID; later color screenshot digest equals before tap",
+    "mobile_uiopen": "su mobile command exit0; immediate process sample has no PID; final later independent process sample also has no Settings/Safari process. UID change alone did not establish a working launch; bootstrap/entitlement context not proven.",
+    "guest_tools_missing": [
+      "notifyutil",
+      "log"
+    ],
+    "pipeline_status_caveat": "log show not found, but tail pipeline exited0; this is not successful log collection",
+    "Safari_path_correction": "old assumed /Applications/MobileSafari.app missing; app_list records an application-container path, so that missing old path is not evidence the registered app is absent",
+    "application_failure_cause": "unknown",
+    "Settings_executable_exists": true,
+    "uiopen_options_match_classic_bridge": true
+  },
+  "runtime": {
+    "pid": 92943,
+    "instance": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+    "guest_connected": true,
+    "API_session": "reconnecting/transport",
+    "environment_status": "api_not_ready",
+    "actual_guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "kept_running": true,
+    "helper_debugserver_remaining": false,
+    "security_helper_run_this_turn": false,
+    "guest_or_kernel_payload_deployed": false,
+    "frozen_artifact_files_verified": 599
+  },
+  "full_swift_and_API_prior_limitations_retained": true,
+  "full_swift_rerun": false,
+  "reason_for_validation_scope": "C-only algorithm additions, source checker/build entrypoint and host harnesses; no Swift implementation or VM artifact rebuilt",
+  "main_head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "main_source_clean": true,
+  "vm_2607_operated": false,
+  "free_bytes_observed": 20994584576,
+  "screenshots": [
+    {
+      "original_path": "/private/tmp/vphone-b11-screen.png",
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b11-vm-new-20261007/initial-screen.jpg",
+      "bytes": 60431,
+      "sha256": "db1b56c346d56601a7ba564e140e160e168f21b1ec44e411f32db5c8a644012a"
+    },
+    {
+      "original_path": "/private/tmp/vphone-b11-after-mobile-uiopen.jpg",
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b11-vm-new-20261007/vphone-b11-after-mobile-uiopen.jpg",
+      "bytes": 59958,
+      "sha256": "8f75cbbfd04ce1b0c7a9a3020c252c8d490008f52513b979921f0d90fb28e35f"
+    },
+    {
+      "original_path": "/private/tmp/vphone-b11-after-tap.jpg",
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b11-vm-new-20261007/vphone-b11-after-tap.jpg",
+      "bytes": 59958,
+      "sha256": "8f75cbbfd04ce1b0c7a9a3020c252c8d490008f52513b979921f0d90fb28e35f"
+    },
+    {
+      "original_path": "/private/tmp/vphone-b11-before-tap.jpg",
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b11-vm-new-20261007/vphone-b11-before-tap.jpg",
+      "bytes": 59958,
+      "sha256": "8f75cbbfd04ce1b0c7a9a3020c252c8d490008f52513b979921f0d90fb28e35f"
+    },
+    {
+      "original_path": "/private/tmp/vphone-b11-tap-response.jpg",
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b11-vm-new-20261007/vphone-b11-tap-response.jpg",
+      "bytes": 24624,
+      "sha256": "68b5a9d8cbc7ce3f21497eecace36dee7b545d5da37a89cdc7b5ff457469bacf"
+    }
+  ],
+  "task_counts": {
+    "accepted": 2,
+    "partial": 42,
+    "pending_local_audit": 2,
+    "deferred_optional": 1,
+    "required_unaccepted": 44
+  }
+}

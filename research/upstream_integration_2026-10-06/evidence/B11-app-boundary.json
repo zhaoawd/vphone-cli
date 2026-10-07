@@ -1,0 +1,160 @@
+[
+  {
+    "request": {
+      "t": "app_list",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      }
+    },
+    "response": {
+      "ok": true,
+      "apps": [
+        {
+          "pid": 0,
+          "name": "Settings",
+          "type": "system",
+          "path": "/Applications/Preferences.app",
+          "state": "not_running",
+          "data_container": "",
+          "bundle_id": "com.apple.Preferences",
+          "version": "1"
+        },
+        {
+          "name": "Safari",
+          "data_container": "/private/var/mobile/Containers/Data/Application/C0CACF36-99E7-49C6-90A5-601843D00A99",
+          "type": "system",
+          "state": "not_running",
+          "pid": 0,
+          "path": "/private/var/containers/Bundle/Application/8267D05A-8582-404F-9A56-437A9750FE03/MobileSafari.app",
+          "version": "26.1",
+          "bundle_id": "com.apple.mobilesafari"
+        }
+      ]
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; uiopen --help; ls -l /var/jb/usr/bin/uiopen /Applications/Preferences.app/Preferences /Applications/MobileSafari.app/MobileSafari; ls -l /var/log; launchctl list | grep -E \"frontboard|runningboard|SpringBoard|vphoned\"",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 1,
+      "stderr": "ls: cannot access '/Applications/MobileSafari.app/MobileSafari': No such file or directory\n",
+      "timed_out": false,
+      "stdout": "Usage: uiopen [OPTION...]\nOpen URLs and open iOS applications by bundle ID\n\n  --url <URL>     Open the specified URL\n  --bundleid <id> Open application with the\n                     specified bundle id.\n  --app <app>     Open application with the\n                     specified name.\n  --path <path>   Open application at the specified path\n  --help          Give this help list.\n-rwxrwxr-x 1 root admin 1871008 Oct 31  2025 /Applications/Preferences.app/Preferences\n-rwxr-xr-x 1 root wheel   94384 Jun 10  2024 /var/jb/usr/bin/uiopen\ntotal 18700\ndrwxr-xr-x 2 root           wheel       64 Oct 31  2025 asl\ndrwxr-xr-x 2 root           wheel       64 Sep 29 17:07 com.apple.wifi.analytics\ndrwxr-xr-x 2 root           wheel      192 Oct  7 04:35 com.apple.xpc.launchd\n-rw-r--r-- 1 root           wheel    13704 Oct  7 03:43 fsck_apfs.log\ndrwxr-xr-x 2 _mdnsresponder wheel       64 Oct 31  2025 mDNSResponder\ndrwxr-xr-x 2 root           wheel       64 Oct 31  2025 ppp\n-rw-r--r-- 1 root           wheel     8158 Oct  7 04:27 vphone_jb_setup.log\n-rw-r--r-- 1 root           wheel 18250102 Oct  7 04:54 vphone_sshd.log\n-rw-rw-rw- 1 root           wheel      384 Sep 29 17:18 vphoned_fix.log\n",
+      "truncated": false,
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "screenshot",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "color": true
+    },
+    "response": {
+      "ok": true,
+      "saved_image": {
+        "path": "/private/tmp/vphone-b11-before-tap.jpg",
+        "bytes": 59958,
+        "sha256": "8f75cbbfd04ce1b0c7a9a3020c252c8d490008f52513b979921f0d90fb28e35f"
+      }
+    }
+  },
+  {
+    "request": {
+      "t": "tap",
+      "screen": true,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "x": 798,
+      "y": 1956,
+      "delay": 2000
+    },
+    "response": {
+      "ok": true,
+      "saved_image": {
+        "path": "/private/tmp/vphone-b11-tap-response.jpg",
+        "bytes": 24624,
+        "sha256": "68b5a9d8cbc7ce3f21497eecace36dee7b545d5da37a89cdc7b5ff457469bacf"
+      }
+    }
+  },
+  {
+    "request": {
+      "t": "app_foreground",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      }
+    },
+    "response": {
+      "name": "",
+      "source": "unknown",
+      "pid": 0,
+      "bundle_id": "",
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"Preferences.app/Preferences|MobileSafari.app/MobileSafari\"",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 1,
+      "stderr": "",
+      "timed_out": false,
+      "stdout": "",
+      "truncated": false,
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "screenshot",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "color": true
+    },
+    "response": {
+      "ok": true,
+      "saved_image": {
+        "path": "/private/tmp/vphone-b11-after-tap.jpg",
+        "bytes": 59958,
+        "sha256": "8f75cbbfd04ce1b0c7a9a3020c252c8d490008f52513b979921f0d90fb28e35f"
+      }
+    }
+  }
+]

@@ -1,0 +1,21 @@
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundTests \
+		Tests/VirtIOSoundTests.c VirtIOSound/VPVirtIOSoundProtocol.c VirtIOSound/VPVirtIOSoundRing.c \
+		VirtIOSound/VPVirtIOSoundFilter.c
+VirtIOSoundTests: all passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundClockTests \
+		Tests/VirtIOSoundClockTests.c VirtIOSound/VPVirtIOSoundClock.c
+VirtIOSoundClockTests: 395516 racing reads, 0 refused
+VirtIOSoundClockTests: all passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundConverterTests \
+		Tests/VirtIOSoundConverterTests.c VirtIOSound/VPVirtIOSoundConverter.c
+VirtIOSoundConverterTests: all passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundLatencyTests \
+		Tests/VirtIOSoundLatencyTests.c VirtIOSound/VPVirtIOSoundLatency.c
+Tests/VirtIOSoundLatencyTests.c:107: CHECK(VPVirtIOSoundLatencyPeriods(UINT64_MAX, 32768) == UINT32_MAX) failed
+Tests/VirtIOSoundLatencyTests.c:109: CHECK(VPVirtIOSoundLatencyPeriods(UINT64_MAX, UINT32_MAX) == UINT32_MAX) failed
+VirtIOSoundLatencyTests: 2 failure(s)
+make: *** [test-virtiosound] Error 1

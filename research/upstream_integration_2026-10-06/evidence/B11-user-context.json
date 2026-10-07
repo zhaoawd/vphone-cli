@@ -1,0 +1,103 @@
+[
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; command -v su; id mobile",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 0,
+      "stderr": "",
+      "timed_out": false,
+      "stdout": "/var/jb/usr/bin/su\nuid=501(mobile) gid=501(mobile) groups=501(mobile),250(_analyticsusers),286,299(systemusers)\n",
+      "truncated": false,
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; su mobile -c '/var/jb/usr/bin/uiopen --bundleid com.apple.Preferences'",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 0,
+      "stderr": "",
+      "timed_out": false,
+      "stdout": "",
+      "truncated": false,
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"Preferences.app/Preferences|MobileSafari.app/MobileSafari\"",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 1,
+      "stderr": "",
+      "timed_out": false,
+      "stdout": "",
+      "truncated": false,
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "app_foreground",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      }
+    },
+    "response": {
+      "name": "",
+      "source": "unknown",
+      "pid": 0,
+      "ok": true,
+      "bundle_id": ""
+    }
+  },
+  {
+    "request": {
+      "t": "screenshot",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "color": true
+    },
+    "response": {
+      "ok": true,
+      "saved_image": {
+        "path": "/private/tmp/vphone-b11-after-mobile-uiopen.jpg",
+        "bytes": 59958,
+        "sha256": "8f75cbbfd04ce1b0c7a9a3020c252c8d490008f52513b979921f0d90fb28e35f"
+      }
+    }
+  }
+]

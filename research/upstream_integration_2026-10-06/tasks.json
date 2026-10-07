@@ -974,16 +974,21 @@
         "evidence/B10-checkpoint.json",
         "evidence/B10-runtime-probe.json",
         "evidence/B10-stop-action.json",
-        "evidence/B10-restart-check.json"
+        "evidence/B10-restart-check.json",
+        "evidence/B11-summary.json",
+        "evidence/B11-diagnose.json",
+        "evidence/B11-app-boundary.json",
+        "evidence/B11-user-context.json",
+        "evidence/B11-final-state.json"
       ],
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "B10 未观察解锁成功，锁屏状态目标应用无 PID；B09 主屏幕状态应用也无 PID，原因未查明。客户机 API 会话未就绪。",
-      "current_environment_note": "vm-new 使用冻结新候选 2387af20 继续运行（本轮最终 PID 92943、instance 068574F6-DEF3-4910-88AB-57F5330C7A02）。原配置、身份预测文件和客户机载荷摘要未变；临时 helper/debugserver 已清理，持久安全设置观测与 B09 一致。vm-2607 未操作。",
-      "current_capacity_bytes": 21240094720,
-      "current_result": "B10 新停机 APFS 检查点 65 文件与源元数据核对通过。新冻结候选 2387af20 启动、正常停机和重启通过，测试文件跨重启摘要一致并已清理，实际原 daemon 摘要未变。解锁未验证、Settings/Safari 无 PID，API 会话未就绪；T03 完整恢复与应用验收仍未通过。",
-      "available_capacity_gib": 19.78,
+      "blocked_reason": "B11 主屏幕状态 Settings 启动仍无 PID，原因未查明；输入解锁过程未证明，客户机 API 会话未就绪。",
+      "current_environment_note": "vm-new 继续使用 B09 冻结的 2387af20 新宿主（PID 92943、instance 068574F6-DEF3-4910-88AB-57F5330C7A02）。B11 新音频算法提交 7e0503df 未部署。配置、身份预测和原客户机载荷摘要未变，无临时 helper/debugserver，vm-2607 未操作。",
+      "current_capacity_bytes": 20994584576,
+      "current_result": "B10 新候选启动、正常停机/重启及测试文件持久化已验证。B11 最新截图显示主屏幕，Settings 程序化启动、一次图标触控及 mobile 身份 uiopen 请求后均未观察目标进程；原因未查明。原 daemon/config/身份预测摘要保持一致，API 未就绪，完整恢复与应用验收仍未通过。",
+      "available_capacity_gib": 19.55,
       "capacity_observed_date": "2026-10-07",
       "selected_vm_path": "/Users/qcz3840/github/vphone-cli/vm-new",
       "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups",
@@ -2880,10 +2885,15 @@
         "evidence/B10-summary.json",
         "evidence/B10-http-probe.json",
         "evidence/B10-restart-runtime-probe.json",
-        "evidence/B10-final-state.json"
+        "evidence/B10-final-state.json",
+        "evidence/B11-summary.json",
+        "evidence/B11-diagnose.json",
+        "evidence/B11-app-boundary.json",
+        "evidence/B11-user-context.json",
+        "evidence/B11-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "B09 冻结源码 2387af20 的签名候选在本轮限定授权下启动 vm-new；正常停机退出 0，无辅助进程重启后 classic 通信、原 daemon 摘要、测试文件持久化、旧 instance 拒绝与令牌轮换检查通过。锁屏解锁未验证，Settings/Safari 无 PID；API 健康请求返回 502。T29 未验收。",
+      "current_result": "B09 冻结源码 2387af20 的候选已于 B10 完成启动、正常停机和重启，classic/hash/marker/instance/token 检查通过。B11 已观察主屏幕，但输入解锁过程未证明，Settings 启动仍无 PID；API 仍 reconnecting/transport。新音频算法未编入或部署到该候选。T29 未验收。",
       "remaining_work": [
         "Prerequisite T28 acceptance; minimum 2.6 and supported major/minor series policy remain unimplemented (local current minimum 2.2).",
         "Resolve/verify unlocking and target applications; guest API health and session remain unavailable. Complete signed UI and actual hardware keyboard acceptance.",
@@ -3679,7 +3689,7 @@
         "T43",
         "T44"
       ],
-      "status": "pending_local_audit",
+      "status": "audio_algorithms_source_pinned_host_verified_full_chain_pending",
       "upstream_paths": [
         "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwareVirtualAudioGraphConfigurations.swift",
@@ -3705,12 +3715,38 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "audio_algorithms_source_pinned_host_verified_full_chain_pending",
+        "paths": [
+          "sources/VPhoneGuestComponents/VirtIOSound/",
+          "sources/VPhoneGuestComponents/Tests/VirtIOSound*Tests.c",
+          "scripts/check_virtio_sound.py",
+          "dependencies/virtio-sound-pins.json",
+          "sources/VPhoneGuestComponents/Makefile"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "7e0503df4be0408108e3a4ca14597dee4cecc0c3"
+      ],
+      "verification_evidence": [
+        "evidence/B11-summary.json",
+        "evidence/B11-source-review.json",
+        "evidence/B11-audio-missing-red.log",
+        "evidence/B11-audio-overflow-red.log",
+        "evidence/B11-guest-components-green.log",
+        "evidence/B11-audio-platform.log",
+        "evidence/B11-python-full.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "固定上游六个音频算法模块及四个宿主测试程序已接入，延迟周期 uint64 加法溢出经 2 项失败复现后修正。宿主组件检查、四个 ASAN/UBSAN 程序、六个 iPhoneOS arm64e 算法目标文件编译及 Python 571 项通过。没有 HAL 工件或音频链部署，T42 未验收。",
+      "remaining_work": [
+        "HAL plugin/build/package",
+        "VirtualAudio routes and microphone chain",
+        "DeviceTree/kernel qualification",
+        "host TCC and capture lifetime",
+        "host latency sync",
+        "full combination deployment/update/rollback",
+        "real playback/recording/duplex/mute/permission-denial/device matrix"
+      ]
     },
     {
       "id": "T43",
@@ -4288,8 +4324,9 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     },
     "B09: prepare/freeze T29 artifacts early without treating unaccepted T28 or any version number as capability equivalence. Retain failed checkpoint and rerun exact metadata/digest validation with diagnostics; do not weaken guards. New CDHash requires separate security authorization; old runtime is separately labeled.",
-    "B10: human confirmed exact candidate CDHash authorization; use independent empty config and clean helper. Boot/restart/classic compatibility and proxy token rejection do not accept guest API health, application behavior, full restored sample, T28 or T29. Retain failed driver attempts and distinguish locked-screen B10 observations from B09 home-screen observations."
+    "B10: human confirmed exact candidate CDHash authorization; use independent empty config and clean helper. Boot/restart/classic compatibility and proxy token rejection do not accept guest API health, application behavior, full restored sample, T28 or T29. Retain failed driver attempts and distinguish locked-screen B10 observations from B09 home-screen observations.",
+    "B11: advance already-authorized T42 algorithm source integration and host tests without treating pending full-chain dependencies as accepted. Separate source7e0503df from running candidate2387af20. Keep upstream hashes and local saturation delta explicit; C tests/objects do not prove HAL linkage, permissions or media runtime."
   ],
-  "latest_implementation_head": "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3",
-  "latest_validation_limitation": "B10 exact frozen source2387af20 candidate boot/normal-stop/restart and classic guest/hash/marker/instance/token rotation checks passed; helper/debugserver cleaned. Unlock and target app launches unverified/failed; authenticated health502, guest API reconnecting, environment api_not_ready. No source/rebuild/new guest deployment/full test rerun or task acceptance. T28/version-series/mixed matrix and prior full Swift/API limitations retained."
+  "latest_implementation_head": "7e0503df4be0408108e3a4ca14597dee4cecc0c3",
+  "latest_validation_limitation": "B11 pinned T42 audio algorithm sources/harnesses and overflow fix pass host/ASAN/UBSAN/iPhoneOS-object/Python571 checks. No HAL/route/kernel/capture/TCC/host sync port or guest deployment. Running frozen source2387af20 unchanged; Home screen observed, Settings still no PID after classic/tap/mobile-uiopen probes, cause unknown; API reconnecting/environment unavailable. Full Swift/API limitations and all full VM/recovery acceptance remain; required unaccepted44."
 }

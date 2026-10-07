@@ -459,3 +459,28 @@ CUA 选择确切 candidate.app，观察并操作 Home 工具栏按钮、垂直�
 T03 与 T29 保持部分推进。T28 前置验收、目标 Core Bundle >=2.6.0、支持 major.minor series 策略、完整混合版本升级/回退矩阵，以及已恢复样本的目标应用仍未通过。此前完整 Swift/API HTTP/WS 的失败与未测范围保留，本轮未重跑测试套件。47 项台账仍为 2 项 accepted、41 项部分推进、3 项待本地对账（T30/T31/T42）、1 项可选延期，44 项必选任务未验收。固定上游提交覆盖台账未改变。
 
 追加前核对 471 份原证据与 3 份输入副本的已提交字节；新增 53 份证据后清单为 524 项。重启日志保存有界快照，私有原日志继续写入。主仓库源码仍为 e8d825b3 且干净，vm-2607 未操作。证据入口：`evidence/B10-summary.json`、`evidence/B10-session-results.json`、`evidence/B10-restart-check.json`。
+
+
+### 2026-10-07 B11：T42 音频算法与应用启动排查
+
+T42 从待本地对账进入部分推进。本轮实现提交为 `7e0503df4be0408108e3a4ca14597dee4cecc0c3`，导入固定目标 `2d21d21fbdd4f51f013616273ceda9b35a3e0789` 的 Ring、Clock、Converter、Filter、Latency、Protocol 六个模块，共 12 个源码/头文件和四个宿主测试程序。逐文件来源在 `dependencies/virtio-sound-pins.json`；只有延迟周期算法及其测试含本地差异。音频来源清单独立于现有六个 dylib 来源清单，不扩大其激活范围。
+
+首次测试确认本地算法源码缺失。导入后，`testPeriodsSaturateBeforeAdditionOverflow` 在 UINT64_MAX、周期 32768 和 UINT32_MAX 两个输入上失败。原因已确认：原实现先计算 `bytes + periodBytes - 1`，uint64 加法溢出发生在取整和 UInt32 饱和之前。改为商加非零余数，再执行原饱和逻辑；回归与原用例通过。保留两个失败日志，不将缺源码编译失败计为数值问题的复现。
+
+| 对象 | 本轮结果 | 未验证范围 |
+| --- | --- | --- |
+| 宿主组件入口 | RootHide loader-link、相机 124 次检查和四个音频程序通过 | 实际客户机组件加载与媒体行为 |
+| 音频算法 | PCM 选择、ring 生命周期、输入积压/重启、44.1/48 kHz 转换、时钟竞争、高通和延迟用例通过 | HAL 调用、采集期间控制和音频设备 |
+| 内存检查 | 四个程序在 AddressSanitizer/UndefinedBehaviorSanitizer 下通过 | 未运行 ThreadSanitizer；不据此证明所有并发场景 |
+| iPhoneOS 编译 | 六个算法模块以 arm64e、iOS 26.0 编译为目标文件 | 未链接 HAL driver，不证明实际 OS/设备兼容 |
+| Python | 完整套件 571 项、268.152 秒通过 | 此前完整 Swift/API 与固件/VM 未测范围保留 |
+
+`make test_guest_components` 已包含音频来源检查和四个程序，原 fast Swift 入口会调用该目标。六个既有签名 dylib stage 的来源、签名与记录摘要核对通过，stage 内容没有改写；新音频模块不加入该安装包。HAL 插件、VirtualAudio 路由与麦克风链、DeviceTree/kernel 资格、宿主 TCC/采集生命周期、宿主延迟同步和完整部署/升级/回退仍待实现。T42 的原依赖和验收条件保留，算法用例不能代替真实录放、双工、静音、权限拒绝或其他机型验收。
+
+vm-new 继续运行 B09 冻结的源码 `2387af20` 候选，PID 92943、instance `068574F6-DEF3-4910-88AB-57F5330C7A02`。本轮没有 VM 宿主重建、daemon/shared-components 安装、kernel/Preboot 写入或 amfid 操作。最终再次核对保存工件 599 个文件摘要，实际客户机 daemon、配置和身份预测摘要未变，主仓库源码仍为 e8d825b3 且干净。新源码提交与当前 VM 工件来源分别记录。
+
+最新 host-control 截图显示主屏幕，但不证明哪次输入完成了解锁。Settings 程序化启动仍返回 `uiopen ok but no pid`。应用注册信息指向存在的 `/Applications/Preferences.app/Preferences`；uiopen 帮助中的参数与 classic bridge 一致。Safari 注册路径位于 application container，旧假定 `/Applications/MobileSafari.app` 的缺失不能证明已注册 Safari 不存在。一次主屏幕 Settings 图标触控返回 ok，之后未观察目标进程，稍后的彩色截图摘要与触控前一致。原因未查明，未据此改写安装、签名或权限逻辑。
+
+客户机没有 notifyutil 和 log。日志采集中的 `log show | tail` 最终退出 0，但 stderr 为 log not found，不能记为日志读取通过。另在确认 su 与 uid=501(mobile) 存在后，以 mobile 身份运行一次 uiopen，命令退出 0，立即进程样本无 PID；最终独立样本仍没有 Settings/Safari 进程。用户 ID 变化没有证明可用启动路径，Mach bootstrap 或运行时权限原因仍未确定。没有输入密码或更改账号、服务配置。classic 通信仍可用，API 为 reconnecting/transport，environment_status 为 api_not_ready。
+
+追加前核对原有 524 份证据与 3 份输入副本的已提交字节；本轮新增 18 份证据。47 项台账为 2 项 accepted、42 项部分推进、2 项待本地对账（T30/T31）、1 项可选延期，44 项必选仍未验收。固定上游提交覆盖台账未改变，vm-2607 未操作。证据入口：`evidence/B11-summary.json`、`evidence/B11-source-review.json`、`evidence/B11-app-boundary.json`。

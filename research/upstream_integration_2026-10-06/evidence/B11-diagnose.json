@@ -1,0 +1,184 @@
+[
+  {
+    "request": {
+      "t": "capabilities",
+      "screen": false
+    },
+    "response": {
+      "commands": {
+        "location_stop": true,
+        "app_terminate": true,
+        "location_stream_start": true,
+        "file_put": true,
+        "tap": true,
+        "environment_status": false,
+        "camera_present": true,
+        "camera_stop": true,
+        "environment_rollback": false,
+        "location_source_control": true,
+        "type": true,
+        "rpc": false,
+        "ipa_install": true,
+        "swipe": true,
+        "app_launch": true,
+        "shell": true,
+        "file_get": true,
+        "location": true,
+        "app_list": true,
+        "location_source_set": true,
+        "location_source_status": true,
+        "environment_update": false,
+        "location_source_stop": true,
+        "key": true,
+        "screenshot": true,
+        "capabilities": true,
+        "location_stream_push": true,
+        "camera_status": true,
+        "app_foreground": true,
+        "open_url": true
+      },
+      "screen_available": true,
+      "guest_capabilities": [
+        "hid",
+        "devmode",
+        "file",
+        "keychain",
+        "location",
+        "location_owned",
+        "ipa_install",
+        "clipboard",
+        "apps_v2",
+        "apps",
+        "app_launch",
+        "url",
+        "settings",
+        "shell",
+        "touch",
+        "touch_edge",
+        "vcam_status",
+        "vcam_receipt_v3"
+      ],
+      "api_session": {
+        "errorCode": "transport",
+        "state": "reconnecting",
+        "vmInstanceID": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "target": {
+        "vm": "vm-new",
+        "pid": 92943,
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+        "process_started_at": 1791372919.040498
+      },
+      "guest_connected": true,
+      "limits": {
+        "connections": 16,
+        "inline_file_bytes": 1048576,
+        "command_timeout_ms": 180000,
+        "host_file_bytes": 67108864,
+        "request_bytes": 2097152
+      },
+      "api_commands": {
+        "app_terminate": false,
+        "file_get": false,
+        "app_foreground": false,
+        "file_put": false,
+        "app_launch": false,
+        "app_list": false
+      },
+      "boot_mode": "normal",
+      "rpc_methods": [],
+      "ok": true,
+      "protocol_version": 1
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; id; ps -A -o pid=,comm= | grep -E \"SpringBoard|backboardd|vphoned|Preferences|MobileSafari\"; command -v notifyutil; command -v log; command -v launchctl; command -v uiopen; df -h /private/var",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 0,
+      "truncated": false,
+      "ok": true,
+      "stderr": "",
+      "timed_out": false,
+      "stdout": "uid=0(root) gid=0(wheel) groups=0(wheel)\n   39 /System/Library/CoreServices/SpringBoard.app/SpringBoard\n   70 /usr/bin/vphoned\n   78 /usr/libexec/backboardd\n   92 /System/Library/PrivateFrameworks/NanoPreferencesSync.framework/nanoprefsyncd\n  262 /System/Library/PrivateFrameworks/IntlPreferences.framework/Support/localizationswitcherd\n  468 /private/var/containers/Bundle/Application/8267D05A-8582-404F-9A56-437A9750FE03/MobileSafari.app/Extensions/SafariLinkExtension.appex/SafariLinkExtension\n/var/jb/usr/bin/launchctl\n/var/jb/usr/bin/uiopen\nFilesystem      Size    Used   Avail Capacity iused ifree %iused  Mounted on\n/dev/disk2s2    58Gi   5.5Gi    37Gi    13%     55k  390M    0%   /private/var\n"
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; notifyutil -g com.apple.springboard.lockstate; notifyutil -g com.apple.iokit.hid.displayStatus; notifyutil -g com.apple.springboard.finishedstartup",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 127,
+      "truncated": false,
+      "ok": true,
+      "stderr": "/var/jb/bin/sh: 1: notifyutil: not found\n/var/jb/bin/sh: 1: notifyutil: not found\n/var/jb/bin/sh: 1: notifyutil: not found\n",
+      "timed_out": false,
+      "stdout": ""
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; log show --last 2m --style compact --predicate 'process == \"SpringBoard\" OR process == \"backboardd\" OR process == \"uiopen\"' | tail -n 160",
+      "timeout_ms": 30000
+    },
+    "response": {
+      "code": 0,
+      "truncated": false,
+      "ok": true,
+      "stderr": "/var/jb/bin/sh: 1: log: not found\n",
+      "timed_out": false,
+      "stdout": ""
+    }
+  },
+  {
+    "request": {
+      "t": "app_launch",
+      "screen": false,
+      "bundle_id": "com.apple.Preferences"
+    },
+    "response": {
+      "ok": false,
+      "error": "com.apple.Preferences did not start (uiopen ok but no pid)"
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; log show --last 20s --style compact --predicate 'process == \"SpringBoard\" OR process == \"backboardd\" OR process == \"uiopen\" OR process == \"runningboardd\"' | tail -n 160",
+      "timeout_ms": 30000
+    },
+    "response": {
+      "code": 0,
+      "truncated": false,
+      "ok": true,
+      "stderr": "/var/jb/bin/sh: 1: log: not found\n",
+      "timed_out": false,
+      "stdout": ""
+    }
+  },
+  {
+    "request": {
+      "t": "screenshot",
+      "screen": false,
+      "color": true
+    },
+    "response": {
+      "ok": true,
+      "saved_image": {
+        "path": "/private/tmp/vphone-b11-screen.png",
+        "bytes": 60431,
+        "sha256": "db1b56c346d56601a7ba564e140e160e168f21b1ec44e411f32db5c8a644012a"
+      }
+    }
+  }
+]
