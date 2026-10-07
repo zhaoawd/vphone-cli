@@ -1645,7 +1645,7 @@
         "T12",
         "T14"
       ],
-      "status": "pending_local_audit",
+      "status": "classic_staging_references_validated_gpu_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Manifest/FirmwareManifest.swift",
@@ -1668,12 +1668,31 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "classic_prepare_publication_guard_verified",
+        "paths": [
+          "sources/vphone-cli/VPhoneNativeFirmwarePreparer.swift",
+          "tests/VPhoneCLITests/NativeFirmwarePrepareTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "a00bedde5147beeae537c8edea42e04d0a71bd3e"
+      ],
+      "verification_evidence": [
+        "evidence/B04-summary.json",
+        "evidence/B04-source-review.json",
+        "evidence/B04-related.log",
+        "evidence/B04-firmware.log",
+        "evidence/B04-t13-red.log",
+        "evidence/B04-t13-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "新增发布前生成 identity 与组件路径/存在性检查。缺引用组件、非法路径、symlink 或目录叶节点均拒绝发布并保留旧树。47 项 prepare/checkpoint 测试通过；使用合成组件，不证明真实固件摘要、GPU/v2 或 restore。",
+      "remaining_work": [
+        "component cryptographic digest and real firmware compatibility",
+        "GPU/v2",
+        "vphone600 input provenance/device catalog",
+        "trusted originals generation and VM restore"
+      ]
     },
     {
       "id": "T14",
@@ -1759,7 +1778,7 @@
         "T24",
         "T32"
       ],
-      "status": "pending_local_audit",
+      "status": "publication_window_validated_disk_receipt_recovery_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
         "VPhoneKit/VPhoneCoreKit/Process/VPhoneConfinedDirectory.swift"
@@ -1783,12 +1802,36 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "existing_offline_copy_transaction_audited_firmware_publication_hardened",
+        "paths": [
+          "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+          "scripts/cfw_install_host.sh",
+          "scripts/cfw_disk_txn.py",
+          "tests/FirmwarePatcherTests/FirmwareTransactionTests.swift",
+          "tests/test_cfw_disk_transaction.py"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "192ed0578ff521c7ebfb339de4eb86548fd8e221"
+      ],
+      "verification_evidence": [
+        "evidence/B04-summary.json",
+        "evidence/B04-source-review.json",
+        "evidence/B04-related.log",
+        "evidence/B04-firmware.log",
+        "evidence/B04-t15-red.log",
+        "evidence/B04-t15-green.log",
+        "evidence/B04-t15-disk.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "固件根事务增加备份前原件/暂存摘要、备份后摘要和全部已发布项读回检查，使用独占 rename，拒绝提交窗口变化。已有离线 clone/完整副本/拒绝路径及恢复窗口在 18 项合成写盘测试中通过。磁盘、配置、receipt 的共同恢复与真实 VM 验收仍待执行。",
+      "remaining_work": [
+        "original/staged owner and hardlink policy audit",
+        "disk/config/component receipt joint recovery",
+        "actual VM write/unmount/swap/recovery",
+        "full hashing cost on real restore trees",
+        "noncooperating path replacement races throughout tree digest"
+      ]
     },
     {
       "id": "T16",
@@ -1860,7 +1903,7 @@
         "T16",
         "T32"
       ],
-      "status": "pending_local_audit",
+      "status": "install_reply_readback_validated_activation_coordination_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
         "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift",
@@ -1889,12 +1932,36 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "host_install_protocol_guard_verified_guest_durability_pending",
+        "paths": [
+          "sources/vphone-cli/VPhoneGuestEnvironment.swift",
+          "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+          "sources/VPhoneDaemon/Daemon/Wire/EnvironmentTransaction.swift",
+          "tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "9389885bef8246a05d853f9a50e2385862f1872b",
+        "7067476117a59c9ec06fa6301b890f3b653b8adb",
+        "001507f408b580f8d20a18cc5d6f1d2f6bab0abd"
+      ],
+      "verification_evidence": [
+        "evidence/B04-summary.json",
+        "evidence/B04-source-review.json",
+        "evidence/B04-related.log",
+        "evidence/B04-firmware.log",
+        "evidence/B04-t17-red.log",
+        "evidence/B04-t17-green.log",
+        "evidence/B04-t17-nonobject-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "宿主严格核对安装回复字段、请求组件顺序/摘要、重复项、安装集合及状态，并读回被替换库摘要。异常返回 api_protocol、unknown 与可能继续操作，停止激活和重启。最终 20 项宿主更新测试通过；客户机日志写入失败、rollback 校验、写操作协调及混合版本 VM 验收仍待完成。",
+      "remaining_work": [
+        "guest journal write failures currently ignored in some paths",
+        "restore response strictness",
+        "mode eligibility binding and per-VM write coordination",
+        "lost reply/Stop competition/mixed versions and real VM activation"
+      ]
     },
     {
       "id": "T18",
@@ -2470,7 +2537,7 @@
         "T44",
         "T46"
       ],
-      "status": "pending_local_audit",
+      "status": "environment_contract_source_audited_final_docs_pending",
       "upstream_paths": [
         "Research/vphoned_http_api.md",
         "Documents/Guides/launchpad-cli.md",
@@ -2491,12 +2558,30 @@
         "docs"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "current_environment_contract_documented_whole_delivery_docs_pending",
+        "paths": [
+          "research/upstream_integration_2026-10-06/T28_environment_contract.md",
+          "research/upstream_integration_2026-10-06/audit_environment_contract.py"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "fc93ef102d55aa0c84e3568a747b26460fe35a58"
+      ],
+      "verification_evidence": [
+        "evidence/B04-summary.json",
+        "evidence/B04-source-review.json",
+        "evidence/B04-related.log",
+        "evidence/B04-firmware.log",
+        "evidence/B04-T28-audit.json",
+        "T28_environment_contract.md"
+      ],
+      "historical_evidence": [],
+      "current_result": "本地 host 清单与 daemon 白名单均为 5 库，固定上游 host/guest 均为 7 库，上游 HTTP 文档仍为 4 库。脚本核验源码和本地文档表格并记录摘要；方法、能力、参数、超时、权限、旧 daemon 与激活范围已记录。其他任务最终接口及交付证据尚未完成。",
+      "remaining_work": [
+        "剩余任务最终 API/配置/补丁/交付文档与版本支持矩阵",
+        "真实 VM、恢复与混合版本执行证据",
+        "最终候选与全部任务状态一致性复核"
+      ]
     },
     {
       "id": "T29",
@@ -2639,7 +2724,7 @@
         "T10",
         "T11"
       ],
-      "status": "pending_local_audit",
+      "status": "journal_report_integrity_validated_component_receipt_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift",
@@ -2661,12 +2746,33 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "existing_journal_report_binding_verified_component_receipt_unknown",
+        "paths": [
+          "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+          "sources/FirmwarePatcher/Core/PatchResult.swift",
+          "sources/FirmwarePatcher/PatchSet/PatchDeclarationGate.swift",
+          "tests/FirmwarePatcherTests/FirmwareTransactionTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "04f19d2be1bfaaf2104420c6fa80b0bd2ce6371a"
+      ],
+      "verification_evidence": [
+        "evidence/B04-summary.json",
+        "evidence/B04-source-review.json",
+        "evidence/B04-related.log",
+        "evidence/B04-firmware.log",
+        "evidence/B04-t32-red.log",
+        "evidence/B04-t32-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "复用现有 journal 保存 reportSHA256；提交、记录 committed 和恢复时校验精确报告字节。提交复用必需失败与计划声明检查；缺历史摘要仍为未知证据。不新增 PatchReceipt.plist，不由 enabled 推断 applied，不确认客户机激活。",
+      "remaining_work": [
+        "PatchReceipt.plist import/store/component mapping",
+        "per-record output byte proof for each component",
+        "VM/generation/disk transaction linkage",
+        "Guest/kernel/boot-chain delivery, activation and acceptance"
+      ]
     },
     {
       "id": "T33",
@@ -3685,6 +3791,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "de12a67930fe4ffa522faef23508b82b40472ee4",
-  "latest_validation_limitation": "B03: related694/89 and firmware15/12 passed; full Swift not rerun, earlier default16 and serial HTTP wait remain unresolved. No signed rebuild or VM operation. T11/T12/T14 remain partial."
+  "latest_implementation_head": "001507f408b580f8d20a18cc5d6f1d2f6bab0abd",
+  "latest_validation_limitation": "B04: related719/92 + XCTest117/3 skipped and firmware15/12 passed before final T17-only outcome-field fix; final20 environment XCTest passed. Disk18 synthetic tests passed. Full suite not rerun; previous global failures remain unexplained. No signed rebuild/deployment/VM operation; all five tasks partial."
 }

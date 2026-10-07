@@ -1,0 +1,115 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "source_reads": [
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Manifest/FirmwareManifest.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "d3463fff4a5c5692f0d7e5f982291171b5e5f28f7ae6b013d8cab56c78f728f9",
+      "evidence": "evidence/B04-T13-manifest.swift"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneCoreKit/Firmware/VPhonePCCGPUDriver.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "464bcca8cc20ceabb1114d5e66b1f1cfb4bfaa6d09d90769d9d106bc3f6b9490",
+      "evidence": "evidence/B04-T13-gpu.swift"
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "c545be1e0d2105610d0446fbbf2c65dd44533968f2e3029e3b08fd2241aa6e95",
+      "evidence": "evidence/B04-T15-installer.swift"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneCoreKit/Process/VPhoneConfinedDirectory.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "9e08956dfc498a7bed71fba03a46ce3faf51c2e64993a1840af2ef7ff2071ba5",
+      "evidence": "evidence/B04-T15-confined.swift"
+    },
+    {
+      "upstream_path": "VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "360d97bcdbaab2ae0d199d059da25c3bcf79031b3e8bcb21c575d0984efea0f4",
+      "evidence": "evidence/B04-T17-guest.swift"
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "ddd37c62fae3b7e0f62ad373e8cc153d1a5e8b692c22abd14d26d6a4c00fe892",
+      "evidence": "evidence/B04-T17-host.swift"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "cff82e72dee8e19006324ba3862a70c4408b3be27a475d865162778360fe3030",
+      "evidence": "evidence/B04-T17-libraries.swift"
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "1e1064ec602c50941385df37da728679454d22cfafbaa379e1cbfed6a051d471",
+      "evidence": "evidence/B04-T32-store.swift"
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "12d508ee8c5409c7b2ce1bde0b2533496d9686654cf7ce455c5e6af7cbfafbab",
+      "evidence": "evidence/B04-T32-drift.swift"
+    },
+    {
+      "upstream_path": "Research/vphoned_http_api.md",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "b4549c6872f2f3c5c11804a3a74fcb043298859f22c37e88a583fc7ac19fe9d0",
+      "evidence": "evidence/B04-T28-api-doc.md"
+    }
+  ],
+  "review_scope": "path and interface audit only; whole upstream commits remain pending semantic review",
+  "T13": {
+    "upstream": "prepare stages manifest, local/cache/recovered GPU bundle checked for expected platform version, compiler plugin then publishes; preparer source preserved in B03",
+    "local": "classic local-archive prepare; staged generated identity and referenced ordinary files checked before publication; no GPU recovery/cache/compiler integration",
+    "verified": "real archive extraction with synthetic component bytes; missing/unsafe/symlink/directory references refuse publication and preserve old tree",
+    "not_verified": [
+      "component cryptographic digest and real firmware compatibility",
+      "GPU/v2",
+      "vphone600 input provenance/device catalog",
+      "trusted originals generation and VM restore"
+    ]
+  },
+  "T15": {
+    "upstream": "clone failure can select original Disk.img; component receipt writes best-effort; do not adopt original-disk fallback",
+    "local_existing": "cfw_disk_txn.py clone with sampled verification or full sparse-copy SHA256 verification; refusal if neither; previous disk retained after swap/exclusive fallback; temporary disk/command doubles used for Python tests",
+    "fixed": "firmware-root publication rechecks original/staged/backup bytes, final all-entry readback including no-op, final binding/mount/report verification and exclusive move",
+    "not_verified": [
+      "original/staged owner and hardlink policy audit",
+      "disk/config/component receipt joint recovery",
+      "actual VM write/unmount/swap/recovery",
+      "full hashing cost on real restore trees",
+      "noncooperating path replacement races throughout tree digest"
+    ]
+  },
+  "T17": {
+    "upstream": "7 libraries, two environment methods, install may restart camera/MIS daemons; host defaults missing installed to [] and reboot flag to false",
+    "local": "5 libraries; transaction and mapped-library activation capabilities; no automatic process restart; install response validated before activation; known library digest readback",
+    "fixed": "missing/duplicate/unrequested rows, requested hashes and installed set, required phase fields and failure order refused; non-object and inconsistent replies carry unknown outcome and possible side effect",
+    "not_verified": [
+      "guest journal write failures currently ignored in some paths",
+      "restore response strictness",
+      "mode eligibility binding and per-VM write coordination",
+      "lost reply/Stop competition/mixed versions and real VM activation"
+    ]
+  },
+  "T32": {
+    "upstream": "part-wise PatchReceipt/Drift; unknown part applied=nil, reference falls back to plan; restoredParts uses enabled patches; best-effort receipt updates",
+    "local": "existing journal/report and declaration gate reused; optional exact reportSHA256 associates stored report with publication; no applied set derived from plan",
+    "not_verified": [
+      "PatchReceipt.plist import/store/component mapping",
+      "per-record output byte proof for each component",
+      "VM/generation/disk transaction linkage",
+      "Guest/kernel/boot-chain delivery, activation and acceptance"
+    ]
+  },
+  "T28": {
+    "source_audit": "local host manifest/daemon lists agree at 5; fixed upstream host/guest agree at 7; fixed upstream document still lists 4",
+    "document": "T28_environment_contract.md contains current method/capability/limits/legacy/activation and evidence distinctions",
+    "not_verified": "remaining task implementation/final delivery source/version matrix and VM acceptance; document is current source scope only"
+  }
+}

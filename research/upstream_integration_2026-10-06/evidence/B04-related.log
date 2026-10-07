@@ -1,0 +1,2251 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/14] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.25s)
+Test Suite 'Selected tests' started at 2026-10-07 15:08:28.736.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 15:08:28.736.
+Test Suite 'FirmwareTransactionAcceptanceTests' started at 2026-10-07 15:08:28.737.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testLargeImageDigestUsesBoundedMemory]' started.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testLargeImageDigestUsesBoundedMemory]' passed (0.160 seconds).
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareTransactionAcceptanceTests.swift:26: -[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts] : Test skipped - Set an isolated C4 firmware fixture directory
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts]' skipped (0.001 seconds).
+Test Suite 'FirmwareTransactionAcceptanceTests' passed at 2026-10-07 15:08:28.898.
+	 Executed 2 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.161 (0.162) seconds
+Test Suite 'FirmwareTransactionCrashTests' started at 2026-10-07 15:08:28.898.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareTransactionAcceptanceTests.swift:71: -[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess] : Test skipped - Only invoked by the crash recovery test
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess]' skipped (0.000 seconds).
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testRecoveryAfterProcessExitsWithoutUnwinding]' started.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testRecoveryAfterProcessExitsWithoutUnwinding]' passed (0.149 seconds).
+Test Suite 'FirmwareTransactionCrashTests' passed at 2026-10-07 15:08:29.048.
+	 Executed 2 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.150 (0.150) seconds
+Test Suite 'FullPipelineParityTests' started at 2026-10-07 15:08:29.048.
+Test Case '-[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FullPipelineParityTests.swift:10: -[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch] : Test skipped - Set VPHONE_TEST_PIPELINE_VM to a fresh staged firmware VM directory
+Test Case '-[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch]' skipped (0.001 seconds).
+Test Suite 'FullPipelineParityTests' passed at 2026-10-07 15:08:29.049.
+	 Executed 1 test, with 1 test skipped and 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-07 15:08:29.049.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testAllCurrentUploadsAndInstallsNothing]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testAllCurrentUploadsAndInstallsNothing]' passed (0.007 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCandidateStageIsVerifiedBeforeGuestContact]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCandidateStageIsVerifiedBeforeGuestContact]' passed (0.007 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCapabilityGates]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCapabilityGates]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCLIRequestsAndRestartValidation]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCLIRequestsAndRestartValidation]' passed (0.037 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testFailedReplacementReturnsRecoveryRecordAndNoOverallSuccess]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testFailedReplacementReturnsRecoveryRecordAndNoOverallSuccess]' passed (0.007 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstalledReadbackMismatchDoesNotReachActivation]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstalledReadbackMismatchDoesNotReachActivation]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart]' passed (0.024 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMissingGuestLibraryOrAliasNeedsFullMigration]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMissingGuestLibraryOrAliasNeedsFullMigration]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testOnlyDifferingLibrariesAreUploadedVerifiedAndReplaced]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testOnlyDifferingLibrariesAreUploadedVerifiedAndReplaced]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRebootRequiredFalseIsNotReportedAsLoaded]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRebootRequiredFalseIsNotReportedAsLoaded]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRespringIsReportedButNeverPerformed]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRespringIsReportedButNeverPerformed]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestartOutsideTheWhitelistIsRefusedBeforeGuestContact]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestartOutsideTheWhitelistIsRefusedBeforeGuestContact]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackNamesTheTransaction]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackNamesTheTransaction]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRPCStillRefusesGuestLibraryReplacement]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRPCStillRefusesGuestLibraryReplacement]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStagedDigestMismatchIsRefusedBeforeInstall]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStagedDigestMismatchIsRefusedBeforeInstall]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStatusWithoutComponentsReportsGuestDigestsOnly]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStatusWithoutComponentsReportsGuestDigestsOnly]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testSummaryNamesRequiredActionsAndRecovery]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testSummaryNamesRequiredActionsAndRecovery]' passed (0.008 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUninspectedProcessesMakeLoadStatePartial]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUninspectedProcessesMakeLoadStatePartial]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownLoadStateFallsBackToManifestActions]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownLoadStateFallsBackToManifestActions]' passed (0.005 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' passed at 2026-10-07 15:08:29.201.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.151 (0.152) seconds
+Test Suite 'HostControlClientTests' started at 2026-10-07 15:08:29.201.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseAfterBytesWithoutLF]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseAfterBytesWithoutLF]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseWithoutBytes]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testCloseWithoutBytes]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testDefaultLimitCoversWorstCaseInlineFile]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testDefaultLimitCoversWorstCaseInlineFile]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testPathChecksBeforeConnecting]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testPathChecksBeforeConnecting]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseLimitExcludesLF]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseLimitExcludesLF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseSplitAcrossWritesAndTrailingBytesIgnored]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testResponseSplitAcrossWritesAndTrailingBytesIgnored]' passed (0.103 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testRoundTripSendsPayloadPlusLF]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testRoundTripSendsPayloadPlusLF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSilentServerHitsDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSilentServerHitsDeadline]' passed (0.303 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSocketOwnedByAnotherUserIsRefused]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testSocketOwnedByAnotherUserIsRefused]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testStaleSocketIsRefused]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testStaleSocketIsRefused]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlClientTests testTricklingBytesDoNotExtendDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlClientTests testTricklingBytesDoNotExtendDeadline]' passed (0.350 seconds).
+Test Suite 'HostControlClientTests' passed at 2026-10-07 15:08:29.966.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.764 (0.765) seconds
+Test Suite 'HostControlIOTests' started at 2026-10-07 15:08:29.966.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEmptyConnectionAndMalformedJSON]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEmptyConnectionAndMalformedJSON]' passed (0.026 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFAndPartialRequestTimeout]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFAndPartialRequestTimeout]' passed (0.023 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFCompletesRequest]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testEOFCompletesRequest]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testFileLimitAndNonRegularFile]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testFileLimitAndNonRegularFile]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testLimitExcludesTerminatorAndFollowingRequests]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testLimitExcludesTerminatorAndFollowingRequests]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testNonReadingPeerHasWriteDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testNonReadingPeerHasWriteDeadline]' passed (0.023 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testOversizeIsRejectedWithoutEOF]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testOversizeIsRejectedWithoutEOF]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testRequestBeyondOldBoundaryAndUTF8]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testRequestBeyondOldBoundaryAndUTF8]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.HostControlIOTests testSplitUTF8AndSlowConnectionDeadline]' started.
+Test Case '-[VPhoneCoreTests.HostControlIOTests testSplitUTF8AndSlowConnectionDeadline]' passed (0.220 seconds).
+Test Suite 'HostControlIOTests' passed at 2026-10-07 15:08:30.265.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.297 (0.299) seconds
+Test Suite 'SystemLocationControllerTests' started at 2026-10-07 15:08:30.265.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCancelledDeliveryWaiterNeverReachesGuest]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCancelledDeliveryWaiterNeverReachesGuest]' passed (0.017 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCancelledQueuedWatchdogCannotPublishHoldingIntent]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCancelledQueuedWatchdogCannotPublishHoldingIntent]' passed (0.062 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testClearLegacyLocationCommitsOwnedPersistentStop]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testClearLegacyLocationCommitsOwnedPersistentStop]' passed (0.005 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCommittedPersistenceClearDoesNotRestoreOnNextLoad]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCommittedPersistenceClearDoesNotRestoreOnNextLoad]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCorruptInstanceDoesNotChangeOtherInstancesPersistedSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testCorruptInstanceDoesNotChangeOtherInstancesPersistedSource]' passed (0.009 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testDefinitiveNACKDuringControlReleasesPendingProducer]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testDefinitiveNACKDuringControlReleasesPendingProducer]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testDefinitiveNACKReleasesPendingProducerAndDelivery]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testDefinitiveNACKReleasesPendingProducerAndDelivery]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testExactProducerRetryConvergesAfterLostPauseAck]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testExactProducerRetryConvergesAfterLostPauseAck]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedFixedStopRepairRestartsMissingHeartbeat]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedFixedStopRepairRestartsMissingHeartbeat]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedPausedStopRepairPreservesPauseIntent]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedPausedStopRepairPreservesPauseIntent]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedPendingProducerReapplyRetriesPendingProducer]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedPendingProducerReapplyRetriesPendingProducer]' passed (0.059 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedRawRollbackMakesExactProducerRetryRebindGuest]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedRawRollbackMakesExactProducerRetryRebindGuest]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedReconnectPreservesPauseIntentForNextReconnect]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedReconnectPreservesPauseIntentForNextReconnect]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedReconnectPreservesWatchdogHoldingForNextReconnect]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFailedReconnectPreservesWatchdogHoldingForNextReconnect]' passed (0.508 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedHeartbeatCannotUndoPauseWhileWaitingForDeliveryTurn]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedHeartbeatCannotUndoPauseWhileWaitingForDeliveryTurn]' passed (0.102 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceAcceptsUnknownAltitudeAndDeliversSentinel]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceAcceptsUnknownAltitudeAndDeliversSentinel]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRefreshesUntilStopped]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRefreshesUntilStopped]' passed (0.013 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRejectsNonSentinelNegativeVerticalAccuracy]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRejectsNonSentinelNegativeVerticalAccuracy]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRejectsUnsafeHeartbeatBeforeGuestActivation]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRejectsUnsafeHeartbeatBeforeGuestActivation]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRequiresZeroSequenceAndConfiguredPersistence]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testFixedSourceRequiresZeroSequenceAndConfiguredPersistence]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testGUIRelinquishDuringStopCannotRestorePersistentSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testGUIRelinquishDuringStopCannotRestorePersistentSource]' passed (0.004 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testHoldingHeartbeatConfirmsMovingProducerWithoutFreezingItAgain]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testHoldingHeartbeatConfirmsMovingProducerWithoutFreezingItAgain]' passed (0.410 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testHoldingLostAckStopRepairCommitsMovingProducer]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testHoldingLostAckStopRepairCommitsMovingProducer]' passed (0.205 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testInterruptedPersistenceClearRestoresOnNextLoad]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testInterruptedPersistenceClearRestoresOnNextLoad]' passed (0.005 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testInvalidTimeoutModeFailsBeforeGuestActivation]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testInvalidTimeoutModeFailsBeforeGuestActivation]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLegacyCommitFailureRestoresPersistedFixThroughRawGuest]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLegacyCommitFailureRestoresPersistedFixThroughRawGuest]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLegacyGuestStopFailureKeepsPersistentOwnedSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLegacyGuestStopFailureKeepsPersistentOwnedSource]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLostAckBindsProducerSequenceToExactPayload]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLostAckBindsProducerSequenceToExactPayload]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLostAckRetriesExactFrameBeforeAdvancingSequence]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testLostAckRetriesExactFrameBeforeAdvancingSequence]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testNewPersistentCandidateSupersedesInterruptedClear]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testNewPersistentCandidateSupersedesInterruptedClear]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOldGenerationCannotPushOrStopReplacement]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOldGenerationCannotPushOrStopReplacement]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOtherOwnerNeedsExplicitReplace]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOtherOwnerNeedsExplicitReplace]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOwnedCapabilityFailureDoesNotChangePersistentSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOwnedCapabilityFailureDoesNotChangePersistentSource]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOwnerConflictDoesNotChangePersistentFixedSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testOwnerConflictDoesNotChangePersistentFixedSource]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPauseUsesIndependentDeliverySequence]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPauseUsesIndependentDeliverySequence]' passed (0.014 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPendingReapplyRetryPreservesStopWatchdog]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPendingReapplyRetryPreservesStopWatchdog]' passed (0.055 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPersistedFixedSourceRestoresWithNewGeneration]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPersistedFixedSourceRestoresWithNewGeneration]' passed (0.004 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPersistedUnsafeHeartbeatIsQuarantined]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPersistedUnsafeHeartbeatIsQuarantined]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPersistentFixedCandidateSurvivesLostInitialAck]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPersistentFixedCandidateSurvivesLostInitialAck]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPushWhilePausedUpdatesCoordinateWithoutResuming]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testPushWhilePausedUpdatesCoordinateWithoutResuming]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testQueuedReconnectCannotUndoPauseThatFinishesFirst]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testQueuedReconnectCannotUndoPauseThatFinishesFirst]' passed (0.009 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testQueuedReconnectCannotUndoResumeThatFinishesFirst]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testQueuedReconnectCannotUndoResumeThatFinishesFirst]' passed (0.007 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectCommitsFirstProducerAfterLostAck]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectCommitsFirstProducerAfterLostAck]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectCommitsNextProducerWithoutRollingBackCoordinate]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectCommitsNextProducerWithoutRollingBackCoordinate]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectReappliesLastAckWithNewDeliverySequence]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectReappliesLastAckWithNewDeliverySequence]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectReapplyCannotUndoLaterResume]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReconnectReapplyCannotUndoLaterResume]' passed (0.010 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testRelinquishForGUIFailsClosedWhenPersistenceCannotBeRemoved]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testRelinquishForGUIFailsClosedWhenPersistenceCannotBeRemoved]' passed (0.004 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testRelinquishForGUISupersedesInterruptedClear]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testRelinquishForGUISupersedesInterruptedClear]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReplacementWaitsForInFlightActivation]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReplacementWaitsForInFlightActivation]' passed (0.009 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReplacementWaitsForInFlightDelivery]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReplacementWaitsForInFlightDelivery]' passed (0.009 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReplacementWaitsForInFlightStop]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testReplacementWaitsForInFlightStop]' passed (0.008 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testRestoredFixedSourceRetriesAfterInitialReapplyFailure]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testRestoredFixedSourceRetriesAfterInitialReapplyFailure]' passed (0.018 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testSequenceCommitsOnlyAfterGuestAck]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testSequenceCommitsOnlyAfterGuestAck]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStaleExternalOwnershipFailsBeforeQueuedReplacementCommits]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStaleExternalOwnershipFailsBeforeQueuedReplacementCommits]' passed (0.010 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopClearsOnlyOwnedGeneration]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopClearsOnlyOwnedGeneration]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopCommitFailureRollsBackFileAndGuest]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopCommitFailureRollsBackFileAndGuest]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopGenerationConflictRebindsPersistentSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopGenerationConflictRebindsPersistentSource]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopLostClearAckRestoresPersistentSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopLostClearAckRestoresPersistentSource]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopPersistenceStageFailureHasNoGuestSideEffect]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopPersistenceStageFailureHasNoGuestSideEffect]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopRollbackFailureLeavesRecoverableSidecar]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopRollbackFailureLeavesRecoverableSidecar]' passed (0.003 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopUnavailableAfterAppliedClearRebindsPersistentSource]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStopUnavailableAfterAppliedClearRebindsPersistentSource]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamAcceptsStrictSequenceAndCachesIdenticalRetry]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamAcceptsStrictSequenceAndCachesIdenticalRetry]' passed (0.001 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamRejectsUnsafeWatchdogBeforeGuestActivation]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamRejectsUnsafeWatchdogBeforeGuestActivation]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamReplacingPersistentFixedSourceDoesNotRestoreAfterReload]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamReplacingPersistentFixedSourceDoesNotRestoreAfterReload]' passed (0.002 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamStartDelegatesResidualClearToAtomicGuestActivation]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testStreamStartDelegatesResidualClearToAtomicGuestActivation]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testWatchdogCanStopOwnedStream]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testWatchdogCanStopOwnedStream]' passed (0.014 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testWatchdogHoldsLastAcceptedCoordinate]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationControllerTests testWatchdogHoldsLastAcceptedCoordinate]' passed (0.013 seconds).
+Test Suite 'SystemLocationControllerTests' passed at 2026-10-07 15:08:31.935.
+	 Executed 67 tests, with 0 failures (0 unexpected) in 1.657 (1.669) seconds
+Test Suite 'SystemLocationValidationTests' started at 2026-10-07 15:08:31.935.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testCourseRangeRejected]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testCourseRangeRejected]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testLatitudeAndLongitudeRangeRejected]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testLatitudeAndLongitudeRangeRejected]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testNonFiniteValuesRejected]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testNonFiniteValuesRejected]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testNonPositiveAccuracyRejected]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testNonPositiveAccuracyRejected]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testUnknownAltitudeSentinelAccepted]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testUnknownAltitudeSentinelAccepted]' passed (0.000 seconds).
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testValidFixAccepted]' started.
+Test Case '-[VPhoneCoreTests.SystemLocationValidationTests testValidFixAccepted]' passed (0.000 seconds).
+Test Suite 'SystemLocationValidationTests' passed at 2026-10-07 15:08:31.937.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 15:08:31.937.
+	 Executed 117 tests, with 3 tests skipped and 0 failures (0 unexpected) in 3.181 (3.201) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 15:08:31.937.
+	 Executed 117 tests, with 3 tests skipped and 0 failures (0 unexpected) in 3.181 (3.201) seconds
+[location] failed to clear persisted fixed source: VPhoneSystemLocationError(code: "test_clear_failure", message: "test clear failure", definitiveGuestRejection: false)
+[location] failed to quarantine persisted fixed source: VPhoneSystemLocationError(code: "test_quarantine_failure", message: "test quarantine failure", definitiveGuestRejection: false)
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ArtifactStructuredTests started.
+◇ Test deviceTreeRebuildMatchesLegacyAndReportsIdempotence() started.
+✔ Test deviceTreeRebuildMatchesLegacyAndReportsIdempotence() passed after 0.001 seconds.
+◇ Test deviceTreeMissingPropertyDoesNotHideBehindSuccessfulProperties() started.
+✔ Test deviceTreeMissingPropertyDoesNotHideBehindSuccessfulProperties() passed after 0.001 seconds.
+◇ Test deviceTreeAblationOmitsThePropertyDuringRebuild() started.
+✔ Test deviceTreeAblationOmitsThePropertyDuringRebuild() passed after 0.001 seconds.
+◇ Test filesystemFailureAndAblationProduceNoArtifacts() started.
+Merging Filesystems
+✔ Test filesystemFailureAndAblationProduceNoArtifacts() passed after 0.006 seconds.
+◇ Test manifestHashStepRebuildsTheSameBytesAndReportsMissingInput() started.
+✔ Test manifestHashStepRebuildsTheSameBytesAndReportsMissingInput() passed after 0.001 seconds.
+◇ Test failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() started.
+✔ Test failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() passed after 0.022 seconds.
+◇ Test excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "regular", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "regular", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "dev", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "dev", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "jb", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "jb", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "exp", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "exp", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+✔ Test excGuardPipelineTruthTable(variant:ios18:) with 8 test cases passed after 0.280 seconds.
+◇ Test artifactStepsMatchManifest() started.
+✔ Test artifactStepsMatchManifest() passed after 0.005 seconds.
+◇ Test lessDryRunRejectsFilesystemSideEffectsBeforeOpeningInputs() started.
+✔ Test lessDryRunRejectsFilesystemSideEffectsBeforeOpeningInputs() passed after 0.001 seconds.
+✔ Suite ArtifactStructuredTests passed after 0.319 seconds.
+➜ Suite DeviceTreeStructuredParityTests skipped.
+➜ Test originalDeviceTreeParity(exp:) skipped.
+◇ Suite CatalogReferenceValidationTests started.
+◇ Test refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "requires" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "conflicts" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "after" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+✔ Test refusesAReferenceToAnUnknownDeclaration(relation:) with 3 test cases passed after 0.001 seconds.
+◇ Test knownConflictAndOrderTargetsMayBeInactive() started.
+✔ Test knownConflictAndOrderTargetsMayBeInactive() passed after 0.001 seconds.
+✔ Suite CatalogReferenceValidationTests passed after 0.002 seconds.
+◇ Suite DeclarationGateTests started.
+◇ Test unknownDeclarationSelected() started.
+✔ Test unknownDeclarationSelected() passed after 0.001 seconds.
+◇ Test notImplementedSelected() started.
+✔ Test notImplementedSelected() passed after 0.001 seconds.
+◇ Test duplicateDeclaration() started.
+✔ Test duplicateDeclaration() passed after 0.001 seconds.
+◇ Test missingDependencyStructural() started.
+✔ Test missingDependencyStructural() passed after 0.001 seconds.
+◇ Test missingDependencyWhenTargetNotEnabled() started.
+✔ Test missingDependencyWhenTargetNotEnabled() passed after 0.001 seconds.
+◇ Test conflictBetweenEnabled() started.
+✔ Test conflictBetweenEnabled() passed after 0.001 seconds.
+◇ Test cyclicOrder() started.
+✔ Test cyclicOrder() passed after 0.001 seconds.
+◇ Test versionIndeterminateWhenBaseUnknown() started.
+✔ Test versionIndeterminateWhenBaseUnknown() passed after 0.001 seconds.
+◇ Test requiredMissingWhenPipelineLacksStep() started.
+✔ Test requiredMissingWhenPipelineLacksStep() passed after 0.001 seconds.
+◇ Test liveStepUndeclaredWhenCatalogIncomplete() started.
+✔ Test liveStepUndeclaredWhenCatalogIncomplete() passed after 0.001 seconds.
+◇ Test gatePassesForACleanReport() started.
+✔ Test gatePassesForACleanReport() passed after 0.001 seconds.
+◇ Test gateRejectsAnUndeclaredRecord() started.
+✔ Test gateRejectsAnUndeclaredRecord() passed after 0.001 seconds.
+◇ Test gateRejectsANotEnabledRecord() started.
+✔ Test gateRejectsANotEnabledRecord() passed after 0.001 seconds.
+◇ Test gateIgnoresNotApplicableAndAblatedResults() started.
+✔ Test gateIgnoresNotApplicableAndAblatedResults() passed after 0.001 seconds.
+◇ Test gateRejectsRecordsWithoutAnOwningResult() started.
+✔ Test gateRejectsRecordsWithoutAnOwningResult() passed after 0.001 seconds.
+◇ Test gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument index → -1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument index → 1 to gateRejectsInvalidRecordIndices(index:) started.
+✔ Test gateRejectsInvalidRecordIndices(index:) with 2 test cases passed after 0.001 seconds.
+◇ Test gateRejectsDuplicateRecordIndicesWithinAResult() started.
+✔ Test gateRejectsDuplicateRecordIndicesWithinAResult() passed after 0.001 seconds.
+◇ Test gateRejectsMultipleOwnersForARecord() started.
+✔ Test gateRejectsMultipleOwnersForARecord() passed after 0.001 seconds.
+◇ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() started.
+✔ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() passed after 0.001 seconds.
+◇ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument outcome → .ablated to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument outcome → .notApplicable to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+✔ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) with 2 test cases passed after 0.001 seconds.
+◇ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() started.
+✔ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() passed after 0.001 seconds.
+◇ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() started.
+✔ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() passed after 0.001 seconds.
+◇ Test gateChecksOwnershipForDeclaredFailedSteps() started.
+✔ Test gateChecksOwnershipForDeclaredFailedSteps() passed after 0.001 seconds.
+◇ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test case passing 1 argument unattributed → false to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test case passing 1 argument unattributed → true to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+✔ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) with 2 test cases passed after 0.168 seconds.
+✔ Suite DeclarationGateTests passed after 0.178 seconds.
+◇ Suite ExpStructuredTests started.
+◇ Test expRequiresBothOidAndCallersAndAcceptsVerifiedIdempotence() started.
+✔ Test expRequiresBothOidAndCallersAndAcceptsVerifiedIdempotence() passed after 0.001 seconds.
+✔ Suite ExpStructuredTests passed after 0.001 seconds.
+➜ Suite ExpStructuredParityTests skipped.
+➜ Test expKernelRecordsAndPayloadMatch() skipped.
+➜ Suite KernelPipelineParityTests skipped.
+➜ Test baseJBAndEXPComposeWithoutChangingBytes() skipped.
+◇ Suite ExplicitSelectionExecutionTests started.
+◇ Test explicitSelectionCannotCrossVariantBoundary() started.
+✔ Test explicitSelectionCannotCrossVariantBoundary() passed after 0.001 seconds.
+◇ Test explicitSelectionCannotEnableFridaWithoutOptIn() started.
+✔ Test explicitSelectionCannotEnableFridaWithoutOptIn() passed after 0.001 seconds.
+◇ Test explicitSelectionCannotOverrideVersionCondition() started.
+✔ Test explicitSelectionCannotOverrideVersionCondition() passed after 0.001 seconds.
+◇ Test explicitSelectionRequiresALiveExecutableStep() started.
+✔ Test explicitSelectionRequiresALiveExecutableStep() passed after 0.001 seconds.
+◇ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() started.
+✔ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() passed after 0.001 seconds.
+◇ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() started.
+✔ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() passed after 0.001 seconds.
+◇ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() started.
+✔ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() passed after 0.001 seconds.
+◇ Test supportedExplicitSelectionRetainsExecutableStep() started.
+✔ Test supportedExplicitSelectionRetainsExecutableStep() passed after 0.001 seconds.
+✔ Suite ExplicitSelectionExecutionTests passed after 0.009 seconds.
+◇ Suite ARM64ConstantTests started.
+◇ Test nop() started.
+✔ Test nop() passed after 0.001 seconds.
+◇ Test ret() started.
+✔ Test ret() passed after 0.001 seconds.
+◇ Test retaa() started.
+✔ Test retaa() passed after 0.001 seconds.
+◇ Test retab() started.
+✔ Test retab() passed after 0.001 seconds.
+◇ Test pacibsp() started.
+✔ Test pacibsp() passed after 0.001 seconds.
+◇ Test movX0_0() started.
+✔ Test movX0_0() passed after 0.001 seconds.
+◇ Test movX0_1() started.
+✔ Test movX0_1() passed after 0.001 seconds.
+◇ Test movW0_0() started.
+✔ Test movW0_0() passed after 0.001 seconds.
+◇ Test movW0_1() started.
+✔ Test movW0_1() passed after 0.001 seconds.
+◇ Test cmpW0W0() started.
+✔ Test cmpW0W0() passed after 0.001 seconds.
+◇ Test cmpX0X0() started.
+✔ Test cmpX0X0() passed after 0.001 seconds.
+◇ Test movX0X20() started.
+✔ Test movX0X20() passed after 0.001 seconds.
+◇ Test strbW0X20_30() started.
+✔ Test strbW0X20_30() passed after 0.001 seconds.
+◇ Test movW0_0xA1() started.
+✔ Test movW0_0xA1() passed after 0.001 seconds.
+✔ Suite ARM64ConstantTests passed after 0.002 seconds.
+◇ Suite ARM64EncoderTests started.
+◇ Test typedOperandHelpersExposeRegisterAndImmediate() started.
+✔ Test typedOperandHelpersExposeRegisterAndImmediate() passed after 0.001 seconds.
+◇ Test encodeBCondEqForward() started.
+✔ Test encodeBCondEqForward() passed after 0.001 seconds.
+◇ Test encodeCmpImmediateW() started.
+✔ Test encodeCmpImmediateW() passed after 0.001 seconds.
+◇ Test encodeCmpRegisterX() started.
+✔ Test encodeCmpRegisterX() passed after 0.001 seconds.
+◇ Test encodeLdrImmediateX() started.
+✔ Test encodeLdrImmediateX() passed after 0.001 seconds.
+◇ Test encodeMovkX() started.
+✔ Test encodeMovkX() passed after 0.001 seconds.
+◇ Test encodeMrsTpidrEl1() started.
+✔ Test encodeMrsTpidrEl1() passed after 0.001 seconds.
+◇ Test encodeBForward() started.
+✔ Test encodeBForward() passed after 0.001 seconds.
+◇ Test encodeBBackward() started.
+✔ Test encodeBBackward() passed after 0.001 seconds.
+◇ Test encodeBLForward() started.
+✔ Test encodeBLForward() passed after 0.001 seconds.
+◇ Test decodeBranchTarget() started.
+✔ Test decodeBranchTarget() passed after 0.001 seconds.
+◇ Test encodeBOutOfRange() started.
+✔ Test encodeBOutOfRange() passed after 0.001 seconds.
+◇ Test encodeADRP() started.
+✔ Test encodeADRP() passed after 0.001 seconds.
+◇ Test encodeAddImm12() started.
+✔ Test encodeAddImm12() passed after 0.001 seconds.
+◇ Test encodeMovXFromZR() started.
+✔ Test encodeMovXFromZR() passed after 0.001 seconds.
+◇ Test encodeMovXIsRegisterMove() started.
+✔ Test encodeMovXIsRegisterMove() passed after 0.001 seconds.
+◇ Test encodeTestBitBranchRoundTrips() started.
+✔ Test encodeTestBitBranchRoundTrips() passed after 0.001 seconds.
+◇ Test encodeMovzWClearsTSSFCheckEntitlement() started.
+✔ Test encodeMovzWClearsTSSFCheckEntitlement() passed after 0.001 seconds.
+✔ Suite ARM64EncoderTests passed after 0.001 seconds.
+◇ Suite FpfsScopedOpenCaveTests started.
+◇ Test caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() started.
+✔ Test caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() passed after 0.001 seconds.
+✔ Suite FpfsScopedOpenCaveTests passed after 0.001 seconds.
+◇ Suite ARM64InstTests started.
+◇ Test fieldAccessors() started.
+✔ Test fieldAccessors() passed after 0.001 seconds.
+◇ Test adrp() started.
+✔ Test adrp() passed after 0.001 seconds.
+◇ Test ldrImm64() started.
+✔ Test ldrImm64() passed after 0.001 seconds.
+◇ Test cmpReg64() started.
+✔ Test cmpReg64() passed after 0.001 seconds.
+◇ Test subImm32() started.
+✔ Test subImm32() passed after 0.001 seconds.
+◇ Test movzW() started.
+✔ Test movzW() passed after 0.001 seconds.
+◇ Test andRegW() started.
+✔ Test andRegW() passed after 0.001 seconds.
+◇ Test lsrImm7W() started.
+✔ Test lsrImm7W() passed after 0.001 seconds.
+◇ Test branchPredicates() started.
+✔ Test branchPredicates() passed after 0.001 seconds.
+◇ Test compareAndBranch() started.
+✔ Test compareAndBranch() passed after 0.001 seconds.
+✔ Suite ARM64InstTests passed after 0.001 seconds.
+◇ Suite BinaryBufferTests started.
+◇ Test readWriteU32() started.
+✔ Test readWriteU32() passed after 0.001 seconds.
+◇ Test findString() started.
+✔ Test findString() passed after 0.001 seconds.
+◇ Test findAll() started.
+✔ Test findAll() passed after 0.001 seconds.
+◇ Test readUnalignedValues() started.
+✔ Test readUnalignedValues() passed after 0.001 seconds.
+✔ Suite BinaryBufferTests passed after 0.001 seconds.
+◇ Suite FirmwarePipelineDataFlowTests started.
+◇ Test chainedPatchersReceivePreviousPatchedBytes() started.
+✔ Test chainedPatchersReceivePreviousPatchedBytes() passed after 0.001 seconds.
+✔ Suite FirmwarePipelineDataFlowTests passed after 0.001 seconds.
+◇ Suite IBootPatcherIdempotencyTests started.
+◇ Test serialLabelsPatchTwoBannerRunsWhenLabelAbsent() started.
+✔ Test serialLabelsPatchTwoBannerRunsWhenLabelAbsent() passed after 0.001 seconds.
+◇ Test serialLabelsSkipWhenLabelAlreadyPresent() started.
+✔ Test serialLabelsSkipWhenLabelAlreadyPresent() passed after 0.001 seconds.
+◇ Test serialLabelsDoNotSkipForUnrelatedSingleLabel() started.
+✔ Test serialLabelsDoNotSkipForUnrelatedSingleLabel() passed after 0.001 seconds.
+✔ Suite IBootPatcherIdempotencyTests passed after 0.001 seconds.
+◇ Suite FirmwarePipelineTests started.
+◇ Test findFileSupportsGlobPatterns() started.
+✔ Test findFileSupportsGlobPatterns() passed after 0.001 seconds.
+✔ Suite FirmwarePipelineTests passed after 0.001 seconds.
+◇ Suite FridaGatingTests started.
+◇ Test cloudOSVersionGate() started.
+✔ Test cloudOSVersionGate() passed after 0.001 seconds.
+✔ Suite FridaGatingTests passed after 0.001 seconds.
+◇ Suite StructuredPatchResultTests started.
+◇ Test requiredMissingFailsComponent() started.
+✔ Test requiredMissingFailsComponent() passed after 0.001 seconds.
+◇ Test conditionalRuleControlsNotApplicableVsFailed() started.
+✔ Test conditionalRuleControlsNotApplicableVsFailed() passed after 0.001 seconds.
+◇ Test optionalMissingBecomesNotApplicableNotFailed() started.
+✔ Test optionalMissingBecomesNotApplicableNotFailed() passed after 0.001 seconds.
+◇ Test idempotentBecomesAlreadyApplied() started.
+✔ Test idempotentBecomesAlreadyApplied() passed after 0.001 seconds.
+◇ Test ambiguousFailsEvenWhenOptional() started.
+✔ Test ambiguousFailsEvenWhenOptional() passed after 0.001 seconds.
+◇ Test partialSuccessKeepsAppliedResults() started.
+✔ Test partialSuccessKeepsAppliedResults() passed after 0.001 seconds.
+◇ Test patchGroupMissingOneRecordFails() started.
+✔ Test patchGroupMissingOneRecordFails() passed after 0.001 seconds.
+◇ Test ablatingRequiredStepDoesNotFailComponent() started.
+✔ Test ablatingRequiredStepDoesNotFailComponent() passed after 0.001 seconds.
+◇ Test unknownAblationIdThrows() started.
+✔ Test unknownAblationIdThrows() passed after 0.124 seconds.
+◇ Test knownAblationTargetsCoverMigratedPatchers() started.
+✔ Test knownAblationTargetsCoverMigratedPatchers() passed after 0.001 seconds.
+◇ Test patchRunReportRoundTripsThroughJSON() started.
+✔ Test patchRunReportRoundTripsThroughJSON() passed after 0.001 seconds.
+◇ Test legacyPatcherCoverageAndSemantics() started.
+✔ Test legacyPatcherCoverageAndSemantics() passed after 0.001 seconds.
+✔ Suite StructuredPatchResultTests passed after 0.126 seconds.
+◇ Suite C1AlignmentTests started.
+◇ Test allManifestGatesMatchDeclaredRules() started.
+✔ Test allManifestGatesMatchDeclaredRules() passed after 0.005 seconds.
+◇ Test avpBooterStepsEqualManifestMethods() started.
+✔ Test avpBooterStepsEqualManifestMethods() passed after 0.001 seconds.
+◇ Test iBootJBStepsSubsetOfManifestMethods() started.
+✔ Test iBootJBStepsSubsetOfManifestMethods() passed after 0.001 seconds.
+◇ Test iBootBaseIBSSStepsSubsetOfManifestMethods() started.
+✔ Test iBootBaseIBSSStepsSubsetOfManifestMethods() passed after 0.001 seconds.
+◇ Test iBECStepsEqualManifestMethods() started.
+✔ Test iBECStepsEqualManifestMethods() passed after 0.001 seconds.
+◇ Test llbStepsEqualManifestMethods() started.
+✔ Test llbStepsEqualManifestMethods() passed after 0.001 seconds.
+◇ Test txmRegularStepsEqualManifestMethods() started.
+✔ Test txmRegularStepsEqualManifestMethods() passed after 0.001 seconds.
+◇ Test txmDevStepsEqualManifestMethods() started.
+✔ Test txmDevStepsEqualManifestMethods() passed after 0.001 seconds.
+✔ Suite C1AlignmentTests passed after 0.012 seconds.
+◇ Suite MigratedPatcherParityTests started.
+◇ Test avpBooterFindAllEqualsStepPath_syntheticNoMatch() started.
+✔ Test avpBooterFindAllEqualsStepPath_syntheticNoMatch() passed after 0.002 seconds.
+◇ Test avpBooterFindAllEqualsStepPath_realData() started.
+✔ Test avpBooterFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test iBootJBFindAllEqualsStepPath_realData() started.
+✔ Test iBootJBFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test iBSSBaseFindAllEqualsStepPath_realData() started.
+✔ Test iBSSBaseFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test iBECFindAllEqualsStepPath_realData() started.
+✔ Test iBECFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test llbFindAllEqualsStepPath_realData() started.
+✔ Test llbFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test txmFindAllEqualsStepPath_realData() started.
+✔ Test txmFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test txmDevFindAllEqualsStepPath_realData() started.
+✔ Test txmDevFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test kernelFindAllEqualsStepPath_syntheticNoMatch() started.
+✔ Test kernelFindAllEqualsStepPath_syntheticNoMatch() passed after 0.001 seconds.
+◇ Test kernelFindAllEqualsStepPath_realData() started.
+✔ Test kernelFindAllEqualsStepPath_realData() passed after 0.001 seconds.
+◇ Test dryAblationRunDoesNotSave() started.
+✔ Test dryAblationRunDoesNotSave() passed after 0.001 seconds.
+✔ Suite MigratedPatcherParityTests passed after 0.003 seconds.
+◇ Suite FirmwarePlanBindingTests started.
+◇ Test newPlanJournalBindsContextAndUsesVersionTwo() started.
+✔ Test newPlanJournalBindsContextAndUsesVersionTwo() passed after 0.016 seconds.
+◇ Test editedRecordCannotAuthorizeRecovery(_:) started.
+◇ Test case passing 1 argument field → "plan" to editedRecordCannotAuthorizeRecovery(_:) started.
+◇ Test case passing 1 argument field → "options" to editedRecordCannotAuthorizeRecovery(_:) started.
+◇ Test case passing 1 argument field → "original" to editedRecordCannotAuthorizeRecovery(_:) started.
+✔ Test editedRecordCannotAuthorizeRecovery(_:) with 3 test cases passed after 0.041 seconds.
+◇ Test missingBindingIsNotTreatedAsLegacyVersionTwo() started.
+✔ Test missingBindingIsNotTreatedAsLegacyVersionTwo() passed after 0.011 seconds.
+◇ Test changedVMConfigRefusesCommitBeforePublication() started.
+✔ Test changedVMConfigRefusesCommitBeforePublication() passed after 0.011 seconds.
+◇ Test explicitLegacyRecoveryDoesNotUpgradeTheRecord() started.
+✔ Test explicitLegacyRecoveryDoesNotUpgradeTheRecord() passed after 0.013 seconds.
+◇ Test missingCorruptUnsupportedAndUnreadableAreDistinct() started.
+✔ Test missingCorruptUnsupportedAndUnreadableAreDistinct() passed after 0.011 seconds.
+◇ Test unsupportedOrChangedBindingIsRefused(_:) started.
+◇ Test case passing 1 argument field → "schemaVersion" to unsupportedOrChangedBindingIsRefused(_:) started.
+◇ Test case passing 1 argument field → "planSHA256" to unsupportedOrChangedBindingIsRefused(_:) started.
+◇ Test case passing 1 argument field → "contextSHA256" to unsupportedOrChangedBindingIsRefused(_:) started.
+✔ Test unsupportedOrChangedBindingIsRefused(_:) with 3 test cases passed after 0.039 seconds.
+◇ Test replacementDirectoryAtSamePathCannotReuseTheBinding() started.
+✔ Test replacementDirectoryAtSamePathCannotReuseTheBinding() passed after 0.015 seconds.
+✔ Suite FirmwarePlanBindingTests passed after 0.161 seconds.
+◇ Suite FirmwareTransactionTests started.
+◇ Test stagedWritesDoNotAlterOriginalAndCommitPublishesAllFiles() started.
+✔ Test stagedWritesDoNotAlterOriginalAndCommitPublishesAllFiles() passed after 0.014 seconds.
+◇ Test recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 0 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 1 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 2 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 3 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 4 to recoveryHandlesEveryRenameWindow(_:) started.
+✔ Test recoveryHandlesEveryRenameWindow(_:) with 5 test cases passed after 0.067 seconds.
+◇ Test repeatedRecoverySurvivesInterruptionDuringRollback() started.
+✔ Test repeatedRecoverySurvivesInterruptionDuringRollback() passed after 0.018 seconds.
+◇ Test committedRecoveryDoesNotRollBackSuccessfulPublication() started.
+✔ Test committedRecoveryDoesNotRollBackSuccessfulPublication() passed after 0.016 seconds.
+◇ Test diskFullWhileCopyingOrPreparingCommitKeepsOriginal() started.
+✔ Test diskFullWhileCopyingOrPreparingCommitKeepsOriginal() passed after 0.015 seconds.
+◇ Test editInBackupWindowIsNotOverwritten() started.
+✔ Test editInBackupWindowIsNotOverwritten() passed after 0.009 seconds.
+◇ Test stageEditAfterBackupDoesNotPublishUnknownBytes() started.
+✔ Test stageEditAfterBackupDoesNotPublishUnknownBytes() passed after 0.011 seconds.
+◇ Test publishedEditCannotBecomeACommittedReceipt() started.
+✔ Test publishedEditCannotBecomeACommittedReceipt() passed after 0.013 seconds.
+◇ Test changedOrMissingReportPreventsCommit(_:) started.
+◇ Test case passing 1 argument remove → false to changedOrMissingReportPreventsCommit(_:) started.
+◇ Test case passing 1 argument remove → true to changedOrMissingReportPreventsCommit(_:) started.
+✔ Test changedOrMissingReportPreventsCommit(_:) with 2 test cases passed after 0.016 seconds.
+◇ Test changedCommittedReportIsNotArchivedByRecovery() started.
+✔ Test changedCommittedReportIsNotArchivedByRecovery() passed after 0.015 seconds.
+◇ Test archivedReportIsBoundToExactSavedBytes() started.
+✔ Test archivedReportIsBoundToExactSavedBytes() passed after 0.015 seconds.
+◇ Test requiredFailureReportCannotCommit() started.
+✔ Test requiredFailureReportCannotCommit() passed after 0.009 seconds.
+◇ Test externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() started.
+✔ Test externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() passed after 0.007 seconds.
+◇ Test recoveryValidatesAllEntriesBeforeRestoringAny() started.
+✔ Test recoveryValidatesAllEntriesBeforeRestoringAny() passed after 0.014 seconds.
+◇ Test symlinkInputAndOutputAreRejected() started.
+✔ Test symlinkInputAndOutputAreRejected() passed after 0.010 seconds.
+◇ Test existingTransactionAndActiveToolBlockNewWorkAndRecovery() started.
+✔ Test existingTransactionAndActiveToolBlockNewWorkAndRecovery() passed after 0.008 seconds.
+◇ Test attachedImageFailurePreventsPublication() started.
+✔ Test attachedImageFailurePreventsPublication() passed after 0.008 seconds.
+◇ Test lessManifestChecksEveryReferencedArtifact() started.
+✔ Test lessManifestChecksEveryReferencedArtifact() passed after 0.002 seconds.
+◇ Test lessManifestChecksRetypedIM4PDigest() started.
+✔ Test lessManifestChecksRetypedIM4PDigest() passed after 0.002 seconds.
+◇ Test killedInitializationWithoutJournalCanBeArchived() started.
+✔ Test killedInitializationWithoutJournalCanBeArchived() passed after 0.002 seconds.
+◇ Test corruptJournalCannotTriggerAReplacement() started.
+✔ Test corruptJournalCannotTriggerAReplacement() passed after 0.007 seconds.
+◇ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+◇ Test case passing 1 argument failRead → true to pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+◇ Test case passing 1 argument failRead → false to pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+✔ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) with 2 test cases passed after 0.049 seconds.
+◇ Test bareAPFSImageResolvesItsPhysicalStore() started.
+✔ Test bareAPFSImageResolvesItsPhysicalStore() passed after 0.001 seconds.
+◇ Test nativeToolOutputIsDrainedAndClosed() started.
+✔ Test nativeToolOutputIsDrainedAndClosed() passed after 0.013 seconds.
+✔ Suite FirmwareTransactionTests passed after 0.352 seconds.
+◇ Suite FirmwareVersionInputsTests started.
+◇ Test versionAndDigestComeFromTheSameManifestBytes() started.
+✔ Test versionAndDigestComeFromTheSameManifestBytes() passed after 0.001 seconds.
+◇ Test buildIsRecordedAlongsideVersionAndByteDigest() started.
+✔ Test buildIsRecordedAlongsideVersionAndByteDigest() passed after 0.001 seconds.
+◇ Test malformedBuildDoesNotBecomeMissing(_:) started.
+◇ Test case passing 1 argument name → "number" to malformedBuildDoesNotBecomeMissing(_:) started.
+◇ Test case passing 1 argument name → "bool" to malformedBuildDoesNotBecomeMissing(_:) started.
+◇ Test case passing 1 argument name → "empty" to malformedBuildDoesNotBecomeMissing(_:) started.
+✔ Test malformedBuildDoesNotBecomeMissing(_:) with 3 test cases passed after 0.001 seconds.
+◇ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() started.
+✔ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() passed after 0.001 seconds.
+◇ Test previouslyMissingManifestCannotAppearAfterFreezing() started.
+✔ Test previouslyMissingManifestCannotAppearAfterFreezing() passed after 0.001 seconds.
+◇ Test presentManifestCannotDisappearAfterFreezing() started.
+✔ Test presentManifestCannotDisappearAfterFreezing() passed after 0.001 seconds.
+◇ Test corruptManifestIsRejected(_:) started.
+◇ Test case passing 1 argument data → 13 bytes to corruptManifestIsRejected(_:) started.
+◇ Test case passing 1 argument data → 23 bytes to corruptManifestIsRejected(_:) started.
+✔ Test corruptManifestIsRejected(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test unreadableManifestIsNotClassifiedAsMissing() started.
+✔ Test unreadableManifestIsNotClassifiedAsMissing() passed after 0.001 seconds.
+◇ Test unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "unknown" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "27.foo" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "26..4" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to unrecognizedProductVersionIsRejected(_:) started.
+✔ Test unrecognizedProductVersionIsRejected(_:) with 6 test cases passed after 0.003 seconds.
+◇ Test productVersionHasToBeAString() started.
+✔ Test productVersionHasToBeAString() passed after 0.001 seconds.
+◇ Test versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "garbage.26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26..4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4.beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+✔ Test versionFloorDoesNotDropMalformedComponents(_:) with 5 test cases passed after 0.001 seconds.
+◇ Test manifestSymlinkIsRejected() started.
+✔ Test manifestSymlinkIsRejected() passed after 0.001 seconds.
+◇ Test manifestDirectoryIsRejected() started.
+✔ Test manifestDirectoryIsRejected() passed after 0.001 seconds.
+◇ Test completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "26.4" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "26.4.1" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "27" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "26.3" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "25.9" to completeNumericVersionFloorIsPreserved(_:) started.
+✔ Test completeNumericVersionFloorIsPreserved(_:) with 5 test cases passed after 0.001 seconds.
+✔ Suite FirmwareVersionInputsTests passed after 0.013 seconds.
+◇ Suite FrozenDeclarationGateTests started.
+◇ Test rejectsAWritingStepBlockedInTheFrozenPlan() started.
+✔ Test rejectsAWritingStepBlockedInTheFrozenPlan() passed after 0.001 seconds.
+◇ Test rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .variant to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .reportGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .resultGates to rejectsReportIdentityChanges(_:) started.
+✔ Test rejectsReportIdentityChanges(_:) with 3 test cases passed after 0.004 seconds.
+◇ Test acceptsMatchingResolvedPlan() started.
+✔ Test acceptsMatchingResolvedPlan() passed after 0.001 seconds.
+✔ Suite FrozenDeclarationGateTests passed after 0.007 seconds.
+◇ Suite FrozenPipelinePlanTests started.
+◇ Test transactionJournalContainsTheResolvedPlan() started.
+✔ Test transactionJournalContainsTheResolvedPlan() passed after 0.166 seconds.
+◇ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() started.
+✔ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() passed after 0.013 seconds.
+◇ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() started.
+✔ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() passed after 0.004 seconds.
+◇ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+◇ Test case passing 1 argument variant → .dev to knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+◇ Test case passing 1 argument variant → .regular to knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+✔ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) with 2 test cases passed after 0.023 seconds.
+✔ Suite FrozenPipelinePlanTests passed after 0.208 seconds.
+◇ Suite FrozenStepExecutionTests started.
+◇ Test excludedStepDoesNotRunOrModifyBytes() started.
+✔ Test excludedStepDoesNotRunOrModifyBytes() passed after 0.001 seconds.
+◇ Test selectedStepStillRunsAndWrites() started.
+✔ Test selectedStepStillRunsAndWrites() passed after 0.001 seconds.
+✔ Suite FrozenStepExecutionTests passed after 0.002 seconds.
+◇ Suite GuestPayloadInstallTests started.
+◇ Test lessInstallCopiesItsOwnPresignedPayload() started.
+✔ Test lessInstallCopiesItsOwnPresignedPayload() passed after 0.002 seconds.
+✔ Suite GuestPayloadInstallTests passed after 0.002 seconds.
+➜ Suite KernelGateDiagnosisTests skipped.
+➜ Test requiredDevExcGuardCompletes() skipped.
+➜ Test requiredJBVmMapProtectCompletes() skipped.
+◇ Suite KernelJBParityTests started.
+➜ Test realKernelGateMatrix() skipped.
+✔ Suite KernelJBParityTests passed after 0.001 seconds.
+◇ Suite KernelGateStructuredMergeTests started.
+◇ Test excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .regular, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .regular, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .dev, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .dev, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .jb, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .jb, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .exp, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .exp, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+✔ Test excGuardMissingAnchorUsesExecutionGate(variant:force:) with 8 test cases passed after 0.001 seconds.
+◇ Test excGuardManifestRuleMatchesSteps() started.
+✔ Test excGuardManifestRuleMatchesSteps() passed after 0.001 seconds.
+✔ Suite KernelGateStructuredMergeTests passed after 0.002 seconds.
+◇ Suite KernelJBStructuredTests started.
+◇ Test declarationsMatchOrchestratorAndManifest() started.
+✔ Test declarationsMatchOrchestratorAndManifest() passed after 0.003 seconds.
+◇ Test missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → false, frida → false to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → false, frida → true to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → true, frida → false to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → true, frida → true to missingAnchorsRespectGates(ios27:frida:) started.
+✔ Test missingAnchorsRespectGates(ios27:frida:) with 4 test cases passed after 0.004 seconds.
+◇ Test ablationPrecedesSetupAndLaterStepPreparesOnce() started.
+✔ Test ablationPrecedesSetupAndLaterStepPreparesOnce() passed after 0.001 seconds.
+◇ Test iomfbAmbiguityReportsCountAndWritesNothing() started.
+✔ Test iomfbAmbiguityReportsCountAndWritesNothing() passed after 0.001 seconds.
+◇ Test postValidationRecognizesIdempotenceWithoutEmitting() started.
+✔ Test postValidationRecognizesIdempotenceWithoutEmitting() passed after 0.001 seconds.
+◇ Test sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test case passing 1 argument malformed → false to sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test case passing 1 argument malformed → true to sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+✔ Test sandboxPartialFailurePreservesSuccessfulWrites(malformed:) with 2 test cases passed after 0.001 seconds.
+◇ Test componentAblationIncludesBothKernelPatchers() started.
+✔ Test componentAblationIncludesBothKernelPatchers() passed after 0.001 seconds.
+◇ Test diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test case passing 1 argument connectPresent → false to diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test case passing 1 argument connectPresent → true to diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+✔ Test diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) with 2 test cases passed after 0.001 seconds.
+◇ Test requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test case passing 1 argument candidates → 1 to requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test case passing 1 argument candidates → 2 to requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+✔ Test requiredVmProtectDoesNotHideAmbiguity(candidates:) with 2 test cases passed after 0.002 seconds.
+✔ Suite KernelJBStructuredTests passed after 0.013 seconds.
+◇ Suite KernelStructuredTests started.
+◇ Test baseKernelMissingMethodsFailIndividually() started.
+✔ Test baseKernelMissingMethodsFailIndividually() passed after 0.001 seconds.
+◇ Test disabledConditionalAndAblationNeverWriteDuringDiscovery() started.
+✔ Test disabledConditionalAndAblationNeverWriteDuringDiscovery() passed after 0.001 seconds.
+◇ Test partialGroupFailsEvenWithAnExistingSuccessfulRecord() started.
+✔ Test partialGroupFailsEvenWithAnExistingSuccessfulRecord() passed after 0.001 seconds.
+◇ Test completedUnchangedRecordsAreIdempotent() started.
+✔ Test completedUnchangedRecordsAreIdempotent() passed after 0.001 seconds.
+◇ Test baseMethodsMatchCompatibilityManifest() started.
+✔ Test baseMethodsMatchCompatibilityManifest() passed after 0.001 seconds.
+◇ Test jbMethodsMatchManifestAndMissingActiveMethodsFail() started.
+✔ Test jbMethodsMatchManifestAndMissingActiveMethodsFail() passed after 0.001 seconds.
+✔ Suite KernelStructuredTests passed after 0.003 seconds.
+➜ Suite KernelStructuredParityTests skipped.
+➜ Test baseKernelRecordsAndPayloadMatch(configuration:) skipped.
+➜ Test jbKernelRecordsAndPayloadMatch(ios27:) skipped.
+➜ Test fridaKernelRecordsAndPayloadMatch(ios27:) skipped.
+➜ Suite LessFilesystemAcceptanceTests skipped.
+➜ Test completeFilesystemAndManifest() skipped.
+➜ Suite LessPipelineAcceptanceTests skipped.
+➜ Test completeProductionPipeline() skipped.
+➜ Suite LessOutputParityTests skipped.
+➜ Test actualManifestAndBootOutputsMatchLegacy() skipped.
+◇ Suite PatchExperimentRecordTests started.
+◇ Test identicalRunsInDifferentDirectoriesCompareSame() started.
+✔ Test identicalRunsInDifferentDirectoriesCompareSame() passed after 0.339 seconds.
+◇ Test changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .variant to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .forceExcGuard to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .ablation to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .inputByte to changedConditionIsNamed(_:) started.
+✔ Test changedConditionIsNamed(_:) with 4 test cases passed after 1.423 seconds.
+◇ Test requiredFailureAfterPartialSuccessKeepsCompletedParts() started.
+✔ Test requiredFailureAfterPartialSuccessKeepsCompletedParts() passed after 0.038 seconds.
+◇ Test cancellationAfterPartialSuccessKeepsOriginalError() started.
+✔ Test cancellationAfterPartialSuccessKeepsOriginalError() passed after 0.036 seconds.
+◇ Test finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 0 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 1 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 2 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 3 to finalWriteFailureDoesNotMaskRunError(_:) started.
+✔ Test finalWriteFailureDoesNotMaskRunError(_:) with 4 test cases passed after 0.124 seconds.
+◇ Test finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 0 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 1 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 2 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 3 to finalWriteFailureAfterSuccessIsReported(_:) started.
+✔ Test finalWriteFailureAfterSuccessIsReported(_:) with 4 test cases passed after 0.633 seconds.
+◇ Test initialWriteFailureStopsBeforePatching() started.
+✔ Test initialWriteFailureStopsBeforePatching() passed after 0.009 seconds.
+◇ Test recordInsideFirmwareInputIsRejectedBeforePatching() started.
+✔ Test recordInsideFirmwareInputIsRejectedBeforePatching() passed after 0.003 seconds.
+◇ Test corruptAndUnknownRecordsAreRejected() started.
+✔ Test corruptAndUnknownRecordsAreRejected() passed after 0.177 seconds.
+◇ Test uncommittedTransactionIsNotSuccessfulOutput() started.
+✔ Test uncommittedTransactionIsNotSuccessfulOutput() passed after 0.026 seconds.
+◇ Test summaryIsRenderedFromTheRecord() started.
+✔ Test summaryIsRenderedFromTheRecord() passed after 0.173 seconds.
+◇ Test sourceStateListsChangedAddedAndDeletedFiles() started.
+✔ Test sourceStateListsChangedAddedAndDeletedFiles() passed after 0.604 seconds.
+✔ Suite PatchExperimentRecordTests passed after 3.591 seconds.
+◇ Suite PatchSelectionFileMigrationFaultTests started.
+◇ Test failureBeforePublicationPreservesSourceAndCleansStage(event:) started.
+◇ Test case passing 1 argument event → .beforeBackup to failureBeforePublicationPreservesSourceAndCleansStage(event:) started.
+◇ Test case passing 1 argument event → .afterBackup to failureBeforePublicationPreservesSourceAndCleansStage(event:) started.
+◇ Test case passing 1 argument event → .beforePublish to failureBeforePublicationPreservesSourceAndCleansStage(event:) started.
+✔ Test failureBeforePublicationPreservesSourceAndCleansStage(event:) with 3 test cases passed after 0.007 seconds.
+◇ Test retryAfterBackupReusesVerifiedOriginal() started.
+✔ Test retryAfterBackupReusesVerifiedOriginal() passed after 0.002 seconds.
+◇ Test failureAfterRenameReportsUncertainPublicationAndKeepsBackup() started.
+✔ Test failureAfterRenameReportsUncertainPublicationAndKeepsBackup() passed after 0.002 seconds.
+◇ Test corruptExistingBackupCannotBeOverwritten() started.
+✔ Test corruptExistingBackupCannotBeOverwritten() passed after 0.001 seconds.
+◇ Test sameBytesInReplacementInodeStillInvalidatePreparedOperation() started.
+✔ Test sameBytesInReplacementInodeStillInvalidatePreparedOperation() passed after 0.001 seconds.
+◇ Test sourceChangedAfterBackupIsPreservedInsteadOfPublishedOver() started.
+✔ Test sourceChangedAfterBackupIsPreservedInsteadOfPublishedOver() passed after 0.001 seconds.
+◇ Test pendingFirmwareTransactionRefusesSelectionWrite() started.
+✔ Test pendingFirmwareTransactionRefusesSelectionWrite() passed after 0.001 seconds.
+◇ Test hardLinkedSelectionIsRejected() started.
+✔ Test hardLinkedSelectionIsRejected() passed after 0.001 seconds.
+◇ Test binaryPlistIsAnUnsupportedFormat() started.
+✔ Test binaryPlistIsAnUnsupportedFormat() passed after 0.001 seconds.
+◇ Test duplicateXMLKeysCannotChooseOnePresetSilently() started.
+✔ Test duplicateXMLKeysCannotChooseOnePresetSilently() passed after 0.001 seconds.
+◇ Test backupChangedBeforePublishRefusesReplacement() started.
+✔ Test backupChangedBeforePublishRefusesReplacement() passed after 0.001 seconds.
+◇ Test changedStagedBytesCannotReplaceTheSelection() started.
+✔ Test changedStagedBytesCannotReplaceTheSelection() passed after 0.001 seconds.
+◇ Test failureCleanupDoesNotDeleteAReplacementStagingFile() started.
+✔ Test failureCleanupDoesNotDeleteAReplacementStagingFile() passed after 0.001 seconds.
+✔ Suite PatchSelectionFileMigrationFaultTests passed after 0.025 seconds.
+◇ Suite PatchSelectionMigrationTests started.
+◇ Test oldDottedIDsPreserveExplicitEnableAndDisable() started.
+✔ Test oldDottedIDsPreserveExplicitEnableAndDisable() passed after 0.001 seconds.
+◇ Test intermediateParavirtDisableSurvivesDefaultChange() started.
+✔ Test intermediateParavirtDisableSurvivesDefaultChange() passed after 0.001 seconds.
+◇ Test migrationDoesNotEnableNewDefaults() started.
+✔ Test migrationDoesNotEnableNewDefaults() passed after 0.001 seconds.
+◇ Test canonicalMigrationIsIdempotent() started.
+✔ Test canonicalMigrationIsIdempotent() passed after 0.001 seconds.
+◇ Test unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument id → "unknown-patch" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument id → "" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument id → " ibss.serial_label" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument id → "IBSS.serial_label" to unknownIDsAreRejected(id:) started.
+✔ Test unknownIDsAreRejected(id:) with 4 test cases passed after 0.001 seconds.
+◇ Test duplicateInputIsRejected(enabled:) started.
+◇ Test case passing 1 argument enabled → true to duplicateInputIsRejected(enabled:) started.
+◇ Test case passing 1 argument enabled → false to duplicateInputIsRejected(enabled:) started.
+✔ Test duplicateInputIsRejected(enabled:) with 2 test cases passed after 0.001 seconds.
+◇ Test oldAndCanonicalAliasesCannotCollapseSilently(enabled:) started.
+◇ Test case passing 1 argument enabled → true to oldAndCanonicalAliasesCannotCollapseSilently(enabled:) started.
+◇ Test case passing 1 argument enabled → false to oldAndCanonicalAliasesCannotCollapseSilently(enabled:) started.
+✔ Test oldAndCanonicalAliasesCannotCollapseSilently(enabled:) with 2 test cases passed after 0.001 seconds.
+◇ Test conflictingIntentAcrossAliasesIsRejected() started.
+✔ Test conflictingIntentAcrossAliasesIsRejected() passed after 0.001 seconds.
+◇ Test localLessIDsRemainLocal() started.
+✔ Test localLessIDsRemainLocal() passed after 0.001 seconds.
+◇ Test newDeclarationDoesNotGainLocalExecutionCoverage() started.
+✔ Test newDeclarationDoesNotGainLocalExecutionCoverage() passed after 0.001 seconds.
+◇ Test bundledExtendedPresetMigratesWithoutRewritingModes() started.
+✔ Test bundledExtendedPresetMigratesWithoutRewritingModes() passed after 0.001 seconds.
+◇ Test modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "regular" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "exp" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "custom" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+✔ Test modeAndCustomPresetAreNotBundledPresetAliases(id:) with 4 test cases passed after 0.001 seconds.
+✔ Suite PatchSelectionMigrationTests passed after 0.001 seconds.
+◇ Suite PlanSelectionValidationTests started.
+◇ Test refusesContradictoryExplicitChoices() started.
+✔ Test refusesContradictoryExplicitChoices() passed after 0.001 seconds.
+◇ Test refusesBlockingAnApplicableRequiredDeclaration() started.
+✔ Test refusesBlockingAnApplicableRequiredDeclaration() passed after 0.001 seconds.
+◇ Test refusesVariantAndGateMismatch() started.
+✔ Test refusesVariantAndGateMismatch() passed after 0.001 seconds.
+◇ Test refusesBlockingOnlyPartOfAnIndivisibleStep() started.
+✔ Test refusesBlockingOnlyPartOfAnIndivisibleStep() passed after 0.002 seconds.
+◇ Test canBlockAnIndependentOptionalStep() started.
+✔ Test canBlockAnIndependentOptionalStep() passed after 0.001 seconds.
+◇ Test canBlockARequiredDeclarationOutsideTheVariant() started.
+✔ Test canBlockARequiredDeclarationOutsideTheVariant() passed after 0.001 seconds.
+◇ Test canBlockAllOptionalDeclarationsSharingOneStep() started.
+✔ Test canBlockAllOptionalDeclarationsSharingOneStep() passed after 0.001 seconds.
+◇ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() started.
+✔ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() passed after 0.001 seconds.
+✔ Suite PlanSelectionValidationTests passed after 0.009 seconds.
+◇ Suite VariantPlanSerializationTests started.
+◇ Test encodedStepsHaveStableOrderForEveryVariant() started.
+✔ Test encodedStepsHaveStableOrderForEveryVariant() passed after 0.012 seconds.
+◇ Test duplicateStepsCannotBeCollapsedDuringDecode() started.
+✔ Test duplicateStepsCannotBeCollapsedDuringDecode() passed after 0.002 seconds.
+◇ Test legacyUnsortedUniqueStepsRetainTheSamePlan() started.
+✔ Test legacyUnsortedUniqueStepsRetainTheSamePlan() passed after 0.003 seconds.
+◇ Test missingStepFieldDoesNotCreateDefaults() started.
+✔ Test missingStepFieldDoesNotCreateDefaults() passed after 0.003 seconds.
+✔ Suite VariantPlanSerializationTests passed after 0.022 seconds.
+◇ Suite VariantPlanTests started.
+◇ Test catalogStructureValidates() started.
+✔ Test catalogStructureValidates() passed after 0.001 seconds.
+◇ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() started.
+✔ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() passed after 0.001 seconds.
+◇ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() started.
+✔ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() passed after 0.033 seconds.
+◇ Test defaultVariantIsRegular() started.
+✔ Test defaultVariantIsRegular() passed after 0.001 seconds.
+◇ Test expOnlyStepsAreAbsentFromOtherVariants() started.
+✔ Test expOnlyStepsAreAbsentFromOtherVariants() passed after 0.002 seconds.
+◇ Test notImplementedIsAlwaysListedAndNeverSelectable() started.
+✔ Test notImplementedIsAlwaysListedAndNeverSelectable() passed after 0.001 seconds.
+◇ Test fridaStepsNeedOptInOnJBAndExp() started.
+✔ Test fridaStepsNeedOptInOnJBAndExp() passed after 0.002 seconds.
+◇ Test lessIsResolvedIndependently() started.
+✔ Test lessIsResolvedIndependently() passed after 0.001 seconds.
+✔ Suite VariantPlanTests passed after 0.042 seconds.
+◇ Suite VersionKnowledgePlanTests started.
+◇ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument block → false to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument block → true to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+✔ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() started.
+✔ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() passed after 0.001 seconds.
+◇ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() started.
+✔ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() passed after 0.001 seconds.
+◇ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() started.
+✔ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() passed after 0.001 seconds.
+✔ Suite VersionKnowledgePlanTests passed after 0.005 seconds.
+◇ Suite CreateLiveStagesTests started.
+◇ Test jbFinalizeIsNeverVerifiedFromAPrintedHint() started.
+✔ Test jbFinalizeIsNeverVerifiedFromAPrintedHint() passed after 0.001 seconds.
+◇ Test firstBootPromptTimeoutIsUnverified() started.
+✔ Test firstBootPromptTimeoutIsUnverified() passed after 0.219 seconds.
+◇ Test lessVerificationBootIsUnverified() started.
+✔ Test lessVerificationBootIsUnverified() passed after 0.002 seconds.
+◇ Test patchRequiresOneCommittedTransactionForTheVariant() started.
+✔ Test patchRequiresOneCommittedTransactionForTheVariant() passed after 0.006 seconds.
+◇ Test patchSelectionIdentityFollowsTheResolvedPlan() started.
+✔ Test patchSelectionIdentityFollowsTheResolvedPlan() passed after 0.029 seconds.
+◇ Test patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() started.
+✔ Test patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() passed after 0.013 seconds.
+◇ Test patchVerificationRefusalPointsToPrepareNotPatch() started.
+✔ Test patchVerificationRefusalPointsToPrepareNotPatch() passed after 0.004 seconds.
+◇ Test prepareRequiresExactlyOneRestoreTreeWithVersions() started.
+✔ Test prepareRequiresExactlyOneRestoreTreeWithVersions() passed after 0.002 seconds.
+◇ Test rerunRewriteDeclarations() started.
+✔ Test rerunRewriteDeclarations() passed after 0.001 seconds.
+◇ Test prepareEvidenceMustMatchBackend() started.
+✔ Test prepareEvidenceMustMatchBackend() passed after 0.002 seconds.
+◇ Test statusReportIsReadOnlyAndShowsStagesAndLiveFacts() started.
+✔ Test statusReportIsReadOnlyAndShowsStagesAndLiveFacts() passed after 0.003 seconds.
+◇ Test statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock() started.
+✔ Test statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock() passed after 0.051 seconds.
+◇ Test verifierAcceptsWhenTheLockIsReleasedWithinTheBound() started.
+✔ Test verifierAcceptsWhenTheLockIsReleasedWithinTheBound() passed after 0.320 seconds.
+◇ Test verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased() started.
+✔ Test verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased() passed after 1.279 seconds.
+◇ Test verifierWaitsForARealBundleLockHolderToRelease() started.
+✔ Test verifierWaitsForARealBundleLockHolderToRelease() passed after 0.529 seconds.
+◇ Test stageReturnsOnlyAfterItsChildExited() started.
+✔ Test stageReturnsOnlyAfterItsChildExited() passed after 0.210 seconds.
+◇ Test stuckChildFailsTheStageAfterTheBound() started.
+[!] fake child did not exit within 0.20s after it was stopped.
+✔ Test stuckChildFailsTheStageAfterTheBound() passed after 0.420 seconds.
+◇ Test realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns() started.
+✔ Test realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns() passed after 0.660 seconds.
+◇ Test busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint() started.
+✔ Test busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint() passed after 0.009 seconds.
+◇ Test unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst() started.
+✔ Test unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst() passed after 0.006 seconds.
+◇ Test removedArtifactRefusalLeadsWithItsCauseNotStopped() started.
+✔ Test removedArtifactRefusalLeadsWithItsCauseNotStopped() passed after 0.005 seconds.
+◇ Test toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() started.
+✔ Test toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() passed after 0.007 seconds.
+◇ Test everyRefusalBeforeWriteSaysRefusedAndUnchanged() started.
+✔ Test everyRefusalBeforeWriteSaysRefusedAndUnchanged() passed after 0.013 seconds.
+◇ Test restoreReprobeRefusesWhileBundleLockIsHeld() started.
+✔ Test restoreReprobeRefusesWhileBundleLockIsHeld() passed after 0.001 seconds.
+◇ Test restoreReprobeRefusesWhileNativeWorkerRuns() started.
+✔ Test restoreReprobeRefusesWhileNativeWorkerRuns() passed after 0.003 seconds.
+◇ Test restoreReprobeRefusesWhileBridgeProcessRuns() started.
+✔ Test restoreReprobeRefusesWhileBridgeProcessRuns() passed after 0.001 seconds.
+◇ Test restoreReprobeIgnoresOtherDevices() started.
+✔ Test restoreReprobeIgnoresOtherDevices() passed after 0.001 seconds.
+◇ Test restoreReprobeRefusesWhileDeviceEndpointAnswers() started.
+✔ Test restoreReprobeRefusesWhileDeviceEndpointAnswers() passed after 0.001 seconds.
+◇ Test reprobeRefusesWhileBootProcessForBundleRuns() started.
+✔ Test reprobeRefusesWhileBootProcessForBundleRuns() passed after 0.001 seconds.
+◇ Test cfwReprobeRefusesWhileBundleImageIsAttached() started.
+✔ Test cfwReprobeRefusesWhileBundleImageIsAttached() passed after 0.001 seconds.
+✔ Suite CreateLiveStagesTests passed after 3.816 seconds.
+◇ Suite FWPlanDuplicateSelectionTests started.
+◇ Test planRejectsDuplicateIDsBeforeSetConversion(option:) started.
+◇ Test case passing 1 argument option → "--select" to planRejectsDuplicateIDsBeforeSetConversion(option:) started.
+◇ Test case passing 1 argument option → "--block" to planRejectsDuplicateIDsBeforeSetConversion(option:) started.
+✔ Test planRejectsDuplicateIDsBeforeSetConversion(option:) with 2 test cases passed after 0.005 seconds.
+◇ Test readOnlyMigrationPreviewAcceptsLegacySelection() started.
+{
+  "bundledPreset" : "experimental",
+  "selection" : {
+    "blocked" : [
+      "kernel-cfw-paravirt_user_clients"
+    ],
+    "mappingRevision" : "vphone.patch-id-migration/1",
+    "notDeclaredLocally" : [
+      "kernel-cfw-paravirt_user_clients"
+    ],
+    "renames" : [
+      {
+        "enabled" : true,
+        "from" : "ibss.serial_label",
+        "to" : "ibss-cfw-serial_label"
+      },
+      {
+        "enabled" : false,
+        "from" : "kernel-exp-paravirt_user_clients",
+        "to" : "kernel-cfw-paravirt_user_clients"
+      }
+    ],
+    "selected" : [
+      "ibss-cfw-serial_label"
+    ],
+    "upstreamTarget" : "2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+  },
+  "variant" : "jb"
+}
+✔ Test readOnlyMigrationPreviewAcceptsLegacySelection() passed after 0.005 seconds.
+✔ Suite FWPlanDuplicateSelectionTests passed after 0.011 seconds.
+◇ Suite NativeFirmwarePrepareTests started.
+◇ Test explicitBackendAndClassicDefault() started.
+✔ Test explicitBackendAndClassicDefault() passed after 0.022 seconds.
+◇ Test localSourcesRejectUnsupportedRequestsAndResolveRelativePaths() started.
+✔ Test localSourcesRejectUnsupportedRequestsAndResolveRelativePaths() passed after 0.001 seconds.
+◇ Test nativePublicationBeforeCheckpointCommitCanResumeAndReverify() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/AA2751EB-AFAE-4A52-8E32-60AEFE1DE25E/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/AA2751EB-AFAE-4A52-8E32-60AEFE1DE25E/vm/.firmware-prepare-backup-A0DC429A-5E8C-4BE0-AC87-60D8263FC8D8/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/AA2751EB-AFAE-4A52-8E32-60AEFE1DE25E/vm/iPhone17,3_26.1_23B85_Restore
+✔ Test nativePublicationBeforeCheckpointCommitCanResumeAndReverify() passed after 0.075 seconds.
+◇ Test checkpointRerunPreservesPreviousTreeOnlyAfterManifestSuccess() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/9D125176-406E-4937-9CCD-41166428156C/vm/.firmware-prepare-backup-7CE727A2-E3FC-4D71-9093-23E02C9D07F4/iPhone17,3_26.1_23B85_Restore
+✔ Test checkpointRerunPreservesPreviousTreeOnlyAfterManifestSuccess() passed after 0.050 seconds.
+◇ Test preservationRefusesAmbiguousAndLinkedInputs() started.
+✔ Test preservationRefusesAmbiguousAndLinkedInputs() passed after 0.001 seconds.
+◇ Test publicationFailureRollsBackPreviousTree() started.
+✔ Test publicationFailureRollsBackPreviousTree() passed after 0.001 seconds.
+◇ Test mergesWithoutMutatingSourcesAndRefusesRerun() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test mergesWithoutMutatingSourcesAndRefusesRerun() passed after 0.033 seconds.
+◇ Test missingReferencedComponentPreservesPreviousGeneration() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test missingReferencedComponentPreservesPreviousGeneration() passed after 0.034 seconds.
+◇ Test invalidGeneratedReferenceIsNotPublished(_:) started.
+◇ Test case passing 1 argument path → "../escape" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "/absolute" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware//test.im4p" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware/./test.im4p" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware/link.im4p" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test invalidGeneratedReferenceIsNotPublished(_:) with 6 test cases passed after 0.200 seconds.
+◇ Test manifestFailureCleansStagingAndPublishesNothing() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test manifestFailureCleansStagingAndPublishesNothing() passed after 0.030 seconds.
+◇ Test concurrentDestinationSurvivesAndInputCancellationCleansUp() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test concurrentDestinationSurvivesAndInputCancellationCleansUp() passed after 0.033 seconds.
+◇ Test rejectsArchiveLinksAndExistingDanglingRestore() started.
+✔ Test rejectsArchiveLinksAndExistingDanglingRestore() passed after 0.002 seconds.
+◇ Test heldVMLockRejectsBeforeOpeningInputs() started.
+✔ Test heldVMLockRejectsBeforeOpeningInputs() passed after 0.001 seconds.
+◇ Test selectionChangeRegeneratesFromOriginalsInsteadOfPatchingTwice() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/6EF4FB29-D041-40B1-864D-1BA654F7BB5D/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/6EF4FB29-D041-40B1-864D-1BA654F7BB5D/vm/.firmware-prepare-backup-8D38D27A-52B2-4FD7-83B4-B47DBD3FC089/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/6EF4FB29-D041-40B1-864D-1BA654F7BB5D/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/6EF4FB29-D041-40B1-864D-1BA654F7BB5D/fresh/iPhone17,3_26.1_23B85_Restore
+✔ Test selectionChangeRegeneratesFromOriginalsInsteadOfPatchingTwice() passed after 0.129 seconds.
+◇ Test repeatedAndReturnedSelectionsUseFreshArchiveBytes() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/.firmware-prepare-backup-B077ECD1-B8F9-4B28-ADD6-89F9E2790FE1/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/.firmware-prepare-backup-841977A1-FE78-454A-B04F-2AE944F560DA/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/.firmware-prepare-backup-9792108C-C098-4FC9-8029-2C2E21434EF7/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/3D779BD8-B2E0-42C7-80E9-346463CE2A3A/vm/iPhone17,3_26.1_23B85_Restore
+✔ Test repeatedAndReturnedSelectionsUseFreshArchiveBytes() passed after 0.169 seconds.
+◇ Test badArchiveKeepsPreviousTreeAndOriginalsDirectory() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test badArchiveKeepsPreviousTreeAndOriginalsDirectory() passed after 0.039 seconds.
+◇ Test acceptedToolChangeWithAnotherSelectionRequiresRegeneration() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/DAA77F4F-2E3E-4ABA-9A63-B23B197EA87A/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/DAA77F4F-2E3E-4ABA-9A63-B23B197EA87A/vm/.firmware-prepare-backup-A474D81D-8FBE-4501-BE06-32418538E7CB/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/DAA77F4F-2E3E-4ABA-9A63-B23B197EA87A/vm/iPhone17,3_26.1_23B85_Restore
+✔ Test acceptedToolChangeWithAnotherSelectionRequiresRegeneration() passed after 0.096 seconds.
+✔ Suite NativeFirmwarePrepareTests passed after 0.923 seconds.
+◇ Suite PatchSelectionFileMigrationTests started.
+◇ Test previewDoesNotCreateBackupOrModifySelection() started.
+{
+  "changed" : true,
+  "migratedPreset" : "experimental",
+  "originalPreset" : "extended",
+  "outputSHA256" : "415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef",
+  "selection" : {
+    "blocked" : [
+      "kernel-cfw-paravirt_user_clients"
+    ],
+    "mappingRevision" : "vphone.patch-id-migration/1",
+    "notDeclaredLocally" : [
+      "kernel-cfw-paravirt_user_clients"
+    ],
+    "renames" : [
+      {
+        "enabled" : true,
+        "from" : "ibss.serial_label",
+        "to" : "ibss-cfw-serial_label"
+      },
+      {
+        "enabled" : false,
+        "from" : "kernel-exp-paravirt_user_clients",
+        "to" : "kernel-cfw-paravirt_user_clients"
+      }
+    ],
+    "selected" : [
+      "ibss-cfw-serial_label"
+    ],
+    "upstreamTarget" : "2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+  },
+  "sourcePath" : "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/selection-migration-D34AD9EE-A0E0-4056-88BD-C731080AFCAA/PatchSelection.plist",
+  "sourceSHA256" : "4900e8c8cbf17e22d2412c5fe9be5b4eb7de43a31eb973440f58adba33c3677e"
+}
+✔ Test previewDoesNotCreateBackupOrModifySelection() passed after 0.003 seconds.
+◇ Test applyPreservesOriginalBytesAndExplicitDisable() started.
+{
+  "backupPath" : "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/selection-migration-BB0C5BDF-91D1-49CB-B58B-86A9BB3214BC/PatchSelection.plist.before-id-migration-4900e8c8cbf17e22d2412c5fe9be5b4eb7de43a31eb973440f58adba33c3677e.bak",
+  "changed" : true,
+  "outputSHA256" : "415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef"
+}
+✔ Test applyPreservesOriginalBytesAndExplicitDisable() passed after 0.005 seconds.
+◇ Test repeatedApplyDoesNotRewriteOrCreateAnotherBackup() started.
+{
+  "backupPath" : "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/selection-migration-8D2040A3-5FD7-4C7D-AE80-A7395E107B5C/PatchSelection.plist.before-id-migration-4900e8c8cbf17e22d2412c5fe9be5b4eb7de43a31eb973440f58adba33c3677e.bak",
+  "changed" : true,
+  "outputSHA256" : "415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef"
+}
+{
+  "changed" : false,
+  "outputSHA256" : "415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef"
+}
+✔ Test repeatedApplyDoesNotRewriteOrCreateAnotherBackup() passed after 0.007 seconds.
+◇ Test staleExternalPreviewDigestRefusesBeforeBackup() started.
+✔ Test staleExternalPreviewDigestRefusesBeforeBackup() passed after 0.003 seconds.
+◇ Test applyRequiresPreviewDigest() started.
+✔ Test applyRequiresPreviewDigest() passed after 0.006 seconds.
+◇ Test occupiedParentDirectoryRefusesApply() started.
+✔ Test occupiedParentDirectoryRefusesApply() passed after 0.003 seconds.
+◇ Test missingFieldsCannotAcquireDefaults(field:) started.
+◇ Test case passing 1 argument field → "Preset" to missingFieldsCannotAcquireDefaults(field:) started.
+◇ Test case passing 1 argument field → "AllowedPatches" to missingFieldsCannotAcquireDefaults(field:) started.
+◇ Test case passing 1 argument field → "BlockedPatches" to missingFieldsCannotAcquireDefaults(field:) started.
+✔ Test missingFieldsCannotAcquireDefaults(field:) with 3 test cases passed after 0.009 seconds.
+◇ Test unknownAndDuplicateIDsRefuseWithoutBackup(id:) started.
+◇ Test case passing 1 argument id → "unknown-id" to unknownAndDuplicateIDsRefuseWithoutBackup(id:) started.
+◇ Test case passing 1 argument id → "ibss.serial_label" to unknownAndDuplicateIDsRefuseWithoutBackup(id:) started.
+✔ Test unknownAndDuplicateIDsRefuseWithoutBackup(id:) with 2 test cases passed after 0.006 seconds.
+◇ Test symlinkSelectionDoesNotModifyItsTarget() started.
+✔ Test symlinkSelectionDoesNotModifyItsTarget() passed after 0.003 seconds.
+◇ Test unrelatedFieldsCannotBeDiscarded() started.
+✔ Test unrelatedFieldsCannotBeDiscarded() passed after 0.003 seconds.
+✔ Suite PatchSelectionFileMigrationTests passed after 0.052 seconds.
+◇ Suite BundleCloneStateTests started.
+◇ Test forcedFallbackKeepsIdentityAndSourceBytes() started.
+✔ Test forcedFallbackKeepsIdentityAndSourceBytes() passed after 0.009 seconds.
+◇ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test case passing 1 argument forceFallback → false to cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+◇ Test case passing 1 argument forceFallback → true to cloneOmitsOnlyRootCFWHistory(forceFallback:) started.
+✔ Test cloneOmitsOnlyRootCFWHistory(forceFallback:) with 2 test cases passed after 0.019 seconds.
+◇ Test refusesLockedSourceWithoutProducingDestination() started.
+✔ Test refusesLockedSourceWithoutProducingDestination() passed after 0.005 seconds.
+◇ Test destinationRaceDoesNotDeleteRival() started.
+✔ Test destinationRaceDoesNotDeleteRival() passed after 0.007 seconds.
+◇ Test failedCopyCleansOnlyPrivateStaging() started.
+✔ Test failedCopyCleansOnlyPrivateStaging() passed after 0.005 seconds.
+◇ Test brokenDestinationSymlinkIsNotAdopted() started.
+✔ Test brokenDestinationSymlinkIsNotAdopted() passed after 0.004 seconds.
+◇ Test exportImportRetainsClonedBootState() started.
+✔ Test exportImportRetainsClonedBootState() passed after 0.098 seconds.
+✔ Suite BundleCloneStateTests passed after 0.149 seconds.
+◇ Suite BundleGuardTests started.
+◇ Test withBundleLockRunsBodyAndReturnsValue() started.
+✔ Test withBundleLockRunsBodyAndReturnsValue() passed after 0.001 seconds.
+◇ Test nestedBundleLockOnSameDirectoryIsBusy() started.
+✔ Test nestedBundleLockOnSameDirectoryIsBusy() passed after 0.001 seconds.
+◇ Test refusedDeleteLeavesBundleBytesUnchanged() started.
+✔ Test refusedDeleteLeavesBundleBytesUnchanged() passed after 1.127 seconds.
+◇ Test lockIsKeyedByInodeNotPathSpelling() started.
+✔ Test lockIsKeyedByInodeNotPathSpelling() passed after 0.007 seconds.
+◇ Test requireDFUOwnerRefusesWhenLockNotHeld() started.
+✔ Test requireDFUOwnerRefusesWhenLockNotHeld() passed after 0.001 seconds.
+◇ Test requireDFUOwnerRefusesWhenRecordMissing() started.
+✔ Test requireDFUOwnerRefusesWhenRecordMissing() passed after 0.001 seconds.
+◇ Test requireDFUOwnerRefusesWhenOperationNotDFU() started.
+✔ Test requireDFUOwnerRefusesWhenOperationNotDFU() passed after 0.001 seconds.
+◇ Test requireDFUOwnerRefusesWhenPIDGone() started.
+✔ Test requireDFUOwnerRefusesWhenPIDGone() passed after 0.001 seconds.
+◇ Test requireDFUOwnerRefusesWhenPIDIsZombie() started.
+✔ Test requireDFUOwnerRefusesWhenPIDIsZombie() passed after 0.001 seconds.
+◇ Test requireDFUOwnerRefusesWhenPIDNotABootProcess() started.
+✔ Test requireDFUOwnerRefusesWhenPIDNotABootProcess() passed after 0.001 seconds.
+◇ Test requireDFUOwnerReturnsRecordOnFullSuccessPath() started.
+✔ Test requireDFUOwnerReturnsRecordOnFullSuccessPath() passed after 0.001 seconds.
+✔ Suite BundleGuardTests passed after 1.139 seconds.
+◇ Suite BundleOpsTests started.
+◇ Test createsBundleWithSparseDiskAndManifest() started.
+✔ Test createsBundleWithSparseDiskAndManifest() passed after 0.002 seconds.
+◇ Test rejectsDuplicateName() started.
+✔ Test rejectsDuplicateName() passed after 0.002 seconds.
+◇ Test rejectsInvalidNames() started.
+✔ Test rejectsInvalidNames() passed after 0.001 seconds.
+◇ Test rollsBackPartialBundleOnFailure() started.
+✔ Test rollsBackPartialBundleOnFailure() passed after 0.001 seconds.
+◇ Test updateConfigPersistsFields() started.
+✔ Test updateConfigPersistsFields() passed after 0.003 seconds.
+◇ Test updateConfigPersistsNetwork() started.
+✔ Test updateConfigPersistsNetwork() passed after 0.002 seconds.
+◇ Test updateConfigRejectsBadNetwork() started.
+✔ Test updateConfigRejectsBadNetwork() passed after 0.002 seconds.
+◇ Test renameThenDelete() started.
+✔ Test renameThenDelete() passed after 0.003 seconds.
+◇ Test renameRejectsExistingTarget() started.
+✔ Test renameRejectsExistingTarget() passed after 0.004 seconds.
+◇ Test cloneCopiesBundleAndPreservesIdentity() started.
+✔ Test cloneCopiesBundleAndPreservesIdentity() passed after 0.006 seconds.
+◇ Test cloneRejectsExistingTarget() started.
+✔ Test cloneRejectsExistingTarget() passed after 0.004 seconds.
+◇ Test exportThenImportRoundTrips() started.
+✔ Test exportThenImportRoundTrips() passed after 2.207 seconds.
+◇ Test importPreservesSparseDiskBytesAndLogicalSize() started.
+✔ Test importPreservesSparseDiskBytesAndLogicalSize() passed after 0.853 seconds.
+◇ Test importRejectsExistingName() started.
+✔ Test importRejectsExistingName() passed after 2.191 seconds.
+◇ Test importWithRenameDoesNotClobberArchivedNameCollision() started.
+✔ Test importWithRenameDoesNotClobberArchivedNameCollision() passed after 2.186 seconds.
+◇ Test exportExcludesRestoreDirByDefault() started.
+✔ Test exportExcludesRestoreDirByDefault() passed after 0.859 seconds.
+◇ Test exportExcludesRegenerableStagingFiles() started.
+✔ Test exportExcludesRegenerableStagingFiles() passed after 0.891 seconds.
+◇ Test importRejectsMultiTopLevelArchive() started.
+✔ Test importRejectsMultiTopLevelArchive() passed after 0.015 seconds.
+◇ Test importRejectsInvalidManifestWithoutPlacingBundle() started.
+✔ Test importRejectsInvalidManifestWithoutPlacingBundle() passed after 0.014 seconds.
+◇ Test exportDefaultsToFastZstd() started.
+✔ Test exportDefaultsToFastZstd() passed after 2.283 seconds.
+◇ Test exportFastProducesZstdAndRoundTrips() started.
+✔ Test exportFastProducesZstdAndRoundTrips() passed after 2.200 seconds.
+◇ Test exportMaxProducesXzAndRoundTrips() started.
+✔ Test exportMaxProducesXzAndRoundTrips() passed after 16.727 seconds.
+◇ Test exportToDirectoryAutoNamesWithExtension() started.
+✔ Test exportToDirectoryAutoNamesWithExtension() passed after 13.851 seconds.
+◇ Test exportAndImportReportProgress() started.
+✔ Test exportAndImportReportProgress() passed after 2.181 seconds.
+◇ Test compressionPresetTarArgs() started.
+✔ Test compressionPresetTarArgs() passed after 0.001 seconds.
+✔ Suite BundleOpsTests passed after 46.501 seconds.
+◇ Suite BundleReportTests started.
+◇ Test mapsManifestFields() started.
+✔ Test mapsManifestFields() passed after 0.001 seconds.
+◇ Test carriesNetworkConfig() started.
+✔ Test carriesNetworkConfig() passed after 0.001 seconds.
+◇ Test encodesToJSON() started.
+✔ Test encodesToJSON() passed after 0.001 seconds.
+✔ Suite BundleReportTests passed after 0.001 seconds.
+◇ Suite ChildCancellationTests started.
+◇ Test foundationProcessStartsANewProcessGroup() started.
+✔ Test foundationProcessStartsANewProcessGroup() passed after 0.001 seconds.
+◇ Test requestEndsTheWholeChildTreeIncludingOwnGroupAndIgnoringDescendants() started.
+✔ Test requestEndsTheWholeChildTreeIncludingOwnGroupAndIgnoringDescendants() passed after 0.641 seconds.
+◇ Test childStartedAfterTheSignalIsStoppedAtOnce() started.
+✔ Test childStartedAfterTheSignalIsStoppedAtOnce() passed after 0.004 seconds.
+◇ Test secondSignalKillsWithoutWaitingForTheGrace() started.
+✔ Test secondSignalKillsWithoutWaitingForTheGrace() passed after 0.378 seconds.
+◇ Test deferredChildIsNotSignalledAndTheForcedExitWaitsForIt() started.
+✔ Test deferredChildIsNotSignalledAndTheForcedExitWaitsForIt() passed after 2.386 seconds.
+◇ Test forcedExitWaitsForACheckpointWriteInProgress() started.
+✔ Test forcedExitWaitsForACheckpointWriteInProgress() passed after 0.807 seconds.
+◇ Test completedOperationIsNotExitedLater() started.
+✔ Test completedOperationIsNotExitedLater() passed after 0.404 seconds.
+◇ Test processTableListsThisProcessWithItsParentAndGroup() started.
+✔ Test processTableListsThisProcessWithItsParentAndGroup() passed after 0.001 seconds.
+✔ Suite ChildCancellationTests passed after 4.626 seconds.
+◇ Suite CreateRunnerCancellationTests started.
+◇ Test signalDuringAStageLeavesItRunningEndsItsChildrenAndReleasesTheLocks() started.
+✔ Test signalDuringAStageLeavesItRunningEndsItsChildrenAndReleasesTheLocks() passed after 0.674 seconds.
+◇ Test signalBeforeAStageStopsWithoutRunningIt() started.
+✔ Test signalBeforeAStageStopsWithoutRunningIt() passed after 0.007 seconds.
+◇ Test signalDuringTheDeferredCFWStageStopsAfterIt() started.
+✔ Test signalDuringTheDeferredCFWStageStopsAfterIt() passed after 1.407 seconds.
+✔ Suite CreateRunnerCancellationTests passed after 2.090 seconds.
+◇ Suite CloneCopyTests started.
+◇ Test forcedNonAPFSFallbackPreservesPersistentState() started.
+✔ Test forcedNonAPFSFallbackPreservesPersistentState() passed after 0.010 seconds.
+◇ Test successfulNativeBranchCleansOnlyDestinationRuntime() started.
+✔ Test successfulNativeBranchCleansOnlyDestinationRuntime() passed after 0.009 seconds.
+◇ Test existingDestinationIsNeverRemoved() started.
+✔ Test existingDestinationIsNeverRemoved() passed after 0.003 seconds.
+◇ Test EEXISTAfterCheckDoesNotDeleteCompetingOutput() started.
+✔ Test EEXISTAfterCheckDoesNotDeleteCompetingOutput() passed after 0.003 seconds.
+◇ Test danglingDestinationSymlinkIsAConflict() started.
+✔ Test danglingDestinationSymlinkIsAConflict() passed after 0.003 seconds.
+◇ Test removesOnlyOwnedPartialOutputBeforeFallback() started.
+✔ Test removesOnlyOwnedPartialOutputBeforeFallback() passed after 0.007 seconds.
+◇ Test omitsRealUnixSocketBeforeFallbackCopy() started.
+✔ Test omitsRealUnixSocketBeforeFallbackCopy() passed after 0.006 seconds.
+✔ Suite CloneCopyTests passed after 0.045 seconds.
+◇ Suite CreateCheckpointTests started.
+◇ Test freshCreateRecordsEveryStageAndOverallStatus() started.
+✔ Test freshCreateRecordsEveryStageAndOverallStatus() passed after 0.022 seconds.
+◇ Test unverifiedStageNeverReportsOverallSuccess() started.
+✔ Test unverifiedStageNeverReportsOverallSuccess() passed after 0.021 seconds.
+◇ Test faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+✔ Test faultMatrixFirstRunAndResume(stage:fault:) with 35 test cases passed after 0.972 seconds.
+◇ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() started.
+✔ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() passed after 0.010 seconds.
+◇ Test movedArtifactRefusesResume() started.
+✔ Test movedArtifactRefusesResume() passed after 0.013 seconds.
+◇ Test rerunStageMayRewriteItsDeclaredArtifacts() started.
+✔ Test rerunStageMayRewriteItsDeclaredArtifacts() passed after 0.026 seconds.
+◇ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() started.
+✔ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() passed after 0.030 seconds.
+◇ Test restartAfterNextUnfinishedStageIsRejected() started.
+✔ Test restartAfterNextUnfinishedStageIsRejected() passed after 0.007 seconds.
+◇ Test movedBundleIsRefused() started.
+✔ Test movedBundleIsRefused() passed after 0.009 seconds.
+◇ Test clonedOrReplacedBundleIsRefused() started.
+✔ Test clonedOrReplacedBundleIsRefused() passed after 0.015 seconds.
+◇ Test changedMachineIdentifierIsRefused() started.
+✔ Test changedMachineIdentifierIsRefused() passed after 0.012 seconds.
+◇ Test truncatedCheckpointIsRejected() started.
+✔ Test truncatedCheckpointIsRejected() passed after 0.009 seconds.
+◇ Test futureSchemaIsRejected() started.
+✔ Test futureSchemaIsRejected() passed after 0.009 seconds.
+◇ Test duplicateStageIsRejected() started.
+✔ Test duplicateStageIsRejected() passed after 0.009 seconds.
+◇ Test unknownStageIsRejected() started.
+✔ Test unknownStageIsRejected() passed after 0.009 seconds.
+◇ Test succeededWithoutVerifierIsRejected() started.
+✔ Test succeededWithoutVerifierIsRejected() passed after 0.010 seconds.
+◇ Test notApplicableWithoutVariantRuleIsRejected() started.
+✔ Test notApplicableWithoutVariantRuleIsRejected() passed after 0.010 seconds.
+◇ Test artifactPathEscapingBundleIsRejected() started.
+✔ Test artifactPathEscapingBundleIsRejected() passed after 0.009 seconds.
+◇ Test symlinkedCheckpointIsRejected() started.
+✔ Test symlinkedCheckpointIsRejected() passed after 0.009 seconds.
+◇ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "building" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "publishing" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "rollingBack" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+✔ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) with 3 test cases passed after 0.023 seconds.
+◇ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() started.
+✔ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() passed after 0.026 seconds.
+◇ Test busyLiveStateStopsResumeUntilProbeIsIdle() started.
+✔ Test busyLiveStateStopsResumeUntilProbeIsIdle() passed after 0.027 seconds.
+◇ Test heldRunLockRefusesResumeWithoutWriting() started.
+✔ Test heldRunLockRefusesResumeWithoutWriting() passed after 0.009 seconds.
+◇ Test runLockHeldByChildProcessRefusesUntilItExits() started.
+✔ Test runLockHeldByChildProcessRefusesUntilItExits() passed after 0.076 seconds.
+◇ Test heldBundleLockRefusesResumeWithoutWriting() started.
+✔ Test heldBundleLockRefusesResumeWithoutWriting() passed after 0.009 seconds.
+◇ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() started.
+✔ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() passed after 0.007 seconds.
+◇ Test concurrentResumeAdmitsOneWriter() started.
+✔ Test concurrentResumeAdmitsOneWriter() passed after 0.024 seconds.
+◇ Test notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "less", skipped → [VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "regular", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "dev", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "jb", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "exp", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+✔ Test notApplicableFollowsVariantRules(variant:skipped:) with 5 test cases passed after 0.090 seconds.
+◇ Test pendingStageIsNeverTreatedAsNotApplicable() started.
+✔ Test pendingStageIsNeverTreatedAsNotApplicable() passed after 0.001 seconds.
+◇ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument completed → false to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument completed → true to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+✔ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) with 2 test cases passed after 0.067 seconds.
+◇ Test optionChangeAffectingCompletedStageIsRefused() started.
+✔ Test optionChangeAffectingCompletedStageIsRefused() passed after 0.025 seconds.
+◇ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() started.
+✔ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() passed after 0.029 seconds.
+◇ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() started.
+✔ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() passed after 0.053 seconds.
+◇ Test nativePrepareFailureCanResume() started.
+✔ Test nativePrepareFailureCanResume() passed after 0.099 seconds.
+◇ Test variantChangeBeforePatchRecomputesApplicability() started.
+✔ Test variantChangeBeforePatchRecomputesApplicability() passed after 0.025 seconds.
+◇ Test toolChangeRequiresExplicitAcceptance() started.
+✔ Test toolChangeRequiresExplicitAcceptance() passed after 0.025 seconds.
+◇ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() started.
+✔ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() passed after 0.027 seconds.
+◇ Test recoveryInputsAreKeptUntilRetainingStagesFinish() started.
+✔ Test recoveryInputsAreKeptUntilRetainingStagesFinish() passed after 0.027 seconds.
+◇ Test restartFromPrepareRegeneratesARemovedRestoreTree() started.
+✔ Test restartFromPrepareRegeneratesARemovedRestoreTree() passed after 0.037 seconds.
+◇ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() started.
+✔ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() passed after 0.036 seconds.
+◇ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .patch to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .restore to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .cfw to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .firstBoot to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .verification to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+✔ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) with 5 test cases passed after 0.099 seconds.
+◇ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() started.
+✔ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() passed after 0.021 seconds.
+◇ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() started.
+✔ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() passed after 0.031 seconds.
+◇ Test artifactLookupReturnsTheLatestRecord() started.
+✔ Test artifactLookupReturnsTheLatestRecord() passed after 0.001 seconds.
+◇ Test keepArtifactsSkipsRemoval() started.
+✔ Test keepArtifactsSkipsRemoval() passed after 0.016 seconds.
+◇ Test removableArtifactsFollowSynthesizedStageStates() started.
+✔ Test removableArtifactsFollowSynthesizedStageStates() passed after 0.001 seconds.
+◇ Test writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .writeTemporary to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncFile to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .rename to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncDirectory to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+✔ Test writeFailureBeforeStageStopsWithoutExecuting(step:) with 4 test cases passed after 0.011 seconds.
+◇ Test failureRecordWriteErrorKeepsOriginalError() started.
+✔ Test failureRecordWriteErrorKeepsOriginalError() passed after 0.026 seconds.
+◇ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() started.
+✔ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() passed after 0.046 seconds.
+◇ Test runKeepsARecordWrittenByAnotherProcess() started.
+✔ Test runKeepsARecordWrittenByAnotherProcess() passed after 0.023 seconds.
+◇ Test missingCheckpointIsNotResumable() started.
+✔ Test missingCheckpointIsNotResumable() passed after 0.001 seconds.
+◇ Test sourceRecordRedactsOnlyURLSecrets() started.
+✔ Test sourceRecordRedactsOnlyURLSecrets() passed after 0.001 seconds.
+✔ Suite CreateCheckpointTests passed after 2.254 seconds.
+◇ Suite CreateOrchestratorTests started.
+◇ Test promptRegexMatchesIosbinpackBashPrompt() started.
+✔ Test promptRegexMatchesIosbinpackBashPrompt() passed after 0.001 seconds.
+◇ Test promptRegexMatchesRamdiskRootPrompt() started.
+✔ Test promptRegexMatchesRamdiskRootPrompt() passed after 0.001 seconds.
+◇ Test promptRegexDoesNotMatchOrdinaryLogLine() started.
+✔ Test promptRegexDoesNotMatchOrdinaryLogLine() passed after 0.001 seconds.
+◇ Test panicRegexMatchesKernelPanicLine() started.
+✔ Test panicRegexMatchesKernelPanicLine() passed after 0.001 seconds.
+◇ Test panicRegexMatchesStackshotSucceeded() started.
+✔ Test panicRegexMatchesStackshotSucceeded() passed after 0.001 seconds.
+◇ Test panicRegexDoesNotMatchOrdinaryLogLine() started.
+✔ Test panicRegexDoesNotMatchOrdinaryLogLine() passed after 0.001 seconds.
+◇ Test panicOrPromptRegexMatchesPanicCaseInsensitively() started.
+✔ Test panicOrPromptRegexMatchesPanicCaseInsensitively() passed after 0.001 seconds.
+◇ Test panicOrPromptRegexKeepsPromptCaseSensitive() started.
+✔ Test panicOrPromptRegexKeepsPromptCaseSensitive() passed after 0.001 seconds.
+◇ Test normalizeECIDStripsPrefixAndPads() started.
+✔ Test normalizeECIDStripsPrefixAndPads() passed after 0.001 seconds.
+◇ Test normalizeECIDPassesThroughSixteenHexDigits() started.
+✔ Test normalizeECIDPassesThroughSixteenHexDigits() passed after 0.001 seconds.
+◇ Test normalizeECIDUppercasesLowerHex() started.
+✔ Test normalizeECIDUppercasesLowerHex() passed after 0.001 seconds.
+◇ Test normalizeECIDRejectsNonHex() started.
+✔ Test normalizeECIDRejectsNonHex() passed after 0.001 seconds.
+◇ Test normalizeECIDRejectsOverlongInput() started.
+✔ Test normalizeECIDRejectsOverlongInput() passed after 0.001 seconds.
+◇ Test normalizeECIDRejectsEmptyInput() started.
+✔ Test normalizeECIDRejectsEmptyInput() passed after 0.001 seconds.
+◇ Test parseHVVmmPresentTrueWhenNested() started.
+✔ Test parseHVVmmPresentTrueWhenNested() passed after 0.001 seconds.
+◇ Test parseHVVmmPresentFalseWhenNotNested() started.
+✔ Test parseHVVmmPresentFalseWhenNotNested() passed after 0.001 seconds.
+◇ Test parseHVVmmPresentFalseWhenEmpty() started.
+✔ Test parseHVVmmPresentFalseWhenEmpty() passed after 0.001 seconds.
+◇ Test firstBootCommandsMatchSetupMachineVerbatim() started.
+✔ Test firstBootCommandsMatchSetupMachineVerbatim() passed after 0.001 seconds.
+✔ Suite CreateOrchestratorTests passed after 0.001 seconds.
+◇ Suite DiagnosticsReportTests started.
+◇ Test severityMapsToExitCodeAndUnknownOutranksWarning() started.
+✔ Test severityMapsToExitCodeAndUnknownOutranksWarning() passed after 0.001 seconds.
+◇ Test jsonSchemaIsStable() started.
+✔ Test jsonSchemaIsStable() passed after 0.001 seconds.
+◇ Test vocabularyIsStable() started.
+✔ Test vocabularyIsStable() passed after 0.001 seconds.
+◇ Test stageCategoriesSeparateInputPatchRestoreAndGuest() started.
+✔ Test stageCategoriesSeparateInputPatchRestoreAndGuest() passed after 0.001 seconds.
+✔ Suite DiagnosticsReportTests passed after 0.002 seconds.
+◇ Suite DiagnosticsRedactionTests started.
+◇ Test redactsCredentialsQueriesSecretsAndHome() started.
+✔ Test redactsCredentialsQueriesSecretsAndHome() passed after 0.001 seconds.
+◇ Test reportRedactsEvidenceMessagesAndActions() started.
+✔ Test reportRedactsEvidenceMessagesAndActions() passed after 0.001 seconds.
+◇ Test checkpointErrorWithCredentialsIsRedactedEndToEnd() started.
+✔ Test checkpointErrorWithCredentialsIsRedactedEndToEnd() passed after 0.014 seconds.
+◇ Test environmentOverrideValueIsNeverReported() started.
+✔ Test environmentOverrideValueIsNeverReported() passed after 0.007 seconds.
+✔ Suite DiagnosticsRedactionTests passed after 0.023 seconds.
+◇ Suite DiagnosticsHostTests started.
+◇ Test healthyHostIsAllOk() started.
+✔ Test healthyHostIsAllOk() passed after 0.008 seconds.
+◇ Test environmentProblemsAreEnvironmentCategory() started.
+✔ Test environmentProblemsAreEnvironmentCategory() passed after 0.007 seconds.
+◇ Test unreadableEntitlementsAreUnknownAndCustomSIPIsWarning() started.
+✔ Test unreadableEntitlementsAreUnknownAndCustomSIPIsWarning() passed after 0.007 seconds.
+◇ Test hostArchitectureRequiresArm64() started.
+✔ Test hostArchitectureRequiresArm64() passed after 0.009 seconds.
+◇ Test researchGuestsFollowActiveKernelConfigurationOnMultiOSHosts() started.
+✔ Test researchGuestsFollowActiveKernelConfigurationOnMultiOSHosts() passed after 0.012 seconds.
+◇ Test csrQueryFailuresAreReportedNotGuessed() started.
+✔ Test csrQueryFailuresAreReportedNotGuessed() passed after 0.001 seconds.
+◇ Test missingPythonRuntimeIsDependencyError() started.
+✔ Test missingPythonRuntimeIsDependencyError() passed after 0.007 seconds.
+◇ Test missingRuntimeCheckScriptMakesPythonUnknown() started.
+✔ Test missingRuntimeCheckScriptMakesPythonUnknown() passed after 0.005 seconds.
+◇ Test pythonLockMismatchNamesPackagesOnly() started.
+✔ Test pythonLockMismatchNamesPackagesOnly() passed after 0.005 seconds.
+◇ Test missingResourcesAreDependencyError() started.
+✔ Test missingResourcesAreDependencyError() passed after 0.007 seconds.
+◇ Test missingToolsAreDependencyErrorOrWarning() started.
+✔ Test missingToolsAreDependencyErrorOrWarning() passed after 0.006 seconds.
+◇ Test lowDiskSpaceIsWarning() started.
+✔ Test lowDiskSpaceIsWarning() passed after 0.005 seconds.
+✔ Suite DiagnosticsHostTests passed after 0.084 seconds.
+◇ Suite DiagnosticsVMTests started.
+◇ Test missingVMAndFilesAreInputErrors() started.
+✔ Test missingVMAndFilesAreInputErrors() passed after 0.007 seconds.
+◇ Test unrestoredBundleIsRestoreWarning() started.
+✔ Test unrestoredBundleIsRestoreWarning() passed after 0.007 seconds.
+◇ Test restoredBundleReportsVersions() started.
+✔ Test restoredBundleReportsVersions() passed after 0.007 seconds.
+◇ Test corruptCheckpointIsInputError() started.
+✔ Test corruptCheckpointIsInputError() passed after 0.008 seconds.
+◇ Test absentCheckpointIsOk() started.
+✔ Test absentCheckpointIsOk() passed after 0.007 seconds.
+◇ Test failedCreateStageCategoryFollowsStage() started.
+✔ Test failedCreateStageCategoryFollowsStage() passed after 0.039 seconds.
+◇ Test interruptedUnverifiedAndSucceededCreates() started.
+✔ Test interruptedUnverifiedAndSucceededCreates() passed after 0.013 seconds.
+◇ Test pendingFirmwareTransactionIsPatchError() started.
+✔ Test pendingFirmwareTransactionIsPatchError() passed after 0.009 seconds.
+◇ Test committedHistoryIsReported() started.
+✔ Test committedHistoryIsReported() passed after 0.007 seconds.
+◇ Test staleRuntimeRecordWithFreeLockIsIdle() started.
+✔ Test staleRuntimeRecordWithFreeLockIsIdle() passed after 0.007 seconds.
+◇ Test heldLockWithDeadRecordIsHolderUnknown() started.
+✔ Test heldLockWithDeadRecordIsHolderUnknown() passed after 0.007 seconds.
+◇ Test bootProcessWithoutLockIsOccupancyError() started.
+✔ Test bootProcessWithoutLockIsOccupancyError() passed after 0.006 seconds.
+◇ Test attachedImagesAndMountResidueWithoutHolderAreWarnings() started.
+✔ Test attachedImagesAndMountResidueWithoutHolderAreWarnings() passed after 0.008 seconds.
+◇ Test retainedCFWDiskStagingDirectoryIsResidue() started.
+✔ Test retainedCFWDiskStagingDirectoryIsResidue() passed after 0.006 seconds.
+◇ Test guestRuntimeFindingsForRunningVM() started.
+✔ Test guestRuntimeFindingsForRunningVM() passed after 0.013 seconds.
+◇ Test librarySummaryListsOnlyProblems() started.
+✔ Test librarySummaryListsOnlyProblems() passed after 0.010 seconds.
+✔ Suite DiagnosticsVMTests passed after 0.171 seconds.
+◇ Suite DiagnosticsLiveProbeTests started.
+◇ Test capabilitiesQueryParsesAnswersFromARealSocket() started.
+✔ Test capabilitiesQueryParsesAnswersFromARealSocket() passed after 0.001 seconds.
+◇ Test boundedRunnerTimesOutAndClosesStdin() started.
+✔ Test boundedRunnerTimesOutAndClosesStdin() passed after 0.255 seconds.
+◇ Test boundedRunnerEscalatesAndDoesNotWaitForInheritedPipes() started.
+✔ Test boundedRunnerEscalatesAndDoesNotWaitForInheritedPipes() passed after 1.110 seconds.
+◇ Test bootProcessParserIgnoresOtherCommands() started.
+✔ Test bootProcessParserIgnoresOtherCommands() passed after 0.001 seconds.
+✔ Suite DiagnosticsLiveProbeTests passed after 1.368 seconds.
+◇ Suite FirmwareCatalogReportTests started.
+◇ Test mapsEveryPairing() started.
+✔ Test mapsEveryPairing() passed after 0.001 seconds.
+◇ Test roundTripsJSON() started.
+✔ Test roundTripsJSON() passed after 0.001 seconds.
+✔ Suite FirmwareCatalogReportTests passed after 0.002 seconds.
+◇ Suite FirmwareCompatibilityManifestTests started.
+◇ Test catalogPairingsMatchManifest() started.
+✔ Test catalogPairingsMatchManifest() passed after 0.003 seconds.
+◇ Test variantsMatchCanonical() started.
+✔ Test variantsMatchCanonical() passed after 0.001 seconds.
+✔ Suite FirmwareCompatibilityManifestTests passed after 0.005 seconds.
+◇ Suite FirmwarePickerTests started.
+◇ Test catalogHasTwentyFivePairings() started.
+✔ Test catalogHasTwentyFivePairings() passed after 0.001 seconds.
+◇ Test everyPairingIsPopulated() started.
+✔ Test everyPairingIsPopulated() passed after 0.001 seconds.
+◇ Test cloudOSOptionsAreDistinctInFirstSeenOrder() started.
+✔ Test cloudOSOptionsAreDistinctInFirstSeenOrder() passed after 0.001 seconds.
+◇ Test bothProvidedPassesThrough() started.
+✔ Test bothProvidedPassesThrough() passed after 0.001 seconds.
+◇ Test nonInteractivePassesThroughEvenWhenIncomplete() started.
+✔ Test nonInteractivePassesThroughEvenWhenIncomplete() passed after 0.001 seconds.
+◇ Test emptyStringsTreatedAsUnset() started.
+✔ Test emptyStringsTreatedAsUnset() passed after 0.001 seconds.
+◇ Test neitherProvidedPicksFullPairing() started.
+✔ Test neitherProvidedPicksFullPairing() passed after 0.001 seconds.
+◇ Test neitherProvidedResolvesBothFromChosenPairing() started.
+✔ Test neitherProvidedResolvesBothFromChosenPairing() passed after 0.001 seconds.
+◇ Test newUpstreamPairingsAreSelectable(build:) started.
+◇ Test case passing 1 argument build → "23G90" to newUpstreamPairingsAreSelectable(build:) started.
+◇ Test case passing 1 argument build → "24A435" to newUpstreamPairingsAreSelectable(build:) started.
+✔ Test newUpstreamPairingsAreSelectable(build:) with 2 test cases passed after 0.001 seconds.
+◇ Test iPhoneProvidedPromptsForCloudOSOnly() started.
+✔ Test iPhoneProvidedPromptsForCloudOSOnly() passed after 0.001 seconds.
+◇ Test cloudOSProvidedPromptsForIPhoneOnly() started.
+✔ Test cloudOSProvidedPromptsForIPhoneOnly() passed after 0.001 seconds.
+◇ Test pairingMenuIsColumnAligned() started.
+✔ Test pairingMenuIsColumnAligned() passed after 0.001 seconds.
+◇ Test retriesThenSucceeds() started.
+✔ Test retriesThenSucceeds() passed after 0.001 seconds.
+◇ Test eofAborts() started.
+✔ Test eofAborts() passed after 0.001 seconds.
+◇ Test tooManyInvalidThrows() started.
+✔ Test tooManyInvalidThrows() passed after 0.001 seconds.
+✔ Suite FirmwarePickerTests passed after 0.005 seconds.
+◇ Suite FirmwareRecoveryLockTests started.
+◇ Test pendingFirmwarePreventsBootAndOfflineMutationButAllowsRecovery() started.
+✔ Test pendingFirmwarePreventsBootAndOfflineMutationButAllowsRecovery() passed after 0.004 seconds.
+✔ Suite FirmwareRecoveryLockTests passed after 0.004 seconds.
+◇ Suite "IPSW cache adoption" started.
+◇ Test "adopting a file writes the download marker with adoption fields" started.
+✔ Test "adopting a file writes the download marker with adoption fields" passed after 0.187 seconds.
+◇ Test "adopted entry is used by resolve without a request" started.
+✔ Test "adopted entry is used by resolve without a request" passed after 0.036 seconds.
+◇ Test "repeated adoption leaves the marker unchanged and does not hash again" started.
+✔ Test "repeated adoption leaves the marker unchanged and does not hash again" passed after 0.026 seconds.
+◇ Test "a marker written by a download is kept and reported" started.
+✔ Test "a marker written by a download is kept and reported" passed after 0.034 seconds.
+◇ Test "digest mismatch is refused without a marker" started.
+✔ Test "digest mismatch is refused without a marker" passed after 0.022 seconds.
+◇ Test "digest in a PCC URL must match" started.
+✔ Test "digest in a PCC URL must match" passed after 0.022 seconds.
+◇ Test "file that is not an IPSW is refused" started.
+✔ Test "file that is not an IPSW is refused" passed after 0.019 seconds.
+◇ Test "symlinks, partials and paths outside the cache are refused" started.
+✔ Test "symlinks, partials and paths outside the cache are refused" passed after 0.021 seconds.
+◇ Test "source comes from the catalog or must be given" started.
+✔ Test "source comes from the catalog or must be given" passed after 0.137 seconds.
+◇ Test "cache names follow fw_prepare naming" started.
+✔ Test "cache names follow fw_prepare naming" passed after 0.001 seconds.
+◇ Test "extraction is adopted only after its IPSW is usable" started.
+✔ Test "extraction is adopted only after its IPSW is usable" passed after 0.153 seconds.
+◇ Test "list reports each state and changes nothing" started.
+✔ Test "list reports each state and changes nothing" passed after 0.039 seconds.
+✔ Suite "IPSW cache adoption" passed after 0.703 seconds.
+◇ Suite IPSWCacheMarkerSafetyTests started.
+◇ Test predictableTemporaryPathDoesNotOverwriteAnotherFile(_:) started.
+◇ Test case passing 1 argument symlink → true to predictableTemporaryPathDoesNotOverwriteAnotherFile(_:) started.
+◇ Test case passing 1 argument symlink → false to predictableTemporaryPathDoesNotOverwriteAnotherFile(_:) started.
+✔ Test predictableTemporaryPathDoesNotOverwriteAnotherFile(_:) with 2 test cases passed after 0.002 seconds.
+◇ Test malformedDigestDoesNotMakeAnEntryUsable(_:) started.
+◇ Test case passing 1 argument character → "g" to malformedDigestDoesNotMakeAnEntryUsable(_:) started.
+◇ Test case passing 1 argument character → "?" to malformedDigestDoesNotMakeAnEntryUsable(_:) started.
+◇ Test case passing 1 argument character → "é" to malformedDigestDoesNotMakeAnEntryUsable(_:) started.
+✔ Test malformedDigestDoesNotMakeAnEntryUsable(_:) with 3 test cases passed after 0.003 seconds.
+◇ Test aValidDigestAndDedicatedTemporaryArePublished() started.
+✔ Test aValidDigestAndDedicatedTemporaryArePublished() passed after 0.001 seconds.
+✔ Suite IPSWCacheMarkerSafetyTests passed after 0.006 seconds.
+◇ Suite "IPSW cache" started.
+◇ Test "local source reads manifest without copying" started.
+✔ Test "local source reads manifest without copying" passed after 0.002 seconds.
+◇ Test "chunked download publishes the entry with a content marker" started.
+✔ Test "chunked download publishes the entry with a content marker" passed after 0.757 seconds.
+◇ Test entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "no-marker" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "other-source" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "modified-after-marker" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+◇ Test case passing 1 argument kind → "marker-from-before-t14" to entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) started.
+✔ Test entryThatCannotBeIdentifiedIsDownloadedAgain(kind:) with 4 test cases passed after 0.031 seconds.
+◇ Test "marker is the same rule the fw_prepare helper applies" started.
+✔ Test "marker is the same rule the fw_prepare helper applies" passed after 0.256 seconds.
+◇ Test "dropped transfer resumes with Range and If-Range" started.
+✔ Test "dropped transfer resumes with Range and If-Range" passed after 0.510 seconds.
+◇ Test "a changed entity or a server without ranges restarts from byte zero" started.
+✔ Test "a changed entity or a server without ranges restarts from byte zero" passed after 1.000 seconds.
+◇ Test "server errors are retried and end in a retryable result" started.
+✔ Test "server errors are retried and end in a retryable result" passed after 0.004 seconds.
+◇ Test "a client error is final" started.
+✔ Test "a client error is final" passed after 0.002 seconds.
+◇ Test "refused connections and short bodies end retryable with nothing published" started.
+✔ Test "refused connections and short bodies end retryable with nothing published" passed after 0.255 seconds.
+◇ Test "content that is not an IPSW is not published" started.
+✔ Test "content that is not an IPSW is not published" passed after 0.002 seconds.
+◇ Test "cancelling a transfer stops it and removes the partial" started.
+✔ Test "cancelling a transfer stops it and removes the partial" passed after 0.272 seconds.
+◇ Test "cancelled before starting and a symlinked entry publish nothing" started.
+✔ Test "cancelled before starting and a symlinked entry publish nothing" passed after 0.001 seconds.
+◇ Test "concurrent downloads publish one entry" started.
+✔ Test "concurrent downloads publish one entry" passed after 0.282 seconds.
+◇ Test "partials of ended processes are removed and live ones kept" started.
+✔ Test "partials of ended processes are removed and live ones kept" passed after 0.022 seconds.
+◇ Test boundedMemberReadAndUnsupportedSourceAreRejected() started.
+✔ Test boundedMemberReadAndUnsupportedSourceAreRejected() passed after 0.003 seconds.
+◇ Test zipIPSWIsInspectedWithoutExtractionOrSourceChanges() started.
+✔ Test zipIPSWIsInspectedWithoutExtractionOrSourceChanges() passed after 0.026 seconds.
+◇ Test "pair check reads each manifest and names the mistake" started.
+✔ Test "pair check reads each manifest and names the mistake" passed after 0.006 seconds.
+✔ Suite "IPSW cache" passed after 3.439 seconds.
+◇ Suite LaunchLayoutTests started.
+◇ Test toolchainFingerprintIncludesBothExecutables() started.
+✔ Test toolchainFingerprintIncludesBothExecutables() passed after 0.002 seconds.
+◇ Test pairedRuntimeAndProcessIdentity() started.
+✔ Test pairedRuntimeAndProcessIdentity() passed after 0.001 seconds.
+◇ Test resolvesArtifactPaths() started.
+✔ Test resolvesArtifactPaths() passed after 0.001 seconds.
+◇ Test resolvesToolPaths() started.
+✔ Test resolvesToolPaths() passed after 0.001 seconds.
+◇ Test delegatesToResources() started.
+✔ Test delegatesToResources() passed after 0.001 seconds.
+◇ Test parsesLsofPIDs() started.
+✔ Test parsesLsofPIDs() passed after 0.001 seconds.
+◇ Test locatesBootProcessByConfigArgument() started.
+✔ Test locatesBootProcessByConfigArgument() passed after 0.001 seconds.
+◇ Test ignoresOtherBundlesAndUnrelatedProcesses() started.
+✔ Test ignoresOtherBundlesAndUnrelatedProcesses() passed after 0.001 seconds.
+◇ Test matchesBundledAppBinaryAndEqualsForm() started.
+✔ Test matchesBundledAppBinaryAndEqualsForm() passed after 0.001 seconds.
+◇ Test dedupsSortsAndSkipsMalformedLines() started.
+✔ Test dedupsSortsAndSkipsMalformedLines() passed after 0.001 seconds.
+◇ Test matchesEitherRawOrResolvedConfigPath() started.
+✔ Test matchesEitherRawOrResolvedConfigPath() passed after 0.001 seconds.
+◇ Test matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() started.
+✔ Test matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() passed after 0.005 seconds.
+◇ Test stageVphonedCopiesWhenSourceExists(less:) started.
+◇ Test case passing 1 argument less → false to stageVphonedCopiesWhenSourceExists(less:) started.
+◇ Test case passing 1 argument less → true to stageVphonedCopiesWhenSourceExists(less:) started.
+✔ Test stageVphonedCopiesWhenSourceExists(less:) with 2 test cases passed after 0.002 seconds.
+◇ Test stageVphonedReturnsFalseWhenSourceAbsent() started.
+✔ Test stageVphonedReturnsFalseWhenSourceAbsent() passed after 0.001 seconds.
+◇ Test stageVphonedOverwritesStaleDestination() started.
+✔ Test stageVphonedOverwritesStaleDestination() passed after 0.001 seconds.
+✔ Suite LaunchLayoutTests passed after 0.015 seconds.
+◇ Suite LibraryLockTests started.
+◇ Test libraryLockHeldAcrossNameCheckAndPlacement() started.
+✔ Test libraryLockHeldAcrossNameCheckAndPlacement() passed after 0.002 seconds.
+◇ Test creatingSameNameTwiceThrowsAlreadyExists() started.
+✔ Test creatingSameNameTwiceThrowsAlreadyExists() passed after 0.002 seconds.
+◇ Test creatingDifferentNameSucceeds() started.
+✔ Test creatingDifferentNameSucceeds() passed after 0.003 seconds.
+◇ Test libraryLockProbeFalseWhenIdle() started.
+✔ Test libraryLockProbeFalseWhenIdle() passed after 0.001 seconds.
+✔ Suite LibraryLockTests passed after 0.008 seconds.
+◇ Suite LibraryTests started.
+◇ Test scansOnlyDirsWithManifest() started.
+✔ Test scansOnlyDirsWithManifest() passed after 0.001 seconds.
+◇ Test bundleNamedThrowsWhenMissing() started.
+✔ Test bundleNamedThrowsWhenMissing() passed after 0.001 seconds.
+◇ Test defaultRootHonorsEnvOverride() started.
+✔ Test defaultRootHonorsEnvOverride() passed after 0.001 seconds.
+◇ Test defaultRootHonorsVPHONERoot() started.
+✔ Test defaultRootHonorsVPHONERoot() passed after 0.001 seconds.
+◇ Test defaultRootIsShellSafe() started.
+✔ Test defaultRootIsShellSafe() passed after 0.001 seconds.
+◇ Test scanReportsCorruptBundlesInsteadOfDropping() started.
+✔ Test scanReportsCorruptBundlesInsteadOfDropping() passed after 0.001 seconds.
+✔ Suite LibraryTests passed after 0.003 seconds.
+◇ Suite ManagedProcessTests started.
+◇ Test waitsForOutputMatch() started.
+✔ Test waitsForOutputMatch() passed after 0.345 seconds.
+◇ Test reportsExitBeforeMatch() started.
+✔ Test reportsExitBeforeMatch() passed after 0.061 seconds.
+◇ Test timesOutWhenNoMatch() started.
+✔ Test timesOutWhenNoMatch() passed after 0.578 seconds.
+◇ Test sendWritesToStdinAndDrivesTheChild() started.
+✔ Test sendWritesToStdinAndDrivesTheChild() passed after 0.061 seconds.
+◇ Test terminateForceKillsAResistantChild() started.
+✔ Test terminateForceKillsAResistantChild() passed after 2.430 seconds.
+✔ Suite ManagedProcessTests passed after 3.478 seconds.
+◇ Suite ManifestTests started.
+◇ Test versionedManifestIsRejectedAndReportedWithoutRewriting() started.
+✔ Test versionedManifestIsRejectedAndReportedWithoutRewriting() passed after 0.009 seconds.
+◇ Test roundTripsThroughPlist() started.
+✔ Test roundTripsThroughPlist() passed after 0.001 seconds.
+◇ Test updatingReplacesOnlyGivenFields() started.
+✔ Test updatingReplacesOnlyGivenFields() passed after 0.001 seconds.
+◇ Test networkConfigRoundTripsThroughPlist() started.
+✔ Test networkConfigRoundTripsThroughPlist() passed after 0.001 seconds.
+◇ Test decodesManifestWithoutBridgeInterfaceKey() started.
+✔ Test decodesManifestWithoutBridgeInterfaceKey() passed after 0.001 seconds.
+✔ Suite ManifestTests passed after 0.014 seconds.
+◇ Suite NVRAMStorageTests started.
+◇ Test createsOnlyOnceAcrossRepeatedOpens() started.
+✔ Test createsOnlyOnceAcrossRepeatedOpens() passed after 0.001 seconds.
+◇ Test openFailureNeverFallsBackToCreation() started.
+✔ Test openFailureNeverFallsBackToCreation() passed after 0.002 seconds.
+◇ Test rejectsBothSymlinkKinds(dangling:) started.
+◇ Test case passing 1 argument dangling → false to rejectsBothSymlinkKinds(dangling:) started.
+◇ Test case passing 1 argument dangling → true to rejectsBothSymlinkKinds(dangling:) started.
+✔ Test rejectsBothSymlinkKinds(dangling:) with 2 test cases passed after 0.003 seconds.
+◇ Test rejectsDirectoryAndFIFO(fifo:) started.
+◇ Test case passing 1 argument fifo → false to rejectsDirectoryAndFIFO(fifo:) started.
+◇ Test case passing 1 argument fifo → true to rejectsDirectoryAndFIFO(fifo:) started.
+✔ Test rejectsDirectoryAndFIFO(fifo:) with 2 test cases passed after 0.001 seconds.
+◇ Test propagatesNonENOENTInspectionFailure() started.
+✔ Test propagatesNonENOENTInspectionFailure() passed after 0.001 seconds.
+◇ Test racingCreatorIsNotOverwritten() started.
+✔ Test racingCreatorIsNotOverwritten() passed after 0.007 seconds.
+◇ Test propagatesCreationFailureWithoutRetry() started.
+✔ Test propagatesCreationFailureWithoutRetry() passed after 0.001 seconds.
+◇ Test rejectsNonFileURL() started.
+✔ Test rejectsNonFileURL() passed after 0.001 seconds.
+✔ Suite NVRAMStorageTests passed after 0.017 seconds.
+◇ Suite NativeTransferTests started.
+◇ Test nativeAndSystemArchivesInteroperate(exporter:compression:) started.
+◇ Test case passing 2 arguments exporter → .systemTar, compression → .fast to nativeAndSystemArchivesInteroperate(exporter:compression:) started.
+◇ Test case passing 2 arguments exporter → .systemTar, compression → .max to nativeAndSystemArchivesInteroperate(exporter:compression:) started.
+◇ Test case passing 2 arguments exporter → .native, compression → .fast to nativeAndSystemArchivesInteroperate(exporter:compression:) started.
+◇ Test case passing 2 arguments exporter → .native, compression → .max to nativeAndSystemArchivesInteroperate(exporter:compression:) started.
+✔ Test nativeAndSystemArchivesInteroperate(exporter:compression:) with 4 test cases passed after 0.328 seconds.
+◇ Test nativeExportHonorsLockExclusionsAndExistingOutput() started.
+✔ Test nativeExportHonorsLockExclusionsAndExistingOutput() passed after 0.014 seconds.
+◇ Test manifestEscapeIsRejectedWithoutPublication(path:) started.
+◇ Test case passing 1 argument path → "../outside" to manifestEscapeIsRejectedWithoutPublication(path:) started.
+◇ Test case passing 1 argument path → "/absolute" to manifestEscapeIsRejectedWithoutPublication(path:) started.
+◇ Test case passing 1 argument path → "nested/../../outside" to manifestEscapeIsRejectedWithoutPublication(path:) started.
+✔ Test manifestEscapeIsRejectedWithoutPublication(path:) with 3 test cases passed after 0.026 seconds.
+◇ Test invalidBundlesLeaveNoPublishedFiles(kind:) started.
+◇ Test case passing 1 argument kind → "external-link" to invalidBundlesLeaveNoPublishedFiles(kind:) started.
+◇ Test case passing 1 argument kind → "config-link" to invalidBundlesLeaveNoPublishedFiles(kind:) started.
+◇ Test case passing 1 argument kind → "disk-link" to invalidBundlesLeaveNoPublishedFiles(kind:) started.
+◇ Test case passing 1 argument kind → "invalid-config" to invalidBundlesLeaveNoPublishedFiles(kind:) started.
+◇ Test case passing 1 argument kind → "multiple-roots" to invalidBundlesLeaveNoPublishedFiles(kind:) started.
+✔ Test invalidBundlesLeaveNoPublishedFiles(kind:) with 5 test cases passed after 0.046 seconds.
+◇ Test publicationIsLockedAndDoesNotOverwriteARacingDirectory() started.
+✔ Test publicationIsLockedAndDoesNotOverwriteARacingDirectory() passed after 0.009 seconds.
+◇ Test nativeTransferPreservesSparseDiskAndPrivateStaging() started.
+✔ Test nativeTransferPreservesSparseDiskAndPrivateStaging() passed after 0.408 seconds.
+◇ Test archiveRootHeaderCannotWidenPrivateStaging(backend:) started.
+◇ Test case passing 1 argument backend → .systemTar to archiveRootHeaderCannotWidenPrivateStaging(backend:) started.
+◇ Test case passing 1 argument backend → .native to archiveRootHeaderCannotWidenPrivateStaging(backend:) started.
+✔ Test archiveRootHeaderCannotWidenPrivateStaging(backend:) with 2 test cases passed after 0.026 seconds.
+✔ Suite NativeTransferTests passed after 0.860 seconds.
+◇ Suite NetworkingTests started.
+◇ Test mergeSetsMode() started.
+✔ Test mergeSetsMode() passed after 0.001 seconds.
+◇ Test mergeWithoutModePreservesCurrent() started.
+✔ Test mergeWithoutModePreservesCurrent() passed after 0.001 seconds.
+◇ Test mergeRejectsHostOnly() started.
+✔ Test mergeRejectsHostOnly() passed after 0.001 seconds.
+◇ Test mergeRejectsBridgeInterfaceWithoutBridgedMode() started.
+✔ Test mergeRejectsBridgeInterfaceWithoutBridgedMode() passed after 0.001 seconds.
+◇ Test bridgedWithoutAvailableInterfacesThrows() started.
+✔ Test bridgedWithoutAvailableInterfacesThrows() passed after 0.014 seconds.
+◇ Test makeNetworkDeviceOffIsNil() started.
+✔ Test makeNetworkDeviceOffIsNil() passed after 0.001 seconds.
+◇ Test makeNetworkDeviceNATHasAttachment() started.
+✔ Test makeNetworkDeviceNATHasAttachment() passed after 0.001 seconds.
+✔ Suite NetworkingTests passed after 0.015 seconds.
+◇ Suite PrepareBackendCheckpointTests started.
+◇ Test historicalEncodingDigestAndBackendStage() started.
+✔ Test historicalEncodingDigestAndBackendStage() passed after 0.001 seconds.
+✔ Suite PrepareBackendCheckpointTests passed after 0.001 seconds.
+◇ Suite ProcessRunnerTests started.
+◇ Test timeoutKillsChildIgnoringTermination() started.
+✔ Test timeoutKillsChildIgnoringTermination() passed after 0.764 seconds.
+◇ Test timeoutBoundsPipesInheritedByDescendant() started.
+✔ Test timeoutBoundsPipesInheritedByDescendant() passed after 1.509 seconds.
+◇ Test timedOutZeroExitIsNotSuccess() started.
+✔ Test timedOutZeroExitIsNotSuccess() passed after 0.001 seconds.
+◇ Test capturesStdoutAndZeroExit() started.
+✔ Test capturesStdoutAndZeroExit() passed after 0.029 seconds.
+◇ Test capturesNonzeroExit() started.
+✔ Test capturesNonzeroExit() passed after 0.016 seconds.
+◇ Test passesCwd() started.
+✔ Test passesCwd() passed after 0.025 seconds.
+◇ Test drainsBothPipesConcurrentlyWithoutDeadlock(bounded:) started.
+◇ Test case passing 1 argument bounded → false to drainsBothPipesConcurrentlyWithoutDeadlock(bounded:) started.
+◇ Test case passing 1 argument bounded → true to drainsBothPipesConcurrentlyWithoutDeadlock(bounded:) started.
+✔ Test drainsBothPipesConcurrentlyWithoutDeadlock(bounded:) with 2 test cases passed after 0.170 seconds.
+◇ Test runStreamingReturnsExitCode() started.
+✔ Test runStreamingReturnsExitCode() passed after 0.015 seconds.
+◇ Test runStreamingEchoFalseStillReturnsExitCode() started.
+✔ Test runStreamingEchoFalseStillReturnsExitCode() passed after 0.059 seconds.
+✔ Suite ProcessRunnerTests passed after 2.593 seconds.
+◇ Suite ResourcesTests started.
+◇ Test bundledLayoutResolvesToContentsResources() started.
+✔ Test bundledLayoutResolvesToContentsResources() passed after 0.001 seconds.
+◇ Test symlinkLaunchResolvesBundleAndCertificate() started.
+✔ Test symlinkLaunchResolvesBundleAndCertificate() passed after 0.002 seconds.
+◇ Test devLayoutWalksUpToProjectRoot() started.
+✔ Test devLayoutWalksUpToProjectRoot() passed after 0.001 seconds.
+◇ Test cacheDirsAreHomeRelativeAndToolsBinIsBaseRelative() started.
+✔ Test cacheDirsAreHomeRelativeAndToolsBinIsBaseRelative() passed after 0.001 seconds.
+◇ Test venvProbesAreTotalForAMissingInterpreter() started.
+✔ Test venvProbesAreTotalForAMissingInterpreter() passed after 0.001 seconds.
+◇ Test explicitPythonMustPassFullLockedProbe() started.
+✔ Test explicitPythonMustPassFullLockedProbe() passed after 0.011 seconds.
+◇ Test managedVenvDefaultsUnderDotVphone() started.
+✔ Test managedVenvDefaultsUnderDotVphone() passed after 0.001 seconds.
+◇ Test userCacheDirHonorsVPHONERoot() started.
+✔ Test userCacheDirHonorsVPHONERoot() passed after 0.001 seconds.
+◇ Test managedVenvOverrideBeatsVPHONERoot() started.
+✔ Test managedVenvOverrideBeatsVPHONERoot() passed after 0.001 seconds.
+◇ Test pythonUsabilityProbeRejectsMissingAcceptsDevVenv() started.
+✔ Test pythonUsabilityProbeRejectsMissingAcceptsDevVenv() passed after 0.510 seconds.
+◇ Test guestPathsDoNotFallBackFromInstalledBundle() started.
+✔ Test guestPathsDoNotFallBackFromInstalledBundle() passed after 0.001 seconds.
+✔ Suite ResourcesTests passed after 0.527 seconds.
+◇ Suite RestoreBackendCheckpointTests started.
+◇ Test legacyOptionsKeepTheirEncodingAndDigest() started.
+✔ Test legacyOptionsKeepTheirEncodingAndDigest() passed after 0.001 seconds.
+✔ Suite RestoreBackendCheckpointTests passed after 0.001 seconds.
+◇ Suite RestoreInfoTests started.
+◇ Test optionalCleanupSkipsBusyBundleAndCanRetry() started.
+[vphone] Warning: skipped optional firmware cleanup: VM '5219727F-58BE-4ADE-B3F7-BB725D5B1F8A' is busy: it is held by pid 27287 running operation "boot" (instance 6A5C9EC7-D55C-43D5-9218-0BA65709ABEF); stop the VM first
+✔ Test optionalCleanupSkipsBusyBundleAndCanRetry() passed after 0.002 seconds.
+◇ Test derivesBothVersionsFromPlists() started.
+✔ Test derivesBothVersionsFromPlists() passed after 0.001 seconds.
+◇ Test deriveNilWhenNoRestoreDir() started.
+✔ Test deriveNilWhenNoRestoreDir() passed after 0.001 seconds.
+◇ Test deriveNilWhenVersionKeyMissing() started.
+✔ Test deriveNilWhenVersionKeyMissing() passed after 0.001 seconds.
+◇ Test writeThenLoadRoundTrips() started.
+✔ Test writeThenLoadRoundTrips() passed after 0.001 seconds.
+◇ Test loadFallsBackToDeriveWhenNoJSON() started.
+✔ Test loadFallsBackToDeriveWhenNoJSON() passed after 0.001 seconds.
+◇ Test bundleReportCarriesRestoreInfo() started.
+✔ Test bundleReportCarriesRestoreInfo() passed after 0.001 seconds.
+◇ Test deviceForVariant() started.
+✔ Test deviceForVariant() passed after 0.001 seconds.
+◇ Test recordVariantMergesIntoVersions() started.
+✔ Test recordVariantMergesIntoVersions() passed after 0.001 seconds.
+◇ Test recordVariantNilWithoutVersions() started.
+✔ Test recordVariantNilWithoutVersions() passed after 0.001 seconds.
+◇ Test bundleReportCarriesUDID() started.
+✔ Test bundleReportCarriesUDID() passed after 0.001 seconds.
+◇ Test notExcludedFromExport() started.
+✔ Test notExcludedFromExport() passed after 0.001 seconds.
+✔ Suite RestoreInfoTests passed after 0.010 seconds.
+◇ Suite RestoreOpsTests started.
+◇ Test resolveECIDPrefersExplicit() started.
+✔ Test resolveECIDPrefersExplicit() passed after 0.001 seconds.
+◇ Test resolveECIDFromPredictionFile() started.
+✔ Test resolveECIDFromPredictionFile() passed after 0.001 seconds.
+◇ Test resolveECIDNilWhenMissing() started.
+✔ Test resolveECIDNilWhenMissing() passed after 0.001 seconds.
+◇ Test resolveUDIDFromPredictionFile() started.
+✔ Test resolveUDIDFromPredictionFile() passed after 0.001 seconds.
+◇ Test resolveUDIDNilWhenMissing() started.
+✔ Test resolveUDIDNilWhenMissing() passed after 0.001 seconds.
+◇ Test isAEAEncryptedDetectsMagic() started.
+✔ Test isAEAEncryptedDetectsMagic() passed after 0.001 seconds.
+✔ Suite RestoreOpsTests passed after 0.002 seconds.
+◇ Suite ShutdownPolicyTests started.
+◇ Test stopTimeoutOutlivesGracefulWait() started.
+✔ Test stopTimeoutOutlivesGracefulWait() passed after 0.001 seconds.
+◇ Test guestCommandWinsWhenShellIsAvailable() started.
+✔ Test guestCommandWinsWhenShellIsAvailable() passed after 0.001 seconds.
+◇ Test requestStopIsTheFallbackAndForceStopIsTheLastResort() started.
+✔ Test requestStopIsTheFallbackAndForceStopIsTheLastResort() passed after 0.001 seconds.
+◇ Test stoppedVMNeedsNoShutdown() started.
+✔ Test stoppedVMNeedsNoShutdown() passed after 0.001 seconds.
+◇ Test repeatedInterruptAndTimeoutBothForceStop() started.
+✔ Test repeatedInterruptAndTimeoutBothForceStop() passed after 0.001 seconds.
+◇ Test guestHaltCommandIsPOSIXShellAndReportsMissingBinary() started.
+✔ Test guestHaltCommandIsPOSIXShellAndReportsMissingBinary() passed after 0.001 seconds.
+✔ Suite ShutdownPolicyTests passed after 0.001 seconds.
+◇ Suite StaleRuntimeStateTests started.
+◇ Test recordOfAnExitedProcessDoesNotNameAHolderOrBlockTheLock() started.
+✔ Test recordOfAnExitedProcessDoesNotNameAHolderOrBlockTheLock() passed after 0.013 seconds.
+◇ Test removeRecordDeletesOnlyThisProcessesRecordForTheOperation() started.
+✔ Test removeRecordDeletesOnlyThisProcessesRecordForTheOperation() passed after 0.001 seconds.
+◇ Test staleSocketIsDeletedAndALiveOneIsKept() started.
+✔ Test staleSocketIsDeletedAndALiveOneIsKept() passed after 0.001 seconds.
+✔ Suite StaleRuntimeStateTests passed after 0.015 seconds.
+◇ Suite VMLockTests started.
+◇ Test diagnosticFailureDoesNotReleaseLock() started.
+[vphone] Warning: runtime record could not be written: Error Domain=NSCocoaErrorDomain Code=4 "The file “.vphone-runtime.json” doesn’t exist." UserInfo={NSFilePath=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/C55C4388-FEEF-427E-B651-C844729B48D6/.vphone-runtime.json, NSURL=file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/C55C4388-FEEF-427E-B651-C844729B48D6/.vphone-runtime.json/, NSUnderlyingError=0x7c906b1380 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+✔ Test diagnosticFailureDoesNotReleaseLock() passed after 0.002 seconds.
+◇ Test exportsReadOnlyBundle() started.
+[vphone] Warning: runtime record could not be written: Error Domain=NSCocoaErrorDomain Code=513 "Creating a temporary file via mktemp failed. Creating the temporary file via _amkrtemp previously also failed with errno 13" UserInfo={NSUserStringVariant=(
+    Folder
+), NSFilePath=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/BF69FE2F-1AC3-43DF-9B36-B09943610FAD/vm/.vphone-runtime.json, NSURL=file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/BF69FE2F-1AC3-43DF-9B36-B09943610FAD/vm/.vphone-runtime.json, NSDebugDescription=Creating a temporary file via mktemp failed. Creating the temporary file via _amkrtemp previously also failed with errno 13, NSUnderlyingError=0x7c906b0090 {Error Domain=NSPOSIXErrorDomain Code=13 "Permission denied"}}
+✔ Test exportsReadOnlyBundle() passed after 0.078 seconds.
+◇ Test excludesAliasesAndSurvivesRecordRemoval() started.
+✔ Test excludesAliasesAndSurvivesRecordRemoval() passed after 0.002 seconds.
+◇ Test releasesAndReplacesStaleRecord() started.
+✔ Test releasesAndReplacesStaleRecord() passed after 0.002 seconds.
+◇ Test differentVMsDoNotBlockAndDescriptorsCloseOnExec() started.
+✔ Test differentVMsDoNotBlockAndDescriptorsCloseOnExec() passed after 0.001 seconds.
+◇ Test pythonAndSwiftUseTheSameKernelLock() started.
+✔ Test pythonAndSwiftUseTheSameKernelLock() passed after 0.068 seconds.
+◇ Test offlineBundleOperationsRejectAnActiveOwner() started.
+✔ Test offlineBundleOperationsRejectAnActiveOwner() passed after 0.003 seconds.
+◇ Test pythonOwnerExcludesSwiftUntilProcessExit() started.
+✔ Test pythonOwnerExcludesSwiftUntilProcessExit() passed after 0.044 seconds.
+◇ Test ordinaryChildDoesNotRetainSwiftLock() started.
+✔ Test ordinaryChildDoesNotRetainSwiftLock() passed after 0.001 seconds.
+◇ Test releaseUnlocksEvenWhenDescriptorWasDuplicated() started.
+✔ Test releaseUnlocksEvenWhenDescriptorWasDuplicated() passed after 0.001 seconds.
+✔ Suite VMLockTests passed after 0.206 seconds.
+◇ Suite VMOperationTests started.
+◇ Test allVocabularyHasNoDuplicates() started.
+✔ Test allVocabularyHasNoDuplicates() passed after 0.001 seconds.
+◇ Test vmLifetimeIsExactlyBootAndDFU() started.
+✔ Test vmLifetimeIsExactlyBootAndDFU() passed after 0.001 seconds.
+◇ Test dfuRecordIsBothDFUAndBoot() started.
+✔ Test dfuRecordIsBothDFUAndBoot() passed after 0.001 seconds.
+◇ Test bootRecordIsBootButNotDFU() started.
+✔ Test bootRecordIsBootButNotDFU() passed after 0.001 seconds.
+◇ Test offlineRecordIsNeitherBootNorDFU() started.
+✔ Test offlineRecordIsNeitherBootNorDFU() passed after 0.001 seconds.
+✔ Suite VMOperationTests passed after 0.001 seconds.
+◇ Suite VMPickerTests started.
+◇ Test returnsProvidedNameUnchanged() started.
+✔ Test returnsProvidedNameUnchanged() passed after 0.001 seconds.
+◇ Test nonInteractiveWithoutNameThrows() started.
+✔ Test nonInteractiveWithoutNameThrows() passed after 0.001 seconds.
+◇ Test emptyLibraryThrows() started.
+✔ Test emptyLibraryThrows() passed after 0.001 seconds.
+◇ Test selectsByIndex() started.
+✔ Test selectsByIndex() passed after 0.001 seconds.
+◇ Test selectsByExactName() started.
+✔ Test selectsByExactName() passed after 0.001 seconds.
+◇ Test retriesThenSucceeds() started.
+✔ Test retriesThenSucceeds() passed after 0.001 seconds.
+◇ Test eofAborts() started.
+✔ Test eofAborts() passed after 0.001 seconds.
+◇ Test tooManyInvalidThrows() started.
+✔ Test tooManyInvalidThrows() passed after 0.001 seconds.
+✔ Suite VMPickerTests passed after 0.001 seconds.
+◇ Suite VMStopTests started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 0.001 seconds.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 0.277 seconds.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 2.708 seconds.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 2.817 seconds.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 0.811 seconds.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 0.055 seconds.
+◇ Test refusesToSignalAForeignLockHolder() started.
+✔ Test refusesToSignalAForeignLockHolder() passed after 0.452 seconds.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 0.001 seconds.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 0.001 seconds.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 0.001 seconds.
+◇ Test reportsSignalErrorsSeparately() started.
+✔ Test reportsSignalErrorsSeparately() passed after 0.001 seconds.
+◇ Test mapsOutcomesToExitCodes() started.
+✔ Test mapsOutcomesToExitCodes() passed after 0.001 seconds.
+◇ Test reportsProgressBeforeTheWaits() started.
+✔ Test reportsProgressBeforeTheWaits() passed after 2.916 seconds.
+✔ Suite VMStopTests passed after 10.041 seconds.
+◇ Suite VerbosityTests started.
+◇ Test countClampsToRange() started.
+✔ Test countClampsToRange() passed after 0.001 seconds.
+◇ Test gatesAreMonotonic() started.
+✔ Test gatesAreMonotonic() passed after 0.001 seconds.
+✔ Suite VerbosityTests passed after 0.001 seconds.
+◇ Suite APIFileUploadTests started.
+◇ Test identityAndSizeAreCheckedBeforeStaging() started.
+✔ Test identityAndSizeAreCheckedBeforeStaging() passed after 0.001 seconds.
+◇ Test commitsExactBytesAndModeWithoutFollowingDestinationSymlink() started.
+✔ Test commitsExactBytesAndModeWithoutFollowingDestinationSymlink() passed after 0.004 seconds.
+◇ Test cancellationShortAndOverlongBodiesPreserveDestinationAndCleanStaging() started.
+✔ Test cancellationShortAndOverlongBodiesPreserveDestinationAndCleanStaging() passed after 0.005 seconds.
+✔ Suite APIFileUploadTests passed after 0.011 seconds.
+◇ Suite APIRequestTests started.
+◇ Test preservesMethodParametersAndIdentifier() started.
+✔ Test preservesMethodParametersAndIdentifier() passed after 0.001 seconds.
+◇ Test omittedParametersAndIdentifierRemainOptional() started.
+✔ Test omittedParametersAndIdentifierRemainOptional() passed after 0.001 seconds.
+◇ Test rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "[]" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "null" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":1}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":""}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","params":[]}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","params":null}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","id":[]}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","id":{}}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "{"method":"health","id":null}" to rejectsInvalidRequestShapes(input:) started.
+◇ Test case passing 1 argument input → "not-json" to rejectsInvalidRequestShapes(input:) started.
+✔ Test rejectsInvalidRequestShapes(input:) with 11 test cases passed after 0.001 seconds.
+◇ Test methodLengthBoundary() started.
+✔ Test methodLengthBoundary() passed after 0.001 seconds.
+◇ Test preservesNumericIDWithoutStringConversion() started.
+✔ Test preservesNumericIDWithoutStringConversion() passed after 0.001 seconds.
+◇ Test reportsStableInvalidEnvelopeMessage() started.
+✔ Test reportsStableInvalidEnvelopeMessage() passed after 0.001 seconds.
+✔ Suite APIRequestTests passed after 0.003 seconds.
+◇ Suite EnvironmentTransactionTests started.
+◇ Test statusReportsInstalledAndStagedDigests() started.
+✔ Test statusReportsInstalledAndStagedDigests() passed after 0.007 seconds.
+◇ Test validationRejectsBeforeAnyWrite() started.
+✔ Test validationRejectsBeforeAnyWrite() passed after 0.006 seconds.
+◇ Test completeInstallKeepsBackupsAndJournal() started.
+✔ Test completeInstallKeepsBackupsAndJournal() passed after 0.013 seconds.
+◇ Test failedReplacementStopsAndRecordsRecovery() started.
+✔ Test failedReplacementStopsAndRecordsRecovery() passed after 0.013 seconds.
+◇ Test restoreRefusesAFileChangedAfterTheTransaction() started.
+✔ Test restoreRefusesAFileChangedAfterTheTransaction() passed after 0.007 seconds.
+◇ Test mappingsAreCurrentOrStaleByFileIdentity() started.
+✔ Test mappingsAreCurrentOrStaleByFileIdentity() passed after 0.006 seconds.
+◇ Test retentionKeepsIncompleteTransactions() started.
+✔ Test retentionKeepsIncompleteTransactions() passed after 0.016 seconds.
+✔ Suite EnvironmentTransactionTests passed after 0.071 seconds.
+✔ Test run with 719 tests in 92 suites passed after 90.464 seconds.

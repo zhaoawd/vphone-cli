@@ -246,3 +246,28 @@ T14 修复提交 `de12a679`：测试复现 marker 可预测临时文件跟随符
 没有签名重建、部署或 VM 操作。vm-new PID 69566 仍运行，配置摘要、旧客户机载荷摘要和签名 VM 二进制摘要保持既有值，codesign 验证通过。未执行 amfid 操作。台账仍为 47 项：2 已验收、13 部分推进、31 待对账、1 可选延期；必选任务仍有 44 项未验收。221 份既有原始证据与 3 份原附件已逐项核对提交字节，新证据单独追加。
 
 证据入口：`evidence/B03-summary.json`、`evidence/B03-source-review.json`、`evidence/B03-related.log`、`evidence/B03-firmware.log`。
+
+
+### 2026-10-07 B04：T13、T15、T17、T32、T28
+
+本轮按用户要求推进 5 项；各项保留完整验收条件，均未标记 accepted。代码和文档提交见 `evidence/B04-summary.json`。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T13 | classic prepare 发布前检查单一生成 identity 和全部引用路径/普通文件；失败保留旧树 | GPU 恢复、缓存和编译器、vphone600 输入来源、真实固件与 restore |
+| T15 | 固件根提交窗口摘要复核、全部输出读回、独占 rename；已有隔离写盘事务复验 | owner/hardlink、磁盘/配置/分组件 receipt 共同恢复及真实 VM |
+| T17 | 安装回复字段、组件、摘要、集合和状态严格核对；安装后读回；异常结果保留 unknown | 客户机日志写入失败、rollback 回复、写操作协调、模式允许集合和混合版本 VM |
+| T32 | 在现有 journal 保存可选 reportSHA256；提交/恢复核对报告，复用必需失败与声明检查 | 分组件 PatchReceipt、实际字节证明、generation/磁盘/客户机激活与验收 |
+| T28 | 源码白名单和接口文档对账；本地 5 库、固定上游源码 7 库、上游旧文档 4 库 | 其余任务最终文档、支持矩阵、交付及 VM 执行证据 |
+
+T15 的 3 项红测试为 12 issues；T13 的 2 个函数/7 个案例为 14 issues；T17 的 13 种回复变形在 1 项 XCTest 中产生 64 failures，非对象回复另产生 2 failures；T32 的 3 个函数/4 个案例为 11 issues。原始失败日志独立保存。T13 正向测试改用生成的合成 plist，保留原提取、合并与失败保全断言。
+
+集中测试为 Swift Testing 113 项/7 个 suite 与 XCTest 19 项。扩展测试为 Swift Testing 719 项/92 个 suite、90.464 秒与 XCTest 117 项、3 跳过、0 失败。标准固件入口 15 项/12 个 suite、42.004 秒通过；参考为本地历史 Python 输出，不证明固定上游等价或 VM 行为。已有隔离写盘事务 18 项 Python 测试、42.670 秒通过，使用临时稀疏文件及挂载/安装命令替身。最后 T17 非对象回复字段修复另以全部 20 项宿主更新 XCTest 验证；此前扩展结果不直接覆盖该最后修改，固件源码没有后续变化。
+
+T32 的 reportSHA256 只关联原报告字节与宿主事务；缺历史字段保留未知证据，没有创建 PatchReceipt.plist，没有从 plan.enabled 推定客户机 applied，也没有更新客户机版本。T15 复用已有 clone/完整副本/拒绝与旧盘保留逻辑；大文件 clone 检查是抽样摘要，不能表述为全文件摘要通过。
+
+没有签名重建、部署、VM 写入或 amfid 操作。只读检查观察到 vm-new PID 69566 仍运行；配置、旧客户机载荷与签名 VM 可执行文件摘要保持既有值，codesign 验证通过。主仓库仍为 e8d825b3 且源码干净。完整 Swift 套件本轮未重跑；此前默认失败和串行 HTTP 等待仍未查明，不能表述为全量通过。
+
+原有 238 份证据与 3 份输入副本均逐项核对已提交字节后追加本轮证据。台账为 47 项：2 已验收、18 部分推进、26 待对账、1 可选延期；46 项必选任务仍有 44 项未验收。
+
+本轮接口说明：`T28_environment_contract.md`。复算入口：`audit_environment_contract.py`。证据入口：`evidence/B04-summary.json`、`evidence/B04-source-review.json`。

@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-07",
+  "tasks": [
+    "T13",
+    "T15",
+    "T17",
+    "T32",
+    "T28"
+  ],
+  "accepted": false,
+  "commits": {
+    "T13": [
+      "a00bedde5147beeae537c8edea42e04d0a71bd3e"
+    ],
+    "T15": [
+      "192ed0578ff521c7ebfb339de4eb86548fd8e221"
+    ],
+    "T17": [
+      "9389885bef8246a05d853f9a50e2385862f1872b",
+      "7067476117a59c9ec06fa6301b890f3b653b8adb",
+      "001507f408b580f8d20a18cc5d6f1d2f6bab0abd"
+    ],
+    "T32": [
+      "04f19d2be1bfaaf2104420c6fa80b0bd2ce6371a"
+    ],
+    "T28": [
+      "fc93ef102d55aa0c84e3568a747b26460fe35a58"
+    ]
+  },
+  "verification": {
+    "focused": {
+      "swift_testing": 113,
+      "suites": 7,
+      "xctest": 19,
+      "pass": true,
+      "seconds": 5.463,
+      "source_equivalent_commit": "04f19d2be1bfaaf2104420c6fa80b0bd2ce6371a"
+    },
+    "related": {
+      "swift_testing": 719,
+      "suites": 92,
+      "xctest": 117,
+      "xctest_skipped": 3,
+      "pass": true,
+      "seconds": 90.464,
+      "source_commit": "04f19d2be1bfaaf2104420c6fa80b0bd2ce6371a"
+    },
+    "firmware": {
+      "tests": 15,
+      "suites": 12,
+      "pass": true,
+      "seconds": 42.004,
+      "scope": "local historical Python reference; not fixed upstream equivalence or VM behavior"
+    },
+    "offline_disk": {
+      "tests": 18,
+      "pass": true,
+      "seconds": 42.67,
+      "scope": "temporary sparse files and command doubles, no actual VM mount"
+    },
+    "final_T17": {
+      "xctest": 20,
+      "pass": true,
+      "seconds": 0.154,
+      "source_equivalent_commit": "001507f408b580f8d20a18cc5d6f1d2f6bab0abd"
+    },
+    "source_document_audit": {
+      "pass": true,
+      "local_libraries": 5,
+      "upstream_libraries": 7,
+      "upstream_documented_libraries": 4
+    }
+  },
+  "red": {
+    "T15": {
+      "functions": 3,
+      "issues": 12
+    },
+    "T13": {
+      "functions": 2,
+      "cases": 7,
+      "issues": 14
+    },
+    "T17": {
+      "xctest": 1,
+      "mutations": 13,
+      "failures": 64
+    },
+    "T17_nonobject": {
+      "xctest": 1,
+      "failures": 2
+    },
+    "T32": {
+      "functions": 3,
+      "cases": 4,
+      "issues": 11
+    }
+  },
+  "final_validation_scope": "Final T17-only error-field change reverified with all 20 environment host tests. Broad and firmware results precede that final change; firmware sources unchanged thereafter.",
+  "full_swift_rerun": false,
+  "full_swift_limitation": "earlier default failures and serial HTTP wait remain unresolved; cause unknown",
+  "vm_new": {
+    "operation_performed": false,
+    "pid_observed": 69566,
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+  },
+  "signed_bundle": {
+    "rebuilt_or_deployed": false,
+    "vm_sha256": "40b283470ea099080aee54b9378368bc130a0e0f01423bcd87528e593efc4a11",
+    "verify_pass": true
+  },
+  "main": {
+    "head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+    "clean": true
+  },
+  "counts": {
+    "total": 47,
+    "required": 46,
+    "accepted": 2,
+    "partial": 18,
+    "pending_audit": 26,
+    "optional_deferred": 1,
+    "required_unaccepted": 44
+  }
+}
