@@ -106,6 +106,8 @@ public enum PatchDeclarationCatalog {
         case variantMismatch(variant: String, gates: String)
         case partialStepSelection(id: String, step: String, enabled: [String])
         case unknownReference(id: String, relation: String, target: String)
+        case selectionNotEnabled(id: String)
+        case guestOverrideUnsupported(id: String)
 
         public var description: String {
             switch self {
@@ -135,6 +137,10 @@ public enum PatchDeclarationCatalog {
                 "plan variant \(variant) does not match gate snapshot variant \(gates)"
             case let .partialStepSelection(id, step, enabled):
                 "declaration \(id) cannot be blocked independently: step \(step) also enables \(enabled.joined(separator: ", "))"
+            case let .selectionNotEnabled(id):
+                "explicitly selected declaration \(id) has no enabled executable step under this variant and gate snapshot"
+            case let .guestOverrideUnsupported(id):
+                "declaration \(id) has no guest execution gate; explicit select/block cannot be enforced"
             case let .unknownReference(id, relation, target):
                 "declaration \(id) has \(relation) reference to unknown declaration \(target)"
             }

@@ -97,7 +97,8 @@ public enum VariantPlanResolver {
     /// dropping. `cloudOSVersionKnown` likewise prevents an active cloudOS-gated
     /// declaration from treating an unknown version as below its floor.
     /// `select` / `block` are explicit per-run overrides (empty on the default
-    /// path); an unknown or not-implemented id in `select` is refused.
+    /// path). Each selected id must bind an enabled live Swift step; mode/version/opt-in
+    /// exclusions and guest overrides without an execution gate are refused.
     public static func resolve(
         variant: FirmwarePipeline.Variant,
         gates: PatchGateSnapshot,
@@ -151,6 +152,10 @@ public enum VariantPlanResolver {
                     "not implemented locally (T18 libmisfix scope)"))
                 continue
             case .guestStep:
+                if select.contains(declaration.id)
+                    || (blocked && declaration.variants.contains(variantName)) {
+                    throw PatchDeclarationCatalog.CatalogError.guestOverrideUnsupported(id: declaration.id)
+                }
                 if declaration.variants.contains(variantName) {
                     guestUncovered.append(entry(declaration, .guestUncovered,
                         "guest Python/zsh step: declaration-only this round, execution not gated"))
@@ -197,6 +202,15 @@ public enum VariantPlanResolver {
                 let rule = declaration.versionRule ?? .always
                 excludedByVersion.append(entry(declaration, .excludedByVersion,
                     "version rule \(rule.rawValue) false for these gates"))
+            }
+        }
+
+        // An explicit request must have an executable effect. Selection never
+        // overrides the mode, version or opt-in boundaries of the frozen gates.
+        for id in select.sorted() {
+            guard enabledIDs.contains(id), let declaration = byID[id],
+                  declaration.swiftSteps.contains(where: liveSet.contains) else {
+                throw PatchDeclarationCatalog.CatalogError.selectionNotEnabled(id: id)
             }
         }
 
