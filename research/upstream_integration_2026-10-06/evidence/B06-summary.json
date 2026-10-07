@@ -1,0 +1,164 @@
+{
+  "date": "2026-10-07",
+  "tasks": [
+    "T40",
+    "T23",
+    "T41",
+    "T25",
+    "T27"
+  ],
+  "accepted": false,
+  "base": "4d28473ca22de68dcc543a0e035659f7951a2a9b",
+  "implementation_head": "cffd033a7cc64fd8330a1cb8bc732c8ebd025426",
+  "commits": {
+    "T40": "0cf9383c7fd2f257cb5afa60f1e327ae4dc9854a",
+    "T23": "700c70274ad826db8a791384998a0b30f8d73571",
+    "T41": "55e636b7e9a8e9ffe592568acce59bf4cad21dc9",
+    "T25": "a63b4b98bbbaa4fbb33d2754b47f20dafdc36bff",
+    "T27": "cffd033a7cc64fd8330a1cb8bc732c8ebd025426"
+  },
+  "red": {
+    "T40": "2 tests /10 issues for suffix/coexist; missing binding/policy APIs compile failure; intermediate fixtures corrected for separate archive and ISO8601 canonical receipt encoding",
+    "T23": "1 test /2 issues: keyboard flag discarded on legacy decode/update",
+    "T41": "missing planner compile failure; protocol field regression 1 test /1 issue",
+    "T25": "overlap 1 test /2 issues; cancelled missing CLI launch 1 test /1 issue; ordinary pre-cancel test already passed",
+    "T27": "missing MachineOrigins model compile failure"
+  },
+  "verification": {
+    "t40-final-green": {
+      "xctest": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 30,
+      "suites": 5,
+      "pass": true,
+      "seconds": 13.167,
+      "issues": 0,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t23-green": {
+      "xctest": 18,
+      "xctest_failures": 0,
+      "swift_testing_reported": 47,
+      "suites": 6,
+      "pass": true,
+      "seconds": 46.61,
+      "issues": 0,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t41-final-green": {
+      "xctest": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 11,
+      "suites": 2,
+      "pass": true,
+      "seconds": 0.016,
+      "issues": 0,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t25-t27-final-green": {
+      "xctest": 17,
+      "xctest_failures": 0,
+      "swift_testing_reported": 54,
+      "suites": 11,
+      "pass": true,
+      "seconds": 15.945,
+      "issues": 0,
+      "skipped_tests": 1,
+      "skipped_suites": 1
+    },
+    "t27-green": {
+      "xctest": 17,
+      "xctest_failures": 0,
+      "swift_testing_reported": 3,
+      "suites": 1,
+      "pass": true,
+      "seconds": 0.001,
+      "issues": 0,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "related": {
+      "xctest": 128,
+      "xctest_failures": 0,
+      "swift_testing_reported": 569,
+      "suites": 84,
+      "pass": false,
+      "seconds": 48.296,
+      "issues": 1,
+      "skipped_tests": 6,
+      "skipped_suites": 4
+    },
+    "cancellation-isolated": {
+      "xctest": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 1,
+      "suites": 1,
+      "pass": true,
+      "seconds": 0.326,
+      "issues": 0,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "related-serial": {
+      "xctest": 128,
+      "xctest_failures": 0,
+      "swift_testing_reported": 569,
+      "suites": 84,
+      "pass": true,
+      "seconds": 155.831,
+      "issues": 0,
+      "skipped_tests": 6,
+      "skipped_suites": 4
+    }
+  },
+  "related_failure": {
+    "test": "LibraryTests.cancellingARunInterruptsOnlyItsChild",
+    "observed_elapsed_seconds": 30.427475929260254,
+    "assertion": "elapsed < 10",
+    "exit_status_assertion_failed": false,
+    "cause": "unknown",
+    "isolated_pass": true,
+    "serial_same_scope_pass": true,
+    "code_changed_for_timing_failure": false
+  },
+  "scope": "Core/BundleStore/LaunchpadKit plus HostRPC/GuestTransport/HardwareKeyboardCLI/CoreBundleCLI; real-firmware selectors cleared; FirmwareIntegrationTests excluded; no firmware or VM acceptance, no full API HTTP/WS suite",
+  "python_or_guest_rebuilt": false,
+  "reason": "no Python or guest source changes in B06; existing B05 candidate untouched/unactivated",
+  "vm_new": {
+    "operations_performed": false,
+    "pid_observed": 69566,
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+  },
+  "signed_host": {
+    "rebuilt_or_deployed": false,
+    "actual_process_executable": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+    "sha256": "40b283470ea099080aee54b9378368bc130a0e0f01423bcd87528e593efc4a11",
+    "CDHash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+    "verify_pass": true,
+    "initial_other_checkout_read": "vm-state.log and host-codesign.log refer to main checkout binary; they are not the observed process executable. running-host.log/final-state.log verify the process path."
+  },
+  "candidate": {
+    "sha256": "75ea2fac2921be48a0b73bf0928486a72051512a45f371e24005258ae24eab94",
+    "activated": false,
+    "runtime_validated": false
+  },
+  "main": {
+    "head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+    "clean": true
+  },
+  "full_swift_rerun": false,
+  "full_swift_limitation": "previous global HTTP/WS/cancellation/helper failures and serial HTTP wait unresolved; cause unknown",
+  "counts": {
+    "total": 47,
+    "required": 46,
+    "accepted": 2,
+    "partial": 28,
+    "pending_audit": 16,
+    "optional_deferred": 1,
+    "required_unaccepted": 44
+  }
+}

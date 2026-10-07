@@ -1,0 +1,113 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/40] Compiling limera1n.c
+[6/40] Compiling normal.c
+[6/40] Compiling log.c
+[6/40] Compiling asr.c
+[9/40] Compiling ipsw.c
+[10/40] Compiling download.c
+[11/40] Compiling fdr.c
+[12/40] Compiling recovery.c
+[13/40] Compiling dfu.c
+[14/40] Compiling img4.c
+[15/40] Compiling img3.c
+[16/40] Compiling ace3.c
+[17/40] Compiling mbn.c
+[18/40] Compiling restore.c
+[19/40] Compiling ftab.c
+[20/40] Compiling fls.c
+[21/40] Compiling locking.c
+[22/40] Compiling deviceinterfaced.c
+[23/40] Compiling common.c
+[24/40] Compiling vphone_zip_stub.c
+[25/40] Compiling idevicerestore.c
+[26/40] Compiling vphone_restore_bridge.c
+[27/40] Compiling MobileRecoveryCore libirecovery.c
+[29/41] Emitting module VPhoneLaunchpadKitTests
+[30/41] Compiling VPhoneLaunchpadKitTests MachineBindingTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:8:51: error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsTargetFeatures'
+ 6 |     @Test func targetFeatureMinimumAndSameSeriesAreSeparateFromLegacyStore() {
+ 7 |         #expect(VPhoneLaunchpadCoreBundleVersion.minimum == "2.2.0")
+ 8 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.5.9-local.ab12cd34"))
+   |                                                   `- error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsTargetFeatures'
+ 9 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.6.0"))
+10 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.6.7-ci.abcdef0", host: "2.6.1-local.ab12cd34"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:9:50: error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsTargetFeatures'
+ 7 |         #expect(VPhoneLaunchpadCoreBundleVersion.minimum == "2.2.0")
+ 8 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.5.9-local.ab12cd34"))
+ 9 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.6.0"))
+   |                                                  `- error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsTargetFeatures'
+10 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.6.7-ci.abcdef0", host: "2.6.1-local.ab12cd34"))
+11 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.7.0", host: "2.6.1"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:10:50: error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+ 8 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.5.9-local.ab12cd34"))
+ 9 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.6.0"))
+10 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.6.7-ci.abcdef0", host: "2.6.1-local.ab12cd34"))
+   |                                                  `- error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+11 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.7.0", host: "2.6.1"))
+12 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.5.9", host: "2.5.8"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:11:51: error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+ 9 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsTargetFeatures("2.6.0"))
+10 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.6.7-ci.abcdef0", host: "2.6.1-local.ab12cd34"))
+11 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.7.0", host: "2.6.1"))
+   |                                                   `- error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+12 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.5.9", host: "2.5.8"))
+13 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("../../2.6.1", host: "2.6.1"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:12:51: error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+10 |         #expect(VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.6.7-ci.abcdef0", host: "2.6.1-local.ab12cd34"))
+11 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.7.0", host: "2.6.1"))
+12 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.5.9", host: "2.5.8"))
+   |                                                   `- error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+13 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("../../2.6.1", host: "2.6.1"))
+14 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:13:51: error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+11 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.7.0", host: "2.6.1"))
+12 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("2.5.9", host: "2.5.8"))
+13 |         #expect(!VPhoneLaunchpadCoreBundleVersion.supportsSeries("../../2.6.1", host: "2.6.1"))
+   |                                                   `- error: type 'VPhoneLaunchpadCoreBundleVersion' has no member 'supportsSeries'
+14 |     }
+15 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:22:43: error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+20 |         let data = Data(#"{"bundle":"2.6.1-local.ab12cd34","guestEnvironment":"2.5.9","bootChain":"2.2.3"}"#.utf8)
+21 |         try data.write(to: machine.url.appendingPathComponent("launchpad.json"))
+22 |         guard case let .loaded(binding) = VPhoneLaunchpadMachineBinding.load(machine) else {
+   |                                           `- error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+23 |             Issue.record("binding missing"); return
+24 |         }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:39:17: error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+37 |         try FileManager.default.createDirectory(at: machine.url, withIntermediateDirectories: true)
+38 |         let file = machine.url.appendingPathComponent("launchpad.json")
+39 |         #expect(VPhoneLaunchpadMachineBinding.load(machine) == .missing)
+   |                 `- error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+40 |         for bytes in [Data("invalid".utf8), Data(#"{"bundle":"../../evil"}"#.utf8),
+41 |                       Data(#"{"bundle":"2.6.1","kernel":"../../evil"}"#.utf8), Data(repeating: 0, count: 65537)] {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:43:35: error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+41 |                       Data(#"{"bundle":"2.6.1","kernel":"../../evil"}"#.utf8), Data(repeating: 0, count: 65537)] {
+42 |             try bytes.write(to: file)
+43 |             guard case .invalid = VPhoneLaunchpadMachineBinding.load(machine) else { Issue.record("invalid binding accepted"); continue }
+   |                                   `- error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+44 |             #expect(try Data(contentsOf: file) == bytes)
+45 |         }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineBindingTests.swift:51:31: error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+49 |         try bytes.write(to: target)
+50 |         try FileManager.default.createSymbolicLink(at: file, withDestinationURL: target)
+51 |         guard case .invalid = VPhoneLaunchpadMachineBinding.load(machine) else { Issue.record("linked binding accepted"); return }
+   |                               `- error: cannot find 'VPhoneLaunchpadMachineBinding' in scope
+52 |         #expect(try Data(contentsOf: target) == bytes)
+53 |     }
+[31/41] Emitting module VPhoneBundleStoreTests
+error: fatalError

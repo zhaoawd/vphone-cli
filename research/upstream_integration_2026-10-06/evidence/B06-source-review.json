@@ -1,0 +1,102 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "source_reads": [
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "440015c3a442be70fd7698031d4525d2d2221e067f37fe01e6ffc21c887a1e67",
+      "evidence": "evidence/B06-T40-bundle-store.swift"
+    },
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "a1d2ed5c3ca173f7cc503a954e6381c50e9c6a50d0a8957e300c91ec7a51fa8c",
+      "evidence": "evidence/B06-T40-binding.swift"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "6ca71a66467a363f23c53df02153877554e74ce0313848b2e19ba6a7000951a5",
+      "evidence": "evidence/B06-T23-manifest.swift"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "3d4452398ae7d4e56abbed636e202883d7ace97046afe45299b654f9e5dfbc56",
+      "evidence": "evidence/B06-T23-key-map.swift"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/Support/VPhoneNetworking.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "b347fe7307355c1e990383cbe45d05b2c2e8461bd8ccd82a8836162ffeb9fdaf",
+      "evidence": "evidence/B06-T41-networking.swift"
+    },
+    {
+      "path": "Documents/Guides/networking.md",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "5a749edcf102000a1ca62a630c04b0d80496b8e0fc87da5c95b2b86e0da310da",
+      "evidence": "evidence/B06-T41-networking.md"
+    },
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineLibrary.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "f51f51f2c535518cf5ca3ba1b99d143b3bbbd0b1c25df951d7b50131ad0f5889",
+      "evidence": "evidence/B06-T25-machine-library.swift"
+    },
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineInspector.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "ceef3ac09b1e51b658499792840c25589436cac638158cdf73ccd3d1d7f8419c",
+      "evidence": "evidence/B06-T27-inspector.swift"
+    }
+  ],
+  "scope": "fixed interface/path audit; no whole upstream commit marked equivalent; five tasks remain partial",
+  "T40": {
+    "implemented": "distinct X.Y.Z-local.<8..64 lowercase hex> names subject to total 64 bytes; legacy minimum 2.2 remains; target interface gate 2.6 and same-major.minor policy separate; four recorded origins and missing/invalid/loaded reads; bounded O_NOFOLLOW regular-file read; host replacement changes value only",
+    "upstream": "binding has bundle/guestEnvironment/bootChain, load returns nil for missing and invalid and has an atomic save; valid version name grammar is broader than local recognized release/build names; target feature minimum is 2.6; local same-series policy comes from accepted C10 plan",
+    "not_verified": [
+      "per-VM execution routing, verified executable lease and missing Bundle recovery refusal",
+      "binding persistence, legacy migration backup, creation freeze and clone/export origin preservation",
+      "kernel-only publication and guest-environment update/rollback coordination with hash/instance receipts",
+      "binding snapshot under same-size concurrent rewrite and full runtime mixed-version acceptance"
+    ]
+  },
+  "T23": {
+    "implemented": "optional per-VM hardwareKeyboardEnabled, nil retains legacy USB keyboard on; vm config --hardware-keyboard on|off changes only explicit field; updating preserves value including machineIdentifier replacement; runtime keyboard device reads usesHardwareKeyboard",
+    "upstream": "same optional keyboard field/default but target manifest schema is v2; local v2 remains deliberately rejected until runtime integration; key map sends globe/JIS/volume/other missing USB usages through daemon; that map is audited, not ported",
+    "not_verified": [
+      "rotation/coordinate-version whole-gesture binding and special keyboard usages",
+      "headless input integration and real iPad 2x/iPhone 3x acceptance",
+      "signed runtime rebuild and actual enabled/disabled USB keyboard behavior"
+    ]
+  },
+  "T41": {
+    "implemented": "pure IPv4 TCP/UDP forward planner with protocol JSON key, nil host address 127.0.0.1, range and ASCII port checks; canonical IPv4; duplicate and wildcard collisions separated by transport; nonempty plans require nat/tunnel string mode",
+    "upstream": "same loopback, NAT/tunnel and TCP/UDP listener collision contracts; resolvesMacName nil defaults true in upstream plan; current local default is retained and not rewritten; guide documents IPv4 tunnel and no internet ICMP forwarding",
+    "not_verified": [
+      "persisted unified per-VM network config, CLI/UI edit and atomic rollback",
+      "tunnel runtime, listeners, TCP/UDP forwarding, lease lifecycle and permissions",
+      "static IP/gateway/DNS/mDNS and eligible guest settings synchronization",
+      "real VPN/routes/concurrent clone MAC/port release tests; DHCP cleanup must remove only tool-owned guest settings"
+    ]
+  },
+  "T25": {
+    "implemented": "reject overlapping global import before replacing activity; preserve per-machine guard; cancelled launch exceptions no longer set actionError; existing result cancellation and export cleanup retained",
+    "upstream": "perform writes global activity without a corresponding overlapping-global guard; catch suppresses CancellationError or cancelled Task; local guard added for accepted batch-state requirement",
+    "not_verified": [
+      "per-VM bundle/network/device/kernel-update and orderly-stop menu/CLI integration",
+      "creation version freeze and dependency-bound batch actions",
+      "full multi-VM partial failure/disconnect/timeout/retry and lifecycle/log ownership acceptance",
+      "broad concurrent cancellation timing failure remains cause unknown despite isolated/serial passes"
+    ]
+  },
+  "T27": {
+    "implemented": "actual Inspector reads four recorded origins off main actor every 5 seconds; selection path guard and cancellation check prevent old machine origins shown on new selection; missing/invalid details visible; actual runtime/applied versions remain Unknown; ui.tree/accessibility.tree/element_at and existing automation callers retained",
+    "upstream": "Inspector uses bound host version and guest/boot-chain labels plus patch catalogue; local read-only records are not described as executable/applied receipts; nested AX remains diagnostic-only per T38",
+    "not_verified": [
+      "full caller inventory and wanted/planned/applied receipt/health integration",
+      "missing installed Bundle, unsupported capability and mixed actual runtime/guest evidence",
+      "AX diagnostic tree UI and real selection/poll/VM acceptance"
+    ]
+  }
+}

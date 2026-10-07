@@ -2217,7 +2217,7 @@
         "T11",
         "T44"
       ],
-      "status": "pending_local_audit",
+      "status": "per_vm_keyboard_config_verified_rotation_and_runtime_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/GuestAPI+Input.swift",
         "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift",
@@ -2240,12 +2240,32 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "optional_keyboard_cli_and_manifest_verified",
+        "paths": [
+          "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
+          "sources/VPhoneCore/VPhoneBundleOps.swift",
+          "sources/vphone-cli/VPhoneVMCLI.swift",
+          "sources/vphone-cli/VPhoneVirtualMachine.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "700c70274ad826db8a791384998a0b30f8d73571"
+      ],
+      "verification_evidence": [
+        "evidence/B06-summary.json",
+        "evidence/B06-source-review.json",
+        "evidence/B06-related.log",
+        "evidence/B06-related-serial.log",
+        "evidence/B06-t23-red.log",
+        "evidence/B06-t23-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "新增每 VM 硬件键盘开关及 vm config --hardware-keyboard on|off；缺字段保持旧 USB 键盘开启，其他配置与 machineIdentifier 更新保留选择。运行时配置已读取该字段；旋转、特殊键和 headless/真实设备验收待完成。",
+      "remaining_work": [
+        "rotation/coordinate-version whole-gesture binding and special keyboard usages",
+        "headless input integration and real iPad 2x/iPhone 3x acceptance",
+        "signed runtime rebuild and actual enabled/disabled USB keyboard behavior"
+      ]
     },
     {
       "id": "T24",
@@ -2373,7 +2393,7 @@
         "T44",
         "T46"
       ],
-      "status": "pending_local_audit",
+      "status": "global_import_concurrency_and_cancelled_errors_verified_entries_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Control/VPhoneLaunchpadControlCommands.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
@@ -2395,12 +2415,33 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "bounded_import_activity_and_cancel_error_verified",
+        "paths": [
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+          "tests/VPhoneLaunchpadKitTests/EditTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "a63b4b98bbbaa4fbb33d2754b47f20dafdc36bff"
+      ],
+      "verification_evidence": [
+        "evidence/B06-summary.json",
+        "evidence/B06-source-review.json",
+        "evidence/B06-related.log",
+        "evidence/B06-related-serial.log",
+        "evidence/B06-t25-red.log",
+        "evidence/B06-t25-t27-final-green.log",
+        "evidence/B06-t25-throw-red.log",
+        "evidence/B06-cancellation-isolated.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "并发导入不会覆盖首个 globalActivity，第二个操作被拒绝；取消后 CLI 启动异常不再产生 actionError。原导出队列/取消清理复验通过。完整新入口与生命周期待完成；联合并行取消时限失败原因未查明。",
+      "remaining_work": [
+        "per-VM bundle/network/device/kernel-update and orderly-stop menu/CLI integration",
+        "creation version freeze and dependency-bound batch actions",
+        "full multi-VM partial failure/disconnect/timeout/retry and lifecycle/log ownership acceptance",
+        "broad concurrent cancellation timing failure remains cause unknown despite isolated/serial passes"
+      ]
     },
     {
       "id": "T26",
@@ -2463,7 +2504,7 @@
         "T38",
         "T40"
       ],
-      "status": "pending_local_audit",
+      "status": "recorded_origins_inspector_verified_actual_receipts_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineInspector.swift",
         "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/",
@@ -2485,12 +2526,31 @@
         "protocol"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "read_only_origins_ui_and_automation_preserved",
+        "paths": [
+          "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineOrigins.swift",
+          "tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "cffd033a7cc64fd8330a1cb8bc732c8ebd025426"
+      ],
+      "verification_evidence": [
+        "evidence/B06-summary.json",
+        "evidence/B06-source-review.json",
+        "evidence/B06-related.log",
+        "evidence/B06-related-serial.log",
+        "evidence/B06-t27-red.log",
+        "evidence/B06-t25-t27-final-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "Inspector 分别显示四类记录来源及缺失/非法原因，实际运行版本保持 Unknown。读取在主 actor 外执行；按机器路径和任务取消隔离旧结果。原 RPC 调用保留。完整 receipt/health 与 AX 诊断 UI 待完成。",
+      "remaining_work": [
+        "full caller inventory and wanted/planned/applied receipt/health integration",
+        "missing installed Bundle, unsupported capability and mixed actual runtime/guest evidence",
+        "AX diagnostic tree UI and real selection/poll/VM acceptance"
+      ]
     },
     {
       "id": "T28",
@@ -3223,7 +3283,7 @@
         "T05",
         "T24"
       ],
-      "status": "pending_local_audit",
+      "status": "four_origins_and_build_suffixes_verified_execution_binding_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -3249,12 +3309,32 @@
         "host"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "read_only_origins_and_version_policy_verified",
+        "paths": [
+          "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineBinding.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "0cf9383c7fd2f257cb5afa60f1e327ae4dc9854a"
+      ],
+      "verification_evidence": [
+        "evidence/B06-summary.json",
+        "evidence/B06-source-review.json",
+        "evidence/B06-related.log",
+        "evidence/B06-related-serial.log",
+        "evidence/B06-t40-red.log",
+        "evidence/B06-t40-final-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "本轮完成四类记录来源、missing/invalid/loaded 区分、local 构建后缀和真实临时 Bundle 并存验证。保留 legacy store 最低 2.2，与目标接口最低 2.6 及同 major.minor 策略分开。未接入持久化、逐 VM 执行或客户机同步。",
+      "remaining_work": [
+        "per-VM execution routing, verified executable lease and missing Bundle recovery refusal",
+        "binding persistence, legacy migration backup, creation freeze and clone/export origin preservation",
+        "kernel-only publication and guest-environment update/rollback coordination with hash/instance receipts",
+        "binding snapshot under same-size concurrent rewrite and full runtime mixed-version acceptance"
+      ]
     },
     {
       "id": "T41",
@@ -3275,7 +3355,7 @@
         "T16",
         "T17"
       ],
-      "status": "pending_local_audit",
+      "status": "port_forward_plan_verified_network_runtime_pending",
       "upstream_paths": [
         "VPhoneKit/VPhoneCoreKit/Support/VPhoneNetworking.swift",
         "VPhoneKit/VPhoneCoreKit/Network/VPhoneUserspaceNetwork.swift",
@@ -3302,12 +3382,31 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "pure_host_planning_loopback_and_collision_verified",
+        "paths": [
+          "sources/VPhoneCore/VPhonePortForwardPlan.swift",
+          "tests/VPhoneCoreTests/PortForwardPlanTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "55e636b7e9a8e9ffe592568acce59bf4cad21dc9"
+      ],
+      "verification_evidence": [
+        "evidence/B06-summary.json",
+        "evidence/B06-source-review.json",
+        "evidence/B06-related.log",
+        "evidence/B06-related-serial.log",
+        "evidence/B06-t41-red.log",
+        "evidence/B06-t41-final-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成纯宿主端口转发规划：TCP/UDP、IPv4/端口校验、protocol 序列化、默认 127.0.0.1、重复/wildcard 冲突检查。未创建监听、未接入持久化或 tunnel 后端、未写客户机网络设置。",
+      "remaining_work": [
+        "persisted unified per-VM network config, CLI/UI edit and atomic rollback",
+        "tunnel runtime, listeners, TCP/UDP forwarding, lease lifecycle and permissions",
+        "static IP/gateway/DNS/mDNS and eligible guest settings synchronization",
+        "real VPN/routes/concurrent clone MAC/port release tests; DHCP cleanup must remove only tool-owned guest settings"
+      ]
     },
     {
       "id": "T42",
@@ -3898,6 +3997,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "7839f5b30cea3f7736acf68f5fd6dbef62810092",
-  "latest_validation_limitation": "B05: related XCTest156 and Swift Testing reported530/78 passed (6 tests/4 suites skipped); Python10 passed after pinned archive harness adaptation; isolated iOS daemon built/metadata checked, not installed or activated. All five tasks partial. Full Swift not rerun; previous global failures unresolved. Signed host and vm-new unchanged."
+  "latest_implementation_head": "cffd033a7cc64fd8330a1cb8bc732c8ebd025426",
+  "latest_validation_limitation": "B06: five tasks partial. Related concurrent run XCTest128 passed, Swift Testing569/84 failed1 cancellation elapsed assertion; cause unknown. Isolated cancellation and serial same-scope rerun passed. Full Swift/API HTTP/WS and real VM acceptance not rerun. Existing signed runtime/vm-new/B05 guest candidate unchanged."
 }

@@ -302,3 +302,34 @@ T36 红测试 2 项 XCTest/8 failures；T37 红测试 1 项 XCTest/4 failures �
 追加前逐项核对原有 267 份证据与 3 份输入副本的已提交字节。台账为 47 项：2 已验收、23 部分推进、21 待对账、1 可选延期；46 项必选仍有 44 项未验收。源码路径审查不等同于上游整个提交的语义等价，原提交覆盖台账保持待审。
 
 证据入口：`evidence/B05-summary.json`、`evidence/B05-source-review.json`。接口约束以以上本轮范围为准；`T28_environment_contract.md` 的五库环境接口对账再次通过。
+
+
+### 2026-10-07 B06：T40、T23、T41、T25、T27
+
+本轮按用户要求推进 5 项，各项分别提交实现。五项均保留完整验收条件，未标记 accepted。完整提交 SHA 与原始日志见 `evidence/B06-summary.json`。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T40 | 四类记录来源；missing/invalid/loaded 区分；带构建摘要的 local 后缀；同发布版本的两个临时 Bundle 并存；目标接口最低版本与同 series 策略 | 逐 VM 执行来源、持久化/迁移备份、创建冻结、clone/export 来源、kernel-only 与客户机同步/回退及真实混合版本 |
+| T23 | 每 VM 硬件键盘开关；`vm config --hardware-keyboard` 的 on/off 选项；缺字段保持旧行为；其他编辑与机器标识更新保留设置 | 旋转坐标版本、特殊键、headless、真实 iPad/iPhone 与签名运行时验收 |
+| T41 | 纯 IPv4 TCP/UDP 转发规划；protocol 序列化；默认 127.0.0.1；端口与重复/wildcard 冲突校验 | 统一网络持久化/CLI/UI、tunnel/监听/转发后端、IP/DNS/mDNS、客户机同步、真实路由与释放 |
+| T25 | 拒绝重叠 global import，保留首个状态；取消后启动异常不写 actionError；原导出队列和取消清理复验 | 完整新入口、创建冻结、多 VM 部分失败/断线/重试及日志归属；并行取消时限失败原因未查明 |
+| T27 | Inspector 显示四类记录来源、缺失/非法原因，实际运行版本 Unknown；按选择路径和取消隔离旧结果；保留现有自动化 RPC | 实际 receipt/wanted/planned/applied/health、缺安装 Bundle 与能力状态、AX 诊断 UI、真实选择/VM 验收 |
+
+T40 的版本语法保持本地已识别的 release/CI 名称，并新增 `X.Y.Z-local.<8..64 位小写十六进制>`，整体仍限制 64 字节。legacy store 最低 2.2.0 保留；目标接口最低 2.6.0 和默认同 major.minor 策略分别表达，不要求 patch 数字相同。这些策略目前没有接入逐 VM 执行。绑定只读取 launchpad.json，不保存或选择可执行文件，不以 host/boot-chain 相同推断 kernel 来源。O_NOFOLLOW、regular-file 和 64 KiB 限制用于读取；尚未证明同长度并发写入时的完整快照一致性。
+
+T40 首轮 2 项测试/10 issues 复现后缀拒绝；绑定模型缺失产生编译失败。中间验证发现测试夹具重复使用不可覆盖的 archive，随后发现 receipt 的 ISO8601 持久化丢弃 Date 小数秒；分别改为独立夹具和 canonical encoded 字节比较。30 项/5 suites 最终通过。并存测试在临时 store 中安装真实签名测试 Bundle，资源摘要不同；没有写实际生产 Bundle store。
+
+T23 红测试 1 项/2 issues 复现键盘字段在旧 manifest 读取/更新时被丢弃。新选项明确支持 on/off，未传选项时不修改原值。运行时机器标识替换改用 updating，避免重构造丢失新增字段。18 项 XCTest 与 47 项 Swift Testing/6 suites 通过，包含 manifest、BundleOps、CLI 解析、触摸路由和传输。固定上游 manifest 已为 schema v2；本轮只适配键盘字段，旧后端仍拒绝 v2。特殊键映射仅审查，未移植。
+
+T41 红验证因缺规划接口编译失败；随后单项测试复现 JSON 字段 transport 与固定上游 protocol 不一致，已修正。规划和原 networking 共 11 项/2 suites 通过。规划中的 tunnel 字符串允许规则不表示本地后端已有 tunnel 支持，没有监听或网络配置写入。上游 resolvesMacName 缺字段默认 true；本轮没有修改本地现有默认值。
+
+T25 红测试 1 项/2 issues 复现并发导入覆盖 globalActivity 且执行两个导入；补充取消后缺失临时 CLI 的启动异常测试，复现 actionError 不应产生却产生（1 项/1 issue）。普通预取消测试在旧代码已经通过，不列为新增修复证据。T27 红验证因缺来源模型编译失败。最终 T25/T27 合并范围 17 项 XCTest 与 54 项 Swift Testing/11 suites 通过。SwiftPM 同时编译 Launchpad；没有进行真实 GUI 或 USB 键盘验收。
+
+联合检查范围为 Core、BundleStore、LaunchpadKit，以及 HostRPC、GuestTransport、HardwareKeyboardCLI、CoreBundleCLI。清除真实固件验收环境选择器，排除 FirmwareIntegrationTests。首次联合运行 XCTest 128 项无失败；Swift Testing 569 项/84 suites 有 1 issue：LibraryTests.cancellingARunInterruptsOnlyItsChild 的退出状态符合 SIGINT，但耗时 30.427 秒超过 10 秒断言。原因未查明，相关子进程实现和该测试本轮未修改。单项复验 0.326 秒通过；同范围显式 --no-parallel 复验 XCTest 128 项无失败、Swift Testing 569 项/84 suites、155.831 秒通过，另报告 6 项测试/4 suites 跳过。保留失败日志，不以复验通过删除失败记录。本轮未重跑完整 API HTTP/WS、固件对比或真实 VM 验收；此前全量验证问题仍保留。
+
+没有 Python 或客户机源码变化，未重复构建 daemon。现有 B05 候选摘要未变且未激活。只读检查观察 vm-new PID 69566 仍使用隔离 worktree 的签名 vphone-vm；其 SHA-256、CDHash、配置和既有客户机载荷摘要与 B05 一致，签名验证通过。初次宿主路径核对读取了主 checkout 的另一个二进制，原读数保存在 vm-state/host-codesign 日志；随后按进程实际路径核对，权威记录为 running-host/final-state。没有 VM 写入、amfid 操作或 vm-2607 操作。主仓库仍为 e8d825b3 且干净。
+
+追加前逐项核对原有 313 份证据与 3 份输入副本的已提交字节。台账为 47 项：2 已验收、28 部分推进、16 待对账、1 可选延期；46 项必选仍有 44 项未验收。固定上游提交覆盖台账保持原状态，源码路径审查不等同于整个提交已合入。
+
+证据入口：`evidence/B06-summary.json`、`evidence/B06-source-review.json`。

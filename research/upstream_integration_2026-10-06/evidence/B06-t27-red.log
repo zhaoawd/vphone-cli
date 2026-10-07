@@ -1,0 +1,128 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/39] Compiling download.c
+[5/39] Compiling asr.c
+[6/39] Compiling fdr.c
+[7/39] Compiling ipsw.c
+[8/40] Compiling limera1n.c
+[9/40] Compiling normal.c
+[10/40] Compiling recovery.c
+[11/40] Compiling dfu.c
+[12/40] Compiling img4.c
+[13/40] Compiling img3.c
+[14/40] Compiling ace3.c
+[15/40] Compiling restore.c
+[16/40] Compiling mbn.c
+[17/40] Compiling ftab.c
+[18/40] Compiling log.c
+[19/40] Compiling fls.c
+[20/40] Compiling locking.c
+[21/40] Compiling vphone_zip_stub.c
+[22/40] Compiling deviceinterfaced.c
+[23/40] Compiling common.c
+[25/40] Emitting module VPhoneArchiveKit
+[25/40] Compiling vphone_restore_bridge.c
+[26/40] Compiling idevicerestore.c
+[27/40] Compiling MobileRecoveryCore libirecovery.c
+[29/42] Emitting module VPhoneBundleStore
+[30/42] Emitting module VPhoneBundleStoreTests
+[31/42] Emitting module VPhoneHelperKitTests
+[32/42] Emitting module VPhoneCore
+[33/46] Emitting module VPhoneArchiveKitTests
+[34/46] Emitting module VPhoneLaunchpadKit
+[35/63] Compiling VPhoneLaunchpad VPhoneLaunchpadStatus.swift
+[36/63] Compiling VPhoneLaunchpad VPhoneLaunchpadTheme.swift
+[37/64] Emitting module FirmwarePatcher
+[38/64] Compiling VPhoneLaunchpad VPhoneLaunchpadWindowWidth.swift
+[39/71] Compiling VPhoneLaunchpad VPhoneLaunchpadHostSetupView.swift
+[40/71] Compiling VPhoneLaunchpad VPhoneLaunchpadMachineInspector.swift
+[41/71] Compiling VPhoneLaunchpad VPhoneLaunchpadModel.swift
+[42/71] Compiling VPhoneLaunchpad VPhoneLaunchpadNewMachineView.swift
+[43/71] Compiling VPhoneLaunchpad VPhoneLaunchpadRootView.swift
+[44/71] Compiling VPhoneLaunchpad VPhoneLaunchpadSheet.swift
+[45/71] Compiling FirmwareIntegrationTests PatchComparisonTests.swift
+[46/71] Emitting module FirmwareIntegrationTests
+[47/71] Emitting module VPhoneLaunchpadKitTests
+[48/71] Compiling VPhoneLaunchpadKitTests MachineOriginsTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:7:28: error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+ 5 |     @Test func recordedOriginsNeverBecomeRuntimeProof() throws {
+ 6 |         let binding = try VPhoneLaunchpadMachineBinding(bundle: "2.6.1-local.ab12cd34", guestEnvironment: "2.5.9", kernel: "2.6.0", bootChain: "2.2.3")
+ 7 |         let presentation = VPhoneLaunchpadMachineOrigins(.loaded(binding))
+   |                            `- error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+ 8 |         #expect(presentation.host == binding.bundle)
+ 9 |         #expect(presentation.guestEnvironment == binding.guestEnvironment)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:7:59: error: cannot infer contextual base in reference to member 'loaded'
+ 5 |     @Test func recordedOriginsNeverBecomeRuntimeProof() throws {
+ 6 |         let binding = try VPhoneLaunchpadMachineBinding(bundle: "2.6.1-local.ab12cd34", guestEnvironment: "2.5.9", kernel: "2.6.0", bootChain: "2.2.3")
+ 7 |         let presentation = VPhoneLaunchpadMachineOrigins(.loaded(binding))
+   |                                                           `- error: cannot infer contextual base in reference to member 'loaded'
+ 8 |         #expect(presentation.host == binding.bundle)
+ 9 |         #expect(presentation.guestEnvironment == binding.guestEnvironment)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:18:22: error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+16 | 
+17 |     @Test func missingAndInvalidBindingsRemainVisibleWithoutADefaultVersion() {
+18 |         let absent = VPhoneLaunchpadMachineOrigins(.missing)
+   |                      `- error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+19 |         #expect(absent.host == "Unknown")
+20 |         #expect(absent.guestEnvironment == "Unknown")
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:18:53: error: cannot infer contextual base in reference to member 'missing'
+16 | 
+17 |     @Test func missingAndInvalidBindingsRemainVisibleWithoutADefaultVersion() {
+18 |         let absent = VPhoneLaunchpadMachineOrigins(.missing)
+   |                                                     `- error: cannot infer contextual base in reference to member 'missing'
+19 |         #expect(absent.host == "Unknown")
+20 |         #expect(absent.guestEnvironment == "Unknown")
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:24:23: error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+22 |         #expect(absent.bootChain == "Unknown")
+23 |         #expect(absent.notice.contains("missing"))
+24 |         let invalid = VPhoneLaunchpadMachineOrigins(.invalid("invalid digest"))
+   |                       `- error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+25 |         #expect(invalid.host == "Unknown")
+26 |         #expect(invalid.notice.contains("invalid digest"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:24:54: error: cannot infer contextual base in reference to member 'invalid'
+22 |         #expect(absent.bootChain == "Unknown")
+23 |         #expect(absent.notice.contains("missing"))
+24 |         let invalid = VPhoneLaunchpadMachineOrigins(.invalid("invalid digest"))
+   |                                                      `- error: cannot infer contextual base in reference to member 'invalid'
+25 |         #expect(invalid.host == "Unknown")
+26 |         #expect(invalid.notice.contains("invalid digest"))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:31:28: error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+29 |     @Test func legacyKernelAndGuestStayUnknownEvenIfHostAndBootChainMatch() throws {
+30 |         let binding = try VPhoneLaunchpadMachineBinding(bundle: "2.6.1", bootChain: "2.6.1")
+31 |         let presentation = VPhoneLaunchpadMachineOrigins(.loaded(binding))
+   |                            `- error: cannot find 'VPhoneLaunchpadMachineOrigins' in scope
+32 |         #expect(presentation.kernel == "Unknown")
+33 |         #expect(presentation.guestEnvironment == "Unknown")
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/MachineOriginsTests.swift:31:59: error: cannot infer contextual base in reference to member 'loaded'
+29 |     @Test func legacyKernelAndGuestStayUnknownEvenIfHostAndBootChainMatch() throws {
+30 |         let binding = try VPhoneLaunchpadMachineBinding(bundle: "2.6.1", bootChain: "2.6.1")
+31 |         let presentation = VPhoneLaunchpadMachineOrigins(.loaded(binding))
+   |                                                           `- error: cannot infer contextual base in reference to member 'loaded'
+32 |         #expect(presentation.kernel == "Unknown")
+33 |         #expect(presentation.guestEnvironment == "Unknown")
+[49/71] Compiling VPhoneLaunchpad VPhoneLaunchpadCoreBundleView.swift
+[50/71] Compiling VPhoneLaunchpad VPhoneLaunchpadCreationView.swift
+[51/71] Compiling VPhoneLaunchpad VPhoneLaunchpadCommandHistoryView.swift
+[52/71] Compiling VPhoneLaunchpad VPhoneLaunchpadCommandInfoButton.swift
+[53/71] Emitting module VPhoneLaunchpad
+error: fatalError
