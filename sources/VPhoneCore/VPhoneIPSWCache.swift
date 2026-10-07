@@ -216,7 +216,8 @@ public enum VPhoneIPSWCache {
               (file?["inode"] as? NSNumber)?.uint64Value == UInt64(info.st_ino),
               (file?["mtime_ns"] as? NSNumber)?.int64Value == mtimeNanoseconds(info)
         else { return "file changed after its completion marker was written" }
-        guard let digest = marker["sha256"] as? String, digest.count == 64 else {
+        guard let digest = marker["sha256"] as? String, digest.utf8.count == 64,
+              digest.utf8.allSatisfy({ (48...57).contains($0) || (65...70).contains($0) || (97...102).contains($0) }) else {
             return "completion marker has no content digest"
         }
         return nil
@@ -250,25 +251,39 @@ public enum VPhoneIPSWCache {
     /// Writes a marker to a temporary name next to `destination`, syncs it and
     /// renames it into place. The caller holds the cache directory lock.
     static func writeMarkerJSON(_ marker: [String: Any], to destination: URL) throws {
-        let data = try JSONSerialization.data(withJSONObject: marker, options: [.sortedKeys])
-        let temporary = destination.deletingLastPathComponent()
-            .appendingPathComponent("\(destination.lastPathComponent).partial.\(getpid())")
-        let fd = open(temporary.path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o600)
+        let data = try JSONSerialization.data(withJSONObject: marker, options: [.sortedKeys]) + Data("\n".utf8)
+        let directory = destination.deletingLastPathComponent()
+        let parent = open(directory.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard parent >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        defer { close(parent) }
+        let temporary = "\(destination.lastPathComponent).partial.\(UUID().uuidString).\(getpid())"
+        let fd = openat(parent, temporary, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
         guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
-        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
-        do {
-            try handle.write(contentsOf: data + Data("\n".utf8))
-            try handle.synchronize()
-            try handle.close()
-        } catch {
-            unlink(temporary.path)
-            throw error
+        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: false)
+        defer { try? handle.close() }
+        var owned = stat()
+        guard fstat(fd, &owned) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        defer {
+            var current = stat()
+            if fstatat(parent, temporary, &current, AT_SYMLINK_NOFOLLOW) == 0,
+               current.st_dev == owned.st_dev, current.st_ino == owned.st_ino {
+                unlinkat(parent, temporary, 0)
+            }
         }
-        guard rename(temporary.path, destination.path) == 0 else {
-            let code = errno
-            unlink(temporary.path)
-            throw POSIXError(POSIXErrorCode(rawValue: code) ?? .EIO)
+        try handle.write(contentsOf: data)
+        try handle.synchronize()
+        try handle.seek(toOffset: 0)
+        let readback = try handle.read(upToCount: data.count + 1)
+        var staged = stat()
+        guard readback == data, fstatat(parent, temporary, &staged, AT_SYMLINK_NOFOLLOW) == 0,
+              staged.st_dev == owned.st_dev, staged.st_ino == owned.st_ino,
+              staged.st_mode & S_IFMT == S_IFREG, staged.st_nlink == 1 else {
+            throw POSIXError(.EIO)
         }
+        guard renameat(parent, temporary, parent, destination.lastPathComponent) == 0 else {
+            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+        }
+        guard fsync(parent) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
     }
 
     static func mtimeNanoseconds(_ info: stat) -> Int64 {
