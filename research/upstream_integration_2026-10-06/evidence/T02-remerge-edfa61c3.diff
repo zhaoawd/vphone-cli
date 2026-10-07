@@ -1,0 +1,314 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+remerge CONFLICT (content): Merge conflict in Research/0_binary_patch_comparison.md
+index c325aa2a..1d1ab019 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2677,7 +2677,39 @@ removed. There is no migration.
+ **Opting out.** `vphone-cli fw set-patches <vm> --block
+ kernel-cfw-paravirt_user_clients`, then re-patch.
+ 
+-<<<<<<< e678a909 (Give iPhone guests D47AP's product description)
++## Guest patches follow the selection, both ways (2026-10-04)
++
++No new Apple binary patch. This changes how every guest-side patch in this
++document (the dyld shared cache rows, the guest Mach-O and file patches, the
++Preboot device-tree repairs) is applied after a VM exists, so it is recorded
++here. Full write-up and live validation:
++`Research/Firmware/post_creation_patch_changes.md`.
++
++**Before.** `cfw install` applied the guest half from `PatchPlan.plist`, and
++turning a guest patch off on an installed VM did nothing: the step was skipped
++and the patched bytes stayed. The dyld cache patches were applied in place with
++no record of what they replaced.
++
++**Now.** `cfw install` and `cfw update-environment` resolve the guest half from
++the VM's current `PatchSelection.plist`, apply what is on and revert what is
++off. Mach-O, entitlement and guest-file patches revert from the `.bak` beside
++the file; the Preboot device tree from `devicetree.img4.bak`; the dyld cache
++from `.vphone-dsc-undo.json` in the cache directory, which holds the original
++bytes of every content write a cache verb makes (slot hashes are re-derived by
++re-attesting, not logged). Each cache verb takes `--undo-log`/`--undo-id`, and
++the hidden `cfw patch-dsc-revert` verb applies the log. What is live is recorded
++in the `Guest` part of `<vm>/PatchReceipt.plist`.
++
++**Existing VMs.** A guest installed before this change has no undo log and no
++backup for the files several patches share, so those patches are reported "not
++revertible" when turned off and stay recorded as live; nothing is guessed. Every
++dyld row above that a cache verb idempotently re-runs keeps its undo records, so
++a revert works however many installs later it happens.
++
++**Boot chain unchanged.** Boot-chain patches still reach a guest only through a
++restore (AVPBooter through `fw patch`); `fw set-patches` and `fw patches <vm>`
++say so per patch.
++
+ ## An iPhone guest's product description from D47AP (2026-10-04)
+ 
+ An iPhone17,3 guest had no Siri page, no Camera Control, no Action Button and no
+@@ -2689,7 +2721,7 @@ its IPSW carries the iPhone's own tree, `Firmware/all_flash/DeviceTree.d47ap.im4
+ 
+ | Patch | Component | Effect |
+ | --- | --- | --- |
+-| `preboot-cfw-devicetree_iphone_product` (new) | Restored Preboot `devicetree.img4`, `cfw install` and `cfw update-environment`, iPhone guests | `DeviceTreePatcher.presentPhoneProduct` (`vphone-cli cfw patch-dt-iphone-product <dt> <board>`): fills the `iPhoneProductProperties` placeholders in `/product` from D47AP, adds `iPhoneAddedProductProperties`, and fills `/buttons/function-button_ringeren`. Only a placeholder is overwritten, only with a real board value. The board tree comes from `FirmwareOriginals`, or is recovered there from the VM's IPSW in `~/.vphone/ipsws` (`VPhoneBoardDeviceTree.need` now answers for iPhones too). |
++| `preboot-cfw-devicetree_iphone_product` (new) | Restored Preboot `devicetree.img4`, `cfw install` and `cfw update-environment`, iPhone17,3 guests (a board-presenting guest already boots its own board's description) | `DeviceTreePatcher.presentPhoneProduct` (`vphone-cli cfw patch-dt-iphone-product <dt> <board>`): fills the `iPhoneProductProperties` placeholders in `/product` from D47AP, adds `iPhoneAddedProductProperties`, and fills `/buttons/function-button_ringeren`. Only a placeholder is overwritten, only with a real board value. The board tree comes from `FirmwareOriginals`, or is recovered there from the VM's IPSW in `~/.vphone/ipsws` (`VPhoneBoardDeviceTree.need` now answers for the iPhone17,3 too). |
+ 
+ What is copied, and why:
+ 
+@@ -2717,37 +2749,3 @@ Action Button's long press (HID 0x0B/0x2D) runs Flashlight and Camera with the
+ Dynamic Island, with no tweak; the search field gains dictation. The guest boots
+ normally. Not yet measured: the change on a VM without the identity patches, on
+ iOS 18.x, and a Camera Control press.
+-=======
+-## Guest patches follow the selection, both ways (2026-10-04)
+-
+-No new Apple binary patch. This changes how every guest-side patch in this
+-document (the dyld shared cache rows, the guest Mach-O and file patches, the
+-Preboot device-tree repairs) is applied after a VM exists, so it is recorded
+-here. Full write-up and live validation:
+-`Research/Firmware/post_creation_patch_changes.md`.
+-
+-**Before.** `cfw install` applied the guest half from `PatchPlan.plist`, and
+-turning a guest patch off on an installed VM did nothing: the step was skipped
+-and the patched bytes stayed. The dyld cache patches were applied in place with
+-no record of what they replaced.
+-
+-**Now.** `cfw install` and `cfw update-environment` resolve the guest half from
+-the VM's current `PatchSelection.plist`, apply what is on and revert what is
+-off. Mach-O, entitlement and guest-file patches revert from the `.bak` beside
+-the file; the Preboot device tree from `devicetree.img4.bak`; the dyld cache
+-from `.vphone-dsc-undo.json` in the cache directory, which holds the original
+-bytes of every content write a cache verb makes (slot hashes are re-derived by
+-re-attesting, not logged). Each cache verb takes `--undo-log`/`--undo-id`, and
+-the hidden `cfw patch-dsc-revert` verb applies the log. What is live is recorded
+-in the `Guest` part of `<vm>/PatchReceipt.plist`.
+-
+-**Existing VMs.** A guest installed before this change has no undo log and no
+-backup for the files several patches share, so those patches are reported "not
+-revertible" when turned off and stay recorded as live; nothing is guessed. Every
+-dyld row above that a cache verb idempotently re-runs keeps its undo records, so
+-a revert works however many installs later it happens.
+-
+-**Boot chain unchanged.** Boot-chain patches still reach a guest only through a
+-restore (AVPBooter through `fw patch`); `fw set-patches` and `fw patches <vm>`
+-say so per patch.
+->>>>>>> a679f49e (Merge pull request #581 from 0xJacky/guest-shutdown)
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+remerge CONFLICT (content): Merge conflict in VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index 93c3d763..eff7559d 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -355,25 +355,30 @@ struct VPhoneCustomFirmwareInstaller {
+         // VPhoneDaemon/Daemon/GuestMobileGestaltCache.swift.
+         let buildVersion = plan?.parameters[FirmwareGuestSystemPatchSet.buildVersionParameter] ?? spoofBuild
+         let boardDeviceTree = try stageBoardDeviceTree(in: bundleDirectory, work: work)
++        // An environment update has no restore tree to read the device from;
++        // the VM's configuration says which board repair its tree takes.
++        let device = configuredGuestDevice(in: bundleDirectory) ?? guestDevice(of: restore)
+         liveGuest.formUnion(try patchPreboot(
+             volumes: volumes,
+             work: work,
+             plan: plan,
+             priorGuest: priorGuest,
+-            guestDevice: guestDevice(of: restore),
++            guestDevice: device,
+             includeIdentity: mode == .full,
+             buildVersion: buildVersion,
+             boardDeviceTree: boardDeviceTree,
+         ))
+         // Selected patches this guest has nothing for, so the receipt does not
+         // report them as missing forever: the board audio repair on an
+-        // iPhone17,3, which has no board tree, and the build spoof with no value
+-        // set. A board-presenting guest whose board tree could not be recovered
+-        // is not among them: its repair is missing, and drift should keep
+-        // saying so.
++        // iPhone17,3, which has no board of its own to present, the iPhone
++        // product repair on a board-presenting guest, whose tree already
++        // carries its board's description, and the build spoof with no value
++        // set. A guest whose board tree could not be recovered is not among
++        // them: its repair is missing, and drift should keep saying so.
+         var notApplicableGuest = Set<String>()
+-        let device = configuredGuestDevice(in: bundleDirectory) ?? guestDevice(of: restore)
+-        if !device.presentsBoard {
++        if device.presentsBoard {
++            notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootIPhoneProduct)
++        } else {
+             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootBoardAudio)
+         }
+         if buildVersion?.isEmpty ?? true {
+@@ -1059,26 +1064,6 @@ struct VPhoneCustomFirmwareInstaller {
+         }
+     }
+ 
+-<<<<<<< e678a909 (Give iPhone guests D47AP's product description)
+-    /// Guest patches declared after most VMs' plans were written. A plan is the
+-    /// list of what was on when `fw patch` ran, so it reads these as off on any
+-    /// VM patched before them. They need no firmware change, so they follow the
+-    /// VM's selection as it resolves now instead.
+-    private static let lateGuestPatches = [
+-        FirmwareGuestSystemPatchSet.virtioSoundDriver,
+-        FirmwareGuestSystemPatchSet.prebootBoardAudio,
+-        FirmwareGuestSystemPatchSet.prebootIPhoneProduct,
+-        FirmwareGuestSystemPatchSet.prebootHaptics,
+-        FirmwareGuestSystemPatchSet.prebootMicrophoneArray,
+-        FirmwareGuestSystemPatchSet.virtualAudioSpeakerRouteThrows,
+-        FirmwareGuestSystemPatchSet.virtualAudioMuteSetThrow,
+-        FirmwareGuestSystemPatchSet.virtualAudioSpeakerProtectionGate,
+-        FirmwareGuestSystemPatchSet.virtualAudioVolumeModePrecondition,
+-        FirmwareGuestSystemPatchSet.virtualAudioGraphConfigurations,
+-        FirmwareGuestSystemPatchSet.virtualAudioSpeakerRawChains,
+-        FirmwareGuestSystemPatchSet.virtualAudioMicrophoneChains,
+-    ]
+-=======
+     /// Restore a guest Mach-O from its `.bak`, re-sealing the bundle it lives in
+     /// when one is given. Returns false when there is no backup — a binary
+     /// patched before backups were kept.
+@@ -1099,7 +1084,6 @@ struct VPhoneCustomFirmwareInstaller {
+         if let bundle { try sealGuestBundle(system: system, bundle: bundle) }
+         return true
+     }
+->>>>>>> a679f49e (Merge pull request #581 from 0xJacky/guest-shutdown)
+ 
+     /// Remove the virtio sound driver bundle. iOS ships no plugin for its
+     /// kernel driver, so the pristine state is the bundle's absence — there is
+@@ -1515,20 +1499,12 @@ struct VPhoneCustomFirmwareInstaller {
+         return VPhoneGuestDevice.detect(buildManifest: manifest) ?? .default
+     }
+ 
+-<<<<<<< e678a909 (Give iPhone guests D47AP's product description)
+-    /// `includeIdentity` is false for an environment update, which carries
+-    /// only the device tree repairs: the board repairs, which need
+-    /// `boardDeviceTree` (an iPad's audio node, an iPhone's product
+-    /// description), and the haptics removal, which every guest gets.
++    /// `includeIdentity` is false for an environment update, which carries only
++    /// the device tree repairs: the board repair, which needs `boardDeviceTree`
++    /// (a board-presenting guest's audio node, an iPhone17,3's product
++    /// description), the haptics removal and the microphone-array repair.
+     /// `boardDeviceTree` is the guest's own board tree (`DeviceTree.<board>.im4p`),
+     /// staged from the VM's `FirmwareOriginals`, or nil when none is kept there.
+-=======
+-    /// `includeIdentity` is false for an environment update, which carries only
+-    /// the device tree repairs: the board audio repair, which needs
+-    /// `boardDeviceTree`, the haptics removal and the microphone-array repair.
+-    /// `boardDeviceTree` is the iPad's own device tree, staged from the VM's
+-    /// `FirmwareOriginals`, or nil for an iPhone guest or a VM patched before
+-    /// `fw patch` kept it.
+     ///
+     /// Returns the Preboot device-tree identifiers live afterwards, for the
+     /// receipt. The repairs share one personalized `devicetree.img4`, so there
+@@ -1549,7 +1525,6 @@ struct VPhoneCustomFirmwareInstaller {
+     /// were kept has none, and an off repair on it is reported not revertible
+     /// and left in place.
+     @discardableResult
+->>>>>>> a679f49e (Merge pull request #581 from 0xJacky/guest-shutdown)
+     private func patchPreboot(
+         volumes: [[String: Any]],
+         work: WorkDirectory,
+@@ -1579,24 +1554,15 @@ struct VPhoneCustomFirmwareInstaller {
+             // last install wrote it, it is still live.
+             live.insert(identity)
+         }
+-<<<<<<< e678a909 (Give iPhone guests D47AP's product description)
+-        let spoofBuild = includeIdentity ? spoofBuild : nil
+-        var repairs: [(verb: String, arguments: [String])] = []
+-        if let boardDeviceTree {
+-            if guestDevice.isPad {
+-                if on(FirmwareGuestSystemPatchSet.prebootBoardAudio) {
+-                    repairs.append(("patch-dt-board-audio", [boardDeviceTree.path]))
+-                }
+-            } else if on(FirmwareGuestSystemPatchSet.prebootIPhoneProduct) {
+-                repairs.append(("patch-dt-iphone-product", [boardDeviceTree.path]))
+-            }
+-=======
+ 
+         // The repairs, which share the one devicetree.img4.
+         var repairGroup: [(id: String, verb: String, arguments: [String])] = []
+         if let boardDeviceTree {
+-            repairGroup.append((FirmwareGuestSystemPatchSet.prebootBoardAudio, "patch-dt-board-audio", [boardDeviceTree.path]))
+->>>>>>> a679f49e (Merge pull request #581 from 0xJacky/guest-shutdown)
++            if guestDevice.presentsBoard {
++                repairGroup.append((FirmwareGuestSystemPatchSet.prebootBoardAudio, "patch-dt-board-audio", [boardDeviceTree.path]))
++            } else {
++                repairGroup.append((FirmwareGuestSystemPatchSet.prebootIPhoneProduct, "patch-dt-iphone-product", [boardDeviceTree.path]))
++            }
+         }
+         repairGroup.append((FirmwareGuestSystemPatchSet.prebootHaptics, "patch-dt-haptics", []))
+         repairGroup.append((FirmwareGuestSystemPatchSet.prebootMicrophoneArray, "patch-dt-microphone-array", []))
+@@ -1764,12 +1730,13 @@ struct VPhoneCustomFirmwareInstaller {
+ 
+     /// Make sure a VM's `FirmwareOriginals` holds the board tree that
+     /// `stageBoardDeviceTree` stages, recovering it from the IPSW the VM was
+-    /// made from when it has none. An iPad VM patched before `fw patch` kept it
+-    /// needs it for the board audio repair, without which VirtualAudio looks
+-    /// for the iPhone's tunings and the guest has no sound. An iPhone VM needs
+-    /// it for the product description repair, without which MobileGestalt
+-    /// reads Siri, Camera Control, the Action Button and the model name as
+-    /// absent; `fw patch` does not keep an iPhone's, so it always comes from here.
++    /// made from when it has none. A board-presenting VM patched before `fw
++    /// patch` kept it needs it for the board audio repair, without which
++    /// VirtualAudio looks for the iPhone's tunings and the guest has no sound.
++    /// An iPhone17,3 VM needs it for the product description repair, without
++    /// which MobileGestalt reads Siri, Camera Control, the Action Button and the
++    /// model name as absent; `fw patch` does not keep the iPhone17,3's, so it
++    /// always comes from here.
+     ///
+     /// The IPSW cache and the VM folder are the caller's, so the search and
+     /// the write run with the caller's credentials, as `cfw install` records
+@@ -1787,11 +1754,11 @@ struct VPhoneCustomFirmwareInstaller {
+         invokingUser: VPhoneInvokingUser?,
+     ) {
+         let device = configuredGuestDevice(in: bundleDirectory) ?? guestDevice(of: restore)
+-        let repair = device.isPad ? FirmwareGuestSystemPatchSet.prebootBoardAudio : FirmwareGuestSystemPatchSet.prebootIPhoneProduct
++        let repair = device.presentsBoard ? FirmwareGuestSystemPatchSet.prebootBoardAudio : FirmwareGuestSystemPatchSet.prebootIPhoneProduct
+         guard plan?.isEnabled(repair) ?? true else { return }
+         let tree = (device.boardDeviceTreePath as NSString).lastPathComponent
+         let originals = VPhoneBundleOperations.firmwareOriginalsDirectoryName
+-        let skipped = device.isPad
++        let skipped = device.presentsBoard
+             ? "[!] Board audio repair skipped, so this \(device.productType) guest will have no sound:"
+             : "[!] iPhone product repair skipped, so this \(device.productType) guest will have no Siri, Camera Control, Action Button or Model Name:"
+         do {
+diff --git a/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift b/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift
+remerge CONFLICT (content): Merge conflict in VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift
+index 636d3fa8..39a6ba51 100644
+--- a/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift
++++ b/VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift
+@@ -3,8 +3,9 @@ import Foundation
+ import VPhoneCoreKit
+ 
+ /// A guest's own device tree, `DeviceTree.<board>.im4p`, as a VM folder
+-/// keeps it and as the IPSW the VM was made from carries it: an iPad's for its
+-/// audio node, an iPhone's (`DeviceTree.d47ap.im4p`) for its product description.
++/// keeps it and as the IPSW the VM was made from carries it: a board-presenting
++/// guest's for its audio node, an iPhone17,3's (`DeviceTree.d47ap.im4p`) for its
++/// product description.
+ ///
+ /// `fw patch` keeps the tree in the VM's `FirmwareOriginals`, mirrored under
+ /// the restore tree's name, and the board audio repair that `cfw install` and
+@@ -99,13 +100,10 @@ public enum VPhoneBoardDeviceTree {
+ 
+     /// What a run has to do about a VM's board tree.
+     public enum Need: Equatable {
+-<<<<<<< e678a909 (Give iPhone guests D47AP's product description)
+-        /// Nothing to do. Every guest has a board tree now — an iPad's carries
+-        /// its audio node, an iPhone's its product description — so `need`
+-        /// does not answer this; it stays for callers that switch over `Need`.
+-=======
+-        /// An iPhone17,3 guest, which has no board tree.
+->>>>>>> a679f49e (Merge pull request #581 from 0xJacky/guest-shutdown)
++        /// Nothing to do. Every guest has a board tree now — a board-presenting
++        /// guest's carries its audio node, an iPhone17,3's its product
++        /// description — so `need` does not answer this; it stays for callers
++        /// that switch over `Need`.
+         case none
+         /// `FirmwareOriginals` already holds one, or several, which staging
+         /// refuses to choose between.
+@@ -125,10 +123,6 @@ public enum VPhoneBoardDeviceTree {
+         in vm: VPhoneConfinedDirectory,
+         recorded: VPhoneRestoreInfo.OSVersion?,
+     ) throws -> Need {
+-<<<<<<< e678a909 (Give iPhone guests D47AP's product description)
+-=======
+-        guard device.presentsBoard else { return .none }
+->>>>>>> a679f49e (Merge pull request #581 from 0xJacky/guest-shutdown)
+         guard try kept(in: vm).isEmpty else { return .kept }
+         var trees: [String] = []
+         if try vm.isDirectory(originalsName) {

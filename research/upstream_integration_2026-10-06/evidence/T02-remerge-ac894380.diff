@@ -1,0 +1,40 @@
+diff --git a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift
+remerge CONFLICT (content): Merge conflict in VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift
+index 1e659c1a..3ab2a310 100644
+--- a/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift
++++ b/VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineComponents.swift
+@@ -276,14 +276,10 @@ extension FirmwarePipeline {
+                         includeIdentityPatches: dtIncludeIdentity,
+                         device: guestDevice,
+                         role: .installed,
+-<<<<<<< 6d284217 (Merge upstream main into guest-audio)
+                         // Read through the originals stash, which keeps a copy: the
+                         // restore tree goes once the VM boots, and `cfw install` and
+                         // the environment update take the board's audio node from it.
+-                        sourceTree: try self.loader.load(from: self.pristineInput(for: boardTreeURL).url),
+-=======
+-                        sourceTree: self.loader.load(from: boardTreeURL),
+->>>>>>> 4c9c1b97 (Release 2.4.1)
++                        sourceTree: self.loader.load(from: self.pristineInput(for: boardTreeURL).url),
+                     )
+                     p.gate = gate
+                     return p
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+remerge CONFLICT (content): Merge conflict in VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index e06265e9..feb94e9c 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -11,12 +11,8 @@
+ 	<key>CFBundleVersion</key>
+ 	<string>28</string>
+ 	<key>CFBundleShortVersionString</key>
+-<<<<<<< 6d284217 (Merge upstream main into guest-audio)
+-	<string>2.4.0</string>
++	<string>2.4.1</string>
+ 	<key>NSMicrophoneUsageDescription</key>
+ 	<string>Shares this Mac's microphone with the virtual iPhone so apps running inside it can record.</string>
+-=======
+-	<string>2.4.1</string>
+->>>>>>> 4c9c1b97 (Release 2.4.1)
+ </dict>
+ </plist>

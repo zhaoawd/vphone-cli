@@ -1,0 +1,117 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/38] Write swift-version--58304C5D6DBC2206.txt
+[3/34] Compiling asr.c
+[4/34] Compiling download.c
+[5/34] Compiling fdr.c
+[6/34] Compiling limera1n.c
+[7/34] Compiling recovery.c
+[8/34] Compiling normal.c
+[9/34] Compiling ipsw.c
+[10/34] Compiling dfu.c
+[11/34] Compiling img4.c
+[12/34] Compiling mbn.c
+[12/34] Compiling ftab.c
+[14/34] Compiling ace3.c
+[15/34] Compiling img3.c
+[16/34] Compiling fls.c
+[17/34] Compiling restore.c
+[18/34] Compiling log.c
+[19/34] Compiling locking.c
+[20/34] Compiling deviceinterfaced.c
+[21/34] Compiling vphone_zip_stub.c
+[22/34] Compiling common.c
+[23/34] Compiling vphone_restore_bridge.c
+[24/34] Compiling idevicerestore.c
+[25/34] Compiling MobileRecoveryCore libirecovery.c
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/36] Emitting module VPhoneCLITests
+[30/36] Write Objects.LinkFileList
+[31/36] Linking vphone-cli
+[32/36] Linking vphone-vm
+[33/36] Applying vphone-cli
+[34/36] Applying vphone-vm
+[35/36] Linking vphone-cliPackageTests
+Build complete! (9.08s)
+Test Suite 'Selected tests' started at 2026-10-07 08:12:33.437.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 08:12:33.438.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 08:12:33.438.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 08:12:33.438.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite APIHTTPTests started.
+◇ Suite APIWebSocketTests started.
+◇ Suite HelperServiceTests started.
+◇ Test realHTTPRPCHealthAndProtocolErrors() started.
+◇ Test webSocketRefusesRedirect() started.
+◇ Test refusesRedirectAndOversizedResponses() started.
+◇ Test malformedMessageFailsPendingRequests() started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() started.
+◇ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() started.
+◇ Test correlatesOutOfOrderRepliesAndInterleavedEvents() started.
+◇ Test cancellationAndLateReplyCannotCompleteNextRequest() started.
+◇ Test receivesEventsWithoutAnRPC() started.
+◇ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() started.
+◇ Test preCancelledTaskDoesNotSend() started.
+◇ Test boundsPendingRequestsAndCloseCompletesWaiters() started.
+◇ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() started.
+◇ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() started.
+◇ Test remoteErrorOnlyFailsItsMatchingRequest() started.
+◇ Test xpcRejectsClientWithoutConfiguredSigningIdentity() started.
+◇ Test unauthorizedRequestCannotInstall() started.
+◇ Test replyCompletesOnlyOnce() started.
+◇ Test verificationIsReadOnlyAndPropagatesFailure() started.
+◇ Test callerIdentityMismatchNamesTheCaller() started.
+◇ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() started.
+◇ Test timeoutIgnoresLateReply() started.
+✔ Test replyCompletesOnlyOnce() passed after 0.002 seconds.
+✔ Test verificationIsReadOnlyAndPropagatesFailure() passed after 0.002 seconds.
+✔ Test unauthorizedRequestCannotInstall() passed after 0.002 seconds.
+✔ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() passed after 0.002 seconds.
+✔ Test preCancelledTaskDoesNotSend() passed after 0.003 seconds.
+✔ Test receivesEventsWithoutAnRPC() passed after 0.003 seconds.
+✔ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() passed after 0.004 seconds.
+✔ Test correlatesOutOfOrderRepliesAndInterleavedEvents() passed after 0.008 seconds.
+✔ Test malformedMessageFailsPendingRequests() passed after 0.009 seconds.
+vphone-helper: refused connection: caller pid 32572, uid 2035870432 does not satisfy the client signing requirement (OSStatus -67050: The operation couldn’t be completed. (OSStatus error -67050.))
+✔ Test callerIdentityMismatchNamesTheCaller() passed after 0.008 seconds.
+✔ Test boundsPendingRequestsAndCloseCompletesWaiters() passed after 0.009 seconds.
+✔ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() passed after 0.010 seconds.
+✔ Test xpcRejectsClientWithoutConfiguredSigningIdentity() passed after 0.011 seconds.
+✔ Test timeoutIgnoresLateReply() passed after 0.015 seconds.
+✔ Suite HelperServiceTests passed after 0.016 seconds.
+✔ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() passed after 0.016 seconds.
+✔ Test remoteErrorOnlyFailsItsMatchingRequest() passed after 0.016 seconds.
+✔ Test cancellationAndLateReplyCannotCompleteNextRequest() passed after 0.016 seconds.
+✔ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() passed after 0.061 seconds.
+✔ Suite APIWebSocketTests passed after 0.061 seconds.
+✔ Test realHTTPRPCHealthAndProtocolErrors() passed after 0.236 seconds.
+✔ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() passed after 0.236 seconds.
+✔ Test refusesRedirectAndOversizedResponses() passed after 0.236 seconds.
+✔ Test webSocketRefusesRedirect() passed after 0.237 seconds.
+✔ Test deadlineAndCallerCancellationEndHTTPWait() passed after 0.284 seconds.
+✔ Suite APIHTTPTests passed after 0.284 seconds.
+✔ Test run with 23 tests in 3 suites passed after 0.284 seconds.

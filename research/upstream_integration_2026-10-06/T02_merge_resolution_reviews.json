@@ -1,0 +1,132 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "reviewed_nonempty_remerge_count": 8,
+  "scope": "8 conflict resolutions; not full coverage of 62 merge commits or 342 total commits",
+  "reviews": [
+    {
+      "sha": "fe81e693277789abc371d59165d1dbef84977f17",
+      "subject": "Merge main into feat/native-ax-hierarchy",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "文档冲突标记移除；保留 native AX 与构建 producer 排空记录。",
+      "integration_decision": "文档合并本身没有新增执行代码；后续 AX 和构建检查仍按最终组件审查。",
+      "tasks": [
+        "T24",
+        "T28",
+        "T38",
+        "T41"
+      ],
+      "evidence": "evidence/T02-remerge-fe81e693.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "6d284217eb4beba322861967bf58c81016c447db",
+      "subject": "Merge upstream main into guest-audio",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "保留 MobileGestalt cache/restart-pending 与 screen.unlock 两段 API 文档。",
+      "integration_decision": "缓存状态与解锁属于不同能力，不能删除任一段；用户解锁授权和音频组合验收仍需分别处理。",
+      "tasks": [
+        "T28",
+        "T36",
+        "T42"
+      ],
+      "evidence": "evidence/T02-remerge-6d284217.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "ac89438058237f07976161d92155b0db249c15a2",
+      "subject": "Merge upstream main (2.4.1) into guest-audio",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "DeviceTree sourceTree 从 pristineInput 读取；保留麦克风 usage description，更新发布版本至 2.4.1。",
+      "integration_decision": "原件保存、board tree 消费和权限声明须成组适配；当前固定目标版本为 2.6.1，不能复制历史版本号。",
+      "tasks": [
+        "T12",
+        "T24",
+        "T42",
+        "T44"
+      ],
+      "evidence": "evidence/T02-remerge-ac894380.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "f343a77a51263f275cab4cec0084050e30a8c74c",
+      "subject": "Merge upstream main (2.4.2) into guest-audio",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "更新历史版本至 2.4.2，保留麦克风 usage description。",
+      "integration_decision": "当前目标保留该权限描述；本地应使用当前构建来源，不继承历史发布元数据。",
+      "tasks": [
+        "T24",
+        "T42"
+      ],
+      "evidence": "evidence/T02-remerge-f343a77a.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "78bac1ecd7a802ccb35c64e86ae23c637b985c1a",
+      "subject": "Merge upstream main into guest-audio",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "保留客户机音频记录与 paravirtual user-client allowlist 加入 standard 的记录。",
+      "integration_decision": "新增文档描述默认选择变化，不构成本地字节等价或音频通过证据；ID/预设迁移与音频验收继续分开跟踪。",
+      "tasks": [
+        "T09",
+        "T28",
+        "T42"
+      ],
+      "evidence": "evidence/T02-remerge-78bac1ec.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "bbf36000521c4eeb15c2f2ccb5100e3a0b9db861",
+      "subject": "Merge upstream main into other-iphone-models",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "Installer 用 presentsBoard 替代 isPad 判断 board audio 是否适用；保留 patchPreboot 返回 live ID 集合的实现。",
+      "integration_decision": "设备分类与实际应用 receipt 需一起接入；不能以 iPhone 名称判定缺少 board，也不能丢弃修复后的 live 集合。",
+      "tasks": [
+        "T16",
+        "T32",
+        "T33",
+        "T44"
+      ],
+      "evidence": "evidence/T02-remerge-bbf36000.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "17e1352e9f87862a3bcb3bd1bdc2ff9b0d883a3b",
+      "subject": "Merge upstream main into other-iphone-models",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "兼容性文档同时保留 iOS 27.0.1 TXM admission 限制和其他 iPhone 型号的历史验收表。",
+      "integration_decision": "历史兼容记录不扩展本地声明范围；TXM 修正与型号固件组合需按实际本地证据验收。",
+      "tasks": [
+        "T10",
+        "T28",
+        "T44"
+      ],
+      "evidence": "evidence/T02-remerge-17e1352e.diff",
+      "local_integrated": false
+    },
+    {
+      "sha": "edfa61c36a33494adacfa1cc5191e52df5f3fb92",
+      "subject": "Merge upstream main into iphone-product-tree",
+      "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+      "resolution": "reviewed",
+      "result": "保留 guest apply/revert 文档；从配置识别设备，按 presentsBoard 选择 audio 或 iPhone product repair；修复分组与撤销/receipt 共用 live 集合；BoardDeviceTree.need 不再排除 iPhone17,3。",
+      "integration_decision": "旧 VM 无 Restore 时仍需配置身份和可验证 board 原件；preboot 分组恢复、不可撤销状态及 receipt 不能拆开；上游无计划时全部启用的默认值不满足本轮 C2 约束。",
+      "tasks": [
+        "T12",
+        "T16",
+        "T32",
+        "T33",
+        "T42",
+        "T44"
+      ],
+      "evidence": "evidence/T02-remerge-edfa61c3.diff",
+      "local_integrated": false
+    }
+  ]
+}

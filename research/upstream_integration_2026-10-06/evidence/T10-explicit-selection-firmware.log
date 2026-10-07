@@ -1,0 +1,169 @@
+python3 scripts/run_tests.py firmware
+Fixture preflight: 17 nonempty files in /Users/qcz3840/github/vphone-cli/ipsws/patch_refactor_input; firmware tests not executed yet.
++ swift test --disable-sandbox --cache-path /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/test-cache --filter FirmwareIntegrationTests
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/38] Write swift-version--58304C5D6DBC2206.txt
+[3/34] Compiling limera1n.c
+[4/34] Compiling download.c
+[5/34] Compiling asr.c
+[5/34] Compiling recovery.c
+[5/34] Compiling fdr.c
+[8/34] Compiling normal.c
+[9/34] Compiling ipsw.c
+[10/34] Compiling ftab.c
+[11/34] Compiling img3.c
+[12/34] Compiling mbn.c
+[13/34] Compiling dfu.c
+[14/34] Compiling fls.c
+[15/34] Compiling ace3.c
+[16/34] Compiling img4.c
+[17/34] Compiling restore.c
+[18/34] Compiling locking.c
+[19/34] Compiling log.c
+[20/34] Compiling vphone_zip_stub.c
+[21/34] Compiling deviceinterfaced.c
+[22/34] Compiling common.c
+[23/34] Compiling vphone_restore_bridge.c
+[24/34] Compiling idevicerestore.c
+[25/34] Compiling MobileRecoveryCore libirecovery.c
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/36] Emitting module VPhoneCLITests
+[30/36] Write Objects.LinkFileList
+[31/36] Linking vphone-vm
+[32/36] Linking vphone-cli
+[33/36] Applying vphone-cli
+[33/36] Applying vphone-vm
+[35/36] Linking vphone-cliPackageTests
+Build complete! (10.13s)
+Test Suite 'Selected tests' started at 2026-10-07 08:10:54.902.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 08:10:54.904.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 08:10:54.904.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 08:10:54.905.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VerboseJBDebug started.
+◇ Suite KernelcacheJBComparisonTests started.
+◇ Suite IBSSComparisonTests started.
+◇ Suite KernelcacheComparisonTests started.
+◇ Suite IBECComparisonTests started.
+◇ Suite AVPBooterComparisonTests started.
+◇ Suite IBSSJBComparisonTests started.
+◇ Suite StructuredDeclarationGateTests started.
+◇ Suite IM4PPayloadParityTests started.
+◇ Suite LLBComparisonTests started.
+◇ Suite TXMDevComparisonTests started.
+◇ Suite TXMComparisonTests started.
+◇ Test compareIBEC() started.
+◇ Test compareKernelcacheJB() started.
+◇ Test compareIBSS() started.
+◇ Test realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test compareIBSSJB() started.
+◇ Test compareKernelcache() started.
+◇ Test compareAVPBooter() started.
+◇ Test compareLLB() started.
+◇ Test savingIBSSIM4PRoundTripsPayload() started.
+◇ Test frozenBlockPreservesActualSerialLabelBytes() started.
+◇ Test ibssIM4PPayloadMatchesRawAndJBPatcherFindsNoncePatch() started.
+◇ Test savingTXMIM4PPreservesPAYPTrailer() started.
+◇ Test debugFailingPatches() started.
+◇ Test compareTXMDev() started.
+◇ Test case passing 1 argument component → .avpbooter to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .ibss to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .llb to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .ibec to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .txm to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .txmDev to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .kernelcache to realBootChainRecordsPassTheDeclarationGate(component:) started.
+  ✓ ibss: all 4 patches match exactly
+◇ Test case passing 1 argument component → .kernelcacheJB to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test compareTXM() started.
+  ✓ ibec: all 7 patches match exactly
+  ✓ avpbooter: all 1 patches match exactly
+  ✓ ibss_jb: all 1 patches match exactly
+  ✓ llb: all 13 patches match exactly
+✔ Test compareIBSS() passed after 14.536 seconds.
+  ✓ txm: all 1 patches match exactly
+✔ Test compareIBEC() passed after 14.560 seconds.
+✔ Test compareAVPBooter() passed after 14.560 seconds.
+✔ Test savingIBSSIM4PRoundTripsPayload() passed after 14.560 seconds.
+✔ Test compareIBSSJB() passed after 14.560 seconds.
+✔ Test savingTXMIM4PPreservesPAYPTrailer() passed after 14.560 seconds.
+✔ Test frozenBlockPreservesActualSerialLabelBytes() passed after 14.560 seconds.
+✔ Test compareLLB() passed after 14.560 seconds.
+✔ Test compareTXM() passed after 5.055 seconds.
+✔ Suite IBSSComparisonTests passed after 14.561 seconds.
+✔ Suite IBECComparisonTests passed after 14.561 seconds.
+✔ Suite AVPBooterComparisonTests passed after 14.561 seconds.
+✔ Suite IBSSJBComparisonTests passed after 14.561 seconds.
+✔ Suite LLBComparisonTests passed after 14.561 seconds.
+✔ Suite TXMComparisonTests passed after 14.561 seconds.
+  ✓ kernelcache: all 28 patches match exactly
+✔ Test compareKernelcache() passed after 15.096 seconds.
+✔ Suite KernelcacheComparisonTests passed after 15.096 seconds.
+✔ Test ibssIM4PPayloadMatchesRawAndJBPatcherFindsNoncePatch() passed after 20.040 seconds.
+✔ Suite IM4PPayloadParityTests passed after 20.041 seconds.
+  ✓ txm_dev: all 12 patches match exactly
+✔ Test compareTXMDev() passed after 20.642 seconds.
+✔ Suite TXMDevComparisonTests passed after 20.642 seconds.
+[*] Symbol table: 0 symbols resolved
+  [*] _panic at foff 0x12F6814 (8502 callers)
+=== HOOK CRED LABEL ===
+
+[JB] _hook_cred_label_update_execve: faithful upstream C23
+  [+] mac_policy_conf at foff 0xA54428, mpc_ops -> 0xA54488
+  [+] hook cred-label wrapper ops[18] entry 0xA54518 -> 0x23B9B64
+  [+] vfs_context_current body at 0xB756DC (prologue shape)
+  [+] vnode_getattr at 0xCC91B4 (via BL at 0x14BC8D8)
+  0xA54518: .byte 0x64, 0x9b, 0x3b, 0x02 → .byte 0x20, 0x17, 0xab, 0x00  [retarget ops[18] to faithful C23 cave [_hook_cred_label_update_execve]]
+  0xAB1720: udf #0 → nop   [faithful upstream C23 cave (vnode getattr -> uid/gid/P_SUGID fixup -> wrapper)]
+Result: matched
+
+=== TASK CONVERSION ===
+
+[JB] task_conversion_eval_internal: cmp xzr,xzr
+  0xB01194: cmp x9, x0 → cmp xzr, xzr  [cmp xzr,xzr [_task_conversion_eval_internal]]
+Result: matched
+
+=== BSD INIT AUTH ===
+
+[JB] _bsd_init: ignore FSIOC_KERNEL_ROOTAUTH failure
+  0xF6D960: cbnz w0, 0xf6dbc8 → nop   [NOP cbnz (rootvp auth) [_bsd_init]]
+Result: matched
+
+=== IOUC MACF ===
+
+[JB] IOUC MACF gate: branch-level deny bypass
+  [+] IOUC MACF gate fn=0x12570C0, bl=0x1257A94, cbz=0x1257A98, allow=0x1257B0C
+  0x1257A98: cbz w0, 0x1257b0c → b 0x1257b0c  [b #0x74 [IOUC MACF deny → allow]]
+Result: matched
+✔ Test debugFailingPatches() passed after 35.028 seconds.
+✔ Suite VerboseJBDebug passed after 35.028 seconds.
+  ✓ kernelcache_jb: all 84 patches match exactly
+✔ Test compareKernelcacheJB() passed after 35.459 seconds.
+✔ Suite KernelcacheJBComparisonTests passed after 35.460 seconds.
+✔ Test realBootChainRecordsPassTheDeclarationGate(component:) with 8 test cases passed after 37.946 seconds.
+✔ Suite StructuredDeclarationGateTests passed after 37.947 seconds.
+✔ Test run with 15 tests in 12 suites passed after 37.947 seconds.

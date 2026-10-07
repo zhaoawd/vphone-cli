@@ -1,0 +1,27 @@
+diff --git a/Research/0_binary_patch_comparison.md b/Research/0_binary_patch_comparison.md
+remerge CONFLICT (content): Merge conflict in Research/0_binary_patch_comparison.md
+index 441c7894..b5b608c3 100644
+--- a/Research/0_binary_patch_comparison.md
++++ b/Research/0_binary_patch_comparison.md
+@@ -2219,7 +2219,6 @@ Those probes now drain producer output while keeping matching, first-platform
+ selection, failure propagation, and all signature checks. The full workspace
+ build and strict signatures then passed.
+ 
+-<<<<<<< 99204127 (Record that a 44100 recording through the converter sounds normal)
+ ## Guest audio: a HAL plugin, and an iPad's own audio node (2026-10-02)
+ 
+ The guest never produced sound, although `vphone-vm` has always attached a
+@@ -2580,7 +2579,7 @@ reported eight speaker configurations. After `cfw update-environment` and a
+ boot, audiomxd built the recording route with `DSP chain
+ 'bottom_mic_measurement'` and the guest's plist read back `speaker_general:
+ graph=speaker_raw austrip=speaker_measurement vol=["vugd"]`.
+-=======
++
+ ## The paravirtual user-client allowlist joins `standard` (2026-10-04)
+ 
+ No new Apple binary patch and no new bytes. JB-31
+@@ -2635,4 +2634,3 @@ removed. There is no migration.
+ 
+ **Opting out.** `vphone-cli fw set-patches <vm> --block
+ kernel-cfw-paravirt_user_clients`, then re-patch.
+->>>>>>> b0125732 (Merge pull request #562 from 0xJacky/standard-paravirt-clients)

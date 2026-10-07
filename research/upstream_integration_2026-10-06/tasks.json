@@ -842,9 +842,11 @@
       "verification_evidence": [
         "source_path_candidates.json",
         "commit_ledger.json",
-        "capability_ledger.json"
+        "capability_ledger.json",
+        "T02_merge_resolution_reviews.json"
       ],
-      "historical_evidence": []
+      "historical_evidence": [],
+      "current_result": "342 个提交的结构性台账保留；8 个非空 remerge diff 的冲突解决内容已核对，并与固定目标对应代码核对。父提交其余变更和本地能力等价审查仍未完成。"
     },
     {
       "id": "T03",
@@ -1292,7 +1294,8 @@
         "4fd8dc87b5ff8eb14bae4f0f0ea53ae15a58fd78",
         "6327738f3e5bc760d9f92f083e9109477e98161b",
         "0c73f59f5065bca9917a527b44099a23f00b6684",
-        "8777bc7e47795939badf222fbc4bbe7d8e3e6584"
+        "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+        "ccda7f464a6ab2b4741aee52d99a520d69162ab8"
       ],
       "verification_evidence": [
         "evidence/T10-ownership-red.log",
@@ -1333,10 +1336,16 @@
         "evidence/T10-base-launchpad-build.log",
         "evidence/T10-base-final-bundle-check.log",
         "evidence/T10-base-build-driver.json",
-        "evidence/T10-base-signed-artifact-manifest.json"
+        "evidence/T10-base-signed-artifact-manifest.json",
+        "evidence/T10-explicit-selection-validation-summary.json",
+        "evidence/T10-explicit-selection-red.log",
+        "evidence/T10-explicit-selection-module-green.log",
+        "evidence/T10-explicit-selection-firmware.log",
+        "evidence/T10-explicit-selection-cli-results.json",
+        "evidence/T10-explicit-selection-default-swift.log"
       ],
       "historical_evidence": [],
-      "current_result": "Swift 写入路径在 staging 前解析一次计划，执行和提交使用同一 gates/步骤集合。提交拒绝计划外写入和报告/结果身份改变；未知必需基线条件及启用 Frida 时未知 cloudOS 在建事务前拒绝。250 项模块 / 39 suites、15 项固件 / 12 suites 通过；当前 catalog 119 项，固定目标 141 项未接入。 所有实际写入还要求基线已识别，覆盖 iBEC/LLB 参数依赖；只读 dev/强制激活判断保留。",
+      "current_result": "显式 select 必须绑定冻结 gates 下已启用的实际 Swift 步骤；拒绝模式、版本、opt-in 排除及无执行 Gate 的 guest override。258 项相关模块、15 项固件、5 个离线 CLI 用例通过；完整 C1 仍未验收。",
       "remaining_work": [
         "固定目标声明与 T09 显式选择迁移；可写 CLI 选择接口尚未接入",
         "按单个声明和实际 patchID 校验组合步骤，核验单个必需补丁缺失",
@@ -3491,6 +3500,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
-  "latest_validation_limitation": "2026-10-07 最终 8777bc7e 默认 make test_swift：XCTest 234/3 跳过/0 失败，Swift Testing 1075/166、2 issues（helper XPC 超时、HTTP 取消耗时断言）。此前 0c73 为 14 issues，相关套件定向对照 40/6 通过；原因未查明。真实 VM 路径及备份目录仍缺失。"
+  "latest_implementation_head": "ccda7f464a6ab2b4741aee52d99a520d69162ab8",
+  "latest_validation_limitation": "Standard Swift 1083/167 failed with 16 issues; related module, firmware, offline CLI and isolated controls passed. Cause unknown; no signed candidate rebuild or VM acceptance."
 }

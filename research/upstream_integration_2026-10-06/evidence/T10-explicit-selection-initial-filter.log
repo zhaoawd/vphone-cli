@@ -1,0 +1,203 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/15] Write sources
+[3/15] Write swift-version--58304C5D6DBC2206.txt
+[5/12] Compiling FirmwarePatcher VariantPlanResolver.swift
+[6/12] Emitting module FirmwarePatcher
+[7/12] Compiling FirmwarePatcher PatchDeclarationCatalog.swift
+[8/21] Emitting module FirmwareIntegrationTests
+[9/21] Compiling FirmwarePatcherTests CatalogReferenceValidationTests.swift
+[10/21] Compiling FirmwarePatcherTests VersionKnowledgePlanTests.swift
+[11/21] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[12/21] Compiling FirmwarePatcherTests PlanSelectionValidationTests.swift
+[13/21] Emitting module FirmwarePatcherTests
+[14/22] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[14/22] Write Objects.LinkFileList
+[17/22] Linking vphone-cli
+[18/22] Linking vphone-vm
+[19/22] Applying vphone-cli
+[20/22] Applying vphone-vm
+[21/22] Linking vphone-cliPackageTests
+Build complete! (7.30s)
+Test Suite 'Selected tests' started at 2026-10-07 08:06:27.072.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 08:06:27.073.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 08:06:27.073.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 08:06:27.073.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VersionKnowledgePlanTests started.
+◇ Suite ExplicitSelectionExecutionTests started.
+◇ Suite StructuredDeclarationGateTests started.
+◇ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() started.
+◇ Test explicitSelectionRequiresALiveExecutableStep() started.
+◇ Suite FrozenDeclarationGateTests started.
+◇ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() started.
+◇ Suite DeclarationGateTests started.
+◇ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() started.
+◇ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() started.
+◇ Test supportedExplicitSelectionRetainsExecutableStep() started.
+◇ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() started.
+◇ Test explicitSelectionCannotEnableFridaWithoutOptIn() started.
+◇ Suite VariantPlanTests started.
+◇ Test explicitSelectionCannotCrossVariantBoundary() started.
+◇ Suite PlanSelectionValidationTests started.
+◇ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() started.
+◇ Test realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test frozenBlockPreservesActualSerialLabelBytes() started.
+◇ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test explicitSelectionCannotOverrideVersionCondition() started.
+◇ Test rejectsReportIdentityChanges(_:) started.
+◇ Test rejectsAWritingStepBlockedInTheFrozenPlan() started.
+◇ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test acceptsMatchingResolvedPlan() started.
+◇ Test cyclicOrder() started.
+◇ Test gateRejectsMultipleOwnersForARecord() started.
+◇ Test gateIgnoresNotApplicableAndAblatedResults() started.
+◇ Test gateChecksOwnershipForDeclaredFailedSteps() started.
+◇ Test unknownDeclarationSelected() started.
+◇ Test notImplementedSelected() started.
+◇ Test gateRejectsRecordsWithoutAnOwningResult() started.
+◇ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() started.
+◇ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() started.
+◇ Test gateRejectsANotEnabledRecord() started.
+◇ Test missingDependencyWhenTargetNotEnabled() started.
+◇ Test gatePassesForACleanReport() started.
+◇ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() started.
+◇ Test gateRejectsDuplicateRecordIndicesWithinAResult() started.
+◇ Test duplicateDeclaration() started.
+◇ Test missingDependencyStructural() started.
+◇ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test gateRejectsInvalidRecordIndices(index:) started.
+◇ Test liveStepUndeclaredWhenCatalogIncomplete() started.
+◇ Test conflictBetweenEnabled() started.
+◇ Test requiredMissingWhenPipelineLacksStep() started.
+◇ Test gateRejectsAnUndeclaredRecord() started.
+◇ Test case passing 1 argument component → .ibss to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .llb to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .ibec to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test versionIndeterminateWhenBaseUnknown() started.
+◇ Test case passing 1 argument component → .txm to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument component → .avpbooter to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument block → false to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument component → .txmDev to realBootChainRecordsPassTheDeclarationGate(component:) started.
+◇ Test case passing 1 argument block → true to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument component → .kernelcache to realBootChainRecordsPassTheDeclarationGate(component:) started.
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .kernelcache at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “kernelcache.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/kernelcache.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/kernelcache.bin, NSUnderlyingError=0x7882acc120 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .txm at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “txm.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/txm.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/txm.bin, NSUnderlyingError=0x104519ab0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test case passing 1 argument component → .kernelcacheJB to realBootChainRecordsPassTheDeclarationGate(component:) started.
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .txmDev at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “txm.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/txm.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/txm.bin, NSUnderlyingError=0x104511850 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .llb at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “llb.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/llb.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/llb.bin, NSUnderlyingError=0x1045121c0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test defaultVariantIsRegular() started.
+✘ Test frozenBlockPreservesActualSerialLabelBytes() recorded an issue at StructuredDeclarationGateTests.swift:66:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “ibss.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/ibss.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/ibss.bin, NSUnderlyingError=0x1045141c0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .ibec at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “ibec.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/ibec.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/ibec.bin, NSUnderlyingError=0x1045130f0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test expOnlyStepsAreAbsentFromOtherVariants() started.
+◇ Test catalogStructureValidates() started.
+✔ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() passed after 0.012 seconds.
+✔ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() passed after 0.012 seconds.
+✔ Test explicitSelectionCannotEnableFridaWithoutOptIn() passed after 0.012 seconds.
+◇ Test notImplementedIsAlwaysListedAndNeverSelectable() started.
+◇ Test fridaStepsNeedOptInOnJBAndExp() started.
+◇ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() started.
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .avpbooter at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “avpbooter.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/avpbooter.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/avpbooter.bin, NSUnderlyingError=0x1045140d0 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test case passing 1 argument mismatch → .variant to rejectsReportIdentityChanges(_:) started.
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .ibss at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “ibss.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/ibss.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/ibss.bin, NSUnderlyingError=0x104510b40 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+✔ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() passed after 0.012 seconds.
+◇ Test lessIsResolvedIndependently() started.
+◇ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() started.
+◇ Test case passing 1 argument mismatch → .reportGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument unattributed → false to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) recorded an issue with 1 argument component → .kernelcacheJB at StructuredDeclarationGateTests.swift:38:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The file “kernelcache.bin” couldn’t be opened because there is no such file." UserInfo={NSFilePath=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/kernelcache.bin, NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/ipsws/patch_refactor_input/raw_payloads/kernelcache.bin, NSUnderlyingError=0x7882acc360 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}
+◇ Test refusesVariantAndGateMismatch() started.
+◇ Test canBlockAnIndependentOptionalStep() started.
+◇ Test case passing 1 argument mismatch → .resultGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument unattributed → true to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test canBlockARequiredDeclarationOutsideTheVariant() started.
+◇ Test refusesContradictoryExplicitChoices() started.
+◇ Test canBlockAllOptionalDeclarationsSharingOneStep() started.
+◇ Test refusesBlockingAnApplicableRequiredDeclaration() started.
+◇ Test refusesBlockingOnlyPartOfAnIndivisibleStep() started.
+◇ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() started.
+✔ Test explicitSelectionRequiresALiveExecutableStep() passed after 0.015 seconds.
+✔ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() passed after 0.015 seconds.
+✔ Test supportedExplicitSelectionRetainsExecutableStep() passed after 0.016 seconds.
+◇ Test case passing 1 argument outcome → .ablated to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument outcome → .notApplicable to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument index → 1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument index → -1 to gateRejectsInvalidRecordIndices(index:) started.
+✔ Test explicitSelectionCannotCrossVariantBoundary() passed after 0.016 seconds.
+✔ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() passed after 0.016 seconds.
+✔ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() passed after 0.017 seconds.
+✔ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) with 2 test cases passed after 0.016 seconds.
+✘ Test realBootChainRecordsPassTheDeclarationGate(component:) with 8 test cases failed after 0.017 seconds with 8 issues.
+✘ Test frozenBlockPreservesActualSerialLabelBytes() failed after 0.018 seconds with 1 issue.
+✔ Test explicitSelectionCannotOverrideVersionCondition() passed after 0.023 seconds.
+✔ Test rejectsReportIdentityChanges(_:) with 3 test cases passed after 0.020 seconds.
+✔ Test gateRejectsMultipleOwnersForARecord() passed after 0.020 seconds.
+✔ Test cyclicOrder() passed after 0.020 seconds.
+✔ Test gateIgnoresNotApplicableAndAblatedResults() passed after 0.020 seconds.
+✔ Test gateChecksOwnershipForDeclaredFailedSteps() passed after 0.020 seconds.
+✔ Test rejectsAWritingStepBlockedInTheFrozenPlan() passed after 0.020 seconds.
+✔ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() passed after 0.019 seconds.
+✔ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() passed after 0.020 seconds.
+✔ Test gateRejectsANotEnabledRecord() passed after 0.019 seconds.
+✔ Test gateRejectsRecordsWithoutAnOwningResult() passed after 0.020 seconds.
+✔ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() passed after 0.019 seconds.
+✔ Test unknownDeclarationSelected() passed after 0.020 seconds.
+✔ Test gatePassesForACleanReport() passed after 0.019 seconds.
+✔ Test duplicateDeclaration() passed after 0.019 seconds.
+✔ Test missingDependencyStructural() passed after 0.019 seconds.
+✔ Test notImplementedSelected() passed after 0.020 seconds.
+✔ Test gateRejectsDuplicateRecordIndicesWithinAResult() passed after 0.019 seconds.
+✔ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) with 2 test cases passed after 0.019 seconds.
+✔ Test gateRejectsInvalidRecordIndices(index:) with 2 test cases passed after 0.019 seconds.
+✔ Test gateRejectsAnUndeclaredRecord() passed after 0.019 seconds.
+✔ Test acceptsMatchingResolvedPlan() passed after 0.020 seconds.
+✔ Test defaultVariantIsRegular() passed after 0.011 seconds.
+✔ Test requiredMissingWhenPipelineLacksStep() passed after 0.019 seconds.
+✔ Test liveStepUndeclaredWhenCatalogIncomplete() passed after 0.019 seconds.
+✔ Test catalogStructureValidates() passed after 0.011 seconds.
+✔ Test conflictBetweenEnabled() passed after 0.020 seconds.
+✔ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() passed after 0.011 seconds.
+✔ Suite VersionKnowledgePlanTests passed after 0.025 seconds.
+✔ Test missingDependencyWhenTargetNotEnabled() passed after 0.020 seconds.
+✔ Test versionIndeterminateWhenBaseUnknown() passed after 0.020 seconds.
+✔ Test lessIsResolvedIndependently() passed after 0.011 seconds.
+✔ Test refusesVariantAndGateMismatch() passed after 0.011 seconds.
+✔ Test expOnlyStepsAreAbsentFromOtherVariants() passed after 0.012 seconds.
+✔ Test notImplementedIsAlwaysListedAndNeverSelectable() passed after 0.012 seconds.
+✔ Test fridaStepsNeedOptInOnJBAndExp() passed after 0.012 seconds.
+✔ Test canBlockARequiredDeclarationOutsideTheVariant() passed after 0.011 seconds.
+✔ Test refusesContradictoryExplicitChoices() passed after 0.011 seconds.
+✔ Test refusesBlockingAnApplicableRequiredDeclaration() passed after 0.011 seconds.
+✘ Suite StructuredDeclarationGateTests failed after 0.025 seconds with 9 issues.
+✔ Suite ExplicitSelectionExecutionTests passed after 0.025 seconds.
+✔ Suite FrozenDeclarationGateTests passed after 0.025 seconds.
+✔ Test refusesBlockingOnlyPartOfAnIndivisibleStep() passed after 0.012 seconds.
+✔ Test canBlockAnIndependentOptionalStep() passed after 0.012 seconds.
+✔ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() passed after 0.012 seconds.
+✔ Test canBlockAllOptionalDeclarationsSharingOneStep() passed after 0.012 seconds.
+✔ Suite PlanSelectionValidationTests passed after 0.026 seconds.
+✔ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() passed after 0.046 seconds.
+✔ Suite VariantPlanTests passed after 0.059 seconds.
+✔ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) with 2 test cases passed after 0.103 seconds.
+✔ Suite DeclarationGateTests passed after 0.107 seconds.
+✘ Test run with 57 tests in 7 suites failed after 0.108 seconds with 9 issues.

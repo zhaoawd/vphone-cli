@@ -1,0 +1,54 @@
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+remerge CONFLICT (content): Merge conflict in VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+index e0051995..6dc7162f 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift
+@@ -366,13 +366,14 @@ struct VPhoneCustomFirmwareInstaller {
+             boardDeviceTree: boardDeviceTree,
+         ))
+         // Selected patches this guest has nothing for, so the receipt does not
+-        // report them as missing forever: the board audio repair on an iPhone,
+-        // which has no board tree, and the build spoof with no value set. An
+-        // iPad whose board tree could not be recovered is not among them: its
+-        // repair is missing, and drift should keep saying so.
++        // report them as missing forever: the board audio repair on an
++        // iPhone17,3, which has no board tree, and the build spoof with no value
++        // set. A board-presenting guest whose board tree could not be recovered
++        // is not among them: its repair is missing, and drift should keep
++        // saying so.
+         var notApplicableGuest = Set<String>()
+         let device = configuredGuestDevice(in: bundleDirectory) ?? guestDevice(of: restore)
+-        if !device.isPad {
++        if !device.presentsBoard {
+             notApplicableGuest.insert(FirmwareGuestSystemPatchSet.prebootBoardAudio)
+         }
+         if buildVersion?.isEmpty ?? true {
+@@ -1528,28 +1529,12 @@ struct VPhoneCustomFirmwareInstaller {
+         includeIdentity: Bool,
+         buildVersion: String?,
+         boardDeviceTree: URL?,
+-<<<<<<< 80db5ac1 (Run iOS from other iPhone models' IPSWs)
+-    ) throws {
+-        /// Like every guest patch, a VM with no plan still gets it — except the
+-        /// identity rewrite on a guest that presents its board (an iPad, or an
+-        /// iPhone other than the iPhone17,3), whose installed tree already
+-        /// carries its own identity from `fw patch`; the rewrite would turn it
+-        /// back into an iPhone17,3.
+-        func on(_ identifier: String) -> Bool {
+-            let enabled = plan?.isEnabled(identifier) ?? true
+-            if let plan, !enabled {
+-                print("  [·] \(identifier): off in preset \(plan.presetIdentifier)")
+-            }
+-            return enabled
+-        }
+-=======
+     ) throws -> Set<String> {
+         var live = Set<String>()
+         /// Whether a device-tree patch is enabled. A VM with no plan gets every
+         /// one, which is what it was restored with.
+         func enabled(_ identifier: String) -> Bool { plan?.isEnabled(identifier) ?? true }
+ 
+->>>>>>> dadf1193 (Merge pull request #570 from 0xJacky/post-creation-patches)
+         let identity = FirmwareGuestIdentityPatchSet.prebootDeviceTreeIdentity
+         var rewriteIdentity = false
+         if includeIdentity {

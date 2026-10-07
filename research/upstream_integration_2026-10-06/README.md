@@ -20,7 +20,7 @@
 | T11 | 现有事务 journal 已保存冻结计划和版本 manifest 字节摘要；暂存输入必须一致 | 仍未形成绑定稳定 VM 身份、catalog/target、schema、planDigest 的 C2 持久化计划及兼容导入 |
 | T24 | 宿主入口已部分审查；隔离 CLI/VM Bundle、Launchpad 与未配置 helper 候选构建和签名检查通过 | 独立 launcher、每台 VM 的 Bundle 选择、真实授权行为和完整运行依赖闭包仍未完成；宿主 Swift 子集有一项 XPC 超时 |
 
-`commit_ledger.json` 共 342 个提交，其中 280 个非合并、62 个合并提交。8 个合并提交的 remerge diff 非空，仍需审查；37 个提交只涉及文档路径，转入 T28 审查。不得据此把所有提交标记为已合入。
+`commit_ledger.json` 共 342 个提交，其中 280 个非合并、62 个合并提交。8 个合并提交的 remerge diff 非空，其冲突解决内容已核对；父提交其余变更和本地适配仍需审查；37 个提交只涉及文档路径，转入 T28 审查。不得据此把所有提交标记为已合入。
 
 ## T05 证据
 
@@ -143,3 +143,16 @@ Launchpad 的构建脚本原先依赖 SwiftPM 生成 `Contents/Resources/*.lproj
 自动审批拒绝下载完整 SpringBoard 私有配置用于宿主侧摘要，理由为可能包含敏感用户数据，未获该特定导出授权。替代操作在客户机内计算 SHA-256 并只返回摘要，审批通过且命令退出 0。私有配置没有导出；其摘要仅为观测基线，不能假定正常停机与启动后该配置的字节保持不变。
 
 当前 VM 不含 FirmwareOriginals 或 Restore 输入目录；历史 journal 为 version 1、phase committed、2 个 entries，没有 plan/versionInputs。旧事务记录不能自动取得 C2 写入授权。该 VM 的 EXP 26.1 样本不能代表五模式和全部固件组合。实际恢复启动、通信、应用启动、数据读回与 C2 兼容识别均待验证。
+
+
+### 2026-10-07 显式选择约束与合并冲突审查
+
+`ccda7f46` 修复解析器静默忽略显式请求的问题。已知 ID 的 select 仍须符合模式、版本和 opt-in，并绑定至少一个当前实际 Swift 步骤；不满足时返回 selectionNotEnabled。客户机步骤尚无执行 Gate，显式选择或关闭当前模式适用的 guest 声明返回 guestOverrideUnsupported。关闭当前模式不适用的 guest 声明仍允许。默认选择、Frida opt-in、必需声明和共享步骤关闭规则保留；不改变补丁算法，也不接入 guest 写入。
+
+红测试 8 项中有 6 个 issues：模式越界、缺 Frida opt-in、版本条件不满足、无 live step、guest select、适用 guest block。修复后完整相关模块 258 项、40 个 suite 通过（1.285 秒）；标准固件入口 15 项、12 个 suite 通过（37.947 秒）；只读 fw plan 的 5 个离线 CLI 用例通过，包括全部五模式、有效 serial 选择、Frida 明确 opt-in 及两个拒绝用例。最初定向命令以 DeclarationGateTests 子串过滤，误包含 StructuredDeclarationGateTests，没有 fixture 环境时产生 9 个缺文件 issues；按模块筛选及标准固件入口分别重跑后通过，该失败记录保留。
+
+标准 make test_swift 本次退出 2。XCTest 为 234 项、3 跳过、0 失败；Swift Testing 为 1083 项、167 个 suite、16 issues、84.568 秒。HTTP 5、WebSocket 7、进程取消 3、helper XPC 1；原因未查明。网络和 helper 定向对照为 23 项、3 个 suite、0.284 秒通过；Launchpad Library 为 4 项、1 个 suite、1.675 秒通过，包含取消用例。额外运行 Core Library 6 项通过，该套件不是取消用例所属模块；之后按唯一测试名运行取消用例，1 项、0.321 秒通过。定向对照存在重叠，不相加为独立用例数。采样命令退出 255，原因是目标测试进程已退出，没有取得采样文件。未放宽超时或删除断言；标准入口后续 tar/guest 检查没有运行。
+
+T02 的 8 个非空 remerge diff 已逐一核对原始字节摘要，并记录冲突解决内容及后续任务依赖。原件保存、board/device 分类、Preboot 分组修复、guest 撤销与 receipt 在合并结果中相互关联。固定目标仍从 pristineInput 读取 board tree；Info.plist 为 2.6.1 并保留麦克风说明；Installer 按配置识别设备，按 presentsBoard 选择 audio 或 iPhone product 修复；BoardDeviceTree.need 支持 iPhone17,3 原件恢复。8 项审查仅覆盖冲突解决内容，全部提交的处置仍保留 pending_semantic_review，不据此认定本地能力已覆盖。
+
+本次未重建或部署签名 Bundle，没有执行 VM 操作。当前供 T03 使用的签名候选仍为 8777bc7e；不能将新源码修复的测试结果描述为该旧候选的运行结果。C1 单个 patchID/必需项、guest Gate、C2 持久化、可写入口的显式选择及目标 catalog 迁移仍待后续执行；本轮整合未完成。

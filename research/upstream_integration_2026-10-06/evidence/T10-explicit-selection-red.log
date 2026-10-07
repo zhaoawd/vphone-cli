@@ -1,0 +1,94 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/38] Compiling locking.c
+[5/38] Compiling deviceinterfaced.c
+[7/38] Compiling fdr.c
+[8/38] Compiling common.c
+[9/38] Compiling ipsw.c
+[10/38] Compiling idevicerestore.c
+[11/38] Compiling download.c
+[12/38] Compiling asr.c
+[13/38] Compiling normal.c
+[14/38] Compiling recovery.c
+[15/38] Compiling limera1n.c
+[16/38] Compiling dfu.c
+[17/38] Compiling img4.c
+[18/38] Compiling img3.c
+[19/38] Compiling mbn.c
+[19/38] Compiling ace3.c
+[21/38] Compiling ftab.c
+[22/38] Compiling fls.c
+[23/38] Compiling restore.c
+[24/38] Compiling vphone_zip_stub.c
+[25/38] Compiling log.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+[29/40] Emitting module FirmwarePatcherTests
+[30/40] Compiling FirmwarePatcherTests ExplicitSelectionExecutionTests.swift
+[31/40] Compiling vphone_cli VPhoneBuildInfo.swift
+[32/40] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[33/42] Compiling vphone_cli VPhoneDoctorCLI.swift
+[34/42] Compiling vphone_cli VPhoneFWCLI.swift
+[34/42] Write Objects.LinkFileList
+[37/43] Emitting module VPhoneCLITests
+[37/43] Write Objects.LinkFileList
+[38/43] Linking vphone-vm
+[39/43] Linking vphone-cli
+[40/43] Applying vphone-vm
+[41/43] Applying vphone-cli
+[42/43] Linking vphone-cliPackageTests
+Build complete! (10.81s)
+Test Suite 'Selected tests' started at 2026-10-07 08:05:44.345.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 08:05:44.347.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 08:05:44.347.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 08:05:44.347.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ExplicitSelectionExecutionTests started.
+◇ Test explicitSelectionCannotEnableFridaWithoutOptIn() started.
+◇ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() started.
+◇ Test explicitSelectionCannotOverrideVersionCondition() started.
+◇ Test explicitSelectionCannotCrossVariantBoundary() started.
+◇ Test supportedExplicitSelectionRetainsExecutableStep() started.
+◇ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() started.
+◇ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() started.
+◇ Test explicitSelectionRequiresALiveExecutableStep() started.
+✘ Test explicitSelectionRequiresALiveExecutableStep() recorded an issue at ExplicitSelectionExecutionTests.swift:36:9: Expectation failed: an error was expected but none was thrown
+✘ Test explicitSelectionCannotCrossVariantBoundary() recorded an issue at ExplicitSelectionExecutionTests.swift:7:9: Expectation failed: an error was expected but none was thrown
+✘ Test explicitSelectionRequiresALiveExecutableStep() failed after 0.003 seconds with 1 issue.
+✔ Test supportedExplicitSelectionRetainsExecutableStep() passed after 0.004 seconds.
+✘ Test explicitSelectionCannotCrossVariantBoundary() failed after 0.004 seconds with 1 issue.
+✔ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() passed after 0.004 seconds.
+✘ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() recorded an issue at ExplicitSelectionExecutionTests.swift:50:9: Expectation failed: an error was expected but none was thrown
+✘ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() failed after 0.004 seconds with 1 issue.
+✘ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() recorded an issue at ExplicitSelectionExecutionTests.swift:43:9: Expectation failed: an error was expected but none was thrown
+✘ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() failed after 0.004 seconds with 1 issue.
+✘ Test explicitSelectionCannotOverrideVersionCondition() recorded an issue at ExplicitSelectionExecutionTests.swift:26:9: Expectation failed: an error was expected but none was thrown
+✘ Test explicitSelectionCannotEnableFridaWithoutOptIn() recorded an issue at ExplicitSelectionExecutionTests.swift:14:9: Expectation failed: an error was expected but none was thrown
+✘ Test explicitSelectionCannotOverrideVersionCondition() failed after 0.005 seconds with 1 issue.
+✘ Test explicitSelectionCannotEnableFridaWithoutOptIn() failed after 0.005 seconds with 1 issue.
+✘ Suite ExplicitSelectionExecutionTests failed after 0.005 seconds with 6 issues.
+✘ Test run with 8 tests in 1 suite failed after 0.005 seconds with 6 issues.

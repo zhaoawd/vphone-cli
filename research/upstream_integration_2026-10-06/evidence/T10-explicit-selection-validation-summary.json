@@ -1,0 +1,103 @@
+{
+  "implementation_commit": "ccda7f464a6ab2b4741aee52d99a520d69162ab8",
+  "red": {
+    "tests": 8,
+    "issues": 6,
+    "exit": 1
+  },
+  "initial_filter": {
+    "tests": 57,
+    "issues": 9,
+    "exit": 1,
+    "reason": "substring DeclarationGateTests also matched StructuredDeclarationGateTests without firmware fixture env; all 9 issues were missing files"
+  },
+  "related_modules": {
+    "tests": 258,
+    "suites": 40,
+    "seconds": 1.285,
+    "exit": 0
+  },
+  "firmware": {
+    "tests": 15,
+    "suites": 12,
+    "seconds": 37.947,
+    "exit": 0,
+    "reference": "current local Python; fixed upstream binary equivalence not asserted"
+  },
+  "offline_cli": {
+    "cases": 5,
+    "all_case_expectations_passed": true
+  },
+  "standard_swift": {
+    "command": "make test_swift",
+    "exit": 2,
+    "xctest": {
+      "tests": 234,
+      "skipped": 3,
+      "failures": 0
+    },
+    "swift_testing": {
+      "tests": 1083,
+      "suites": 167,
+      "issues": 16,
+      "seconds": 84.568
+    },
+    "issue_lines": [
+      "✘ Test boundsPendingRequestsAndCloseCompletesWaiters() recorded an issue at APIWebSocketTests.swift:128:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test remoteErrorOnlyFailsItsMatchingRequest() recorded an issue at APIWebSocketTests.swift:159:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() recorded an issue at APIWebSocketTests.swift:149:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test malformedMessageFailsPendingRequests() recorded an issue at APIWebSocketTests.swift:139:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test correlatesOutOfOrderRepliesAndInterleavedEvents() recorded an issue at APIWebSocketTests.swift:59:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() recorded an issue at APIWebSocketTests.swift:107:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() recorded an issue at APIHTTPTests.swift:97:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 \"(null)\"",
+      "✘ Test refusesRedirectAndOversizedResponses() recorded an issue at APIHTTPTests.swift:64:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 \"(null)\"",
+      "✘ Test deadlineAndCallerCancellationEndHTTPWait() recorded an issue at APIHTTPTests.swift:74:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 \"(null)\"",
+      "✘ Test cancellationAndLateReplyCannotCompleteNextRequest() recorded an issue at APIWebSocketTests.swift:77:6: Caught error: Error Domain=NSURLErrorDomain Code=-1001 \"(null)\"",
+      "✘ Test webSocketRefusesRedirect() recorded an issue at APIHTTPTests.swift:88:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 \"(null)\"",
+      "✘ Test realHTTPRPCHealthAndProtocolErrors() recorded an issue at APIHTTPTests.swift:51:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 \"(null)\"",
+      "✘ Test cancellingARunInterruptsOnlyItsChild() recorded an issue at LibraryTests.swift:167:9: Expectation failed: (result.status → 0) == (SIGINT → 2)",
+      "✘ Test cancellingARunInterruptsOnlyItsChild() recorded an issue at LibraryTests.swift:168:9: Expectation failed: (Date().timeIntervalSince(started) → 54.82892096042633) < (10 → 10.0)",
+      "✘ Test cancellingARunInterruptsOnlyItsChild() recorded an issue at LibraryTests.swift:170:9: Expectation failed: (history.entries.first?.status → 0) == (SIGINT → 2)",
+      "✘ Test xpcRejectsClientWithoutConfiguredSigningIdentity() recorded an issue at HelperTests.swift:114:13: Expectation failed: !((error.localizedDescription → \"Helper timed out; an install may still be running. Verify before retrying.\").contains(\"Helper timed out\") → true)"
+    ],
+    "cause": "原因未查明",
+    "later_tar_and_guest_checks_ran_in_this_entrypoint": false
+  },
+  "isolated_controls": {
+    "api_http_websocket_helper": {
+      "tests": 23,
+      "suites": 3,
+      "seconds": 0.284,
+      "exit": 0
+    },
+    "launchpad_library": {
+      "tests": 4,
+      "suites": 1,
+      "seconds": 1.675,
+      "exit": 0,
+      "includes_cancellation_case": true
+    },
+    "core_library_extra": {
+      "tests": 6,
+      "suites": 1,
+      "seconds": 0.004,
+      "exit": 0,
+      "scope": "extra suite from incorrect failure-location inference; not a cancellation control"
+    },
+    "cancellation_single": {
+      "tests": 1,
+      "suites": 1,
+      "seconds": 0.321,
+      "exit": 0,
+      "overlaps_launchpad_library_control": true
+    }
+  },
+  "sample": {
+    "exit": 255,
+    "obtained": false,
+    "reason": "test process had already exited"
+  },
+  "signed_candidate_rebuilt": false,
+  "vm_operation_this_turn": false,
+  "full_T10_T11_acceptance": false
+}

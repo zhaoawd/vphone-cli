@@ -1,0 +1,88 @@
+[
+  {
+    "case": "all-defaults",
+    "argv": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cli",
+      "fw",
+      "plan",
+      "--all",
+      "--json"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "variants": [
+      "regular",
+      "dev",
+      "jb",
+      "exp",
+      "less"
+    ]
+  },
+  {
+    "case": "selected-serial",
+    "argv": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cli",
+      "fw",
+      "plan",
+      "-V",
+      "regular",
+      "--select",
+      "ibss-cfw-serial_label",
+      "--json"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "variants": [
+      "regular"
+    ]
+  },
+  {
+    "case": "frida-opt-in",
+    "argv": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cli",
+      "fw",
+      "plan",
+      "-V",
+      "jb",
+      "--frida",
+      "--select",
+      "kernel-exp-frida_thread_set_state_entitlement_flag",
+      "--json"
+    ],
+    "exit": 0,
+    "stderr": "",
+    "variants": [
+      "jb"
+    ]
+  },
+  {
+    "case": "variant-refusal",
+    "argv": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cli",
+      "fw",
+      "plan",
+      "-V",
+      "regular",
+      "--select",
+      "kernel-exp-hv_vmm"
+    ],
+    "exit": 1,
+    "stderr": "Error: explicitly selected declaration kernel-exp-hv_vmm has no enabled executable step under this variant and gate snapshot\n",
+    "variants": []
+  },
+  {
+    "case": "guest-block-refusal",
+    "argv": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cli",
+      "fw",
+      "plan",
+      "-V",
+      "regular",
+      "--block",
+      "dyld-boot-iomfb_force_kern"
+    ],
+    "exit": 1,
+    "stderr": "Error: declaration dyld-boot-iomfb_force_kern has no guest execution gate; explicit select/block cannot be enforced\n",
+    "variants": []
+  }
+]

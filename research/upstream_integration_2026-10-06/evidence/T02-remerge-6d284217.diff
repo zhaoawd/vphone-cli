@@ -1,0 +1,30 @@
+diff --git a/Research/vphoned_http_api.md b/Research/vphoned_http_api.md
+remerge CONFLICT (content): Merge conflict in Research/vphoned_http_api.md
+index aec499cc..e9545c25 100644
+--- a/Research/vphoned_http_api.md
++++ b/Research/vphoned_http_api.md
+@@ -299,7 +299,6 @@ and whenever the settings change. SpringBoard reads the key when it starts, so
+ a newly written one holds from the next boot or respring. Measurements:
+ `Research/Guest/lock_screen_idle_timer.md`.
+ 
+-<<<<<<< f23873c1 (Make the guest's volume change what the Mac plays)
+ `/v1/health` also carries `mobilegestalt_restart_pending`. At startup vphoned
+ removes libMobileGestalt's cache,
+ `/private/var/containers/Shared/SystemGroup/systemgroup.com.apple.mobilegestaltcache/Library/Caches/com.apple.MobileGestalt.plist`,
+@@ -309,7 +308,7 @@ answers were worked out from an older tree
+ the answers they read, so the field is true from that removal until the guest
+ restarts, also across a vphoned restart in the same boot; vphoned does not
+ restart the guest itself. See `Research/Guest/virtio_sound.md` §7.
+-=======
++
+ `screen.unlock` reads the lock state, then turns the display on with
+ `SBSUndimScreen` (no toggle, unlike a power press) and presses Home to dismiss
+ the Lock Screen: a passcode-free guest goes to the Home Screen, a guest with a
+@@ -319,7 +318,6 @@ at once; a dark but unlocked one is only woken. A guest with a passcode needs
+ `passcode`, entered once and never retried; without it the call fails before
+ any key is sent. It needs no private entitlement. `timeout` is 1–60 seconds,
+ 10 by default. Measurements: `Research/Guest/screen_unlock.md`.
+->>>>>>> 63e2809a (Merge pull request #558 from 0xJacky/screen-unlock-cli)
+ 
+ `network.ipv4.get` and `network.ipv4.set` read and write the IPv4 settings of
+ one interface (default `en0`) in configd's network preferences,
