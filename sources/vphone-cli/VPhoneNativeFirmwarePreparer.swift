@@ -78,6 +78,7 @@ enum VPhoneNativeFirmwarePreparer {
             try fm.copyItem(at: phoneTree.appendingPathComponent("BuildManifest.plist"),
                             to: phoneTree.appendingPathComponent("iPhone-BuildManifest.plist"))
             try generateManifest(phoneTree, cloudTree)
+            try validatePreparedTree(phoneTree)
             if isCancelled() { throw CancellationError() }
             let destination = bundle.appendingPathComponent("iPhone17,3_\(phone.version)_\(phone.build)_Restore")
             try publish(phoneTree, to: destination, previous: previous, bundle: bundle)
@@ -144,6 +145,36 @@ enum VPhoneNativeFirmwarePreparer {
         }
         if let backup {
             print("[+] Previous restore tree preserved: \(backup.path)")
+        }
+    }
+
+    /// Presence and path checks for the classic generated identity. Component
+    /// digests, GPU compatibility and boot behavior require separate validation.
+    static func validatePreparedTree(_ tree: URL) throws {
+        let bytes = try Data(contentsOf: tree.appendingPathComponent("BuildManifest.plist"))
+        guard let plist = try PropertyListSerialization.propertyList(from: bytes, format: nil) as? [String: Any],
+              let identities = plist["BuildIdentities"] as? [[String: Any]], identities.count == 1,
+              (identities[0]["Info"] as? [String: Any])?["DeviceClass"] as? String == "vresearch101ap",
+              let components = identities[0]["Manifest"] as? [String: [String: Any]], !components.isEmpty else {
+            throw Failure(message: "Invalid prepared classic BuildManifest.")
+        }
+        for (name, component) in components {
+            guard let info = component["Info"] as? [String: Any], let path = info["Path"] as? String else {
+                throw Failure(message: "Missing prepared component path: \(name)")
+            }
+            let parts = path.split(separator: "/", omittingEmptySubsequences: false)
+            guard !parts.isEmpty, parts.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." && !$0.contains("\0") }) else {
+                throw Failure(message: "Unsafe prepared component path: \(name)")
+            }
+            var file = tree
+            for (index, part) in parts.enumerated() {
+                file.appendPathComponent(String(part))
+                var value = stat()
+                guard lstat(file.path, &value) == 0,
+                      value.st_mode & S_IFMT == (index == parts.count - 1 ? S_IFREG : S_IFDIR) else {
+                    throw Failure(message: "Missing or linked prepared component: \(name) at \(path)")
+                }
+            }
         }
     }
 

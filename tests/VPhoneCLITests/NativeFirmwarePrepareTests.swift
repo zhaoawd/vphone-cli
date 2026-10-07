@@ -139,8 +139,9 @@ struct NativeFirmwarePrepareTests {
         #expect(try Data(contentsOf: previous.appendingPathComponent("marker")) == Data("patched previous tree".utf8))
         #expect(try FileManager.default.contentsOfDirectory(atPath: vm.path).filter { $0.hasPrefix(".firmware-prepare-") }.isEmpty)
         let prepared = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm,
-            preserveExistingRestore: true, generateManifest: { _, _ in
+            preserveExistingRestore: true, generateManifest: { tree, cloud in
                 #expect(FileManager.default.fileExists(atPath: previous.appendingPathComponent("marker").path))
+                try FirmwareManifest.generate(iPhoneDir: tree, cloudOSDir: cloud, verbose: false)
             })
         #expect(prepared.path == previous.path)
         #expect(!FileManager.default.fileExists(atPath: previous.appendingPathComponent("marker").path))
@@ -188,20 +189,64 @@ struct NativeFirmwarePrepareTests {
         let phoneBytes = try Data(contentsOf: phone), cloudBytes = try Data(contentsOf: cloud)
         let vm = root.appendingPathComponent("vm")
         try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: true)
-        let result = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm, generateManifest: { phone, _ in
-            try Data("generated".utf8).write(to: phone.appendingPathComponent("BuildManifest.plist"))
-        })
+        let result = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm)
         #expect(result.lastPathComponent == "iPhone17,3_26.1_23B85_Restore")
         #expect(try String(contentsOf: result.appendingPathComponent("kernelcache.test"), encoding: .utf8) == "cloud")
         #expect(try String(contentsOf: result.appendingPathComponent("shared.dmg"), encoding: .utf8) == "phone")
         #expect(try String(contentsOf: result.appendingPathComponent("Firmware/shared.dmg.trustcache"), encoding: .utf8) == "phone")
-        #expect(try String(contentsOf: result.appendingPathComponent("BuildManifest.plist"), encoding: .utf8) == "generated")
+        let generated = try #require(try PropertyListSerialization.propertyList(
+            from: Data(contentsOf: result.appendingPathComponent("BuildManifest.plist")), format: nil) as? [String: Any])
+        #expect(generated["SupportedProductTypes"] as? [String] == ["iPhone99,11"])
         #expect(try Data(contentsOf: phone) == phoneBytes)
         #expect(try Data(contentsOf: cloud) == cloudBytes)
         #expect(throws: (any Error).self) {
             _ = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm)
         }
         #expect(!VPhoneVMLockProbe.isLockHeld(directory: vm))
+    }
+
+    @Test func missingReferencedComponentPreservesPreviousGeneration() throws {
+        let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
+        let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
+        let vm = root.appendingPathComponent("vm")
+        let previous = vm.appendingPathComponent("iPhone17,3_previous_Restore")
+        try FileManager.default.createDirectory(at: previous, withIntermediateDirectories: true)
+        try Data("old tree".utf8).write(to: previous.appendingPathComponent("marker"))
+        #expect(throws: (any Error).self) {
+            _ = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm,
+                preserveExistingRestore: true, generateManifest: { tree, cloud in
+                    try FirmwareManifest.generate(iPhoneDir: tree, cloudOSDir: cloud, verbose: false)
+                    try FileManager.default.removeItem(at: tree.appendingPathComponent("Firmware/test.im4p"))
+                })
+        }
+        #expect(try Data(contentsOf: previous.appendingPathComponent("marker")) == Data("old tree".utf8))
+        #expect(!FileManager.default.fileExists(atPath: vm.appendingPathComponent("iPhone17,3_26.1_23B85_Restore").path))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: vm.path).allSatisfy {
+            !$0.hasPrefix(".firmware-prepare-")
+        })
+    }
+
+    @Test(arguments: ["../escape", "/absolute", "Firmware//test.im4p", "Firmware/./test.im4p", "Firmware", "Firmware/link.im4p"])
+    func invalidGeneratedReferenceIsNotPublished(_ path: String) throws {
+        let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
+        let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
+        let vm = root.appendingPathComponent("vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
+        #expect(throws: (any Error).self) {
+            _ = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm,
+                generateManifest: { tree, cloud in
+                    try FirmwareManifest.generate(iPhoneDir: tree, cloudOSDir: cloud, verbose: false)
+                    let file = tree.appendingPathComponent("BuildManifest.plist")
+                    var plist = try #require(try PropertyListSerialization.propertyList(from: Data(contentsOf: file), format: nil) as? [String: Any])
+                    var identities = try #require(plist["BuildIdentities"] as? [[String: Any]])
+                    identities[0]["Manifest"] = ["KernelCache": ["Info": ["Path": path]]]
+                    plist["BuildIdentities"] = identities
+                    try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0).write(to: file)
+                    try FileManager.default.createSymbolicLink(at: tree.appendingPathComponent("Firmware/link.im4p"),
+                        withDestinationURL: tree.appendingPathComponent("Firmware/test.im4p"))
+                })
+        }
+        #expect(!FileManager.default.fileExists(atPath: vm.appendingPathComponent("iPhone17,3_26.1_23B85_Restore").path))
     }
 
     @Test func manifestFailureCleansStagingAndPublishesNothing() throws {
@@ -229,7 +274,8 @@ struct NativeFirmwarePrepareTests {
         }
         let competing = vm.appendingPathComponent("iPhone17,3_26.1_23B85_Restore")
         #expect(throws: (any Error).self) {
-            _ = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm, generateManifest: { _, _ in
+            _ = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm, generateManifest: { tree, cloud in
+                try FirmwareManifest.generate(iPhoneDir: tree, cloudOSDir: cloud, verbose: false)
                 try Data("other owner".utf8).write(to: competing)
             })
         }
