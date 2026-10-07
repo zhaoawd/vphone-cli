@@ -1,0 +1,875 @@
+{
+  "policy_fixture_source": "read-only fw plan --all --json, ccda7f46 source debug executable",
+  "policy_is_firmware_or_vm_acceptance": false,
+  "mode_plans": [
+    {
+      "variant": "regular",
+      "enabled_steps": 28,
+      "guest_uncovered": [
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_force_kern",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB force kernel swap",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_force_kern"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_swapend",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB swap-end size",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_swapend"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-maxslide",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Shared cache max slide",
+          "upstreamIDs": [
+            "dyld-boot-maxslide"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-lsd_embedded_reg",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "lsd registration entitlement",
+          "upstreamIDs": [
+            "dyld-boot-lsd_embedded_reg"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-xpc_lwcr",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "XPC lightweight code requirements",
+          "upstreamIDs": [
+            "dyld-boot-xpc_lwcr"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-lockdown_mode",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Lockdown mode sysctl gate",
+          "upstreamIDs": [
+            "dyld-boot-lockdown_mode"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-seputil-boot-gigalocker_uuid",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "seputil Gigalocker UUID",
+          "upstreamIDs": [
+            "system-seputil-boot-gigalocker_uuid"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-diskimagesiod-cfw-is_mount_complete",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "diskimagesiod mount completion",
+          "upstreamIDs": [
+            "system-diskimagesiod-cfw-is_mount_complete"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd cache loader gate",
+          "upstreamIDs": [
+            "system-launchd_cache_loader-boot-unsecure_cache_gate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-mobileactivationd-boot-should_hactivate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "mobileactivationd activation",
+          "upstreamIDs": [
+            "system-mobileactivationd-boot-should_hactivate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-gigalocker-boot-rename",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Gigalocker rename",
+          "upstreamIDs": [
+            "system-gigalocker-boot-rename"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-extensions-boot-gpu_bundle",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "GPU driver bundle",
+          "upstreamIDs": [
+            "system-extensions-boot-gpu_bundle"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-vphoned-boot-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "vphoned",
+          "upstreamIDs": [
+            "system-vphoned-boot-install"
+          ]
+        }
+      ],
+      "not_implemented": [
+        {
+          "disposition": "notImplemented",
+          "id": "dyld-exp-mis_trust_auth",
+          "optIn": "none",
+          "reason": "not implemented locally (T18 libmisfix scope)",
+          "required": false,
+          "swiftSteps": [],
+          "title": "MIS online authorization",
+          "upstreamIDs": [
+            "dyld-exp-mis_trust_auth"
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "dev",
+      "enabled_steps": 34,
+      "guest_uncovered": [
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_swapend",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB swap-end size",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_swapend"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-seputil-boot-gigalocker_uuid",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "seputil Gigalocker UUID",
+          "upstreamIDs": [
+            "system-seputil-boot-gigalocker_uuid"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd cache loader gate",
+          "upstreamIDs": [
+            "system-launchd_cache_loader-boot-unsecure_cache_gate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-mobileactivationd-boot-should_hactivate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "mobileactivationd activation",
+          "upstreamIDs": [
+            "system-mobileactivationd-boot-should_hactivate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd-boot-jetsam_panic_guard_bypass",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd jetsam panic guard",
+          "upstreamIDs": [
+            "system-launchd-boot-jetsam_panic_guard_bypass"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-debugserver-cfw-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "debugserver",
+          "upstreamIDs": [
+            "system-debugserver-cfw-install"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-gigalocker-boot-rename",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Gigalocker rename",
+          "upstreamIDs": [
+            "system-gigalocker-boot-rename"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-extensions-boot-gpu_bundle",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "GPU driver bundle",
+          "upstreamIDs": [
+            "system-extensions-boot-gpu_bundle"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-vphoned-boot-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "vphoned",
+          "upstreamIDs": [
+            "system-vphoned-boot-install"
+          ]
+        }
+      ],
+      "not_implemented": [
+        {
+          "disposition": "notImplemented",
+          "id": "dyld-exp-mis_trust_auth",
+          "optIn": "none",
+          "reason": "not implemented locally (T18 libmisfix scope)",
+          "required": false,
+          "swiftSteps": [],
+          "title": "MIS online authorization",
+          "upstreamIDs": [
+            "dyld-exp-mis_trust_auth"
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "jb",
+      "enabled_steps": 58,
+      "guest_uncovered": [
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_force_kern",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB force kernel swap",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_force_kern"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_swapend",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB swap-end size",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_swapend"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-maxslide",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Shared cache max slide",
+          "upstreamIDs": [
+            "dyld-boot-maxslide"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-lsd_embedded_reg",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "lsd registration entitlement",
+          "upstreamIDs": [
+            "dyld-boot-lsd_embedded_reg"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-xpc_lwcr",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "XPC lightweight code requirements",
+          "upstreamIDs": [
+            "dyld-boot-xpc_lwcr"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-lockdown_mode",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Lockdown mode sysctl gate",
+          "upstreamIDs": [
+            "dyld-boot-lockdown_mode"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-seputil-boot-gigalocker_uuid",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "seputil Gigalocker UUID",
+          "upstreamIDs": [
+            "system-seputil-boot-gigalocker_uuid"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-diskimagesiod-cfw-is_mount_complete",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "diskimagesiod mount completion",
+          "upstreamIDs": [
+            "system-diskimagesiod-cfw-is_mount_complete"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd cache loader gate",
+          "upstreamIDs": [
+            "system-launchd_cache_loader-boot-unsecure_cache_gate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-mobileactivationd-boot-should_hactivate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "mobileactivationd activation",
+          "upstreamIDs": [
+            "system-mobileactivationd-boot-should_hactivate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd-boot-jetsam_panic_guard_bypass",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd jetsam panic guard",
+          "upstreamIDs": [
+            "system-launchd-boot-jetsam_panic_guard_bypass"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-debugserver-cfw-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "debugserver",
+          "upstreamIDs": [
+            "system-debugserver-cfw-install"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-campo-cfw-entitlements",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "Campo entitlements",
+          "upstreamIDs": [
+            "system-campo-cfw-entitlements"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-gigalocker-boot-rename",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Gigalocker rename",
+          "upstreamIDs": [
+            "system-gigalocker-boot-rename"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-extensions-boot-gpu_bundle",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "GPU driver bundle",
+          "upstreamIDs": [
+            "system-extensions-boot-gpu_bundle"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-vphoned-boot-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "vphoned",
+          "upstreamIDs": [
+            "system-vphoned-boot-install"
+          ]
+        }
+      ],
+      "not_implemented": [
+        {
+          "disposition": "notImplemented",
+          "id": "dyld-exp-mis_trust_auth",
+          "optIn": "none",
+          "reason": "not implemented locally (T18 libmisfix scope)",
+          "required": false,
+          "swiftSteps": [],
+          "title": "MIS online authorization",
+          "upstreamIDs": [
+            "dyld-exp-mis_trust_auth"
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "exp",
+      "enabled_steps": 78,
+      "guest_uncovered": [
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_force_kern",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB force kernel swap",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_force_kern"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-iomfb_swapend",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "IOMFB swap-end size",
+          "upstreamIDs": [
+            "dyld-boot-iomfb_swapend"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-exp-hv_vmm",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "Shared cache hypervisor strings",
+          "upstreamIDs": [
+            "dyld-exp-hv_vmm"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-watchdogd-exp-hv_vmm_cache",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "watchdogd hypervisor cache",
+          "upstreamIDs": [
+            "system-watchdogd-exp-hv_vmm_cache"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "preboot-exp-devicetree_identity",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "Preboot device tree identity",
+          "upstreamIDs": [
+            "preboot-exp-devicetree_identity"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-cfw-camera",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "Camera shared cache symbols",
+          "upstreamIDs": [
+            "dyld-cfw-camera"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-maxslide",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Shared cache max slide",
+          "upstreamIDs": [
+            "dyld-boot-maxslide"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-lsd_embedded_reg",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "lsd registration entitlement",
+          "upstreamIDs": [
+            "dyld-boot-lsd_embedded_reg"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-xpc_lwcr",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "XPC lightweight code requirements",
+          "upstreamIDs": [
+            "dyld-boot-xpc_lwcr"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "dyld-boot-lockdown_mode",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Lockdown mode sysctl gate",
+          "upstreamIDs": [
+            "dyld-boot-lockdown_mode"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-seputil-boot-gigalocker_uuid",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "seputil Gigalocker UUID",
+          "upstreamIDs": [
+            "system-seputil-boot-gigalocker_uuid"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-diskimagesiod-cfw-is_mount_complete",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "diskimagesiod mount completion",
+          "upstreamIDs": [
+            "system-diskimagesiod-cfw-is_mount_complete"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd cache loader gate",
+          "upstreamIDs": [
+            "system-launchd_cache_loader-boot-unsecure_cache_gate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-mobileactivationd-boot-should_hactivate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "mobileactivationd activation",
+          "upstreamIDs": [
+            "system-mobileactivationd-boot-should_hactivate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd-boot-jetsam_panic_guard_bypass",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd jetsam panic guard",
+          "upstreamIDs": [
+            "system-launchd-boot-jetsam_panic_guard_bypass"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-debugserver-cfw-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "debugserver",
+          "upstreamIDs": [
+            "system-debugserver-cfw-install"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-campo-cfw-entitlements",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "Campo entitlements",
+          "upstreamIDs": [
+            "system-campo-cfw-entitlements"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-gigalocker-boot-rename",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "Gigalocker rename",
+          "upstreamIDs": [
+            "system-gigalocker-boot-rename"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-extensions-boot-gpu_bundle",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "GPU driver bundle",
+          "upstreamIDs": [
+            "system-extensions-boot-gpu_bundle"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-vphoned-boot-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "vphoned",
+          "upstreamIDs": [
+            "system-vphoned-boot-install"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-systemversion-cfw-build_version",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": false,
+          "swiftSteps": [],
+          "title": "Reported build version",
+          "upstreamIDs": [
+            "system-systemversion-cfw-build_version"
+          ]
+        }
+      ],
+      "not_implemented": [
+        {
+          "disposition": "notImplemented",
+          "id": "dyld-exp-mis_trust_auth",
+          "optIn": "none",
+          "reason": "not implemented locally (T18 libmisfix scope)",
+          "required": false,
+          "swiftSteps": [],
+          "title": "MIS online authorization",
+          "upstreamIDs": [
+            "dyld-exp-mis_trust_auth"
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "less",
+      "enabled_steps": 15,
+      "guest_uncovered": [
+        {
+          "disposition": "guestUncovered",
+          "id": "system-launchd_cache_loader-boot-unsecure_cache_gate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "launchd cache loader gate",
+          "upstreamIDs": [
+            "system-launchd_cache_loader-boot-unsecure_cache_gate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-mobileactivationd-boot-should_hactivate",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "mobileactivationd activation",
+          "upstreamIDs": [
+            "system-mobileactivationd-boot-should_hactivate"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-extensions-boot-gpu_bundle",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "GPU driver bundle",
+          "upstreamIDs": [
+            "system-extensions-boot-gpu_bundle"
+          ]
+        },
+        {
+          "disposition": "guestUncovered",
+          "id": "system-vphoned-boot-install",
+          "optIn": "none",
+          "reason": "guest Python/zsh step: declaration-only this round, execution not gated",
+          "required": true,
+          "swiftSteps": [],
+          "title": "vphoned",
+          "upstreamIDs": [
+            "system-vphoned-boot-install"
+          ]
+        }
+      ],
+      "not_implemented": [
+        {
+          "disposition": "notImplemented",
+          "id": "dyld-exp-mis_trust_auth",
+          "optIn": "none",
+          "reason": "not implemented locally (T18 libmisfix scope)",
+          "required": false,
+          "swiftSteps": [],
+          "title": "MIS online authorization",
+          "upstreamIDs": [
+            "dyld-exp-mis_trust_auth"
+          ]
+        }
+      ]
+    }
+  ],
+  "actual_vm_sample": {
+    "variant": "exp",
+    "device": "iPhone17,3",
+    "ios": "26.1",
+    "ios_build": "23B85",
+    "cloudOS": "26.1",
+    "cloudOS_build": "23B85",
+    "origin": "existing legacy bundle, version 1 transaction journal",
+    "new_vm_acceptance": false,
+    "restored_boot_acceptance": "pending"
+  },
+  "other_mode_or_firmware_vm_acceptance": "not performed; no supported-combination claim from policy-only fixture",
+  "concurrent_identity_clone": "not created; original and restored copy must not run together"
+}

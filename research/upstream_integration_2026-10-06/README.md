@@ -156,3 +156,25 @@ Launchpad 的构建脚本原先依赖 SwiftPM 生成 `Contents/Resources/*.lproj
 T02 的 8 个非空 remerge diff 已逐一核对原始字节摘要，并记录冲突解决内容及后续任务依赖。原件保存、board/device 分类、Preboot 分组修复、guest 撤销与 receipt 在合并结果中相互关联。固定目标仍从 pristineInput 读取 board tree；Info.plist 为 2.6.1 并保留麦克风说明；Installer 按配置识别设备，按 presentsBoard 选择 audio 或 iPhone product 修复；BoardDeviceTree.need 支持 iPhone17,3 原件恢复。8 项审查仅覆盖冲突解决内容，全部提交的处置仍保留 pending_semantic_review，不据此认定本地能力已覆盖。
 
 本次未重建或部署签名 Bundle，没有执行 VM 操作。当前供 T03 使用的签名候选仍为 8777bc7e；不能将新源码修复的测试结果描述为该旧候选的运行结果。C1 单个 patchID/必需项、guest Gate、C2 持久化、可写入口的显式选择及目标 catalog 迁移仍待后续执行；本轮整合未完成。
+
+
+### 2026-10-07 授权与剩余任务
+
+用户明确回复“授权，现在还有哪些TODO”，授权仅针对前述候选 CDHash `61ea15c6739775b707d3a36fca082c4d97049be2` 的临时 amfid 操作，使用 `--spoof-apple` 和独立临时配置。不得继承路径放行或广泛允许列表，不修改持久 SIP/AMFI 设置；验收结束后停止辅助进程。授权已记录，操作尚未执行，原有启动检查失败尚未解决。
+
+台账共 47 项：T00/T01 已验收；T02–T11 与 T24 共 11 项部分推进；T12–T23、T25–T44、T46 共 33 项待本地对账；T45 为可选延期项。46 项必选任务中仍有 44 项未完成验收。“待本地对账”不能解释为本地完全未实现。当前优先完成 T03 停机一致备份与实际恢复验收，以及 T09–T11 共同约束；标准 Swift 测试仍有 16 个 issues，原因未查明。
+
+
+### 2026-10-07 T03 实际备份与恢复
+
+T03 尚未验收。原 vm-new 正常停止，恢复点为主项目 `vm.backups/t03-vm-new-20261007-recovery-point`。65 个普通文件的备份摘要与独立 APFS 卷恢复摘要全部一致。备份实际分配 20,125,147,136 字节。ACL 与扩展属性未复制，所有者差异已记录；两份工件位于同一内部磁盘。
+
+临时 amfid 操作仅使用已授权 CDHash 和独立空配置。签名候选 --help 退出 0，未允许的签名 debug 对照仍退出 137。SIGINT 未完成辅助进程停止；只对本轮辅助进程 PID 51380 发送 SIGTERM。随后 debugserver 退出，amfid 的 PPID 为 1、状态为 Ss；未修改持久 SIP/AMFI 设置。当前签名候选仍为 8777bc7e，不包含 ccda7f46 新代码。
+
+首次恢复的 /private/var/tmp 测试标记缺失，失败记录保留。随后在两个客户机卷内创建相同内容的文件并 sync，停机后以 APFS 写时复制生成新副本，65 文件摘要通过。新副本启动后，mobile/Library 文件读回摘要为 `15aefbeaf947f76ad669d0708ce18323ea5c98459f5bbe6929a3e8a2a1605f87`，与写入前一致；var/tmp 文件仍缺失。该行为已观察，机制未查明，不能用临时文件缺失直接认定完整磁盘备份失败。
+
+Settings 启动接口返回“uiopen ok but no pid”；Safari 验收未运行。SpringBoard 与 backboardd 进程存在。GUI 显示首次设置界面；普通滑动与边缘滑动返回成功，画面未推进，原因未查明。基础设置没有完成。截图和完整客户机控制台保留在 Git 忽略的私有工件目录，提交证据只记录截图摘要。
+
+所有恢复副本已正常停止，映像已卸载并保留失败样本。原 vm-new 已恢复 GUI 运行，PID 69566，客户机连接正常。其配置与旧客户机载荷摘要未变；宿主进程使用隔离工作树的 8777bc7e 候选，主树 Bundle 未替换，API 0.7.16 客户机未激活。原 VM 的唯一专用临时标记在重启后已不存在。
+
+复制与测试启动保持空间保护。空间不足的两次拒绝记录保留；只清理本轮隔离工作树的可重建编译缓存、中间产物和调试符号，候选字节未变，make check_bundle 与签名检查通过。五模式只读计划已保存；真实 VM 范围仅覆盖当前 EXP 26.1 样本。详细路径、命令驱动、限制及状态见 `evidence/T03-actual-summary.json`。T02/T09 源码对账继续推进。

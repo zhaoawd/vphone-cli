@@ -863,7 +863,7 @@
         "T01",
         "T02"
       ],
-      "status": "in_progress",
+      "status": "backup_restore_boot_data_validated_application_pending",
       "upstream_paths": [
         "VPhoneKit/VPhoneCoreKit/VirtualMachine/"
       ],
@@ -883,8 +883,14 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "actual_acceptance_paths_resolved",
+        "paths": [
+          "sources/VPhoneCore/VPhoneVMStopper.swift",
+          "sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+          "sources/vphone-cli/VPhoneHostControl.swift",
+          "sources/vphone-cli/VPhoneHostCommandExecutor.swift",
+          "research/upstream_integration_2026-10-06/evidence/T03-actual-drivers/"
+        ]
       },
       "implementation_commits": [],
       "verification_evidence": [
@@ -898,19 +904,85 @@
         "evidence/T03-input-bindings-before.json",
         "evidence/T03-capabilities-before.json",
         "evidence/T03-guest-data-hashes-before.json",
-        "evidence/T03-test-marker-before.json"
+        "evidence/T03-test-marker-before.json",
+        "evidence/T03-actual-fresh-pre-stop-20261007.json",
+        "evidence/T03-actual-stop-source.log",
+        "evidence/T03-actual-backup-report.json",
+        "evidence/T03-actual-backup-copy.log",
+        "evidence/T03-actual-create-volume.log",
+        "evidence/T03-actual-attach-volume.log",
+        "evidence/T03-actual-restore-copy-report.json",
+        "evidence/T03-actual-restore-copy.log",
+        "evidence/T03-actual-restored-guard.log",
+        "evidence/T03-actual-restored-acceptance.json",
+        "evidence/T03-actual-restored-acceptance.log",
+        "evidence/T03-actual-restored-marker-diagnosis.json",
+        "evidence/T03-actual-restored-mounts-data-hashes.json",
+        "evidence/T03-actual-persistence-probes-before.json",
+        "evidence/T03-actual-stop-restored-first.log",
+        "evidence/T03-actual-clone-probe-report.json",
+        "evidence/T03-actual-clone-probe.log",
+        "evidence/T03-actual-clone-probe-report-2.json",
+        "evidence/T03-actual-clone-probe-2.log",
+        "evidence/T03-actual-persistent-clone-report.json",
+        "evidence/T03-actual-persistent-clone.log",
+        "evidence/T03-actual-persistent-relocation.json",
+        "evidence/T03-actual-restored-persistent-guard.log",
+        "evidence/T03-actual-restored-persistent-acceptance.json",
+        "evidence/T03-actual-restored-persistent-acceptance.log",
+        "evidence/T03-actual-persistent-boot-diagnosis.json",
+        "evidence/T03-actual-app-services-diagnosis.json",
+        "evidence/T03-actual-target-processes-diagnosis.json",
+        "evidence/T03-actual-home-launch-probe.json",
+        "evidence/T03-actual-stop-restored-persistent.log",
+        "evidence/T03-actual-restored-gui-guard.log",
+        "evidence/T03-actual-restored-gui-guard-second.log",
+        "evidence/T03-actual-gui-capabilities.json",
+        "evidence/T03-actual-gui-initial-screen.json",
+        "evidence/T03-actual-stop-restored-gui.log",
+        "evidence/T03-actual-detach-restored-volume.log",
+        "evidence/T03-actual-original-restart.json",
+        "evidence/T03-actual-original-capabilities-after.json",
+        "evidence/T03-actual-original-input-bindings-after.json",
+        "evidence/T03-actual-original-marker-cleanup.json",
+        "evidence/T03-actual-cache-cleanup.json",
+        "evidence/T03-actual-cache-cleanup-second.json",
+        "evidence/T03-actual-bundle-check-after-cache-cleanup.log",
+        "evidence/T03-actual-five-mode-plans.json",
+        "evidence/T03-actual-verification-matrix.json",
+        "evidence/T03-actual-edge-swipe-response.json",
+        "evidence/T03-actual-drivers/controlled_copy.py",
+        "evidence/T03-actual-drivers/clone_copy.py",
+        "evidence/T03-actual-drivers/guarded_boot.py",
+        "evidence/T03-actual-drivers/guarded_boot_two_sources.py",
+        "evidence/T03-actual-drivers/guarded_boot_two_sources_gui.py",
+        "evidence/T03-actual-drivers/check_restored.py",
+        "evidence/T03-actual-drivers/check_restored_persistent.py",
+        "evidence/T03-actual-drivers/ctl.py",
+        "evidence/T03-actual-scoped-amfid.py",
+        "evidence/T03-actual-scoped-amfid.log",
+        "evidence/T03-actual-host-preflight-after.log",
+        "evidence/T03-actual-summary.json"
       ],
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "Signed candidate --help exited 137; temporary system amfid debugging is awaiting separate user authorization. Keep vm-new running until fresh startup prerequisites are confirmed.",
-      "current_environment_note": "用户已指定 vm-new；它当前运行，客户机连接正常。备份目标拟为项目 vm.backups，停止后才执行复制。",
+      "blocked_reason": "目标应用与首次设置验收未通过，原因未查明；原 vm-new 验收前是否完成设置待用户补充。",
+      "current_environment_note": "原 vm-new 已恢复运行（PID 69566，候选宿主 8777bc7e）；本轮恢复映像已卸载，原始恢复点和失败副本均保留，vm-2607 未操作。",
       "current_capacity_bytes": 60620800000,
-      "current_result": "已保存运行基线、宿主/客户机载荷摘要并验证复制脚本的准备检查；专用客户机测试文件已创建。未停止原 VM，未制作实际备份，未启动恢复副本。",
+      "current_result": "原 VM 正常停机；65 文件备份与独立 APFS 卷恢复均逐文件摘要通过；再次 APFS 克隆 65 文件通过，持久卷专用测试文件读回一致。Settings 启动返回无 PID，GUI 停留首次设置且滑动未推进，原因未查明；T03 未验收。原 VM 已用 8777bc7e 候选重启、连接正常，配置与旧客户机载荷摘要未变。",
       "available_capacity_gib": 56.46,
       "capacity_observed_date": "2026-10-07",
       "selected_vm_path": "/Users/qcz3840/github/vphone-cli/vm-new",
-      "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups"
+      "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups",
+      "temporary_amfid_authorization": {
+        "status": "granted",
+        "date": "2026-10-07",
+        "user_message": "授权，现在还有哪些TODO",
+        "candidate_cdhash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+        "scope": "仅该候选 CDHash，使用 --spoof-apple 和独立临时配置；不继承路径放行或广泛允许列表；不修改持久 SIP/AMFI 设置；验收结束后停止辅助进程。",
+        "execution_status": "completed_helper_stopped"
+      }
     },
     {
       "id": "T04",
@@ -2081,7 +2153,9 @@
         "evidence/T10-base-launchpad-build.log",
         "evidence/T10-base-final-bundle-check.log",
         "evidence/T10-base-build-driver.json",
-        "evidence/T10-base-signed-artifact-manifest.json"
+        "evidence/T10-base-signed-artifact-manifest.json",
+        "evidence/T03-actual-host-preflight-after.log",
+        "evidence/T03-actual-bundle-check-after-cache-cleanup.log"
       ],
       "historical_evidence": [],
       "current_result": "已审查 policy、实际调用方和 helper 专用协议。隔离 CLI/VM Bundle 与 Launchpad 编译、资源及签名检查通过；修复 SwiftPM 未编译 xcstrings 导致的 Launchpad 打包失败。41 项相关 Python 测试通过。50 项宿主 Swift 子集仍有一项 XPC 超时；原因未查明。",
@@ -2090,7 +2164,8 @@
         "核验真实授权主体的 location/microphone usage description 与 entitlement、签名责任链",
         "默认并行宿主 XPC 超时诊断、实际 signed helper 接受/拒绝与生命周期验收",
         "运行依赖的完整传递闭包验证、真实 Launchpad/VM 验收"
-      ]
+      ],
+      "latest_vm_observation": "已在限定临时 amfid 范围下验证候选 --help 和恢复副本正常启动；完整 launcher/授权责任链仍未验收。"
     },
     {
       "id": "T25",

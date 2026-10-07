@@ -1,0 +1,9 @@
+guest_connected
+marker_matched
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/research/artifacts/t03-vm-new-20261007/check_restored_persistent.py", line 33, in <module>
+    launch=call('app_launch',bundle_id=bid);pid=launch.get('pid')
+  File "/Users/qcz3840/github/vphone-cli/research/artifacts/t03-vm-new-20261007/check_restored_persistent.py", line 15, in call
+    if not r.get('ok'):raise RuntimeError(str(r))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'ok': False, 'error': 'com.apple.Preferences did not start (uiopen ok but no pid)'}

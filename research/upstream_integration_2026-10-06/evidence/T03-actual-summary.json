@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-07",
+  "task": "T03",
+  "task_accepted": false,
+  "source_vm": "/Users/qcz3840/github/vphone-cli/vm-new",
+  "source_stopped_pid": 29288,
+  "source_restarted_pid": 69566,
+  "candidate_implementation_commit": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+  "candidate_cdhash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+  "source_firmware": {
+    "cloudOS": {
+      "build": "23B85",
+      "version": "26.1"
+    },
+    "device": "iPhone17,3",
+    "ios": {
+      "build": "23B85",
+      "version": "26.1"
+    },
+    "variant": "exp"
+  },
+  "backup_path": "/Users/qcz3840/github/vphone-cli/vm.backups/t03-vm-new-20261007-recovery-point",
+  "restore_image": "/Users/qcz3840/github/vphone-cli/vm.backups/t03-vm-new-20261007-restored.sparsebundle",
+  "backup_files_verified": 65,
+  "backup_allocated_bytes": 20125147136,
+  "independent_apfs_restore_files_verified": 65,
+  "cow_clone_files_verified": 65,
+  "cow_clone_is_physical_independence": false,
+  "temporary_amfid": {
+    "authorized": true,
+    "candidate_only": true,
+    "allow_all": false,
+    "paths": [],
+    "spoof_apple": true,
+    "persistent_sip_amfi_changes": false,
+    "helper_stopped": true,
+    "cleanup": "SIGINT did not complete shutdown; sent SIGTERM to own helper PID 51380; afterward debugserver exited and amfid was observed with PPID 1 and state Ss."
+  },
+  "signed_release_help_exit_after_helper": 0,
+  "signed_debug_control_exit": 137,
+  "restored_guest_connected": true,
+  "persistent_marker_readback_sha256": "15aefbeaf947f76ad669d0708ce18323ea5c98459f5bbe6929a3e8a2a1605f87",
+  "persistent_marker_matched": true,
+  "two_volume_observation": "Before stop, synchronized identical markers existed on /private/var and /private/var/mobile; after cloned restored boot, /private/var/tmp marker was absent and mobile/Library marker matched. Mechanism remains unidentified.",
+  "application_acceptance": "pending: Settings reported uiopen ok but no pid; Safari acceptance did not run; GUI showed first setup screen, swipe responses ok but screen did not progress. Cause unknown.",
+  "original_configuration_unchanged": true,
+  "original_guest_payload_unchanged": true,
+  "original_guest_connection_restored": true,
+  "original_marker_cleanup": "already absent after boot",
+  "restored_volume_detached": true,
+  "failed_samples_retained": true,
+  "source_current_host": "candidate worktree Bundle; main Bundle not replaced",
+  "api_0_7_16_activated": false,
+  "metadata_limitations": [
+    "ACL and extended attributes are not copied",
+    "compressed files are copied as ordinary bytes",
+    "owner/group differences are recorded, not changed"
+  ],
+  "same_internal_disk_only": true,
+  "unverified": [
+    "target app launch",
+    "completed setup",
+    "concurrent distinct-identity clone",
+    "other firmware/mode VM combinations",
+    "crash/power-loss recovery",
+    "complete T03 acceptance"
+  ],
+  "rulings": [
+    "Preserve first failed tmp-marker run; use controlled two-volume probes rather than infer data loss from temp-file absence.",
+    "APFS clone used for repeat persistence probe after independent physical-volume restore had already been byte-verified; no dense fallback.",
+    "Shortened second clone parent to p2 for a 92-byte socket path; original config unchanged.",
+    "Original restart uses 10 GiB minimum reserve after test image detached; no second same-identity VM runs. Test-copy boot guards retained 12 GiB requirement."
+  ],
+  "private_artifacts": "/Users/qcz3840/github/vphone-cli/research/artifacts/t03-vm-new-20261007",
+  "screenshots": {
+    "setup-edge-swipe.png": {
+      "bytes": 4072691,
+      "sha256": "2c0420993846525c79e245da6cba0d0c9d543708e2020097dfa1660c08de9cac"
+    },
+    "restored-gui-second.png": {
+      "bytes": 4072691,
+      "sha256": "2c0420993846525c79e245da6cba0d0c9d543708e2020097dfa1660c08de9cac"
+    },
+    "restored-gui-initial.png": {
+      "bytes": 79530,
+      "sha256": "a4d58c9ce68109c209e2ca1f8549abcb4b8f6e3edb0a2ceb5260e74c6b2b669b"
+    },
+    "setup-02.png": {
+      "bytes": 4072691,
+      "sha256": "2c0420993846525c79e245da6cba0d0c9d543708e2020097dfa1660c08de9cac"
+    },
+    "setup-01.png": {
+      "bytes": 4072691,
+      "sha256": "2c0420993846525c79e245da6cba0d0c9d543708e2020097dfa1660c08de9cac"
+    }
+  }
+}

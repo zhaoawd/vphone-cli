@@ -1,0 +1,36 @@
+[
+  {
+    "request": {
+      "t": "key",
+      "name": "home",
+      "screen": false
+    },
+    "response": {
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "app_launch",
+      "bundle_id": "com.apple.Preferences",
+      "screen": false
+    },
+    "response": {
+      "ok": false,
+      "error": "com.apple.Preferences did not start (uiopen ok but no pid)"
+    }
+  },
+  {
+    "request": {
+      "t": "app_foreground",
+      "screen": false
+    },
+    "response": {
+      "pid": 0,
+      "bundle_id": "",
+      "source": "unknown",
+      "name": "",
+      "ok": true
+    }
+  }
+]

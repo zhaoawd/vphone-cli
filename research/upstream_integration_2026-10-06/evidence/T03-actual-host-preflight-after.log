@@ -1,0 +1,55 @@
+
+=== Host ===
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+model: MacBook Pro
+kern.hv_vmm_present: 0
+SIP: System Integrity Protection status: unknown (Custom Configuration).
+
+Configuration:
+	Apple Internal: disabled
+	Kext Signing: enabled
+	Filesystem Protections: enabled
+	Debugging Restrictions: disabled
+	DTrace Restrictions: enabled
+	NVRAM Protections: enabled
+	BaseSystem Verification: enabled
+	Boot-arg Restrictions: enabled
+	Kernel Integrity Protections: enabled
+	Authenticated Root Requirement: enabled
+
+This is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.
+allow-research-guests: Allow Research Guests status: enabled
+current kern.bootargs: 
+next-boot nvram boot-args: 
+assessment: assessments enabled
+
+=== Entitlements ===
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>com.apple.private.bmk.allow</key><true/><key>com.apple.private.virtualization</key><true/><key>com.apple.private.virtualization.security-research</key><true/><key>com.apple.security.get-task-allow</key><true/><key>com.apple.security.personal-information.location</key><true/><key>com.apple.security.virtualization</key><true/><key>com.apple.vm.networking</key><true/></dict></plist>
+
+=== Policy ===
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm: rejected
+
+=== Unsigned Debug Binary ===
+[debug_help] exit=0
+
+=== Signed Release Binary ===
+[release_help] exit=0
+
+=== Signed Debug Control ===
+/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T//vphone-preflight.NJX3vE/vphone-cli.debug.signed: replacing existing signature
+[signed_debug_help] exit=137
+
+=== Result ===
+If unsigned debug runs but either signed binary exits 137 / signal 9,
+the host is not currently permitting the required private virtualization entitlements.
+If the signed release binary exits 0 but the signed debug control still exits 137,
+a path/CDHash-scoped amfidont bypass may already be active for this repo.
+Typical requirements for this project are:
+  1. macOS 15+ with PV=3 support
+  2. Host hardware must expose Virtualization.framework VM support (not a nested VM without virtualization availability)
+  3. SIP disabled
+  4. allow-research-guests enabled in Recovery OS
+  5. AMFI / execution policy state that permits the private entitlements
+  6. Gatekeeper / assessment configured so the signed binary is launchable

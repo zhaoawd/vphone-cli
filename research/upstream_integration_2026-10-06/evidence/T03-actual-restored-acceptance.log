@@ -1,0 +1,8 @@
+guest_connected
+Traceback (most recent call last):
+  File "/Users/qcz3840/github/vphone-cli/research/artifacts/t03-vm-new-20261007/check_restored.py", line 28, in <module>
+    r=call('file_get',path='/private/var/tmp/vphone-t03-acceptance-20261007.txt')
+  File "/Users/qcz3840/github/vphone-cli/research/artifacts/t03-vm-new-20261007/check_restored.py", line 15, in call
+    if not r.get('ok'):raise RuntimeError(str(r))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: {'error': 'open failed: No such file or directory', 'ok': False}
