@@ -3,9 +3,10 @@ import Foundation
 import Virtualization
 
 @MainActor
-class VPhoneWindowController: NSObject, NSToolbarDelegate {
+class VPhoneWindowController: NSObject, NSToolbarDelegate, NSWindowDelegate {
     private var windowController: NSWindowController?
     private var statusTimer: Timer?
+    private var clipboardSync: VPhoneClipboardFocusSync?
     private weak var control: VPhoneControl?
     private weak var virtualMachineView: VPhoneVirtualMachineView?
     private(set) var touchIDMonitor: VPhoneTouchIDMonitor?
@@ -23,6 +24,24 @@ class VPhoneWindowController: NSObject, NSToolbarDelegate {
     ) {
         self.control = control
         self.ecid = ecid
+        let sync = VPhoneClipboardFocusSync(identity: { [weak control] in
+            guard let control, let session = control.clipboardSession else { return nil }
+            return .init(connection: session, revision: control.clipboardRevision)
+        }, read: { [weak control] in
+            guard let control else { throw CancellationError() }
+            return try await control.clipboardGet()
+        }, macChangeCount: { NSPasteboard.general.changeCount }, write: { content in
+            let board = NSPasteboard.general
+            if let text = content.text, !text.isEmpty {
+                board.clearContents()
+                board.setString(text, forType: .string)
+            } else if let data = content.imageData {
+                board.clearContents()
+                board.setData(data, forType: .png)
+            }
+        })
+        clipboardSync = sync
+        control.onClipboardMutation = { [weak sync] in sync?.clipboardMutated() }
 
         let view = VPhoneVirtualMachineView()
         view.virtualMachine = vm
@@ -45,6 +64,7 @@ class VPhoneWindowController: NSObject, NSToolbarDelegate {
         )
 
         window.isReleasedWhenClosed = false
+        window.delegate = self
         window.contentAspectRatio = windowSize
         window.title = "VPHONE [loading]"
         window.subtitle = makeSubtitle(ip: nil)
@@ -82,11 +102,16 @@ class VPhoneWindowController: NSObject, NSToolbarDelegate {
             [weak self, weak window] _ in
             Task { @MainActor in
                 guard let self, let window, let control = self.control else { return }
+                self.clipboardSync?.connectionChanged()
                 window.title = control.isConnected ? "VPHONE [connected]" : "VPHONE [disconnected]"
                 window.subtitle = self.makeSubtitle(ip: control.isConnected ? control.guestIP : nil)
             }
         }
     }
+
+    func windowDidBecomeKey(_: Notification) { clipboardSync?.focusChanged(key: true) }
+    func windowDidResignKey(_: Notification) { clipboardSync?.focusChanged(key: false) }
+    func windowWillClose(_: Notification) { clipboardSync?.stop() }
 
     private func makeSubtitle(ip: String?) -> String {
         switch (ecid, ip) {

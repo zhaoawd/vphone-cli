@@ -49,6 +49,12 @@ class VPhoneControl {
         useGuestTouchInjection ? connectionAttemptToken : nil
     }
 
+    var clipboardSession: UInt64? {
+        isConnected && guestCaps.contains("clipboard") ? connectionAttemptToken : nil
+    }
+    private(set) var clipboardRevision: UInt64 = 0
+    var onClipboardMutation: (() -> Void)?
+
     /// Path to the signed vphoned binary. When set, enables auto-update.
     var guestBinaryURL: URL?
 
@@ -689,6 +695,8 @@ class VPhoneControl {
         guard VPhoneClipboardTransfer.fits(text: text) else {
             throw ControlError.protocolError("clipboard text exceeds 1 MiB UTF-8")
         }
+        clipboardRevision &+= 1
+        defer { onClipboardMutation?() }
         _ = try await sendRequest(["t": "clipboard_set", "text": text])
     }
 
@@ -696,6 +704,8 @@ class VPhoneControl {
         guard VPhoneClipboardTransfer.fits(image: imageData) else {
             throw ControlError.protocolError("clipboard image must be nonempty and at most 16 MiB")
         }
+        clipboardRevision &+= 1
+        defer { onClipboardMutation?() }
         _ = try await performRequest(["t": "clipboard_set", "type": "image", "size": imageData.count], payload: imageData)
     }
 
