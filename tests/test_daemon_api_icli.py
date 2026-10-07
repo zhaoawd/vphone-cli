@@ -4,7 +4,8 @@ T08 (IcliKit 0.7.5/0.7.6): IPA and deb entry names are read with a thread-local
 UTF-8 LC_CTYPE while the caller stays in the C locale, and Mac metadata
 (`__MACOSX/`, `._name`) is skipped during IPA extraction. The checks compile the
 resolved checkout's own Archive.m/Deb.m and its Tests/ArchiveLocale harness
-against the macOS slice of the resolved libarchive. They need the package
+against the macOS slice of the resolved libarchive. The 0.7.16 harness also
+checks deb hard links, symlink escapes and JSON guards. They need the package
 checkout left by `make daemon_api_build`; iOS launchd, installd and container
 registration are not exercised.
 """
@@ -72,24 +73,60 @@ class DaemonAPIIcliArchiveTests(unittest.TestCase):
             subprocess.run(['ar', '-rcS', 'test.deb', 'debian-binary', 'control.tar.gz', 'data.tar.gz'],
                            cwd=deb, check=True, capture_output=True)
 
+            # Match the pinned checkout's scripts/test-archive-locale.sh fixtures.
+            links = work / 'links'
+            control = links / 'control'
+            binary = links / 'data/var/jb/usr/bin'
+            (control / 'sub').mkdir(parents=True)
+            binary.mkdir(parents=True)
+            (control / 'control').write_text('Package: dev.owngoal.icli.linktest\nVersion: 1.0\nArchitecture: iphoneos-arm64\n')
+            (control / 'list').write_text('/etc/passwd\n')
+            (control / 'sub/postinst').write_text('#!/bin/sh\n')
+            (binary / 'tool').write_text('linked tool\n')
+            os.link(binary / 'tool', binary / 'alias')
+            subprocess.run(['bsdtar', '-czf', '../control.tar.gz', './control', './list', './sub'], cwd=control, check=True)
+            subprocess.run(['bsdtar', '-czf', '../data.tar.gz', './var'], cwd=links / 'data', check=True)
+            shutil.copy(deb / 'debian-binary', links)
+            subprocess.run(['ar', '-rcS', 'links.deb', 'debian-binary', 'control.tar.gz', 'data.tar.gz'],
+                           cwd=links, check=True, capture_output=True)
+
+            escape = work / 'escape'
+            (escape / 'link').mkdir(parents=True)
+            (escape / 'file/a/x/y').mkdir(parents=True)
+            outside = work / 'outside'
+            outside.mkdir()
+            (escape / 'link/a').symlink_to(outside)
+            (escape / 'file/a/x/y/file').write_text('escaped\n')
+            subprocess.run(['bsdtar', '-cf', '../link.tar', './a'], cwd=escape / 'link', check=True)
+            subprocess.run(['bsdtar', '-cf', '../file.tar', './a/x/y/file'], cwd=escape / 'file', check=True)
+            subprocess.run(['bsdtar', '-czf', 'data.tar.gz', '@link.tar', '@file.tar'], cwd=escape, check=True)
+            for name in ('control.tar.gz', 'debian-binary'):
+                shutil.copy(deb / name, escape)
+            subprocess.run(['ar', '-rcS', 'escape.deb', 'debian-binary', 'control.tar.gz', 'data.tar.gz'],
+                           cwd=escape, check=True, capture_output=True)
+
             objects = []
             for source in ('Archive', 'Deb'):
                 output = work / f'{source}.o'
-                subprocess.run(['xcrun', 'clang', '-fobjc-arc', '-fblocks', f'-I{work / "include"}',
+                compiled = subprocess.run(['xcrun', 'clang', '-fobjc-arc', '-fblocks', f'-I{work / "include"}',
                                 f'-I{ICLI / "Sources/IcliPrivate/include"}',
                                 f'-I{ICLI / "Sources/IcliSystemPrivate/include"}',
+                                f'-I{ICLI / "Sources/IcliLaunchPrivate/include"}',
                                 '-c', str(ICLI / f'Sources/IcliPrivate/{source}.m'), '-o', str(output)],
-                               check=True, capture_output=True)
+                               capture_output=True, text=True)
+                self.assertEqual(compiled.returncode, 0, compiled.stderr)
                 objects.append(str(output))
             harness = work / 'archive-locale-tests'
-            subprocess.run(['xcrun', 'swiftc', '-swift-version', '6', '-module-cache-path', str(work / 'modules'),
+            compiled = subprocess.run(['xcrun', 'swiftc', '-swift-version', '6', '-module-cache-path', str(work / 'modules'),
                             '-import-objc-header', str(ICLI / 'Tests/ArchiveLocale/Bridge.h'),
-                            str(ICLI / 'Tests/ArchiveLocale/main.swift'), *objects,
+                            str(ICLI / 'Tests/ArchiveLocale/main.swift'), str(ICLI / 'Sources/IcliSystem/JSONSafe.swift'), *objects,
                             str(LIBARCHIVE / 'Versions/A/libarchive'), '-framework', 'Foundation',
                             '-lz', '-lbz2', '-liconv', '-lxml2', '-o', str(harness)],
-                           check=True, capture_output=True)
+                           capture_output=True, text=True)
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
             # The harness forces setlocale(LC_ALL, "C") and requires US-ASCII before reading.
-            result = subprocess.run([str(harness), str(deb / 'test.deb')], capture_output=True, text=True,
+            result = subprocess.run([str(harness), str(deb / 'test.deb'), str(links / 'links.deb'),
+                                     str(escape / 'escape.deb'), str(outside)], capture_output=True, text=True,
                                     env=dict(os.environ, LC_ALL='C'), timeout=120)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn('Unicode IPA and deb names in the C locale', result.stdout)
