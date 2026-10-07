@@ -132,31 +132,8 @@ enum GuestIrisinInstaller {
     }
 
     private static func completedBootstrap() throws -> (layout: String, root: String)? {
-        guard let markerURL = markerForRead() else { return nil }
-        let data = try Data(contentsOf: markerURL)
-        guard let marker = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw GuestAPIError.operationFailed("Completed bootstrap marker is invalid")
-        }
-        if marker["installed"] as? Bool == false {
-            return nil
-        }
-        guard let layout = marker["layout"] as? String,
-              let root = marker["jbroot"] as? String,
-              (layout == "rootless" && root == "/var/jb") ||
-              (layout == "roothide" && root.hasPrefix("/private/var/containers/Bundle/Application/")
-                  && roothideName(String(root.dropFirst("/private/var/containers/Bundle/Application/".count))))
-        else { throw GuestAPIError.operationFailed("Completed bootstrap marker has an invalid root") }
-        return (layout, root)
-    }
-
-    private static func markerForRead() -> URL? {
-        if itemExists(completionMarker) {
-            return completionMarker
-        }
-        if itemExists(legacyCompletionMarker) {
-            return legacyCompletionMarker
-        }
-        return nil
+        guard let marker = try GuestBootstrapState.read(primary: completionMarker, legacy: legacyCompletionMarker) else { return nil }
+        return (marker.layout, marker.root)
     }
 
     private static func writeMarker(_ marker: [String: Any]) throws {
@@ -562,13 +539,7 @@ enum GuestIrisinInstaller {
     }
 
     private static func roothideName(_ name: String) -> Bool {
-        guard name.range(of: "^\\.jbroot-[0-9a-fA-F]{16}$", options: .regularExpression) != nil,
-              let value = UInt64(name.dropFirst(8), radix: 16)
-        else { return false }
-        let check = (1 ... 7).reduce(UInt8(0)) {
-            $0 ^ UInt8(truncatingIfNeeded: value >> ($1 * 8))
-        }
-        return check == UInt8(truncatingIfNeeded: value)
+        GuestBootstrapState.rootHideName(name)
     }
 
     private struct Asset {
