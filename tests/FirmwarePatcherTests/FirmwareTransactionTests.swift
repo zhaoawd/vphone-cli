@@ -136,6 +136,50 @@ import Testing
         #expect(throws: (any Error).self) { try f.recover() }
     }
 
+    @Test(arguments: [false, true]) func changedOrMissingReportPreventsCommit(_ remove: Bool) throws {
+        let f = try Fixture(); let t = try f.begin(); try f.patch(t)
+        let report = DeclarationGateTests.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass", outcome: .applied, variant: "regular")
+        try t.saveReport(report)
+        let file = t.root.appendingPathComponent("report.json")
+        if remove { try f.fm.removeItem(at: file) }
+        else { try Data("{}".utf8).write(to: file) }
+        #expect(throws: (any Error).self) { try t.commit() }
+        try f.original()
+        #expect(t.journalSnapshot.phase != .committed)
+    }
+
+    @Test func changedCommittedReportIsNotArchivedByRecovery() throws {
+        let f = try Fixture()
+        let t = try f.begin { if $0 == .beforeArchive { throw POSIXError(.EINTR) } }
+        try f.patch(t)
+        try t.saveReport(DeclarationGateTests.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass", outcome: .applied, variant: "regular"))
+        #expect(throws: (any Error).self) { try t.commit() }
+        #expect(t.journalSnapshot.phase == .committed)
+        try Data("{}".utf8).write(to: t.root.appendingPathComponent("report.json"))
+        #expect(throws: (any Error).self) { try f.recover() }
+        #expect(f.fm.fileExists(atPath: t.root.path))
+    }
+
+    @Test func archivedReportIsBoundToExactSavedBytes() throws {
+        let f = try Fixture(); let t = try f.begin(); try f.patch(t)
+        let report = DeclarationGateTests.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass", outcome: .applied, variant: "regular")
+        try t.saveReport(report)
+        let archive = try t.commit()
+        let bytes = try Data(contentsOf: archive.appendingPathComponent("report.json"))
+        let journal = try #require(try JSONSerialization.jsonObject(with: Data(contentsOf: archive.appendingPathComponent("journal.json"))) as? [String: Any])
+        #expect(journal["reportSHA256"] as? String == SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined())
+        #expect(try JSONDecoder().decode(PatchRunReport.self, from: bytes) == report)
+        #expect(journal["phase"] as? String == "committed")
+    }
+
+    @Test func requiredFailureReportCannotCommit() throws {
+        let f = try Fixture(); let t = try f.begin(); try f.patch(t)
+        try t.saveReport(DeclarationGateTests.report(step: "avpbooter.AVPBooterPatcher.patchDGSTBypass", outcome: .failed, variant: "regular"))
+        #expect(throws: (any Error).self) { try t.commit() }
+        try f.original()
+        #expect(try f.recover() != nil)
+    }
+
     @Test func externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() throws {
         let f = try Fixture(); let t = try f.begin(); try f.patch(t)
         let external = Data("external edit".utf8); try external.write(to: f.boot)

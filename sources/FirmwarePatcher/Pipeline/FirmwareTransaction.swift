@@ -21,6 +21,8 @@ final class FirmwareTransaction {
         let plan: VariantPlanResolver.VariantPlan?
         let versionInputs: FirmwareVersionInputs?
         let planBinding: FirmwarePlanBinding?
+        /// Exact saved run report bytes; absent in historical/manual transactions.
+        var reportSHA256: String? = nil
         var phase: Phase = .building
         var entries: [Entry]
         var failure: String?
@@ -162,7 +164,42 @@ final class FirmwareTransaction {
     }
 
     func saveReport(_ report: PatchRunReport) throws {
-        try Self.writeDurably(try Self.encoder.encode(report), to: root.appendingPathComponent("report.json"))
+        let bytes = try Self.encoder.encode(report)
+        guard bytes.count <= 64 << 20 else { throw Self.error("Firmware report exceeds 64 MiB") }
+        try Self.writeDurably(bytes, to: root.appendingPathComponent("report.json"))
+        journal.reportSHA256 = Self.sha256(bytes)
+        try validateReport(forCommit: false)
+        try saveJournal()
+    }
+
+    /// Reads the existing report; no applied set is inferred from enabled steps.
+    private func validateReport(forCommit: Bool) throws {
+        guard let expected = journal.reportSHA256 else { return }
+        let path = root.appendingPathComponent("report.json")
+        let fd = open(path.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard fd >= 0 else { throw Self.error("Recorded firmware report is unavailable") }
+        defer { close(fd) }
+        var before = stat(), after = stat()
+        guard fstat(fd, &before) == 0, before.st_mode & S_IFMT == S_IFREG, before.st_nlink == 1,
+              before.st_size >= 0, before.st_size <= 64 << 20 else { throw Self.error("Invalid firmware report file") }
+        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: false)
+        let bytes = try handle.read(upToCount: Int(before.st_size) + 1) ?? Data()
+        guard bytes.count == before.st_size, fstat(fd, &after) == 0,
+              before.st_dev == after.st_dev, before.st_ino == after.st_ino, before.st_size == after.st_size,
+              before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
+              before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
+              before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
+              before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec,
+              Self.sha256(bytes) == expected else { throw Self.error("Firmware report differs from journal") }
+        let report = try JSONDecoder().decode(PatchRunReport.self, from: bytes)
+        if forCommit {
+            guard report.failedRequired.isEmpty else { throw Self.error("Required patch failure in recorded report") }
+            if let plan = journal.plan { try PatchDeclarationGate.enforce(report: report, plan: plan) }
+        }
+    }
+
+    private static func sha256(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
     @discardableResult
@@ -170,6 +207,7 @@ final class FirmwareTransaction {
         try withWorkerLock {
             try mounts(root, false)
             try inject(.beforeReady)
+            try validateReport(forCommit: true)
             try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
             for index in journal.entries.indices {
                 let entry = journal.entries[index]
@@ -209,6 +247,7 @@ final class FirmwareTransaction {
             }
             try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
             try mounts(root, false)
+            try validateReport(forCommit: true)
             journal.phase = .committed
             try saveJournal()
             return try archive()
@@ -239,6 +278,7 @@ final class FirmwareTransaction {
         let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inject: inject, mounts: mounts)
         return try transaction.withWorkerLock {
             try mounts(transaction.root, true)
+            try transaction.validateReport(forCommit: false)
             try transaction.restoreOrVerify()
             return try transaction.archive()
         }
