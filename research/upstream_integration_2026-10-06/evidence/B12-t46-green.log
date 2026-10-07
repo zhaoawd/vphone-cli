@@ -1,0 +1,40 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[5/19] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCommandLine.swift
+[6/19] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[7/19] Emitting module VPhoneLaunchpadKit
+[8/19] Compiling VPhoneLaunchpadKit VPhoneLaunchpadLineReader.swift
+[9/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadHostSetup.swift
+[10/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreateCommand.swift
+[11/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineEdit.swift
+[12/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreation.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift:299:38: error: value of type 'VPhoneLaunchpadLineCollector' has no member 'lines'
+297 |         let code = await waiter.value
+298 |         exitStatus = code
+299 |         outputTail = Array(collector.lines.suffix(20))
+    |                                      `- error: value of type 'VPhoneLaunchpadLineCollector' has no member 'lines'
+300 |         VPhoneLaunchpadMachineLibrary.diagnostic("vm create pid \(child.processIdentifier) exited with status \(code)")
+301 |         await reloadProgress()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift:303:68: error: value of type 'VPhoneLaunchpadLineCollector' has no member 'lines'
+301 |         await reloadProgress()
+302 |         if code != 0, command?.kind == .resume {
+303 |             toolChange = VPhoneLaunchpadToolChange.parse(collector.lines)
+    |                                                                    `- error: value of type 'VPhoneLaunchpadLineCollector' has no member 'lines'
+304 |         }
+305 |         if let status = VPhoneLaunchpadCreateCommand.status(machine) {
+[13/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCoreBundle.swift
+[14/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadReadOnlyCommand.swift
+[15/26] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError

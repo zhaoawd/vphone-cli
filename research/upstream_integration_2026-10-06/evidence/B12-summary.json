@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-07",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "baseline": "7a13a9f206d3c3e87f9878ebce154969f3a698b2",
+  "implementation_head": "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762",
+  "advanced_tasks": [
+    "T36",
+    "T37",
+    "T39",
+    "T40",
+    "T46"
+  ],
+  "all_five_full_acceptance_passed": false,
+  "implementation_commits": {
+    "T36": [
+      "92eeb3afc70f2506b9a03d0e0bd5d6a0edfed7ef"
+    ],
+    "T37": [
+      "b1af6dd64e88cd90512951f5fd68ef02a46b7c20",
+      "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762"
+    ],
+    "T39": [
+      "c54a5e4df8cc3e77831b36988d6dab03e56e3c85"
+    ],
+    "T40": [
+      "7d6f45e03907ab2b0739f9083d338322eb8a89bb",
+      "94ec7976f2ad21e6bf59e867228a6f083a6a9304"
+    ],
+    "T46": [
+      "73272aa9f7c54ffbab2564fd935d27ff5bf3bff2",
+      "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762"
+    ]
+  },
+  "validation": {
+    "related_XCTest": 47,
+    "related_Swift_Testing_reported": 217,
+    "related_Swift_Testing_suites": 49,
+    "pass": true,
+    "whole_Launchpad_Kit_included": true,
+    "full_Swift_rerun": false,
+    "Python_rerun": false,
+    "firmware_rerun": false,
+    "VM_new_code_acceptance": false,
+    "new_signed_host_built": false
+  },
+  "failures_and_corrections": [
+    "T37 three failing liveness/history assertions reproduced unwanted SIGINT after Stop refusal.",
+    "T46 missing API RED followed by missing collector accessor compile error, corrected. Parallel combined run exceeded initial fixture startup wait; wait expanded; underlying scheduler cause not established.",
+    "T40 missing API RED followed by missing try at #require, corrected. Identical rewrite real regression failed and revision timestamps corrected.",
+    "T39 missing API RED followed by MainActor closure annotation compile error, corrected.",
+    "T36 missing API RED; state and real simulated session heartbeat notification pass.",
+    "First broad related run was interrupted (runner exit143) because original Stop-failure test awaited an implicit interrupt no longer sent; test updated to assert refusal preservation before explicit cleanup.",
+    "Foundation upToCount held pipe ready line until writer EOF; live test failed. POSIX read correction restored immediate line delivery.",
+    "Closed FileHandle descriptor getter caused uncaught NSException in negative fixture; new descriptor-level test uses captured closed fd. Orphan test child45991 exact identity checked and SIGINT cleaned; no VM signal.",
+    "Final related suite exited0; old unrelated full Swift/API limitations retained."
+  ],
+  "runtime": {
+    "source_head": "2387af2015f3e86dbddca43d9ba1a9b06344c4b0",
+    "pid": 92943,
+    "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+    "guest_payload_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "classic_guest_readback_verified": true,
+    "API_status": "reconnecting/transport; environment_status api_not_ready",
+    "frozen_artifact_files_verified": 599,
+    "kept_running": true,
+    "new_code_deployed": false,
+    "new_helper_or_security_action": false,
+    "vm_2607_operated": false
+  },
+  "old_evidence_verified": 542,
+  "immutable_inputs_verified": 3,
+  "new_evidence_entries_including_summary": 35,
+  "semantic_commit_ledger_sha256": "dc97478d216297cd026ab73e2b7c5b9f3ad75f5f2232e6a15e5fc7fc22fd73e1",
+  "semantic_commit_ledger_changed": false,
+  "counts": {
+    "accepted": 2,
+    "partial": 42,
+    "pending_local_audit": 2,
+    "deferred_optional": 1,
+    "required_unaccepted": 44
+  }
+}

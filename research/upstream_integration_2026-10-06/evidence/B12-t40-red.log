@@ -1,0 +1,72 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling deviceinterfaced.c
+[5/37] Compiling log.c
+[6/37] Compiling fdr.c
+[7/37] Compiling locking.c
+[8/37] Compiling ipsw.c
+[9/37] Compiling asr.c
+[10/37] Compiling download.c
+[11/37] Compiling idevicerestore.c
+[12/37] Compiling recovery.c
+[13/37] Compiling normal.c
+[14/37] Compiling limera1n.c
+[15/37] Compiling dfu.c
+[16/37] Compiling img3.c
+[17/37] Compiling ace3.c
+[18/37] Compiling img4.c
+[19/37] Compiling mbn.c
+[19/37] Compiling ftab.c
+[21/37] Compiling restore.c
+[22/37] Compiling fls.c
+[23/37] Compiling vphone_zip_stub.c
+[24/37] Compiling common.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Emitting module VPhoneLaunchpadKitTests
+[29/38] Compiling VPhoneLaunchpadKitTests BindingSnapshotTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift:13:67: error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+11 |         let old = Data(#"{"bundle":"2.6.1","guestEnvironment":"2.2.3","kernel":"2.6.0","bootChain":"2.2.3"}"#.utf8)
+12 |         try old.write(to: url)
+13 |         let snapshot = try #require(VPhoneLaunchpadMachineBinding.snapshot(machine))
+   |                                                                   `- error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+14 |         #expect(snapshot.binding.bundle == "2.6.1")
+15 |         #expect(snapshot.sha256.count == 64)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift:13:24: warning: no calls to throwing functions occur within 'try' expression
+11 |         let old = Data(#"{"bundle":"2.6.1","guestEnvironment":"2.2.3","kernel":"2.6.0","bootChain":"2.2.3"}"#.utf8)
+12 |         try old.write(to: url)
+13 |         let snapshot = try #require(VPhoneLaunchpadMachineBinding.snapshot(machine))
+   |                        `- warning: no calls to throwing functions occur within 'try' expression
+14 |         #expect(snapshot.binding.bundle == "2.6.1")
+15 |         #expect(snapshot.sha256.count == 64)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift:34:47: error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+32 |         try Data(#"{"bundle":"2.6.1"}"#.utf8).write(to: url)
+33 |         #expect(throws: (any Error).self) {
+34 |             try VPhoneLaunchpadMachineBinding.snapshot(machine, afterRead: {
+   |                                               `- error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+35 |                 try Data(#"{"bundle":"2.6.2"}"#.utf8).write(to: url)
+36 |             })
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift:44:51: error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+42 |         let machine = VPhoneLaunchpadMachinePath(libraryRoot: temp.url.path, name: "vm")
+43 |         try FileManager.default.createDirectory(at: machine.url, withIntermediateDirectories: true)
+44 |         #expect(try VPhoneLaunchpadMachineBinding.snapshot(machine) == nil)
+   |                                                   `- error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+45 |         try Data(#"{"bundle":"../../escape"}"#.utf8).write(to: machine.url.appendingPathComponent("launchpad.json"))
+46 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadMachineBinding.snapshot(machine) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift:46:79: error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+44 |         #expect(try VPhoneLaunchpadMachineBinding.snapshot(machine) == nil)
+45 |         try Data(#"{"bundle":"../../escape"}"#.utf8).write(to: machine.url.appendingPathComponent("launchpad.json"))
+46 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadMachineBinding.snapshot(machine) }
+   |                                                                               `- error: type 'VPhoneLaunchpadMachineBinding' has no member 'snapshot'
+47 |     }
+48 | }
+error: fatalError

@@ -1,0 +1,80 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling vphone_zip_stub.c
+[5/37] Compiling locking.c
+[6/37] Compiling deviceinterfaced.c
+[7/37] Compiling common.c
+[8/37] Compiling ipsw.c
+[9/37] Compiling idevicerestore.c
+[10/37] Compiling fdr.c
+[11/37] Compiling download.c
+[12/37] Compiling asr.c
+[13/37] Compiling recovery.c
+[14/37] Compiling restore.c
+[15/37] Compiling normal.c
+[16/37] Compiling limera1n.c
+[17/37] Compiling dfu.c
+[18/37] Compiling img3.c
+[19/37] Compiling img4.c
+[20/37] Compiling ace3.c
+[21/37] Compiling ftab.c
+[22/37] Compiling mbn.c
+[23/37] Compiling fls.c
+[24/37] Compiling log.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Emitting module VPhoneLaunchpadKitTests
+[29/38] Compiling VPhoneLaunchpadKitTests OutputCompletionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift:21:28: error: value of type 'VPhoneLaunchpadCommandResult' has no member 'outputDrained'
+19 |         for (name, result) in [("first", try await first), ("second", try await second)] {
+20 |             #expect(result.status == 0)
+21 |             #expect(result.outputDrained)
+   |                            `- error: value of type 'VPhoneLaunchpadCommandResult' has no member 'outputDrained'
+22 |             #expect(result.omittedLineCount == 501)
+23 |             #expect(result.lines.count == 4000)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift:22:28: error: value of type 'VPhoneLaunchpadCommandResult' has no member 'omittedLineCount'
+20 |             #expect(result.status == 0)
+21 |             #expect(result.outputDrained)
+22 |             #expect(result.omittedLineCount == 501)
+   |                            `- error: value of type 'VPhoneLaunchpadCommandResult' has no member 'omittedLineCount'
+23 |             #expect(result.lines.count == 4000)
+24 |             #expect(result.lines.allSatisfy { $0.hasPrefix(name + ":") })
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift:32:108: error: value of tuple type '()' has no member 'failed'
+30 |         let pipe = Pipe()
+31 |         try pipe.fileHandleForReading.close()
+32 |         #expect(VPhoneLaunchpadLineReader.readLines(from: pipe.fileHandleForReading, onLine: { _ in }) == .failed)
+   |                                                                                                            `- error: value of tuple type '()' has no member 'failed'
+33 |         try pipe.fileHandleForWriting.close()
+34 |         let empty = Pipe()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift:36:109: error: value of tuple type '()' has no member 'drained'
+34 |         let empty = Pipe()
+35 |         try empty.fileHandleForWriting.close()
+36 |         #expect(VPhoneLaunchpadLineReader.readLines(from: empty.fileHandleForReading, onLine: { _ in }) == .drained)
+   |                                                                                                             `- error: value of tuple type '()' has no member 'drained'
+37 |     }
+38 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift:40:88: error: extra argument 'outputDrained' in call
+38 | 
+39 |     @Test func exitZeroWithReadFailureIsNotACompleteCommand() {
+40 |         let result = VPhoneLaunchpadCommandResult(status: 0, lines: [], outputDrained: false)
+   |                                                                                        `- error: extra argument 'outputDrained' in call
+41 |         #expect(!result.succeeded)
+42 |         let history = VPhoneLaunchpadCommandHistory()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift:44:54: error: extra argument 'outputDrained' in call
+42 |         let history = VPhoneLaunchpadCommandHistory()
+43 |         let id = history.record("operation")
+44 |         history.finish(id, status: 0, outputDrained: false)
+   |                                                      `- error: extra argument 'outputDrained' in call
+45 |         #expect(history.entries[0].outcome == .failed)
+46 |         #expect(history.entries[0].status == 0)
+error: fatalError

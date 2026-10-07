@@ -1,0 +1,200 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling locking.c
+[5/37] Compiling download.c
+[6/37] Compiling fdr.c
+[7/37] Compiling deviceinterfaced.c
+[8/37] Compiling ipsw.c
+[9/37] Compiling asr.c
+[10/37] Compiling recovery.c
+[11/37] Compiling normal.c
+[12/37] Compiling idevicerestore.c
+[13/37] Compiling limera1n.c
+[14/37] Compiling dfu.c
+[15/37] Compiling img3.c
+[16/37] Compiling img4.c
+[17/37] Compiling ace3.c
+[18/37] Compiling mbn.c
+[19/37] Compiling ftab.c
+[20/37] Compiling restore.c
+[21/37] Compiling fls.c
+[22/37] Compiling log.c
+[23/37] Compiling vphone_zip_stub.c
+[24/37] Compiling common.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling VPhoneAPIKitTests StartupUnlockTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:19:22: error: cannot find 'VPhoneStartupUnlock' in scope
+17 |     @Test func defaultOffAndEnablingCurrentInstanceDoesNotUnlock() async throws {
+18 |         var calls = 0
+19 |         let unlock = VPhoneStartupUnlock { _, _, _ in calls += 1; return .object(["was_locked": .bool(true)]) }
+   |                      `- error: cannot find 'VPhoneStartupUnlock' in scope
+20 |         let first = try snapshot()
+21 |         unlock.observe(first)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:19:75: error: cannot infer contextual base in reference to member 'object'
+17 |     @Test func defaultOffAndEnablingCurrentInstanceDoesNotUnlock() async throws {
+18 |         var calls = 0
+19 |         let unlock = VPhoneStartupUnlock { _, _, _ in calls += 1; return .object(["was_locked": .bool(true)]) }
+   |                                                                           `- error: cannot infer contextual base in reference to member 'object'
+20 |         let first = try snapshot()
+21 |         unlock.observe(first)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:19:98: error: type 'Any' has no member 'bool'
+17 |     @Test func defaultOffAndEnablingCurrentInstanceDoesNotUnlock() async throws {
+18 |         var calls = 0
+19 |         let unlock = VPhoneStartupUnlock { _, _, _ in calls += 1; return .object(["was_locked": .bool(true)]) }
+   |                                                                                                  `- error: type 'Any' has no member 'bool'
+20 |         let first = try snapshot()
+21 |         unlock.observe(first)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:28:9: warning: no 'async' operations occur within 'await' expression
+26 |         let next = try snapshot()
+27 |         unlock.observe(next)
+28 |         await unlock.operation?.value
+   |         `- warning: no 'async' operations occur within 'await' expression
+29 |         #expect(calls == 1)
+30 |         unlock.observe(try snapshot(UUID(uuidString: next.health!.instanceID!)!))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:37:26: error: cannot find 'VPhoneStartupUnlock' in scope
+35 |     @Test func setupPendingUnknownAndMissingCapabilitySkipAutomaticWork() async throws {
+36 |         for setup: VPhoneJSONValue? in [nil, .bool(true)] {
+37 |             let unlock = VPhoneStartupUnlock(enabled: true) { _, _, _ in Issue.record("unlock must be skipped"); return .null }
+   |                          `- error: cannot find 'VPhoneStartupUnlock' in scope
+38 |             unlock.observe(try snapshot(setup: setup))
+39 |             #expect(unlock.operation == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:37:122: error: cannot infer contextual base in reference to member 'null'
+35 |     @Test func setupPendingUnknownAndMissingCapabilitySkipAutomaticWork() async throws {
+36 |         for setup: VPhoneJSONValue? in [nil, .bool(true)] {
+37 |             let unlock = VPhoneStartupUnlock(enabled: true) { _, _, _ in Issue.record("unlock must be skipped"); return .null }
+   |                                                                                                                          `- error: cannot infer contextual base in reference to member 'null'
+38 |             unlock.observe(try snapshot(setup: setup))
+39 |             #expect(unlock.operation == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:41:22: error: cannot find 'VPhoneStartupUnlock' in scope
+39 |             #expect(unlock.operation == nil)
+40 |         }
+41 |         let unlock = VPhoneStartupUnlock(enabled: true) { _, _, _ in Issue.record("missing capability"); return .null }
+   |                      `- error: cannot find 'VPhoneStartupUnlock' in scope
+42 |         unlock.observe(try snapshot(caps: ["session_identity", "display"]))
+43 |         #expect(unlock.operation == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:41:114: error: cannot infer contextual base in reference to member 'null'
+39 |             #expect(unlock.operation == nil)
+40 |         }
+41 |         let unlock = VPhoneStartupUnlock(enabled: true) { _, _, _ in Issue.record("missing capability"); return .null }
+   |                                                                                                                  `- error: cannot infer contextual base in reference to member 'null'
+42 |         unlock.observe(try snapshot(caps: ["session_identity", "display"]))
+43 |         #expect(unlock.operation == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:49:22: error: cannot find 'VPhoneStartupUnlock' in scope
+47 |     @Test func earlyUnlockedStateIsObservedBeforeLaterLockAndRetry() async throws {
+48 |         var calls: [String] = []
+49 |         let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { method, _, _ in
+   |                      `- error: cannot find 'VPhoneStartupUnlock' in scope
+50 |             calls.append(method)
+51 |             if method == "device.screen" { return .object(["locked": .bool(true)]) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:49:66: error: cannot infer contextual base in reference to member 'init'
+47 |     @Test func earlyUnlockedStateIsObservedBeforeLaterLockAndRetry() async throws {
+48 |         var calls: [String] = []
+49 |         let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { method, _, _ in
+   |                                                                  `- error: cannot infer contextual base in reference to member 'init'
+50 |             calls.append(method)
+51 |             if method == "device.screen" { return .object(["locked": .bool(true)]) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:49:80: error: cannot infer contextual base in reference to member 'milliseconds'
+47 |     @Test func earlyUnlockedStateIsObservedBeforeLaterLockAndRetry() async throws {
+48 |         var calls: [String] = []
+49 |         let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { method, _, _ in
+   |                                                                                `- error: cannot infer contextual base in reference to member 'milliseconds'
+50 |             calls.append(method)
+51 |             if method == "device.screen" { return .object(["locked": .bool(true)]) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:49:105: error: cannot infer contextual base in reference to member 'milliseconds'
+47 |     @Test func earlyUnlockedStateIsObservedBeforeLaterLockAndRetry() async throws {
+48 |         var calls: [String] = []
+49 |         let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { method, _, _ in
+   |                                                                                                         `- error: cannot infer contextual base in reference to member 'milliseconds'
+50 |             calls.append(method)
+51 |             if method == "device.screen" { return .object(["locked": .bool(true)]) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:55:9: warning: no 'async' operations occur within 'await' expression
+53 |         }
+54 |         unlock.observe(try snapshot())
+55 |         await unlock.operation?.value
+   |         `- warning: no 'async' operations occur within 'await' expression
+56 |         #expect(calls == ["screen.unlock", "device.screen", "screen.unlock"])
+57 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:63:26: error: cannot find 'VPhoneStartupUnlock' in scope
+61 |             var blocked: CheckedContinuation<VPhoneJSONValue, any Error>?
+62 |             var calls = 0
+63 |             let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { _, _, _ in
+   |                          `- error: cannot find 'VPhoneStartupUnlock' in scope
+64 |                 calls += 1
+65 |                 return try await withCheckedThrowingContinuation { blocked = $0 }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:63:70: error: cannot infer contextual base in reference to member 'init'
+61 |             var blocked: CheckedContinuation<VPhoneJSONValue, any Error>?
+62 |             var calls = 0
+63 |             let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { _, _, _ in
+   |                                                                      `- error: cannot infer contextual base in reference to member 'init'
+64 |                 calls += 1
+65 |                 return try await withCheckedThrowingContinuation { blocked = $0 }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:63:84: error: cannot infer contextual base in reference to member 'milliseconds'
+61 |             var blocked: CheckedContinuation<VPhoneJSONValue, any Error>?
+62 |             var calls = 0
+63 |             let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { _, _, _ in
+   |                                                                                    `- error: cannot infer contextual base in reference to member 'milliseconds'
+64 |                 calls += 1
+65 |                 return try await withCheckedThrowingContinuation { blocked = $0 }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:63:109: error: cannot infer contextual base in reference to member 'milliseconds'
+61 |             var blocked: CheckedContinuation<VPhoneJSONValue, any Error>?
+62 |             var calls = 0
+63 |             let unlock = VPhoneStartupUnlock(enabled: true, timing: .init(window: .milliseconds(50), poll: .milliseconds(1))) { _, _, _ in
+   |                                                                                                             `- error: cannot infer contextual base in reference to member 'milliseconds'
+64 |                 calls += 1
+65 |                 return try await withCheckedThrowingContinuation { blocked = $0 }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:74:37: error: cannot infer contextual base in reference to member 'init'
+72 |             switch action {
+73 |             case 0: unlock.stop()
+74 |             case 1: unlock.observe(.init(vmInstanceID: "vm", state: .reconnecting, generation: nil, health: nil, errorCode: "transport"))
+   |                                     `- error: cannot infer contextual base in reference to member 'init'
+75 |             case 2: unlock.setEnabled(false)
+76 |             default:
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:74:70: error: cannot infer contextual base in reference to member 'reconnecting'
+72 |             switch action {
+73 |             case 0: unlock.stop()
+74 |             case 1: unlock.observe(.init(vmInstanceID: "vm", state: .reconnecting, generation: nil, health: nil, errorCode: "transport"))
+   |                                                                      `- error: cannot infer contextual base in reference to member 'reconnecting'
+75 |             case 2: unlock.setEnabled(false)
+76 |             default:
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:74:96: error: 'nil' requires a contextual type
+72 |             switch action {
+73 |             case 0: unlock.stop()
+74 |             case 1: unlock.observe(.init(vmInstanceID: "vm", state: .reconnecting, generation: nil, health: nil, errorCode: "transport"))
+   |                                                                                                `- error: 'nil' requires a contextual type
+75 |             case 2: unlock.setEnabled(false)
+76 |             default:
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/StartupUnlockTests.swift:74:109: error: 'nil' requires a contextual type
+72 |             switch action {
+73 |             case 0: unlock.stop()
+74 |             case 1: unlock.observe(.init(vmInstanceID: "vm", state: .reconnecting, generation: nil, health: nil, errorCode: "transport"))
+   |                                                                                                             `- error: 'nil' requires a contextual type
+75 |             case 2: unlock.setEnabled(false)
+76 |             default:
+[29/37] Emitting module VPhoneAPIKitTests
+error: fatalError

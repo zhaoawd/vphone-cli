@@ -484,3 +484,26 @@ vm-new 继续运行 B09 冻结的源码 `2387af20` 候选，PID 92943、instance
 客户机没有 notifyutil 和 log。日志采集中的 `log show | tail` 最终退出 0，但 stderr 为 log not found，不能记为日志读取通过。另在确认 su 与 uid=501(mobile) 存在后，以 mobile 身份运行一次 uiopen，命令退出 0，立即进程样本无 PID；最终独立样本仍没有 Settings/Safari 进程。用户 ID 变化没有证明可用启动路径，Mach bootstrap 或运行时权限原因仍未确定。没有输入密码或更改账号、服务配置。classic 通信仍可用，API 为 reconnecting/transport，environment_status 为 api_not_ready。
 
 追加前核对原有 524 份证据与 3 份输入副本的已提交字节；本轮新增 18 份证据。47 项台账为 2 项 accepted、42 项部分推进、2 项待本地对账（T30/T31）、1 项可选延期，44 项必选仍未验收。固定上游提交覆盖台账未改变，vm-2607 未操作。证据入口：`evidence/B11-summary.json`、`evidence/B11-source-review.json`、`evidence/B11-app-boundary.json`。
+
+
+### 2026-10-07 B12：五项状态管理与宿主接入
+
+本轮推进 T36、T37、T39、T40、T46，仍为部分完成。实现终点 `c1cb3099ee62be0f4fc1ce9e17052252cb0ca762`，固定上游目标保持 `2d21d21`。本轮七个本地提交分别记录五项实现及两处复查修正，不据此调整上游语义提交覆盖数量。
+
+| 任务 | 本轮结果 | 剩余范围 |
+| --- | --- | --- |
+| T36 自动解锁 | direct boot 新增默认关闭的 `--unlock-at-startup`；可信 instance/hash/generation 去重；启用不立即解锁当前实例；Setup Assistant unknown/pending 跳过；停止、断线、换连接和关闭后旧任务失效；与手动宿主输入共用队列 | 当前 daemon 缺少 setup_pending 提供方；持久配置、菜单/Launchpad/vm launch 转发和真实锁屏、密码、启动/重启验收 |
+| T37 停止 | CLI Stop 失败后不再追加 SIGINT；成功时保留 launch wrapper 清理；真实测试子进程与既有关机策略通过 | API guest-first、更新/备份冲突与磁盘释放、真实关机和旧 guest/DFU/panic |
+| T39 剪贴板 | 窗口焦点与连接观察接入 classic；本连接可靠计数基线；连接、修改和焦点代际及 Mac changeCount 淘汰旧回复；自动 type/set 后重建基线；原文本 1 MiB/图片 16 MiB 限制保留 | Cmd C/X/V 传输入口、API 分开图片下载的第二次 await、真实图片/rich text/快速切窗/重启 |
+| T40 绑定 | 快照冻结 SHA-256、device/inode、mtime/ctime；检测读取期间同长度改写和路径替换；同字节重写也使旧快照失效；现有来源读取复用该检查 | 执行路由/可执行文件校验、持久化/迁移备份/创建冻结、clone/export 和四层更新收据；快照不是原子事务 |
+| T46 日志 | 分开退出码、同步 reader callback 排空和显示列表省略行数；启动/创建/命令历史接入完成状态；并发归属、尾部、EOF/读取错误与即时 pipe 输出通过 | 异步批量 writer、完整 helper/client 协议与 ACK、30 秒超时/断线/写失败/应用退出、UI 和真实 VM 吞吐 |
+
+最终联合验证命令覆盖完整 VPhoneLaunchpadKitTests、Clipboard、StartupUnlock、APIWire、HostCommandExecutor、HostRPC、VMStop/Shutdown 以及两项模拟 API 会话测试。XCTest 47 项、Swift Testing 报告 217 项/49 个 suite，退出 0。单项还运行了 classic guest transport 全部 18 项。没有运行完整 Swift/Python/固件套件；此前完整 Swift/API 的未解决结果保留，未声称通过。来源和本地适配见 `evidence/B12-source-review.json`，8 个上游参考文件都来自固定 SHA，24 个本地变更文件分别记录摘要。
+
+本轮保留全部失败记录。T37 初始用例以 3 个断言复现停止拒绝后的多余 SIGINT。T40 同字节重写最初仍匹配旧快照，回归失败后加入 mtime/ctime。T46 首次接口改动遗漏 collector.lines，已修正；另一个并行用例未在最初等待期限内生成 child.pid，等待期限扩大，调度原因未确定。T39 初次异步读取闭包缺少 MainActor 标注，T40 初次 #require 缺少 try；修正后通过。缺新类型的编译 RED 只证明接口尚未存在，不作为行为缺陷复现。
+
+首次完整 Kit 联合运行卡在原用例 `failedStopIsReportedAndOwnChildStillInterrupted`：它等待新的拒绝语义不会发送的 SIGINT。已终止该次测试 runner（退出 143），清理该用例的独立子进程；旧用例改为先验证仍运行且日志无 SIGINT，再显式清理夹具。该次运行不计为通过。新增 pipe 用例随后在 2 秒内收不到 ready 行，确认本轮 Foundation read(upToCount:) 等待更多字节导致即时输出退化；改为 POSIX read，保留 EINTR、EOF、读取失败区分。错误夹具直接读取已关闭 FileHandle 的 descriptor 时发生 NSException；现在在关闭前保存 descriptor，用 POSIX 读取复现失败，生产 reader 由 child 持有打开的 FileHandle。异常测试留下的 PID 45991 经完整命令和脚本摘要核对后 SIGINT 清理。最终实时输出等 32 项和最终联合验证通过，没有向 VM 发送信号。
+
+vm-new 的本轮操作为有 PID/instance 限制的只读 capabilities、environment_status、进程采样和 daemon 文件摘要核对。VM 仍为 B09 冻结源码 `2387af20`、PID 92943、instance `068574F6-DEF3-4910-88AB-57F5330C7A02`；classic 连接与原 daemon 摘要匹配，API 仍 reconnecting/transport、environment_status 为 api_not_ready。599 个冻结文件以及配置、身份预测和客户机载荷摘要保持一致。新源码没有打包/签名/部署，没有新的 amfid/helper/security 操作、guest/kernel 写入或 vm-2607 操作；主仓库仍为 e8d825b3 且干净。因此本轮测试不证明新代码在当前运行 VM 上生效，也没有补齐此前应用启动问题的验收。
+
+追加前再次验证原 542 份已提交证据和 3 份不可变输入副本，保留原任务依赖、步骤、接口、验收与回退条件。47 项状态保持 2 项 accepted、42 项部分推进、2 项待本地对账（T30/T31）、1 项可选延期，44 项必选仍未验收。证据入口：`evidence/B12-summary.json`、`evidence/B12-related-green.log`、`evidence/B12-final-state.json`。
