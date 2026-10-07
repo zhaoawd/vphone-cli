@@ -55,7 +55,7 @@ GPU_PROVENANCE := $(STAGE)/gpu/README.md
 
 # Directory timestamps also catch files removed from the wildcard inputs.
 
-.PHONY: all gpu package test-loader-links test-vcam-dataplane clean
+.PHONY: all gpu package test-loader-links test-vcam-dataplane test-virtiosound clean
 
 all: $(ARTIFACTS) $(PLISTS) $(GPU_PROVENANCE)
 
@@ -81,6 +81,27 @@ test-vcam-dataplane:
 		-framework CoreMedia -framework CoreVideo -framework CoreFoundation \
 		-framework CoreGraphics
 	@$(OUT)/VCamDataPlaneTests
+
+test-virtiosound:
+	../../.venv/bin/python3 -B ../../scripts/check_virtio_sound.py
+	@mkdir -p $(OUT)
+	xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o $(OUT)/VirtIOSoundTests \
+		Tests/VirtIOSoundTests.c VirtIOSound/VPVirtIOSoundProtocol.c VirtIOSound/VPVirtIOSoundRing.c \
+		VirtIOSound/VPVirtIOSoundFilter.c
+	@$(OUT)/VirtIOSoundTests
+	xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o $(OUT)/VirtIOSoundClockTests \
+		Tests/VirtIOSoundClockTests.c VirtIOSound/VPVirtIOSoundClock.c
+	@$(OUT)/VirtIOSoundClockTests
+	xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o $(OUT)/VirtIOSoundConverterTests \
+		Tests/VirtIOSoundConverterTests.c VirtIOSound/VPVirtIOSoundConverter.c
+	@$(OUT)/VirtIOSoundConverterTests
+	xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o $(OUT)/VirtIOSoundLatencyTests \
+		Tests/VirtIOSoundLatencyTests.c VirtIOSound/VPVirtIOSoundLatency.c
+	@$(OUT)/VirtIOSoundLatencyTests
 
 $(STAGE)/camfix $(STAGE)/locationfix $(STAGE)/vcamcaptured $(STAGE)/launchhook $(STAGE)/systemhook $(STAGE)/gpu:
 	@mkdir -p $@

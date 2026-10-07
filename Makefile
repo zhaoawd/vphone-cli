@@ -141,7 +141,7 @@ help:
 	@echo "  make test_python / test_swift Run one firmware-free language suite"
 	@echo "  make test_fixtures           Check comparison fixture presence; does not run tests"
 	@echo "  make guest_components_build Build isolated upstream guest dylib candidates; does not install"
-	@echo "  make test_guest_components  Run host loader-link and camera data-plane checks"
+	@echo "  make test_guest_components  Run host loader-link, camera and audio algorithm checks"
 	@echo "  make test_firmware           Run Swift firmware comparisons; fails if fixtures are missing"
 	@echo "    VPHONE_TEST_FIXTURES=/path  Override ipsws/patch_refactor_input"
 	@echo "  make test_jb_patches         Run all JB kernel patches (incl. Sandbox) over every supported cloudOS kernel"
@@ -308,7 +308,7 @@ guest_components_build:
 	zsh $(SCRIPTS)/build_guest_components.sh
 
 test_guest_components:
-	$(MAKE) -C sources/VPhoneGuestComponents test-loader-links test-vcam-dataplane
+	$(MAKE) -C sources/VPhoneGuestComponents test-loader-links test-vcam-dataplane test-virtiosound
 
 # Cross-compile + sign vphoned daemon for iOS arm64 (requires ldid)
 .PHONY: vphoned
