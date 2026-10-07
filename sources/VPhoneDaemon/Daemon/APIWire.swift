@@ -30,9 +30,15 @@ enum APIWire {
                 } else {
                     (error is GuestAPIError ? "invalid_operation" : "operation_failed", String(describing: error))
                 }
+            let details: [String: Any]?
+            if let icli = error as? IcliError, case let .commandFailed(output) = icli {
+                details = output
+            } else {
+                details = nil
+            }
             return .json(status: 400, [
                 "type": "response", "id": request.id ?? NSNull(),
-                "error": ["code": code, "message": message],
+                "error": GuestOperationFailure.response(code: code, message: message, details: details),
             ])
         }
     }
