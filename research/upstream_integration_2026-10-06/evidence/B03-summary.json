@@ -1,0 +1,92 @@
+{
+  "commits": {
+    "T11": "345a7969b1e199e1d1e246de273b5f3538fd8012",
+    "T12": "fea969e98713923d0b49a63c28dc9f400be2ba21",
+    "T14": "de12a67930fe4ffa522faef23508b82b40472ee4"
+  },
+  "tasks": [
+    "T11",
+    "T12",
+    "T14"
+  ],
+  "accepted": false,
+  "tests": {
+    "focused": {
+      "tests": 40,
+      "suites": 4,
+      "passed": true,
+      "seconds": 0.734
+    },
+    "related": {
+      "tests": 694,
+      "suites": 89,
+      "passed": true,
+      "seconds": 88.855
+    },
+    "firmware": {
+      "tests": 15,
+      "suites": 12,
+      "passed": true,
+      "seconds": 41.764
+    }
+  },
+  "red": {
+    "T11_binding": {
+      "tests": 5,
+      "issues": 8
+    },
+    "T11_build": {
+      "tests": 2,
+      "issues": 4
+    },
+    "T14_marker": {
+      "tests": 3,
+      "issues": 8
+    }
+  },
+  "corrected_tool_errors": [
+    "T11 test missing inner try",
+    "Any test arguments not Sendable",
+    "run_tests.py requires positional firmware, not --suite"
+  ],
+  "T11": {
+    "journal_schema": 2,
+    "binding_schema": 1,
+    "plan_digest": true,
+    "context_digest": true,
+    "vm_directory_identity": "dev:ino",
+    "config_binding": "whole file SHA-256, nil only if absent; bounded NOFOLLOW read",
+    "catalog_revision": "upstream-2.2.3",
+    "catalog_entries": 119,
+    "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+    "input_binding": "journal original root digests plus manifest byte digests/ProductVersion/ProductBuildVersion",
+    "legacy": "explicit version1 recovery retained, not upgraded, not reusable plan authorization",
+    "recovery": "validates stored binding/config/directory and known backup/output; independent of current catalog",
+    "publication": "also requires current catalog and config/directory to match",
+    "remaining": "desired-plan import/store, stable runtime machine identity and disk/generation linkage, unknown old VM update eligibility"
+  },
+  "T12_test_limit": "synthetic ROM/patch stage; no real firmware idempotence or VM behavior established",
+  "T14": "same completion marker format; UUID exclusive NOFOLLOW temp, anchored rename/readback/fsync and owned-inode cleanup; SHA-256 ASCII hex validation",
+  "vm_new": {
+    "operation_performed": false,
+    "pid_observed": 69566,
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+  },
+  "signed_bundle": {
+    "rebuilt_or_deployed": false,
+    "vm_sha256": "40b283470ea099080aee54b9378368bc130a0e0f01423bcd87528e593efc4a11",
+    "codesign_verify_passed": true
+  },
+  "full_swift_rerun": false,
+  "full_swift_limit": "previous default16 issues and serial HTTP waitUntilExit interruption retained; cause unknown",
+  "counts": {
+    "total": 47,
+    "required": 46,
+    "accepted": 2,
+    "partial": 13,
+    "pending_audit": 31,
+    "optional_deferred": 1,
+    "required_unaccepted": 44
+  }
+}

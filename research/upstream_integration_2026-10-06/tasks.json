@@ -1483,7 +1483,7 @@
       "dependencies": [
         "T10"
       ],
-      "status": "canonical_plan_serialization_validated_c2_binding_pending",
+      "status": "transaction_context_binding_validated_desired_store_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
@@ -1503,7 +1503,7 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "canonical_serialization_and_transaction_evidence_validated_c2_pending",
+        "state": "bound_transaction_record_validated_c2_import_generation_pending",
         "paths": [
           "sources/vphone-cli/VPhoneFWCLI.swift",
           "sources/vphone-cli/VPhoneCreateLiveStages.swift",
@@ -1512,13 +1512,16 @@
           "sources/FirmwarePatcher/Pipeline/FirmwareVersionInputs.swift",
           "tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift",
           "sources/FirmwarePatcher/PatchSet/VariantPlanSerialization.swift",
-          "tests/FirmwarePatcherTests/VariantPlanSerializationTests.swift"
+          "tests/FirmwarePatcherTests/VariantPlanSerializationTests.swift",
+          "sources/FirmwarePatcher/Pipeline/FirmwarePlanBinding.swift",
+          "tests/FirmwarePatcherTests/FirmwarePlanBindingTests.swift"
         ]
       },
       "implementation_commits": [
         "0c73f59f5065bca9917a527b44099a23f00b6684",
         "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
-        "3cd5b5949a54f706fba432351b207bfae68b857b"
+        "3cd5b5949a54f706fba432351b207bfae68b857b",
+        "345a7969b1e199e1d1e246de273b5f3538fd8012"
       ],
       "verification_evidence": [
         "evidence/T11-version-inputs-red.log",
@@ -1547,14 +1550,19 @@
         "evidence/T11-canonical-cli.json",
         "evidence/T11-canonical-cli.py",
         "evidence/T11-canonical-cli-initial.py",
-        "evidence/T11-canonical-summary.json"
+        "evidence/T11-canonical-summary.json",
+        "evidence/B03-source-review.json",
+        "evidence/B03-summary.json",
+        "evidence/B03-related.log",
+        "evidence/B03-focused-green.log",
+        "evidence/B03-firmware.log"
       ],
       "historical_evidence": [],
-      "current_result": "现有事务 journal 保存本次解析计划和两份版本 manifest 的原始字节 SHA/版本；暂存输入必须匹配，读取拒绝损坏、权限拒绝及无法识别版本。历史缺新字段 journal 保留恢复。未形成完整 C2 持久化计划，记录不作为重新执行授权。 计划 enabledSteps 已排序编码，重复值解码拒绝；旧无重复的数组兼容。4 项红绿回归、269 项相关测试与 43 项检查点测试通过，8 个独立 CLI 进程完整 JSON 摘要一致。未新增持久化授权或配置源。",
+      "current_result": "新解析事务使用 journal version 2 和 binding schema 1，绑定目录 dev:ino、配置原字节摘要、mode/gates、计划摘要、真实 119 项 catalog 摘要及 revision、固定 target、原始输入根摘要和两份 manifest 的 version/build/字节摘要。缺失、不可读、损坏、未知 schema、binding/VM 不匹配分别拒绝。version 1 保留显式恢复，不自动升级或赋予计划重执行资格。694 项相关测试和 15 项固件比较通过；desired store、稳定运行身份及磁盘/generation 对应仍待实现。",
       "remaining_work": [
-        "绑定稳定 VM 身份、mode、build/digest、catalog/固定 target、schema 与 planDigest",
-        "missing/corrupt/unsupported/已识别 legacy 分别表达，禁止解码失败后宽松默认",
-        "复用原记录做原子迁移，绑定磁盘/generation，迁移备份与恢复验收"
+        "复用原记录做 desired-plan 原子保存/显式导入，保留迁移前记录",
+        "首次启动前后与 legacy VM 的稳定运行身份和更新资格",
+        "绑定实际磁盘/generation，验收迁移备份与恢复；事务证据不作为重新执行授权"
       ]
     },
     {
@@ -1572,7 +1580,7 @@
         "T03",
         "T11"
       ],
-      "status": "pending_local_audit",
+      "status": "source_lifecycle_audited_checkpoint_controls_validated_generation_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineOriginals.swift",
         "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift"
@@ -1593,12 +1601,34 @@
         "core"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "checkpoint_regeneration_slice_verified_originals_generation_pending",
+        "paths": [
+          "sources/vphone-cli/VPhoneNativeFirmwarePreparer.swift",
+          "sources/vphone-cli/VPhoneCreateLiveStages.swift",
+          "sources/VPhoneCore/VPhoneCreateCheckpoint.swift",
+          "sources/VPhoneCore/VPhoneCreateCheckpointStore.swift",
+          "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+          "tests/VPhoneCLITests/NativeFirmwarePrepareTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "fea969e98713923d0b49a63c28dc9f400be2ba21"
+      ],
+      "verification_evidence": [
+        "evidence/B03-source-review.json",
+        "evidence/B03-summary.json",
+        "evidence/B03-related.log",
+        "evidence/B03-focused-green.log",
+        "evidence/B03-firmware.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "固定目标原件与 prepare 的生命周期已读取对账。现有 checkpoint 不允许在已补丁树上直接更换计划；显式 prepare 从归档重新提取，新树发布后保存旧树。新增合成补丁阶段的 A→A→B→A 和坏归档保全测试通过；不证明真实固件重复补丁或 VM 行为。未引入上游先存当前文件、先删除旧 Originals 的路径。",
+      "remaining_work": [
+        "trusted FirmwareOriginals generation manifest and full original byte digests",
+        "device/GPU/planDigest linkage",
+        "same-plan repeated fw patch from Originals without prepare",
+        "real firmware and VM acceptance"
+      ]
     },
     {
       "id": "T13",
@@ -1661,7 +1691,7 @@
         "T05",
         "T24"
       ],
-      "status": "pending_local_audit",
+      "status": "ipsw_cache_audited_marker_publication_fixed_gpu_pending",
       "upstream_paths": [
         "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift",
         "VPhoneKit/VPhoneCoreKit/Firmware/VPhoneResources.swift"
@@ -1682,12 +1712,34 @@
         "core"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "existing_ipsw_cache_reused_marker_guard_validated_gpu_pending",
+        "paths": [
+          "sources/VPhoneCore/VPhoneIPSWCache.swift",
+          "sources/VPhoneCore/VPhoneIPSWCacheAdoption.swift",
+          "sources/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
+          "scripts/ipsw_cache_entry.py",
+          "tests/VPhoneCoreTests/IPSWCacheTests.swift",
+          "tests/VPhoneCoreTests/IPSWCacheAdoptionTests.swift",
+          "tests/VPhoneCoreTests/IPSWCacheMarkerSafetyTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "de12a67930fe4ffa522faef23508b82b40472ee4"
+      ],
+      "verification_evidence": [
+        "evidence/B03-source-review.json",
+        "evidence/B03-summary.json",
+        "evidence/B03-related.log",
+        "evidence/B03-focused-green.log",
+        "evidence/B03-firmware.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "复用现有 source marker、流式下载、Range/If-Range 续传、并发发布和 PID 清理。marker 写入改为 UUID 专属 O_EXCL/O_NOFOLLOW 临时文件、目录 fd 限定、读回、原子替换、目录同步及 inode 限定清理；摘要要求 64 位 ASCII 十六进制。相关测试包含真实本机 HTTP 下载与并发；GPU 工件缓存及宿主权限复核仍待执行。",
+      "remaining_work": [
+        "GPU derived-cache key/source/manifest integration",
+        "upstream remote ZIP member-range interface not found in local archive reader",
+        "catalog/device compatibility and T24 root/cache permissions review"
+      ]
     },
     {
       "id": "T15",
@@ -3633,6 +3685,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "3cd5b5949a54f706fba432351b207bfae68b857b",
-  "latest_validation_limitation": "T11 canonical4/1, related269/44, checkpoint43/2 and CLI8 processes passed. Full standard/serial validation remains unresolved from T09 source; no full suite rerun for T11. No signed rebuild or VM operation."
+  "latest_implementation_head": "de12a67930fe4ffa522faef23508b82b40472ee4",
+  "latest_validation_limitation": "B03: related694/89 and firmware15/12 passed; full Swift not rerun, earlier default16 and serial HTTP wait remain unresolved. No signed rebuild or VM operation. T11/T12/T14 remain partial."
 }

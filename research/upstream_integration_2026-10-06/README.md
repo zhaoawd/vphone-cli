@@ -227,3 +227,22 @@ T11 的 8 次独立只读 fw plan 调用得到 8 种 enabledSteps 数组顺序�
 完整 Swift 测试没有在本次序列化修正后重跑；前一步标准 16 issues 和串行 HTTP 夹具 waitUntilExit 阻塞记录保留，不能表述为全量通过。没有签名重建、部署或 VM 操作。C2 仍需 VM/输入 build 与摘要、catalog/target/schema/planDigest 绑定，记录状态分类及原子迁移；T11 未标记 accepted。下一步复用 FirmwareTransaction.Journal、FirmwareVersionInputs 和 VPhoneCreateBundleIdentity，审查首次启动前后及 legacy VM 的身份边界，不另建平行配置源。
 
 证据入口：`evidence/T11-canonical-summary.json`、`evidence/T11-canonical-related.log`、`evidence/T11-canonical-checkpoint.log`。
+
+
+### 2026-10-07 B03：T11、T12、T14
+
+本轮按用户要求推进三项任务，分别提交；三项均保留未完成的整项验收条件。
+
+T11 实现提交 `345a7969`：新解析事务在现有 journal 内保存 binding schema 1，journal 使用 version 2。绑定目录 dev:ino、配置原字节 SHA-256、mode/gates、规范计划摘要、真实 catalog 摘要与 revision、固定 target、输入根原字节摘要和 manifest version/build/摘要。catalog 仍为 119 项，revision 仍为 upstream-2.2.3；记录固定目标不代表 141 项实现已接入。缺失、不可读、损坏、未知 schema 和 binding 不匹配分别表达。配置缺失时只保存目录身份，不能据此确认运行 VM 的完整更新资格。
+
+发布前核对当前目录、配置与 catalog；恢复核对记录内部一致性、目录与配置，但不要求当前 catalog 相同，因为恢复不运行补丁算法。version 1 仍按已知输入/备份的显式恢复处理，不自动升级。version 2 缺 binding、字段不一致、摘要不一致、同路径新目录、配置变化均拒绝。目录/配置变化后的记录没有自动兼容导入。本次没有建立独立 desired-plan 配置源；稳定运行身份、磁盘/generation 对应和原子导入仍待执行。摘要是内容一致性证据，不是密码学签名。
+
+T12 测试提交 `fea969e9`：固定目标的 pristineInput 首次保存当前文件，prepare 会在新输入解析验证前删除旧 Originals；本地不直接采纳这两项处理。现有本地 checkpoint 要求计划改变后从 prepare 重新提取归档，成功发布新树后保存旧树。新增 A→A→B→A 与坏归档保全验证通过。A→A 使用显式 prepare，补丁阶段使用合成实现；不能认定直接重复 fw patch 幂等，也不能认定真实 VM 行为通过。FirmwareOriginals 的可信输入/generation manifest、device/GPU/planDigest 绑定仍待实现。checkpoint 的 source 字符串摘要与归档内容摘要分开；本地 sourceState 核对 dev/ino/size/mtime/ctime。
+
+T14 修复提交 `de12a679`：测试复现 marker 可预测临时文件跟随符号链接并截断外部文件，以及非法摘要仅按长度通过。修复采用 UUID 专属 O_EXCL/O_NOFOLLOW 文件、目录 fd 限定、写后读回、原子替换、目录 fsync 和创建 inode 限定清理；保留已有 marker 格式。摘要要求 64 个 ASCII 十六进制字符。保留现有 source marker、同源并发、PID 存活清理与 Range/If-Range 全包续传；不采用上游按一小时 mtime 删除 partial 的规则。缓存复用通过 size/inode/mtime 和 marker 检查，不逐次重新计算整包摘要；下载和显式 adoption 会计算整包摘要。adopted/source_verified=false 不改写为来源已验证。GPU 派生缓存、remote ZIP 成员 Range 接口、设备 catalog 与宿主权限复核仍待执行。
+
+验证：绑定红测试 5 项、8 issues；build 红测试 2 项、4 issues；marker 红测试 3 项、8 issues。修复后三项集中 40 项、4 个 suite 通过；扩大相关范围 694 项、89 个 suite 串行通过，88.855 秒；标准固件入口 15 项、12 个 suite 通过，41.764 秒。固件比较采用本地历史 Python 参考，不等同固定上游二进制等价。测试编译中缺内层 try、Any 参数不满足 Sendable，以及标准入口误用 --suite 的错误均修正，原日志保留。完整 Swift 套件本轮未重跑；此前标准 16 issues 与串行 HTTP 等待阻塞仍未查明，不能表述为全量通过。
+
+没有签名重建、部署或 VM 操作。vm-new PID 69566 仍运行，配置摘要、旧客户机载荷摘要和签名 VM 二进制摘要保持既有值，codesign 验证通过。未执行 amfid 操作。台账仍为 47 项：2 已验收、13 部分推进、31 待对账、1 可选延期；必选任务仍有 44 项未验收。221 份既有原始证据与 3 份原附件已逐项核对提交字节，新证据单独追加。
+
+证据入口：`evidence/B03-summary.json`、`evidence/B03-source-review.json`、`evidence/B03-related.log`、`evidence/B03-firmware.log`。

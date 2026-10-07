@@ -1,0 +1,74 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "source_reads": [
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipelineOriginals.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "d3cba6c76b3e09a30aeafa36f03c612b6c956aaa075ad66655725ec56329557e",
+      "evidence": "evidence/B03-T12-originals-upstream.swift"
+    },
+    {
+      "upstream_path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneFirmwarePreparer.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "7568ec4384aa29da5f886051f04c03821dc0b7401400d8fb537782927a9360dc",
+      "evidence": "evidence/B03-T12-preparer-upstream.swift"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneCoreKit/Bundle/VPhoneBundleOperations.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "4943a1dd103474b2983503815240f9c119ba089be570d29126496ed51ce75ac6",
+      "evidence": "evidence/B03-T12-bundle-upstream.swift"
+    },
+    {
+      "upstream_path": "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneIPSWCache.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "0f0143aa20d0758bc5d1544ee20326ac6c6df73d81e2f95252ccf6195410acb1",
+      "evidence": "evidence/B03-T14-cache-upstream.swift"
+    }
+  ],
+  "T12": {
+    "commit_scope": "a3d2382e2ecab8789c25c289e3a499003ef6b154 path review only; whole commit remains pending semantic review",
+    "upstream_behavior": [
+      "pristineInput stashes current file if original missing",
+      "same path used for subsequent pristine reads",
+      "prepare removes old Originals before resolving/verifying new sources"
+    ],
+    "local_behavior": [
+      "checkpoint selection change refuses patch-only rerun",
+      "restart from prepare re-extracts local archives",
+      "previous restore tree preserved after successful staged publication",
+      "bad sources/cancellation do not publish new tree",
+      "source record sha256 hashes source string, not archive bytes",
+      "sourceState compares dev/ino/size/mtime/ctime"
+    ],
+    "verified": "A→A→B→A via explicit prepare with real extraction and synthetic patch stage; bad archive preserves prior tree and synthetic Originals marker",
+    "remaining": [
+      "trusted FirmwareOriginals generation manifest and full original byte digests",
+      "device/GPU/planDigest linkage",
+      "same-plan repeated fw patch from Originals without prepare",
+      "real firmware and VM acceptance"
+    ]
+  },
+  "T14": {
+    "upstream_behavior": [
+      "reuse primarily inspects readable manifest",
+      "partial cleanup uses one-hour modification-time threshold"
+    ],
+    "local_behavior": [
+      "source URL + size/inode/mtime completion marker",
+      "full SHA-256 computed during download/adoption; metadata-based reuse does not rehash complete file",
+      "PID liveness cleanup retains active partials",
+      "Range/If-Range full-download resume is separate from remote ZIP member ranges",
+      "adoption records adopted=true/source_verified=false"
+    ],
+    "fixed": [
+      "marker predictable temporary symlink/file overwrite",
+      "malformed SHA-256 text admitted by length-only check"
+    ],
+    "remaining": [
+      "GPU derived-cache key/source/manifest integration",
+      "upstream remote ZIP member-range interface not found in local archive reader",
+      "catalog/device compatibility and T24 root/cache permissions review"
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/16] Write sources
+[4/16] Write swift-version--58304C5D6DBC2206.txt
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[6/10] Emitting module FirmwarePatcherTests
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift:38:6: error: type 'Any' does not conform to the 'Sendable' protocol
+ 36 |     }
+ 37 | 
+ 38 |     @Test(arguments: [0, true, ""])
+    |      `- error: type 'Any' does not conform to the 'Sendable' protocol
+ 39 |     func malformedBuildDoesNotBecomeMissing(_ value: Any) throws {
+ 40 |         let fixture = try Fixture()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift:38:6: error: type 'Any' does not conform to the 'Sendable' protocol
+ 36 |     }
+ 37 | 
+ 38 |     @Test(arguments: [0, true, ""])
+    |      `- error: type 'Any' does not conform to the 'Sendable' protocol
+ 39 |     func malformedBuildDoesNotBecomeMissing(_ value: Any) throws {
+ 40 |         let fixture = try Fixture()
+[7/10] Compiling FirmwarePatcherTests FirmwareVersionInputsTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift:38:6: error: type 'Any' does not conform to the 'Sendable' protocol
+ 36 |     }
+ 37 | 
+ 38 |     @Test(arguments: [0, true, ""])
+    |      `- error: type 'Any' does not conform to the 'Sendable' protocol
+ 39 |     func malformedBuildDoesNotBecomeMissing(_ value: Any) throws {
+ 40 |         let fixture = try Fixture()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift:38:6: error: type 'Any' does not conform to the 'Sendable' protocol
+ 36 |     }
+ 37 | 
+ 38 |     @Test(arguments: [0, true, ""])
+    |      `- error: type 'Any' does not conform to the 'Sendable' protocol
+ 39 |     func malformedBuildDoesNotBecomeMissing(_ value: Any) throws {
+ 40 |         let fixture = try Fixture()
+
+macro expansion @Test:12:11: error: type 'Any' does not conform to the 'Sendable' protocol
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift:43:6: note: expanded code originates here
+ 36 |     }
+ 37 | 
+ 38 |     @Test(arguments: [0, true, ""])
+    |     `- note: in expansion of macro 'Test' on instance method 'malformedBuildDoesNotBecomeMissing' here
+ 39 |     func malformedBuildDoesNotBecomeMissing(_ value: Any) throws {
+ 40 |         let fixture = try Fixture()
+ 41 |         try fixture.write(["ProductVersion": "26.1", "ProductBuildVersion": value])
+ 42 |         #expect(throws: (any Error).self) { try FirmwareVersionInputs.read(in: fixture.root) }
+ 43 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |10 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |11 | @Sendable private static func $s20FirmwarePatcherTests0a13VersionInputsC0V34malformedBuildDoesNotBecomeMissing4TestfMp_25generatoreecbaa101bc0f65ffMu_() async -> Testing.Test {
+    |12 |   return .__function(
+    |   |           `- error: type 'Any' does not conform to the 'Sendable' protocol
+    |13 |   named: "malformedBuildDoesNotBecomeMissing(_:)",
+    |14 |   in: FirmwareVersionInputsTests.self,
+    +-------------------------------------------------------------------
+ 44 | 
+ 45 |     @Test func changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() throws {
+
+macro expansion @Test:12:11: error: type 'Any' does not conform to the 'Sendable' protocol
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift:43:6: note: expanded code originates here
+ 36 |     }
+ 37 | 
+ 38 |     @Test(arguments: [0, true, ""])
+    |     `- note: in expansion of macro 'Test' on instance method 'malformedBuildDoesNotBecomeMissing' here
+ 39 |     func malformedBuildDoesNotBecomeMissing(_ value: Any) throws {
+ 40 |         let fixture = try Fixture()
+ 41 |         try fixture.write(["ProductVersion": "26.1", "ProductBuildVersion": value])
+ 42 |         #expect(throws: (any Error).self) { try FirmwareVersionInputs.read(in: fixture.root) }
+ 43 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |10 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |11 | @Sendable private static func $s20FirmwarePatcherTests0a13VersionInputsC0V34malformedBuildDoesNotBecomeMissing4TestfMp_25generatoreecbaa101bc0f65ffMu_() async -> Testing.Test {
+    |12 |   return .__function(
+    |   |           `- error: type 'Any' does not conform to the 'Sendable' protocol
+    |13 |   named: "malformedBuildDoesNotBecomeMissing(_:)",
+    |14 |   in: FirmwareVersionInputsTests.self,
+    +-------------------------------------------------------------------
+ 44 | 
+ 45 |     @Test func changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() throws {
+[8/10] Emitting module VPhoneCLITests
+error: fatalError
