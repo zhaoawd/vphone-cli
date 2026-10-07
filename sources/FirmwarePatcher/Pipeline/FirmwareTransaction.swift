@@ -185,11 +185,30 @@ final class FirmwareTransaction {
             for entry in journal.entries where entry.original != entry.output {
                 try inject(.beforeBackup(entry.name))
                 try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
-                try Self.move(vmDirectory.appendingPathComponent(entry.name), to: backup.appendingPathComponent(entry.name))
+                let destination = vmDirectory.appendingPathComponent(entry.name)
+                let staged = stage.appendingPathComponent(entry.name)
+                let saved = backup.appendingPathComponent(entry.name)
+                guard try Self.digest(destination) == entry.original,
+                      try Self.digest(staged) == entry.output else {
+                    throw Self.error("Firmware changed in publication window: \(entry.name)")
+                }
+                try Self.move(destination, to: saved)
                 try inject(.afterBackup(entry.name))
-                try Self.move(stage.appendingPathComponent(entry.name), to: vmDirectory.appendingPathComponent(entry.name))
+                guard try Self.digest(saved) == entry.original,
+                      try Self.digest(staged) == entry.output else {
+                    throw Self.error("Firmware changed after backup: \(entry.name)")
+                }
+                try Self.move(staged, to: destination)
                 try inject(.afterPublish(entry.name))
             }
+            // Include unchanged entries: a no-op is evidence only after readback.
+            for entry in journal.entries {
+                guard try Self.digest(vmDirectory.appendingPathComponent(entry.name), sync: true) == entry.output else {
+                    throw Self.error("Published firmware differs from journal: \(entry.name)")
+                }
+            }
+            try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
+            try mounts(root, false)
             journal.phase = .committed
             try saveJournal()
             return try archive()
@@ -380,7 +399,7 @@ final class FirmwareTransaction {
     }
     private static func move(_ source: URL, to destination: URL) throws {
         guard !exists(destination) else { throw error("Refusing to replace existing transaction path: \(destination.path)") }
-        guard rename(source.path, destination.path) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        guard renamex_np(source.path, destination.path, UInt32(RENAME_EXCL)) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         try syncDirectory(source.deletingLastPathComponent())
         try syncDirectory(destination.deletingLastPathComponent())
     }

@@ -97,6 +97,45 @@ import Testing
         }
     }
 
+    @Test func editInBackupWindowIsNotOverwritten() throws {
+        let f = try Fixture()
+        let external = Data("external before backup".utf8)
+        let t = try f.begin { event in
+            if event == .beforeBackup(f.boot.lastPathComponent) { try external.write(to: f.boot) }
+        }
+        try f.patch(t)
+        #expect(throws: (any Error).self) { try t.commit() }
+        #expect(try Data(contentsOf: f.boot) == external)
+        #expect(t.journalSnapshot.phase != .committed)
+    }
+
+    @Test func stageEditAfterBackupDoesNotPublishUnknownBytes() throws {
+        let f = try Fixture()
+        let stage = f.root.appendingPathComponent(".firmware-transaction/stage").appendingPathComponent(f.boot.lastPathComponent)
+        let t = try f.begin { event in
+            if event == .afterBackup(f.boot.lastPathComponent) { try Data("unknown stage".utf8).write(to: stage) }
+        }
+        try f.patch(t)
+        #expect(throws: (any Error).self) { try t.commit() }
+        #expect(!f.fm.fileExists(atPath: f.boot.path))
+        #expect(t.journalSnapshot.phase != .committed)
+        #expect(try f.recover() != nil)
+        try f.original()
+    }
+
+    @Test func publishedEditCannotBecomeACommittedReceipt() throws {
+        let f = try Fixture()
+        let external = Data("external after publish".utf8)
+        let t = try f.begin { event in
+            if event == .afterPublish(f.restore.lastPathComponent) { try external.write(to: f.boot) }
+        }
+        try f.patch(t)
+        #expect(throws: (any Error).self) { try t.commit() }
+        #expect(t.journalSnapshot.phase != .committed)
+        #expect(try Data(contentsOf: f.boot) == external)
+        #expect(throws: (any Error).self) { try f.recover() }
+    }
+
     @Test func externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() throws {
         let f = try Fixture(); let t = try f.begin(); try f.patch(t)
         let external = Data("external edit".utf8); try external.write(to: f.boot)
