@@ -81,15 +81,19 @@ public struct VPhoneLaunchpadLineSplitter: Sendable {
 
 public enum VPhoneLaunchpadLineReader {
     /// Reads `handle` until end of file on the calling thread.
-    public static func readLines(from handle: FileHandle, onLine: (String) -> Void) {
+    public enum Completion: Equatable, Sendable { case drained, failed }
+
+    @discardableResult
+    public static func readLines(from handle: FileHandle, onLine: (String) -> Void) -> Completion {
         var splitter = VPhoneLaunchpadLineSplitter()
-        while true {
-            let chunk = handle.availableData
-            if chunk.isEmpty {
-                break
+        defer { splitter.flush(onLine) }
+        do {
+            while let chunk = try handle.read(upToCount: 1 << 20), !chunk.isEmpty {
+                splitter.feed(chunk, onLine)
             }
-            splitter.feed(chunk, onLine)
+            return .drained
+        } catch {
+            return .failed
         }
-        splitter.flush(onLine)
     }
 }

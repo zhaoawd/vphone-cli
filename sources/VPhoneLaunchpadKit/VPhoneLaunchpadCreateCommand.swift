@@ -268,8 +268,8 @@ public extension VPhoneLaunchpadCommandLine {
             appendingToLog: appendingToLog, onLine: onLine)
         let history = history
         Task {
-            let status = await child.wait()
-            history.finish(entry, status: status)
+            let completion = await child.waitForCompletion()
+            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
         }
         return child
     }

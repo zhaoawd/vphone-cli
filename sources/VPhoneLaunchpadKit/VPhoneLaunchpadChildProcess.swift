@@ -22,6 +22,14 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     private var detachedPID: pid_t?
     private let lock = NSLock()
     private var exitStatus: Int32?
+    private var outputDrained = false
+
+    public struct Completion: Sendable {
+        public let status: Int32
+        /// All bytes available to this reader reached the synchronous callback.
+        /// This does not acknowledge an asynchronous writer or XPC helper.
+        public let outputDrained: Bool
+    }
     /// The detached child has exited. Set under `lock` while the child is
     /// still an unreaped zombie, so `interrupt()` can never reach a reused PID.
     private var hasExited = false
@@ -74,9 +82,9 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
             try process.run()
             let reader = pipe.fileHandleForReading
             Thread.detachNewThread { [self] in
-                VPhoneLaunchpadLineReader.readLines(from: reader, onLine: onLine)
+                let output = VPhoneLaunchpadLineReader.readLines(from: reader, onLine: onLine)
                 process.waitUntilExit()
-                finish(process.terminationStatus)
+                finish(process.terminationStatus, outputDrained: output == .drained)
             }
         }
     }
@@ -106,6 +114,11 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
             waiters.append(continuation)
             lock.unlock()
         }
+    }
+
+    public func waitForCompletion() async -> Completion {
+        let status = await wait()
+        return lock.withLock { Completion(status: status, outputDrained: outputDrained) }
     }
 
     /// SIGINT, which `vphone-cli` treats as a graceful stop. Only ever sent to
@@ -166,10 +179,15 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
     /// wrote is read.
     private func tail(_ reader: FileHandle, _ onLine: (String) -> Void) {
         var splitter = VPhoneLaunchpadLineSplitter()
+        var readFailed = false
         while true {
             let exited = lock.withLock { hasExited }
-            if let chunk = try? reader.readToEnd(), !chunk.isEmpty {
-                splitter.feed(chunk, onLine)
+            if !readFailed {
+                do {
+                    if let chunk = try reader.readToEnd(), !chunk.isEmpty {
+                        splitter.feed(chunk, onLine)
+                    }
+                } catch { readFailed = true }
             }
             if exited {
                 break
@@ -178,7 +196,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
         }
         splitter.flush(onLine)
         try? reader.close()
-        finish(lock.withLock { exitCode })
+        finish(lock.withLock { exitCode }, outputDrained: !readFailed)
     }
 
     private typealias SetDisclaim = @convention(c) (UnsafeMutablePointer<posix_spawnattr_t?>, Int32) -> Int32
@@ -232,8 +250,9 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
         return signal == 0 ? (status >> 8) & 0xFF : signal
     }
 
-    private func finish(_ status: Int32) {
+    private func finish(_ status: Int32, outputDrained: Bool) {
         lock.lock()
+        self.outputDrained = outputDrained
         exitStatus = status
         let pending = waiters
         waiters = []

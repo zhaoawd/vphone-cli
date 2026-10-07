@@ -205,6 +205,7 @@ public final class VPhoneLaunchpadCreation {
     public private(set) var progress: Result<VPhoneLaunchpadCreateProgress, VPhoneLaunchpadError>?
     public private(set) var startedAt: Date?
     public private(set) var exitStatus: Int32?
+    public private(set) var outputDrained: Bool?
     /// The last lines the run printed, shown when it fails.
     public private(set) var outputTail: [String] = []
     public private(set) var status: Result<VPhoneLaunchpadCreateStatus, VPhoneLaunchpadError>?
@@ -248,6 +249,7 @@ public final class VPhoneLaunchpadCreation {
         }
         self.command = command
         exitStatus = nil
+        outputDrained = nil
         status = nil
         toolChange = nil
         cancelRequested = false
@@ -289,14 +291,17 @@ public final class VPhoneLaunchpadCreation {
         _ child: VPhoneLaunchpadChildProcess, commandLine: VPhoneLaunchpadCommandLine,
         collector: VPhoneLaunchpadLineCollector
     ) async {
-        let waiter = Task { await child.wait() }
+        let waiter = Task { await child.waitForCompletion() }
         while child.isRunning {
             await reloadProgress()
             try? await Task.sleep(for: Self.pollInterval)
         }
-        let code = await waiter.value
+        let completion = await waiter.value
+        let code = completion.status
         exitStatus = code
+        outputDrained = completion.outputDrained
         outputTail = Array(collector.lines.suffix(20))
+        if !completion.outputDrained { outputTail.append("Console read failed; output completeness unknown") }
         VPhoneLaunchpadMachineLibrary.diagnostic("vm create pid \(child.processIdentifier) exited with status \(code)")
         await reloadProgress()
         if code != 0, command?.kind == .resume {

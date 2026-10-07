@@ -280,7 +280,8 @@ public final class VPhoneLaunchpadMachineLibrary {
             startedAt[machine] = Date()
             Self.diagnostic("vm launch started, pid \(child.processIdentifier)")
             Task { [weak self] in
-                let status = await child.wait()
+                let completion = await child.waitForCompletion()
+                let status = completion.status
                 Self.diagnostic("vm launch pid \(child.processIdentifier) exited with status \(status)")
                 guard let self else {
                     return
@@ -288,7 +289,9 @@ public final class VPhoneLaunchpadMachineLibrary {
                 if launched[machine] === child {
                     launched[machine] = nil
                     startedAt[machine] = nil
-                    VPhoneLaunchpadConsoleLog.append(VPhoneLaunchpadConsoleLog.exitLine(status: status), to: log)
+                    let line = VPhoneLaunchpadConsoleLog.exitLine(status: status)
+                        + (completion.outputDrained ? "" : " (console read failed; output completeness unknown)")
+                    VPhoneLaunchpadConsoleLog.append(line, to: log)
                 }
                 await refresh()
             }

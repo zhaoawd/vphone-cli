@@ -26,14 +26,19 @@ public struct VPhoneLaunchpadError: LocalizedError, Sendable {
 public struct VPhoneLaunchpadCommandResult: Sendable {
     public let status: Int32
     public let lines: [String]
+    public let outputDrained: Bool
+    /// Lines omitted from the bounded display list; the detached raw log is separate.
+    public let omittedLineCount: Int
 
-    public init(status: Int32, lines: [String]) {
+    public init(status: Int32, lines: [String], outputDrained: Bool = true, omittedLineCount: Int = 0) {
         self.status = status
         self.lines = lines
+        self.outputDrained = outputDrained
+        self.omittedLineCount = omittedLineCount
     }
 
     public var succeeded: Bool {
-        status == 0
+        status == 0 && outputDrained
     }
 
     /// The last few lines, which is where `vphone-cli` reports what failed.
@@ -79,6 +84,7 @@ public final class VPhoneLaunchpadCommandHistory {
         /// Non-zero statuses that mean "finished with warnings", not failure.
         public var warningStatuses: Set<Int32> = []
         public var status: Int32?
+        public var outputDrained: Bool?
 
         /// Running until it exits; 0 succeeded; a warning status is a
         /// warning; any other status failed.
@@ -86,6 +92,7 @@ public final class VPhoneLaunchpadCommandHistory {
             guard let status else {
                 return .running
             }
+            if outputDrained == false { return .failed }
             if status == 0 {
                 return .succeeded
             }
@@ -106,9 +113,10 @@ public final class VPhoneLaunchpadCommandHistory {
         return entry.id
     }
 
-    public func finish(_ id: UUID, status: Int32) {
+    public func finish(_ id: UUID, status: Int32, outputDrained: Bool = true) {
         if let index = entries.firstIndex(where: { $0.id == id }) {
             entries[index].status = status
+            entries[index].outputDrained = outputDrained
         }
     }
 }
@@ -157,15 +165,17 @@ public struct VPhoneLaunchpadCommandLine {
             collector.append(line)
             onLine?(line)
         }
-        let status = await withTaskCancellationHandler {
-            await child.wait()
+        let completion = await withTaskCancellationHandler {
+            await child.waitForCompletion()
         } onCancel: {
             child.interrupt()
         }
         if let entry {
-            history.finish(entry, status: status)
+            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
         }
-        return VPhoneLaunchpadCommandResult(status: status, lines: collector.lines)
+        let output = collector.snapshot
+        return VPhoneLaunchpadCommandResult(status: completion.status, lines: output.lines,
+            outputDrained: completion.outputDrained, omittedLineCount: output.omitted)
     }
 
     /// Starts a long-running command (`vm launch`) and returns at once. Its
@@ -183,8 +193,8 @@ public struct VPhoneLaunchpadCommandLine {
             executable: executable, arguments: arguments, logFile: logFile, preamble: preamble, onLine: onLine)
         let history = history
         Task {
-            let status = await child.wait()
-            history.finish(entry, status: status)
+            let completion = await child.waitForCompletion()
+            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
         }
         return child
     }
@@ -194,17 +204,21 @@ public struct VPhoneLaunchpadCommandLine {
 final class VPhoneLaunchpadLineCollector: @unchecked Sendable {
     private let lock = NSLock()
     private var storage: [String] = []
+    private var omitted = 0
 
     func append(_ line: String) {
         lock.withLock {
             storage.append(line)
             if storage.count > 4000 {
+                omitted += storage.count - 4000
                 storage.removeFirst(storage.count - 4000)
             }
         }
     }
 
-    var lines: [String] {
-        lock.withLock { storage }
+    var lines: [String] { snapshot.lines }
+
+    var snapshot: (lines: [String], omitted: Int) {
+        lock.withLock { (storage, omitted) }
     }
 }

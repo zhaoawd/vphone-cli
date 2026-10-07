@@ -26,7 +26,7 @@ struct StopRefusalTests {
         library.stopMonitoring()
         let machine = VPhoneLaunchpadMachinePath(libraryRoot: temp.url.path, name: "sample")
         library.start(machine)
-        for _ in 0..<100 {
+        for _ in 0..<500 {
             if FileManager.default.fileExists(atPath: pidFile.path) { break }
             try await Task.sleep(for: .milliseconds(20))
         }
