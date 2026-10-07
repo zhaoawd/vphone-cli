@@ -313,6 +313,19 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         }
     }
 
+    func testInstalledReadbackMismatchDoesNotReachActivation() async throws {
+        let api = EnvironmentDaemonFake()
+        current(api, except: ["libcamfix.dylib"])
+        api.mutateInstall = { [weak api] _ in api?.installed["libcamfix.dylib"] = "different bytes" }
+        let result = try await update(api, ["restart": ["cameracaptured"]])
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "api_protocol")
+        XCTAssertEqual(result["outcome"] as? String, "unknown")
+        XCTAssertEqual(result["operation_may_continue"] as? Bool, true)
+        XCTAssertTrue(api.killed.isEmpty)
+        XCTAssertFalse(api.methods.contains("environment.loaded"))
+    }
+
     func testStagedDigestMismatchIsRefusedBeforeInstall() async throws {
         let api = EnvironmentDaemonFake()
         current(api, except: ["libcamfix.dylib", "libvlocation.dylib"])
