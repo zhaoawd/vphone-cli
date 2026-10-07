@@ -9,7 +9,8 @@ struct VPhoneFWCommand: ParsableCommand {
         abstract: "Firmware pipeline: prepare (download/merge IPSWs) and patch",
         subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self,
                       VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self, VPhoneFWPlanCommand.self,
-                      VPhoneFWCacheCommand.self, VPhoneFWSelectionPreviewCommand.self])
+                      VPhoneFWCacheCommand.self, VPhoneFWSelectionPreviewCommand.self,
+                      VPhoneFWSelectionMigrateCommand.self])
 }
 
 // MARK: - catalog
