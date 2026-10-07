@@ -1,0 +1,26 @@
+xcrun --sdk iphoneos clang -arch arm64e -miphoneos-version-min=26.0 -Os -fobjc-arc -dynamiclib \
+		-install_name @rpath/libcamfix.dylib \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/stage/camfix/libcamfix.dylib CamFix/libcamfix.m \
+		-framework Foundation -framework AVFoundation -framework ImageIO \
+		-framework IOSurface -framework CoreMedia -framework CoreVideo \
+		-framework CoreGraphics -framework QuartzCore
+xcrun --sdk iphoneos clang -arch arm64e -miphoneos-version-min=26.0 -Os -fobjc-arc -dynamiclib \
+		-install_name /usr/lib/libvlocation.dylib \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/stage/locationfix/libvlocation.dylib LocationFix/libvlocation.m \
+		-framework Foundation -framework CoreLocation
+ld: warning: static initializer 'ltmp14' found in '/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/libvlocation-ff0cd4.o'. Use -no_inits to make this an error.  Use -no_warn_inits to suppress warning
+xcrun --sdk iphoneos clang -arch arm64e -miphoneos-version-min=26.0 -Os -fobjc-arc -dynamiclib \
+		-install_name @rpath/libvcamcaptured.dylib \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/stage/vcamcaptured/libvcamcaptured.dylib VCamCaptured/libvcamcaptured.m \
+		-framework Foundation -framework CoreMedia -framework CoreVideo
+xcrun --sdk iphoneos clang -arch arm64e -miphoneos-version-min=26.0 -Os -dynamiclib \
+		-install_name /usr/lib/launchdhook-vphone.dylib \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/stage/launchhook/launchdhook-vphone.dylib LaunchHook/launchdhook-vphone.c Shared/RootHideLoaderLinks.c -Wl,-not_for_dyld_shared_cache
+xcrun --sdk iphoneos clang -arch arm64e -miphoneos-version-min=26.0 -Os -dynamiclib \
+		-install_name /usr/lib/SystemHook-vphone.dylib \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/stage/systemhook/SystemHook-vphone.dylib SystemHook/SystemHook-vphone.c Shared/RootHideLoaderLinks.c -Wl,-not_for_dyld_shared_cache
+xcrun --sdk iphoneos clang++ -arch arm64e -miphoneos-version-min=26.1 \
+		-std=c++17 -O2 -dynamiclib -Wl,-U,_LLVMDisposeMemoryBuffer -Wl,-U,_LLVMGetBufferStart -Wl,-U,_LLVMGetBufferSize -Wl,-U,_LLVMGetTarget -Wl,-U,_LLVMExtraMakeSharedModule -Wl,-U,_LLVMExtraDisposeSharedModule -Wl,-U,_LLVMGetNamedMetadataNumOperands -Wl,-U,_LLVMGetNamedMetadataOperands -Wl,-U,_LLVMGetMDNodeNumOperands -Wl,-U,_LLVMGetMDNodeOperands -Wl,-U,_LLVMGetValueName2 -Wl,-U,_MTLGPUCompilerCreate -Wl,-U,_MTLGPUCompilerDestroy -Wl,-U,_MTLDowngradeAIRModule -Wl,-U,_MTLMetalLibCreateExecutableWithTriple -Wl,-U,_MTLMetalFunctionCreate -Wl,-U,_MTLMetalLibInsertFunction -Wl,-U,_MTLWriteMetalLibToMemoryBuffer \
+		-Wl,-not_for_dyld_shared_cache \
+		-install_name /System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle/libAppleParavirtCompilerPluginIOGPUFamily.dylib \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/stage/gpu/libAppleParavirtCompilerPluginIOGPUFamily.dylib GraphicLoader/main.mm

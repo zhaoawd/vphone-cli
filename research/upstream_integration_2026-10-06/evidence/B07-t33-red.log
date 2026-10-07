@@ -1,0 +1,80 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling locking.c
+[5/35] Compiling deviceinterfaced.c
+[6/35] Compiling fdr.c
+[7/35] Compiling common.c
+[8/35] Compiling ipsw.c
+[9/37] Compiling download.c
+[10/37] Compiling idevicerestore.c
+[10/37] Compiling asr.c
+[12/37] Compiling recovery.c
+[13/37] Compiling limera1n.c
+[14/37] Compiling normal.c
+[15/37] Compiling restore.c
+[16/37] Compiling ace3.c
+[17/37] Compiling img3.c
+[18/37] Compiling dfu.c
+[19/37] Compiling mbn.c
+[20/37] Compiling img4.c
+[21/37] Compiling ftab.c
+[22/37] Compiling fls.c
+[23/37] Compiling vphone_zip_stub.c
+[24/37] Compiling log.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling FirmwarePatcherTests PatchUndoLogTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchUndoLogTests.swift:12:23: error: cannot find 'VPhonePatchUndoLog' in scope
+10 |     }
+11 |     @Test func restoresSelectedBytesAndLeavesOtherPatchInSamePage() throws {
+12 |         let log = try VPhonePatchUndoLog(generation: generation, records: [record(), record("p2", offset: 3, before: Data([4]), after: Data([9]))])
+   |                       `- error: cannot find 'VPhonePatchUndoLog' in scope
+13 |         let live = Data([1, 8, 3, 9, 5])
+14 |         let result = try log.restoring(live, component: "dsc", patchIDs: ["p1"], generation: generation)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchUndoLogTests.swift:16:36: error: cannot infer key path type from context; consider explicitly specifying a root type
+14 |         let result = try log.restoring(live, component: "dsc", patchIDs: ["p1"], generation: generation)
+15 |         #expect(result.data == Data([1, 2, 3, 9, 5]))
+16 |         #expect(result.records.map(\.patchID) == ["p1"])
+   |                                    `- error: cannot infer key path type from context; consider explicitly specifying a root type
+17 |         #expect(live == Data([1, 8, 3, 9, 5]))
+18 |         let decoded = try JSONDecoder().decode(VPhonePatchUndoLog.self, from: JSONEncoder().encode(log))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchUndoLogTests.swift:18:48: error: cannot find 'VPhonePatchUndoLog' in scope
+16 |         #expect(result.records.map(\.patchID) == ["p1"])
+17 |         #expect(live == Data([1, 8, 3, 9, 5]))
+18 |         let decoded = try JSONDecoder().decode(VPhonePatchUndoLog.self, from: JSONEncoder().encode(log))
+   |                                                `- error: cannot find 'VPhonePatchUndoLog' in scope
+19 |         #expect(try decoded.restoring(live, component: "dsc", patchIDs: ["p1"], generation: generation).data == result.data)
+20 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchUndoLogTests.swift:18:41: error: failed to produce diagnostic for expression; please submit a bug report (https://swift.org/contributing/#reporting-bugs)
+16 |         #expect(result.records.map(\.patchID) == ["p1"])
+17 |         #expect(live == Data([1, 8, 3, 9, 5]))
+18 |         let decoded = try JSONDecoder().decode(VPhonePatchUndoLog.self, from: JSONEncoder().encode(log))
+   |                                         `- error: failed to produce diagnostic for expression; please submit a bug report (https://swift.org/contributing/#reporting-bugs)
+19 |         #expect(try decoded.restoring(live, component: "dsc", patchIDs: ["p1"], generation: generation).data == result.data)
+20 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchUndoLogTests.swift:22:23: error: cannot find 'VPhonePatchUndoLog' in scope
+20 |     }
+21 |     @Test func wrongGenerationLiveBytesOrMissingOriginalCannotAuthorizeUndo() throws {
+22 |         let log = try VPhonePatchUndoLog(generation: generation, records: [record()])
+   |                       `- error: cannot find 'VPhonePatchUndoLog' in scope
+23 |         for (data, ids, gen) in [(Data([1, 8, 3]), Set(["p1"]), String(repeating: "b", count: 64)),
+24 |                                  (Data([1, 7, 3]), Set(["p1"]), generation),
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchUndoLogTests.swift:37:31: error: cannot find 'VPhonePatchUndoLog' in scope
+35 |                         [record(before: Data([2, 3]), after: Data([8]))]] {
+36 |             #expect(throws: (any Error).self) {
+37 |                 let log = try VPhonePatchUndoLog(generation: generation, records: records)
+   |                               `- error: cannot find 'VPhonePatchUndoLog' in scope
+38 |                 _ = try log.restoring(live, component: "dsc", patchIDs: Set(records.map(\.patchID)), generation: generation)
+39 |             }
+[29/38] Emitting module FirmwarePatcherTests
+error: fatalError

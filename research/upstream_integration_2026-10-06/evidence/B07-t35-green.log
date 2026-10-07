@@ -1,0 +1,19 @@
+E...............
+======================================================================
+ERROR: test_already_zero_over_region_is_a_no_op (test_dsc_maxslide.MaxSlideDecisionTests.test_already_zero_over_region_is_a_no_op)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_dsc_maxslide.py", line 156, in test_already_zero_over_region_is_a_no_op
+    result, lines = self.run_patch()
+                    ~~~~~~~~~~~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_dsc_maxslide.py", line 70, in run_patch
+    result = patch_dsc_maxslide(str(self.dir), **kwargs)
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/patchers/cfw_patch_dsc_maxslide.py", line 128, in patch_dsc_maxslide
+    raise RuntimeError(f"{main}: cache size 0x{srsize:X} exceeds kernel shared region "
+                       f"0x{kernel_region_size:X} even at zero slide")
+RuntimeError: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/dsc maxslide sm9z1_qg/dyld_shared_cache_arm64e: cache size 0x180004000 exceeds kernel shared region 0x180000000 even at zero slide
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.278s
+
+FAILED (errors=1)

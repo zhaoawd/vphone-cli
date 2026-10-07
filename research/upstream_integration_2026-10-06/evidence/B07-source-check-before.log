@@ -1,0 +1,6 @@
+Reproduction: check_sources with B06 committed pins and current sources; first mismatch predates B07.
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/check_guest_components.py", line 31, in check_sources
+    raise ValueError(f"Guest component source differs from its recorded input: {entry['local']}")
+ValueError: Guest component source differs from its recorded input: sources/VPhoneGuestComponents/LocationFix/libvlocation.m

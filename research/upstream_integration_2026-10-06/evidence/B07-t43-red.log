@@ -1,0 +1,29 @@
+F.F
+======================================================================
+FAIL: test_any_explicit_safe_flag_disables_injection_despite_duplicate_env_keys (test_injection_environment.InjectionEnvironmentTests.test_any_explicit_safe_flag_disables_injection_despite_duplicate_env_keys)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_injection_environment.py", line 56, in test_any_explicit_safe_flag_disables_injection_despite_duplicate_env_keys
+    self.run_case("duplicates")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_injection_environment.py", line 53, in run_case
+    self.assertEqual(result.returncode, 0, name + ": " + result.stderr.decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : duplicates: 
+
+======================================================================
+FAIL: test_oversized_environment_refuses_injection (test_injection_environment.InjectionEnvironmentTests.test_oversized_environment_refuses_injection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_injection_environment.py", line 59, in test_oversized_environment_refuses_injection
+    self.run_case("bounded")
+    ~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_injection_environment.py", line 53, in run_case
+    self.assertEqual(result.returncode, 0, name + ": " + result.stderr.decode())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : bounded: 
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.442s
+
+FAILED (failures=2)

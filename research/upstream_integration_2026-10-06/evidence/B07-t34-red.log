@@ -1,0 +1,72 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling locking.c
+[5/37] Compiling ftab.c
+[5/37] Compiling log.c
+[5/37] Compiling fls.c
+[5/37] Compiling deviceinterfaced.c
+[9/37] Compiling common.c
+[10/37] Compiling idevicerestore.c
+[11/37] Compiling download.c
+[12/37] Compiling fdr.c
+[13/37] Compiling recovery.c
+[14/37] Compiling asr.c
+[15/37] Compiling ipsw.c
+[16/37] Compiling limera1n.c
+[17/37] Compiling normal.c
+[18/37] Compiling dfu.c
+[19/37] Compiling img4.c
+[20/37] Compiling img3.c
+[21/37] Compiling ace3.c
+[22/37] Compiling vphone_zip_stub.c
+[23/37] Compiling mbn.c
+[24/37] Compiling restore.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling FirmwarePatcherTests KernelcacheSwapTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/KernelcacheSwapTests.swift:22:21: error: cannot find 'VPhoneKernelcacheSwap' in scope
+20 |         let restore = Data([0, 255, 128])
+21 |         let input = Self.target(old, manifest: manifest, restore: restore)
+22 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: input, with: new) == Self.target(new, manifest: manifest, restore: restore))
+   |                     `- error: cannot find 'VPhoneKernelcacheSwap' in scope
+23 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: Self.target(new), with: new) == nil)
+24 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: input, with: Self.target(new)) == Self.target(new, manifest: manifest, restore: restore))
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/KernelcacheSwapTests.swift:23:21: error: cannot find 'VPhoneKernelcacheSwap' in scope
+21 |         let input = Self.target(old, manifest: manifest, restore: restore)
+22 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: input, with: new) == Self.target(new, manifest: manifest, restore: restore))
+23 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: Self.target(new), with: new) == nil)
+   |                     `- error: cannot find 'VPhoneKernelcacheSwap' in scope
+24 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: input, with: Self.target(new)) == Self.target(new, manifest: manifest, restore: restore))
+25 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/KernelcacheSwapTests.swift:24:21: error: cannot find 'VPhoneKernelcacheSwap' in scope
+22 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: input, with: new) == Self.target(new, manifest: manifest, restore: restore))
+23 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: Self.target(new), with: new) == nil)
+24 |         #expect(try VPhoneKernelcacheSwap.replacingPayload(in: input, with: Self.target(new)) == Self.target(new, manifest: manifest, restore: restore))
+   |                     `- error: cannot find 'VPhoneKernelcacheSwap' in scope
+25 |     }
+26 |     @Test func refusesBareTargetWrongFourccAndMissingManifest() throws {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/KernelcacheSwapTests.swift:31:53: error: cannot find 'VPhoneKernelcacheSwap' in scope
+29 |         for (target, source) in [(kernel, kernel), (Self.target(kernel), tree), (Self.target(tree), kernel),
+30 |                                  (Self.element(0x30, Self.element(0x16, Data("IMG4".utf8)) + kernel), kernel)] {
+31 |             #expect(throws: (any Error).self) { try VPhoneKernelcacheSwap.replacingPayload(in: target, with: source) }
+   |                                                     `- error: cannot find 'VPhoneKernelcacheSwap' in scope
+32 |         }
+33 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/KernelcacheSwapTests.swift:38:53: error: cannot find 'VPhoneKernelcacheSwap' in scope
+36 |         for bytes in [Data([0x30, 0x80]), Data([0x30, 0x88] + Array(repeating: 255, count: 8)),
+37 |                       Data([0x30, 4, 0x16, 5, 0, 0]), Self.target(kernel) + Data([0])] {
+38 |             #expect(throws: (any Error).self) { try VPhoneKernelcacheSwap.replacingPayload(in: bytes, with: kernel) }
+   |                                                     `- error: cannot find 'VPhoneKernelcacheSwap' in scope
+39 |         }
+40 |     }
+[29/38] Emitting module FirmwarePatcherTests
+error: fatalError

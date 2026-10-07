@@ -1,0 +1,121 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "source_reads": [
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Memory/KernelCustomFirmwarePatchSharedRegionSize.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "7c8b37695391f80067f48cdfab6537d1b393d534695c2128ff7c5674122a21d3",
+      "evidence": "evidence/B07-T35-shared-region.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "250be63436474830cdf007da04ff14720a51a5987a33860677f73bed9e1a4066",
+      "evidence": "evidence/B07-T33-undo.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/CustomFirmware/CustomFirmwareKernelcacheSwapTests.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "934e18251f567905d9b84afd11d2a4b30803e7572237b2d3c62fb28485b2b3c3",
+      "evidence": "evidence/B07-T34-swap-tests.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/CustomFirmware/CustomFirmwarePostRestoreDeviceTree.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "4a43c02cf8f08c8041da9d51462403f468b42f73eb9ca9fa954249581aa36b80",
+      "evidence": "evidence/B07-T34-container.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "c545be1e0d2105610d0446fbbf2c65dd44533968f2e3029e3b08fd2241aa6e95",
+      "evidence": "evidence/B07-T34-T35-installer.swift"
+    },
+    {
+      "path": "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "4f792b954bed187e8309a8d53b000448ba92fd16cb54b444e4ed8d894cb1d8cd",
+      "evidence": "evidence/B07-T44-board.swift"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDevice.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "9c4a6a9b5f64b2a914e5ce81686b123c15ad59cfdf24f6810be3b7e49eb46cfe",
+      "evidence": "evidence/B07-T44-device.swift"
+    },
+    {
+      "path": "VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "58637c75ede4df52f937a44968017f59f475628240077a9e8d48b012e2f67d00",
+      "evidence": "evidence/B07-T43-environment.h"
+    },
+    {
+      "path": "VPhoneGuestComponents/VCamCaptured/Image/VCamCodePatch.m",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "fbb9404be5bafdc295ff3f0bcd9bae09b180a355bb404017a32ef3c75883d43c",
+      "evidence": "evidence/B07-T43-code-patch.m"
+    },
+    {
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "cff82e72dee8e19006324ba3862a70c4408b3be27a475d865162778360fe3030",
+      "evidence": "evidence/B07-T16-environment.swift"
+    }
+  ],
+  "scope": "fixed source path/interface review; no whole upstream commit marked equivalent; all six tasks remain partial",
+  "T35": {
+    "implemented": "Reject DSC declared region size above supplied kernel capacity even at maxSlide zero, force and dry_run; validate supplied capacity; retain default stock 6 GiB.",
+    "upstream": "Installer uses widened patch receipt when present but falls back to 27.x version when receipt is absent, and skips an unreadable region header. C8 requires actual kernel proof and fail-closed unknown; those callers are not ported. Fixed shared-region patch source was read, no local kernel patch added.",
+    "not_verified": [
+      "Recover and prove the actual kernel shared-region base/size from trusted original and candidate/installed kernel; validate final DSC mappings and effective maxSlide as a pair.",
+      "Implement source-backed unique shared_region_size patch and applicability, unknown/refusal states and independent RAM/disk checks.",
+      "Wire candidate-kernel/current-DSC and installed-kernel/candidate-DSC checks into T34/T16 and complete real 6/7 GiB boot acceptance."
+    ]
+  },
+  "T34": {
+    "implemented": "Pure krnl IM4P replacement inside a target IMG4, source unencrypted, exact target type/manifest/trailing child bytes retained; unchanged payload returns nil; bounded DER length arithmetic.",
+    "upstream": "Same byte-preservation operation and idempotence; installer mounts Preboot, resolves a unique target and replaces it. Local operation is not wired to those disk/CLI paths.",
+    "not_verified": [
+      "Select trusted generation original and patch plan/mode, resolve exactly one stopped-VM Preboot regular-file target and bind to proved DSC compatibility.",
+      "Publish kernel payload, kernel receipt and origins transactionally with failure rollback; CLI/Launchpad update-kernel wiring.",
+      "Verify boot, retained guest data, repeated update and rollback with vm-new. Preserved IM4M bytes do not prove signature validity."
+    ]
+  },
+  "T33": {
+    "implemented": "Codable in-memory generation-bound undo using existing PatchRecord original/patched bytes; validate component bounds and all overlap, require requested IDs and current patched bytes before producing a copy; return touched spans.",
+    "upstream": "DSC undo stores per-chunk original bytes, merges keeping first originals and restores selected spans. Local API adds expected current-byte preflight and generation matching; it does not provide chunk persistence or code-page re-attestation.",
+    "not_verified": [
+      "Persist authenticated first-original undo records and merge repeated patches without replacing originals with patched bytes.",
+      "Connect DSC chunk, Mach-O and Preboot undo paths; re-attest touched code pages and publish disk/receipt/undo state transactionally.",
+      "Verify off/on transitions, wrong generation/current bytes, missing backup not-revertible and real guest behavior. In-memory generation comparison does not authenticate a receipt."
+    ]
+  },
+  "T43": {
+    "implemented": "Any duplicate flag with exact value 1 disables, and an environment scan exceeding 4096 entries disables; insertion/dedup/root logic and auth/Irisin callers retained.",
+    "upstream": "Shared environment helper still uses first matching flag; target header also has additional library constants and plural hook insertion not ported. VCam code patch source suspends other threads and manages W^X/mutex/icache; these mechanisms are not ported or validated here.",
+    "provenance_repair": "Source check exposed a pre-B07 LocationFix local edit from 5d1bdaf8 absent from pins. Exact current bytes matched that committed edit; added local_sha256 and note while preserving upstream revision/hash. InjectionEnvironment has its own B07 local_sha256.",
+    "not_verified": [
+      "Complete hook target, OS, mode, load/disable and deployment inventory while retaining authentication, Irisin and five modes.",
+      "Adapt missing target hooks, VCam thread/protection code patching and version-specific paravirtual I/O paths with target-specific evidence; no general service-name bypass.",
+      "Review candidate environment eligibility and install only with compatible loader/daemon contracts; complete real disable/deployment/VM acceptance. Candidate build remains unactivated."
+    ]
+  },
+  "T44": {
+    "implemented": "Bounded manifest/member reads without extraction; separate product/version/build coverage and supplied board selection; regular-file uniqueness, path validation, ambiguous board member refusal and same-member dedup.",
+    "upstream": "Fixed board source supports cached and IPSW originals; local API implements reading only. Verified target catalogue examples d47ap/iPhone17,3 and j717ap/iPad16,3 are synthetic test identities, not supported-device boot evidence.",
+    "not_verified": [
+      "Integrate verified device catalogue, restore board/runtime board and screen-scale boundaries while preserving the original iPhone baseline.",
+      "Validate the product/board pairing and dtre IM4P contents independently; publish trusted FirmwareOriginals generation with bounded cache/ownership/permission rules.",
+      "Wire legacy-board recovery and migrations and verify supported device firmware/boot behavior. Synthetic archive reads do not establish real IPSW or VM compatibility."
+    ]
+  },
+  "T16": {
+    "implemented": "Reject malformed reasons/replacement lists, empty update list, duplicates, unsafe filenames and contradictory current/update states; retain authoritative root-driver recheck and five-library legacy contract.",
+    "upstream": "Target environment has seven libraries while legacy local environment has five plus its existing mode-specific rules. No blind library-set upgrade or modern eligibility declaration.",
+    "not_verified": [
+      "Implement replace/migrate/rebuild/reject eligibility with authenticated generation, mode, loader and required-library capabilities, complete install and patch-plan evidence.",
+      "Bind environment update to proved installed-kernel/candidate-DSC compatibility and board repair prerequisites; preserve payload authentication and credentials.",
+      "Integrate transactional stopped-VM deployment and failure rollback, ownership and real legacy/new VM acceptance. Report-shape refusal alone does not establish modern update eligibility."
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling vphone_zip_stub.c
+[5/37] Compiling log.c
+[6/37] Compiling locking.c
+[7/37] Compiling deviceinterfaced.c
+[8/37] Compiling fls.c
+[9/37] Compiling common.c
+[10/37] Compiling download.c
+[11/37] Compiling fdr.c
+[12/37] Compiling idevicerestore.c
+[13/37] Compiling asr.c
+[14/37] Compiling recovery.c
+[15/37] Compiling ipsw.c
+[16/37] Compiling normal.c
+[17/37] Compiling limera1n.c
+[18/37] Compiling img3.c
+[19/37] Compiling img4.c
+[20/37] Compiling dfu.c
+[21/37] Compiling ace3.c
+[22/37] Compiling ftab.c
+[23/37] Compiling mbn.c
+[24/37] Compiling restore.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling VPhoneArchiveKitTests BoardDeviceTreeSourceTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneArchiveKitTests/BoardDeviceTreeSourceTests.swift:28:26: error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+26 |                                    identity("D47AP", path: "Firmware/all_flash/DeviceTree.d47ap.im4p")])
+27 |         defer { try? FileManager.default.removeItem(at: fixture.directory) }
+28 |         let source = try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: "iPhone17,3", deviceClass: "d47ap", version: "26.1", build: "23B85")
+   |                          `- error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+29 |         #expect(source.contents == Data([1, 2, 3]))
+30 |         #expect(source.member == "Firmware/all_flash/DeviceTree.d47ap.im4p")
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneArchiveKitTests/BoardDeviceTreeSourceTests.swift:33:53: error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+31 |         #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.directory.path).sorted() == ["input", "input.ipsw"])
+32 |         for (product, version, build) in [("iPhone18,1", "26.1", "23B85"), ("iPhone17,3", "26.2", "23B85"), ("iPhone17,3", "26.1", "wrong")] {
+33 |             #expect(throws: (any Error).self) { try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: product, deviceClass: "d47ap", version: version, build: build) }
+   |                                                     `- error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+34 |         }
+35 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneArchiveKitTests/BoardDeviceTreeSourceTests.swift:42:29: error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+40 |             defer { try? FileManager.default.removeItem(at: fixture.directory) }
+41 |             if Set(paths).count == 1 {
+42 |                 #expect(try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: "iPhone17,3", deviceClass: "d47ap", version: "26.1", build: "23B85").contents == Data([1, 2, 3]))
+   |                             `- error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+43 |             } else {
+44 |                 #expect(throws: (any Error).self) { try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: "iPhone17,3", deviceClass: "d47ap", version: "26.1", build: "23B85") }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneArchiveKitTests/BoardDeviceTreeSourceTests.swift:44:57: error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+42 |                 #expect(try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: "iPhone17,3", deviceClass: "d47ap", version: "26.1", build: "23B85").contents == Data([1, 2, 3]))
+43 |             } else {
+44 |                 #expect(throws: (any Error).self) { try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: "iPhone17,3", deviceClass: "d47ap", version: "26.1", build: "23B85") }
+   |                                                         `- error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+45 |             }
+46 |         }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneArchiveKitTests/BoardDeviceTreeSourceTests.swift:52:53: error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+50 |             let fixture = try archive([identity("d47ap", path: path)])
+51 |             defer { try? FileManager.default.removeItem(at: fixture.directory) }
+52 |             #expect(throws: (any Error).self) { try VPhoneBoardDeviceTreeSource.read(from: fixture.archive, productType: "iPhone17,3", deviceClass: "d47ap", version: "26.1", build: "23B85") }
+   |                                                     `- error: cannot find 'VPhoneBoardDeviceTreeSource' in scope
+53 |         }
+54 |     }
+[29/37] Emitting module VPhoneArchiveKitTests
+error: cancelled
+error: fatalError

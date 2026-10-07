@@ -1,0 +1,28 @@
+..F..........E..
+======================================================================
+ERROR: test_unknown_or_invalid_kernel_region_is_not_a_success (test_dsc_maxslide.MaxSlideDecisionTests.test_unknown_or_invalid_kernel_region_is_not_a_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_dsc_maxslide.py", line 85, in test_unknown_or_invalid_kernel_region_is_not_a_success
+    self.run_patch(kernel_region_size=size)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_dsc_maxslide.py", line 70, in run_patch
+    result = patch_dsc_maxslide(str(self.dir), **kwargs)
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/patchers/cfw_patch_dsc_maxslide.py", line 123, in patch_dsc_maxslide
+    fits = combined <= kernel_region_size
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '<=' not supported between instances of 'int' and 'NoneType'
+
+======================================================================
+FAIL: test_cache_larger_than_kernel_region_is_rejected_even_at_zero_slide (test_dsc_maxslide.MaxSlideDecisionTests.test_cache_larger_than_kernel_region_is_rejected_even_at_zero_slide)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_dsc_maxslide.py", line 77, in test_cache_larger_than_kernel_region_is_rejected_even_at_zero_slide
+    with self.assertRaisesRegex(RuntimeError, 'shared region'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: RuntimeError not raised
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.283s
+
+FAILED (failures=1, errors=1)

@@ -333,3 +333,35 @@ T25 红测试 1 项/2 issues 复现并发导入覆盖 globalActivity 且执行�
 追加前逐项核对原有 313 份证据与 3 份输入副本的已提交字节。台账为 47 项：2 已验收、28 部分推进、16 待对账、1 可选延期；46 项必选仍有 44 项未验收。固定上游提交覆盖台账保持原状态，源码路径审查不等同于整个提交已合入。
 
 证据入口：`evidence/B06-summary.json`、`evidence/B06-source-review.json`。
+
+
+### 2026-10-07 B07：T35、T34、T33、T43、T44、T16
+
+本轮按用户要求推进 6 项，分别提交实现；另提交上一轮 Inspector 的翻译目录修复。六项均保留完整验收条件，未标记 accepted。提交 SHA、原始失败和通过日志见 `evidence/B07-summary.json`。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T35 | DSC 超过传入内核容量时拒绝，覆盖 maxSlide 为零、force、dry_run；容量参数校验，保留默认 6 GiB | 实际内核 base/size 证明、最终 DSC 映射与 maxSlide 成组验证、7 GiB 补丁、调用接入与启动验收 |
+| T34 | 纯 krnl IMG4 载荷替换；目标 IM4M 和附加 DER 元素字节保留；重复更新返回 nil；边界和溢出拒绝 | 原件/generation/plan 校验、唯一 Preboot 文件、DSC 兼容、停机挂载、事务/receipt、CLI/UI 与保留数据验收 |
+| T33 | generation、记录范围/重叠、请求 ID 和当前 patched bytes 校验后产生撤销副本；返回代码页处理所需范围 | 可信首份原件、undo 持久化/合并、DSC/Mach-O/Preboot 接入、代码页重新证明、磁盘事务及 off/on 验收 |
+| T43 | 重复安全开关任一值为 1 即禁用；超过 4096 项按禁用处理；来源摘要核对、候选构建和宿主验证 | 完整 Hook 门控清单、VCam 线程/页保护、版本相关 paravirtual I/O 适配、环境资格、部署与真实模式验收 |
+| T44 | 受限清单与 board DeviceTree 成员读取；身份字段、regular file、路径、容量和歧义检查 | 产品/board 配对独立验证、dtre IM4P、设备目录/restore/runtime/scale、可信原件存储/缓存与迁移/启动验收 |
+| T16 | 拒绝非法或矛盾的环境更新报告、空/重复/路径替换列表；保留 root driver 复检和旧五库接口 | 完整 replace/migrate/rebuild/reject 资格、安装/loader/plan 证据、内核/DSC 配对、停机事务和真实旧 VM 验收 |
+
+T35 的容量来自调用参数，本轮没有实际内核解析证明。显式传入 7 GiB 不证明 VM 已扩容；默认 6 GiB 保留。红测试为 16 项中 1 failure、1 error；首轮修复后，旧测试仍将超容量且 maxSlide 为零描述为 no-op，导致 1 error。按原 C8 拒绝条件改为超容量拒绝并检查字节未变，最终 16 项通过。补丁比较文档记录此次拒绝行为，没有新增内核指令补丁。固定上游安装器在缺 kernel receipt 时使用 27.x 版本推断容量，并可跳过不可读取的 region header；本地后续接入须遵守 C8 的实际证明和 unknown 拒绝要求。
+
+T34、T33、T44 首轮均因缺失新接口编译失败。T34 三项测试验证原始 IM4M/附加元素字节、幂等和畸形 DER；保留字节不等于签名或启动验证。T33 三项测试验证选择性撤销、同页其他补丁保留、JSON 往返、错误 generation/当前字节/缺记录/非法范围/重叠拒绝；它只生成内存副本，不认证调用方原件。T44 三项合成归档测试验证多 board、重复相同来源、冲突和不安全路径；测试使用固定目录中的 d47ap/iPhone17,3 与 j717ap/iPad16,3，不证明真实 IPSW 或设备启动兼容。
+
+T43 红测试 3 项中 2 项失败，修复后 3 项通过。来源检查还发现历史提交 5d1bdaf8 的 LocationFix 修改未记录 local_sha256；当前字节与该已提交修改一致。补齐 local 摘要和说明，保留原 upstream revision/hash；同样记录本轮共享头文件摘要。iOS SDK 候选构建与来源/架构/签名/清单核对通过，构建包含现有 LocationFix 静态初始化警告。RootHide loader link 测试通过，摄像头宿主路径 124 次检查无失败。候选继续保持 activated=false、runtime_validated=false，保留 64 字节摄像头协议头且不兼容 classic camera，未安装。
+
+T16 红测试 1 项产生 9 issues；环境更新和提权复检相关 10 项、3 suites 最终通过。该修复检查报告结构与状态一致性；固定目标七库接口尚未替换本地五库接口，不能据此声明新环境具有更新资格。
+
+串行联合 Swift 范围为 FirmwarePatcher、Archive、Core，以及 CFWEnvironment、GuestEnvironmentUpdate、HostRPC；清除真实固件选择器，排除 FirmwareIntegrationTests。XCTest 135 项，其中 3 项跳过，无失败；Swift Testing 714 项/99 suites、88.107 秒通过，另报告 12 项测试/8 个 suite 跳过，包含真实固件/less 验收。未重跑完整 API HTTP/WS 或真实固件对比；此前全量 Swift 与并行取消时限问题仍保留，原因未查明。
+
+Python 全套首轮运行 564 项、256.960 秒，只有字符串目录测试失败。原因是 B06 提交 cffd033a 新增的 7 个 Inspector 文本缺少翻译目录条目。补齐 en/zh-Hans 条目后，14 项字符串测试通过；完整复验 564 项、260.889 秒通过。保留首轮失败日志及修复提交。
+
+没有签名 VM 宿主重建、候选部署、VM 写入、amfid 或 vm-2607 操作。只读检查观察 vm-new PID 69566 仍使用隔离 worktree 的既有签名 vphone-vm；其 SHA-256/CDHash、配置和既有客户机载荷摘要未变，签名核验通过。主仓库仍为 e8d825b3 且干净。
+
+追加前逐项核对原有 348 份证据与 3 份输入副本的已提交字节。台账为 47 项：2 已验收、34 部分推进、10 待对账、1 可选延期；46 项必选仍有 44 项未验收。步骤、验收、回退、依赖和接口约束未改写。固定上游提交覆盖台账保持原状态，源码路径审查不等同于整个提交已合入。
+
+证据入口：`evidence/B07-summary.json`、`evidence/B07-source-review.json`。

@@ -1860,7 +1860,7 @@
         "T34",
         "T44"
       ],
-      "status": "pending_local_audit",
+      "status": "environment_report_refusal_verified_modern_eligibility_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
         "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift",
@@ -1885,12 +1885,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "environment_report_refusal_verified_modern_eligibility_pending",
+        "paths": [
+          "sources/vphone-cli/VPhoneCFWEnvironmentCLI.swift",
+          "tests/VPhoneCLITests/CFWEnvironmentUpdateTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "4c7a73af1cea94b09a9859cfb85e4e1382125fbd"
+      ],
+      "verification_evidence": [
+        "evidence/B07-summary.json",
+        "evidence/B07-source-review.json",
+        "evidence/B07-swift-related.log",
+        "evidence/B07-python-final.log",
+        "evidence/B07-t16-red.log",
+        "evidence/B07-t16-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "拒绝非法 reasons/replacement 列表、空更新列表、重复和路径文件名，以及 already_current 的矛盾更新状态。保留 root driver 复检和旧五库接口；完整停机更新资格与部署待完成。",
+      "remaining_work": [
+        "Implement replace/migrate/rebuild/reject eligibility with authenticated generation, mode, loader and required-library capabilities, complete install and patch-plan evidence.",
+        "Bind environment update to proved installed-kernel/candidate-DSC compatibility and board repair prerequisites; preserve payload authentication and credentials.",
+        "Integrate transactional stopped-VM deployment and failure rollback, ownership and real legacy/new VM acceptance. Report-shape refusal alone does not establish modern update eligibility."
+      ]
     },
     {
       "id": "T17",
@@ -2534,7 +2552,8 @@
         ]
       },
       "implementation_commits": [
-        "cffd033a7cc64fd8330a1cb8bc732c8ebd025426"
+        "cffd033a7cc64fd8330a1cb8bc732c8ebd025426",
+        "95afaf010f59bb2cd8f33c847ad7a94f48e62f9b"
       ],
       "verification_evidence": [
         "evidence/B06-summary.json",
@@ -2542,7 +2561,11 @@
         "evidence/B06-related.log",
         "evidence/B06-related-serial.log",
         "evidence/B06-t27-red.log",
-        "evidence/B06-t25-t27-final-green.log"
+        "evidence/B06-t25-t27-final-green.log",
+        "evidence/B07-strings-red.log",
+        "evidence/B07-strings-green.log",
+        "evidence/B07-python.log",
+        "evidence/B07-python-final.log"
       ],
       "historical_evidence": [],
       "current_result": "Inspector 分别显示四类记录来源及缺失/非法原因，实际运行版本保持 Unknown。读取在主 actor 外执行；按机器路径和任务取消隔离旧结果。原 RPC 调用保留。完整 receipt/health 与 AX 诊断 UI 待完成。",
@@ -2857,7 +2880,7 @@
         "T15",
         "T32"
       ],
-      "status": "pending_local_audit",
+      "status": "generation_and_current_bytes_undo_verified_publication_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DyldSharedCache/DyldSharedCacheUndoLog.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcherTests/DyldSharedCache/DyldSharedCacheUndoLogTests.swift",
@@ -2879,12 +2902,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "generation_and_current_bytes_undo_verified_publication_pending",
+        "paths": [
+          "sources/FirmwarePatcher/Core/VPhonePatchUndoLog.swift",
+          "tests/FirmwarePatcherTests/PatchUndoLogTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "f225028269804d85873707bf21ee00f803d754ef"
+      ],
+      "verification_evidence": [
+        "evidence/B07-summary.json",
+        "evidence/B07-source-review.json",
+        "evidence/B07-swift-related.log",
+        "evidence/B07-python-final.log",
+        "evidence/B07-t33-red.log",
+        "evidence/B07-t33-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成基于 PatchRecord 的内存撤销预检：generation、请求 ID、范围、重叠及当前字节校验通过后返回新副本和修改范围。原件认证、持久化、代码页重新证明及磁盘事务待完成。",
+      "remaining_work": [
+        "Persist authenticated first-original undo records and merge repeated patches without replacing originals with patched bytes.",
+        "Connect DSC chunk, Mach-O and Preboot undo paths; re-attest touched code pages and publish disk/receipt/undo state transactionally.",
+        "Verify off/on transitions, wrong generation/current bytes, missing backup not-revertible and real guest behavior. In-memory generation comparison does not authenticate a receipt."
+      ]
     },
     {
       "id": "T34",
@@ -2905,7 +2946,7 @@
         "T32",
         "T35"
       ],
-      "status": "pending_local_audit",
+      "status": "kernel_img4_payload_swap_verified_disk_update_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhoneCustomFirmwareInstaller.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
@@ -2932,12 +2973,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "kernel_img4_payload_swap_verified_disk_update_pending",
+        "paths": [
+          "sources/FirmwarePatcher/Binary/VPhoneKernelcacheSwap.swift",
+          "tests/FirmwarePatcherTests/KernelcacheSwapTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "e00ffc9e54a2c0144216ece08116c46e76222297"
+      ],
+      "verification_evidence": [
+        "evidence/B07-summary.json",
+        "evidence/B07-source-review.json",
+        "evidence/B07-swift-related.log",
+        "evidence/B07-python-final.log",
+        "evidence/B07-t34-red.log",
+        "evidence/B07-t34-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成纯 IMG4 内核载荷替换，保留目标 IM4M 和附加 DER 元素原始字节；相同载荷返回 nil，非法或溢出 DER 拒绝。未接入挂载、CLI、receipt 或事务。",
+      "remaining_work": [
+        "Select trusted generation original and patch plan/mode, resolve exactly one stopped-VM Preboot regular-file target and bind to proved DSC compatibility.",
+        "Publish kernel payload, kernel receipt and origins transactionally with failure rollback; CLI/Launchpad update-kernel wiring.",
+        "Verify boot, retained guest data, repeated update and rollback with vm-new. Preserved IM4M bytes do not prove signature validity."
+      ]
     },
     {
       "id": "T35",
@@ -2958,7 +3017,7 @@
         "T32",
         "T03"
       ],
-      "status": "pending_local_audit",
+      "status": "supplied_region_capacity_refusal_verified_kernel_proof_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Memory/KernelCustomFirmwarePatchSharedRegionSize.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/KernelCustomFirmwarePatcher.swift",
@@ -2983,12 +3042,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "supplied_region_capacity_refusal_verified_kernel_proof_pending",
+        "paths": [
+          "scripts/patchers/cfw_patch_dsc_maxslide.py",
+          "tests/test_dsc_maxslide.py"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "9e197e004232cdd4af259d86a1b52b949899dafc"
+      ],
+      "verification_evidence": [
+        "evidence/B07-summary.json",
+        "evidence/B07-source-review.json",
+        "evidence/B07-swift-related.log",
+        "evidence/B07-python-final.log",
+        "evidence/B07-t35-red.log",
+        "evidence/B07-t35-final-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成 DSC 超过传入内核容量时的拒绝，包括 maxSlide 已为零、force 和 dry_run；容量参数校验，默认仍为 6 GiB。显式 7 GiB 参数不证明实际内核已扩容。",
+      "remaining_work": [
+        "Recover and prove the actual kernel shared-region base/size from trusted original and candidate/installed kernel; validate final DSC mappings and effective maxSlide as a pair.",
+        "Implement source-backed unique shared_region_size patch and applicability, unknown/refusal states and independent RAM/disk checks.",
+        "Wire candidate-kernel/current-DSC and installed-kernel/candidate-DSC checks into T34/T16 and complete real 6/7 GiB boot acceptance."
+      ]
     },
     {
       "id": "T36",
@@ -3483,7 +3560,7 @@
         "T24",
         "T03"
       ],
-      "status": "pending_local_audit",
+      "status": "duplicate_safe_flags_and_candidate_verified_hook_port_pending",
       "upstream_paths": [
         "VPhoneGuestComponents/Shared/InjectionEnvironment.h",
         "VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
@@ -3510,12 +3587,36 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "duplicate_safe_flags_and_candidate_verified_hook_port_pending",
+        "paths": [
+          "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h",
+          "dependencies/guest-components-pins.json",
+          "tests/test_injection_environment.py"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "b0eef1bf16dbe10f8bdd48a479d64c9663ea1a56"
+      ],
+      "verification_evidence": [
+        "evidence/B07-summary.json",
+        "evidence/B07-source-review.json",
+        "evidence/B07-swift-related.log",
+        "evidence/B07-python-final.log",
+        "evidence/B07-t43-red.log",
+        "evidence/B07-t43-green.log",
+        "evidence/B07-guest-build.log",
+        "evidence/B07-guest-check.log",
+        "evidence/B07-guest-host-tests.log",
+        "evidence/B07-source-check-before.log",
+        "evidence/B07-guest-candidate-manifest.json"
+      ],
+      "historical_evidence": [],
+      "current_result": "修复重复安全开关的首值覆盖；任一值为 1 即禁用，扫描超过 4096 项按禁用处理。修正历史 LocationFix 来源摘要记录，候选构建与宿主测试通过；未部署，完整 Hook 适配待完成。",
+      "remaining_work": [
+        "Complete hook target, OS, mode, load/disable and deployment inventory while retaining authentication, Irisin and five modes.",
+        "Adapt missing target hooks, VCam thread/protection code patching and version-specific paravirtual I/O paths with target-specific evidence; no general service-name bypass.",
+        "Review candidate environment eligibility and install only with compatible loader/daemon contracts; complete real disable/deployment/VM acceptance. Candidate build remains unactivated."
+      ]
     },
     {
       "id": "T44",
@@ -3537,7 +3638,7 @@
         "T35",
         "T15"
       ],
-      "status": "pending_local_audit",
+      "status": "bounded_board_original_read_verified_identity_migration_pending",
       "upstream_paths": [
         "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestDevice.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/DeviceTree/DeviceTreeGuestDevicePatches.swift",
@@ -3564,12 +3665,30 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "bounded_board_original_read_verified_identity_migration_pending",
+        "paths": [
+          "sources/VPhoneArchiveKit/Archive/VPhoneBoardDeviceTreeSource.swift",
+          "tests/VPhoneArchiveKitTests/BoardDeviceTreeSourceTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "fb519141fa7fce509a7dd5f57471ea7a7a64381b"
+      ],
+      "verification_evidence": [
+        "evidence/B07-summary.json",
+        "evidence/B07-source-review.json",
+        "evidence/B07-swift-related.log",
+        "evidence/B07-python-final.log",
+        "evidence/B07-t44-red.log",
+        "evidence/B07-t44-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成受限 IPSW 清单和 board 原件读取：身份字段匹配、单一 regular member、路径和容量限制、歧义拒绝。产品与 board 配对由调用方另行验证；未持久化原件或验证真实固件/启动。",
+      "remaining_work": [
+        "Integrate verified device catalogue, restore board/runtime board and screen-scale boundaries while preserving the original iPhone baseline.",
+        "Validate the product/board pairing and dtre IM4P contents independently; publish trusted FirmwareOriginals generation with bounded cache/ownership/permission rules.",
+        "Wire legacy-board recovery and migrations and verify supported device firmware/boot behavior. Synthetic archive reads do not establish real IPSW or VM compatibility."
+      ]
     },
     {
       "id": "T45",
@@ -3997,6 +4116,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "cffd033a7cc64fd8330a1cb8bc732c8ebd025426",
-  "latest_validation_limitation": "B06: five tasks partial. Related concurrent run XCTest128 passed, Swift Testing569/84 failed1 cancellation elapsed assertion; cause unknown. Isolated cancellation and serial same-scope rerun passed. Full Swift/API HTTP/WS and real VM acceptance not rerun. Existing signed runtime/vm-new/B05 guest candidate unchanged."
+  "latest_implementation_head": "95afaf010f59bb2cd8f33c847ad7a94f48e62f9b",
+  "latest_validation_limitation": "B07: six tasks partial. Python564 pass after missing B06 Inspector catalog repair; affected serial Swift XCTest135 (3 skipped), Swift Testing714/99 pass. Guest host loader checks and camera124 checks pass; iOS candidate source/build/signature checks pass, unactivated. Actual kernel proof, disk/receipt transactions, modern eligibility and real VM acceptance remain open. Full Swift/API HTTP/WS not rerun; previous failures cause unknown. Signed vm-new runtime unchanged."
 }

@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-07",
+  "tasks": [
+    "T35",
+    "T34",
+    "T33",
+    "T43",
+    "T44",
+    "T16"
+  ],
+  "accepted": false,
+  "base": "e71d992ad18dc10e574c07fd48f5462b78d0b5cc",
+  "implementation_head": "4c7a73af1cea94b09a9859cfb85e4e1382125fbd",
+  "head_with_validation_repair": "95afaf010f59bb2cd8f33c847ad7a94f48e62f9b",
+  "commits": {
+    "T35": "9e197e004232cdd4af259d86a1b52b949899dafc",
+    "T34": "e00ffc9e54a2c0144216ece08116c46e76222297",
+    "T33": "f225028269804d85873707bf21ee00f803d754ef",
+    "T43": "b0eef1bf16dbe10f8bdd48a479d64c9663ea1a56",
+    "T44": "fb519141fa7fce509a7dd5f57471ea7a7a64381b",
+    "T16": "4c7a73af1cea94b09a9859cfb85e4e1382125fbd"
+  },
+  "validation_repair_commit": "95afaf010f59bb2cd8f33c847ad7a94f48e62f9b",
+  "red": {
+    "T35": "16 tests, one failure and one error; intermediate green retained existing oversize no-op characterization and failed one test; replaced that characterization with C8-required refusal and unchanged bytes.",
+    "T34": "missing kernelcache swap API compile failure",
+    "T33": "missing undo API compile failure",
+    "T43": "3 tests, 2 failures for duplicate/oversized flag environments",
+    "T44": "missing board source API compile failure; synthetic iPad board corrected to fixed catalogue j717ap before green",
+    "T16": "1 test, 9 issues for malformed/contradictory reports"
+  },
+  "verification": {
+    "t34-green": {
+      "xctest": 0,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 3,
+      "suites": 1,
+      "pass": true,
+      "seconds": 0.002,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t33-green": {
+      "xctest": 0,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 6,
+      "suites": 2,
+      "pass": true,
+      "seconds": 0.001,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t44-green": {
+      "xctest": 0,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 3,
+      "suites": 1,
+      "pass": true,
+      "seconds": 0.032,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t16-green": {
+      "xctest": 0,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 10,
+      "suites": 3,
+      "pass": true,
+      "seconds": 2.555,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "swift-related": {
+      "xctest": 135,
+      "xctest_skipped": 3,
+      "xctest_failures": 0,
+      "swift_testing_reported": 714,
+      "suites": 99,
+      "pass": true,
+      "seconds": 88.107,
+      "skipped_tests": 12,
+      "skipped_suites": 8
+    }
+  },
+  "python": {
+    "reported": 564,
+    "seconds": 260.889,
+    "skipped": 0,
+    "pass": true,
+    "initial_failure": "564 tests, one failure: seven Inspector string literals absent from catalog",
+    "cause": "B06 commit cffd033a added localizable call sites without catalog entries",
+    "repair": "Added seven en/zh-Hans entries; 14 string tests passed then full suite rerun"
+  },
+  "guest": {
+    "build_pass": true,
+    "source_pin_check_pass": true,
+    "loader_link_pass": true,
+    "camera_host_checks": 124,
+    "camera_host_failures": 0,
+    "candidate_manifest": "evidence/B07-guest-candidate-manifest.json",
+    "activated": false,
+    "runtime_validated": false,
+    "warning": "Existing LocationFix static initializer warning in build log"
+  },
+  "scope": "Affected Swift FirmwarePatcher/Archive/Core and CFWEnvironment/GuestEnvironmentUpdate/HostRPC serial suites; real-firmware selectors cleared and FirmwareIntegrationTests excluded. Python whole firmware-free suite. Guest host tests and iOS candidate build. No real firmware or VM acceptance.",
+  "vm_new": {
+    "operations_performed": false,
+    "pid_observed": 69566,
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+  },
+  "signed_host": {
+    "rebuilt_or_deployed": false,
+    "actual_process_executable": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+    "sha256": "40b283470ea099080aee54b9378368bc130a0e0f01423bcd87528e593efc4a11",
+    "CDHash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+    "verify_pass": true
+  },
+  "main": {
+    "head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+    "clean": true
+  },
+  "full_swift_rerun": false,
+  "full_swift_limitation": "Previous HTTP/WS/cancellation/helper failures and serial HTTP wait unresolved; cause unknown. Related B06 concurrent cancellation timing failure preserved despite isolated and serial passes.",
+  "counts": {
+    "total": 47,
+    "required": 46,
+    "accepted": 2,
+    "partial": 34,
+    "pending_audit": 10,
+    "optional_deferred": 1,
+    "required_unaccepted": 44
+  }
+}
