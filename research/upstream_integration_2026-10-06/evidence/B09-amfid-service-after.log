@@ -1,0 +1,158 @@
+system/com.apple.MobileFileIntegrity = {
+	active count = 0
+	path = /System/Library/LaunchDaemons/com.apple.MobileFileIntegrity.plist
+	type = LaunchDaemon
+	state = not running
+
+	program = /usr/libexec/amfid
+	arguments = {
+		/usr/libexec/amfid
+	}
+
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	environment = {
+		OSLogRateLimit => 64
+		MallocSpaceEfficient => 1
+		XPC_SERVICE_NAME => com.apple.MobileFileIntegrity
+	}
+
+	domain = system
+	minimum runtime = 10
+	base minimum runtime = 10
+	exit timeout = 5
+	runs = 44
+	last exit reason = JETSAM_REASON_MEMORY_IDLE_EXIT
+	last jetsam exit details = JETSAM_REASON_MEMORY_IDLE_EXIT
+
+	event triggers = {
+		com.apple.MobileFileIntegrity.CodeRequirementPrefsChanged => {
+			keepalive = 0
+			service = com.apple.MobileFileIntegrity
+			stream = com.apple.fsevents.matching
+			monitor = com.apple.UserEventAgent-System
+			descriptor = {
+				"Path" => "/Library/Preferences/com.apple.security.coderequirements.plist"
+			}
+		}
+		com.apple.MobileFileIntegrity.LibraryValidationPrefsChanged => {
+			keepalive = 0
+			service = com.apple.MobileFileIntegrity
+			stream = com.apple.fsevents.matching
+			monitor = com.apple.UserEventAgent-System
+			descriptor = {
+				"Path" => "/Library/Preferences/com.apple.security.libraryvalidation.plist"
+			}
+		}
+		com.apple.security.amfid.reportmetrics => {
+			keepalive = 0
+			service = com.apple.MobileFileIntegrity
+			stream = com.apple.xpc.activity
+			monitor = com.apple.UserEventAgent-System
+			descriptor = {
+				"Repeating" => true
+				"GracePeriod" => 3600
+				"Delay" => 86400
+				"Priority" => "Maintenance"
+			}
+		}
+		com.apple.security.amfid.cleanmetrics => {
+			keepalive = 0
+			service = com.apple.MobileFileIntegrity
+			stream = com.apple.xpc.activity
+			monitor = com.apple.UserEventAgent-System
+			descriptor = {
+				"Repeating" => true
+				"GracePeriod" => 3600
+				"Delay" => 1209600
+				"Priority" => "Maintenance"
+			}
+		}
+	}
+
+	endpoints = {
+		"com.apple.amfi.nsxpc" = {
+			port = 0x5f03
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+		"com.apple.MobileFileIntegrity" = {
+			port = 0x310b
+			host-special port = 18 (amfi)
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+		"com.apple.amfi.xpc" = {
+			port = 0x7403
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+		"com.apple.amfi.lockdown" = {
+			port = 0x6003
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+	}
+
+	event channels = {
+		"com.apple.fsevents.matching" = {
+			port = 0x7303
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+		"com.apple.xpc.activity" = {
+			port = 0x7203
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+	}
+
+	resource coalition = {
+		ID = 269
+		type = resource
+		state = active
+		active count = 1
+		name = com.apple.MobileFileIntegrity
+	}
+
+	jetsam coalition = {
+		ID = 270
+		type = jetsam
+		state = active
+		active count = 1
+		name = com.apple.MobileFileIntegrity
+	}
+
+	spawn type = interactive (4)
+	jetsam priority = 40
+	jetsam memory limit (active, soft) = 50 MB
+	jetsam memory limit (inactive, soft) = 50 MB
+	jetsamproperties category = daemon
+	jetsam thread limit = 32
+	cpumon = default
+	exponential throttling grace limit = 10
+	job state = exited
+	sanitizer flags = 0x0
+
+	properties = runatload | supports transactions | supports pressured exit | inferred program | system service | exponential throttling | tle system
+}

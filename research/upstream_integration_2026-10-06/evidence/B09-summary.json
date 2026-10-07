@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-07",
+  "task_accepted": false,
+  "source_head": "2387af2015f3e86dbddca43d9ba1a9b06344c4b0",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "scope": [
+    "T03 baseline VM acceptance",
+    "T29 candidate assembly",
+    "T19 host observation",
+    "T22 read-only status",
+    "T26 signed artifact checks"
+  ],
+  "source_changes": false,
+  "candidate": {
+    "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B09/candidate.app",
+    "vm_sha256": "fe835bab19e8f71338adf803ae496b5906c75ceb4f2b34b16963970edba25a87",
+    "vm_cdhash": "52b10bcbce6db82de6afa83b801eb95da55246c7",
+    "build_pass": true,
+    "bundle_check_pass": true,
+    "external_resource_resolution_pass": true,
+    "vm_help_exit": 137,
+    "runtime_verified": false,
+    "security_authorization": "pending exact-hash authorization; no new candidate bypass performed"
+  },
+  "baseline": {
+    "source_commit": "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+    "vm_cdhash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+    "pid": 60709,
+    "connected": true,
+    "first_direct_boot_exit": -9,
+    "guest_actual_readback": {
+      "bytes": 240352,
+      "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+    },
+    "stale_instance_refused": true,
+    "matching_target_pass": true,
+    "apps": [
+      {
+        "request": {
+          "t": "app_launch",
+          "screen": false,
+          "bundle_id": "com.apple.Preferences"
+        },
+        "response": {
+          "ok": false,
+          "error": "com.apple.Preferences did not start (uiopen ok but no pid)"
+        }
+      },
+      {
+        "request": {
+          "t": "app_launch",
+          "screen": false,
+          "bundle_id": "com.apple.mobilesafari"
+        },
+        "response": {
+          "ok": false,
+          "error": "com.apple.mobilesafari did not start (uiopen ok but no pid)"
+        }
+      }
+    ],
+    "touch_settings_did_not_show_settings": true,
+    "native_window_capture": "CUA displayed black VM area; cause unknown; API screen capture showed SpringBoard. No native coordinate click performed.",
+    "api_transport": "api_not_ready; baseline has no api listener",
+    "kept_running": true
+  },
+  "checkpoint": {
+    "path": "/Users/qcz3840/github/vphone-cli/vm.backups/b09-vm-new-stopped-20261007-second",
+    "files_verified": 65,
+    "source_metadata_changes": {},
+    "method": "APFS clonefile; copy-on-write; no physical independence; no dense fallback",
+    "first_attempt": "All file digests matched, final source metadata equality failed; specific original differences were not captured. Cause unknown. Failed sample retained.",
+    "first_failed_path": "/Users/qcz3840/github/vphone-cli/vm.backups/b09-vm-new-stopped-20261007.staging",
+    "physical_independence": false,
+    "prior_independent_restore_retained": true
+  },
+  "identity": {
+    "expected": "0000FE01-F77952D4F70ACD5D",
+    "matching_host_devices": [
+      {
+        "serial": "0000FE01-F77952D4F70ACD5D",
+        "connection_type": "USB"
+      }
+    ],
+    "scope": "usbmux list only; no pairing, trust or guest identity write",
+    "guest_identity_not_collected": true
+  },
+  "launchpad": {
+    "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B09/launchpad.app",
+    "build_and_signature_pass": true,
+    "live_settings_keyboard_tested": false
+  },
+  "security_helper": {
+    "authorized_hash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+    "allow_all": false,
+    "paths": [],
+    "independent_empty_config": true,
+    "spoof_apple": true,
+    "exit_code": 1,
+    "exception": "Unexpected process state 10; detach Sending disconnect packet failed",
+    "launchd_last_exit_reason": "JETSAM_REASON_MEMORY_IDLE_EXIT",
+    "helper_and_debugserver_remaining": false,
+    "amfid_service_config_retained": true,
+    "persistent_security_modifications": false
+  },
+  "configuration_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+  "guest_payload_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "api_v2_or_shared_components_deployed": false,
+  "setup_observation": "Welcome -> appearance -> SpringBoard observed; only one standard swipe was issued by this driver. No setup agreement/account/permission confirmation performed; full transition mechanism not established. Settings and Safari still had no PID after SpringBoard.",
+  "application_failure_cause": "unknown",
+  "crash_observation": "No corresponding Settings/Safari crash file observed in top-level/Retired lists. Two Setup ExcUserFault records were listed; content not analyzed.",
+  "asuser_probe": "Guest launchctl has no asuser subcommand; uiopen was not run by this probe. This does not test the user-bootstrap hypothesis.",
+  "version_audit": {
+    "local_app_plist": "1.0",
+    "local_core_bundle_minimum": "2.2.0",
+    "target_plan_core_bundle_minimum": "2.6.0",
+    "target_supported_series_policy_implemented": false,
+    "note": "Local candidate versions do not imply official 2.6.1 capabilities; T29 remains partial and T28 prerequisites unaccepted."
+  },
+  "free_bytes_observed": 14508982272,
+  "screenshots": [
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/after-app-launches.png",
+      "bytes": 790767,
+      "sha256": "ee9a19b88dc1db40a973d3ee137cce3446cdc035cb0cdf02d3fe796c37b86817"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/after-swipe.png",
+      "bytes": 299259,
+      "sha256": "62b5b7e9a146df1fe8fb37a361ff21e3d5641d21ab5119b51f0104249f27c0f6"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/apps-after-home.png",
+      "bytes": 3112081,
+      "sha256": "a1fa55f90c7f7e2865f1bd6b19ca7a51755e0f54b540c8c17c3fc5060b4052a8"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/current-setup.png",
+      "bytes": 3112633,
+      "sha256": "ec8dee43e70039a6d68d51ec2f929444dc5c0b2613a6bd5aca81a992cb2a0f5c"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/home-after-settings.png",
+      "bytes": 4009141,
+      "sha256": "e8d53222b1e107ca949d332b4543f60b59429040163159608b5d50b05c585960"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/home-before-launches.png",
+      "bytes": 3112081,
+      "sha256": "a1fa55f90c7f7e2865f1bd6b19ca7a51755e0f54b540c8c17c3fc5060b4052a8"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/screen-30.png",
+      "bytes": 36645,
+      "sha256": "19ed6b6b393a3f04083dd030e7a571c623bc390be7d29b4d80ac464b79bfa4b5"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/settings-manual.png",
+      "bytes": 3112081,
+      "sha256": "a1fa55f90c7f7e2865f1bd6b19ca7a51755e0f54b540c8c17c3fc5060b4052a8"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/startup.png",
+      "bytes": 4033530,
+      "sha256": "de3ecd7a8845e722c63d261812c6d7e5a8b454c8e24e596aebea1b7dbd3bbcee"
+    }
+  ],
+  "prior_test_results_not_recounted": true,
+  "full_swift_and_api_test_limitations_retained": true,
+  "main_head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "main_source_clean": true,
+  "vm_2607_operated": false,
+  "remaining_required_unaccepted": 44
+}

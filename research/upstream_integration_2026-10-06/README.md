@@ -397,3 +397,32 @@ T26 初始测试误用了不存在的 decodeInfo；改为现有 decodeList 后�
 追加前逐项核对原有 387 份证据和 3 份输入副本的已提交字节。当前 47 项：2 已验收、40 部分推进、4 待对账、1 可选延期；46 项必选仍有 44 项未验收。未改写步骤、验收、回退、依赖和接口约束；固定上游提交覆盖台账未改变。
 
 证据入口：`evidence/B08-summary.json`、`evidence/B08-source-review.json`。
+
+
+### 2026-10-07 B09：签名候选与 vm-new 实际验收
+
+本轮没有修改实现源码。基于 `2387af2015f3e86dbddca43d9ba1a9b06344c4b0` 执行 `make build`，完整 Bundle 的资源、嵌入权限和签名检查通过；`check_bundle.py --execute` 的仓库外工作目录及符号链接资源定位通过。Launchpad 构建与双语资源、嵌入 CLI/VM CDHash 一致性及外层签名检查通过。工件分别保存在 `.build/acceptance/B09/{baseline.app,candidate.app,launchpad.app}`，逐文件摘要为 196、197、206 个文件，具体清单见 `evidence/B09-artifact-manifest.json`。工件保存并不构成发布签收。
+
+| 任务 | 结果 | 未完成范围 |
+| --- | --- | --- |
+| T03 | 新停机 APFS 检查点 65 文件摘要及源元数据一致性通过；旧宿主启动 vm-new 并连接 | Settings/Safari 仍无 PID；未通过应用与完整恢复验收 |
+| T19 | 宿主 usbmux USB serial 与预测 UDID 一致；只读发现，不创建配对或信任 | guest 独立身份未采集，新比较接口未接入运行路径 |
+| T22 | classic 摄像头通道连接、来源 off；定位来源 off | 当前运行旧宿主，不验证本轮写入 lease；预览、拍照和最终组件组合未测 |
+| T26 | 本轮签名 Launchpad 及嵌入工具链校验通过 | 新 UI 操作、实际硬件键盘输入及其他管理场景未测 |
+| T29 | CLI/VM/Launchpad 候选组装和摘要保存完成，保留上一完整 Bundle | 新 VM 可执行文件直接退出 137，限定临时放行授权待确认；版本矩阵、T28 前置验收未完成 |
+
+新增停机检查点为 `/Users/qcz3840/github/vphone-cli/vm.backups/b09-vm-new-stopped-20261007-second`。首次克隆的每个文件摘要一致，但最后源元数据比较失败；该次未记录具体变化项，原因未查明，`.staging` 失败样本保留。第二次在不降低检查条件的情况下记录差异，65 文件通过，`source_metadata_changes={}`。这属于同 APFS 卷的写时复制检查点，不证明物理介质独立；此前独立卷恢复与原备份继续保留。
+
+本轮新 VM CDHash 为 `52b10bcbce6db82de6afa83b801eb95da55246c7`，直接 `--help` 退出 137。此前授权只覆盖 `61ea15c6739775b707d3a36fca082c4d97049be2`，没有自动扩大授权。已请求为新哈希使用独立空配置、`--spoof-apple` 的限定临时放行；回复尚未收到，新哈希辅助进程未运行。执行技能将 security-sensitive action 列为暂停确认项，具体来源为 `/Users/qcz3840/.codex/plugins/cache/openai-curated-remote/superpowers/6.4.2/skills/executing-plans/SKILL.md`。
+
+实际运行使用旧宿主 `8777bc7e47795939badf222fbc4bbe7d8e3e6584`，PID 60709，显式指定 EXP 和 vm-new 原 `.vphoned.signed`。旧工件从保存路径直接启动也被系统终止，之后按已有精确哈希授权运行独立临时辅助进程，VM 启动并连接。实际 guest `/usr/bin/vphoned` 读回 SHA-256 为 `306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001`，与宿主原载荷一致。配置 SHA-256 保持 `e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee`。没有部署 API-v2 daemon 或 shared-components 候选，也未改写 kernel/Preboot。
+
+错误 instance 请求返回 `target_mismatch` 与 `operation_may_continue=false`，匹配 instance 的请求通过。应用列表读取 235 项，classic 服务与 v3 摄像头能力可见；API transport 返回 `api_not_ready`。上述结果只验证旧组合。本轮曾发出不带 generation 的 camera_status，被参数检查拒绝；带测试 generation 的只读状态返回 connected=true、source=off，不证明发布、消费或拍照。
+
+屏幕先显示欢迎页，随后显示外观页，再显示主屏幕。驱动只发送一次普通上滑；没有执行条款、账号或权限确认。完整页面转移过程尚未确定。主屏幕出现前后，Settings 与 Safari 程序化启动均返回 `uiopen ok but no pid`，对应进程查询无结果。一次 Settings 图标触控返回 ok，但截图仍为主屏幕，进程查询仍无结果；命令回复不作为应用启动证明。CUA 选择确切旧 Bundle 后观察到黑色 VM 显示区域，而 host-control 截图显示主屏幕，原因未查明；仅前置窗口，未在黑色区域执行坐标点击。CrashReporter/Retired 清单未列出对应应用崩溃文件；列出两项 Setup ExcUserFault，但未分析内容。guest `launchctl asuser` 探测返回不支持该子命令，没有执行该探测中的 uiopen，不能据此验证用户 bootstrap 假设。
+
+临时旧哈希辅助进程退出码 1，报告 `Unexpected process state 10` 和 detach disconnect 失败。之后 launchd 显示 amfid 最近退出原因 `JETSAM_REASON_MEMORY_IDLE_EXIT`；最终进程检查无该 helper 或 debugserver。vm-new 继续运行、通信可用。未修改持久安全设置。首次最终进程快照误用 Darwin 截断的 comm 字段，已改用完整 command 字段并断言 PID/路径；最终证据记录了修正。
+
+T29 提前准备工件，不视为 T28 已验收。本地 Info.plist 仍为 1.0，Core Bundle 代码最低版本仍为 2.2.0，目标计划的 >=2.6.0 与支持 major.minor series 策略尚未接入；版本数字不证明官方功能等价。没有重跑此前完整 Python/Swift 测试，也未把此前定向通过计为本轮新的用例。完整 Swift/API HTTP/WS 的既有失败与未测范围继续保留。
+
+台账为 2 项 accepted、41 项部分推进、3 项待本地对账（T30/T31/T42）、1 项可选延期；44 项必选任务仍未验收。主仓库源码仍为 e8d825b3 且干净，vm-2607 未操作。证据入口：`evidence/B09-summary.json`。

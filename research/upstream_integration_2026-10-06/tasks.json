@@ -962,16 +962,23 @@
         "evidence/T03-actual-scoped-amfid.py",
         "evidence/T03-actual-scoped-amfid.log",
         "evidence/T03-actual-host-preflight-after.log",
-        "evidence/T03-actual-summary.json"
+        "evidence/T03-actual-summary.json",
+        "evidence/B09-summary.json",
+        "evidence/B09-artifact-manifest.json",
+        "evidence/B09-checkpoint-second.json",
+        "evidence/B09-runtime-probe.json",
+        "evidence/B09-followup.json",
+        "evidence/B09-apps-after-home.json",
+        "evidence/B09-manual-apps.json"
       ],
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "目标应用与首次设置验收未通过，原因未查明；原 vm-new 验收前是否完成设置待用户补充。",
-      "current_environment_note": "原 vm-new 已恢复运行（PID 69566，候选宿主 8777bc7e）；本轮恢复映像已卸载，原始恢复点和失败副本均保留，vm-2607 未操作。",
-      "current_capacity_bytes": 60620800000,
-      "current_result": "原 VM 正常停机；65 文件备份与独立 APFS 卷恢复均逐文件摘要通过；再次 APFS 克隆 65 文件通过，持久卷专用测试文件读回一致。Settings 启动返回无 PID，GUI 停留首次设置且滑动未推进，原因未查明；T03 未验收。原 VM 已用 8777bc7e 候选重启、连接正常，配置与旧客户机载荷摘要未变。",
-      "available_capacity_gib": 56.46,
+      "blocked_reason": "主屏幕状态下目标应用启动仍无 PID，原因未查明；新候选精确 CDHash 临时放行授权待确认。",
+      "current_environment_note": "vm-new 使用冻结旧候选运行（PID 60709）；客户机载荷/配置摘要未变。限定旧哈希辅助进程因 amfid 退出后报错退出，已无 helper/debugserver；持久安全设置未修改，vm-2607 未操作。",
+      "current_capacity_bytes": 14508982272,
+      "current_result": "本轮新增停机 APFS 检查点 65 文件逐项摘要通过。旧宿主 8777bc7e 启动 vm-new、通信和现有 daemon 摘要读回通过；屏幕已进入主屏幕，但 Settings/Safari 程序化启动仍无 PID，标准 Settings 触控后也未观察对应进程，原因未查明。T03 未验收。",
+      "available_capacity_gib": 13.51,
       "capacity_observed_date": "2026-10-07",
       "selected_vm_path": "/Users/qcz3840/github/vphone-cli/vm-new",
       "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups",
@@ -2112,7 +2119,9 @@
         "evidence/B08-t19-red.log",
         "evidence/B08-swift-related.log",
         "evidence/B08-python.log",
-        "evidence/B08-t19-green.log"
+        "evidence/B08-t19-green.log",
+        "evidence/B09-summary.json",
+        "evidence/B09-artifact-manifest.json"
       ],
       "historical_evidence": [],
       "current_result": "完成调用方提供的 expected/guest/host 身份比较；缺失、非法、差异和匹配分别表达。未采集实际身份，未新增修改身份能力或推定宿主信任。",
@@ -2309,7 +2318,9 @@
         "evidence/B08-python.log",
         "evidence/B08-t22-green.log",
         "evidence/B08-t22-failure-red-corrected.log",
-        "evidence/B08-t26-t22-green.log"
+        "evidence/B08-t26-t22-green.log",
+        "evidence/B09-summary.json",
+        "evidence/B09-artifact-manifest.json"
       ],
       "historical_evidence": [],
       "current_result": "排队写入使用独立描述符，限制一项未完成帧并设发送超时；晚失败核对连接、来源和描述符。保留本地协议及回执，实际重连、完整组件与预览/拍照验收待完成。",
@@ -2616,7 +2627,9 @@
         "evidence/B08-swift-related.log",
         "evidence/B08-python.log",
         "evidence/B08-t26-t22-green.log",
-        "evidence/B08-t26-red-corrected.log"
+        "evidence/B08-t26-red-corrected.log",
+        "evidence/B09-summary.json",
+        "evidence/B09-artifact-manifest.json"
       ],
       "historical_evidence": [],
       "current_result": "接入每 VM 键盘开关报告与设置 UI；旧报告缺字段保持开启，仅明确编辑时发出 on/off。翻译条目齐备，真实签名 UI、键盘输入和其他历史 UI 范围待完成。",
@@ -2808,7 +2821,7 @@
       "dependencies": [
         "T28"
       ],
-      "status": "pending_local_audit",
+      "status": "signed_candidate_frozen_old_guest_baseline_verified_new_runtime_authorization_pending",
       "upstream_paths": [
         "VPhone.xcworkspace/",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -2833,12 +2846,27 @@
         "protocol"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "signed_candidate_frozen_old_guest_baseline_verified_new_runtime_authorization_pending",
+        "paths": [
+          "scripts/build.sh",
+          "scripts/build_launchpad.sh",
+          "scripts/check_bundle.py",
+          "scripts/check_launchpad_bundle.py",
+          "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift"
+        ]
       },
       "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "verification_evidence": [
+        "evidence/B09-summary.json",
+        "evidence/B09-artifact-manifest.json"
+      ],
+      "historical_evidence": [],
+      "current_result": "完整 CLI/VM 与 Launchpad 签名候选构建、资源定位、嵌入一致性核对通过，逐文件摘要冻结。新 VM 工件直接执行退出 137，限定临时放行授权待确认；旧候选连接与原 guest 摘要读回通过，应用启动失败，原因未查明。",
+      "remaining_work": [
+        "Prerequisite T28 acceptance; minimum 2.6 and supported major/minor series policy remain unimplemented (local current minimum 2.2).",
+        "Authorize and run the exact signed candidate; baseline 8777bc7e behavior cannot validate source 2387af20.",
+        "Complete explicit mixed-version compatibility/upgrade/rollback matrix with all component/firmware provenance; no API-v2/guest environment activation performed."
+      ]
     },
     {
       "id": "T30",
@@ -4236,8 +4264,9 @@
       "id": "R08",
       "decision": "T24 在打包前显式编译现有 xcstrings；隔离构建输入固定到当前 Gitlink，复制独立文件",
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
-    }
+    },
+    "B09: prepare/freeze T29 artifacts early without treating unaccepted T28 or any version number as capability equivalence. Retain failed checkpoint and rerun exact metadata/digest validation with diagnostics; do not weaken guards. New CDHash requires separate security authorization; old runtime is separately labeled."
   ],
   "latest_implementation_head": "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3",
-  "latest_validation_limitation": "B08 six tasks partial; Python571 pass; affected serial Swift XCTest167 and Swift Testing553/84 pass with documented skips. Daemon candidate build/pins/signature checks pass, unactivated. No guest deployment, signed VM runtime rebuild or VM acceptance. Full Swift/API HTTP/WS limitations retained."
+  "latest_validation_limitation": "B09 builds/freeze/full signed Bundle and Launchpad checks passed. Only old 8777bc7e runtime accepted for connection/readback/refusal probes; Settings/Safari still fail with no PID after SpringBoard, cause unknown. New 2387af20 runtime direct help exit137 awaits exact-hash security authorization. No source changes, new guest/component deployment, full test rerun or task acceptance."
 }

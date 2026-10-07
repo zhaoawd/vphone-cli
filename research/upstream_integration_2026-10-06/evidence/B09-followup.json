@@ -1,0 +1,153 @@
+[
+  {
+    "request": {
+      "t": "file_get",
+      "screen": false,
+      "path": "/usr/bin/vphoned"
+    },
+    "response": {
+      "size": 240352,
+      "ok": true,
+      "readback": {
+        "bytes": 240352,
+        "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+      }
+    }
+  },
+  {
+    "request": {
+      "t": "camera_status",
+      "screen": false,
+      "generation": "b09-read-only-status"
+    },
+    "response": {
+      "host_published_frame_index": 0,
+      "streaming": false,
+      "presentation_id": "",
+      "host_frame_index_semantics": "scheduled_tick",
+      "ok": true,
+      "role": "neutral",
+      "generation": "",
+      "host_scheduled_frame_index": 0,
+      "source": "off",
+      "connected": true,
+      "matches_requested": false
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; launchctl list | grep -E \"vphoned|sshd\"; ps -A -o pid=,comm= | grep -E \"vphoned|Setup.app/Setup|SpringBoard\"",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "stdout": "   39 /System/Library/CoreServices/SpringBoard.app/SpringBoard\n  349 /Applications/Setup.app/Setup\n  433 /usr/bin/vphoned\n",
+      "timed_out": false,
+      "ok": true,
+      "truncated": false,
+      "code": 0,
+      "stderr": ""
+    }
+  },
+  {
+    "request": {
+      "t": "swipe",
+      "screen": false,
+      "x1": 645.0,
+      "y1": 2792.0,
+      "x2": 645.0,
+      "y2": 1400.0,
+      "ms": 600
+    },
+    "response": {
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "screenshot",
+      "screen": false,
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/after-swipe.png"
+    },
+    "response": {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/after-swipe.png",
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "app_launch",
+      "screen": false,
+      "bundle_id": "com.apple.Preferences"
+    },
+    "response": {
+      "error": "com.apple.Preferences did not start (uiopen ok but no pid)",
+      "ok": false
+    }
+  },
+  {
+    "request": {
+      "t": "app_foreground",
+      "screen": false
+    },
+    "response": {
+      "pid": 0,
+      "name": "",
+      "source": "unknown",
+      "bundle_id": "",
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "app_launch",
+      "screen": false,
+      "bundle_id": "com.apple.mobilesafari"
+    },
+    "response": {
+      "error": "com.apple.mobilesafari did not start (uiopen ok but no pid)",
+      "ok": false
+    }
+  },
+  {
+    "request": {
+      "t": "app_foreground",
+      "screen": false
+    },
+    "response": {
+      "pid": 0,
+      "name": "",
+      "source": "unknown",
+      "bundle_id": "",
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "screenshot",
+      "screen": false,
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/after-app-launches.png"
+    },
+    "response": {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b09-vm-new-20261007/after-app-launches.png",
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"Preferences.app/Preferences|MobileSafari.app/MobileSafari|Setup.app/Setup\"",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 0,
+      "timed_out": false,
+      "stdout": "  349 /Applications/Setup.app/Setup\n",
+      "stderr": "",
+      "ok": true,
+      "truncated": false
+    }
+  }
+]
