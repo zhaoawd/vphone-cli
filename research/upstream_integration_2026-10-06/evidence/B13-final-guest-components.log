@@ -1,0 +1,145 @@
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C sources/VPhoneGuestComponents test-loader-links test-vcam-dataplane test-virtiosound
+/usr/bin/clang -Wall -Wextra -Werror -o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/RootHideLoaderLinksTests \
+		Tests/RootHideLoaderLinksTests.c Shared/RootHideLoaderLinks.c
+RootHide loader link tests passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -Wno-unused-parameter \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VCamDataPlaneTests \
+		Tests/VCamDataPlaneTests.c VCamDataPlane/vcam_dataplane.c \
+		-framework CoreMedia -framework CoreVideo -framework CoreFoundation \
+		-framework CoreGraphics
+vcam data-plane proof harness
+=============================
+
+[1] timing state machine
+    host_ts=1726500000000000000 pts=0.000000s dur=0.033333s
+    host_ts=1726500000033400000 pts=0.033400s dur=0.033400s
+    host_ts=1726500000066700000 pts=0.066700s dur=0.033300s
+    host_ts=1726500000566700000 pts=0.566700s dur=0.033333s
+    host_ts=1726500000566700000 pts=0.600033s dur=0.033333s
+  ok
+
+[2] format descriptions from pixel buffers
+    mediaSubType = '420v' (0x34323076)
+  CMVideoFormatDescription:
+    mediaSubType = '420v' (0x34323076)
+    dims = 1280x720
+    extensions.count = 7
+    extensions = {
+    CVBytesPerRow = 1924;
+    CVCleanAperture =     {
+        Height = 720;
+        HorizontalOffset = 0;
+        VerticalOffset = 0;
+        Width = 1280;
+    };
+    CVImageBufferColorPrimaries = "ITU_R_709_2";
+    CVImageBufferTransferFunction = "ITU_R_709_2";
+    CVImageBufferYCbCrMatrix = "ITU_R_709_2";
+    CVPixelAspectRatio =     {
+        HorizontalSpacing = 1;
+        VerticalSpacing = 1;
+    };
+    Version = 2;
+}
+    cleanAperture = 1280x720 off(0,0)
+    mediaSubType = 'BGRA' (0x42475241)
+  ok
+
+[3] full chains + reachable-state dump
+  -- chain: BGRA host frame -> '420v' camera sample --
+  CVPixelBuffer:
+    dims = 1280x720
+    format = '420v' (0x34323076)
+    planeCount = 2
+    plane 0: 1280x720 bpr=1280 base=0x0
+    plane 1: 640x360 bpr=1280 base=0x0
+    attachment YCbCrMatrix = ITU_R_709_2
+    attachment ColorPrimaries = ITU_R_709_2
+    attachment TransferFunction = ITU_R_709_2
+  CMVideoFormatDescription:
+    mediaSubType = '420v' (0x34323076)
+    dims = 1280x720
+    extensions.count = 7
+    extensions = {
+    CVBytesPerRow = 1924;
+    CVCleanAperture =     {
+        Height = 720;
+        HorizontalOffset = 0;
+        VerticalOffset = 0;
+        Width = 1280;
+    };
+    CVImageBufferColorPrimaries = "ITU_R_709_2";
+    CVImageBufferTransferFunction = "ITU_R_709_2";
+    CVImageBufferYCbCrMatrix = "ITU_R_709_2";
+    CVPixelAspectRatio =     {
+        HorizontalSpacing = 1;
+        VerticalSpacing = 1;
+    };
+    Version = 2;
+}
+    cleanAperture = 1280x720 off(0,0)
+  CMSampleBuffer:
+    numSamples = 1
+    duration = 0.033333s (33333333/1000000000)
+    pts = 0.000000s (stream-local)
+    attachmentsArray = (present)
+    intrinsicMatrix (column-major) =
+      [1044.39, 0.00, 640.00]
+      [0.00, 1044.39, 360.00]
+      [0.00, 0.00, 1.00]
+    dependsOnOthers = false (I-frame)
+    patch white  -> Y=235 (exp 235 d=0)  Cb=128 (exp 128 d=0)  Cr=128 (exp 128 d=0)
+    patch black  -> Y= 16 (exp  16 d=0)  Cb=128 (exp 128 d=0)  Cr=128 (exp 128 d=0)
+    patch red    -> Y= 63 (exp  63 d=0)  Cb=102 (exp 102 d=0)  Cr=240 (exp 240 d=0)
+    patch green  -> Y=172 (exp 172 d=0)  Cb= 41 (exp  41 d=0)  Cr= 34 (exp  34 d=0)
+    patch blue   -> Y= 32 (exp  32 d=0)  Cb=240 (exp 240 d=0)  Cr=110 (exp 110 d=0)
+    patch gray   -> Y=126 (exp 126 d=0)  Cb=128 (exp 128 d=0)  Cr=128 (exp 128 d=0)
+    fx=fy=1044.39 (want 1044.39 from HFOV 63.0 deg) ox=640.0 oy=360.0
+  -- chain: BGRA host frame -> BGRA camera sample --
+  CVPixelBuffer:
+    dims = 1280x720
+    format = 'BGRA' (0x42475241)
+    planeCount = 0
+    bpr = 5120 base=0x0
+    attachment YCbCrMatrix = (none)
+    attachment ColorPrimaries = ITU_R_709_2
+    attachment TransferFunction = ITU_R_709_2
+    fx=fy=1044.39 (want 1044.39 from HFOV 63.0 deg) ox=640.0 oy=360.0
+  ok
+
+[4] 420v -> BGRA round trip
+    round-trip white  -> B=255 G=255 R=255 (delta 0/0/0)
+    round-trip black  -> B=  0 G=  0 R=  0 (delta 0/0/0)
+    round-trip red    -> B=  0 G=  1 R=255 (delta 0/1/0)
+    round-trip green  -> B=  0 G=250 R= 13 (delta 0/5/13)
+    round-trip blue   -> B=255 G=  4 R=  0 (delta 0/4/0)
+    round-trip gray   -> B=128 G=128 R=128 (delta 0/0/0)
+  ok
+
+[5] phase 3/4: CGImage path + format/sample consistency
+  [4a] pixel buffer -> CGImage (preview/photo path)
+  [4b] published-format <-> delivered-sample consistency
+  ok
+
+=============================
+124 checks, 0 failures
+../../.venv/bin/python3 -B ../../scripts/check_virtio_sound.py
+VirtIOSound algorithm provenance passed; no deployable audio driver or runtime validation
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundTests \
+		Tests/VirtIOSoundTests.c VirtIOSound/VPVirtIOSoundProtocol.c VirtIOSound/VPVirtIOSoundRing.c \
+		VirtIOSound/VPVirtIOSoundFilter.c
+VirtIOSoundTests: all passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundClockTests \
+		Tests/VirtIOSoundClockTests.c VirtIOSound/VPVirtIOSoundClock.c
+VirtIOSoundClockTests: 410890 racing reads, 0 refused
+VirtIOSoundClockTests: all passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundConverterTests \
+		Tests/VirtIOSoundConverterTests.c VirtIOSound/VPVirtIOSoundConverter.c
+VirtIOSoundConverterTests: all passed
+xcrun --sdk macosx clang -O1 -Wall -Wextra -Werror -IVirtIOSound \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest-components-v2/VirtIOSoundLatencyTests \
+		Tests/VirtIOSoundLatencyTests.c VirtIOSound/VPVirtIOSoundLatency.c
+VirtIOSoundLatencyTests: all passed

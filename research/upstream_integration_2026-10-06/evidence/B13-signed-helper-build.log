@@ -1,0 +1,21 @@
+COMMAND ["/bin/zsh", "scripts/build_helper_candidate.sh"]
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Building for production...
+[0/3] Write swift-version--58304C5D6DBC2206.txt
+[1/2] Linking vphone-helper
+Build of product 'vphone-helper' complete! (4.88s)
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper: replacing existing signature
+configured: 3AA3QL69MQ, protocol 2
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/MacOS/vphone-cli: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app: replacing existing signature
+Signed candidate: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app
+Registration was not performed. Use its CLI: helper register

@@ -1,0 +1,40 @@
+OVERVIEW: Boot a virtual iPhone or patch firmware with the Swift pipeline
+
+USAGE: vphone-cli <subcommand>
+
+OPTIONS:
+  -h, --help              Show help information.
+
+SUBCOMMANDS:
+  boot (default)          Boot a virtual iPhone (PV=3)
+  patch-firmware          Patch boot-chain firmware in a VM directory using the
+                          Swift pipeline (diagnostic entry: takes a bare path
+                          instead of a VM name; `vphone-cli fw patch` is the
+                          normal one). Both take the same VM-directory lock and
+                          refuse a busy VM.
+  patch-component         Patch a single firmware component payload and write
+                          the patched raw bytes
+  vm                      Manage vphone VM bundles
+  fw                      Firmware pipeline: prepare (download/merge IPSWs) and
+                          patch
+  restore                 DFU-restore firmware into a VM bundle (requires a
+                          running DFU boot)
+  cfw                     Custom-firmware install (host-mount; VM must be off;
+                          re-execs sudo)
+  setup                   Provision/verify the host Python environment
+                          (~/.vphone/venv)
+  resources               Print the resolved runtime resource directory
+  doctor                  Diagnose the host and a VM without changing anything
+                          (read-only)
+  sign                    Sign an ARM Mach-O with the native signing library
+  dump-entitlements       Print a Mach-O's embedded entitlements (replaces
+                          `ldid -e`)
+  archive                 Unpack and pack archives
+  restore-inspect         Inspect a local restore directory and optional ticket
+                          without accessing a device
+  core-bundle             Install and verify root-owned Core Bundles
+  helper                  Manage the signed privileged helper (requires a
+                          configured Apple signing team)
+  guest                   Send host-control requests to a running VM
+
+  See 'vphone-cli help <subcommand>' for detailed help.

@@ -1,0 +1,42 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[6/18] Write swift-version--58304C5D6DBC2206.txt
+[8/17] Compiling VPhoneCore VPhoneVirtualMachineManifest.swift
+[9/17] Emitting module VPhoneCore
+[10/17] Compiling VPhoneCore VPhoneBundleOps.swift
+[11/27] Compiling VPhoneCore VPhoneNativeTransfer.swift
+[12/27] Compiling VPhoneCore VPhoneLibrary.swift
+[13/27] Compiling VPhoneCore VPhoneRestoreInfo.swift
+[14/27] Compiling VPhoneCore VPhoneRestoreOps.swift
+[15/27] Compiling VPhoneCore VPhoneBundle.swift
+[16/27] Compiling VPhoneCore VPhoneBundleReport.swift
+[17/27] Compiling VPhoneCore VPhoneLaunchLayout.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:125:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+123 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+124 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+125 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+126 |         }
+127 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[18/27] Compiling VPhoneCore VPhoneNetworking.swift
+[19/27] Compiling VPhoneCore VPhoneCreateCheckpoint.swift
+[20/27] Compiling VPhoneCore VPhoneDiagnosticChecks.swift
+[21/50] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachine.swift
+[22/50] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineEdit.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift:99:13: error: cannot find 'args' in scope
+ 97 |         }
+ 98 |         if let enabled = settings.unlockAtStartup {
+ 99 |             args += ["--startup-unlock", enabled ? "on" : "off"]
+    |             `- error: cannot find 'args' in scope
+100 |         }
+101 |         if let enabled = settings.hardwareKeyboardEnabled {
+[23/53] Emitting module VPhoneArchiveKitTests
+[24/53] Emitting module VPhoneLaunchpadKit
+[25/53] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+[26/53] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMenuBar.swift
+[27/53] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreation.swift
+error: fatalError

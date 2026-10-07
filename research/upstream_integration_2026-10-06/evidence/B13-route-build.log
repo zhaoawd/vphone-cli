@@ -1,0 +1,45 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/48] Compiling fdr.c
+[6/57] Compiling asr.c
+[7/61] Compiling download.c
+[8/81] Compiling ipsw.c
+[9/114] Compiling recovery.c
+[10/118] Compiling normal.c
+[11/118] Compiling dfu.c
+[12/118] Compiling restore.c
+[14/118] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineOrigins.swift
+[14/118] Compiling limera1n.c
+[15/118] Compiling img4.c
+[16/118] Compiling img3.c
+[18/118] Compiling VPhoneLaunchpadKit VPhoneLaunchpadBindingPersistence.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBindingPersistence.swift:31:69: error: call can throw but is not marked with 'try'
+29 |                 let before = try snapshotInventory(source)
+30 |                 try VPhoneStoppedSnapshotCopy.copy(from: source, to: destination)
+31 |                 guard try snapshotInventory(destination) == before, snapshotInventory(source) == before else {
+   |                                                                     |- error: call can throw but is not marked with 'try'
+   |                                                                     |- note: did you mean to use 'try'?
+   |                                                                     |- note: did you mean to handle error as optional value?
+   |                                                                     `- note: did you mean to disable error propagation?
+32 |                     throw VPhoneLaunchpadError("VM backup verification failed; binding was not changed. Preserve the backup for inspection.")
+33 |                 }
+[18/118] Compiling ace3.c
+[19/118] Compiling mbn.c
+[20/118] Compiling ftab.c
+[21/118] Compiling fls.c
+[23/118] Compiling VPhoneLaunchpadKit VPhoneLaunchpadConsoleLog.swift
+[23/118] Compiling locking.c
+[24/118] Compiling log.c
+[25/118] Compiling idevicerestore.c
+[26/118] Compiling deviceinterfaced.c
+[27/118] Compiling common.c
+[28/118] Compiling vphone_zip_stub.c
+[29/118] Compiling vphone_restore_bridge.c
+[30/118] Compiling MobileRecoveryCore libirecovery.c
+[32/118] Emitting module VPhoneLaunchpadKit
+error: fatalError

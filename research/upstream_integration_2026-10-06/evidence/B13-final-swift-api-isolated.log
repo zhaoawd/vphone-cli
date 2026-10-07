@@ -1,0 +1,61 @@
+COMMAND ["swift", "test", "--disable-sandbox", "--skip-build", "--filter", "APIHTTPTests|APIWebSocketTests|OutputXPCTests"]
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-08 00:09:07.559.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-08 00:09:07.561.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-08 00:09:07.561.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 00:09:07.561.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputXPCTests started.
+◇ Suite APIHTTPTests started.
+◇ Suite APIWebSocketTests started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+◇ Test realHTTPRPCHealthAndProtocolErrors() started.
+◇ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() started.
+◇ Test webSocketRefusesRedirect() started.
+◇ Test refusesRedirectAndOversizedResponses() started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() started.
+◇ Test preCancelledTaskDoesNotSend() started.
+◇ Test correlatesOutOfOrderRepliesAndInterleavedEvents() started.
+◇ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() started.
+◇ Test malformedMessageFailsPendingRequests() started.
+◇ Test remoteErrorOnlyFailsItsMatchingRequest() started.
+◇ Test receivesEventsWithoutAnRPC() started.
+◇ Test cancellationAndLateReplyCannotCompleteNextRequest() started.
+◇ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() started.
+◇ Test boundsPendingRequestsAndCloseCompletesWaiters() started.
+✔ Test preCancelledTaskDoesNotSend() passed after 0.002 seconds.
+✔ Test receivesEventsWithoutAnRPC() passed after 0.002 seconds.
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 0.003 seconds.
+✔ Test correlatesOutOfOrderRepliesAndInterleavedEvents() passed after 0.008 seconds.
+✔ Test boundsPendingRequestsAndCloseCompletesWaiters() passed after 0.009 seconds.
+✔ Test malformedMessageFailsPendingRequests() passed after 0.009 seconds.
+✔ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() passed after 0.011 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 0.011 seconds.
+✔ Suite OutputXPCTests passed after 0.011 seconds.
+✔ Test cancellationAndLateReplyCannotCompleteNextRequest() passed after 0.014 seconds.
+✔ Test remoteErrorOnlyFailsItsMatchingRequest() passed after 0.015 seconds.
+✔ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() passed after 0.015 seconds.
+✔ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() passed after 0.061 seconds.
+✔ Suite APIWebSocketTests passed after 0.062 seconds.
+✔ Test refusesRedirectAndOversizedResponses() passed after 0.171 seconds.
+✔ Test webSocketRefusesRedirect() passed after 0.225 seconds.
+✔ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() passed after 0.226 seconds.
+✔ Test realHTTPRPCHealthAndProtocolErrors() passed after 0.238 seconds.
+✔ Test deadlineAndCallerCancellationEndHTTPWait() passed after 0.280 seconds.
+✔ Suite APIHTTPTests passed after 0.280 seconds.
+✔ Test run with 17 tests in 3 suites passed after 0.280 seconds.

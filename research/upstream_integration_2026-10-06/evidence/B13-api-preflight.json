@@ -1,0 +1,164 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "capabilities",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        }
+      },
+      "response": {
+        "guest_connected": true,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+          "process_started_at": 1791372919.040498
+        },
+        "protocol_version": 1,
+        "ok": true,
+        "boot_mode": "normal",
+        "screen_available": true,
+        "commands": {
+          "location_stop": true,
+          "app_launch": true,
+          "environment_status": false,
+          "capabilities": true,
+          "camera_stop": true,
+          "camera_status": true,
+          "shell": true,
+          "location_stream_push": true,
+          "location_source_control": true,
+          "screenshot": true,
+          "rpc": false,
+          "open_url": true,
+          "type": true,
+          "key": true,
+          "location_stream_start": true,
+          "app_foreground": true,
+          "location_source_status": true,
+          "location": true,
+          "camera_present": true,
+          "ipa_install": true,
+          "file_get": true,
+          "swipe": true,
+          "location_source_set": true,
+          "environment_rollback": false,
+          "app_terminate": true,
+          "app_list": true,
+          "location_source_stop": true,
+          "file_put": true,
+          "tap": true,
+          "environment_update": false
+        },
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "api_session": {
+          "errorCode": "transport",
+          "state": "reconnecting",
+          "vmInstanceID": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "rpc_methods": [],
+        "api_commands": {
+          "app_foreground": false,
+          "app_list": false,
+          "file_put": false,
+          "app_terminate": false,
+          "app_launch": false,
+          "file_get": false
+        },
+        "limits": {
+          "inline_file_bytes": 1048576,
+          "command_timeout_ms": 180000,
+          "request_bytes": 2097152,
+          "host_file_bytes": 67108864,
+          "connections": 16
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "environment_status",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        }
+      },
+      "response": {
+        "code": "api_not_ready",
+        "ok": false,
+        "error": "the guest API session is not ready"
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; id; command -v launchctl; command -v mkdir; ls -ld /var/root/vphone-b13-api; ps -A -o pid=,comm= | grep -E \"vphoned|vphone-b13\"; ls -l /var/root/Library/Caches/vphoned*",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "ok": true,
+        "timed_out": false,
+        "stderr": "ls: cannot access '/var/root/vphone-b13-api': No such file or directory\n",
+        "stdout": "uid=0(root) gid=0(wheel) groups=0(wheel)\n/var/jb/usr/bin/launchctl\n/var/jb/usr/bin/mkdir\n   70 /usr/bin/vphoned\n-rwxr-xr-x 1 root wheel 240352 Oct  2 02:11 /var/root/Library/Caches/vphoned\n",
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "ok": true,
+        "size": 240352,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    }
+  ],
+  "frozen_host": {
+    "vm": "vm-new",
+    "pid": 92943,
+    "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+  },
+  "candidate_sha256": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749"
+}

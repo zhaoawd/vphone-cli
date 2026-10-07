@@ -1,0 +1,65 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/15] Write sources
+[3/15] Write swift-version--58304C5D6DBC2206.txt
+[5/14] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[6/14] Compiling vphone_cli VPhoneClipboardShortcutSync.swift
+[7/14] Compiling vphone_cli VPhoneWindowController.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneWindowController.swift:70:105: error: extra argument 'uti' in call
+ 68 |             guard let control else { throw CancellationError() }
+ 69 |             if let text = value.text { try await control.clipboardSet(text: text) }
+ 70 |             else if let bytes = value.imageData { try await control.clipboardSet(imageData: bytes, uti: "public.png") }
+    |                                                                                                         `- error: extra argument 'uti' in call
+ 71 |         }, chord: { [weak control] usage in
+ 72 |             control?.sendHIDDown(page: 0x07, usage: 0xE3)
+[8/14] Compiling vphone_cli VPhoneAppDelegate.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:195:44: error: cannot find 'hostInputQueueHex' in scope
+193 |                 keyHelper: keyHelper,
+194 |                 control: control,
+195 |                 ecid: vm.ecid, inputQueue: hostInputQueueHex
+    |                                            `- error: cannot find 'hostInputQueueHex' in scope
+196 |             )
+197 |             windowController = wc
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:195:26: error: value of type 'VPhoneVirtualMachine' has no member 'ecid'
+193 |                 keyHelper: keyHelper,
+194 |                 control: control,
+195 |                 ecid: vm.ecid, inputQueue: hostInputQueueHex
+    |                          `- error: value of type 'VPhoneVirtualMachine' has no member 'ecid'
+196 |             )
+197 |             windowController = wc
+[9/23] Compiling vphone_cli VPhoneHostScreenAdapter.swift
+[10/23] Compiling vphone_cli VPhoneMenuApps.swift
+[11/24] Compiling vphone_cli VPhoneMenuRecord.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[12/24] Compiling vphone_cli VPhoneMenuController.swift
+[13/24] Compiling vphone_cli VPhoneMenuKeys.swift
+[14/24] Compiling vphone_cli VPhoneMenuConnect.swift
+[15/24] Compiling vphone_cli VPhoneMenuLocation.swift
+[16/24] Compiling vphone_cli VPhoneMenuBattery.swift
+[17/24] Compiling vphone_cli VPhoneMenuCamera.swift
+[18/24] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[19/24] Compiling vphone_cli VPhoneScreenRecorder.swift
+error: fatalError

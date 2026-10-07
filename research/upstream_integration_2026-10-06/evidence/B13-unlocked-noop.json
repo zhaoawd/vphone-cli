@@ -1,0 +1,164 @@
+{
+  "observations": [
+    {
+      "request": {
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "t": "rpc",
+        "method": "screen.unlock",
+        "params": {
+          "timeout": 10
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_screen_off": true,
+          "was_locked": true
+        },
+        "method": "screen.unlock"
+      }
+    },
+    {
+      "request": {
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "t": "rpc",
+        "method": "screen.unlock",
+        "params": {
+          "timeout": 10
+        }
+      },
+      "response": {
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_screen_off": false,
+          "was_locked": false
+        },
+        "method": "screen.unlock",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "t": "rpc",
+        "method": "device.screen",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "orientation": 0,
+          "locked": false,
+          "screen_off": false,
+          "height": 932,
+          "width": 430,
+          "scale": 3
+        },
+        "method": "device.screen"
+      }
+    },
+    {
+      "request": {
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "t": "screenshot",
+        "color": true
+      },
+      "response": {
+        "ok": true,
+        "saved_image": {
+          "path": "/private/tmp/vphone-b13-unlocked-screen.jpg",
+          "bytes": 37840,
+          "sha256": "0259385965972bc285b4fd983c3ab108be89e85169eb36c6418ae88b6a57bbff"
+        }
+      }
+    },
+    {
+      "request": {
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "t": "rpc",
+        "method": "agent.health",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "instance_id": "67449773-367D-4774-AD7D-239FEDD0A7CC",
+          "capabilities": [
+            "session_identity",
+            "touch",
+            "hid",
+            "apps",
+            "url",
+            "files",
+            "file_download_identity",
+            "file_upload_identity",
+            "clipboard",
+            "location",
+            "keychain",
+            "ipa_install",
+            "bootstrap_install",
+            "bootstrap_uninstall",
+            "port_forward",
+            "screenshot",
+            "screen_unlock",
+            "device_info",
+            "display",
+            "audio",
+            "input_gestures",
+            "ui_inspection",
+            "processes",
+            "services",
+            "logs",
+            "network_capture",
+            "app_details",
+            "system_control",
+            "system_shutdown",
+            "file_tools",
+            "packages",
+            "environment_update",
+            "environment_transaction",
+            "environment_activation"
+          ],
+          "name": "vphoned",
+          "ios": "26.1.0",
+          "status": "ok",
+          "setup_pending": false,
+          "api_version": 1,
+          "ip": "fe80::103c:5a1f:d2f9:99b6%en0",
+          "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749"
+        },
+        "method": "agent.health",
+        "ok": true
+      }
+    }
+  ],
+  "password_supplied": false,
+  "automatic_host_worker_activated": false
+}

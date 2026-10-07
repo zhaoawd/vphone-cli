@@ -1,0 +1,85 @@
+{
+  "source_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+  "rows": [
+    {
+      "case": "missing-installed-bundle",
+      "arguments": [
+        "vm",
+        "launch",
+        "sample",
+        "--library-root",
+        "/private/tmp/vphone-b13-binding-hru7u2fe"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: Unable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\n"
+    },
+    {
+      "case": "bound-project-root-refused",
+      "arguments": [
+        "vm",
+        "launch",
+        "sample",
+        "--library-root",
+        "/private/tmp/vphone-b13-binding-hru7u2fe",
+        "--project-root",
+        "/private/tmp"
+      ],
+      "returncode": 64,
+      "stdout": "",
+      "stderr": "Error: A bound VM uses its verified Core Bundle resources; --project-root is refused.\nUsage: vphone-cli <subcommand>\n  See 'vphone-cli --help' for more information.\n"
+    },
+    {
+      "case": "corrupt-binding-refused",
+      "arguments": [
+        "vm",
+        "launch",
+        "sample",
+        "--library-root",
+        "/private/tmp/vphone-b13-binding-hru7u2fe"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: DecodingError.dataCorrupted: Data was corrupted. Debug description: The given data was not valid JSON.. Underlying error: Error Domain=NSCocoaErrorDomain Code=3840 \"Unexpected character 'b' around line 1, column 3.\" UserInfo={NSDebugDescription=Unexpected character 'b' around line 1, column 3., NSJSONSerializationErrorIndex=2}\n"
+    },
+    {
+      "case": "target-below-minimum-refused",
+      "arguments": [
+        "vm",
+        "bind-core-bundle",
+        "sample",
+        "--library-root",
+        "/private/tmp/vphone-b13-binding-hru7u2fe",
+        "--version",
+        "2.5.9",
+        "--backup",
+        "/private/tmp/vphone-b13-binding-hru7u2fe/backup"
+      ],
+      "returncode": 64,
+      "stdout": "",
+      "stderr": "Error: Bound execution requires Core Bundle 2.6.0 or later\nUsage: vphone-cli <subcommand>\n  See 'vphone-cli --help' for more information.\n"
+    },
+    {
+      "case": "missing-bundle-refused-before-migration",
+      "arguments": [
+        "vm",
+        "bind-core-bundle",
+        "sample",
+        "--library-root",
+        "/private/tmp/vphone-b13-binding-hru7u2fe",
+        "--version",
+        "2.6.1-local.55fd8ef5",
+        "--backup",
+        "/private/tmp/vphone-b13-binding-hru7u2fe/backup"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: Unable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\n"
+    }
+  ],
+  "config_unchanged": true,
+  "backup_not_created": true,
+  "binding_not_published": true,
+  "real_VM_not_touched": true,
+  "VM_boot_was_not_required": true
+}

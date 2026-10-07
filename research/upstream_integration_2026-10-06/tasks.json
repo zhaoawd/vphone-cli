@@ -1280,7 +1280,10 @@
         "evidence/B05-python.log",
         "evidence/B05-icli-diagnostic.log",
         "evidence/B05-icli-intermediate.log",
-        "evidence/B05-python-green.log"
+        "evidence/B05-python-green.log",
+        "evidence/B13-summary.json",
+        "evidence/B13-api-acceptance.json",
+        "evidence/B13-api-cleanup-final.json"
       ],
       "historical_evidence": [],
       "acceptance_limits": [
@@ -2894,7 +2897,10 @@
         "evidence/B11-user-context.json",
         "evidence/B11-final-state.json",
         "evidence/B12-summary.json",
-        "evidence/B12-final-state.json"
+        "evidence/B12-final-state.json",
+        "evidence/B13-summary.json",
+        "evidence/B13-api-acceptance.json",
+        "evidence/B13-api-cleanup-final.json"
       ],
       "historical_evidence": [],
       "current_result": "B09 冻结源码 2387af20 的候选已于 B10 完成启动、正常停机和重启，classic/hash/marker/instance/token 检查通过。B11 已观察主屏幕，但输入解锁过程未证明，Settings 启动仍无 PID；API 仍 reconnecting/transport。新音频算法未编入或部署到该候选。T29 未验收。",
@@ -3272,7 +3278,7 @@
         "T08",
         "T23"
       ],
-      "status": "automatic_lifecycle_and_known_setup_gate_verified_vm_pending",
+      "status": "startup_unlock_persistence_and_guest_readiness_bridge_vm_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
         "VPhoneDaemon/Native/vphoned_unlock.m",
@@ -3296,7 +3302,7 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "automatic_lifecycle_and_known_setup_gate_verified_vm_pending",
+        "state": "startup_unlock_persistence_and_guest_readiness_bridge_vm_pending",
         "paths": [
           "sources/VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
           "sources/VPhoneDaemon/Native/vphoned_unlock.m",
@@ -3307,11 +3313,13 @@
           "sources/VPhoneAPIKit/VPhoneAPIWire.swift",
           "sources/vphone-cli/VPhoneAppDelegate.swift",
           "sources/vphone-cli/VPhoneCLI.swift"
-        ]
+        ],
+        "batch_source_manifest": "evidence/B13-source-review.json"
       },
       "implementation_commits": [
         "57b124589b78530ddc2f0d19e31119b108cd1686",
-        "92eeb3afc70f2506b9a03d0e0bd5d6a0edfed7ef"
+        "92eeb3afc70f2506b9a03d0e0bd5d6a0edfed7ef",
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -3324,15 +3332,18 @@
         "evidence/B05-candidate-check.log",
         "evidence/B12-summary.json",
         "evidence/B12-source-review.json",
-        "evidence/B12-related-green.log"
+        "evidence/B12-related-green.log",
+        "evidence/B13-summary.json",
+        "evidence/B13-source-review.json",
+        "evidence/B13-final-partition-results.json",
+        "evidence/B13-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "新增默认关闭的 direct boot --unlock-at-startup；API health 严格解析可选 setup_pending，未知或 pending 时跳过。按可信 instance/hash/连接代际去重，启用当前实例不立即执行；停止、关闭、断线及换连接使后续请求失效。启动早期观察和请求与手动宿主输入共用队列；测试通过。当前 daemon 没有 setup_pending 提供方，新宿主未部署，真实锁屏/密码未验收。",
+      "current_result": "接入每 VM 默认关闭的 unlockAtStartup、CLI vm config/vm launch、Launchpad 设置和菜单；菜单手动解锁与自动解锁复用输入队列。guest health 根据 Setup Assistant 状态提供可选 setup_pending。临时 API-only daemon 的实际健康返回 false，熄屏锁定及 respring 后解锁返回 unlocked，已解锁重复请求保持 unlocked。新宿主尚未启动，因此这些 RPC 不证明新宿主自动解锁 worker 已生效。",
       "remaining_work": [
-        "guest setup_pending provider and actual Setup Assistant readiness verification; current daemon lacks field and automatic work is skipped",
-        "per-VM persisted option, menu/Launchpad setting and VM launch forwarding; only direct boot opt-in is wired",
-        "actual dark/locked/unlocked/known password/cold boot/respring/userspace behavior with new signed host",
-        "cancellation cannot undo an already submitted RPC; password bypass is not established"
+        "new signed host cold boot, same-instance reconnect and userspace reboot acceptance with persisted toggle and manual/automatic input queue",
+        "actual password-configured behavior remains unverified; no credentials supplied and no bypass claim",
+        "full prerequisite T06/T07/T08/T23 acceptance; already submitted RPC cannot be undone by later cancellation"
       ]
     },
     {
@@ -3354,7 +3365,7 @@
         "T24",
         "T40"
       ],
-      "status": "stop_refusal_guard_verified_api_guest_first_pending",
+      "status": "api_guest_first_shutdown_and_disk_release_guard_vm_pending",
       "upstream_paths": [
         "VPhoneDaemon/Native/vphoned_power.m",
         "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
@@ -3377,7 +3388,7 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "stop_refusal_guard_verified_api_guest_first_pending",
+        "state": "api_guest_first_shutdown_and_disk_release_guard_vm_pending",
         "paths": [
           "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
           "sources/VPhoneDaemon/Native/vphoned_power.m",
@@ -3385,12 +3396,14 @@
           "sources/vphone-cli/VPhoneAppDelegate.swift",
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
           "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift"
-        ]
+        ],
+        "batch_source_manifest": "evidence/B13-source-review.json"
       },
       "implementation_commits": [
         "975d1288bffda4189e915b68afb1f8ff68a9d6e0",
         "b1af6dd64e88cd90512951f5fd68ef02a46b7c20",
-        "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762"
+        "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762",
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -3403,14 +3416,18 @@
         "evidence/B05-candidate-check.log",
         "evidence/B12-summary.json",
         "evidence/B12-source-review.json",
-        "evidence/B12-related-green.log"
+        "evidence/B12-related-green.log",
+        "evidence/B13-summary.json",
+        "evidence/B13-source-review.json",
+        "evidence/B13-final-partition-results.json",
+        "evidence/B13-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "修复 Launchpad Stop 失败后仍向自身 launch 子进程发送 SIGINT 的行为；成功时保留原 wrapper 清理。真实子进程回归先复现 3 个失败断言后通过，完整 Kit 中与旧语义冲突的测试已调整并显式清理夹具。guest-first API、写操作冲突与磁盘释放仍未完成。",
+      "current_result": "宿主 Stop 接入 API guest-first，旧 guest 回退并区分 accepted/alreadyStopped/frameworkRequired；API accepted 后不重复发旧 guest 请求，保留既有宽限期与 framework 回退。停止完成及旧 VM 绑定写入均要求磁盘占用检查成功且为空。真实测试子进程及打开磁盘夹具验证失效/占用时拒绝；不向磁盘占用进程发送信号。临时 API force:false 请求实际拒绝，VM 保持运行。新宿主真实关机未验收。",
       "remaining_work": [
-        "API guest-first menu/Launchpad integration and target timeout/error state checks",
-        "Stop/update/backup coordination and disk release observation",
-        "authorization/force/root negative guest cases and real shutdown/DFU/panic/old daemon behavior"
+        "actual new-host stop, disk release, API disconnect during shutdown, timeout and old guest/DFU/panic behavior",
+        "update/backup/Stop coordination across full T24/T40 integration",
+        "full authorization/root negative matrix; force:false and HTTP authentication were exercised, not all privilege paths"
       ]
     },
     {
@@ -3495,7 +3512,7 @@
         "T23",
         "T36"
       ],
-      "status": "focus_sync_generation_and_mac_preservation_verified_vm_pending",
+      "status": "clipboard_shortcuts_and_rich_text_preservation_bridge_vm_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift",
         "VPhoneKit/VPhoneCoreKit/Support/VPhoneClipboardTransfer.swift",
@@ -3518,7 +3535,7 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "focus_sync_generation_and_mac_preservation_verified_vm_pending",
+        "state": "clipboard_shortcuts_and_rich_text_preservation_bridge_vm_pending",
         "paths": [
           "sources/VPhoneCore/VPhoneClipboardTransfer.swift",
           "sources/vphone-cli/VPhoneControl.swift",
@@ -3528,11 +3545,13 @@
           "sources/vphone-cli/VPhoneClipboardFocusSync.swift",
           "sources/vphone-cli/VPhoneWindowController.swift",
           "tests/VPhoneCLITests/ClipboardFocusTests.swift"
-        ]
+        ],
+        "batch_source_manifest": "evidence/B13-source-review.json"
       },
       "implementation_commits": [
         "f03615b1de4d658304ce83edce57b8b132a1d071",
-        "c54a5e4df8cc3e77831b36988d6dab03e56e3c85"
+        "c54a5e4df8cc3e77831b36988d6dab03e56e3c85",
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -3542,14 +3561,18 @@
         "evidence/B05-t39-green.log",
         "evidence/B12-summary.json",
         "evidence/B12-source-review.json",
-        "evidence/B12-related-green.log"
+        "evidence/B12-related-green.log",
+        "evidence/B13-summary.json",
+        "evidence/B13-source-review.json",
+        "evidence/B13-final-partition-results.json",
+        "evidence/B13-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "窗口 become/resign key 与连接观察已接入 classic 失焦复制。可靠非负 change_count 建立本连接基线；后续增量才可同步。连接 token、修改 revision、焦点代际和 Mac changeCount 淘汰晚回复；自动 type/clipboard set 完成后重建基线。classic 图片随同一次 await 返回，既有 1 MiB/16 MiB 限制保留。5 个状态测试及 18 个传输测试通过，未在新宿主/真实图片上验收。",
+      "current_result": "Cmd C/X/V 接入共享输入队列；每次异步等待检查窗口焦点、连接、修改代际及 Mac changeCount。复制缺少可靠原计数时仍发送 guest HID，增量同步保持有界；粘贴仅在本次写入计数一致时发送 Cmd V。Mac writer 对相同文本/图片不重写 pasteboard，命名 pasteboard 测试验证 rich text 与 changeCount 保留。classic 文本 1 MiB/图片 16 MiB 限制保留。新宿主真实操作和 API 分开图片下载尚未验收。",
       "remaining_work": [
-        "Cmd C/X/V transfer/chord integration and real touch-copy/fast focus acceptance with new signed host",
-        "API separate image download second-await lease checks when that transport is integrated",
-        "actual Mac rich-text/image/type/reconnect/reboot behavior; classic connection-local count is not a persistent daemon identity"
+        "modern API separate image-download await lease integration when that transport is enabled",
+        "actual new-host touch Copy, Cmd C/X/V, image/rich-text, fast focus changes, slow replies, type and reconnect/reboot matrix",
+        "full prerequisites T06/T23/T36 acceptance; old classic runtime does not exercise new clipboard UI code"
       ]
     },
     {
@@ -3570,7 +3593,7 @@
         "T05",
         "T24"
       ],
-      "status": "binding_snapshot_revision_and_four_origins_verified_execution_pending",
+      "status": "core_binding_persistence_verified_routing_and_legacy_backup_bridge_vm_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -3596,18 +3619,20 @@
         "host"
       ],
       "local_mapping": {
-        "state": "binding_snapshot_revision_and_four_origins_verified_execution_pending",
+        "state": "core_binding_persistence_verified_routing_and_legacy_backup_bridge_vm_pending",
         "paths": [
           "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift",
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineBinding.swift",
           "tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift"
-        ]
+        ],
+        "batch_source_manifest": "evidence/B13-source-review.json"
       },
       "implementation_commits": [
         "0cf9383c7fd2f257cb5afa60f1e327ae4dc9854a",
         "7d6f45e03907ab2b0739f9083d338322eb8a89bb",
-        "94ec7976f2ad21e6bf59e867228a6f083a6a9304"
+        "94ec7976f2ad21e6bf59e867228a6f083a6a9304",
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
       ],
       "verification_evidence": [
         "evidence/B06-summary.json",
@@ -3618,15 +3643,19 @@
         "evidence/B06-t40-final-green.log",
         "evidence/B12-summary.json",
         "evidence/B12-source-review.json",
-        "evidence/B12-related-green.log"
+        "evidence/B12-related-green.log",
+        "evidence/B13-summary.json",
+        "evidence/B13-source-review.json",
+        "evidence/B13-final-partition-results.json",
+        "evidence/B13-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "读取绑定现通过快照验证，保存 SHA-256、device/inode 和 mtime/ctime；检测读取期间同长度改写及路径替换。内容相同的重写最初未使快照失效，真实回归失败后修正。现有 inspector 读取复用快照，四类来源保持原语义；未接入执行选择、持久化或客户机写入。",
+      "current_result": "绑定及版本策略移入 VPhoneCore；默认最低执行版本 2.6，支持 major.minor series 和 local/CI 后缀。CLI bind-core-bundle 在 VM 锁与磁盘释放检查后持久化绑定；旧 VM 首次迁移先制作完整可读回的写时复制备份。launch 持有 verified Bundle 执行租约，拒绝 projectRoot 和缺失/损坏绑定，启动时再次校验绑定摘要。已绑定宿主不自动更新 guest daemon。四类来源读取及 clone/export 测试通过，实际 CLI 五项负向拒绝且配置未变。",
       "remaining_work": [
-        "per-VM execution routing, verified executable lease and missing Bundle recovery refusal",
-        "binding persistence, legacy migration backup, creation freeze and clone/export origin preservation",
-        "kernel-only publication and guest-environment update/rollback coordination with hash/instance receipts",
-        "use snapshot matching at operation boundary; no atomic transaction or full runtime mixed-version acceptance established"
+        "creation toolchain freeze and real installed Bundle/local-build coexistence/version matrix (T24)",
+        "missing Bundle currently refuses with generic store error; explicit runtime recovery guidance remains to implement",
+        "actual kernel-only source receipts and explicit guest upgrade/rollback mixed-version hash/instance acceptance",
+        "first-migration backup is APFS copy-on-write, not physically independent; cooperative lock plus snapshot checks are not atomic CAS against uncooperative writers"
       ]
     },
     {
@@ -3994,7 +4023,7 @@
         "T02",
         "T24"
       ],
-      "status": "output_drain_and_display_truncation_verified_helper_ack_pending",
+      "status": "batch_log_writer_and_protocol2_output_ack_bridge_privileged_acceptance_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLineReader.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -4021,19 +4050,21 @@
         "host"
       ],
       "local_mapping": {
-        "state": "output_drain_and_display_truncation_verified_helper_ack_pending",
+        "state": "batch_log_writer_and_protocol2_output_ack_bridge_privileged_acceptance_pending",
         "paths": [
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLineReader.swift",
           "tests/VPhoneLaunchpadKitTests/LineSplitterTests.swift",
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
           "tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift"
-        ]
+        ],
+        "batch_source_manifest": "evidence/B13-source-review.json"
       },
       "implementation_commits": [
         "4af226fb589afc78ac58ebd44eb6b5e1928bc587",
         "73272aa9f7c54ffbab2564fd935d27ff5bf3bff2",
-        "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762"
+        "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762",
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -4046,15 +4077,19 @@
         "evidence/B05-benchmark-driver.swift",
         "evidence/B12-summary.json",
         "evidence/B12-source-review.json",
-        "evidence/B12-related-green.log"
+        "evidence/B12-related-green.log",
+        "evidence/B13-summary.json",
+        "evidence/B13-source-review.json",
+        "evidence/B13-final-partition-results.json",
+        "evidence/B13-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "本地 child completion 区分退出码与同步 reader callback 排空；命令/创建/启动历史使用该状态，显示列表记录省略行数。并发输出归属与尾部通过。首次 Foundation 分块读取延迟了 pipe 首行，2 秒用例失败后改为 POSIX read；错误记录 failed。已关闭 FileHandle 的 descriptor getter 会抛 NSException，错误用例改用预先取得的已关闭描述符。实时输出等 32 项和最终联合测试通过；helper ACK 与异步 writer 未接入。",
+      "current_result": "完整日志 writer 移入 VPhoneCore，每操作使用独占 0600 文件；串行批量写入，finish 排空、fsync/close 后完成，写失败和迟到写入使完整状态失效。helper/client 接入协议 2 和 operation UUID 输出/完成 ACK，30 秒无 ACK、断线、错误/重复/迟到 ACK 不误报完整；旧协议明确拒绝。命令历史修复初始化失败遗留 running 状态。实际匿名 XPC 两连接归属及断线测试通过，30 秒默认超时用例通过；签名 helper 配置检查通过但未注册。",
       "remaining_work": [
-        "batch log writer, per-operation full helper protocol version integration and asynchronous writer-drained acknowledgement",
-        "helper timeout/disconnect/write-error/immediate-app-exit behavior and old-helper refusal",
-        "UI responsiveness and real VM console throughput",
-        "outputDrained covers synchronous callbacks from the owned reader only, not async persistence, descendant writers or helper ACK"
+        "actual registered privileged helper v2 XPC/code-identity/authorization/install verification and cleanup",
+        "detached VM/create raw logs, descendant writers and immediate UI exit are not fully covered by the command reader/writer handshake",
+        "actual UI responsiveness, panic recognition, cancel/rotation and VM console throughput acceptance; local batch benchmark is not runtime throughput",
+        "full upstream helper operation coverage and T24 integration remain incomplete"
       ]
     }
   ],
@@ -4369,8 +4404,9 @@
     "B09: prepare/freeze T29 artifacts early without treating unaccepted T28 or any version number as capability equivalence. Retain failed checkpoint and rerun exact metadata/digest validation with diagnostics; do not weaken guards. New CDHash requires separate security authorization; old runtime is separately labeled.",
     "B10: human confirmed exact candidate CDHash authorization; use independent empty config and clean helper. Boot/restart/classic compatibility and proxy token rejection do not accept guest API health, application behavior, full restored sample, T28 or T29. Retain failed driver attempts and distinguish locked-screen B10 observations from B09 home-screen observations.",
     "B11: advance already-authorized T42 algorithm source integration and host tests without treating pending full-chain dependencies as accepted. Separate source7e0503df from running candidate2387af20. Keep upstream hashes and local saturation delta explicit; C tests/objects do not prove HAL linkage, permissions or media runtime.",
-    "B12: implement five previously authorized task increments within existing worktree; keep every original dependency/step/acceptance/rollback/interface contract. Known setup status is required before optional startup work; absent provider skips it. Read drain does not imply writer/helper drain or actual VM stop/disk release. New code tests do not validate the older frozen runtime."
+    "B12: implement five previously authorized task increments within existing worktree; keep every original dependency/step/acceptance/rollback/interface contract. Known setup status is required before optional startup work; absent provider skips it. Read drain does not imply writer/helper drain or actual VM stop/disk release. New code tests do not validate the older frozen runtime.",
+    "B13: move binding/version/writer primitives to VPhoneCore to preserve existing CLI module boundary. Require disk-free observation even without VM lock before stopped/binding success; foreign holders are never signalled. Preserve classic256-byte camera and never deploy modern64-byte cohort singly; temporary API-only mode skips cache/camera/Irisin update. Binding does not auto-update guest. Partitioned coverage does not establish default full-suite success. New VM hash and temporary privileged helper registration require scoped security authorization; no such mutation occurred. Original contracts and semantic coverage unchanged."
   ],
-  "latest_implementation_head": "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762",
-  "latest_validation_limitation": "B12 advances T36/T37/T39/T40/T46 as partial increments: related XCTest47 and Swift Testing217/49 suites including whole Launchpad Kit pass. New source c1cb3099 was not packaged/signed/deployed; vm-new remains frozen source2387af20, daemon/config/frozen599 files unchanged, API not ready. No new lock/password/image/UI/full helper or execution-binding acceptance. Full Swift/API prior limitations retained; required unaccepted44."
+  "latest_implementation_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+  "latest_validation_limitation": "B13 source55fd8ef5: Python571 pass; final partitioned nonfirmware Swift union1238 plus XCTest251 (3 skipped) pass. Default full parallel20 issues and final full serial fixture wait hang unresolved. New signed VM AMFI-424/SIGKILL, not booted; exact new hash outside old authorization. Signed helper protocol2 candidate configuration passes, not registered. API-only guest unlock/respring/Settings pass then exact temporary pair cleaned; classic payloads preserved and current API not ready. Five tasks remain partial; required unaccepted44."
 }

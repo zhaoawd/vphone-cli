@@ -1,0 +1,50 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/16] Write sources
+[4/16] Write swift-version--58304C5D6DBC2206.txt
+[6/14] Compiling VPhoneCore VPhoneCloneCopy.swift
+[7/14] Emitting module VPhoneCore
+[8/15] Compiling VPhoneCore VPhoneBundleOps.swift
+[9/112] Compiling FirmwarePatcher ARM64Encoder.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBindingPersistence.swift:31:69: error: call can throw but is not marked with 'try'
+29 |                 let before = try snapshotInventory(source)
+30 |                 try VPhoneStoppedSnapshotCopy.copy(from: source, to: destination)
+31 |                 guard try snapshotInventory(destination) == before, snapshotInventory(source) == before else {
+   |                                                                     |- error: call can throw but is not marked with 'try'
+   |                                                                     |- note: did you mean to use 'try'?
+   |                                                                     |- note: did you mean to handle error as optional value?
+   |                                                                     `- note: did you mean to disable error propagation?
+32 |                     throw VPhoneLaunchpadError("VM backup verification failed; binding was not changed. Preserve the backup for inspection.")
+33 |                 }
+[10/112] Compiling FirmwarePatcher BinaryBuffer.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadBindingPersistence.swift:31:69: error: call can throw but is not marked with 'try'
+29 |                 let before = try snapshotInventory(source)
+30 |                 try VPhoneStoppedSnapshotCopy.copy(from: source, to: destination)
+31 |                 guard try snapshotInventory(destination) == before, snapshotInventory(source) == before else {
+   |                                                                     |- error: call can throw but is not marked with 'try'
+   |                                                                     |- note: did you mean to use 'try'?
+   |                                                                     |- note: did you mean to handle error as optional value?
+   |                                                                     `- note: did you mean to disable error propagation?
+32 |                     throw VPhoneLaunchpadError("VM backup verification failed; binding was not changed. Preserve the backup for inspection.")
+33 |                 }
+[11/113] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLocations.swift
+[12/113] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[13/113] Compiling VPhoneArchiveKitTests ArchiveSafetyTests.swift
+[14/113] Compiling VPhoneArchiveKitTests RoundTripTests.swift
+[15/113] Compiling VPhoneArchiveKitTests ExtractPermissionsTests.swift
+[16/113] Emitting module VPhoneArchiveKitTests
+[17/113] Compiling VPhoneLaunchpadKit VPhoneLaunchpadHostSetup.swift
+[18/113] Compiling FirmwarePatcher KernelJBPatchSecureRoot.swift
+[19/113] Compiling FirmwarePatcher KernelJBPatchSharedRegion.swift
+[20/113] Compiling FirmwarePatcher KernelJBPatchSyscallmask.swift
+[21/113] Compiling FirmwarePatcher KernelJBPatchTaskForPid.swift
+[22/113] Compiling FirmwarePatcher KernelJBPatchThidCrash.swift
+[23/113] Compiling FirmwarePatcher KernelJBPatchThreadSetState.swift
+[24/118] Compiling FirmwarePatcher IM4PHandler.swift
+[25/118] Compiling FirmwarePatcher MachOHelpers.swift
+[26/118] Emitting module VPhoneLaunchpadKit
+[27/118] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreation.swift
+[28/118] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+[29/118] Compiling VPhoneLaunchpadKit VPhoneLaunchpadLineReader.swift
+error: fatalError

@@ -1,0 +1,409 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[5/41] Write swift-version--58304C5D6DBC2206.txt
+[6/39] Compiling ace3.c
+[7/39] Compiling mbn.c
+[7/39] Compiling fls.c
+[7/39] Compiling img3.c
+[7/39] Compiling ftab.c
+[7/39] Compiling log.c
+[12/39] Compiling download.c
+[13/39] Compiling asr.c
+[14/39] Compiling normal.c
+[15/39] Compiling fdr.c
+[16/39] Compiling recovery.c
+[17/39] Compiling ipsw.c
+[18/39] Compiling limera1n.c
+[19/39] Compiling locking.c
+[20/39] Compiling dfu.c
+[21/39] Compiling img4.c
+[22/39] Compiling restore.c
+[23/39] Compiling deviceinterfaced.c
+[24/39] Compiling vphone_zip_stub.c
+[25/39] Compiling common.c
+[26/39] Compiling idevicerestore.c
+[27/39] Compiling vphone_restore_bridge.c
+[28/39] Compiling MobileRecoveryCore libirecovery.c
+[30/41] Compiling VPhoneLaunchpadKitTests MachineOriginsTests.swift
+[31/41] Emitting module VPhoneLaunchpadKitTests
+[32/41] Compiling vphone_cli VPhoneClipboardMacWriter.swift
+[33/41] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[34/82] Compiling VPhoneVMEntry main.swift
+[35/82] Emitting module VPhoneVMEntry
+[35/82] Write Objects.LinkFileList
+[37/82] Compiling VPhoneCommandEntry main.swift
+[38/82] Emitting module VPhoneCommandEntry
+[38/82] Write Objects.LinkFileList
+[40/82] Compiling VPhoneCLITests NativeTransferCLITests.swift
+[41/82] Compiling VPhoneCLITests PatchComponentResultTests.swift
+[42/82] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[43/82] Compiling VPhoneCLITests PatchSelectionFileMigrationTests.swift
+[44/82] Compiling VPhoneCLITests RestoreInspectCLITests.swift
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm
+[44/87] Linking vphone-cli
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm
+[45/87] Linking vphone-vm
+[47/87] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[48/87] Compiling VPhoneCLITests GuestShutdownTests.swift
+[49/87] Compiling VPhoneCLITests GuestTransportTests.swift
+[50/87] Compiling VPhoneCLITests HardwareKeyboardCLITests.swift
+[51/87] Compiling VPhoneCLITests HelperCLITests.swift
+[52/87] Emitting module VPhoneCLITests
+[53/87] Compiling VPhoneCLITests APIProxyCLITests.swift
+[54/87] Compiling VPhoneCLITests ArchiveCLITests.swift
+[55/87] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[56/87] Compiling VPhoneCLITests CFWInvocationTests.swift
+[57/87] Compiling VPhoneCLITests CameraWriteLeaseTests.swift
+[58/87] Compiling VPhoneCLITests ClipboardFocusTests.swift
+[58/87] Applying vphone-cli
+[59/87] Applying vphone-vm
+[61/87] Compiling VPhoneCLITests DoctorCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[62/87] Compiling VPhoneCLITests DyldMaxSlideOptionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[63/87] Compiling VPhoneCLITests FWPlanDuplicateSelectionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[64/87] Compiling VPhoneCLITests GuestCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[65/87] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[66/87] Compiling VPhoneCLITests HostAPICommandTests.swift
+[67/87] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[68/87] Compiling VPhoneCLITests HostCommandServiceTests.swift
+[69/87] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[70/87] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[71/87] Compiling VPhoneCLITests ClipboardMacWriterTests.swift
+[72/87] Compiling VPhoneCLITests ClipboardShortcutTests.swift
+[73/87] Compiling VPhoneCLITests CoreBundleCLITests.swift
+[74/87] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[75/87] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[76/87] Compiling VPhoneCLITests HostLocationReuseTests.swift
+[77/87] Compiling VPhoneCLITests HostRPCTests.swift
+[78/87] Compiling VPhoneCLITests LocationValidationTests.swift
+[79/87] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[80/87] Compiling VPhoneCLITests NativeRestoreCLITests.swift
+[81/87] Compiling VPhoneCLITests SignCLITests.swift
+[82/87] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[83/87] Compiling VPhoneCLITests TouchRouteTests.swift
+[84/87] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[85/87] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[85/87] Write Objects.LinkFileList
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3OEAFRIGRBYR0/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3OEAFRIGRBYR0/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[86/87] Linking vphone-cliPackageTests
+Build complete! (14.98s)
+Test Suite 'Selected tests' started at 2026-10-07 23:23:03.761.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 23:23:03.764.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 23:23:03.764.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 23:23:03.764.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ClipboardMacWriterTests started.
+◇ Test sameTextReadbackPreservesOriginalRichTextAndMacChangeCount() started.
+✘ Test sameTextReadbackPreservesOriginalRichTextAndMacChangeCount() recorded an issue at ClipboardMacWriterTests.swift:17:9: Expectation failed: (board.changeCount → 2) == (count → 1)
+✘ Test sameTextReadbackPreservesOriginalRichTextAndMacChangeCount() recorded an issue at ClipboardMacWriterTests.swift:18:9: Expectation failed: (board.data(forType: .rtf) → nil) == (rich → 21 bytes)
+✘ Test sameTextReadbackPreservesOriginalRichTextAndMacChangeCount() failed after 0.012 seconds with 2 issues.
+✘ Suite ClipboardMacWriterTests failed after 0.012 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.012 seconds with 2 issues.

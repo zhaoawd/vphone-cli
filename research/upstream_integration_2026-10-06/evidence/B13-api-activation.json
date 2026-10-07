@@ -1,0 +1,185 @@
+{
+  "candidate_sha256": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+  "candidate_readback_verified": true,
+  "classic_daemon_unchanged": true,
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test ! -e /var/root/vphone-b13-api && mkdir -m 700 /var/root/vphone-b13-api",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "truncated": false,
+        "stderr": "",
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "path": "/var/root/vphone-b13-api/vphoned",
+        "load": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/candidate/vphoned",
+        "perm": "755"
+      },
+      "response": {
+        "ok": true,
+        "size": 9035760
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "path": "/var/root/vphone-b13-api/vphoned",
+        "save": "/private/tmp/vphone-b13-api-readback"
+      },
+      "response": {
+        "path": "/private/tmp/vphone-b13-api-readback",
+        "ok": true,
+        "size": 9035760
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "path": "/var/root/vphone-b13-api/job.plist",
+        "load": "/private/tmp/vphone-b13-api-job.plist",
+        "perm": "600"
+      },
+      "response": {
+        "ok": true,
+        "size": 787
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; launchctl bootstrap system /var/root/vphone-b13-api/job.plist",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "ok": true,
+        "timed_out": false,
+        "stderr": "/var/root/vphone-b13-api/job.plist: Service cannot load in requested session\n",
+        "stdout": "",
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "environment_status",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        }
+      },
+      "response": {
+        "code": "api_not_ready",
+        "ok": false,
+        "error": "the guest API session is not ready"
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; launchctl print system/com.vphone.acceptance.b13.api; tail -n 20 /var/root/vphone-b13-api/stderr.log; ps -A -o pid=,comm= | grep -E \"vphoned|vphone-b13\"",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "ok": true,
+        "timed_out": false,
+        "stderr": "Could not find service \"com.vphone.acceptance.b13.api\" in domain for system\ntail: cannot open '/var/root/vphone-b13-api/stderr.log' for reading: No such file or directory\n",
+        "stdout": "   70 /usr/bin/vphoned\n",
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+      }
+    }
+  ],
+  "health_probes": [
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    }
+  ],
+  "host_new_source_activated": false,
+  "camera_shared_memory_activated": false
+}

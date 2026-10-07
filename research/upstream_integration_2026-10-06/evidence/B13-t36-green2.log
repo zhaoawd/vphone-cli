@@ -1,0 +1,82 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/16] Write sources
+[4/16] Write swift-version--58304C5D6DBC2206.txt
+[6/14] Emitting module VPhoneCore
+[7/14] Compiling VPhoneCore VPhoneBundleReport.swift
+[8/36] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineEdit.swift
+[9/37] Emitting module VPhoneArchiveKitTests
+[10/37] Emitting module VPhoneLaunchpadKit
+[11/37] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+[12/51] Compiling VPhoneCoreTests LibraryTests.swift
+[13/51] Compiling VPhoneCoreTests ManifestTests.swift
+[14/52] Emitting module FirmwarePatcher
+[15/66] Compiling VPhoneCoreTests VMLockTests.swift
+[16/66] Compiling VPhoneLaunchpad VPhoneLaunchpadMachineSheets.swift
+[17/66] Compiling VPhoneLaunchpad VPhoneLaunchpadNewMachineView.swift
+[18/66] Compiling VPhoneLaunchpad VPhoneLaunchpadRootView.swift
+[19/66] Compiling VPhoneLaunchpad VPhoneLaunchpadMachineInspector.swift
+[20/66] Emitting module VPhoneLaunchpad
+[21/66] Compiling VPhoneLaunchpad VPhoneLaunchpadMachinesView.swift
+[21/66] Write Objects.LinkFileList
+[23/66] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[24/67] Emitting module VPhoneCoreTests
+[25/67] Compiling vphone_cli VPhoneGuestCLI.swift
+[26/67] Compiling vphone_cli VPhoneRestoreCLI.swift
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[26/67] Linking vphone-launchpad
+[27/67] Applying vphone-launchpad
+[29/67] Compiling vphone_cli VPhoneVMCLI.swift
+[30/67] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[31/67] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[32/67] Compiling vphone_cli VPhoneVMSelection.swift
+[33/67] Compiling vphone_cli VPhoneVMTransferCLI.swift
+[34/67] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[35/67] Compiling vphone_cli VPhoneFWCLI.swift
+[36/67] Compiling vphone_cli VPhoneCLI.swift
+[37/67] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[38/67] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[41/67] Compiling vphone_cli VPhoneAppDelegate.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:155:87: error: operator can throw but expression is not marked with 'try'
+153 |                             vmInstanceID: vmLock.state.instanceID)
+154 |                         apiSession = session
+155 |                         let unlock = VPhoneStartupUnlock(enabled: cli.unlockAtStartup || (try VPhoneVirtualMachineManifest.load(from: options.configURL)).usesStartupUnlock) { [weak session, hostInputQueue] method, params, capability in
+    |                                                                                       |  `- note: call is to 'rethrows' function, but argument function can throw
+    |                                                                                       `- error: operator can throw but expression is not marked with 'try'
+156 |                             guard let session else { throw CancellationError() }
+157 |                             let result: Result<VPhoneJSONValue, any Error> = await hostInputQueue.run(cancelled: .failure(CancellationError())) {
+[42/67] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift:155:87: error: operator can throw but expression is not marked with 'try'
+153 |                             vmInstanceID: vmLock.state.instanceID)
+154 |                         apiSession = session
+155 |                         let unlock = VPhoneStartupUnlock(enabled: cli.unlockAtStartup || (try VPhoneVirtualMachineManifest.load(from: options.configURL)).usesStartupUnlock) { [weak session, hostInputQueue] method, params, capability in
+    |                                                                                       |  `- note: call is to 'rethrows' function, but argument function can throw
+    |                                                                                       `- error: operator can throw but expression is not marked with 'try'
+156 |                             guard let session else { throw CancellationError() }
+157 |                             let result: Result<VPhoneJSONValue, any Error> = await hostInputQueue.run(cancelled: .failure(CancellationError())) {
+[43/68] Compiling VPhoneLaunchpadKitTests RealCLIEditTests.swift
+[44/68] Compiling vphone_cli VPhoneVirtualMachine.swift
+[45/68] Emitting module VPhoneLaunchpadKitTests
+[46/68] Compiling VPhoneLaunchpadKitTests LaunchpadFixtures.swift
+[47/68] Compiling VPhoneLaunchpadKitTests HardwareKeyboardSettingsTests.swift
+[48/68] Compiling VPhoneLaunchpadKitTests MachineDecodeTests.swift
+error: fatalError

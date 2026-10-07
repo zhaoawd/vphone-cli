@@ -1,0 +1,47 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[5/17] Write swift-version--58304C5D6DBC2206.txt
+[7/18] Emitting module VPhoneCore
+[8/18] Compiling VPhoneCore VPhoneMachineBindingPersistence.swift
+[9/18] Compiling VPhoneCore VPhoneVMRuntimeState.swift
+[10/24] Compiling VPhoneCore VPhoneRestoreInfo.swift
+[11/24] Compiling VPhoneCore VPhoneCreateCheckpointStore.swift
+[12/24] Compiling VPhoneCore VPhoneDiagnosticChecks.swift
+[13/24] Compiling VPhoneCore VPhoneVMLock.swift
+[14/24] Compiling VPhoneCore VPhoneBundleOps.swift
+[15/24] Compiling VPhoneCore VPhoneCreateRunner.swift
+[16/44] Emitting module VPhoneHelperKit
+[16/44] Write Objects.LinkFileList
+[18/47] Emitting module VPhoneArchiveKitTests
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[18/47] Linking vphone-helper
+[20/47] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCommandLine.swift
+[21/47] Emitting module VPhoneHelperKitTests
+[22/47] Compiling VPhoneHelperKitTests OutputAcknowledgementTests.swift
+[23/47] Compiling VPhoneHelperKitTests OutputXPCTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneHelperKitTests/OutputXPCTests.swift:61:99: error: capture of 'connection' with non-Sendable type 'NSXPCConnection' in a '@Sendable' closure [#SendableClosureCaptures]
+59 |         let operation = UUID().uuidString
+60 |         let connection = NSXPCConnection(listenerEndpoint: listener.endpoint)
+61 |         let output = VPhoneHelperOutputReceiver(operation: operation, writer: nil, onLine: { _ in connection.invalidate() })
+   |                                                                                                   `- error: capture of 'connection' with non-Sendable type 'NSXPCConnection' in a '@Sendable' closure [#SendableClosureCaptures]
+62 |         connection.remoteObjectInterface = NSXPCInterface(with: VPhoneHelperProtocol.self)
+63 |         connection.exportedInterface = NSXPCInterface(with: VPhoneHelperOutputProtocol.self)
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSXPCConnection.h:49:12: note: class 'NSXPCConnection' does not conform to the 'Sendable' protocol
+ 47 | // This object is the main configuration mechanism for the communication between two processes. Each NSXPCConnection instance has a private serial queue. This queue is used when sending messages to reply handlers, interruption handlers, and invalidation handlers.
+ 48 | API_AVAILABLE(macos(10.8), ios(6.0), watchos(2.0), tvos(9.0))
+ 49 | @interface NSXPCConnection : NSObject <NSXPCProxyCreating>
+    |            `- note: class 'NSXPCConnection' does not conform to the 'Sendable' protocol
+ 50 | 
+ 51 | // Initialize an NSXPCConnection that will connect to the specified service name. Note: Receiving a non-nil result from this init method does not mean the service name is valid or the service has been launched. The init method simply constructs the local object.
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[23/47] Applying vphone-helper
+[24/47] Compiling VPhoneCoreTests FirmwareRecoveryLockTests.swift
+[25/47] Compiling VPhoneCoreTests StaleRuntimeStateTests.swift
+error: fatalError

@@ -1,0 +1,182 @@
+{
+  "new_frozen_artifact_files_verified": 607,
+  "candidate_source_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+  "processes": [
+    {
+      "pid": 92943,
+      "ppid": 92929,
+      "state": "S",
+      "command": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B09/candidate.app/Contents/MacOS/vphone-vm --config /Users/qcz3840/github/vphone-cli/vm-new/config.plist --variant exp --vphoned-bin /Users/qcz3840/github/vphone-cli/vm-new/.vphoned.signed --api-listen 127.0.0.1:0"
+    }
+  ],
+  "observations": [
+    {
+      "request": {
+        "t": "capabilities",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        }
+      },
+      "response": {
+        "protocol_version": 1,
+        "guest_connected": true,
+        "commands": {
+          "app_launch": true,
+          "type": true,
+          "environment_status": false,
+          "screenshot": true,
+          "shell": true,
+          "app_terminate": true,
+          "camera_stop": true,
+          "camera_status": true,
+          "location": true,
+          "tap": true,
+          "capabilities": true,
+          "environment_update": false,
+          "environment_rollback": false,
+          "location_source_set": true,
+          "rpc": false,
+          "key": true,
+          "ipa_install": true,
+          "camera_present": true,
+          "file_get": true,
+          "location_stop": true,
+          "swipe": true,
+          "file_put": true,
+          "location_source_stop": true,
+          "location_source_status": true,
+          "location_stream_start": true,
+          "location_stream_push": true,
+          "location_source_control": true,
+          "app_list": true,
+          "open_url": true,
+          "app_foreground": true
+        },
+        "ok": true,
+        "screen_available": true,
+        "rpc_methods": [],
+        "target": {
+          "process_started_at": 1791372919.040498,
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "limits": {
+          "inline_file_bytes": 1048576,
+          "command_timeout_ms": 180000,
+          "request_bytes": 2097152,
+          "host_file_bytes": 67108864,
+          "connections": 16
+        },
+        "api_session": {
+          "errorCode": "transport",
+          "state": "reconnecting",
+          "vmInstanceID": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "boot_mode": "normal",
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "api_commands": {
+          "app_terminate": false,
+          "app_launch": false,
+          "file_put": false,
+          "app_list": false,
+          "app_foreground": false,
+          "file_get": false
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "environment_status",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        }
+      },
+      "response": {
+        "ok": false,
+        "error": "the guest API session is not ready",
+        "code": "api_not_ready"
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"Preferences.app/Preferences|MobileSafari.app/MobileSafari\"",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "code": 0,
+        "stdout": "61498 /Applications/Preferences.app/Preferences\n"
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    }
+  ],
+  "implementation_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+  "worktree_status": "",
+  "main_head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "main_status": "",
+  "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+  "guest_payload_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "udid_prediction_sha256": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc",
+  "free_bytes": 19720073216,
+  "frozen_artifact_files_verified": 599,
+  "helper_debugserver_remaining": false,
+  "classic_guest_payload_replaced": false,
+  "temporary_API_trial_performed": true,
+  "temporary_API_pair_stopped": true,
+  "vm_2607_operated": false
+}

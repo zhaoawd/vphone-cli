@@ -1,0 +1,10 @@
+from pathlib import Path
+p=Path('/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift')
+s=p.read_text().replace('    public let history: VPhoneLaunchpadCommandHistory','    public let history: VPhoneLaunchpadCommandHistory\n    private let logsDirectory: URL?')
+s=s.replace('self.init(executable: toolchain.executable, history: history)','self.init(executable: toolchain.executable, history: history, logsDirectory: VPhoneLaunchpadIdentity.logsDirectory())')
+s=s.replace('init(executable: URL, history: VPhoneLaunchpadCommandHistory) {','init(executable: URL, history: VPhoneLaunchpadCommandHistory, logsDirectory: URL? = nil) {\n        self.logsDirectory = logsDirectory')
+s=s.replace('        let collector = VPhoneLaunchpadLineCollector()','        let writer = try recordInHistory ? logsDirectory.map { try VPhoneLaunchpadLogWriter(url: $0.appendingPathComponent("command-\\(UUID().uuidString).log")) } : nil\n        let collector = VPhoneLaunchpadLineCollector()',1)
+s=s.replace('            collector.append(line)\n            onLine?(line)','            writer?.write(line)\n            collector.append(line)\n            onLine?(line)',1)
+s=s.replace('        if let entry {\n            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)\n        }\n        let output = collector.snapshot','        var drained = completion.outputDrained\n        do { try await writer?.finish() }\n        catch { drained = false; collector.append("Log persistence failed: \\(error.localizedDescription)") }\n        if let entry {\n            history.finish(entry, status: completion.status, outputDrained: drained)\n        }\n        let output = collector.snapshot',1)
+s=s.replace('outputDrained: completion.outputDrained, omittedLineCount: output.omitted','outputDrained: drained, omittedLineCount: output.omitted',1)
+p.write_text(s)

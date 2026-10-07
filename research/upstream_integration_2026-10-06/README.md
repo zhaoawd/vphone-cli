@@ -507,3 +507,38 @@ vm-new 继续运行 B09 冻结的源码 `2387af20` 候选，PID 92943、instance
 vm-new 的本轮操作为有 PID/instance 限制的只读 capabilities、environment_status、进程采样和 daemon 文件摘要核对。VM 仍为 B09 冻结源码 `2387af20`、PID 92943、instance `068574F6-DEF3-4910-88AB-57F5330C7A02`；classic 连接与原 daemon 摘要匹配，API 仍 reconnecting/transport、environment_status 为 api_not_ready。599 个冻结文件以及配置、身份预测和客户机载荷摘要保持一致。新源码没有打包/签名/部署，没有新的 amfid/helper/security 操作、guest/kernel 写入或 vm-2607 操作；主仓库仍为 e8d825b3 且干净。因此本轮测试不证明新代码在当前运行 VM 上生效，也没有补齐此前应用启动问题的验收。
 
 追加前再次验证原 542 份已提交证据和 3 份不可变输入副本，保留原任务依赖、步骤、接口、验收与回退条件。47 项状态保持 2 项 accepted、42 项部分推进、2 项待本地对账（T30/T31）、1 项可选延期，44 项必选仍未验收。证据入口：`evidence/B12-summary.json`、`evidence/B12-related-green.log`、`evidence/B12-final-state.json`。
+
+
+### 2026-10-08 B13：五项功能接入、签名候选与客户机 API 验收
+
+本轮从 `dd3c8002` 推进 T36、T37、T39、T40、T46，实现提交为 `55fd8ef57a6731e42cba0727f477bc9b25f0c9ca`。固定上游目标仍为 `2d21d21`。五项主要接入已经实现，原依赖和完整验收条件尚未全部满足，状态继续为部分推进。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T36 自动解锁 | 每 VM 默认关闭的持久设置、CLI/菜单/Launchpad、共享输入队列、guest setup_pending 提供方已接入；临时 API 在熄屏锁定、respring 后及已解锁重复请求中通过 | 新宿主 cold boot、同实例重连、userspace reboot、设置生命周期和密码路径；RPC 成功不能证明未启动的新 worker 生效 |
+| T37 有序停止 | API guest-first、旧 guest 回退和完成分类；停止及绑定前严格检查磁盘无占用；不向磁盘占用进程发信号；实际 force:false 请求拒绝 | 新宿主真实关机、磁盘释放、DFU/panic/超时/旧 guest、更新/备份冲突和完整权限矩阵 |
+| T39 剪贴板 | Cmd C/X/V 入口及异步状态校验；相同文本/图片不重写 Mac pasteboard；命名 pasteboard 测试保留 rich text 和 changeCount | API 分开图片下载的第二次 await 接入；真实长按 Copy、图片、快速切窗、慢回复、type、重启及新 UI 验收 |
+| T40 Bundle 绑定 | Core 持久化、已停机及磁盘释放门禁、旧 VM 完整可读回备份、verified Bundle 执行租约；最低执行版本 2.6 和 series/local/CI 策略；已绑定宿主不自动更新 guest；CLI 五项拒绝且配置不变 | 创建工具链冻结、真实多版本并存、kernel-only 来源收据、guest 显式升级/回退及混合版本 hash/instance；缺 Bundle 的运行时错误目前为通用 store 错误，恢复提示仍待完善 |
+| T46 日志完成确认 | 独占完整日志、串行批量写入、finish 排空及 fsync/close；协议 2 与 operation UUID ACK；30 秒默认超时、断线、写失败及旧协议拒绝；两条真实匿名 XPC 连接归属通过 | 注册系统 helper 后的权限/代码身份/实际 XPC；脱离 UI 的 VM/create raw log、后代 writer、立即退出应用、panic/取消/轮换、UI 响应与 VM 吞吐 |
+
+绑定、版本与日志 writer 放入 VPhoneCore，CLI 没有新增 VPhoneLaunchpadKit 依赖。旧 VM 第一次绑定的备份使用同 APFS 卷写时复制，并流式核对源、备份和源的摘要；不证明物理介质独立。持久化使用 VM 协作锁、快照校验及独占临时文件发布，不宣称对不遵守锁的外部写入者实现原子 CAS。操作建议是先恢复或安装绑定记录指定的 Bundle；确需改变来源时，对已停机且磁盘无占用的 VM 执行显式绑定，不能仅因 Bundle 缺失自动选择其他版本。完整工具链和四层来源验收仍待完成。
+
+最终 Python 全套 571 项、268.219 秒通过。最终源码的 Swift 非固件覆盖分两次运行：排除 FirmwareIntegrationTests/APIHTTPTests 的串行分组为 XCTest 251 项（3 项跳过）和 Swift Testing 1233 项/197 suite；APIHTTPTests/APIWebSocketTests/OutputXPCTests 分组为 17 项/3 suite。第二组新增 5 项 HTTP 用例，去重后的 Swift Testing 覆盖为 1238 项。两条命令均退出 0，不记为一次完整运行通过。
+
+默认并行全套仍有 20 个 issue；相关 56 项隔离运行通过，原因未查明。严格磁盘门禁修改前的串行全套曾通过 1234 项；最终串行全套在 APIHTTPFixture.stop 的 Foundation waitUntilExit 等待处卡住，直接 OS 子进程查询为空。已保存进程采样并只终止核对过身份的测试 helper，该次运行不计通过。保留默认并行失败、两次完整串行等待、误用直接测试 helper --help 导致运行用例及其受控清理记录。没有通过修改测试入口或降低断言把完整运行记为通过。
+
+新增磁盘释放用例先复现无 VM 锁但磁盘被打开、原 VM 退出后磁盘仍被打开、旧 VM 首次绑定磁盘被打开三个失败场景。生产实现改为有界 lsof 检查；检查异常或占用均拒绝成功。原测试曾预期外部磁盘占用不影响 stopped，已改为期望 failed，同时继续验证不向占用者发送信号；最终 54 项/8 suite 通过。其他失败及修正包括 Cmd C/X/V 无可靠旧计数时仍应发送 HID、相同 plain text 不应覆盖 rich text、绑定宿主不应自动更新 guest、日志创建或 child 初始化失败不能遗留 running 历史，以及匿名 XPC 断线不能确认日志完整。全部 RED、编译失败、修正和最终结果保留。
+
+`make test_guest_components` 的 RootHide loader-link、相机数据平面 124 次检查和四个 VirtIOSound 算法程序通过；这不证明现代客户机组件加载或音频运行。1 GiB tar 文件/producer 内存探测通过。单次本地 100000 行、13488890 字节日志比较中，逐行 FileHandle.write 为 0.535912 秒，批量 writer 为 0.054696 秒；没有测量 UI 响应和真实 VM console 吞吐。本轮没有运行固件验收或应用新 kernel patch。
+
+vm-new 的宿主继续为 B09 源码 `2387af20`、PID 92943、instance `068574F6-DEF3-4910-88AB-57F5330C7A02`。API-only 候选实际上传到独立 `/var/root/vphone-b13-api/vphoned` 并读回摘要；没有覆盖 `/usr/bin/vphoned`、原 cache 或宿主 `.vphoned.signed`。该模式跳过 cache 引导、camera 启动和 Irisin 更新，并拒绝 camera 与 agent.apply_update 调用；保留 classic 256 字节 camera ABI，未单独部署现代 64 字节媒体组件。健康 HTTP 200、setup_pending=false、API instance `67449773-367D-4774-AD7D-239FEDD0A7CC`，daemon SHA-256 `152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749`。环境状态为 full_migration_required，现代 shared-components 缺失；没有执行完整环境安装。
+
+实际 API 熄屏锁定后解锁及已解锁重复请求通过；respring 使用 frontboard_relaunch，SpringBoard PID 从 39 变为 55146，API instance 和摘要保持不变，随后解锁通过。Settings 启动 PID 51992，foreground 查询验证为 true。SpringBoard apps.launch 请求失败，主屏幕 foreground 查询 PID 0/source unavailable/verified false，不能记为可靠主屏幕 PID 验收。截图含上次或过渡帧，不能单独证明当前解锁状态。未提供密码或修改配置；缺失/错误 HTTP token 返回 401，force:false 的关机请求拒绝且 VM 仍运行。
+
+临时 launchd bootstrap 输出 session 错误，print 查询确认 job 没有加载，原因未查明；随后以独立进程运行 API 试验。清理先对代理 50710 和 worker 50711 核对 PID、父进程、启动时间及路径后发送 SIGTERM，二者仍存在，原因未查明。再次在发送信号的同一 shell 中核对完整身份后 SIGKILL 两个临时进程，最终确认二者消失、job 不存在、原 daemon PID 70 与 VM 继续运行。临时文件保留供后续授权验收。清理后 API 恢复 reconnecting/transport，environment_status 为 api_not_ready。保留失败清理日志及最终成功记录。
+
+新宿主、Launchpad 与协议 2 helper 已构建、签名和冻结于 `.build/acceptance/B13/`，共 607 个文件；B09 的 599 个文件摘要保持一致。候选来源仍为实现提交 `55fd8ef5`，后续证据提交不改变该来源。新 VM SHA-256 为 `db62e750f65208a662708c155cf1ac3dec2aac68d2de14684fcef6bf5293a548`，CDHash 为 `6ae3461ec4dae85f9375bdba4f8b7052ea9257ff`。VM --help 被 SIGKILL，amfid 日志记录 AppleMobileFileIntegrityError -424：The file is adhoc signed but contains restricted entitlements。CLI --help 返回 0，不将日志中的 CLI -423 写为 CLI 无法运行。
+
+签名 helper 的 TeamIdentifier 为 `3AA3QL69MQ`，CDHash 为 `30ce6ce220a60617b6ae42066372bf3ac2e8ebe6`，严格签名检查与 --check-configuration 返回 0。系统服务 com.vphone.cli.helper、对应 PrivilegedHelperTools/LaunchDaemons 路径不存在；正确 authorization right com.vphone.cli.helper.privileged 只读查询返回 NO (-60005)。初次查错 right 名称的记录保留，不能用作正确名称的基线。没有注册 helper、写授权数据库或操作 amfid。旧授权只覆盖 B09 CDHash `52b10bcbce6db82de6afa83b801eb95da55246c7`，新 VM 的临时 AMFI 授权及系统 helper 注册需要明确的新授权。
+
+追加前核对原 577 份已提交证据及 3 份不可变输入，8 个上游参考的固定 SHA 字节和 54 个本地提交文件摘要通过。原依赖、步骤、接口、验收与回退条件不变；上游语义提交覆盖台账不变。47 项仍为 2 项 accepted、42 项部分推进、T30/T31 待本地对账、T45 可选延期，44 项必选未验收。主仓库 HEAD e8d825b3 且干净，vm-2607 未操作。证据入口：`evidence/B13-summary.json`、`evidence/B13-final-partition-results.json`、`evidence/B13-artifact-manifest.json`、`evidence/B13-final-state.json`。

@@ -1,0 +1,48 @@
+{
+  "observations": [
+    {
+      "name": "helper-service",
+      "command": [
+        "/bin/launchctl",
+        "print",
+        "system/com.vphone.cli.helper"
+      ],
+      "returncode": 113
+    },
+    {
+      "name": "helper-right",
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.privileged"
+      ],
+      "returncode": 255
+    },
+    {
+      "name": "amfi-candidate-log",
+      "command": [
+        "/usr/bin/log",
+        "show",
+        "--last",
+        "5m",
+        "--style",
+        "compact",
+        "--predicate",
+        "process == \"amfid\" AND (eventMessage CONTAINS \"6ae3461ec4dae85f9375bdba4f8b7052ea9257ff\" OR eventMessage CONTAINS \"acceptance/B13\")"
+      ],
+      "returncode": 0
+    }
+  ],
+  "files": [
+    {
+      "path": "/Library/PrivilegedHelperTools/com.vphone.cli.helper",
+      "exists": false
+    },
+    {
+      "path": "/Library/LaunchDaemons/com.vphone.cli.helper.plist",
+      "exists": false
+    }
+  ],
+  "security_mutation_performed": false
+}

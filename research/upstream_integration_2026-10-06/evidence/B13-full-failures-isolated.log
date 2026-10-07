@@ -1,0 +1,163 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-07 23:43:43.376.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 23:43:43.378.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 23:43:43.378.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 23:43:43.378.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite APIHTTPTests started.
+◇ Suite StopRefusalTests started.
+◇ Suite HelperServiceTests started.
+◇ Suite LibraryTests started.
+◇ Suite LocationTests started.
+◇ Suite OutputXPCTests started.
+◇ Suite EditLibraryTests started.
+◇ Test realHTTPRPCHealthAndProtocolErrors() started.
+◇ Test webSocketRefusesRedirect() started.
+◇ Suite APIWebSocketTests started.
+◇ Suite LibraryTests started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test refusesRedirectAndOversizedResponses() started.
+◇ Test failedStopDoesNotInterruptLaunchpadChild() started.
+◇ Test cancellingARunInterruptsOnlyItsChild() started.
+◇ Test missingAddedLibraryIsSkippedAndFailureKeepsLastListing() started.
+◇ Test listsDefaultAndAddedLibraries() started.
+◇ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() started.
+◇ Test defaultRootIsTheCLIDefaultCanonical() started.
+◇ Test consoleLogsAreSeparatedPerLibrary() started.
+◇ Test canonicalResolvesSymbolicLinks() started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+◇ Test addedLocationPersistsInInjectedDefaults() started.
+◇ Test addedRootsAreAbsoluteCanonicalUniqueAndNotTheDefault() started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+◇ Test localIdentityIsSeparateFromUpstream() started.
+◇ Test replyCompletesOnlyOnce() started.
+◇ Test timeoutIgnoresLateReply() started.
+◇ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() started.
+◇ Test callerIdentityMismatchNamesTheCaller() started.
+◇ Test xpcRejectsClientWithoutConfiguredSigningIdentity() started.
+◇ Test correlatesOutOfOrderRepliesAndInterleavedEvents() started.
+◇ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() started.
+◇ Test cancellationAndLateReplyCannotCompleteNextRequest() started.
+◇ Test verificationIsReadOnlyAndPropagatesFailure() started.
+◇ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() started.
+◇ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() started.
+◇ Test malformedMessageFailsPendingRequests() started.
+◇ Test unauthorizedRequestCannotInstall() started.
+◇ Test remoteErrorOnlyFailsItsMatchingRequest() started.
+◇ Test preCancelledTaskDoesNotSend() started.
+◇ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() started.
+◇ Test receivesEventsWithoutAnRPC() started.
+◇ Test boundsPendingRequestsAndCloseCompletesWaiters() started.
+◇ Test scanReportsCorruptBundlesInsteadOfDropping() started.
+◇ Test bundleNamedThrowsWhenMissing() started.
+◇ Test defaultRootHonorsVPHONERoot() started.
+◇ Test defaultRootHonorsEnvOverride() started.
+◇ Test settingsRunOneConfigPerMachineAndAreRecorded() started.
+◇ Test scansOnlyDirsWithManifest() started.
+◇ Test defaultRootIsShellSafe() started.
+✔ Test consoleLogsAreSeparatedPerLibrary() passed after 0.003 seconds.
+✔ Test canonicalResolvesSymbolicLinks() passed after 0.003 seconds.
+✔ Test localIdentityIsSeparateFromUpstream() passed after 0.003 seconds.
+✔ Test replyCompletesOnlyOnce() passed after 0.003 seconds.
+[launchpad] vm launch started, pid 37458
+✔ Test defaultRootIsTheCLIDefaultCanonical() passed after 0.006 seconds.
+✔ Test addedRootsAreAbsoluteCanonicalUniqueAndNotTheDefault() passed after 0.006 seconds.
+✔ Test defaultRootHonorsVPHONERoot() passed after 0.004 seconds.
+✔ Test defaultRootHonorsEnvOverride() passed after 0.004 seconds.
+✔ Test bundleNamedThrowsWhenMissing() passed after 0.004 seconds.
+✔ Test defaultRootIsShellSafe() passed after 0.004 seconds.
+✔ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() passed after 0.007 seconds.
+✔ Test scansOnlyDirsWithManifest() passed after 0.004 seconds.
+✔ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() passed after 0.007 seconds.
+✔ Suite LocationTests passed after 0.008 seconds.
+✔ Test verificationIsReadOnlyAndPropagatesFailure() passed after 0.007 seconds.
+✔ Test unauthorizedRequestCannotInstall() passed after 0.007 seconds.
+✔ Test receivesEventsWithoutAnRPC() passed after 0.007 seconds.
+✔ Test preCancelledTaskDoesNotSend() passed after 0.007 seconds.
+✔ Test scanReportsCorruptBundlesInsteadOfDropping() passed after 0.005 seconds.
+✔ Suite LibraryTests passed after 0.008 seconds.
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 0.009 seconds.
+✔ Test callerIdentityMismatchNamesTheCaller() passed after 0.011 seconds.
+vphone-helper: refused connection: caller pid 37449, uid 2035870432 does not satisfy the client signing requirement (OSStatus -67050: The operation couldn’t be completed. (OSStatus error -67050.))
+✔ Test boundsPendingRequestsAndCloseCompletesWaiters() passed after 0.012 seconds.
+✔ Test malformedMessageFailsPendingRequests() passed after 0.012 seconds.
+✔ Test xpcRejectsClientWithoutConfiguredSigningIdentity() passed after 0.013 seconds.
+✔ Test correlatesOutOfOrderRepliesAndInterleavedEvents() passed after 0.013 seconds.
+✔ Test timeoutIgnoresLateReply() passed after 0.014 seconds.
+✔ Suite HelperServiceTests passed after 0.014 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 0.014 seconds.
+✔ Suite OutputXPCTests passed after 0.014 seconds.
+✔ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() passed after 0.014 seconds.
+✔ Test remoteErrorOnlyFailsItsMatchingRequest() passed after 0.018 seconds.
+✔ Test cancellationAndLateReplyCannotCompleteNextRequest() passed after 0.018 seconds.
+✔ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() passed after 0.018 seconds.
+✔ Test addedLocationPersistsInInjectedDefaults() passed after 0.021 seconds.
+✔ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() passed after 0.069 seconds.
+✔ Suite APIWebSocketTests passed after 0.069 seconds.
+✔ Test webSocketRefusesRedirect() passed after 0.131 seconds.
+✔ Test refusesRedirectAndOversizedResponses() passed after 0.227 seconds.
+✔ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() passed after 0.227 seconds.
+✔ Test realHTTPRPCHealthAndProtocolErrors() passed after 0.228 seconds.
+✔ Test deadlineAndCallerCancellationEndHTTPWait() passed after 0.277 seconds.
+✔ Suite APIHTTPTests passed after 0.277 seconds.
+✔ Test cancellingARunInterruptsOnlyItsChild() passed after 0.386 seconds.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test failedStopDoesNotInterruptLaunchpadChild() passed after 1.843 seconds.
+✔ Suite StopRefusalTests passed after 1.843 seconds.
+[launchpad] listed 1 machines from 2 libraries
+[launchpad] vm launch pid 37458 exited with status 9
+✔ Test missingAddedLibraryIsSkippedAndFailureKeepsLastListing() passed after 2.196 seconds.
+[launchpad] listed 3 machines from 2 libraries
+✔ Test listsDefaultAndAddedLibraries() passed after 2.371 seconds.
+✔ Suite LibraryTests passed after 2.372 seconds.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test settingsRunOneConfigPerMachineAndAreRecorded() passed after 3.967 seconds.
+◇ Test aRefusalIsShownWithTheCLIOutput() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test aRefusalIsShownWithTheCLIOutput() passed after 1.352 seconds.
+◇ Test renameSelectsTheNewNameAndCloneTheClone() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test renameSelectsTheNewNameAndCloneTheClone() passed after 0.960 seconds.
+◇ Test deleteRunsVMDeleteForEachMachineAndNothingElse() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test deleteRunsVMDeleteForEachMachineAndNothingElse() passed after 1.056 seconds.
+◇ Test importGoesIntoTheDefaultLibrary() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test importGoesIntoTheDefaultLibrary() passed after 0.841 seconds.
+◇ Test importCancelledBeforeLaunchDoesNotReportAnActionFailure() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test importCancelledBeforeLaunchDoesNotReportAnActionFailure() passed after 0.699 seconds.
+◇ Test cancelledImportLaunchErrorDoesNotReportAnActionFailure() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test cancelledImportLaunchErrorDoesNotReportAnActionFailure() passed after 0.598 seconds.
+◇ Test concurrentImportsDoNotReplaceOneGlobalActivity() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test concurrentImportsDoNotReplaceOneGlobalActivity() passed after 1.220 seconds.
+◇ Test aNameLaunchpadCannotPassRunsNothing() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test aNameLaunchpadCannotPassRunsNothing() passed after 0.541 seconds.
+◇ Test exportsRunOneAtATime() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test exportsRunOneAtATime() passed after 1.254 seconds.
+◇ Test cancellingAWaitingExportTakesItOutOfTheQueue() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test cancellingAWaitingExportTakesItOutOfTheQueue() passed after 0.928 seconds.
+◇ Test cancellingARunningExportRemovesOnlyTheFileItCreated() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test cancellingARunningExportRemovesOnlyTheFileItCreated() passed after 0.874 seconds.
+◇ Test cancellingAnExportOverAnExistingFileLeavesThatFile() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test cancellingAnExportOverAnExistingFileLeavesThatFile() passed after 0.858 seconds.
+◇ Test aFolderExportDoesNotReplaceAnExistingFile() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test aFolderExportDoesNotReplaceAnExistingFile() passed after 0.884 seconds.
+◇ Test historyRecordsEveryEditButNotTheListing() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test historyRecordsEveryEditButNotTheListing() passed after 1.514 seconds.
+✔ Suite EditLibraryTests passed after 17.557 seconds.
+✔ Test run with 56 tests in 9 suites passed after 17.557 seconds.

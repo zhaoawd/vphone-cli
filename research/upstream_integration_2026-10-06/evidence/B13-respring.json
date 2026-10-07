@@ -1,0 +1,271 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "agent.health",
+        "params": {}
+      },
+      "response": {
+        "method": "agent.health",
+        "ok": true,
+        "result": {
+          "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+          "capabilities": [
+            "session_identity",
+            "touch",
+            "hid",
+            "apps",
+            "url",
+            "files",
+            "file_download_identity",
+            "file_upload_identity",
+            "clipboard",
+            "location",
+            "keychain",
+            "ipa_install",
+            "bootstrap_install",
+            "bootstrap_uninstall",
+            "port_forward",
+            "screenshot",
+            "screen_unlock",
+            "device_info",
+            "display",
+            "audio",
+            "input_gestures",
+            "ui_inspection",
+            "processes",
+            "services",
+            "logs",
+            "network_capture",
+            "app_details",
+            "system_control",
+            "system_shutdown",
+            "file_tools",
+            "packages",
+            "environment_update",
+            "environment_transaction",
+            "environment_activation"
+          ],
+          "instance_id": "67449773-367D-4774-AD7D-239FEDD0A7CC",
+          "name": "vphoned",
+          "ios": "26.1.0",
+          "status": "ok",
+          "api_version": 1,
+          "ip": "fe80::103c:5a1f:d2f9:99b6%en0",
+          "setup_pending": false
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "system.respring",
+        "params": {
+          "force": true
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "method": "frontboard_relaunch",
+          "previous_pid": 39,
+          "pid": 55146,
+          "restarted": true
+        },
+        "method": "system.respring"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "agent.health",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+          "capabilities": [
+            "session_identity",
+            "touch",
+            "hid",
+            "apps",
+            "url",
+            "files",
+            "file_download_identity",
+            "file_upload_identity",
+            "clipboard",
+            "location",
+            "keychain",
+            "ipa_install",
+            "bootstrap_install",
+            "bootstrap_uninstall",
+            "port_forward",
+            "screenshot",
+            "screen_unlock",
+            "device_info",
+            "display",
+            "audio",
+            "input_gestures",
+            "ui_inspection",
+            "processes",
+            "services",
+            "logs",
+            "network_capture",
+            "app_details",
+            "system_control",
+            "system_shutdown",
+            "file_tools",
+            "packages",
+            "environment_update",
+            "environment_transaction",
+            "environment_activation"
+          ],
+          "instance_id": "67449773-367D-4774-AD7D-239FEDD0A7CC",
+          "name": "vphoned",
+          "ios": "26.1.0",
+          "status": "ok",
+          "api_version": 1,
+          "ip": "fe80::103c:5a1f:d2f9:99b6%en0",
+          "setup_pending": false
+        },
+        "method": "agent.health"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "device.screen",
+        "params": {}
+      },
+      "response": {
+        "method": "device.screen",
+        "ok": true,
+        "result": {
+          "orientation": 0,
+          "locked": true,
+          "screen_off": false,
+          "height": 932,
+          "width": 430,
+          "scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "screen.unlock",
+        "params": {
+          "timeout": 10
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_screen_off": false,
+          "was_locked": true
+        },
+        "method": "screen.unlock"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "device.screen",
+        "params": {}
+      },
+      "response": {
+        "method": "device.screen",
+        "ok": true,
+        "result": {
+          "orientation": 0,
+          "locked": false,
+          "screen_off": false,
+          "height": 932,
+          "width": 430,
+          "scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "key",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "name": "home"
+      },
+      "response": {
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 92943,
+          "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+        },
+        "method": "apps.foreground",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "bundle_id": "com.apple.springboard",
+          "source": "unavailable",
+          "name": "Home Screen",
+          "pid": 0,
+          "verified": false
+        },
+        "method": "apps.foreground"
+      }
+    }
+  ],
+  "new_host_source_activated": false,
+  "passcode_supplied": false
+}

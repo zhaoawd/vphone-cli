@@ -1,0 +1,139 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/44] Write sources
+[6/44] Write swift-version--58304C5D6DBC2206.txt
+[7/45] Copying Localizable.xcstrings
+[8/50] Compiling img3.c
+[8/50] Compiling ace3.c
+[10/50] Compiling download.c
+[11/50] Compiling img4.c
+[12/50] Compiling fdr.c
+[13/50] Compiling ipsw.c
+[14/50] Compiling asr.c
+[15/50] Compiling normal.c
+[16/50] Compiling restore.c
+[17/50] Compiling recovery.c
+[18/50] Compiling limera1n.c
+[19/50] Compiling mbn.c
+[20/50] Compiling dfu.c
+[21/50] Compiling ftab.c
+[22/50] Compiling fls.c
+[23/50] Compiling log.c
+[24/50] Compiling locking.c
+[25/50] Compiling vphone_zip_stub.c
+[26/50] Compiling deviceinterfaced.c
+[27/50] Compiling common.c
+[28/50] Compiling idevicerestore.c
+[29/50] Compiling vphone_restore_bridge.c
+[30/50] Compiling MobileRecoveryCore libirecovery.c
+[32/50] Compiling VPhoneCore VPhoneLogWriter.swift
+[33/50] Compiling VPhoneCore VPhoneMachineBindingPersistence.swift
+[34/50] Compiling VPhoneCore VPhoneCoreBundleVersion.swift
+[35/50] Compiling VPhoneCore VPhoneMachineBinding.swift
+[36/50] Emitting module VPhoneCore
+[37/159] Compiling VPhoneHelperKit VPhoneHelperOutput.swift
+[38/159] Compiling VPhoneHelperKit VPhoneHelperService.swift
+[39/159] Compiling VPhoneHelperKit VPhoneHelperClient.swift
+[40/159] Emitting module VPhoneHelperKit
+[41/159] Compiling FirmwarePatcher KernelJBPatchMacMount.swift
+[42/159] Compiling FirmwarePatcher KernelJBPatchSandboxExtended.swift
+[43/159] Compiling FirmwarePatcher PatchSelectionFileMigration.swift
+[44/167] Emitting module VPhoneHelperEntry
+[45/167] Compiling VPhoneHelperEntry main.swift
+[45/167] Write Objects.LinkFileList
+[47/167] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[48/167] Compiling VPhoneLaunchpadKit VPhoneLaunchpadToolchain.swift
+[49/167] Emitting module VPhoneArchiveKitTests
+[50/167] Compiling VPhoneArchiveKitTests ExtractPermissionsTests.swift
+[51/167] Compiling VPhoneArchiveKitTests ArchiveSafetyTests.swift
+[52/167] Compiling VPhoneArchiveKitTests RoundTripTests.swift
+[53/167] Compiling FirmwarePatcher MachOHelpers.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineOrigins.swift:11:55: error: cannot use enum 'Read' here; 'VPhoneCore' was not imported by this file
+ 9 |     public let notice: String
+10 | 
+11 |     public init(_ read: VPhoneLaunchpadMachineBinding.Read) {
+   |                                                       `- error: cannot use enum 'Read' here; 'VPhoneCore' was not imported by this file
+12 |         runtime = "Unknown"
+13 |         switch read {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneMachineBinding.swift:14:17: note: enum declared here
+ 12 |     public let bootChain: String?
+ 13 | 
+ 14 |     public enum Read: Equatable, Sendable {
+    |                 `- note: enum declared here
+ 15 |         case missing
+ 16 |         case invalid(String)
+[54/167] Compiling FirmwarePatcher VPhoneKernelcacheSwap.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineOrigins.swift:11:55: error: cannot use enum 'Read' here; 'VPhoneCore' was not imported by this file
+ 9 |     public let notice: String
+10 | 
+11 |     public init(_ read: VPhoneLaunchpadMachineBinding.Read) {
+   |                                                       `- error: cannot use enum 'Read' here; 'VPhoneCore' was not imported by this file
+12 |         runtime = "Unknown"
+13 |         switch read {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneMachineBinding.swift:14:17: note: enum declared here
+ 12 |     public let bootChain: String?
+ 13 | 
+ 14 |     public enum Read: Equatable, Sendable {
+    |                 `- note: enum declared here
+ 15 |         case missing
+ 16 |         case invalid(String)
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[54/167] Linking vphone-helper
+[56/167] Compiling FirmwarePatcher PatchSelectionMigration.swift
+[57/167] Compiling FirmwarePatcher VariantPlanResolver.swift
+[58/167] Compiling FirmwarePatcher FirmwarePipeline.swift
+[59/167] Compiling FirmwarePatcher KernelPatchApfsMount.swift
+[60/167] Compiling FirmwarePatcher KernelPatchBsdInit.swift
+[61/167] Compiling FirmwarePatcher KernelPatchDebugger.swift
+[62/167] Compiling FirmwarePatcher KernelPatchPostValidation.swift
+[63/167] Compiling FirmwarePatcher KernelPatchSandbox.swift
+[64/172] Compiling FirmwarePatcher ARM64Encoder.swift
+[65/172] Compiling FirmwarePatcher BinaryBuffer.swift
+[66/172] Compiling FirmwarePatcher IM4PHandler.swift
+[67/172] Emitting module VPhoneHelperKitTests
+[68/172] Compiling VPhoneHelperKitTests HelperTests.swift
+[69/172] Compiling VPhoneHelperKitTests OutputAcknowledgementTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneHelperKitTests/OutputAcknowledgementTests.swift:29:81: error: cannot convert value of type 'VPhoneLaunchpadLogWriter' to expected argument type 'VPhoneLogWriter'
+27 |         let url = directory.appendingPathComponent("operation.log")
+28 |         let writer = try VPhoneLaunchpadLogWriter(url: url)
+29 |         let receiver = VPhoneHelperOutputReceiver(operation: operation, writer: writer, onLine: { _ in })
+   |                                                                                 `- error: cannot convert value of type 'VPhoneLaunchpadLogWriter' to expected argument type 'VPhoneLogWriter'
+30 |         for index in 0..<10000 { receiver.helperDidEmit(operation: operation, line: "line \(index)") }
+31 |         receiver.helperDidEmit(operation: operation, line: "panic: final tail")
+[70/172] Compiling VPhoneHelperKitTests OutputXPCTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneHelperKitTests/OutputXPCTests.swift:34:87: error: cannot convert value of type 'VPhoneLaunchpadLogWriter' to expected argument type 'VPhoneLogWriter'
+32 |             let operation = UUID().uuidString
+33 |             let url = directory.appendingPathComponent(operation + ".log")
+34 |             let output = VPhoneHelperOutputReceiver(operation: operation, writer: try VPhoneLaunchpadLogWriter(url: url), onLine: { _ in })
+   |                                                                                       `- error: cannot convert value of type 'VPhoneLaunchpadLogWriter' to expected argument type 'VPhoneLogWriter'
+35 |             let connection = NSXPCConnection(listenerEndpoint: listener.endpoint)
+36 |             connection.remoteObjectInterface = NSXPCInterface(with: VPhoneHelperProtocol.self)
+[70/172] Applying vphone-helper
+[71/172] Compiling FirmwarePatcher KernelJBPatchIoucSandbox.swift
+[72/172] Compiling FirmwarePatcher KernelJBPatchKcall10.swift
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[73/172] Emitting module VPhoneLaunchpadKit
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineOrigins.swift:11:55: error: cannot use enum 'Read' here; 'VPhoneCore' was not imported by this file
+ 9 |     public let notice: String
+10 | 
+11 |     public init(_ read: VPhoneLaunchpadMachineBinding.Read) {
+   |                                                       `- error: cannot use enum 'Read' here; 'VPhoneCore' was not imported by this file
+12 |         runtime = "Unknown"
+13 |         switch read {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneMachineBinding.swift:14:17: note: enum declared here
+ 12 |     public let bootChain: String?
+ 13 | 
+ 14 |     public enum Read: Equatable, Sendable {
+    |                 `- note: enum declared here
+ 15 |         case missing
+ 16 |         case invalid(String)
+error: fatalError

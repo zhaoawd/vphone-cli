@@ -1,0 +1,52 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[3/40] Write swift-version--58304C5D6DBC2206.txt
+[4/43] Compiling locking.c
+[5/43] Compiling common.c
+[6/43] Compiling fdr.c
+[7/43] Compiling deviceinterfaced.c
+[8/43] Compiling download.c
+[9/43] Compiling asr.c
+[10/43] Compiling ipsw.c
+[11/43] Compiling recovery.c
+[12/43] Compiling normal.c
+[13/43] Compiling limera1n.c
+[14/43] Compiling img3.c
+[15/43] Compiling dfu.c
+[16/43] Compiling img4.c
+[17/43] Compiling ace3.c
+[18/43] Compiling mbn.c
+[19/43] Compiling ftab.c
+[20/43] Compiling fls.c
+[21/43] Compiling log.c
+[22/43] Compiling vphone_zip_stub.c
+[23/43] Compiling vphone_restore_bridge.c
+[24/43] Compiling idevicerestore.c
+[25/43] Compiling restore.c
+[27/43] Compiling VPhoneHelperKit VPhoneHelperService.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneHelperKit/VPhoneHelperService.swift:33:17: error: cannot find 'VPhoneBundleVersion' in scope
+ 31 |         streaming(operation: operation, reply: reply) { [self] output in
+ 32 |             try authorize(authorization)
+ 33 |             try VPhoneBundleVersion.require(version)
+    |                 `- error: cannot find 'VPhoneBundleVersion' in scope
+ 34 |             output.emit("Installing Core Bundle \(version)")
+ 35 |             return try install(version, archive, sha256)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneHelperKit/VPhoneHelperService.swift:41:17: error: cannot find 'VPhoneBundleVersion' in scope
+ 39 |     func verifyBundleStreaming(version: String, operation: String, reply: @escaping @Sendable (Data?, String?) -> Void) {
+ 40 |         streaming(operation: operation, reply: reply) { [self] output in
+ 41 |             try VPhoneBundleVersion.require(version)
+    |                 `- error: cannot find 'VPhoneBundleVersion' in scope
+ 42 |             output.emit("Verifying Core Bundle \(version)")
+ 43 |             return try verify(version)
+[27/43] Compiling MobileRecoveryCore libirecovery.c
+[29/43] Compiling VPhoneHelperKit VPhoneHelperProtocol.swift
+[30/44] Compiling VPhoneHelperKit VPhoneHelperOutput.swift
+[31/44] Emitting module VPhoneHelperKit
+[32/44] Compiling VPhoneHelperKit VPhoneHelperClient.swift
+[33/44] Compiling VPhoneHelperKit VPhoneHelperAuthorization.swift
+error: fatalError

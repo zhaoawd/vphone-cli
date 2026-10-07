@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b13-api-cleanup.py", line 32, in <module>
+    assert 'vphone-b13-api/vphoned' not in r.get('stdout','');assert '/usr/bin/vphoned' in r.get('stdout','');assert 'Could not find service' in r.get('stderr','') or 'Could not find service' in r.get('stdout','')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,155 @@
+COMMAND ["/bin/zsh", "scripts/build.sh", "--no-vphoned"]
+=== Building vphone-cli (55fd8ef5) ===
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for production...
+[2/41] Copying Localizable.xcstrings
+[2/41] Write sources
+[9/41] Write swift-version--58304C5D6DBC2206.txt
+[11/44] Compiling AppleMobileDeviceLibrary AppleMobileDeviceLibrary.swift
+[11/44] Compiling vphone_zip_stub.c
+[12/44] Compiling deviceinterfaced.c
+[13/44] Compiling common.c
+[14/44] Compiling ipsw.c
+[15/44] Compiling download.c
+[16/44] Compiling asr.c
+[17/44] Compiling idevicerestore.c
+[18/44] Compiling fdr.c
+[19/44] Compiling recovery.c
+[20/44] Compiling limera1n.c
+[21/44] Compiling normal.c
+[22/44] Compiling dfu.c
+[23/44] Compiling img3.c
+[24/44] Compiling ace3.c
+[25/44] Compiling ftab.c
+[26/44] Compiling mbn.c
+[27/44] Compiling img4.c
+[28/44] Compiling restore.c
+[29/44] Compiling fls.c
+[30/44] Compiling log.c
+[31/44] Compiling locking.c
+[32/44] Compiling vphone_restore_bridge.c
+[33/44] Compiling MobileRecoveryCore libirecovery.c
+[35/45] Compiling VPhoneRestore VPhoneRecoveryProbe.swift
+[36/45] Compiling VPhoneAPIKit VPhoneAPIClient.swift
+[37/45] Compiling VPhoneCore HostControlClient.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:140:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+138 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+139 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+140 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+141 |         }
+142 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[38/48] Compiling VPhoneHelperKit VPhoneHelperAuthorization.swift
+[39/49] Compiling VPhoneHelperEntry main.swift
+[39/49] Write Objects.LinkFileList
+[40/49] Linking vphone-helper
+[42/49] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[43/50] Compiling VPhoneLaunchpad VPhoneLaunchpadApp.swift
+[43/50] Write Objects.LinkFileList
+[44/50] Linking vphone-launchpad
+[46/50] Compiling FirmwarePatcher ARM64Constants.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[47/51] Compiling vphone_cli VPhoneAPIProxyOptions.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[48/53] Compiling VPhoneVMEntry main.swift
+[49/53] Compiling VPhoneCommandEntry main.swift
+[49/53] Write Objects.LinkFileList
+[51/53] Linking vphone-cli
+[52/53] Linking vphone-vm
+Build complete! (99.22s)
+=== Signing with entitlements ===
+.build/release/vphone-cli: replacing existing signature
+.build/release/vphone-vm: replacing existing signature
+  signed OK → .build/release/vphone-cli
+=== Bundling .build/vphone-cli.app ===
+.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+  bundled → .build/vphone-cli.app
+=== Bundling runtime assets → .build/vphone-cli.app/Contents/Resources ===
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont
+=== Signing .build/vphone-cli.app (final Resources) ===
+.build/vphone-cli.app: replacing existing signature
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+  resealed and verified OK
+
+=== Build complete ===
+  binary : .build/release/vphone-cli
+  bundle : .build/vphone-cli.app
+  guest  : .build/guest/{vphoned,vphoned-less}
+
+Run: .build/release/vphone-cli --help
