@@ -63,6 +63,8 @@ struct VPhoneLaunchpadMachineInspector: View {
     @Environment(VPhoneLaunchpadModel.self) private var model
     /// Nil while the machine has no create checkpoint.
     @State private var creation: Result<VPhoneLaunchpadCreateSummary, VPhoneLaunchpadError>?
+    @State private var origins = VPhoneLaunchpadMachineOrigins(.missing)
+    @State private var originsMachine: VPhoneLaunchpadMachinePath?
 
     private var library: VPhoneLaunchpadMachineLibrary {
         model.machines
@@ -111,6 +113,19 @@ struct VPhoneLaunchpadMachineInspector: View {
                 }
             }
 
+            Section("Recorded Origins") {
+                if originsMachine == machine.path {
+                    value(LocalizedStringKey("Host selection"), origins.host)
+                    value(LocalizedStringKey("Guest environment"), origins.guestEnvironment)
+                    value(LocalizedStringKey("Kernel"), origins.kernel)
+                    value(LocalizedStringKey("Other boot chain"), origins.bootChain)
+                    value(LocalizedStringKey("Actual runtime"), origins.runtime)
+                    Text(verbatim: origins.notice).foregroundStyle(.secondary)
+                } else {
+                    Text("Reading component origins…").foregroundStyle(.secondary)
+                }
+            }
+
             Section("Hardware") {
                 LabeledContent("CPU") { Text("\(machine.cpuCount) cores") }
                 LabeledContent("Memory") { Text(verbatim: VPhoneLaunchpadMachinesView.memory(machine.memoryMB)) }
@@ -151,11 +166,17 @@ struct VPhoneLaunchpadMachineInspector: View {
         .scrollContentBackground(.hidden)
         .background(VPhoneLaunchpadTheme.background)
         .task(id: machine.path) {
-            // The checkpoint file is small and written by rename; read it
-            // off the main actor and again while the inspector shows it.
+            // Read the checkpoint and bounded origin record off the main
+            // actor. A cancelled selection must not apply its late snapshot.
             let path = machine.path
             while !Task.isCancelled {
-                creation = await Task.detached { VPhoneLaunchpadCreateSummary.read(path) }.value
+                let snapshot = await Task.detached {
+                    (VPhoneLaunchpadCreateSummary.read(path), VPhoneLaunchpadMachineBinding.load(path))
+                }.value
+                guard !Task.isCancelled else { return }
+                creation = snapshot.0
+                origins = VPhoneLaunchpadMachineOrigins(snapshot.1)
+                originsMachine = path
                 try? await Task.sleep(for: .seconds(5))
             }
         }
