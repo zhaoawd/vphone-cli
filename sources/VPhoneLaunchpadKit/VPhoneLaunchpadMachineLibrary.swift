@@ -312,12 +312,15 @@ public final class VPhoneLaunchpadMachineLibrary {
             let result = try await commandLine.run(["vm", "stop", machine.name] + machine.libraryArguments)
             if !result.succeeded {
                 actionError = VPhoneLaunchpadError(String(localized: "Unable to Stop \(machine.name)"), detail: result.tail)
+            } else {
+                // Only cancel our launch wrapper after the CLI confirmed Stop.
+                // A refusal (for example an active update) must not be bypassed.
+                launched[machine]?.interrupt()
             }
         } catch {
             actionError = VPhoneLaunchpadError(
                 String(localized: "Unable to Stop \(machine.name)"), detail: error.localizedDescription)
         }
-        launched[machine]?.interrupt()
         await refresh()
     }
 
