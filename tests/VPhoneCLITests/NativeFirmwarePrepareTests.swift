@@ -344,6 +344,49 @@ extension NativeFirmwarePrepareTests {
         #expect(try contents(tree) == contents(freshTree))
     }
 
+    @Test func repeatedAndReturnedSelectionsUseFreshArchiveBytes() throws {
+        let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
+        let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
+        let vm = root.appendingPathComponent("vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
+        let stages = SyntheticPatchCheckpointStages(bundle: vm)
+        let runner = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, log: { _ in }, keepArtifacts: true)
+        #expect(throws: VPhoneCreateRunError.self) {
+            try runner.create(bundleURL: vm, options: options("regular", phone: phone, cloud: cloud),
+                iphoneSource: phone.path, cloudosSource: cloud.path)
+        }
+        let firstTree = try #require(VPhoneCreateLiveStages.restoreTree(vm))
+        let first = try contents(firstTree)
+        for variant in ["regular", "jb", "regular"] {
+            #expect(throws: VPhoneCreateRunError.self) {
+                try runner.resume(bundleURL: vm, request: .init(overrides: .init(variant: variant), restartFrom: .prepare))
+            }
+            let tree = try #require(VPhoneCreateLiveStages.restoreTree(vm))
+            #expect(try stages.patched(tree) == "cloud|" + variant)
+            if variant == "regular" { #expect(try contents(tree) == first) }
+        }
+        #expect(stages.patchRuns == 4 && stages.prepareRuns == 4)
+    }
+
+    @Test func badArchiveKeepsPreviousTreeAndOriginalsDirectory() throws {
+        let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
+        let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
+        let vm = root.appendingPathComponent("vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
+        let tree = try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm)
+        let before = try contents(tree)
+        let originals = vm.appendingPathComponent("FirmwareOriginals")
+        try FileManager.default.createDirectory(at: originals, withIntermediateDirectories: false)
+        let marker = originals.appendingPathComponent("preserve")
+        let bytes = Data("prior original generation".utf8); try bytes.write(to: marker)
+        try Data("corrupt archive".utf8).write(to: cloud)
+        #expect(throws: (any Error).self) {
+            try VPhoneNativeFirmwarePreparer.prepare(iPhone: phone, cloudOS: cloud, bundle: vm, preserveExistingRestore: true)
+        }
+        #expect(try contents(tree) == before)
+        #expect(try Data(contentsOf: marker) == bytes)
+    }
+
     @Test func acceptedToolChangeWithAnotherSelectionRequiresRegeneration() throws {
         let root = try workspace(); defer { try? FileManager.default.removeItem(at: root) }
         let phone = try archive(root, cloud: false), cloud = try archive(root, cloud: true)
