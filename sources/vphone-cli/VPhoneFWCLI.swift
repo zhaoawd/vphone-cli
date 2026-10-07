@@ -9,7 +9,7 @@ struct VPhoneFWCommand: ParsableCommand {
         abstract: "Firmware pipeline: prepare (download/merge IPSWs) and patch",
         subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self,
                       VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self, VPhoneFWPlanCommand.self,
-                      VPhoneFWCacheCommand.self])
+                      VPhoneFWCacheCommand.self, VPhoneFWSelectionPreviewCommand.self])
 }
 
 // MARK: - catalog
@@ -324,6 +324,7 @@ struct VPhoneFWPlanCommand: ParsableCommand {
     }
 
     func run() throws {
+        try PatchSelectionMigration.validateExplicitInputs(select: select, block: block)
         let variants: [FirmwarePipeline.Variant] = all
             ? [.regular, .dev, .jb, .exp, .less]
             : [variant.pipelineVariant]
