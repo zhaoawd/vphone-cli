@@ -33,7 +33,7 @@ extension GuestAPI {
         case "apps.network_policy":
             return try appNetworkPolicy(string(params, "bundle_id"), repair: bool(params, "repair"))
         case "system.uicache":
-            return try refreshApps(directory: optionalString(params, "directory"))
+            return try refreshAppRegistrations(directory: optionalString(params, "directory"))
         case "system.system_apps":
             return try systemAppsVisibility(set: params["visible"] as? Bool)
         case "system.respring":
@@ -54,5 +54,20 @@ extension GuestAPI {
         default:
             return nil
         }
+    }
+}
+
+// MARK: - App registrations
+
+extension GuestAPI {
+    static func refreshAppRegistrations(directory: String?) throws -> [String: Any] {
+        let resolved: String
+        if let directory {
+            resolved = try GuestAppRefreshDirectory.resolve(requested: directory, installation: nil)
+        } else {
+            resolved = try GuestIrisinInstaller.applicationsDirectory()
+        }
+        // Preserve IcliError.commandFailed's structured bundle results.
+        return try refreshApps(directory: resolved)
     }
 }

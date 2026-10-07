@@ -40,6 +40,14 @@ enum GuestIrisinInstaller {
         return progress
     }
 
+    static func applicationsDirectory() throws -> String {
+        guard let installation = try completedBootstrap(),
+              try physicalChildDirectoryExists(root: installation.root, relative: "Applications") else {
+            throw GuestAPIError.operationFailed("No completed bootstrap application directory was found")
+        }
+        return try GuestAppRefreshDirectory.resolve(requested: nil, installation: .init(layout: installation.layout, root: installation.root))
+    }
+
     static func installedBootstrap() throws -> [String: Any] {
         let roots = try bootstrapRoots()
         var result: [String: Any] = ["installed": !roots.isEmpty, "roots": roots.map(\.root)]
