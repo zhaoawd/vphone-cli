@@ -177,6 +177,10 @@ struct LaunchpadEditStandIn {
           exit 1
         fi
         case "$2" in
+        import)
+          trap 'echo "import got SIGINT"; exit 130' INT
+          while [ -e "$root/.import-block" ]; do sleep 0.03; done
+          echo "import ok" ;;
         export)
           trap 'echo "export $name got SIGINT"; exit 130' INT
           : > "$out"
@@ -310,6 +314,52 @@ struct EditLibraryTests {
         await library.importArchive(URL(fileURLWithPath: "/archives/m 1.tzst"))
         #expect(standIn.edits == ["vm import /archives/m 1.tzst --library-root \(standIn.root)"])
         #expect(standIn.history.entries.map(\.text) == ["vphone-cli vm import '/archives/m 1.tzst' --library-root \(standIn.root)"])
+        #expect(library.globalActivity == nil)
+    }
+
+    @Test func importCancelledBeforeLaunchDoesNotReportAnActionFailure() async throws {
+        let standIn = try LaunchpadEditStandIn()
+        let library = await standIn.library()
+        let task = Task { await library.importArchive(URL(fileURLWithPath: "/archives/cancel.tzst")) }
+        task.cancel()
+        await task.value
+        #expect(library.actionError == nil)
+        #expect(library.globalActivity == nil)
+        #expect(standIn.edits.isEmpty)
+    }
+
+    @Test func cancelledImportLaunchErrorDoesNotReportAnActionFailure() async throws {
+        let standIn = try LaunchpadEditStandIn()
+        let library = await standIn.library()
+        library.startMonitoring(with: VPhoneLaunchpadCommandLine(
+            executable: standIn.temp.url.appendingPathComponent("missing-cli"), history: standIn.history
+        ))
+        library.stopMonitoring()
+        let task = Task { await library.importArchive(URL(fileURLWithPath: "/archives/cancel.tzst")) }
+        task.cancel()
+        await task.value
+        #expect(library.actionError == nil)
+        #expect(library.globalActivity == nil)
+        #expect(standIn.edits.isEmpty)
+    }
+
+    @Test func concurrentImportsDoNotReplaceOneGlobalActivity() async throws {
+        let standIn = try LaunchpadEditStandIn()
+        let blocker = URL(fileURLWithPath: standIn.root).appendingPathComponent(".import-block")
+        try Data().write(to: blocker)
+        defer { try? FileManager.default.removeItem(at: blocker) }
+        let library = await standIn.library()
+        let first = Task { await library.importArchive(URL(fileURLWithPath: "/archives/first.tzst")) }
+        #expect(await eventually { library.globalActivity != nil })
+        let activity = library.globalActivity
+        let second = Task { await library.importArchive(URL(fileURLWithPath: "/archives/second.tzst")) }
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(library.globalActivity == activity)
+        try FileManager.default.removeItem(at: blocker)
+        await first.value
+        await second.value
+        #expect(standIn.edits.count == 1)
+        #expect(standIn.edits.first?.contains("first.tzst") == true)
         #expect(library.globalActivity == nil)
     }
 

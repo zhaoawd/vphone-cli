@@ -467,9 +467,8 @@ public final class VPhoneLaunchpadMachineLibrary {
             actionError = VPhoneLaunchpadError(failure, detail: String(localized: "Launchpad cannot pass this name or path to vphone-cli."))
             return false
         }
-        if let machine, activities[machine] != nil {
-            return false
-        }
+        if let machine, activities[machine] != nil { return false }
+        if machine == nil, globalActivity != nil { return false }
         if let machine {
             activities[machine] = activity
         } else {
@@ -490,7 +489,9 @@ public final class VPhoneLaunchpadMachineLibrary {
                 actionError = VPhoneLaunchpadError(failure, detail: result.tail)
             }
         } catch {
-            actionError = VPhoneLaunchpadError(failure, detail: error.localizedDescription)
+            if !Task.isCancelled {
+                actionError = VPhoneLaunchpadError(failure, detail: error.localizedDescription)
+            }
         }
         // A new task: a cancelled export's own cancellation would interrupt
         // the `vm list` children of this refresh.
