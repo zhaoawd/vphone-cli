@@ -70,6 +70,26 @@ class MaxSlideDecisionTests(unittest.TestCase):
             result = patch_dsc_maxslide(str(self.dir), **kwargs)
         return result, out.getvalue().splitlines()
 
+    def test_cache_larger_than_kernel_region_is_rejected_even_at_zero_slide(self):
+        for slide in (0, 0x20000000):
+            for options in ({}, {'force': True}, {'dry_run': True}):
+                before = self.write(build_cache(size=REGION + 0x4000, max_slide=slide))
+                with self.assertRaisesRegex(RuntimeError, 'shared region'):
+                    self.run_patch(**options)
+                self.assertEqual(self.main.read_bytes(), before)
+
+    def test_unknown_or_invalid_kernel_region_is_not_a_success(self):
+        for size in (None, True, 0, -1, 1 << 64):
+            before = self.write(build_cache(size=REGION - 0x4000, max_slide=0))
+            with self.assertRaises((RuntimeError, ValueError)):
+                self.run_patch(kernel_region_size=size)
+            self.assertEqual(self.main.read_bytes(), before)
+
+    def test_explicit_seven_gib_region_accepts_cache_that_six_gib_rejects(self):
+        before = self.write(build_cache(size=0x185804000, max_slide=0x20000000))
+        self.assertEqual(self.run_patch(kernel_region_size=0x1C0000000)[0], 0)
+        self.assertEqual(self.main.read_bytes(), before)
+
     # MARK: - needs clearing
 
     def test_overflow_zeroes_max_slide_only(self):
@@ -131,12 +151,11 @@ class MaxSlideDecisionTests(unittest.TestCase):
         self.assertEqual(self.main.read_bytes(), original)
         self.assertEqual(lines[-1], "      [=] maxSlide already 0; no change")
 
-    def test_already_zero_over_region_is_a_no_op(self):
+    def test_declared_region_larger_than_kernel_is_rejected_even_when_mapping_span_fits(self):
         original = self.write(build_cache(size=REGION + 0x4000, max_slide=0, span=REGION))
-        result, lines = self.run_patch()
-        self.assertEqual(result, 0)
+        with self.assertRaisesRegex(RuntimeError, "shared region"):
+            self.run_patch()
         self.assertEqual(self.main.read_bytes(), original)
-        self.assertEqual(lines[-1], "      [=] maxSlide already 0; no change")
 
     # MARK: - invalid header
 

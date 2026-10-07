@@ -108,6 +108,8 @@ def _read_header(chunks_dir, main):
 
 
 def patch_dsc_maxslide(chunks_dir, *, kernel_region_size=KERNEL_SHARED_REGION_SIZE, dry_run=False, force=False):
+    if type(kernel_region_size) is not int or not 0 < kernel_region_size < (1 << 64):
+        raise ValueError("kernel shared region size is unknown or invalid")
     main = os.path.join(chunks_dir, MAIN_CHUNK)
     if not os.path.isfile(main):
         raise FileNotFoundError(f"main DSC chunk not found: {main}")
@@ -120,6 +122,11 @@ def patch_dsc_maxslide(chunks_dir, *, kernel_region_size=KERNEL_SHARED_REGION_SI
         raise RuntimeError(f"{main}: sharedRegionSize 0x{srsize:X} + maxSlide 0x{maxslide:X} "
                            f"overflows 64 bits; header is not a dyld_cache_header")
 
+    # Clearing ASLR cannot make a cache whose un-slid span exceeds the region fit.
+    # Check this before the already-zero/force/dry-run paths, without writing.
+    if srsize > kernel_region_size:
+        raise RuntimeError(f"{main}: cache size 0x{srsize:X} exceeds kernel shared region "
+                           f"0x{kernel_region_size:X} even at zero slide")
     fits = combined <= kernel_region_size
     if fits and not force:
         print(f"      [=] fits: span+maxSlide 0x{combined:X} <= "

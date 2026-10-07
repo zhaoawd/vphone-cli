@@ -1207,3 +1207,8 @@ The legacy export helper's uppercase iBoot defaults initially produced four labe
 `make test_firmware` passed 13 tests in 11 suites. Patch comparisons: AVPBooter 1, iBSS 4, iBEC 7, LLB 13, TXM 1, TXM dev 12, kernel base 28, iBSS JB 1, kernel JB 84. IM4P payload/repack checks and the diagnostic kernel test also passed. This is offline evidence for the recorded inputs, not VM restore/boot acceptance. See `research/artifacts/upstream-remaining-2026-09-29/firmware-comparison-final.log`.
 
 The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 methods / 58 records, dev 34 / 70, jb 68 / 152, exp 88 / 178. Runs used isolated copies under `research/artifacts/upstream-remaining-2026-09-29/firmware-variants`, without booting a VM. The less pipeline and other cloudOS builds were not run in this batch. Structured reports and gate output are retained there.
+
+
+### 2026-10-07 B07：DSC maxSlide 共享区域拒绝条件
+
+`cfw_patch_dsc_maxslide.py` 在决定是否清零 maxSlide 前拒绝未知/非法区域容量，并拒绝缓存自身 sharedRegionSize 超过给定 kernel 区域的组合，包括 maxSlide=0、force 和 dry-run。显式 7 GiB 参数只表示调用者给定容量，不构成安装内核证明；默认仍保留既有 vphone600 6 GiB 路径。本轮没有增加内核扩容补丁或证明新区域可启动。合成缓存验证和原始日志记录在 B07 台账。
