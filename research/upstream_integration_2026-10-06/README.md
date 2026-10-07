@@ -214,3 +214,16 @@ T02 已完整读取两个签名单文件提交：ee8b70ca 的 SOURCE_VERSION 回
 T11 的 8 次独立只读 fw plan 调用得到 8 种 enabledSteps 数组顺序和同一集合摘要。模型使用 Set 的合成 Codable，序列化顺序不固定。现有创建检查点 identityText 已对 selectedIDs 与 enabledSteps 排序；没有证据表明该摘要存在回归。后续持久化需要明确规范序列化，再绑定 VM、输入、catalog、schema 和 planDigest；当前事务 journal 与版本 manifest 不能直接作为重新执行授权。
 
 证据入口：`evidence/T09-file-summary.json`、`evidence/T09-file-related-swift.log`、`evidence/T09-file-serial-sample.txt`。T09 与 T11 均未标记 accepted。
+
+
+### 2026-10-07 T11 计划规范序列化
+
+实现提交 `3cd5b594` 保留 VariantPlan 的原有字段，将 enabledSteps 排序后编码。解码先读取数组并拒绝重复步骤，再转换为 Set；无重复的旧乱序数组仍兼容，字段缺失仍拒绝。未新增计划文件、修改事务 schema 或授予持久化记录执行资格。现有创建检查点 identityText 的字段与排序规则不变。
+
+4 项回归先出现 7 个 issues，修复后通过。第一次测试编译误用了 Variant.allCases 和简化 Gate 初始化，修正为已有五模式与完整 Gate 测试数据，编译错误日志保留。相关模块 269 项、44 个 suite 通过，0.891 秒；创建检查点和准备流程 43 项、2 个 suite 通过，1.293 秒。两组测试范围分别记录，不相加为整套独立测试数。
+
+真实 debug CLI 的 8 个独立 regular 计划进程均输出排序的 enabledSteps，集合、数组顺序和完整 JSON 的摘要各只有一个值。初始驱动误将 CLI 的数组输出当作对象，发生 TypeError；修正解析与显式 variant 后通过，原驱动保留。此前 8 种顺序的只读探测与本次结果分别存档。
+
+完整 Swift 测试没有在本次序列化修正后重跑；前一步标准 16 issues 和串行 HTTP 夹具 waitUntilExit 阻塞记录保留，不能表述为全量通过。没有签名重建、部署或 VM 操作。C2 仍需 VM/输入 build 与摘要、catalog/target/schema/planDigest 绑定，记录状态分类及原子迁移；T11 未标记 accepted。下一步复用 FirmwareTransaction.Journal、FirmwareVersionInputs 和 VPhoneCreateBundleIdentity，审查首次启动前后及 legacy VM 的身份边界，不另建平行配置源。
+
+证据入口：`evidence/T11-canonical-summary.json`、`evidence/T11-canonical-related.log`、`evidence/T11-canonical-checkpoint.log`。

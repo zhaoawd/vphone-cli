@@ -1,0 +1,56 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling locking.c
+[5/35] Compiling mbn.c
+[6/35] Compiling ace3.c
+[7/35] Compiling img3.c
+[8/35] Compiling dfu.c
+[9/37] Compiling img4.c
+[10/37] Compiling fdr.c
+[11/37] Compiling download.c
+[12/37] Compiling asr.c
+[13/37] Compiling recovery.c
+[14/37] Compiling normal.c
+[15/37] Compiling ipsw.c
+[16/37] Compiling limera1n.c
+[17/37] Compiling ftab.c
+[18/37] Compiling log.c
+[19/37] Compiling fls.c
+[20/37] Compiling deviceinterfaced.c
+[21/37] Compiling restore.c
+[22/37] Compiling vphone_zip_stub.c
+[23/37] Compiling common.c
+[24/37] Compiling idevicerestore.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling FirmwarePatcherTests VariantPlanSerializationTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/VariantPlanSerializationTests.swift:7:71: error: incorrect argument label in call (have 'variant:', expected 'from:')
+ 5 | @Suite struct VariantPlanSerializationTests {
+ 6 |     private func plan(_ variant: FirmwarePipeline.Variant = .regular) throws -> VariantPlanResolver.VariantPlan {
+ 7 |         try VariantPlanResolver.resolve(variant: variant, gates: .init(variant: variant.rawValue))
+   |                                                                       `- error: incorrect argument label in call (have 'variant:', expected 'from:')
+ 8 |     }
+ 9 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/VariantPlanSerializationTests.swift:7:89: error: argument type 'String' does not conform to expected type 'Decoder'
+ 5 | @Suite struct VariantPlanSerializationTests {
+ 6 |     private func plan(_ variant: FirmwarePipeline.Variant = .regular) throws -> VariantPlanResolver.VariantPlan {
+ 7 |         try VariantPlanResolver.resolve(variant: variant, gates: .init(variant: variant.rawValue))
+   |                                                                                         `- error: argument type 'String' does not conform to expected type 'Decoder'
+ 8 |     }
+ 9 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/VariantPlanSerializationTests.swift:11:49: error: type 'FirmwarePipeline.Variant' has no member 'allCases'
+ 9 | 
+10 |     @Test func encodedStepsHaveStableOrderForEveryVariant() throws {
+11 |         for variant in FirmwarePipeline.Variant.allCases {
+   |                                                 `- error: type 'FirmwarePipeline.Variant' has no member 'allCases'
+12 |             let plan = try plan(variant)
+13 |             let data = try JSONEncoder().encode(plan)
+[29/38] Emitting module FirmwarePatcherTests
+error: fatalError

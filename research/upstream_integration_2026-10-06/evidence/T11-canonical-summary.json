@@ -1,0 +1,109 @@
+{
+  "commit": "3cd5b5949a54f706fba432351b207bfae68b857b",
+  "task": "T11",
+  "accepted": false,
+  "changed": "existing VariantPlan enabledSteps encoded in sorted order; repeated decoded steps refused before Set conversion",
+  "legacy_compatibility": "unsorted unique array supported; existing wire field names unchanged; missing field still refused",
+  "red": {
+    "tests": 4,
+    "suites": 1,
+    "issues": 7
+  },
+  "green": {
+    "tests": 4,
+    "suites": 1,
+    "passed": true,
+    "seconds": 0.017
+  },
+  "related": {
+    "tests": 269,
+    "suites": 44,
+    "passed": true,
+    "seconds": 0.891
+  },
+  "checkpoint": {
+    "tests": 43,
+    "suites": 2,
+    "passed": true,
+    "seconds": 1.293
+  },
+  "cli": {
+    "samples": [
+      {
+        "sample": 0,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 1,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 2,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 3,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 4,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 5,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 6,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      },
+      {
+        "sample": 7,
+        "steps_count": 28,
+        "step_set_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "encoded_steps_sha256": "3ffd076ee2e6e85199e18f4ee5cdcf7b8ab7ff847caa5a76de44cddc39e0bac1",
+        "plan_json_sha256": "32fcc813a369e3b7fe15a2a3498a0740069836510bdf5fec98ae97dc3540105d"
+      }
+    ],
+    "distinct_order_digests": 1,
+    "distinct_sets": 1,
+    "distinct_plan_json_digests": 1,
+    "scope": "eight independent read-only CLI processes; no persistence or VM operations"
+  },
+  "initial_test_compile_error": "Variant does not conform to CaseIterable; Gate initializer requires all fields; corrected to existing shared variant/gate test data",
+  "initial_cli_driver_error": "fw plan JSON is an array; initial driver raised TypeError; corrected array parsing and explicit regular variant",
+  "write_authority_granted": false,
+  "journal_schema_changed": false,
+  "new_configuration_source": false,
+  "signed_rebuild_or_deployment": false,
+  "vm_operation": false,
+  "full_swift_after_this_change_run": false,
+  "full_swift_limitation": "previous T09 source standard16 issues and final serial HTTP fixture waitUntilExit interruption retained; no global success claim",
+  "remaining": [
+    "C2 VM identity and input build/digest binding",
+    "catalog/target/schema/planDigest binding",
+    "missing/corrupt/unsupported/recognized legacy state classification",
+    "atomic record import and generation correspondence"
+  ]
+}

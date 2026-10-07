@@ -1483,7 +1483,7 @@
       "dependencies": [
         "T10"
       ],
-      "status": "transaction_plan_input_evidence_validated_c2_pending",
+      "status": "canonical_plan_serialization_validated_c2_binding_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchDrift.swift"
@@ -1503,19 +1503,22 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "transaction_evidence_slice_validated_c2_pending",
+        "state": "canonical_serialization_and_transaction_evidence_validated_c2_pending",
         "paths": [
           "sources/vphone-cli/VPhoneFWCLI.swift",
           "sources/vphone-cli/VPhoneCreateLiveStages.swift",
           "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
           "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
           "sources/FirmwarePatcher/Pipeline/FirmwareVersionInputs.swift",
-          "tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift"
+          "tests/FirmwarePatcherTests/FirmwareVersionInputsTests.swift",
+          "sources/FirmwarePatcher/PatchSet/VariantPlanSerialization.swift",
+          "tests/FirmwarePatcherTests/VariantPlanSerializationTests.swift"
         ]
       },
       "implementation_commits": [
         "0c73f59f5065bca9917a527b44099a23f00b6684",
-        "8777bc7e47795939badf222fbc4bbe7d8e3e6584"
+        "8777bc7e47795939badf222fbc4bbe7d8e3e6584",
+        "3cd5b5949a54f706fba432351b207bfae68b857b"
       ],
       "verification_evidence": [
         "evidence/T11-version-inputs-red.log",
@@ -1534,15 +1537,24 @@
         "evidence/T10-base-final-bundle-check.log",
         "evidence/T10-base-build-driver.json",
         "evidence/T10-base-signed-artifact-manifest.json",
-        "evidence/T11-plan-serialization-probe.json"
+        "evidence/T11-plan-serialization-probe.json",
+        "evidence/T11-canonical-red.log",
+        "evidence/T11-canonical-red2.log",
+        "evidence/T11-canonical-green.log",
+        "evidence/T11-canonical-related.log",
+        "evidence/T11-canonical-checkpoint.log",
+        "evidence/T11-canonical-cli.log",
+        "evidence/T11-canonical-cli.json",
+        "evidence/T11-canonical-cli.py",
+        "evidence/T11-canonical-cli-initial.py",
+        "evidence/T11-canonical-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "现有事务 journal 保存本次解析计划和两份版本 manifest 的原始字节 SHA/版本；暂存输入必须匹配，读取拒绝损坏、权限拒绝及无法识别版本。历史缺新字段 journal 保留恢复。未形成完整 C2 持久化计划，记录不作为重新执行授权。",
+      "current_result": "现有事务 journal 保存本次解析计划和两份版本 manifest 的原始字节 SHA/版本；暂存输入必须匹配，读取拒绝损坏、权限拒绝及无法识别版本。历史缺新字段 journal 保留恢复。未形成完整 C2 持久化计划，记录不作为重新执行授权。 计划 enabledSteps 已排序编码，重复值解码拒绝；旧无重复的数组兼容。4 项红绿回归、269 项相关测试与 43 项检查点测试通过，8 个独立 CLI 进程完整 JSON 摘要一致。未新增持久化授权或配置源。",
       "remaining_work": [
         "绑定稳定 VM 身份、mode、build/digest、catalog/固定 target、schema 与 planDigest",
         "missing/corrupt/unsupported/已识别 legacy 分别表达，禁止解码失败后宽松默认",
-        "复用原记录做原子迁移，绑定磁盘/generation，迁移备份与恢复验收",
-        "VariantPlan 集合序列化排序与重复值拒绝；现有 checkpoint identityText 已排序，未证明其摘要存在回归"
+        "复用原记录做原子迁移，绑定磁盘/generation，迁移备份与恢复验收"
       ]
     },
     {
@@ -3621,6 +3633,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "dbe635c95bdffd650a0e8d3f8c948d51f29ca24e",
-  "latest_validation_limitation": "T09 related265/43 and CLI13 passed; default Swift1118/171 has16 issues. Final serial run blocked in HTTP fixture waitUntilExit, interrupted with SIGTERM; cause unknown. No signed rebuild or VM migration."
+  "latest_implementation_head": "3cd5b5949a54f706fba432351b207bfae68b857b",
+  "latest_validation_limitation": "T11 canonical4/1, related269/44, checkpoint43/2 and CLI8 processes passed. Full standard/serial validation remains unresolved from T09 source; no full suite rerun for T11. No signed rebuild or VM operation."
 }
