@@ -357,13 +357,18 @@ struct VPhoneGuestEnvironmentUpdater {
             throw VPhoneGuestEnvironmentRefusal("install_failed", "environment.install did not return a result", fields)
         }
 
-        let journal = install["libraries"] as? [[String: Any]] ?? []
+        let journal = try validateInstall(install, requested: changed, candidates: candidates)
         for row in journal {
             if let name = row["name"] as? String, let state = row["state"] as? String { results[name] = state }
         }
-        let complete = install["complete"] as? Bool ?? false
+        let complete = install["complete"] as? Bool == true
         let replaced = manifest.names.filter { results[$0] == "replaced" }
         let after = try await GuestStatus.read(session, generation)
+        guard replaced.allSatisfy({ after.sha256[$0] == candidates[$0]?.sha256 }) else {
+            throw VPhoneGuestEnvironmentRefusal("api_protocol", "installed files do not match the reported transaction",
+                ["outcome": "unknown", "operation_may_continue": true, "transaction": install["id"] ?? NSNull(),
+                 "journal": install["journal"] ?? NSNull()])
+        }
         var fields: [String: Any] = ["outcome": complete ? "updated" : "partial_failure",
                                      "files": files(manifest, before: before, after: after, candidates: candidates, results: results),
                                      "transaction": install["id"] ?? NSNull()]
@@ -395,6 +400,44 @@ struct VPhoneGuestEnvironmentUpdater {
         }
         return try await finish(&fields, session, generation, manifest: manifest, load: load, replaced: replaced,
                                 reboot: reboot, rootReadOnly: rootReadOnly, restart: restart)
+    }
+
+    /// Validate the file-install reply before deriving activation or restarting processes.
+    private func validateInstall(_ value: [String: Any], requested: [String],
+                                 candidates: [String: VPhoneGuestEnvironmentCandidates.Candidate]) throws -> [[String: Any]] {
+        func refuse() -> VPhoneGuestEnvironmentRefusal {
+            VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment.install result",
+                ["outcome": "unknown", "operation_may_continue": true,
+                 "transaction": value["id"] ?? NSNull(), "journal": value["journal"] ?? NSNull()])
+        }
+        guard let id = value["id"] as? String, !id.isEmpty,
+              let path = value["journal"] as? String, !path.isEmpty,
+              let complete = value["complete"] as? Bool,
+              value["state"] as? String == (complete ? "complete" : "incomplete"),
+              value["reboot_required"] is Bool, value["root_read_only"] is Bool,
+              let rows = value["libraries"] as? [[String: Any]], rows.count == requested.count,
+              let installed = value["installed"] as? [String], Set(installed).count == installed.count else { throw refuse() }
+        var seen = Set<String>()
+        var replaced = Set<String>()
+        var failed = false
+        for (index, row) in rows.enumerated() {
+            guard let name = row["name"] as? String, name == requested[index], seen.insert(name).inserted,
+                  row["sha256"] as? String == candidates[name]?.sha256,
+                  let state = row["state"] as? String else { throw refuse() }
+            switch state {
+            case "replaced":
+                guard !failed else { throw refuse() }
+                replaced.insert(name)
+            case "failed":
+                guard !failed else { throw refuse() }
+                failed = true
+            case "not_attempted":
+                guard failed else { throw refuse() }
+            default: throw refuse()
+            }
+        }
+        guard Set(installed) == replaced, complete == !failed else { throw refuse() }
+        return rows
     }
 
     private func finish(_ fields: inout [String: Any], _ session: any VPhoneHostAPISession, _ generation: UUID?,

@@ -23,6 +23,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
     /// Index of the replacement that fails inside environment.install.
     var failReplacementAt: Int?
     var rootStaysWritable = false
+    var mutateInstall: ((inout [String: VPhoneJSONValue]) -> Void)?
     /// pid -> (name, [library: stale?]); nil stale means current.
     var processes: [Int: (name: String, maps: [String: Bool])] = [:]
     var uninspected: [[String: VPhoneJSONValue]] = []
@@ -97,13 +98,15 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
                       case let .string(name)? = fields["name"] else { return nil }
                 return name
             }
-            return .object([
+            var response: [String: VPhoneJSONValue] = [
                 "id": .string("T1"), "state": .string(failed ? "incomplete" : "complete"), "complete": .bool(!failed),
                 "libraries": .array(rows), "installed": .array(replaced.map { .string($0) }),
                 "journal": .string("/var/root/Library/Caches/vphone-environment/transactions/T1/journal.json"),
                 "reboot_required": .bool(rootStaysWritable || replaced.contains("launchdhook-vphone.dylib")),
                 "root_read_only": .bool(!rootStaysWritable), "restarted_pids": .array([]),
-            ])
+            ]
+            mutateInstall?(&response)
+            return .object(response)
         case "environment.restore":
             return .object(["id": params["transaction"] ?? .null, "state": .string("restored"),
                             "libraries": .array([.object(["name": .string("libcamfix.dylib"), "state": .string("restored")])])])
@@ -264,6 +267,50 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
         XCTAssertEqual(restart["executed"] as? Bool, false)
         XCTAssertTrue(api.killed.isEmpty)
         XCTAssertEqual((result["activation"] as? [String: Any])?["automatic_restart"] as? Bool, false)
+    }
+
+    func testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart() async throws {
+        let mutations: [(String, (inout [String: VPhoneJSONValue]) -> Void)] = [
+            ("missing libraries", { $0.removeValue(forKey: "libraries") }),
+            ("missing complete", { $0.removeValue(forKey: "complete") }),
+            ("missing installed", { $0.removeValue(forKey: "installed") }),
+            ("missing reboot", { $0.removeValue(forKey: "reboot_required") }),
+            ("missing root state", { $0.removeValue(forKey: "root_read_only") }),
+            ("missing id", { $0.removeValue(forKey: "id") }),
+            ("wrong state", { $0["state"] = .string("incomplete") }),
+            ("wrong installed set", { $0["installed"] = .array([]) }),
+            ("duplicate installed", { $0["installed"] = .array([.string("libcamfix.dylib"), .string("libcamfix.dylib")]) }),
+            ("duplicate libraries", { value in
+                if case let .array(rows)? = value["libraries"] { value["libraries"] = .array(rows + rows) }
+            }),
+            ("unrequested library", { value in
+                if case let .array(rows)? = value["libraries"], case var .object(row) = rows[0] {
+                    row["name"] = .string("SystemHook-vphone.dylib"); value["libraries"] = .array([.object(row)])
+                }
+            }),
+            ("wrong digest", { value in
+                if case let .array(rows)? = value["libraries"], case var .object(row) = rows[0] {
+                    row["sha256"] = .string(String(repeating: "0", count: 64)); value["libraries"] = .array([.object(row)])
+                }
+            }),
+            ("unknown row state", { value in
+                if case let .array(rows)? = value["libraries"], case var .object(row) = rows[0] {
+                    row["state"] = .string("activated"); value["libraries"] = .array([.object(row)])
+                }
+            }),
+        ]
+        for (label, mutate) in mutations {
+            let api = EnvironmentDaemonFake()
+            current(api, except: ["libcamfix.dylib"])
+            api.mutateInstall = mutate
+            let result = try await update(api, ["restart": ["cameracaptured"]])
+            XCTAssertEqual(result["ok"] as? Bool, false, label)
+            XCTAssertEqual(result["code"] as? String, "api_protocol", label)
+            XCTAssertEqual(result["operation_may_continue"] as? Bool, true, label)
+            XCTAssertEqual(result["outcome"] as? String, "unknown", label)
+            XCTAssertTrue(api.killed.isEmpty, label)
+            XCTAssertFalse(api.methods.contains("environment.loaded"), label)
+        }
     }
 
     func testStagedDigestMismatchIsRefusedBeforeInstall() async throws {
