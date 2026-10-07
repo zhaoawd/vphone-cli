@@ -49,6 +49,11 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
     /// Screen configuration
     public let screenConfig: ScreenConfig
 
+    /// Missing in older manifests, which keep the original USB keyboard.
+    public let hardwareKeyboardEnabled: Bool?
+
+    public var usesHardwareKeyboard: Bool { hardwareKeyboardEnabled ?? true }
+
     // MARK: - Network
 
     /// Network configuration (NAT mode for vphone)
@@ -148,6 +153,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         memorySize: UInt64,
         screenConfig: ScreenConfig = .default,
         networkConfig: NetworkConfig = .default,
+        hardwareKeyboardEnabled: Bool? = nil,
         diskImage: String = "Disk.img",
         nvramStorage: String = "nvram.bin",
         romImages: ROMImages?,
@@ -160,6 +166,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         self.memorySize = memorySize
         self.screenConfig = screenConfig
         self.networkConfig = networkConfig
+        self.hardwareKeyboardEnabled = hardwareKeyboardEnabled
         self.diskImage = diskImage
         self.nvramStorage = nvramStorage
         self.romImages = romImages
@@ -235,7 +242,8 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         memorySize: UInt64? = nil,
         screenConfig: ScreenConfig? = nil,
         machineIdentifier: Data? = nil,
-        networkConfig: NetworkConfig? = nil
+        networkConfig: NetworkConfig? = nil,
+        hardwareKeyboardEnabled: Bool? = nil
     ) -> VPhoneVirtualMachineManifest {
         VPhoneVirtualMachineManifest(
             platformType: platformType,
@@ -245,6 +253,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
             memorySize: memorySize ?? self.memorySize,
             screenConfig: screenConfig ?? self.screenConfig,
             networkConfig: networkConfig ?? self.networkConfig,
+            hardwareKeyboardEnabled: hardwareKeyboardEnabled ?? self.hardwareKeyboardEnabled,
             diskImage: diskImage,
             nvramStorage: nvramStorage,
             romImages: romImages,

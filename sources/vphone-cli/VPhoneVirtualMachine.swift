@@ -61,19 +61,7 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
             machineIdentifier = newID
 
             // Update manifest with new machineIdentifier
-            manifest = VPhoneVirtualMachineManifest(
-                platformType: manifest.platformType,
-                platformFusing: manifest.platformFusing,
-                machineIdentifier: newID.dataRepresentation,
-                cpuCount: manifest.cpuCount,
-                memorySize: manifest.memorySize,
-                screenConfig: manifest.screenConfig,
-                networkConfig: manifest.networkConfig,
-                diskImage: manifest.diskImage,
-                nvramStorage: manifest.nvramStorage,
-                romImages: manifest.romImages,
-                sepStorage: manifest.sepStorage
-            )
+            manifest = manifest.updating(machineIdentifier: newID.dataRepresentation)
             try manifest.write(to: options.configURL)
 
             print("[vphone] Created new machineIdentifier -> saved to config.plist")
@@ -85,19 +73,7 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
             let newID = VZMacMachineIdentifier()
             machineIdentifier = newID
 
-            manifest = VPhoneVirtualMachineManifest(
-                platformType: manifest.platformType,
-                platformFusing: manifest.platformFusing,
-                machineIdentifier: newID.dataRepresentation,
-                cpuCount: manifest.cpuCount,
-                memorySize: manifest.memorySize,
-                screenConfig: manifest.screenConfig,
-                networkConfig: manifest.networkConfig,
-                diskImage: manifest.diskImage,
-                nvramStorage: manifest.nvramStorage,
-                romImages: manifest.romImages,
-                sepStorage: manifest.sepStorage
-            )
+            manifest = manifest.updating(machineIdentifier: newID.dataRepresentation)
             try manifest.write(to: options.configURL)
 
             print("[vphone] Invalid machineIdentifier in config.plist, created new")
@@ -243,7 +219,7 @@ class VPhoneVirtualMachine: NSObject, VZVirtualMachineDelegate {
         config.entropyDevices = [obj]
         print("[vphone] Entropy device configured")
 
-        config.keyboards = [VZUSBKeyboardConfiguration()]
+        config.keyboards = manifest.usesHardwareKeyboard ? [VZUSBKeyboardConfiguration()] : []
 
         if !options.noVphoned {
             // Vsock (host <-> guest control channel, no IP/TCP involved)

@@ -105,6 +105,19 @@ struct BundleOpsTests {
         #expect(updated.manifest.networkConfig.mode == .nat)
     }
 
+    @Test func hardwareKeyboardChoicePersistsAndUnrelatedOfflineEditKeepsIt() throws {
+        let root = try makeRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let rom = try fakeROM(); let seprom = try fakeROM()
+        defer { try? FileManager.default.removeItem(at: rom); try? FileManager.default.removeItem(at: seprom) }
+        let lib = VPhoneLibrary(root: root)
+        _ = try VPhoneBundleOps.create(.init(name: "keyboard", cpuCount: 8, memoryMB: 8192, diskSizeGB: 1, romSource: rom, sepromSource: seprom), in: lib)
+        _ = try VPhoneBundleOps.updateConfig(bundleNamed: "keyboard", in: lib, cpuCount: nil, memoryMB: nil, hardwareKeyboardEnabled: false)
+        #expect(!(try lib.bundle(named: "keyboard").manifest.usesHardwareKeyboard))
+        _ = try VPhoneBundleOps.updateConfig(bundleNamed: "keyboard", in: lib, cpuCount: 4, memoryMB: nil)
+        #expect(!(try lib.bundle(named: "keyboard").manifest.usesHardwareKeyboard))
+    }
+
     @Test func updateConfigPersistsNetwork() throws {
         let root = try makeRoot()
         defer { try? FileManager.default.removeItem(at: root) }

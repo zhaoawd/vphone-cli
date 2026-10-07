@@ -128,9 +128,14 @@ struct VPhoneVMNewCommand: ParsableCommand {
 
 // MARK: - config
 
+enum VPhoneHardwareKeyboardOption: String, ExpressibleByArgument {
+    case on, off
+    var enabled: Bool { self == .on }
+}
+
 struct VPhoneVMConfigCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "config", abstract: "Edit VM manifest fields (cpu/memory/network)")
+        commandName: "config", abstract: "Edit VM manifest fields (cpu/memory/network/keyboard)")
 
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
@@ -139,16 +144,19 @@ struct VPhoneVMConfigCommand: ParsableCommand {
     @Option(name: [.customShort("n"), .long], help: "Network mode: nat | bridged | none") var network: String?
     @Option(name: .long, help: "Host interface to bridge (bridged mode; auto-picks first if omitted)")
     var bridgeInterface: String?
+    @Option(name: .customLong("hardware-keyboard"), help: "USB keyboard: on | off (takes effect after restart)")
+    var hardwareKeyboard: VPhoneHardwareKeyboardOption?
 
     func run() throws {
         let mode = try network.map(Self.parseMode)
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let updated = try VPhoneBundleOps.updateConfig(
             bundleNamed: name, in: lib.library, cpuCount: cpu, memoryMB: memory,
-            networkMode: mode, bridgeInterface: bridgeInterface)
+            networkMode: mode, bridgeInterface: bridgeInterface,
+            hardwareKeyboardEnabled: hardwareKeyboard?.enabled)
         let m = updated.manifest
         print("updated \(updated.name): \(m.cpuCount) CPU, \(m.memorySize / (1024*1024)) MB, "
-            + "net=\(describeNetwork(m.networkConfig))")
+            + "net=\(describeNetwork(m.networkConfig)), keyboard=\(m.usesHardwareKeyboard ? "on" : "off")")
     }
 
     private static func parseMode(_ s: String)
