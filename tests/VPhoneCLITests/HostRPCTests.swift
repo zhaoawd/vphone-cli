@@ -129,6 +129,43 @@ final class HostRPCTests: XCTestCase {
         XCTAssertNil(result["disk_free"])
     }
 
+    func testNestedRequestRejectsLegacyFlatAndInvalidDiagnosticFlags() async throws {
+        let api = RPCSessionFake(); api.caps.append("ui_inspection")
+        let executor = VPhoneHostCommandExecutor(apiSession: api)
+        let request: [String: Any] = ["t": "rpc", "method": "ui.tree", "params": ["nested": true]]
+        api.handler = { _ in .object(["source": .string("ax"), "elements": .array([])]) }
+        var result = try await call(executor, request)
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "nested_unsupported")
+        for (key, value) in [("relationship_source", VPhoneJSONValue.string("inferred_frames")),
+                             ("action_eligible", .bool(true))] {
+            api.handler = { _ in
+                var fields: [String: VPhoneJSONValue] = ["source": .string("ax"), "format": .string("nested"),
+                    "relationship_source": .string("AXUIElementCopyAttributeValue:5001"), "action_eligible": .bool(false),
+                    "roots": .array([]), "status": .string("partial"), "truncated": .bool(true)]
+                fields[key] = value; return .object(fields)
+            }
+            result = try await call(executor, request)
+            XCTAssertEqual(result["ok"] as? Bool, false, key)
+            XCTAssertEqual(result["code"] as? String, "api_protocol", key)
+        }
+    }
+
+    func testNestedDiagnosticPassesAndFlatDefaultRemainsAvailable() async throws {
+        let api = RPCSessionFake(); api.caps.append("ui_inspection")
+        api.handler = { _ in .object(["source": .string("ax"), "format": .string("nested"),
+            "relationship_source": .string("AXUIElementCopyAttributeValue:5001"), "action_eligible": .bool(false),
+            "roots": .array([]), "status": .string("unavailable"), "truncated": .bool(false)]) }
+        let executor = VPhoneHostCommandExecutor(apiSession: api)
+        var result = try await call(executor, ["t": "rpc", "method": "ui.tree", "params": ["nested": true]])
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        api.handler = { _ in .object(["elements": .array([])]) }
+        result = try await call(executor, ["t": "rpc", "method": "ui.tree"])
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        result = try await call(executor, ["t": "rpc", "method": "ui.tree", "params": ["nested": "true"]])
+        XCTAssertEqual(result["code"] as? String, "invalid_argument")
+    }
+
     // MARK: - Forwarding
 
     func testForwardsDeclaredMethodWithParamsAndReturnsResult() async throws {

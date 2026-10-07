@@ -111,6 +111,9 @@ enum VPhoneHostRPC {
               let data = try? JSONSerialization.data(withJSONObject: object),
               case let .object(params)? = try? JSONDecoder().decode(VPhoneJSONValue.self, from: data)
         else { return .failure(.invalidArgument) }
+        if ["ui.tree", "accessibility.tree"].contains(method), let nested = params["nested"] {
+            guard case .bool = nested else { return .failure(.invalidArgument) }
+        }
         if let reason = blocked[method] { return .failure(.notForwardable(reason)) }
         if method == "input.hid", params["down"] != nil {
             return .failure(.notForwardable("a half key press would split one press across requests; omit down"))
@@ -149,6 +152,19 @@ enum VPhoneHostRPC {
                   session.snapshot.health?.instanceID == health?.instanceID,
                   session.snapshot.health?.binaryHash == health?.binaryHash else {
                 return .failure(.init(code: "api_stale_session", mayContinue: true))
+            }
+            if ["ui.tree", "accessibility.tree"].contains(plan.method), plan.params["nested"] == .bool(true) {
+                guard case let .object(fields) = value else { return .failure(.init(code: "api_protocol")) }
+                guard fields["format"] == .string("nested") else {
+                    return .failure(.init(code: "nested_unsupported"))
+                }
+                guard fields["source"] == .string("ax"),
+                      fields["relationship_source"] == .string("AXUIElementCopyAttributeValue:5001"),
+                      fields["action_eligible"] == .bool(false),
+                      case .array = fields["roots"], case .bool = fields["truncated"],
+                      let status = fields["status"], [.string("complete"), .string("partial"), .string("unavailable")].contains(status) else {
+                    return .failure(.init(code: "api_protocol"))
+                }
             }
             guard let result = try? JSONEncoder().encode(value) else {
                 return .failure(.init(code: "api_protocol", mayContinue: true))
