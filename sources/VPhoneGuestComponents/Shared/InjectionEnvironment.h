@@ -25,8 +25,18 @@ static const char *vpEnvValue(char *const env[], const char *name) {
 }
 
 static int vpEnvIsOne(char *const env[], const char *name) {
-    const char *value = vpEnvValue(env, name);
-    return value && strcmp(value, "1") == 0;
+    if (!env)
+        return 0;
+    size_t length = strlen(name);
+    for (size_t i = 0; i < 4096; i++) {
+        if (!env[i])
+            return 0;
+        if (strncmp(env[i], name, length) == 0 && env[i][length] == '=' &&
+            strcmp(env[i] + length + 1, "1") == 0)
+            return 1;
+    }
+    // An unbounded environment cannot establish that injection is enabled.
+    return 1;
 }
 
 static int vpInjectionDisabled(char *const env[]) {

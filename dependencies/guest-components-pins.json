@@ -31,7 +31,9 @@
     {
       "upstream": "VPhoneGuestComponents/LocationFix/libvlocation.m",
       "local": "sources/VPhoneGuestComponents/LocationFix/libvlocation.m",
-      "upstream_sha256": "ffc2150d47cca2e95b89daebad832cf4d75273380e6c19ddb50cdfa6a36262dc"
+      "upstream_sha256": "ffc2150d47cca2e95b89daebad832cf4d75273380e6c19ddb50cdfa6a36262dc",
+      "local_sha256": "3f13b1885238a697748b7b471b461e72c1fb526b70b77c8ddba6e0c7f36d0d55",
+      "local_adaptation": "Existing local location path/ownership adaptation in 5d1bdaf8; source unchanged in B07."
     },
     {
       "upstream": "VPhoneGuestComponents/Makefile",
@@ -48,7 +50,9 @@
     {
       "upstream": "VPhoneGuestComponents/Shared/InjectionEnvironment.h",
       "local": "sources/VPhoneGuestComponents/Shared/InjectionEnvironment.h",
-      "upstream_sha256": "29a3f3cd91bac72b53e49d38564a754762e4cfc6b1498d4e4f8a0705539b7bf3"
+      "upstream_sha256": "29a3f3cd91bac72b53e49d38564a754762e4cfc6b1498d4e4f8a0705539b7bf3",
+      "local_sha256": "97175d707f52424e9fe8e076a3e41dbdae4e29391f4ed510eec190ca955fefd8",
+      "local_adaptation": "B07: any explicit safe/disable flag wins despite duplicate keys; environment scan limited to 4096 entries."
     },
     {
       "upstream": "VPhoneGuestComponents/Shared/RootHideLoaderLinks.c",
