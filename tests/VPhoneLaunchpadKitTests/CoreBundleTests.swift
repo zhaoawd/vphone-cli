@@ -12,6 +12,18 @@ struct CoreBundleRuleTests {
         #expect(VPhoneLaunchpadCoreBundleVersion.minimum == "2.2.0")
     }
 
+    @Test func distinctLocalBuildNamesAreAcceptedAndReleaseIsPreserved() throws {
+        for name in ["2.6.1-local.ab12cd34", "2.6.1-local.0123456789abcdef", "2.2.3-local.ab12cd34"] {
+            #expect(VPhoneLaunchpadCoreBundleVersion.isStoreName(name))
+            #expect(throws: Never.self) { try VPhoneBundleVersion.require(name) }
+            #expect(VPhoneBundleVersion.release(of: name) == name.components(separatedBy: "-local")[0])
+        }
+        for name in ["2.6.1-local.ab12", "2.6.1-local.AB12CD34", "2.6.1-local../x", "2.6.1-local." + String(repeating: "a", count: 64)] {
+            #expect(!VPhoneLaunchpadCoreBundleVersion.isStoreName(name))
+            #expect(throws: VPhoneBundleStoreError.self) { try VPhoneBundleVersion.require(name) }
+        }
+    }
+
     /// The panel's name filter accepts exactly the names the store's format
     /// check accepts; the version minimum stays with the CLI.
     @Test(arguments: [

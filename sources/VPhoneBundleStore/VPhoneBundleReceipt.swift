@@ -33,8 +33,8 @@ public enum VPhoneBundleExecutable: String, CaseIterable, Sendable {
     case vm = "vphone-vm"
 }
 
-/// Store names follow upstream 2.2.3 `VPhoneLaunchpadNames`: a release
-/// `X.Y.Z`, `X.Y.Z-local` for a build made on this Mac, or
+/// Store names retain legacy formats and target build identifiers: a release
+/// `X.Y.Z`, `X.Y.Z-local[.<build>]` for a build made on this Mac, or
 /// `X.Y.Z-ci.<commit>` for a GitHub Actions artifact. Upstream 2.2.0 renamed
 /// every patch identifier and dropped `--force-dsc-maxslide`, so older
 /// bundles are refused by name before any store access.
@@ -44,9 +44,9 @@ enum VPhoneBundleVersion {
 
     static func require(_ value: String) throws {
         guard value.utf8.count <= 64,
-              value.range(of: "^[0-9]{1,9}\\.[0-9]{1,9}\\.[0-9]{1,9}(-local|-ci\\.[0-9a-f]{7,40})?$",
+              value.range(of: "^[0-9]{1,9}\\.[0-9]{1,9}\\.[0-9]{1,9}(-local(\\.[0-9a-f]{8,64})?|-ci\\.[0-9a-f]{7,40})?$",
                           options: .regularExpression) != nil else {
-            throw VPhoneBundleStoreError("Invalid Core Bundle version \(quoted(value)): use X.Y.Z, X.Y.Z-local or X.Y.Z-ci.<commit>.")
+            throw VPhoneBundleStoreError("Invalid Core Bundle version \(quoted(value)): use X.Y.Z, X.Y.Z-local[.<build>] or X.Y.Z-ci.<commit>.")
         }
         let parts = release(of: value).split(separator: ".").compactMap { Int($0) }
         guard parts.count == 3, (parts[0], parts[1], parts[2]) >= minimum else {
@@ -56,7 +56,9 @@ enum VPhoneBundleVersion {
 
     /// The bundle's own `CFBundleShortVersionString` inside a store name.
     static func release(of value: String) -> String {
-        if value.hasSuffix("-local") { return String(value.dropLast("-local".count)) }
+        if let suffix = value.range(of: "-local(\\.[0-9a-f]{8,64})?$", options: .regularExpression) {
+            return String(value[..<suffix.lowerBound])
+        }
         if let suffix = value.range(of: "-ci\\.[0-9a-f]{7,40}$", options: .regularExpression) {
             return String(value[..<suffix.lowerBound])
         }

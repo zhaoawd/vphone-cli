@@ -108,6 +108,21 @@ struct CoreBundleStoreTests {
         #expect(try FileManager.default.contentsOfDirectory(atPath: fixture.store.root.path).sorted() == [".store.lock", "2.2.3-local"])
     }
 
+    @Test func distinctBuildsOfOneReleaseCoexistWithoutReplacingExistingFiles() throws {
+        let fixture = try BundleFixture()
+        let first = try fixture.install(version: "2.2.3-local.ab12cd34")
+        let secondFixture = try BundleFixture()
+        try Data("other build".utf8).write(to: secondFixture.source.appendingPathComponent("Contents/Resources/data"))
+        let digest = try secondFixture.pack()
+        let input = try FileHandle(forReadingFrom: secondFixture.archive)
+        defer { try? input.close() }
+        let second = try fixture.store.install(version: "2.2.3-local.cd34ef56", archive: input, sha256: digest)
+        #expect(first.version != second.version)
+        #expect(first.sha256 != second.sha256)
+        #expect(try fixture.store.verify(version: first.version).encoded() == first.encoded())
+        #expect(try fixture.store.verify(version: second.version).encoded() == second.encoded())
+    }
+
     @Test func acceptsUpstreamResourceBundleLayout() throws {
         let fixture = try BundleFixture()
         let plist = fixture.source.appendingPathComponent("Contents/Info.plist")
