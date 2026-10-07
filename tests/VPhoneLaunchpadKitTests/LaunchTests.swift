@@ -335,7 +335,7 @@ struct LaunchTests {
         #expect(bStatus7 == 130)
     }
 
-    @Test func failedStopIsReportedAndOwnChildStillInterrupted() async throws {
+    @Test func failedStopIsReportedWithoutInterruptingOwnChild() async throws {
         let standIn = try LaunchpadStandIn()
         try standIn.makeMachines(["alpha"])
         let library = await standIn.library()
@@ -346,6 +346,10 @@ struct LaunchTests {
         #expect(await eventually { standIn.log("alpha").contains("serial alpha 0") })
         await library.stop(alpha)
         #expect(library.actionError?.detail?.contains("error: alpha: stop failed") == true)
+        #expect(a.isRunning)
+        #expect(!standIn.log("alpha").contains("got SIGINT"))
+        // Explicit fixture cleanup, after verifying refusal leaves the child running.
+        a.interrupt()
         let aStatus8 = await a.wait()
         #expect(aStatus8 == 130)
     }

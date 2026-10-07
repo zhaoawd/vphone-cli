@@ -26,10 +26,25 @@ struct OutputCompletionTests {
         }
     }
 
+    @Test func livePipeDeliversLinesBeforeWriterCloses() async throws {
+        let pipe = Pipe()
+        let lines = LaunchpadLines()
+        let completion = Task.detached {
+            VPhoneLaunchpadLineReader.readLines(from: pipe.fileHandleForReading) { lines.append($0) }
+        }
+        try pipe.fileHandleForWriting.write(contentsOf: Data("ready\n".utf8))
+        #expect(await eventually(2) { lines.all == ["ready"] })
+        try pipe.fileHandleForWriting.close()
+        #expect(await completion.value == .drained)
+    }
+
     @Test func readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() throws {
         let pipe = Pipe()
+        let fd = pipe.fileHandleForReading.fileDescriptor
         try pipe.fileHandleForReading.close()
-        #expect(VPhoneLaunchpadLineReader.readLines(from: pipe.fileHandleForReading, onLine: { _ in }) == .failed)
+        // A closed FileHandle's descriptor accessor raises NSException on macOS.
+        // Pass the already captured descriptor to exercise POSIX read failure.
+        #expect(VPhoneLaunchpadLineReader.readLines(fileDescriptor: fd, onLine: { _ in }) == .failed)
         try pipe.fileHandleForWriting.close()
         let empty = Pipe()
         try empty.fileHandleForWriting.close()

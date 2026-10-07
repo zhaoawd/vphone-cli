@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 // MARK: - Line splitter
@@ -85,15 +86,26 @@ public enum VPhoneLaunchpadLineReader {
 
     @discardableResult
     public static func readLines(from handle: FileHandle, onLine: (String) -> Void) -> Completion {
+        // Foundation's fileDescriptor accessor requires an open handle.
+        // The child process owns and retains this handle throughout the read.
+        readLines(fileDescriptor: handle.fileDescriptor, onLine: onLine)
+    }
+
+    @discardableResult
+    static func readLines(fileDescriptor fd: Int32, onLine: (String) -> Void) -> Completion {
         var splitter = VPhoneLaunchpadLineSplitter()
         defer { splitter.flush(onLine) }
-        do {
-            while let chunk = try handle.read(upToCount: 1 << 20), !chunk.isEmpty {
-                splitter.feed(chunk, onLine)
+        var buffer = [UInt8](repeating: 0, count: 64 << 10)
+        while true {
+            // Foundation read(upToCount:) can wait to fill the requested size.
+            // POSIX read delivers the currently available pipe bytes immediately.
+            let count = buffer.withUnsafeMutableBytes { Darwin.read(fd, $0.baseAddress, $0.count) }
+            if count == 0 { return .drained }
+            if count < 0 {
+                if errno == EINTR { continue }
+                return .failed
             }
-            return .drained
-        } catch {
-            return .failed
+            splitter.feed(Data(buffer.prefix(count)), onLine)
         }
     }
 }
