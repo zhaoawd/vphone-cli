@@ -1,0 +1,40 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling locking.c
+[5/37] Compiling normal.c
+[6/37] Compiling deviceinterfaced.c
+[7/37] Compiling common.c
+[8/37] Compiling ipsw.c
+[9/37] Compiling fdr.c
+[10/37] Compiling idevicerestore.c
+[11/37] Compiling download.c
+[12/37] Compiling asr.c
+[13/37] Compiling limera1n.c
+[14/37] Compiling img4.c
+[14/37] Compiling recovery.c
+[16/37] Compiling dfu.c
+[17/37] Compiling img3.c
+[18/37] Compiling ace3.c
+[19/37] Compiling restore.c
+[20/37] Compiling mbn.c
+[21/37] Compiling ftab.c
+[22/37] Compiling log.c
+[23/37] Compiling vphone_zip_stub.c
+[24/37] Compiling fls.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Emitting module VPhoneLaunchpadKitTests
+[29/38] Compiling VPhoneLaunchpadKitTests LineSplitterTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/LineSplitterTests.swift:18:49: error: type 'VPhoneLaunchpadLineSplitter' has no member 'strippingEscapes'
+16 |                       "\u{1b}[", "\u{1b}[31", "\u{1b}[3:1m", "\u{1b}x", "\u{1b}[\u{1b}[32m", "\u{1b}]title\u{07}"]
+17 |         for value in values {
+18 |             #expect(VPhoneLaunchpadLineSplitter.strippingEscapes(value)
+   |                                                 `- error: type 'VPhoneLaunchpadLineSplitter' has no member 'strippingEscapes'
+19 |                 == value.replacingOccurrences(of: "\u{1B}\\[[0-9;?]*[ -/]*[@-~]", with: "", options: .regularExpression))
+20 |         }
+error: fatalError

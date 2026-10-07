@@ -71,7 +71,7 @@ public struct VPhoneShutdownPlan: Sendable {
         case waitForStop
     }
 
-    /// True once `start` has chosen a graceful path, i.e. a wait is in progress.
+    /// True after the first shutdown decision, including force stop or an already stopped VM.
     public private(set) var didStart = false
     public private(set) var forceStopRequested = false
 

@@ -1,0 +1,131 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "runtime_verified": false,
+  "local_libraries": [
+    "launchdhook-vphone.dylib",
+    "SystemHook-vphone.dylib",
+    "libvcamcaptured.dylib",
+    "libcamfix.dylib",
+    "libvlocation.dylib"
+  ],
+  "local_methods": [
+    "environment.install",
+    "environment.loaded",
+    "environment.restore",
+    "environment.status"
+  ],
+  "local_environment_capabilities": [
+    "environment_activation",
+    "environment_transaction",
+    "environment_update"
+  ],
+  "upstream_libraries": [
+    "launchdhook-vphone.dylib",
+    "SystemHook-vphone.dylib",
+    "libvcamcaptured.dylib",
+    "libcamfix.dylib",
+    "libmisfix.dylib",
+    "libhapticsfix.dylib",
+    "libbatteryhealthfix.dylib"
+  ],
+  "upstream_documented_libraries": [
+    "launchdhook-vphone.dylib",
+    "SystemHook-vphone.dylib",
+    "libvcamcaptured.dylib",
+    "libcamfix.dylib"
+  ],
+  "upstream_documentation_matches_source": false,
+  "local_only": [
+    "libvlocation.dylib"
+  ],
+  "upstream_only": [
+    "libbatteryhealthfix.dylib",
+    "libhapticsfix.dylib",
+    "libmisfix.dylib"
+  ],
+  "sources": [
+    {
+      "scope": "local",
+      "path": "scripts/guest_environment.json",
+      "bytes": 2260,
+      "sha256": "6c1c88c90d15319f44fef7f94502b49d5407d196749658120f1ce6d170fefd98"
+    },
+    {
+      "scope": "local",
+      "path": "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "bytes": 11132,
+      "sha256": "ffa44155c0907440e022596985db87a62e44d388160993577d6b313caa63ea82"
+    },
+    {
+      "scope": "local",
+      "path": "sources/vphone-cli/VPhoneGuestEnvironment.swift",
+      "bytes": 43889,
+      "sha256": "34684e7eb1051358aaf9754e5a0dfa00d1f92fb3948b47d38ab49997dcfdd0f6"
+    },
+    {
+      "scope": "local",
+      "path": "sources/vphone-cli/VPhoneGuestEnvironmentCLI.swift",
+      "bytes": 9242,
+      "sha256": "cf9e57f6d73de88d0e79d2d58e62f3927c4508ba8dc8e64b99aec6cf985da948"
+    },
+    {
+      "scope": "local",
+      "path": "scripts/cfw_install_host.sh",
+      "bytes": 21330,
+      "sha256": "a2b40c02f6df4553d34f4b24da3ead7f985c4ff548fa8d2503de5d1a8c608b89"
+    },
+    {
+      "scope": "local",
+      "path": "scripts/cfw_disk_txn.py",
+      "bytes": 24273,
+      "sha256": "f2e0e723d4bf2204a1671b5a625f0394709ef1aad81ae3d4035b47a32402bef2"
+    },
+    {
+      "scope": "local",
+      "path": "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "bytes": 22290,
+      "sha256": "7f44e522f0ede2953a1a143540d7b2f178fecbceeb2f0c2d3c58ad93c2077586"
+    },
+    {
+      "scope": "local",
+      "path": "sources/VPhoneAPIKit/VPhoneAPIClient.swift",
+      "bytes": 8691,
+      "sha256": "91b0c26b13830ed4e82cfaf34465d51933190ff93177ae7a92bf15280433a0f6"
+    },
+    {
+      "scope": "local",
+      "path": "sources/VPhoneDaemon/Daemon/Wire/APIFileUploadTransaction.swift",
+      "bytes": 3082,
+      "sha256": "ba5185f4f8b930bd642d259b0e8ba85ee1e07f95228be6f9f97f3b019bb8a418"
+    },
+    {
+      "scope": "upstream",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "path": "VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
+      "bytes": 8563,
+      "sha256": "360d97bcdbaab2ae0d199d059da25c3bcf79031b3e8bcb21c575d0984efea0f4"
+    },
+    {
+      "scope": "upstream",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "path": "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestEnvironment.swift",
+      "bytes": 601,
+      "sha256": "cff82e72dee8e19006324ba3862a70c4408b3be27a475d865162778360fe3030"
+    },
+    {
+      "scope": "upstream",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControlEnvironment.swift",
+      "bytes": 3053,
+      "sha256": "ddd37c62fae3b7e0f62ad373e8cc153d1a5e8b692c22abd14d26d6a4c00fe892"
+    },
+    {
+      "scope": "upstream",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "path": "Research/vphoned_http_api.md",
+      "bytes": 42466,
+      "sha256": "b4549c6872f2f3c5c11804a3a74fcb043298859f22c37e88a583fc7ac19fe9d0"
+    }
+  ],
+  "local_document_list_verified": true
+}

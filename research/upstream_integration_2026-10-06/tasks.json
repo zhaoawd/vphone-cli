@@ -1237,21 +1237,27 @@
         ]
       },
       "implementation_commits": [
-        "c7234c9b"
+        "c7234c9b",
+        "7839f5b30cea3f7736acf68f5fd6dbef62810092"
       ],
       "verification_evidence": [
         "T08-pins-red.log: old 0.7.7 fails requested 0.7.16 contract",
         "T08-pins-green.log: 6 tests passed",
         "T08-json-safe.log: actual fixed dependency source macOS probe passed",
         "T08-candidate-build.log: iOS arm64 build, exact checkouts, candidate signature/metadata/dynamic dependencies and manifest passed",
-        "T08-candidate-manifest.json: activated=false, runtime_validated=false; artifact hashes and seven pins recorded"
+        "T08-candidate-manifest.json: activated=false, runtime_validated=false; artifact hashes and seven pins recorded",
+        "evidence/B05-python.log",
+        "evidence/B05-icli-diagnostic.log",
+        "evidence/B05-icli-intermediate.log",
+        "evidence/B05-python-green.log"
       ],
       "historical_evidence": [],
       "acceptance_limits": [
         "候选交叉编译与签名检查已完成；没有部署/激活；guest runtime hash 未验证",
         "截图重复调用、worker/location/rotation/RootHide/timezone 的真实客户机验证未执行",
         "保留现有 keychain-access-groups 两项范围，未引入上游新增 * 和 apple"
-      ]
+      ],
+      "current_result": "B05 补充复验发现固定 IcliKit 0.7.16 测试 harness 需要 LaunchPrivate 头、JSONSafe 与安全夹具，已按固定源码脚本适配并通过 10 项 Python 验证；不修改固定依赖源码。"
     },
     {
       "id": "T09",
@@ -2943,7 +2949,7 @@
         "T08",
         "T23"
       ],
-      "status": "pending_local_audit",
+      "status": "manual_unlock_and_late_reply_identity_verified_automatic_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
         "VPhoneDaemon/Native/vphoned_unlock.m",
@@ -2967,12 +2973,34 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "manual_api_candidate_compiled_not_activated",
+        "paths": [
+          "sources/VPhoneDaemon/Daemon/GuestScreenUnlock.swift",
+          "sources/VPhoneDaemon/Native/vphoned_unlock.m",
+          "sources/vphone-cli/VPhoneHostRPC.swift",
+          "tests/VPhoneCLITests/HostRPCTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "57b124589b78530ddc2f0d19e31119b108cd1686"
+      ],
+      "verification_evidence": [
+        "evidence/B05-summary.json",
+        "evidence/B05-source-review.json",
+        "evidence/B05-related.log",
+        "evidence/B05-t36-red.log",
+        "evidence/B05-t36-green.log",
+        "evidence/B05-daemon-build.log",
+        "evidence/B05-candidate-manifest.json",
+        "evidence/B05-candidate-check.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "新增能力门控的手动 screen.unlock，复用输入队列。RPC 晚回复核对 instance/hash/generation。iOS daemon 候选构建和元数据验证通过，未激活；自动启动解锁与真实锁屏/密码验收待完成。",
+      "remaining_work": [
+        "automatic startup option, trustworthy instance/SetupAssistant readiness state machine and cancellation on Stop/change/disable",
+        "actual dark/locked/unlocked/known password/cold boot/respring/userspace behavior",
+        "password bypass is not established"
+      ]
     },
     {
       "id": "T37",
@@ -2993,7 +3021,7 @@
         "T24",
         "T40"
       ],
-      "status": "pending_local_audit",
+      "status": "guest_halt_candidate_and_force_stop_dedup_verified_launchpad_pending",
       "upstream_paths": [
         "VPhoneDaemon/Native/vphoned_power.m",
         "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
@@ -3016,12 +3044,34 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "guest_api_and_host_policy_verified_real_stop_pending",
+        "paths": [
+          "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+          "sources/VPhoneDaemon/Native/vphoned_power.m",
+          "sources/VPhoneCore/VPhoneShutdownPolicy.swift",
+          "sources/vphone-cli/VPhoneAppDelegate.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "975d1288bffda4189e915b68afb1f8ff68a9d6e0"
+      ],
+      "verification_evidence": [
+        "evidence/B05-summary.json",
+        "evidence/B05-source-review.json",
+        "evidence/B05-related.log",
+        "evidence/B05-t37-red.log",
+        "evidence/B05-t37-green.log",
+        "evidence/B05-daemon-build.log",
+        "evidence/B05-candidate-manifest.json",
+        "evidence/B05-candidate-check.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "新增 system.shutdown 与专用能力，保留 force/root/现有 API 认证边界；去除重复 force stop 和晚失败重复框架请求。accepted 不表示 VM 停止或磁盘释放。Launchpad guest-first 与真实关机待完成。",
+      "remaining_work": [
+        "API guest-first menu/Launchpad integration and target timeout/error state checks",
+        "Stop/update/backup coordination and disk release observation",
+        "authorization/force/root negative guest cases and real shutdown/DFU/panic/old daemon behavior"
+      ]
     },
     {
       "id": "T38",
@@ -3040,7 +3090,7 @@
         "T23",
         "T24"
       ],
-      "status": "pending_local_audit",
+      "status": "nested_reply_protocol_guard_verified_native_walker_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/GuestAPI+Hierarchy.swift",
         "VPhoneDaemon/Native/vphoned_ax_hierarchy.m",
@@ -3064,12 +3114,29 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "host_explicit_nested_contract_verified_guest_flat_retained",
+        "paths": [
+          "sources/vphone-cli/VPhoneHostRPC.swift",
+          "tests/VPhoneCLITests/HostRPCTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "a7ee78c462e8ca100af913b5e483354fe5ed651f"
+      ],
+      "verification_evidence": [
+        "evidence/B05-summary.json",
+        "evidence/B05-source-review.json",
+        "evidence/B05-related.log",
+        "evidence/B05-t38-red.log",
+        "evidence/B05-t38-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "嵌套请求只接受显式 nested/AX 关系来源/action_eligible=false 及必要诊断字段；旧 flat 回复返回 nested_unsupported，默认平面请求保留。native walker、图诊断和 VM 验收待完成。",
+      "remaining_work": [
+        "native AX graph walker and guest entitlements/foreground/lock/readiness integration",
+        "cycle/shared/parent conflict/frame/limits graph diagnostics",
+        "node IDs remain diagnostics; no action selector guarantee"
+      ]
     },
     {
       "id": "T39",
@@ -3088,7 +3155,7 @@
         "T23",
         "T36"
       ],
-      "status": "pending_local_audit",
+      "status": "clipboard_transfer_bounds_and_unknown_count_verified_focus_sync_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift",
         "VPhoneKit/VPhoneCoreKit/Support/VPhoneClipboardTransfer.swift",
@@ -3111,12 +3178,32 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "shared_policy_and_classic_limits_verified_focus_baseline_pending",
+        "paths": [
+          "sources/VPhoneCore/VPhoneClipboardTransfer.swift",
+          "sources/vphone-cli/VPhoneControl.swift",
+          "sources/vphone-cli/VPhoneMenuConnect.swift",
+          "tests/VPhoneCoreTests/ClipboardTransferTests.swift",
+          "tests/VPhoneCLITests/GuestTransportTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "f03615b1de4d658304ce83edce57b8b132a1d071"
+      ],
+      "verification_evidence": [
+        "evidence/B05-summary.json",
+        "evidence/B05-source-review.json",
+        "evidence/B05-related.log",
+        "evidence/B05-t39-red.log",
+        "evidence/B05-t39-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "接入固定上游共享传输策略；classic 文本按 UTF-8 限制 1 MiB，非空图片限制 16 MiB，入站图片长度在分配前核对。非法/缺失 change_count 保留 unknown。18 项传输和 4 项策略测试通过；触摸复制、失焦基线与第二次图片 await 防晚响应待完成。",
+      "remaining_work": [
+        "Cmd C/X/V and touch-copy focus sync integration with reliable baseline",
+        "instance/generation/input queues and second image await invalidation",
+        "Mac rich-text preservation, fast focus changes, reconnect/reboot/type and real images"
+      ]
     },
     {
       "id": "T40",
@@ -3447,7 +3534,7 @@
         "T02",
         "T24"
       ],
-      "status": "pending_local_audit",
+      "status": "console_splitter_equivalence_and_throughput_verified_helper_ack_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLineReader.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -3474,12 +3561,32 @@
         "host"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "chunk_and_ansi_scanner_verified_log_writer_drain_pending",
+        "paths": [
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLineReader.swift",
+          "tests/VPhoneLaunchpadKitTests/LineSplitterTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "4af226fb589afc78ac58ebd44eb6b5e1928bc587"
+      ],
+      "verification_evidence": [
+        "evidence/B05-summary.json",
+        "evidence/B05-source-review.json",
+        "evidence/B05-related.log",
+        "evidence/B05-t46-red.log",
+        "evidence/B05-t46-green.log",
+        "evidence/B05-t46-benchmark-old.log",
+        "evidence/B05-t46-benchmark-new.log",
+        "evidence/B05-benchmark-driver.swift"
+      ],
+      "historical_evidence": [],
+      "current_result": "分块单次扫描和 CSI 扫描替代逐行移除/正则，保留原 whitespace 和 panic 语义。16 项分行/轮换测试通过。10 万行本地基准中位 2.310→0.040 秒；不证明 UI 响应。helper ACK、writer 排空和操作归属待完成。",
+      "remaining_work": [
+        "batch log writer, per-operation output ownership and full helper protocol version integration",
+        "writer-drained acknowledgement, timeout/disconnect/write-error/exit behavior and old-helper refusal",
+        "UI responsiveness and real VM console throughput"
+      ]
     }
   ],
   "primary_sources": [
@@ -3791,6 +3898,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "001507f408b580f8d20a18cc5d6f1d2f6bab0abd",
-  "latest_validation_limitation": "B04: related719/92 + XCTest117/3 skipped and firmware15/12 passed before final T17-only outcome-field fix; final20 environment XCTest passed. Disk18 synthetic tests passed. Full suite not rerun; previous global failures remain unexplained. No signed rebuild/deployment/VM operation; all five tasks partial."
+  "latest_implementation_head": "7839f5b30cea3f7736acf68f5fd6dbef62810092",
+  "latest_validation_limitation": "B05: related XCTest156 and Swift Testing reported530/78 passed (6 tests/4 suites skipped); Python10 passed after pinned archive harness adaptation; isolated iOS daemon built/metadata checked, not installed or activated. All five tasks partial. Full Swift not rerun; previous global failures unresolved. Signed host and vm-new unchanged."
 }

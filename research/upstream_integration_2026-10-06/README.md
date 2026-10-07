@@ -271,3 +271,34 @@ T32 的 reportSHA256 只关联原报告字节与宿主事务；缺历史字段�
 原有 238 份证据与 3 份输入副本均逐项核对已提交字节后追加本轮证据。台账为 47 项：2 已验收、18 部分推进、26 待对账、1 可选延期；46 项必选任务仍有 44 项未验收。
 
 本轮接口说明：`T28_environment_contract.md`。复算入口：`audit_environment_contract.py`。证据入口：`evidence/B04-summary.json`、`evidence/B04-source-review.json`。
+
+
+### 2026-10-07 B05：T36、T37、T38、T39、T46
+
+本轮按用户要求推进 5 项。各项完成本轮实现与相关验证，保留完整验收条件，均未标记 accepted。六个实现/验证提交见 `evidence/B05-summary.json`。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T36 | 手动 screen.unlock；screen_unlock 能力及输入队列；RPC 晚回复核对 instance/hash/generation | 自动启动选项、可信实例与 SetupAssistant/readiness 状态机、Stop/禁用取消、真实锁屏/密码/冷启动/respring |
+| T37 | system.shutdown 保留 force/root/API 认证；专用能力；重复 force stop 和晚失败重复请求防护 | Launchpad/菜单 guest-first、目标超时和错误状态核对、更新/备份协调、真实停机和磁盘释放 |
+| T38 | 嵌套请求参数与显式回复契约；旧 flat 回复拒绝；默认 flat 保留 | native AX walker、entitlements、前台/锁/重试、图关系诊断及真实客户机 |
+| T39 | 固定上游共享策略；classic 文本 1 MiB UTF-8/图片 16 MiB；入站图片分配前限制；计数不可靠保留 unknown | Cmd C/X/V、触摸复制和失焦基线、第二段图片 await 核对、实例/输入队列/Mac rich-text 及 VM 行为 |
+| T46 | 分块扫描和 CSI 扫描，保留 whitespace 与 panic 语义；分块/尾部/轮换等价测试和本地基准 | 批量 writer、操作日志归属、完整 helper 版本与 ACK/writer 排空、超时/断线/写错/退出、UI 响应 |
+
+T36 红测试 2 项 XCTest/8 failures；T37 红测试 1 项 XCTest/4 failures 与 1 项 Swift Testing/2 issues；T38 红测试 2 项 XCTest/7 failures；T39 4 项 XCTest 中 3 项失败、11 failures；T46 红验证因缺 strippingEscapes 编译失败。分别保存原始失败和通过日志。T39 整个传输 suite 18 项 XCTest 与共享策略 4 项 Swift Testing 通过，覆盖容量边界、UTF-8、未知计数和图片头长度。T46 分行/console/轮换/follower 16 项、4 个 suite、6.225 秒通过；12 组确定性随机切块、单字节切块、Unicode/非法 UTF-8/ANSI/CRLF/未结束尾部与原实现精确输出一致。panic matcher 未修改。
+
+相关范围为 Core、LaunchpadKit、HostRPC、GuestTransport、HostCommandExecutor、HostControlProtocol。XCTest 156 项无失败；Swift Testing 报告 530 项/78 个 suite、136.891 秒通过，另报告 6 项测试/4 个 suite 跳过，包含真实 CLI/父进程角色及 checkpoint 夹具。本轮没有重跑完整 API HTTP/WS 套件或固件对比，不能表述为全量 Swift 通过；此前全量失败和串行 HTTP 等待原因仍未查明。
+
+候选 daemon 在 T37 后的客户机源码上用 iOS SDK 构建成功，固定依赖、架构、entitlements、动态库和清单摘要核验通过，候选二进制 SHA-256 为 `75ea2fac2921be48a0b73bf0928486a72051512a45f371e24005258ae24eab94`。构建日志含 dSYM 缺缓存模块的警告；最终 BUILD SUCCEEDED。候选保留 `activated=false`、`runtime_validated=false`，未安装。新增 unlock/halt native 方法没有在宿主或真实 VM 上执行。
+
+补充 Python 验证最初在固定 IcliKit 0.7.16 ArchiveLocale harness 编译失败：缺 IcliLaunchPrivate.h；补齐后还缺 JSONSafe.swift，且 harness 的运行参数已增加安全夹具。按固定 checkout 的 scripts/test-archive-locale.sh 补齐头文件、JSONSafe、hard-link 与 symlink escape 夹具，保留原 Unicode/metadata/locale 断言，并输出编译诊断。10 项 Python 构建、归档与组件检查、5.110 秒通过；固定依赖源码没有修改。
+
+分行基准采用 `swiftc -O`、3,300,000 字节输入、10 万行、每次 1 MiB 切块，各运行 3 次。原实现中位耗时 2.3098135 秒，新实现 0.039958542 秒；两端均输出 10 万行、2,200,000 字节。该结果只证明本机合成输入分行耗时，不证明 UI、VM、日志 writer 或 helper 的性能。驱动及两端源码分别保存在 B05 证据中。
+
+固定上游仍有需要本地适配的接口边界：自动解锁把缺 instance 当作新启动，缺 setup_pending 默认 false；本地后续自动路径需按 C9 拒绝这种不完整证据。上游 clipboard 图片读取 await 后直接写 Mac pasteboard，未再次核验 instance/generation/Mac change count；C10 后续实现须补齐。上游 helper callback ACK 立即回复，服务端忽略 30 秒 wait 结果，异步 LogWriter 使用 try? 且没有 writer-drained 契约；不能直接将 ACK 表述为日志完整。这些属于固定源码审查结果，未宣称真实运行后果。
+
+没有签名宿主重建、候选部署、VM 写入、amfid 操作或 vm-2607 操作。只读检查观察 vm-new PID 69566 仍运行；config、既有客户机载荷与签名 VM 摘要不变，codesign 验证通过。主仓库仍为 e8d825b3 且干净。磁盘可用约 11.5 GiB，本轮候选保存在隔离构建目录。
+
+追加前逐项核对原有 267 份证据与 3 份输入副本的已提交字节。台账为 47 项：2 已验收、23 部分推进、21 待对账、1 可选延期；46 项必选仍有 44 项未验收。源码路径审查不等同于上游整个提交的语义等价，原提交覆盖台账保持待审。
+
+证据入口：`evidence/B05-summary.json`、`evidence/B05-source-review.json`。接口约束以以上本轮范围为准；`T28_environment_contract.md` 的五库环境接口对账再次通过。

@@ -1,0 +1,36 @@
+test_utf8_names_and_mac_metadata_in_c_locale (tests.test_daemon_api_icli.DaemonAPIIcliArchiveTests.test_utf8_names_and_mac_metadata_in_c_locale) ... Compiler diagnostic for ['xcrun', 'swiftc', '-swift-version', '6', '-module-cache-path', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/modules', '-import-objc-header', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/checkouts/icli/Tests/ArchiveLocale/Bridge.h', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/checkouts/icli/Tests/ArchiveLocale/main.swift', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/Archive.o', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/Deb.o', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/artifacts/libarchive.xcframework/libarchive/libarchive.xcframework/macos-arm64_x86_64/libarchive.framework/Versions/A/libarchive', '-framework', 'Foundation', '-lz', '-lbz2', '-liconv', '-lxml2', '-o', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/archive-locale-tests']
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/checkouts/icli/Tests/ArchiveLocale/main.swift:275:16: error: cannot find 'jsonSafe' in scope
+273 |     try check(icli_system_string(bytes, 4) == "a\u{FF}b", "a non-UTF-8 name was not decoded as Latin-1")
+274 |     try check(icli_system_double(.nan) as? String == "nan", "a NaN double was not turned into text")
+275 |     let safe = jsonSafe([
+    |                `- error: cannot find 'jsonSafe' in scope
+276 |         "nan": Double.nan,
+277 |         "nested": ["inf": -Double.infinity, "date": Date(timeIntervalSince1970: 0), "data": Data([1, 2])],
+ERROR
+
+======================================================================
+ERROR: test_utf8_names_and_mac_metadata_in_c_locale (tests.test_daemon_api_icli.DaemonAPIIcliArchiveTests.test_utf8_names_and_mac_metadata_in_c_locale)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_api_icli.py", line 86, in test_utf8_names_and_mac_metadata_in_c_locale
+    subprocess.run(['xcrun', 'swiftc', '-swift-version', '6', '-module-cache-path', str(work / 'modules'),
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    '-import-objc-header', str(ICLI / 'Tests/ArchiveLocale/Bridge.h'),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+                    '-lz', '-lbz2', '-liconv', '-lxml2', '-o', str(harness)],
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   check=True, capture_output=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/vphone-b05-icli-diagnostic.py", line 7, in diagnostic
+    try:return original(*args,**kwargs)
+               ~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['xcrun', 'swiftc', '-swift-version', '6', '-module-cache-path', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/modules', '-import-objc-header', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/checkouts/icli/Tests/ArchiveLocale/Bridge.h', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/checkouts/icli/Tests/ArchiveLocale/main.swift', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/Archive.o', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/Deb.o', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/Xcode/SourcePackages/artifacts/libarchive.xcframework/libarchive/libarchive.xcframework/macos-arm64_x86_64/libarchive.framework/Versions/A/libarchive', '-framework', 'Foundation', '-lz', '-lbz2', '-liconv', '-lxml2', '-o', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/tmp3ghd4jxa/archive-locale-tests']' returned non-zero exit status 1.
+
+----------------------------------------------------------------------
+Ran 1 test in 3.168s
+
+FAILED (errors=1)

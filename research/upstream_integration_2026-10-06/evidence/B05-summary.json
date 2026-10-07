@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-07",
+  "tasks": [
+    "T36",
+    "T37",
+    "T38",
+    "T39",
+    "T46"
+  ],
+  "accepted": false,
+  "base": "7a5039128865d53fcc20c86c74719c0c29a339b5",
+  "implementation_head": "7839f5b30cea3f7736acf68f5fd6dbef62810092",
+  "commits": {
+    "T36": [
+      "57b124589b78530ddc2f0d19e31119b108cd1686"
+    ],
+    "T37": [
+      "975d1288bffda4189e915b68afb1f8ff68a9d6e0"
+    ],
+    "T38": [
+      "a7ee78c462e8ca100af913b5e483354fe5ed651f"
+    ],
+    "T39": [
+      "f03615b1de4d658304ce83edce57b8b132a1d071"
+    ],
+    "T46": [
+      "4af226fb589afc78ac58ebd44eb6b5e1928bc587"
+    ],
+    "T08_support": [
+      "7839f5b30cea3f7736acf68f5fd6dbef62810092"
+    ]
+  },
+  "red": {
+    "T36": {
+      "xctest": 2,
+      "failures": 8
+    },
+    "T37": {
+      "xctest": 1,
+      "failures": 4,
+      "swift_testing": 1,
+      "issues": 2
+    },
+    "T38": {
+      "xctest": 2,
+      "failures": 7
+    },
+    "T39": {
+      "xctest": 4,
+      "failed_tests": 3,
+      "failures": 11
+    },
+    "T46": {
+      "result": "compile failure: missing strippingEscapes scanner"
+    },
+    "support_archive_harness": {
+      "initial": "missing IcliLaunchPrivate.h",
+      "intermediate": "missing JSONSafe.swift; fixed 0.7.16 harness also requires safety fixture arguments"
+    }
+  },
+  "verification": {
+    "T36_host": {
+      "xctest": 14,
+      "pass": true
+    },
+    "T37_host_policy": {
+      "xctest": 15,
+      "swift_testing": 7,
+      "suites": 1,
+      "pass": true
+    },
+    "T38_host": {
+      "xctest": 17,
+      "pass": true
+    },
+    "T39_host_core": {
+      "xctest": 18,
+      "swift_testing": 4,
+      "suites": 1,
+      "pass": true
+    },
+    "T46_splitter_rotation": {
+      "swift_testing": 16,
+      "suites": 4,
+      "pass": true,
+      "seconds": 6.225
+    },
+    "related": {
+      "xctest": 156,
+      "swift_testing_reported": 530,
+      "suites": 78,
+      "swift_testing_skipped_tests": 6,
+      "swift_testing_skipped_suites": 4,
+      "seconds": 136.891,
+      "pass": true,
+      "source_equivalent_head": "4af226fb589afc78ac58ebd44eb6b5e1928bc587",
+      "scope": "Core, LaunchpadKit, HostRPC, GuestTransport, HostCommandExecutor, HostControlProtocol; excludes firmware/VM acceptance and full API HTTP/WS suite"
+    },
+    "python": {
+      "tests": 10,
+      "seconds": 5.11,
+      "pass": true,
+      "source_equivalent_head": "7839f5b30cea3f7736acf68f5fd6dbef62810092"
+    },
+    "candidate": {
+      "build_pass": true,
+      "check_pass": true,
+      "guest_source_commit": "975d1288bffda4189e915b68afb1f8ff68a9d6e0",
+      "candidate_binary_sha256": "75ea2fac2921be48a0b73bf0928486a72051512a45f371e24005258ae24eab94",
+      "activated": false,
+      "runtime_validated": false
+    },
+    "T28_environment_audit": {
+      "pass": true,
+      "local_libraries": 5,
+      "upstream_libraries": 7,
+      "upstream_documented_libraries": 4
+    }
+  },
+  "benchmark": {
+    "compiler": "swiftc -O",
+    "runs_each": 3,
+    "input_bytes": 3300000,
+    "lines": 100000,
+    "output_bytes": 2200000,
+    "old_seconds": [
+      2.334629834,
+      2.3098135,
+      2.295666125
+    ],
+    "new_seconds": [
+      0.042986,
+      0.039958542,
+      0.03949
+    ],
+    "median_old": 2.3098135,
+    "median_new": 0.039958542,
+    "median_ratio": 57.80524975110454,
+    "scope": "local synthetic line-splitter throughput only; equivalent output byte/line counts plus random chunk exact-output regression; not UI/VM/log writer throughput"
+  },
+  "vm_new": {
+    "operations_performed": false,
+    "pid_observed": 69566,
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+  },
+  "signed_host": {
+    "rebuilt_or_deployed": false,
+    "verify_pass": true,
+    "vm_sha256": "40b283470ea099080aee54b9378368bc130a0e0f01423bcd87528e593efc4a11"
+  },
+  "main": {
+    "head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+    "clean": true
+  },
+  "full_swift_rerun": false,
+  "full_swift_limitation": "earlier default failures and serial HTTP wait unresolved; cause unknown",
+  "counts": {
+    "total": 47,
+    "required": 46,
+    "accepted": 2,
+    "partial": 23,
+    "pending_audit": 21,
+    "optional_deferred": 1,
+    "required_unaccepted": 44
+  }
+}
