@@ -1268,7 +1268,7 @@
         "T02",
         "T24"
       ],
-      "status": "read_only_migration_preview_validated_atomic_apply_pending",
+      "status": "selection_file_migration_validated_applicability_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift",
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
@@ -1289,7 +1289,7 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "preview_implemented_applicability_pending",
+        "state": "explicit_file_migration_implemented_applicability_pending",
         "paths": [
           "research/t09_patch_id_mapping_2026-10-01.json",
           "research/t10_patch_declarations_2026-10-01.json",
@@ -1297,11 +1297,16 @@
           "sources/FirmwarePatcher/PatchSet/PatchSelectionMigration.swift",
           "sources/FirmwarePatcher/PatchSet/PatchSelectionMigrationData.swift",
           "sources/vphone-cli/VPhoneFWSelectionPreviewCLI.swift",
-          "scripts/generate_patch_id_migration.py"
+          "scripts/generate_patch_id_migration.py",
+          "sources/FirmwarePatcher/PatchSet/PatchSelectionFileMigration.swift",
+          "sources/vphone-cli/VPhoneFWSelectionMigrateCLI.swift",
+          "tests/FirmwarePatcherTests/PatchSelectionFileMigrationFaultTests.swift",
+          "tests/VPhoneCLITests/PatchSelectionFileMigrationTests.swift"
         ]
       },
       "implementation_commits": [
-        "698314e202718af8c08c0411342650b7fb561c7e"
+        "698314e202718af8c08c0411342650b7fb561c7e",
+        "dbe635c95bdffd650a0e8d3f8c948d51f29ca24e"
       ],
       "verification_evidence": [
         "T09_declaration_delta.json",
@@ -1315,12 +1320,32 @@
         "evidence/T09-read-only-cli.json",
         "evidence/T09-read-only-cli-driver.py",
         "evidence/T09-extended-preset-rename.diff",
-        "evidence/T09-selection-source-review.json"
+        "evidence/T09-selection-source-review.json",
+        "evidence/T09-file-red.log",
+        "evidence/T09-file-green.log",
+        "evidence/T09-file-green2.log",
+        "evidence/T09-file-fault-red.log",
+        "evidence/T09-file-fault-red2.log",
+        "evidence/T09-file-fault-red3.log",
+        "evidence/T09-file-final-green.log",
+        "evidence/T09-file-default-swift.log",
+        "evidence/T09-file-serial-swift-initial.log",
+        "evidence/T09-file-stage-red.log",
+        "evidence/T09-file-stage-green.log",
+        "evidence/T09-file-related-swift.log",
+        "evidence/T09-file-serial-swift.log",
+        "evidence/T09-file-tar-memory.log",
+        "evidence/T09-file-guest-components.log",
+        "evidence/T09-file-cli-check.json",
+        "evidence/T09-file-cli-check.py",
+        "evidence/T09-file-original-state.json",
+        "evidence/T09-file-serial-swift.py",
+        "evidence/T09-file-serial-sample.txt",
+        "evidence/T09-file-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "只读 selection-preview 实现 117 旧点号别名与 1 中间别名、内置 extended→experimental 改名。143 个识别 ID 包括上游 141 和本地 less 2 个；执行 catalog 仍为 119。保留显式开关和五模式，拒绝未知、重复、别名冲突及相互矛盾输入。14 项回归测试、242 项相关测试及 13 个 CLI 用例通过；标准 Swift 仍有 14 issues，原因未查明。",
+      "current_result": "显式 XML 选择文件可预览并按源摘要核对应用，保存原字节备份、原子替换与读回，重复应用不重写。37 项迁移测试、265 项相关测试、13 个真实 CLI/备份恢复用例通过。标准 Swift 有 16 issues，最终串行测试停在 HTTP 夹具 waitUntilExit 后被停止；原因未查明。vm-new 无选择文件，未执行实际迁移。识别目录与执行 catalog 的范围不变。",
       "remaining_work": [
-        "选择文件迁移预览、原文件备份、原子提交及幂等",
         "C2 持久化身份/输入/catalog/schema/planDigest 绑定与错误区分",
         "重验 141 目标声明的实现、五模式、版本和默认适用性",
         "T24 宿主入口约束审查"
@@ -1508,14 +1533,16 @@
         "evidence/T10-base-launchpad-build.log",
         "evidence/T10-base-final-bundle-check.log",
         "evidence/T10-base-build-driver.json",
-        "evidence/T10-base-signed-artifact-manifest.json"
+        "evidence/T10-base-signed-artifact-manifest.json",
+        "evidence/T11-plan-serialization-probe.json"
       ],
       "historical_evidence": [],
       "current_result": "现有事务 journal 保存本次解析计划和两份版本 manifest 的原始字节 SHA/版本；暂存输入必须匹配，读取拒绝损坏、权限拒绝及无法识别版本。历史缺新字段 journal 保留恢复。未形成完整 C2 持久化计划，记录不作为重新执行授权。",
       "remaining_work": [
         "绑定稳定 VM 身份、mode、build/digest、catalog/固定 target、schema 与 planDigest",
         "missing/corrupt/unsupported/已识别 legacy 分别表达，禁止解码失败后宽松默认",
-        "复用原记录做原子迁移，绑定磁盘/generation，迁移备份与恢复验收"
+        "复用原记录做原子迁移，绑定磁盘/generation，迁移备份与恢复验收",
+        "VariantPlan 集合序列化排序与重复值拒绝；现有 checkpoint identityText 已排序，未证明其摘要存在回归"
       ]
     },
     {
@@ -3594,6 +3621,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "ccda7f464a6ab2b4741aee52d99a520d69162ab8",
-  "latest_validation_limitation": "Standard Swift 1083/167 failed with 16 issues; related module, firmware, offline CLI and isolated controls passed. Cause unknown; no signed candidate rebuild or VM acceptance."
+  "latest_implementation_head": "dbe635c95bdffd650a0e8d3f8c948d51f29ca24e",
+  "latest_validation_limitation": "T09 related265/43 and CLI13 passed; default Swift1118/171 has16 issues. Final serial run blocked in HTTP fixture waitUntilExit, interrupted with SIGTERM; cause unknown. No signed rebuild or VM migration."
 }

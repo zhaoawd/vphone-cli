@@ -1,0 +1,51 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling locking.c
+[5/35] Compiling log.c
+[6/35] Compiling ftab.c
+[7/35] Compiling fls.c
+[8/37] Compiling fdr.c
+[9/37] Compiling ipsw.c
+[10/37] Compiling asr.c
+[11/37] Compiling download.c
+[12/37] Compiling recovery.c
+[13/37] Compiling normal.c
+[14/37] Compiling limera1n.c
+[15/37] Compiling img3.c
+[15/37] Compiling dfu.c
+[17/37] Compiling ace3.c
+[18/37] Compiling img4.c
+[19/37] Compiling mbn.c
+[20/37] Compiling vphone_zip_stub.c
+[21/37] Compiling restore.c
+[22/37] Compiling deviceinterfaced.c
+[23/37] Compiling common.c
+[24/37] Compiling vphone_restore_bridge.c
+[25/37] Compiling idevicerestore.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Emitting module FirmwarePatcherTests
+[29/38] Compiling FirmwarePatcherTests PatchSelectionFileMigrationFaultTests.swift
+macro expansion #expect:1:22: error: call can throw but is not marked with 'try'
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/PatchSelectionFileMigrationFaultTests.swift:100:136: note: expanded code originates here
+ 98 |         }
+ 99 |         #expect(try Data(contentsOf: file) == external)
+100 |         #expect(!FileManager.default.contentsOfDirectory(atPath: dir.path).contains { $0.hasPrefix(".PatchSelection.plist.migrate-") })
+    |         |- note: in expansion of macro 'expect' here
+    |         |- note: in expansion of macro 'expect' here
+    |         |- note: in expansion of macro 'expect' here
+    |         `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(FileManager.default.contentsOfDirectory(atPath: dir.path).contains { $0.hasPrefix(".PatchSelection.plist.migrate-") },expression: .__fromNegation(.__fromSyntaxNode(#"FileManager.default.contentsOfDirectory(atPath: dir.path).contains { $0.hasPrefix(".PatchSelection.plist.migrate-") }"#), false),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      |- error: call can throw but is not marked with 'try'
+    |  |                      |- note: did you mean to use 'try'?
+    |  |                      |- note: did you mean to handle error as optional value?
+    |  |                      `- note: did you mean to disable error propagation?
+    +-------------------------------------------------------------------
+101 |     }
+102 | 
+error: fatalError

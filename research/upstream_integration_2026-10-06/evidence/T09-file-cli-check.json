@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "count": 13,
+  "cases": [
+    {
+      "case": "preview",
+      "exit_code": 0,
+      "stdout": "{\n  \"changed\" : true,\n  \"migratedPreset\" : \"experimental\",\n  \"originalPreset\" : \"extended\",\n  \"outputSHA256\" : \"415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef\",\n  \"selection\" : {\n    \"blocked\" : [\n      \"kernel-cfw-paravirt_user_clients\"\n    ],\n    \"mappingRevision\" : \"vphone.patch-id-migration/1\",\n    \"notDeclaredLocally\" : [\n      \"kernel-cfw-paravirt_user_clients\"\n    ],\n    \"renames\" : [\n      {\n        \"enabled\" : true,\n        \"from\" : \"ibss.serial_label\",\n        \"to\" : \"ibss-cfw-serial_label\"\n      },\n      {\n        \"enabled\" : false,\n        \"from\" : \"kernel-exp-paravirt_user_clients\",\n        \"to\" : \"kernel-cfw-paravirt_user_clients\"\n      }\n    ],\n    \"selected\" : [\n      \"ibss-cfw-serial_label\"\n    ],\n    \"upstreamTarget\" : \"2d21d21fbdd4f51f013616273ceda9b35a3e0789\"\n  },\n  \"sourcePath\" : \"/tmp/vphone-selection-file-cli-lzh4_qrl/normal/PatchSelection.plist\",\n  \"sourceSHA256\" : \"4900e8c8cbf17e22d2412c5fe9be5b4eb7de43a31eb973440f58adba33c3677e\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "case": "apply",
+      "exit_code": 0,
+      "stdout": "{\n  \"backupPath\" : \"/tmp/vphone-selection-file-cli-lzh4_qrl/normal/PatchSelection.plist.before-id-migration-4900e8c8cbf17e22d2412c5fe9be5b4eb7de43a31eb973440f58adba33c3677e.bak\",\n  \"changed\" : true,\n  \"outputSHA256\" : \"415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "case": "repeated-apply",
+      "exit_code": 0,
+      "stdout": "{\n  \"changed\" : false,\n  \"outputSHA256\" : \"415bdf85fd0a674d2fff44fc72e0e6dd3c47ab634a94b62770efe4ad8c23b5ef\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "case": "original-byte-rollback",
+      "exit_code": 0
+    },
+    {
+      "case": "stale",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Selection or its directory changed since the preview; preview again\n"
+    },
+    {
+      "case": "busy",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Selection directory is locked; stop the VM or wait for its operation\n"
+    },
+    {
+      "case": "missing-digest",
+      "exit_code": 64,
+      "stdout": "",
+      "stderr": "Error: --apply requires --expected-source-sha256 from the preview\nUsage: vphone-cli fw selection-migrate <file> [--apply] [--expected-source-sha256 <expected-source-sha256>]\n  See 'vphone-cli fw selection-migrate --help' for more information.\n"
+    },
+    {
+      "case": "backup-conflict",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Existing selection backup differs from the original; preserved without overwriting\n"
+    },
+    {
+      "case": "pending",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Pending firmware transaction; selection migration refused\n"
+    },
+    {
+      "case": "unknown-key",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Selection requires exactly Preset, AllowedPatches and BlockedPatches with valid types\n"
+    },
+    {
+      "case": "corrupt",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Selection plist is corrupt or contains repeated keys/entities\n"
+    },
+    {
+      "case": "entity",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Selection plist is corrupt or contains repeated keys/entities\n"
+    },
+    {
+      "case": "link",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Error: Selection migration open PatchSelection.plist: Too many levels of symbolic links\n"
+    }
+  ],
+  "scope": "temporary synthetic files only; no VM operations"
+}

@@ -197,3 +197,20 @@ T02 已完整读取两个签名单文件提交：ee8b70ca 的 SOURCE_VERSION 回
 本步未重建签名 Bundle。原 vm-new 仍由 8777bc7e 候选运行；配置、旧客户机载荷与签名 VM 二进制摘要均保持 T03 记录值。T03 应用和输入验收仍未完成，T09 也未标记 accepted。
 
 复现入口：`python -B scripts/generate_patch_id_migration.py --check`；`.build/debug/vphone-cli fw selection-preview --variant jb --bundled-preset extended --select ibss.serial_label --block kernel-exp-paravirt_user_clients`。Python 使用项目 .venv。
+
+
+### 2026-10-07 T09 显式选择文件迁移
+
+实现提交 `dbe635c9` 新增 `fw selection-migrate <PatchSelection.plist>`。默认输出只读 JSON 预览；应用要求 `--apply --expected-source-sha256 <预览摘要>`。仅接受已审查的上游 XML 格式及三个完整字段 Preset、AllowedPatches、BlockedPatches；仅处理已知内置预设。未知字段、缺失字段、损坏、二进制格式、重复 ID、歧义或冲突均拒绝，不补入标准预设默认值。
+
+应用复用目录独占 flock，拒绝未结束的固件事务，并核对目录及源文件身份。原字节备份先写入、读回并同步；发布前再次核对源、备份及暂存文件身份与字节，随后原子替换并读回。备份冲突不覆盖；重复应用不重写。异常清理仅删除本次创建的 inode。重命名后的异常返回 publicationUncertain，不声称已回滚。输出保留 uid、gid 和权限位，没有复制 ACL 或扩展属性。目录锁为协作式锁。
+
+红测试发现缺少命令、二进制格式错误分类、备份被修改后仍发布、暂存字节被修改后仍重命名、清理删除同名替换文件等问题。编译阶段另出现 FoundationXML 模块不可用及测试缺 try，均修正，失败日志保留。最终 37 项迁移测试、4 个 suite 通过；相关模块 265 项、43 个 suite 通过。真实 debug CLI 的 13 个合成目录用例通过，含预览、摘要过期、目录锁、缺摘要、备份冲突、未结束事务、未知字段、损坏、实体、符号链接、幂等及原备份字节恢复；配置哨兵未变。
+
+标准 make test_swift 退出 2：XCTest 234 项、3 跳过、0 失败；Swift Testing 1118 项、171 个 suite、16 issues，76.806 秒。HTTP 5、WebSocket 7、取消 3、helper XPC 1；原因未查明。暂存校验修复之前的串行测试为 1118 项通过，181.076 秒，不能作为最终源码的全量通过证据。最终源码串行测试日志停止更新，采样显示 APIHTTPFixture.stop 等待 NSConcreteTask.waitUntilExit；辅助进程运行 5 分 2 秒后被 SIGTERM 停止，入口退出 1。原因未查明，完整 Swift 测试尚未通过。标准入口未到达的 tar 内存检查和 guest 检查已单独运行，前者通过，后者 124 检查、0 失败。
+
+生成器 --check 通过，仍为 118 个别名、143 个识别 ID 和 119 个执行声明。迁移只修改 desired overrides，不生成冻结计划，也不赋予写固件资格。原 vm-new 没有 PatchSelection.plist，本步没有创建默认文件或执行真实 VM 迁移。签名候选、VM 配置和旧客户机载荷摘要保持既有值；没有重建签名 Bundle 或部署新载荷。T09 的 141 声明适用性、T24 入口约束以及 C2 绑定仍待执行。
+
+T11 的 8 次独立只读 fw plan 调用得到 8 种 enabledSteps 数组顺序和同一集合摘要。模型使用 Set 的合成 Codable，序列化顺序不固定。现有创建检查点 identityText 已对 selectedIDs 与 enabledSteps 排序；没有证据表明该摘要存在回归。后续持久化需要明确规范序列化，再绑定 VM、输入、catalog、schema 和 planDigest；当前事务 journal 与版本 manifest 不能直接作为重新执行授权。
+
+证据入口：`evidence/T09-file-summary.json`、`evidence/T09-file-related-swift.log`、`evidence/T09-file-serial-sample.txt`。T09 与 T11 均未标记 accepted。

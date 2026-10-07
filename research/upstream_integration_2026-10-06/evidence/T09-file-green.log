@@ -1,0 +1,48 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/36] Compiling locking.c
+[6/36] Compiling limera1n.c
+[7/36] Compiling deviceinterfaced.c
+[8/36] Compiling common.c
+[9/36] Compiling ipsw.c
+[10/36] Compiling asr.c
+[11/36] Compiling idevicerestore.c
+[12/36] Compiling fdr.c
+[13/36] Compiling download.c
+[14/38] Compiling recovery.c
+[15/38] Compiling normal.c
+[16/38] Compiling restore.c
+[17/38] Compiling img3.c
+[18/38] Compiling dfu.c
+[19/38] Compiling ace3.c
+[20/38] Compiling img4.c
+[21/38] Compiling mbn.c
+[22/38] Compiling ftab.c
+[23/38] Compiling fls.c
+[24/38] Compiling vphone_zip_stub.c
+[25/38] Compiling log.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[29/38] Emitting module FirmwarePatcher
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/PatchSet/PatchSelectionFileMigration.swift:4:8: error: no such module 'FoundationXML'
+  2 | import Darwin
+  3 | import Foundation
+  4 | import FoundationXML
+    |        `- error: no such module 'FoundationXML'
+  5 | 
+  6 | /// Explicit migration of the upstream XML selection format. Does not create
+[30/38] Compiling FirmwarePatcher PatchSelectionFileMigration.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/PatchSet/PatchSelectionFileMigration.swift:4:8: error: no such module 'FoundationXML'
+  2 | import Darwin
+  3 | import Foundation
+  4 | import FoundationXML
+    |        `- error: no such module 'FoundationXML'
+  5 | 
+  6 | /// Explicit migration of the upstream XML selection format. Does not create
+error: fatalError

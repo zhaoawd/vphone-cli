@@ -1,0 +1,104 @@
+{
+  "implementation_commit": "dbe635c95bdffd650a0e8d3f8c948d51f29ca24e",
+  "task": "T09",
+  "accepted": false,
+  "format": "explicit upstream XML PatchSelection.plist with exactly Preset/AllowedPatches/BlockedPatches; reviewed builtin presets only",
+  "published_state": "desired overrides; not a C2 execution authorization",
+  "guards": [
+    "preview SHA-256",
+    "directory identity and exclusive advisory flock",
+    "no pending firmware transaction",
+    "caller-owned bounded regular files without hard/symbolic links",
+    "raw original backup verified and synced",
+    "source identity/bytes recheck",
+    "stage identity/bytes recheck",
+    "atomic rename and output readback",
+    "cleanup only created inode",
+    "post-rename errors report publication uncertainty"
+  ],
+  "preserved_metadata": [
+    "uid",
+    "gid",
+    "permission bits"
+  ],
+  "acl_xattrs_copied": false,
+  "related_swift": {
+    "tests": 265,
+    "suites": 43,
+    "passed": true,
+    "seconds": 0.896
+  },
+  "migration_swift": {
+    "tests": 37,
+    "suites": 4,
+    "passed": true,
+    "seconds": 0.031
+  },
+  "cli_cases": {
+    "count": 13,
+    "passed": true,
+    "scope": "synthetic directories; includes original-byte backup rollback"
+  },
+  "default_swift": {
+    "exit": 2,
+    "xctest": 234,
+    "skipped": 3,
+    "xctest_failures": 0,
+    "swift_testing": 1118,
+    "suites": 171,
+    "issues": 16,
+    "failure_groups": {
+      "HTTP": 5,
+      "WebSocket": 7,
+      "cancellation": 3,
+      "helper_XPC": 1
+    },
+    "cause": "原因未查明"
+  },
+  "serial_before_stage_guard_fix": {
+    "tests": 1118,
+    "suites": 171,
+    "passed": true,
+    "seconds": 181.076,
+    "covers_final_source": false
+  },
+  "serial_final_source": {
+    "exit": 1,
+    "passed": false,
+    "interrupted": true,
+    "sample_pid": 55323,
+    "observed_wait": "APIHTTPFixture.stop -> NSConcreteTask.waitUntilExit",
+    "helper_elapsed_at_termination": "05:02",
+    "signal": "SIGTERM",
+    "cause": "原因未查明"
+  },
+  "downstream_checks": {
+    "guest_checks": 124,
+    "guest_failures": 0,
+    "tar_memory_passed": true
+  },
+  "generator_check": {
+    "passed": true,
+    "aliases": 118,
+    "canonical_ids": 143,
+    "execution_catalog": 119
+  },
+  "vm_new": {
+    "selection_file_present": false,
+    "source_config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_payload_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "actual_selection_migration_performed": false
+  },
+  "signed_rebuild_or_deployment": false,
+  "remaining": [
+    "C2 VM/input/catalog/schema/planDigest binding",
+    "141 declaration applicability",
+    "T24 host entry constraints"
+  ],
+  "t11_probe": {
+    "distinct_encoded_step_orders": 8,
+    "distinct_step_sets": 1,
+    "confirmed_model": "VariantPlan.enabledSteps uses synthesized Set Codable",
+    "existing_checkpoint_identity": "identityText already sorts selectedIDs/enabledSteps; no digest regression established"
+  }
+}
