@@ -47,3 +47,6 @@ bool vp_proc_info_layout_matches(size_t size, size_t vnode_offset, size_t path_o
 
 /// Lights the guest display through SpringBoardServices; does not toggle its state.
 bool vp_screen_undim(void);
+
+/// Requests guest halt through launchd; zero means accepted, not stopped.
+int vp_system_halt(void);

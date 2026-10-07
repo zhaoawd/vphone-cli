@@ -1,4 +1,6 @@
+import Darwin
 import Foundation
+import VphonedNative
 import IcliKit
 
 // MARK: - App Detail and System Control
@@ -41,6 +43,14 @@ extension GuestAPI {
             let userspace = bool(params, "userspace")
             try requireForce(params, userspace ? "restart userspace" : "reboot the guest")
             return try requestReboot(userspace: userspace, force: true)
+        case "system.shutdown":
+            try requireForce(params, "shut down the guest")
+            guard geteuid() == 0 else { throw GuestAPIError.operationFailed("shutdown requires root") }
+            let status = vp_system_halt()
+            guard status == 0 else {
+                throw GuestAPIError.operationFailed("shutdown request rejected: \(String(cString: strerror(status)))")
+            }
+            return ["accepted": true, "completion": "the virtual machine stops"]
         default:
             return nil
         }

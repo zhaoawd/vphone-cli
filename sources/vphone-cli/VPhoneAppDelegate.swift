@@ -381,6 +381,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             if !vm.requestGuestStop() {
                 forceStopAndExit(action: shutdownPlan.gracefulAttemptFailed())
             }
+        case .waitForStop:
+            return
         case .forceStop:
             print("[vphone] no graceful shutdown path available; stopping")
             forceStopAndExit(action: action)
@@ -391,6 +393,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     /// request, else force-stop. The graceful timer is already running.
     @MainActor
     private func fallBackFromGuestCommand(vm: VPhoneVirtualMachine) {
+        guard !shutdownPlan.forceStopRequested, vm.isRunning else { return }
         if vm.canRequestStop {
             print("[vphone] graceful shutdown via VZVirtualMachine.requestStop()")
             if vm.requestGuestStop() { return }

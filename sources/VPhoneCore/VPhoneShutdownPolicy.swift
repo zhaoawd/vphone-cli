@@ -67,26 +67,36 @@ public struct VPhoneShutdownPlan: Sendable {
         case forceStop
         /// Nothing is running; exit without touching the VM.
         case exitImmediately
+        /// A force-stop request is already in progress; wait for its completion.
+        case waitForStop
     }
 
     /// True once `start` has chosen a graceful path, i.e. a wait is in progress.
     public private(set) var didStart = false
+    public private(set) var forceStopRequested = false
 
     public init() {}
 
     public mutating func start(_ conditions: Conditions) -> Action {
+        guard !didStart else { return abortWait() }
         didStart = true
         guard conditions.vmRunning else { return .exitImmediately }
         if conditions.guestShellAvailable { return .guestCommand }
         if conditions.canRequestStop { return .requestStop }
+        return requestForceStop()
+    }
+
+    private mutating func requestForceStop() -> Action {
+        guard !forceStopRequested else { return .waitForStop }
+        forceStopRequested = true
         return .forceStop
     }
 
     /// The graceful attempt did not work (guest has no power-off command, or
     /// `requestStop` was refused): go straight to the force stop.
-    public mutating func gracefulAttemptFailed() -> Action { .forceStop }
+    public mutating func gracefulAttemptFailed() -> Action { requestForceStop() }
 
     /// A second interrupt, or the expiry of `gracefulTimeout`, skips the rest
     /// of the wait.
-    public mutating func abortWait() -> Action { .forceStop }
+    public mutating func abortWait() -> Action { requestForceStop() }
 }

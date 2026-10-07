@@ -35,6 +35,7 @@ enum VPhoneHostRPC {
         add("network_capture", ["network.capture"])
         add("system_control", ["security.ssl_killswitch", "diagnostics.self_test", "system.uicache",
                                "system.system_apps", "system.respring", "system.reboot"])
+        add("system_shutdown", ["system.shutdown"])
         add("apps", ["apps.list", "apps.search", "apps.refresh", "apps.launch", "apps.terminate",
                      "apps.uninstall", "apps.foreground"])
         add("url", ["apps.open_url"])

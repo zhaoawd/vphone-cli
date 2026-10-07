@@ -111,6 +111,24 @@ final class HostRPCTests: XCTestCase {
         XCTAssertEqual(result["operation_may_continue"] as? Bool, true)
     }
 
+    func testShutdownUsesDedicatedCapabilityAndPreservesForce() async throws {
+        let api = RPCSessionFake()
+        api.caps.append("system_control")
+        let executor = VPhoneHostCommandExecutor(apiSession: api)
+        let request: [String: Any] = ["t": "rpc", "method": "system.shutdown", "params": ["force": true]]
+        var result = try await call(executor, request)
+        XCTAssertEqual(result["code"] as? String, "capability_unavailable")
+        XCTAssertTrue(api.calls.isEmpty)
+        api.caps.append("system_shutdown")
+        api.handler = { _ in .object(["accepted": .bool(true)]) }
+        result = try await call(executor, request)
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        XCTAssertEqual(api.calls.last?.capability, "system_shutdown")
+        XCTAssertEqual(api.calls.last?.params["force"], .bool(true))
+        XCTAssertNil(result["stopped"])
+        XCTAssertNil(result["disk_free"])
+    }
+
     // MARK: - Forwarding
 
     func testForwardsDeclaredMethodWithParamsAndReturnsResult() async throws {

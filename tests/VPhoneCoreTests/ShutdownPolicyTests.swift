@@ -39,8 +39,18 @@ struct ShutdownPolicyTests {
         var plan = VPhoneShutdownPlan()
         _ = plan.start(.init(vmRunning: true, guestShellAvailable: true, canRequestStop: true))
         #expect(plan.abortWait() == .forceStop)
-        #expect(plan.gracefulAttemptFailed() == .forceStop)
+        var failedAttempt = VPhoneShutdownPlan()
+        _ = failedAttempt.start(.init(vmRunning: true, guestShellAvailable: true, canRequestStop: true))
+        #expect(failedAttempt.gracefulAttemptFailed() == .forceStop)
         #expect(plan.didStart)
+    }
+
+    @Test func lateFailureAndRepeatedInterruptDoNotIssueAnotherForceStop() {
+        var plan = VPhoneShutdownPlan()
+        _ = plan.start(.init(vmRunning: true, guestShellAvailable: true, canRequestStop: true))
+        #expect(plan.abortWait() == .forceStop)
+        #expect(plan.abortWait() != .forceStop)
+        #expect(plan.gracefulAttemptFailed() != .forceStop)
     }
 
     @Test func guestHaltCommandIsPOSIXShellAndReportsMissingBinary() {

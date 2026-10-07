@@ -83,6 +83,7 @@ enum GuestAPI {
                 "network_capture",
                 "app_details",
                 "system_control",
+                "system_shutdown",
                 "file_tools",
                 "packages",
                 "environment_update",
