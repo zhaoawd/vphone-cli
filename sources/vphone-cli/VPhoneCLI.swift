@@ -54,6 +54,9 @@ struct VPhoneBootCLI: ParsableCommand {
     @Option(help: "Expose the candidate guest API on 127.0.0.1:PORT (0 selects a port). Requires VPHONE_API_TOKEN; no daemon installation.")
     var apiListen: String?
 
+    @Flag(help: "Unlock newly observed guest instances at startup. Requires --api-listen and trusted Setup Assistant status; default off. No passcode is supplied.")
+    var unlockAtStartup = false
+
     @Option(help: "Kernel GDB debug stub port on host (omit for system-assigned port; valid: 6000...65535)")
     var kernelDebugPort: Int?
 
@@ -94,6 +97,9 @@ struct VPhoneBootCLI: ParsableCommand {
 
     mutating func validate() throws {
         try VPhoneAPIProxyOptions.validate(listen: apiListen, dfu: dfu, noVphoned: noVphoned)
+        if unlockAtStartup, apiListen == nil {
+            throw ValidationError("--unlock-at-startup requires --api-listen")
+        }
         if dfu, let packageURL = installPackageURL {
             throw ValidationError(
                 "`--install-ipa` is unavailable with `--dfu` because DFU mode does not start the guest control channel: \(packageURL.path)"

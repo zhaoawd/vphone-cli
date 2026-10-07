@@ -39,6 +39,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var hostControl: VPhoneHostControl?
     private var apiProxy: VPhoneAPIProxy?
     private var apiSession: VPhoneAPISession?
+    private var startupUnlock: VPhoneStartupUnlock?
+    private let hostInputQueue = VPhoneHostInputQueue()
     private var cameraServer: VPhoneCameraServer?
     private var sigintSource: DispatchSourceSignal?
     private var hostSleepActivity: NSObjectProtocol?
@@ -150,6 +152,16 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                             client: try VPhoneAPIClient(baseURL: url, token: apiOptions.token, timeout: 5),
                             vmInstanceID: vmLock.state.instanceID)
                         apiSession = session
+                        let unlock = VPhoneStartupUnlock(enabled: cli.unlockAtStartup) { [weak session, hostInputQueue] method, params, capability in
+                            guard let session else { throw CancellationError() }
+                            let result: Result<VPhoneJSONValue, any Error> = await hostInputQueue.run(cancelled: .failure(CancellationError())) {
+                                do { return .success(try await session.call(method, params: params, requiring: capability)) }
+                                catch { return .failure(error) }
+                            }
+                            return try result.get()
+                        }
+                        startupUnlock = unlock
+                        session.onSnapshotChange = { [weak unlock] snapshot in unlock?.observe(snapshot) }
                         session.start()
                     }
                     print("[api] proxy listening on \(url.absoluteString); guest VSOCK 1339; token from VPHONE_API_TOKEN")
@@ -294,7 +306,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         let executor = VPhoneHostCommandExecutor(
             control: control, camera: cameraServer, location: locationProvider,
             screen: hostScreen, apiSession: apiSession, bootMode: cli.dfu ? .dfu : .normal,
-            target: vmLock.map { VPhoneHostTarget(lock: $0.state) })
+            target: vmLock.map { VPhoneHostTarget(lock: $0.state) }, inputQueue: hostInputQueue)
         let hc = VPhoneHostControl(
             socketPath: options.configURL.deletingLastPathComponent()
                 .appendingPathComponent("vphone.sock").path,
@@ -347,6 +359,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     /// teardown is the framework's and not this process dying.
     @MainActor
     private func handleInterrupt() {
+        startupUnlock?.stop()
         guard let vm else {
             NSApp.terminate(nil)
             return
@@ -428,6 +441,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_: Notification) {
+        startupUnlock?.stop()
         apiSession?.stop()
         apiProxy?.stop()
         hostControl?.stop()

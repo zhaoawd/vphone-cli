@@ -14,6 +14,7 @@ public final class VPhoneAPISession {
     }
 
     public private(set) var snapshot: Snapshot
+    public var onSnapshotChange: (@MainActor (Snapshot) -> Void)?
     private let probe: @Sendable () async throws -> VPhoneAPIHealth
     private let connect: @Sendable () -> VPhoneAPIWebSocket
     private let requiredCapabilities: Set<String>
@@ -148,6 +149,7 @@ public final class VPhoneAPISession {
                             let current = try VPhoneAPIHealth.decode(JSONEncoder().encode(value),
                                 requiredCapabilities: [], expectedBinaryHash: nil)
                             guard Self.sameIdentity(hello, current) else { throw Self.error("identity_mismatch") }
+                            await self.publishHeartbeat(current, run: id, generation: connection.generation)
                         }
                     }
                     defer { group.cancelAll() }
@@ -169,6 +171,11 @@ public final class VPhoneAPISession {
         }
     }
 
+    private func publishHeartbeat(_ health: VPhoneAPIHealth, run id: UUID, generation: UUID) {
+        guard runID == id, snapshot.state == .ready, snapshot.generation == generation else { return }
+        transition(.ready, generation: generation, health: health)
+    }
+
     private func check(_ id: UUID) throws {
         try Task.checkCancellation()
         guard runID == id else { throw Self.error("stale_session") }
@@ -188,6 +195,7 @@ public final class VPhoneAPISession {
         }
         snapshot = Snapshot(vmInstanceID: snapshot.vmInstanceID, state: state,
                             generation: generation, health: health, errorCode: errorCode)
+        onSnapshotChange?(snapshot)
     }
 
     private nonisolated static func sameIdentity(_ a: VPhoneAPIHealth, _ b: VPhoneAPIHealth) -> Bool {

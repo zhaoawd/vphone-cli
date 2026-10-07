@@ -69,6 +69,8 @@ public struct VPhoneAPIHealth: Codable, Sendable, Equatable {
     public let capabilities: Set<String>
     public let ios: String?
     public let instanceID: String?
+    /// Absent in legacy candidates. Unknown must not authorize startup unlock.
+    public let setupPending: Bool?
 
     static func decode(_ data: Data, requiredCapabilities: Set<String>, expectedBinaryHash: String?) throws -> Self {
         let value = try VPhoneAPIWire.object(data)
@@ -97,6 +99,12 @@ public struct VPhoneAPIHealth: Codable, Sendable, Equatable {
             }
             instanceID = uuid.uuidString
         } else { instanceID = nil }
-        return Self(apiVersion: 1, binaryHash: hash, capabilities: capabilities, ios: ios, instanceID: instanceID)
+        let setupPending: Bool?
+        if let field = value["setup_pending"] {
+            guard case let .bool(pending) = field else { throw VPhoneAPIWire.invalidEnvelope() }
+            setupPending = pending
+        } else { setupPending = nil }
+        return Self(apiVersion: 1, binaryHash: hash, capabilities: capabilities, ios: ios, instanceID: instanceID,
+                    setupPending: setupPending)
     }
 }

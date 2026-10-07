@@ -16,7 +16,7 @@ final class VPhoneHostCommandExecutor {
     private let target: VPhoneHostTarget?
     /// `scripts/guest_environment.json` for the T17 environment commands.
     private let environmentManifest: URL
-    let inputQueue = VPhoneHostInputQueue()
+    let inputQueue: VPhoneHostInputQueue
 
     init(control: (any VPhoneHostGuest)? = nil,
          camera: (any VPhoneHostCamera)? = nil,
@@ -25,7 +25,8 @@ final class VPhoneHostCommandExecutor {
          apiSession: (any VPhoneHostAPISession)? = nil,
          bootMode: BootMode = .normal,
          target: VPhoneHostTarget? = nil,
-         environmentManifest: URL? = nil) {
+         environmentManifest: URL? = nil, inputQueue: VPhoneHostInputQueue = VPhoneHostInputQueue()) {
+        self.inputQueue = inputQueue
         self.bootMode = bootMode
         self.target = target
         self.environmentManifest = environmentManifest

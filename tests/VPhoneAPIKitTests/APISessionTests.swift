@@ -26,6 +26,35 @@ final class APISessionTests: XCTestCase {
         }
     }
 
+    func testSnapshotObserverReceivesMutableSetupStatusWithoutIdentityChange() async throws {
+        let (_, plain) = try health()
+        guard case var .object(fields) = plain else { return XCTFail("health fixture") }
+        fields["setup_pending"] = .bool(false)
+        let value = VPhoneJSONValue.object(fields)
+        let baseline = try VPhoneAPIHealth.decode(JSONEncoder().encode(value), requiredCapabilities: [], expectedBinaryHash: nil)
+        let fixture = APISocketFixture()
+        try hello(fixture, value)
+        let session = VPhoneAPISession(vmInstanceID: "vm", timing: .init(heartbeat: .milliseconds(20)),
+            probe: { baseline }, connect: { VPhoneAPIWebSocket(transport: fixture, timeout: 5) })
+        defer { session.stop() }
+        var observed: [VPhoneAPISession.Snapshot] = []
+        session.onSnapshotChange = { observed.append($0) }
+        session.start()
+        try await wait { session.snapshot.state == .ready }
+        let generation = session.snapshot.generation
+        let heartbeat = try await fixture.messages(1)[0]
+        fields["setup_pending"] = .bool(true)
+        try fixture.reply(id: XCTUnwrap(heartbeat["id"]), result: .object(fields))
+        try await wait { session.snapshot.health?.setupPending == true }
+        XCTAssertEqual(session.snapshot.state, .ready)
+        XCTAssertEqual(session.snapshot.generation, generation)
+        XCTAssertEqual(observed.first?.state, .connecting)
+        XCTAssertTrue(observed.contains(where: { $0.health?.setupPending == false }))
+        XCTAssertTrue(observed.contains(where: { $0.health?.setupPending == true }))
+        session.stop()
+        XCTAssertEqual(observed.last?.state, .stopped)
+    }
+
     func testRealLoopbackSession() async throws {
         let fixture = try await APIHTTPFixture(managedSession: true)
         defer { fixture.stop() }
