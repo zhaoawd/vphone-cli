@@ -18,8 +18,12 @@
         "T04"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "already_equivalent",
+      "reason": "完整单文件提交与固定目标复核：本地空间不足时回收 LC_SOURCE_VERSION、重算 command area、先检查后写入；已有定向签名/边界证据。",
+      "evidence": [
+        "evidence/T02-T04-source-version.diff",
+        "evidence/T04-T05-green.log"
+      ]
     },
     {
       "sha": "915177898354d86a63d67b1a3abeedfa4ed92165",
@@ -84,8 +88,12 @@
         "T04"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "intentionally_not_adopted",
+      "reason": "完整单文件提交复核：保留已记录的用户 LC_UUID 决定。本地 UUID 保留，回收 SOURCE_VERSION 后仍不足则拒绝；该差异与目标文件逻辑 diff 一致，guest 无 UUID launchd 行为未验证。",
+      "evidence": [
+        "evidence/T02-T04-uuid-reclaim.diff",
+        "evidence/T04-T05-green.log"
+      ]
     },
     {
       "sha": "374a2c5687faaa1fcf53aadebb288f7b56f2f925",

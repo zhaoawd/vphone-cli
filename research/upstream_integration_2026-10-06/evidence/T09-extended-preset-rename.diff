@@ -1,0 +1,59 @@
+commit b323fc4ec761d995a9af881be10041edbcde978f
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Wed Sep 30 15:49:41 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Wed Sep 30 15:55:39 2026 +0900
+
+    Call it custom firmware, not jb, everywhere the project owns the name
+    
+    Every Jailbreak* type, file and directory in the firmware patcher is now
+    CustomFirmware*: Kernel/JailbreakPatches -> Kernel/CustomFirmwarePatches,
+    KernelJailbreakPatch* -> KernelCustomFirmwarePatch*, IBootJailbreakPatcher,
+    KernelJailbreakPatcher(Base), FirmwareKernelJailbreakPatchSet. The kernel
+    patch set is com.vphone.patchset.kernel.cfw and provides
+    vphone.kernel.cfw; the patcher's gate component is kernelcache_cfw; the
+    `fw patch-component` verb is kernel-cfw; log lines print [CFW].
+    
+    The `extended` preset is now `experimental`, which is what it has always
+    been: every patch the bundle declares, including ones a freshly restored
+    guest may not survive. Launchpad's machine inspector stops showing the raw
+    restore variant and names the firmware instead — Standard Custom Firmware,
+    Experimental Custom Firmware, or Unknown Firmware for anything else.
+    
+    Left alone deliberately: /var/jb and .jbroot-<hex> are rootless and
+    roothide's naming, not ours; vphoned's `jailbreak` API object and the
+    device-info panel that renders it describe that same environment; and
+    FirmwarePipeline.Variant.jb keeps its spelling because its raw value is
+    recorded in every existing VM's RestoreInfo, which is why the inspector
+    maps it rather than rewriting it.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/extended.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist
+similarity index 95%
+rename from VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/extended.plist
+rename to VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist
+index 231e6ed4..0f010786 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/extended.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist
+@@ -19,9 +19,9 @@
+ <plist version="1.0">
+ <dict>
+ 	<key>Identifier</key>
+-	<string>extended</string>
++	<string>experimental</string>
+ 	<key>Title</key>
+-	<string>Extended</string>
++	<string>Experimental</string>
+ 	<key>Summary</key>
+ 	<string>Every patch this bundle declares, including the Frida Stalker relaxations, the iPhone17,3 identity rewrites, and the hv_vmm_present concealment that a freshly restored 26.4 guest does not survive.</string>
+ 	<key>PatchSets</key>
+@@ -42,7 +42,7 @@
+ 			<key>Kind</key>
+ 			<string>Bundled</string>
+ 			<key>Identifier</key>
+-			<string>com.vphone.patchset.kernel.jailbreak</string>
++			<string>com.vphone.patchset.kernel.cfw</string>
+ 		</dict>
+ 		<dict>
+ 			<key>Kind</key>

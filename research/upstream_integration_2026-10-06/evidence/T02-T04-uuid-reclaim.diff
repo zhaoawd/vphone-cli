@@ -1,0 +1,30 @@
+commit cd45b8fab2c1fb6f542953335fdd3889492bdb91
+Author:     sizucen <sizucendev@gmail.com>
+AuthorDate: Sun Sep 27 03:07:37 2026 +0300
+Commit:     Lakr <25259084+Lakr233@users.noreply.github.com>
+CommitDate: Sun Sep 27 18:48:44 2026 +0900
+
+    Fix iOS 26.3 launchd signature space
+
+diff --git a/VPhoneExecutable/VPhoneCommand/VPhoneSign/MachO/VPhoneMachOImage.swift b/VPhoneExecutable/VPhoneCommand/VPhoneSign/MachO/VPhoneMachOImage.swift
+index 0e65c0e6..86843bf1 100644
+--- a/VPhoneExecutable/VPhoneCommand/VPhoneSign/MachO/VPhoneMachOImage.swift
++++ b/VPhoneExecutable/VPhoneCommand/VPhoneSign/MachO/VPhoneMachOImage.swift
+@@ -351,6 +351,17 @@ struct VPhoneMachOImage {
+             carried.removeAll { $0.command == UInt32(LC_SOURCE_VERSION) }
+             rebuilt = carried.reduce(0) { $0 + $1.size } + commandSize
+         }
++        // iOS 26.3 launchd has no LC_SOURCE_VERSION and can still run out of
++        // command space after the CFW dylib injection. LC_UUID is not required
++        // for loading, so drop it only as a last resort to make room for the
++        // replacement LC_CODE_SIGNATURE.
++        if UInt64(Self.headerSize + max(rebuilt, commandsSize)) > firstContent,
++           carried.contains(where: { $0.command == UInt32(LC_UUID) })
++        {
++            carried.removeAll { $0.command == UInt32(LC_UUID) }
++            rebuilt = carried.reduce(0) { $0 + $1.size } + commandSize
++        }
++
+         guard UInt64(Self.headerSize + max(rebuilt, commandsSize)) <= firstContent,
+               firstContent <= UInt64(codeEnd)
+         else {

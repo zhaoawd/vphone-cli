@@ -204,6 +204,24 @@
         "采样未取得文件，不建立新的堆栈证据",
         "旧元数据导入及完整 C1/C2 接受条件未满足"
       ]
+    },
+    {
+      "tasks": [
+        "T02",
+        "T09",
+        "T11",
+        "T14"
+      ],
+      "scope": "selection and preset persistence semantics; no firmware byte equivalence",
+      "evidence": "evidence/T09-selection-source-review.json",
+      "commit": "698314e202718af8c08c0411342650b7fb561c7e",
+      "result": "读取固定目标 selection/store 源码，记录 Set 去重、选择默认回退和空 receipt 回退；本地迁移仅为只读预览，C2/C7 写入授权不继承这些回退。",
+      "limitations": [
+        "selection-file preview/backup/atomic commit",
+        "C2 storage binding and corruption/schema handling",
+        "141 target declaration applicability and implementation review",
+        "T24 command-entry constraints"
+      ]
     }
   ]
 }

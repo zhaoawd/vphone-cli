@@ -1,0 +1,1009 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/38] Write swift-version--58304C5D6DBC2206.txt
+[3/34] Compiling deviceinterfaced.c
+[4/34] Compiling normal.c
+[5/34] Compiling download.c
+[6/34] Compiling asr.c
+[7/34] Compiling fdr.c
+[8/34] Compiling recovery.c
+[9/34] Compiling ipsw.c
+[10/34] Compiling limera1n.c
+[11/34] Compiling dfu.c
+[12/34] Compiling img3.c
+[13/34] Compiling ace3.c
+[14/34] Compiling mbn.c
+[15/34] Compiling img4.c
+[16/34] Compiling ftab.c
+[17/34] Compiling fls.c
+[18/34] Compiling locking.c
+[19/34] Compiling restore.c
+[20/34] Compiling log.c
+[21/34] Compiling vphone_zip_stub.c
+[22/34] Compiling common.c
+[23/34] Compiling vphone_restore_bridge.c
+[24/34] Compiling idevicerestore.c
+[25/34] Compiling MobileRecoveryCore libirecovery.c
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/36] Emitting module VPhoneCLITests
+[30/36] Write Objects.LinkFileList
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm
+[31/36] Linking vphone-vm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm
+[32/36] Linking vphone-cli
+[33/36] Applying vphone-vm
+[34/36] Applying vphone-cli
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice-1QK1DF28QOVSF.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libimobiledevice_glue-3DRVKRL9FM4U0.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libplist-LOOMTKWSOYWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/libusbmuxd-1UFKZ0L6SMILZ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Q7QMDYMSDSVJ/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libarchive-3QS9I46B5XK6K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3H3NLVJP02GPY/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/1RP58ENRQJC7U/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachOKitC-JEIC32H1OIY8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3Z1HUAB0S1UA/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/11QL9BILNBA48/libssl-35ZJ0ML39KS0S.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3OEAFRIGRBYR0/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/ModuleCache/3OEAFRIGRBYR0/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[35/36] Linking vphone-cliPackageTests
+Build complete! (9.17s)
+Test Suite 'Selected tests' started at 2026-10-07 09:45:19.181.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-07 09:45:19.183.
+Test Suite 'FirmwareTransactionAcceptanceTests' started at 2026-10-07 09:45:19.183.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testLargeImageDigestUsesBoundedMemory]' started.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testLargeImageDigestUsesBoundedMemory]' passed (0.133 seconds).
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareTransactionAcceptanceTests.swift:26: -[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts] : Test skipped - Set an isolated C4 firmware fixture directory
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionAcceptanceTests testProductionArtifacts]' skipped (0.001 seconds).
+Test Suite 'FirmwareTransactionAcceptanceTests' passed at 2026-10-07 09:45:19.316.
+	 Executed 2 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.133 (0.134) seconds
+Test Suite 'FirmwareTransactionCrashTests' started at 2026-10-07 09:45:19.316.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FirmwareTransactionAcceptanceTests.swift:71: -[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess] : Test skipped - Only invoked by the crash recovery test
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testChildProcess]' skipped (0.000 seconds).
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testRecoveryAfterProcessExitsWithoutUnwinding]' started.
+Test Case '-[FirmwarePatcherTests.FirmwareTransactionCrashTests testRecoveryAfterProcessExitsWithoutUnwinding]' passed (0.147 seconds).
+Test Suite 'FirmwareTransactionCrashTests' passed at 2026-10-07 09:45:19.464.
+	 Executed 2 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.147 (0.147) seconds
+Test Suite 'FullPipelineParityTests' started at 2026-10-07 09:45:19.464.
+Test Case '-[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch]' started.
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwarePatcherTests/FullPipelineParityTests.swift:10: -[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch] : Test skipped - Set VPHONE_TEST_PIPELINE_VM to a fresh staged firmware VM directory
+Test Case '-[FirmwarePatcherTests.FullPipelineParityTests testNonLessLegacyAndStructuredPayloadsMatch]' skipped (0.000 seconds).
+Test Suite 'FullPipelineParityTests' passed at 2026-10-07 09:45:19.464.
+	 Executed 1 test, with 1 test skipped and 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-07 09:45:19.464.
+	 Executed 5 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.281 (0.282) seconds
+Test Suite 'Selected tests' passed at 2026-10-07 09:45:19.464.
+	 Executed 5 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.281 (0.284) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwarePipelineTests started.
+◇ Suite FirmwareVersionInputsTests started.
+◇ Suite ArtifactStructuredTests started.
+◇ Suite PlanSelectionValidationTests started.
+➜ Suite LessFilesystemAcceptanceTests skipped.
+◇ Suite C1AlignmentTests started.
+◇ Suite FirmwareTransactionTests started.
+◇ Suite GuestPayloadInstallTests started.
+◇ Suite ExpStructuredTests started.
+◇ Suite FrozenStepExecutionTests started.
+◇ Suite ARM64InstTests started.
+◇ Suite KernelJBParityTests started.
+◇ Suite FpfsScopedOpenCaveTests started.
+◇ Suite FWPlanDuplicateSelectionTests started.
+➜ Suite KernelGateDiagnosisTests skipped.
+◇ Suite FridaGatingTests started.
+➜ Suite KernelPipelineParityTests skipped.
+◇ Suite FrozenPipelinePlanTests started.
+◇ Suite DeclarationGateTests started.
+➜ Suite ExpStructuredParityTests skipped.
+◇ Suite FirmwarePipelineDataFlowTests started.
+➜ Suite KernelStructuredParityTests skipped.
+➜ Suite DeviceTreeStructuredParityTests skipped.
+◇ Suite KernelJBStructuredTests started.
+➜ Suite LessPipelineAcceptanceTests skipped.
+◇ Suite StructuredPatchResultTests started.
+◇ Suite BinaryBufferTests started.
+◇ Suite CatalogReferenceValidationTests started.
+◇ Suite KernelStructuredTests started.
+◇ Suite ARM64ConstantTests started.
+◇ Suite PatchSelectionMigrationTests started.
+◇ Suite VariantPlanTests started.
+◇ Suite KernelGateStructuredMergeTests started.
+◇ Suite IBootPatcherIdempotencyTests started.
+◇ Suite VersionKnowledgePlanTests started.
+◇ Suite FrozenDeclarationGateTests started.
+◇ Suite ExplicitSelectionExecutionTests started.
+◇ Suite PatchExperimentRecordTests started.
+◇ Suite ARM64EncoderTests started.
+➜ Suite LessOutputParityTests skipped.
+◇ Test corruptManifestIsRejected(_:) started.
+◇ Test findFileSupportsGlobPatterns() started.
+◇ Test unrecognizedProductVersionIsRejected(_:) started.
+◇ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() started.
+◇ Test presentManifestCannotDisappearAfterFreezing() started.
+◇ Suite MigratedPatcherParityTests started.
+◇ Test previouslyMissingManifestCannotAppearAfterFreezing() started.
+◇ Test manifestDirectoryIsRejected() started.
+◇ Test completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test productVersionHasToBeAString() started.
+◇ Test versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test canBlockARequiredDeclarationOutsideTheVariant() started.
+◇ Test versionAndDigestComeFromTheSameManifestBytes() started.
+◇ Test manifestSymlinkIsRejected() started.
+◇ Test refusesBlockingAnApplicableRequiredDeclaration() started.
+◇ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() started.
+◇ Test canBlockAnIndependentOptionalStep() started.
+◇ Test refusesContradictoryExplicitChoices() started.
+◇ Test refusesBlockingOnlyPartOfAnIndivisibleStep() started.
+◇ Test unreadableManifestIsNotClassifiedAsMissing() started.
+➜ Test completeFilesystemAndManifest() skipped.
+◇ Test iBootJBStepsSubsetOfManifestMethods() started.
+◇ Test refusesVariantAndGateMismatch() started.
+◇ Test txmRegularStepsEqualManifestMethods() started.
+◇ Test iBECStepsEqualManifestMethods() started.
+◇ Test avpBooterStepsEqualManifestMethods() started.
+◇ Test deviceTreeRebuildMatchesLegacyAndReportsIdempotence() started.
+◇ Test allManifestGatesMatchDeclaredRules() started.
+◇ Test corruptJournalCannotTriggerAReplacement() started.
+◇ Test canBlockAllOptionalDeclarationsSharingOneStep() started.
+◇ Test iBootBaseIBSSStepsSubsetOfManifestMethods() started.
+◇ Test lessManifestChecksRetypedIM4PDigest() started.
+◇ Test stagedWritesDoNotAlterOriginalAndCommitPublishesAllFiles() started.
+◇ Test recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test llbStepsEqualManifestMethods() started.
+◇ Test recoveryValidatesAllEntriesBeforeRestoringAny() started.
+◇ Test artifactStepsMatchManifest() started.
+◇ Test deviceTreeAblationOmitsThePropertyDuringRebuild() started.
+◇ Test lessDryRunRejectsFilesystemSideEffectsBeforeOpeningInputs() started.
+◇ Test deviceTreeMissingPropertyDoesNotHideBehindSuccessfulProperties() started.
+◇ Test manifestHashStepRebuildsTheSameBytesAndReportsMissingInput() started.
+◇ Test externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() started.
+◇ Test nativeToolOutputIsDrainedAndClosed() started.
+◇ Test existingTransactionAndActiveToolBlockNewWorkAndRecovery() started.
+◇ Test killedInitializationWithoutJournalCanBeArchived() started.
+◇ Test diskFullWhileCopyingOrPreparingCommitKeepsOriginal() started.
+◇ Test filesystemFailureAndAblationProduceNoArtifacts() started.
+◇ Test bareAPFSImageResolvesItsPhysicalStore() started.
+◇ Test failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() started.
+◇ Test attachedImageFailurePreventsPublication() started.
+◇ Test excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test lessManifestChecksEveryReferencedArtifact() started.
+◇ Test symlinkInputAndOutputAreRejected() started.
+◇ Test excludedStepDoesNotRunOrModifyBytes() started.
+◇ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+◇ Test expRequiresBothOidAndCallersAndAcceptsVerifiedIdempotence() started.
+◇ Test txmDevStepsEqualManifestMethods() started.
+◇ Test lessInstallCopiesItsOwnPresignedPayload() started.
+◇ Test selectedStepStillRunsAndWrites() started.
+◇ Test ldrImm64() started.
+◇ Test committedRecoveryDoesNotRollBackSuccessfulPublication() started.
+◇ Test repeatedRecoverySurvivesInterruptionDuringRollback() started.
+➜ Test realKernelGateMatrix() skipped.
+◇ Test fieldAccessors() started.
+◇ Test lsrImm7W() started.
+◇ Test compareAndBranch() started.
+◇ Test andRegW() started.
+◇ Test planRejectsDuplicateIDsBeforeSetConversion(option:) started.
+➜ Test requiredDevExcGuardCompletes() skipped.
+◇ Test movzW() started.
+◇ Test readOnlyMigrationPreviewAcceptsLegacySelection() started.
+◇ Test adrp() started.
+➜ Test requiredJBVmMapProtectCompletes() skipped.
+◇ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() started.
+➜ Test baseJBAndEXPComposeWithoutChangingBytes() skipped.
+◇ Test cloudOSVersionGate() started.
+◇ Test branchPredicates() started.
+◇ Test conflictBetweenEnabled() started.
+◇ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+➜ Test expKernelRecordsAndPayloadMatch() skipped.
+◇ Test gateRejectsDuplicateRecordIndicesWithinAResult() started.
+◇ Test gatePassesForACleanReport() started.
+◇ Test caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() started.
+◇ Test requiredMissingWhenPipelineLacksStep() started.
+◇ Test subImm32() started.
+◇ Test transactionJournalContainsTheResolvedPlan() started.
+◇ Test cyclicOrder() started.
+◇ Test cmpReg64() started.
+◇ Test gateRejectsRecordsWithoutAnOwningResult() started.
+◇ Test gateChecksOwnershipForDeclaredFailedSteps() started.
+◇ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test missingDependencyWhenTargetNotEnabled() started.
+➜ Test baseKernelRecordsAndPayloadMatch(configuration:) skipped.
+◇ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() started.
+➜ Test jbKernelRecordsAndPayloadMatch(ios27:) skipped.
+◇ Test versionIndeterminateWhenBaseUnknown() started.
+◇ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() started.
+◇ Test chainedPatchersReceivePreviousPatchedBytes() started.
+◇ Test missingDependencyStructural() started.
+◇ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() started.
+◇ Test gateRejectsInvalidRecordIndices(index:) started.
+◇ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() started.
+◇ Test notImplementedSelected() started.
+◇ Test gateRejectsAnUndeclaredRecord() started.
+◇ Test gateRejectsANotEnabledRecord() started.
+◇ Test gateRejectsMultipleOwnersForARecord() started.
+◇ Test iomfbAmbiguityReportsCountAndWritesNothing() started.
+◇ Test gateIgnoresNotApplicableAndAblatedResults() started.
+◇ Test ablationPrecedesSetupAndLaterStepPreparesOnce() started.
+➜ Test fridaKernelRecordsAndPayloadMatch(ios27:) skipped.
+◇ Test duplicateDeclaration() started.
+◇ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test liveStepUndeclaredWhenCatalogIncomplete() started.
+➜ Test originalDeviceTreeParity(exp:) skipped.
+◇ Test diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test postValidationRecognizesIdempotenceWithoutEmitting() started.
+➜ Test completeProductionPipeline() skipped.
+◇ Test sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test unknownDeclarationSelected() started.
+◇ Test componentAblationIncludesBothKernelPatchers() started.
+◇ Test declarationsMatchOrchestratorAndManifest() started.
+◇ Test conditionalRuleControlsNotApplicableVsFailed() started.
+◇ Test ambiguousFailsEvenWhenOptional() started.
+◇ Test readUnalignedValues() started.
+◇ Test missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test knownConflictAndOrderTargetsMayBeInactive() started.
+◇ Test readWriteU32() started.
+◇ Test legacyPatcherCoverageAndSemantics() started.
+◇ Test findAll() started.
+◇ Test requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test optionalMissingBecomesNotApplicableNotFailed() started.
+◇ Test baseMethodsMatchCompatibilityManifest() started.
+◇ Test disabledConditionalAndAblationNeverWriteDuringDiscovery() started.
+◇ Test unknownAblationIdThrows() started.
+◇ Test ablatingRequiredStepDoesNotFailComponent() started.
+◇ Test requiredMissingFailsComponent() started.
+◇ Test idempotentBecomesAlreadyApplied() started.
+◇ Test completedUnchangedRecordsAreIdempotent() started.
+◇ Test findString() started.
+◇ Test baseKernelMissingMethodsFailIndividually() started.
+◇ Test knownAblationTargetsCoverMigratedPatchers() started.
+◇ Test patchGroupMissingOneRecordFails() started.
+◇ Test partialSuccessKeepsAppliedResults() started.
+◇ Test refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test retaa() started.
+◇ Test jbMethodsMatchManifestAndMissingActiveMethodsFail() started.
+◇ Test cmpX0X0() started.
+◇ Test movW0_0xA1() started.
+◇ Test movW0_0() started.
+◇ Test pacibsp() started.
+◇ Test movW0_1() started.
+◇ Test patchRunReportRoundTripsThroughJSON() started.
+◇ Test migrationDoesNotEnableNewDefaults() started.
+◇ Test partialGroupFailsEvenWithAnExistingSuccessfulRecord() started.
+◇ Test movX0_1() started.
+◇ Test bundledExtendedPresetMigratesWithoutRewritingModes() started.
+◇ Test ret() started.
+◇ Test movX0X20() started.
+◇ Test newDeclarationDoesNotGainLocalExecutionCoverage() started.
+◇ Test movX0_0() started.
+◇ Test unknownIDsAreRejected(id:) started.
+◇ Test oldAndCanonicalAliasesCannotCollapseSilently(enabled:) started.
+◇ Test strbW0X20_30() started.
+◇ Test retab() started.
+◇ Test intermediateParavirtDisableSurvivesDefaultChange() started.
+◇ Test localLessIDsRemainLocal() started.
+◇ Test oldDottedIDsPreserveExplicitEnableAndDisable() started.
+◇ Test lessIsResolvedIndependently() started.
+◇ Test canonicalMigrationIsIdempotent() started.
+◇ Test duplicateInputIsRejected(enabled:) started.
+◇ Test catalogStructureValidates() started.
+◇ Test nop() started.
+◇ Test excGuardManifestRuleMatchesSteps() started.
+◇ Test defaultVariantIsRegular() started.
+◇ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() started.
+◇ Test modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test cmpW0W0() started.
+◇ Test expOnlyStepsAreAbsentFromOtherVariants() started.
+◇ Test serialLabelsSkipWhenLabelAlreadyPresent() started.
+◇ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() started.
+◇ Test serialLabelsDoNotSkipForUnrelatedSingleLabel() started.
+◇ Test excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test fridaStepsNeedOptInOnJBAndExp() started.
+◇ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() started.
+◇ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() started.
+◇ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() started.
+◇ Test notImplementedIsAlwaysListedAndNeverSelectable() started.
+◇ Test case passing 1 argument value → "" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "unknown" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument data → 13 bytes to corruptManifestIsRejected(_:) started.
+◇ Test serialLabelsPatchTwoBannerRunsWhenLabelAbsent() started.
+◇ Test case passing 1 argument data → 23 bytes to corruptManifestIsRejected(_:) started.
+◇ Test conflictingIntentAcrossAliasesIsRejected() started.
+◇ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument value → "27.foo" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "26..4" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to unrecognizedProductVersionIsRejected(_:) started.
+◇ Test case passing 1 argument version → "26.4" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "26.4.1" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "27" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "26.3" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument version → "25.9" to completeNumericVersionFloorIsPreserved(_:) started.
+◇ Test case passing 1 argument value → "garbage.26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26..4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4.beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "+26.4" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test case passing 1 argument value → "26.4-beta" to versionFloorDoesNotDropMalformedComponents(_:) started.
+◇ Test acceptsMatchingResolvedPlan() started.
+◇ Test rejectsReportIdentityChanges(_:) started.
+◇ Test rejectsAWritingStepBlockedInTheFrozenPlan() started.
+◇ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() started.
+◇ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() started.
+◇ Test supportedExplicitSelectionRetainsExecutableStep() started.
+◇ Test explicitSelectionCannotOverrideVersionCondition() started.
+◇ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() started.
+◇ Test explicitSelectionCannotEnableFridaWithoutOptIn() started.
+◇ Test explicitSelectionRequiresALiveExecutableStep() started.
+◇ Test explicitSelectionCannotCrossVariantBoundary() started.
+◇ Test case passing 1 argument point → 0 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 1 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 2 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 3 to recoveryHandlesEveryRenameWindow(_:) started.
+◇ Test case passing 1 argument point → 4 to recoveryHandlesEveryRenameWindow(_:) started.
+Merging Filesystems
+◇ Test case passing 2 arguments variant → "regular", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "regular", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "dev", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "dev", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "jb", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 1 argument failRead → true to pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+◇ Test case passing 1 argument failRead → false to pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) started.
+◇ Test case passing 2 arguments variant → "jb", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "exp", ios18 → false to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 2 arguments variant → "exp", ios18 → true to excGuardPipelineTruthTable(variant:ios18:) started.
+◇ Test case passing 1 argument option → "--select" to planRejectsDuplicateIDsBeforeSetConversion(option:) started.
+◇ Test case passing 1 argument option → "--block" to planRejectsDuplicateIDsBeforeSetConversion(option:) started.
+◇ Test encodeBOutOfRange() started.
+◇ Test encodeMrsTpidrEl1() started.
+◇ Test typedOperandHelpersExposeRegisterAndImmediate() started.
+◇ Test encodeAddImm12() started.
+◇ Test encodeMovkX() started.
+◇ Test encodeLdrImmediateX() started.
+◇ Test encodeCmpImmediateW() started.
+➜ Test actualManifestAndBootOutputsMatchLegacy() skipped.
+◇ Test case passing 1 argument variant → .dev to knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+◇ Test case passing 1 argument variant → .regular to knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) started.
+{
+  "bundledPreset" : "experimental",
+  "selection" : {
+    "blocked" : [
+      "kernel-cfw-paravirt_user_clients"
+    ],
+    "mappingRevision" : "vphone.patch-id-migration/1",
+    "notDeclaredLocally" : [
+      "kernel-cfw-paravirt_user_clients"
+    ],
+    "renames" : [
+      {
+        "enabled" : true,
+        "from" : "ibss.serial_label",
+        "to" : "ibss-cfw-serial_label"
+      },
+      {
+        "enabled" : false,
+        "from" : "kernel-exp-paravirt_user_clients",
+        "to" : "kernel-cfw-paravirt_user_clients"
+      }
+    ],
+    "selected" : [
+      "ibss-cfw-serial_label"
+    ],
+    "upstreamTarget" : "2d21d21fbdd4f51f013616273ceda9b35a3e0789"
+  },
+  "variant" : "jb"
+}
+◇ Test decodeBranchTarget() started.
+◇ Test uncommittedTransactionIsNotSuccessfulOutput() started.
+◇ Test encodeCmpRegisterX() started.
+◇ Test recordInsideFirmwareInputIsRejectedBeforePatching() started.
+◇ Test encodeADRP() started.
+◇ Test cancellationAfterPartialSuccessKeepsOriginalError() started.
+◇ Test encodeMovXFromZR() started.
+◇ Test changedConditionIsNamed(_:) started.
+◇ Test finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test corruptAndUnknownRecordsAreRejected() started.
+◇ Test encodeMovXIsRegisterMove() started.
+◇ Test case passing 1 argument unattributed → false to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test case passing 1 argument unattributed → true to rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) started.
+◇ Test sourceStateListsChangedAddedAndDeletedFiles() started.
+◇ Test encodeBBackward() started.
+◇ Test encodeBForward() started.
+◇ Test summaryIsRenderedFromTheRecord() started.
+◇ Test encodeTestBitBranchRoundTrips() started.
+◇ Test requiredFailureAfterPartialSuccessKeepsCompletedParts() started.
+◇ Test identicalRunsInDifferentDirectoriesCompareSame() started.
+◇ Test initialWriteFailureStopsBeforePatching() started.
+◇ Test encodeBLForward() started.
+◇ Test encodeMovzWClearsTSSFCheckEntitlement() started.
+◇ Test finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → -1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument index → 1 to gateRejectsInvalidRecordIndices(index:) started.
+◇ Test case passing 1 argument outcome → .ablated to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test encodeBCondEqForward() started.
+◇ Test case passing 1 argument outcome → .notApplicable to gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) started.
+◇ Test case passing 1 argument connectPresent → false to diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test case passing 1 argument connectPresent → true to diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) started.
+◇ Test case passing 1 argument malformed → false to sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test case passing 1 argument malformed → true to sandboxPartialFailurePreservesSuccessfulWrites(malformed:) started.
+◇ Test case passing 2 arguments ios27 → false, frida → false to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → false, frida → true to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → true, frida → false to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 2 arguments ios27 → true, frida → true to missingAnchorsRespectGates(ios27:frida:) started.
+◇ Test case passing 1 argument candidates → 1 to requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test case passing 1 argument candidates → 2 to requiredVmProtectDoesNotHideAmbiguity(candidates:) started.
+◇ Test case passing 1 argument relation → "requires" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "conflicts" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument relation → "after" to refusesAReferenceToAnUnknownDeclaration(relation:) started.
+◇ Test case passing 1 argument id → "unknown-patch" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument id → "" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument enabled → true to oldAndCanonicalAliasesCannotCollapseSilently(enabled:) started.
+◇ Test case passing 1 argument id → " ibss.serial_label" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument enabled → false to oldAndCanonicalAliasesCannotCollapseSilently(enabled:) started.
+◇ Test case passing 1 argument id → "IBSS.serial_label" to unknownIDsAreRejected(id:) started.
+◇ Test case passing 1 argument enabled → true to duplicateInputIsRejected(enabled:) started.
+◇ Test case passing 1 argument enabled → false to duplicateInputIsRejected(enabled:) started.
+◇ Test case passing 1 argument id → "regular" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "exp" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "custom" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 1 argument id → "" to modeAndCustomPresetAreNotBundledPresetAliases(id:) started.
+◇ Test case passing 2 arguments variant → .regular, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .regular, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .dev, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .dev, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .jb, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .jb, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .exp, force → false to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 2 arguments variant → .exp, force → true to excGuardMissingAnchorUsesExecutionGate(variant:force:) started.
+◇ Test case passing 1 argument block → false to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+◇ Test case passing 1 argument block → true to unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) started.
+✔ Test corruptManifestIsRejected(_:) with 2 test cases passed after 0.164 seconds.
+✔ Test unrecognizedProductVersionIsRejected(_:) with 6 test cases passed after 0.164 seconds.
+✔ Test findFileSupportsGlobPatterns() passed after 0.164 seconds.
+◇ Test avpBooterFindAllEqualsStepPath_syntheticNoMatch() started.
+◇ Test dryAblationRunDoesNotSave() started.
+◇ Test iBSSBaseFindAllEqualsStepPath_realData() started.
+◇ Test avpBooterFindAllEqualsStepPath_realData() started.
+◇ Test llbFindAllEqualsStepPath_realData() started.
+◇ Test iBootJBFindAllEqualsStepPath_realData() started.
+◇ Test txmFindAllEqualsStepPath_realData() started.
+◇ Test iBECFindAllEqualsStepPath_realData() started.
+◇ Test kernelFindAllEqualsStepPath_syntheticNoMatch() started.
+◇ Test txmDevFindAllEqualsStepPath_realData() started.
+◇ Test kernelFindAllEqualsStepPath_realData() started.
+✔ Test completeNumericVersionFloorIsPreserved(_:) with 5 test cases passed after 0.164 seconds.
+✔ Test versionFloorDoesNotDropMalformedComponents(_:) with 5 test cases passed after 0.165 seconds.
+✔ Test previouslyMissingManifestCannotAppearAfterFreezing() passed after 0.165 seconds.
+✔ Test productVersionHasToBeAString() passed after 0.165 seconds.
+✔ Test manifestDirectoryIsRejected() passed after 0.165 seconds.
+✔ Test presentManifestCannotDisappearAfterFreezing() passed after 0.165 seconds.
+✔ Test changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() passed after 0.165 seconds.
+✔ Test versionAndDigestComeFromTheSameManifestBytes() passed after 0.165 seconds.
+◇ Test case passing 1 argument mismatch → .variant to rejectsReportIdentityChanges(_:) started.
+✔ Test manifestSymlinkIsRejected() passed after 0.165 seconds.
+◇ Test case passing 1 argument mismatch → .reportGates to rejectsReportIdentityChanges(_:) started.
+◇ Test case passing 1 argument mismatch → .resultGates to rejectsReportIdentityChanges(_:) started.
+✔ Test refusesContradictoryExplicitChoices() passed after 0.171 seconds.
+✔ Test unreadableManifestIsNotClassifiedAsMissing() passed after 0.171 seconds.
+✔ Test refusesBlockingAnApplicableRequiredDeclaration() passed after 0.172 seconds.
+✔ Test txmRegularStepsEqualManifestMethods() passed after 0.172 seconds.
+✔ Test iBECStepsEqualManifestMethods() passed after 0.172 seconds.
+✔ Test canBlockARequiredDeclarationOutsideTheVariant() passed after 0.173 seconds.
+✔ Test canBlockARequiredDeclarationWhoseVersionRuleIsFalse() passed after 0.173 seconds.
+✔ Test deviceTreeRebuildMatchesLegacyAndReportsIdempotence() passed after 0.172 seconds.
+✔ Test refusesVariantAndGateMismatch() passed after 0.173 seconds.
+✔ Test iBootJBStepsSubsetOfManifestMethods() passed after 0.172 seconds.
+✔ Test avpBooterStepsEqualManifestMethods() passed after 0.172 seconds.
+✔ Test canBlockAnIndependentOptionalStep() passed after 0.173 seconds.
+✔ Test refusesBlockingOnlyPartOfAnIndivisibleStep() passed after 0.173 seconds.
+✔ Test iBootBaseIBSSStepsSubsetOfManifestMethods() passed after 0.172 seconds.
+✔ Test canBlockAllOptionalDeclarationsSharingOneStep() passed after 0.173 seconds.
+✔ Test llbStepsEqualManifestMethods() passed after 0.173 seconds.
+✔ Test lessManifestChecksRetypedIM4PDigest() passed after 0.172 seconds.
+✔ Test corruptJournalCannotTriggerAReplacement() passed after 0.173 seconds.
+✔ Test allManifestGatesMatchDeclaredRules() passed after 0.173 seconds.
+✔ Test artifactStepsMatchManifest() passed after 0.172 seconds.
+✔ Test deviceTreeAblationOmitsThePropertyDuringRebuild() passed after 0.172 seconds.
+✔ Test stagedWritesDoNotAlterOriginalAndCommitPublishesAllFiles() passed after 0.173 seconds.
+✔ Test recoveryHandlesEveryRenameWindow(_:) with 5 test cases passed after 0.173 seconds.
+✔ Test deviceTreeMissingPropertyDoesNotHideBehindSuccessfulProperties() passed after 0.173 seconds.
+✔ Test lessDryRunRejectsFilesystemSideEffectsBeforeOpeningInputs() passed after 0.172 seconds.
+✔ Test killedInitializationWithoutJournalCanBeArchived() passed after 0.173 seconds.
+✔ Test manifestHashStepRebuildsTheSameBytesAndReportsMissingInput() passed after 0.173 seconds.
+✔ Test bareAPFSImageResolvesItsPhysicalStore() passed after 0.172 seconds.
+✔ Test filesystemFailureAndAblationProduceNoArtifacts() passed after 0.172 seconds.
+✔ Test recoveryValidatesAllEntriesBeforeRestoringAny() passed after 0.173 seconds.
+✔ Test lessManifestChecksEveryReferencedArtifact() passed after 0.172 seconds.
+✔ Test externalEditPreventsCommitAndRecoveryWithoutOverwritingIt() passed after 0.173 seconds.
+✔ Test existingTransactionAndActiveToolBlockNewWorkAndRecovery() passed after 0.173 seconds.
+✔ Test nativeToolOutputIsDrainedAndClosed() passed after 0.173 seconds.
+✔ Test attachedImageFailurePreventsPublication() passed after 0.173 seconds.
+✔ Test failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() passed after 0.173 seconds.
+✔ Test diskFullWhileCopyingOrPreparingCommitKeepsOriginal() passed after 0.173 seconds.
+✔ Test expRequiresBothOidAndCallersAndAcceptsVerifiedIdempotence() passed after 0.172 seconds.
+✔ Test symlinkInputAndOutputAreRejected() passed after 0.173 seconds.
+✔ Test lessInstallCopiesItsOwnPresignedPayload() passed after 0.172 seconds.
+✔ Test excGuardPipelineTruthTable(variant:ios18:) with 8 test cases passed after 0.173 seconds.
+✔ Test selectedStepStillRunsAndWrites() passed after 0.172 seconds.
+✔ Test excludedStepDoesNotRunOrModifyBytes() passed after 0.173 seconds.
+✔ Test txmDevStepsEqualManifestMethods() passed after 0.173 seconds.
+✔ Test pipelineReadAndPartialSaveFailuresRemainRecoverable(_:) with 2 test cases passed after 0.173 seconds.
+✔ Test ldrImm64() passed after 0.172 seconds.
+✔ Test fieldAccessors() passed after 0.172 seconds.
+✔ Suite KernelJBParityTests passed after 0.174 seconds.
+✔ Test lsrImm7W() passed after 0.172 seconds.
+✔ Test compareAndBranch() passed after 0.172 seconds.
+✔ Test andRegW() passed after 0.172 seconds.
+✔ Test planRejectsDuplicateIDsBeforeSetConversion(option:) with 2 test cases passed after 0.172 seconds.
+✔ Test movzW() passed after 0.172 seconds.
+✔ Test adrp() passed after 0.172 seconds.
+✔ Test cloudOSVersionGate() passed after 0.173 seconds.
+✔ Test branchPredicates() passed after 0.173 seconds.
+✔ Test committedRecoveryDoesNotRollBackSuccessfulPublication() passed after 0.173 seconds.
+✔ Test conflictBetweenEnabled() passed after 0.173 seconds.
+✔ Test gateRejectsDuplicateRecordIndicesWithinAResult() passed after 0.173 seconds.
+✔ Test readOnlyMigrationPreviewAcceptsLegacySelection() passed after 0.173 seconds.
+✔ Test gatePassesForACleanReport() passed after 0.173 seconds.
+✔ Test caveRoutesFileProviderDaemonsToRealHookAndAllowsOthers() passed after 0.173 seconds.
+✔ Test subImm32() passed after 0.173 seconds.
+✔ Test requiredMissingWhenPipelineLacksStep() passed after 0.173 seconds.
+◇ Test case passing 1 argument change → .variant to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .forceExcGuard to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .ablation to changedConditionIsNamed(_:) started.
+◇ Test case passing 1 argument change → .inputByte to changedConditionIsNamed(_:) started.
+✔ Test cyclicOrder() passed after 0.217 seconds.
+✔ Test cmpReg64() passed after 0.217 seconds.
+◇ Test case passing 1 argument index → 0 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 1 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 2 to finalWriteFailureDoesNotMaskRunError(_:) started.
+◇ Test case passing 1 argument index → 3 to finalWriteFailureDoesNotMaskRunError(_:) started.
+✔ Test gateRejectsRecordsWithoutAnOwningResult() passed after 0.306 seconds.
+✔ Test gateChecksOwnershipForDeclaredFailedSteps() passed after 0.307 seconds.
+✔ Test repeatedRecoverySurvivesInterruptionDuringRollback() passed after 0.332 seconds.
+✔ Test missingDependencyWhenTargetNotEnabled() passed after 0.340 seconds.
+✔ Test unknownRequiredVersionIsRejectedBeforeCreatingATransaction() passed after 0.379 seconds.
+✔ Test knownExcGuardActivationDoesNotResolveUnknownBootArgumentParameters(_:) with 2 test cases passed after 0.379 seconds.
+✔ Test gateAllowsAnAlreadyAppliedStepWithoutRecords() passed after 0.447 seconds.
+✔ Test missingDependencyStructural() passed after 0.447 seconds.
+✔ Test chainedPatchersReceivePreviousPatchedBytes() passed after 0.447 seconds.
+✔ Test gateAllowsMultipleRecordsOwnedByOneDeclaredStep() passed after 0.458 seconds.
+◇ Test case passing 1 argument index → 0 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 1 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 2 to finalWriteFailureAfterSuccessIsReported(_:) started.
+◇ Test case passing 1 argument index → 3 to finalWriteFailureAfterSuccessIsReported(_:) started.
+✔ Test gateRejectsInvalidRecordIndices(index:) with 2 test cases passed after 0.516 seconds.
+✔ Test versionIndeterminateWhenBaseUnknown() passed after 0.516 seconds.
+✔ Test gateRejectsAnUndeclaredFailedStepThatEmittedRecords() passed after 0.516 seconds.
+✔ Test gateRejectsAnUndeclaredRecord() passed after 0.516 seconds.
+✔ Test gateRejectsANotEnabledRecord() passed after 0.516 seconds.
+✔ Test gateRejectsMultipleOwnersForARecord() passed after 0.516 seconds.
+✔ Test iomfbAmbiguityReportsCountAndWritesNothing() passed after 0.516 seconds.
+✔ Test gateIgnoresNotApplicableAndAblatedResults() passed after 0.516 seconds.
+✔ Test ablationPrecedesSetupAndLaterStepPreparesOnce() passed after 0.516 seconds.
+✔ Test duplicateDeclaration() passed after 0.516 seconds.
+✔ Test gateRejectsRecordsFromAnOutcomeThatCannotWrite(outcome:) with 2 test cases passed after 0.516 seconds.
+✔ Test postValidationRecognizesIdempotenceWithoutEmitting() passed after 0.516 seconds.
+✔ Test unknownCloudOSWithFridaIsRejectedBeforeCreatingATransaction() passed after 0.517 seconds.
+✔ Test sandboxPartialFailurePreservesSuccessfulWrites(malformed:) with 2 test cases passed after 0.516 seconds.
+✔ Test liveStepUndeclaredWhenCatalogIncomplete() passed after 0.516 seconds.
+✔ Test diskImagesRequiresBothABIGatesButAllowsAbsentNotificationShape(connectPresent:) with 2 test cases passed after 0.516 seconds.
+✔ Test notImplementedSelected() passed after 0.517 seconds.
+✔ Test componentAblationIncludesBothKernelPatchers() passed after 0.516 seconds.
+✔ Test unknownDeclarationSelected() passed after 0.516 seconds.
+✔ Test conditionalRuleControlsNotApplicableVsFailed() passed after 0.516 seconds.
+✔ Test readUnalignedValues() passed after 0.516 seconds.
+✔ Test ambiguousFailsEvenWhenOptional() passed after 0.516 seconds.
+✔ Test missingAnchorsRespectGates(ios27:frida:) with 4 test cases passed after 0.516 seconds.
+✔ Test readWriteU32() passed after 0.516 seconds.
+✔ Test legacyPatcherCoverageAndSemantics() passed after 0.516 seconds.
+✔ Test findAll() passed after 0.516 seconds.
+✔ Test optionalMissingBecomesNotApplicableNotFailed() passed after 0.516 seconds.
+✔ Test declarationsMatchOrchestratorAndManifest() passed after 0.517 seconds.
+✔ Test disabledConditionalAndAblationNeverWriteDuringDiscovery() passed after 0.516 seconds.
+✔ Test requiredVmProtectDoesNotHideAmbiguity(candidates:) with 2 test cases passed after 0.517 seconds.
+✔ Test ablatingRequiredStepDoesNotFailComponent() passed after 0.516 seconds.
+✔ Test requiredMissingFailsComponent() passed after 0.516 seconds.
+✔ Test idempotentBecomesAlreadyApplied() passed after 0.516 seconds.
+✔ Test completedUnchangedRecordsAreIdempotent() passed after 0.516 seconds.
+✔ Test findString() passed after 0.516 seconds.
+✔ Test baseKernelMissingMethodsFailIndividually() passed after 0.516 seconds.
+✔ Test knownAblationTargetsCoverMigratedPatchers() passed after 0.516 seconds.
+✔ Test patchGroupMissingOneRecordFails() passed after 0.517 seconds.
+✔ Test partialSuccessKeepsAppliedResults() passed after 0.517 seconds.
+✔ Test refusesAReferenceToAnUnknownDeclaration(relation:) with 3 test cases passed after 0.516 seconds.
+✔ Test retaa() passed after 0.517 seconds.
+✔ Test cmpX0X0() passed after 0.517 seconds.
+✔ Test movW0_0xA1() passed after 0.517 seconds.
+✔ Test movW0_0() passed after 0.517 seconds.
+✔ Test pacibsp() passed after 0.517 seconds.
+✔ Test movW0_1() passed after 0.517 seconds.
+✔ Test patchRunReportRoundTripsThroughJSON() passed after 0.517 seconds.
+✔ Test migrationDoesNotEnableNewDefaults() passed after 0.517 seconds.
+✔ Test partialGroupFailsEvenWithAnExistingSuccessfulRecord() passed after 0.517 seconds.
+✔ Test movX0_1() passed after 0.517 seconds.
+✔ Test bundledExtendedPresetMigratesWithoutRewritingModes() passed after 0.517 seconds.
+✔ Test ret() passed after 0.517 seconds.
+✔ Test movX0X20() passed after 0.517 seconds.
+✔ Test newDeclarationDoesNotGainLocalExecutionCoverage() passed after 0.517 seconds.
+✔ Test movX0_0() passed after 0.517 seconds.
+✔ Test unknownIDsAreRejected(id:) with 4 test cases passed after 0.517 seconds.
+✔ Test oldAndCanonicalAliasesCannotCollapseSilently(enabled:) with 2 test cases passed after 0.517 seconds.
+✔ Test strbW0X20_30() passed after 0.517 seconds.
+✔ Test retab() passed after 0.517 seconds.
+✔ Test knownConflictAndOrderTargetsMayBeInactive() passed after 0.517 seconds.
+✔ Test intermediateParavirtDisableSurvivesDefaultChange() passed after 0.517 seconds.
+✔ Test jbMethodsMatchManifestAndMissingActiveMethodsFail() passed after 0.517 seconds.
+✔ Test baseMethodsMatchCompatibilityManifest() passed after 0.517 seconds.
+✔ Test localLessIDsRemainLocal() passed after 0.517 seconds.
+✔ Test oldDottedIDsPreserveExplicitEnableAndDisable() passed after 0.517 seconds.
+✔ Test canonicalMigrationIsIdempotent() passed after 0.517 seconds.
+✔ Test duplicateInputIsRejected(enabled:) with 2 test cases passed after 0.517 seconds.
+✔ Test nop() passed after 0.517 seconds.
+✔ Test defaultVariantIsRegular() passed after 0.517 seconds.
+✔ Test catalogStructureValidates() passed after 0.517 seconds.
+✔ Test modeAndCustomPresetAreNotBundledPresetAliases(id:) with 4 test cases passed after 0.517 seconds.
+✔ Test cmpW0W0() passed after 0.517 seconds.
+✔ Test excGuardManifestRuleMatchesSteps() passed after 0.517 seconds.
+✔ Test serialLabelsSkipWhenLabelAlreadyPresent() passed after 0.517 seconds.
+✔ Test everySwiftStepIsBoundExactlyOnceOrByAlternatives() passed after 0.517 seconds.
+✔ Test serialLabelsDoNotSkipForUnrelatedSingleLabel() passed after 0.517 seconds.
+✔ Test lessIsResolvedIndependently() passed after 0.517 seconds.
+✔ Test excGuardMissingAnchorUsesExecutionGate(variant:force:) with 8 test cases passed after 0.517 seconds.
+✔ Test expOnlyStepsAreAbsentFromOtherVariants() passed after 0.517 seconds.
+✔ Test fridaStepsNeedOptInOnJBAndExp() passed after 0.517 seconds.
+✔ Test optedInFridaCannotTreatUnknownCloudOSAsBelowTheFloor() passed after 0.517 seconds.
+✔ Test unknownCloudOSDoesNotBlockAPlanWithoutFrida() passed after 0.517 seconds.
+✔ Test conflictingIntentAcrossAliasesIsRejected() passed after 0.517 seconds.
+✔ Test serialLabelsPatchTwoBannerRunsWhenLabelAbsent() passed after 0.517 seconds.
+✔ Test unknownBaseCannotDisableAnIndeterminateRequiredGuard(_:) with 2 test cases passed after 0.517 seconds.
+✔ Test notImplementedIsAlwaysListedAndNeverSelectable() passed after 0.517 seconds.
+✔ Test devGuardDoesNotNeedTheBaseToDecideItsActivation() passed after 0.521 seconds.
+✔ Test rejectsReportIdentityChanges(_:) with 3 test cases passed after 0.515 seconds.
+✔ Test acceptsMatchingResolvedPlan() passed after 0.515 seconds.
+✔ Test applicableGuestBlockIsRefusedUntilGuestExecutionIsGated() passed after 0.515 seconds.
+✔ Test guestBlockOutsideVariantDoesNotChangeSwiftPlan() passed after 0.515 seconds.
+✔ Test supportedExplicitSelectionRetainsExecutableStep() passed after 0.515 seconds.
+✔ Test explicitSelectionCannotOverrideVersionCondition() passed after 0.515 seconds.
+✔ Test rejectsAWritingStepBlockedInTheFrozenPlan() passed after 0.515 seconds.
+✔ Test guestSelectionIsRefusedUntilGuestExecutionIsGated() passed after 0.514 seconds.
+✔ Test explicitSelectionCannotEnableFridaWithoutOptIn() passed after 0.514 seconds.
+✔ Test explicitSelectionRequiresALiveExecutableStep() passed after 0.514 seconds.
+✔ Test encodeBOutOfRange() passed after 0.405 seconds.
+✔ Test encodeMrsTpidrEl1() passed after 0.405 seconds.
+✔ Test typedOperandHelpersExposeRegisterAndImmediate() passed after 0.405 seconds.
+✔ Test encodeAddImm12() passed after 0.405 seconds.
+✔ Test encodeMovkX() passed after 0.404 seconds.
+✔ Test encodeLdrImmediateX() passed after 0.404 seconds.
+✔ Test encodeCmpImmediateW() passed after 0.401 seconds.
+✔ Test decodeBranchTarget() passed after 0.396 seconds.
+✔ Test explicitSelectionCannotCrossVariantBoundary() passed after 0.513 seconds.
+✔ Test encodeCmpRegisterX() passed after 0.396 seconds.
+✔ Test encodeADRP() passed after 0.394 seconds.
+✔ Test recordInsideFirmwareInputIsRejectedBeforePatching() passed after 0.394 seconds.
+✔ Test encodeMovXFromZR() passed after 0.391 seconds.
+✔ Test unknownAblationIdThrows() passed after 0.523 seconds.
+✔ Test resolvedPlanMatchesLiveStepsForEveryVariantAndGate() passed after 0.522 seconds.
+✔ Test cancellationAfterPartialSuccessKeepsOriginalError() passed after 0.392 seconds.
+✔ Test uncommittedTransactionIsNotSuccessfulOutput() passed after 0.396 seconds.
+✔ Test finalWriteFailureDoesNotMaskRunError(_:) with 4 test cases passed after 0.392 seconds.
+✔ Test transactionJournalContainsTheResolvedPlan() passed after 0.524 seconds.
+✔ Test encodeMovXIsRegisterMove() passed after 0.392 seconds.
+✔ Test rejectionBeforeCommitLeavesOriginalBytesUnchanged(unattributed:) with 2 test cases passed after 0.524 seconds.
+✔ Test encodeBBackward() passed after 0.383 seconds.
+✔ Test encodeBForward() passed after 0.383 seconds.
+✔ Test encodeTestBitBranchRoundTrips() passed after 0.381 seconds.
+✔ Test requiredFailureAfterPartialSuccessKeepsCompletedParts() passed after 0.381 seconds.
+✔ Test corruptAndUnknownRecordsAreRejected() passed after 0.392 seconds.
+✔ Test initialWriteFailureStopsBeforePatching() passed after 0.379 seconds.
+✔ Test encodeBLForward() passed after 0.379 seconds.
+✔ Test encodeMovzWClearsTSSFCheckEntitlement() passed after 0.379 seconds.
+✔ Test summaryIsRenderedFromTheRecord() passed after 0.383 seconds.
+✔ Test encodeBCondEqForward() passed after 0.378 seconds.
+✔ Suite FirmwareVersionInputsTests passed after 0.526 seconds.
+✔ Suite FirmwarePipelineTests passed after 0.526 seconds.
+✔ Test avpBooterFindAllEqualsStepPath_syntheticNoMatch() passed after 0.361 seconds.
+✔ Test dryAblationRunDoesNotSave() passed after 0.361 seconds.
+✔ Test iBSSBaseFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test avpBooterFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test llbFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test iBootJBFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test txmFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test iBECFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test kernelFindAllEqualsStepPath_syntheticNoMatch() passed after 0.361 seconds.
+✔ Test txmDevFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Test kernelFindAllEqualsStepPath_realData() passed after 0.361 seconds.
+✔ Suite PlanSelectionValidationTests passed after 0.527 seconds.
+✔ Suite C1AlignmentTests passed after 0.527 seconds.
+✔ Suite ArtifactStructuredTests passed after 0.527 seconds.
+✔ Suite FirmwareTransactionTests passed after 0.527 seconds.
+✔ Suite ExpStructuredTests passed after 0.527 seconds.
+✔ Suite GuestPayloadInstallTests passed after 0.527 seconds.
+✔ Suite FrozenStepExecutionTests passed after 0.527 seconds.
+✔ Suite ARM64InstTests passed after 0.527 seconds.
+✔ Suite FWPlanDuplicateSelectionTests passed after 0.527 seconds.
+✔ Suite FridaGatingTests passed after 0.527 seconds.
+✔ Suite FpfsScopedOpenCaveTests passed after 0.527 seconds.
+✔ Suite FrozenPipelinePlanTests passed after 0.527 seconds.
+✔ Suite FirmwarePipelineDataFlowTests passed after 0.527 seconds.
+✔ Suite KernelJBStructuredTests passed after 0.527 seconds.
+✔ Suite StructuredPatchResultTests passed after 0.527 seconds.
+✔ Suite BinaryBufferTests passed after 0.527 seconds.
+✔ Suite KernelStructuredTests passed after 0.527 seconds.
+✔ Suite CatalogReferenceValidationTests passed after 0.527 seconds.
+✔ Suite ARM64ConstantTests passed after 0.527 seconds.
+✔ Suite PatchSelectionMigrationTests passed after 0.527 seconds.
+✔ Suite VariantPlanTests passed after 0.527 seconds.
+✔ Suite KernelGateStructuredMergeTests passed after 0.527 seconds.
+✔ Suite IBootPatcherIdempotencyTests passed after 0.527 seconds.
+✔ Suite VersionKnowledgePlanTests passed after 0.527 seconds.
+✔ Suite FrozenDeclarationGateTests passed after 0.527 seconds.
+✔ Suite ExplicitSelectionExecutionTests passed after 0.527 seconds.
+✔ Suite ARM64EncoderTests passed after 0.527 seconds.
+✔ Suite DeclarationGateTests passed after 0.528 seconds.
+✔ Suite MigratedPatcherParityTests passed after 0.527 seconds.
+✔ Test changedConditionIsNamed(_:) with 4 test cases passed after 0.398 seconds.
+✔ Test finalWriteFailureAfterSuccessIsReported(_:) with 4 test cases passed after 0.452 seconds.
+✔ Test identicalRunsInDifferentDirectoriesCompareSame() passed after 0.481 seconds.
+✔ Test sourceStateListsChangedAddedAndDeletedFiles() passed after 0.741 seconds.
+✔ Suite PatchExperimentRecordTests passed after 0.882 seconds.
+✔ Test run with 242 tests in 41 suites passed after 0.883 seconds.

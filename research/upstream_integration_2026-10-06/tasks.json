@@ -1025,7 +1025,9 @@
       },
       "implementation_commits": [],
       "verification_evidence": [
-        "T04-T05-green.log: 78 tests / 12 suites passed; includes codesign verification and command-space cases"
+        "T04-T05-green.log: 78 tests / 12 suites passed; includes codesign verification and command-space cases",
+        "evidence/T02-T04-source-version.diff",
+        "evidence/T02-T04-uuid-reclaim.diff"
       ],
       "historical_evidence": [],
       "execution_contract_adjustment": {
@@ -1033,7 +1035,7 @@
         "contract": "空间不足时只回收 LC_SOURCE_VERSION；仍不足返回 noRoom，保留 LC_UUID 与输入文件",
         "cost": "上游 cd45b8fa 的 UUID 回收能力不纳入本地；部分输入仍会明确拒绝签名"
       },
-      "acceptance_dependency_state": "T02 整体语义对账未完成；本项本地代码与定向验证已完成"
+      "acceptance_dependency_state": "T02 两个签名提交已完成完整单文件语义审查；全局 T02 仍未完成，本项保持 local_review_validated。"
     },
     {
       "id": "T05",
@@ -1266,7 +1268,7 @@
         "T02",
         "T24"
       ],
-      "status": "declaration_audit_in_progress",
+      "status": "read_only_migration_preview_validated_atomic_apply_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/PatchSets/FirmwarePatchSetCatalog.swift",
         "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
@@ -1287,24 +1289,41 @@
         "patch"
       ],
       "local_mapping": {
-        "state": "metadata_audited_semantics_pending",
+        "state": "preview_implemented_applicability_pending",
         "paths": [
           "research/t09_patch_id_mapping_2026-10-01.json",
           "research/t10_patch_declarations_2026-10-01.json",
-          "sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalogData.swift"
+          "sources/FirmwarePatcher/PatchSet/PatchDeclarationCatalogData.swift",
+          "sources/FirmwarePatcher/PatchSet/PatchSelectionMigration.swift",
+          "sources/FirmwarePatcher/PatchSet/PatchSelectionMigrationData.swift",
+          "sources/vphone-cli/VPhoneFWSelectionPreviewCLI.swift",
+          "scripts/generate_patch_id_migration.py"
         ]
       },
-      "implementation_commits": [],
+      "implementation_commits": [
+        "698314e202718af8c08c0411342650b7fb561c7e"
+      ],
       "verification_evidence": [
         "T09_declaration_delta.json",
-        "evidence/T09-paravirt-declaration-preset.diff"
+        "evidence/T09-paravirt-declaration-preset.diff",
+        "evidence/T09-id-migration-red.log",
+        "evidence/T09-id-migration-green.log",
+        "evidence/T09-preset-cli-red.log",
+        "evidence/T09-preset-cli-green.log",
+        "evidence/T09-default-swift.log",
+        "evidence/T09-related-swift.log",
+        "evidence/T09-read-only-cli.json",
+        "evidence/T09-read-only-cli-driver.py",
+        "evidence/T09-extended-preset-rename.diff",
+        "evidence/T09-selection-source-review.json"
       ],
       "historical_evidence": [],
-      "current_result": "目标 141 个声明、比 2.2.3 新增 24 个、无删除；standard/experimental 版本门前分别新增 23/24 个选中 ID。当前运行目录未改动。",
+      "current_result": "只读 selection-preview 实现 117 旧点号别名与 1 中间别名、内置 extended→experimental 改名。143 个识别 ID 包括上游 141 和本地 less 2 个；执行 catalog 仍为 119。保留显式开关和五模式，拒绝未知、重复、别名冲突及相互矛盾输入。14 项回归测试、242 项相关测试及 13 个 CLI 用例通过；标准 Swift 仍有 14 issues，原因未查明。",
       "remaining_work": [
-        "重验旧映射的实现与五模式适用性",
-        "中间 ID、旧点号 ID 和预设的迁移预览、备份、原子提交及幂等",
-        "T24 宿主入口约束审查和本地五模式语义矩阵对账"
+        "选择文件迁移预览、原文件备份、原子提交及幂等",
+        "C2 持久化身份/输入/catalog/schema/planDigest 绑定与错误区分",
+        "重验 141 目标声明的实现、五模式、版本和默认适用性",
+        "T24 宿主入口约束审查"
       ]
     },
     {

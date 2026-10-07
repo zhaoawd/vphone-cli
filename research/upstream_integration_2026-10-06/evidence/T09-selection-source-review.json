@@ -1,0 +1,54 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "implementation_commit": "698314e202718af8c08c0411342650b7fb561c7e",
+  "source_files": [
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/VPhonePatchKit/PatchSet/VPhonePatchSelection.swift",
+      "sha256": "2e67e1c328dfbef192dab24a93260b4fe44337c7dccb97c5a6a753fe0395792b"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneCommand/VPhoneCommand/Firmware/VPhonePatchPresetStore.swift",
+      "sha256": "1e1064ec602c50941385df37da728679454d22cfafbaa379e1cbfed6a051d471"
+    }
+  ],
+  "scope": "selection and preset persistence semantics; no firmware byte equivalence",
+  "findings": [
+    {
+      "source": "VPhonePatchSelection.swift",
+      "phenomenon": "Array patch IDs decode into Set; repeated IDs are not retained",
+      "local_decision": "Validate repeated IDs before Set conversion; do not import this deduplication behavior"
+    },
+    {
+      "source": "VPhonePatchPresetStore.swift",
+      "phenomenon": "Missing/unreadable selection returns standard defaults; plan and receipt try? loads return nil",
+      "local_decision": "C2 must distinguish missing, corrupt and unsupported schema; fallback does not authorize writes"
+    },
+    {
+      "source": "VPhonePatchPresetStore.swift",
+      "phenomenon": "updateReceipt substitutes an empty receipt when loadReceipt returns nil",
+      "local_decision": "C7 requires actual-byte evidence tied to VM, generation, plan and transaction; a default receipt does not prove commitment"
+    }
+  ],
+  "preserved": [
+    "five local mode names",
+    "explicit enable/disable choices",
+    "current 119-entry execution catalog",
+    "existing guest execution restrictions"
+  ],
+  "vocabulary": {
+    "old_dotted_aliases": 117,
+    "intermediate_aliases": 1,
+    "upstream_canonical_ids": 141,
+    "local_only_less_ids": 2,
+    "removed_old_ids": 0,
+    "split_or_merge_aliases": 0
+  },
+  "migration_preview_accepted": true,
+  "T09_accepted": false,
+  "remaining": [
+    "selection-file preview/backup/atomic commit",
+    "C2 storage binding and corruption/schema handling",
+    "141 target declaration applicability and implementation review",
+    "T24 command-entry constraints"
+  ]
+}

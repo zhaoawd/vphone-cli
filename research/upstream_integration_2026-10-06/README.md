@@ -178,3 +178,22 @@ Settings 启动接口返回“uiopen ok but no pid”；Safari 验收未运行�
 所有恢复副本已正常停止，映像已卸载并保留失败样本。原 vm-new 已恢复 GUI 运行，PID 69566，客户机连接正常。其配置与旧客户机载荷摘要未变；宿主进程使用隔离工作树的 8777bc7e 候选，主树 Bundle 未替换，API 0.7.16 客户机未激活。原 VM 的唯一专用临时标记在重启后已不存在。
 
 复制与测试启动保持空间保护。空间不足的两次拒绝记录保留；只清理本轮隔离工作树的可重建编译缓存、中间产物和调试符号，候选字节未变，make check_bundle 与签名检查通过。五模式只读计划已保存；真实 VM 范围仅覆盖当前 EXP 26.1 样本。详细路径、命令驱动、限制及状态见 `evidence/T03-actual-summary.json`。T02/T09 源码对账继续推进。
+
+
+### 2026-10-07 T09 只读迁移预览
+
+实现提交 `698314e2` 新增 `fw selection-preview`，输入显式 select/block 与本地 variant，可单独提供 bundled-preset。识别 117 个旧点号别名、1 个 paravirt 中间别名和 143 个规范 ID（上游 141、本地 less 2）。`extended` 仅在内置预设名称空间迁为 `experimental`；五模式保持原名。新默认值不补入显式选择，显式禁用保持禁用。未知 ID、重复 ID、同一目标的多个别名和相互矛盾选择均拒绝。`fw plan` 在转为 Set 前也拒绝重复输入。
+
+迁移输出携带固定 target 和映射 revision，并单独列出当前执行 catalog 未声明的 ID。识别 ID 不建立实际实现、适用性或启动证明；当前执行 catalog 仍为 119 个，guest Gate 和未实现声明的既有执行限制保留。该入口不读取或改写 VM，不迁移配置文件。T09 的原文件备份、原子提交、C2 持久化绑定及声明语义复验仍待执行。
+
+第一轮 11 项测试先报告 23 个失败断言，实现后通过。预设和 CLI 第二轮 14 项先报告 6 个 issues，实现后通过。全部 FirmwarePatcher 与新增 CLI 定向测试为 242 项、41 个 suite 通过，0.883 秒。真实 debug CLI 的 13 个离线用例通过：五模式、全部 117 旧 ID、空选择及六类拒绝。生成器 --check 确认源映射与 Swift 表字节一致。
+
+标准 make test_swift 退出 2：XCTest 234 项、3 跳过、0 失败；Swift Testing 1097 项、169 个 suite、14 issues、89.480 秒。失败为 HTTP 5、WebSocket 7、进程取消 1、helper XPC 1；原因未查明。后续 tar/guest 检查未运行。原始日志与具体失败名称保存在 `evidence/T09-default-swift.log`，没有将定向通过改写为全局通过。
+
+T02 已完整读取两个签名单文件提交：ee8b70ca 的 SOURCE_VERSION 回收已等价实现；cd45b8fa 的 UUID 回收按既有用户决定不采纳。固定目标 Mach-O 文件唯一逻辑差异仍是保留 UUID。全局 T02 及 T04 接受依赖尚未解除。
+
+固定目标的 PatchSelection 与 PresetStore 源码审查表明：Set 解码丢弃重复输入；损坏/缺失选择可回退标准预设；plan/receipt 的 try? 加载以及 updateReceipt 空值替代不能直接用于本地 C2/C7 写入授权。当前只读预览已采用严格输入校验，持久化和 receipt 处理另行实现。
+
+本步未重建签名 Bundle。原 vm-new 仍由 8777bc7e 候选运行；配置、旧客户机载荷与签名 VM 二进制摘要均保持 T03 记录值。T03 应用和输入验收仍未完成，T09 也未标记 accepted。
+
+复现入口：`python -B scripts/generate_patch_id_migration.py --check`；`.build/debug/vphone-cli fw selection-preview --variant jb --bundled-preset extended --select ibss.serial_label --block kernel-exp-paravirt_user_clients`。Python 使用项目 .venv。
