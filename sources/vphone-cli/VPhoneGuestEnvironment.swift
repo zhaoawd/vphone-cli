@@ -339,7 +339,10 @@ struct VPhoneGuestEnvironmentUpdater {
                 "libraries": .array(changed.map { .object(["name": .string($0), "sha256": .string(candidates[$0]!.sha256)]) }),
             ], requiring: "environment_update")
             try check(session, generation, submitted: true)
-            guard let object = environmentPlain(value) as? [String: Any] else { throw VPhoneGuestEnvironmentRefusal("api_protocol", "malformed install result") }
+            guard let object = environmentPlain(value) as? [String: Any] else {
+                throw VPhoneGuestEnvironmentRefusal("api_protocol", "malformed install result",
+                    ["outcome": "unknown", "operation_may_continue": true])
+            }
             install = object
         } catch let refusal as VPhoneGuestEnvironmentRefusal {
             throw refusal

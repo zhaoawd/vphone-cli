@@ -24,6 +24,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
     var failReplacementAt: Int?
     var rootStaysWritable = false
     var mutateInstall: ((inout [String: VPhoneJSONValue]) -> Void)?
+    var invalidInstallValue: VPhoneJSONValue?
     /// pid -> (name, [library: stale?]); nil stale means current.
     var processes: [Int: (name: String, maps: [String: Bool])] = [:]
     var uninspected: [[String: VPhoneJSONValue]] = []
@@ -106,7 +107,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
                 "root_read_only": .bool(!rootStaysWritable), "restarted_pids": .array([]),
             ]
             mutateInstall?(&response)
-            return .object(response)
+            return invalidInstallValue ?? .object(response)
         case "environment.restore":
             return .object(["id": params["transaction"] ?? .null, "state": .string("restored"),
                             "libraries": .array([.object(["name": .string("libcamfix.dylib"), "state": .string("restored")])])])
@@ -311,6 +312,18 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
             XCTAssertTrue(api.killed.isEmpty, label)
             XCTAssertFalse(api.methods.contains("environment.loaded"), label)
         }
+    }
+
+    func testNonObjectInstallReplyRetainsUnknownSideEffect() async throws {
+        let api = EnvironmentDaemonFake()
+        current(api, except: ["libcamfix.dylib"])
+        api.invalidInstallValue = .null
+        let result = try await update(api)
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "api_protocol")
+        XCTAssertEqual(result["outcome"] as? String, "unknown")
+        XCTAssertEqual(result["operation_may_continue"] as? Bool, true)
+        XCTAssertFalse(api.methods.contains("environment.loaded"))
     }
 
     func testInstalledReadbackMismatchDoesNotReachActivation() async throws {
