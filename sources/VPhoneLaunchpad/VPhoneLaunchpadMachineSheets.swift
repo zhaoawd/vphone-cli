@@ -10,12 +10,13 @@ import VPhoneLaunchpadKit
 /// are left alone.
 struct VPhoneLaunchpadMachineSettingsView: View {
     private enum Field {
-        case cpu, memory, network
+        case cpu, memory, network, hardwareKeyboard
     }
 
     let machines: [VPhoneLaunchpadMachine]
     @Environment(VPhoneLaunchpadModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @State private var hardwareKeyboardEnabled: Bool
     @State private var cpu: Int
     @State private var memoryMB: Int
     @State private var network: String
@@ -25,6 +26,7 @@ struct VPhoneLaunchpadMachineSettingsView: View {
     init(machines: [VPhoneLaunchpadMachine]) {
         self.machines = machines
         let first = machines.first
+        _hardwareKeyboardEnabled = State(initialValue: first?.usesHardwareKeyboard ?? true)
         _cpu = State(initialValue: first?.cpuCount ?? 8)
         _memoryMB = State(initialValue: first?.memoryMB ?? 8192)
         // `vm config --network` takes nat, bridged or none; an older
@@ -44,7 +46,8 @@ struct VPhoneLaunchpadMachineSettingsView: View {
             cpu: edited.contains(.cpu) ? cpu : nil,
             memoryMB: edited.contains(.memory) ? memoryMB : nil,
             network: network,
-            bridgeInterface: network == "bridged" ? bridgeInterface.trimmingCharacters(in: .whitespaces) : nil
+            bridgeInterface: network == "bridged" ? bridgeInterface.trimmingCharacters(in: .whitespaces) : nil,
+            hardwareKeyboardEnabled: edited.contains(.hardwareKeyboard) ? hardwareKeyboardEnabled : nil
         )
     }
 
@@ -56,6 +59,7 @@ struct VPhoneLaunchpadMachineSettingsView: View {
         VPhoneLaunchpadSheet(title) {
             Form {
                 Section {
+                    Toggle("Hardware Keyboard", isOn: $hardwareKeyboardEnabled)
                     Stepper("CPU: \(cpu) cores", value: $cpu, in: 1 ... ProcessInfo.processInfo.activeProcessorCount)
                     Stepper("Memory: \(memoryMB) MB", value: $memoryMB, in: 2048 ... 65536, step: 1024)
                 } header: {
@@ -95,6 +99,7 @@ struct VPhoneLaunchpadMachineSettingsView: View {
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
+        .onChange(of: hardwareKeyboardEnabled) { edited.insert(.hardwareKeyboard) }
         .onChange(of: cpu) { edited.insert(.cpu) }
         .onChange(of: memoryMB) { edited.insert(.memory) }
         .onChange(of: network) { edited.insert(.network) }

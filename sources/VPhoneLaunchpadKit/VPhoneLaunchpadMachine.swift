@@ -75,11 +75,13 @@ public struct VPhoneLaunchpadMachine: Decodable, Hashable, Identifiable, Sendabl
     /// it decodes as nil.
     public let customFirmwareInstalled: Bool?
     public let udid: String?
+    public let hardwareKeyboardEnabled: Bool?
+    public var usesHardwareKeyboard: Bool { hardwareKeyboardEnabled ?? true }
     /// The library `vm list` was run on. Not part of the JSON.
     public var libraryRoot = ""
 
     private enum CodingKeys: String, CodingKey {
-        case name, cpuCount, memoryMB, diskSizeBytes, network, restoreInfo, customFirmwareInstalled, udid
+        case name, cpuCount, memoryMB, diskSizeBytes, network, restoreInfo, customFirmwareInstalled, udid, hardwareKeyboardEnabled
     }
 
     public var path: VPhoneLaunchpadMachinePath {
