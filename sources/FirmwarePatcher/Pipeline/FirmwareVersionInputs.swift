@@ -10,6 +10,12 @@ struct FirmwareVersionInputs: Codable, Equatable {
         /// nil only when the manifest was absent at capture time.
         let sha256: String?
         let productVersion: String?
+        let productBuildVersion: String?
+
+        init(name: String, sha256: String?, productVersion: String?, productBuildVersion: String? = nil) {
+            self.name = name; self.sha256 = sha256; self.productVersion = productVersion
+            self.productBuildVersion = productBuildVersion
+        }
     }
 
     let manifests: [Manifest]
@@ -48,9 +54,16 @@ struct FirmwareVersionInputs: Codable, Equatable {
                 }
                 version = string
             }
+            var build: String?
+            if let value = plist["ProductBuildVersion"] {
+                guard let string = value as? String, !string.isEmpty else {
+                    throw PatcherError.invalidFormat("Unrecognized ProductBuildVersion in \(name)")
+                }
+                build = string
+            }
             manifests.append(Manifest(name: name,
                 sha256: SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined(),
-                productVersion: version))
+                productVersion: version, productBuildVersion: build))
         }
         return Self(manifests: manifests)
     }

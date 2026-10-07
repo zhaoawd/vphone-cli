@@ -20,9 +20,28 @@ final class FirmwareTransaction {
         /// Resolution for this transaction; absent in historical journals.
         let plan: VariantPlanResolver.VariantPlan?
         let versionInputs: FirmwareVersionInputs?
+        let planBinding: FirmwarePlanBinding?
         var phase: Phase = .building
         var entries: [Entry]
         var failure: String?
+    }
+    enum RecordFailure: Error, Equatable, LocalizedError {
+        case missing
+        case unreadable(Int32)
+        case corrupt
+        case unsupportedSchema(Int)
+        case unsupportedBinding(Int)
+        case bindingMismatch(String)
+        var errorDescription: String? {
+            switch self {
+            case .missing: "Firmware journal is missing"
+            case let .unreadable(code): "Firmware journal is unreadable (errno \(code))"
+            case .corrupt: "Firmware journal is corrupt"
+            case let .unsupportedSchema(version): "Unsupported firmware journal schema \(version)"
+            case let .unsupportedBinding(version): "Unsupported plan binding schema \(version)"
+            case let .bindingMismatch(field): "Firmware plan binding differs: \(field)"
+            }
+        }
     }
     enum Event: Equatable {
         case beforeCopy(String), beforeReady, beforeBackup(String), afterBackup(String)
@@ -67,8 +86,16 @@ final class FirmwareTransaction {
         guard !entries.isEmpty, Set(entries.map(\.name)).count == entries.count else {
             throw Self.error("Firmware transaction requires distinct inputs")
         }
-        journal = Journal(id: UUID().uuidString.lowercased(), vmPath: self.vmDirectory.path,
-                          options: options, plan: plan, versionInputs: versionInputs, entries: entries)
+        let binding: FirmwarePlanBinding?
+        if let plan, let versionInputs {
+            binding = try FirmwarePlanBinding.capture(directory: self.vmDirectory, plan: plan,
+                versions: versionInputs, entries: entries, options: options)
+        } else {
+            guard plan == nil, versionInputs == nil else { throw RecordFailure.bindingMismatch("incomplete plan inputs") }
+            binding = nil
+        }
+        journal = Journal(version: binding == nil ? 1 : 2, id: UUID().uuidString.lowercased(), vmPath: self.vmDirectory.path,
+                          options: options, plan: plan, versionInputs: versionInputs, planBinding: binding, entries: entries)
         // mkdir is exclusive. Never reuse another run's transaction directory.
         guard mkdir(root.path, 0o700) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         try Self.syncDirectory(self.vmDirectory)
@@ -96,14 +123,37 @@ final class FirmwareTransaction {
         try Self.requireDirectory(root)
         let url = root.appendingPathComponent("journal.json")
         try Self.requireRegularFile(url)
-        journal = try JSONDecoder().decode(Journal.self, from: Data(contentsOf: url))
-        guard journal.version == 1, journal.vmPath == self.vmDirectory.path,
+        journal = try Self.readJournal(at: url)
+        try journal.planBinding?.validate(journal: journal, directory: self.vmDirectory, currentCatalog: false)
+        guard (journal.version == 1 || journal.version == 2), journal.vmPath == self.vmDirectory.path,
               UUID(uuidString: journal.id) != nil, !journal.entries.isEmpty,
               Set(journal.entries.map(\.name)).count == journal.entries.count else {
             throw Self.error("Invalid firmware transaction journal")
         }
         for entry in journal.entries { try Self.validateName(entry.name) }
         for directory in [stage, backup, work] where Self.exists(directory) { try Self.requireDirectory(directory) }
+    }
+
+    /// Version 1 is recognized recovery-only history; it is never upgraded by loading.
+    static func readJournal(at url: URL) throws -> Journal {
+        let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard fd >= 0 else { throw errno == ENOENT ? RecordFailure.missing : RecordFailure.unreadable(errno) }
+        defer { close(fd) }
+        var info = stat()
+        guard fstat(fd, &info) == 0 else { throw RecordFailure.unreadable(errno) }
+        guard info.st_mode & S_IFMT == S_IFREG, info.st_size >= 0, info.st_size <= 16 << 20 else { throw RecordFailure.corrupt }
+        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: false)
+        let data: Data
+        do { data = try handle.read(upToCount: Int(info.st_size) + 1) ?? Data() } catch { throw RecordFailure.unreadable(EIO) }
+        guard data.count == info.st_size else { throw RecordFailure.corrupt }
+        struct Header: Decodable { let version: Int }
+        let version: Int
+        do { version = try JSONDecoder().decode(Header.self, from: data).version } catch { throw RecordFailure.corrupt }
+        guard version == 1 || version == 2 else { throw RecordFailure.unsupportedSchema(version) }
+        let result: Journal
+        do { result = try JSONDecoder().decode(Journal.self, from: data) } catch { throw RecordFailure.corrupt }
+        guard (version == 2) == (result.planBinding != nil) else { throw RecordFailure.bindingMismatch("journal schema/binding") }
+        return result
     }
 
     func recordFailure(_ error: Error) {
@@ -120,6 +170,7 @@ final class FirmwareTransaction {
         try withWorkerLock {
             try mounts(root, false)
             try inject(.beforeReady)
+            try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
             for index in journal.entries.indices {
                 let entry = journal.entries[index]
                 guard try Self.digest(vmDirectory.appendingPathComponent(entry.name)) == entry.original else {
@@ -133,6 +184,7 @@ final class FirmwareTransaction {
             try saveJournal()
             for entry in journal.entries where entry.original != entry.output {
                 try inject(.beforeBackup(entry.name))
+                try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
                 try Self.move(vmDirectory.appendingPathComponent(entry.name), to: backup.appendingPathComponent(entry.name))
                 try inject(.afterBackup(entry.name))
                 try Self.move(stage.appendingPathComponent(entry.name), to: vmDirectory.appendingPathComponent(entry.name))

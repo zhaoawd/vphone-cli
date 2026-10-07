@@ -26,6 +26,23 @@ import Testing
         try inputs.validate(in: fixture.root)
     }
 
+    @Test func buildIsRecordedAlongsideVersionAndByteDigest() throws {
+        let fixture = try Fixture()
+        try fixture.write(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"])
+        let inputs = try FirmwareVersionInputs.read(in: fixture.root)
+        let object = try #require(try JSONSerialization.jsonObject(with: JSONEncoder().encode(inputs)) as? [String: Any])
+        let manifests = try #require(object["manifests"] as? [[String: Any]])
+        #expect(manifests.first?["productBuildVersion"] as? String == "23B85")
+    }
+
+    @Test(arguments: ["number", "bool", "empty"])
+    func malformedBuildDoesNotBecomeMissing(_ name: String) throws {
+        let value: Any = name == "number" ? 0 : name == "bool" ? true : ""
+        let fixture = try Fixture()
+        try fixture.write(["ProductVersion": "26.1", "ProductBuildVersion": value])
+        #expect(throws: (any Error).self) { try FirmwareVersionInputs.read(in: fixture.root) }
+    }
+
     @Test func changedBuildIsRejectedEvenWhenProductVersionIsUnchanged() throws {
         let fixture = try Fixture()
         try fixture.write(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"])
