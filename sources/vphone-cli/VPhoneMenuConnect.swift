@@ -221,7 +221,7 @@ extension VPhoneMenuController {
                 }
                 message += "Types: \(content.types.joined(separator: ", "))\n"
                 message += "Has Image: \(content.hasImage)\n"
-                message += "Change Count: \(content.changeCount)"
+                message += "Change Count: \(content.changeCount.map(String.init) ?? "unknown")"
                 showAlert(title: "Clipboard Content", message: message, style: .informational)
             } catch {
                 showAlert(title: "Clipboard", message: "\(error)", style: .warning)

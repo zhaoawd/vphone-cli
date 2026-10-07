@@ -657,7 +657,7 @@ class VPhoneControl {
         let text: String?
         let types: [String]
         let hasImage: Bool
-        let changeCount: Int
+        let changeCount: Int?
         let imageData: Data?
     }
 
@@ -666,17 +666,36 @@ class VPhoneControl {
         let text = resp["text"] as? String
         let types = resp["types"] as? [String] ?? []
         let hasImage = resp["has_image"] as? Bool ?? false
-        let changeCount = resp["change_count"] as? Int ?? 0
+        let changeCount: Int?
+        if let number = resp["change_count"] as? NSNumber,
+           CFGetTypeID(number) != CFBooleanGetTypeID(),
+           let value = Int(number.stringValue), value >= 0 {
+            changeCount = value
+        } else {
+            changeCount = nil
+        }
+        if let text, !VPhoneClipboardTransfer.fits(text: text) {
+            throw ControlError.protocolError("clipboard text exceeds 1 MiB UTF-8")
+        }
+        if let data, !VPhoneClipboardTransfer.fits(image: data) {
+            throw ControlError.protocolError("clipboard image must be nonempty and at most 16 MiB")
+        }
         return ClipboardContent(
             text: text, types: types, hasImage: hasImage, changeCount: changeCount, imageData: data
         )
     }
 
     func clipboardSet(text: String) async throws {
+        guard VPhoneClipboardTransfer.fits(text: text) else {
+            throw ControlError.protocolError("clipboard text exceeds 1 MiB UTF-8")
+        }
         _ = try await sendRequest(["t": "clipboard_set", "text": text])
     }
 
     func clipboardSet(imageData: Data) async throws {
+        guard VPhoneClipboardTransfer.fits(image: imageData) else {
+            throw ControlError.protocolError("clipboard image must be nonempty and at most 16 MiB")
+        }
         _ = try await performRequest(["t": "clipboard_set", "type": "image", "size": imageData.count], payload: imageData)
     }
 
@@ -938,9 +957,10 @@ class VPhoneControl {
                 let payloadKey: String? = type == "file_data" ? "size"
                     : (type == "clipboard_get" && msg["has_image"] as? Bool == true ? "image_size" : nil)
                 if let payloadKey {
+                    let payloadLimit = type == "clipboard_get" ? VPhoneClipboardTransfer.maxImageBytes : 64 * 1024 * 1024
                     guard let number = msg[payloadKey] as? NSNumber,
                           CFGetTypeID(number) != CFBooleanGetTypeID(),
-                          number.doubleValue >= 0, number.doubleValue <= 64 * 1024 * 1024,
+                          number.doubleValue >= 0, number.doubleValue <= Double(payloadLimit),
                           number.doubleValue.rounded(.towardZero) == number.doubleValue else { break }
                     let size = number.intValue
                     var payload = Data(count: size)

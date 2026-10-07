@@ -320,6 +320,54 @@ final class GuestTransportTests: XCTestCase {
         XCTAssertEqual(value, Data([1, 255, 0]))
     }
 
+    func testOversizedClipboardImagesDisconnectBeforeReadingPayload() async throws {
+        let session = try GuestSession(timing: .init(request: 0.3))
+        defer { session.stop() }
+        try await session.ready(caps: ["clipboard"])
+        let request = Task { try await session.control.clipboardGet() }
+        let fields = try await session.readRequest()
+        try session.peer.send(["v": 1, "t": "clipboard_get", "id": try XCTUnwrap(fields["id"]),
+                               "has_image": true, "image_size": 16 * 1024 * 1024 + 1])
+        do { _ = try await request.value; XCTFail("oversized image accepted") } catch {}
+        XCTAssertFalse(session.control.isConnected)
+    }
+
+    func testClipboardRejectsOversizedAndEmptyOutboundPayloadsBeforeConnection() async throws {
+        let control = VPhoneControl(variant: .regular)
+        for text in [String(repeating: "x", count: 1024 * 1024 + 1),
+                     String(repeating: "中", count: 1024 * 1024 / 3 + 1)] {
+            do { try await control.clipboardSet(text: text); XCTFail("oversized text accepted") }
+            catch { XCTAssertTrue(String(describing: error).contains("clipboard text exceeds"), "\(error)") }
+        }
+        for image in [Data(), Data(repeating: 7, count: 16 * 1024 * 1024 + 1)] {
+            do { try await control.clipboardSet(imageData: image); XCTFail("invalid image accepted") }
+            catch { XCTAssertTrue(String(describing: error).contains("clipboard image must"), "\(error)") }
+        }
+    }
+
+    func testClipboardTextBoundsAndUnreliableChangeCounts() async throws {
+        let session = try GuestSession()
+        defer { session.stop() }
+        try await session.ready(caps: ["clipboard"])
+        for count: Any? in [nil, -1, true, 1.5, "1", 7] {
+            let request = Task { try await session.control.clipboardGet() }
+            let fields = try await session.readRequest()
+            var response: [String: Any] = ["v": 1, "t": "clipboard_get", "id": try XCTUnwrap(fields["id"]), "text": "ok"]
+            if let count { response["change_count"] = count }
+            try session.peer.send(response)
+            let result = try await request.value
+            XCTAssertEqual(result.text, "ok")
+            if let count = count as? Int, count == 7 { XCTAssertEqual(result.changeCount, 7) }
+            else { XCTAssertNil(result.changeCount) }
+        }
+        let oversized = Task { try await session.control.clipboardGet() }
+        let fields = try await session.readRequest()
+        try session.peer.send(["v": 1, "t": "clipboard_get", "id": try XCTUnwrap(fields["id"]),
+                               "text": String(repeating: "中", count: 1024 * 1024 / 3 + 1)])
+        do { _ = try await oversized.value; XCTFail("oversized incoming text accepted") }
+        catch { XCTAssertTrue(String(describing: error).contains("clipboard text exceeds"), "\(error)") }
+    }
+
     func testInvalidPayloadSizesDisconnectWithoutAllocating() async throws {
         for size: Any in [-1, 64 * 1024 * 1024 + 1, 1.5, true, "10"] {
             let session = try GuestSession()
