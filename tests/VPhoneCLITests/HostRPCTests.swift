@@ -8,11 +8,12 @@ final class RPCSessionFake: VPhoneHostAPISession {
     var state = "ready"
     var caps = ["session_identity", "clipboard", "input_gestures", "hid", "apps"]
     var generation = UUID()
+    var instanceID = "6A5A4D0B-6D53-4A4B-8F2B-0B8E7E3F7A11"
     var calls: [(method: String, params: [String: VPhoneJSONValue], capability: String?)] = []
     var handler: ((String) async throws -> VPhoneJSONValue)?
     var snapshot: VPhoneAPISession.Snapshot {
         let health: [String: Any] = ["apiVersion": 1, "binaryHash": String(repeating: "b", count: 64),
-                                     "capabilities": caps, "instanceID": "6A5A4D0B-6D53-4A4B-8F2B-0B8E7E3F7A11"]
+                                     "capabilities": caps, "instanceID": instanceID]
         var value: [String: Any] = ["vmInstanceID": "fixture", "state": state]
         if state == "ready" { value["generation"] = generation.uuidString; value["health"] = health }
         return try! JSONDecoder().decode(VPhoneAPISession.Snapshot.self, from: JSONSerialization.data(withJSONObject: value))
@@ -80,6 +81,34 @@ final class HostRPCTests: XCTestCase {
         XCTAssertTrue(VPhoneHostRPC.methods["input.tap"]!.input)
         XCTAssertTrue(VPhoneHostRPC.methods["ui.tap_element"]!.input)
         XCTAssertFalse(VPhoneHostRPC.methods["clipboard.get"]!.input)
+    }
+
+    func testManualUnlockRequiresCapabilityAndUsesInputQueue() async throws {
+        let api = RPCSessionFake()
+        let executor = VPhoneHostCommandExecutor(apiSession: api)
+        let request: [String: Any] = ["t": "rpc", "method": "screen.unlock", "params": ["passcode": "123456"]]
+        var result = try await call(executor, request)
+        XCTAssertEqual(result["code"] as? String, "capability_unavailable")
+        XCTAssertTrue(api.calls.isEmpty)
+        api.caps.append("screen_unlock")
+        api.handler = { _ in .object(["locked": .bool(false), "screen_off": .bool(false)]) }
+        result = try await call(executor, request)
+        XCTAssertEqual(result["ok"] as? Bool, true)
+        XCTAssertEqual(api.calls.last?.capability, "screen_unlock")
+        XCTAssertEqual(api.calls.last?.params["passcode"], .string("123456"))
+        XCTAssertEqual(VPhoneHostRPC.methods["screen.unlock"]?.input, true)
+    }
+
+    func testInstanceChangeWithoutGenerationChangeRejectsLateReply() async throws {
+        let api = RPCSessionFake()
+        api.handler = { [weak api] _ in
+            api?.instanceID = UUID().uuidString
+            return .object(["text": .string("late old instance")])
+        }
+        let result = try await call(VPhoneHostCommandExecutor(apiSession: api), ["t": "rpc", "method": "clipboard.get"])
+        XCTAssertEqual(result["ok"] as? Bool, false)
+        XCTAssertEqual(result["code"] as? String, "api_stale_session")
+        XCTAssertEqual(result["operation_may_continue"] as? Bool, true)
     }
 
     // MARK: - Forwarding

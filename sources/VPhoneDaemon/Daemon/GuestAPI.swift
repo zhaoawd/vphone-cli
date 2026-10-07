@@ -71,6 +71,7 @@ enum GuestAPI {
                 "port_forward",
                 "camera",
                 "screenshot",
+                "screen_unlock",
                 "device_info",
                 "display",
                 "audio",

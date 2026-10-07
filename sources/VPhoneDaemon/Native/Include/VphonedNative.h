@@ -44,3 +44,6 @@ int vp_process_mapped_files(int pid, VPMappedFile *files, int capacity, int *fla
 
 /// Test hook: whether the private proc_info mirror has the given layout.
 bool vp_proc_info_layout_matches(size_t size, size_t vnode_offset, size_t path_offset, size_t inode_offset);
+
+/// Lights the guest display through SpringBoardServices; does not toggle its state.
+bool vp_screen_undim(void);

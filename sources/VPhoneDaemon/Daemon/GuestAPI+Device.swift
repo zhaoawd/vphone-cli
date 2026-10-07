@@ -57,6 +57,9 @@ extension GuestAPI {
                 interface: optionalString(params, "interface") ?? "en0",
                 filter: optionalString(params, "filter"),
             )
+        case "screen.unlock":
+            return try GuestScreenUnlock.unlock(passcode: optionalString(params, "passcode"),
+                                                timeout: number(params, "timeout", default: 10))
         case "security.ssl_killswitch":
             return sslKillswitchStatus()
         case "diagnostics.self_test":

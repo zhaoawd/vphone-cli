@@ -29,6 +29,7 @@ enum VPhoneHostRPC {
         add("device_info", ["device.snapshot", "device.screen", "device.info", "device.network",
                             "device.ioreg", "device.environment", "device.basebin"])
         add("screenshot", ["screen.screenshot"])
+        add("screen_unlock", ["screen.unlock"], input: true)
         add("display", ["display.brightness", "display.rotation", "display.rotation_lock"])
         add("audio", ["audio.volume", "audio.state"])
         add("network_capture", ["network.capture"])
@@ -138,11 +139,14 @@ enum VPhoneHostRPC {
             return .failure(.init(code: "capability_unavailable", capability: capability))
         }
         let generation = session.snapshot.generation
+        let health = session.snapshot.health
         guard !Task.isCancelled else { return .failure(.init(code: "command_cancelled")) }
         do {
             let value = try await session.call(plan.method, params: plan.params, requiring: plan.entry.capability)
             try Task.checkCancellation()
-            guard session.snapshot.state == .ready, session.snapshot.generation == generation else {
+            guard session.snapshot.state == .ready, session.snapshot.generation == generation,
+                  session.snapshot.health?.instanceID == health?.instanceID,
+                  session.snapshot.health?.binaryHash == health?.binaryHash else {
                 return .failure(.init(code: "api_stale_session", mayContinue: true))
             }
             guard let result = try? JSONEncoder().encode(value) else {
