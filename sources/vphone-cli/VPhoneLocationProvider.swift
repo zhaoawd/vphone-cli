@@ -59,7 +59,7 @@ class VPhoneLocationProvider: NSObject {
 
     private var locationManager: CLLocationManager?
     private var delegateProxy: LocationDelegateProxy?
-    private var lastLocation: CLLocation?
+    private var lastHostLocation: CLLocation?
     private var replayTask: Task<Void, Never>?
     private var replayName: String?
 
@@ -141,7 +141,7 @@ class VPhoneLocationProvider: NSObject {
         hostModeStarted = true
         print("[location] started host location tracking")
         // Re-send last known location immediately on reconnect
-        if let last = lastLocation {
+        if let last = Self.reusableHostFix(lastHostLocation) {
             forward(last)
             print("[location] re-sent last known host location")
         }
@@ -201,7 +201,7 @@ class VPhoneLocationProvider: NSObject {
         intervalSeconds: Double = 1.5,
         loop: Bool = true
     ) -> Bool {
-        guard !points.isEmpty else {
+        guard !points.isEmpty, let sleepNanos = Self.replayNanoseconds(intervalSeconds) else {
             print("[location] replay '\(name)' ignored: no points")
             return false
         }
@@ -211,7 +211,7 @@ class VPhoneLocationProvider: NSObject {
         stopReplay()
 
         replayName = name
-        let sleepNanos = UInt64((max(intervalSeconds, 0.1) * 1_000_000_000).rounded())
+        let revision = locationSourceRevision
         print(
             "[location] starting replay '\(name)' (\(points.count) points, interval \(String(format: "%.1f", intervalSeconds))s, loop=\(loop))"
         )
@@ -219,8 +219,10 @@ class VPhoneLocationProvider: NSObject {
         replayTask = Task { @MainActor [weak self] in
             guard let self else { return }
             defer {
-                self.replayTask = nil
-                self.replayName = nil
+                if self.locationSourceRevision == revision {
+                    self.replayTask = nil
+                    self.replayName = nil
+                }
             }
 
             var index = 0
@@ -268,8 +270,24 @@ class VPhoneLocationProvider: NSObject {
         replayName = nil
     }
 
+    /// Cached host fixes expire independently of fixed/replay sources.
+    static func reusableHostFix(_ location: CLLocation?, now: Date = Date()) -> CLLocation? {
+        guard let location, CLLocationCoordinate2DIsValid(location.coordinate),
+              location.horizontalAccuracy.isFinite, location.horizontalAccuracy >= 0,
+              abs(location.timestamp.timeIntervalSince(now)) < 60 else { return nil }
+        return location
+    }
+
+    static func replayNanoseconds(_ interval: Double) -> UInt64? {
+        guard interval.isFinite, interval > 0 else { return nil }
+        let nanos = (max(interval, 0.1) * 1_000_000_000).rounded()
+        guard nanos.isFinite, nanos < Double(UInt64.max) else { return nil }
+        return UInt64(nanos)
+    }
+
     private func forward(_ location: CLLocation) {
-        lastLocation = location
+        guard Self.reusableHostFix(location) != nil else { return }
+        lastHostLocation = location
         // stopUpdatingLocation() can race with delegate callbacks that were
         // already queued onto the main actor. Keep the latest host fix cached
         // for a future explicit resume, but never let a stale callback escape
@@ -301,15 +319,6 @@ class VPhoneLocationProvider: NSObject {
         speed: Double,
         course: Double
     ) {
-        let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        lastLocation = CLLocation(
-            coordinate: coordinate,
-            altitude: altitude,
-            horizontalAccuracy: horizontalAccuracy,
-            verticalAccuracy: verticalAccuracy,
-            timestamp: Date()
-        )
-
         guard control.isConnected else {
             print("[location] simulate: not connected, cached for later")
             return
