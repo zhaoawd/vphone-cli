@@ -969,16 +969,21 @@
         "evidence/B09-runtime-probe.json",
         "evidence/B09-followup.json",
         "evidence/B09-apps-after-home.json",
-        "evidence/B09-manual-apps.json"
+        "evidence/B09-manual-apps.json",
+        "evidence/B10-summary.json",
+        "evidence/B10-checkpoint.json",
+        "evidence/B10-runtime-probe.json",
+        "evidence/B10-stop-action.json",
+        "evidence/B10-restart-check.json"
       ],
       "historical_evidence": [
         "research/t03_vm_backup_2026-10-01.md"
       ],
-      "blocked_reason": "主屏幕状态下目标应用启动仍无 PID，原因未查明；新候选精确 CDHash 临时放行授权待确认。",
-      "current_environment_note": "vm-new 使用冻结旧候选运行（PID 60709）；客户机载荷/配置摘要未变。限定旧哈希辅助进程因 amfid 退出后报错退出，已无 helper/debugserver；持久安全设置未修改，vm-2607 未操作。",
-      "current_capacity_bytes": 14508982272,
-      "current_result": "本轮新增停机 APFS 检查点 65 文件逐项摘要通过。旧宿主 8777bc7e 启动 vm-new、通信和现有 daemon 摘要读回通过；屏幕已进入主屏幕，但 Settings/Safari 程序化启动仍无 PID，标准 Settings 触控后也未观察对应进程，原因未查明。T03 未验收。",
-      "available_capacity_gib": 13.51,
+      "blocked_reason": "B10 未观察解锁成功，锁屏状态目标应用无 PID；B09 主屏幕状态应用也无 PID，原因未查明。客户机 API 会话未就绪。",
+      "current_environment_note": "vm-new 使用冻结新候选 2387af20 继续运行（本轮最终 PID 92943、instance 068574F6-DEF3-4910-88AB-57F5330C7A02）。原配置、身份预测文件和客户机载荷摘要未变；临时 helper/debugserver 已清理，持久安全设置观测与 B09 一致。vm-2607 未操作。",
+      "current_capacity_bytes": 21240094720,
+      "current_result": "B10 新停机 APFS 检查点 65 文件与源元数据核对通过。新冻结候选 2387af20 启动、正常停机和重启通过，测试文件跨重启摘要一致并已清理，实际原 daemon 摘要未变。解锁未验证、Settings/Safari 无 PID，API 会话未就绪；T03 完整恢复与应用验收仍未通过。",
+      "available_capacity_gib": 19.78,
       "capacity_observed_date": "2026-10-07",
       "selected_vm_path": "/Users/qcz3840/github/vphone-cli/vm-new",
       "prepared_backup_parent": "/Users/qcz3840/github/vphone-cli/vm.backups",
@@ -989,7 +994,19 @@
         "candidate_cdhash": "61ea15c6739775b707d3a36fca082c4d97049be2",
         "scope": "仅该候选 CDHash，使用 --spoof-apple 和独立临时配置；不继承路径放行或广泛允许列表；不修改持久 SIP/AMFI 设置；验收结束后停止辅助进程。",
         "execution_status": "completed_helper_stopped"
-      }
+      },
+      "additional_temporary_amfid_authorizations": [
+        {
+          "status": "granted",
+          "date": "2026-10-07",
+          "user_message": "确认授权",
+          "candidate_cdhash": "52b10bcbce6db82de6afa83b801eb95da55246c7",
+          "scope": "仅该冻结候选 CDHash；独立空临时配置、--spoof-apple、paths=[]、allow_all=false；不修改持久 SIP/AMFI 设置。",
+          "execution_status": "completed_helper_stopped",
+          "helper_exit_code": 143,
+          "cleanup_evidence": "evidence/B10-cleanup-processes.log"
+        }
+      ]
     },
     {
       "id": "T04",
@@ -2629,7 +2646,8 @@
         "evidence/B08-t26-t22-green.log",
         "evidence/B08-t26-red-corrected.log",
         "evidence/B09-summary.json",
-        "evidence/B09-artifact-manifest.json"
+        "evidence/B09-artifact-manifest.json",
+        "evidence/B10-summary.json"
       ],
       "historical_evidence": [],
       "current_result": "接入每 VM 键盘开关报告与设置 UI；旧报告缺字段保持开启，仅明确编辑时发出 on/off。翻译条目齐备，真实签名 UI、键盘输入和其他历史 UI 范围待完成。",
@@ -2821,7 +2839,7 @@
       "dependencies": [
         "T28"
       ],
-      "status": "signed_candidate_frozen_old_guest_baseline_verified_new_runtime_authorization_pending",
+      "status": "signed_candidate_boot_restart_classic_guest_verified_api_application_pending",
       "upstream_paths": [
         "VPhone.xcworkspace/",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -2846,7 +2864,7 @@
         "protocol"
       ],
       "local_mapping": {
-        "state": "signed_candidate_frozen_old_guest_baseline_verified_new_runtime_authorization_pending",
+        "state": "signed_candidate_boot_restart_classic_guest_verified_api_application_pending",
         "paths": [
           "scripts/build.sh",
           "scripts/build_launchpad.sh",
@@ -2858,13 +2876,17 @@
       "implementation_commits": [],
       "verification_evidence": [
         "evidence/B09-summary.json",
-        "evidence/B09-artifact-manifest.json"
+        "evidence/B09-artifact-manifest.json",
+        "evidence/B10-summary.json",
+        "evidence/B10-http-probe.json",
+        "evidence/B10-restart-runtime-probe.json",
+        "evidence/B10-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "完整 CLI/VM 与 Launchpad 签名候选构建、资源定位、嵌入一致性核对通过，逐文件摘要冻结。新 VM 工件直接执行退出 137，限定临时放行授权待确认；旧候选连接与原 guest 摘要读回通过，应用启动失败，原因未查明。",
+      "current_result": "B09 冻结源码 2387af20 的签名候选在本轮限定授权下启动 vm-new；正常停机退出 0，无辅助进程重启后 classic 通信、原 daemon 摘要、测试文件持久化、旧 instance 拒绝与令牌轮换检查通过。锁屏解锁未验证，Settings/Safari 无 PID；API 健康请求返回 502。T29 未验收。",
       "remaining_work": [
         "Prerequisite T28 acceptance; minimum 2.6 and supported major/minor series policy remain unimplemented (local current minimum 2.2).",
-        "Authorize and run the exact signed candidate; baseline 8777bc7e behavior cannot validate source 2387af20.",
+        "Resolve/verify unlocking and target applications; guest API health and session remain unavailable. Complete signed UI and actual hardware keyboard acceptance.",
         "Complete explicit mixed-version compatibility/upgrade/rollback matrix with all component/firmware provenance; no API-v2/guest environment activation performed."
       ]
     },
@@ -4265,8 +4287,9 @@
       "decision": "T24 在打包前显式编译现有 xcstrings；隔离构建输入固定到当前 Gitlink，复制独立文件",
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     },
-    "B09: prepare/freeze T29 artifacts early without treating unaccepted T28 or any version number as capability equivalence. Retain failed checkpoint and rerun exact metadata/digest validation with diagnostics; do not weaken guards. New CDHash requires separate security authorization; old runtime is separately labeled."
+    "B09: prepare/freeze T29 artifacts early without treating unaccepted T28 or any version number as capability equivalence. Retain failed checkpoint and rerun exact metadata/digest validation with diagnostics; do not weaken guards. New CDHash requires separate security authorization; old runtime is separately labeled.",
+    "B10: human confirmed exact candidate CDHash authorization; use independent empty config and clean helper. Boot/restart/classic compatibility and proxy token rejection do not accept guest API health, application behavior, full restored sample, T28 or T29. Retain failed driver attempts and distinguish locked-screen B10 observations from B09 home-screen observations."
   ],
   "latest_implementation_head": "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3",
-  "latest_validation_limitation": "B09 builds/freeze/full signed Bundle and Launchpad checks passed. Only old 8777bc7e runtime accepted for connection/readback/refusal probes; Settings/Safari still fail with no PID after SpringBoard, cause unknown. New 2387af20 runtime direct help exit137 awaits exact-hash security authorization. No source changes, new guest/component deployment, full test rerun or task acceptance."
+  "latest_validation_limitation": "B10 exact frozen source2387af20 candidate boot/normal-stop/restart and classic guest/hash/marker/instance/token rotation checks passed; helper/debugserver cleaned. Unlock and target app launches unverified/failed; authenticated health502, guest API reconnecting, environment api_not_ready. No source/rebuild/new guest deployment/full test rerun or task acceptance. T28/version-series/mixed matrix and prior full Swift/API limitations retained."
 }

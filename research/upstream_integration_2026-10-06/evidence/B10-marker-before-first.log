@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b10-marker.py", line 16, in <module>
+    call('file_put',path=path,data=base64.b64encode(blob).decode())
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/vphone-b10-marker.py", line 13, in call
+    r=json.loads(buf.split(b'\n')[0]);rows.append({'request':q,'response':r});assert r['ok'],r;return r
+                                                                                     ~^^^^^^
+AssertionError: {'error': 'file_put requires data_b64 or load', 'ok': False}

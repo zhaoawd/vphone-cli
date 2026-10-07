@@ -1,0 +1,30 @@
+[
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "test ! -e /private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "timed_out": false,
+      "truncated": false,
+      "ok": true,
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  {
+    "request": {
+      "t": "file_put",
+      "screen": false,
+      "path": "/private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+      "data": "dnBob25lIEIxMCBhY2NlcHRhbmNlCnNvdXJjZSAyMzg3YWYyMDE1ZjNlODZkYmRkY2E0M2Q5YmExYTliMDYzNDRjNGIwCg=="
+    },
+    "response": {
+      "error": "file_put requires data_b64 or load",
+      "ok": false
+    }
+  }
+]

@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-07",
+  "task_accepted": false,
+  "source_head": "2387af2015f3e86dbddca43d9ba1a9b06344c4b0",
+  "documentation_base": "2d02850e8722d83df5c3d68205f882d62f2165c9",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "scope": [
+    "T03 recovery acceptance follow-up",
+    "T29 frozen candidate runtime compatibility",
+    "T26 native input observation"
+  ],
+  "source_changes": false,
+  "rebuilt_this_turn": false,
+  "candidate": {
+    "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B09/candidate.app",
+    "vm_sha256": "fe835bab19e8f71338adf803ae496b5906c75ceb4f2b34b16963970edba25a87",
+    "vm_cdhash": "52b10bcbce6db82de6afa83b801eb95da55246c7",
+    "all_frozen_artifact_hashes_verified": true,
+    "first_pid": 87653,
+    "first_instance": "5F7970EC-0380-448B-ADDF-A0F11FD0F543",
+    "normal_stop_exit_code": 0,
+    "restart_pid": 92943,
+    "restart_instance": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+    "kept_running": true,
+    "restart_used_security_helper": false,
+    "post_stop_help_exit_code": 0
+  },
+  "authorization": {
+    "status": "granted",
+    "user_message": "确认授权",
+    "authorized_cdhash": "52b10bcbce6db82de6afa83b801eb95da55246c7",
+    "paths": [],
+    "allow_all": false,
+    "spoof_apple": true,
+    "independent_empty_config": true,
+    "persistent_security_modifications": false
+  },
+  "security_helper": {
+    "pid": 87460,
+    "amfid_pid": 71124,
+    "exit_code": 143,
+    "cleanup": "SIGINT did not exit; SIGTERM sent to the same verified helper. No helper/debugserver remained; amfid observed PPID1 Ss afterward.",
+    "python_finally_detach_success_claimed": false,
+    "sip_and_authenticated_root_observation_equal_B09": true
+  },
+  "checkpoint": {
+    "path": "/Users/qcz3840/github/vphone-cli/vm.backups/b10-vm-new-stopped-20261007",
+    "files_verified": 65,
+    "source_metadata_changes": {},
+    "method": "APFS clonefile; copy-on-write; no physical independence; no dense fallback",
+    "physical_independence": false,
+    "used_as": "pre-test recovery point; not a fresh whole-disk hash validation after marker writes",
+    "prior_backups_and_independent_restore_retained": true
+  },
+  "classic_guest": {
+    "connected_before_and_after_restart": true,
+    "protocol_version": 1,
+    "actual_readback_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "actual_readback_bytes": 240352,
+    "embedded_entitlements_count": 250,
+    "missing_expected_entitlement_keys": [],
+    "entitlement_scope": "signature contents only; does not prove runtime entitlement grants"
+  },
+  "configuration_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+  "udid_prediction_sha256": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc",
+  "persistent_marker": {
+    "path": "/private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+    "bytes": 70,
+    "sha256": "8c9377cc74e3e190b6934b8b0e6767daf488a79ec9f2e9ce60ccbb00313a5beb",
+    "guarded_nonexistent_before_write": true,
+    "restart_readback_matched": true,
+    "cleaned_after_verification": true
+  },
+  "instance_fencing": {
+    "previous_boot_instance_refused": true,
+    "operation_may_continue": false,
+    "matching_current_instance_pass": true
+  },
+  "api": {
+    "binding": "127.0.0.1",
+    "first_missing_and_wrong_token": [
+      401,
+      401
+    ],
+    "first_current_token_health": 502,
+    "restart_previous_token": 401,
+    "restart_current_token_health": 502,
+    "session_state": "reconnecting",
+    "errorCode": "transport",
+    "environment_status": "api_not_ready",
+    "health_accepted": false,
+    "token_values_saved_to_evidence": false,
+    "first_token_removed_after_stopped_server": true,
+    "active_restart_token_file_mode": "0600"
+  },
+  "applications": [
+    {
+      "request": {
+        "t": "app_launch",
+        "screen": false,
+        "bundle_id": "com.apple.Preferences"
+      },
+      "response": {
+        "ok": false,
+        "error": "com.apple.Preferences did not start (uiopen ok but no pid)"
+      }
+    },
+    {
+      "request": {
+        "t": "app_launch",
+        "screen": false,
+        "bundle_id": "com.apple.mobilesafari"
+      },
+      "response": {
+        "ok": false,
+        "error": "com.apple.mobilesafari did not start (uiopen ok but no pid)"
+      }
+    }
+  ],
+  "application_launch_pass": false,
+  "application_test_screen": "locked. apps-after-home filenames were reused from B09; they do not prove an unlocked home screen in B10.",
+  "native_ui_observation": {
+    "app": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B09/candidate.app",
+    "actions": [
+      "observed toolbar Home",
+      "native vertical drag",
+      "Return"
+    ],
+    "result": "lock screen remained; native capture intermittently black",
+    "unlock_verified": false,
+    "hardware_keyboard_verified": false,
+    "cause": "unknown",
+    "credentials_or_setup_confirmations_entered": false
+  },
+  "driver_corrections": [
+    "file_put data rejected; corrected to data_b64 before writing marker",
+    "guest rm not found in initial PATH; explicit existing guest PATH used for successful cleanup",
+    "initial camera_status missing generation rejected; explicit generation returned connected/source off",
+    "guest shasum unavailable; daemon SHA verified from file_get bytes instead"
+  ],
+  "api_v2_or_shared_components_deployed": false,
+  "kernel_or_preboot_changed": false,
+  "full_swift_and_api_test_limitations_retained": true,
+  "new_test_suite_results_claimed": false,
+  "version_policy_limitations": {
+    "local_app_plist": "1.0",
+    "local_core_bundle_minimum": "2.2.0",
+    "target_minimum": "2.6.0",
+    "target_series_policy_implemented": false,
+    "T28_accepted": false
+  },
+  "main_head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "main_source_clean": true,
+  "vm_2607_operated": false,
+  "free_bytes_observed": 21240094720,
+  "screenshots": [
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b10-vm-new-20261007/after-unlock.png",
+      "bytes": 3989004,
+      "sha256": "ec701519dc09beb7979d55d20b03b9b1f10482591c64c80041d9de39a99e3e4c"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b10-vm-new-20261007/apps-after-home.png",
+      "bytes": 3989004,
+      "sha256": "ec701519dc09beb7979d55d20b03b9b1f10482591c64c80041d9de39a99e3e4c"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b10-vm-new-20261007/home-before-launches.png",
+      "bytes": 3989004,
+      "sha256": "ec701519dc09beb7979d55d20b03b9b1f10482591c64c80041d9de39a99e3e4c"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b10-vm-new-20261007/screen-32.png",
+      "bytes": 41546,
+      "sha256": "47c9d3511a48245bce92a618a19eddc19962b5e7bf2b38802be98a1feb068df7"
+    },
+    {
+      "path": "/Users/qcz3840/github/vphone-cli/research/artifacts/b10-vm-new-restart-20261007/screen-29.png",
+      "bytes": 41383,
+      "sha256": "ad5e523a675fc2d46e17ed0a1f691f9f2a3778c64519c250286bdc39c42d973b"
+    }
+  ],
+  "task_counts": {
+    "accepted": 2,
+    "partial": 41,
+    "pending_local_audit": 3,
+    "deferred_optional": 1,
+    "required_unaccepted": 44
+  }
+}

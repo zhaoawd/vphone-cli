@@ -1,0 +1,25 @@
+{
+  "port": 54716,
+  "binding": "127.0.0.1",
+  "token_saved_to_evidence": false,
+  "results": [
+    {
+      "authentication": "missing",
+      "status": 401,
+      "body": "{\"type\":\"response\",\"id\":null,\"error\":{\"code\":\"unauthorized\",\"message\":\"Missing or wrong API token\"}}",
+      "elapsed_seconds": 0.003
+    },
+    {
+      "authentication": "incorrect",
+      "status": 401,
+      "body": "{\"type\":\"response\",\"id\":null,\"error\":{\"code\":\"unauthorized\",\"message\":\"Missing or wrong API token\"}}",
+      "elapsed_seconds": 0.001
+    },
+    {
+      "authentication": "correct",
+      "status": 502,
+      "body": "",
+      "elapsed_seconds": 0.001
+    }
+  ]
+}

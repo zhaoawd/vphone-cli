@@ -426,3 +426,36 @@ T26 初始测试误用了不存在的 decodeInfo；改为现有 decodeList 后�
 T29 提前准备工件，不视为 T28 已验收。本地 Info.plist 仍为 1.0，Core Bundle 代码最低版本仍为 2.2.0，目标计划的 >=2.6.0 与支持 major.minor series 策略尚未接入；版本数字不证明官方功能等价。没有重跑此前完整 Python/Swift 测试，也未把此前定向通过计为本轮新的用例。完整 Swift/API HTTP/WS 的既有失败与未测范围继续保留。
 
 台账为 2 项 accepted、41 项部分推进、3 项待本地对账（T30/T31/T42）、1 项可选延期；44 项必选任务仍未验收。主仓库源码仍为 e8d825b3 且干净，vm-2607 未操作。证据入口：`evidence/B09-summary.json`。
+
+
+### 2026-10-07 B10：新候选启动、正常停机与重启验收
+
+用户回复“确认授权”后，按本次明确范围执行新候选的临时 amfid 操作。授权只覆盖冻结 VM 工件的 CDHash `52b10bcbce6db82de6afa83b801eb95da55246c7`。使用独立空临时配置、`--spoof-apple`、`paths=[]`、`allow_all=false`。没有扩大到其他工件或路径，没有修改持久 SIP/AMFI 设置。本轮 SIP 与 authenticated-root 观测输出和 B09 字节一致。
+
+本轮没有修改实现源码或重新构建。实际运行的是 B09 完整签名候选，源码 SHA 为 `2387af2015f3e86dbddca43d9ba1a9b06344c4b0`，VM SHA-256 为 `fe835bab19e8f71338adf803ae496b5906c75ceb4f2b34b16963970edba25a87`；B10 文档追加前的提交为 `2d02850e8722d83df5c3d68205f882d62f2165c9`。baseline、candidate 和 Launchpad 保存工件共 599 个文件的摘要再次核对通过。文档提交不改变候选来源 SHA。
+
+| 对象 | 结果 | 验收范围 |
+| --- | --- | --- |
+| 停机检查点 | 65 文件摘要一致，源元数据变化项为空 | 同 APFS 卷写时复制；不证明物理介质独立 |
+| 新宿主与 classic guest | 首次启动、连接、正常停机退出 0；无辅助进程重启后再次连接 | 原 daemon 组合兼容检查；不验证未部署的 API-v2 daemon |
+| 数据持久化 | 70 字节测试文件跨重启摘要一致，核对后清理成功 | 本轮测试文件；完整恢复和目标应用验收仍未完成 |
+| instance 约束 | 上次启动 instance 被拒绝，`operation_may_continue=false`；当前 instance 请求通过 | 两次实际启动间的宿主控制约束 |
+| HTTP 认证 | 缺失/错误令牌返回 401；重启后旧令牌返回 401 | 宿主代理认证与令牌轮换检查 |
+| 客户机 API | 正确令牌健康请求返回 502；session 为 reconnecting/transport，environment_status 返回 api_not_ready | 健康验收未通过；未执行环境安装、更新或回退 |
+| GUI 与应用 | 未观察解锁成功；Settings/Safari 返回 `uiopen ok but no pid`，对应进程查询无结果 | 本轮应用探测位于锁屏；不能据此确定启动失败原因 |
+
+停机检查点保存在 `/Users/qcz3840/github/vphone-cli/vm.backups/b10-vm-new-stopped-20261007`，检查没有降低为只检查文件存在。它是本轮写入测试文件前的恢复点；重启前只再次核对配置、原 guest 载荷、空间和文件占用，不宣称修改后的整个磁盘仍与检查点相同。此前原备份、独立卷恢复记录及 B09 失败样本继续保留。
+
+第一次新候选运行 PID 为 87653，instance 为 `5F7970EC-0380-448B-ADDF-A0F11FD0F543`。测试文件写入前确认目标不存在，读回 SHA-256 为 `8c9377cc74e3e190b6934b8b0e6767daf488a79ec9f2e9ce60ccbb00313a5beb`。随后向核对过命令路径的该 VM PID 发送 SIGINT，日志记录 graceful shutdown、guest power-off 请求连接结束及 `Guest stopped`，父驱动退出 0。停机后同一 VM 工件 `--help` 明确返回 0。第二次启动没有重新运行 amfid 辅助进程，PID 为 92943，instance 为 `068574F6-DEF3-4910-88AB-57F5330C7A02`。测试文件读回摘要一致，之后删除并验证路径不存在。vm-new 在本轮最终检查时继续运行。
+
+两次启动均显式指定 EXP 与 vm-new 原 `.vphoned.signed`。实际客户机 `/usr/bin/vphoned` 读回为 240352 字节，SHA-256 保持 `306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001`；配置与身份预测文件摘要未变。嵌入签名读取列出 250 个 entitlement，预期键缺失项为空。该读取只证明签名中的字段，不证明运行时权限授予。没有安装 API-v2 daemon、shared-components 或修改 kernel/Preboot。
+
+CUA 选择确切 candidate.app，观察并操作 Home 工具栏按钮、垂直拖动和 Return。屏幕仍显示锁屏；原生窗口捕获在部分检查中为黑色，原因未查明。命令返回不证明解锁、触控或实际硬件键盘输入成功，没有输入凭据或执行设置条款确认。`apps-after-home`、`home-before-launches` 等文件名沿用旧驱动命名，本轮这些文件不证明已进入主屏幕。B09 在已观察主屏幕时也出现 Settings/Safari 无 PID，两个实验设置分别保留。
+
+临时辅助进程 PID 87460 在 SIGINT 后未退出；核对同一进程命令后发送 SIGTERM，父会话退出 143。随后进程快照没有该 helper/debugserver，amfid 为 PPID 1、状态 Ss。记录清理结果，不宣称 Python finally 或 detach 流程成功。首次启动令牌在服务器停止后删除；运行中的重启令牌保留于本机 0600 私有文件。令牌值没有写入研究证据，监听限定为 127.0.0.1。
+
+原始失败尝试与修正均保留：测试驱动首次 file_put 使用 `data` 被拒绝，改为 `data_b64` 后写入；首次 rm 因 guest PATH 找不到命令，显式使用已有 PATH 后清理通过；不带 generation 的 camera_status 被拒绝，补字段后只读状态为 connected/source off；guest shasum 不可用，实际 daemon 摘要改由 file_get 字节计算。没有把这些驱动错误记录为产品修复。原始 help-before/help-after 文本没有保存明确退出码，不据此推断状态；停机后的 restart-help-result 单独保存 returncode=0。
+
+T03 与 T29 保持部分推进。T28 前置验收、目标 Core Bundle >=2.6.0、支持 major.minor series 策略、完整混合版本升级/回退矩阵，以及已恢复样本的目标应用仍未通过。此前完整 Swift/API HTTP/WS 的失败与未测范围保留，本轮未重跑测试套件。47 项台账仍为 2 项 accepted、41 项部分推进、3 项待本地对账（T30/T31/T42）、1 项可选延期，44 项必选任务未验收。固定上游提交覆盖台账未改变。
+
+追加前核对 471 份原证据与 3 份输入副本的已提交字节；新增 53 份证据后清单为 524 项。重启日志保存有界快照，私有原日志继续写入。主仓库源码仍为 e8d825b3 且干净，vm-2607 未操作。证据入口：`evidence/B10-summary.json`、`evidence/B10-session-results.json`、`evidence/B10-restart-check.json`。

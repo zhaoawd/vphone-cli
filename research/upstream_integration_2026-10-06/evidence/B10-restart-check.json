@@ -1,0 +1,290 @@
+[
+  {
+    "request": {
+      "t": "capabilities",
+      "screen": false
+    },
+    "response": {
+      "api_commands": {
+        "app_list": false,
+        "app_foreground": false,
+        "file_get": false,
+        "file_put": false,
+        "app_terminate": false,
+        "app_launch": false
+      },
+      "protocol_version": 1,
+      "target": {
+        "process_started_at": 1791372919.040498,
+        "vm": "vm-new",
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+        "pid": 92943
+      },
+      "api_session": {
+        "errorCode": "transport",
+        "state": "reconnecting",
+        "vmInstanceID": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "guest_connected": true,
+      "boot_mode": "normal",
+      "commands": {
+        "app_foreground": true,
+        "type": true,
+        "environment_status": false,
+        "screenshot": true,
+        "shell": true,
+        "app_terminate": true,
+        "camera_stop": true,
+        "camera_status": true,
+        "location": true,
+        "tap": true,
+        "capabilities": true,
+        "environment_rollback": false,
+        "environment_update": false,
+        "location_source_set": true,
+        "rpc": false,
+        "key": true,
+        "ipa_install": true,
+        "file_get": true,
+        "camera_present": true,
+        "location_stop": true,
+        "swipe": true,
+        "file_put": true,
+        "location_source_stop": true,
+        "location_source_status": true,
+        "location_stream_push": true,
+        "location_stream_start": true,
+        "location_source_control": true,
+        "app_list": true,
+        "open_url": true,
+        "app_launch": true
+      },
+      "rpc_methods": [],
+      "screen_available": true,
+      "ok": true,
+      "limits": {
+        "request_bytes": 2097152,
+        "command_timeout_ms": 180000,
+        "inline_file_bytes": 1048576,
+        "connections": 16,
+        "host_file_bytes": 67108864
+      },
+      "guest_capabilities": [
+        "hid",
+        "devmode",
+        "file",
+        "keychain",
+        "location",
+        "location_owned",
+        "ipa_install",
+        "clipboard",
+        "apps_v2",
+        "apps",
+        "app_launch",
+        "url",
+        "settings",
+        "shell",
+        "touch",
+        "touch_edge",
+        "vcam_status",
+        "vcam_receipt_v3"
+      ]
+    }
+  },
+  {
+    "request": {
+      "t": "capabilities",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "instance_id": "5F7970EC-0380-448B-ADDF-A0F11FD0F543",
+        "pid": 87653
+      }
+    },
+    "response": {
+      "ok": false,
+      "operation_may_continue": false,
+      "error": "request target does not match this VM process",
+      "target": {
+        "process_started_at": 1791372919.040498,
+        "vm": "vm-new",
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+        "pid": 92943
+      },
+      "code": "target_mismatch"
+    }
+  },
+  {
+    "request": {
+      "t": "capabilities",
+      "screen": false,
+      "target": {
+        "process_started_at": 1791372919.040498,
+        "vm": "vm-new",
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+        "pid": 92943
+      }
+    },
+    "response": {
+      "api_commands": {
+        "app_list": false,
+        "app_foreground": false,
+        "file_get": false,
+        "file_put": false,
+        "app_terminate": false,
+        "app_launch": false
+      },
+      "protocol_version": 1,
+      "target": {
+        "process_started_at": 1791372919.040498,
+        "vm": "vm-new",
+        "instance_id": "068574F6-DEF3-4910-88AB-57F5330C7A02",
+        "pid": 92943
+      },
+      "api_session": {
+        "errorCode": "transport",
+        "state": "reconnecting",
+        "vmInstanceID": "068574F6-DEF3-4910-88AB-57F5330C7A02"
+      },
+      "guest_connected": true,
+      "boot_mode": "normal",
+      "commands": {
+        "file_get": true,
+        "rpc": false,
+        "ipa_install": true,
+        "type": true,
+        "capabilities": true,
+        "location_source_stop": true,
+        "camera_present": true,
+        "camera_status": true,
+        "location_source_set": true,
+        "screenshot": true,
+        "key": true,
+        "file_put": true,
+        "environment_status": false,
+        "location_source_control": true,
+        "camera_stop": true,
+        "app_terminate": true,
+        "environment_rollback": false,
+        "app_launch": true,
+        "location_stream_push": true,
+        "swipe": true,
+        "environment_update": false,
+        "location_stream_start": true,
+        "tap": true,
+        "location": true,
+        "app_list": true,
+        "app_foreground": true,
+        "shell": true,
+        "open_url": true,
+        "location_source_status": true,
+        "location_stop": true
+      },
+      "rpc_methods": [],
+      "screen_available": true,
+      "ok": true,
+      "limits": {
+        "request_bytes": 2097152,
+        "command_timeout_ms": 180000,
+        "inline_file_bytes": 1048576,
+        "connections": 16,
+        "host_file_bytes": 67108864
+      },
+      "guest_capabilities": [
+        "hid",
+        "devmode",
+        "file",
+        "keychain",
+        "location",
+        "location_owned",
+        "ipa_install",
+        "clipboard",
+        "apps_v2",
+        "apps",
+        "app_launch",
+        "url",
+        "settings",
+        "shell",
+        "touch",
+        "touch_edge",
+        "vcam_status",
+        "vcam_receipt_v3"
+      ]
+    }
+  },
+  {
+    "request": {
+      "t": "file_get",
+      "screen": false,
+      "path": "/private/var/mobile/Library/vphone-b10-acceptance-20261007.txt"
+    },
+    "response": {
+      "size": 70,
+      "data": "dnBob25lIEIxMCBhY2NlcHRhbmNlCnNvdXJjZSAyMzg3YWYyMDE1ZjNlODZkYmRkY2E0M2Q5YmExYTliMDYzNDRjNGIwCg==",
+      "ok": true,
+      "sha256": "8c9377cc74e3e190b6934b8b0e6767daf488a79ec9f2e9ce60ccbb00313a5beb"
+    }
+  },
+  {
+    "request": {
+      "t": "file_get",
+      "screen": false,
+      "path": "/usr/bin/vphoned"
+    },
+    "response": {
+      "size": 240352,
+      "ok": true,
+      "readback": {
+        "bytes": 240352,
+        "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+      }
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; rm /private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 0,
+      "ok": true,
+      "stderr": "",
+      "truncated": false,
+      "timed_out": false,
+      "stdout": ""
+    }
+  },
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "test ! -e /private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "code": 0,
+      "ok": true,
+      "stderr": "",
+      "truncated": false,
+      "timed_out": false,
+      "stdout": ""
+    }
+  },
+  {
+    "http_auth_after_restart": [
+      {
+        "authentication": "previous_boot_token",
+        "status": 401,
+        "body": "{\"type\":\"response\",\"id\":null,\"error\":{\"code\":\"unauthorized\",\"message\":\"Missing or wrong API token\"}}"
+      },
+      {
+        "authentication": "current_boot_token",
+        "status": 502,
+        "body": ""
+      }
+    ],
+    "token_saved_to_evidence": false
+  }
+]

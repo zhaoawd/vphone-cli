@@ -1,0 +1,43 @@
+[
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "cmd": "test ! -e /private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "timed_out": false,
+      "truncated": false,
+      "ok": true,
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  {
+    "request": {
+      "t": "file_put",
+      "screen": false,
+      "path": "/private/var/mobile/Library/vphone-b10-acceptance-20261007.txt",
+      "data_b64": "dnBob25lIEIxMCBhY2NlcHRhbmNlCnNvdXJjZSAyMzg3YWYyMDE1ZjNlODZkYmRkY2E0M2Q5YmExYTliMDYzNDRjNGIwCg=="
+    },
+    "response": {
+      "size": 70,
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "file_get",
+      "screen": false,
+      "path": "/private/var/mobile/Library/vphone-b10-acceptance-20261007.txt"
+    },
+    "response": {
+      "ok": true,
+      "size": 70,
+      "data": "dnBob25lIEIxMCBhY2NlcHRhbmNlCnNvdXJjZSAyMzg3YWYyMDE1ZjNlODZkYmRkY2E0M2Q5YmExYTliMDYzNDRjNGIwCg==",
+      "sha256": "8c9377cc74e3e190b6934b8b0e6767daf488a79ec9f2e9ce60ccbb00313a5beb"
+    }
+  }
+]
