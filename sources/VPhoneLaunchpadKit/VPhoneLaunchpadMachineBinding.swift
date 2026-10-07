@@ -40,12 +40,20 @@ public struct VPhoneLaunchpadMachineBinding: Codable, Equatable, Sendable {
         public let sha256: String
         private let device: Int32
         private let inode: UInt64
+        private let modifiedSeconds: Int
+        private let modifiedNanoseconds: Int
+        private let changedSeconds: Int
+        private let changedNanoseconds: Int
 
         fileprivate init(binding: VPhoneLaunchpadMachineBinding, bytes: Data, info: stat) {
             self.binding = binding
             sha256 = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
             device = info.st_dev
             inode = UInt64(info.st_ino)
+            modifiedSeconds = info.st_mtimespec.tv_sec
+            modifiedNanoseconds = info.st_mtimespec.tv_nsec
+            changedSeconds = info.st_ctimespec.tv_sec
+            changedNanoseconds = info.st_ctimespec.tv_nsec
         }
 
         public func matches(_ machine: VPhoneLaunchpadMachinePath) -> Bool {

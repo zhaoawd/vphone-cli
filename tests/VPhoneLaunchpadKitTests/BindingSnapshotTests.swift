@@ -14,6 +14,8 @@ struct BindingSnapshotTests {
         #expect(snapshot.binding.bundle == "2.6.1")
         #expect(snapshot.sha256.count == 64)
         #expect(snapshot.matches(machine))
+        try old.write(to: url)
+        #expect(!snapshot.matches(machine))
         let replacement = Data(String(decoding: old, as: UTF8.self).replacingOccurrences(of: "2.6.1", with: "2.6.2").utf8)
         #expect(old.count == replacement.count)
         try replacement.write(to: url)
