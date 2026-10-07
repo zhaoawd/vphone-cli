@@ -2005,7 +2005,7 @@
         "T17",
         "T21"
       ],
-      "status": "pending_local_audit",
+      "status": "bootstrap_refresh_and_failure_details_verified_provider_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
         "VPhoneDaemon/Daemon/",
@@ -2030,12 +2030,37 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "bootstrap_refresh_and_failure_details_verified_provider_pending",
+        "paths": [
+          "sources/VPhoneDaemon/Daemon/GuestAppRefreshDirectory.swift",
+          "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+          "sources/VPhoneDaemon/Daemon/APIWire.swift",
+          "sources/VPhoneDaemon/Daemon/GuestOperationFailure.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "ba5b6ec50af5dd06679ca154f29a344ea36ac6c7",
+        "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3"
+      ],
+      "verification_evidence": [
+        "evidence/B08-summary.json",
+        "evidence/B08-source-review.json",
+        "evidence/B08-t18-red.log",
+        "evidence/B08-swift-related.log",
+        "evidence/B08-python.log",
+        "evidence/B08-t18-green.log",
+        "evidence/B08-t18-error-red.log",
+        "evidence/B08-t18-error-green.log",
+        "evidence/B08-daemon-final-build.log",
+        "evidence/B08-daemon-candidate-manifest.json"
+      ],
+      "historical_evidence": [],
+      "current_result": "默认应用刷新绑定合法完成记录的 Applications 目录，缺目录拒绝；保留显式路径能力。API 回复保留 Icli 命令失败详情。MIS/installd 与扩展 provider 实际运行待完成。",
+      "remaining_work": [
+        "Complete MIS/installd targets and signing/mode inventory, extension registration and app/provider independent accepted/completed/launched evidence.",
+        "Verify actual supported RootHide/rootless directory, app refresh and extension provider discovery with vm-new; path tests and daemon compilation do not execute LaunchServices.",
+        "Audit host client/CLI details propagation and verify structured Icli failure details over actual guest HTTP/WebSocket; the JSON formatter is tested but an actual daemon request is not. apps.install success cannot establish installd Hook or devicectl support."
+      ]
     },
     {
       "id": "T19",
@@ -2051,7 +2076,7 @@
       "dependencies": [
         "T18"
       ],
-      "status": "pending_local_audit",
+      "status": "independent_identity_comparison_verified_runtime_readback_pending",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/",
         "VPhoneKit/VPhoneCoreKit/VirtualMachine/",
@@ -2072,12 +2097,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "independent_identity_comparison_verified_runtime_readback_pending",
+        "paths": [
+          "sources/VPhoneCore/VPhoneDeviceIdentityCheck.swift",
+          "tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "207f542f3a8a1906ba356b3c3fea45cf86a782ac"
+      ],
+      "verification_evidence": [
+        "evidence/B08-summary.json",
+        "evidence/B08-source-review.json",
+        "evidence/B08-t19-red.log",
+        "evidence/B08-swift-related.log",
+        "evidence/B08-python.log",
+        "evidence/B08-t19-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成调用方提供的 expected/guest/host 身份比较；缺失、非法、差异和匹配分别表达。未采集实际身份，未新增修改身份能力或推定宿主信任。",
+      "remaining_work": [
+        "Acquire separate authenticated guest and host observations, wire readback into callers, and preserve the original allowed identity/trust scope.",
+        "Adapt UDID set/clear/reboot and safe restoration with compatible MIS/USB/process-refresh components; no identity mutation was introduced here.",
+        "Real guest/host discovery, USB serial and pairing/trust acceptance; supplied observations and equality do not prove host trust."
+      ]
     },
     {
       "id": "T20",
@@ -2097,7 +2140,7 @@
         "T24",
         "T40"
       ],
-      "status": "pending_local_audit",
+      "status": "host_cache_and_replay_bounds_verified_helper_permission_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneLocationProvider.swift",
         "VPhoneDaemon/Daemon/",
@@ -2120,12 +2163,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "host_cache_and_replay_bounds_verified_helper_permission_pending",
+        "paths": [
+          "sources/vphone-cli/VPhoneLocationProvider.swift",
+          "tests/VPhoneCLITests/HostLocationReuseTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "408f3d23b29d16e6e28998d92e20023e897548a3"
+      ],
+      "verification_evidence": [
+        "evidence/B08-summary.json",
+        "evidence/B08-source-review.json",
+        "evidence/B08-t20-red.log",
+        "evidence/B08-swift-related.log",
+        "evidence/B08-python.log",
+        "evidence/B08-t20-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "宿主缓存与模拟来源分离，缓存仅在有效且未过期时复用；非法/溢出重放间隔在改来源前拒绝，旧重放清理按来源代次核对。独立 helper 权限与真实读回待完成。",
+      "remaining_work": [
+        "Package and sign VPhoneLocation.app with usage descriptions and verify the actual helper TCC authorization owner across direct CLI, Bundle switches and local builds.",
+        "Implement permission denial, missing fix/altitude, helper exit/stdin/pipe cleanup and reconnect/guest-not-ready behavior while retaining local external ownership and other Hooks.",
+        "Verify stale replay cleanup and fixed-source/host-source switching on actual runtime; core location parser/controller tests do not establish host permission or new simulated guest readback."
+      ]
     },
     {
       "id": "T21",
@@ -2143,7 +2204,7 @@
         "T16",
         "T43"
       ],
-      "status": "pending_local_audit",
+      "status": "bounded_bootstrap_marker_reads_verified_service_acceptance_pending",
       "upstream_paths": [
         "VPhoneGuestComponents/",
         "VPhoneDaemon/Daemon/"
@@ -2164,12 +2225,30 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "bounded_bootstrap_marker_reads_verified_service_acceptance_pending",
+        "paths": [
+          "sources/VPhoneDaemon/Daemon/GuestBootstrapState.swift",
+          "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "76ce963254a0f0cbc5ec8e2fb06115b2266c6320"
+      ],
+      "verification_evidence": [
+        "evidence/B08-summary.json",
+        "evidence/B08-source-review.json",
+        "evidence/B08-t21-red.log",
+        "evidence/B08-swift-related.log",
+        "evidence/B08-python.log",
+        "evidence/B08-t21-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "完成受限完成记录读取；非法主记录拒绝，false 主记录覆盖 legacy；保留 RootHide checksum 与现有用户状态。服务适配和真实 bootstrap 验收待完成。",
+      "remaining_work": [
+        "Complete fixed-target bootstrap/service compatibility, base initialization and RootHide package-state handling without replacing existing credentials, host keys or package state.",
+        "Validate completed root existence/ownership and authenticated marker provenance; the bounded reader does not establish receipt authenticity or snapshot consistency under a same-size concurrent rewrite.",
+        "Real new/existing/bootstrap-repeat and missing-tool VM acceptance; installer mutation/rollback remains unverified."
+      ]
     },
     {
       "id": "T22",
@@ -2189,7 +2268,7 @@
         "T17",
         "T43"
       ],
-      "status": "pending_local_audit",
+      "status": "camera_write_leases_and_late_failure_fence_verified_vm_pending",
       "upstream_paths": [
         "VPhoneGuestComponents/VCamCaptured/",
         "VPhoneGuestComponents/CamFix/",
@@ -2211,12 +2290,34 @@
         "vm"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "camera_write_leases_and_late_failure_fence_verified_vm_pending",
+        "paths": [
+          "sources/vphone-cli/VPhoneCameraServer.swift",
+          "sources/vphone-cli/VPhoneCameraWriteLease.swift",
+          "tests/VPhoneCLITests/CameraWriteLeaseTests.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "2dedb0e8ec6c8b9b928c4dbfb4068ebf6a2b35c4",
+        "bf054a71db49f3bb36a2aa8f4a390026f9fdd28f"
+      ],
+      "verification_evidence": [
+        "evidence/B08-summary.json",
+        "evidence/B08-source-review.json",
+        "evidence/B08-t22-red.log",
+        "evidence/B08-swift-related.log",
+        "evidence/B08-python.log",
+        "evidence/B08-t22-green.log",
+        "evidence/B08-t22-failure-red-corrected.log",
+        "evidence/B08-t26-t22-green.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "排队写入使用独立描述符，限制一项未完成帧并设发送超时；晚失败核对连接、来源和描述符。保留本地协议及回执，实际重连、完整组件与预览/拍照验收待完成。",
+      "remaining_work": [
+        "Integrate final compatible daemon/shared memory/VCam/CamFix/GPU prewarm combination without losing local frame lifecycle, presentation and receipt ABI.",
+        "Real socket reconnect, source switching during sends, cancellation and continuous memory/timeout acceptance; descriptor/predicate tests do not execute the actual late callback or VZ connection.",
+        "Independent system/third-party preview and photo checks, color/format/timestamp and guest process restart; candidate remains unactivated."
+      ]
     },
     {
       "id": "T23",
@@ -2476,7 +2577,7 @@
         "T25",
         "T40"
       ],
-      "status": "pending_local_audit",
+      "status": "launchpad_hardware_keyboard_settings_verified_live_ui_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadModel.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings",
@@ -2497,12 +2598,33 @@
         "host"
       ],
       "local_mapping": {
-        "state": "resolve_in_T02",
-        "paths": []
+        "state": "launchpad_hardware_keyboard_settings_verified_live_ui_pending",
+        "paths": [
+          "sources/VPhoneCore/VPhoneBundleReport.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
+          "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineEdit.swift",
+          "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift"
+        ]
       },
-      "implementation_commits": [],
-      "verification_evidence": [],
-      "historical_evidence": []
+      "implementation_commits": [
+        "08e31534abbb4ca571ff95c85eef5133145a7bb7"
+      ],
+      "verification_evidence": [
+        "evidence/B08-summary.json",
+        "evidence/B08-source-review.json",
+        "evidence/B08-t26-red.log",
+        "evidence/B08-swift-related.log",
+        "evidence/B08-python.log",
+        "evidence/B08-t26-t22-green.log",
+        "evidence/B08-t26-red-corrected.log"
+      ],
+      "historical_evidence": [],
+      "current_result": "接入每 VM 键盘开关报告与设置 UI；旧报告缺字段保持开启，仅明确编辑时发出 on/off。翻译条目齐备，真实签名 UI、键盘输入和其他历史 UI 范围待完成。",
+      "remaining_work": [
+        "Audit remaining historical ded81cb–caebc24 entries and complete target startup/background/network/progress/close settings only when backend capabilities are available.",
+        "Verify mixed-machine edits, rapid switching/cancel/create-close and supported languages in signed Launchpad with real VM state.",
+        "Verify actual hardware keyboard input on rebuilt signed runtime; UI compilation/report/CLI command tests do not prove real device behavior."
+      ]
     },
     {
       "id": "T27",
@@ -4116,6 +4238,6 @@
       "cost": "构建需要 Xcode xcstringstool；本轮未完成 launcher、隐私授权与 VM 验收"
     }
   ],
-  "latest_implementation_head": "95afaf010f59bb2cd8f33c847ad7a94f48e62f9b",
-  "latest_validation_limitation": "B07: six tasks partial. Python564 pass after missing B06 Inspector catalog repair; affected serial Swift XCTest135 (3 skipped), Swift Testing714/99 pass. Guest host loader checks and camera124 checks pass; iOS candidate source/build/signature checks pass, unactivated. Actual kernel proof, disk/receipt transactions, modern eligibility and real VM acceptance remain open. Full Swift/API HTTP/WS not rerun; previous failures cause unknown. Signed vm-new runtime unchanged."
+  "latest_implementation_head": "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3",
+  "latest_validation_limitation": "B08 six tasks partial; Python571 pass; affected serial Swift XCTest167 and Swift Testing553/84 pass with documented skips. Daemon candidate build/pins/signature checks pass, unactivated. No guest deployment, signed VM runtime rebuild or VM acceptance. Full Swift/API HTTP/WS limitations retained."
 }

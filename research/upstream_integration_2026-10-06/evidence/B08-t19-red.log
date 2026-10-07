@@ -1,0 +1,163 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/16] Copying Localizable.xcstrings
+[3/40] Write sources
+[4/40] Write swift-version--58304C5D6DBC2206.txt
+[5/36] Compiling log.c
+[6/36] Compiling locking.c
+[6/36] Compiling deviceinterfaced.c
+[8/36] Compiling download.c
+[9/36] Compiling fdr.c
+[10/40] Compiling ipsw.c
+[11/40] Compiling limera1n.c
+[12/40] Compiling normal.c
+[13/40] Compiling dfu.c
+[14/40] Compiling asr.c
+[15/40] Compiling recovery.c
+[16/40] Compiling img3.c
+[17/40] Compiling ace3.c
+[18/40] Compiling ftab.c
+[19/40] Compiling mbn.c
+[20/40] Compiling fls.c
+[21/40] Compiling img4.c
+[22/40] Compiling restore.c
+[23/40] Compiling vphone_zip_stub.c
+[24/40] Compiling common.c
+[25/40] Compiling vphone_restore_bridge.c
+[26/40] Compiling idevicerestore.c
+[27/40] Compiling MobileRecoveryCore libirecovery.c
+[29/41] Compiling VPhoneCoreTests IPSWCacheTests.swift
+[30/41] Compiling VPhoneCoreTests NativeTransferTests.swift
+[31/41] Emitting module VPhoneCoreTests
+[32/41] Compiling VPhoneCoreTests DeviceIdentityCheckTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:6:21: error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+ 4 | struct DeviceIdentityCheckTests {
+ 5 |     @Test func usbSerialAndGuestUDIDAgreeWithoutInferringTrust() {
+ 6 |         let check = VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000fe01-0011223344556677", host: "0000FE010011223344556677")
+   |                     `- error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+ 7 |         #expect(check.state == .matching)
+ 8 |         #expect(check.host == "0000FE01-0011223344556677")
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:7:33: error: cannot infer contextual base in reference to member 'matching'
+ 5 |     @Test func usbSerialAndGuestUDIDAgreeWithoutInferringTrust() {
+ 6 |         let check = VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000fe01-0011223344556677", host: "0000FE010011223344556677")
+ 7 |         #expect(check.state == .matching)
+   |                                 `- error: cannot infer contextual base in reference to member 'matching'
+ 8 |         #expect(check.host == "0000FE01-0011223344556677")
+ 9 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:11:21: error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+ 9 |     }
+10 |     @Test func missingObservationDoesNotUsePredictionAsReadback() {
+11 |         let check = VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: nil, host: nil)
+   |                     `- error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+12 |         #expect(check.state == .incomplete)
+13 |         #expect(check.guest == nil && check.host == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:11:93: error: 'nil' requires a contextual type
+ 9 |     }
+10 |     @Test func missingObservationDoesNotUsePredictionAsReadback() {
+11 |         let check = VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: nil, host: nil)
+   |                                                                                             `- error: 'nil' requires a contextual type
+12 |         #expect(check.state == .incomplete)
+13 |         #expect(check.guest == nil && check.host == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:11:104: error: 'nil' requires a contextual type
+ 9 |     }
+10 |     @Test func missingObservationDoesNotUsePredictionAsReadback() {
+11 |         let check = VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: nil, host: nil)
+   |                                                                                                        `- error: 'nil' requires a contextual type
+12 |         #expect(check.state == .incomplete)
+13 |         #expect(check.guest == nil && check.host == nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:12:33: error: cannot infer contextual base in reference to member 'incomplete'
+10 |     @Test func missingObservationDoesNotUsePredictionAsReadback() {
+11 |         let check = VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: nil, host: nil)
+12 |         #expect(check.state == .incomplete)
+   |                                 `- error: cannot infer contextual base in reference to member 'incomplete'
+13 |         #expect(check.guest == nil && check.host == nil)
+14 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:16:17: error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+14 |     }
+15 |     @Test func disagreementAndMalformedEvidenceStayDistinct() {
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+   |                 `- error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:16:139: error: cannot infer contextual base in reference to member 'mismatch'
+14 |     }
+15 |     @Test func disagreementAndMalformedEvidenceStayDistinct() {
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+   |                                                                                                                                           `- error: cannot infer contextual base in reference to member 'mismatch'
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:16:124: error: 'nil' requires a contextual type
+14 |     }
+15 |     @Test func disagreementAndMalformedEvidenceStayDistinct() {
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+   |                                                                                                                            `- error: 'nil' requires a contextual type
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:17:17: error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+15 |     @Test func disagreementAndMalformedEvidenceStayDistinct() {
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+   |                 `- error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+19 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:17:123: error: cannot infer contextual base in reference to member 'invalid'
+15 |     @Test func disagreementAndMalformedEvidenceStayDistinct() {
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+   |                                                                                                                           `- error: cannot infer contextual base in reference to member 'invalid'
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+19 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:17:108: error: 'nil' requires a contextual type
+15 |     @Test func disagreementAndMalformedEvidenceStayDistinct() {
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+   |                                                                                                            `- error: 'nil' requires a contextual type
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+19 |     }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:18:17: error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+   |                 `- error: cannot find 'VPhoneDeviceIdentityCheck' in scope
+19 |     }
+20 | }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/DeviceIdentityCheckTests.swift:18:181: error: cannot infer contextual base in reference to member 'matching'
+16 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "0000FE01-0011223344556678", host: nil).state == .mismatch)
+17 |         #expect(VPhoneDeviceIdentityCheck(expected: "0000FE01-0011223344556677", guest: "arbitrary", host: nil).state == .invalid)
+18 |         #expect(VPhoneDeviceIdentityCheck(expected: String(repeating: "a", count: 40), guest: String(repeating: "A", count: 40), host: String(repeating: "A", count: 40)).state == .matching)
+   |                                                                                                                                                                                     `- error: cannot infer contextual base in reference to member 'matching'
+19 |     }
+20 | }
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError

@@ -1,0 +1,127 @@
+{
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "source_reads": [
+    {
+      "path": "VPhoneDaemon/Daemon/Bootstrap/GuestIrisinInstaller.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "cc36f53d729d0c5133b9e86413b709a344f1033fa8db335e0f8ef09737f7883a",
+      "evidence": "evidence/B08-T21-bootstrap.swift"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "40ed9fc73b841662e04a84a29d76df271ecb848ce8bd80ea664030bd9346c2eb",
+      "evidence": "evidence/B08-T18-app-detail.swift"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/APIWire.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "f6284f30e7a768e142c03f4c30ff6e690fe3865a0714fe1a88bd4ff2c83b3ae1",
+      "evidence": "evidence/B08-T18-api-wire.swift"
+    },
+    {
+      "path": "VPhoneDaemon/Daemon/GuestAPI+DeviceIdentity.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "02c477d2eada06326934c00c54d47fc9eee69dcb88e497da79e2f918c5f1ba8d",
+      "evidence": "evidence/B08-T19-identity.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuUDID.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "f905f69dbedf5180cce6244114adb9c58f8ac842f20461ec32557854b748cca5",
+      "evidence": "evidence/B08-T19-menu.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneLocationProvider.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "a1ab6150e70c678f95b2039cc9e105d012802377b3161dbb932130eafdc67cd3",
+      "evidence": "evidence/B08-T20-location.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneVirtualization/LocationHelperProcess/main.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "4cf32cd2987a657c0fbc0fa09ae03d5c35ee14210f9408bb11efa47465a8ed7b",
+      "evidence": "evidence/B08-T20-helper.swift"
+    },
+    {
+      "path": "VPhoneExecutable/VPhoneVirtualization/UI/HostDevices/VPhoneCameraServer.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "754e16cb1d6aae9c3b02ae67757de2c18c3f30bd1ebbe07ea1ee26a281c1ff5b",
+      "evidence": "evidence/B08-T22-camera.swift"
+    },
+    {
+      "path": "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineSheets.swift",
+      "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "sha256": "325d8db2f0bd2a7bc6ab248f76853933adb05bf2ac604a5990b20276049b0722",
+      "evidence": "evidence/B08-T26-settings.swift"
+    },
+    {
+      "path": "Sources/IcliKit/Apps.swift",
+      "dependency_revision": "702990b59ca412ad975f9f0ea5dafe95c30fac21",
+      "sha256": "4c3938943ac1236c0efa20e52a3136d6e6a459d15885952b6e5aedb760c60fcc",
+      "evidence": "evidence/B08-T18-Icli-Apps.swift"
+    },
+    {
+      "path": "Sources/IcliPrivate/AppRegistration.m",
+      "dependency_revision": "702990b59ca412ad975f9f0ea5dafe95c30fac21",
+      "sha256": "b7521c921439690c668afaa90b91e6fde00efcd3f2b1680695c29063168338f7",
+      "evidence": "evidence/B08-T18-Icli-AppRegistration.m"
+    }
+  ],
+  "scope": "fixed source/interface review; no whole upstream commit marked equivalent; six tasks remain partial",
+  "T21": {
+    "implemented": "No-follow regular marker read capped at64KiB; present corrupt/linked/oversized primary refuses rather than falling back; exact boolean tombstone shadows legacy; retained rootless literal and local RootHide checksum validator; no marker write path changed.",
+    "upstream": "Target installer is split into bootstrap/layout files and recognizes its canonical RootHide root; local checksum-permitted existing root scope preserved. Fixed base/services/watchers were not ported.",
+    "not_verified": [
+      "Complete fixed-target bootstrap/service compatibility, base initialization and RootHide package-state handling without replacing existing credentials, host keys or package state.",
+      "Validate completed root existence/ownership and authenticated marker provenance; the bounded reader does not establish receipt authenticity or snapshot consistency under a same-size concurrent rewrite.",
+      "Real new/existing/bootstrap-repeat and missing-tool VM acceptance; installer mutation/rollback remains unverified."
+    ]
+  },
+  "T18": {
+    "implemented": "Both apps.refresh and system.uicache default to completed bootstrap Applications with child-directory check; explicit canonical absolute path retained. Icli commandFailed details carried in error response without flattening bundle output.",
+    "upstream": "Target default refresh similarly names completed bootstrap; target wrapper converts failed/unverified bundle names into prose. Local retains structured details. Pinned IcliKit0.7.16 already registers via LaunchServices and queries plugInKitPlugins; no new provider implementation or execution verified.",
+    "not_verified": [
+      "Complete MIS/installd targets and signing/mode inventory, extension registration and app/provider independent accepted/completed/launched evidence.",
+      "Verify actual supported RootHide/rootless directory, app refresh and extension provider discovery with vm-new; path tests and daemon compilation do not execute LaunchServices.",
+      "Audit host client/CLI details propagation and verify structured Icli failure details over actual guest HTTP/WebSocket; the JSON formatter is tested but an actual daemon request is not. apps.install success cannot establish installd Hook or devicectl support."
+    ]
+  },
+  "T19": {
+    "implemented": "Pure comparison of expected/guest/host observations; 24hex USB serial normalizes to8-16 form, 40hex legacy form retained; missing/invalid/mismatch/matching distinct; no runtime caller or identity mutation.",
+    "upstream": "UDID target has MIS/process/USB routes, clear tombstone and startup retry. Source comments describe upstream observations, not local evidence. No arbitrary UDID probing or new mutation scope adopted.",
+    "not_verified": [
+      "Acquire separate authenticated guest and host observations, wire readback into callers, and preserve the original allowed identity/trust scope.",
+      "Adapt UDID set/clear/reboot and safe restoration with compatible MIS/USB/process-refresh components; no identity mutation was introduced here.",
+      "Real guest/host discovery, USB serial and pairing/trust acceptance; supplied observations and equality do not prove host trust."
+    ]
+  },
+  "T20": {
+    "implemented": "Host-only cache separate from simulated presets/replays; cached age absolute<60s with valid coordinate/accuracy; nonfinite/overflow intervals refuse before ownership change; cleanup guarded by source revision.",
+    "upstream": "Fixed provider uses helper app and60s cache bound. Local still uses existing CoreLocation manager; helper packaging/permission lifecycle not ported.",
+    "not_verified": [
+      "Package and sign VPhoneLocation.app with usage descriptions and verify the actual helper TCC authorization owner across direct CLI, Bundle switches and local builds.",
+      "Implement permission denial, missing fix/altitude, helper exit/stdin/pipe cleanup and reconnect/guest-not-ready behavior while retaining local external ownership and other Hooks.",
+      "Verify stale replay cleanup and fixed-source/host-source switching on actual runtime; core location parser/controller tests do not establish host permission or new simulated guest readback."
+    ]
+  },
+  "T22": {
+    "implemented": "CLOEXEC duplicate for queued writer, one pending frame and5s socket send timeout; framework owns original; connection/source/descriptor predicate fences late failure, original generation/presentation/receipt wire unchanged.",
+    "upstream": "Fixed camera uses dup, one pending frame, send timeout and connection token; it uses different final daemon/camera wire than local custom v3. Local preserves existing wire instead of adopting one component alone.",
+    "correction": "First camera commit retained fd-only callback because a text replacement did not match. Self-review found it before final validation; added pure failure ownership predicate RED->GREEN in second commit.",
+    "not_verified": [
+      "Integrate final compatible daemon/shared memory/VCam/CamFix/GPU prewarm combination without losing local frame lifecycle, presentation and receipt ABI.",
+      "Real socket reconnect, source switching during sends, cancellation and continuous memory/timeout acceptance; descriptor/predicate tests do not execute the actual late callback or VZ connection.",
+      "Independent system/third-party preview and photo checks, color/format/timestamp and guest process restart; candidate remains unactivated."
+    ]
+  },
+  "T26": {
+    "implemented": "Optional keyboard flag reported from manifest, nil defaults legacy on in machine decode, settings toggle only emits explicit on/off edits; en/zh-Hans label.",
+    "upstream": "Final settings includes additional network/startup/forward controls; these depend on runtime and remain pending. Keyboard addition uses B06 local CLI contract.",
+    "not_verified": [
+      "Audit remaining historical ded81cb–caebc24 entries and complete target startup/background/network/progress/close settings only when backend capabilities are available.",
+      "Verify mixed-machine edits, rapid switching/cancel/create-close and supported languages in signed Launchpad with real VM state.",
+      "Verify actual hardware keyboard input on rebuilt signed runtime; UI compilation/report/CLI command tests do not prove real device behavior."
+    ]
+  }
+}

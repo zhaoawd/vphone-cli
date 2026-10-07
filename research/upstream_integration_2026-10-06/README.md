@@ -365,3 +365,35 @@ Python 全套首轮运行 564 项、256.960 秒，只有字符串目录测试失
 追加前逐项核对原有 348 份证据与 3 份输入副本的已提交字节。台账为 47 项：2 已验收、34 部分推进、10 待对账、1 可选延期；46 项必选仍有 44 项未验收。步骤、验收、回退、依赖和接口约束未改写。固定上游提交覆盖台账保持原状态，源码路径审查不等同于整个提交已合入。
 
 证据入口：`evidence/B07-summary.json`、`evidence/B07-source-review.json`。
+
+
+### 2026-10-07 B08：T21、T18、T19、T20、T22、T26
+
+本轮按用户要求推进 6 项，共 8 个实现提交。六项保留完整验收条件，均未标记 accepted。源码、修正记录、完整 SHA 与原始日志见 `evidence/B08-summary.json`。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T21 | 64 KiB、regular file、O_NOFOLLOW 完成记录读取；非法主记录拒绝、主 tombstone 覆盖 legacy；保留原 RootHide checksum | 可信记录与根目录证明、服务/基础初始化、现有密码/host keys/包状态和真实重复安装验收 |
+| T18 | 默认刷新绑定完成 bootstrap 的 Applications；缺目录拒绝；显式规范绝对目录保留；API 错误保留 Icli commandFailed 详情 | MIS/installd 与模式签名、实际应用安装/扩展注册/provider 启动、真实错误回复 |
+| T19 | 分别比较 expected/guest/host；USB serial 规范化；缺失/非法/差异/匹配区分 | 真实身份采集、调用方接入、set/clear/reboot/USB/Hook 适配及宿主发现/信任 |
+| T20 | 宿主与模拟来源缓存分离；有效且年龄绝对值小于 60 秒才复用；非法重放间隔拒绝、清理按来源代次核对 | 独立定位 helper 打包/签名/TCC、权限/退出/重连、真实新鲜定位及旧重放清理 |
+| T22 | 排队帧独立 CLOEXEC 描述符、单项未完成帧和发送超时；晚失败核对连接/来源/描述符；保留本地 wire/回执 | 完整媒体组件组合、实际 socket/source 切换、持续内存与 guest 重启、预览和拍照 |
+| T26 | 键盘可选字段贯通 manifest 报告、Launchpad 解码与设置；缺字段仍开启，只发明确编辑项；双语条目 | 其余目标管理/后台/网络/关闭项、真实签名 UI、多 VM 与实际硬件键盘输入 |
+
+T21 的 3 项真实文件测试验证主 tombstone 不改写旧用户记录、非法/numeric/linked/oversized 主记录不回退，以及 RootHide checksum/目录范围。T18 的 3 项路径测试区分默认 bootstrap 与显式目录。两者首轮因新接口缺失编译失败。本轮只改变读取/default refresh，安装、marker 写入、密码、host keys 和包操作逻辑未改写。受限读并不证明 marker 来源可信或同长度并发写入的一致快照。
+
+T18 初次封装保留了 IcliError，但复核 APIWire 发现输出仍被丢弃。新增错误详情 JSON 测试先失败，补齐 error.details 后 1 项通过；failed/unverified 与机器错误码在 JSON 往返中保留。该测试没有执行真实 HTTP/WebSocket 请求。固定 IcliKit 0.7.16 源码与锁定 checkout 核对，应用/plugInKitPlugins 接口已经存在；未宣称实际 .appex provider 已注册或启动。
+
+T19 首轮因缺比较 API 编译失败，3 项 Swift 测试通过。比较输入由调用方提供，不采集真实身份，也不证明配对/信任；没有新增身份写入。T20 首轮因缺缓存/计时 API 编译失败，82 项定位相关 XCTest 通过；固定源和 replay 不再写宿主缓存。采用固定上游 60 秒缓存边界，但本地仍使用现有 CoreLocation manager，独立 helper 与权限职责尚未接入。
+
+T22 首轮因缺描述符 lease 编译失败，真实 pipe 复用测试及相关范围 11 项 XCTest 通过。复核发现首个提交的晚失败回调仍只有 fd 检查，文本替换未匹配原代码；增加连接/来源匹配测试，排除 T26 缺 API 的编译干扰后，单独确认缺 isCurrent 接口。第二个提交补齐检查。测试覆盖真实 descriptor 复用、lease 关闭和纯匹配条件，不证明 VZ 真实晚回调已执行。原 v3 generation/presentation/消费回执协议保留，未替换为单个上游媒体组件。
+
+T26 初始测试误用了不存在的 decodeInfo；改为现有 decodeList 后，确认 Settings 和键盘属性缺失的失败，再实现。最终测试使用实际 manifest/report 编解码，验证 false 传递、legacy nil 默认及仅明确编辑字段进入命令。与相机补充范围共同通过 3 项 XCTest 和 19 项 Swift Testing/4 suites；首个 ledger 计数 5 已更正为 3。SwiftPM 同时编译 UI，但未进行真实 GUI/键盘验收。
+
+串行相关 Swift 范围为 Core、LaunchpadKit、定位、相机与传输/控制接口；清除真实固件选择器，排除 FirmwareIntegrationTests。XCTest 167 项（0 项跳过）无失败；Swift Testing 553 项/84 suites、137.172 秒通过，另报告 6 项测试/4 suites 跳过。Python 全套 571 项、254.700 秒通过。未重跑完整 API HTTP/WS 或固件对比；此前全量 Swift 与取消时限问题保留，原因未查明。
+
+最终 daemon 候选按固定依赖构建，来源/架构/签名/清单核对通过，SHA-256 为 `1b76423d0d212972ad67cbc50e8119d571aa0a1584c8bda1d5eeb4d0f9d26962`。构建中的 dSYM 缓存模块警告保留；候选 activated=false、runtime_validated=false，未安装。本轮未重建签名 VM 宿主，也没有 VM 写入、amfid 或 vm-2607 操作。只读检查观察 vm-new PID 69566，现有宿主 SHA-256/CDHash、配置与客户机载荷摘要未变，签名验证通过；主仓库仍为 e8d825b3 且干净。
+
+追加前逐项核对原有 387 份证据和 3 份输入副本的已提交字节。当前 47 项：2 已验收、40 部分推进、4 待对账、1 可选延期；46 项必选仍有 44 项未验收。未改写步骤、验收、回退、依赖和接口约束；固定上游提交覆盖台账未改变。
+
+证据入口：`evidence/B08-summary.json`、`evidence/B08-source-review.json`。

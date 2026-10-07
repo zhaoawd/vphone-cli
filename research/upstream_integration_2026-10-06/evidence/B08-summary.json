@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-07",
+  "tasks": [
+    "T21",
+    "T18",
+    "T19",
+    "T20",
+    "T22",
+    "T26"
+  ],
+  "accepted": false,
+  "base": "fde6da6646cb13167452e407a0fe3bfa9006b61d",
+  "implementation_head": "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3",
+  "commits": {
+    "T21": [
+      "76ce963254a0f0cbc5ec8e2fb06115b2266c6320"
+    ],
+    "T18": [
+      "ba5b6ec50af5dd06679ca154f29a344ea36ac6c7",
+      "faa0ee40b85d61583baf23d0f3ed8e751d3d10e3"
+    ],
+    "T19": [
+      "207f542f3a8a1906ba356b3c3fea45cf86a782ac"
+    ],
+    "T20": [
+      "408f3d23b29d16e6e28998d92e20023e897548a3"
+    ],
+    "T22": [
+      "2dedb0e8ec6c8b9b928c4dbfb4068ebf6a2b35c4",
+      "bf054a71db49f3bb36a2aa8f4a390026f9fdd28f"
+    ],
+    "T26": [
+      "08e31534abbb4ca571ff95c85eef5133145a7bb7"
+    ]
+  },
+  "verification": {
+    "t19-green": {
+      "xctest": 0,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 3,
+      "suites": 1,
+      "seconds": 0.001,
+      "pass": true,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t20-green": {
+      "xctest": 82,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 0,
+      "suites": 0,
+      "seconds": 0.001,
+      "pass": true,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t22-green": {
+      "xctest": 11,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 0,
+      "suites": 0,
+      "seconds": 0.001,
+      "pass": true,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "t26-t22-green": {
+      "xctest": 3,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 19,
+      "suites": 4,
+      "seconds": 0.043,
+      "pass": true,
+      "skipped_tests": 0,
+      "skipped_suites": 0
+    },
+    "swift-related": {
+      "xctest": 167,
+      "xctest_skipped": 0,
+      "xctest_failures": 0,
+      "swift_testing_reported": 553,
+      "suites": 84,
+      "seconds": 137.172,
+      "pass": true,
+      "skipped_tests": 6,
+      "skipped_suites": 4
+    }
+  },
+  "python": {
+    "reported": 571,
+    "seconds": 254.7,
+    "skipped": 0,
+    "pass": true
+  },
+  "red": {
+    "T21": "missing marker reader input compile failure;3 real file tests passed",
+    "T18": "missing directory resolver compile failure; missing error formatter one Python failure;3+1 tests passed",
+    "T19": "missing observation API compile failure;3 Swift tests passed",
+    "T20": "missing cache/timing helpers compile failure;82 XCTest passed",
+    "T22": "missing lease API compile failure;11 related XCTest passed; late predicate red initially masked by T26 missing APIs, corrected red isolated missing isCurrent API; final3 XCTest passed",
+    "T26": "first test incorrectly called nonexistent decodeInfo; corrected to existing decodeList before implementation red missing settings/property; final actual manifest/report/command2 tests passed within19 Swift tests"
+  },
+  "scope": "Serial affected Core/LaunchpadKit/location/camera and related transport/control Swift suites; real-firmware selectors cleared and FirmwareIntegrationTests excluded. Whole Python firmware-free suite. iOS candidate build with fixed dependency checks. No full API HTTP/WS or real firmware/VM acceptance.",
+  "candidate": {
+    "sha256": "1b76423d0d212972ad67cbc50e8119d571aa0a1584c8bda1d5eeb4d0f9d26962",
+    "manifest": "evidence/B08-daemon-candidate-manifest.json",
+    "activated": false,
+    "runtime_validated": false,
+    "build_pass": true,
+    "warning": "dSYM module-cache warnings retained in build log"
+  },
+  "vm_new": {
+    "operations_performed": false,
+    "pid_observed": 69566,
+    "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    "guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+  },
+  "signed_host": {
+    "rebuilt_or_deployed": false,
+    "sha256": "40b283470ea099080aee54b9378368bc130a0e0f01423bcd87528e593efc4a11",
+    "CDHash": "61ea15c6739775b707d3a36fca082c4d97049be2",
+    "verify_pass": true
+  },
+  "main": {
+    "head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+    "clean": true
+  },
+  "full_swift_rerun": false,
+  "full_swift_limitation": "Previous full HTTP/WS/cancellation/helper failures and serial HTTP wait remain unresolved, cause unknown; no whole-suite acceptance claim.",
+  "counts": {
+    "total": 47,
+    "required": 46,
+    "accepted": 2,
+    "partial": 40,
+    "pending_audit": 4,
+    "optional_deferred": 1,
+    "required_unaccepted": 44
+  }
+}

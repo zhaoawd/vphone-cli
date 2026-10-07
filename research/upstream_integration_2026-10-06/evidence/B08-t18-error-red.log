@@ -1,0 +1,16 @@
+test_bundle_failure_details_and_machine_error_code_survive_json (test_guest_operation_failure.GuestOperationFailureTests.test_bundle_failure_details_and_machine_error_code_survive_json) ... FAIL
+
+======================================================================
+FAIL: test_bundle_failure_details_and_machine_error_code_survive_json (test_guest_operation_failure.GuestOperationFailureTests.test_bundle_failure_details_and_machine_error_code_survive_json)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_guest_operation_failure.py", line 20, in test_bundle_failure_details_and_machine_error_code_survive_json
+    self.assertEqual(result.returncode,0,result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : <unknown>:0: error: error opening input file '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestOperationFailure.swift' (No such file or directory)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.150s
+
+FAILED (failures=1)
