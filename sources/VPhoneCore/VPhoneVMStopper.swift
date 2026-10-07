@@ -17,20 +17,20 @@ import Foundation
 ///    reused; a different `startedAt` means the original process exited and the
 ///    number now belongs to somebody else, who must not be signalled.
 /// 2. Success is confirmed, not assumed. After a SIGKILL the stopper waits for
-///    the targets to disappear and for the bundle lock to be released before it
-///    reports `.stopped`.
+///    the targets to disappear, the bundle lock to be released, and the disk
+///    to have no remaining holders before it reports `.stopped`.
 public struct VPhoneVMStopper {
     // MARK: Outcome
 
     public enum Outcome: Equatable, Sendable {
-        /// Nothing holds the bundle lock.
+        /// Nothing holds the bundle lock or disk image.
         case notRunning
         /// The bundle lock is held, but not by a boot process of this bundle.
         /// Nothing was signalled.
         case noBootTarget(detail: String)
-        /// Every target is gone and the bundle lock is released.
+        /// Every target is gone, the bundle lock is released and the disk is unused.
         case stopped(signalled: [pid_t], forceKilled: [pid_t])
-        /// Targets outlived the sequence, or the lock was not released.
+        /// Targets, the lock or disk holders outlived the sequence, or disk inspection failed.
         case failed(survivors: [pid_t], reason: String)
 
         /// Process exit status the CLI reports for this outcome. Only a
@@ -82,8 +82,8 @@ public struct VPhoneVMStopper {
     public var sleep: (TimeInterval) -> Void
     /// Diagnostic record of the current lock holder, if readable.
     public var readRecord: () -> VPhoneVMRuntimeState?
-    /// PIDs holding the disk image open. Diagnosis only — never signalled.
-    public var diskHolders: () -> [pid_t]
+    /// PIDs holding the disk image open. Holders are never signalled; inspection failure refuses completion.
+    public var diskHolders: () throws -> [pid_t]
     /// Progress sink; see `Event`.
     public var report: (Event) -> Void
 
@@ -94,7 +94,7 @@ public struct VPhoneVMStopper {
         lockHeld: @escaping () -> Bool,
         sleep: @escaping (TimeInterval) -> Void = { Thread.sleep(forTimeInterval: $0) },
         readRecord: @escaping () -> VPhoneVMRuntimeState? = { nil },
-        diskHolders: @escaping () -> [pid_t] = { [] },
+        diskHolders: @escaping () throws -> [pid_t] = { [] },
         report: @escaping (Event) -> Void = { _ in }
     ) {
         self.listTargets = listTargets
@@ -113,7 +113,7 @@ public struct VPhoneVMStopper {
     /// from `lsof Disk.img`: the disk image is opened by the
     /// Virtualization.framework helper process, so a file holder lookup names
     /// the helper and never the process that owns the VM lifecycle. `lsof` is
-    /// wired in as `diskHolders` for diagnosis only.
+    /// inspected through `diskHolders` to confirm release; these PIDs are never signalled.
     public init(
         bundleDirectory: URL, configURL: URL, diskURL: URL,
         report: @escaping (Event) -> Void = { _ in }
@@ -126,13 +126,7 @@ public struct VPhoneVMStopper {
             },
             lockHeld: { VPhoneVMLockProbe.isLockHeld(directory: bundleDirectory) },
             readRecord: { VPhoneVMRuntimeState.read(in: bundleDirectory) },
-            diskHolders: {
-                guard FileManager.default.fileExists(atPath: diskURL.path),
-                      let lsof = try? VPhoneProcessRunner.runCapturing(
-                          URL(fileURLWithPath: "/usr/sbin/lsof"), ["-t", "--", diskURL.path])
-                else { return [] }
-                return VPhoneLsof.parsePIDs(lsof.stdout)
-            },
+            diskHolders: { try VPhoneLsof.holders(of: diskURL) },
             report: report)
     }
 
@@ -141,7 +135,12 @@ public struct VPhoneVMStopper {
     /// Runs the whole stop sequence. `timeout` is the graceful wait in seconds;
     /// `force` skips SIGINT and the wait, but not the final confirmation.
     public func stop(timeout: TimeInterval, force: Bool) -> Outcome {
-        guard lockHeld() else { return .notRunning }
+        guard lockHeld() else {
+            do {
+                let holders = try diskHolders()
+                return holders.isEmpty ? .notRunning : .failed(survivors: [], reason: "VM disk is still open in \(holders.map(String.init).joined(separator: ", ")); no holder was signalled")
+            } catch { return .failed(survivors: [], reason: "VM disk release is unverified: \(error.localizedDescription)") }
+        }
 
         // A target is only ever a process ps still lists AND the kernel still
         // knows; a pid that vanished between the two reads is dropped here.
@@ -186,20 +185,26 @@ public struct VPhoneVMStopper {
 
         // Confirm the actual state instead of assuming the signals worked.
         var waited: TimeInterval = 0
-        while waited < Self.confirmWindow, !survivors(of: snapshot).isEmpty || lockHeld() {
-            sleep(Self.confirmPollInterval)
-            waited += Self.confirmPollInterval
-        }
+        var holders: [pid_t] = []
+        do {
+            holders = try diskHolders()
+            while waited < Self.confirmWindow, !survivors(of: snapshot).isEmpty || lockHeld() || !holders.isEmpty {
+                sleep(Self.confirmPollInterval)
+                waited += Self.confirmPollInterval
+                holders = try diskHolders()
+            }
+        } catch { return .failed(survivors: survivors(of: snapshot).map(\.pid).sorted(), reason: "VM disk release is unverified: \(error.localizedDescription)") }
 
         let stillAlive = survivors(of: snapshot)
         let stillLocked = lockHeld()
-        if stillAlive.isEmpty, !stillLocked {
+        if stillAlive.isEmpty, !stillLocked, holders.isEmpty {
             return .stopped(signalled: signalled.sorted(), forceKilled: forceKilled.sorted())
         }
         return .failed(
             survivors: stillAlive.map(\.pid).sorted(),
             reason: failureReason(
-                survivors: stillAlive, sendErrors: sendErrors, lockHeld: stillLocked))
+                survivors: stillAlive, sendErrors: sendErrors, lockHeld: stillLocked)
+                + (holders.isEmpty ? "" : "; VM disk is still open in \(holders.map(String.init).joined(separator: ", ")); no holder was signalled"))
     }
 
     /// instanceID of the runtime record when it names a process that is actually
@@ -233,7 +238,7 @@ public struct VPhoneVMStopper {
             detail = "it is held by pid \(record.pid) running operation \"\(record.operation)\""
             if record.isBootOperation { detail += " (instance \(record.instanceID))" }
         }
-        let holders = diskHolders()
+        let holders = (try? diskHolders()) ?? []
         if !holders.isEmpty {
             detail += "; Disk.img is open in \(holders.map(String.init).joined(separator: ", "))"
                 + " (diagnosis only, not signalled)"

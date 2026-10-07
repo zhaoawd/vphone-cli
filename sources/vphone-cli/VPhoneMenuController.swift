@@ -9,6 +9,11 @@ class VPhoneMenuController {
     let control: VPhoneControl
     weak var vm: VPhoneVirtualMachine?
 
+    var onStop: (() -> Void)?
+    var onManualUnlock: (() -> Void)?
+    var onStartupUnlockChanged: ((Bool) throws -> Void)?
+    var startupUnlockItem: NSMenuItem?
+    var manualUnlockItem: NSMenuItem?
     var onFilesPressed: (() -> Void)?
     var onKeychainPressed: (() -> Void)?
     var onAppsPressed: (() -> Void)?
@@ -75,6 +80,15 @@ class VPhoneMenuController {
         buildItem.isEnabled = false
         appMenu.addItem(buildItem)
         appMenu.addItem(NSMenuItem.separator())
+        appMenu.addItem(makeItem("Stop VM", action: #selector(stopVM)))
+        let manual = makeItem("Unlock Screen…", action: #selector(unlockScreen))
+        manual.isEnabled = false
+        manualUnlockItem = manual
+        appMenu.addItem(manual)
+        let startup = makeItem("Unlock at Startup", action: #selector(toggleStartupUnlock))
+        startup.isEnabled = false
+        startupUnlockItem = startup
+        appMenu.addItem(startup)
         appMenu.addItem(
             withTitle: "Quit vphone", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"
         )
@@ -106,5 +120,16 @@ class VPhoneMenuController {
         let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
         item.target = self
         return item
+    }
+}
+
+extension VPhoneMenuController {
+    @objc private func stopVM() { onStop?() }
+    @objc private func unlockScreen() { onManualUnlock?() }
+    @objc private func toggleStartupUnlock() {
+        guard let item = startupUnlockItem, let change = onStartupUnlockChanged else { return }
+        let enabled = item.state != .on
+        do { try change(enabled); item.state = enabled ? .on : .off }
+        catch { let alert = NSAlert(); alert.messageText = "Unable to save startup unlock"; alert.informativeText = error.localizedDescription; alert.runModal() }
     }
 }

@@ -21,7 +21,7 @@ if team and not re.fullmatch(r'[A-Z0-9]{10}', team):
 label = 'com.vphone.cli.helper'
 def requirement(identifier):
     return f'anchor apple generic and identifier "{identifier}" and certificate leaf[subject.OU] = "{team}"'
-info = {'CFBundleIdentifier': label, 'CFBundleVersion': '1', 'CFBundleShortVersionString': '2.0.8',
+info = {'CFBundleIdentifier': label, 'CFBundleVersion': '2', 'CFBundleShortVersionString': '2.0.8',
         'VPhoneHelperSigningTeam': team, 'SMAuthorizedClients':
         [requirement(name) for name in ['com.vphone.cli', 'com.vphone.cli.launchpad']] if team else []}
 (stage/'Helper-Info.plist').write_bytes(plistlib.dumps(info))

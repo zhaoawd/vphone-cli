@@ -1,6 +1,7 @@
 import Foundation
 import Security
 import ServiceManagement
+import VPhoneCore
 
 /// Synchronous client for CLI/background UI workers. Never call blocking
 /// operations from a UI actor. Each request owns and closes its XPC connection.
@@ -24,18 +25,20 @@ public final class VPhoneHelperClient: @unchecked Sendable {
         try request(timeout: 5) { proxy, reply in proxy.helperVersion { reply(.success($0)) } }
     }
 
-    public func verifyBundle(version: String) throws -> Data {
+    public func verifyBundle(version: String, logFile: URL? = nil) throws -> Data {
         try requireVersion()
-        return try request(timeout: 300) { proxy, reply in
-            proxy.verifyBundle(version: version) { data, error in Self.finish(data, error, reply) }
+        let output = try outputReceiver(logFile: logFile)
+        return try request(timeout: 300, output: output) { proxy, reply in
+            proxy.verifyBundleStreaming(version: version, operation: output.operation) { data, error in Self.finish(data, error, reply) }
         }
     }
 
-    public func installBundle(version: String, archive: FileHandle, sha256: String) throws -> Data {
+    public func installBundle(version: String, archive: FileHandle, sha256: String, logFile: URL? = nil) throws -> Data {
         try requireVersion()
         let form = try externalForm()
-        return try request(timeout: 1800) { proxy, reply in
-            proxy.installBundle(authorization: form, version: version, archive: archive, sha256: sha256) { data, error in
+        let output = try outputReceiver(logFile: logFile)
+        return try request(timeout: 1800, output: output) { proxy, reply in
+            proxy.installBundleStreaming(authorization: form, version: version, archive: archive, sha256: sha256, operation: output.operation) { data, error in
                 Self.finish(data, error, reply)
             }
         }
@@ -107,12 +110,23 @@ public final class VPhoneHelperClient: @unchecked Sendable {
         }
     }
 
-    private func request<T: Sendable>(timeout: TimeInterval,
+    private func outputReceiver(logFile: URL?) throws -> VPhoneHelperOutputReceiver {
+        try VPhoneHelperOutputReceiver(operation: UUID().uuidString,
+            writer: logFile.map { try VPhoneLogWriter(url: $0) }, onLine: { line in
+                try FileHandle.standardError.write(contentsOf: Data((line + "\n").utf8))
+            })
+    }
+
+    private func request<T: Sendable>(timeout: TimeInterval, output: VPhoneHelperOutputReceiver? = nil,
         _ body: (VPhoneHelperProtocol, @escaping @Sendable (Result<T, Error>) -> Void) -> Void) throws -> T {
         let reply = VPhoneHelperReply<T>()
         let connection = NSXPCConnection(machServiceName: VPhoneHelperIdentity.label, options: .privileged)
         connection.setCodeSigningRequirement(configuration.helperRequirement)
         connection.remoteObjectInterface = NSXPCInterface(with: VPhoneHelperProtocol.self)
+        if let output {
+            connection.exportedInterface = NSXPCInterface(with: VPhoneHelperOutputProtocol.self)
+            connection.exportedObject = output
+        }
         connection.interruptionHandler = { reply.finish(.failure(VPhoneHelperError("Helper connection interrupted; an install may still be running. Verify before retrying."))) }
         connection.invalidationHandler = { reply.finish(.failure(VPhoneHelperError("Helper connection invalidated; an install may still be running. Verify before retrying."))) }
         connection.resume()

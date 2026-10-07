@@ -12,7 +12,7 @@ struct VPhoneVMCommand: ParsableCommand {
             VPhoneVMListCommand.self,
             VPhoneVMInfoCommand.self,
             VPhoneVMNewCommand.self,
-            VPhoneVMConfigCommand.self,
+            VPhoneVMConfigCommand.self, VPhoneVMBindCoreBundleCommand.self,
             VPhoneVMRenameCommand.self,
             VPhoneVMDeleteCommand.self,
             VPhoneVMCloneCommand.self,
@@ -146,6 +146,8 @@ struct VPhoneVMConfigCommand: ParsableCommand {
     var bridgeInterface: String?
     @Option(name: .customLong("hardware-keyboard"), help: "USB keyboard: on | off (takes effect after restart)")
     var hardwareKeyboard: VPhoneHardwareKeyboardOption?
+    @Option(help: "Startup unlock: on | off (default off; requires an API listener at launch)")
+    var startupUnlock: VPhoneHardwareKeyboardOption?
 
     func run() throws {
         let mode = try network.map(Self.parseMode)
@@ -153,7 +155,7 @@ struct VPhoneVMConfigCommand: ParsableCommand {
         let updated = try VPhoneBundleOps.updateConfig(
             bundleNamed: name, in: lib.library, cpuCount: cpu, memoryMB: memory,
             networkMode: mode, bridgeInterface: bridgeInterface,
-            hardwareKeyboardEnabled: hardwareKeyboard?.enabled)
+            hardwareKeyboardEnabled: hardwareKeyboard?.enabled, unlockAtStartup: startupUnlock?.enabled)
         let m = updated.manifest
         print("updated \(updated.name): \(m.cpuCount) CPU, \(m.memorySize / (1024*1024)) MB, "
             + "net=\(describeNetwork(m.networkConfig)), keyboard=\(m.usesHardwareKeyboard ? "on" : "off")")

@@ -5,16 +5,19 @@ import NIOPosix
 import NIOWebSocket
 import VphonedNative
 
+let apiOnly = ProcessInfo.processInfo.environment["VPHONE_API_ONLY"] == "1"
 let mode = vp_native_process_mode()
 if mode != 1 {
     guard mode == 0 else { exit(64) }
-    vp_native_bootstrap_cached_binary()
+    if !apiOnly { vp_native_bootstrap_cached_binary() }
     exit(vp_native_run_proxy())
 }
 
 guard vp_native_watch_proxy() == 0 else { exit(1) }
-vp_vcam_start()
-GuestIrisinInstaller.refreshBootstrapOnStartup()
+if !apiOnly {
+    vp_vcam_start()
+    GuestIrisinInstaller.refreshBootstrapOnStartup()
+}
 
 let group = MultiThreadedEventLoopGroup(numberOfThreads: 2)
 let filePool = NIOThreadPool(numberOfThreads: 2)

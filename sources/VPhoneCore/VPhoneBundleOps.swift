@@ -136,7 +136,8 @@ public enum VPhoneBundleOps {
         cpuCount: UInt?, memoryMB: UInt64?,
         networkMode: VPhoneVirtualMachineManifest.NetworkConfig.NetworkMode? = nil,
         bridgeInterface: String? = nil,
-        hardwareKeyboardEnabled: Bool? = nil
+        hardwareKeyboardEnabled: Bool? = nil,
+        unlockAtStartup: Bool? = nil
     ) throws -> VPhoneBundle {
         let directory = try library.bundle(named: name).url
         // Editing the config of a running VM is refused, not queued: the boot
@@ -156,7 +157,8 @@ public enum VPhoneBundleOps {
                 memorySize: memoryMB.map { $0 * 1024 * 1024 },
                 screenConfig: nil,
                 networkConfig: network,
-                hardwareKeyboardEnabled: hardwareKeyboardEnabled)
+                hardwareKeyboardEnabled: hardwareKeyboardEnabled,
+                unlockAtStartup: unlockAtStartup)
             try updated.write(to: bundle.configURL)
             return VPhoneBundle(url: bundle.url, manifest: updated)
         }

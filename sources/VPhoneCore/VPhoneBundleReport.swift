@@ -9,6 +9,7 @@ public struct VPhoneBundleReport: Codable, Equatable, Sendable {
     public let restoreInfo: VPhoneRestoreInfo?
     public let udid: String?
     public let hardwareKeyboardEnabled: Bool?
+    public let unlockAtStartup: Bool?
 
     public init(bundle: VPhoneBundle) {
         self.name = bundle.name
@@ -18,6 +19,7 @@ public struct VPhoneBundleReport: Codable, Equatable, Sendable {
         self.network = bundle.manifest.networkConfig
         self.restoreInfo = VPhoneRestoreInfo.load(fromBundle: bundle)
         self.hardwareKeyboardEnabled = bundle.manifest.hardwareKeyboardEnabled
+        self.unlockAtStartup = bundle.manifest.unlockAtStartup
         self.udid = VPhoneRestoreOps.resolveUDID(bundle: bundle)
     }
 }

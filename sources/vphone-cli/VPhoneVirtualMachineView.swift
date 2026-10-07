@@ -5,6 +5,7 @@ import Virtualization
 
 class VPhoneVirtualMachineView: VZVirtualMachineView {
     var keyHelper: VPhoneKeyHelper?
+    var onClipboardShortcut: ((String) -> Bool)?
     weak var control: VPhoneControl?
 
     private var touchRoute = VPhoneTouchRoute()
@@ -168,6 +169,9 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
     }
 
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
+           let key = event.charactersIgnoringModifiers, ["c", "x", "v"].contains(key),
+           onClipboardShortcut?(key) == true { return true }
         if event.modifierFlags.contains(.command),
            event.charactersIgnoringModifiers == "h"
         {

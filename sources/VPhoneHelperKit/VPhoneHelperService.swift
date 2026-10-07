@@ -2,11 +2,13 @@ import Darwin
 import Foundation
 import Security
 import VPhoneBundleStore
+import VPhoneCore
 
 final class VPhoneHelperService: NSObject, VPhoneHelperProtocol, @unchecked Sendable {
     // Serial across connections, not one queue per client. Store flock also
     // protects against the direct sudo CLI in another process.
     static let work = DispatchQueue(label: "com.vphone.cli.helper.operations")
+    weak var connection: NSXPCConnection?
     let authorize: @Sendable (Data) throws -> Void
     let install: @Sendable (String, FileHandle, String) throws -> Data
     let verify: @Sendable (String) throws -> Data
@@ -23,6 +25,43 @@ final class VPhoneHelperService: NSObject, VPhoneHelperProtocol, @unchecked Send
         self.authorize = authorize
         self.install = install
         self.verify = verify
+    }
+
+    func installBundleStreaming(authorization: Data, version: String, archive: FileHandle, sha256: String,
+                                operation: String, reply: @escaping @Sendable (Data?, String?) -> Void) {
+        streaming(operation: operation, reply: reply) { [self] output in
+            try authorize(authorization)
+            guard VPhoneCoreBundleVersion.isStoreName(version) else { throw VPhoneHelperError("Invalid Core Bundle version") }
+            output.emit("Installing Core Bundle \(version)")
+            return try install(version, archive, sha256)
+        }
+    }
+
+    func verifyBundleStreaming(version: String, operation: String, reply: @escaping @Sendable (Data?, String?) -> Void) {
+        streaming(operation: operation, reply: reply) { [self] output in
+            guard VPhoneCoreBundleVersion.isStoreName(version) else { throw VPhoneHelperError("Invalid Core Bundle version") }
+            output.emit("Verifying Core Bundle \(version)")
+            return try verify(version)
+        }
+    }
+
+    private func streaming(operation: String, reply: @escaping @Sendable (Data?, String?) -> Void,
+                           body: @escaping @Sendable (VPhoneHelperOutputChannel) throws -> Data) {
+        guard UUID(uuidString: operation) != nil, let connection else {
+            reply(nil, "Helper output requires an operation UUID and a live connection")
+            return
+        }
+        let output = VPhoneHelperOutputChannel(connection: connection, operation: operation)
+        Self.work.async {
+            let result = Result { try body(output) }
+            output.emit(result.failureMessage ?? "Core Bundle operation completed")
+            do { try output.finish() }
+            catch { reply(nil, error.localizedDescription); return }
+            switch result {
+            case let .success(data): reply(data, nil)
+            case let .failure(error): reply(nil, error.localizedDescription)
+            }
+        }
     }
 
     func helperVersion(reply: @escaping @Sendable (String) -> Void) { reply(VPhoneHelperIdentity.protocolVersion) }
@@ -67,7 +106,10 @@ public final class VPhoneHelperListener: NSObject, NSXPCListenerDelegate {
         }
         connection.setCodeSigningRequirement(configuration.connectionRequirement)
         connection.exportedInterface = NSXPCInterface(with: VPhoneHelperProtocol.self)
-        connection.exportedObject = VPhoneHelperService()
+        let service = VPhoneHelperService()
+        service.connection = connection
+        connection.exportedObject = service
+        connection.remoteObjectInterface = NSXPCInterface(with: VPhoneHelperOutputProtocol.self)
         connection.resume()
         return true
     }
@@ -121,4 +163,8 @@ public enum VPhoneHelperDaemon {
         listener.resume()
         withExtendedLifetime((delegate, listener)) { dispatchMain() }
     }
+}
+
+private extension Result where Success == Data, Failure == Error {
+    var failureMessage: String? { if case let .failure(error) = self { return error.localizedDescription }; return nil }
 }

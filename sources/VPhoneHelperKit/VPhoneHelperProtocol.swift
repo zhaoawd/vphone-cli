@@ -12,7 +12,7 @@ public enum VPhoneHelperIdentity {
     // is integrated. Never replace an upstream installation with this subset.
     public static let label = "com.vphone.cli.helper"
     public static let privilegedRight = label + ".privileged"
-    public static let protocolVersion = "1"
+    public static let protocolVersion = "2"
     /// Bundle identifiers allowed to call the helper: the CLI app and the
     /// local Launchpad. Upstream `com.vphone.launchpad` is deliberately not
     /// among them; the local Launchpad uses its own identifier (T26).
@@ -22,6 +22,9 @@ public enum VPhoneHelperIdentity {
 /// No command, shell, executable path, AMFI or legacy CFW verb is exposed.
 @objc(VPhoneHelperProtocol)
 public protocol VPhoneHelperProtocol {
+    func installBundleStreaming(authorization: Data, version: String, archive: FileHandle, sha256: String,
+                                operation: String, reply: @escaping @Sendable (Data?, String?) -> Void)
+    func verifyBundleStreaming(version: String, operation: String, reply: @escaping @Sendable (Data?, String?) -> Void)
     func helperVersion(reply: @escaping @Sendable (String) -> Void)
     func installBundle(authorization: Data, version: String, archive: FileHandle, sha256: String,
                        reply: @escaping @Sendable (Data?, String?) -> Void)

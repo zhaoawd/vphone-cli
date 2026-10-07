@@ -102,3 +102,11 @@ enum VPhoneCloneCopy {
         }
     }
 }
+
+public enum VPhoneStoppedSnapshotCopy {
+    /// Caller must retain the stopped source VM's lock throughout copy and verification.
+    public static func copy(from source: URL, to destination: URL) throws {
+        try VPhoneCloneCopy.copy(from: source, to: destination,
+            excludingRootNames: [VPhoneVMRuntimeState.filename, "vphone.sock"])
+    }
+}

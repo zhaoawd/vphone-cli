@@ -1,3 +1,5 @@
+import VPhoneCore
+
 /// Inspector values read from launchpad.json. A recorded origin does not
 /// establish the executable or components currently running in a VM.
 public struct VPhoneLaunchpadMachineOrigins: Equatable, Sendable {
@@ -16,7 +18,7 @@ public struct VPhoneLaunchpadMachineOrigins: Equatable, Sendable {
             guestEnvironment = binding.guestEnvironment ?? "Unknown"
             kernel = binding.kernel ?? "Unknown"
             bootChain = binding.bootChain ?? "Unknown"
-            notice = "These are recorded origins; binding execution is pending integration. Actual runtime and applied component versions are unknown."
+            notice = "These are recorded origins; launch uses the verified bound host Core Bundle. Actual applied component versions require guest/runtime receipts."
         case .missing:
             host = "Unknown"
             guestEnvironment = "Unknown"

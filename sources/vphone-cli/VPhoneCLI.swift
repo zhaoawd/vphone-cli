@@ -56,12 +56,19 @@ struct VPhoneBootCLI: ParsableCommand {
 
     @Flag(help: "Unlock newly observed guest instances at startup. Requires --api-listen and trusted Setup Assistant status; default off. No passcode is supplied.")
     var unlockAtStartup = false
+    @Option(help: "Expected launchpad.json digest, checked after acquiring the VM lock")
+    var bindingSha256: String?
 
     @Option(help: "Kernel GDB debug stub port on host (omit for system-assigned port; valid: 6000...65535)")
     var kernelDebugPort: Int?
 
     @Option(help: "Override the packaged signed vphoned used for guest auto-update")
     var vphonedBin: String?
+
+    @Flag(help: "Connect to the existing classic daemon without offering a binary update")
+    var noVphonedUpdate = false
+
+    var autoUpdateGuestBinaryURL: URL? { bindingSha256 == nil && !noVphonedUpdate ? guestBinaryURL : nil }
 
     var guestBinaryURL: URL {
         if let vphonedBin { return URL(fileURLWithPath: vphonedBin) }

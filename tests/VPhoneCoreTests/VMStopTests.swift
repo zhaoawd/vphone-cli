@@ -181,7 +181,13 @@ struct VMStopTests {
 
         let outcome = stop.stop(timeout: 5, force: false)
 
-        #expect(outcome == .stopped(signalled: [boot.processIdentifier], forceKilled: []))
+        guard case let .failed(survivors, reason) = outcome else {
+            Issue.record("Open disk holder must prevent successful stop: \(outcome)")
+            return
+        }
+        #expect(survivors.isEmpty)
+        #expect(reason.contains("VM disk is still open"))
+        #expect(reason.contains(String(holder.processIdentifier)))
         #expect(log.count(holder.processIdentifier) == 0)
         #expect(StopFixture.isRunning(holder.processIdentifier))
         #expect(log.signals(boot.processIdentifier) == [SIGINT])
@@ -224,6 +230,32 @@ struct VMStopTests {
     }
 
     // MARK: Already exited
+
+
+    @Test func unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() throws {
+        let fixture = try StopFixture()
+        defer { fixture.terminateAll() }
+        let holder = try fixture.spawnPlain("exec 3<>'\(fixture.diskURL.path)'")
+        let stop = VPhoneVMStopper(bundleDirectory: fixture.bundle, configURL: fixture.configURL, diskURL: fixture.diskURL)
+        let outcome = stop.stop(timeout: 0, force: false)
+        #expect(outcome.exitCode != 0)
+        #expect(StopFixture.isRunning(holder.processIdentifier))
+    }
+
+    @Test func exitedTargetAndReleasedLockStillRequireDiskRelease() {
+        let pid: pid_t = 424246
+        let target = VPhoneProcessIdentity(pid: pid, startedAt: 4000, uid: 0)
+        var running = true
+        let stop = VPhoneVMStopper(listTargets: { running ? [pid] : [] }, identity: { _ in running ? target : nil },
+            send: { _, _ in running = false; return 0 }, lockHeld: { running }, sleep: { _ in }, diskHolders: { [424247] })
+        #expect(stop.stop(timeout: 0, force: true).exitCode != 0)
+    }
+
+
+    @Test func diskInspectionFailureCannotReportStopped() {
+        let stop = VPhoneVMStopper(listTargets: { [] }, lockHeld: { false }, diskHolders: { throw NSError(domain: "inspection", code: 1) })
+        #expect(stop.stop(timeout: 0, force: false).exitCode != 0)
+    }
 
     @Test func reportsNotRunningWhenNothingHoldsTheLock() throws {
         let fixture = try StopFixture()

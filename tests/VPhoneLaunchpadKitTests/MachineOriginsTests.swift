@@ -1,3 +1,4 @@
+import VPhoneCore
 import Testing
 @testable import VPhoneLaunchpadKit
 
@@ -11,7 +12,7 @@ struct MachineOriginsTests {
         #expect(presentation.bootChain == binding.bootChain)
         #expect(presentation.runtime == "Unknown")
         #expect(presentation.notice.contains("recorded"))
-        #expect(presentation.notice.contains("pending"))
+        #expect(presentation.notice.contains("receipts"))
     }
 
     @Test func missingAndInvalidBindingsRemainVisibleWithoutADefaultVersion() {

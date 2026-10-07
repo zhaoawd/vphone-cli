@@ -1,6 +1,7 @@
 import ArgumentParser
 import Foundation
 import VPhoneCore
+import VPhoneBundleStore
 
 struct VPhoneVMLaunchCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -40,10 +41,30 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         let v = VPhoneVerbosity(count: verboseCount)
         let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
         let bundle = try lib.library.bundle(named: name)
-        let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
-        let layout = VPhoneLaunchLayout(resources: resources)
+        if bundle.manifest.usesStartupUnlock && !dfu && apiListen == nil {
+            throw ValidationError("This VM enables startup unlock; supply --api-listen and VPHONE_API_TOKEN, or disable it with vm config --startup-unlock off.")
+        }
+        let machine = bundle.url
+        let binding = try VPhoneMachineBinding.snapshot(machine)
+        if let binding {
+            guard projectRoot == nil else { throw ValidationError("A bound VM uses its verified Core Bundle resources; --project-root is refused.") }
+            guard VPhoneCoreBundleVersion.supportsTargetFeatures(binding.binding.bundle) else {
+                throw ValidationError("Bound VM execution requires Core Bundle 2.6.0 or later; select and verify a compatible bundle with vm bind-core-bundle.")
+            }
+            return try VPhoneCoreBundleStore().withVerifiedExecutable(version: binding.binding.bundle, executable: .vm) { binary in
+                try launch(bundle: bundle, name: name, v: v, bootBinary: binary,
+                    resources: .resolve(executablePath: binary.path), binding: binding, machine: machine)
+            }
+        }
+        try launch(bundle: bundle, name: name, v: v, bootBinary: VPhoneResources.vmExecutable(),
+            resources: projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve(),
+            binding: nil, machine: machine)
+    }
 
-        let bootBinary = VPhoneResources.vmExecutable()
+    private func launch(bundle: VPhoneBundle, name: String, v: VPhoneVerbosity, bootBinary: URL,
+                        resources: VPhoneResources, binding: VPhoneMachineBinding.Snapshot?,
+                        machine: URL) throws {
+        let layout = VPhoneLaunchLayout(resources: resources)
         guard FileManager.default.isExecutableFile(atPath: bootBinary.path) else {
             FileHandle.standardError.write(Data(
                 "error: \(bootBinary.path) not found — build it first (make build/bundle).\n".utf8))
@@ -68,7 +89,7 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
             throw ExitCode(pre.exitCode == 0 ? 1 : pre.exitCode)
         }
 
-        if !dfu && !noVphoned {
+        if binding == nil && !dfu && !noVphoned {
             // Staging is separate from the child boot lifetime. The child takes
             // its own lock and fails safely if another launch wins the gap.
             try VPhoneBundleGuard.withBundleLock(
@@ -83,7 +104,12 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
             }
         }
 
-        var args = ["--config", bundle.configURL.path] + guestPayloadArguments(resources: resources) + apiProxyArguments()
+        var args = ["--config", bundle.configURL.path] + (binding == nil ? guestPayloadArguments(resources: resources) : ["--no-vphoned-update"]) + apiProxyArguments()
+        if bundle.manifest.usesStartupUnlock && !dfu { args.append("--unlock-at-startup") }
+        if let binding {
+            guard binding.matches(machine) else { throw ValidationError("VM binding changed during launch; no VM was started.") }
+            args += ["--binding-sha256", binding.sha256]
+        }
         if dfu { args.append("--dfu") }
         if headless { args.append("--headless") }
         if let variant { args += ["--variant", variant] }

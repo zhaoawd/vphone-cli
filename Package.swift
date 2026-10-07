@@ -29,7 +29,7 @@ let package = Package(
         .package(path: "vendor/MachOKit"),
     ],
     targets: [
-        .target(name: "VPhoneHelperKit", dependencies: ["VPhoneBundleStore"],
+        .target(name: "VPhoneHelperKit", dependencies: ["VPhoneBundleStore", "VPhoneCore"],
                 path: "sources/VPhoneHelperKit", linkerSettings: [.linkedFramework("Security"), .linkedFramework("ServiceManagement")]),
         .executableTarget(name: "VPhoneHelperEntry", dependencies: ["VPhoneHelperKit"], path: "sources/VPhoneHelperEntry"),
         .testTarget(name: "VPhoneHelperKitTests", dependencies: ["VPhoneHelperKit"], path: "tests/VPhoneHelperKitTests"),

@@ -18,6 +18,7 @@ public enum VPhoneVMOperation {
 
     // Swift offline operations.
     public static let stageVphoned = "stage-vphoned"
+    public static let bindCoreBundle = "bind-core-bundle"
     public static let config = "config"
     public static let rename = "rename"
     public static let clone = "clone"

@@ -51,6 +51,9 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
 
     /// Missing in older manifests, which keep the original USB keyboard.
     public let hardwareKeyboardEnabled: Bool?
+    /// Default off for legacy configurations; affects only a new daemon instance.
+    public let unlockAtStartup: Bool?
+    public var usesStartupUnlock: Bool { unlockAtStartup ?? false }
 
     public var usesHardwareKeyboard: Bool { hardwareKeyboardEnabled ?? true }
 
@@ -154,6 +157,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         screenConfig: ScreenConfig = .default,
         networkConfig: NetworkConfig = .default,
         hardwareKeyboardEnabled: Bool? = nil,
+        unlockAtStartup: Bool? = nil,
         diskImage: String = "Disk.img",
         nvramStorage: String = "nvram.bin",
         romImages: ROMImages?,
@@ -167,6 +171,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         self.screenConfig = screenConfig
         self.networkConfig = networkConfig
         self.hardwareKeyboardEnabled = hardwareKeyboardEnabled
+        self.unlockAtStartup = unlockAtStartup
         self.diskImage = diskImage
         self.nvramStorage = nvramStorage
         self.romImages = romImages
@@ -206,7 +211,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
 
         do {
             let data = try encoder.encode(self)
-            try data.write(to: url)
+            try data.write(to: url, options: .atomic)
         } catch {
             throw VPhoneManifestError.writeFailed(path: url.path, underlying: error)
         }
@@ -243,7 +248,8 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
         screenConfig: ScreenConfig? = nil,
         machineIdentifier: Data? = nil,
         networkConfig: NetworkConfig? = nil,
-        hardwareKeyboardEnabled: Bool? = nil
+        hardwareKeyboardEnabled: Bool? = nil,
+        unlockAtStartup: Bool? = nil
     ) -> VPhoneVirtualMachineManifest {
         VPhoneVirtualMachineManifest(
             platformType: platformType,
@@ -254,6 +260,7 @@ public struct VPhoneVirtualMachineManifest: Codable, Sendable {
             screenConfig: screenConfig ?? self.screenConfig,
             networkConfig: networkConfig ?? self.networkConfig,
             hardwareKeyboardEnabled: hardwareKeyboardEnabled ?? self.hardwareKeyboardEnabled,
+            unlockAtStartup: unlockAtStartup ?? self.unlockAtStartup,
             diskImage: diskImage,
             nvramStorage: nvramStorage,
             romImages: romImages,

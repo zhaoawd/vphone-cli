@@ -10,12 +10,13 @@ import VPhoneLaunchpadKit
 /// are left alone.
 struct VPhoneLaunchpadMachineSettingsView: View {
     private enum Field {
-        case cpu, memory, network, hardwareKeyboard
+        case cpu, memory, network, hardwareKeyboard, startupUnlock
     }
 
     let machines: [VPhoneLaunchpadMachine]
     @Environment(VPhoneLaunchpadModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @State private var unlockAtStartup: Bool
     @State private var hardwareKeyboardEnabled: Bool
     @State private var cpu: Int
     @State private var memoryMB: Int
@@ -26,6 +27,7 @@ struct VPhoneLaunchpadMachineSettingsView: View {
     init(machines: [VPhoneLaunchpadMachine]) {
         self.machines = machines
         let first = machines.first
+        _unlockAtStartup = State(initialValue: first?.usesStartupUnlock ?? false)
         _hardwareKeyboardEnabled = State(initialValue: first?.usesHardwareKeyboard ?? true)
         _cpu = State(initialValue: first?.cpuCount ?? 8)
         _memoryMB = State(initialValue: first?.memoryMB ?? 8192)
@@ -47,7 +49,8 @@ struct VPhoneLaunchpadMachineSettingsView: View {
             memoryMB: edited.contains(.memory) ? memoryMB : nil,
             network: network,
             bridgeInterface: network == "bridged" ? bridgeInterface.trimmingCharacters(in: .whitespaces) : nil,
-            hardwareKeyboardEnabled: edited.contains(.hardwareKeyboard) ? hardwareKeyboardEnabled : nil
+            hardwareKeyboardEnabled: edited.contains(.hardwareKeyboard) ? hardwareKeyboardEnabled : nil,
+            unlockAtStartup: edited.contains(.startupUnlock) ? unlockAtStartup : nil
         )
     }
 
@@ -59,6 +62,7 @@ struct VPhoneLaunchpadMachineSettingsView: View {
         VPhoneLaunchpadSheet(title) {
             Form {
                 Section {
+                    Toggle("Unlock at Startup (requires API listener)", isOn: $unlockAtStartup)
                     Toggle("Hardware Keyboard", isOn: $hardwareKeyboardEnabled)
                     Stepper("CPU: \(cpu) cores", value: $cpu, in: 1 ... ProcessInfo.processInfo.activeProcessorCount)
                     Stepper("Memory: \(memoryMB) MB", value: $memoryMB, in: 2048 ... 65536, step: 1024)
@@ -99,6 +103,7 @@ struct VPhoneLaunchpadMachineSettingsView: View {
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
+        .onChange(of: unlockAtStartup) { edited.insert(.startupUnlock) }
         .onChange(of: hardwareKeyboardEnabled) { edited.insert(.hardwareKeyboard) }
         .onChange(of: cpu) { edited.insert(.cpu) }
         .onChange(of: memoryMB) { edited.insert(.memory) }

@@ -45,7 +45,7 @@ enum GuestAPI {
         let ip = addresses.first(where: { $0.hasPrefix("en") && !$0.contains("127.0.0.1") })?
             .split(separator: " ").last.map(String.init)
         let version = ProcessInfo.processInfo.operatingSystemVersion
-        return [
+        var result: [String: Any] = [
             "name": "vphoned",
             "api_version": 1,
             "status": "ok",
@@ -93,9 +93,18 @@ enum GuestAPI {
                 "environment_activation",
             ],
         ]
+        if apiOnly, var capabilities = result["capabilities"] as? [String] {
+            capabilities.removeAll { $0 == "camera" }
+            result["capabilities"] = capabilities
+        }
+        if let pending = setupAssistantPending() { result["setup_pending"] = pending }
+        return result
     }
 
     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
+        if apiOnly && (method.hasPrefix("camera.") || method == "agent.apply_update") {
+            throw GuestAPIError.unsupportedMethod(method)
+        }
         switch method {
         case "agent.health":
             return health()

@@ -37,6 +37,21 @@ public struct VPhoneLaunchLayout: Sendable {
 // MARK: - VPhoneLsof
 
 public enum VPhoneLsof {
+    /// A failed inspection is not evidence that a file is unused.
+    public static func holders(of file: URL) throws -> [Int32] {
+        guard FileManager.default.fileExists(atPath: file.path) else {
+            throw NSError(domain: "VPhoneFileUse", code: 1, userInfo: [NSLocalizedDescriptionKey: "Cannot inspect missing VM disk: \(file.path)"])
+        }
+        let result = try VPhoneProcessRunner.runCapturing(URL(fileURLWithPath: "/usr/sbin/lsof"),
+            ["-nP", "-t", "--", file.path], timeout: 5)
+        let holders = parsePIDs(result.stdout)
+        guard !result.timedOut, result.stderr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              (result.exitCode == 0 && !holders.isEmpty) || (result.exitCode == 1 && result.stdout.isEmpty) else {
+            throw NSError(domain: "VPhoneFileUse", code: 2, userInfo: [NSLocalizedDescriptionKey: "VM disk holder inspection failed (exit \(result.exitCode)): \(result.stderr)"])
+        }
+        return holders
+    }
+
     public static func parsePIDs(_ output: String) -> [Int32] {
         var seen = Set<Int32>()
         var pids: [Int32] = []

@@ -48,6 +48,7 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
         public static let networkModes = ["nat", "bridged", "none"]
 
         public var hardwareKeyboardEnabled: Bool?
+        public var unlockAtStartup: Bool?
         public var cpu: Int?
         public var memoryMB: Int?
         /// `nat`, `bridged` or `none`.
@@ -56,7 +57,8 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
         /// interface.
         public var bridgeInterface: String?
 
-        public init(cpu: Int? = nil, memoryMB: Int? = nil, network: String? = nil, bridgeInterface: String? = nil, hardwareKeyboardEnabled: Bool? = nil) {
+        public init(cpu: Int? = nil, memoryMB: Int? = nil, network: String? = nil, bridgeInterface: String? = nil, hardwareKeyboardEnabled: Bool? = nil, unlockAtStartup: Bool? = nil) {
+            self.unlockAtStartup = unlockAtStartup
             self.hardwareKeyboardEnabled = hardwareKeyboardEnabled
             self.cpu = cpu
             self.memoryMB = memoryMB
@@ -65,7 +67,7 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
         }
 
         public var isEmpty: Bool {
-            cpu == nil && memoryMB == nil && network == nil && hardwareKeyboardEnabled == nil
+            cpu == nil && memoryMB == nil && network == nil && hardwareKeyboardEnabled == nil && unlockAtStartup == nil
         }
     }
 
@@ -92,6 +94,9 @@ public struct VPhoneLaunchpadEditCommand: Equatable, Sendable {
         if let memoryMB = settings.memoryMB {
             guard memoryMB >= 1 else { return nil }
             arguments += ["--memory", String(memoryMB)]
+        }
+        if let enabled = settings.unlockAtStartup {
+            arguments += ["--startup-unlock", enabled ? "on" : "off"]
         }
         if let enabled = settings.hardwareKeyboardEnabled {
             arguments += ["--hardware-keyboard", enabled ? "on" : "off"]

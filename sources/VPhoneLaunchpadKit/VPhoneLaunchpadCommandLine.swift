@@ -129,14 +129,16 @@ public final class VPhoneLaunchpadCommandHistory {
 public struct VPhoneLaunchpadCommandLine {
     public let executable: URL
     public let history: VPhoneLaunchpadCommandHistory
+    private let logsDirectory: URL?
 
     /// The only public way in: a verified embedded toolchain.
     public init(toolchain: VPhoneLaunchpadToolchain, history: VPhoneLaunchpadCommandHistory) {
-        self.init(executable: toolchain.executable, history: history)
+        self.init(executable: toolchain.executable, history: history, logsDirectory: VPhoneLaunchpadIdentity.logsDirectory())
     }
 
     /// Test seam for stand-in executables; not reachable from the app.
-    init(executable: URL, history: VPhoneLaunchpadCommandHistory) {
+    init(executable: URL, history: VPhoneLaunchpadCommandHistory, logsDirectory: URL? = nil) {
+        self.logsDirectory = logsDirectory
         self.executable = executable
         self.history = history
     }
@@ -159,23 +161,35 @@ public struct VPhoneLaunchpadCommandLine {
         warningStatuses: Set<Int32> = [],
         onLine: (@Sendable (String) -> Void)? = nil
     ) async throws -> VPhoneLaunchpadCommandResult {
+        let writer = try recordInHistory ? logsDirectory.map { try VPhoneLaunchpadLogWriter(url: $0.appendingPathComponent("command-\(UUID().uuidString).log")) } : nil
         let entry = recordInHistory ? history.record(Self.display(arguments), warningStatuses: warningStatuses) : nil
         let collector = VPhoneLaunchpadLineCollector()
-        let child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments) { line in
-            collector.append(line)
-            onLine?(line)
+        let child: VPhoneLaunchpadChildProcess
+        do {
+            child = try VPhoneLaunchpadChildProcess(executable: executable, arguments: arguments) { line in
+                writer?.write(line)
+                collector.append(line)
+                onLine?(line)
+            }
+        } catch {
+            try? await writer?.finish()
+            if let entry { history.finish(entry, status: -1, outputDrained: false) }
+            throw error
         }
         let completion = await withTaskCancellationHandler {
             await child.waitForCompletion()
         } onCancel: {
             child.interrupt()
         }
+        var drained = completion.outputDrained
+        do { try await writer?.finish() }
+        catch { drained = false; collector.append("Log persistence failed: \(error.localizedDescription)") }
         if let entry {
-            history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
+            history.finish(entry, status: completion.status, outputDrained: drained)
         }
         let output = collector.snapshot
         return VPhoneLaunchpadCommandResult(status: completion.status, lines: output.lines,
-            outputDrained: completion.outputDrained, omittedLineCount: output.omitted)
+            outputDrained: drained, omittedLineCount: output.omitted)
     }
 
     /// Starts a long-running command (`vm launch`) and returns at once. Its
