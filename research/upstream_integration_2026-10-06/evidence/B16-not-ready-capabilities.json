@@ -1,0 +1,97 @@
+{
+  "request": {
+    "target": {
+      "vm": "vm-new",
+      "pid": 8231,
+      "instance_id": "24DC2EA6-EAA8-4E18-B386-2E78A1EA8566"
+    },
+    "screen": false,
+    "t": "capabilities"
+  },
+  "response": {
+    "api_commands": {
+      "file_get": false,
+      "app_list": false,
+      "app_launch": false,
+      "app_terminate": false,
+      "file_put": false,
+      "app_foreground": false
+    },
+    "ok": true,
+    "guest_connected": true,
+    "protocol_version": 1,
+    "target": {
+      "pid": 8231,
+      "process_started_at": 1791427558.968774,
+      "instance_id": "24DC2EA6-EAA8-4E18-B386-2E78A1EA8566",
+      "vm": "vm-new"
+    },
+    "screen_available": true,
+    "boot_mode": "normal",
+    "guest_capabilities": [
+      "hid",
+      "devmode",
+      "file",
+      "keychain",
+      "location",
+      "location_owned",
+      "ipa_install",
+      "clipboard",
+      "apps_v2",
+      "apps",
+      "app_launch",
+      "url",
+      "settings",
+      "shell",
+      "touch",
+      "touch_edge",
+      "vcam_status",
+      "vcam_receipt_v3"
+    ],
+    "limits": {
+      "request_bytes": 2097152,
+      "command_timeout_ms": 180000,
+      "host_file_bytes": 67108864,
+      "connections": 16,
+      "inline_file_bytes": 1048576
+    },
+    "api_session": {
+      "state": "reconnecting",
+      "errorCode": "transport",
+      "vmInstanceID": "24DC2EA6-EAA8-4E18-B386-2E78A1EA8566"
+    },
+    "rpc_methods": [],
+    "commands": {
+      "rpc": false,
+      "location_source_set": true,
+      "location_stream_start": true,
+      "screenshot": true,
+      "location_source_stop": true,
+      "swipe": true,
+      "tap": true,
+      "capabilities": true,
+      "location_source_status": true,
+      "app_terminate": true,
+      "file_put": true,
+      "environment_update": false,
+      "location": true,
+      "environment_status": false,
+      "location_source_control": true,
+      "location_stop": true,
+      "camera_stop": true,
+      "camera_present": true,
+      "camera_status": true,
+      "shell": true,
+      "environment_rollback": false,
+      "app_foreground": true,
+      "app_list": true,
+      "app_launch": true,
+      "location_stream_push": true,
+      "open_url": true,
+      "ipa_install": true,
+      "file_get": true,
+      "type": true,
+      "key": true
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "provenance": "Transcription of CUA and LLDB tool observations in this chat; raw tool results remain in chat history.",
+  "runtime_source": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+  "VM_PID": 8231,
+  "instance": "24DC2EA6-EAA8-4E18-B386-2E78A1EA8566",
+  "classic_GetClipboard_before": {
+    "empty": true,
+    "has_image": false
+  },
+  "real_Command_V": {
+    "search_displayed": "v",
+    "classic_clipboard_after_empty": true,
+    "Mac_test_plain_and_RTF_preserved_changeCount": 246
+  },
+  "LLDB": {
+    "key_window_present": true,
+    "first_responder_class": "NSKVONotifying_vphone_cli.VPhoneVirtualMachineView",
+    "performKeyEquivalent_resolved_locations": 1,
+    "performKeyEquivalent_hit_count": 0,
+    "VZVirtualMachineView_keyDown_resolved_locations": 1,
+    "VZVirtualMachineView_keyDown_hit_count": 1,
+    "event_modifierFlags": 1048576,
+    "event_keyCode": 9,
+    "all_breakpoints_removed": true,
+    "process_detached": true
+  },
+  "finding": "Observed Command+V is delivered through VZVirtualMachineView.keyDown without calling the local performKeyEquivalent override. Local keyDown previously had no clipboard synchronization handler.",
+  "scope_limit": "Observed on this macOS/runtime and B15 artifact. It does not establish behavior on other OS versions.",
+  "CUA_limits": [
+    "Coordinate clicks returned noWindowsAvailable; AX menu actions and key input worked. Guest search focused through existing project API input.tap.",
+    "AX capture timed out while LLDB stopped at keyDown; debugger resumed by detach."
+  ],
+  "modern_camera_or_shared_components_deployed": false
+}

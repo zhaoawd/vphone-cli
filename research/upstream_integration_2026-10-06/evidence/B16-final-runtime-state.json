@@ -1,0 +1,41 @@
+{
+  "VM_stopped": true,
+  "VM_exit": 0,
+  "disk_released": true,
+  "config_classic_payload_UDID_unchanged": true,
+  "Mac_original_items_types_data_restored_readback_matched": true,
+  "Mac_original_change_count_not_restored": true,
+  "Mac_private_backup_0600_retained": "/private/tmp/vphone-b16-private-pasteboard.plist",
+  "VM_2607_operated": false,
+  "API_only_guest_processes_stopped": true,
+  "AMFI_driver_and_debugserver_stopped": true,
+  "VM_debugger_detached": true,
+  "persistent_security_settings_changed": false,
+  "observations": [
+    {
+      "command": [
+        "ps",
+        "-p",
+        "8231",
+        "-o",
+        "pid=,command="
+      ],
+      "code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/lsof",
+        "-t",
+        "--",
+        "/Users/qcz3840/github/vphone-cli/vm-new/Disk.img"
+      ],
+      "code": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "free_bytes": 12463448064,
+  "API_only_guest_cleanup_note": "Exact PID/command checks preceded SIGTERM to proxy593/worker608; independent exit readback before VM stop was not collected. Stop log still classified apiAccepted. All guest processes ended when VM stopped; no claim that API-only was absent before stop."
+}

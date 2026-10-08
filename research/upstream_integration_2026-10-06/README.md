@@ -603,3 +603,22 @@ B15 宿主、Launchpad、签名 helper 客户端构建成功，607 文件冻结�
 最终 vm-new 停机、磁盘释放，原配置、classic 载荷、UDID 预测摘要未变；B09/B13 原冻结工件1206文件再次核对。保留 classic 256 字节相机协议及原 Hook/Irisin 边界，未单独部署现代64字节组件，未改写 kernel/Preboot。磁盘正常启动/停止的数据变化未整体回滚，不宣称恢复了完整磁盘检查点。主仓库仍为 e8d825b3 且干净，vm-2607 未操作。
 
 追加前核对原847份证据和3份输入；新增100份后清单为947项。全部原依赖、步骤、接口、接受与回退条件、固定上游语义提交覆盖台账不变。47项仍为2项accepted、42项部分推进、T30/T31待对账、T45可选延期，44项必选未验收。证据入口：`evidence/B15-summary.json`、`evidence/B15-source-review.json`、`evidence/B15-post-fix-serial-swift.log`、`evidence/B15-post-fix-full-swift.log`、`evidence/B15-artifact-manifest.json`、`evidence/B15-helper-log-probe.json`、`evidence/B15-final-state.json`。
+
+
+### 2026-10-08 B16 新宿主验收与键盘事件修正
+
+用户授权的 B15 VM CDHash `343c11ebfeab191227fe5e6b849897282c2289c7` 已按独立空配置、paths=[]、allow_all=false、spoof_apple=true 执行。新的停机恢复点 `vm.backups/b16-vm-new-stopped-20261008` 共65个文件逐一摘要一致，源元数据无变化；同卷 APFS 写时复制不证明物理独立性。
+
+B15宿主ee7b9ec2实际运行PID8231，实例24DC2EA6-EAA8-4E18-B386-2E78A1EA8566。classic连接建立前的失败检查保留，重试完成原daemon/缓存/API_ONLY摘要核对。启动解锁观察locked=false、screen_off=false，未发送手动unlock RPC；Settings PID676且frontmost_verified=true。停止分类为apiAccepted，随后Guest stopped，CLI/VM退出0，8.712秒，磁盘释放。API_ONLY精确PID SIGTERM后没有独立退出读回，不能将该结果列为classic-only；旧回退证据保持。
+
+真实Cmd V后设置搜索框显示v，classic剪贴板仍为空，Mac测试文本和RTF保持。LLDB观察key window和VM view first responder存在；performKeyEquivalent命中0次，VZ keyDown命中1次，modifierFlags1048576、keyCode9。所有断点删除，调试器分离。修正f2331b7a为keyDown补齐同一同步回调，保留原焦点/连接/变化计数保护。事件回归3项在旧实现失败1项，修正后3项全部通过，相关Swift Testing13项通过。
+
+标准make test_swift：XCTest254项、跳过3项、0失败；Swift Testing1243项/198suite，54.849秒，3项问题（Library取消耗时、HTTP取消耗时、helper未配置身份请求超时），原因未查明。完整串行：XCTest254项/跳过3项/0失败；Swift Testing1243项/198suite，239.086秒，退出0。Python和真实固件比较本轮未重跑。
+
+新签名候选为 `.build/acceptance/B16/candidate.app`，源码f2331b7a6b3a577642f2a0cccb4ec623395f5352，CDHash `ab7682cd27dce3d64dbf1233c98975d4dab392b5`，SHA256 `cde831706e0239c51c5c7fde5d1e328e04585c57b4ce6ec984195543a8ef72bf`。资源、签名、权限、外部工作目录与符号链接执行检查通过；未启动该新候选VM。本轮既有授权仅覆盖B15精确哈希。
+
+vm-new已停机，配置/原classic载荷/UDID摘要保持，vm-2607未操作。AMFI辅助进程SIGINT未退出，核验PID5503后SIGTERM清理，debugserver退出，amfid PPID1。Mac原始剪贴板项目/类型/数据恢复并读回一致，变化计数不可恢复，0600私有备份保留。停止后API token已删除。未替换guest/kernel/boot-chain，也未执行整盘回滚。
+
+原947份证据和3份输入副本校验一致；本轮新增45份证据。T36/T37/T39/T40/T46均保持局部验收状态，完整计划仍为2项accepted、42项partial、2项待本地审计、1项可选延后，44项必需任务未完成验收。原依赖、步骤、接口、接受条件、回退及342提交覆盖台账保持。
+
+构建后仅清理隔离工作树可重建debug中间产物和release ModuleCache，释放1,435,779,072字节；清理后可用13,609,791,488字节，通过12 GiB启动门槛。B15/B16共806个冻结文件摘要再次一致。恢复点、日志、源文件及冻结候选均保留。

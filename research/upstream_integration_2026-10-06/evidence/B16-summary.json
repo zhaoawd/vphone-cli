@@ -1,0 +1,172 @@
+{
+  "date": "2026-10-08",
+  "worktree_baseline": "02d3594b0c0a6407cd7c82103d2e16853c07b7b4",
+  "implementation_head": "f2331b7a6b3a577642f2a0cccb4ec623395f5352",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "all_five_full_acceptance_passed": false,
+  "authorization_executed": {
+    "VM_CDHash": "343c11ebfeab191227fe5e6b849897282c2289c7",
+    "source": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+    "paths": [],
+    "allow_all": false,
+    "spoof_apple": true,
+    "independent_empty_config": true,
+    "persistent_security_settings_changed": false,
+    "helper_registration_performed": false
+  },
+  "VM_acceptance": {
+    "PID": 8231,
+    "instance": "24DC2EA6-EAA8-4E18-B386-2E78A1EA8566",
+    "checkpoint_files": 65,
+    "checkpoint_source_metadata_changes": {},
+    "checkpoint_method": "same-volume APFS clonefile; copy-on-write, not physically independent",
+    "startup_unlock_flag": true,
+    "unlocked_observed_without_manual_unlock_RPC": true,
+    "Settings_launch_PID": 676,
+    "Settings_frontmost_verified": true,
+    "stop_classification": "apiAccepted; awaiting VM stop",
+    "CLI_stop_exit": 0,
+    "VM_exit": 0,
+    "stop_seconds": 8.712136749993078,
+    "disk_released": true,
+    "classic_only_fallback_on_B16_claimed": false,
+    "API_only_pre_stop_independent_exit_not_verified": true,
+    "original_config_classic_and_UDID_hashes_preserved": true,
+    "full_disk_rollback_performed": false,
+    "VM_2607_operated": false,
+    "modern_guest_or_camera_deployed": false,
+    "first_guest_start_attempt": "failed because classic not connected; preserved; retry passed"
+  },
+  "clipboard": {
+    "classic_initial_and_after_Cmd_V_empty": true,
+    "Cmd_V_displayed_literal_v": true,
+    "Mac_known_plain_and_RTF_preserved": true,
+    "debugger_performKeyEquivalent_hits": 0,
+    "debugger_VZ_keyDown_hits": 1,
+    "event_modifierFlags": 1048576,
+    "event_keyCode": 9,
+    "first_responder": "VPhoneVirtualMachineView",
+    "source_fix": "Route direct keyDown through the same guarded clipboard callback as performKeyEquivalent.",
+    "new_fix_real_VM_acceptance": false,
+    "Mac_original_items_types_data_restored_readback_matched": true,
+    "changeCount_not_restored": true,
+    "private_backup_0600_retained": true,
+    "API_separate_image_await_path_integrated": false
+  },
+  "tests": {
+    "red_event_routing": {
+      "XCTest": 3,
+      "failures": 1,
+      "expected_missing_keyDown_callback": true,
+      "exit": 1
+    },
+    "green_related": {
+      "XCTest": 3,
+      "Swift_Testing": 13,
+      "Swift_Testing_suites": 2,
+      "exit": 0
+    },
+    "full_default_parallel": {
+      "XCTest": 254,
+      "XCTest_skipped": 3,
+      "XCTest_failures": 0,
+      "Swift_Testing": 1243,
+      "suites": 198,
+      "Swift_Testing_seconds": 54.849,
+      "issues": 3,
+      "exit": 2,
+      "failures": [
+        "LibraryTests.cancellingARunInterruptsOnlyItsChild elapsed26.927690982818604 >10",
+        "APIHTTPTests.deadlineAndCallerCancellationEndHTTPWait elapsed4.245997875 >1",
+        "HelperServiceTests.xpcRejectsClientWithoutConfiguredSigningIdentity timed out"
+      ],
+      "causes": "not established"
+    },
+    "full_serial": {
+      "XCTest": 254,
+      "XCTest_skipped": 3,
+      "XCTest_failures": 0,
+      "Swift_Testing": 1243,
+      "suites": 198,
+      "Swift_Testing_seconds": 239.086,
+      "exit": 0
+    },
+    "Python_or_firmware_tests_rerun": false
+  },
+  "new_candidate": {
+    "source_head": "f2331b7a6b3a577642f2a0cccb4ec623395f5352",
+    "stage": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B16",
+    "total_files": 199,
+    "VM_CDHash": "ab7682cd27dce3d64dbf1233c98975d4dab392b5",
+    "VM_SHA256": "cde831706e0239c51c5c7fde5d1e328e04585c57b4ce6ec984195543a8ef72bf",
+    "VM_booted": false,
+    "VM_help_executed": false,
+    "new_VM_AMFI_authorization": "not yet requested; prior exact authorization applies to B15 hash only",
+    "build_and_bundle_execute_checks_passed": true,
+    "guest_rebuilt_or_deployed": false,
+    "helper_built_or_registered": false,
+    "Launchpad_rebuilt": false
+  },
+  "cleanup": {
+    "VM_stopped": true,
+    "VM_exit": 0,
+    "disk_released": true,
+    "config_classic_payload_UDID_unchanged": true,
+    "Mac_original_items_types_data_restored_readback_matched": true,
+    "Mac_original_change_count_not_restored": true,
+    "Mac_private_backup_0600_retained": "/private/tmp/vphone-b16-private-pasteboard.plist",
+    "VM_2607_operated": false,
+    "API_only_guest_processes_stopped": true,
+    "AMFI_driver_and_debugserver_stopped": true,
+    "VM_debugger_detached": true,
+    "persistent_security_settings_changed": false,
+    "observations": [
+      {
+        "command": [
+          "ps",
+          "-p",
+          "8231",
+          "-o",
+          "pid=,command="
+        ],
+        "code": 1,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/usr/sbin/lsof",
+          "-t",
+          "--",
+          "/Users/qcz3840/github/vphone-cli/vm-new/Disk.img"
+        ],
+        "code": 1,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "free_bytes": 12463448064,
+    "API_only_guest_cleanup_note": "Exact PID/command checks preceded SIGTERM to proxy593/worker608; independent exit readback before VM stop was not collected. Stop log still classified apiAccepted. All guest processes ended when VM stopped; no claim that API-only was absent before stop."
+  },
+  "ledger": {
+    "total": 47,
+    "accepted": 2,
+    "partial": 42,
+    "pending_local_audit": 2,
+    "optional_deferred": 1,
+    "required_unaccepted": 44,
+    "original_contracts_preserved": true
+  },
+  "rebuildable_cache_cleanup": {
+    "removed_rebuildable_paths": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug",
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache"
+    ],
+    "free_before": 12174012416,
+    "free_after": 13609791488,
+    "freed_bytes": 1435779072,
+    "B15_B16_frozen_files_verified_after_cleanup": 806,
+    "VM_boot_12_GiB_guard_passes": true,
+    "VM_backup_evidence_and_sources_deleted": false
+  }
+}
