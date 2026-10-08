@@ -48,8 +48,9 @@ class VPhoneWindowController: NSObject, NSToolbarDelegate, NSWindowDelegate {
         }, read: { [weak control] in
             guard let control else { throw CancellationError() }
             return try await control.clipboardGet()
-        }, macChangeCount: { NSPasteboard.general.changeCount }, write: { content in
+        }, macChangeCount: { NSPasteboard.general.changeCount }, write: { [weak self] content in
             VPhoneClipboardMacWriter.write(content)
+            self?.shortcutSync?.guestCopyWasWrittenToMac()
         })
         let shortcuts = VPhoneClipboardShortcutSync(identity: { [weak control] in
             guard let control, let connection = control.clipboardSession else { return nil }

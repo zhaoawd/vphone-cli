@@ -1,8 +1,16 @@
+import Foundation
 import ArgumentParser
 import Testing
 @testable import vphone_cli
 
 struct HelperCLITests {
+    @Test func explicitOperationLogPathsAreParsedByBothHelperCommands() throws {
+        let verify = try VPhoneHelperVerifyBundleCommand.parse(["--version", "2.6.1-local.1234abcd", "--log-file", "/tmp/verify.log"])
+        let install = try VPhoneHelperInstallBundleCommand.parse(["--version", "2.6.1-local.1234abcd", "--archive", "/tmp/bundle.tar", "--sha256", "abc", "--log-file", "/tmp/install.log"])
+        #expect(verify.logFile?.path == "/tmp/verify.log")
+        #expect(install.logFile?.path == "/tmp/install.log")
+    }
+
     @Test func parsesFixedHelperOperations() throws {
         #expect(try VPhoneCLI.parseAsRoot(["helper", "status"]) is VPhoneHelperStatusCommand)
         #expect(try VPhoneCLI.parseAsRoot(["helper", "register"]) is VPhoneHelperRegisterCommand)

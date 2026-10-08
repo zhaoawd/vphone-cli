@@ -4,6 +4,47 @@ import Testing
 
 @MainActor
 struct ClipboardShortcutTests {
+    @Test func unchangedMacClipboardDoesNotOverwriteSubsequentGuestCopy() async {
+        var revision: UInt64 = 0
+        var guest = "", sets = 0, chords = 0
+        let coordinator = VPhoneClipboardShortcutSync(identity: { .init(connection: 1, revision: revision) }, macCount: { 10 },
+            read: { .init(text: guest, types: [], hasImage: false, changeCount: 1, imageData: nil) },
+            set: { value in guest = value.text ?? ""; sets += 1; revision += 1 },
+            chord: { _ in chords += 1 }, write: { _ in })
+        let mac = VPhoneControl.ClipboardContent(text: "earlier Mac copy", types: [], hasImage: false, changeCount: nil, imageData: nil)
+        await coordinator.paste(mac)
+        guest = "later guest touch copy"
+        await coordinator.paste(mac)
+        #expect(guest == "later guest touch copy")
+        #expect(sets == 1)
+        #expect(chords == 2)
+    }
+
+    @Test func changedMacClipboardAndNewConnectionStillSendPayload() async {
+        var connection: UInt64 = 1, revision: UInt64 = 0
+        var mac = 10, sets = 0, chords = 0
+        let coordinator = VPhoneClipboardShortcutSync(identity: { .init(connection: connection, revision: revision) }, macCount: { mac },
+            read: { .init(text: nil, types: [], hasImage: false, changeCount: 1, imageData: nil) },
+            set: { _ in sets += 1; revision += 1 }, chord: { _ in chords += 1 }, write: { _ in })
+        let payload = VPhoneControl.ClipboardContent(text: "Mac copy", types: [], hasImage: false, changeCount: nil, imageData: nil)
+        await coordinator.paste(payload)
+        mac = 11
+        await coordinator.paste(payload)
+        connection = 2; revision = 0
+        await coordinator.paste(payload)
+        #expect(sets == 3 && chords == 3)
+    }
+
+    @Test func focusCopyWrittenToMacDoesNotGetSentBackOnPaste() async {
+        var revision: UInt64 = 0, sets = 0, chords = 0
+        let coordinator = VPhoneClipboardShortcutSync(identity: { .init(connection: 1, revision: revision) }, macCount: { 10 },
+            read: { .init(text: nil, types: [], hasImage: false, changeCount: 1, imageData: nil) },
+            set: { _ in sets += 1; revision += 1 }, chord: { _ in chords += 1 }, write: { _ in })
+        coordinator.guestCopyWasWrittenToMac()
+        await coordinator.paste(.init(text: "Guest copy now on Mac", types: [], hasImage: false, changeCount: nil, imageData: nil))
+        #expect(sets == 0 && chords == 1)
+    }
+
     @Test func copyWritesOnlyNewGuestContentAndPreservesLaterMacChanges() async {
         var identity: VPhoneClipboardFocusSync.Identity? = .init(connection: 1, revision: 0)
         var mac = 10, count = 5, writes = 0, chords = 0

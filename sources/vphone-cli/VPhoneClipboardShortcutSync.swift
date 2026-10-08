@@ -12,6 +12,7 @@ final class VPhoneClipboardShortcutSync {
     private let chord: (UInt32) -> Void
     private let write: (VPhoneControl.ClipboardContent) -> Void
     private var generation = UUID()
+    private var syncedMac: (connection: UInt64, count: Int)?
 
     init(identity: @escaping () -> VPhoneClipboardFocusSync.Identity?, macCount: @escaping () -> Int,
          read: @escaping () async throws -> VPhoneControl.ClipboardContent,
@@ -22,6 +23,11 @@ final class VPhoneClipboardShortcutSync {
     }
 
     func invalidate() { generation = UUID() }
+
+    func guestCopyWasWrittenToMac() {
+        guard let owner = identity() else { syncedMac = nil; return }
+        syncedMac = (owner.connection, macCount())
+    }
 
     func copy(cut: Bool) async {
         guard let owner = identity() else { return }
@@ -36,6 +42,7 @@ final class VPhoneClipboardShortcutSync {
             if let changed = value.changeCount, changed > count {
                 guard supported(value) else { return }
                 write(value)
+                guestCopyWasWrittenToMac()
                 return
             }
             do { try await Task.sleep(for: .milliseconds(100)) } catch { return }
@@ -45,10 +52,17 @@ final class VPhoneClipboardShortcutSync {
     func paste(_ payload: VPhoneControl.ClipboardContent) async {
         guard let owner = identity(), supported(payload) else { return }
         let lease = generation, mac = macCount()
+        // A later guest copy must survive pasting an unchanged Mac clipboard.
+        if syncedMac?.connection == owner.connection, syncedMac?.count == mac {
+            guard valid(lease, owner, mac) else { return }
+            chord(0x19)
+            return
+        }
         do { try await set(payload) } catch { return }
         guard !Task.isCancelled, generation == lease, macCount() == mac,
               let current = identity(), current.connection == owner.connection,
               current.revision == owner.revision &+ 1 else { return }
+        syncedMac = (owner.connection, mac)
         chord(0x19)
     }
 

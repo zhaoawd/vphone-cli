@@ -35,20 +35,22 @@ struct VPhoneHelperInstallBundleCommand: ParsableCommand {
     @Option var version: String
     @Option(transform: URL.init(fileURLWithPath:)) var archive: URL
     @Option(help: "Archive SHA-256 from a trusted source") var sha256: String
+    @Option(help: "New private operation log; completion waits for all output to be synchronized and closed", transform: URL.init(fileURLWithPath:)) var logFile: URL?
     func run() throws {
         let client = try VPhoneHelperClient()
         let fd = open(archive.path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK)
         guard fd >= 0 else { throw ValidationError("Unable to open archive: \(archive.path)") }
         let input = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
         defer { try? input.close() }
-        FileHandle.standardOutput.write(try client.installBundle(version: version, archive: input, sha256: sha256) + Data("\n".utf8))
+        FileHandle.standardOutput.write(try client.installBundle(version: version, archive: input, sha256: sha256, logFile: logFile) + Data("\n".utf8))
     }
 }
 
 struct VPhoneHelperVerifyBundleCommand: ParsableCommand {
     static let configuration = CommandConfiguration(commandName: "verify-bundle", abstract: "Ask the signed helper to verify an installed Core Bundle")
     @Option var version: String
+    @Option(help: "New private operation log; completion waits for all output to be synchronized and closed", transform: URL.init(fileURLWithPath:)) var logFile: URL?
     func run() throws {
-        FileHandle.standardOutput.write(try VPhoneHelperClient().verifyBundle(version: version) + Data("\n".utf8))
+        FileHandle.standardOutput.write(try VPhoneHelperClient().verifyBundle(version: version, logFile: logFile) + Data("\n".utf8))
     }
 }

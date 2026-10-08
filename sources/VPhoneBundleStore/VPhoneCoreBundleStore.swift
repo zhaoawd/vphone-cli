@@ -97,11 +97,19 @@ public struct VPhoneCoreBundleStore: Sendable {
     public func withVerifiedExecutable<T>(version: String, executable: VPhoneBundleExecutable,
                                           body: (URL) throws -> T) throws -> T {
         try VPhoneBundleVersion.require(version)
-        try requireRoot()
+        do { try requireRoot() }
+        catch { throw unavailableExecutable(version: version, cause: error) }
         return try withLock(exclusive: false) {
-            _ = try verifiedReceipt(version)
+            do { _ = try verifiedReceipt(version) }
+            catch { throw unavailableExecutable(version: version, cause: error) }
             return try body(executableURL(directory(version).appendingPathComponent("VPhone.bundle"), executable))
         }
+    }
+
+    private func unavailableExecutable(version: String, cause: any Error) -> VPhoneBundleStoreError {
+        VPhoneBundleStoreError("Core Bundle \(version) is unavailable or failed verification. \(cause.localizedDescription) "
+            + "Restore this exact verified version with bundle install, or explicitly select another verified version with vm bind-core-bundle. "
+            + "No default bundle was selected and no executable was run.")
     }
 
     private func verifiedReceipt(_ version: String) throws -> VPhoneBundleReceipt {

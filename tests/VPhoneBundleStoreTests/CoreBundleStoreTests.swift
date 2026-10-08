@@ -89,6 +89,19 @@ private final class BundleFixture {
 
 @Suite(.serialized)
 struct CoreBundleStoreTests {
+    @Test func unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() throws {
+        let fixture = try BundleFixture()
+        var invoked = false
+        let message = try #require(BundleFixture.message {
+            try fixture.store.withVerifiedExecutable(version: "2.6.0-local.1234abcd", executable: .vm) { _ in invoked = true }
+        })
+        #expect(message.contains("2.6.0-local.1234abcd"))
+        #expect(message.contains("bundle install"))
+        #expect(message.contains("vm bind-core-bundle"))
+        #expect(!invoked)
+        #expect(fixture.snapshot().isEmpty)
+    }
+
     @Test func installsSignedBundleAndVerifiesReceipt() throws {
         let fixture = try BundleFixture()
         // Framework-style relative links remain supported.

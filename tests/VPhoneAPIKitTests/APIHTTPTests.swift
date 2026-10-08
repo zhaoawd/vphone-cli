@@ -4,6 +4,7 @@ import Testing
 
 final class APIHTTPFixture {
     let process = Process()
+    private let exited = DispatchGroup()
     let directory: URL
     let port: Int
 
@@ -18,7 +19,10 @@ final class APIHTTPFixture {
         if waitForPeerClose { process.arguments?.append("--wait-for-peer-close") }
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
-        try process.run()
+        exited.enter()
+        process.terminationHandler = { [exited] _ in exited.leave() }
+        do { try process.run() }
+        catch { exited.leave(); throw error }
         let deadline = ContinuousClock.now + .seconds(30)
         var boundPort: Int?
         while ContinuousClock.now < deadline, process.isRunning {
@@ -29,8 +33,7 @@ final class APIHTTPFixture {
             try await Task.sleep(for: .milliseconds(10))
         }
         guard let boundPort else {
-            if process.isRunning { process.terminate(); process.waitUntilExit() }
-            try? FileManager.default.removeItem(at: directory)
+            Self.stop(process: process, exited: exited, directory: directory)
             throw URLError(.cannotConnectToHost)
         }
         port = boundPort
@@ -41,8 +44,17 @@ final class APIHTTPFixture {
                             token: "1234567890abcdef", timeout: timeout)
     }
 
-    func stop() {
-        if process.isRunning { process.terminate(); process.waitUntilExit() }
+    func stop() { Self.stop(process: process, exited: exited, directory: directory) }
+
+    private static func stop(process: Process, exited: DispatchGroup, directory: URL) {
+        if process.isRunning { process.terminate() }
+        // Observe termination with the handler installed before spawning.
+        // Do not depend on the run loop of the thread resuming this test;
+        // keep teardown bounded even when the fixture fails to exit.
+        guard exited.wait(timeout: .now() + 5) == .success else {
+            Issue.record("Loopback fixture did not exit within five seconds")
+            return
+        }
         try? FileManager.default.removeItem(at: directory)
     }
 }
