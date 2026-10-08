@@ -1,0 +1,23 @@
+{
+  "requests_without_response_files": [
+    "guest-before-cleanup",
+    "guest-api-stop",
+    "api-stop-process-1003"
+  ],
+  "observed_error": "timed out",
+  "operation_effect_not_independently_confirmed": true,
+  "subsequent_capabilities_api_state": "ready",
+  "stop_actual_classification": "apiAccepted",
+  "classic_only_not_claimed": true,
+  "helper_registration": {
+    "first_user_process_timeout_seconds": 40,
+    "root_registration_returncode": 1,
+    "root_registration_stderr": "Error: Helper timed out; an install may still be running. Verify before retrying.",
+    "independent_later_status": "helper protocol: 2",
+    "successful_verify_requests": 2,
+    "service_cleanup_passed": true
+  },
+  "first_AMFI_cleanup_script_assertion_failed": true,
+  "independent_AMFI_readback": "amfid PPID1; no matching temporary drivers",
+  "all_failed_attempts_preserved": true
+}

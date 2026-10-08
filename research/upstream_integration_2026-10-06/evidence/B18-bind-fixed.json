@@ -1,0 +1,35 @@
+{
+  "command": [
+    "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+    "vm",
+    "bind-core-bundle",
+    "--library-root",
+    "/Users/qcz3840/github/vphone-cli",
+    "vm-new",
+    "--version",
+    "2.6.1",
+    "--backup",
+    "/Users/qcz3840/github/vphone-cli/vm.backups/b18-vm-new-fixed-binding-20261008"
+  ],
+  "returncode": 0,
+  "stdout": "vm-new: host Core Bundle bound to 2.6.1; guest, kernel and boot-chain origins preserved\n",
+  "stderr": "      130.57 real        86.63 user        24.46 sys\n            27754496  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                2470  page reclaims\n                 552  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n               16212  voluntary context switches\n              176310  involuntary context switches\n        486833756248  instructions retired\n        345106879521  cycles elapsed\n             7979752  peak memory footprint\n",
+  "seconds": 130.58384879201185,
+  "before": {
+    "config.plist": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    ".vphoned.signed": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "udid-prediction.txt": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc"
+  },
+  "backup": "/Users/qcz3840/github/vphone-cli/vm.backups/b18-vm-new-fixed-binding-20261008",
+  "free_bytes": 40335331328,
+  "binding": {
+    "bundle": "2.6.1"
+  },
+  "binding_sha256": "405bf0d48c6fe9fc1952fd1a2487fa42aacc9aeab33056372f314d224c47c723",
+  "after": {
+    "config.plist": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    ".vphoned.signed": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "udid-prediction.txt": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc"
+  },
+  "maximum_rss_bytes": 27754496
+}

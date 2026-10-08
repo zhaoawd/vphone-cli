@@ -1,0 +1,588 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/43] Write sources
+[5/43] Write swift-version--58304C5D6DBC2206.txt
+[6/47] Compiling download.c
+[6/47] Compiling asr.c
+[7/47] Compiling fls.c
+[7/47] Compiling log.c
+[10/47] Compiling fdr.c
+[11/47] Compiling ipsw.c
+[12/47] Compiling limera1n.c
+[13/47] Compiling dfu.c
+[14/47] Compiling img3.c
+[15/47] Compiling normal.c
+[16/47] Compiling recovery.c
+[17/47] Compiling ace3.c
+[17/47] Compiling img4.c
+[19/47] Compiling restore.c
+[20/47] Compiling mbn.c
+[21/47] Compiling locking.c
+[22/47] Compiling ftab.c
+[23/47] Compiling vphone_zip_stub.c
+[24/47] Compiling deviceinterfaced.c
+[25/47] Compiling common.c
+[26/47] Compiling idevicerestore.c
+[27/47] Compiling vphone_restore_bridge.c
+[28/47] Compiling MobileRecoveryCore libirecovery.c
+[30/47] Emitting module VPhoneCore
+[31/47] Compiling VPhoneCore VPhoneCreateCheckpoint.swift
+[32/47] Compiling VPhoneCore VPhoneFileDigest.swift
+[33/47] Compiling VPhoneCore VPhoneMachineBindingPersistence.swift
+[34/151] Compiling FirmwarePatcher VPhoneKernelcacheSwap.swift
+[35/151] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[36/152] Compiling VPhoneHelperKit VPhoneHelperService.swift
+[37/152] Emitting module VPhoneHelperKit
+[38/152] Compiling VPhoneHelperKit VPhoneHelperClient.swift
+[39/152] Compiling VPhoneHelperKit VPhoneHelperOutput.swift
+[39/152] Write Objects.LinkFileList
+[41/156] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[42/156] Compiling FirmwarePatcher IBootPatcher.swift
+[43/156] Compiling FirmwarePatcher KernelJBPatchAmfiTrustcache.swift
+[44/156] Compiling VPhoneArchiveKitTests ExtractPermissionsTests.swift
+[45/156] Emitting module VPhoneHelperKitTests
+[46/156] Compiling VPhoneHelperKitTests OutputXPCTests.swift
+[46/156] Linking vphone-helper
+[48/156] Emitting module VPhoneLaunchpadKit
+[49/156] Compiling FirmwarePatcher KernelJBPatchDounmount.swift
+[50/156] Compiling FirmwarePatcher KernelJBPatchFpfsScopedOpen.swift
+[51/156] Compiling FirmwarePatcher KernelJBPatchContainerUpcall.swift
+[52/156] Compiling FirmwarePatcher KernelJBPatchDiskImages2.swift
+[53/156] Compiling FirmwarePatcher KernelJBPatchHookCredLabel.swift
+[54/156] Compiling FirmwarePatcher KernelJBPatchIoucMacf.swift
+[55/156] Compiling FirmwarePatcher ARM64Encoder.swift
+[56/156] Compiling FirmwarePatcher BinaryBuffer.swift
+[57/156] Compiling FirmwarePatcher IM4PHandler.swift
+[58/156] Compiling FirmwarePatcher MachOHelpers.swift
+[58/156] Write Objects.LinkFileList
+[60/156] Emitting module VPhoneArchiveKitTests
+[61/156] Compiling VPhoneArchiveKitTests ArchiveSafetyTests.swift
+[62/156] Compiling VPhoneArchiveKitTests RoundTripTests.swift
+[63/176] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[64/176] Compiling FirmwarePatcher KernelJBPatchSharedRegion.swift
+[65/176] Compiling FirmwarePatcher KernelJBPatchSyscallmask.swift
+[66/176] Compiling FirmwarePatcher KernelJBPatchTaskForPid.swift
+[67/176] Compiling FirmwarePatcher KernelJBPatchThidCrash.swift
+[68/176] Compiling FirmwarePatcher KernelJBPatchThreadSetState.swift
+[69/181] Compiling FirmwarePatcher KernelPatchApfsMount.swift
+[70/181] Compiling FirmwarePatcher KernelPatchBsdInit.swift
+[71/181] Compiling FirmwarePatcher KernelPatchDebugger.swift
+[72/181] Compiling FirmwarePatcher KernelPatchPostValidation.swift
+[73/181] Compiling FirmwarePatcher KernelPatchSandbox.swift
+[74/181] Emitting module FirmwarePatcher
+[74/181] Linking vphone-launchpad
+[76/181] Compiling VPhoneHelperKitTests HelperTests.swift
+[77/181] Compiling VPhoneHelperKitTests OutputAcknowledgementTests.swift
+[78/181] Compiling VPhoneLaunchpadKitTests CreateTests.swift
+[79/181] Compiling VPhoneLaunchpadKitTests EditTests.swift
+[80/181] Compiling VPhoneLaunchpadKitTests HardwareKeyboardSettingsTests.swift
+[81/181] Compiling VPhoneLaunchpadKitTests MenuBarTests.swift
+[82/181] Compiling VPhoneLaunchpadKitTests RealCLICreateTests.swift
+[83/181] Compiling VPhoneLaunchpadKitTests RealCLIEditTests.swift
+[83/181] Applying vphone-helper
+[85/181] Compiling FirmwarePatcher PatchSelectionFileMigration.swift
+[86/181] Compiling FirmwarePatcher PatchSelectionMigration.swift
+[87/181] Compiling FirmwarePatcher VariantPlanResolver.swift
+[88/181] Compiling FirmwarePatcher FirmwarePipeline.swift
+[89/181] Compiling FirmwarePatcher FirmwarePlanBinding.swift
+[89/181] Applying vphone-launchpad
+[95/181] Compiling FirmwarePatcher FirmwareTransaction.swift
+[96/186] Compiling VPhoneLaunchpadKitTests HostSetupTests.swift
+[97/186] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[98/186] Compiling VPhoneLaunchpadKitTests LaunchpadFixtures.swift
+[99/186] Compiling VPhoneLaunchpadKitTests MachineBindingTests.swift
+[100/186] Compiling VPhoneLaunchpadKitTests MachineDecodeTests.swift
+[101/186] Compiling VPhoneLaunchpadKitTests MachineOriginsTests.swift
+[107/186] Emitting module VPhoneLaunchpadKitTests
+[108/188] Compiling FirmwarePatcher KernelJBPatchVmFault.swift
+[109/188] Compiling FirmwarePatcher KernelJBPatchVmMapDelete.swift
+[110/188] Compiling FirmwarePatcher KernelJBPatchVmProtect.swift
+[111/188] Compiling FirmwarePatcher KernelJBPatcherBase.swift
+[112/188] Compiling FirmwarePatcher KernelPatcherBase.swift
+[113/188] Compiling VPhoneLaunchpadKitTests BindingPersistenceTests.swift
+[114/188] Compiling VPhoneLaunchpadKitTests BindingSnapshotTests.swift
+[115/188] Compiling VPhoneLaunchpadKitTests CoreBundleTests.swift
+[116/188] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[117/188] Compiling VPhoneLaunchpadKitTests LineSplitterTests.swift
+[118/188] Compiling VPhoneLaunchpadKitTests LogWriterTests.swift
+[125/188] Emitting module VPhoneCoreTests
+[126/188] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[127/188] Compiling VPhoneLaunchpadKitTests ToolchainTests.swift
+[140/188] Compiling VPhoneCoreTests VMLockTests.swift
+[141/188] Compiling VPhoneCoreTests VMOperationTests.swift
+[142/188] Compiling VPhoneCoreTests VMPickerTests.swift
+[143/188] Compiling VPhoneCoreTests VMStopTests.swift
+[144/188] Compiling VPhoneCoreTests VerbosityTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[150/229] Compiling vphone_cli VPhoneAppBrowserView.swift
+[151/229] Compiling vphone_cli VPhoneAppDelegate.swift
+[152/229] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[153/229] Compiling vphone_cli VPhoneSetupCLI.swift
+[154/229] Compiling vphone_cli VPhoneVMBindingCLI.swift
+[155/229] Compiling vphone_cli VPhoneVMCLI.swift
+[156/229] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[157/229] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[158/234] Compiling vphone_cli VPhoneEntry.swift
+[159/234] Compiling vphone_cli VPhoneFWCLI.swift
+[160/234] Compiling vphone_cli VPhoneFWCacheCLI.swift
+[161/234] Compiling vphone_cli VPhoneFWInspectCLI.swift
+[162/234] Compiling vphone_cli VPhoneFileBrowserView.swift
+[163/234] Compiling vphone_cli VPhoneFirmwareSelection.swift
+[164/234] Compiling vphone_cli VPhoneClipboardShortcutSync.swift
+[165/234] Compiling vphone_cli VPhoneControl.swift
+[166/234] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[167/234] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[168/234] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[169/234] Compiling vphone_cli VPhoneDoctorCLI.swift
+[170/234] Compiling vphone_cli VPhoneHostCommandService.swift
+[171/234] Compiling vphone_cli VPhoneHostControl.swift
+[172/234] Compiling vphone_cli VPhoneHostTarget.swift
+[173/234] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[174/234] Compiling vphone_cli VPhoneLocationProvider.swift
+[175/234] Compiling vphone_cli VPhoneMenuLocation.swift
+[176/234] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[177/234] Compiling vphone_cli VPhoneVMSelection.swift
+[178/234] Compiling vphone_cli VPhoneVMTransferCLI.swift
+[179/234] Compiling vphone_cli VPhoneVirtualMachine.swift
+[180/234] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[181/234] Compiling vphone_cli VPhoneWindowController.swift
+[182/234] Compiling vphone_cli VPhoneNativeFirmwarePreparer.swift
+[183/234] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[184/234] Compiling vphone_cli VPhoneProgressBar.swift
+[185/234] Compiling vphone_cli VPhoneResourcesCLI.swift
+[186/234] Compiling vphone_cli VPhoneRestoreCLI.swift
+[187/234] Compiling vphone_cli VPhoneGuestCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[188/234] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[189/234] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[190/234] Compiling vphone_cli VPhoneHostAPICommands.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[191/234] Compiling vphone_cli VPhoneHostCapabilities.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[192/234] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[196/234] Compiling vphone_cli VPhoneCLI.swift
+[197/234] Compiling vphone_cli VPhoneCameraServer.swift
+[198/234] Compiling vphone_cli VPhoneClipboardFocusSync.swift
+[214/234] Write Objects.LinkFileList
+[217/258] Emitting module VPhoneCLITests
+[218/261] Compiling VPhoneCLITests GuestCLITests.swift
+[219/261] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[220/261] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[221/261] Compiling VPhoneCLITests GuestTransportTests.swift
+[222/261] Compiling VPhoneCLITests HardwareKeyboardCLITests.swift
+[223/261] Compiling VPhoneCLITests HostAPICommandTests.swift
+[224/261] Compiling VPhoneCLITests APIProxyCLITests.swift
+[225/261] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[226/261] Compiling VPhoneCLITests CFWInvocationTests.swift
+[227/261] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[228/261] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[229/261] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[230/261] Compiling VPhoneCLITests DoctorCLITests.swift
+[231/261] Compiling VPhoneCLITests DyldMaxSlideOptionTests.swift
+[232/261] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[233/261] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[234/261] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[235/261] Compiling VPhoneCLITests NativeRestoreCLITests.swift
+[235/261] Linking vphone-vm
+[236/261] Linking vphone-cli
+[237/261] Applying vphone-vm
+[238/261] Applying vphone-cli
+[240/261] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[241/261] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[242/261] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[246/261] Compiling VPhoneCLITests HostRPCTests.swift
+[247/261] Compiling VPhoneCLITests LocationValidationTests.swift
+[248/261] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[250/261] Compiling VPhoneCLITests NativeTransferCLITests.swift
+[251/261] Compiling VPhoneCLITests RestoreInspectCLITests.swift
+[259/261] Write Objects.LinkFileList
+[260/261] Linking vphone-cliPackageTests
+Build complete! (31.68s)
+Test Suite 'Selected tests' started at 2026-10-08 14:15:57.468.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-08 14:15:57.470.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-08 14:15:57.470.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 14:15:57.470.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite StartupUnlockCLITests started.
+◇ Suite CreateCheckpointTests started.
+◇ Suite ToolchainTests started.
+◇ Suite VMStopTests started.
+◇ Suite OutputXPCTests started.
+◇ Suite BindingPersistenceTests started.
+◇ Suite StartupUnlockTests started.
+◇ Suite HelperServiceTests started.
+◇ Test defaultOffAndOptInRequiresAPISurface() started.
+◇ Test configOptionIsExplicitAndLaunchForwardingKeepsAPIListener() started.
+◇ Test boundHostExecutionDoesNotOfferPackagedDaemonForAutoUpdate() started.
+◇ Suite OutputAcknowledgementTests started.
+◇ Test optionChangeAffectingCompletedStageIsRefused() started.
+◇ Test missingCheckpointIsNotResumable() started.
+◇ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() started.
+◇ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test movedArtifactRefusesResume() started.
+◇ Test busyLiveStateStopsResumeUntilProbeIsIdle() started.
+◇ Test notApplicableWithoutVariantRuleIsRejected() started.
+◇ Test symlinkedCheckpointIsRejected() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test heldRunLockRefusesResumeWithoutWriting() started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test variantChangeBeforePatchRecomputesApplicability() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() started.
+◇ Test artifactLookupReturnsTheLatestRecord() started.
+◇ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() started.
+◇ Test keepArtifactsSkipsRemoval() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test recoveryInputsAreKeptUntilRetainingStagesFinish() started.
+◇ Test legacyBindingRefusesOpenDiskBeforeBackupOrPublication() started.
+◇ Test cloneRenameAndExportPreserveAllRecordedOrigins() started.
+◇ Test pendingStageIsNeverTreatedAsNotApplicable() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test futureSchemaIsRejected() started.
+◇ Test restartAfterNextUnfinishedStageIsRejected() started.
+◇ Test firstBindingRequiresBackupAndPreservesOriginalConfigAndUnknownOrigins() started.
+◇ Test concurrentResumeAdmitsOneWriter() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() started.
+◇ Test artifactPathEscapingBundleIsRejected() started.
+◇ Test toolChangeRequiresExplicitAcceptance() started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+◇ Test hostRebindingPreservesComponentOriginsAndRefusesStaleSnapshot() started.
+◇ Test runKeepsARecordWrittenByAnotherProcess() started.
+◇ Test truncatedCheckpointIsRejected() started.
+◇ Test removableArtifactsFollowSynthesizedStageStates() started.
+◇ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() started.
+◇ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() started.
+◇ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() started.
+◇ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+◇ Test notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test rerunStageMayRewriteItsDeclaredArtifacts() started.
+◇ Test movedBundleIsRefused() started.
+◇ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() started.
+◇ Test succeededWithoutVerifierIsRejected() started.
+◇ Test duplicateStageIsRejected() started.
+◇ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test restartFromPrepareRegeneratesARemovedRestoreTree() started.
+◇ Test faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test changedMachineIdentifierIsRefused() started.
+◇ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() started.
+◇ Test unverifiedStageNeverReportsOverallSuccess() started.
+◇ Test sourceRecordRedactsOnlyURLSecrets() started.
+◇ Test unknownStageIsRejected() started.
+◇ Test heldBundleLockRefusesResumeWithoutWriting() started.
+◇ Test failureRecordWriteErrorKeepsOriginalError() started.
+◇ Test nativePrepareFailureCanResume() started.
+◇ Test freshCreateRecordsEveryStageAndOverallStatus() started.
+◇ Test runLockHeldByChildProcessRefusesUntilItExits() started.
+◇ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test clonedOrReplacedBundleIsRefused() started.
+◇ Test defaultOffAndEnablingCurrentInstanceDoesNotUnlock() started.
+◇ Test unauthorizedRequestCannotInstall() started.
+◇ Test earlyUnlockedStateIsObservedBeforeLaterLockAndRetry() started.
+◇ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() started.
+◇ Test diskInspectionFailureCannotReportStopped() started.
+◇ Test setupPendingUnknownAndMissingCapabilitySkipAutomaticWork() started.
+◇ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() started.
+◇ Test stopDisconnectDisableAndReplacementDiscardLateReply() started.
+◇ Test verificationIsReadOnlyAndPropagatesFailure() started.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+◇ Test timeoutIgnoresLateReply() started.
+◇ Test reportsProgressBeforeTheWaits() started.
+◇ Test callerIdentityMismatchNamesTheCaller() started.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+◇ Test xpcRejectsClientWithoutConfiguredSigningIdentity() started.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+◇ Test replyCompletesOnlyOnce() started.
+◇ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() started.
+◇ Test reportsSignalErrorsSeparately() started.
+◇ Test refusesToSignalAForeignLockHolder() started.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+◇ Test mapsOutcomesToExitCodes() started.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+◇ Test exitedTargetAndReleasedLockStillRequireDiskRelease() started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+◇ Test case passing 2 arguments variant → "less", skipped → [VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "regular", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "dev", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "jb", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "exp", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument restart → .patch to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .restore to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .cfw to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument restart → .firstBoot to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .verification to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test receiverAcknowledgesOnlyAfterFullLogIsPersistedAndRejectsOtherOperation() started.
+◇ Test successfulAckPermitsCompletion() started.
+◇ Test defaultMissingAcknowledgementWaitsThirtySecondsThenFails() started.
+◇ Test disconnectOrWriterFailureCannotBeTurnedIntoSuccessByLateAck() started.
+◇ Test case passing 1 argument phase → "building" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test missingAcknowledgementDoesNotReturnSuccess() started.
+◇ Test case passing 1 argument phase → "publishing" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "rollingBack" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+✔ Test missingCheckpointIsNotResumable() passed after 2.664 seconds.
+✔ Test boundHostExecutionDoesNotOfferPackagedDaemonForAutoUpdate() passed after 2.676 seconds.
+◇ Test case passing 1 argument completed → false to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument completed → true to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument step → .writeTemporary to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncFile to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .rename to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncDirectory to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+✔ Test configOptionIsExplicitAndLaunchForwardingKeepsAPIListener() passed after 2.748 seconds.
+✔ Test defaultOffAndOptInRequiresAPISurface() passed after 2.748 seconds.
+✔ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() passed after 2.748 seconds.
+✔ Test movedArtifactRefusesResume() passed after 2.748 seconds.
+✔ Test notApplicableWithoutVariantRuleIsRejected() passed after 2.748 seconds.
+✔ Test symlinkedCheckpointIsRejected() passed after 2.748 seconds.
+✔ Test heldRunLockRefusesResumeWithoutWriting() passed after 2.752 seconds.
+✔ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() passed after 2.752 seconds.
+✔ Test optionChangeAffectingCompletedStageIsRefused() passed after 2.782 seconds.
+✔ Test busyLiveStateStopsResumeUntilProbeIsIdle() passed after 2.782 seconds.
+✔ Test variantChangeBeforePatchRecomputesApplicability() passed after 2.782 seconds.
+✔ Test artifactLookupReturnsTheLatestRecord() passed after 2.783 seconds.
+✔ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() passed after 2.783 seconds.
+✔ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() passed after 2.784 seconds.
+vphone-helper: refused connection: caller pid 12231, uid 2035870432 does not satisfy the client signing requirement (OSStatus -67050: The operation couldn’t be completed. (OSStatus error -67050.))
+✔ Test keepArtifactsSkipsRemoval() passed after 2.784 seconds.
+✔ Test recoveryInputsAreKeptUntilRetainingStagesFinish() passed after 2.790 seconds.
+✔ Test pendingStageIsNeverTreatedAsNotApplicable() passed after 2.793 seconds.
+✔ Test futureSchemaIsRejected() passed after 2.793 seconds.
+✔ Test restartAfterNextUnfinishedStageIsRejected() passed after 2.793 seconds.
+✔ Test cloneRenameAndExportPreserveAllRecordedOrigins() passed after 2.793 seconds.
+✔ Test concurrentResumeAdmitsOneWriter() passed after 2.793 seconds.
+✔ Test artifactPathEscapingBundleIsRejected() passed after 2.822 seconds.
+✔ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() passed after 2.822 seconds.
+✔ Test truncatedCheckpointIsRejected() passed after 2.822 seconds.
+✔ Test removableArtifactsFollowSynthesizedStageStates() passed after 2.822 seconds.
+✔ Test runKeepsARecordWrittenByAnotherProcess() passed after 2.862 seconds.
+✔ Test toolChangeRequiresExplicitAcceptance() passed after 2.862 seconds.
+✔ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() passed after 3.016 seconds.
+✔ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() passed after 3.170 seconds.
+✔ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() passed after 3.170 seconds.
+✔ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() passed after 3.171 seconds.
+✔ Test legacyBindingRefusesOpenDiskBeforeBackupOrPublication() passed after 3.171 seconds.
+✔ Test rerunStageMayRewriteItsDeclaredArtifacts() passed after 3.171 seconds.
+✔ Test notApplicableFollowsVariantRules(variant:skipped:) with 5 test cases passed after 3.171 seconds.
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+✔ Test movedBundleIsRefused() passed after 3.208 seconds.
+✔ Test succeededWithoutVerifierIsRejected() passed after 3.208 seconds.
+✔ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) with 5 test cases passed after 3.208 seconds.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+✔ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() passed after 3.389 seconds.
+✔ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) with 3 test cases passed after 3.407 seconds.
+✔ Test duplicateStageIsRejected() passed after 3.407 seconds.
+✔ Test changedMachineIdentifierIsRefused() passed after 3.407 seconds.
+✔ Test faultMatrixFirstRunAndResume(stage:fault:) with 35 test cases passed after 3.407 seconds.
+✔ Test restartFromPrepareRegeneratesARemovedRestoreTree() passed after 3.408 seconds.
+✔ Test firstBindingRequiresBackupAndPreservesOriginalConfigAndUnknownOrigins() passed after 3.408 seconds.
+✔ Test hostRebindingPreservesComponentOriginsAndRefusesStaleSnapshot() passed after 3.408 seconds.
+✔ Test unverifiedStageNeverReportsOverallSuccess() passed after 3.407 seconds.
+✔ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() passed after 3.408 seconds.
+✔ Test sourceRecordRedactsOnlyURLSecrets() passed after 3.407 seconds.
+✔ Test unknownStageIsRejected() passed after 3.405 seconds.
+✔ Test heldBundleLockRefusesResumeWithoutWriting() passed after 3.395 seconds.
+✔ Test freshCreateRecordsEveryStageAndOverallStatus() passed after 3.395 seconds.
+✔ Test failureRecordWriteErrorKeepsOriginalError() passed after 3.395 seconds.
+✔ Test writeFailureBeforeStageStopsWithoutExecuting(step:) with 4 test cases passed after 3.395 seconds.
+✔ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) with 2 test cases passed after 3.395 seconds.
+✔ Test diskInspectionFailureCannotReportStopped() passed after 3.361 seconds.
+✔ Test timeoutIgnoresLateReply() passed after 3.361 seconds.
+✔ Test clonedOrReplacedBundleIsRefused() passed after 3.375 seconds.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 3.409 seconds.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 3.321 seconds.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 3.268 seconds.
+✔ Test replyCompletesOnlyOnce() passed after 3.268 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 3.409 seconds.
+✔ Test rejectsMissingNestedApp() passed after 3.409 seconds.
+✔ Test runLockHeldByChildProcessRefusesUntilItExits() passed after 3.395 seconds.
+✔ Test reportsSignalErrorsSeparately() passed after 1.383 seconds.
+✔ Test nativePrepareFailureCanResume() passed after 3.396 seconds.
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 1.352 seconds.
+✔ Test mapsOutcomesToExitCodes() passed after 1.352 seconds.
+✔ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() passed after 3.239 seconds.
+✔ Test refusesToSignalAForeignLockHolder() passed after 1.361 seconds.
+✔ Test exitedTargetAndReleasedLockStillRequireDiskRelease() passed after 1.317 seconds.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 1.264 seconds.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 1.345 seconds.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 1.317 seconds.
+✔ Test cdhashMatchesCodesign() passed after 3.409 seconds.
+✔ Test successfulAckPermitsCompletion() passed after 1.133 seconds.
+✔ Test disconnectOrWriterFailureCannotBeTurnedIntoSuccessByLateAck() passed after 1.133 seconds.
+✔ Test missingAcknowledgementDoesNotReturnSuccess() passed after 1.128 seconds.
+✔ Suite StartupUnlockCLITests passed after 3.410 seconds.
+✔ Test unauthorizedRequestCannotInstall() passed after 3.361 seconds.
+✔ Test authorizedInstallReturnsReceiptAndForwardsDescriptor() passed after 3.361 seconds.
+✔ Test verificationIsReadOnlyAndPropagatesFailure() passed after 3.361 seconds.
+✔ Test setupPendingUnknownAndMissingCapabilitySkipAutomaticWork() passed after 3.361 seconds.
+✔ Test callerMatchingItsOwnDesignatedRequirementIsAccepted() passed after 3.361 seconds.
+✔ Test callerIdentityMismatchNamesTheCaller() passed after 3.353 seconds.
+✔ Suite BindingPersistenceTests passed after 3.410 seconds.
+✔ Suite CreateCheckpointTests passed after 3.410 seconds.
+✔ Test defaultOffAndEnablingCurrentInstanceDoesNotUnlock() passed after 3.367 seconds.
+✔ Test receiverAcknowledgesOnlyAfterFullLogIsPersistedAndRejectsOtherOperation() passed after 1.147 seconds.
+✔ Test earlyUnlockedStateIsObservedBeforeLaterLockAndRetry() passed after 3.367 seconds.
+✔ Test stopDisconnectDisableAndReplacementDiscardLateReply() passed after 3.369 seconds.
+✔ Suite StartupUnlockTests passed after 3.418 seconds.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 1.221 seconds.
+✔ Test rejectsModifiedNestedExecutable() passed after 3.422 seconds.
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 3.437 seconds.
+✔ Test xpcRejectsClientWithoutConfiguredSigningIdentity() passed after 3.351 seconds.
+✔ Suite HelperServiceTests passed after 3.439 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 3.442 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 3.446 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 3.446 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 3.449 seconds.
+✔ Suite OutputXPCTests passed after 3.450 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 3.451 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 3.716 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 3.770 seconds.
+✔ Suite ToolchainTests passed after 3.771 seconds.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 5.220 seconds.
+✔ Test reportsProgressBeforeTheWaits() passed after 5.220 seconds.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 6.514 seconds.
+✔ Suite VMStopTests passed after 8.754 seconds.
+✔ Test defaultMissingAcknowledgementWaitsThirtySecondsThenFails() passed after 31.123 seconds.
+✔ Suite OutputAcknowledgementTests passed after 33.400 seconds.
+✔ Test run with 105 tests in 9 suites passed after 33.401 seconds.

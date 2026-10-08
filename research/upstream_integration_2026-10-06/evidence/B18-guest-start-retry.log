@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b18-guest-start-retry.py", line 17, in <module>
+    cap=call('capabilities');assert cap['ok'] and cap['guest_connected']
+  File "/private/tmp/vphone-b18-guest-start-retry.py", line 8, in call
+    s.settimeout(30);s.connect(str(vm/'vphone.sock'));s.sendall(json.dumps(q).encode()+b'\n');data=b''
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted

@@ -1,0 +1,75 @@
+{
+  "observations": [
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 0,
+      "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n\t<key>allow-root</key>\n\t<false/>\n\t<key>authenticate-user</key>\n\t<true/>\n\t<key>class</key>\n\t<string>user</string>\n\t<key>created</key>\n\t<real>813132504.58782601</real>\n\t<key>default-prompt</key>\n\t<dict>\n\t\t<key></key>\n\t\t<string>Install verified VPhone Core Bundles</string>\n\t</dict>\n\t<key>group</key>\n\t<string>admin</string>\n\t<key>identifier</key>\n\t<string>com.vphone.cli.helper</string>\n\t<key>modified</key>\n\t<real>813132504.58782601</real>\n\t<key>requirement</key>\n\t<string>identifier \"com.vphone.cli.helper\" and anchor apple generic and certificate leaf[subject.CN] = \"Apple Development: QingLiang Zhao (Y4CD942RX6)\" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>\n\t<key>session-owner</key>\n\t<false/>\n\t<key>shared</key>\n\t<false/>\n\t<key>timeout</key>\n\t<integer>300</integer>\n\t<key>tries</key>\n\t<integer>10000</integer>\n\t<key>version</key>\n\t<integer>1</integer>\n</dict>\n</plist>\n",
+      "stderr": "YES (0)\n"
+    },
+    {
+      "command": [
+        "/bin/launchctl",
+        "bootout",
+        "system",
+        "/Library/LaunchDaemons/com.vphone.cli.helper.plist"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "remove",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "YES (0)\n"
+    },
+    {
+      "command": [
+        "/bin/launchctl",
+        "print",
+        "system/com.vphone.cli.helper"
+      ],
+      "returncode": 113,
+      "stdout": "",
+      "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+    },
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "NO (-60005)\n"
+    },
+    {
+      "command": [
+        "/usr/sbin/lsof",
+        "-nP",
+        "-t",
+        "--",
+        "/Library/PrivilegedHelperTools/com.vphone.cli.helper"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "lsof: status error on /Library/PrivilegedHelperTools/com.vphone.cli.helper: No such file or directory\nlsof 4.91\n latest revision: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/\n latest FAQ: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/FAQ\n latest man page: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/lsof_man\n usage: [-?abhlnNoOPRtUvVX] [+|-c c] [+|-d s] [+D D] [+|-f[cgG]]\n [-F [f]] [-g [s]] [-i [i]] [+|-L [l]] [+|-M] [-o [o]] [-p s]\n [+|-r [t]] [-s [p:s]] [-S [t]] [-T [t]] [-u s] [+|-w] [-x [fl]] [--] [names]\nUse the ``-h'' option to get more help information.\n"
+    }
+  ],
+  "temporary_service_removed": true,
+  "temporary_right_removed": true,
+  "temporary_root_owned_binary_and_plist_removed": true,
+  "original_absent_baseline_restored": true,
+  "official_Bundle_installed_separately_for_binding": true
+}

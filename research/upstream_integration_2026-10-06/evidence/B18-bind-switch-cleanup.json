@@ -1,0 +1,46 @@
+{
+  "observations": [
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/Users/qcz3840/github/vphone-cli",
+        "vm-new",
+        "--version",
+        "2.6.0"
+      ],
+      "returncode": 0,
+      "stdout": "vm-new: host Core Bundle bound to 2.6.0; guest, kernel and boot-chain origins preserved\n",
+      "binding": {
+        "bundle": "2.6.0"
+      },
+      "guest_kernel_bootChain_origins_remain_unknown": true
+    },
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/Users/qcz3840/github/vphone-cli",
+        "vm-new",
+        "--version",
+        "2.6.1"
+      ],
+      "returncode": 0,
+      "stdout": "vm-new: host Core Bundle bound to 2.6.1; guest, kernel and boot-chain origins preserved\n",
+      "binding": {
+        "bundle": "2.6.1"
+      },
+      "guest_kernel_bootChain_origins_remain_unknown": true
+    }
+  ],
+  "original_missing_binding_restored": true,
+  "critical_hashes_preserved": true,
+  "backup_retained": "/Users/qcz3840/github/vphone-cli/vm.backups/b18-vm-new-fixed-binding-20261008",
+  "explicit_guest_upgrade_or_rollback_performed": false,
+  "upstream_VM_or_CLI_executed": false,
+  "four_origin_runtime_identity_matrix_complete": false
+}

@@ -1,0 +1,6 @@
+import Foundation
+import CryptoKit
+let input = try FileHandle(forReadingFrom: URL(fileURLWithPath: CommandLine.arguments[1]))
+var hash = SHA256()
+while let data = try input.read(upToCount: 1 << 20), !data.isEmpty { hash.update(data: data) }
+print(hash.finalize().map { String(format: "%02x", $0) }.joined())

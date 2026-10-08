@@ -1,0 +1,403 @@
+{
+  "date": "2026-10-08",
+  "worktree_baseline": "7330c5a1b00bc99b14b221062e3360cb25b7b07d",
+  "implementation_head": "fd12d73841ea9bd11cc80b94cfe8e6d9a4707a63",
+  "fixed_upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "tasks_progressed": [
+    "T39",
+    "T24",
+    "T36",
+    "T37",
+    "T40",
+    "T46"
+  ],
+  "all_six_full_acceptance_passed": false,
+  "authorization": {
+    "VM_CDHash": "ab7682cd27dce3d64dbf1233c98975d4dab392b5",
+    "VM_source": "f2331b7a6b3a577642f2a0cccb4ec623395f5352",
+    "independent_empty_AMFI_config": true,
+    "paths": [],
+    "allow_all": false,
+    "spoof_apple": true,
+    "helper_CDHash": "30ce6ce220a60617b6ae42066372bf3ac2e8ebe6",
+    "helper_reused_B13": true,
+    "persistent_security_settings_changed": false
+  },
+  "VM": {
+    "PID": 61914,
+    "instance": "86C9E1B1-4E37-4445-964C-CB7E071C264F",
+    "startup_unlock_observed_before_manual_RPC": true,
+    "initial_locked": false,
+    "initial_screen_off": false,
+    "later_lock_and_screen_off_observed": true,
+    "manual_unlock_RPC_success": true,
+    "shutdown_classification": "apiAccepted",
+    "Guest_stopped": true,
+    "VM_exit": 0,
+    "disk_released": true,
+    "classic_only_fallback_claimed": false,
+    "API_only_process_pre_stop_exit_independently_verified": false,
+    "guest_kernel_bootchain_replaced": false,
+    "classic_camera_256byte_v3_retained": true,
+    "VM_2607_operated": false
+  },
+  "clipboard": {
+    "source": "CUA actual key/menu actions and private pasteboard utility readback in this turn",
+    "VM_PID": 61914,
+    "VM_instance": "86C9E1B1-4E37-4445-964C-CB7E071C264F",
+    "VM_source": "f2331b7a6b3a577642f2a0cccb4ec623395f5352",
+    "VM_CDHash": "ab7682cd27dce3d64dbf1233c98975d4dab392b5",
+    "initial_classic_text_empty": true,
+    "Mac_test_text": "B18-MAC-paste-20261008",
+    "Mac_test_RTF_present": true,
+    "Mac_test_changeCount": 253,
+    "real_Command_V_classic_readback": {
+      "text": "B18-MAC-paste-20261008",
+      "types": [
+        "public.utf8-plain-text"
+      ],
+      "has_image": false,
+      "change_count": 4
+    },
+    "repeat_V_after_menu_set": {
+      "menu_set_text": "B18-GUEST-later-copy",
+      "classic_readback_text": "B18-GUEST-later-copy",
+      "change_count": 5,
+      "unchanged_Mac_did_not_overwrite_guest": true,
+      "touch_copy_not_claimed": true
+    },
+    "Command_C_and_X": {
+      "real_key_events_sent": true,
+      "guest_selection_not_verified": true,
+      "Mac_still_original_test_text_RTF_and_changeCount": true,
+      "actual_selection_copy_cut_acceptance_passed": false,
+      "assert_guest_text_failed_and_exit_133_preserved": "vphone-b18-pasteboard-owned-2026-10-08-135703.ips"
+    },
+    "input_focus": {
+      "API_and_classic_taps_returned_success": true,
+      "Settings_search_focus_and_text_entry_not_confirmed": true,
+      "CUA_coordinate_click_error": "Computer Use server error -10005: noWindowsAvailable",
+      "cause": "unknown",
+      "classic_tap_coordinate_review": {
+        "configured_full_resolution": [
+          1290,
+          2796
+        ],
+        "compact_preview_resolution": [
+          430,
+          932
+        ],
+        "classic_tap_used": [
+          150,
+          870
+        ],
+        "production_adapter_uses_full_resolution": true,
+        "classic_driver_coordinate_range_incorrect": true,
+        "focus_acceptance_invalid": true,
+        "corrected_driver_VM_retry_performed": false,
+        "API_tap_cause": "unknown"
+      }
+    },
+    "cleanup": {
+      "Mac_original_all_items_types_data_restored_and_readback_equal": true,
+      "Mac_original_changeCount_not_restorable": true,
+      "private_backup_retained_0600": true,
+      "guest_type_empty_succeeded": true,
+      "classic_final_readback": {
+        "text": "",
+        "types": [
+          "public.utf8-plain-text"
+        ],
+        "has_image": false,
+        "change_count": 6
+      },
+      "guest_changeCount_not_restored": true,
+      "guest_initial_type_set_not_recorded_in_this_report": true
+    },
+    "remaining": [
+      "actual selected text Cmd C/X and focused input paste",
+      "touch Copy/image/rapid focus/slow reply/type/reboot matrix",
+      "API separate image download second await identity fence"
+    ]
+  },
+  "digest_memory": {
+    "old_VM_binding_returncodes": [
+      -9,
+      -9
+    ],
+    "SIGKILL_system_cause": "not independently established",
+    "old_vmmap_recorded_peak_physical_footprint": "66.6G; sampling target died during vmmap",
+    "independent_512MiB_reproduction": [
+      {
+        "name": "probe",
+        "exit_code": 0,
+        "sha256": "9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767",
+        "maximum_rss_bytes": 545292288
+      },
+      {
+        "name": "probe-fixed",
+        "exit_code": 0,
+        "sha256": "9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767",
+        "maximum_rss_bytes": 8470528
+      }
+    ],
+    "fix": "Per-chunk autoreleasepool in shared VPhoneFileDigest; binding inventory and creation fingerprint retain previous SHA256 and descriptor/identity checks",
+    "production_512MiB_check": {
+      "bytes": 536870912,
+      "peak_rss": 8421376,
+      "sha256": "9acca8e8c22201155389f65abbf6bc9723edc7384ead80503839f49dcc56d767"
+    },
+    "real_64GiB_VM_binding": {
+      "exit": 0,
+      "seconds": 130.58384879201185,
+      "maximum_rss_bytes": 27754496,
+      "backup": "/Users/qcz3840/github/vphone-cli/vm.backups/b18-vm-new-fixed-binding-20261008",
+      "same_volume_APFS_COW_not_physically_independent": true,
+      "full_snapshot_inventory_verified_by_production": true,
+      "critical_file_hashes_unchanged": true
+    }
+  },
+  "Bundle": {
+    "official_releases": {
+      "installed_versions": [
+        {
+          "version": "2.6.0",
+          "receipt": {
+            "cdhashes": {
+              "vphone-cli": "0ce19862b991ff7c90933b283ba7d189b64d7505",
+              "vphone-vm": "3324e170da6d47c354e2859431ae39f180937e6b"
+            },
+            "installedAt": "2026-10-08T06:23:51Z",
+            "sha256": "ea389bba953eeff6d75f54c42d100dde6ffa6907adac84a40d56a35d08e78761",
+            "version": "2.6.0"
+          },
+          "CLI_sha256": "d4f7c8bba7d6cdf4e899cf8d0355c12d698fc6f16c1961e2dc577f568cad1b45"
+        },
+        {
+          "version": "2.6.1",
+          "receipt": {
+            "cdhashes": {
+              "vphone-cli": "c18348ecd0bf87c70c6c3df4a9ac459d4ea2ba1c",
+              "vphone-vm": "90fd3de15ad24187eff193b55038c65257ba2da5"
+            },
+            "installedAt": "2026-10-08T06:04:23Z",
+            "sha256": "651224d58064c59159e47b4a5fb066ca6dc758bdd221a346d43465cd34df5420",
+            "version": "2.6.1"
+          },
+          "CLI_sha256": "cb08e0480f943bebe0bca6f881deccd039336b680051e9e06512ebd91125b338"
+        }
+      ],
+      "local_B16_CLI_sha256": "8639c4ce5ad43d9b7a82d9f5ec2d6f981e2d45526788710fbab81e3fd665b5b2",
+      "upstream_VM_or_CLI_executed": false,
+      "guest_deployed": false
+    },
+    "first_binding": {
+      "bundle": "2.6.1"
+    },
+    "switch_and_restore": {
+      "observations": [
+        {
+          "command": [
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+            "vm",
+            "bind-core-bundle",
+            "--library-root",
+            "/Users/qcz3840/github/vphone-cli",
+            "vm-new",
+            "--version",
+            "2.6.0"
+          ],
+          "returncode": 0,
+          "stdout": "vm-new: host Core Bundle bound to 2.6.0; guest, kernel and boot-chain origins preserved\n",
+          "binding": {
+            "bundle": "2.6.0"
+          },
+          "guest_kernel_bootChain_origins_remain_unknown": true
+        },
+        {
+          "command": [
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+            "vm",
+            "bind-core-bundle",
+            "--library-root",
+            "/Users/qcz3840/github/vphone-cli",
+            "vm-new",
+            "--version",
+            "2.6.1"
+          ],
+          "returncode": 0,
+          "stdout": "vm-new: host Core Bundle bound to 2.6.1; guest, kernel and boot-chain origins preserved\n",
+          "binding": {
+            "bundle": "2.6.1"
+          },
+          "guest_kernel_bootChain_origins_remain_unknown": true
+        }
+      ],
+      "original_missing_binding_restored": true,
+      "critical_hashes_preserved": true,
+      "backup_retained": "/Users/qcz3840/github/vphone-cli/vm.backups/b18-vm-new-fixed-binding-20261008",
+      "explicit_guest_upgrade_or_rollback_performed": false,
+      "upstream_VM_or_CLI_executed": false,
+      "four_origin_runtime_identity_matrix_complete": false
+    },
+    "local_B16_frozen_files_preserved": true,
+    "actual_local_build_in_system_store_not_claimed": true,
+    "four_origin_runtime_upgrade_rollback_matrix_complete": false,
+    "downloaded_archives_retained": true
+  },
+  "helper": {
+    "successful_real_signed_XPC_verify_requests": 2,
+    "success_log_bytes_each": 60,
+    "log_mode": "0600",
+    "files_closed_after_reply": true,
+    "receipts_match_official_archive": true,
+    "helper_install_success_not_verified": true,
+    "ACK_fsync_evidence": "Implementation order plus success replies and closed complete files; no independent packet or syscall tracing",
+    "registration_timeouts_preserved": true,
+    "status_independently_verified_protocol": "2",
+    "temporary_service_right_files_cleaned": true
+  },
+  "tests": {
+    "targeted": {
+      "Swift_Testing": 105,
+      "suites": 9,
+      "seconds": 33.401,
+      "exit": 0
+    },
+    "final_full_serial": {
+      "XCTest": 254,
+      "skipped": 3,
+      "failures": 0,
+      "Swift_Testing": 1243,
+      "suites": 198,
+      "Swift_Testing_seconds": 230.171,
+      "exit": 0
+    },
+    "final_default_make_test_swift": {
+      "XCTest": 254,
+      "skipped": 3,
+      "failures": [
+        "unauthorized XPC helper timeout",
+        "Library cancellation elapsed >10s",
+        "HTTP cancellation elapsed >1s",
+        "NativeRestore worker.pid missing"
+      ],
+      "Swift_Testing": 1243,
+      "suites": 198,
+      "Swift_Testing_seconds": 48.696,
+      "issues": 4,
+      "exit": 2,
+      "full_cause": "not established",
+      "blocking_wait_on_cooperative_executor_confirmed_and_moved_to_dedicated_threads": true,
+      "test_deadlines_relaxed": false
+    },
+    "Python": {
+      "tests": 571,
+      "seconds": 275.167,
+      "exit": 0
+    },
+    "runner_red": {
+      "tests": 6,
+      "failures": 1
+    },
+    "runner_green": {
+      "tests": 6,
+      "failures": 0
+    },
+    "extra_checks": [
+      {
+        "command": [
+          "/Users/qcz3840/github/vphone-cli/.venv/bin/python",
+          "-B",
+          "scripts/check_tar_pipe_memory.py"
+        ],
+        "returncode": 0,
+        "seconds": 6.8435180420055985
+      },
+      {
+        "command": [
+          "/Users/qcz3840/github/vphone-cli/.venv/bin/python",
+          "-B",
+          "scripts/check_file_digest_memory.py"
+        ],
+        "returncode": 0,
+        "seconds": 2.0207557909889147
+      },
+      {
+        "command": [
+          "make",
+          "test_guest_components"
+        ],
+        "returncode": 0,
+        "seconds": 4.276538415986579
+      }
+    ],
+    "firmware_comparison_rerun": false,
+    "acceptance_selectors": {
+      "acceptance_selector_names": []
+    }
+  },
+  "candidate": {
+    "source_head": "f604f5ad5cdcf8181253e8c9aebe5d50f5cafd25",
+    "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app",
+    "files": 199,
+    "VM_executable_retained_B16_not_started": true,
+    "resources_retained_B16_not_rebuilt_or_deployed": true
+  },
+  "cleanup": {
+    "VM_new_stopped": true,
+    "disk_released": true,
+    "critical_hashes": {
+      "config.plist": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+      ".vphoned.signed": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+      "udid-prediction.txt": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc"
+    },
+    "binding_original_absent": true,
+    "root_Bundle_store_original_absent": true,
+    "helper_service_files_absent": true,
+    "temporary_token_absent": true,
+    "private_Mac_backup_0600_retained": true,
+    "process_readback": [
+      " 8206     1 Ss   /usr/libexec/amfid"
+    ],
+    "B18_candidate_files_verified": 199,
+    "restoration_checkpoint_retained": "/Users/qcz3840/github/vphone-cli/vm.backups/b18-vm-new-fixed-binding-20261008",
+    "full_disk_rollback_performed": false,
+    "VM_2607_operated": false,
+    "free_bytes": 42972442624,
+    "main_status": "?? research/vm_backup_cleanup_2026-10-08.md\n",
+    "old_B15_B16_frozen_files_reverified": 806
+  },
+  "failed_attempts": {
+    "requests_without_response_files": [
+      "guest-before-cleanup",
+      "guest-api-stop",
+      "api-stop-process-1003"
+    ],
+    "observed_error": "timed out",
+    "operation_effect_not_independently_confirmed": true,
+    "subsequent_capabilities_api_state": "ready",
+    "stop_actual_classification": "apiAccepted",
+    "classic_only_not_claimed": true,
+    "helper_registration": {
+      "first_user_process_timeout_seconds": 40,
+      "root_registration_returncode": 1,
+      "root_registration_stderr": "Error: Helper timed out; an install may still be running. Verify before retrying.",
+      "independent_later_status": "helper protocol: 2",
+      "successful_verify_requests": 2,
+      "service_cleanup_passed": true
+    },
+    "first_AMFI_cleanup_script_assertion_failed": true,
+    "independent_AMFI_readback": "amfid PPID1; no matching temporary drivers",
+    "all_failed_attempts_preserved": true
+  },
+  "ledger": {
+    "total": 47,
+    "accepted": 2,
+    "partial": 42,
+    "pending_local_audit": 2,
+    "optional_deferred": 1,
+    "required_unaccepted": 44,
+    "original_contracts_and_342_commit_coverage_preserved": true
+  }
+}

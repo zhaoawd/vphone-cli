@@ -622,3 +622,33 @@ vm-new已停机，配置/原classic载荷/UDID摘要保持，vm-2607未操作。
 原947份证据和3份输入副本校验一致；本轮新增45份证据。T36/T37/T39/T40/T46均保持局部验收状态，完整计划仍为2项accepted、42项partial、2项待本地审计、1项可选延后，44项必需任务未完成验收。原依赖、步骤、接口、接受条件、回退及342提交覆盖台账保持。
 
 构建后仅清理隔离工作树可重建debug中间产物和release ModuleCache，释放1,435,779,072字节；清理后可用13,609,791,488字节，通过12 GiB启动门槛。B15/B16共806个冻结文件摘要再次一致。恢复点、日志、源文件及冻结候选均保留。
+
+
+### 2026-10-08 B18：继续推进 T39、T24、T36、T37、T40、T46
+
+固定上游目标保持2d21d21。本轮实现提交ee4a27eb、f604f5ad、fd12d738。六项均保留未覆盖的原接受条件，未增加完整验收任务数。
+
+| 任务 | 本轮结果 | 未验证内容 |
+| --- | --- | --- |
+| T39 | B16宿主真实Command-V传入classic测试文本；重复V保留后来通过菜单设置的guest文本；Mac RTF及changeCount保持 | 实际输入框粘贴、选区C/X、触摸Copy、图片、切窗、慢回复、type/重启和API图片第二次await |
+| T24 | 采样确认协作执行器中的阻塞ACK等待，移至独立线程；相关105项和完整串行通过 | 最终默认并行仍4 issues，完整原因未查明；独立launcher及完整运行依赖闭包 |
+| T36 | B16启动后手动RPC之前locked=false、screen_off=false；后来锁定及手动解锁均观察到 | 密码、userspace reboot、完整设置/停止/实例取消及依赖 |
+| T37 | 菜单停止apiAccepted，Guest stopped，VM退出0，独立核对磁盘释放 | 当前新宿主classic-only、panic、未ready、超时、更新/备份协调和权限矩阵 |
+| T40 | 官方2.6.0/2.6.1安装校验和并存；修正内存积累后vm-new完整备份及首次绑定通过；显式切换通过 | 实际本地Core Bundle打包、创建冻结全流程、kernel-only及guest升级回退四层来源矩阵 |
+| T46 | 两条真实签名XPC请求成功验证官方Bundle，分别保存完整60字节0600日志，返回后关闭 | 成功streaming install、UI立即退出、后代writer、panic/取消/轮换和运行吞吐 |
+
+B16 VM源码f2331b7a、CDHash ab7682cd27dce3d64dbf1233c98975d4dab392b5，按用户精确授权使用独立空配置、paths=[]、allow_all=false、spoof_apple=true。实际PID61914，实例86C9E1B1-4E37-4445-964C-CB7E071C264F。首次解锁观察早于手动RPC；后续锁屏与手动解锁单独记录。API_ONLY进程清理请求超时，未独立核对停止前退出；实际关机仍为apiAccepted，不列为classic-only。VM已停机，磁盘释放，临时令牌、AMFI驱动及debugserver清理，amfid由launchd管理。未操作vm-2607，未更新guest/kernel/boot-chain或部署modern相机。
+
+剪贴板传输及不重复写入已验证。C/X没有确认客户机选区，Mac剪贴板保持测试RTF和changeCount，不能计为实际复制剪切通过。复核确认classic tap使用了430x932缩略图坐标，接口要求1290x2796完整分辨率，因此输入框焦点验收无效；API输入路径原因未查明。本轮未按修正坐标重启VM复验。Mac原项目、类型及数据已恢复并读回一致，0600私有备份保留；guest测试文本通过type空字符串清除，最终类型为public.utf8-plain-text，变化计数不能恢复。
+
+旧CLI两次首次绑定分别在97.055及106.711秒以-9退出，未生成备份或绑定。系统终止原因未独立确认；vmmap记录峰值physical footprint66.6G，采样期间目标退出。独立512MiB摘要实验原循环最大RSS545292288B，逐块autoreleasepool后8470528B，SHA-256一致。VPhoneFileDigest现在供绑定清单和创建指纹共用，保留原摘要、描述符和读前/读后身份检查。生产内存检查输入536870912B，峰值RSS8421376B，结果正确。
+
+新CLI候选`.build/acceptance/B18/binding-cli.app`仅CLI源码为f604f5ad，199个文件冻结核验；资源和VM可执行文件保留B16，没有启动此候选VM。修正后的64GiB vm-new完整备份与首次绑定2.6.1耗时130.584秒，最大RSS27754496B。恢复点`vm.backups/b18-vm-new-fixed-binding-20261008`保留，生产代码在发布绑定前核对完整清单；同卷APFS写时复制不证明物理独立性。配置、原classic载荷和UDID摘要保持，host切换2.6.0/2.6.1后guest/kernel/boot-chain来源仍unknown。验收后原无绑定状态和系统Bundle store缺失状态均恢复，没有执行guest升级或上游VM。
+
+官方工件来自[2.6.1发布](https://github.com/Lakr233/vphone-cli/releases/tag/2.6.1)和[2.6.0发布](https://github.com/Lakr233/vphone-cli/releases/tag/2.6.0)，下载字节数及SHA-256与GitHub资产摘要一致；完整元数据与收据保存在B18证据中。2.6.1摘要651224d58064c59159e47b4a5fb066ca6dc758bdd221a346d43465cd34df5420；2.6.0摘要ea389bba953eeff6d75f54c42d100dde6ffa6907adac84a40d56a35d08e78761。
+
+沿用已授权B13 helper CDHash30ce6ce220a60617b6ae42066372bf3ac2e8ebe6。注册请求超时保留，之后独立确认protocol2及两次成功verify-bundle；各返回官方2.6.1收据及完整60字节日志，0600，返回后关闭。ACK/fsync以实现顺序、成功结果和完整关闭文件核对，未独立抓取协议包或系统调用。临时helper服务、right、二进制及plist已清理，未放宽管理员规则；成功streaming install未验证。
+
+最终完整串行：Swift Testing1243项/198suite，230.171秒通过；XCTest254项、跳过3项、0失败。Python571项、275.167秒通过。归档内存、摘要内存及guest组件检查通过。最终标准make test_swift：Swift Testing1243项/198suite，48.696秒，4 issues（未授权XPC超时、Library取消耗时、HTTP取消耗时、NativeRestore未生成worker.pid）；完整原因未查明，原阈值未放宽。真实固件比较本轮未重跑。
+
+原992份证据、3份输入副本及B15/B16共806个冻结文件校验一致。主检出的未跟踪`research/vm_backup_cleanup_2026-10-08.md`不是本轮生成，未修改。台账保持47项：accepted2、partial42、待本地审计2、可选延后1；44项必选任务未完成验收。原依赖、步骤、接口、接受条件、回退及342提交覆盖记录不变。
