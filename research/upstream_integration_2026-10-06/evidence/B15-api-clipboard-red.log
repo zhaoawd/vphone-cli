@@ -1,0 +1,21 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/16] Write sources
+[4/16] Write swift-version--58304C5D6DBC2206.txt
+[6/10] Emitting module VPhoneAPIKitTests
+[7/10] Compiling VPhoneAPIKitTests APIHTTPTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:37:23: error: instance method 'wait' is unavailable from asynchronous contexts; Use a TaskGroup instead
+ 35 |         guard let boundPort else {
+ 36 |             if process.isRunning { process.terminate() }
+ 37 |             if exited.wait(timeout: .now() + 5) != .success {
+    |                       `- error: instance method 'wait' is unavailable from asynchronous contexts; Use a TaskGroup instead
+ 38 |                 Issue.record("Loopback fixture startup cleanup did not finish within five seconds")
+ 39 |             }
+
+Dispatch.DispatchGroup.wait:2:13: note: 'wait(timeout:)' declared here
+1 | class DispatchGroup {
+2 | public func wait(timeout: DispatchTime) -> DispatchTimeoutResult}
+  |             `- note: 'wait(timeout:)' declared here
+3 | 
+error: fatalError

@@ -1,0 +1,59 @@
+Another instance of SwiftPM (PID: 61209) is already running using '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build', waiting until that process has finished execution...warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-08 09:10:26.126.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-08 09:10:26.129.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-08 09:10:26.129.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 09:10:26.129.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputXPCTests started.
+◇ Suite APIHTTPTests started.
+◇ Suite ToolchainTests started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+◇ Test refusesRedirectAndOversizedResponses() started.
+◇ Test webSocketRefusesRedirect() started.
+◇ Test realHTTPRPCHealthAndProtocolErrors() started.
+◇ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test rejectsUnknownManifestSchema() started.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 41.924 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 41.924 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 41.924 seconds.
+✔ Test cdhashMatchesCodesign() passed after 41.924 seconds.
+✔ Test rejectsMissingNestedApp() passed after 41.924 seconds.
+✘ Test realHTTPRPCHealthAndProtocolErrors() recorded an issue at APIHTTPTests.swift:63:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() recorded an issue at APIHTTPTests.swift:109:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test refusesRedirectAndOversizedResponses() recorded an issue at APIHTTPTests.swift:76:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test deadlineAndCallerCancellationEndHTTPWait() recorded an issue at APIHTTPTests.swift:86:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✘ Test webSocketRefusesRedirect() recorded an issue at APIHTTPTests.swift:100:6: Caught error: Error Domain=NSURLErrorDomain Code=-1004 "(null)"
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 41.942 seconds.
+✘ Test realHTTPRPCHealthAndProtocolErrors() failed after 41.942 seconds with 1 issue.
+✘ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() failed after 41.942 seconds with 1 issue.
+✘ Test refusesRedirectAndOversizedResponses() failed after 41.942 seconds with 1 issue.
+✘ Test deadlineAndCallerCancellationEndHTTPWait() failed after 41.942 seconds with 1 issue.
+✘ Test webSocketRefusesRedirect() failed after 41.942 seconds with 1 issue.
+✘ Suite APIHTTPTests failed after 41.943 seconds with 5 issues.
+✔ Test rejectsModifiedNestedExecutable() passed after 41.967 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 42.035 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 42.043 seconds.
+✔ Suite OutputXPCTests passed after 42.043 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 42.045 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 42.047 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 42.048 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 42.048 seconds.
+✔ Suite ToolchainTests passed after 42.048 seconds.
+✘ Test run with 18 tests in 3 suites failed after 42.049 seconds with 5 issues.

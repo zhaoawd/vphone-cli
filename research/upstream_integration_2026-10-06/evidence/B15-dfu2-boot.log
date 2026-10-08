@@ -1,0 +1,40 @@
+[vphone] VM lock acquired
+[vphone] Loaded VM manifest from /Users/qcz3840/github/vphone-cli/vm-new/config.plist
+=== vphone-cli ===
+Variant : exp
+ROM     : /Users/qcz3840/github/vphone-cli/vm-new/AVPBooter.vresearch1.bin
+Disk    : /Users/qcz3840/github/vphone-cli/vm-new/Disk.img
+NVRAM   : /Users/qcz3840/github/vphone-cli/vm-new/nvram.bin
+Config  : /Users/qcz3840/github/vphone-cli/vm-new/config.plist
+CPU     : 4
+Memory  : 4096 MB
+Screen: 1290x2796 @ 460 PPI (scale 3.0x)
+Kernel debug stub : auto-assigned
+SEP               : enabled
+  storage         : /Users/qcz3840/github/vphone-cli/vm-new/SEPStorage
+  rom             : /Users/qcz3840/github/vphone-cli/vm-new/AVPSEPBooter.vresearch1.bin
+
+[vphone] PV=3 hardware model: isSupported = true
+[vphone] Loaded machineIdentifier from config.plist (ECID stable)
+[vphone] ECID: F77952D4F70ACD5D
+[vphone] Predicted UDID: 0000FE01-F77952D4F70ACD5D
+[vphone] Wrote UDID prediction: /Users/qcz3840/github/vphone-cli/vm-new/udid-prediction.txt
+[vphone] NVRAM boot-args: serial=3 debug=0x104c04
+[vphone] PL011 serial port attached (interactive)
+[vphone] Accelerator devices configured
+[vphone] USB touch screen configured
+[vphone] Entropy device configured
+[vphone] Synthetic battery configured (100%, charging)
+[vphone] Kernel GDB debug stub enabled (system-assigned port)
+[vphone] SEP coprocessor enabled (storage: /Users/qcz3840/github/vphone-cli/vm-new/SEPStorage)
+[vphone] Configuration validated
+[vphone] Starting DFU...
+[vphone] VM started in DFU mode - connect with irecovery
+WARNING: Trying to access an unrecognized member: VZVirtualMachine._configuration
+[vphone] Host idle system sleep disabled while VM is running
+[hostctl] listening on /Users/qcz3840/github/vphone-cli/vm-new/vphone.sock
+
+[vphone] SIGINT — shutting down
+[vphone] graceful shutdown via VZVirtualMachine.requestStop()
+[vphone] graceful shutdown timed out; stopping
+[vphone] VM stopped

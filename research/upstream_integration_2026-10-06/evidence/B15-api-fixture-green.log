@@ -1,0 +1,252 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/15] Write sources
+[3/15] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Emitting module VPhoneAPIKitTests
+[6/7] Compiling VPhoneAPIKitTests APIHTTPTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:36:13: error: 'self' used in method call 'stop' before all stored properties are initialized
+  7 |     private let exited = DispatchGroup()
+  8 |     let directory: URL
+  9 |     let port: Int
+    |         `- note: 'self.port' not initialized
+ 10 | 
+ 11 |     init(behindProxy: Bool = false, managedSession: Bool = false, waitForPeerClose: Bool = false) async throws {
+    :
+ 34 |         }
+ 35 |         guard let boundPort else {
+ 36 |             stop()
+    |             `- error: 'self' used in method call 'stop' before all stored properties are initialized
+ 37 |             try? FileManager.default.removeItem(at: directory)
+ 38 |             throw URLError(.cannotConnectToHost)
+
+macro expansion @Test:27:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:73:6: note: expanded code originates here
+ 60 | 
+ 61 | struct APIHTTPTests {
+ 62 |     @Test func realHTTPRPCHealthAndProtocolErrors() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'realHTTPRPCHealthAndProtocolErrors()' here
+ 63 |         let fixture = try await APIHTTPFixture()
+ 64 |         defer { fixture.stop() }
+    :
+ 71 |             catch let error as VPhoneAPIError { #expect(error.code == expected) }
+ 72 |         }
+ 73 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV34realHTTPRPCHealthAndProtocolErrors4TestfMp_33testContentRecordfcfe22840c0ab878fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+ 74 | 
+ 75 |     @Test func refusesRedirectAndOversizedResponses() async throws {
+
+macro expansion @Test:27:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:83:6: note: expanded code originates here
+ 73 |     }
+ 74 | 
+ 75 |     @Test func refusesRedirectAndOversizedResponses() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'refusesRedirectAndOversizedResponses()' here
+ 76 |         let fixture = try await APIHTTPFixture()
+ 77 |         defer { fixture.stop() }
+    :
+ 81 |         }
+ 82 |         #expect(!FileManager.default.fileExists(atPath: fixture.directory.appendingPathComponent("followed").path))
+ 83 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV36refusesRedirectAndOversizedResponses4TestfMp_33testContentRecordca121e3ee4273546fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+ 84 | 
+ 85 |     @Test func deadlineAndCallerCancellationEndHTTPWait() async throws {
+
+macro expansion @Test:27:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:97:6: note: expanded code originates here
+ 83 |     }
+ 84 | 
+ 85 |     @Test func deadlineAndCallerCancellationEndHTTPWait() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'deadlineAndCallerCancellationEndHTTPWait()' here
+ 86 |         let fixture = try await APIHTTPFixture()
+ 87 |         defer { fixture.stop() }
+    :
+ 95 |         await #expect(throws: (any Error).self) { try await task.value }
+ 96 |         #expect(start.duration(to: .now) < .seconds(1))
+ 97 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV40deadlineAndCallerCancellationEndHTTPWait4TestfMp_33testContentRecord2fd5d9e3cc56e3fffMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+ 98 | 
+ 99 |     @Test func webSocketRefusesRedirect() async throws {
+
+macro expansion @Test:27:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:106:6: note: expanded code originates here
+ 97 |     }
+ 98 | 
+ 99 |     @Test func webSocketRefusesRedirect() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'webSocketRefusesRedirect()' here
+100 |         let fixture = try await APIHTTPFixture()
+101 |         defer { fixture.stop() }
+    :
+104 |         #expect(!FileManager.default.fileExists(atPath: fixture.directory.appendingPathComponent("followed").path))
+105 |         await socket.close()
+106 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV24webSocketRefusesRedirect4TestfMp_33testContentRecordc845f93448bd3426fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+107 | 
+108 |     @Test func realWebSocketUsesBearerAndCorrelatesConcurrentReplies() async throws {
+
+macro expansion @Test:27:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:119:6: note: expanded code originates here
+106 |     }
+107 | 
+108 |     @Test func realWebSocketUsesBearerAndCorrelatesConcurrentReplies() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'realWebSocketUsesBearerAndCorrelatesConcurrentReplies()' here
+109 |         let fixture = try await APIHTTPFixture()
+110 |         defer { fixture.stop() }
+    :
+117 |         #expect(try await events.next()?.event == "connected")
+118 |         await socket.close()
+119 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV53realWebSocketUsesBearerAndCorrelatesConcurrentReplies4TestfMp_33testContentRecord79aeb8ec1e8080e7fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+120 | }
+121 | 
+
+macro expansion @Test:27:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:73:6: note: expanded code originates here
+ 60 | 
+ 61 | struct APIHTTPTests {
+ 62 |     @Test func realHTTPRPCHealthAndProtocolErrors() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'realHTTPRPCHealthAndProtocolErrors()' here
+ 63 |         let fixture = try await APIHTTPFixture()
+ 64 |         defer { fixture.stop() }
+    :
+ 71 |             catch let error as VPhoneAPIError { #expect(error.code == expected) }
+ 72 |         }
+ 73 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV34realHTTPRPCHealthAndProtocolErrors4TestfMp_33testContentRecordfcfe22840c0ab878fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+ 74 | 
+ 75 |     @Test func refusesRedirectAndOversizedResponses() async throws {
+
+macro expansion @Test:27:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:83:6: note: expanded code originates here
+ 73 |     }
+ 74 | 
+ 75 |     @Test func refusesRedirectAndOversizedResponses() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'refusesRedirectAndOversizedResponses()' here
+ 76 |         let fixture = try await APIHTTPFixture()
+ 77 |         defer { fixture.stop() }
+    :
+ 81 |         }
+ 82 |         #expect(!FileManager.default.fileExists(atPath: fixture.directory.appendingPathComponent("followed").path))
+ 83 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV36refusesRedirectAndOversizedResponses4TestfMp_33testContentRecordca121e3ee4273546fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+ 84 | 
+ 85 |     @Test func deadlineAndCallerCancellationEndHTTPWait() async throws {
+
+macro expansion @Test:27:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:97:6: note: expanded code originates here
+ 83 |     }
+ 84 | 
+ 85 |     @Test func deadlineAndCallerCancellationEndHTTPWait() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'deadlineAndCallerCancellationEndHTTPWait()' here
+ 86 |         let fixture = try await APIHTTPFixture()
+ 87 |         defer { fixture.stop() }
+    :
+ 95 |         await #expect(throws: (any Error).self) { try await task.value }
+ 96 |         #expect(start.duration(to: .now) < .seconds(1))
+ 97 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV40deadlineAndCallerCancellationEndHTTPWait4TestfMp_33testContentRecord2fd5d9e3cc56e3fffMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+ 98 | 
+ 99 |     @Test func webSocketRefusesRedirect() async throws {
+
+macro expansion @Test:27:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:106:6: note: expanded code originates here
+ 97 |     }
+ 98 | 
+ 99 |     @Test func webSocketRefusesRedirect() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'webSocketRefusesRedirect()' here
+100 |         let fixture = try await APIHTTPFixture()
+101 |         defer { fixture.stop() }
+    :
+104 |         #expect(!FileManager.default.fileExists(atPath: fixture.directory.appendingPathComponent("followed").path))
+105 |         await socket.close()
+106 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV24webSocketRefusesRedirect4TestfMp_33testContentRecordc845f93448bd3426fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+107 | 
+108 |     @Test func realWebSocketUsesBearerAndCorrelatesConcurrentReplies() async throws {
+
+macro expansion @Test:27:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneAPIKitTests/APIHTTPTests.swift:119:6: note: expanded code originates here
+106 |     }
+107 | 
+108 |     @Test func realWebSocketUsesBearerAndCorrelatesConcurrentReplies() async throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'realWebSocketUsesBearerAndCorrelatesConcurrentReplies()' here
+109 |         let fixture = try await APIHTTPFixture()
+110 |         defer { fixture.stop() }
+    :
+117 |         #expect(try await events.next()?.event == "connected")
+118 |         await socket.close()
+119 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |25 | @used
+    |26 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |27 | private nonisolated static let $s17VPhoneAPIKitTests12APIHTTPTestsV53realWebSocketUsesBearerAndCorrelatesConcurrentReplies4TestfMp_33testContentRecord79aeb8ec1e8080e7fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |28 |   0x74657374, /* 'test' */
+    |29 |   0,
+    +-------------------------------------------------------------------
+120 | }
+121 | 
+error: fatalError
