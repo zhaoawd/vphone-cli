@@ -43,11 +43,18 @@ class TestRunnerTests(unittest.TestCase):
                          VPHONE_LESS_PIPELINE_VM="must-not-run", VPHONE_TEST_VMDIR="must-not-run")
         with mock.patch.dict(os.environ, selectors), mock.patch.object(runner, "run") as run:
             runner.run_swift()
-        self.assertEqual(run.call_count, 4)
+        self.assertEqual(run.call_count, 5)
         self.assertEqual(run.call_args_list[0].args[0][0], "swift")
-        self.assertEqual(run.call_args_list[3].args[0], ["make", "test_guest_components"])
-        self.assertEqual(run.call_args_list[1].args[0][1], ROOT / "scripts/check_tar_pipe_memory.py")
-        self.assertEqual(run.call_args_list[2].args[0][1], ROOT / "scripts/check_file_digest_memory.py")
+        self.assertEqual(run.call_args_list[4].args[0], ["make", "test_guest_components"])
+        self.assertEqual(run.call_args_list[2].args[0][1], ROOT / "scripts/check_tar_pipe_memory.py")
+        self.assertEqual(run.call_args_list[3].args[0][1], ROOT / "scripts/check_file_digest_memory.py")
+        heavy = run.call_args_list[0].args[0]
+        sensitive = run.call_args_list[1].args[0]
+        self.assertIn("--skip-build", sensitive)
+        isolated = sensitive[sensitive.index("--filter") + 1]
+        self.assertIn(isolated, heavy[heavy.index("--skip") + 1])
+        self.assertNotIn("FirmwareIntegrationTests", isolated)
+        self.assertNotIn("--no-parallel", heavy + sensitive)
         for invocation in run.call_args_list:
             for name in selectors:
                 self.assertNotIn(name, invocation.kwargs["env"])

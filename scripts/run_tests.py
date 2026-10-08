@@ -64,6 +64,19 @@ def run_python():
     run([python, "-B", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"])
 
 
+# These tests assert subsecond/short wall-clock deadlines or require their
+# fixture to start before a short timeout. Run them together after the suites
+# that spawn/sign many stand-ins, so unrelated work cannot consume their budget.
+# Both groups retain Swift Testing's parallel execution and original deadlines.
+LATENCY_TESTS = "|".join((
+    "xpcRejectsClientWithoutConfiguredSigningIdentity",
+    "cancellingARunInterruptsOnlyItsChild",
+    "deadlineAndCallerCancellationEndHTTPWait",
+    "supervisorRejectsFailureAndStopsTimedOutWorker",
+    "a changed entity or a server without ranges restarts from byte zero",
+))
+
+
 def run_swift(firmware=False):
     env = os.environ.copy()
     # Real firmware selectors must not activate acceptance tests in a fast run.
@@ -80,9 +93,12 @@ def run_swift(firmware=False):
     env.setdefault("CLANG_MODULE_CACHE_PATH", str(modules))
     env.setdefault("SWIFT_MODULECACHE_PATH", str(modules))
     # Separate targets prevent new fixture tests from leaking into the fast suite.
-    selection = "--filter" if firmware else "--skip"
-    run(["swift", "test", "--disable-sandbox", "--cache-path", cache,
-         selection, "FirmwareIntegrationTests"], env=env)
+    command = ["swift", "test", "--disable-sandbox", "--cache-path", cache]
+    if firmware:
+        run(command + ["--filter", "FirmwareIntegrationTests"], env=env)
+    else:
+        run(command + ["--skip", "FirmwareIntegrationTests|" + LATENCY_TESTS], env=env)
+        run(command + ["--skip-build", "--filter", LATENCY_TESTS], env=env)
     if not firmware:
         run([sys.executable, ROOT / "scripts/check_tar_pipe_memory.py"], env=env)
         run([sys.executable, ROOT / "scripts/check_file_digest_memory.py"], env=env)
