@@ -1,0 +1,96 @@
+Test Suite 'Selected tests' started at 2026-10-08 19:07:18.578.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-08 19:07:18.579.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-08 19:07:18.579.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 19:07:18.579.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ParentExitTests started.
+◇ Suite DetachedChildTests started.
+◇ Suite LogFollowerTests started.
+◇ Test startingReplacesTheLogWithANewFile() started.
+◇ Test childrenOutliveTheProcessThatStartedThem() started.
+◇ Suite ConsoleLogRotationTests started.
+◇ Suite CreationRunTests started.
+◇ Test replaysOnlyTheTailFromALineStart() started.
+◇ Test resetsWhenTheFileIsReplaced() started.
+◇ Suite ConsoleLogTests started.
+◇ Test resetsWhenTheFileIsTruncated() started.
+◇ Test interruptReachesTheRunningChildEvenWhenTheParentIgnoresSIGINT() started.
+◇ Test previousLogNameKeepsTheStem() started.
+◇ Test runsInItsOwnSessionWithNullStdinAndOnlyTheLogOpen() started.
+◇ Test existingDotOneIsReplaced() started.
+◇ Test symbolicLinkLogIsNotRotatedAndTheStartGoesOn() started.
+◇ Test firstStartHasNoPreviousLog() started.
+◇ Test exitCodeMatchesProcessTerminationStatus() started.
+◇ Test startDoesNotReplaceTheLogOfAMachineNamedDotOne() started.
+◇ Test rotationStaysInTheLogsDirectory() started.
+◇ Test startKeepsThePreviousRunAsDotOne() started.
+◇ Test followsAppendsAndReportsAMissingFileOnce() started.
+◇ Test aNewMachineRunsVMCreateDetachedAndReadsStatusOnceAfterwards() started.
+◇ Test exitLineIsAppendedOnItsOwnLine() started.
+◇ Test panicLines() started.
+✔ Test replaysOnlyTheTailFromALineStart() passed after 0.004 seconds.
+✔ Test exitLineIsAppendedOnItsOwnLine() passed after 0.003 seconds.
+✔ Test exitCodeMatchesProcessTerminationStatus() passed after 0.004 seconds.
+✔ Test resetsWhenTheFileIsReplaced() passed after 0.004 seconds.
+✔ Test followsAppendsAndReportsAMissingFileOnce() passed after 0.004 seconds.
+✔ Test panicLines() passed after 0.004 seconds.
+✔ Suite ConsoleLogTests passed after 0.005 seconds.
+✔ Test resetsWhenTheFileIsTruncated() passed after 0.005 seconds.
+✔ Suite LogFollowerTests passed after 0.005 seconds.
+✔ Test previousLogNameKeepsTheStem() passed after 0.032 seconds.
+✔ Test rotationStaysInTheLogsDirectory() passed after 0.032 seconds.
+✔ Test startingReplacesTheLogWithANewFile() passed after 0.258 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 45386
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 45387
+✔ Test interruptReachesTheRunningChildEvenWhenTheParentIgnoresSIGINT() passed after 2.590 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 45391
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] vm launch started, pid 45392
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 45397
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 45408
+✔ Test runsInItsOwnSessionWithNullStdinAndOnlyTheLogOpen() passed after 3.077 seconds.
+✔ Suite DetachedChildTests passed after 3.078 seconds.
+[launchpad] vm launch pid 45387 exited with status 7
+[launchpad] vm launch pid 45386 exited with status 7
+✔ Test firstStartHasNoPreviousLog() passed after 3.105 seconds.
+✔ Test existingDotOneIsReplaced() passed after 3.109 seconds.
+[launchpad] vm launch pid 45391 exited with status 7
+[launchpad] vm launch pid 45392 exited with status 7
+✔ Test startDoesNotReplaceTheLogOfAMachineNamedDotOne() passed after 3.163 seconds.
+✔ Test symbolicLinkLogIsNotRotatedAndTheStartGoesOn() passed after 3.200 seconds.
+[launchpad] vm launch pid 45397 exited with status 7
+[launchpad] vm launch started, pid 45441
+✔ Test childrenOutliveTheProcessThatStartedThem() passed after 3.679 seconds.
+✔ Suite ParentExitTests passed after 3.679 seconds.
+[launchpad] vm launch pid 45441 exited with status 7
+✔ Test startKeepsThePreviousRunAsDotOne() passed after 3.797 seconds.
+✔ Suite ConsoleLogRotationTests passed after 3.797 seconds.
+[launchpad] vm create pid 45408 exited with status 0
+✔ Test aNewMachineRunsVMCreateDetachedAndReadsStatusOnceAfterwards() passed after 3.957 seconds.
+◇ Test cancellingInterruptsTheWholeProcessGroupAndRefreshNeverAsksForStatus() started.
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 45490
+[launchpad] vm create pid 45490: SIGINT to its process group
+[launchpad] vm create pid 45490 exited with status 2
+✔ Test cancellingInterruptsTheWholeProcessGroupAndRefreshNeverAsksForStatus() passed after 4.865 seconds.
+◇ Test aChangedToolchainIsResumedOnlyAfterConfirmation() started.
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 45611
+[launchpad] vm create pid 45611 exited with status 1
+[launchpad] vm create started, pid 45642
+[launchpad] vm create pid 45642 exited with status 0
+✔ Test aChangedToolchainIsResumedOnlyAfterConfirmation() passed after 2.842 seconds.
+◇ Test lessAndBusyMachinesAreNotResumed() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test lessAndBusyMachinesAreNotResumed() passed after 0.899 seconds.
+✔ Suite CreationRunTests passed after 12.565 seconds.
+✔ Test run with 22 tests in 6 suites passed after 12.565 seconds.

@@ -1,0 +1,50 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-08 19:02:14.491.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-08 19:02:14.493.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-08 19:02:14.493.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 19:02:14.493.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputXPCTests started.
+◇ Suite OutputAcknowledgementTests started.
+◇ Suite OutputCompletionTests started.
+◇ Suite LogWriterTests started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+◇ Test logCreationFailureDoesNotLeaveRunningHistory() started.
+◇ Test successfulAckPermitsCompletion() started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+◇ Test disconnectOrWriterFailureCannotBeTurnedIntoSuccessByLateAck() started.
+◇ Test livePipeDeliversLinesBeforeWriterCloses() started.
+◇ Test missingAcknowledgementDoesNotReturnSuccess() started.
+◇ Test spawnFailureFinishesHistoryAndClosesLog() started.
+◇ Test failedWritePreventsAcknowledgementAndLateWritesAreRejected() started.
+◇ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() started.
+◇ Test defaultMissingAcknowledgementWaitsThirtySecondsThenFails() started.
+◇ Test exitZeroWithReadFailureIsNotACompleteCommand() started.
+◇ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() started.
+◇ Test drainPersistsEveryLineInOrderIncludingFinalPanic() started.
+◇ Test receiverAcknowledgesOnlyAfterFullLogIsPersistedAndRejectsOtherOperation() started.
+✔ Test successfulAckPermitsCompletion() passed after 0.001 seconds.
+✔ Test disconnectOrWriterFailureCannotBeTurnedIntoSuccessByLateAck() passed after 0.001 seconds.
+✔ Test logCreationFailureDoesNotLeaveRunningHistory() passed after 0.002 seconds.
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 0.002 seconds.
+✔ Test spawnFailureFinishesHistoryAndClosesLog() passed after 0.004 seconds.
+✔ Test exitZeroWithReadFailureIsNotACompleteCommand() passed after 0.005 seconds.
+✔ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() passed after 0.005 seconds.
+✔ Test failedWritePreventsAcknowledgementAndLateWritesAreRejected() passed after 0.010 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 0.011 seconds.
+✔ Suite OutputXPCTests passed after 0.011 seconds.
+✔ Test missingAcknowledgementDoesNotReturnSuccess() passed after 0.012 seconds.
+✔ Test drainPersistsEveryLineInOrderIncludingFinalPanic() passed after 0.015 seconds.
+✔ Suite LogWriterTests passed after 0.015 seconds.
+✔ Test receiverAcknowledgesOnlyAfterFullLogIsPersistedAndRejectsOtherOperation() passed after 0.018 seconds.
+✔ Test livePipeDeliversLinesBeforeWriterCloses() passed after 0.053 seconds.
+✔ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() passed after 1.112 seconds.
+✔ Suite OutputCompletionTests passed after 1.113 seconds.
+✔ Test defaultMissingAcknowledgementWaitsThirtySecondsThenFails() passed after 30.005 seconds.
+✔ Suite OutputAcknowledgementTests passed after 30.006 seconds.
+✔ Test run with 15 tests in 4 suites passed after 30.006 seconds.

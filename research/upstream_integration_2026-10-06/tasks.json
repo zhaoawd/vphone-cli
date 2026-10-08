@@ -3357,12 +3357,13 @@
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
         "evidence/B18-summary.json",
-        "evidence/B19-summary.json"
+        "evidence/B19-summary.json",
+        "evidence/B20-reboot-source-review.json"
       ],
       "historical_evidence": [],
       "current_result": "B19 复用冻结B16宿主，冷启动手动RPC前观察解锁。真实respring重启SpringBoard39→6360，API instance保持，随后锁屏/熄屏为true。同一实例未观察再次自动解锁。userspace reboot两次失败，直接API报Input/output error，原因未查明；未列为通过。",
       "remaining_work": [
-        "userspace reboot actual EIO failure (cause unknown); password-configured path remains unverified",
+        "userspace reboot reports Input/output error; wrapper returns errno ?: EIO, so message alone cannot identify raw errno; record raw reboot3 return/errno and instance changes; password-configured path remains unverified",
         "full target guest/shared-component cohort and original T06/T07/T08/T23 prerequisite acceptance",
         "full startup/stop/disable/instance-change cancellation matrix on real runtime; already submitted RPC cannot be undone"
       ]
@@ -4136,12 +4137,13 @@
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
         "evidence/B18-summary.json",
-        "evidence/B19-summary.json"
+        "evidence/B19-summary.json",
+        "evidence/B20-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B19 精确B13 helper注册被自动审批拒绝，命令未执行、未绕过；已询问精确注册/安装/清理范围授权，记录时未收到答复。成功streaming install验收未完成，既有两次成功verify证据保持。完整立即退出/后代输出/panic/取消/轮换矩阵仍待完成。",
+      "current_result": "B20 用户已明确授权B19精确helper范围。相同B13签名helper注册退出0、protocol2、服务运行，管理员规则未放宽。安装首次等待系统认证150秒超时，确认无store和操作日志；重试等待900秒，记录时仍需用户在受保护macOS认证窗口完成认证。有界收尾进程在成功认证后通过签名helper独立verify、核对收据和完整日志再清理；超时且确认未安装则恢复缺失基线，状态不确定保留检查。安装成功尚未验收。15项ACK/输出及22项子进程/取消/panic/轮换夹具回归通过，不扩大为真实VM全矩阵通过。",
       "remaining_work": [
-        "explicit helper registration authorization pending after auto-review rejection; do not retry or bypass without approval",
+        "exact registration scope approved and registered; normal macOS administrator authentication still pending for install; bounded finalizer running, inspect B20-finalization.json before any success/cleanup claim",
         "successful streaming helper install with unchanged administrator authorization; actual success this batch covers verify only",
         "complete operation lifecycle, detached VM/create/descendant output and immediate UI exit",
         "panic/cancel/rotation, UI responsiveness and actual VM throughput"
@@ -4465,8 +4467,9 @@
     "B15: Preserve all original contracts and fixed upstream target. Fix unchanged-Mac overwrite, explicit bound-Bundle recovery and helper CLI log paths. Dedicated-thread signature tests resolve the minimal combined failure but do not claim all parallel failures fixed. Reuse exact authorized frozen B13 helper with new normally signed CLI; verify real logs on missing-store error replies, then clean service/right/files/process. New B15 VM343c11eb ordinary help SIGKILL; request exact security scope before any new AMFI driver. Preserve independently changed Mac clipboard and retain original private backup0600; do not overwrite current user content.",
     "B16: Execute user authorization only for B15 VM343c11eb with empty independent AMFI config; helper/debugserver cleaned, no persistent setting changes. Preserve failed classic-not-ready attempt and successful retry. Keep apiAccepted distinct from classic-only because API_ONLY exit was not independently observed before stop. Route direct keyDown using the same existing clipboard guard after LLDB showed performKeyEquivalent0/keyDown1. Preserve full default parallel3 failures alongside serial pass. New candidate hash needs its own exact authorization before temporary AMFI use; do not broaden B15 scope. Mac clipboard restored all formats and data; original changeCount cannot be restored. Keep all original contracts and fixed target.",
     "B18: Preserve exact B16 AMFI scope and B13 helper identity; no persistent security changes. Retain all failed registration/control/binding attempts. Confirmed isolated file-digest autoreleased-buffer growth; drain each chunk in shared digest while preserving fd/identity/SHA checks. Real64GiB binding backup+publication and2.6.0/2.6.1 switches pass; restore original missing binding and temporary system store, retain full backup. Keep guest/kernel/boot-chain unknown instead of inventing origins. Real Command-V clipboard transfer does not establish focused application input; classic driver used preview coordinates instead of full-resolution coordinates, so focused paste/C/X remain unaccepted. Keep final default4issues alongside serial/Python passes, deadlines unchanged. Main untracked research/vm_backup_cleanup_2026-10-08.md was not created or modified by this batch. Original47 contracts and342-commit coverage retained.",
-    "B19 Ruling: isolate five short-deadline/fixture-start tests from mass fixture/signing work while retaining parallel execution and original assertions/deadlines; default entrypoint passes and reviewer confirms same selected tests. This changes scheduling and does not prove unrestricted monolithic failure causes; cost if wrong: combined contention regressions may remain undetected by default scheduling. Keep actual clipboard unavailable and userspace reboot EIO as failed acceptance, no speculative guest/kernel patch; cost if diagnosis is incomplete: additional investigation remains. Preserve root store/binding/helper absence and original frozen bytes. Auto-review rejected privileged helper registration; request exact permission and do not bypass. Final review minor (deferred): no dedicated regression for second Swift group failing after first succeeds; current check=True flow propagates errors, cost if deferred: a future exit-propagation regression lacks this specific test."
+    "B19 Ruling: isolate five short-deadline/fixture-start tests from mass fixture/signing work while retaining parallel execution and original assertions/deadlines; default entrypoint passes and reviewer confirms same selected tests. This changes scheduling and does not prove unrestricted monolithic failure causes; cost if wrong: combined contention regressions may remain undetected by default scheduling. Keep actual clipboard unavailable and userspace reboot EIO as failed acceptance, no speculative guest/kernel patch; cost if diagnosis is incomplete: additional investigation remains. Preserve root store/binding/helper absence and original frozen bytes. Auto-review rejected privileged helper registration; request exact permission and do not bypass. Final review minor (deferred): no dedicated regression for second Swift group failing after first succeeds; current check=True flow propagates errors, cost if deferred: a future exit-propagation regression lacks this specific test.",
+    "B20 Ruling: user authorized exact B19 helper scope; register original frozen signed helper and keep administrator rule unchanged. Human must complete protected SecurityAgent authentication; do not request password in chat or bypass authentication. First150s wait was too short for human interaction and timed out before store/log creation; retry once with900s and bounded post-result verification/cleanup. Cost if authentication remains pending: install acceptance cannot complete in this turn. Fixed IcliKit icli_reboot uses errno ?: EIO; treat error text as wrapper result, do not infer actual kernel errno or apply speculative patches. Firmware-free15+22 regressions establish fixture behavior only, not real VM lifecycle coverage."
   ],
   "latest_implementation_head": "82649fe7444b4aa6788f454ea2b8a9cbbbd23269",
-  "latest_validation_limitation": "B19 default Swift entrypoint passes: XCTest254/3skip/0fail; SwiftTesting1238+5 with original deadlines and parallel execution within each group. Python571 passes. Actual focused paste/respring/classic-only shutdown verified. Actual selected C/X/touch Copy sync fails with guest clipboard unavailable; userspace reboot EIO; causes unknown. Helper registration auto-review rejected and precise permission pending. Local escalator and self-contained non-system dependencies missing; full six acceptance remains false, required unaccepted44."
+  "latest_validation_limitation": "B20 precise helper authorization received; registration exit0/protocol2. Install awaits protected normal macOS admin authentication, first150s wait timed out without store/log, retry900s ongoing. Bounded post-result verification and exact cleanup running; success and cleanup not yet claimed. 15 output/ACK and22 console lifecycle fixture tests pass. EIO wrapper fallback identified in fixed IcliKit source; actual reboot cause unknown. Required unaccepted44."
 }

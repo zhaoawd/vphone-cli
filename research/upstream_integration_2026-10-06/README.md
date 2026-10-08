@@ -678,3 +678,16 @@ B16 VM源码f2331b7a、CDHash ab7682cd27dce3d64dbf1233c98975d4dab392b5，按用�
 helper注册命令被自动审批拒绝，原因为该操作改变系统特权访问状态，而当前可信授权未明确该helper、注册方式及权限范围。已询问对com.vphone.cli.helper、Team3AA3QL69MQ、CDHash30ce6ce220a60617b6ae42066372bf3ac2e8ebe6的临时注册、按管理员规则安装官方2.6.1及清理范围授权，记录时未收到回复；未通过其他途径重试。
 
 最终vm-new停机、磁盘释放，config.plist、原classic载荷和UDID摘要与B18一致；临时token删除，原无绑定、无系统Bundle store、无helper服务/文件状态保持。恢复点B18保留；同卷APFS写时复制不证明物理独立性，本轮未整盘回滚。vm-2607未操作。原1084份证据、3份输入和806个B15/B16冻结文件重新核验；47项原合同、依赖及342提交覆盖保持，44项必选仍未完整验收。证据入口：evidence/B19-summary.json、evidence/B19-final-state.json、evidence/B19-dependency-audit.json。
+
+
+### 2026-10-08 B20：明确授权后的 helper 注册与系统认证等待
+
+用户回复“授权，继续推进”，明确覆盖B19已列明的helper身份、注册方式、官方2.6.1安装及清理范围。原helper SHA256728b0353…383b60ce、CDHash30ce6ce220a60617b6ae42066372bf3ac2e8ebe6、Team3AA3QL69MQ再次核对，官方归档摘要保持651224d5…5420。缺失基线核对后，sudo原签名CLI helper register退出0，独立查询protocol2、服务运行。管理员规则仍为authenticate-user=true、allow-root=false、shared=false、group=admin。
+
+安装进入正常macOS管理员认证。工具禁止操作受保护SecurityAgent，已请求用户在本机认证，未索取聊天密码。首次150秒认证等待超时，确认未生成操作日志、未创建Bundle store；重试延长至900秒，记录时仍待认证，不能列为安装成功。已启动有界收尾进程：成功返回后通过原签名helper verify，核对收据、日志尾部、0600和文件关闭，记录安装清单，再清理本轮匹配身份的官方2.6.1 Bundle、helper服务/文件和授权项；超时且确认未安装则恢复缺失基线，状态不确定时保留检查。最终结果预计写入/private/tmp/vphone-b20-finalization.json；本条记录时该文件尚未产生，不声称系统已清理。
+
+日志/ACK相关15项、4suite通过，缺失ACK实际30.005秒后失败；父进程退出、取消、panic和日志轮换相关22项、6suite通过。它们使用真实子进程夹具，不启动VM，不能扩展为真实VM全部生命周期通过。本轮未重复完整Swift/Python套件，没有源码行为修改，vm-new未启动、vm-2607未操作。
+
+固定IcliKit提交702990b59ca412ad975f9f0ea5dafe95c30fac21的Sources/IcliPrivate/System.m显示：icli_reboot先清零errno，reboot3返回非零后返回errno ?: EIO。因此B19错误文本不能区分实际errno=EIO与errno仍为零时的包装回退；原始返回值和errno尚未记录，重启失败原因未查明。未据此修改guest或kernel。
+
+原1156份证据摘要核对；新增13份。原47项合同、依赖及342提交覆盖保持，44项必选仍未完整验收。入口：evidence/B20-summary.json。

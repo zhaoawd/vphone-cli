@@ -1,0 +1,16 @@
+{
+  "upstream_repository": "https://github.com/owngoal-dev/icli",
+  "fixed_revision": "702990b59ca412ad975f9f0ea5dafe95c30fac21",
+  "path": "Sources/IcliPrivate/System.m",
+  "sha256": "5f05f653e039c3141a207c41fa5a89ba4747e1b3d911673668eb04909162876f",
+  "source_finding": "icli_reboot sets errno=0, calls reboot3, then returns errno ?: EIO on nonzero return",
+  "runtime_error": "reboot request rejected: Input/output error",
+  "inference": "The runtime message alone does not distinguish an actual EIO errno from the wrapper fallback when errno remains zero",
+  "raw_reboot3_return_and_errno_recorded": false,
+  "cause": "unknown",
+  "guest_kernel_modified": false,
+  "further_evidence_needed": [
+    "raw reboot3 return value and errno before formatting",
+    "actual VM/guest instance change before and after reboot request"
+  ]
+}
