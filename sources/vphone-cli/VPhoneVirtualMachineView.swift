@@ -168,10 +168,19 @@ class VPhoneVirtualMachineView: VZVirtualMachineView {
         keyHelper.sendHome()
     }
 
+    private func handleClipboardShortcut(_ event: NSEvent) -> Bool {
+        guard event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
+              let key = event.charactersIgnoringModifiers, ["c", "x", "v"].contains(key) else { return false }
+        return onClipboardShortcut?(key) == true
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if handleClipboardShortcut(event) { return }
+        super.keyDown(with: event)
+    }
+
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        if event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
-           let key = event.charactersIgnoringModifiers, ["c", "x", "v"].contains(key),
-           onClipboardShortcut?(key) == true { return true }
+        if handleClipboardShortcut(event) { return true }
         if event.modifierFlags.contains(.command),
            event.charactersIgnoringModifiers == "h"
         {
