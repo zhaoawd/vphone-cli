@@ -1,0 +1,33 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-08 15:21:20.002.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-08 15:21:20.003.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-08 15:21:20.003.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-08 15:21:20.003.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite APIHTTPTests started.
+◇ Suite HelperServiceTests started.
+◇ Suite "IPSW cache" started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test xpcRejectsClientWithoutConfiguredSigningIdentity() started.
+◇ Test "a changed entity or a server without ranges restarts from byte zero" started.
+◇ Suite LibraryTests started.
+◇ Test cancellingARunInterruptsOnlyItsChild() started.
+◇ Suite NativeRestoreCLITests started.
+◇ Test supervisorRejectsFailureAndStopsTimedOutWorker() started.
+vphone-helper: refused connection: caller pid 17627, uid 2035870432 does not satisfy the client signing requirement (OSStatus -67050: The operation couldn’t be completed. (OSStatus error -67050.))
+✔ Test xpcRejectsClientWithoutConfiguredSigningIdentity() passed after 0.008 seconds.
+✔ Suite HelperServiceTests passed after 0.008 seconds.
+✔ Test deadlineAndCallerCancellationEndHTTPWait() passed after 0.170 seconds.
+✔ Suite APIHTTPTests passed after 0.170 seconds.
+✔ Test cancellingARunInterruptsOnlyItsChild() passed after 0.323 seconds.
+✔ Suite LibraryTests passed after 0.323 seconds.
+✔ Test "a changed entity or a server without ranges restarts from byte zero" passed after 1.018 seconds.
+✔ Suite "IPSW cache" passed after 1.018 seconds.
+✔ Test supervisorRejectsFailureAndStopsTimedOutWorker() passed after 2.450 seconds.
+✔ Suite NativeRestoreCLITests passed after 2.450 seconds.
+✔ Test run with 5 tests in 5 suites passed after 2.450 seconds.

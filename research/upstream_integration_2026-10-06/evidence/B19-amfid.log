@@ -1,0 +1,16 @@
+{"paths": [], "cdhashes": ["ab7682cd27dce3d64dbf1233c98975d4dab392b5"], "allow_all": false, "spoof_apple": true, "config_dir": "/private/tmp/vphone-b19-amfid-candidate/config"}
+SCOPED_AMFID_READY pid=8206
+SCOPED_AMFID_DETACH error: Sending disconnect packet failed.
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b19-amfid-candidate/scoped.py", line 41, in <module>
+    runtime.bypass_loop(process,target,paths=[],cdhashes=[AUTHORIZED],verbose=False,allow_all=False,spoof_apple=True)
+  File "/Users/qcz3840/Library/Python/3.9/lib/python/site-packages/amfidont/bypass_runtime.py", line 232, in bypass_loop
+    raise RuntimeError(
+RuntimeError: Unexpected process state 10
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b19-amfid-candidate/scoped.py", line 51, in <module>
+    raise RuntimeError('detach failed: ' + str(detach_error))
+RuntimeError: detach failed: error: Sending disconnect packet failed.
