@@ -77,15 +77,14 @@ extension VPhoneMachineBinding {
                 guard fd >= 0 else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
                 let input = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
                 defer { try? input.close() }
-                var hash = SHA256()
-                while let data = try input.read(upToCount: 1 << 20), !data.isEmpty { hash.update(data: data) }
+                let digest = try VPhoneFileDigest.sha256(input).digest
                 var after = stat()
                 guard fstat(fd, &after) == 0, info.st_dev == after.st_dev, info.st_ino == after.st_ino,
                       info.st_size == after.st_size, info.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
                       info.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec else {
                     throw VPhoneMachineBindingError("File changed during snapshot verification: \(relative)")
                 }
-                entries[relative] = hash.finalize().map { String(format: "%02x", $0) }.joined()
+                entries[relative] = digest
             default: throw VPhoneMachineBindingError("Unsupported VM snapshot entry: \(relative)")
             }
         }

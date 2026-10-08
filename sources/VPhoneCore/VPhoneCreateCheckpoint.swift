@@ -516,13 +516,7 @@ public enum VPhoneCreateDigest {
     public static func sha256(fileAt url: URL) throws -> (digest: String, size: Int64) {
         let handle = try FileHandle(forReadingFrom: url)
         defer { try? handle.close() }
-        var hash = SHA256()
-        var size: Int64 = 0
-        while let chunk = try handle.read(upToCount: 1 << 20), !chunk.isEmpty {
-            hash.update(data: chunk)
-            size += Int64(chunk.count)
-        }
-        return (hash.finalize().map { String(format: "%02x", $0) }.joined(), size)
+        return try VPhoneFileDigest.sha256(handle)
     }
 
     /// Fingerprint of an artifact inside the bundle. Throws when it is missing
