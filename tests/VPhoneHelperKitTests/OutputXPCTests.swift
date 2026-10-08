@@ -50,7 +50,7 @@ struct OutputXPCTests {
                 else if let data { response.finish(.success(data)) }
                 else { response.finish(.failure(VPhoneHelperError("Missing response"))) }
             }
-            let result = try await Task.detached { try response.wait(timeout: 40) }.value
+            let result = try await onHelperTestThread { try response.wait(timeout: 40) }
             #expect(result == Data(version.utf8))
             let text = try String(contentsOf: url, encoding: .utf8)
             #expect(text == "Verifying Core Bundle \(version)\nCore Bundle operation completed\n")
@@ -76,10 +76,10 @@ struct OutputXPCTests {
             else if let data { response.finish(.success(data)) }
             else { response.finish(.failure(VPhoneHelperError("Missing response"))) }
         }
-        let failed = await Task.detached {
+        let failed = try await onHelperTestThread {
             do { _ = try response.wait(timeout: 40); return false }
             catch { return true }
-        }.value
+        }
         #expect(failed)
     }
 

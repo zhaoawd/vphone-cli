@@ -32,10 +32,16 @@ struct ToolchainTests {
     @Test func cdhashMatchesCodesign() async throws {
         let temp = try LaunchpadTemporaryDirectory()
         let fixture = try LaunchpadFixtureApp.make(in: temp.url)
-        for url in [fixture.cli, fixture.vm] {
-            #expect(VPhoneLaunchpadToolchain.cdhash(of: url) == (try LaunchpadProcess.codesignCDHash(url)))
+        let urls = [fixture.cli, fixture.vm]
+        let hashes: [String?] = await withCheckedContinuation { continuation in
+            Thread.detachNewThread {
+                continuation.resume(returning: urls.map { VPhoneLaunchpadToolchain.cdhash(of: $0) })
+            }
         }
-        #expect(VPhoneLaunchpadToolchain.cdhash(of: fixture.cli) != VPhoneLaunchpadToolchain.cdhash(of: fixture.vm))
+        for (url, hash) in zip(urls, hashes) {
+            #expect(hash == (try LaunchpadProcess.codesignCDHash(url)))
+        }
+        #expect(hashes[0] != hashes[1])
     }
 
     /// No environment variable or default can redirect the executable.

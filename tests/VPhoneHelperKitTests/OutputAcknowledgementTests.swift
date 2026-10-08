@@ -47,11 +47,11 @@ struct OutputAcknowledgementTests {
     }
 
     @Test func defaultMissingAcknowledgementWaitsThirtySecondsThenFails() async throws {
-        let result = await Task.detached {
+        let result = try await onHelperTestThread {
             let started = Date()
             do { try VPhoneHelperOutputAcknowledgement().wait(); return (Date().timeIntervalSince(started), false) }
             catch { return (Date().timeIntervalSince(started), true) }
-        }.value
+        }
         #expect(result.1)
         #expect(result.0 >= 29)
         #expect(result.0 < 40)
