@@ -1,0 +1,21 @@
+{
+  "request": {
+    "target": {
+      "vm": "vm-new",
+      "pid": 18728,
+      "instance_id": "47A910CF-34D6-48D4-8568-260E6E9E9225"
+    },
+    "screen": false,
+    "t": "shell",
+    "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 481 -o comm= | tr -d \" \" )\" = /var/root/vphone-b13-api/vphoned && test \"$(ps -p 505 -o comm= | tr -d \" \" )\" = /private/var/root/vphone-b13-api/vphoned && kill -TERM 481 505",
+    "timeout_ms": 5000
+  },
+  "response": {
+    "timed_out": false,
+    "ok": true,
+    "truncated": false,
+    "code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+}

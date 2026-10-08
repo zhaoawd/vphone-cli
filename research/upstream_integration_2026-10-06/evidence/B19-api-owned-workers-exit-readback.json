@@ -1,0 +1,21 @@
+{
+  "request": {
+    "target": {
+      "vm": "vm-new",
+      "pid": 18728,
+      "instance_id": "47A910CF-34D6-48D4-8568-260E6E9E9225"
+    },
+    "screen": false,
+    "t": "shell",
+    "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -z \"$(ps -A -o comm= | grep -E \"vphone-b13-api/vphoned$\")\" && printf api_workers_absent",
+    "timeout_ms": 5000
+  },
+  "response": {
+    "timed_out": false,
+    "ok": true,
+    "truncated": false,
+    "code": 1,
+    "stdout": "",
+    "stderr": ""
+  }
+}

@@ -652,3 +652,29 @@ B16 VM源码f2331b7a、CDHash ab7682cd27dce3d64dbf1233c98975d4dab392b5，按用�
 最终完整串行：Swift Testing1243项/198suite，230.171秒通过；XCTest254项、跳过3项、0失败。Python571项、275.167秒通过。归档内存、摘要内存及guest组件检查通过。最终标准make test_swift：Swift Testing1243项/198suite，48.696秒，4 issues（未授权XPC超时、Library取消耗时、HTTP取消耗时、NativeRestore未生成worker.pid）；完整原因未查明，原阈值未放宽。真实固件比较本轮未重跑。
 
 原992份证据、3份输入副本及B15/B16共806个冻结文件校验一致。主检出的未跟踪`research/vm_backup_cleanup_2026-10-08.md`不是本轮生成，未修改。台账保持47项：accepted2、partial42、待本地审计2、可选延后1；44项必选任务未完成验收。原依赖、步骤、接口、接受条件、回退及342提交覆盖记录不变。
+
+
+### 2026-10-08 B19：默认测试入口修正与六项运行验收
+
+实现提交82649fe7。T39、T24、T36、T37、T40、T46继续推进，六项整体接受条件尚未满足。
+
+| 任务 | 结果 | 未完成范围 |
+| --- | --- | --- |
+| T24 | 默认Swift入口分组后1238+5项通过，XCTest254项/3skip/0fail；独立审查无阻塞发现；递归审计非系统依赖 | 工具依赖外部Homebrew libcrypto/libplist，本地缺vphone-escalator；系统共享缓存未递归审计，原整组并行失败原因未完全查明 |
+| T36 | 冷启动解锁观察、真实respring通过；respring后API instance保持且屏幕锁定 | userspace reboot实际返回Input/output error，原因未查明；原生命周期及依赖矩阵尚未完成，密码路径未验证 |
+| T37 | 新B16宿主classic-only菜单Stop为classicAccepted，随后Guest stopped、VM退出0、磁盘释放；缺force请求拒绝 | panic、未ready、非DFU超时、更新/备份协调及完整权限矩阵 |
+| T39 | 完整分辨率坐标修正，真实Cmd V文本显示在Settings搜索框；整段选区和Cmd X删除可见 | Cmd C/X、触摸Copy未同步到Mac；客户机剪贴板读取unavailable，原因未查明；图片/切窗/慢响应及API图片路径仍待验收 |
+| T40 | 原Bundle/绑定证据保持，原无绑定与store缺失状态保持 | 合法本地Core Bundle构建和并存、创建冻结全流程、四层来源升级回退矩阵 |
+| T46 | 原两次成功verify证据保持；本轮helper注册被自动审批拒绝，未执行 | 精确注册权限待回复；成功streaming install和完整输出生命周期尚未验收 |
+
+原默认整组运行有5项issue。5项隔离运行全部通过；现将其从常规组排除后单独并行运行，原断言及截止时间不变。最终默认make test_swift退出0：常规Swift Testing1238项/198suite、54.135秒；计时组5项/5suite、2.481秒；XCTest254项、3项跳过、0失败。Python571项通过。调度修改没有证明原整组并行失败的完整原因，Range断言失败原因仍未查明。独立审查确认前后测试选择一致、环境选择器清理和失败传播保持；minor暂缓：尚无“第一组通过、第二组失败”的专门退出码回归，当前check=True实现正确传播。真实固件比较未重跑。
+
+真实VM复用冻结B16源码f2331b7a、CDHash ab7682cd27dce3d64dbf1233c98975d4dab392b5，PID18728、实例47A910CF-34D6-48D4-8568-260E6E9E9225。API_ONLY使用已有载荷，未重新部署现代组件；classic 256字节/v3相机协议保持。启动解锁观察早于手动RPC。respring实际将SpringBoard39重启为6360，API实例462A8727-A889-4C4F-A712-66FF1108D78E保持；随后观察锁屏和熄屏。userspace reboot两次失败，直接API保留Input/output error，不列为重启通过。缺force的shutdown/respring/userspace reboot均拒绝。临时API worker TERM后仍在，核对精确路径与PID后KILL，独立确认不存在，API变为reconnecting/rpc=false；菜单Stop记录classicAccepted。VM退出0来自工具会话完成记录，boot日志另有Guest stopped；最终磁盘无占用。
+
+剪贴板本轮使用1290x2796完整分辨率坐标，真实Cmd V粘贴可见。原生三击确认整段选区；Cmd A曾插入字母a，未列为全选成功。Cmd X删除选中文本可见，Cmd C及触摸Copy执行后Mac保持测试plain text/RTF及changeCount。classic读回有类型和计数，无文本；API一次读到已知测试文本，随后直接错误为Clipboard text is unavailable to this process。不能将这些结果列为复制同步通过。经典载荷已含相关pasteboard权限，未据此假定只是缺少权限。固定IcliKit0.7.16源码702990b5的相应错误分支保留用于诊断。Finder getApp耗时601秒，未独立确认窗口失焦。Mac原项目/类型/数据恢复并读回一致，0600私有备份未进入公开证据；changeCount不能恢复。guest测试文本已通过classic type空字符串清除。
+
+独立AMFI配置仍为paths=[]、allow_all=false、spoof_apple=true，仅已有精确B16哈希。驱动退出1，记录unexpected process state与detach错误；清理脚本因进程已不存在而断言失败。后续独立确认驱动和debugserver均不存在，正确launchd服务com.apple.MobileFileIntegrity运行、amfid PPID1。首次错误查询com.apple.amfid未找到服务，已保留并修正；没有声称驱动正常detach。
+
+helper注册命令被自动审批拒绝，原因为该操作改变系统特权访问状态，而当前可信授权未明确该helper、注册方式及权限范围。已询问对com.vphone.cli.helper、Team3AA3QL69MQ、CDHash30ce6ce220a60617b6ae42066372bf3ac2e8ebe6的临时注册、按管理员规则安装官方2.6.1及清理范围授权，记录时未收到回复；未通过其他途径重试。
+
+最终vm-new停机、磁盘释放，config.plist、原classic载荷和UDID摘要与B18一致；临时token删除，原无绑定、无系统Bundle store、无helper服务/文件状态保持。恢复点B18保留；同卷APFS写时复制不证明物理独立性，本轮未整盘回滚。vm-2607未操作。原1084份证据、3份输入和806个B15/B16冻结文件重新核验；47项原合同、依赖及342提交覆盖保持，44项必选仍未完整验收。证据入口：evidence/B19-summary.json、evidence/B19-final-state.json、evidence/B19-dependency-audit.json。

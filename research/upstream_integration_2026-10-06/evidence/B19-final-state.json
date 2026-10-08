@@ -1,0 +1,42 @@
+{
+  "VM_new_stopped": true,
+  "VM_exit": 0,
+  "VM_exit_evidence": "tools.write_stdin session87334 completion printed VM_EXIT=0; transcript observation, not boot logfile content",
+  "disk_released": true,
+  "disk_lsof": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "critical_hashes": {
+    "config.plist": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    ".vphoned.signed": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "udid-prediction.txt": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc"
+  },
+  "system_paths_original_absent": {
+    "/Library/PrivilegedHelperTools/com.vphone.cli.helper": true,
+    "/Library/LaunchDaemons/com.vphone.cli.helper.plist": true,
+    "/Library/Application Support/vphone-launchpad/Bundles": true
+  },
+  "helper_service_absent": true,
+  "helper_registration_rejected_no_retry": true,
+  "temporary_token_absent": true,
+  "private_Mac_backup_0600_retained": true,
+  "Mac_original_items_types_data_restored": true,
+  "Mac_changeCount_not_restorable": true,
+  "binding_original_absent": true,
+  "process_readback": [
+    "67542     1 /usr/libexec/amfid"
+  ],
+  "AMFI_service_readback": {
+    "exit": 0,
+    "stdout": "system/com.apple.MobileFileIntegrity = {\n\tactive count = 5\n\tpath = /System/Library/LaunchDaemons/com.apple.MobileFileIntegrity.plist\n\ttype = LaunchDaemon\n\tstate = running\n\n\tprogram = /usr/libexec/amfid\n\targuments = {\n\t\t/usr/libexec/amfid\n\t}\n\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tMallocSpaceEfficient => 1\n\t\tXPC_SERVICE_NAME => com.apple.MobileFileIntegrity\n\t}\n\n\tdomain = system\n\tminimum runtime = 10\n\tbase minimum runtime = 10\n\texit timeout = 5\n\truns = 58\n\tpid = 67542\n\timmediate reason = ipc (mach)\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit reason = JETSAM_REASON_MEMORY_IDLE_EXIT\n\tlast jetsam exit details = JETSAM_REASON_MEMORY_IDLE_EXIT\n\n\tevent triggers = {\n\t\tcom.apple.MobileFileIntegrity.CodeRequirementPrefsChanged => {\n\t\t\tkeepalive = 0\n\t\t\tservice = com.apple.MobileFileIntegrity\n\t\t\tstream = com.apple.fsevents.matching\n\t\t\tmonitor = com.apple.UserEventAgent-System\n\t\t\tdescriptor = {\n\t\t\t\t\"Path\" => \"/Library/Preferences/com.apple.security.coderequirements.plist\"\n\t\t\t}\n\t\t}\n\t\tcom.apple.MobileFileIntegrity.LibraryValidationPrefsChanged => {\n\t\t\tkeepalive = 0\n\t\t\tservice = com.apple.MobileFileIntegrity\n\t\t\tstream = com.apple.fsevents.matching\n\t\t\tmonitor = com.apple.UserEventAgent-System\n\t\t\tdescriptor = {\n\t\t\t\t\"Path\" => \"/Library/Preferences/com.apple.security.libraryvalidation.plist\"\n\t\t\t}\n\t\t}\n\t\tcom.apple.security.amfid.reportmetrics => {\n\t\t\tkeepalive = 0\n\t\t\tservice = com.apple.MobileFileIntegrity\n\t\t\tstream = com.apple.xpc.activity\n\t\t\tmonitor = com.apple.UserEventAgent-System\n\t\t\tdescriptor = {\n\t\t\t\t\"Repeating\" => true\n\t\t\t\t\"GracePeriod\" => 3600\n\t\t\t\t\"Delay\" => 86400\n\t\t\t\t\"Priority\" => \"Maintenance\"\n\t\t\t}\n\t\t}\n\t\tcom.apple.security.amfid.cleanmetrics => {\n\t\t\tkeepalive = 0\n\t\t\tservice = com.apple.MobileFileIntegrity\n\t\t\tstream = com.apple.xpc.activity\n\t\t\tmonitor = com.apple.UserEventAgent-System\n\t\t\tdescriptor = {\n\t\t\t\t\"Repeating\" => true\n\t\t\t\t\"GracePeriod\" => 3600\n\t\t\t\t\"Delay\" => 1209600\n\t\t\t\t\"Priority\" => \"Maintenance\"\n\t\t\t}\n\t\t}\n\t}\n\n\tendpoints = {\n\t\t\"com.apple.amfi.nsxpc\" = {\n\t\t\tport = 0x5f03\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t\t\"com.apple.MobileFileIntegrity\" = {\n\t\t\tport = 0x310b\n\t\t\thost-special port = 18 (amfi)\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t\t\"com.apple.amfi.xpc\" = {\n\t\t\tport = 0x7403\n\t\t\tactive = 0\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t\t\"com.apple.amfi.lockdown\" = {\n\t\t\tport = 0x6003\n\t\t\tactive = 0\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t}\n\n\tevent channels = {\n\t\t\"com.apple.fsevents.matching\" = {\n\t\t\tport = 0x7303\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t\t\"com.apple.xpc.activity\" = {\n\t\t\tport = 0x7203\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t}\n\n\tresource coalition = {\n\t\tID = 269\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.apple.MobileFileIntegrity\n\t}\n\n\tjetsam coalition = {\n\t\tID = 270\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.apple.MobileFileIntegrity\n\t}\n\n\tspawn type = interactive (4)\n\tjetsam priority = 40\n\tjetsam memory limit (active, soft) = 50 MB\n\tjetsam memory limit (inactive, soft) = 50 MB\n\tjetsamproperties category = daemon\n\tjetsam thread limit = 32\n\tcpumon = default\n\texponential throttling grace limit = 10\n\tjob state = running\n\tsanitizer flags = 0x0\n\n\tproperties = runatload | supports transactions | supports pressured exit | inferred program | system service | exponential throttling | tle system\n}\n",
+    "stderr": ""
+  },
+  "driver_exit_error_preserved": true,
+  "full_disk_rollback_performed": false,
+  "restoration_checkpoint_retained": true,
+  "VM_2607_operated": false,
+  "free_bytes": 39757090816,
+  "main_status": "?? research/vm_backup_cleanup_2026-10-08.md\n"
+}

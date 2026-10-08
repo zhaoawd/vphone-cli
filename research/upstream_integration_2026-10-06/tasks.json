@@ -2489,7 +2489,8 @@
       },
       "implementation_commits": [
         "0531b903208d6ac497d85c58597f302b0e646407",
-        "f604f5ad5cdcf8181253e8c9aebe5d50f5cafd25"
+        "f604f5ad5cdcf8181253e8c9aebe5d50f5cafd25",
+        "82649fe7444b4aa6788f454ea2b8a9cbbbd23269"
       ],
       "verification_evidence": [
         "T24_host_entry_review.json",
@@ -2523,15 +2524,17 @@
         "evidence/T10-base-signed-artifact-manifest.json",
         "evidence/T03-actual-host-preflight-after.log",
         "evidence/T03-actual-bundle-check-after-cache-cleanup.log",
-        "evidence/B18-summary.json"
+        "evidence/B18-summary.json",
+        "evidence/B19-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B18 默认并行复现4 issues；采样确认测试在协作执行器阻塞等待ACK，相关等待及Security调用移至独立线程，原阈值保持。相关105项和完整串行1243项/198suite、XCTest254项/3skip/0fail通过；最终默认并行仍4 issues，完整原因未查明。真实冻结helper成功验证官方Bundle两次并完成清理。",
+      "current_result": "B19 默认Swift入口分为常规1238项和计时敏感5项，两组保持并行、原阈值不变，均通过；XCTest254项/3skip/0fail，Python571项通过。独立审查无阻塞发现。运行依赖递归审计发现工具依赖Homebrew libcrypto/libplist，无未解析非系统路径；系统共享缓存为审计边界。本地缺少vphone-escalator，整体合同未完成。",
       "remaining_work": [
-        "resolve final default-parallel XPC/cancellation/HTTP and missing worker.pid issues without relaxing deadlines; full causes unknown",
+        "default test entrypoint passes with two parallel groups; unrestricted monolithic parallel deadline/Range failures not fully diagnosed; no runtime deadline guarantee established",
         "complete independent launcher/per-VM execution and signed toolchain dependency closure; full T24 contract remains open",
         "独立 launcher 与 root-owned Bundle 选择/绑定按 T40/T25 接入，策略拒绝不得直接回退",
-        "核验真实授权主体的 location/microphone usage description 与 entitlement、签名责任链"
+        "核验真实授权主体的 location/microphone usage description 与 entitlement、签名责任链",
+        "bundle or otherwise validate Homebrew libcrypto/libplist runtime dependency chain; system shared-cache internals not recursively audited"
       ],
       "latest_vm_observation": "已在限定临时 amfid 范围下验证候选 --help 和恢复副本正常启动；完整 launcher/授权责任链仍未验收。"
     },
@@ -3353,12 +3356,13 @@
         "evidence/B15-summary.json",
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
-        "evidence/B18-summary.json"
+        "evidence/B18-summary.json",
+        "evidence/B19-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B18 按精确授权启动B16宿主f2331b7a，PID61914、实例86C9E1B1；手动RPC之前观察locked=false、screen_off=false。随后自动锁屏观察为true/true，手动解锁RPC成功。完整密码、userspace reboot、生命周期取消和依赖仍未验收。",
+      "current_result": "B19 复用冻结B16宿主，冷启动手动RPC前观察解锁。真实respring重启SpringBoard39→6360，API instance保持，随后锁屏/熄屏为true。同一实例未观察再次自动解锁。userspace reboot两次失败，直接API报Input/output error，原因未查明；未列为通过。",
       "remaining_work": [
-        "actual userspace reboot and password-configured matrix remain unverified; no credentials supplied",
+        "userspace reboot actual EIO failure (cause unknown); password-configured path remains unverified",
         "full target guest/shared-component cohort and original T06/T07/T08/T23 prerequisite acceptance",
         "full startup/stop/disable/instance-change cancellation matrix on real runtime; already submitted RPC cannot be undone"
       ]
@@ -3443,14 +3447,15 @@
         "evidence/B15-summary.json",
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
-        "evidence/B18-summary.json"
+        "evidence/B18-summary.json",
+        "evidence/B19-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B18 B16宿主菜单停止为apiAccepted，随后Guest stopped，VM退出0，独立核对磁盘释放。API_ONLY进程清理请求超时，未独立核对停止前退出，不列为classic-only。原停止诊断记录保留，临时令牌和AMFI驱动清理。",
+      "current_result": "B19 新宿主真实classic-only停止通过：核对临时API进程身份后TERM未退出，KILL并独立确认不存在；API为reconnecting/rpc=false，classic仍连接。菜单Stop记录classicAccepted、Guest stopped，VM退出0，磁盘释放。shutdown/respring/userspace reboot缺force均拒绝。完整panic/未ready/更新协调及权限矩阵未完成。",
       "remaining_work": [
         "panic/unready and non-DFU timeout fallback matrix; actual old-classic-only and DFU fallback are now covered on frozen B13 source",
         "full update/backup/Stop coordination (T24/T40), root/privilege negative matrix",
-        "preserve accepted/requested, VM stopped and disk-free distinctions; B16 verifies new B15 host API stop only"
+        "preserve accepted/requested, VM stopped and disk-free distinctions; B19 verifies frozen B16 host classic-only stop after independently observed API worker exit"
       ]
     },
     {
@@ -3535,7 +3540,7 @@
         "T23",
         "T36"
       ],
-      "status": "real_Command_V_transfer_and_unchanged_Mac_preservation_verified_copy_cut_focus_pending",
+      "status": "focused_Command_V_verified_selected_copy_cut_and_touch_Copy_sync_failed_guest_read_unavailable",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift",
         "VPhoneKit/VPhoneCoreKit/Support/VPhoneClipboardTransfer.swift",
@@ -3596,12 +3601,13 @@
         "evidence/B15-summary.json",
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
-        "evidence/B18-summary.json"
+        "evidence/B18-summary.json",
+        "evidence/B19-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B18 新B16宿主真实Command-V将测试文本传入classic剪贴板；相同Mac changeCount再次V保留菜单后来设置的guest文本，Mac RTF和changeCount不变。C/X未确认客户机选区，Mac未变化，不列为复制剪切通过。classic tap驱动误用430x932预览坐标，接口实际1290x2796，焦点/输入框验收无效。Mac原项目/类型/数据恢复读回一致，guest测试文本清空。",
+      "current_result": "B19 修正为1290x2796完整坐标，真实Cmd V文本显示在Settings搜索框。原生三击确认整段选区，Cmd X实际删除文本，Cmd C及触摸Copy均执行；Mac未接收新内容，classic读取只返回类型/计数，API直接报Clipboard text is unavailable to this process，原因未查明。复制剪切同步未通过；Mac原项目/类型/数据恢复读回一致。",
       "remaining_work": [
-        "correct full-resolution classic tap driver and verify focused paste plus actual selected-text Cmd C/X; prior C/X attempts unaccepted",
+        "diagnose actual selected Cmd C/X and touch Copy read-unavailable failure; focused Settings paste now verified; full cause unknown",
         "touch Copy, images, rapid focus, slow reply, type and reboot matrix",
         "API separate image-download second-await identity fence; do not mix classic/API-only pasteboards",
         "full T06/T23/T36 prerequisites; original clipboard changeCounts cannot be restored"
@@ -3687,10 +3693,11 @@
         "evidence/B15-summary.json",
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
-        "evidence/B18-summary.json"
+        "evidence/B18-summary.json",
+        "evidence/B19-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B18 官方2.6.0/2.6.1真实安装和校验通过，本地B16保留。旧首次绑定两次-9且未发布；独立512MiB实验确认摘要循环RSS545292288B，逐块释放后8470528B且SHA一致。修正后真实64GiB vm-new完整备份、首次绑定2.6.1通过，130.584秒、最大RSS27754496B；显式切换2.6.0/2.6.1通过，guest/kernel/boot-chain来源保持unknown。原无绑定和系统store缺失状态恢复，备份保留。",
+      "current_result": "B19 保留B18真实官方Bundle并存、首次绑定与切换证据。依赖审计确认当前本地冻结应用无vphone-escalator，不能据此宣称合法本地Core Bundle并存或创建全流程通过。未执行guest/kernel/boot-chain升级回退，原配置/载荷/UDID摘要保持，原无绑定恢复状态保持。",
       "remaining_work": [
         "actual locally built valid Core Bundle packaging/coexistence and creation toolchain freeze through complete workflow",
         "kernel-only origin receipts, explicit guest upgrade/rollback and mixed-version four-origin hash/instance matrix",
@@ -4128,11 +4135,13 @@
         "evidence/B15-summary.json",
         "evidence/B15-final-state.json",
         "evidence/B16-summary.json",
-        "evidence/B18-summary.json"
+        "evidence/B18-summary.json",
+        "evidence/B19-summary.json"
       ],
       "historical_evidence": [],
-      "current_result": "B18 相同冻结B13 helper配B15签名客户端，两条真实XPC verify-bundle请求成功返回官方2.6.1收据；各保存完整60字节0600日志，返回后文件关闭。注册请求超时保留，随后独立protocol2和成功操作确认；临时helper/right/文件清理完成。ACK/fsync按实现顺序及完成结果核对，未独立捕获协议包或系统调用。",
+      "current_result": "B19 精确B13 helper注册被自动审批拒绝，命令未执行、未绕过；已询问精确注册/安装/清理范围授权，记录时未收到答复。成功streaming install验收未完成，既有两次成功verify证据保持。完整立即退出/后代输出/panic/取消/轮换矩阵仍待完成。",
       "remaining_work": [
+        "explicit helper registration authorization pending after auto-review rejection; do not retry or bypass without approval",
         "successful streaming helper install with unchanged administrator authorization; actual success this batch covers verify only",
         "complete operation lifecycle, detached VM/create/descendant output and immediate UI exit",
         "panic/cancel/rotation, UI responsiveness and actual VM throughput"
@@ -4455,8 +4464,9 @@
     "B14: user reply 授权 permits exact new VM6ae3461e temporary AMFI scope and signed helper30ce6ce2/Team3AA3QL69MQ registration. Execute normal signed registration, verify underlying missing-store responses without installing an incomplete Bundle, then remove owned service/right/files. Preserve classic256 camera and daemon hashes; API-only mode remains separate. Report delayed manual observation and Cmd V non-transfer rather than infer causes; do not treat rejected verification as successful installation or test inference as direct ACK telemetry. Restore original config only after stopped/disk-free/VM-lock; private clipboard/token values excluded. amfid MEMORY_IDLE_EXIT is valid service observation, not a lingering debugger or forced restart.",
     "B15: Preserve all original contracts and fixed upstream target. Fix unchanged-Mac overwrite, explicit bound-Bundle recovery and helper CLI log paths. Dedicated-thread signature tests resolve the minimal combined failure but do not claim all parallel failures fixed. Reuse exact authorized frozen B13 helper with new normally signed CLI; verify real logs on missing-store error replies, then clean service/right/files/process. New B15 VM343c11eb ordinary help SIGKILL; request exact security scope before any new AMFI driver. Preserve independently changed Mac clipboard and retain original private backup0600; do not overwrite current user content.",
     "B16: Execute user authorization only for B15 VM343c11eb with empty independent AMFI config; helper/debugserver cleaned, no persistent setting changes. Preserve failed classic-not-ready attempt and successful retry. Keep apiAccepted distinct from classic-only because API_ONLY exit was not independently observed before stop. Route direct keyDown using the same existing clipboard guard after LLDB showed performKeyEquivalent0/keyDown1. Preserve full default parallel3 failures alongside serial pass. New candidate hash needs its own exact authorization before temporary AMFI use; do not broaden B15 scope. Mac clipboard restored all formats and data; original changeCount cannot be restored. Keep all original contracts and fixed target.",
-    "B18: Preserve exact B16 AMFI scope and B13 helper identity; no persistent security changes. Retain all failed registration/control/binding attempts. Confirmed isolated file-digest autoreleased-buffer growth; drain each chunk in shared digest while preserving fd/identity/SHA checks. Real64GiB binding backup+publication and2.6.0/2.6.1 switches pass; restore original missing binding and temporary system store, retain full backup. Keep guest/kernel/boot-chain unknown instead of inventing origins. Real Command-V clipboard transfer does not establish focused application input; classic driver used preview coordinates instead of full-resolution coordinates, so focused paste/C/X remain unaccepted. Keep final default4issues alongside serial/Python passes, deadlines unchanged. Main untracked research/vm_backup_cleanup_2026-10-08.md was not created or modified by this batch. Original47 contracts and342-commit coverage retained."
+    "B18: Preserve exact B16 AMFI scope and B13 helper identity; no persistent security changes. Retain all failed registration/control/binding attempts. Confirmed isolated file-digest autoreleased-buffer growth; drain each chunk in shared digest while preserving fd/identity/SHA checks. Real64GiB binding backup+publication and2.6.0/2.6.1 switches pass; restore original missing binding and temporary system store, retain full backup. Keep guest/kernel/boot-chain unknown instead of inventing origins. Real Command-V clipboard transfer does not establish focused application input; classic driver used preview coordinates instead of full-resolution coordinates, so focused paste/C/X remain unaccepted. Keep final default4issues alongside serial/Python passes, deadlines unchanged. Main untracked research/vm_backup_cleanup_2026-10-08.md was not created or modified by this batch. Original47 contracts and342-commit coverage retained.",
+    "B19 Ruling: isolate five short-deadline/fixture-start tests from mass fixture/signing work while retaining parallel execution and original assertions/deadlines; default entrypoint passes and reviewer confirms same selected tests. This changes scheduling and does not prove unrestricted monolithic failure causes; cost if wrong: combined contention regressions may remain undetected by default scheduling. Keep actual clipboard unavailable and userspace reboot EIO as failed acceptance, no speculative guest/kernel patch; cost if diagnosis is incomplete: additional investigation remains. Preserve root store/binding/helper absence and original frozen bytes. Auto-review rejected privileged helper registration; request exact permission and do not bypass. Final review minor (deferred): no dedicated regression for second Swift group failing after first succeeds; current check=True flow propagates errors, cost if deferred: a future exit-propagation regression lacks this specific test."
   ],
-  "latest_implementation_head": "fd12d73841ea9bd11cc80b94cfe8e6d9a4707a63",
-  "latest_validation_limitation": "B18 advances six tasks, no full task acceptance added. Full serial Swift1243/198 suites and XCTest254/3skip/0fail pass; Python571 and archive/digest-memory/guest checks pass. Final default make test_swift still4issues (unauthorized XPC timeout, Library cancellation elapsed, HTTP cancellation elapsed, NativeRestore worker.pid missing); full causes unknown. Real B16 startup unlock/API stop/Command-V clipboard transfer verified; focused paste/C/X not accepted due incorrect classic tap coordinates and no confirmed selection. Official2.6.0/2.6.1 store/binding and helper success-verify pass then restored; no upstream VM or guest deployment. Required unaccepted44."
+  "latest_implementation_head": "82649fe7444b4aa6788f454ea2b8a9cbbbd23269",
+  "latest_validation_limitation": "B19 default Swift entrypoint passes: XCTest254/3skip/0fail; SwiftTesting1238+5 with original deadlines and parallel execution within each group. Python571 passes. Actual focused paste/respring/classic-only shutdown verified. Actual selected C/X/touch Copy sync fails with guest clipboard unavailable; userspace reboot EIO; causes unknown. Helper registration auto-review rejected and precise permission pending. Local escalator and self-contained non-system dependencies missing; full six acceptance remains false, required unaccepted44."
 }

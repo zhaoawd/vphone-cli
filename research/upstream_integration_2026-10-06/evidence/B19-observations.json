@@ -1,0 +1,73 @@
+{
+  "source": "Current-turn native UI tool observations transcribed into this record; this file is not raw UI tool output",
+  "VM_PID": 18728,
+  "VM_instance": "47A910CF-34D6-48D4-8568-260E6E9E9225",
+  "guest_API_instance": "462A8727-A889-4C4F-A712-66FF1108D78E",
+  "clipboard": {
+    "full_guest_resolution": [1290,2796],
+    "correct_full_resolution_search_tap": [450,2635],
+    "real_Command_V_text_visible_in_Settings_search": true,
+    "real_whole_text_selection_confirmed_by_native_triple_click": true,
+    "Command_A_inserted_literal_a_instead_of_selecting_all": true,
+    "Command_C_sent_after_confirmed_selection": true,
+    "Command_X_visibly_removed_selected_search_text": true,
+    "touch_Copy_menu_action_after_confirmed_selection": true,
+    "Mac_test_plain_text_and_RTF_unchanged_after_C_X_and_Copy": true,
+    "classic_GetClipboard_returned_types_and_count_without_text": true,
+    "API_get_once_returned_known_test_text_then_unavailable": true,
+    "direct_API_error": "Clipboard text is unavailable to this process.",
+    "copy_cut_touch_Copy_to_Mac_acceptance_passed": false,
+    "cause": "unknown",
+    "real_loss_of_focus_not_independently_verified": true,
+    "Finder_getApp_took_seconds": 601,
+    "Mac_original_items_types_data_restored_and_readback_equal": true,
+    "original_changeCount_not_restorable": true,
+    "private_backup_0600_retained_not_in_public_evidence": true,
+    "guest_test_text_cleared_by_classic_type_empty": true
+  },
+  "system": {
+    "startup_unlock_observed_before_manual_RPC": true,
+    "respring_restarted_SpringBoard": true,
+    "respring_old_pid": 39,
+    "respring_new_pid": 6360,
+    "API_instance_after_respring_unchanged": true,
+    "after_respring_locked_and_screen_off": true,
+    "userspace_reboot_success": false,
+    "userspace_reboot_error": "reboot request rejected: Input/output error",
+    "userspace_reboot_failure_cause": "unknown",
+    "missing_force_rejected_for_shutdown_respring_userspace_reboot": true
+  },
+  "stop": {
+    "temporary_API_workers_SIGTERM_did_not_exit": true,
+    "exact_owned_paths_and_PIDs_rechecked_before_SIGKILL": true,
+    "SIGKILL_API_workers_absent_independently_verified": true,
+    "API_capability_after_worker_exit": "reconnecting; rpc=false; classic connected",
+    "native_menu_Stop": true,
+    "classification": "classicAccepted",
+    "Guest_stopped": true,
+    "VM_exit": 0,
+    "VM_exit_source": "write_stdin session87334 completion printed VM_EXIT=0",
+    "disk_released_independently_verified": true
+  },
+  "helper": {
+    "attempted_command": "sudo -n B15/helper-client.app/Contents/MacOS/vphone-cli helper register",
+    "auto_review_rejected": true,
+    "action_executed": false,
+    "reason": "该命令通过 sudo 注册特权 helper，属于改变系统特权访问状态的高风险操作；现有可信用户消息仅授权继续任务，未明确授权该具体 helper、注册方式及权限范围。",
+    "exact_scope_permission_question_pending": true,
+    "label": "com.vphone.cli.helper",
+    "Team_ID": "3AA3QL69MQ",
+    "CDHash": "30ce6ce220a60617b6ae42066372bf3ac2e8ebe6",
+    "registration_not_retried_or_bypassed": true,
+    "successful_install_acceptance_complete": false
+  },
+  "review": {
+    "source": "Fresh-context review_b19_acceptance agent final response transcribed",
+    "Critical": 0,
+    "Important": 0,
+    "Minor_deferred": "Second Swift group failure exit propagation has no dedicated regression; implementation propagates failure correctly",
+    "tests_selected_before_after_equivalent": true,
+    "reviewer_did_not_run_tests_or_VM": true,
+    "review_limited_to_B19_runner_diff_and_provided_acceptance_evidence": true
+  }
+}
