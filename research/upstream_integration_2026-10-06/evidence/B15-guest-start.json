@@ -1,0 +1,666 @@
+{
+  "target": {
+    "vm": "vm-new",
+    "pid": 30749,
+    "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+  },
+  "observations": [
+    {
+      "request": {
+        "t": "capabilities",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        }
+      },
+      "response": {
+        "protocol_version": 1,
+        "ok": true,
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "guest_connected": true,
+        "target": {
+          "vm": "vm-new",
+          "process_started_at": 1791414575.307325,
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "boot_mode": "normal",
+        "rpc_methods": [],
+        "limits": {
+          "connections": 16,
+          "command_timeout_ms": 180000,
+          "host_file_bytes": 67108864,
+          "request_bytes": 2097152,
+          "inline_file_bytes": 1048576
+        },
+        "screen_available": true,
+        "api_session": {
+          "errorCode": "transport",
+          "state": "reconnecting",
+          "vmInstanceID": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "commands": {
+          "tap": true,
+          "environment_update": false,
+          "type": true,
+          "camera_stop": true,
+          "location": true,
+          "rpc": false,
+          "app_launch": true,
+          "file_get": true,
+          "camera_status": true,
+          "location_source_set": true,
+          "environment_status": false,
+          "ipa_install": true,
+          "location_stream_push": true,
+          "location_source_control": true,
+          "app_list": true,
+          "app_foreground": true,
+          "key": true,
+          "camera_present": true,
+          "location_source_stop": true,
+          "swipe": true,
+          "app_terminate": true,
+          "open_url": true,
+          "shell": true,
+          "file_put": true,
+          "screenshot": true,
+          "environment_rollback": false,
+          "location_source_status": true,
+          "location_stream_start": true,
+          "capabilities": true,
+          "location_stop": true
+        },
+        "api_commands": {
+          "app_list": false,
+          "app_foreground": false,
+          "app_launch": false,
+          "file_get": false,
+          "file_put": false,
+          "app_terminate": false
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "path": "/var/root/vphone-b13-api/vphoned"
+      },
+      "response": {
+        "size": 9035760,
+        "ok": true,
+        "readback": {
+          "bytes": 9035760,
+          "sha256": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -z \"$(ps -A -o comm= | grep -E \"vphone-b13-api/vphoned$\")\" && VPHONE_API_ONLY=1 /var/root/vphone-b13-api/vphoned </dev/null >/var/root/vphone-b13-api/b15-direct.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stdout": "",
+        "ok": true,
+        "timed_out": false,
+        "stderr": "",
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "method": "device.screen",
+        "params": {}
+      },
+      "response": {
+        "method": "device.screen",
+        "ok": true,
+        "result": {
+          "scale": 3,
+          "locked": false,
+          "screen_off": false,
+          "height": 932,
+          "width": 430,
+          "orientation": 0
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "capabilities",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        }
+      },
+      "response": {
+        "protocol_version": 1,
+        "guest_capabilities": [
+          "hid",
+          "devmode",
+          "file",
+          "keychain",
+          "location",
+          "location_owned",
+          "ipa_install",
+          "clipboard",
+          "apps_v2",
+          "apps",
+          "app_launch",
+          "url",
+          "settings",
+          "shell",
+          "touch",
+          "touch_edge",
+          "vcam_status",
+          "vcam_receipt_v3"
+        ],
+        "screen_available": true,
+        "ok": true,
+        "rpc_methods": [
+          "accessibility.tree",
+          "agent.health",
+          "apps.binary",
+          "apps.data_dir",
+          "apps.foreground",
+          "apps.handlers",
+          "apps.info",
+          "apps.install",
+          "apps.launch",
+          "apps.list",
+          "apps.network_policy",
+          "apps.open_url",
+          "apps.refresh",
+          "apps.register",
+          "apps.registration",
+          "apps.search",
+          "apps.terminate",
+          "apps.uninstall",
+          "apps.unregister",
+          "apps.unregister_dir",
+          "apps.url_schemes",
+          "audio.state",
+          "audio.volume",
+          "bootstrap.firmware",
+          "bootstrap.inspect",
+          "bootstrap.install",
+          "bootstrap.status",
+          "bootstrap.uninstall",
+          "clipboard.clear",
+          "clipboard.get",
+          "clipboard.set",
+          "developer_mode.enable",
+          "developer_mode.status",
+          "device.basebin",
+          "device.environment",
+          "device.info",
+          "device.ioreg",
+          "device.network",
+          "device.screen",
+          "device.snapshot",
+          "diagnostics.self_test",
+          "display.brightness",
+          "display.rotation",
+          "display.rotation_lock",
+          "environment.loaded",
+          "environment.status",
+          "files.chmod",
+          "files.chown",
+          "files.copy",
+          "files.find",
+          "files.list",
+          "files.mkdir",
+          "files.plist",
+          "files.plist_set",
+          "files.read",
+          "files.remove",
+          "files.rename",
+          "files.symlink",
+          "files.write",
+          "input.button",
+          "input.double_tap",
+          "input.drag",
+          "input.hid",
+          "input.key",
+          "input.long_press",
+          "input.paste",
+          "input.swipe",
+          "input.tap",
+          "input.touch_sequence",
+          "input.type",
+          "keychain.add",
+          "keychain.database",
+          "keychain.delete",
+          "keychain.get",
+          "keychain.list",
+          "keychain.update",
+          "launchd.getenv",
+          "launchd.setenv",
+          "launchd.unsetenv",
+          "location.current",
+          "logs.crash",
+          "logs.crashes",
+          "logs.syslog",
+          "memory.jetsam",
+          "memory.pressure",
+          "network.capture",
+          "packages.compare",
+          "packages.info",
+          "packages.list",
+          "packages.repos",
+          "packages.status",
+          "packages.tweaks",
+          "power.low_power_mode",
+          "processes.kill",
+          "processes.list",
+          "screen.screenshot",
+          "screen.unlock",
+          "security.ssl_killswitch",
+          "services.disable",
+          "services.disabled",
+          "services.dump",
+          "services.enable",
+          "services.list",
+          "services.load",
+          "services.print",
+          "services.remove",
+          "services.signal",
+          "services.start",
+          "services.status",
+          "services.stop",
+          "services.unload",
+          "settings.delete",
+          "settings.get",
+          "settings.set",
+          "system.reboot",
+          "system.respring",
+          "system.shutdown",
+          "system.system_apps",
+          "system.uicache",
+          "ui.describe",
+          "ui.element_at",
+          "ui.ocr",
+          "ui.tap_element",
+          "ui.tree",
+          "ui.wait",
+          "ui.wait_gone"
+        ],
+        "commands": {
+          "app_list": true,
+          "location_source_control": true,
+          "location_source_status": true,
+          "camera_present": true,
+          "environment_status": true,
+          "type": true,
+          "rpc": true,
+          "screenshot": true,
+          "capabilities": true,
+          "open_url": true,
+          "swipe": true,
+          "location_stream_push": true,
+          "location_stream_start": true,
+          "tap": true,
+          "file_get": true,
+          "ipa_install": true,
+          "location_source_stop": true,
+          "location_stop": true,
+          "environment_update": true,
+          "camera_stop": true,
+          "app_launch": true,
+          "key": true,
+          "location_source_set": true,
+          "file_put": true,
+          "app_foreground": true,
+          "environment_rollback": true,
+          "app_terminate": true,
+          "shell": true,
+          "location": true,
+          "camera_status": true
+        },
+        "limits": {
+          "request_bytes": 2097152,
+          "inline_file_bytes": 1048576,
+          "command_timeout_ms": 180000,
+          "host_file_bytes": 67108864,
+          "connections": 16
+        },
+        "api_commands": {
+          "file_get": true,
+          "file_put": true,
+          "app_foreground": true,
+          "app_list": true,
+          "app_launch": true,
+          "app_terminate": true
+        },
+        "guest_connected": true,
+        "target": {
+          "pid": 30749,
+          "process_started_at": 1791414575.307325,
+          "vm": "vm-new",
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "boot_mode": "normal",
+        "api_session": {
+          "generation": "BFA82910-DEA1-4438-A48F-6D92CD4947EC",
+          "health": {
+            "capabilities": [
+              "bootstrap_uninstall",
+              "screen_unlock",
+              "files",
+              "ipa_install",
+              "url",
+              "file_upload_identity",
+              "file_tools",
+              "system_shutdown",
+              "location",
+              "ui_inspection",
+              "port_forward",
+              "bootstrap_install",
+              "app_details",
+              "display",
+              "keychain",
+              "packages",
+              "processes",
+              "session_identity",
+              "clipboard",
+              "logs",
+              "system_control",
+              "network_capture",
+              "apps",
+              "environment_activation",
+              "screenshot",
+              "touch",
+              "audio",
+              "environment_transaction",
+              "services",
+              "file_download_identity",
+              "environment_update",
+              "device_info",
+              "hid",
+              "input_gestures"
+            ],
+            "setupPending": false,
+            "binaryHash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+            "instanceID": "0AEBA2AF-989F-4350-B704-6632BA6AB452",
+            "ios": "26.1.0",
+            "apiVersion": 1
+          },
+          "state": "ready",
+          "vmInstanceID": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "environment_status",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        }
+      },
+      "response": {
+        "files": {
+          "libraries": [
+            {
+              "guest": null,
+              "name": "launchdhook-vphone.dylib"
+            },
+            {
+              "guest": null,
+              "name": "SystemHook-vphone.dylib"
+            },
+            {
+              "name": "libvcamcaptured.dylib",
+              "guest": null
+            },
+            {
+              "name": "libcamfix.dylib",
+              "guest": null
+            },
+            {
+              "guest": null,
+              "name": "libvlocation.dylib"
+            }
+          ]
+        },
+        "transactions": [],
+        "load": {
+          "libraries": [
+            {
+              "state": "not_mapped",
+              "stale": [],
+              "name": "launchdhook-vphone.dylib",
+              "current_pids": []
+            },
+            {
+              "name": "SystemHook-vphone.dylib",
+              "state": "not_mapped",
+              "stale": [],
+              "current_pids": []
+            },
+            {
+              "state": "not_mapped",
+              "name": "libvcamcaptured.dylib",
+              "stale": [],
+              "current_pids": []
+            },
+            {
+              "current_pids": [],
+              "state": "not_mapped",
+              "name": "libcamfix.dylib",
+              "stale": []
+            },
+            {
+              "stale": [],
+              "current_pids": [],
+              "state": "not_mapped",
+              "name": "libvlocation.dylib"
+            }
+          ],
+          "source": "environment.loaded",
+          "complete": true,
+          "uninspected": [],
+          "scanned": 371
+        },
+        "application": {
+          "state": "not_verified",
+          "note": "not verified: this command checks files and mapped copies only; camera and location behavior need their own acceptance"
+        },
+        "activation": {
+          "executed": [],
+          "basis": "mappings",
+          "daemon_reboot_required": null,
+          "root_read_only": true,
+          "note": "reboot_required=false only means the daemon saw no reason to reboot; it does not mean that running processes loaded the new files",
+          "actions": [],
+          "automatic_restart": false
+        },
+        "assessment": {
+          "reasons": [
+            "/usr/lib/launchdhook-vphone.dylib is missing; the online update replaces existing libraries only",
+            "/usr/lib/SystemHook-vphone.dylib is missing; the online update replaces existing libraries only",
+            "/usr/lib/libvcamcaptured.dylib is missing; the online update replaces existing libraries only",
+            "/usr/lib/libcamfix.dylib is missing; the online update replaces existing libraries only",
+            "/usr/lib/libvlocation.dylib is missing; the online update replaces existing libraries only",
+            "/vh points to nothing, not /usr/lib/launchdhook-vphone.dylib"
+          ],
+          "state": "full_migration_required"
+        },
+        "root_read_only": true,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 30749,
+          "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,lstart=,comm= | grep -E \"vphoned|vphone-b13\"; tail -n 30 /var/root/vphone-b13-api/b15-direct.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "truncated": false,
+        "code": 0,
+        "stdout": "   70     1 Wed Oct  7 16:09:37 2026     /usr/bin/vphoned\n  631     1 Wed Oct  7 16:11:34 2026     /var/root/vphone-b13-api/vphoned\n  635   631 Wed Oct  7 16:11:34 2026     /private/var/root/vphone-b13-api/vphoned\n2026-10-07 16:11:34.573 vphoned[635:5857] vphoned: HTTP/WebSocket API listening on vsock 1339\n",
+        "stderr": "",
+        "ok": true
+      }
+    }
+  ],
+  "health_probes": [
+    {
+      "status": 200,
+      "body": {
+        "api_version": 1,
+        "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+        "capabilities": [
+          "session_identity",
+          "touch",
+          "hid",
+          "apps",
+          "url",
+          "files",
+          "file_download_identity",
+          "file_upload_identity",
+          "clipboard",
+          "location",
+          "keychain",
+          "ipa_install",
+          "bootstrap_install",
+          "bootstrap_uninstall",
+          "port_forward",
+          "screenshot",
+          "screen_unlock",
+          "device_info",
+          "display",
+          "audio",
+          "input_gestures",
+          "ui_inspection",
+          "processes",
+          "services",
+          "logs",
+          "network_capture",
+          "app_details",
+          "system_control",
+          "system_shutdown",
+          "file_tools",
+          "packages",
+          "environment_update",
+          "environment_transaction",
+          "environment_activation"
+        ],
+        "instance_id": "0AEBA2AF-989F-4350-B704-6632BA6AB452",
+        "ios": "26.1.0",
+        "ip": "fe80::103c:5a1f:d2f9:99b6%en0",
+        "name": "vphoned",
+        "setup_pending": false,
+        "status": "ok"
+      }
+    }
+  ],
+  "new_host_startup_unlock_observation": {
+    "method": "device.screen",
+    "ok": true,
+    "result": {
+      "scale": 3,
+      "locked": false,
+      "screen_off": false,
+      "height": 932,
+      "width": 430,
+      "orientation": 0
+    }
+  },
+  "manual_unlock_called": false
+}

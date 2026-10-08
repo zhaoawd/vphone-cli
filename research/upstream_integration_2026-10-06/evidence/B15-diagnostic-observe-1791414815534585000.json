@@ -1,0 +1,53 @@
+[
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 30749,
+        "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+      },
+      "method": "device.screen",
+      "params": {}
+    },
+    "response": {
+      "method": "device.screen",
+      "result": {
+        "scale": 3,
+        "locked": false,
+        "screen_off": false,
+        "height": 932,
+        "width": 430,
+        "orientation": 0
+      },
+      "ok": true
+    }
+  },
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 30749,
+        "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+      },
+      "method": "clipboard.get",
+      "params": {}
+    },
+    "response": {
+      "method": "clipboard.get",
+      "ok": true,
+      "result": {
+        "method": "uipasteboard",
+        "has_text": false,
+        "change_count": 0,
+        "types": [],
+        "has_image": false,
+        "text": "",
+        "items": 0
+      }
+    }
+  }
+]

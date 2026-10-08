@@ -1,0 +1,162 @@
+{
+  "observations": [
+    {
+      "command": [
+        "/bin/ps",
+        "-p",
+        "30749",
+        "-o",
+        "pid=,command="
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/bin/ps",
+        "-p",
+        "58582",
+        "-o",
+        "pid=,command="
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/bin/ps",
+        "-p",
+        "52699",
+        "-o",
+        "pid=,command="
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/lsof",
+        "-nP",
+        "-t",
+        "--",
+        "/Users/qcz3840/github/vphone-cli/vm-new/udid-prediction.txt",
+        "/Users/qcz3840/github/vphone-cli/vm-new/Disk.img",
+        "/Users/qcz3840/github/vphone-cli/vm-new/.vphone-runtime.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/.vphoned.signed",
+        "/Users/qcz3840/github/vphone-cli/vm-new/F77952D4F70ACD5D.shsh",
+        "/Users/qcz3840/github/vphone-cli/vm-new/restore-info.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/AVPBooter.vresearch1.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/.ssh_forward",
+        "/Users/qcz3840/github/vphone-cli/vm-new/SEPStorage",
+        "/Users/qcz3840/github/vphone-cli/vm-new/config.plist",
+        "/Users/qcz3840/github/vphone-cli/vm-new/nvram.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/AVPSEPBooter.vresearch1.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/.create-checkpoint/checkpoint.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/vphone-cli-start.log",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/agent-execution.jsonl",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery-events/2026-10-03.jsonl",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery-events/2026-10-02.jsonl",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery-events/.events.lock",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-26b8494cbb74/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-26b8494cbb74/attempt-1/thread-events.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-26b8494cbb74/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-26b8494cbb74/attempt-1/states.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-943de020ae41/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-943de020ae41/attempt-1/thread-events.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-943de020ae41/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-943de020ae41/attempt-1/states.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/A-REC-4c54d4efd385636de3e44cb51f6d4028/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/A-REC-4c54d4efd385636de3e44cb51f6d4028/attempt-1/startup.log",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/A-REC-4c54d4efd385636de3e44cb51f6d4028/attempt-1/recovery-receipt.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/large-result.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/small-result.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/capabilities.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/compatibility.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/large-source.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-37722ed18c5e/attempt-1/wire.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-8295caf0b0c6/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-8295caf0b0c6/attempt-1/thread-events.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-8295caf0b0c6/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-8295caf0b0c6/attempt-1/states.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-e532e4746165/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-e532e4746165/attempt-1/thread-events.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-e532e4746165/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-e532e4746165/attempt-1/states.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/A-REC-f6b830f30436eb23267df1f061e25d4d/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/A-REC-f6b830f30436eb23267df1f061e25d4d/attempt-1/startup.log",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/A-REC-f6b830f30436eb23267df1f061e25d4d/attempt-1/recovery-receipt.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/large-result.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/small-result.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/capabilities.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/compatibility.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/large-source.bin",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-d504d684b8be/attempt-1/wire.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-c4f47663aad9/attempt-1/spool-manifest.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-c4f47663aad9/attempt-1/thread-events.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-c4f47663aad9/attempt-1/result.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/artifact-spool/bl082-c4f47663aad9/attempt-1/states.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery/A-REC-4c54d4efd385636de3e44cb51f6d4028/attempt-1/startup.log",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery/A-REC-4c54d4efd385636de3e44cb51f6d4028/attempt-1/recovery-receipt.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery/A-REC-f6b830f30436eb23267df1f061e25d4d/attempt-1/startup.log",
+        "/Users/qcz3840/github/vphone-cli/vm-new/logs/recovery/A-REC-f6b830f30436eb23267df1f061e25d4d/attempt-1/recovery-receipt.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/.firmware-history/39cb7c55-0717-4263-93e8-2ff208e7c0bf/report.json",
+        "/Users/qcz3840/github/vphone-cli/vm-new/.firmware-history/39cb7c55-0717-4263-93e8-2ff208e7c0bf/journal.json"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/bin/launchctl",
+        "print",
+        "system/com.vphone.cli.helper"
+      ],
+      "returncode": 113,
+      "stdout": "",
+      "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+    },
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "NO (-60005)\n"
+    }
+  ],
+  "VM_new_stopped": true,
+  "disk_released": true,
+  "VM_2607_operated": false,
+  "B13_runtime_source": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+  "config_sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+  "classic_payload_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "udid_prediction_sha256": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc",
+  "old_frozen_files_verified": 1206,
+  "helper_service_right_files_absent": true,
+  "amfid_or_debugserver_started_this_batch": false,
+  "temporary_diagnostic_app_stopped": true,
+  "private_tokens_and_guest_empty_backup_removed": [
+    "/private/tmp/vphone-b15-restart-token",
+    "/private/tmp/vphone-b15-private-guest-clipboard.json"
+  ],
+  "Mac_clipboard_independently_changed_not_overwritten": true,
+  "Mac_clipboard_original_backup_retained_0600": "/private/tmp/vphone-b15-private-pasteboard.plist",
+  "guest_classic_test_text_cleared_before_stop": true,
+  "original_guest_changeCount_not_restored": true,
+  "temporary_API_only_guest_files_retained_unregistered": "/var/root/vphone-b13-api",
+  "full_disk_rollback_performed": false,
+  "main_head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "main_status": "",
+  "free_bytes": 17963487232
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "request": {
+      "t": "shell",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 30749,
+        "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+      },
+      "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,lstart=,comm= | grep -E \"vphone-b13-api/vphoned$|/usr/bin/vphoned$\"",
+      "timeout_ms": 10000
+    },
+    "response": {
+      "ok": true,
+      "stdout": "   70     1 Wed Oct  7 16:09:37 2026     /usr/bin/vphoned\n  631     1 Wed Oct  7 16:11:34 2026     /var/root/vphone-b13-api/vphoned\n  635   631 Wed Oct  7 16:11:34 2026     /private/var/root/vphone-b13-api/vphoned\n",
+      "stderr": "",
+      "timed_out": false,
+      "truncated": false,
+      "code": 0
+    }
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 30749,
+        "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+      },
+      "method": "screen.unlock",
+      "params": {
+        "timeout": 10
+      }
+    },
+    "response": {
+      "method": "screen.unlock",
+      "ok": true,
+      "result": {
+        "locked": false,
+        "screen_off": false,
+        "was_screen_off": true,
+        "was_locked": true
+      }
+    }
+  },
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 30749,
+        "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+      },
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.Preferences"
+      }
+    },
+    "response": {
+      "method": "apps.launch",
+      "ok": true,
+      "result": {
+        "pid": 991,
+        "frontmost_verified": true
+      }
+    }
+  },
+  {
+    "request": {
+      "t": "rpc",
+      "screen": false,
+      "target": {
+        "vm": "vm-new",
+        "pid": 30749,
+        "instance_id": "66D34CB6-9764-4ACE-A35F-5B5C592898C6"
+      },
+      "method": "input.tap",
+      "params": {
+        "x": 200,
+        "y": 882
+      }
+    },
+    "response": {
+      "method": "input.tap",
+      "ok": true,
+      "result": {
+        "x": 200,
+        "y": 882
+      }
+    }
+  }
+]

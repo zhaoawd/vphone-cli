@@ -1,0 +1,58 @@
+{
+  "source_head": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+  "helper_source_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+  "helper_CDHash": "30ce6ce220a60617b6ae42066372bf3ac2e8ebe6",
+  "observations": [
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.0",
+        "--log-file",
+        "/private/tmp/vphone-b15-helper-operation-retest-2.6.0.log"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Verifying Core Bundle 2.6.0\nUnable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\nError: Unable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\n",
+      "elapsed_seconds": 0.5606037499965169,
+      "log_path": "/private/tmp/vphone-b15-helper-operation-retest-2.6.0.log",
+      "log_bytes": 122,
+      "log_sha256": "268d42f5e2ca5ecb10ee56261c6e511465a2e195a3165940a1717f3f912f3ba6",
+      "log_mode": "0600",
+      "log_closed_after_return": true,
+      "exact_own_version_only": true
+    },
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.1",
+        "--log-file",
+        "/private/tmp/vphone-b15-helper-operation-retest-2.6.1.log"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Verifying Core Bundle 2.6.1\nUnable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\nError: Unable to inspect at /Library/Application Support/vphone-launchpad: No such file or directory\n",
+      "elapsed_seconds": 0.5583996250061318,
+      "log_path": "/private/tmp/vphone-b15-helper-operation-retest-2.6.1.log",
+      "log_bytes": 122,
+      "log_sha256": "dbb1618ed9b13b3fecf86db719a505af97719acf8dcdf4a1db93f06495d6fda4",
+      "log_mode": "0600",
+      "log_closed_after_return": true,
+      "exact_own_version_only": true
+    }
+  ],
+  "existing_log_refused_without_overwrite": {
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "Error: The operation couldn\u2019t be completed. File exists\n",
+    "unchanged": true
+  },
+  "two_signed_clients_logs_complete_and_separate": true,
+  "successful_Bundle_install_or_verify": false,
+  "ACK_evidence": "Underlying operation error is returned after finish ACK according to frozen service and current client implementation; no syscall or ACK packet tracing was performed."
+}

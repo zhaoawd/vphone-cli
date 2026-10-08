@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/usr/bin/log",
+    "show",
+    "--last",
+    "10m",
+    "--style",
+    "compact",
+    "--predicate",
+    "process == \"amfid\" AND eventMessage CONTAINS \"acceptance/B15/candidate.app/Contents/MacOS/vphone-vm\""
+  ],
+  "returncode": 0,
+  "stdout": "Timestamp               Ty Process[PID:TID]\n2026-10-08 09:16:40.794 Df amfid[34170:aa0515] /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/candidate.app/Contents/MacOS/vphone-vm not valid: Error Domain=AppleMobileFileIntegrityError Code=-424 \"The file is adhoc signed but contains restricted entitlements\" UserInfo={NSURL=file:///Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/candidate.app/Contents/MacOS/vphone-vm, NSLocalizedDescription=The file is adhoc signed but contains restricted entitlements}\n",
+  "stderr": ""
+}

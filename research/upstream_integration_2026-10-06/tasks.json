@@ -3347,10 +3347,12 @@
         "evidence/B13-final-partition-results.json",
         "evidence/B13-final-state.json",
         "evidence/B14-summary.json",
-        "evidence/B14-final-state.json"
+        "evidence/B14-final-state.json",
+        "evidence/B15-summary.json",
+        "evidence/B15-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "B14 授权后实际运行冻结源码55fd8ef5。两次启动均在未发送手动 RPC 的情况下返回 unlocked：首次 CLI flag，第二次只依赖持久设置且没有 amfid 辅助进程。菜单设置写入后当前锁定实例未立即解锁；同 API instance 短暂断线重连仍锁定。手动菜单立即重测返回 unlocked，首次延迟观察仍锁定的原因未查明。CLI config 成功，启用设置而无 API 的 launch 拒绝64。停机后原配置字节恢复。",
+      "current_result": "B15 使用冻结 B13 宿主55fd8ef5和CLI启动解锁标志，在未发送手动解锁RPC的情况下观察locked=false、screen_off=false。未修改T36实现。该结果不验证B15新VM工件或密码/userspace reboot路径。",
       "remaining_work": [
         "actual userspace reboot and password-configured matrix remain unverified; no credentials supplied",
         "full target guest/shared-component cohort and original T06/T07/T08/T23 prerequisite acceptance",
@@ -3376,7 +3378,7 @@
         "T24",
         "T40"
       ],
-      "status": "signed_host_menu_and_CLI_graceful_API_stop_disk_free_verified_fallback_matrix_pending",
+      "status": "classic_and_DFU_stop_disk_free_verified_full_fallback_matrix_pending",
       "upstream_paths": [
         "VPhoneDaemon/Native/vphoned_power.m",
         "VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
@@ -3433,14 +3435,16 @@
         "evidence/B13-final-partition-results.json",
         "evidence/B13-final-state.json",
         "evidence/B14-summary.json",
-        "evidence/B14-final-state.json"
+        "evidence/B14-final-state.json",
+        "evidence/B15-summary.json",
+        "evidence/B15-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "B14 实际菜单 Stop 与生产 CLI Stop 均记录 API apiAccepted、Guest stopped、父驱动退出0和磁盘无占用，没有超时强停。CLI 使用精确 instance/PID84587 发送 SIGINT，宿主执行 API guest-first；首次菜单没有外部 watcher 信号。force:false 请求实际拒绝，缺失/错误/旧 token 返回401。旧 guest/DFU/panic/超时及更新/备份冲突仍待验收。",
+      "current_result": "B15 在冻结 B13 宿主上完成真实 classic-only 与 DFU 两条回退：classicAccepted、Guest stopped、VM退出0；DFU无guest连接，经framework requestStop超时后强制停止、VM退出0。两次生产CLI Stop返回0，最终磁盘无占用。",
       "remaining_work": [
-        "new source55fd8ef5 old-classic-only/DFU/panic/unready/timeout fallback matrix",
+        "panic/unready and non-DFU timeout fallback matrix; actual old-classic-only and DFU fallback are now covered on frozen B13 source",
         "full update/backup/Stop coordination (T24/T40), root/privilege negative matrix",
-        "preserve accepted/requested, VM stopped and disk-free distinctions; two actual positive stops do not cover every fallback"
+        "preserve accepted/requested, VM stopped and disk-free distinctions; new B15 VM remains unexecuted"
       ]
     },
     {
@@ -3525,7 +3529,7 @@
         "T23",
         "T36"
       ],
-      "status": "signed_host_real_Cmd_V_transfer_unverified_private_clipboard_restored",
+      "status": "unchanged_Mac_regression_validated_real_keyboard_transfer_pending",
       "upstream_paths": [
         "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneClipboardSync.swift",
         "VPhoneKit/VPhoneCoreKit/Support/VPhoneClipboardTransfer.swift",
@@ -3564,7 +3568,8 @@
       "implementation_commits": [
         "f03615b1de4d658304ce83edce57b8b132a1d071",
         "c54a5e4df8cc3e77831b36988d6dab03e56e3c85",
-        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+        "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -3580,14 +3585,16 @@
         "evidence/B13-final-partition-results.json",
         "evidence/B13-final-state.json",
         "evidence/B14-summary.json",
-        "evidence/B14-final-state.json"
+        "evidence/B14-final-state.json",
+        "evidence/B15-summary.json",
+        "evidence/B15-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "B14 在真实新宿主中准备测试文本和 RTF，解锁后原生 guest tap 使 Settings 搜索框进入输入状态。CUA Cmd V 未观察到测试文本，guest clipboard仍items0/types[]/change_count0；原因未查明。Mac 测试文本及 RTF 保留，原 items/types/data 读回恢复，changeCount 不可恢复；原 guest 空剪贴板保持。实际 Cmd C/X/V 与触摸 Copy 不记为通过。",
+      "current_result": "B15 修复同一连接中Mac剪贴板未变时重复Paste覆盖后续guest复制的问题，3项新增回归与52项定向并行、完整串行验证通过。真实Cmd V仍未确认成功；独立按键探针观察到Command+V，但没有证明VM回调执行。classic直接type的GetClipboard读回与API-only空剪贴板不同，原因未查明。Mac独立变化后保留当前内容，原备份0600保留。",
       "remaining_work": [
-        "diagnose actual window/key focus and keyboard dispatch; Cmd V transfer not established, cause unknown",
-        "API separate image-download second-await integration plus real image/rich-text/touch Copy/fast focus/slow reply/type/reboot matrix",
-        "full T06/T23/T36 prerequisites; private clipboard backup values were omitted and test backups cleaned"
+        "real Cmd C/X/V, touch Copy, images, fast focus, slow reply, type and reboot matrix on B15 VM; new exact CDHash temporary authorization requested",
+        "API separate image-download second-await integration; do not mix observed different classic/API-only pasteboards",
+        "full T06/T23/T36 prerequisites; Mac independent clipboard change retained, original 0600 private backup remains"
       ]
     },
     {
@@ -3608,7 +3615,7 @@
         "T05",
         "T24"
       ],
-      "status": "real_stopped_VM_missing_Bundle_refusal_verified_full_source_matrix_pending",
+      "status": "recovery_guidance_and_real_refusal_verified_full_source_matrix_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -3647,7 +3654,8 @@
         "0cf9383c7fd2f257cb5afa60f1e327ae4dc9854a",
         "7d6f45e03907ab2b0739f9083d338322eb8a89bb",
         "94ec7976f2ad21e6bf59e867228a6f083a6a9304",
-        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+        "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b"
       ],
       "verification_evidence": [
         "evidence/B06-summary.json",
@@ -3664,13 +3672,14 @@
         "evidence/B13-final-partition-results.json",
         "evidence/B13-final-state.json",
         "evidence/B14-summary.json",
-        "evidence/B14-final-state.json"
+        "evidence/B14-final-state.json",
+        "evidence/B15-summary.json",
+        "evidence/B15-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "B14 在实际已停机 vm-new 上请求绑定缺失的2.6.0 Bundle，拒绝且没有绑定发布、迁移备份或配置变化。新宿主55fd8ef5 配合旧 classic guest 两次启动，实际 /usr/bin/vphoned 与 cache 摘要保持。配置测试后恢复原字节。真实安装的多 Bundle、创建冻结、kernel-only 来源和 guest 显式升级/回退仍待完成。",
+      "current_result": "B15 在verified executable入口增加缺失或校验失败Bundle的指定版本恢复和显式绑定提示；新CLI对真实停机vm-new拒绝缺失2.6.0并显示恢复命令，配置未变，无绑定或备份发布。未安装新Bundle，也未变更guest/kernel/boot-chain。",
       "remaining_work": [
         "T24 creation toolchain freeze and real installed Bundle/local-build coexistence/version matrix",
-        "missing Bundle runtime recovery guidance still generic; explicit recovery text implementation pending",
         "actual kernel-only receipts and mixed host/guest/kernel/boot-chain version/hash/instance upgrade/rollback acceptance",
         "APFS backup is copy-on-write, not physically independent; no atomic CAS against uncooperative writers claimed"
       ]
@@ -4040,7 +4049,7 @@
         "T02",
         "T24"
       ],
-      "status": "registered_signed_helper_protocol2_streamed_error_ACK_observed_full_install_log_pending",
+      "status": "registered_helper_complete_error_logs_verified_full_operation_matrix_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLineReader.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -4081,7 +4090,8 @@
         "4af226fb589afc78ac58ebd44eb6b5e1928bc587",
         "73272aa9f7c54ffbab2564fd935d27ff5bf3bff2",
         "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762",
-        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
+        "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+        "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -4100,12 +4110,14 @@
         "evidence/B13-final-partition-results.json",
         "evidence/B13-final-state.json",
         "evidence/B14-summary.json",
-        "evidence/B14-final-state.json"
+        "evidence/B14-final-state.json",
+        "evidence/B15-summary.json",
+        "evidence/B15-final-state.json"
       ],
       "historical_evidence": [],
-      "current_result": "B14 正常注册冻结签名 helper，实际 root 服务协议2、字节与工件一致，管理员授权规则正确。两条签名客户端收到各自输出和缺 Store 的错误；根据冻结实现，底层错误回复位于 output.finish ACK 之后，属于 ACK 推断。ad hoc 同 bundleIdentifier 客户端连接中断且未获版本，具体拒绝原因未单独捕获。没有成功安装/验证 Bundle。新增服务、right 和两个 root 文件均清理。",
+      "current_result": "B15 install-bundle/verify-bundle接入--log-file。新签名CLI配合已授权冻结B13 helper，两条真实XPC请求分别保存完整122字节日志、0600、返回后关闭，已有日志拒绝覆盖；底层结果均为缺Store错误，不计成功Bundle安装。ACK/fsync顺序结合实现推断，无单独系统调用跟踪。服务/right/文件/进程清理完成。",
       "remaining_work": [
-        "real successful Bundle install/verify operation and receiver full-log fsync/close ACK in registered privileged path",
+        "real successful Bundle install/verify operation; current actual registered-helper full-log acceptance covers operation-error replies only",
         "complete helper operation set/T24 integration and immediate UI exit, detached VM/create/descendant writer completion",
         "UI responsiveness, panic/cancel/rotation and actual VM console throughput; B13 local benchmark is not runtime proof"
       ]
@@ -4424,8 +4436,9 @@
     "B11: advance already-authorized T42 algorithm source integration and host tests without treating pending full-chain dependencies as accepted. Separate source7e0503df from running candidate2387af20. Keep upstream hashes and local saturation delta explicit; C tests/objects do not prove HAL linkage, permissions or media runtime.",
     "B12: implement five previously authorized task increments within existing worktree; keep every original dependency/step/acceptance/rollback/interface contract. Known setup status is required before optional startup work; absent provider skips it. Read drain does not imply writer/helper drain or actual VM stop/disk release. New code tests do not validate the older frozen runtime.",
     "B13: move binding/version/writer primitives to VPhoneCore to preserve existing CLI module boundary. Require disk-free observation even without VM lock before stopped/binding success; foreign holders are never signalled. Preserve classic256-byte camera and never deploy modern64-byte cohort singly; temporary API-only mode skips cache/camera/Irisin update. Binding does not auto-update guest. Partitioned coverage does not establish default full-suite success. New VM hash and temporary privileged helper registration require scoped security authorization; no such mutation occurred. Original contracts and semantic coverage unchanged.",
-    "B14: user reply 授权 permits exact new VM6ae3461e temporary AMFI scope and signed helper30ce6ce2/Team3AA3QL69MQ registration. Execute normal signed registration, verify underlying missing-store responses without installing an incomplete Bundle, then remove owned service/right/files. Preserve classic256 camera and daemon hashes; API-only mode remains separate. Report delayed manual observation and Cmd V non-transfer rather than infer causes; do not treat rejected verification as successful installation or test inference as direct ACK telemetry. Restore original config only after stopped/disk-free/VM-lock; private clipboard/token values excluded. amfid MEMORY_IDLE_EXIT is valid service observation, not a lingering debugger or forced restart."
+    "B14: user reply 授权 permits exact new VM6ae3461e temporary AMFI scope and signed helper30ce6ce2/Team3AA3QL69MQ registration. Execute normal signed registration, verify underlying missing-store responses without installing an incomplete Bundle, then remove owned service/right/files. Preserve classic256 camera and daemon hashes; API-only mode remains separate. Report delayed manual observation and Cmd V non-transfer rather than infer causes; do not treat rejected verification as successful installation or test inference as direct ACK telemetry. Restore original config only after stopped/disk-free/VM-lock; private clipboard/token values excluded. amfid MEMORY_IDLE_EXIT is valid service observation, not a lingering debugger or forced restart.",
+    "B15: Preserve all original contracts and fixed upstream target. Fix unchanged-Mac overwrite, explicit bound-Bundle recovery and helper CLI log paths. Dedicated-thread signature tests resolve the minimal combined failure but do not claim all parallel failures fixed. Reuse exact authorized frozen B13 helper with new normally signed CLI; verify real logs on missing-store error replies, then clean service/right/files/process. New B15 VM343c11eb ordinary help SIGKILL; request exact security scope before any new AMFI driver. Preserve independently changed Mac clipboard and retain original private backup0600; do not overwrite current user content."
   ],
-  "latest_implementation_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
-  "latest_validation_limitation": "B14 authorized exact frozen B13 VM hash and signed helper scope exercised and cleaned. Two real new-host boots (second no helper/no unlock flag, stored setting), same-instance reconnect, manual menu immediate retest, actual menu/CLI API graceful stops with disk-free, token rotation and signed helper protocol2 stream-error/ACK inference verified. Real Cmd V transfer not established; modern guest cohort, userspace/password/fallback/source layers and successful helper install/full logs unverified. VM stopped, original config/Mac clipboard restored, secrets/helper rights cleaned. Required unaccepted44; B13 full Swift failures unresolved."
+  "latest_implementation_head": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+  "latest_validation_limitation": "B15 final complete serial Swift: 1243 Swift Testing plus XCTest251/3skip passed; default parallel still7issues. New CLI binding recovery and real helper full logs verified using frozen B13 helper; classic-only and DFU VM stop verified on B13 runtime. B15 VM --help SIGKILL, exact new CDHash authorization requested/no response yet. Real clipboard transfer, modern cohort, four-layer source/creation freeze and full original task contracts remain unaccepted. Required unaccepted44."
 }

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "vphone-cli",
+    "sha256": "b447295c489b1c2f61f3b0fbf569e32fcf79bc77aa59a4fc9d36f4ccf572a939",
+    "CDHash": "3cde8b547c2cee64ad1516c2f700dfcd344f4d5c",
+    "returncode": 0,
+    "stdout": "OVERVIEW: Boot a virtual iPhone or patch firmware with the Swift pipeline\n\nUSAGE: vphone-cli <subcommand>\n\nOPTIONS:\n  -h, --help              Show help information.\n\nSUBCOMMANDS:\n  boot (default)          Boot a virtual iPhone (PV=3)\n  patch-firmware          Patch boot-chain firmware in a VM directory using the\n                          Swift pipeline (diagnostic entry: takes a bare path\n                          instead of a VM name; `vphone-cli fw patch` is the\n                          normal one). Both take the same VM-directory lock and\n                          refuse a busy VM.\n  patch-component         Patch a single firmware component payload and write\n                          the patched raw bytes\n  vm                      Manage vphone VM bundles\n  fw                      Firmware pipeline: prepare (download/merge IPSWs) and\n                          patch\n  restore                 DFU-restore firmware into a VM bundle (requires a\n                          running DFU boot)\n  cfw                     Custom-firmware install (host-mount; VM must be off;\n                          re-execs sudo)\n  setup                   Provision/verify the host Python environment\n                          (~/.vphone/venv)\n  resources               Print the resolved runtime resource directory\n  doctor                  Diagnose the host and a VM without changing anything\n                          (read-only)\n  sign                    Sign an ARM Mach-O with the native signing library\n  dump-entitlements       Print a Mach-O's embedded entitlements (replaces\n                          `ldid -e`)\n  archive                 Unpack and pack archives\n  restore-inspect         Inspect a local restore directory and optional ticket\n                          without accessing a device\n  core-bundle             Install and verify root-owned Core Bundles\n  helper                  Manage the signed privileged helper (requires a\n                          configured Apple signing team)\n  guest                   Send host-control requests to a running VM\n\n  See 'vphone-cli help <subcommand>' for detailed help.\n",
+    "stderr": ""
+  },
+  {
+    "name": "vphone-vm",
+    "sha256": "01f584eb815f9c853494f9165d4c6d5d782308441fff823938e33315d8cb363c",
+    "CDHash": "343c11ebfeab191227fe5e6b849897282c2289c7",
+    "returncode": -9,
+    "stdout": "",
+    "stderr": ""
+  }
+]

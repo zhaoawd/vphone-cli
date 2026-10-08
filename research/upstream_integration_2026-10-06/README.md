@@ -572,3 +572,34 @@ Mac原剪贴板全部items/types/data保存至本机0600临时备份，没有把
 最终vm-new已停机。持VM目录协作锁且磁盘无占用时恢复原config字节；config、原classic载荷、UDID预测以及AVPBooter/AVPSEPBooter/restore-info摘要与检查点匹配。B09/B13冻结工件共1206文件再次校验，严格签名检查通过。Mac私有剪贴板备份、guest空剪贴板备份以及已停止三个服务器的临时token已清理；未注册的guest临时API工件保留供后续验收，不会作为launchd job启动。当前磁盘正常启动/关机的数据变化未回滚，不宣称整个Disk.img恢复到检查点。
 
 本轮未重跑Swift/Python/固件套件，没有把B13结果计作新的测试通过；B13默认完整Swift失败与最终串行等待继续保留。本轮主要验证真实宿主和注册后的XPC行为。五项仍有原合同未满足，保持部分推进；47项仍为2项accepted、42项部分推进、T30/T31待本地对账、T45可选延期，44项必选未验收。原760份证据、3份输入、全部原任务依赖/步骤/接口/验收/回退与语义提交覆盖台账保持不变。主仓库e8d825b3干净，vm-2607未操作。证据入口：`evidence/B14-summary.json`、`evidence/B14-final-state.json`、`evidence/B14-helper-probe.json`、`evidence/B14-stop-result.json`、`evidence/B14-second-stop.json`。
+
+
+### 2026-10-08 B15：剪贴板、Bundle 恢复提示、完整日志及停止回退
+
+本轮实现提交为 `ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b`，起点为 `268fe330`，固定上游目标仍为 `2d21d21`。新增三项修正，并补充真实 classic-only、DFU 停止和注册 helper 日志验收。五项原合同尚未全部满足，保持部分推进。
+
+| 任务 | 结果 | 未完成范围 |
+| --- | --- | --- |
+| T36 | 冻结 B13 宿主携带启动解锁标志，未发送手动解锁 RPC 的观察为 locked=false、screen_off=false | 密码、userspace reboot、完整客户机组件组合及原依赖验收 |
+| T37 | 生产 CLI 对 classic-only 实例停止返回 0；宿主记录 classicAccepted、Guest stopped、VM 退出 0。DFU 无 guest 连接，framework requestStop 超时后强制停止，CLI 与 VM 均退出 0；最终磁盘无占用 | panic、未 ready、非 DFU 超时、更新/备份冲突和完整权限矩阵 |
+| T39 | 同一连接中 Mac changeCount 未变时不重复写 guest 剪贴板，保留后续 guest 复制；Mac 变化或新连接仍发送。新增 3 项回归通过 | 新工件真实 Cmd C/X/V、触摸 Copy、图片、切窗、慢回复、type、重启；API 分开图片下载后的第二次 await 尚未接入 |
+| T40 | 缺失或校验失败的绑定 Bundle 明确提示恢复指定版本或显式重新绑定。B15 CLI 在停机 vm-new 上实际显示恢复提示，拒绝后配置未变，无绑定或备份发布 | 创建工具链冻结、实际多 Bundle 并存、kernel-only 来源收据及四层来源升级/回退矩阵 |
+| T46 | helper 两命令接入 --log-file；新签名 CLI 与冻结 B13 helper 的两条真实 XPC 请求分别保存完整 122 字节、0600 日志，返回后文件关闭；已有日志拒绝覆盖 | 成功安装/验证完整 Bundle、完整操作集、立即退出 UI、后代 writer、panic/取消/轮换和真实 VM 吞吐 |
+
+最终完整串行 Swift 命令退出 0：Swift Testing 1243 项、198 个 suite、225.460 秒；XCTest 251 项、3 项跳过、0 失败。52 项/7 suite 的相关并行验证通过。项目默认 `make test_swift` 仍失败：1243 项、61.013 秒、7 个 issue，涉及 VMRuntimeEntry 状态/输出 2 项、取消耗时 1 项、helper 身份拒绝超时 1 项、HTTP 截止/取消耗时 1 项、IPSW 续传 Range 断言 2 项。串行通过不作为默认并行通过。没有重跑 Python 或固件测试，也没有应用新 kernel patch。
+
+HTTP 夹具的先前串行等待采样位于 APIHTTPFixture.stop 的 Foundation waitUntilExit，直接子进程查询为空。现在在启动前安装 terminationHandler，并以有界 DispatchGroup 等待退出。保留编译失败和旧等待记录。默认并行的两次采样显示多个协作线程同步等待 Security 签名验证，并有归档 I/O。签名/HTTP/XPC 最小组合为 18 项、42.049 秒、5 个 issue；将测试签名验证移到独立线程后，52 项相关组合全部通过，没有放宽断言或截止时间。完整并行仍有上述失败，其完整原因未查明。首次 B15 完整串行有 2 个 issue，两项隔离复跑通过，最终完整串行也通过；保留全部结果，不宣称间歇失败原因已经确定。
+
+本轮真实 VM 宿主仍为冻结源码 `55fd8ef5`，不是 B15 新工件。普通启动 PID30749、instance66D34CB6-9764-4ACE-A35F-5B5C592898C6；classic-only CLI Stop 耗时 6.612 秒。独立 API-only 代理/worker 核对身份后清理，原 classic daemon 保留，随后验证旧 guest 回退。DFU PID58582、instanceB338CD8C-248D-498E-A53F-D347A41A948A；CLI Stop 耗时 11.951 秒，包含框架请求超时。DFU 未执行 restore 或刷写。首次 DFU 驱动误用 --no-graphics，退出 64、未启动 VM；修正为实际支持的 DFU 参数后完成验收，失败样本保留。
+
+真实 Cmd V 仍未确认传入测试文本。独立诊断窗口观察到 command=true、charactersIsV=true、keyCode9、keyWindow=true；该结果不能证明 VM 窗口回调执行。classic 的直接 type 后，GetClipboard UI 读回 B15-control-direct/public.utf8-plain-text/changeCount1，同阶段 API-only 读回仍为空。两个通道的观测不同，原因未查明；没有用 API-only 空结果推断 classic 写入失败，也没有据此修改键盘路由。原生观察是从聊天工具结果转录，未伪造为原始工具输出。
+
+Mac pasteboard 的 changeCount 从测试设置后的 234 变为 237，当前内容不再匹配已知测试值。恢复守卫拒绝写入，随后保持独立变化后的当前剪贴板。原 items/types/data 备份以 0600 保留在 `/private/tmp/vphone-b15-private-pasteboard.plist`，值未写入研究证据；未声称原 changeCount 可恢复。guest classic 测试文本在停机前清空，原 changeCount 未恢复。临时按键探针已停止；已停机服务器的 token 和空 guest 私有备份已清理。
+
+B15 宿主、Launchpad、签名 helper 客户端构建成功，607 文件冻结于 `.build/acceptance/B15/`。资源、严格签名、权限声明、仓库外和符号链接资源定位检查通过。新 VM SHA-256 为 `01f584eb815f9c853494f9165d4c6d5d782308441fff823938e33315d8cb363c`，CDHash 为 `343c11ebfeab191227fe5e6b849897282c2289c7`。CLI --help 返回 0，VM --help 被 SIGKILL；精确路径的 amfid 日志记录 AppleMobileFileIntegrityError -424：The file is adhoc signed but contains restricted entitlements。尚未运行 B15 VM 验收。已请求仅对这个新哈希进行独立空配置、paths=[]、allow_all=false、spoof_apple=true 的临时放行；记录时尚未收到回复，未启动新的 amfid 驱动。具体暂停来源为执行技能中的 security-sensitive action 要求，技能路径为 `/Users/qcz3840/.codex/plugins/cache/openai-curated-remote/superpowers/6.4.2/skills/executing-plans/SKILL.md`。
+
+签名客户端源码为 B15 ee7b9ec2，内嵌 helper 沿用 B13 冻结字节 SHA-256728b0353…383b60ce、CDHash30ce6ce2…a8ebe6、Team3AA3QL69MQ、协议2；没有制造或注册新的 helper 哈希。沿用已有精确授权临时注册，分别验证2.6.0与2.6.1，操作结果均为 Store 不存在。日志包括开始行和错误行，首次驱动只预期开始行而失败，原样本保留；修正预期并使用新日志路径后通过。底层错误回复位于 finish ACK 之后，是实现顺序与实际回复结合的推断；文件完整且关闭有独立检查，没有记录 ACK 报文或 fsync 系统调用。未计为成功 Bundle 安装。服务、right、两个 root 文件与 helper 进程均已清理，原缺失基线恢复。
+
+最终 vm-new 停机、磁盘释放，原配置、classic 载荷、UDID 预测摘要未变；B09/B13 原冻结工件1206文件再次核对。保留 classic 256 字节相机协议及原 Hook/Irisin 边界，未单独部署现代64字节组件，未改写 kernel/Preboot。磁盘正常启动/停止的数据变化未整体回滚，不宣称恢复了完整磁盘检查点。主仓库仍为 e8d825b3 且干净，vm-2607 未操作。
+
+追加前核对原847份证据和3份输入；新增100份后清单为947项。全部原依赖、步骤、接口、接受与回退条件、固定上游语义提交覆盖台账不变。47项仍为2项accepted、42项部分推进、T30/T31待对账、T45可选延期，44项必选未验收。证据入口：`evidence/B15-summary.json`、`evidence/B15-source-review.json`、`evidence/B15-post-fix-serial-swift.log`、`evidence/B15-post-fix-full-swift.log`、`evidence/B15-artifact-manifest.json`、`evidence/B15-helper-log-probe.json`、`evidence/B15-final-state.json`。

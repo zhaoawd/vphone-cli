@@ -1,0 +1,153 @@
+{
+  "date": "2026-10-08",
+  "worktree_baseline": "268fe330293bc5ad72010e5124514fdacdbf4cbe",
+  "implementation_head": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "all_five_full_acceptance_passed": false,
+  "source_fixes": [
+    "T39 unchanged Mac clipboard does not overwrite a subsequent guest copy on the same connection",
+    "T40 unavailable bound Bundle explains exact-version restore or explicit bind recovery",
+    "T46 helper install-bundle/verify-bundle --log-file forwards to existing exclusive writer and finish ACK"
+  ],
+  "tests": {
+    "targeted_parallel": {
+      "Swift_Testing": 52,
+      "suites": 7,
+      "exit_code": 0
+    },
+    "final_full_serial": {
+      "Swift_Testing": 1243,
+      "suites": 198,
+      "seconds": 225.46,
+      "XCTest": 251,
+      "XCTest_skipped": 3,
+      "XCTest_failures": 0,
+      "exit_code": 0
+    },
+    "final_default_parallel": {
+      "Swift_Testing": 1243,
+      "suites": 198,
+      "seconds": 61.013,
+      "issues": 7,
+      "exit_code": 2,
+      "failures": [
+        "VMRuntimeEntry paired runtime status/stdout (2)",
+        "Library cancellation elapsed time (1)",
+        "Helper unauthorized-client timeout (1)",
+        "HTTP deadline/cancellation elapsed time (1)",
+        "IPSW changed/no-range request Range absent (2)"
+      ]
+    },
+    "earlier_full_serial": {
+      "issues": 2,
+      "causes_not_established": true,
+      "isolated_21_tests_passed": true
+    },
+    "signature_wait_minimal_reproduction": {
+      "tests": 18,
+      "issues": 5,
+      "seconds": 42.049,
+      "samples": "Synchronous Security static validation waits on cooperative threads; move test validation to dedicated threads. Full parallel scheduler failures remain."
+    },
+    "Python_or_firmware_tests_rerun": false
+  },
+  "runtime": {
+    "runtime_source_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+    "normal_boot_PID": 30749,
+    "normal_instance": "66D34CB6-9764-4ACE-A35F-5B5C592898C6",
+    "startup_unlock_flag": true,
+    "startup_observation_unlocked_without_manual_RPC": true,
+    "classic_only_CLI_stop": {
+      "classification": "classicAccepted",
+      "CLI_exit": 0,
+      "VM_exit": 0,
+      "seconds": 6.612252582970541,
+      "disk_released": true
+    },
+    "DFU_CLI_stop": {
+      "PID": 58582,
+      "instance": "B338CD8C-248D-498E-A53F-D347A41A948A",
+      "guest_connected": false,
+      "classification": "framework requestStop then graceful timeout and force stop",
+      "CLI_exit": 0,
+      "VM_exit": 0,
+      "seconds": 11.951241040951572,
+      "disk_released": true
+    },
+    "classic_camera_256_byte_protocol_preserved": true,
+    "modern_guest_cohort_deployed": false,
+    "kernel_or_Preboot_modified": false,
+    "VM_2607_operated": false
+  },
+  "clipboard_diagnosis": {
+    "real_Cmd_V_success": false,
+    "CUA_key_probe": "Dedicated test window observed command=true, charactersIsV=true, keyCode9, keyWindow=true. This does not prove VM callback dispatch.",
+    "classic_direct_type_readback": "GetClipboard UI showed B15-control-direct, public.utf8-plain-text, changeCount1",
+    "API_only_readback": "items0/types[]/change_count0 at same diagnostic stage",
+    "channel_difference_cause": "not established",
+    "Mac_changeCount_before_after": [
+      234,
+      237
+    ],
+    "Mac_independent_change_not_overwritten": true,
+    "private_original_backup_retained_0600": "/private/tmp/vphone-b15-private-pasteboard.plist",
+    "guest_test_text_cleared": true,
+    "guest_original_changeCount_not_restored": true,
+    "API_separate_image_await_path_integrated": false
+  },
+  "new_artifacts": {
+    "source_head": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+    "files": 607,
+    "build_and_resource_signature_entitlement_checks_passed": true,
+    "VM_sha256": "01f584eb815f9c853494f9165d4c6d5d782308441fff823938e33315d8cb363c",
+    "VM_CDHash": "343c11ebfeab191227fe5e6b849897282c2289c7",
+    "VM_ordinary_help_exit": -9,
+    "new_VM_runtime_acceptance": false,
+    "new_VM_temporary_AMFI_authorization": "requested; no reply received when recording this batch",
+    "helper_reused_B13_CDHash": "30ce6ce220a60617b6ae42066372bf3ac2e8ebe6",
+    "helper_source_head": "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca"
+  },
+  "helper_runtime": {
+    "registered_exact_existing_authorized_helper": true,
+    "new_signed_CLI_source": "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+    "two_versions": [
+      "2.6.0",
+      "2.6.1"
+    ],
+    "both_full_logs_bytes": 122,
+    "both_logs_mode": "0600",
+    "both_logs_closed_after_return": true,
+    "separate_operation_content_verified": true,
+    "existing_log_rejected_without_overwrite": true,
+    "underlying_operation_result": "missing store; successful Bundle install/verify not claimed",
+    "ACK_and_fsync_evidence": "Implementation order plus underlying error response and completed closed files; no ACK packet/syscall tracing.",
+    "service_right_files_and_process_cleaned": true,
+    "driver_first_attempt": "Incorrect one-line expectation; helper emitted error as second line. Failed logs retained; corrected driver and separate log paths passed."
+  },
+  "new_CLI_real_binding_refusal": {
+    "explicit_recovery_guidance_observed": true,
+    "configuration_unchanged": true,
+    "binding_and_backup_not_created": true,
+    "VM_started": false
+  },
+  "cleanup": {
+    "VM_new_stopped": true,
+    "config_classic_and_UDID_hashes_preserved": true,
+    "old_frozen_files_verified": 1206,
+    "Mac_backup_retained_0600": true,
+    "temporary_tokens_and_guest_empty_backup_removed": true,
+    "temporary_API_files_retained_unregistered": true,
+    "full_disk_rollback_performed": false,
+    "persistent_security_configuration_modified": false,
+    "new_amfid_driver_started": false
+  },
+  "ledger": {
+    "total": 47,
+    "accepted": 2,
+    "partial": 42,
+    "pending_local_audit": 2,
+    "deferred_optional": 1,
+    "required_unaccepted": 44,
+    "original_contracts_and_commit_coverage_unchanged": true
+  }
+}
