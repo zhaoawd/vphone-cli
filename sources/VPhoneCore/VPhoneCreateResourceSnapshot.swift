@@ -30,11 +30,13 @@ public final class VPhoneCreateResourceSnapshot {
     public let resources: VPhoneResources
     public let executable: URL
     public let manifest: Manifest
+    package var romSource: URL { directory.appendingPathComponent("ROMs/AVPBooter.vresearch1.bin") }
+    package var sepromSource: URL { directory.appendingPathComponent("ROMs/AVPSEPBooter.vresearch1.bin") }
     private var retained = false
 
     public static let closureLimits = [
         "Python interpreter, Python framework, third-party packages and their native dependencies are external",
-        "PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external",
+        "PATH tools, host SDK/compiler and JB compilation are external",
         "Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external",
         "In-process code is loaded by the invoking executable; a new attempt may use another accepted build",
         "A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding",
@@ -51,16 +53,25 @@ public final class VPhoneCreateResourceSnapshot {
 
     /// No VM data or entire development .build directory is traversed.
     public static func capture(resources source: VPhoneResources, executable cli: URL) throws -> VPhoneCreateResourceSnapshot {
+        try capture(resources: source, executable: cli,
+            romSource: VPhoneBundleOps.defaultROMSource(), sepromSource: VPhoneBundleOps.defaultSEPROMSource())
+    }
+
+    package static func capture(resources source: VPhoneResources, executable cli: URL,
+                                romSource: URL, sepromSource: URL) throws -> VPhoneCreateResourceSnapshot {
         try capture(resources: source, executable: cli, storage: FileManager.default.temporaryDirectory
-            .appendingPathComponent("vphone-create-toolchains-\(geteuid())"), availableBytes: availableCapacity)
+            .appendingPathComponent("vphone-create-toolchains-\(geteuid())"),
+            romSource: romSource, sepromSource: sepromSource, availableBytes: availableCapacity)
     }
 
     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+                                romSource: URL = VPhoneBundleOps.defaultROMSource(),
+                                sepromSource: URL = VPhoneBundleOps.defaultSEPROMSource(),
                                 availableBytes: (URL) throws -> Int64,
                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
         let fm = FileManager.default
         let cli = cli.resolvingSymlinksInPath()
-        for required in source.coreRuntimeResources + [source.vphoned, cli, VPhoneResources.vmExecutable(executable: cli)] {
+        for required in source.coreRuntimeResources + [source.vphoned, cli, VPhoneResources.vmExecutable(executable: cli), romSource, sepromSource] {
             var info = stat()
             guard stat(required.path, &info) == 0, info.st_mode & S_IFMT == S_IFREG else {
                 throw VPhoneMachineBindingError("Create resource is missing or is not a regular file: \(required.path)")
@@ -100,6 +111,9 @@ public final class VPhoneCreateResourceSnapshot {
                 roots.append((url, "VPhone.bundle/Contents/MacOS/" + url.lastPathComponent))
             }
         }
+        // Keep external ROM copies beside the sealed bundle so its signatures remain valid.
+        roots += [(romSource, "ROMs/AVPBooter.vresearch1.bin"),
+                  (sepromSource, "ROMs/AVPSEPBooter.vresearch1.bin")]
         let inputs = try inventory(roots)
         let total = inputs.reduce(Int64(0)) { $0 + $1.entry.bytes }
         let retainedBytes = try existing.reduce(Int64(0)) { total, url in
@@ -143,7 +157,7 @@ public final class VPhoneCreateResourceSnapshot {
         guard try inventory(roots).map(\.entry) == inputs.map(\.entry) else {
             throw VPhoneMachineBindingError("Create resources changed while copying; retry with stable inputs")
         }
-        let entries = try inventory([(directory.appendingPathComponent("VPhone.bundle"), "VPhone.bundle")]).map(\.entry)
+        let entries = try inventory(snapshotRoots(directory)).map(\.entry)
         let digest = try digest(entries)
         let manifest = Manifest(schemaVersion: 1, snapshotId: id, sourceResourceBase: source.base.path,
             sourceExecutable: cli.path, snapshotPath: directory.path, sha256: digest, bytes: total, entries: entries,
@@ -163,8 +177,13 @@ public final class VPhoneCreateResourceSnapshot {
 
     deinit { if !retained { Self.removeCopy(directory) } }
 
+    private static func snapshotRoots(_ directory: URL) -> [(URL, String)] {
+        [(directory.appendingPathComponent("VPhone.bundle"), "VPhone.bundle"),
+         (directory.appendingPathComponent("ROMs"), "ROMs")]
+    }
+
     public func fingerprint() throws -> String {
-        try Self.digest(Self.inventory([(directory.appendingPathComponent("VPhone.bundle"), "VPhone.bundle")]).map(\.entry))
+        try Self.digest(Self.inventory(Self.snapshotRoots(directory)).map(\.entry))
     }
 
     public var evidence: [String: String] {

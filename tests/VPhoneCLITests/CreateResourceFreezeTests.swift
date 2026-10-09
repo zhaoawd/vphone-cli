@@ -10,6 +10,9 @@ struct CreateResourceFreezeTests {
         let resources: VPhoneResources
         let executable: URL
 
+        var rom: URL { root.appendingPathComponent("framework/boot-rom") }
+        var seprom: URL { root.appendingPathComponent("framework/sep-rom") }
+
         init() throws {
             root = FileManager.default.temporaryDirectory.appendingPathComponent("create-freeze-" + UUID().uuidString)
             resources = VPhoneResources(base: root.appendingPathComponent("source"))
@@ -28,6 +31,9 @@ struct CreateResourceFreezeTests {
                 (".build/guest-components-v2/stage/manifest.json", "components-before"),
                 ("tools/apfs_snap_rename.py", "rename-before"),
             ] { try write(path, content) }
+            try FileManager.default.createDirectory(at: rom.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data("rom-A".utf8).write(to: rom)
+            try Data("sep-A".utf8).write(to: seprom)
         }
 
         func write(_ path: String, _ content: String) throws {
@@ -40,9 +46,36 @@ struct CreateResourceFreezeTests {
         func runner() throws -> VPhoneCreateRunner {
             try VPhoneCreateOrchestrator(library: VPhoneLibrary(root: root.appendingPathComponent("library")),
                 resources: resources, selfExecutable: executable).makeRunner(.init(
-                    sudoEnvExtras: [:], rootPopup: false, interactive: false, verbosity: .quiet, keepArtifacts: false))
+                    sudoEnvExtras: [:], rootPopup: false, interactive: false, verbosity: .quiet, keepArtifacts: false), romSource: rom, sepromSource: seprom)
         }
         func cleanup() { try? FileManager.default.removeItem(at: root) }
+    }
+
+    // Catch new/prepare consumers selecting live system ROMs after snapshot capture.
+    @Test func newAndPrepareRefreshUseCapturedROMBytes() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let runner = try f.runner()
+        let selected = try #require(runner.executor as? VPhoneCreateLiveStages).orchestrator
+        let snapshot = try #require(runner.resourceSnapshot)
+        try Data("rom-B".utf8).write(to: f.rom)
+        try Data("sep-B".utf8).write(to: f.seprom)
+        let machine = try selected.createBundle(.init(name: "frozen", variant: "less", cpuCount: 2,
+            memoryMB: 1024, diskSizeGB: 0), snapshot: snapshot)
+        #expect(try String(contentsOf: machine.url.appendingPathComponent("AVPBooter.vresearch1.bin"), encoding: .utf8) == "rom-A")
+        #expect(try String(contentsOf: machine.url.appendingPathComponent("AVPSEPBooter.vresearch1.bin"), encoding: .utf8) == "sep-A")
+        try Data("patched".utf8).write(to: machine.url.appendingPathComponent("AVPBooter.vresearch1.bin"))
+        try selected.refreshBootROM(bundleURL: machine.url)
+        #expect(try String(contentsOf: machine.url.appendingPathComponent("AVPBooter.vresearch1.bin"), encoding: .utf8) == "rom-A")
+    }
+
+    @Test func createBundleWithoutSnapshotRefusesBeforeAllocatingDisk() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let orchestrator = VPhoneCreateOrchestrator(library: VPhoneLibrary(root: f.root.appendingPathComponent("library")),
+            resources: f.resources, selfExecutable: f.executable)
+        #expect(throws: Error.self) {
+            try orchestrator.createBundle(.init(name: "missing", variant: "less", diskSizeGB: 0), snapshot: nil)
+        }
+        #expect(!FileManager.default.fileExists(atPath: f.root.appendingPathComponent("library/missing").path))
     }
 
     // Catch reading the original source path after a create attempt has selected inputs.

@@ -230,11 +230,7 @@ public struct VPhoneCreateOrchestrator {
         let runner = try makeRunner(runtime)
 
         print("\n=== vm new ===")
-        let spec = VPhoneBundleOps.NewBundleSpec(
-            name: options.name, cpuCount: options.cpuCount, memoryMB: options.memoryMB,
-            diskSizeGB: options.diskSizeGB,
-            romSource: VPhoneBundleOps.defaultROMSource(), sepromSource: VPhoneBundleOps.defaultSEPROMSource())
-        let bundle = try VPhoneBundleOps.create(spec, in: library)
+        let bundle = try createBundle(options, snapshot: runner.resourceSnapshot)
         print("created \(bundle.url.path)")
 
         let effective = VPhoneCreateEffectiveOptions(
@@ -343,8 +339,19 @@ public struct VPhoneCreateOrchestrator {
         Self.printOutcome(checkpoint)
     }
 
-    func makeRunner(_ runtime: VPhoneCreateRuntime) throws -> VPhoneCreateRunner {
-        let snapshot = try VPhoneCreateResourceSnapshot.capture(resources: resources, executable: selfExecutable)
+    func createBundle(_ options: Options, snapshot: VPhoneCreateResourceSnapshot?) throws -> VPhoneBundle {
+        guard let snapshot else { throw VPhoneMachineBindingError("Create requires a captured ROM snapshot before allocating a VM") }
+        let spec = VPhoneBundleOps.NewBundleSpec(
+            name: options.name, cpuCount: options.cpuCount, memoryMB: options.memoryMB,
+            diskSizeGB: options.diskSizeGB, romSource: snapshot.romSource, sepromSource: snapshot.sepromSource)
+        return try VPhoneBundleOps.create(spec, in: library)
+    }
+
+    func makeRunner(_ runtime: VPhoneCreateRuntime,
+                    romSource: URL = VPhoneBundleOps.defaultROMSource(),
+                    sepromSource: URL = VPhoneBundleOps.defaultSEPROMSource()) throws -> VPhoneCreateRunner {
+        let snapshot = try VPhoneCreateResourceSnapshot.capture(resources: resources, executable: selfExecutable,
+            romSource: romSource, sepromSource: sepromSource)
         var frozen = VPhoneCreateOrchestrator(library: library, resources: snapshot.resources, selfExecutable: snapshot.executable)
         frozen.resourceSnapshot = snapshot
         let stages = VPhoneCreateLiveStages(orchestrator: frozen, runtime: runtime)
@@ -632,10 +639,11 @@ public struct VPhoneCreateOrchestrator {
     /// rewrites it in place, so without this a restart from prepare would patch
     /// an already patched ROM.
     func refreshBootROM(bundleURL: URL) throws {
+        guard let resourceSnapshot else { throw VPhoneMachineBindingError("Create requires a captured ROM snapshot before prepare") }
         try VPhoneBundleGuard.withBundleLock(directory: bundleURL, operation: VPhoneVMOperation.fwPrepare) { _ in
             let target = bundleURL.appendingPathComponent("AVPBooter.vresearch1.bin")
             let staged = bundleURL.appendingPathComponent(".AVPBooter.vresearch1.bin.\(UUID().uuidString)")
-            try FileManager.default.copyItem(at: VPhoneBundleOps.defaultROMSource(), to: staged)
+            try FileManager.default.copyItem(at: resourceSnapshot.romSource, to: staged)
             guard rename(staged.path, target.path) == 0 else {
                 let code = errno
                 try? FileManager.default.removeItem(at: staged)
