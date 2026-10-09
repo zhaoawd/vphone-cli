@@ -132,6 +132,30 @@ public struct VPhoneLaunchpadCommandLine {
     public let history: VPhoneLaunchpadCommandHistory
     private let logsDirectory: URL?
     private let launcher: URL?
+    private let activity = VPhoneLaunchpadCommandActivity()
+
+    public var hasActiveCommands: Bool { activity.hasActiveCommands }
+
+    /// Synchronously closes the ordinary-command gate and interrupts owned
+    /// children. False if a termination request has already begun. The caller
+    /// must immediately schedule waitForTermination to bound the drain.
+    public func beginTermination() -> Bool { activity.beginTermination() }
+
+    /// Starts the bounded wait after beginTermination. An unbegun or duplicate
+    /// wait returns timedOut without changing another request's state. Timeout
+    /// reopens the gate; a completed drain keeps it closed until app exit.
+    public func waitForTermination(timeout: Duration = .seconds(5)) async -> VPhoneLaunchpadCommandTermination {
+        await activity.waitForTermination(timeout: timeout)
+    }
+
+    /// Stops new ordinary commands, interrupts only their own children, and
+    /// waits for pipe EOF, writer synchronization/close and history completion.
+    /// A timeout keeps the operation alive and reopens the command gate so
+    /// AppKit can cancel termination without losing the reader or writer.
+    public func prepareForTermination(timeout: Duration = .seconds(5)) async -> VPhoneLaunchpadCommandTermination {
+        guard beginTermination() else { return .timedOut }
+        return await waitForTermination(timeout: timeout)
+    }
 
     /// The only public way in: a verified embedded toolchain.
     public init(toolchain: VPhoneLaunchpadToolchain, history: VPhoneLaunchpadCommandHistory) {
@@ -164,6 +188,9 @@ public struct VPhoneLaunchpadCommandLine {
         warningStatuses: Set<Int32> = [],
         onLine: (@Sendable (String) -> Void)? = nil
     ) async throws -> VPhoneLaunchpadCommandResult {
+        let operation = try activity.begin()
+        var drained = false
+        defer { activity.finish(operation, outputDrained: drained) }
         let writer = try recordInHistory ? logsDirectory.map { try VPhoneLaunchpadLogWriter(url: $0.appendingPathComponent("command-\(UUID().uuidString).log")) } : nil
         let entry = recordInHistory ? history.record(Self.display(arguments), warningStatuses: warningStatuses) : nil
         let collector = VPhoneLaunchpadLineCollector()
@@ -179,12 +206,13 @@ public struct VPhoneLaunchpadCommandLine {
             if let entry { history.finish(entry, status: -1, outputDrained: false) }
             throw error
         }
+        activity.attach(child, to: operation)
         let completion = await withTaskCancellationHandler {
             await child.waitForCompletion()
         } onCancel: {
             child.interrupt()
         }
-        var drained = completion.outputDrained
+        drained = completion.outputDrained
         do { try await writer?.finish() }
         catch { drained = false; collector.append("Log persistence failed: \(error.localizedDescription)") }
         if let entry {
@@ -226,6 +254,67 @@ public struct VPhoneLaunchpadCommandLine {
             history.finish(entry, status: completion.status, outputDrained: completion.outputDrained)
         }
         return child
+    }
+}
+
+public enum VPhoneLaunchpadCommandTermination: Equatable, Sendable {
+    case drained
+    /// The reader or persistent writer reported a failure.
+    case incomplete
+    /// The application must cancel termination; output is still being read.
+    case timedOut
+}
+
+/// Shared by every copy of one CommandLine, including the monitoring and
+/// panel callers. Detached launch/create children retain their own lifecycle.
+@MainActor
+private final class VPhoneLaunchpadCommandActivity {
+    private enum Phase { case accepting, draining, waiting, sealed }
+    private struct Operation { var child: VPhoneLaunchpadChildProcess? }
+    private var operations: [UUID: Operation] = [:]
+    private var phase = Phase.accepting
+    private var failedDrain = false
+
+    var hasActiveCommands: Bool { !operations.isEmpty }
+
+    func begin() throws -> UUID {
+        guard phase == .accepting else { throw VPhoneLaunchpadError("Application is waiting for command output before quitting.") }
+        let id = UUID()
+        operations[id] = Operation()
+        return id
+    }
+
+    func attach(_ child: VPhoneLaunchpadChildProcess, to id: UUID) {
+        operations[id]?.child = child
+    }
+
+    func finish(_ id: UUID, outputDrained: Bool) {
+        operations.removeValue(forKey: id)
+        if phase != .accepting && !outputDrained { failedDrain = true }
+    }
+
+    func beginTermination() -> Bool {
+        guard phase == .accepting else { return false }
+        phase = .draining
+        failedDrain = false
+        for operation in operations.values { operation.child?.interrupt() }
+        return true
+    }
+
+    func waitForTermination(timeout: Duration) async -> VPhoneLaunchpadCommandTermination {
+        guard phase == .draining else { return .timedOut }
+        phase = .waiting
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: max(.zero, timeout))
+        while !operations.isEmpty {
+            if clock.now >= deadline || Task.isCancelled {
+                phase = .accepting
+                return .timedOut
+            }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        phase = .sealed
+        return failedDrain ? .incomplete : .drained
     }
 }
 

@@ -12,7 +12,32 @@ public enum VPhoneResourcesError: Error, Equatable {
 public struct VPhoneResources: Sendable {
     public let base: URL
 
+    @TaskLocal private static var createResources: VPhoneResources?
+
+    /// Internal resource consumers in the synchronous firmware pipeline share
+    /// the attempt selection. An explicit executable path retains its meaning.
+    public static func withCreateResources<T>(_ resources: Self, operation: () throws -> T) rethrows -> T {
+        try $createResources.withValue(resources, operation: operation)
+    }
+
     private let environmentOverride: [String: String]?
+    private var createPythonCandidates: [(source: PythonSource, url: URL)]? = nil
+
+    /// Captured for a create resource copy; secrets are never persisted in its manifest.
+    public var processEnvironment: [String: String] { environment }
+
+    public func rebasedForCreate(at base: URL) -> Self {
+        var env = environment
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        var copy = Self(base: base, environment: env)
+        // Retain the source venv interpretation: rebasing must not select a
+        // different managed environment merely because .venv was not copied.
+        copy.createPythonCandidates = pythonCandidates.map { candidate in
+            (candidate.source, candidate.url.deletingLastPathComponent().resolvingSymlinksInPath()
+                .appendingPathComponent(candidate.url.lastPathComponent))
+        }
+        return copy
+    }
     private var environment: [String: String] {
         environmentOverride ?? ProcessInfo.processInfo.environment
     }
@@ -49,6 +74,7 @@ public struct VPhoneResources: Sendable {
     }
 
     public static func resolve(executablePath: String? = nil) -> VPhoneResources {
+        if executablePath == nil, let createResources { return createResources }
         let exe = executablePath.map { URL(fileURLWithPath: $0).resolvingSymlinksInPath() }
             ?? runningExecutable()
         let macos = exe.deletingLastPathComponent()             // …/Contents/MacOS
@@ -165,6 +191,7 @@ public struct VPhoneResources: Sendable {
 
     /// Interpreters `pythonExecutable()` tries, in order, before bootstrapping.
     public var pythonCandidates: [(source: PythonSource, url: URL)] {
+        if let createPythonCandidates { return createPythonCandidates }
         if let override = environment["VPHONE_PYTHON"], !override.isEmpty {
             return [(.environmentOverride, URL(fileURLWithPath: override))]
         }

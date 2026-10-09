@@ -210,6 +210,7 @@ public struct VPhoneCreateRunner {
     public var storeHooks: VPhoneCreateCheckpointStore.Hooks
     /// An unavailable fingerprint refuses execution at the stage boundary.
     public var toolFingerprint: () -> String?
+    public var resourceSnapshot: VPhoneCreateResourceSnapshot?
     public var bundleLockHeld: (URL) -> Bool
     public var now: () -> Date
     public var log: (String) -> Void
@@ -225,6 +226,7 @@ public struct VPhoneCreateRunner {
         prober: any VPhoneCreateStateProber,
         storeHooks: VPhoneCreateCheckpointStore.Hooks = .init(),
         toolFingerprint: @escaping () -> String? = { nil },
+        resourceSnapshot: VPhoneCreateResourceSnapshot? = nil,
         bundleLockHeld: @escaping (URL) -> Bool = { VPhoneVMLockProbe.isLockHeld(directory: $0) },
         now: @escaping () -> Date = Date.init,
         log: @escaping (String) -> Void = { print($0) },
@@ -236,6 +238,7 @@ public struct VPhoneCreateRunner {
         self.prober = prober
         self.storeHooks = storeHooks
         self.toolFingerprint = toolFingerprint
+        self.resourceSnapshot = resourceSnapshot
         self.bundleLockHeld = bundleLockHeld
         self.now = now
         self.log = log
@@ -262,7 +265,10 @@ public struct VPhoneCreateRunner {
             tool: .init(executableSha256: toolFingerprint(), stageContractVersion: VPhoneCreateCheckpoint.stageContractVersion),
             now: now())
         try commit(store, checkpoint, original: nil)
-        return try runStages(store: store, checkpoint: &checkpoint, iphoneSource: iphoneSource, cloudosSource: cloudosSource)
+        try resourceSnapshot?.recordAttempt(checkpoint.attemptId, checkpointDirectory: store.directory)
+        let result = try runStages(store: store, checkpoint: &checkpoint, iphoneSource: iphoneSource, cloudosSource: cloudosSource)
+        resourceSnapshot?.releaseAfterSuccess()
+        return result
     }
 
     // MARK: Resume
@@ -445,9 +451,12 @@ public struct VPhoneCreateRunner {
         log("[create] resuming \(bundleURL.lastPathComponent) from \(firstToRun.rawValue) (attempt \(checkpoint.attemptId))")
 
         // 7. Run.
-        return try runStages(
+        try resourceSnapshot?.recordAttempt(checkpoint.attemptId, checkpointDirectory: store.directory)
+        let result = try runStages(
             store: store, checkpoint: &checkpoint,
             iphoneSource: overrides.iphoneSource, cloudosSource: overrides.cloudosSource)
+        resourceSnapshot?.releaseAfterSuccess()
+        return result
     }
 
     // MARK: Stage loop
@@ -478,6 +487,7 @@ public struct VPhoneCreateRunner {
                 $0.pid = getpid()
                 $0.startedAt = started
                 $0.inputs = inputs
+                $0.evidence = resourceSnapshot?.evidence ?? [:]
             }
             checkpoint.updatedAt = started
             try commit(store, checkpoint, original: nil)
@@ -491,6 +501,9 @@ public struct VPhoneCreateRunner {
             let evidence: [String: String]
             do {
                 evidence = try executor.execute(stage, context: context(bundleURL: bundleURL, checkpoint: checkpoint, overrides: overrides))
+                if let resourceSnapshot, try resourceSnapshot.fingerprint() != checkpoint.tool.executableSha256 {
+                    throw VPhoneMachineBindingError("Create resource snapshot changed while stage \(stage.rawValue) ran")
+                }
             } catch {
                 // The failure is the signal's effect on the stage's children;
                 // the stage stays running (overall interrupted) for resume to reprobe.
@@ -544,7 +557,7 @@ public struct VPhoneCreateRunner {
                 $0.reason = unverifiedReason
                 $0.executorResult = "completed"
                 $0.verifierVersion = verifierVersion
-                $0.evidence = evidence.merging(extra) { _, new in new }
+                $0.evidence = (resourceSnapshot?.evidence ?? [:]).merging(evidence) { _, new in new }.merging(extra) { _, new in new }
                 $0.outputs = records.map(\.name)
                 $0.finishedAt = finished
             }

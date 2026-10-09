@@ -636,7 +636,10 @@ struct CreationRunTests {
         // The stage left running reads as interrupted once the run is gone.
         let progress = try #require(try creation.progress?.get())
         #expect(progress.overallStatus == "interrupted")
-        #expect(VPhoneLaunchpadQuit.decision(library) == .quit)
+        // The final create-status/list refresh must also close its ordinary
+        // command output before the application can quit synchronously.
+        #expect(await eventually(10) { VPhoneLaunchpadQuit.decision(library) == .quit },
+                "Quit decision after final refresh: \(VPhoneLaunchpadQuit.decision(library))")
         #expect(!creation.cancel())
         let log = try String(contentsOf: creation.logFile, encoding: .utf8)
         #expect(!log.contains("outer after middle"))

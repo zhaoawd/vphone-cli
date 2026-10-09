@@ -16,6 +16,9 @@ import VPhoneCore
 /// - `vm stop <name>` waits 0.3 s, records whether the machine's console log
 ///   already shows `got SIGINT`, prints `<name>: stopped` and exits 0, or 1
 ///   when `<root>/<name>.stopfail` exists. It signals nothing.
+/// - Only the parent-exit test enables `<name>.probe-mode`: after the ready
+///   line, output waits for an atomic `<name>.probe` request and acknowledges
+///   its token in the console log. `<name>.exit` still releases the child.
 struct LaunchpadStandIn {
     let temp: LaunchpadTemporaryDirectory
     let root: String
@@ -41,6 +44,20 @@ struct LaunchpadStandIn {
         launch)
           trap 'echo "launch $name got SIGINT"; exit 130' INT
           echo "launch $name started"
+          # The parent-exit fixture waits for explicit output requests.
+          # Other tests retain the periodic serial-output mode below.
+          if [ -e "$root/$name.probe-mode" ]; then
+            echo "serial $name ready"
+            while :; do
+              if [ ! -d "$root" ] || [ -e "$root/$name.exit" ]; then echo "launch $name exiting"; exit 7; fi
+              if [ -e "$root/$name.probe" ]; then
+                IFS= read -r token < "$root/$name.probe"
+                rm -f "$root/$name.probe"
+                printf 'probe %s %s\\n' "$name" "$token"
+              fi
+              sleep 0.01
+            done
+          fi
           i=0
           while :; do
             echo "serial $name $i"
@@ -467,7 +484,8 @@ struct LaunchParentRole {
 struct ParentExitTests {
     /// Runs `LaunchParentRole` in a new test process, which exits after
     /// starting two machines. The children keep running in their own
-    /// sessions, re-parented to launchd, and keep writing their logs; the
+    /// sessions, re-parented to launchd, and acknowledge a new request in
+    /// their logs after that parent exits; the
     /// exited process's pipe was not inherited, or reading it to the end
     /// would wait for the children.
     @Test(.enabled(if: testBundleRerun(filter: "LaunchParentRole") != nil))
@@ -475,6 +493,8 @@ struct ParentExitTests {
         let standIn = try LaunchpadStandIn()
         try standIn.makeMachines(["alpha", "beta"])
         let pidFile = standIn.temp.url.appendingPathComponent("children.pid")
+        standIn.touch("alpha.probe-mode")
+        standIn.touch("beta.probe-mode")
         let configurationFile = standIn.temp.url.appendingPathComponent("parent-role.json")
         try JSONEncoder().encode(LaunchParentRoleConfiguration(
             executable: standIn.script.path, defaultRoot: standIn.root, logs: standIn.logs.path,
@@ -495,6 +515,7 @@ struct ParentExitTests {
         try parent.run()
         let output = await Task.detached { String(decoding: pipe.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self) }.value
         parent.waitUntilExit()
+        let parentExitedAt = Date().timeIntervalSince1970
         #expect(parent.terminationStatus == 0, "\(output)")
         #expect(output.contains("startMachinesThenExit() passed"), "\(output)")
 
@@ -513,11 +534,30 @@ struct ParentExitTests {
             #expect(ppid == "1")
         }
         let before = (standIn.log("alpha").count, standIn.log("beta").count)
-        try await Task.sleep(for: .milliseconds(600))
+        // This token exists only after the launching process has exited.
+        // Its acknowledgement proves a later write without assuming that a
+        // periodically sleeping child runs in a particular 600ms interval.
+        let token = UUID().uuidString
+        let requestedAt = Date().timeIntervalSince1970
+        for name in ["alpha", "beta"] {
+            try (token + "\n").write(to: URL(fileURLWithPath: standIn.root).appendingPathComponent("\(name).probe"),
+                                    atomically: true, encoding: .utf8)
+        }
+        #expect(await eventually(10) {
+            ["alpha", "beta"].allSatisfy { standIn.log($0).contains("probe \($0) \(token)\n") }
+        }, "Post-exit request \(token) was not acknowledged; alpha: \(standIn.log("alpha")); beta: \(standIn.log("beta"))")
+        let acknowledgedAt = Date().timeIntervalSince1970
         #expect(standIn.log("alpha").count > before.0)
         #expect(standIn.log("beta").count > before.1)
         #expect(!standIn.log("alpha").contains("beta"))
         #expect(!standIn.log("beta").contains("alpha"))
+        let evidence: [String: Any] = [
+            "parent_pid": parent.processIdentifier, "child_pids": pids,
+            "parent_exit_observed_at": parentExitedAt, "request_sent_at": requestedAt,
+            "ack_observed_at": acknowledgedAt, "token": token,
+            "alpha_log": standIn.log("alpha"), "beta_log": standIn.log("beta"),
+        ]
+        print("PARENT_EXIT_ACK " + String(decoding: try JSONSerialization.data(withJSONObject: evidence, options: [.sortedKeys]), as: UTF8.self))
 
         standIn.touch("alpha.exit")
         standIn.touch("beta.exit")

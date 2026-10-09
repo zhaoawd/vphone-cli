@@ -6,6 +6,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+from build_native_dependencies import check_native_dependencies
+
 root = Path(__file__).resolve().parents[1]
 bundle = Path(sys.argv[1]).resolve()
 resources = bundle / 'Contents/Resources'
@@ -25,6 +27,7 @@ report = {
     'package_resolved_sha256': hashlib.sha256((root / 'Package.resolved').read_bytes()).hexdigest(),
     'files_sha256': {},
     'host_tool_libraries': {},
+    'host_native_libraries': check_native_dependencies(bundle),
 }
 for path in sorted(resources.rglob('*')):
     if path.is_file() and path.name != 'build-dependencies.json':

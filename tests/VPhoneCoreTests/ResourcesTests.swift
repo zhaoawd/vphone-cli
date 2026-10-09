@@ -103,4 +103,25 @@ struct ResourcesTests {
         let dev = VPhoneResources(base: URL(fileURLWithPath: "/tmp/repo"))
         #expect(dev.vphoned.path == "/tmp/repo/.build/guest/vphoned")
     }
+
+    @Test func createRebaseRetainsTheSelectedVenvGenerationAndUserRoot() throws {
+        let fm = FileManager.default
+        let root = fm.temporaryDirectory.appendingPathComponent("create-rebase-" + UUID().uuidString)
+        defer { try? fm.removeItem(at: root) }
+        let source = root.appendingPathComponent("source")
+        let first = root.appendingPathComponent("generation-one")
+        let second = root.appendingPathComponent("generation-two")
+        for directory in [source, first.appendingPathComponent("bin"), second.appendingPathComponent("bin")] {
+            try fm.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        try fm.createSymbolicLink(at: source.appendingPathComponent(".venv"), withDestinationURL: first)
+        let original = VPhoneResources(base: source, environment: ["VPHONE_ROOT": root.appendingPathComponent("user").path])
+        let rebased = original.rebasedForCreate(at: root.appendingPathComponent("copy"))
+        try fm.removeItem(at: source.appendingPathComponent(".venv"))
+        try fm.createSymbolicLink(at: source.appendingPathComponent(".venv"), withDestinationURL: second)
+        #expect(rebased.pythonCandidates.first?.url == first.resolvingSymlinksInPath().appendingPathComponent("bin/python3"))
+        #expect(rebased.userCacheDir.path == root.appendingPathComponent("user").path)
+        #expect(rebased.processEnvironment["PYTHONDONTWRITEBYTECODE"] == "1")
+    }
+
 }

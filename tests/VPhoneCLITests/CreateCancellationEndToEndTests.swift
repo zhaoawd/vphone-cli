@@ -83,11 +83,28 @@ struct CreateCancellationEndToEndTests {
             // Never leave a stand-in behind, whatever the result.
             for process in tracked where process.alive { kill(process.identity.pid, SIGKILL) }
             for process in tracked where process.group > 1 && process.group != getpgrp() { killpg(process.group, SIGKILL) }
+            // This test owns the interrupted attempt and its source fixture.
+            // Keep production failure retention intact while removing this copy.
+            let machine = library.appendingPathComponent("e2e")
+            if let checkpoint = try? VPhoneCreateCheckpointStore.load(bundleURL: machine).checkpoint,
+               let path = checkpoint.record(.prepare).evidence["resource_snapshot_path"],
+               let data = try? Data(contentsOf: URL(fileURLWithPath: path).appendingPathComponent("manifest.json")),
+               let manifest = try? VPhoneCreateJSON.decoder.decode(VPhoneCreateResourceSnapshot.Manifest.self, from: data),
+               manifest.sourceResourceBase == root.path, manifest.snapshotPath == path {
+                try? fm.removeItem(at: URL(fileURLWithPath: path))
+            }
             try? fm.removeItem(at: temp)
         }
         try fm.copyItem(at: Self.repo.appendingPathComponent("scripts/vm_lock.py"), to: scripts.appendingPathComponent("vm_lock.py"))
         try Data("import sys\nsys.exit(0)\n".utf8).write(to: scripts.appendingPathComponent("check_python_runtime.py"))
         try Data(Self.prepareStandIn.utf8).write(to: scripts.appendingPathComponent("fw_prepare.sh"))
+        // The stand-in only executes prepare; later-stage inputs still need a
+        // complete selected source tree before the attempt can be frozen.
+        for path in ["scripts/patchers/cfw.py", "scripts/vphoned/signcert.p12", "requirements.txt", ".build/guest/vphoned"] {
+            let file = root.appendingPathComponent(path)
+            try fm.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data("cancellation fixture".utf8).write(to: file)
+        }
 
         let log = temp.appendingPathComponent("create.log")
         fm.createFile(atPath: log.path, contents: nil)

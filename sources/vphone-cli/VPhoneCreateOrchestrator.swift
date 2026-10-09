@@ -177,6 +177,7 @@ public struct VPhoneCreateOrchestrator {
     let library: VPhoneLibrary
     let resources: VPhoneResources
     let selfExecutable: URL
+    var resourceSnapshot: VPhoneCreateResourceSnapshot?
 
     public init(library: VPhoneLibrary, resources: VPhoneResources, selfExecutable: URL) {
         self.library = library
@@ -222,6 +223,12 @@ public struct VPhoneCreateOrchestrator {
             verbosity: options.verbosity, orchestrator: self)
         defer { sudo.cleanup() }
 
+        let runtime = VPhoneCreateRuntime(
+            sudoEnvExtras: sudo.envExtras, rootPopup: options.rootPopup, interactive: options.interactive,
+            verbosity: options.verbosity, keepArtifacts: options.keepArtifacts)
+        // Validate capacity and freeze resources before allocating a new VM disk.
+        let runner = try makeRunner(runtime)
+
         print("\n=== vm new ===")
         let spec = VPhoneBundleOps.NewBundleSpec(
             name: options.name, cpuCount: options.cpuCount, memoryMB: options.memoryMB,
@@ -235,12 +242,9 @@ public struct VPhoneCreateOrchestrator {
             spoofBuild: options.spoofBuild, forceDscMaxSlide: options.forceDSCMaxSlide,
             enableFrida: options.enableFrida, cpuCount: options.cpuCount, memoryMb: options.memoryMB,
             diskSizeGb: options.diskSizeGB, restoreBackend: options.restoreBackend, prepareBackend: options.prepareBackend)
-        let runtime = VPhoneCreateRuntime(
-            sudoEnvExtras: sudo.envExtras, rootPopup: options.rootPopup, interactive: options.interactive,
-            verbosity: options.verbosity, keepArtifacts: options.keepArtifacts)
         let checkpoint: VPhoneCreateCheckpoint
         do {
-            checkpoint = try makeRunner(runtime).create(
+            checkpoint = try runner.create(
                 bundleURL: bundle.url, options: effective,
                 iphoneSource: options.iphoneSource, cloudosSource: options.cloudosSource)
         } catch {
@@ -339,12 +343,14 @@ public struct VPhoneCreateOrchestrator {
         Self.printOutcome(checkpoint)
     }
 
-    func makeRunner(_ runtime: VPhoneCreateRuntime) -> VPhoneCreateRunner {
-        let stages = VPhoneCreateLiveStages(orchestrator: self, runtime: runtime)
-        let executable = selfExecutable
+    func makeRunner(_ runtime: VPhoneCreateRuntime) throws -> VPhoneCreateRunner {
+        let snapshot = try VPhoneCreateResourceSnapshot.capture(resources: resources, executable: selfExecutable)
+        var frozen = VPhoneCreateOrchestrator(library: library, resources: snapshot.resources, selfExecutable: snapshot.executable)
+        frozen.resourceSnapshot = snapshot
+        let stages = VPhoneCreateLiveStages(orchestrator: frozen, runtime: runtime)
         return VPhoneCreateRunner(
-            executor: stages, verifier: stages, prober: VPhoneCreateLiveProber.live(resources: resources),
-            toolFingerprint: { try? VPhoneCreateDigest.toolchain(cli: executable) },
+            executor: stages, verifier: stages, prober: VPhoneCreateLiveProber.live(resources: snapshot.resources),
+            toolFingerprint: { try? snapshot.fingerprint() }, resourceSnapshot: snapshot,
             keepArtifacts: runtime.keepArtifacts, cancellation: VPhoneChildCancellation.current)
     }
 
@@ -484,7 +490,7 @@ public struct VPhoneCreateOrchestrator {
             return ("the CLI/VM toolchain differs from the one recorded in the checkpoint "
                 + "(\(recorded.map { String($0.prefix(12)) } ?? "unknown") -> \(current.map { String($0.prefix(12)) } ?? "unknown"))", [
                 "to continue with this build: \(command) --accept-tool-change",
-                "or resume with the build whose SHA-256 is recorded in the checkpoint",
+                "or resume with the CLI/VM and resources whose aggregate SHA-256 is recorded in the checkpoint",
             ])
         case let .contractChanged(recorded, current):
             return ("the stage contract version changed (\(recorded) -> \(current))", [
@@ -655,7 +661,7 @@ public struct VPhoneCreateOrchestrator {
         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
 
-        var env = ProcessInfo.processInfo.environment
+        var env = resources.processEnvironment
         if let iphoneSource { env["IPHONE_SOURCE"] = iphoneSource }
         if let cloudosSource { env["CLOUDOS_SOURCE"] = cloudosSource }
         env["VPHONE_PYTHON"] = try resources.pythonExecutable().path
@@ -823,7 +829,7 @@ public struct VPhoneCreateOrchestrator {
                 [resources.pmd3Bridge.path, "restore-get-shsh", "--vm-dir", ".", "--udid", udid, "--ecid", "0x\(ecid)"]
                 + verbosityArgs
             trace("spawn \(python.path) \(shshArgs.joined(separator: " "))", v)
-            let shshCode = try VPhoneProcessRunner.runStreaming(python, shshArgs, cwd: bundleURL, echo: v.showsToolDetail)
+            let shshCode = try VPhoneProcessRunner.runStreaming(python, shshArgs, cwd: bundleURL, env: resources.processEnvironment, echo: v.showsToolDetail)
             guard shshCode == 0 else { throw VPhoneCreateError.restoreGetSHSHFailed(shshCode) }
 
             print("[*] Restoring...")
@@ -832,7 +838,7 @@ public struct VPhoneCreateOrchestrator {
                 + verbosityArgs
             trace("spawn \(python.path) \(restoreArgs.joined(separator: " "))", v)
             let restoreCode = try VPhoneProcessRunner.runStreaming(
-                python, restoreArgs, cwd: bundleURL, echo: v.showsToolDetail)
+                python, restoreArgs, cwd: bundleURL, env: resources.processEnvironment, echo: v.showsToolDetail)
             guard restoreCode == 0 else { throw VPhoneCreateError.restoreUpdateFailed(restoreCode) }
         }
 
@@ -925,7 +931,7 @@ public struct VPhoneCreateOrchestrator {
         for _ in 1...90 {
             try VPhoneChildCancellation.current?.throwIfRequested()
             let result = try? VPhoneProcessRunner.runCapturing(
-                python, [resources.pmd3Bridge.path, "recovery-probe", "--ecid", "0x\(ecid)", "--timeout", "2"])
+                python, [resources.pmd3Bridge.path, "recovery-probe", "--ecid", "0x\(ecid)", "--timeout", "2"], env: resources.processEnvironment)
             if result?.succeeded == true {
                 print("[+] Device endpoint is reachable")
                 return
@@ -977,6 +983,8 @@ public struct VPhoneCreateOrchestrator {
             "IPSW_DIR": resources.ipswCacheDir.path,
             "VPHONE_SEAL_DIR": resources.sealVolumeCacheDir.path,
             "VPHONE_DEBS_DIR": resources.debsCacheDir.path,
+            "VPHONE_GUEST_COMPONENTS": resources.guestComponentsStage.path,
+            "PYTHONDONTWRITEBYTECODE": "1",
         ]
         if let spoofBuild = options.spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
         if options.forceDscMaxSlide { scriptEnv["FORCE_DSC_MAXSLIDE"] = "1" }
@@ -985,7 +993,8 @@ public struct VPhoneCreateOrchestrator {
 
         let args = [resources.cfwInstallHostScript.path, "--variant", options.variant, bundleURL.path]
         let invocation = Self.cfwInvocation(
-            scriptEnv: scriptEnv, sudoEnvExtras: sudoEnvExtras, rootPopup: runtime.rootPopup)
+            scriptEnv: scriptEnv, sudoEnvExtras: sudoEnvExtras, rootPopup: runtime.rootPopup,
+            processEnvironment: resources.processEnvironment)
         // The driver runs as root: this process cannot signal it, and stopping
         // its user-owned parent (osascript, sudo) would leave it running and
         // holding the bundle lock. A cancellation waits for it to finish.
@@ -1147,7 +1156,7 @@ public struct VPhoneCreateOrchestrator {
         trace("spawn \(selfExecutable.path) \(args.joined(separator: " ")) (echo=\(v.showsToolDetail))", v)
         defer { Self.removeStaleControlSocket(bundleURL) }
         let code = try VPhoneProcessRunner.runStreaming(
-            selfExecutable, args, cwd: bundleURL, echo: v.showsToolDetail)
+            selfExecutable, args, cwd: bundleURL, env: resources.processEnvironment, echo: v.showsToolDetail)
         guard code == 0 else { throw VPhoneCreateError.lessBootFailed(code) }
     }
 }

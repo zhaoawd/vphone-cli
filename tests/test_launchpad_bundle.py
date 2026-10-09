@@ -225,7 +225,11 @@ class LaunchpadB1BoundaryTests(unittest.TestCase):
 
     def test_signals_reach_only_the_own_child(self):
         code = re.sub(r'//.*', '', self.CHILD_PROCESS.read_text())
-        self.assertEqual(sorted(re.findall(r'\bkill\(([^)]*)\)', code)),
+        calls = re.findall(r'\bkill\(([^)]*)\)', code)
+        probes = [call for call in calls if re.search(r',\s*0\s*$', call)]
+        # Signal 0 inspects group existence; it does not send a signal.
+        self.assertEqual(probes, ['-detachedPID, 0'])
+        self.assertEqual(sorted(call for call in calls if call not in probes),
                          ['detachedPID, SIGINT', 'process.processIdentifier, SIGINT'])
         # B4: the create's process group, only while its leader is unreaped.
         self.assertEqual(re.findall(r'\bkillpg\(([^)]*)\)', code), ['detachedPID, SIGINT'])

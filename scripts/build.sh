@@ -103,6 +103,8 @@ cp -f scripts/vphone-amfidont "${RES}/vphone-amfidont"
 chmod +x "${RES}/vphone-amfidont"
 echo "  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont"
 
+# Rewrite and sign the complete host Mach-O closure before recording or sealing.
+python3 "$SCRIPT_DIR/build_native_dependencies.py" "$BUNDLE"
 python3 "$SCRIPT_DIR/record_build_dependencies.py" "$BUNDLE"
 
 # Seal the final resource tree only after every runtime asset is staged.

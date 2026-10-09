@@ -174,6 +174,9 @@ def main(argv=None):
         reference = {name: cdhash(args.reference.resolve() / 'Contents/MacOS' / name) for name in NESTED}
     check_manifest(json.loads((app / MANIFEST).read_text()), actual, reference)
     check_nested_entitlements(app)
+    for target in (app, app / HELPER):
+        subprocess.run([sys.executable, str(ROOT / 'scripts/build_native_dependencies.py'),
+                        str(target), '--check'], check=True)
     subprocess.run(['codesign', '--verify', '--strict', '--deep', '--verbose=2', str(app)], check=True)
     identifier = signing_identifier(app)
     if identifier != BUNDLE_ID:

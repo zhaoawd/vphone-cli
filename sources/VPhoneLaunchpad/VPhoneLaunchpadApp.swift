@@ -66,6 +66,7 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
     /// The window scene's open action, kept for the smoke check's reopen.
     var openWindow: OpenWindowAction?
     private let dockPolicy = VPhoneLaunchpadDockPolicy()
+    private var terminationPending = false
 
     func applicationWillFinishLaunching(_: Notification) {
         // The design system is dark only.
@@ -81,22 +82,46 @@ final class VPhoneLaunchpadAppDelegate: NSObject, NSApplicationDelegate {
         VPhoneLaunchpadMenuBar.terminatesAfterLastWindowClosed()
     }
 
-    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
-        guard let library = model?.machines,
-              case let .confirm(machines) = VPhoneLaunchpadQuit.decision(library)
-        else {
+    func applicationShouldTerminate(_ application: NSApplication) -> NSApplication.TerminateReply {
+        if terminationPending { return .terminateLater }
+        if let library = model?.machines,
+           case let .confirm(machines) = VPhoneLaunchpadQuit.decision(library) {
+            let alert = NSAlert()
+            alert.messageText = String(localized: "Stop Creating Machines?")
+            alert.informativeText = String(localized: "vm create is running for \(machines.joined(separator: ", ")). Quitting sends SIGINT to its process group; the checkpoint then reads interrupted, and Resume continues from it later.")
+            alert.addButton(withTitle: String(localized: "Quit"))
+            alert.addButton(withTitle: String(localized: "Cancel"))
+            guard alert.runModal() == .alertFirstButtonReturn else {
+                return .terminateCancel
+            }
+            VPhoneLaunchpadQuit.confirmed(library)
+        }
+        guard let commandLine = model?.commandLine, commandLine.hasActiveCommands else {
             return .terminateNow
         }
-        let alert = NSAlert()
-        alert.messageText = String(localized: "Stop Creating Machines?")
-        alert.informativeText = String(localized: "vm create is running for \(machines.joined(separator: ", ")). Quitting sends SIGINT to its process group; the checkpoint then reads interrupted, and Resume continues from it later.")
-        alert.addButton(withTitle: String(localized: "Quit"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
-        guard alert.runModal() == .alertFirstButtonReturn else {
-            return .terminateCancel
+        guard commandLine.beginTermination() else { return .terminateCancel }
+        terminationPending = true
+        Task { @MainActor in
+            let result = await commandLine.waitForTermination()
+            terminationPending = false
+            switch result {
+            case .drained:
+                Self.diagnostic("quit: ordinary command output drained and logs closed")
+                application.reply(toApplicationShouldTerminate: true)
+            case .incomplete:
+                Self.diagnostic("quit: ordinary command output incomplete; see command history")
+                application.reply(toApplicationShouldTerminate: true)
+            case .timedOut:
+                Self.diagnostic("quit cancelled: command output did not drain within 5 seconds")
+                application.reply(toApplicationShouldTerminate: false)
+                let alert = NSAlert()
+                alert.messageText = String(localized: "Command Output Is Still Active")
+                alert.informativeText = String(localized: "Quitting was cancelled because command output has not finished. The reader and log remain active. Wait for the command to finish, then quit again.")
+                alert.addButton(withTitle: String(localized: "OK"))
+                alert.runModal()
+            }
         }
-        VPhoneLaunchpadQuit.confirmed(library)
-        return .terminateNow
+        return .terminateLater
     }
 
     // MARK: - Smoke check

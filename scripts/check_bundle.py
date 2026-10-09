@@ -31,7 +31,7 @@ REQUIRED = (
     'guest-resources/vphoned', 'guest-resources/vphoned-less',
     'guest-resources/vphoned.plist', 'guest-resources/vphoned.entitlements.plist',
     'guest-resources/manifest.json', 'vphone-amfidont',
-    'scripts/check_guest_payloads.py',
+    'scripts/check_guest_payloads.py', 'scripts/build_native_dependencies.py',
 )
 
 
@@ -61,6 +61,8 @@ def main():
     bundle = args.bundle.resolve()
     resources = check_resources(bundle)
     subprocess.run(['codesign', '--verify', '--strict', '--verbose=2', str(bundle)], check=True)
+    subprocess.run([os.sys.executable, str(Path(__file__).resolve().parent / 'build_native_dependencies.py'),
+                    str(bundle), '--check'], check=True)
     subprocess.run([os.sys.executable, str(resources / 'scripts/check_guest_payloads.py'),
                     str(resources / 'guest-resources'), '--ldid',
                     str(bundle / 'Contents/MacOS/ldid')], check=True)

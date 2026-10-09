@@ -425,13 +425,15 @@ public extension VPhoneLaunchpadMachineLibrary {
 public enum VPhoneLaunchpadQuit {
     public enum Decision: Equatable, Sendable {
         case quit
+        case drainCommands
         case confirm(machines: [String])
     }
 
     @MainActor
     public static func decision(_ library: VPhoneLaunchpadMachineLibrary) -> Decision {
         let running = library.creations.values.filter(\.isRunning).map(\.machine.name).sorted()
-        return running.isEmpty ? .quit : .confirm(machines: running)
+        if !running.isEmpty { return .confirm(machines: running) }
+        return library.currentCommandLine?.hasActiveCommands == true ? .drainCommands : .quit
     }
 
     /// The user confirmed: SIGINT to every create run's process group.
