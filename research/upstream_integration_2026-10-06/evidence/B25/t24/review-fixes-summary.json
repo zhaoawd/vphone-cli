@@ -1,0 +1,27 @@
+{
+  "base_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+  "files_sha256": {
+    "scripts/build_native_dependencies.py": "273bdbc86bc421f2957e4c6def622b47a1c0933d714db982bf09a29521181ee2",
+    "scripts/build_launchpad.sh": "e989f51767f43eac1d70dcd9d11ee12bfb8f3c743cca78eea2e3c07e718feb98",
+    "tests/test_bundle_native_dependencies.py": "964df59013a9df3c516012cc29547552f01c76bc8543784966fb0efb98f09827"
+  },
+  "review_fixes": [
+    "Bare @loader_path and @executable_path expand in both source dependency resolution and inherited rpath normalization.",
+    "All staging write destinations resolving under outer Contents/Helpers are rejected, including a referenced nested library and a host root symlink targeting a nested executable.",
+    "Original load commands are cached before rewriting. Revisited shared sources are resolved under every root/inherited-rpath context, and a changed dependency resolution map is rejected before success. No per-version library cloning added."
+  ],
+  "red_evidence": {
+    "tokens_and_nested": "review-token-nested-red-independent.log: 15 tests, 4 failures; both bare-token cases unresolved and both nested cases changed bytes.",
+    "root_context": "review-root-context-red.log: fixture executions before staging were 42 and 104, but staging returned 0; test correctly failed on silent shared-library reuse."
+  },
+  "green_evidence": {
+    "bundle": "review-all-bundle-green.log: 21 tests passed / 25.273s (16 real native tests + 5 resource tests).",
+    "launchpad": "review-launchpad-green.log: 23 tests passed / 0.162s.",
+    "diff": "git diff --check passed."
+  },
+  "limits": [
+    "No SwiftPM, app mutation, system permissions, helper/TCC/AMFI/VM action or Git commit.",
+    "Full standard suite/final app rebuild remain owned by parent.",
+    "Final-proof.py remains prepared and unexecuted pending successful rebuilt artifacts."
+  ]
+}

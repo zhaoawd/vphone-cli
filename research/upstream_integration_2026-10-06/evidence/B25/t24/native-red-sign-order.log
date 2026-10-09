@@ -1,0 +1,43 @@
+test_check_rejects_external_rpath_with_internal_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_external_rpath_with_internal_dependencies) ... ok
+test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape) ... ok
+test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies) ... ok
+test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes) ... ok
+test_main_executable_is_signed_after_nested_host_tools (test_bundle_native_dependencies.NativeDependencyBundleTests.test_main_executable_is_signed_after_nested_host_tools) ... FAIL
+test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success) ... ok
+test_recursive_rpath_uses_executable_ancestors_loader_directory (test_bundle_native_dependencies.NativeDependencyBundleTests.test_recursive_rpath_uses_executable_ancestors_loader_directory) ... ok
+test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals) ... ok
+
+======================================================================
+FAIL: test_main_executable_is_signed_after_nested_host_tools (test_bundle_native_dependencies.NativeDependencyBundleTests.test_main_executable_is_signed_after_nested_host_tools)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 117, in test_main_executable_is_signed_after_nested_host_tools
+    self.assertEqual(result.returncode, 0, result.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-928bclaq/test.app/Contents/Frameworks/libleaf.dylib: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-928bclaq/test.app/Contents/Frameworks/libparent.dylib: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-928bclaq/test.app/Contents/MacOS/ldid: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-928bclaq/test.app/Contents/Resources/.tools/bin/insert_dylib: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-928bclaq/test.app/Contents/MacOS/ldid: a sealed resource is missing or invalid
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 200, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 195, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 187, in stage_native_dependencies
+    return check_native_dependencies(bundle)
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 121, in check_native_dependencies
+    subprocess.run(['codesign', '--verify', '--strict', str(path)], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['codesign', '--verify', '--strict', '/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-928bclaq/test.app/Contents/MacOS/ldid']' returned non-zero exit status 1.
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 8.620s
+
+FAILED (failures=1)

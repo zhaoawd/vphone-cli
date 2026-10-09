@@ -1,0 +1,24 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-09 18:04:42.335.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 18:04:42.337.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 18:04:42.337.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 18:04:42.337.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Test actualBuildResourceCopyRunsReadOnlyProbes() started.
+✔ Test actualBuildResourceCopyRunsReadOnlyProbes() passed after 2.987 seconds.
+✔ Suite CreateResourceSnapshotTests passed after 2.988 seconds.
+✔ Test run with 1 test in 1 suite passed after 2.988 seconds.

@@ -1,0 +1,73 @@
+{
+  "task": "T08",
+  "fixed_revision": "702990b59ca412ad975f9f0ea5dafe95c30fac21",
+  "source": "/private/tmp/vphone-b24-icli-source/Sources/IcliSystemPrivate/Launchd.m",
+  "sha256": "ae9056472c9a0a164d6ef232d3cf9359ad0aafa4236b59b7ec135e053a21a27c",
+  "source_hits": [
+    {
+      "line": 23,
+      "text": "    RoutineStart = 813,"
+    },
+    {
+      "line": 89,
+      "text": "enum { DomainSystem = 1, DomainUser = 2, DomainCaller = 7 };"
+    },
+    {
+      "line": 148,
+      "text": "    int status = launchdRoutine(enable ? RoutineEnable : RoutineDisable, DomainSystem, 0, message, &reply);"
+    },
+    {
+      "line": 156,
+      "text": "    uint64_t domains[2][2] = {{DomainSystem, 0}, {DomainUser, xpc_user_sessions_get_foreground_uid(0)}};"
+    },
+    {
+      "line": 175,
+      "text": "/// absent (status 113)."
+    },
+    {
+      "line": 195,
+      "text": "    int status = launchdRoutine(RoutinePrint, DomainSystem, 0, message, &reply);"
+    },
+    {
+      "line": 215,
+      "text": "static int launchdServiceRoutine(uint64_t routine, xpc_object_t message, NSString **domainName) {"
+    },
+    {
+      "line": 216,
+      "text": "    uint64_t domains[2][2] = {{DomainUser, xpc_user_sessions_get_foreground_uid(0)}, {DomainSystem, 0}};"
+    },
+    {
+      "line": 218,
+      "text": "    int status = 113;"
+    },
+    {
+      "line": 219,
+      "text": "    for (int i = 0; i < 2 && status == 113; i++) {"
+    },
+    {
+      "line": 234,
+      "text": "    int status = launchdServiceRoutine(routine, message, &domain);"
+    },
+    {
+      "line": 262,
+      "text": "    uint64_t domains[2][2] = {{DomainUser, xpc_user_sessions_get_foreground_uid(0)}, {DomainSystem, 0}};"
+    },
+    {
+      "line": 264,
+      "text": "    int status = 113;"
+    },
+    {
+      "line": 267,
+      "text": "    for (int i = 0; i < 2 && status == 113; i++) {"
+    },
+    {
+      "line": 322,
+      "text": "    return launchdRoutine(RoutineStop, DomainSystem, 0, message, NULL);"
+    }
+  ],
+  "observation": "Historical rootless services.start returned144; actual RootHide test path has not been provided.",
+  "conclusion": "原因未查明。固定依赖的状态144文字描述涉及service-configure privilege；该描述不确定实际拒绝的责任主体或所需权限。",
+  "hypothesis": "待验证假设：前台用户domain调用先被拒绝，状态144未进入仅状态113的system fallback。需要实际RootHide受控验收确认，未改变权限或添加shell fallback。",
+  "VM_started_this_batch": false,
+  "rotation": "保留已有Safari90/270通过、Settings400及180未生效记录；本轮没有新增旋转验收。"
+}

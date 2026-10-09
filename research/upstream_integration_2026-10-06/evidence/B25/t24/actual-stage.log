@@ -1,0 +1,32 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-cli
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-cli
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-vm
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-vm
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-cli: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-vm: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/insert_dylib: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache: replacing existing signature
+/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-cli: nested code is modified or invalid
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 200, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 195, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 187, in stage_native_dependencies
+    return check_native_dependencies(bundle)
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 121, in check_native_dependencies
+    subprocess.run(['codesign', '--verify', '--strict', str(path)], check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['codesign', '--verify', '--strict', '/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-cli']' returned non-zero exit status 1.

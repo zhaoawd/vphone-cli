@@ -1,0 +1,85 @@
+{
+  "standard_failure": {
+    "log": "/private/tmp/vphone-b25/swift-second-full.log",
+    "tests": 1285,
+    "suites": 205,
+    "issues": 5,
+    "stop_refusal": "Fixture launch sleep30 exits normally with status0 while test still expects running",
+    "parent_exit": "After a fixed 600ms sampling delay alpha/beta log lengths remain51/48; alive/session/PPID and final exit tail checks pass",
+    "actual_parent_exit_no_growth_cause": "原因未查明"
+  },
+  "historical_B24": "README B24 retains prior parent-exit timing failure as unexplained despite later passing targeted and standard runs; this followup does not retrospectively explain it.",
+  "hypotheses": [
+    "Stop fixture lifetime unrelated to refusal semantics can expire during a delayed test continuation",
+    "Fixed ParentExit sampling interval assumes progress without a request or acknowledgement",
+    "A real signal/output lifecycle defect remains a separate hypothesis, not established by the original log or stack samples"
+  ],
+  "controlled_red": {
+    "log": "controlled-red.log",
+    "tests": 2,
+    "suites": 2,
+    "issues": 5,
+    "seconds": 2.778,
+    "settings": [
+      "Stop fixture TTL deliberately shortened from30s to50ms",
+      "ParentExit-only probe-mode waits for explicit output request, so original fixed sample sees no growth"
+    ],
+    "scope": "Controlled experiments reproduce the assertion pattern; they do not establish the cause of the second standard ParentExit no-growth event."
+  },
+  "changes": [
+    "Stop launch now installs INT marker, publishes ready and remains until explicit release; after refused stop it acknowledges a probe, stays running with nil launch status, and finally exits0 with complete output when released",
+    "Stop retains the started owned ChildProcess immediately and defers identity-guarded interrupt for failure cleanup; a vanished release file cannot leave it waiting indefinitely",
+    "Stop release completion uses existing eventually10 bound before awaiting completion",
+    "ParentExit alone enables request-driven stand-in output; UUID created after observed parent exit is atomically sent to each child and acknowledged in each original raw log",
+    "ParentExit waits using existing eventually10 rather than a fixed600ms sample, retains log-growth/isolation/live/session/PPID/final-tail checks, and emits parent exit/request/ack timestamps and raw logs",
+    "Probe-mode exits if fixture root disappears; default periodic-output mode is unchanged"
+  ],
+  "bounds": {
+    "existing_eventually_seconds": 10,
+    "ParentExit_suite_minutes": 1,
+    "no_deadline_increase": true,
+    "no_FIFO_or_unbounded_open": true
+  },
+  "isolated_green": {
+    "log": "isolated-green.log",
+    "tests": 2,
+    "suites": 2,
+    "seconds": 3.095
+  },
+  "final_related_green": {
+    "log": "final-related-green.log",
+    "tests": 103,
+    "suites": 24,
+    "seconds": 21.456
+  },
+  "final_post_exit_ack": {
+    "ack_observed_at": 1791538786.4134312,
+    "alpha_log": "launch alpha started\nserial alpha ready\nprobe alpha BE63F4C1-D532-43EA-B1D0-850E84218873\n",
+    "beta_log": "launch beta started\nserial beta ready\nprobe beta BE63F4C1-D532-43EA-B1D0-850E84218873\n",
+    "child_pids": [
+      5774,
+      5775
+    ],
+    "parent_exit_observed_at": 1791538785.9182801,
+    "parent_pid": 5617,
+    "request_sent_at": 1791538786.304276,
+    "token": "BE63F4C1-D532-43EA-B1D0-850E84218873"
+  },
+  "files": {
+    "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift": "17bf5ddefd9ac490fa81e54945a15ee6017a77bac43bfc10158b01b785dc8de9",
+    "tests/VPhoneLaunchpadKitTests/LaunchTests.swift": "266ed3bc23f77830bed4a8cbb45144bc749963ad0970c82ba94e900c41c9ad05"
+  },
+  "review": {
+    "agent": "/root/b25_review",
+    "initial_finding": "Important: release-only defer can race temporary-directory deletion",
+    "resolution": "Immediate owned child capture plus identity-guarded defer interrupt; probe-mode directory-loss exit",
+    "final": "No remaining Critical/Important; reviewed final file hashes; no independent SwiftPM execution"
+  },
+  "scope": "Only the two authorized test files changed in this followup; no production changes",
+  "remaining": [
+    "Parent standard full suite rerun",
+    "Actual second standard ParentExit no-growth cause remains unexplained"
+  ],
+  "swiftpm_slot_returned": true,
+  "no_git_commit": true
+}

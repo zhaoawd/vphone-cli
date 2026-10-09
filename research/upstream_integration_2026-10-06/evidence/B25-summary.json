@@ -1,0 +1,215 @@
+{
+  "batch": "B25",
+  "date": "2026-10-09",
+  "base_head": "2b6c28f7",
+  "implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+  "source_commits": [
+    "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+    "53580180f09819ec539ba656c15fab7a23fdc1c3"
+  ],
+  "selected_tasks": [
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "selected_accepted": 6,
+  "selected_remaining": [
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "newly_accepted": [],
+  "all_tasks": {
+    "accepted": 8,
+    "required_remaining": 38,
+    "optional": 1
+  },
+  "results": {
+    "T08": {
+      "status": "fixed_overlay_memory_rotation_verified_actual_RootHide_service_pending",
+      "result": "B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。",
+      "remaining": [
+        "实际RootHide客户机服务验收；用户测试路径待回复",
+        "services.start状态144及未生效rotation范围，原因未查明"
+      ]
+    },
+    "T24": {
+      "status": "host_native_dependency_closure_verified_TCC_and_historical_helper_runtime_pending",
+      "result": "B25递归封装宿主Mach-O依赖至Contents/Frameworks，重写相对引用并按嵌套代码后主可执行文件顺序签名。真实副本7个宿主映像逐个及整体签名通过；沙箱确认原Homebrew库读取被拒绝，同策略ldid提取和trustcache创建/读取退出0。历史v1未配置helper实物已定位，SHA256及内嵌版本保全，只读配置检查退出78；没有安装或启动该历史服务。TCC静态链已记录，实际责任归属未验收。",
+      "remaining": [
+        "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线",
+        "历史v1 helper未配置签名团队；仍缺历史服务与最终客户端的实际XPC拒绝矩阵",
+        "Python framework、包、PATH工具和现场编译不属于本轮宿主Mach-O封装范围；部分旧证书候选当前签名信任检查失败，记录保留，未新安装"
+      ]
+    },
+    "T40": {
+      "status": "attempt_resource_snapshot_verified_external_toolchain_and_origin_matrix_pending",
+      "result": "B25每attempt使用CLI/VM及所选资源的私有副本和聚合摘要；executor/verifier/prober及内部TaskLocal解析共用副本。resume变更未经确认拒绝，确认后整体换用新副本，保留此前阶段来源。副本最多8份、合计2GiB、64MiB余量；成功或未接受attempt释放，失败已接受attempt保留。审查发现并修复debs.list遗漏、Disk.img链接别名绕过、复制增长超预算3项。开发副本只读CLI/VM探针通过；最终签名App资源副本235个entry、161310727字节，CLI resources与静态签名检查退出0；原VM及副本VM --help均退出9，原因未查明，外部Python探针不可用。",
+      "remaining": [
+        "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、Virtualization ROM、既有cfw_input及可变缓存未形成不可变闭包",
+        "新机可信store binding/receipt发布及带可信既有binding/receipt的实际VM传输验收",
+        "kernel-only及环境升级/回退、混合版本四层来源矩阵；依赖T12/T17/T32/T34生产能力",
+        "完整64GiB VM归档往返空间仍不足；同卷APFS副本不证明物理独立备份"
+      ]
+    },
+    "T46": {
+      "status": "ordinary_command_drain_implemented_final_UI_blocked_by_host_lock_full_runtime_pending",
+      "result": "B25普通命令同步关闭入口并有界等待child、pipe EOF、日志finish和history；定向及标准Swift通过。早期普通/escaped隔离UI两组日志精确匹配，但属于同步门控修改前快照。最终release隔离副本已启动doctor并观察writer存活，随后CUA报告Mac锁定；尚未执行退出操作。writer自释放后日志10002行/138939字节及panic尾部精确匹配；应用仍打开，最终退出两组待解锁复验。",
+      "remaining": [
+        "最终签名release普通/escaped两组退出复验；Mac锁屏待用户解锁，当前普通writer已自释放需重跑",
+        "完整panic/取消/轮换、UI响应及实际VM吞吐矩阵",
+        "helper异步ACK缺失/30秒超时/XPC断线/写入失败组合的完整实际验收"
+      ]
+    }
+  },
+  "validation": {
+    "python": {
+      "entrypoint": "make test_python",
+      "exit": 0,
+      "seconds": 352.68103158299346,
+      "log": "B25/python-final.log",
+      "source_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "tests": 611,
+      "suite_seconds": 351.268,
+      "skipped": 2,
+      "first_run": {
+        "entrypoint": "make test_python",
+        "exit": 0,
+        "tests": 603,
+        "skipped": 2,
+        "seconds": 279.878,
+        "log": "B25/python-first-full.log"
+      }
+    },
+    "swift": {
+      "exit": 0,
+      "first_run": {
+        "exit": 2,
+        "swift_testing_tests": 1284,
+        "suites": 205,
+        "issues": 1,
+        "failure": "CommandTerminationTests timed transient gate assertion after sleep20ms vs150ms timeout; actual quick command succeeded; precise ordering unconfirmed",
+        "log": "B25/swift-first-full.log",
+        "sampling": "B25/swift-failure-sample-70847.txt"
+      },
+      "second_run": {
+        "exit": 2,
+        "swift_testing_tests": 1285,
+        "suites": 205,
+        "issues": 5,
+        "failure": "StopRefusalTests 3 issues and ParentExitTests 2 issues; cause under investigation",
+        "log": "B25/swift-second-full.log",
+        "sampling": "B25/swift-failure-sample-84183.txt",
+        "fixture_followup": {
+          "controlled_red": "B25/t46/legacy-fixtures/controlled-red.log",
+          "related_green": "B25/t46/legacy-fixtures/final-related-green.log",
+          "tests": 103,
+          "suites": 24,
+          "seconds": 21.456,
+          "original_cause": "unconfirmed; controlled fixture experiments do not establish original scheduling cause"
+        }
+      },
+      "entrypoint": "make test_swift",
+      "seconds": 119.31869583402295,
+      "log": "B25/swift-final.log",
+      "failure_sampling_triggered": false,
+      "xctest_tests": 254,
+      "xctest_skipped": 3,
+      "swift_testing_tests": 1285,
+      "suites": 205,
+      "timing_tests": 9,
+      "timing_suites": 8,
+      "regular_seconds": 66.248,
+      "timing_seconds": 7.124,
+      "tar_and_guest_checks": true,
+      "source_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+      "swift_sources_unchanged_at_final_head": true
+    },
+    "build": {
+      "entrypoint": "make launchpad check_bundle check_launchpad",
+      "exit": 0,
+      "seconds": 67.08864170900779,
+      "log": "B25/build-final.log",
+      "source_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "first_run": {
+        "entrypoint": "make launchpad check_bundle check_launchpad",
+        "exit": 2,
+        "seconds": 142.03442329197424,
+        "log": "B25/build-first-full.log",
+        "source_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+        "failure": "Checker rejected contained loader-relative rpath; outer Launchpad staging absent, leaving absolute Xcode rpaths; fixed and rebuilt in 53580180"
+      }
+    },
+    "UI": {
+      "final_state": "blocked_by_Mac_locked_before_quit",
+      "scope": "final release controlled signed CLI, actual logging passed; no quit acceptance",
+      "historical_pre_gate_ui": "B25/ui-first-acceptance.json",
+      "final_observation": "B25/ui-acceptance.json",
+      "normal_writer_self_released": true,
+      "normal_application_left_open": true,
+      "unlock_requested": true
+    },
+    "T24_native": {
+      "focused_tests": 13,
+      "native_tests_included": 8,
+      "homebrew_denied_tools_exit": 0,
+      "scope": "host Mach-O only",
+      "final_proof": {
+        "exit": 0,
+        "head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+        "report": "B25/t24/final-proof/report.json",
+        "commands": 89,
+        "denial_controls": 2,
+        "sandbox_tool_operations": 8
+      },
+      "final_focused_tests": 21,
+      "final_native_tests_included": 16
+    },
+    "artifact_cli": [
+      {
+        "label": "actual-cli",
+        "exit": 0,
+        "seconds": 55.659359791025054,
+        "log": "B25/actual-cli.log"
+      },
+      {
+        "label": "final-snapshot",
+        "exit": 0,
+        "seconds": 12.173265582998283,
+        "log": "B25/final-snapshot.log"
+      }
+    ],
+    "installed_snapshot": {
+      "bytes": 161310727,
+      "cli_resources_exit": 0,
+      "vm_help_exit": 9,
+      "source_vm_help_exit": 9,
+      "vm_help_succeeded": false,
+      "signature_verify_exit": 0,
+      "external_python_locked_probe": false,
+      "vm_started": false
+    },
+    "source_heads": {
+      "main_implementation": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+      "final_packaging": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+    }
+  },
+  "review": {
+    "initial_T40_important": 3,
+    "T24_followup_findings": 3,
+    "T46_fixture_cleanup_findings": 1,
+    "remaining_important": 0,
+    "final": "B25/code-review-final.json"
+  },
+  "UI": "B25/ui-acceptance.json",
+  "VM": "B25/vm-readback.json",
+  "source_freeze_note": "T02的11064b07历史语义审查基线保持；本批新增生产改动独立记录，不改写旧结论。"
+}

@@ -1,0 +1,20 @@
+test_check_rejects_external_rpath_with_internal_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_external_rpath_with_internal_dependencies) ... ok
+test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape) ... ok
+test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies) ... ok
+test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes) ... FAIL
+test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success) ... ok
+test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals) ... ok
+
+======================================================================
+FAIL: test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 95, in test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 6 tests in 6.942s
+
+FAILED (failures=1)

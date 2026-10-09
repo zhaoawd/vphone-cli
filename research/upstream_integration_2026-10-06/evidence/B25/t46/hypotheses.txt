@@ -1,0 +1,5 @@
+T46 hypothesis ranking before probes:
+1. AppDelegate returns terminateNow with active ordinary commands; termination bypasses ChildProcess pipe EOF and LogWriter.finish. Prediction: quit decision says quit while a blocked ordinary command is actively writing.
+2. Child process termination delivers status before descendant pipe writers close. Prediction: ordinary completion could precede final descendant output; existing read loop appears to await EOF, test required.
+3. LogWriter.finish overtakes scheduled writes. Prediction: normal command completion loses final line; existing Core writer serial queue and existing tests reduce this likelihood.
+Planned fix only after RED: explicit ordinary-command activity/drain coordination and bounded termination delay; detached create semantics remain separate.

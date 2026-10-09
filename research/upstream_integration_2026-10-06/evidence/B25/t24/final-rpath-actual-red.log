@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 210, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 205, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 108, in check_native_dependencies
+    raise ValueError(f'Nonportable rpath in {path}: {rpath}')
+ValueError: Nonportable rpath in /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher: @loader_path

@@ -1,0 +1,370 @@
+{
+  "searched_roots": [
+    "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build",
+    "/Users/qcz3840/github/vphone-cli/.build",
+    "/private/tmp",
+    "/Applications"
+  ],
+  "installed_helper_exists": false,
+  "matching_macho": [
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper",
+      "sha256": "728b03532d1792cf2ef54077ac98cbcece910a55b367d00af1e3178e383b60ce",
+      "controlled_fixture": false,
+      "protocol": "2 (embedded metadata; binary not launched)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=9049 flags=0x0(none) hashes=277+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nCandidateCDHashFull sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nHash choices=sha256\nCMSDigest=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nCMSDigestType=2\nCDHash=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nSignature size=4785\nAuthority=(unavailable)\nInfo.plist=not bound\nTeamIdentifier=3AA3QL69MQ\nSealed Resources=none\nInternal requirements count=1 size=188\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper:\nContents of (__TEXT,__info_plist) section\n0000000100256634\t6d783f3c 6576206c 6f697372 31223d6e \n0000000100256644\t2022302e 6f636e65 676e6964 5455223d \n0000000100256654\t22382d46 3c0a3e3f 434f4421 45505954 \n0000000100256664\t696c7020 50207473 494c4255 2d222043 \n0000000100256674\t70412f2f 2f656c70 4454442f 494c5020 \n0000000100256684\t31205453 2f2f302e 20224e45 74746822 \n0000000100256694\t2f2f3a70 2e777777 6c707061 6f632e65 \n00000001002566a4\t54442f6d 502f7344 65706f72 4c797472 \n00000001002566b4\t2d747369 2e302e31 22647464 703c0a3e \n00000001002566c4\t7473696c 72657620 6e6f6973 2e31223d \n00000001002566d4\t0a3e2230 6369643c 090a3e74 79656b3c \n00000001002566e4\t4246433e 6c646e75 65644965 6669746e \n00000001002566f4\t3c726569 79656b2f 3c090a3e 69727473 \n0000000100256704\t633e676e 762e6d6f 6e6f6870 6c632e65 \n0000000100256714\t65682e69 7265706c 74732f3c 676e6972 \n0000000100256724\t3c090a3e 3e79656b 75424643 656c646e \n0000000100256734\t726f6853 72655674 6e6f6973 69727453 \n0000000100256744\t2f3c676e 3e79656b 733c090a 6e697274 \n0000000100256754\t2e323e67 3c382e30 7274732f 3e676e69 \n0000000100256764\t6b3c090a 433e7965 6e754246 56656c64 \n0000000100256774\t69737265 2f3c6e6f 3e79656b 733c090a \n0000000100256784\t6e697274 3c323e67 7274732f 3e676e69 \n0000000100256794\t6b3c090a 533e7965 7475414d 69726f68 \n00000001002567a4\t4364657a 6e65696c 2f3c7374 3e79656b \n00000001002567b4\t613c090a 79617272 09090a3e 7274733c \n00000001002567c4\t3e676e69 68636e61 6120726f 656c7070 \n00000001002567d4\t6e656720 63697265 646e6120 65646920 \n00000001002567e4\t6669746e 20726569 6d6f6322 6870762e \n00000001002567f4\t2e656e6f 22696c63 646e6120 72656320 \n0000000100256804\t69666974 65746163 61656c20 75735b66 \n0000000100256814\t63656a62 554f2e74 203d205d 41413322 \n0000000100256824\t364c5133 22514d39 74732f3c 676e6972 \n0000000100256834\t09090a3e 7274733c 3e676e69 68636e61 \n0000000100256844\t6120726f 656c7070 6e656720 63697265 \n0000000100256854\t646e6120 65646920 6669746e 20726569 \n0000000100256864\t6d6f6322 6870762e 2e656e6f 2e696c63 \n0000000100256874\t6e75616c 61706863 61202264 6320646e \n0000000100256884\t69747265 61636966 6c206574 5b666165 \n0000000100256894\t6a627573 2e746365 205d554f 3322203d \n00000001002568a4\t51334141 4d39364c 2f3c2251 69727473 \n00000001002568b4\t0a3e676e 612f3c09 79617272 3c090a3e \n00000001002568c4\t3e79656b 6f685056 6548656e 7265706c \n00000001002568d4\t6e676953 54676e69 3c6d6165 79656b2f \n00000001002568e4\t3c090a3e 69727473 333e676e 51334141 \n00000001002568f4\t4d39364c 732f3c51 6e697274 3c0a3e67 \n0000000100256904\t6369642f 3c0a3e74 696c702f 0a3e7473 \n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": {
+        "CFBundleIdentifier": "com.vphone.cli.helper",
+        "CFBundleShortVersionString": "2.0.8",
+        "CFBundleVersion": "2",
+        "SMAuthorizedClients": [
+          "anchor apple generic and identifier \"com.vphone.cli\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+          "anchor apple generic and identifier \"com.vphone.cli.launchpad\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\""
+        ],
+        "VPhoneHelperSigningTeam": "3AA3QL69MQ"
+      },
+      "signature_verify": {
+        "exit_code": 1,
+        "stderr": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper: CSSMERR_TP_NOT_TRUSTED\nIn architecture: arm64\n"
+      }
+    },
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper",
+      "sha256": "bbc0917c2d5551de48b2eff7db8396c1c1d9a7d62f48eecdacf66a82da48b3c4",
+      "controlled_fixture": false,
+      "protocol": "1 (embedded metadata; binary not launched)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=3470 flags=0x2(adhoc) hashes=103+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=fbc4eeacedab7ae67078d66352e0985c7b73d9a8\nCandidateCDHashFull sha256=fbc4eeacedab7ae67078d66352e0985c7b73d9a808e41d68a984620e6d9a3e8f\nHash choices=sha256\nCMSDigest=fbc4eeacedab7ae67078d66352e0985c7b73d9a808e41d68a984620e6d9a3e8f\nCMSDigestType=2\nCDHash=fbc4eeacedab7ae67078d66352e0985c7b73d9a8\nSignature=adhoc\nInfo.plist entries=5\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper:\nContents of (__TEXT,__info_plist) section\n0000000100137a1a\t6d783f3c 6576206c 6f697372 31223d6e \n0000000100137a2a\t2022302e 6f636e65 676e6964 5455223d \n0000000100137a3a\t22382d46 3c0a3e3f 434f4421 45505954 \n0000000100137a4a\t696c7020 50207473 494c4255 2d222043 \n0000000100137a5a\t70412f2f 2f656c70 4454442f 494c5020 \n0000000100137a6a\t31205453 2f2f302e 20224e45 74746822 \n0000000100137a7a\t2f2f3a70 2e777777 6c707061 6f632e65 \n0000000100137a8a\t54442f6d 502f7344 65706f72 4c797472 \n0000000100137a9a\t2d747369 2e302e31 22647464 703c0a3e \n0000000100137aaa\t7473696c 72657620 6e6f6973 2e31223d \n0000000100137aba\t0a3e2230 6369643c 090a3e74 79656b3c \n0000000100137aca\t4246433e 6c646e75 65644965 6669746e \n0000000100137ada\t3c726569 79656b2f 3c090a3e 69727473 \n0000000100137aea\t633e676e 762e6d6f 6e6f6870 6c632e65 \n0000000100137afa\t65682e69 7265706c 74732f3c 676e6972 \n0000000100137b0a\t3c090a3e 3e79656b 75424643 656c646e \n0000000100137b1a\t726f6853 72655674 6e6f6973 69727453 \n0000000100137b2a\t2f3c676e 3e79656b 733c090a 6e697274 \n0000000100137b3a\t2e323e67 3c382e30 7274732f 3e676e69 \n0000000100137b4a\t6b3c090a 433e7965 6e754246 56656c64 \n0000000100137b5a\t69737265 2f3c6e6f 3e79656b 733c090a \n0000000100137b6a\t6e697274 3c313e67 7274732f 3e676e69 \n0000000100137b7a\t6b3c090a 533e7965 7475414d 69726f68 \n0000000100137b8a\t4364657a 6e65696c 2f3c7374 3e79656b \n0000000100137b9a\t613c090a 79617272 090a3e2f 79656b3c \n0000000100137baa\t6850563e 48656e6f 65706c65 67695372 \n0000000100137bba\t676e696e 6d616554 656b2f3c 090a3e79 \n0000000100137bca\t7274733c 3e676e69 74732f3c 676e6972 \n0000000100137bda\t2f3c0a3e 74636964 2f3c0a3e 73696c70 \n0000000100137bea\t74 3e 0a \n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": {
+        "CFBundleIdentifier": "com.vphone.cli.helper",
+        "CFBundleShortVersionString": "2.0.8",
+        "CFBundleVersion": "1",
+        "SMAuthorizedClients": [],
+        "VPhoneHelperSigningTeam": ""
+      },
+      "signature_verify": {
+        "exit_code": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper",
+      "sha256": "728b03532d1792cf2ef54077ac98cbcece910a55b367d00af1e3178e383b60ce",
+      "controlled_fixture": false,
+      "protocol": "2 (embedded metadata; binary not launched)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=9049 flags=0x0(none) hashes=277+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nCandidateCDHashFull sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nHash choices=sha256\nCMSDigest=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nCMSDigestType=2\nCDHash=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nSignature size=4785\nAuthority=(unavailable)\nInfo.plist=not bound\nTeamIdentifier=3AA3QL69MQ\nSealed Resources=none\nInternal requirements count=1 size=188\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper:\nContents of (__TEXT,__info_plist) section\n0000000100256634\t6d783f3c 6576206c 6f697372 31223d6e \n0000000100256644\t2022302e 6f636e65 676e6964 5455223d \n0000000100256654\t22382d46 3c0a3e3f 434f4421 45505954 \n0000000100256664\t696c7020 50207473 494c4255 2d222043 \n0000000100256674\t70412f2f 2f656c70 4454442f 494c5020 \n0000000100256684\t31205453 2f2f302e 20224e45 74746822 \n0000000100256694\t2f2f3a70 2e777777 6c707061 6f632e65 \n00000001002566a4\t54442f6d 502f7344 65706f72 4c797472 \n00000001002566b4\t2d747369 2e302e31 22647464 703c0a3e \n00000001002566c4\t7473696c 72657620 6e6f6973 2e31223d \n00000001002566d4\t0a3e2230 6369643c 090a3e74 79656b3c \n00000001002566e4\t4246433e 6c646e75 65644965 6669746e \n00000001002566f4\t3c726569 79656b2f 3c090a3e 69727473 \n0000000100256704\t633e676e 762e6d6f 6e6f6870 6c632e65 \n0000000100256714\t65682e69 7265706c 74732f3c 676e6972 \n0000000100256724\t3c090a3e 3e79656b 75424643 656c646e \n0000000100256734\t726f6853 72655674 6e6f6973 69727453 \n0000000100256744\t2f3c676e 3e79656b 733c090a 6e697274 \n0000000100256754\t2e323e67 3c382e30 7274732f 3e676e69 \n0000000100256764\t6b3c090a 433e7965 6e754246 56656c64 \n0000000100256774\t69737265 2f3c6e6f 3e79656b 733c090a \n0000000100256784\t6e697274 3c323e67 7274732f 3e676e69 \n0000000100256794\t6b3c090a 533e7965 7475414d 69726f68 \n00000001002567a4\t4364657a 6e65696c 2f3c7374 3e79656b \n00000001002567b4\t613c090a 79617272 09090a3e 7274733c \n00000001002567c4\t3e676e69 68636e61 6120726f 656c7070 \n00000001002567d4\t6e656720 63697265 646e6120 65646920 \n00000001002567e4\t6669746e 20726569 6d6f6322 6870762e \n00000001002567f4\t2e656e6f 22696c63 646e6120 72656320 \n0000000100256804\t69666974 65746163 61656c20 75735b66 \n0000000100256814\t63656a62 554f2e74 203d205d 41413322 \n0000000100256824\t364c5133 22514d39 74732f3c 676e6972 \n0000000100256834\t09090a3e 7274733c 3e676e69 68636e61 \n0000000100256844\t6120726f 656c7070 6e656720 63697265 \n0000000100256854\t646e6120 65646920 6669746e 20726569 \n0000000100256864\t6d6f6322 6870762e 2e656e6f 2e696c63 \n0000000100256874\t6e75616c 61706863 61202264 6320646e \n0000000100256884\t69747265 61636966 6c206574 5b666165 \n0000000100256894\t6a627573 2e746365 205d554f 3322203d \n00000001002568a4\t51334141 4d39364c 2f3c2251 69727473 \n00000001002568b4\t0a3e676e 612f3c09 79617272 3c090a3e \n00000001002568c4\t3e79656b 6f685056 6548656e 7265706c \n00000001002568d4\t6e676953 54676e69 3c6d6165 79656b2f \n00000001002568e4\t3c090a3e 69727473 333e676e 51334141 \n00000001002568f4\t4d39364c 732f3c51 6e697274 3c0a3e67 \n0000000100256904\t6369642f 3c0a3e74 696c702f 0a3e7473 \n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": {
+        "CFBundleIdentifier": "com.vphone.cli.helper",
+        "CFBundleShortVersionString": "2.0.8",
+        "CFBundleVersion": "2",
+        "SMAuthorizedClients": [
+          "anchor apple generic and identifier \"com.vphone.cli\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+          "anchor apple generic and identifier \"com.vphone.cli.launchpad\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\""
+        ],
+        "VPhoneHelperSigningTeam": "3AA3QL69MQ"
+      },
+      "signature_verify": {
+        "exit_code": 1,
+        "stderr": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/Library/LaunchServices/com.vphone.cli.helper: CSSMERR_TP_NOT_TRUSTED\nIn architecture: arm64\n"
+      }
+    },
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-helper",
+      "sha256": "8874573e84361314859cd1537ce675aba7cf2cceb3eb0b291e511e7b75eac8c2",
+      "controlled_fixture": false,
+      "protocol": "unknown; binary not launched",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-helper\nIdentifier=vphone-helper-5555494457f99a2f62593d4badba50a212d761fc\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=12687 flags=0x2(adhoc) hashes=385+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=dc570d28735b8258506ea18309ed7bef29cad178\nCandidateCDHashFull sha256=dc570d28735b8258506ea18309ed7bef29cad1783f32843a0ddc0ad2edbfb5cd\nHash choices=sha256\nCMSDigest=dc570d28735b8258506ea18309ed7bef29cad1783f32843a0ddc0ad2edbfb5cd\nCMSDigestType=2\nCDHash=dc570d28735b8258506ea18309ed7bef29cad178\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-helper:\n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": null,
+      "signature_verify": {
+        "exit_code": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/vphone-helper",
+      "sha256": "3816c7f453d645edfa2850e09b2512f1ff096637242b0028dbb7912ee48ea2fe",
+      "controlled_fixture": false,
+      "protocol": "unknown; binary not launched",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/vphone-helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/vphone-helper\nIdentifier=vphone-helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=35622 flags=0x20002(adhoc,linker-signed) hashes=1110+0 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=29df02efbbc4c569737a2b2384efda1fc068ed76\nCandidateCDHashFull sha256=29df02efbbc4c569737a2b2384efda1fc068ed763531a8a69aac5c776fe0b75b\nHash choices=sha256\nCMSDigest=29df02efbbc4c569737a2b2384efda1fc068ed763531a8a69aac5c776fe0b75b\nCMSDigestType=2\nCDHash=29df02efbbc4c569737a2b2384efda1fc068ed76\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements=none\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/vphone-helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/vphone-helper:\n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": null,
+      "signature_verify": {
+        "exit_code": 0,
+        "stderr": ""
+      }
+    },
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper",
+      "sha256": "728b03532d1792cf2ef54077ac98cbcece910a55b367d00af1e3178e383b60ce",
+      "controlled_fixture": false,
+      "protocol": "2 (embedded metadata; binary not launched)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=9049 flags=0x0(none) hashes=277+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nCandidateCDHashFull sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nHash choices=sha256\nCMSDigest=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nCMSDigestType=2\nCDHash=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nSignature size=4785\nAuthority=(unavailable)\nInfo.plist=not bound\nTeamIdentifier=3AA3QL69MQ\nSealed Resources=none\nInternal requirements count=1 size=188\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper:\nContents of (__TEXT,__info_plist) section\n0000000100256634\t6d783f3c 6576206c 6f697372 31223d6e \n0000000100256644\t2022302e 6f636e65 676e6964 5455223d \n0000000100256654\t22382d46 3c0a3e3f 434f4421 45505954 \n0000000100256664\t696c7020 50207473 494c4255 2d222043 \n0000000100256674\t70412f2f 2f656c70 4454442f 494c5020 \n0000000100256684\t31205453 2f2f302e 20224e45 74746822 \n0000000100256694\t2f2f3a70 2e777777 6c707061 6f632e65 \n00000001002566a4\t54442f6d 502f7344 65706f72 4c797472 \n00000001002566b4\t2d747369 2e302e31 22647464 703c0a3e \n00000001002566c4\t7473696c 72657620 6e6f6973 2e31223d \n00000001002566d4\t0a3e2230 6369643c 090a3e74 79656b3c \n00000001002566e4\t4246433e 6c646e75 65644965 6669746e \n00000001002566f4\t3c726569 79656b2f 3c090a3e 69727473 \n0000000100256704\t633e676e 762e6d6f 6e6f6870 6c632e65 \n0000000100256714\t65682e69 7265706c 74732f3c 676e6972 \n0000000100256724\t3c090a3e 3e79656b 75424643 656c646e \n0000000100256734\t726f6853 72655674 6e6f6973 69727453 \n0000000100256744\t2f3c676e 3e79656b 733c090a 6e697274 \n0000000100256754\t2e323e67 3c382e30 7274732f 3e676e69 \n0000000100256764\t6b3c090a 433e7965 6e754246 56656c64 \n0000000100256774\t69737265 2f3c6e6f 3e79656b 733c090a \n0000000100256784\t6e697274 3c323e67 7274732f 3e676e69 \n0000000100256794\t6b3c090a 533e7965 7475414d 69726f68 \n00000001002567a4\t4364657a 6e65696c 2f3c7374 3e79656b \n00000001002567b4\t613c090a 79617272 09090a3e 7274733c \n00000001002567c4\t3e676e69 68636e61 6120726f 656c7070 \n00000001002567d4\t6e656720 63697265 646e6120 65646920 \n00000001002567e4\t6669746e 20726569 6d6f6322 6870762e \n00000001002567f4\t2e656e6f 22696c63 646e6120 72656320 \n0000000100256804\t69666974 65746163 61656c20 75735b66 \n0000000100256814\t63656a62 554f2e74 203d205d 41413322 \n0000000100256824\t364c5133 22514d39 74732f3c 676e6972 \n0000000100256834\t09090a3e 7274733c 3e676e69 68636e61 \n0000000100256844\t6120726f 656c7070 6e656720 63697265 \n0000000100256854\t646e6120 65646920 6669746e 20726569 \n0000000100256864\t6d6f6322 6870762e 2e656e6f 2e696c63 \n0000000100256874\t6e75616c 61706863 61202264 6320646e \n0000000100256884\t69747265 61636966 6c206574 5b666165 \n0000000100256894\t6a627573 2e746365 205d554f 3322203d \n00000001002568a4\t51334141 4d39364c 2f3c2251 69727473 \n00000001002568b4\t0a3e676e 612f3c09 79617272 3c090a3e \n00000001002568c4\t3e79656b 6f685056 6548656e 7265706c \n00000001002568d4\t6e676953 54676e69 3c6d6165 79656b2f \n00000001002568e4\t3c090a3e 69727473 333e676e 51334141 \n00000001002568f4\t4d39364c 732f3c51 6e697274 3c0a3e67 \n0000000100256904\t6369642f 3c0a3e74 696c702f 0a3e7473 \n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": {
+        "CFBundleIdentifier": "com.vphone.cli.helper",
+        "CFBundleShortVersionString": "2.0.8",
+        "CFBundleVersion": "2",
+        "SMAuthorizedClients": [
+          "anchor apple generic and identifier \"com.vphone.cli\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+          "anchor apple generic and identifier \"com.vphone.cli.launchpad\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\""
+        ],
+        "VPhoneHelperSigningTeam": "3AA3QL69MQ"
+      },
+      "signature_verify": {
+        "exit_code": 1,
+        "stderr": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/com.vphone.cli.helper: CSSMERR_TP_NOT_TRUSTED\nIn architecture: arm64\n"
+      }
+    },
+    {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/Library/LaunchServices/com.vphone.cli.helper",
+      "sha256": "728b03532d1792cf2ef54077ac98cbcece910a55b367d00af1e3178e383b60ce",
+      "controlled_fixture": false,
+      "protocol": "2 (embedded metadata; binary not launched)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/Library/LaunchServices/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/Library/LaunchServices/com.vphone.cli.helper\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=9049 flags=0x0(none) hashes=277+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nCandidateCDHashFull sha256=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nHash choices=sha256\nCMSDigest=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6bff1d495ec8b19fbb234bda3\nCMSDigestType=2\nCDHash=30ce6ce220a60617b6ae42066372bf3ac2e8ebe6\nSignature size=4785\nAuthority=(unavailable)\nInfo.plist=not bound\nTeamIdentifier=3AA3QL69MQ\nSealed Resources=none\nInternal requirements count=1 size=188\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/Library/LaunchServices/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/Library/LaunchServices/com.vphone.cli.helper:\nContents of (__TEXT,__info_plist) section\n0000000100256634\t6d783f3c 6576206c 6f697372 31223d6e \n0000000100256644\t2022302e 6f636e65 676e6964 5455223d \n0000000100256654\t22382d46 3c0a3e3f 434f4421 45505954 \n0000000100256664\t696c7020 50207473 494c4255 2d222043 \n0000000100256674\t70412f2f 2f656c70 4454442f 494c5020 \n0000000100256684\t31205453 2f2f302e 20224e45 74746822 \n0000000100256694\t2f2f3a70 2e777777 6c707061 6f632e65 \n00000001002566a4\t54442f6d 502f7344 65706f72 4c797472 \n00000001002566b4\t2d747369 2e302e31 22647464 703c0a3e \n00000001002566c4\t7473696c 72657620 6e6f6973 2e31223d \n00000001002566d4\t0a3e2230 6369643c 090a3e74 79656b3c \n00000001002566e4\t4246433e 6c646e75 65644965 6669746e \n00000001002566f4\t3c726569 79656b2f 3c090a3e 69727473 \n0000000100256704\t633e676e 762e6d6f 6e6f6870 6c632e65 \n0000000100256714\t65682e69 7265706c 74732f3c 676e6972 \n0000000100256724\t3c090a3e 3e79656b 75424643 656c646e \n0000000100256734\t726f6853 72655674 6e6f6973 69727453 \n0000000100256744\t2f3c676e 3e79656b 733c090a 6e697274 \n0000000100256754\t2e323e67 3c382e30 7274732f 3e676e69 \n0000000100256764\t6b3c090a 433e7965 6e754246 56656c64 \n0000000100256774\t69737265 2f3c6e6f 3e79656b 733c090a \n0000000100256784\t6e697274 3c323e67 7274732f 3e676e69 \n0000000100256794\t6b3c090a 533e7965 7475414d 69726f68 \n00000001002567a4\t4364657a 6e65696c 2f3c7374 3e79656b \n00000001002567b4\t613c090a 79617272 09090a3e 7274733c \n00000001002567c4\t3e676e69 68636e61 6120726f 656c7070 \n00000001002567d4\t6e656720 63697265 646e6120 65646920 \n00000001002567e4\t6669746e 20726569 6d6f6322 6870762e \n00000001002567f4\t2e656e6f 22696c63 646e6120 72656320 \n0000000100256804\t69666974 65746163 61656c20 75735b66 \n0000000100256814\t63656a62 554f2e74 203d205d 41413322 \n0000000100256824\t364c5133 22514d39 74732f3c 676e6972 \n0000000100256834\t09090a3e 7274733c 3e676e69 68636e61 \n0000000100256844\t6120726f 656c7070 6e656720 63697265 \n0000000100256854\t646e6120 65646920 6669746e 20726569 \n0000000100256864\t6d6f6322 6870762e 2e656e6f 2e696c63 \n0000000100256874\t6e75616c 61706863 61202264 6320646e \n0000000100256884\t69747265 61636966 6c206574 5b666165 \n0000000100256894\t6a627573 2e746365 205d554f 3322203d \n00000001002568a4\t51334141 4d39364c 2f3c2251 69727473 \n00000001002568b4\t0a3e676e 612f3c09 79617272 3c090a3e \n00000001002568c4\t3e79656b 6f685056 6548656e 7265706c \n00000001002568d4\t6e676953 54676e69 3c6d6165 79656b2f \n00000001002568e4\t3c090a3e 69727473 333e676e 51334141 \n00000001002568f4\t4d39364c 732f3c51 6e697274 3c0a3e67 \n0000000100256904\t6369642f 3c0a3e74 696c702f 0a3e7473 \n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": {
+        "CFBundleIdentifier": "com.vphone.cli.helper",
+        "CFBundleShortVersionString": "2.0.8",
+        "CFBundleVersion": "2",
+        "SMAuthorizedClients": [
+          "anchor apple generic and identifier \"com.vphone.cli\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+          "anchor apple generic and identifier \"com.vphone.cli.launchpad\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\""
+        ],
+        "VPhoneHelperSigningTeam": "3AA3QL69MQ"
+      },
+      "signature_verify": {
+        "exit_code": 1,
+        "stderr": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/Library/LaunchServices/com.vphone.cli.helper: CSSMERR_TP_NOT_TRUSTED\nIn architecture: arm64\n"
+      }
+    },
+    {
+      "path": "/private/tmp/vphone-b24-helper-v1/legacy-helper-v1",
+      "sha256": "e08af0b6ed5f3398ff815c4f8698b1926ece60107aa1b56bda65949c340471e8",
+      "controlled_fixture": true,
+      "protocol": "1 (controlled fixture; not historical production code)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/private/tmp/vphone-b24-helper-v1/legacy-helper-v1"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/private/tmp/vphone-b24-helper-v1/legacy-helper-v1\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=313 flags=0x0(none) hashes=4+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=679905d165a501ad12a8ace506b0c3652faf3c90\nCandidateCDHashFull sha256=679905d165a501ad12a8ace506b0c3652faf3c9064cea13c281f79a6af857e0d\nHash choices=sha256\nCMSDigest=679905d165a501ad12a8ace506b0c3652faf3c9064cea13c281f79a6af857e0d\nCMSDigestType=2\nCDHash=679905d165a501ad12a8ace506b0c3652faf3c90\nSignature size=4785\nAuthority=(unavailable)\nInfo.plist=not bound\nTeamIdentifier=3AA3QL69MQ\nSealed Resources=none\nInternal requirements count=1 size=188\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/private/tmp/vphone-b24-helper-v1/legacy-helper-v1"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/tmp/vphone-b24-helper-v1/legacy-helper-v1:\n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": null,
+      "signature_verify": {
+        "exit_code": 1,
+        "stderr": "/private/tmp/vphone-b24-helper-v1/legacy-helper-v1: CSSMERR_TP_NOT_TRUSTED\nIn architecture: arm64\n"
+      }
+    },
+    {
+      "path": "/private/tmp/vphone-b24-helper-v1-current/legacy-helper-v1",
+      "sha256": "e08af0b6ed5f3398ff815c4f8698b1926ece60107aa1b56bda65949c340471e8",
+      "controlled_fixture": true,
+      "protocol": "1 (controlled fixture; not historical production code)",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/private/tmp/vphone-b24-helper-v1-current/legacy-helper-v1"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/private/tmp/vphone-b24-helper-v1-current/legacy-helper-v1\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=313 flags=0x0(none) hashes=4+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=679905d165a501ad12a8ace506b0c3652faf3c90\nCandidateCDHashFull sha256=679905d165a501ad12a8ace506b0c3652faf3c9064cea13c281f79a6af857e0d\nHash choices=sha256\nCMSDigest=679905d165a501ad12a8ace506b0c3652faf3c9064cea13c281f79a6af857e0d\nCMSDigestType=2\nCDHash=679905d165a501ad12a8ace506b0c3652faf3c90\nSignature size=4785\nAuthority=(unavailable)\nInfo.plist=not bound\nTeamIdentifier=3AA3QL69MQ\nSealed Resources=none\nInternal requirements count=1 size=188\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/private/tmp/vphone-b24-helper-v1-current/legacy-helper-v1"
+          ],
+          "exit_code": 0,
+          "stdout": "/private/tmp/vphone-b24-helper-v1-current/legacy-helper-v1:\n",
+          "stderr": ""
+        }
+      ],
+      "embedded_info_plist": null,
+      "signature_verify": {
+        "exit_code": 1,
+        "stderr": "/private/tmp/vphone-b24-helper-v1-current/legacy-helper-v1: CSSMERR_TP_NOT_TRUSTED\nIn architecture: arm64\n"
+      }
+    }
+  ],
+  "limits": "Read-only inventory; no binary execution, installation or service registration. One historical protocol-v1 candidate located, with empty signing team and no authorized clients. Current production helper runtime rejection still untested against this binary.",
+  "historical_v1_provenance": "B13-build-candidates.py copies prior .build/helper-candidate to .build/acceptance/B13/prior-helper-candidate before rebuilding; saved binary timestamp Oct 6 22:49."
+}

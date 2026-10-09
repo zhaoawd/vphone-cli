@@ -1,0 +1,328 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Copying Localizable.xcstrings
+[3/48] Write sources
+[7/48] Write swift-version--58304C5D6DBC2206.txt
+[8/52] Compiling img3.c
+[9/52] Compiling ace3.c
+[10/52] Compiling limera1n.c
+[11/52] Compiling dfu.c
+[12/52] Compiling log.c
+[13/52] Compiling img4.c
+[14/52] Compiling fdr.c
+[15/52] Compiling download.c
+[16/52] Compiling asr.c
+[17/52] Compiling normal.c
+[18/52] Compiling ipsw.c
+[19/52] Compiling recovery.c
+[20/52] Compiling ftab.c
+[21/52] Compiling mbn.c
+[22/52] Compiling locking.c
+[23/52] Compiling fls.c
+[24/52] Compiling restore.c
+[25/52] Compiling deviceinterfaced.c
+[26/52] Compiling vphone_zip_stub.c
+[27/52] Compiling common.c
+[28/52] Compiling idevicerestore.c
+[29/52] Compiling vphone_restore_bridge.c
+[30/52] Compiling MobileRecoveryCore libirecovery.c
+[32/52] Compiling VPhoneCore VPhoneResources.swift
+[33/56] Compiling VPhoneCore VPhoneLibrary.swift
+[34/56] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[35/56] Emitting module VPhoneCore
+[36/56] Compiling VPhoneCore VPhoneCreateRunner.swift
+[37/56] Compiling VPhoneCore VPhoneLaunchLayout.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[38/56] Compiling VPhoneCore VPhoneDiagnosticChecks.swift
+[39/56] Compiling VPhoneCore VPhoneCreateCheckpoint.swift
+[40/160] Emitting module VPhoneHelperKit
+[41/160] Compiling FirmwarePatcher KernelPatchPostValidation.swift
+[42/160] Compiling FirmwarePatcher KernelPatchSandbox.swift
+[43/162] Compiling VPhoneHelperKit VPhoneHelperOutput.swift
+[44/162] Compiling VPhoneHelperKit VPhoneHelperClient.swift
+[45/162] Compiling VPhoneHelperKit VPhoneHelperService.swift
+[45/162] Write Objects.LinkFileList
+[47/162] Compiling FirmwarePatcher IBootPatcher.swift
+[48/162] Compiling FirmwarePatcher KernelJBPatchAmfiTrustcache.swift
+[49/162] Compiling FirmwarePatcher FirmwarePlanBinding.swift
+[50/162] Compiling FirmwarePatcher KernelPatchApfsMount.swift
+[51/162] Compiling VPhoneLaunchpadKit VPhoneLaunchpadReadOnlyCommand.swift
+[52/162] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[53/162] Compiling FirmwarePatcher PatchSelectionFileMigration.swift
+[54/162] Compiling FirmwarePatcher PatchSelectionMigration.swift
+[55/162] Compiling VPhoneArchiveKitTests ExtractPermissionsTests.swift
+[56/162] Emitting module VPhoneLaunchpadKit
+[57/162] Compiling FirmwarePatcher KernelJBPatchContainerUpcall.swift
+[58/162] Compiling FirmwarePatcher KernelJBPatchDiskImages2.swift
+[58/162] Linking vphone-helper
+[60/162] Compiling FirmwarePatcher VariantPlanResolver.swift
+[61/162] Compiling FirmwarePatcher FirmwarePipeline.swift
+[62/162] Compiling FirmwarePatcher KernelPatchBsdInit.swift
+[63/162] Compiling FirmwarePatcher KernelPatchDebugger.swift
+[63/162] Write Objects.LinkFileList
+[66/183] Emitting module VPhoneArchiveKitTests
+[67/183] Compiling VPhoneArchiveKitTests RoundTripTests.swift
+[68/183] Compiling VPhoneArchiveKitTests ArchiveSafetyTests.swift
+[68/183] Applying vphone-helper
+[70/183] Compiling FirmwarePatcher KernelJBPatchSecureRoot.swift
+[71/183] Compiling FirmwarePatcher KernelJBPatchSharedRegion.swift
+[72/183] Compiling FirmwarePatcher KernelJBPatchSyscallmask.swift
+[73/183] Compiling FirmwarePatcher KernelJBPatchTaskForPid.swift
+[74/183] Compiling FirmwarePatcher KernelJBPatchThidCrash.swift
+[75/183] Compiling FirmwarePatcher KernelJBPatchThreadSetState.swift
+[75/188] Linking vphone-launchpad-launcher
+[76/188] Linking vphone-launchpad
+[78/188] Emitting module FirmwarePatcher
+[79/188] Compiling VPhoneLaunchpadKitTests EditTests.swift
+[80/188] Compiling VPhoneLaunchpadKitTests LineSplitterTests.swift
+[81/188] Compiling VPhoneLaunchpadKitTests LogWriterTests.swift
+[82/188] Compiling VPhoneLaunchpadKitTests MachineBindingTests.swift
+[83/188] Compiling VPhoneLaunchpadKitTests RealCLICreateTests.swift
+[87/190] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[88/190] Compiling VPhoneLaunchpadKitTests HardwareKeyboardSettingsTests.swift
+[89/190] Compiling VPhoneLaunchpadKitTests HostSetupTests.swift
+[90/190] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+[91/190] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[92/190] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[93/190] Compiling VPhoneLaunchpadKitTests BindingPersistenceTests.swift
+[94/190] Compiling VPhoneLaunchpadKitTests BindingSnapshotTests.swift
+[95/190] Compiling VPhoneLaunchpadKitTests CommandTerminationTests.swift
+[96/190] Compiling VPhoneLaunchpadKitTests CoreBundleTests.swift
+[97/190] Compiling VPhoneLaunchpadKitTests CreateTests.swift
+[97/190] Applying vphone-launchpad-launcher
+[98/190] Applying vphone-launchpad
+[107/190] Compiling FirmwarePatcher ARM64Encoder.swift
+[108/190] Compiling FirmwarePatcher KernelJBPatchVmMapDelete.swift
+[109/190] Compiling FirmwarePatcher KernelJBPatchVmProtect.swift
+[110/190] Compiling FirmwarePatcher KernelJBPatcherBase.swift
+[111/190] Compiling FirmwarePatcher KernelPatcherBase.swift
+[112/190] Compiling FirmwarePatcher FirmwareTransaction.swift
+[117/195] Compiling VPhoneLaunchpadKitTests RealCLIEditTests.swift
+[118/195] Compiling VPhoneLaunchpadKitTests MachineDecodeTests.swift
+[119/195] Emitting module VPhoneLaunchpadKitTests
+[122/195] Emitting module VPhoneCoreTests
+[123/195] Compiling FirmwarePatcher KernelJBPatchVmFault.swift
+[128/195] Compiling FirmwarePatcher BinaryBuffer.swift
+[129/195] Compiling FirmwarePatcher IM4PHandler.swift
+[130/195] Compiling FirmwarePatcher MachOHelpers.swift
+[131/195] Compiling FirmwarePatcher VPhoneKernelcacheSwap.swift
+[132/195] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[136/195] Compiling VPhoneLaunchpadKitTests MachineOriginsTests.swift
+[137/195] Compiling VPhoneLaunchpadKitTests MenuBarTests.swift
+[138/195] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[139/195] Compiling VPhoneLaunchpadKitTests LaunchpadFixtures.swift
+[152/195] Compiling VPhoneCoreTests VMLockTests.swift
+[153/195] Compiling VPhoneCoreTests VMOperationTests.swift
+[154/195] Compiling VPhoneCoreTests VMPickerTests.swift
+[155/195] Compiling VPhoneCoreTests VMStopTests.swift
+[156/195] Compiling VPhoneCoreTests VerbosityTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[179/236] Compiling vphone_cli VPhoneNativeFirmwarePreparer.swift
+[180/236] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[181/236] Compiling vphone_cli VPhoneProgressBar.swift
+[182/236] Compiling vphone_cli VPhoneResourcesCLI.swift
+[183/236] Compiling vphone_cli VPhoneRestoreCLI.swift
+[184/241] Compiling vphone_cli VPhoneSetupCLI.swift
+[185/241] Compiling vphone_cli VPhoneVMBindingCLI.swift
+[186/241] Compiling vphone_cli VPhoneVMCLI.swift
+[187/241] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[188/241] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[189/241] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[190/241] Compiling vphone_cli VPhoneHostCommandService.swift
+[191/241] Compiling vphone_cli VPhoneHostControl.swift
+[192/241] Compiling vphone_cli VPhoneHostTarget.swift
+[193/241] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[194/241] Compiling vphone_cli VPhoneLocationProvider.swift
+[195/241] Compiling vphone_cli VPhoneMenuLocation.swift
+[196/241] Compiling vphone_cli VPhoneVMSelection.swift
+[197/241] Compiling vphone_cli VPhoneVMTransferCLI.swift
+[198/241] Compiling vphone_cli VPhoneVirtualMachine.swift
+[199/241] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[200/241] Compiling vphone_cli VPhoneWindowController.swift
+[201/241] Compiling vphone_cli VPhoneEntry.swift
+[202/241] Compiling vphone_cli VPhoneFWCLI.swift
+[203/241] Compiling vphone_cli VPhoneFWCacheCLI.swift
+[204/241] Compiling vphone_cli VPhoneFWInspectCLI.swift
+[205/241] Compiling vphone_cli VPhoneFileBrowserView.swift
+[206/241] Compiling vphone_cli VPhoneFirmwareSelection.swift
+[207/241] Compiling vphone_cli VPhoneClipboardShortcutSync.swift
+[208/241] Compiling vphone_cli VPhoneControl.swift
+[209/241] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[210/241] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[211/241] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[212/241] Compiling vphone_cli VPhoneDoctorCLI.swift
+[213/241] Compiling vphone_cli VPhoneAppBrowserView.swift
+[214/241] Compiling vphone_cli VPhoneAppDelegate.swift
+[215/241] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[216/241] Compiling vphone_cli VPhoneCLI.swift
+[217/241] Compiling vphone_cli VPhoneCameraServer.swift
+[218/241] Compiling vphone_cli VPhoneClipboardFocusSync.swift
+[222/241] Compiling vphone_cli VPhoneGuestCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[223/241] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[224/241] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[225/241] Compiling vphone_cli VPhoneHostAPICommands.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[226/241] Compiling vphone_cli VPhoneHostCapabilities.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[227/241] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[227/241] Write Objects.LinkFileList
+[230/267] Compiling VPhoneCLITests DyldMaxSlideOptionTests.swift
+[231/267] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+[232/267] Compiling VPhoneCLITests GuestCLITests.swift
+[233/267] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[234/270] Emitting module VPhoneCLITests
+[235/270] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[236/270] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[237/270] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[237/270] Linking vphone-cli
+[239/270] Compiling VPhoneCLITests NativeTransferCLITests.swift
+[240/270] Compiling VPhoneCLITests RestoreInspectCLITests.swift
+[241/270] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[242/270] Compiling VPhoneCLITests GuestTransportTests.swift
+[243/270] Compiling VPhoneCLITests HardwareKeyboardCLITests.swift
+[244/270] Compiling VPhoneCLITests HostAPICommandTests.swift
+[244/270] Linking vphone-vm
+[246/270] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[247/270] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[248/270] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[248/270] Applying vphone-cli
+[250/270] Compiling VPhoneCLITests APIProxyCLITests.swift
+[251/270] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[252/270] Compiling VPhoneCLITests CFWInvocationTests.swift
+[253/270] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[253/270] Applying vphone-vm
+[255/270] Compiling VPhoneCLITests NativeRestoreCLITests.swift
+[258/270] Compiling VPhoneCLITests HostRPCTests.swift
+[259/270] Compiling VPhoneCLITests LocationValidationTests.swift
+[260/270] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[265/270] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[266/270] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[267/270] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+[268/270] Compiling VPhoneCLITests DoctorCLITests.swift
+[268/270] Write Objects.LinkFileList
+[269/270] Linking vphone-cliPackageTests
+Build complete! (37.32s)
+Test Suite 'Selected tests' started at 2026-10-09 16:01:33.035.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 16:01:33.037.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 16:01:33.037.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 16:01:33.037.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceFreezeTests started.
+◇ Test unavailableResourceSourceRefusesBeforeReturningRunner() started.
+◇ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() started.
+◇ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() started.
+◇ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() started.
+✔ Test unavailableResourceSourceRefusesBeforeReturningRunner() passed after 0.009 seconds.
+✘ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() recorded an issue at CreateResourceFreezeTests.swift:69:6: Caught error: DecodingError.keyNotFound: Key 'snapshotID' not found in keyed decoding container. Debug description: No value associated with key CodingKeys(stringValue: "snapshotID", intValue: nil) ("snapshotID").
+✘ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() failed after 0.034 seconds with 1 issue.
+↳ // Catch resume treating changed non-executable inputs as the recorded toolchain.
+✘ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() recorded an issue at CreateResourceFreezeTests.swift:82:6: Caught error: DecodingError.keyNotFound: Key 'snapshotID' not found in keyed decoding container. Debug description: No value associated with key CodingKeys(stringValue: "snapshotID", intValue: nil) ("snapshotID").
+✘ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() failed after 0.036 seconds with 1 issue.
+✔ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() passed after 0.139 seconds.
+✘ Suite CreateResourceFreezeTests failed after 0.139 seconds with 2 issues.
+✘ Test run with 4 tests in 1 suite failed after 0.139 seconds with 2 issues.
+swift_test_exit=1

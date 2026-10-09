@@ -1,0 +1,1619 @@
+{
+  "bytes" : 156051358,
+  "cli_resources_exit" : 0,
+  "closure_limits" : [
+    "Python interpreter, Python framework, third-party packages and their native dependencies are external",
+    "PATH tools, host SDK\/compiler, Virtualization framework ROMs and JB compilation are external",
+    "Existing VM cfw_input\/cfw_jb_input, firmware sources and mutable caches are external",
+    "In-process code is loaded by the invoking executable; a new attempt may use another accepted build",
+    "A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding"
+  ],
+  "entries" : [
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents"
+    },
+    {
+      "bytes" : 1126,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Info.plist",
+      "sha256" : "931d5ca082e233f188cf3861d910f15af7d29b58f1f0e26cb7f80bc6a620bbaf"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/MacOS"
+    },
+    {
+      "bytes" : 238080,
+      "kind" : "file",
+      "mode" : 365,
+      "path" : "VPhone.bundle\/Contents\/MacOS\/ldid",
+      "sha256" : "d8fa6b67569cc6629852e3158617ed70ccd8052eb196f3c55ae3ac74ddb6ac2e"
+    },
+    {
+      "bytes" : 60628208,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/MacOS\/vphone-cli",
+      "sha256" : "17cbd9f17bd4d1feb6f5cbe78ce0e838e8c7fca1081ccee8c6d563704b882c1f"
+    },
+    {
+      "bytes" : 60629168,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/MacOS\/vphone-vm",
+      "sha256" : "41edb542839dc9cd5a580f125a742c48eaa39e8d6e99ebb4639e2d7e1d0cc67b"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/.tools"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/.tools\/bin"
+    },
+    {
+      "bytes" : 52528,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/.tools\/bin\/insert_dylib",
+      "sha256" : "a5d8a1b22a1252f224faa543d8e2cd0f7521e909f08c886fc8cd039897c77cac"
+    },
+    {
+      "bytes" : 70504,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/.tools\/bin\/trustcache",
+      "sha256" : "cea75dbcca8575a3273f0d644680c70650768a4c1dd0bc864d03297908a3b763"
+    },
+    {
+      "bytes" : 47175,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/AppIcon.icns",
+      "sha256" : "c8d9944986b92e63c76b38ebcf189a2e76095b60fcd10596aeee813f0e215bf6"
+    },
+    {
+      "bytes" : 26225,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/README.md",
+      "sha256" : "7066b6fb9a45cc42e944f2312c60bec2777767226c18a3d07761a36c5130344b"
+    },
+    {
+      "bytes" : 23944,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/build-dependencies.json",
+      "sha256" : "316c41edabd961a94452c1e94553aff58337fd13781bf8081fd19c5c9fcdb301"
+    },
+    {
+      "bytes" : 1006,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/debs.list",
+      "sha256" : "ad86867fa61cad5a297d53bf9b1446d32b8f8de510d9a834d56fdd35ca68d056"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies"
+    },
+    {
+      "bytes" : 3241,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/README.md",
+      "sha256" : "9f41fb4694a5d7e91836f2cc1ea04987094dcb5c62f7970061626c0290f1867a"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/daemon-api-overlays"
+    },
+    {
+      "bytes" : 2329,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/daemon-api-overlays\/icli-jpeg-copy.patch",
+      "sha256" : "e1e93ea015d9d4c4f946bb2ea79627cff0bf990c9391e760b3aa56b71e52d74e"
+    },
+    {
+      "bytes" : 592,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/daemon-api-overlays\/manifest.json",
+      "sha256" : "97646e0b3f49de9039f64d876c533b1d1602d3b2d43e8ae7feb8e630387e6aba"
+    },
+    {
+      "bytes" : 1956,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/daemon-api-pins.json",
+      "sha256" : "c636e8d4132f940751890b68d7ab15779652685dff1c0ad6801aabe757b71792"
+    },
+    {
+      "bytes" : 8230,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/guest-components-pins.json",
+      "sha256" : "d26103439094a152e05907194b481921dce9c7c3598d529d8537df1ff6edf29d"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api"
+    },
+    {
+      "bytes" : 1065,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/VPhoneDaemon-MIT.txt",
+      "sha256" : "1f4b38df6a142e678a85d84c3a7ec4d1db328a556483241df714156134e81615"
+    },
+    {
+      "bytes" : 1071,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/icli-LICENSE",
+      "sha256" : "79b8af7a9877c42384ecc70ee213d554ec4ba0c65a029ff3e6af2fe045595523"
+    },
+    {
+      "bytes" : 9314,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/libarchive-COPYING.txt",
+      "sha256" : "d026cb2ca04b2eae819639f5e64a09549badefbd2eb2c410ef0f92b1048e2e1b"
+    },
+    {
+      "bytes" : 9314,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/libarchive.xcframework-LICENSE",
+      "sha256" : "d026cb2ca04b2eae819639f5e64a09549badefbd2eb2c410ef0f92b1048e2e1b"
+    },
+    {
+      "bytes" : 1105,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/llhttp-LICENSE",
+      "sha256" : "ebca854e0134cd256d673627c20499f42577eb74bacf08b9f25b626a73c91277"
+    },
+    {
+      "bytes" : 11751,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/swift-argument-parser-LICENSE.txt",
+      "sha256" : "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    {
+      "bytes" : 11751,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/swift-atomics-LICENSE.txt",
+      "sha256" : "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    {
+      "bytes" : 11751,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/swift-collections-LICENSE.txt",
+      "sha256" : "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    {
+      "bytes" : 11358,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/swift-nio-LICENSE.txt",
+      "sha256" : "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "bytes" : 3233,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/swift-nio-NOTICE.txt",
+      "sha256" : "5b701792f9e9ab67f654f1fd413ea09867df4f1aa6e278bd386dbbc5caf3b2c5"
+    },
+    {
+      "bytes" : 11750,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/licenses\/daemon-api\/swift-system-LICENSE.txt",
+      "sha256" : "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3"
+    },
+    {
+      "bytes" : 32530,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/python-darwin-arm64-3.13.json",
+      "sha256" : "7e0ce50077c8fc918f438d3bb3f8da414288b2a0a51520992bf3ae2ea3378852"
+    },
+    {
+      "bytes" : 11189,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/python-darwin-arm64-3.13.lock",
+      "sha256" : "a4b6e498b37ab53cc578e54968a2870afb99f5b3392898a7e3c3c492914f7fbd"
+    },
+    {
+      "bytes" : 32169,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/python-darwin-arm64-3.14.json",
+      "sha256" : "08f3c60f2a0da452ef92d9291d32c6f81d3f2aa9b6dce7a2c3eb579d55807c7b"
+    },
+    {
+      "bytes" : 11079,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/python-darwin-arm64-3.14.lock",
+      "sha256" : "d7947c972be97f2ffb71bd4c339fae0ebb2df73dec000b4977aa3a48752e793b"
+    },
+    {
+      "bytes" : 5103,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/dependencies\/virtio-sound-pins.json",
+      "sha256" : "afcfdb3dd9f2d2ffd1d1edb4776f13ef5741841380d19d305187ec887eb65f62"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/guest-resources"
+    },
+    {
+      "bytes" : 584,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/guest-resources\/manifest.json",
+      "sha256" : "f40fce5bb2cb09988fa2cf87c1f88b5dbb633052e882d3844deb522734898b42"
+    },
+    {
+      "bytes" : 240352,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/guest-resources\/vphoned",
+      "sha256" : "90adb96f671a8e415c79695ec0623bc1614df3fdc552f91b53367fcdaf001c36"
+    },
+    {
+      "bytes" : 240320,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/guest-resources\/vphoned-less",
+      "sha256" : "ad6eccac1e2cfd326f5b5fd7327df6bce7cf19082e766614f0604d99c7ef437a"
+    },
+    {
+      "bytes" : 19105,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/guest-resources\/vphoned.entitlements.plist",
+      "sha256" : "6e9f81cbe95e9db165141ce81126fdefb3b8fe5f188e1fa7dfa1b14cacb87a82"
+    },
+    {
+      "bytes" : 389,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/guest-resources\/vphoned.plist",
+      "sha256" : "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67"
+    },
+    {
+      "bytes" : 84,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/requirements.txt",
+      "sha256" : "fec8a19e8016b6b851af57458d04979181f459b8e94e73a7ba66673828a007ea"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts"
+    },
+    {
+      "bytes" : 1699,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/_analyze_ibss_nonce.py",
+      "sha256" : "833ba4c3f664fe99ccf4afdfbfa4f1861d2ada45674ec70a4f321bc45dab5e60"
+    },
+    {
+      "bytes" : 6395,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/boot_host_preflight.sh",
+      "sha256" : "88f9d6a3099db0f161ab8eff27aae794278d696ee4d8c01b74702e5f4a44b2f7"
+    },
+    {
+      "bytes" : 5139,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build.sh",
+      "sha256" : "ce077b93c54b997e0b73c7cb3a0d32f6444a8aae7fa8bc2b19e078c58b10a4e2"
+    },
+    {
+      "bytes" : 1857,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_daemon_api.sh",
+      "sha256" : "6baa34d964603a2066d2f231b18b6ef5b96f9873234fe711cd78c0cb4a945d84"
+    },
+    {
+      "bytes" : 289,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_guest_components.sh",
+      "sha256" : "4439595efc9fdfb869d8e2746b8295b850fff5c86ef9ac6a396983b2a6080dce"
+    },
+    {
+      "bytes" : 924,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_guest_payloads.sh",
+      "sha256" : "a9e409c4abf0d5773171b172f38da63d1057709379e1980cda9c0ef4e0f0c62f"
+    },
+    {
+      "bytes" : 779,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_guest_signer.sh",
+      "sha256" : "89ed2aa28a926894fb97e03602747c9189ce25db763bdf32fc3fdeb228d4926b"
+    },
+    {
+      "bytes" : 3313,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_helper_candidate.sh",
+      "sha256" : "e6a9c2561f7fc9d64d1ce19f61400eb9f9922de3836ba427be9e7d27f8441cef"
+    },
+    {
+      "bytes" : 4692,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_launchpad.sh",
+      "sha256" : "6e3da0eda31811bfa8ba4691b6185afc67639017351fc99f207c56b654a3d2a5"
+    },
+    {
+      "bytes" : 712,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/build_runtime_tools.sh",
+      "sha256" : "08ec623320afd0ada02afdfbfcc40e6ab9000bc2658c2d4bf220eabd17714dcc"
+    },
+    {
+      "bytes" : 5405,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cache_systemos.py",
+      "sha256" : "7619cc1253be878e5fc9167e932dda36f92e1e87b781fec068ea2392442122dc"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/camfix"
+    },
+    {
+      "bytes" : 8,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/camfix\/.gitignore",
+      "sha256" : "4ce880cddc44eb0514fc484231a647d2fd997a65d43308bd78b4984475d98c51"
+    },
+    {
+      "bytes" : 71892,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/camfix\/libcamfix.m",
+      "sha256" : "dee197bf1c52be17fb744a928be0cb217a01a1084491e6e1196ff5adadf7db0e"
+    },
+    {
+      "bytes" : 327,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/camfix\/libcamfix.plist",
+      "sha256" : "4d6ac52c31e657de2f4e9523087d83b599e055056c2e0529260942187e0043ad"
+    },
+    {
+      "bytes" : 24273,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_disk_txn.py",
+      "sha256" : "f2e0e723d4bf2204a1671b5a625f0394709ef1aad81ae3d4035b47a32402bef2"
+    },
+    {
+      "bytes" : 39650,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_env_update.py",
+      "sha256" : "bdf2a86d3a0169957899a6e7bcce9989b00f9631d57a8ae42648f205909d090c"
+    },
+    {
+      "bytes" : 20943,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_install.sh",
+      "sha256" : "f6b5c3052e15c354a521bfc77a7ec7f15d4510e4669c18650aa3a49f85befae8"
+    },
+    {
+      "bytes" : 16558,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_install_dev.sh",
+      "sha256" : "afd49071b966511666713ab22737ce8dafde1009cad5733cbc91becb40151074"
+    },
+    {
+      "bytes" : 35838,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_install_exp.sh",
+      "sha256" : "3fc0dab9562e6f8b56daf1bc8afe084f3bb98cb1a9d6c41487d4e3c718e86b4d"
+    },
+    {
+      "bytes" : 21330,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_install_host.sh",
+      "sha256" : "a2b40c02f6df4553d34f4b24da3ead7f985c4ff548fa8d2503de5d1a8c608b89"
+    },
+    {
+      "bytes" : 20474,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/cfw_install_jb.sh",
+      "sha256" : "6ff45791d4af04f164c3c973be0c9a686b28d4b40cc15b7845154a0541240d2b"
+    },
+    {
+      "bytes" : 4916,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_bundle.py",
+      "sha256" : "501ec1060c4aaaff45c0dd0c4664096b26a61cdfe8d74198797aaf4350fa42fc"
+    },
+    {
+      "bytes" : 6844,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_daemon_api.py",
+      "sha256" : "0054e427e208aba85f8d4b9b5858867dcf115a06852e09b75bd66ba54c239046"
+    },
+    {
+      "bytes" : 2085,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_file_digest_memory.py",
+      "sha256" : "0be28d61375c5e4989eee78312422d2983e2756eeed023c2e0af3530945affe5"
+    },
+    {
+      "bytes" : 3464,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_guest_components.py",
+      "sha256" : "b4668f11853ec2f21c64a6747f5c332434314605d39ec7c37f0733110ba1cd7b"
+    },
+    {
+      "bytes" : 3586,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_guest_payloads.py",
+      "sha256" : "01b3f0093188d8d2a2e167b34af971c636ff8ec2ad0ef82cf937441555c31a56"
+    },
+    {
+      "bytes" : 8273,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_launchpad_bundle.py",
+      "sha256" : "71668ae2f6eeebcf01a520ffa906adb30ab6eaed594b0ced28b316402150d351"
+    },
+    {
+      "bytes" : 9251,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_launchpad_strings.py",
+      "sha256" : "0c66e0d1ac533e7dd577e886e34f49f211e4c489db8a3b6555cc758afd827dc6"
+    },
+    {
+      "bytes" : 6139,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_patch_report.py",
+      "sha256" : "bda3b6acfb8950b6d8ae9ca342bddd190469f5e61a5b2831bd315d47d004a925"
+    },
+    {
+      "bytes" : 3925,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_python_runtime.py",
+      "sha256" : "7fc8dfcda28adbd54e7fc4417f06e892efd43e1baf0e09f0116a96bf48c333cb"
+    },
+    {
+      "bytes" : 1612,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_scripts.py",
+      "sha256" : "84a56f17c06b89e97e8d51457b6d4ee0125b5e465cc7d51adbdd4ca7edf94893"
+    },
+    {
+      "bytes" : 3118,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_tar_pipe_memory.py",
+      "sha256" : "4b4ce9a6a252448fc56f1d46274f414cf13150665326c5cacaea4cbd559f20c2"
+    },
+    {
+      "bytes" : 508,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/check_virtio_sound.py",
+      "sha256" : "23698b61e84b4c79621707e67c67e8c39e28fe20dd03b82f0bb7addf6a93412c"
+    },
+    {
+      "bytes" : 3644,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/daemon_api_overlays.py",
+      "sha256" : "dc793006b248063773ddfa939d748e30be5a5c7ae1a83b05b607c9f68b7794df"
+    },
+    {
+      "bytes" : 59679,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f1_runtime_acceptance.py",
+      "sha256" : "5b27687e598b05668a3a365d8c36a7446b0c387b3a0eede3c89ae20dea6d092b"
+    },
+    {
+      "bytes" : 53937,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f1_support_matrix.py",
+      "sha256" : "44051ad5d9dfd3d4e0e428f0032aee6a3a88c7f2b76939683607715ba0ae66bf"
+    },
+    {
+      "bytes" : 33335,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f2_dual_vm_acceptance.py",
+      "sha256" : "6528766f93732460d0a00726606924ab0f955fbc16f40ba41b8bb9f031b20c9f"
+    },
+    {
+      "bytes" : 123727,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f3_benchmark.py",
+      "sha256" : "59fe5c84ba3affc8eea8d961691d8487cd1f22d90ab132a5851b16bc0c76697d"
+    },
+    {
+      "bytes" : 11603,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f3_common.py",
+      "sha256" : "2e502c218e8073747d7c89ce7568d3d83418032b40a110d9b5f0a10d679e5355"
+    },
+    {
+      "bytes" : 31206,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f3_host_sampler.py",
+      "sha256" : "3f85a9f2f6d2e4ff4e203b6053cef40f4f5dfd584fa6ec93c604decbf4a02445"
+    },
+    {
+      "bytes" : 30577,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/f3_stats.py",
+      "sha256" : "a2b0a94ba8aeaa3eef2471c29908a79bd54c7261a73c14a732842f207fcdef71"
+    },
+    {
+      "bytes" : 4242,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/fetch_debs.sh",
+      "sha256" : "46a50bd70a1f48fdd0529ebf5ffcdf8e765e55d715dd61c94a91e02f557da866"
+    },
+    {
+      "bytes" : 2000,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/firmware_worker.py",
+      "sha256" : "588d0c9ac9d8419e2bc58340e392d213d008af8bacbc0692d5a10a4029b2eb40"
+    },
+    {
+      "bytes" : 9661,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/fw_manifest.py",
+      "sha256" : "f7233536a02d8d75d2b17c1135f6b380172bb71195706f451c01fb57e1eb8f39"
+    },
+    {
+      "bytes" : 27768,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/fw_prepare.sh",
+      "sha256" : "06ce8b054db8c5c9489e4263b649fa6dc92ca2d48561c0b87760e626cef7109a"
+    },
+    {
+      "bytes" : 3037,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/generate_patch_id_migration.py",
+      "sha256" : "c0869e9b7b910cdb06c0a846b5aa2c9a0dcc36856e8e6cc38f9bb1b2dc2e3654"
+    },
+    {
+      "bytes" : 2260,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/guest_environment.json",
+      "sha256" : "6c1c88c90d15319f44fef7f94502b49d5407d196749658120f1ce6d170fefd98"
+    },
+    {
+      "bytes" : 6640,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/host_control_client.py",
+      "sha256" : "ff2641a67e1ffd3eedf0e72a0c8731c2ff5c02cdb8f0f05aaca380fb1a4edd6f"
+    },
+    {
+      "bytes" : 15248,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/ipsw_cache_entry.py",
+      "sha256" : "1bc67ad8af34be925a225b2f888dc748fcafc335a007b20d39fcbebdebf2b800"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/lib"
+    },
+    {
+      "bytes" : 5319,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/lib\/cfw_common.sh",
+      "sha256" : "b9a5bc1ac9fb83ec35cd68fe9bd35c44a8d09d9f23d6a5c70cb33a5939221986"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses"
+    },
+    {
+      "bytes" : 46149,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/AppleMobileDeviceLibrary-NOTICES.txt",
+      "sha256" : "87639a172ba7b4eb8f60e6dc9f8f08d4325fcbd372dc91f2fb5d4ab507c81f24"
+    },
+    {
+      "bytes" : 1067,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/AppleMobileDeviceLibrary.txt",
+      "sha256" : "5dffb6c45faaa71f6c393255b135145cc17f0b07e968a705ef58f9c68aeb112d"
+    },
+    {
+      "bytes" : 35149,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/GPL-3.0.txt",
+      "sha256" : "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "bytes" : 26529,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/MobileRecoveryCore.txt",
+      "sha256" : "a1a33180d02960ab1c5de36cf20b1a2f0fe9888d83826ad263da5db52f1b183b"
+    },
+    {
+      "bytes" : 7651,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/MobileRestoreCore.txt",
+      "sha256" : "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    {
+      "bytes" : 1066,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/OpenSSL-SPM.txt",
+      "sha256" : "aa086b0a6f1539df31bd9347a73f9d49eff0b54fc6f2cd7ae0a6fe711c82a2ad"
+    },
+    {
+      "bytes" : 10175,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/OpenSSL.txt",
+      "sha256" : "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+    },
+    {
+      "bytes" : 9314,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/libarchive.txt",
+      "sha256" : "d026cb2ca04b2eae819639f5e64a09549badefbd2eb2c410ef0f92b1048e2e1b"
+    },
+    {
+      "bytes" : 26434,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/licenses\/libimobiledevice-LGPL-2.1.txt",
+      "sha256" : "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+    },
+    {
+      "bytes" : 1406,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/lock_python_dependencies.py",
+      "sha256" : "f1009621b60a9371137022995d8db5b67e7aaa21d6a21fb747a0c163ba5e0cdf"
+    },
+    {
+      "bytes" : 1606,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patch_camera_userland.sh",
+      "sha256" : "bba2bdf98f8569ae6215416b7f4f33f0faed2ba5f448cdff9d0acf528f1fcb9a"
+    },
+    {
+      "bytes" : 2672,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patch_hv_vmm_userland.sh",
+      "sha256" : "316b4a43c67d6475908ca96c72e5144b9103c0c79884924030b439daba711bdd"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers"
+    },
+    {
+      "bytes" : 186,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/__init__.py",
+      "sha256" : "45531a1ca2ca2b6bde3e49e064608e58b14eafe2949149de4438988b3de74137"
+    },
+    {
+      "bytes" : 1756,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/campo_mach_lookup_exceptions.py",
+      "sha256" : "8a18dc87779fc7a6c97b45e47a906d763522c4f70677194b38556825aac7580d"
+    },
+    {
+      "bytes" : 15404,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw.py",
+      "sha256" : "bb9d53a5b7137ed9656d675bf42e9d0ed2054fbee09af3e817a1ba32be64df48"
+    },
+    {
+      "bytes" : 7413,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_asm.py",
+      "sha256" : "e2aede49397ef48043f53c346ce8b5537df1c60c5de7219861993ecf8cae299e"
+    },
+    {
+      "bytes" : 3829,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_daemons.py",
+      "sha256" : "32be2fdb1f73973bc52fc4c49bbc1b1d36be757bb58ebc136c3b3b6d25b85ccf"
+    },
+    {
+      "bytes" : 13600,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_dsc_chunks.py",
+      "sha256" : "48b2462a4e467d193e328a4f0073333cc691c74ba980423be23317dc3e461463"
+    },
+    {
+      "bytes" : 11131,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_dsc_codesign.py",
+      "sha256" : "710e31cb072813dd5d808eacef93a7665d8897bc6c415e51683ab4882a3d40d0"
+    },
+    {
+      "bytes" : 12654,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_macho_codesign.py",
+      "sha256" : "d31aca8d458e5616668ece24246d930a1de1dd98e62ea8899cb6c70e25a6d305"
+    },
+    {
+      "bytes" : 3465,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_build_version.py",
+      "sha256" : "3db2de1ae1913c8201af44b33ba8fd5fb453df27814a6d80923deef67c6437d2"
+    },
+    {
+      "bytes" : 8406,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_cache_loader.py",
+      "sha256" : "deb789cb85e565a873b4d224ac070c6b6beb13fc68b2704050443075e85f872b"
+    },
+    {
+      "bytes" : 11769,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_camera_dsc.py",
+      "sha256" : "119cdf53b7b0fb022b8acbbd921ec15a3631c2d8fa326e142c60fbbf79a19981"
+    },
+    {
+      "bytes" : 11930,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_diskimagesiod.py",
+      "sha256" : "add5b2a12497a9d605de6b509d21eece89387fe135842b93de7e2c64f0e5b1ed"
+    },
+    {
+      "bytes" : 9695,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_dsc_maxslide.py",
+      "sha256" : "ad5434f552dfb16980ecc66bd239e0954bf6b4bc49c0783d11c49659e27be8e1"
+    },
+    {
+      "bytes" : 5710,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_hv_vmm.py",
+      "sha256" : "38bb19f3db25894f1b8f379ecded6c9f5ff14373ab14693cd423e06fa4e19dd3"
+    },
+    {
+      "bytes" : 12519,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_hv_vmm_dsc.py",
+      "sha256" : "9e8464de9e558322fd58ec347482437d09bf23a1c973b8ff9b0a44694da0c596"
+    },
+    {
+      "bytes" : 12090,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_hv_vmm_rootfs.py",
+      "sha256" : "8278917fa32fcb6cec982d1f52e5df00d04907b0fb9cecdd81f5114e89288519"
+    },
+    {
+      "bytes" : 8082,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_iomfb_force_kern.py",
+      "sha256" : "7042774ebb9698767b81531418724b75cbb2915cd213ba352f2577bad0dc1d33"
+    },
+    {
+      "bytes" : 7933,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_iomfb_swapend.py",
+      "sha256" : "61974b58e18db99b49f1e3a6693dd8ef455f6fee6227d50611569675e97c1c73"
+    },
+    {
+      "bytes" : 4899,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_jetsam.py",
+      "sha256" : "c9796d3b34a6220da2bce29a1d367ae14505fdce89901688393e6827d2854b6d"
+    },
+    {
+      "bytes" : 4534,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_lockdown_mode.py",
+      "sha256" : "e3adf020dfb323e80fa164070250932cf05d84cc5273908d2838cdf3fb0b96e2"
+    },
+    {
+      "bytes" : 7674,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_lsd_embedded_reg.py",
+      "sha256" : "5185588e84e63bef849cb0dd471f090c76b4ad353265bdedc19453332cf3334d"
+    },
+    {
+      "bytes" : 5848,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_mobileactivationd.py",
+      "sha256" : "57d69943a6c4ac1b0b7cf4f22b54ce9005d5378bc6abbbcc466133a7501e03a5"
+    },
+    {
+      "bytes" : 12014,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_post_restore_dt.py",
+      "sha256" : "37d2da9c1cc91446d51b708c03228271a5d543c1a0ed84ec281619cf517e7d4c"
+    },
+    {
+      "bytes" : 1943,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_seputil.py",
+      "sha256" : "f6184e9c1be05b71d852ab51601a8484979bbdbe03ca5ada979bbfa4ab984391"
+    },
+    {
+      "bytes" : 16664,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_watchdogd.py",
+      "sha256" : "26686b01d6a1993d111f2cdc7bb0a27b5f0882cbe8bcbb7ab6780cfea7429d80"
+    },
+    {
+      "bytes" : 9648,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/patchers\/cfw_patch_xpc_lwcr.py",
+      "sha256" : "ef94c78bb0d9a906d47f05b7f73618afdd5ebb068d1a1bac9ba6721662be4e92"
+    },
+    {
+      "bytes" : 8714,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/prepare_firmware_fixtures.py",
+      "sha256" : "37a53a0121858df740fd432143d00671ddda8be92da137377b9caf5fe8e6efcf"
+    },
+    {
+      "bytes" : 21601,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/pymobiledevice3_bridge.py",
+      "sha256" : "7aecca99298fe6944546f2a2e37858bb1a4711f012b4fa89e72ad271d5475739"
+    },
+    {
+      "bytes" : 5529,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/python_environment.py",
+      "sha256" : "e043c6185a428de6ea8f4d5ef38b009bcd706c218bcbfeaa0f4a2f158393a1e9"
+    },
+    {
+      "bytes" : 1407,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/record_build_dependencies.py",
+      "sha256" : "f918cd2e3f445abe6c097ee0a5c0ef348c363395dc166bcf70bf059eee4735dc"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/.github"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/.github\/workflows"
+    },
+    {
+      "bytes" : 698,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/.github\/workflows\/squash.yml",
+      "sha256" : "64294ab9e7e7b002ffd176bd1bedc8bd0952b0445c7e97e2583e5866b011cc6e"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/cfw_dev"
+    },
+    {
+      "bytes" : 263024,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/cfw_dev\/rpcserver_ios",
+      "sha256" : "4e2b6e349faedcad08bd2487944c556ccf47f31dfe5a10c546ed655bf7cd3fad"
+    },
+    {
+      "bytes" : 7733065,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/cfw_input.tar.zst",
+      "sha256" : "8749ba5fbd2a45f01903f1e6f331316ec5fb56329eaf7f2a1a77174234b3cf65"
+    },
+    {
+      "bytes" : 23861464,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/resources\/cfw_jb_input.tar.zst",
+      "sha256" : "8ae14132ff33234e7af14c6b92ce226a5c47bec4a370b18c9c5c429eaca1272a"
+    },
+    {
+      "bytes" : 2445,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/run_launchpad_cli_tests.sh",
+      "sha256" : "2077478761d1e08413a4c20de0eed0251a1eaf081a3fdef3f173c7c84eace2d3"
+    },
+    {
+      "bytes" : 5318,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/run_tests.py",
+      "sha256" : "953a946856e935c4b30026085efd73b8d5e47e8bf69715bc44c5da136f2d8865"
+    },
+    {
+      "bytes" : 3222,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/setup_tools.sh",
+      "sha256" : "caffc42fc204c51c35920ef9d1c90d397f672b5c403ecae59e9c2447bbe90142"
+    },
+    {
+      "bytes" : 409,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/setup_venv.sh",
+      "sha256" : "e827d3f90d3478e4f5e3416e157bbe73812898e3629dd2204db01db4651eb46d"
+    },
+    {
+      "bytes" : 1564,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/setup_venv_linux.sh",
+      "sha256" : "ff12150c60cb1e510915ca5bb3d839957b52adfb34be995164602491e411fd0c"
+    },
+    {
+      "bytes" : 2559,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/sparse_file.py",
+      "sha256" : "36d703f18b2fe929b361cbd703dcf3c0745f362497b10e2481806f6d7518c034"
+    },
+    {
+      "bytes" : 2286,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/ssh_forward.sh",
+      "sha256" : "366d33e6d2bdd9819cd9bc4842b0e5127dadd55ff4cd8d9bf82a9f94daa5ac53"
+    },
+    {
+      "bytes" : 2365,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/start_amfidont_for_vphone.sh",
+      "sha256" : "6c2b93fdb54d37c78c242cfb1b8308058a82a3d45b0114f1dd982892226e47fd"
+    },
+    {
+      "bytes" : 1194,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/tail_jb_patch_logs.sh",
+      "sha256" : "d55fb20d84148197fd335be5fc965e7ac6d4c7f46f4204c50668a3194cf8accd"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/tweakloader"
+    },
+    {
+      "bytes" : 561,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/tweakloader\/README.md",
+      "sha256" : "5d36df2ac4c6ea2f93c9b5ad8ad68f9c15f2d7011725ae8e7fb60001b8dbb187"
+    },
+    {
+      "bytes" : 12317,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/tweakloader\/TweakLoader.m",
+      "sha256" : "d122170f7cf7ec5896bc0c36a567d07e8cfe27ce66650f934c96efed1f79fbd0"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vcamcaptured"
+    },
+    {
+      "bytes" : 8,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vcamcaptured\/.gitignore",
+      "sha256" : "4ce880cddc44eb0514fc484231a647d2fd997a65d43308bd78b4984475d98c51"
+    },
+    {
+      "bytes" : 589,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vcamcaptured\/Makefile",
+      "sha256" : "0a342b093f4ee7e102e417b41d4423da76e99c848b2a3ae469a3227bacdd4568"
+    },
+    {
+      "bytes" : 214121,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vcamcaptured\/libvcamcaptured.m",
+      "sha256" : "3a89baa8dfa3a0743a217358a699749fc099895a1c358facd4f99555f3eaf531"
+    },
+    {
+      "bytes" : 305,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vcamcaptured\/libvcamcaptured.plist",
+      "sha256" : "7fbfdc2b371565d7b34876db271ff89075a483ca5054908b0f4a58ad6d1ef678"
+    },
+    {
+      "bytes" : 3829,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_backup.sh",
+      "sha256" : "b6ab395d97dbe09bc4027f3b6ad2d97d79a4d2b4d3114b4b256e2ba5c9feb424"
+    },
+    {
+      "bytes" : 6387,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_create.sh",
+      "sha256" : "6003d0fc11c3ff1a12a18fc911dcd878ead8e82e54828639d9b69f6666bc8b5c"
+    },
+    {
+      "bytes" : 3374,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_lock.py",
+      "sha256" : "9d651f9b91d60084e694e39f0e35ed3ac8c8a0e21b429e278b294010c0f2b7e2"
+    },
+    {
+      "bytes" : 3446,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_manifest.py",
+      "sha256" : "4abd2a3286e8ad10bc32ffc6799a3f1cfd25ab7b35ed287ef745c756e35d8d77"
+    },
+    {
+      "bytes" : 18965,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_package.sh",
+      "sha256" : "dfa69b71d3a30c26120047065ae4570fc283e00da5ba6e4d12e4a205e24f7248"
+    },
+    {
+      "bytes" : 4365,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_restore.sh",
+      "sha256" : "c44b1de2bc6b4ea964a5e6c37fcddaa29b0f95fae96326256f90417162eb1bfd"
+    },
+    {
+      "bytes" : 5992,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vm_switch.sh",
+      "sha256" : "fa1326e8966b833807f8c5e1d269f77bb0c1e6daa59ed2c745d3d9d325f0f9f1"
+    },
+    {
+      "bytes" : 2154,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphone-amfidont",
+      "sha256" : "6957e55ad9e9b6e48bc882fd3539f2b23c8c11691017009bed29c00ae1d40712"
+    },
+    {
+      "bytes" : 648,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphone_jb_setup.plist",
+      "sha256" : "80ff5a830b81012c1ecfdc596bfb05557ace23ae747002233b2b88b464de9efc"
+    },
+    {
+      "bytes" : 12965,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphone_jb_setup.sh",
+      "sha256" : "510965f0ddcd67ca1b52ee9f71956b3ed51f85b14532beac09d2a404df0645d5"
+    },
+    {
+      "bytes" : 761,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphone_sshd.plist",
+      "sha256" : "76dfc165b2af2e8251f470692ab1ecc6e7da3d020cf8e3b6186e45270ab49745"
+    },
+    {
+      "bytes" : 3919,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphone_sshd.sh",
+      "sha256" : "e9c8070be0e10586f654ca55b0a36db1486cfb5e522a68c061c65040b26b8a97"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned"
+    },
+    {
+      "bytes" : 679,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/Makefile",
+      "sha256" : "26f2d48d722032158a16a62d411d664c762bbaa5fb66a114acc237b3afa7367a"
+    },
+    {
+      "bytes" : 19105,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/entitlements.plist",
+      "sha256" : "6e9f81cbe95e9db165141ce81126fdefb3b8fe5f188e1fa7dfa1b14cacb87a82"
+    },
+    {
+      "bytes" : 5563,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/signcert.p12",
+      "sha256" : "0d8e568d90518d6cb9580b410a45fea7464cd7ebe6c72c6dc44bdc9b2fa90ae0"
+    },
+    {
+      "bytes" : 139,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/unarchive.h",
+      "sha256" : "e0b54e38a68755a1359830691778c54454830de6e4d998bff7b43086ea286302"
+    },
+    {
+      "bytes" : 4100,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/unarchive.m",
+      "sha256" : "282807272145b71c82b5b834b9891f6adfcf8d49d17e3f9e7e370e5a0e0f97d7"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vendor"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vendor\/libarchive"
+    },
+    {
+      "bytes" : 3311,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vendor\/libarchive\/archive.h",
+      "sha256" : "225c263f40d0edc8a95b833e24e89b01c45e3d5ea55402d7b38a92e9d0d76ce5"
+    },
+    {
+      "bytes" : 1892,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vendor\/libarchive\/archive_entry.h",
+      "sha256" : "5bca2acf829ef575f10eec1bdd3742c347d294e81aed4926c255243adf71d93c"
+    },
+    {
+      "bytes" : 23280,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned.m",
+      "sha256" : "1eb57b50a235bc60876f11870edb6ea93de1c3b637a0adfe049fb2bff7f63648"
+    },
+    {
+      "bytes" : 389,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned.plist",
+      "sha256" : "bff9167348456c64e66cd1589a3b1d550c7ba1f7a9edb084ceea2294ea865c67"
+    },
+    {
+      "bytes" : 399,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_accessibility.h",
+      "sha256" : "c290b3afbd5423c46f6b87d0ea8c62715bf2228bfb54cc0f5eaa2fc3b21829d4"
+    },
+    {
+      "bytes" : 685,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_accessibility.m",
+      "sha256" : "b012d3890c3a6bc9b6191c51139acce19332b49cc6bab8a77d32288d2bce796c"
+    },
+    {
+      "bytes" : 1174,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_apps.h",
+      "sha256" : "caf4b3594a41c3602cdb32967bb362c254b845d8e87d57477c182e5f0d7f9922"
+    },
+    {
+      "bytes" : 14955,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_apps.m",
+      "sha256" : "16167f6a299cd54dac35d5fec58b012c70b37d2c468c0d8fb99ecba5990fd3a3"
+    },
+    {
+      "bytes" : 589,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_clipboard.h",
+      "sha256" : "d35febc4e57110d76c91788362a4a6d296a63ad1d45af65b91088f8aab7ced54"
+    },
+    {
+      "bytes" : 5021,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_clipboard.m",
+      "sha256" : "328426b28791cba849e181e8e427ad2df12d06ec0c91ab18381282ca8c499e1f"
+    },
+    {
+      "bytes" : 694,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_devmode.h",
+      "sha256" : "e6a7c4936f73c1e5ecc1eb8858b56d4feb28c6340c72e154f5bec77ddfa894fc"
+    },
+    {
+      "bytes" : 3774,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_devmode.m",
+      "sha256" : "6921faaaee5505d389fdb9413f7454f17fb35e483f7c67e0930dbef4bc3d30a8"
+    },
+    {
+      "bytes" : 469,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_files.h",
+      "sha256" : "8f1187bf790fc7799565535bd5f220c26e647e38dd17949bbf8c3b664ff38efd"
+    },
+    {
+      "bytes" : 9195,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_files.m",
+      "sha256" : "f456055b28829d0b809bed76da9377f78838fe5ea99068357a85caeb29cc0bab"
+    },
+    {
+      "bytes" : 1135,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_hid.h",
+      "sha256" : "72cfc8975bcc12d32ebb1b74afbc19003da329760298615f17db131e83fa6cee"
+    },
+    {
+      "bytes" : 6562,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_hid.m",
+      "sha256" : "46a735cb31365f5a2fc4833a202e44fca48215a47a14365fcb74c9e14f973f45"
+    },
+    {
+      "bytes" : 136,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_install.h",
+      "sha256" : "e3497886ffc7034c2b5c5a185f7900d078c81b6a9ffa6822674172c85823a060"
+    },
+    {
+      "bytes" : 37942,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_install.m",
+      "sha256" : "6dcecc4cc1516c14c2ec2718e39491898eeb53844da16c1dc1f18ba23e6d7384"
+    },
+    {
+      "bytes" : 354,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_keychain.h",
+      "sha256" : "f50483984fd7c0b88a44a82dce864d969a0d379142dec186935e7bc1e27329ce"
+    },
+    {
+      "bytes" : 9744,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_keychain.m",
+      "sha256" : "9bbbce2df6c2ae93a647116a1353ae394ec6eb0afeed3379f505de5c57225d27"
+    },
+    {
+      "bytes" : 2340,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_location.h",
+      "sha256" : "0c8dccdb6e931a4b0efbc75b06878964d3dc9594c5c6d1fcf77ab8d6fc775832"
+    },
+    {
+      "bytes" : 12493,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_location.m",
+      "sha256" : "dff33afc083e1b64e83709878e7f9515ee2985885fa5469c8b771efa7c2fa38c"
+    },
+    {
+      "bytes" : 107,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_notify.h",
+      "sha256" : "d78b3264221e502d2916def4374f91379335bd755274abef3f99976c50bab80b"
+    },
+    {
+      "bytes" : 1086,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_notify.m",
+      "sha256" : "42c776cdbdfbde5727d33a6c60fb474fd7e40e3d239fedf0fd214e90e72afc85"
+    },
+    {
+      "bytes" : 1553,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_protocol.h",
+      "sha256" : "cf499fb43828c13d7462dfcbc6db127db682b3f83c6571a5348c63a0bf4e40a8"
+    },
+    {
+      "bytes" : 2885,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_protocol.m",
+      "sha256" : "81e46267327d9f1db1bb29c8ee447f2acb25aee21427989714e4357532beabe1"
+    },
+    {
+      "bytes" : 374,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_settings.h",
+      "sha256" : "c78072f438d89138698e21cc2e69ab70fef98a85064b1913179a441aa28f9ce9"
+    },
+    {
+      "bytes" : 5712,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_settings.m",
+      "sha256" : "10ad483bc28d4b9db6e4c0624347370fa19125aa8f7b2771be91636df94253da"
+    },
+    {
+      "bytes" : 1148,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_shell.h",
+      "sha256" : "b9d458567af540f1537345a9b4573fff757a3e70167b135b37cf8361c4600317"
+    },
+    {
+      "bytes" : 9995,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_shell.m",
+      "sha256" : "e3e82926e6c98b7c1e12d478cce0f91bc8cf76d762f24eb74be0346df1b5497a"
+    },
+    {
+      "bytes" : 265,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_url.h",
+      "sha256" : "ed98d88594ca65b15f6d2501bc285ef284f3bd591b6cc2a255e63429735ad66f"
+    },
+    {
+      "bytes" : 1305,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_url.m",
+      "sha256" : "c3fd08af6a068d4c9c417755ba12915dbd47a3bf00c76ed0d0f033eab19daf66"
+    },
+    {
+      "bytes" : 4600,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_vcam.h",
+      "sha256" : "3164ce465946e2e4b7f6d268aebaa86f8d24157475c7611e0543f8b1aa46a771"
+    },
+    {
+      "bytes" : 15631,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vphoned\/vphoned_vcam.m",
+      "sha256" : "d95a9964b5364fae84b79926b671b6742f327f0b35caaf5263deb0f255b13541"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vpregister"
+    },
+    {
+      "bytes" : 2836,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/Resources\/scripts\/vpregister\/vpregister.m",
+      "sha256" : "2b3780d0409b144649b1c28985dcd3cc6e2682dc288ed8a55057b4b51db2c6e5"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/tools"
+    },
+    {
+      "bytes" : 6929,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/tools\/apfs_snap_rename.py",
+      "sha256" : "0b8e28f36d058f3a5a9731e46b80c8b15084c119a446c22a4ab4b5439304f452"
+    },
+    {
+      "bytes" : 2154,
+      "kind" : "file",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/Resources\/vphone-amfidont",
+      "sha256" : "6957e55ad9e9b6e48bc882fd3539f2b23c8c11691017009bed29c00ae1d40712"
+    },
+    {
+      "bytes" : 0,
+      "kind" : "directory",
+      "mode" : 493,
+      "path" : "VPhone.bundle\/Contents\/_CodeSignature"
+    },
+    {
+      "bytes" : 56295,
+      "kind" : "file",
+      "mode" : 420,
+      "path" : "VPhone.bundle\/Contents\/_CodeSignature\/CodeResources",
+      "sha256" : "ccc430504447acb95a08679196697ea482a7a924f359452a9012829eac87b811"
+    }
+  ],
+  "external_python_locked_probe" : false,
+  "resolved_resource_paths" : {
+    "base" : "\/var\/folders\/z5\/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0\/T\/vphone-create-toolchains-2035870432\/74436a87-ef29-4208-beed-03b62e7c9c95\/VPhone.bundle\/Contents\/Resources",
+    "guestResources" : "\/var\/folders\/z5\/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0\/T\/vphone-create-toolchains-2035870432\/74436a87-ef29-4208-beed-03b62e7c9c95\/VPhone.bundle\/Contents\/Resources\/guest-resources",
+    "vphoned" : "\/var\/folders\/z5\/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0\/T\/vphone-create-toolchains-2035870432\/74436a87-ef29-4208-beed-03b62e7c9c95\/VPhone.bundle\/Contents\/Resources\/guest-resources\/vphoned",
+    "vphonedLess" : "\/var\/folders\/z5\/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0\/T\/vphone-create-toolchains-2035870432\/74436a87-ef29-4208-beed-03b62e7c9c95\/VPhone.bundle\/Contents\/Resources\/guest-resources\/vphoned-less"
+  },
+  "retention" : "Successful and refused attempts release their copies; failed started attempts retain copies. At most 8 snapshots \/ 2 GiB are admitted. Retained evidence requires explicit cleanup. Temporary storage may be cleared by the OS.",
+  "schema_version" : 1,
+  "sha256" : "a10d854284516cae7b288506ca23e1fcc89e0e5a9cc692bc6e923d8acc117672",
+  "signature_verify_exit" : 0,
+  "snapshot_id" : "74436a87-ef29-4208-beed-03b62e7c9c95",
+  "snapshot_path" : "\/var\/folders\/z5\/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0\/T\/vphone-create-toolchains-2035870432\/74436a87-ef29-4208-beed-03b62e7c9c95",
+  "source_executable" : "\/Users\/qcz3840\/.codex\/worktrees\/upstream-2d21d21-integration\/vphone-cli\/.build\/vphone-cli.app\/Contents\/MacOS\/vphone-cli",
+  "source_resource_base" : "\/Users\/qcz3840\/.codex\/worktrees\/upstream-2d21d21-integration\/vphone-cli\/.build\/vphone-cli.app\/Contents\/Resources",
+  "vm_help_exit" : 9,
+  "vm_started" : false
+}

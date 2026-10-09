@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B24 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B25 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -794,3 +794,29 @@ B24 的202项处置为：175项 adaptation_planned、11项 already_equivalent、
 机器校验覆盖202/342唯一SHA及精确集合、47项合同/依赖/入口、原状态保留、计划适配未提升、路径实有和摘要一致；全部检查通过。独立结构检查不代表第二次完整语义审查。冻结源码对象和删除记录位于 `evidence/B24/T02/evidence-objects/`，完整diff及审查时源码压缩档位于 [source-evidence.tar.gz](evidence/B24/T02/source-evidence.tar.gz)。当前台账见 [逐提交审查](T02_commit_semantic_reviews.json)、[342提交台账](commit_ledger.json)、[47能力台账](capability_ledger.json)、[本地路径映射](local_path_map.json)。
 
 独立审查修正后的一次全量运行仍出现12项HTTP/WebSocket/XPC连接或超时失败；隔离17项/3套件通过，最终同一标准入口1262项/202套件及计时9项/8套件通过。7项WebSocket失败用例使用内存传输，不据此归因为网络；原因未查明。失败与成功日志均保留。最终客户端另通过两种归档后端的合成往返，8个持久文件一致，native/system-tar归档分别1272/1416字节；该结果不替代真实64GiB VM或可信store receipt验收。
+
+
+## B25 结果（2026-10-09）
+
+本轮继续 T02–T08、T24、T40、T46 共10项。已验收6项（T02–T07）；T08/T24/T40/T46仍未完成，没有新增整项验收。47项仍为8项accepted、38项必选尚未完成、1项可选延期。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T08 | 只读核对固定IcliKit的domain顺序和144状态说明，未更改权限或添加fallback | 缺实际RootHide路径；服务144和部分旋转未生效，原因未查明 |
+| T24 | 宿主Mach-O依赖递归封装、相对引用、嵌套签名顺序和Bundle验证；禁止读取Homebrew时ldid/trustcache实际运行通过 | 完整TCC责任链、历史helper实际XPC拒绝；Python/PATH不在本轮闭包内 |
+| T40 | 每attempt私有CLI/VM与资源副本、聚合摘要、resume整体接受/拒绝；最多8份/2GiB并预留64MiB；失败副本保留 | Python/SDK/JB现场编译/既有cfw_input/可信新机binding未形成不可变依赖闭包；完整四层升级回退矩阵及64GiB往返仍未验 |
+| T46 | 普通命令同步终止入口及有界排空实现、相关与标准测试通过；最终release实际日志精确匹配，UI退出操作被锁屏中断 | 解锁后重跑最终普通/escaped两组退出；helper组合及实际VM吞吐仍待验收 |
+
+T40独立审查发现3项Important：开发debs.list遗漏、Disk.img链接别名绕过、复制期间来源增长可超过容量预检。三项均建立行为RED，修复后定向与相关测试通过，静态复审无新增Critical/Important。创建取消替身曾因来源revision变化提前拒绝，独立运行也复现。fs_usage确认QzhddrSrv在清单检查与复制之间对fixture requirements.txt执行setxattr，ctime变化而其余所记录revision字段相同。夹具预读及有界稳定等待未解决问题，已撤销。经复审，ctime/ACL/扩展属性/所有者未进入manifest；去掉ctime-only额外拒绝，保留inode、mode、size、mtime、逐文件SHA及全来源二次清单检查。确定性测试覆盖两个元数据变更时点、恢复mtime的内容改写与链接替换；原失败和诊断保留。
+
+本轮标准Swift曾失败两次。首轮在新增终止门控测试中观察到quick命令执行成功，日志没有确定终止任务启动、超时和quick执行的准确先后；同步begin关闭入口后再异步wait已通过定向检查。第二轮在旧StopRefusal/ParentExit测试中记录5个issues；两个受控实验分别用50ms子进程存活时间和暂停周期输出复现相应断言失败。最终fixture改为停止拒绝后的存活回执、父进程退出后UUID请求与原日志回执，并保留存活、session、PPID、隔离和尾部断言。条件等待使用既有10秒上限；Suite时间限制和性能断言不变。上述两个fixture调整未修改生产停止信号或标准测试分组。受控实验不证明第二轮实际失败的完整原因，原原因仍未查明。原失败、采样和定向检查保留在B25及t46/legacy-fixtures中。
+
+早期隔离UI的普通和escaped两组退出验收通过，各10002行/138939字节，属于同步门控修改前快照，不能替代最终release复验。最终53580180的签名隔离副本与生产主程序在移除签名后字节一致，已启动doctor并记录writer PID51919存活；随后CUA报告Mac已锁定且自动解锁失败，未执行退出操作。writer自释放后10002行/138939字节与预期精确一致，SHA256为`f972c4a3f4ffda6f317183c1cb66bc06522e5f6f454d6bf19c545c8ae69eedad`，包含panic尾部。隔离应用PID51581仍打开，待手动解锁后退出并重跑两组最终UI；未通过shell操作该UI。早期界面选择调用分别耗时约2564秒和865秒，未计为应用性能。最终UI的当前限制见`B25/ui-acceptance.json`。
+
+首次签名构建中，CLI Bundle检查通过，Launchpad新校验器拒绝内部`@loader_path`；进一步核查发现外层两个宿主程序保留Xcode绝对rpath。校验器修复对loader/executable相对路径解析后进行Bundle包含检查，未知token、相对穿越、符号链接越界和非系统绝对路径仍拒绝；Launchpad在最终封存前对外层宿主程序执行native staging。独立复审要求补齐裸token实际依赖解析、拒绝修改Helpers嵌入Bundle，以及拒绝同一来源库在不同宿主程序上下文解析出不同依赖的行为测试。该修复未修改Swift源码，最终标准Python及签名构建结果另行记录，保留首次构建失败。
+
+历史v1 helper实物SHA256为`bbc0917c2d5551de48b2eff7db8396c1c1d9a7d62f48eecdacf66a82da48b3c4`，内嵌版本1、签名团队空。只读配置检查退出78，未安装或启动服务。该结果不替代历史helper与最终客户端的XPC矩阵。TCC目前只有静态责任链和不记录坐标的验收步骤。
+
+开发资源副本CLI resources与VM --help只读探针通过。最终安装布局副本235个条目、161310727字节；CLI resources及静态签名通过，原VM及副本VM --help均退出9，原因未查明；外部Python探针不可用。签名通过不代表VM可执行。本轮未启动VM、未修改AMFI或TCC，保留客户机载荷摘要。
+
+本批源码提交为`0d1dc844`、`53580180`，最终构建基线为`53580180`。标准Python 611项（2项跳过）；Swift Testing常规1285项、计时9项；XCTest 254项（3项跳过）。签名构建、Bundle检查、实际内嵌CLI 4项及安装资源副本探针1项通过；最终原生依赖检查89条命令完成，2项Homebrew读取拒绝对照及8项沙箱工具操作符合预期。结果见[B25-summary.json](evidence/B25-summary.json)。测试原始输出、独立审查、实际UI记录和失败诊断保存在[evidence manifest](evidence/B25-evidence-manifest.json)。原始日志按`* -text`保全，最终测试结果不能替代未执行的实际VM接受条件。

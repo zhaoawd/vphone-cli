@@ -1,0 +1,28 @@
+{
+  "base_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+  "problem": "Final Launchpad check rejected internal @loader_path, then exposed genuine absolute Xcode build rpath on both host executables.",
+  "root_cause": "Checker accepted only absolute system LC_RPATH; Launchpad build did not run native staging for outer host executables.",
+  "changes": [
+    "Check loader/executable-relative rpaths after resolving symlinks and enforce bundle containment; retain root executable context while following dylib dependencies.",
+    "Reject unknown @rpath tokens, bare relative paths, symlink/relative escapes, and absolute non-system paths, including Homebrew and Xcode.",
+    "Run native staging on assembled outer Launchpad before embedded manifest/final seal; embedded app excluded from host staging traversal."
+  ],
+  "files_sha256": {
+    "scripts/build_native_dependencies.py": "09f59eee9fdbe2a4f562f4f0fe61666d595b6138b239c63f62811b8f8349e0dc",
+    "scripts/build_launchpad.sh": "e989f51767f43eac1d70dcd9d11ee12bfb8f3c743cca78eea2e3c07e718feb98",
+    "tests/test_bundle_native_dependencies.py": "20925d2a4fdd81d9a17f0a1ee518c3c625323e8d00d51119d5f6c560ed6b830e"
+  },
+  "validation": {
+    "red": "final-rpath-actual-red.log and final-rpath-synthetic-red-independent.log: actual @loader_path rejection plus 4 failing internal relative token cases.",
+    "green": "final-rpath-bundle-green.log: 16 tests passed / 16.683s, including loader/executable token cases, 6 unsafe rpath cases, nested app byte/signature preservation with two outer host roots, and prior native tests.",
+    "launchpad": "final-rpath-launchpad-tests.log: 23 tests passed / 0.150s.",
+    "existing_signed_artifact": "final-rpath-actual-after-relative.log: still rejected absolute Xcode rpath as required. No signed app modifications made.",
+    "shell_syntax": "zsh -n scripts/build_launchpad.sh passed",
+    "diff_check": "git diff --check passed"
+  },
+  "limits": [
+    "Final make launchpad rebuild remains for parent; existing signed output intentionally still fails absolute Xcode rpath.",
+    "No SwiftPM, final-proof.py, TCC/helper/AMFI/VM action or signing/app mutation performed in this repair.",
+    "Full Python suite was not rerun in this scoped repair; parent owns final standard validation."
+  ]
+}

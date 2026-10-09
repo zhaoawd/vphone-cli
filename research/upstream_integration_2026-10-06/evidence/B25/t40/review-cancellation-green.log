@@ -1,0 +1,82 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling limera1n.c
+[5/35] Compiling recovery.c
+[6/35] Compiling normal.c
+[6/35] Compiling download.c
+[8/35] Compiling asr.c
+[9/35] Compiling fdr.c
+[10/35] Compiling idevicerestore.c
+[11/35] Compiling ace3.c
+[12/35] Compiling img3.c
+[13/35] Compiling dfu.c
+[14/35] Compiling mbn.c
+[15/35] Compiling img4.c
+[16/35] Compiling ipsw.c
+[17/35] Compiling ftab.c
+[18/35] Compiling locking.c
+[19/35] Compiling log.c
+[20/35] Compiling restore.c
+[21/35] Compiling vphone_zip_stub.c
+[22/35] Compiling fls.c
+[23/35] Compiling deviceinterfaced.c
+[24/35] Compiling common.c
+[25/35] Compiling vphone_restore_bridge.c
+[26/35] Compiling MobileRecoveryCore libirecovery.c
+[28/36] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[28/36] Write Objects.LinkFileList
+[31/38] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[32/38] Emitting module VPhoneCLITests
+[32/38] Write Objects.LinkFileList
+[33/38] Linking vphone-cli
+[34/38] Linking vphone-vm
+[35/38] Applying vphone-cli
+[36/38] Applying vphone-vm
+[37/38] Linking vphone-cliPackageTests
+Build complete! (9.81s)
+Test Suite 'Selected tests' started at 2026-10-09 17:10:01.342.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:10:01.343.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:10:01.343.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:10:01.343.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateCancellationEndToEndTests started.
+◇ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() started.
+✘ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() recorded an issue at CreateCancellationEndToEndTests.swift:190:13: Expectation failed: (create → <NSConcreteTask: 0x10360c8c0>).isRunning → false
+↳ vm create exited before the stand-in started:
+  Error: Resource changed before copying: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vc-cancel-639256B5/resources/requirements.txt; expected dev=16777233,ino=587341692,mode=33188,size=20,mtime=1791537001.483236952,ctime=1791537001.483236952; observed dev=16777233,ino=587341692,mode=33188,size=20,mtime=1791537001.483236952,ctime=1791537004.554183961
+  
+✘ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() failed after 3.359 seconds with 1 issue.
+✘ Suite CreateCancellationEndToEndTests failed after 3.360 seconds with 1 issue.
+↳ /// `vm create` cancelled the way Launchpad cancels it (B4 G4): SIGINT to the
+↳ /// process group whose leader is `vm create`. The real CLI runs a fresh create
+↳ /// in temporary directories; the prepare stage's script is a stand-in.
+↳ ///
+↳ /// Foundation `Process` starts every child in a new process group, so the
+↳ /// signal reaches only `vm create`; the stand-in has a foreground child that
+↳ /// writes into the VM directory and a background grandchild that leaves the
+↳ /// stage's group (setpgid) and writes too.
+✘ Test run with 1 test in 1 suite failed after 3.360 seconds with 1 issue.

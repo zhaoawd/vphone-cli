@@ -1,0 +1,15 @@
+fix: freeze create inputs and drain Launchpad command output
+
+Capture one private CLI, VM and resource snapshot per create attempt and bind
+resume decisions to its content identity. Bound retained snapshots and writes,
+materialize selected links, reject VM image aliases, and preserve failed inputs.
+
+Stage and validate recursive host Mach-O dependencies inside the app, rewrite
+relative loads, and sign nested code before the bundle executable.
+
+Close the ordinary command gate synchronously on quit, wait for children and
+log writers, and cancel quitting when escaped writers still hold output.
+Replace two time-dependent lifecycle fixtures with post-action handshakes.
+
+Validation: make test_python (603, 2 skipped); make test_swift
+(254 XCTest, 3 skipped; 1285 regular + 9 timing; tar and guest checks).

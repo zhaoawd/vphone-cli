@@ -1,0 +1,81 @@
+{
+  "review": "B25 independent read-only review",
+  "baseline": "2b6c28f75181582624c307b393ab85ef7d8e5f59",
+  "worktree": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli",
+  "verdict": "changes_requested",
+  "critical_count": 0,
+  "important_count": 3,
+  "findings": [
+    {
+      "id": "B25-R1",
+      "severity": "Important",
+      "priority": 1,
+      "title": "开发资源副本必须包含 debs.list",
+      "file": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "line_start": 89,
+      "line_end": 90,
+      "problem": "开发布局的 roots 白名单遗漏根 debs.list。创建改用副本脚本后，JB/EXP 的 fetch_debs.sh 按副本 Resources 根目录查找 debs.list；缺失时打印跳过下载并退出 0。",
+      "impact": "开发 vm create 的 JB/EXP 创建不再下载清单配置的包；当前仓库清单包含 openssh-client、openssh-sftp-server 和 openssh-server。debs.list 变更不影响 aggregate SHA，因此 resume 不会针对该输入变更要求 --accept-tool-change。已缓存包可能掩盖下载缺失。",
+      "evidence": [
+        "snapshot.swift:89-90 未包含 debs.list；安装布局复制整个 Contents，因此此缺陷限定开发分支。",
+        "scripts/cfw_install_jb.sh:289 和 scripts/cfw_install_exp.sh:486 调用 fetch_debs.sh。",
+        "scripts/fetch_debs.sh:20 默认 $REPO_ROOT/debs.list；69-70 缺失则跳过；123 退出 0。",
+        "scripts/build.sh:97 明确将 debs.list 纳入已安装资源。"
+      ],
+      "reproduction": "使用开发 Fixture 的 source.base 加入非空 debs.list 后 capture；snapshot.resources.base/debs.list 缺失。只修改原 debs.list 后重新 capture，aggregate SHA 不变。无需 VM 即可加入回归测试。",
+      "validation": "源码路径交叉核对及静态检查已执行；本次未运行 Swift 测试。",
+      "requested_change": "将存在的 debs.list 纳入开发 roots，并添加复制与摘要/resume 变更测试。"
+    },
+    {
+      "id": "B25-R2",
+      "severity": "Important",
+      "priority": 1,
+      "title": "Disk.img 排除检查必须覆盖链接解析目标",
+      "file": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "line_start": 214,
+      "line_end": 219,
+      "problem": "visit 在解析符号链接前只检查 source.lastPathComponent；别名链接名称不是 Disk.img 时会通过，然后对解析目标按普通文件计量和复制。",
+      "impact": "资源目录中的 alias -> /path/to/VM/Disk.img 可将 VM 磁盘内容纳入资源副本。目标文件低于剩余 2 GiB 上限时不存在后续磁盘拒绝检查，违反禁止复制 VM 磁盘的合同。大磁盘仍可能由 byte limit 拒绝，此结论不声称所有大小均可通过。",
+      "evidence": [
+        "snapshot.swift:214 仅检查 source 名称；217 之后才 resolvingSymlinksInPath。",
+        "snapshot.swift:230-240 解析后普通文件仅检查大小与内容稳定性。",
+        "snapshot.swift:249-273 使用 Input.source 打开已解析目标并复制。",
+        "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:182-185 只覆盖直接命名 Disk.img 的文件，未覆盖链接别名。"
+      ],
+      "reproduction": "在 Fixture.machine 下创建小型 Disk.img，在 Fixture.source.scriptsDir 下创建名为 disk-alias 的符号链接指向该文件，然后 capture；当前控制流会将磁盘内容复制为 scripts/disk-alias，而非拒绝。",
+      "validation": "源码控制流和静态顺序检查已执行；本次未运行 Swift 测试。",
+      "requested_change": "至少同时检查解析后的目标名称；添加别名链接及链接链回归测试，保持直接文件排除。"
+    },
+    {
+      "id": "B25-R3",
+      "severity": "Important",
+      "priority": 1,
+      "title": "复制期间限制实际写入量",
+      "file": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "line_start": 263,
+      "line_end": 270,
+      "problem": "copy 在前置 stat 检查后一直读取到 EOF 并写入目标，循环没有将实际读取/写入字节数限制在 input.entry.bytes 或总预算内；来源变化检查在写完后才执行。",
+      "impact": "来源在复制期间追加数据时，资源副本可超过预检的 total、2 GiB 配额和 64 MiB 余量预留。持续追加可使复制持续写入直到 EOF 或文件系统空间耗尽，结束时拒绝和清理不能保证复制期间的空间上限。",
+      "evidence": [
+        "snapshot.swift:101-113 根据 inventory 的固定大小进行容量和 retained 配额预检。",
+        "snapshot.swift:254-256 仅在复制前检查修订。",
+        "snapshot.swift:263-265 无计数限制地读取和写入。",
+        "snapshot.swift:267-270 才检测最终修订及摘要变化。"
+      ],
+      "reproduction": "在一个可通过初始 inventory 的大文件复制期间，另一个线程在前置 fstat 后向同一 inode 追加足够数据，使目标写入超过 initial entry.bytes。当前循环会先写入新增字节，再在最终 sameRevision/digest 检查失败。可通过受控测试同步点验证，无需实际耗尽磁盘。",
+      "validation": "源码数据流检查已执行；未进行耗盘实验或 Swift 构建。",
+      "requested_change": "复制时累计实际字节数，拒绝任何超出已登记文件大小/剩余预算的读取，在写目标前执行限额检查。"
+    }
+  ],
+  "reviewed_areas": {
+    "T24": "已检查递归 Mach-O 解析、重写、架构检查、签名主程序最后顺序和两种 bundle 验证入口；未发现新的 Critical/Important。",
+    "T40": "以上三项 Important。闭包未覆盖外部 Python、PATH、SDK/JB、VM cfw_input 等已有声明；未将其视为完成。",
+    "T46": "已检查普通 command 活动登记、writer/history 完成顺序、terminateLater、5 秒超时取消及 own-child SIGINT；未发现新的 Critical/Important。"
+  },
+  "limitations": [
+    "只读审查。未修改仓库文件。未运行 SwiftPM、构建、VM、UI 或系统服务。",
+    "已读取 /private/tmp/vphone-b25-t24/summary.json、t40/summary.json、t46/summary.json 和 t40/design.md。",
+    "本报告基于源码及已有验证记录；复现步骤未在本次审查中执行 Swift 运行时。",
+    "git diff --check 2b6c28f7 通过。"
+  ]
+}

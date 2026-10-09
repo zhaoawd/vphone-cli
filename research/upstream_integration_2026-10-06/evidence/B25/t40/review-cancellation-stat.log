@@ -1,0 +1,103 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/41] Compiling locking.c
+[5/43] Compiling asr.c
+[6/43] Compiling download.c
+[7/43] Compiling fdr.c
+[8/43] Compiling ipsw.c
+[9/43] Compiling idevicerestore.c
+[10/43] Compiling recovery.c
+[11/43] Compiling limera1n.c
+[12/43] Compiling restore.c
+[13/43] Compiling normal.c
+[14/43] Compiling dfu.c
+[15/43] Compiling img3.c
+[16/43] Compiling img4.c
+[17/43] Compiling ace3.c
+[18/43] Compiling ftab.c
+[19/43] Compiling mbn.c
+[20/43] Compiling deviceinterfaced.c
+[21/43] Compiling log.c
+[22/43] Compiling fls.c
+[23/43] Compiling common.c
+[24/43] Compiling vphone_zip_stub.c
+[25/43] Compiling vphone_restore_bridge.c
+[26/43] Compiling MobileRecoveryCore libirecovery.c
+[28/43] Emitting module VPhoneCore
+[29/43] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[30/44] Compiling VPhoneCore VPhoneCreateRunner.swift
+[30/47] Write Objects.LinkFileList
+[31/54] Linking vphone-helper
+[32/54] Applying vphone-helper
+[34/54] Emitting module VPhoneLaunchpadKit
+[34/54] Write Objects.LinkFileList
+[37/54] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[38/55] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[39/55] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[40/55] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[40/55] Linking vphone-launchpad-launcher
+[41/55] Applying vphone-launchpad-launcher
+[42/55] Linking vphone-launchpad
+[43/55] Applying vphone-launchpad
+[45/55] Emitting module VPhoneLaunchpadKitTests
+[46/55] Emitting module VPhoneCoreTests
+[47/55] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[47/55] Write Objects.LinkFileList
+[50/60] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[51/60] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[52/60] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+[53/60] Emitting module VPhoneCLITests
+[54/60] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[54/60] Linking vphone-vm
+[55/60] Linking vphone-cli
+[56/60] Write Objects.LinkFileList
+[57/60] Applying vphone-vm
+[58/60] Applying vphone-cli
+[59/60] Linking vphone-cliPackageTests
+Build complete! (14.39s)
+Test Suite 'Selected tests' started at 2026-10-09 17:06:49.739.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:06:49.740.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:06:49.740.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:06:49.740.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateCancellationEndToEndTests started.
+◇ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() started.
+✘ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() recorded an issue at CreateCancellationEndToEndTests.swift:149:13: Expectation failed: (create → <NSConcreteTask: 0x1048bd0d0>).isRunning → false
+↳ vm create exited before the stand-in started:
+  Error: Resource changed before copying: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vc-cancel-8E1E4747/resources/requirements.txt; expected dev=16777233,ino=587340884,mode=33188,size=20,mtime=1791536809.875315524,ctime=1791536809.875315524; observed dev=16777233,ino=587340884,mode=33188,size=20,mtime=1791536809.875315524,ctime=1791536811.755680311
+  
+✘ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() failed after 2.158 seconds with 1 issue.
+✘ Suite CreateCancellationEndToEndTests failed after 2.158 seconds with 1 issue.
+↳ /// `vm create` cancelled the way Launchpad cancels it (B4 G4): SIGINT to the
+↳ /// process group whose leader is `vm create`. The real CLI runs a fresh create
+↳ /// in temporary directories; the prepare stage's script is a stand-in.
+↳ ///
+↳ /// Foundation `Process` starts every child in a new process group, so the
+↳ /// signal reaches only `vm create`; the stand-in has a foreground child that
+↳ /// writes into the VM directory and a background grandchild that leaves the
+↳ /// stage's group (setpgid) and writes too.
+✘ Test run with 1 test in 1 suite failed after 2.158 seconds with 1 issue.

@@ -1,0 +1,74 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[5/17] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[6/18] Compiling vphone_cli VPhoneControl.swift
+[7/18] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[8/18] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[9/18] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[10/18] Emitting module VPhoneCoreTests
+[10/18] Write Objects.LinkFileList
+[13/26] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[14/27] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[15/27] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[16/27] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[16/27] Linking vphone-cli
+[17/27] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+[19/27] Emitting module VPhoneCLITests
+[20/27] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[21/27] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[22/27] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+[22/27] Linking vphone-vm
+[23/27] Write Objects.LinkFileList
+[24/27] Applying vphone-vm
+[25/27] Applying vphone-cli
+[26/27] Linking vphone-cliPackageTests
+Build complete! (9.60s)
+Test Suite 'Selected tests' started at 2026-10-09 16:07:18.108.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 16:07:18.109.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 16:07:18.109.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 16:07:18.109.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Suite CreateResourceFreezeTests started.
+◇ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() started.
+◇ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() started.
+◇ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() started.
+◇ Test unavailableResourceSourceRefusesBeforeReturningRunner() started.
+◇ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() started.
+◇ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() started.
+◇ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() started.
+◇ Test snapshotMutationDuringFinalStageCannotBeAccepted() started.
+✔ Test unavailableResourceSourceRefusesBeforeReturningRunner() passed after 0.014 seconds.
+✔ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() passed after 0.015 seconds.
+✔ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() passed after 0.032 seconds.
+✔ Test snapshotMutationDuringFinalStageCannotBeAccepted() passed after 0.082 seconds.
+✔ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() passed after 0.107 seconds.
+✔ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() passed after 0.116 seconds.
+✔ Suite CreateResourceSnapshotTests passed after 0.116 seconds.
+✔ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() passed after 0.172 seconds.
+✔ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() passed after 0.195 seconds.
+✔ Suite CreateResourceFreezeTests passed after 0.195 seconds.
+✔ Test run with 8 tests in 2 suites passed after 0.195 seconds.
+swift_test_exit=0

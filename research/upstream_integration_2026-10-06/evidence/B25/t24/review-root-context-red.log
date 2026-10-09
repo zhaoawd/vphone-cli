@@ -1,0 +1,39 @@
+test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) ... ok
+test_check_rejects_external_rpath_with_internal_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_external_rpath_with_internal_dependencies) ... ok
+test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape) ... ok
+test_check_rejects_relative_escape_unknown_token_and_symlink_rpaths (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_relative_escape_unknown_token_and_symlink_rpaths) ... ok
+test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies) ... ok
+test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes) ... ok
+test_launchpad_native_staging_preserves_embedded_toolchain_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_launchpad_native_staging_preserves_embedded_toolchain_bytes) ... ok
+test_main_executable_is_signed_after_nested_host_tools (test_bundle_native_dependencies.NativeDependencyBundleTests.test_main_executable_is_signed_after_nested_host_tools) ... ok
+test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success) ... ok
+test_recursive_rpath_uses_executable_ancestors_loader_directory (test_bundle_native_dependencies.NativeDependencyBundleTests.test_recursive_rpath_uses_executable_ancestors_loader_directory) ... ok
+test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals) ... ok
+test_staging_rejects_outer_root_symlink_to_nested_executable (test_bundle_native_dependencies.NativeDependencyBundleTests.test_staging_rejects_outer_root_symlink_to_nested_executable) ... ok
+test_staging_rejects_referenced_nested_library_without_changing_it (test_bundle_native_dependencies.NativeDependencyBundleTests.test_staging_rejects_referenced_nested_library_without_changing_it) ... ok
+test_staging_rejects_shared_library_resolution_that_differs_between_roots (test_bundle_native_dependencies.NativeDependencyBundleTests.test_staging_rejects_shared_library_resolution_that_differs_between_roots) ... FAIL
+test_staging_resolves_library_bare_executable_token_against_host_root (test_bundle_native_dependencies.NativeDependencyBundleTests.test_staging_resolves_library_bare_executable_token_against_host_root) ... ok
+test_staging_resolves_rpath_with_bare_loader_token (test_bundle_native_dependencies.NativeDependencyBundleTests.test_staging_resolves_rpath_with_bare_loader_token) ... ok
+
+======================================================================
+FAIL: test_staging_rejects_shared_library_resolution_that_differs_between_roots (test_bundle_native_dependencies.NativeDependencyBundleTests.test_staging_rejects_shared_library_resolution_that_differs_between_roots)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 234, in test_staging_rejects_shared_library_resolution_that_differs_between_roots
+    self.assertNotEqual(staged.returncode, 0, staged.stdout)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0 : /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/Frameworks/libparent.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/Frameworks/libparent.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/Frameworks/libparent.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/MacOS/ldid
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/Frameworks/libparent.dylib: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/MacOS/ldid: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/MacOS/libleaf.dylib: replacing existing signature
+/private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-omlq7uba/test.app/Contents/Resources/.tools/bin/trustcache: replacing existing signature
+Portable host Mach-O closure verified: 4 signed images
+
+
+----------------------------------------------------------------------
+Ran 16 tests in 24.797s
+
+FAILED (failures=1)

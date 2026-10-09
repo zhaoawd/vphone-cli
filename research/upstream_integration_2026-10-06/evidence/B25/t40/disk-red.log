@@ -1,0 +1,28 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/10] Emitting module VPhoneCLITests
+[7/10] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[8/10] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[9/10] Emitting module VPhoneCoreTests
+[9/11] Write Objects.LinkFileList
+[10/11] Linking vphone-cliPackageTests
+Build complete! (6.42s)
+Test Suite 'Selected tests' started at 2026-10-09 16:14:36.078.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 16:14:36.079.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 16:14:36.079.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 16:14:36.079.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Test aVMImageCannotEnterTheResourceCopy() started.
+✘ Test aVMImageCannotEnterTheResourceCopy() recorded an issue at CreateResourceSnapshotTests.swift:171:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✘ Test aVMImageCannotEnterTheResourceCopy() failed after 0.027 seconds with 1 issue.
+✘ Suite CreateResourceSnapshotTests failed after 0.028 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 0.028 seconds with 1 issue.
+swift_test_exit=1

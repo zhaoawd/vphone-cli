@@ -1,0 +1,96 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/17] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[6/17] Emitting module VPhoneCore
+[7/18] Compiling VPhoneCore VPhoneCreateRunner.swift
+[7/23] Write Objects.LinkFileList
+[8/30] Linking vphone-helper
+[9/30] Applying vphone-helper
+[11/30] Emitting module VPhoneLaunchpadKit
+[11/30] Write Objects.LinkFileList
+[14/31] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[15/31] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[16/31] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[17/31] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[17/31] Linking vphone-launchpad-launcher
+[18/31] Applying vphone-launchpad-launcher
+[19/31] Linking vphone-launchpad
+[20/31] Applying vphone-launchpad
+[22/31] Emitting module VPhoneLaunchpadKitTests
+[23/31] Emitting module VPhoneCoreTests
+[24/31] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[24/31] Write Objects.LinkFileList
+[27/32] Linking vphone-vm
+[28/32] Linking vphone-cli
+[29/32] Applying vphone-vm
+[30/32] Applying vphone-cli
+[31/32] Linking vphone-cliPackageTests
+Build complete! (9.89s)
+Test Suite 'Selected tests' started at 2026-10-09 17:15:28.703.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:15:28.704.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:15:28.704.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:15:28.704.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Suite CreateCancellationEndToEndTests started.
+◇ Test sameLengthContentRewriteWithRestoredMtimeIsRefused() started.
+◇ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+➜ Test actualBuildResourceCopyRunsReadOnlyProbes() skipped.
+◇ Test unusedSnapshotWithReadOnlySourceDirectoriesIsReleased() started.
+◇ Test snapshotQuotaRefusesAdditionalCopiesWithoutDeletingEvidence() started.
+◇ Test developmentDebListIsCopiedAndResumeRequiresAcceptanceAfterChanges() started.
+◇ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() started.
+◇ Test aVMImageCannotEnterTheResourceCopy() started.
+◇ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test linkRedirectedAfterInventoryToDifferentContentIsRefused() started.
+◇ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() started.
+◇ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() started.
+◇ Test case passing 1 argument initialBytes → 0 to sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test case passing 1 argument initialBytes → 1048583 to sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+◇ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() started.
+◇ Test snapshotMutationDuringFinalStageCannotBeAccepted() started.
+◇ Test case passing 1 argument linkCount → 1 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument linkCount → 2 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument linkCount → 3 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument timing → "afterInventory" to metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+◇ Test case passing 1 argument timing → "beforeCopy" to metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+✔ Test aVMImageCannotEnterTheResourceCopy() passed after 0.059 seconds.
+✔ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) with 2 test cases passed after 0.059 seconds.
+✔ Test sameLengthContentRewriteWithRestoredMtimeIsRefused() passed after 0.059 seconds.
+✔ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) with 3 test cases passed after 0.059 seconds.
+✔ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() passed after 0.059 seconds.
+✔ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() passed after 0.059 seconds.
+✔ Test unusedSnapshotWithReadOnlySourceDirectoriesIsReleased() passed after 0.060 seconds.
+✔ Test linkRedirectedAfterInventoryToDifferentContentIsRefused() passed after 0.059 seconds.
+✔ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) with 2 test cases passed after 0.101 seconds.
+✔ Test developmentDebListIsCopiedAndResumeRequiresAcceptanceAfterChanges() passed after 0.123 seconds.
+✔ Test snapshotMutationDuringFinalStageCannotBeAccepted() passed after 0.138 seconds.
+✔ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() passed after 0.157 seconds.
+✔ Test snapshotQuotaRefusesAdditionalCopiesWithoutDeletingEvidence() passed after 0.170 seconds.
+✔ Suite CreateResourceSnapshotTests passed after 0.170 seconds.
+✔ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() passed after 3.667 seconds.
+✔ Suite CreateCancellationEndToEndTests passed after 3.668 seconds.
+✔ Test run with 15 tests in 2 suites passed after 3.668 seconds.

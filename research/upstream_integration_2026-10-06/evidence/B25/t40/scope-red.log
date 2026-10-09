@@ -1,0 +1,49 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling asr.c
+[5/37] Compiling normal.c
+[5/37] Compiling download.c
+[7/37] Compiling recovery.c
+[7/37] Compiling fdr.c
+[9/37] Compiling ipsw.c
+[10/37] Compiling limera1n.c
+[11/37] Compiling img4.c
+[12/37] Compiling ace3.c
+[13/37] Compiling img3.c
+[14/37] Compiling mbn.c
+[15/37] Compiling dfu.c
+[16/37] Compiling restore.c
+[17/37] Compiling ftab.c
+[18/37] Compiling fls.c
+[19/37] Compiling log.c
+[20/37] Compiling locking.c
+[21/37] Compiling deviceinterfaced.c
+[22/37] Compiling vphone_zip_stub.c
+[23/37] Compiling common.c
+[24/37] Compiling idevicerestore.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Emitting module VPhoneCoreTests
+[29/38] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:113:29: error: type 'VPhoneResources' has no member 'withCreateResources'
+111 |         let snapshot = try f.capture()
+112 |         let before = VPhoneResources.resolve().base
+113 |         try VPhoneResources.withCreateResources(snapshot.resources) {
+    |                             `- error: type 'VPhoneResources' has no member 'withCreateResources'
+114 |             #expect(VPhoneResources.resolve().base == snapshot.resources.base)
+115 |             #expect(try String(contentsOf: VPhoneResources.resolve().fwPrepareScript, encoding: .utf8) == "original")
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError
+swift_test_exit=1

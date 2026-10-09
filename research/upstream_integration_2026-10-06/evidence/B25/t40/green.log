@@ -1,0 +1,63 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/17] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[6/17] Emitting module VPhoneCore
+[6/24] Write Objects.LinkFileList
+[7/27] Linking vphone-helper
+[8/27] Applying vphone-helper
+[10/27] Emitting module VPhoneLaunchpadKit
+[10/27] Write Objects.LinkFileList
+[12/28] Linking vphone-launchpad-launcher
+[14/28] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[14/28] Applying vphone-launchpad-launcher
+[15/28] Linking vphone-launchpad
+[16/28] Applying vphone-launchpad
+[18/28] Emitting module VPhoneLaunchpadKitTests
+[19/28] Emitting module VPhoneCoreTests
+[20/28] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[20/28] Write Objects.LinkFileList
+[23/28] Linking vphone-cli
+[23/28] Linking vphone-vm
+[25/28] Applying vphone-vm
+[25/28] Applying vphone-cli
+[27/28] Linking vphone-cliPackageTests
+Build complete! (8.57s)
+Test Suite 'Selected tests' started at 2026-10-09 16:02:13.398.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 16:02:13.399.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 16:02:13.399.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 16:02:13.399.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceFreezeTests started.
+◇ Test unavailableResourceSourceRefusesBeforeReturningRunner() started.
+◇ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() started.
+◇ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() started.
+◇ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() started.
+✔ Test unavailableResourceSourceRefusesBeforeReturningRunner() passed after 0.009 seconds.
+✔ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() passed after 0.094 seconds.
+✔ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() passed after 0.136 seconds.
+✔ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() passed after 0.177 seconds.
+✔ Suite CreateResourceFreezeTests passed after 0.177 seconds.
+✔ Test run with 4 tests in 1 suite passed after 0.177 seconds.
+swift_test_exit=0

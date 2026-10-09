@@ -1,0 +1,38 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/10] Compiling VPhoneLaunchpadKitTests CommandTerminationTests.swift
+[7/10] Emitting module VPhoneLaunchpadKitTests
+[8/10] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/CreateResourceFreezeTests.swift:41:13: warning: no calls to throwing functions occur within 'try' expression
+39 | 
+40 |         func runner() throws -> VPhoneCreateRunner {
+41 |             try VPhoneCreateOrchestrator(library: VPhoneLibrary(root: root.appendingPathComponent("library")),
+   |             `- warning: no calls to throwing functions occur within 'try' expression
+42 |                 resources: resources, selfExecutable: executable).makeRunner(.init(
+43 |                     sudoEnvExtras: [:], rootPopup: false, interactive: false, verbosity: .quiet, keepArtifacts: false))
+[9/10] Emitting module VPhoneCLITests
+[9/11] Write Objects.LinkFileList
+[10/11] Linking vphone-cliPackageTests
+Build complete! (7.58s)
+Test Suite 'Selected tests' started at 2026-10-09 15:53:07.561.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 15:53:07.565.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 15:53:07.565.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 15:53:07.565.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CommandTerminationTests started.
+◇ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() started.
+◇ Test terminationWaitsForOrdinaryPanicTailAndClosedLog() started.
+◇ Test escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate() started.
+✔ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() passed after 1.360 seconds.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate() passed after 1.670 seconds.
+✔ Test terminationWaitsForOrdinaryPanicTailAndClosedLog() passed after 1.756 seconds.
+✔ Suite CommandTerminationTests passed after 1.757 seconds.
+✔ Test run with 3 tests in 1 suite passed after 1.757 seconds.

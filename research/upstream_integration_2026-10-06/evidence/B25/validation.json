@@ -1,0 +1,132 @@
+{
+  "python": {
+    "entrypoint": "make test_python",
+    "exit": 0,
+    "seconds": 352.68103158299346,
+    "log": "B25/python-final.log",
+    "source_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+    "tests": 611,
+    "suite_seconds": 351.268,
+    "skipped": 2,
+    "first_run": {
+      "entrypoint": "make test_python",
+      "exit": 0,
+      "tests": 603,
+      "skipped": 2,
+      "seconds": 279.878,
+      "log": "B25/python-first-full.log"
+    }
+  },
+  "swift": {
+    "exit": 0,
+    "first_run": {
+      "exit": 2,
+      "swift_testing_tests": 1284,
+      "suites": 205,
+      "issues": 1,
+      "failure": "CommandTerminationTests timed transient gate assertion after sleep20ms vs150ms timeout; actual quick command succeeded; precise ordering unconfirmed",
+      "log": "B25/swift-first-full.log",
+      "sampling": "B25/swift-failure-sample-70847.txt"
+    },
+    "second_run": {
+      "exit": 2,
+      "swift_testing_tests": 1285,
+      "suites": 205,
+      "issues": 5,
+      "failure": "StopRefusalTests 3 issues and ParentExitTests 2 issues; cause under investigation",
+      "log": "B25/swift-second-full.log",
+      "sampling": "B25/swift-failure-sample-84183.txt",
+      "fixture_followup": {
+        "controlled_red": "B25/t46/legacy-fixtures/controlled-red.log",
+        "related_green": "B25/t46/legacy-fixtures/final-related-green.log",
+        "tests": 103,
+        "suites": 24,
+        "seconds": 21.456,
+        "original_cause": "unconfirmed; controlled fixture experiments do not establish original scheduling cause"
+      }
+    },
+    "entrypoint": "make test_swift",
+    "seconds": 119.31869583402295,
+    "log": "B25/swift-final.log",
+    "failure_sampling_triggered": false,
+    "xctest_tests": 254,
+    "xctest_skipped": 3,
+    "swift_testing_tests": 1285,
+    "suites": 205,
+    "timing_tests": 9,
+    "timing_suites": 8,
+    "regular_seconds": 66.248,
+    "timing_seconds": 7.124,
+    "tar_and_guest_checks": true,
+    "source_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+    "swift_sources_unchanged_at_final_head": true
+  },
+  "build": {
+    "entrypoint": "make launchpad check_bundle check_launchpad",
+    "exit": 0,
+    "seconds": 67.08864170900779,
+    "log": "B25/build-final.log",
+    "source_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+    "first_run": {
+      "entrypoint": "make launchpad check_bundle check_launchpad",
+      "exit": 2,
+      "seconds": 142.03442329197424,
+      "log": "B25/build-first-full.log",
+      "source_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+      "failure": "Checker rejected contained loader-relative rpath; outer Launchpad staging absent, leaving absolute Xcode rpaths; fixed and rebuilt in 53580180"
+    }
+  },
+  "UI": {
+    "final_state": "blocked_by_Mac_locked_before_quit",
+    "scope": "final release controlled signed CLI, actual logging passed; no quit acceptance",
+    "historical_pre_gate_ui": "B25/ui-first-acceptance.json",
+    "final_observation": "B25/ui-acceptance.json",
+    "normal_writer_self_released": true,
+    "normal_application_left_open": true,
+    "unlock_requested": true
+  },
+  "T24_native": {
+    "focused_tests": 13,
+    "native_tests_included": 8,
+    "homebrew_denied_tools_exit": 0,
+    "scope": "host Mach-O only",
+    "final_proof": {
+      "exit": 0,
+      "head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "report": "B25/t24/final-proof/report.json",
+      "commands": 89,
+      "denial_controls": 2,
+      "sandbox_tool_operations": 8
+    },
+    "final_focused_tests": 21,
+    "final_native_tests_included": 16
+  },
+  "artifact_cli": [
+    {
+      "label": "actual-cli",
+      "exit": 0,
+      "seconds": 55.659359791025054,
+      "log": "B25/actual-cli.log"
+    },
+    {
+      "label": "final-snapshot",
+      "exit": 0,
+      "seconds": 12.173265582998283,
+      "log": "B25/final-snapshot.log"
+    }
+  ],
+  "installed_snapshot": {
+    "bytes": 161310727,
+    "cli_resources_exit": 0,
+    "vm_help_exit": 9,
+    "source_vm_help_exit": 9,
+    "vm_help_succeeded": false,
+    "signature_verify_exit": 0,
+    "external_python_locked_probe": false,
+    "vm_started": false
+  },
+  "source_heads": {
+    "main_implementation": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+    "final_packaging": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+  }
+}

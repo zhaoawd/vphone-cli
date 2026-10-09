@@ -1,0 +1,76 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[6/21] Compiling VPhoneCore VPhoneResources.swift
+[7/21] Emitting module VPhoneCore
+[8/26] Compiling VPhoneCore VPhoneLaunchLayout.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[9/26] Compiling VPhoneCore VPhoneLibrary.swift
+[10/26] Compiling VPhoneCore VPhoneCreateCheckpoint.swift
+[11/26] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[12/26] Compiling VPhoneCore VPhoneDiagnosticChecks.swift
+[12/29] Write Objects.LinkFileList
+[13/39] Linking vphone-helper
+[15/39] Emitting module VPhoneLaunchpadKit
+[15/39] Write Objects.LinkFileList
+[18/39] Compiling FirmwarePatcher FirmwarePipeline.swift
+[19/40] Compiling FirmwarePatcher FirmwareTransaction.swift
+[19/40] Applying vphone-helper
+[20/40] Linking vphone-launchpad-launcher
+[21/40] Applying vphone-launchpad-launcher
+[22/40] Linking vphone-launchpad
+[23/40] Applying vphone-launchpad
+[25/40] Emitting module FirmwarePatcher
+[26/40] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[27/40] Emitting module VPhoneLaunchpadKitTests
+[28/55] Compiling vphone_cli VPhoneRestoreCLI.swift
+[29/55] Compiling vphone_cli VPhoneSetupCLI.swift
+[30/57] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[31/57] Compiling vphone_cli VPhoneDoctorCLI.swift
+[32/57] Compiling vphone_cli VPhoneEntry.swift
+[33/57] Compiling vphone_cli VPhoneFWCLI.swift
+[34/57] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[35/57] Compiling vphone_cli VPhoneCLI.swift
+[36/57] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[37/57] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[38/57] Emitting module VPhoneCoreTests
+[39/57] Compiling VPhoneCoreTests LaunchLayoutTests.swift
+[40/57] Compiling VPhoneCoreTests ResourcesTests.swift
+[41/57] Compiling VPhoneCoreTests DiagnosticsTests.swift
+[42/57] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+macro expansion #expect:1:22: error: errors thrown from here are not handled
+`- /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:115:118: note: expanded code originates here
+113 |         try VPhoneResources.withCreateResources(snapshot.resources) {
+114 |             #expect(VPhoneResources.resolve().base == snapshot.resources.base)
+115 |             #expect(try String(contentsOf: VPhoneResources.resolve().fwPrepareScript, encoding: .utf8) == "original")
+    |             `- note: in expansion of macro 'expect' here
+    +--- macro expansion #expect ---------------------------------------
+    |1 | Testing.__checkValue(try String(contentsOf: VPhoneResources.resolve().fwPrepareScript, encoding: .utf8) == "original",expression: .__fromSyntaxNode(#"try String(contentsOf: VPhoneResources.resolve().fwPrepareScript, encoding: .utf8) == "original""#),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+    |  |                      `- error: errors thrown from here are not handled
+    +-------------------------------------------------------------------
+116 |             #expect(VPhoneResources.resolve(executablePath: "/Applications/Other.app/Contents/MacOS/vphone-cli").base.path == "/Applications/Other.app/Contents/Resources")
+117 |         }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:113:9: warning: no calls to throwing functions occur within 'try' expression
+111 |         let snapshot = try f.capture()
+112 |         let before = VPhoneResources.resolve().base
+113 |         try VPhoneResources.withCreateResources(snapshot.resources) {
+    |         `- warning: no calls to throwing functions occur within 'try' expression
+114 |             #expect(VPhoneResources.resolve().base == snapshot.resources.base)
+115 |             #expect(try String(contentsOf: VPhoneResources.resolve().fwPrepareScript, encoding: .utf8) == "original")
+[43/57] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[44/57] Compiling vphone_cli VPhoneResourcesCLI.swift
+[45/57] Compiling vphone_cli VPhoneFWCacheCLI.swift
+[46/57] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+error: fatalError
+swift_test_exit=1

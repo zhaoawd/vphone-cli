@@ -1,0 +1,18 @@
+test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape) ... ok
+test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies) ... FAIL
+test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success) ... ok
+test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals) ... ok
+
+======================================================================
+FAIL: test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 47, in test_check_rejects_resolvable_external_dependencies
+    self.assertIn('External dependency', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'External dependency' not found in 'Traceback (most recent call last):\n  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 189, in <module>\n    main()\n    ~~~~^^\n  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 184, in main\n    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)\n             ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^\n  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 106, in check_native_dependencies\n    raise ValueError(f\'Nonportable rpath in {path}: {rpath}\')\nValueError: Nonportable rpath in /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-v3q9qba7/test.app/Contents/MacOS/ldid: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-v3q9qba7/external\n'
+
+----------------------------------------------------------------------
+Ran 4 tests in 6.288s
+
+FAILED (failures=1)

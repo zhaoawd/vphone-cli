@@ -1,0 +1,64 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/18] Emitting module VPhoneCore
+[7/18] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[8/19] Compiling VPhoneCore VPhoneCreateRunner.swift
+[8/22] Write Objects.LinkFileList
+[9/30] Linking vphone-helper
+[10/30] Applying vphone-helper
+[12/30] Emitting module VPhoneLaunchpadKit
+[12/30] Write Objects.LinkFileList
+[15/30] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[16/31] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[16/31] Linking vphone-launchpad-launcher
+[17/31] Applying vphone-launchpad-launcher
+[18/31] Linking vphone-launchpad
+[19/31] Applying vphone-launchpad
+[21/31] Emitting module VPhoneLaunchpadKitTests
+[22/31] Emitting module VPhoneCoreTests
+[23/31] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[24/31] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[25/31] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[25/31] Write Objects.LinkFileList
+[28/33] Linking vphone-cli
+[29/33] Linking vphone-vm
+[30/33] Applying vphone-cli
+[31/33] Applying vphone-vm
+[32/33] Linking vphone-cliPackageTests
+Build complete! (9.84s)
+Test Suite 'Selected tests' started at 2026-10-09 17:01:20.638.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:01:20.639.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:01:20.639.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:01:20.639.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test case passing 1 argument initialBytes → 1048583 to sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test case passing 1 argument initialBytes → 0 to sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+✘ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) recorded an issue with 1 argument initialBytes → 0 at CreateResourceSnapshotTests.swift:246:9: Expectation failed: try target.seekToEnd() <= UInt64(initialBytes)
+✘ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) recorded an issue with 1 argument initialBytes → 1048583 at CreateResourceSnapshotTests.swift:246:9: Expectation failed: try target.seekToEnd() <= UInt64(initialBytes)
+✘ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) with 2 test cases failed after 0.016 seconds with 2 issues.
+✘ Suite CreateResourceSnapshotTests failed after 0.016 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.016 seconds with 2 issues.

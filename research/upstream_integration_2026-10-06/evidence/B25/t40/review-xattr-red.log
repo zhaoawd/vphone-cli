@@ -1,0 +1,34 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/10] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[7/10] Emitting module VPhoneCLITests
+[8/10] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[9/10] Emitting module VPhoneCoreTests
+[9/11] Write Objects.LinkFileList
+[10/11] Linking vphone-cliPackageTests
+Build complete! (6.48s)
+Test Suite 'Selected tests' started at 2026-10-09 17:14:41.800.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:14:41.801.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:14:41.801.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:14:41.801.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Test sameLengthContentRewriteWithRestoredMtimeIsRefused() started.
+◇ Test linkRedirectedAfterInventoryToDifferentContentIsRefused() started.
+◇ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+◇ Test case passing 1 argument timing → "afterInventory" to metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+◇ Test case passing 1 argument timing → "beforeCopy" to metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+✔ Test sameLengthContentRewriteWithRestoredMtimeIsRefused() passed after 0.016 seconds.
+✔ Test linkRedirectedAfterInventoryToDifferentContentIsRefused() passed after 0.019 seconds.
+✘ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) recorded an issue with 1 argument timing → "afterInventory" at CreateResourceSnapshotTests.swift:251:6: Caught error: VPhoneMachineBindingError(message: "Resource changed before copying: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-26ED051B-532E-4C04-9152-CD1AF1D3441E/source/scripts/fw_prepare.sh; expected dev=16777233,ino=587342483,mode=33188,size=8,mtime=1791537281.941016476,ctime=1791537281.941016476; observed dev=16777233,ino=587342483,mode=33188,size=8,mtime=1791537281.941016476,ctime=1791537281.959527808")
+✘ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) recorded an issue with 1 argument timing → "beforeCopy" at CreateResourceSnapshotTests.swift:251:6: Caught error: VPhoneMachineBindingError(message: "Resource changed while copying: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-BF75BAC6-AE30-4671-818B-A8CD9EF9A0DD/source/scripts/fw_prepare.sh")
+✘ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) with 2 test cases failed after 0.030 seconds with 2 issues.
+✘ Suite CreateResourceSnapshotTests failed after 0.030 seconds with 2 issues.
+✘ Test run with 3 tests in 1 suite failed after 0.030 seconds with 2 issues.

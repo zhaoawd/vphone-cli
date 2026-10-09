@@ -1,0 +1,66 @@
+{
+  "problem": "Standard Swift run: quick succeeded where old test expected a throw inside a presumed 150ms gate window",
+  "standard_evidence": "/private/tmp/vphone-b25/swift-final.log",
+  "sample_evidence": "/private/tmp/vphone-b25/swift-failure-sample-70847.txt",
+  "sample_identity": "swiftpm-testing-helper test runner with ParentExitTests synchronous read/wait work on main thread; sample includes CommandTerminationTests stack",
+  "root_cause": "Test slept 20ms after scheduling an async termination task and assumed the actor resumed before its 150ms deadline. Task sleep specifies a minimum delay; delayed continuation can observe the correctly reopened gate. A deterministic late-resume experiment reproduces the same incorrect test expectation.",
+  "red": {
+    "log": "late-resume-red.log",
+    "deadline_ms": 150,
+    "injected_check_resume_delay_ms": 250,
+    "tests": 1,
+    "issues": 1,
+    "seconds": 1.792
+  },
+  "production_change": "Synchronous beginTermination closes gate and interrupts registered own children before AppDelegate returns terminateLater; async waitForTermination establishes deadline when waiting starts. prepareForTermination delegates to both phases.",
+  "phase_semantics": {
+    "accepting": "New ordinary commands allowed. begin returns true and moves to draining.",
+    "draining": "Gate closed synchronously; repeated begin returns false; wait enters waiting.",
+    "waiting": "Single bounded wait active; duplicate wait returns timedOut without changing original request; timeout/cancellation returns accepting and preserves active operations.",
+    "sealed": "Reader and writer completed; gate remains closed for app exit; begin returns false and duplicate wait returns timedOut.",
+    "unbegun_wait": "Returns timedOut and leaves accepting state unchanged."
+  },
+  "new_test_observations": [
+    "Gate rejection happens after synchronous begin and before timeout starts",
+    "Blocked quick command creates no child marker, history entry or extra log",
+    "Unchanged 150ms wait reports timedOut while escaped writer remains running",
+    "After timeout, quick child creates marker and completes; escaped final tail persists after release",
+    "Unbegun wait, repeated begin and completed drain sealing have explicit regression coverage"
+  ],
+  "preserved_bounds": {
+    "test_wait_timeout_ms": 150,
+    "test_elapsed_upper_bound_seconds": 2,
+    "production_default_timeout_seconds": 5
+  },
+  "isolated_green": {
+    "log": "isolated-green.log",
+    "tests": 4,
+    "suites": 1,
+    "seconds": 2.858
+  },
+  "related_green": {
+    "log": "related-green.log",
+    "tests": 102,
+    "suites": 23,
+    "seconds": 16.946
+  },
+  "strings_green": {
+    "log": "strings-green.log",
+    "keys": 282,
+    "literals": 282,
+    "issues": 0
+  },
+  "files": {
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift": "48d8418365cf60802446ebf24042850bc009b724bb2424e51790205895879a47",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "7080f9926a2e4d0eefaf5c2cb16f87f42a2e75605d5c659e579c024b95cfaa9e",
+    "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift": "7c37bbbe74b5effabc91e9507c24bf3fb6b33504172755b3e45ced2eac5a82cb"
+  },
+  "remaining": [
+    "Parent standard Swift entrypoint rerun",
+    "Independent review of two-phase production lifecycle",
+    "Final re-signed UI acceptance after this source change"
+  ],
+  "no_git_commit": true,
+  "no_UI_VM_or_system_service_started": true,
+  "swiftpm_slot_returned": true
+}

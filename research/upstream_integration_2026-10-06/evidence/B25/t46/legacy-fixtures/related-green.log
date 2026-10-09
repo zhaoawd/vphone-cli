@@ -1,0 +1,342 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[6/7] Emitting module VPhoneLaunchpadKitTests
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (5.83s)
+Test Suite 'Selected tests' started at 2026-10-09 17:37:55.996.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:37:55.997.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:37:55.997.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:37:55.997.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ConsoleLogTests started.
+◇ Suite LibraryTests started.
+◇ Suite ConsoleLogRotationTests started.
+◇ Suite CreateSummaryTests started.
+◇ Suite LocationTests started.
+◇ Suite CreationRunTests started.
+◇ Suite EditLibraryTests started.
+◇ Suite OutputCompletionTests started.
+◇ Suite LineSplitterTests started.
+➜ Suite RealCLICreateTests skipped.
+◇ Suite ParentExitTests started.
+◇ Suite CommandTerminationTests started.
+◇ Suite ConsoleLifecycleTests started.
+◇ Suite StopRefusalTests started.
+◇ Suite CreateCommandTests started.
+◇ Suite LibraryTests started.
+◇ Suite LocationProblemTests started.
+◇ Suite LaunchTests started.
+➜ Suite SmokeCheckpointFixtures skipped.
+◇ Suite LogFollowerTests started.
+◇ Suite CreateProgressTests started.
+◇ Suite DetachedChildTests started.
+◇ Suite LogWriterTests started.
+◇ Test panicLines() started.
+➜ Suite LaunchParentRole skipped.
+◇ Test scanReportsCorruptBundlesInsteadOfDropping() started.
+◇ Test exitLineIsAppendedOnItsOwnLine() started.
+◇ Test defaultRootIsShellSafe() started.
+◇ Test defaultRootHonorsVPHONERoot() started.
+◇ Test runningStageReadsAsInterruptedAndUnreadableIsAFailure() started.
+◇ Test previousLogNameKeepsTheStem() started.
+◇ Test statusesKeepTheirCheckpointSpelling() started.
+◇ Test scansOnlyDirsWithManifest() started.
+◇ Test noCheckpointIsNil() started.
+◇ Test rotationStaysInTheLogsDirectory() started.
+◇ Test defaultRootHonorsEnvOverride() started.
+◇ Test startKeepsThePreviousRunAsDotOne() started.
+◇ Test bundleNamedThrowsWhenMissing() started.
+◇ Test symbolicLinkLogIsNotRotatedAndTheStartGoesOn() started.
+◇ Test canonicalResolvesSymbolicLinks() started.
+◇ Test aNewMachineRunsVMCreateDetachedAndReadsStatusOnceAfterwards() started.
+◇ Test exitZeroWithReadFailureIsNotACompleteCommand() started.
+◇ Test consoleLogsAreSeparatedPerLibrary() started.
+◇ Test existingDotOneIsReplaced() started.
+◇ Test localIdentityIsSeparateFromUpstream() started.
+◇ Test firstStartHasNoPreviousLog() started.
+◇ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() started.
+◇ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() started.
+◇ Test startDoesNotReplaceTheLogOfAMachineNamedDotOne() started.
+◇ Test addedRootsAreAbsoluteCanonicalUniqueAndNotTheDefault() started.
+◇ Test spawnFailureFinishesHistoryAndClosesLog() started.
+◇ Test escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate() started.
+◇ Test arbitraryChunkingPreservesCRLFUnicodeANSIAndTail() started.
+◇ Test detachedParentExitDoesNotConfirmDescendantOutput() started.
+◇ Test defaultRootIsTheCLIDefaultCanonical() started.
+◇ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() started.
+◇ Test logCreationFailureDoesNotLeaveRunningHistory() started.
+◇ Test failedStopDoesNotInterruptLaunchpadChild() started.
+◇ Test terminationPhasesRejectUnbegunWaitAndDuplicateBegin() started.
+◇ Test backendsAndOptionsAppearOnlyWhenChosen() started.
+◇ Test childrenOutliveTheProcessThatStartedThem() started.
+◇ Test settingsRunOneConfigPerMachineAndAreRecorded() started.
+◇ Test escapeScannerMatchesPreviousPatternIncludingIncompleteSequences() started.
+◇ Test singleByteChunksPreserveIncompleteUTF8AndEscapeSequences() started.
+◇ Test cancelledDetachedWriterKeepsPanicTailAcrossRotation() started.
+◇ Test concurrentCommandsPersistNormalizedPanicTailsInSeparateLogs() started.
+◇ Test catalogDecodesTheCLIReport() started.
+◇ Test productionConsolePipelineThroughput() started.
+◇ Test livePipeDeliversLinesBeforeWriterCloses() started.
+◇ Test resumeStatusAndCatalogArguments() started.
+◇ Test terminationWaitsForOrdinaryPanicTailAndClosedLog() started.
+◇ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() started.
+◇ Test lessIsNotOffered() started.
+◇ Test twoMachinesWriteSeparateLogs() started.
+◇ Test createPassesTheRootPopupAndOnlyTheDefaults() started.
+◇ Test aReadOnlyFolderIsRefused() started.
+◇ Test aMachineFolderIsRefused() started.
+◇ Test panicLineMarksTheMachineUntilItStartsAgain() started.
+◇ Test requestsTheCLIWouldRejectAreRefused() started.
+◇ Test noCommandCarriesAPasswordOrInteractivePrompts() started.
+◇ Test stopRunsVMStopThenInterruptsOnlyItsOwnChild() started.
+➜ Test writeSmokeCheckpoints() skipped.
+◇ Test resetsWhenTheFileIsReplaced() started.
+➜ Test catalogHelpAndStatusMatchTheEmbeddedCLI() skipped.
+◇ Test followsAppendsAndReportsAMissingFileOnce() started.
+◇ Test failedStopIsReportedWithoutInterruptingOwnChild() started.
+◇ Test addedLocationPersistsInInjectedDefaults() started.
+◇ Test resetsWhenTheFileIsTruncated() started.
+◇ Test replaysOnlyTheTailFromALineStart() started.
+◇ Test aWritableFolderAndAMissingOneBelowItAreAccepted() started.
+◇ Test startRunsVMLaunchDetachedAndAppendsTheExitLine() started.
+◇ Test unverifiedNeverReadsAsPassed() started.
+◇ Test startingReplacesTheLogWithANewFile() started.
+◇ Test runsInItsOwnSessionWithNullStdinAndOnlyTheLogOpen() started.
+◇ Test aRunningStageIsUnderWayOnlyWhileTheOwnRunLives() started.
+◇ Test missingAddedLibraryIsSkippedAndFailureKeepsLastListing() started.
+◇ Test exitCodeMatchesProcessTerminationStatus() started.
+◇ Test listsDefaultAndAddedLibraries() started.
+◇ Test interruptReachesTheRunningChildEvenWhenTheParentIgnoresSIGINT() started.
+◇ Test cancellingARunInterruptsOnlyItsChild() started.
+◇ Test missingAndUnreadableCheckpoints() started.
+◇ Test freshRegularCreateIsIncompleteAndJBFinalizeDoesNotApply() started.
+◇ Test toolChangeIsReadFromTheCLIError() started.
+◇ Test drainPersistsEveryLineInOrderIncludingFinalPanic() started.
+◇ Test allStagesDoneIsTheOnlyPassedOverall() started.
+◇ Test failedWritePreventsAcknowledgementAndLateWritesAreRejected() started.
+◇ Test recoveryRequiredAndFailuresKeepTheirNames() started.
+◇ Test lessMarksCFWAndJBFinalizeNotApplicable() started.
+◇ Test createStatusDecodesTheCLIFields() started.
+➜ Test startMachinesThenExit() skipped.
+✔ Test defaultRootHonorsVPHONERoot() passed after 0.018 seconds.
+✔ Test panicLines() passed after 0.021 seconds.
+✔ Test defaultRootHonorsEnvOverride() passed after 0.022 seconds.
+✔ Test exitLineIsAppendedOnItsOwnLine() passed after 0.025 seconds.
+✔ Test noCheckpointIsNil() passed after 0.028 seconds.
+✔ Test defaultRootIsShellSafe() passed after 0.029 seconds.
+✔ Test localIdentityIsSeparateFromUpstream() passed after 0.028 seconds.
+✔ Test consoleLogsAreSeparatedPerLibrary() passed after 0.028 seconds.
+✔ Test bundleNamedThrowsWhenMissing() passed after 0.028 seconds.
+✔ Test defaultRootIsTheCLIDefaultCanonical() passed after 0.028 seconds.
+✔ Test canonicalResolvesSymbolicLinks() passed after 0.028 seconds.
+✔ Test backendsAndOptionsAppearOnlyWhenChosen() passed after 0.028 seconds.
+✔ Test addedRootsAreAbsoluteCanonicalUniqueAndNotTheDefault() passed after 0.029 seconds.
+✔ Test scansOnlyDirsWithManifest() passed after 0.029 seconds.
+✔ Test resumeStatusAndCatalogArguments() passed after 0.028 seconds.
+✔ Test lessIsNotOffered() passed after 0.028 seconds.
+✔ Test escapeScannerMatchesPreviousPatternIncludingIncompleteSequences() passed after 0.028 seconds.
+✔ Test scanReportsCorruptBundlesInsteadOfDropping() passed after 0.029 seconds.
+✔ Test singleByteChunksPreserveIncompleteUTF8AndEscapeSequences() passed after 0.028 seconds.
+✔ Test createPassesTheRootPopupAndOnlyTheDefaults() passed after 0.028 seconds.
+✔ Test requestsTheCLIWouldRejectAreRefused() passed after 0.028 seconds.
+✔ Test noCommandCarriesAPasswordOrInteractivePrompts() passed after 0.028 seconds.
+✔ Test statusesKeepTheirCheckpointSpelling() passed after 0.029 seconds.
+✔ Test replaysOnlyTheTailFromALineStart() passed after 0.028 seconds.
+✔ Test resetsWhenTheFileIsReplaced() passed after 0.028 seconds.
+✔ Test followsAppendsAndReportsAMissingFileOnce() passed after 0.028 seconds.
+✔ Test runningStageReadsAsInterruptedAndUnreadableIsAFailure() passed after 0.029 seconds.
+✔ Test resetsWhenTheFileIsTruncated() passed after 0.029 seconds.
+✔ Test unverifiedNeverReadsAsPassed() passed after 0.031 seconds.
+✔ Test catalogDecodesTheCLIReport() passed after 0.032 seconds.
+✔ Test aReadOnlyFolderIsRefused() passed after 0.032 seconds.
+✔ Test toolChangeIsReadFromTheCLIError() passed after 0.031 seconds.
+✔ Test aMachineFolderIsRefused() passed after 0.032 seconds.
+✔ Test missingAndUnreadableCheckpoints() passed after 0.032 seconds.
+✔ Test allStagesDoneIsTheOnlyPassedOverall() passed after 0.032 seconds.
+✔ Test lessMarksCFWAndJBFinalizeNotApplicable() passed after 0.029 seconds.
+✔ Test aRunningStageIsUnderWayOnlyWhileTheOwnRunLives() passed after 0.033 seconds.
+✔ Test createStatusDecodesTheCLIFields() passed after 0.030 seconds.
+✔ Suite LibraryTests passed after 0.035 seconds.
+✔ Suite ConsoleLogTests passed after 0.035 seconds.
+✔ Suite CreateSummaryTests passed after 0.035 seconds.
+✔ Test freshRegularCreateIsIncompleteAndJBFinalizeDoesNotApply() passed after 0.033 seconds.
+✔ Suite LocationTests passed after 0.035 seconds.
+✔ Test recoveryRequiredAndFailuresKeepTheirNames() passed after 0.031 seconds.
+✔ Suite CreateCommandTests passed after 0.035 seconds.
+✔ Suite LogFollowerTests passed after 0.035 seconds.
+✔ Suite CreateProgressTests passed after 0.035 seconds.
+✔ Test exitCodeMatchesProcessTerminationStatus() passed after 0.034 seconds.
+✔ Test failedWritePreventsAcknowledgementAndLateWritesAreRejected() passed after 0.037 seconds.
+✔ Test drainPersistsEveryLineInOrderIncludingFinalPanic() passed after 0.043 seconds.
+✔ Suite LogWriterTests passed after 0.045 seconds.
+✔ Test aWritableFolderAndAMissingOneBelowItAreAccepted() passed after 0.105 seconds.
+✔ Suite LocationProblemTests passed after 0.107 seconds.
+✔ Test arbitraryChunkingPreservesCRLFUnicodeANSIAndTail() passed after 0.211 seconds.
+✔ Suite LineSplitterTests passed after 0.212 seconds.
+✔ Test startingReplacesTheLogWithANewFile() passed after 0.287 seconds.
+✔ Test logCreationFailureDoesNotLeaveRunningHistory() passed after 0.331 seconds.
+[launchpad] vm launch started, pid 2649
+✔ Test spawnFailureFinishesHistoryAndClosesLog() passed after 0.655 seconds.
+✔ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() passed after 0.655 seconds.
+✔ Test exitZeroWithReadFailureIsNotACompleteCommand() passed after 0.668 seconds.
+✔ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() passed after 0.668 seconds.
+✔ Test terminationPhasesRejectUnbegunWaitAndDuplicateBegin() passed after 0.667 seconds.
+✔ Test previousLogNameKeepsTheStem() passed after 0.670 seconds.
+✔ Test livePipeDeliversLinesBeforeWriterCloses() passed after 0.669 seconds.
+✔ Test rotationStaysInTheLogsDirectory() passed after 0.670 seconds.
+✔ Test addedLocationPersistsInInjectedDefaults() passed after 0.669 seconds.
+✔ Test cancellingARunInterruptsOnlyItsChild() passed after 0.950 seconds.
+[launchpad] listed 3 machines from 2 libraries
+✔ Test listsDefaultAndAddedLibraries() passed after 1.557 seconds.
+✔ Test runsInItsOwnSessionWithNullStdinAndOnlyTheLogOpen() passed after 1.565 seconds.
+✔ Test detachedParentExitDoesNotConfirmDescendantOutput() passed after 1.968 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2741
+✔ Test interruptReachesTheRunningChildEvenWhenTheParentIgnoresSIGINT() passed after 2.060 seconds.
+✔ Suite DetachedChildTests passed after 2.061 seconds.
+[launchpad] listed 1 machines from 2 libraries
+[launchpad] listed 0 machines from 1 libraries
+✔ Test cancelledDetachedWriterKeepsPanicTailAcrossRotation() passed after 2.372 seconds.
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] vm launch started, pid 2766
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2767
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2768
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2774
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] vm launch started, pid 2776
+[launchpad] vm launch started, pid 2777
+✔ Test missingAddedLibraryIsSkippedAndFailureKeepsLastListing() passed after 2.611 seconds.
+✔ Suite LibraryTests passed after 2.613 seconds.
+[launchpad] vm launch pid 2649 exited with status 0
+✔ Test failedStopDoesNotInterruptLaunchpadChild() passed after 2.626 seconds.
+✔ Suite StopRefusalTests passed after 2.628 seconds.
+✔ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() passed after 2.660 seconds.
+✔ Suite OutputCompletionTests passed after 2.661 seconds.
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 2786
+[launchpad] vm launch pid 2741 exited with status 7
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2793
+✔ Test escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate() passed after 2.854 seconds.
+[launchpad] vm launch started, pid 2794
+[launchpad] listed 2 machines from 1 libraries
+✔ Test terminationWaitsForOrdinaryPanicTailAndClosedLog() passed after 3.056 seconds.
+✔ Test concurrentCommandsPersistNormalizedPanicTailsInSeparateLogs() passed after 3.315 seconds.
+T46_THROUGHPUT {"display_lines":4000,"final_tail":"kernel panic: throughput final tail","input_bytes":12788934,"input_bytes_per_second":4646925.0150890676,"lines":100001,"lines_per_second":36335.878223620661,"omitted_display_lines":96001,"output_drained":true,"persisted_bytes":11788926,"persisted_bytes_per_second":4283566.9595631585,"persisted_sha256":"720a521ea7620059a8b4bb1a568ba3843fbe32dfe77981a330028c7f84326ca5","scope":"production CommandLine\/LineReader\/LogWriter with cat input fixture; no VM or UI rendering","seconds_including_spawn_read_and_writer_finish":2.752128334}
+✔ Test productionConsolePipelineThroughput() passed after 3.341 seconds.
+✔ Suite ConsoleLifecycleTests passed after 3.342 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2822
+[launchpad] vm launch pid 2766 exited with status 7
+✔ Test startDoesNotReplaceTheLogOfAMachineNamedDotOne() passed after 3.450 seconds.
+✔ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() passed after 3.503 seconds.
+✔ Suite CommandTerminationTests passed after 3.504 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 2839
+[launchpad] vm launch pid 2774 exited with status 7
+[launchpad] listed 3 machines from 1 libraries
+[launchpad] vm launch started, pid 2841
+[launchpad] vm launch started, pid 2842
+[launchpad] listed 0 machines from 1 libraries
+✔ Test existingDotOneIsReplaced() passed after 3.609 seconds.
+[launchpad] vm launch pid 2767 exited with status 7
+✔ Test firstStartHasNoPreviousLog() passed after 3.703 seconds.
+[launchpad] vm launch pid 2768 exited with status 7
+[launchpad] vm create pid 2786 exited with status 0
+✔ Test symbolicLinkLogIsNotRotatedAndTheStartGoesOn() passed after 3.765 seconds.
+[launchpad] vm launch pid 2794 exited with status 7
+✔ Test startKeepsThePreviousRunAsDotOne() passed after 3.947 seconds.
+✔ Suite ConsoleLogRotationTests passed after 3.948 seconds.
+✔ Test aNewMachineRunsVMCreateDetachedAndReadsStatusOnceAfterwards() passed after 4.298 seconds.
+◇ Test cancellingInterruptsTheWholeProcessGroupAndRefreshNeverAsksForStatus() started.
+[launchpad] vm launch pid 2776 exited with status 130
+PARENT_EXIT_ACK {"ack_observed_at":1791538680.7237229,"alpha_log":"launch alpha started\nserial alpha ready\nprobe alpha BEF27AC3-F1FB-4672-A13D-319AAD209516\n","beta_log":"launch beta started\nserial beta ready\nprobe beta BEF27AC3-F1FB-4672-A13D-319AAD209516\n","child_pids":[2868,2869],"parent_exit_observed_at":1791538680.3656631,"parent_pid":2672,"request_sent_at":1791538680.566304,"token":"BEF27AC3-F1FB-4672-A13D-319AAD209516"}
+[launchpad] vm launch pid 2822 exited with status 7
+✔ Test startRunsVMLaunchDetachedAndAppendsTheExitLine() passed after 4.400 seconds.
+✔ Test childrenOutliveTheProcessThatStartedThem() passed after 4.452 seconds.
+✔ Suite ParentExitTests passed after 4.453 seconds.
+[launchpad] vm launch started, pid 2953
+[launchpad] vm launch pid 2839 exited with status 130
+✔ Test settingsRunOneConfigPerMachineAndAreRecorded() passed after 4.594 seconds.
+◇ Test aRefusalIsShownWithTheCLIOutput() started.
+[launchpad] vm launch pid 2777 exited with status 130
+✔ Test twoMachinesWriteSeparateLogs() passed after 4.604 seconds.
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 2975
+[launchpad] vm launch pid 2953 exited with status 130
+✔ Test panicLineMarksTheMachineUntilItStartsAgain() passed after 4.820 seconds.
+[launchpad] vm launch pid 2841 exited with status 130
+[launchpad] vm launch pid 2793 exited with status 130
+✔ Test failedStopIsReportedWithoutInterruptingOwnChild() passed after 4.880 seconds.
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] vm launch pid 2842 exited with status 130
+✔ Test stopRunsVMStopThenInterruptsOnlyItsOwnChild() passed after 6.131 seconds.
+✔ Suite LaunchTests passed after 6.132 seconds.
+✔ Test aRefusalIsShownWithTheCLIOutput() passed after 1.638 seconds.
+◇ Test renameSelectsTheNewNameAndCloneTheClone() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test renameSelectsTheNewNameAndCloneTheClone() passed after 0.919 seconds.
+◇ Test deleteRunsVMDeleteForEachMachineAndNothingElse() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test deleteRunsVMDeleteForEachMachineAndNothingElse() passed after 0.995 seconds.
+◇ Test importGoesIntoTheDefaultLibrary() started.
+[launchpad] vm create pid 2975: SIGINT to its process group
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create pid 2975 exited with status 2
+✔ Test importGoesIntoTheDefaultLibrary() passed after 0.855 seconds.
+◇ Test importCancelledBeforeLaunchDoesNotReportAnActionFailure() started.
+✔ Test cancellingInterruptsTheWholeProcessGroupAndRefreshNeverAsksForStatus() passed after 4.831 seconds.
+◇ Test aChangedToolchainIsResumedOnlyAfterConfirmation() started.
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 3173
+✔ Test importCancelledBeforeLaunchDoesNotReportAnActionFailure() passed after 0.626 seconds.
+◇ Test cancelledImportLaunchErrorDoesNotReportAnActionFailure() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test cancelledImportLaunchErrorDoesNotReportAnActionFailure() passed after 0.483 seconds.
+◇ Test concurrentImportsDoNotReplaceOneGlobalActivity() started.
+[launchpad] vm create pid 3173 exited with status 1
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm create started, pid 3210
+✔ Test concurrentImportsDoNotReplaceOneGlobalActivity() passed after 0.771 seconds.
+◇ Test aNameLaunchpadCannotPassRunsNothing() started.
+[launchpad] listed 0 machines from 1 libraries
+✔ Test aNameLaunchpadCannotPassRunsNothing() passed after 0.531 seconds.
+◇ Test exportsRunOneAtATime() started.
+[launchpad] vm create pid 3210 exited with status 0
+✔ Test aChangedToolchainIsResumedOnlyAfterConfirmation() passed after 2.646 seconds.
+◇ Test lessAndBusyMachinesAreNotResumed() started.
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] listed 0 machines from 1 libraries
+✔ Test exportsRunOneAtATime() passed after 1.071 seconds.
+◇ Test cancellingAWaitingExportTakesItOutOfTheQueue() started.
+✔ Test lessAndBusyMachinesAreNotResumed() passed after 0.777 seconds.
+✔ Suite CreationRunTests passed after 12.554 seconds.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test cancellingAWaitingExportTakesItOutOfTheQueue() passed after 0.826 seconds.
+◇ Test cancellingARunningExportRemovesOnlyTheFileItCreated() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test cancellingARunningExportRemovesOnlyTheFileItCreated() passed after 0.790 seconds.
+◇ Test cancellingAnExportOverAnExistingFileLeavesThatFile() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test cancellingAnExportOverAnExistingFileLeavesThatFile() passed after 0.813 seconds.
+◇ Test aFolderExportDoesNotReplaceAnExistingFile() started.
+[launchpad] listed 2 machines from 1 libraries
+✔ Test aFolderExportDoesNotReplaceAnExistingFile() passed after 0.782 seconds.
+◇ Test historyRecordsEveryEditButNotTheListing() started.
+[launchpad] listed 1 machines from 1 libraries
+✔ Test historyRecordsEveryEditButNotTheListing() passed after 1.391 seconds.
+✔ Suite EditLibraryTests passed after 17.092 seconds.
+✔ Test run with 103 tests in 24 suites passed after 17.093 seconds.

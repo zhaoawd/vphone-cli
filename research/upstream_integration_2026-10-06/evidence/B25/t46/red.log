@@ -1,0 +1,82 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/38] Compiling asr.c
+[6/38] Compiling fls.c
+[6/38] Compiling download.c
+[8/38] Compiling recovery.c
+[8/38] Compiling fdr.c
+[10/38] Compiling ipsw.c
+[11/38] Compiling limera1n.c
+[12/38] Compiling dfu.c
+[13/38] Compiling normal.c
+[14/38] Compiling img3.c
+[15/38] Compiling img4.c
+[16/38] Compiling ace3.c
+[17/38] Compiling ftab.c
+[18/38] Compiling mbn.c
+[19/38] Compiling restore.c
+[20/38] Compiling log.c
+[20/38] Compiling locking.c
+[22/38] Compiling deviceinterfaced.c
+[23/38] Compiling vphone_zip_stub.c
+[24/38] Compiling common.c
+[25/38] Compiling idevicerestore.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+[29/38] Compiling VPhoneLaunchpadKitTests CommandTerminationTests.swift
+[30/40] Emitting module VPhoneLaunchpadKitTests
+[31/40] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[32/40] Compiling vphone_cli VPhoneBuildInfo.swift
+[32/40] Write Objects.LinkFileList
+[35/41] Emitting module VPhoneCLITests
+[35/41] Write Objects.LinkFileList
+[36/41] Linking vphone-vm
+[37/41] Linking vphone-cli
+[38/41] Applying vphone-vm
+[39/41] Applying vphone-cli
+[40/41] Linking vphone-cliPackageTests
+Build complete! (14.96s)
+Test Suite 'Selected tests' started at 2026-10-09 15:50:15.251.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 15:50:15.254.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 15:50:15.254.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 15:50:15.254.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CommandTerminationTests started.
+◇ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() started.
+✘ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() recorded an issue at CommandTerminationTests.swift:32:9: Expectation failed: (VPhoneLaunchpadQuit.decision(library) → .quit) != .quit
+↳ // Returning quit here lets AppKit exit before the pipe and writer drain.
+✘ Test quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput() failed after 0.510 seconds with 1 issue.
+✘ Suite CommandTerminationTests failed after 0.510 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 0.511 seconds with 1 issue.

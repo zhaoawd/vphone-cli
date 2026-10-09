@@ -1,0 +1,579 @@
+{
+  "review": "B25 independent final static re-review",
+  "baseline": "2b6c28f75181582624c307b393ab85ef7d8e5f59",
+  "worktree": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli",
+  "verdict": "no_remaining_critical_or_important_in_reviewed_scope",
+  "critical_count": 0,
+  "important_count": 0,
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "B25-R1",
+      "status": "resolved",
+      "production_file": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "lines": [
+        91,
+        92,
+        93,
+        94
+      ],
+      "evidence": "debs.list 已纳入开发 roots，按既有 inventory/copy 路径复制并纳入 aggregate SHA。已安装布局仍复制整个 Contents。",
+      "regression_file": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "test": "developmentDebListIsCopiedAndResumeRequiresAcceptanceAfterChanges",
+      "test_line": 93,
+      "coverage": "断言复制内容、修改清单后摘要变化、未经 accept 的 resume 抛错及 checkpoint 不变。"
+    },
+    {
+      "id": "B25-R2",
+      "status": "resolved",
+      "production_file": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "lines": [
+        217,
+        218,
+        219
+      ],
+      "evidence": "visit 先解析链接，随后同时拒绝 source.lastPathComponent 和 resolved.lastPathComponent 为 Disk.img 的输入，拒绝发生在文件散列及复制前。",
+      "regression_file": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "test": "aVMImageAliasCannotEnterTheResourceCopy(linkCount:)",
+      "test_line": 210,
+      "coverage": "1、2、3 层文件链接别名均要求拒绝，并检查存储为空和原 Disk.img 内容不变。",
+      "note": "首次复审读到的是强化链接链测试期间的临时 RED mutation；实施代理已确认并恢复双检查，最终 SHA 为本报告所记录版本。"
+    },
+    {
+      "id": "B25-R3",
+      "status": "resolved",
+      "production_file": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "lines": [
+        127,
+        134,
+        254,
+        275,
+        278,
+        279,
+        280,
+        285
+      ],
+      "evidence": "remainingBytes 从预检 total 初始化；每次写目标前检查 chunk 大小不超过单文件剩余预检大小及 snapshot remainingBytes，写入后递减预算。最终检查已复制大小、stat 修订和 SHA。出现错误仍由未发布副本清理路径删除该副本。",
+      "regression_file": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "test": "sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:)",
+      "test_line": 227,
+      "coverage": "0 字节及 1 MiB+7 字节来源在前置 stat 后通过 package 同步点追加 64 KiB，保留实际目标 inode 的只读描述符，断言写入未超过预检大小且失败副本清理。"
+    }
+  ],
+  "new_production_review": "三项原 T40 Important 保持已修复；ctime 合同调整符合已声明的内容范围。新增 T46 同步 begin+异步 wait 四阶段门控及 AppDelegate 调用顺序经静态复审未发现 Critical/Important。审查包含对应回归测试和实施代理提供的隔离/相关测试证据；最终标准 Swift 和 UI 验证由父任务汇总。",
+  "verification": {
+    "performed_by_reviewer": [
+      "只读源码与测试检查",
+      "git diff --check 2b6c28f7 -- :!TODO.md",
+      "最终源文件 SHA-256 记录"
+    ],
+    "implementation_evidence_read": [
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-r1-green.log",
+        "result": "1 test / 1 suite passed"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-r3-green.log",
+        "result": "sourceGrowth 两种 initialBytes case passed"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-r2-chain-red.log",
+        "result": "撤去 resolved 检查时，1/2/3 层链接测试均产生预期失败"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-snapshot-green.log",
+        "result": "11 tests / 1 suite passed；包含三项修复回归"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-related-final.log",
+        "result": "143 tests / 9 suites passed；真实 CLI SIGINT 取消替身通过。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/scheduling/isolated-green.log",
+        "result": "4 tests / 1 suite passed；同步门控改动。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/scheduling/related-green.log",
+        "result": "102 tests / 23 suites passed；同步门控改动。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/legacy-fixtures/final-related-green.log",
+        "result": "103 tests / 24 suites passed，21.456s；最后cleanup修复后相关验证，不替代最终标准Swift。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-all-bundle-green.log",
+        "result": "21 tests passed，25.273s；最终裸token/nested边界/root上下文修复后。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-launchpad-green.log",
+        "result": "23 tests passed，0.162s；最终rpath修复后。"
+      }
+    ],
+    "ui_evidence_read": {
+      "path": "/private/tmp/vphone-b25/ui-acceptance.json",
+      "scope": "签名 Launchpad/AppDelegate/CommandLine 与受控签名 CLI；普通及 escaped pipe 日志精确匹配 10002 行/138939 字节；escaped pipe 退出取消提示已记录；不含实际 VM 吞吐。",
+      "status": "historical_pre_synchronous_gate_build_only; final UI acceptance pending parent"
+    }
+  },
+  "sha256": {
+    "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift": "a64f603c96da7a64e1d5a6c1d0d6d3a0ffd8f13cf27df46d837430e8a215c594",
+    "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift": "8af8bd7c2958ab06ac7281010ff2caf06f1e8335838f46607f65dae8fdda7db5",
+    "tests/VPhoneCLITests/CreateCancellationEndToEndTests.swift": "54634228b0590f9df79f406d3e4384044b923d9f1bd59fd98c54ce65834f1540",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "7080f9926a2e4d0eefaf5c2cb16f87f42a2e75605d5c659e579c024b95cfaa9e",
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift": "48d8418365cf60802446ebf24042850bc009b724bb2424e51790205895879a47",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift": "2bef823d92b6be453bee645cdbc40afc8a7917887748a7ded0cc8194d5af8ab6",
+    "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift": "7c37bbbe74b5effabc91e9507c24bf3fb6b33504172755b3e45ced2eac5a82cb",
+    "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift": "17bf5ddefd9ac490fa81e54945a15ee6017a77bac43bfc10158b01b785dc8de9",
+    "tests/VPhoneLaunchpadKitTests/LaunchTests.swift": "266ed3bc23f77830bed4a8cbb45144bc749963ad0970c82ba94e900c41c9ad05",
+    "scripts/build_native_dependencies.py": "273bdbc86bc421f2957e4c6def622b47a1c0933d714db982bf09a29521181ee2",
+    "scripts/build_launchpad.sh": "e989f51767f43eac1d70dcd9d11ee12bfb8f3c743cca78eea2e3c07e718feb98",
+    "tests/test_bundle_native_dependencies.py": "964df59013a9df3c516012cc29547552f01c76bc8543784966fb0efb98f09827"
+  },
+  "limits": [
+    "审查代理未运行 SwiftPM、构建、Swift 测试、VM、UI 或系统服务，测试结果为读取实施证据。",
+    "T40 的外部 Python、PATH、SDK/JB、既有 cfw_input 等闭包限制仍有效，不构成整项验收。",
+    "实际 VM 创建、恢复、启动与吞吐不由本次代码审查或受控 CLI UI 证据证明。",
+    "已读取实施代理最终 143 tests/9 suites 证据；父任务正在进行的标准 Swift 验证不属于本报告已确认结果。",
+    "T46 早期 UI 验收属于同步门控修复前快照；本次修复后的 UI 验收尚待父任务完成。"
+  ],
+  "metadata_contract_review": {
+    "production_lines": [
+      35,
+      41,
+      297,
+      301,
+      304,
+      305,
+      306
+    ],
+    "scope": "Manifest 冻结 path/type/rwx/bytes/SHA；不冻结 owner、ACL、扩展属性和来源触碰历史。sameRevision 仅移除 ctime 比较；dev/ino/full mode/size/mtime、最终复制 SHA、二次完整来源 inventory 及写前容量预算保留。ctime 仍保留在修订诊断中。",
+    "conclusion": "符合当前内容合同；未发现维持该合同必须依赖 ctime 的路径，最终静态复审无新增 Critical/Important。",
+    "risk": "owner/ACL/xattr 单独变化及恢复 mtime 的瞬时修改不再必然拒绝，因此不能声称检测所有来源触碰。内容不同仍需通过最终复制 SHA 和二次来源 inventory。相同 Entry 内容的链接重定向原实现也未保证拒绝，因二次清单不比较 inode。",
+    "diagnostic_evidence": [
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-cancellation-stat.log",
+        "result": "真实 CLI 取消替身在 prepare 前拒绝；requirements.txt dev/ino/mode/size/mtime 相同，仅 ctime 变化。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-requirements-fs-usage.log",
+        "result": "记录 QzhddrSrv 于 CLI inventory 与 copy 之间对该 requirements.txt 成功 setxattr。此证据确认本次元数据变化路径，不推导其他失败原因。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-xattr-red.log",
+        "result": "保留 ctime 比较时，afterInventory 和 beforeCopy 两种 setxattr-only case 均失败；内容改写恢复 mtime 和不同内容链接重定向拒绝测试通过。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t40/review-xattr-green.log",
+        "result": "移除 ctime 比较后，15 tests / 2 suites 通过，包含两种 xattr-only case、内容/增长/链接拒绝及真实 CLI SIGINT 取消替身。"
+      }
+    ],
+    "tests": [
+      {
+        "name": "metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:)",
+        "line": 251,
+        "coverage": "afterInventory 和 beforeCopy 两时点；断言 dev/ino/mode/size/mtime 未变而 ctime 改变；成功副本 SHA 与基线相同。"
+      },
+      {
+        "name": "sameLengthContentRewriteWithRestoredMtimeIsRefused",
+        "line": 286,
+        "coverage": "同 inode、同长度改写后恢复 mtime，仍拒绝并清理副本。"
+      },
+      {
+        "name": "linkRedirectedAfterInventoryToDifferentContentIsRefused",
+        "line": 311,
+        "coverage": "来源链接在初次 inventory 后重定向到不同内容，二次来源清单拒绝，原目标不变且副本清理。"
+      }
+    ],
+    "cancellation_fixture": "最终文件 SHA 54634228b0590f9df79f406d3e4384044b923d9f1bd59fd98c54ce65834f1540 与前次审查相同；没有预读或有界稳定等待。仅保留补齐所选资源树和按来源 manifest 清理本测试自有中断副本。"
+  },
+  "T46_synchronous_gate_review": {
+    "conclusion": "新增同步门控静态复审无 Critical/Important。",
+    "production_evidence": [
+      {
+        "file": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+        "lines": [
+          139,
+          142,
+          147,
+          155,
+          156,
+          157
+        ],
+        "result": "beginTermination 同步关闭普通 command 门控并中断 own child；prepareForTermination 兼容入口复用 begin+wait。"
+      },
+      {
+        "file": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+        "lines": [
+          272,
+          280,
+          291,
+          296,
+          304,
+          310,
+          316
+        ],
+        "result": "四阶段 accepting/draining/waiting/sealed：仅 accepting 接受 command；begin 只从 accepting 进入 draining；wait 只从 draining 进入 waiting；未开始或重复 wait 返回 timedOut 且不改其他请求状态；超时/取消回到 accepting；drain 完成进入 sealed。失败标记持续至 drain 完成。"
+      },
+      {
+        "file": "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift",
+        "lines": [
+          86,
+          102,
+          103,
+          104,
+          105,
+          124
+        ],
+        "result": "AppDelegate 在调度 wait Task 和返回 terminateLater 前同步 begin；terminationPending 拒绝重复调度。超时回复 false，drained/incomplete 回复 true。普通 command 活动仍在 pipe EOF、同步 callback、writer finish/fsync/close 和 history 更新后才解除。"
+      }
+    ],
+    "tests_reviewed": [
+      {
+        "file": "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift",
+        "line": 8,
+        "name": "terminationPhasesRejectUnbegunWaitAndDuplicateBegin",
+        "coverage": "未开始 wait、重复 begin、成功 sealed 后禁止 command 与无新增 history。"
+      },
+      {
+        "file": "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift",
+        "line": 59,
+        "name": "escapedPipeWriterTimesOutWithoutLosingTailAndReopensCommandGate",
+        "coverage": "在同步 begin 后、wait 开始前断言 command 拒绝；history 条目数、日志文件数与 quick-started 标记证明未启动。保持原 150ms 超时及 2s 上限。超时后 command 可执行，原 reader/writer 持续到释放 escaped writer，尾部和日志内容精确匹配。"
+      },
+      {
+        "file": "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift",
+        "line": 22,
+        "name": "terminationWaitsForOrdinaryPanicTailAndClosedLog",
+        "coverage": "prepare 兼容入口等待尾部、history、日志关闭及成功 sealed。"
+      },
+      {
+        "file": "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift",
+        "line": 126,
+        "name": "quitDecisionDefersWhileOrdinaryCommandStillOwnsOutput",
+        "coverage": "普通 command 仍持有输出时 Quit 不得返回 quit。"
+      }
+    ],
+    "timing_evidence": [
+      {
+        "path": "/private/tmp/vphone-b25/swift-first-full.log",
+        "result": "首轮全套测试在旧 sleep20ms 门控断言处记录 quick command 成功返回。该记录未确定精确调度先后，不据此宣称已确认特定调度原因。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/scheduling/late-resume-red.log",
+        "result": "受控 250ms 迟恢复模拟复现旧门控断言失效；这是模拟证据，与首轮失败的精确调度原因区分。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/scheduling/isolated-green.log",
+        "result": "4 tests / 1 suite passed。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/scheduling/related-green.log",
+        "result": "102 tests / 23 suites passed。"
+      }
+    ],
+    "runtime_boundary": "有界等待的 deadline 从 waitForTermination 开始执行时起算；begin 的公开合同要求调用方立即调度 wait。AppDelegate 已满足调用顺序。早期实际 UI 证据来自此修复前构建；最终构建后的 UI 复验由父任务进行，本报告未将早期 UI 证据视为最终版本验收。"
+  },
+  "T46_legacy_fixture_review": {
+    "conclusion": "两项旧测试最终增量静态复审无剩余 Critical/Important；不包含生产行为修改。",
+    "baseline_snapshots": [
+      "/private/tmp/vphone-b25-t46/legacy-fixtures/StopRefusalTests.before.swift",
+      "/private/tmp/vphone-b25-t46/legacy-fixtures/LaunchTests.before.swift"
+    ],
+    "sha256": {
+      "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift": "17bf5ddefd9ac490fa81e54945a15ee6017a77bac43bfc10158b01b785dc8de9",
+      "tests/VPhoneLaunchpadKitTests/LaunchTests.swift": "266ed3bc23f77830bed4a8cbb45144bc749963ad0970c82ba94e900c41c9ad05"
+    },
+    "reviewed_changes": [
+      {
+        "file": "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift",
+        "lines": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          42,
+          43,
+          46,
+          47,
+          49,
+          50,
+          51,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          62,
+          63,
+          64,
+          65
+        ],
+        "result": "有限 sleep 替换为显式 ready/release 与拒绝 stop 后的 probe acknowledgement。保留 actionError、running、PID存活、launch history未完成、activity清空断言；新增 SIGINT marker 必须不存在、正常 release 后退出0及 outputDrained 断言。release 后先以 eventually(10) 有界确认 !child.isRunning，再 await completion。"
+      },
+      {
+        "file": "tests/VPhoneLaunchpadKitTests/LaunchTests.swift",
+        "lines": [
+          49,
+          52,
+          53,
+          54,
+          55,
+          56,
+          61,
+          70,
+          483,
+          496,
+          497,
+          516,
+          517,
+          518,
+          529,
+          530,
+          531,
+          532,
+          534,
+          540,
+          543,
+          546,
+          550,
+          551,
+          552,
+          553,
+          560,
+          562,
+          563,
+          564,
+          566,
+          567
+        ],
+        "result": "仅 ParentExit 使用 probe-mode；默认周期输出循环未改。父进程 pipe读取与 waitUntilExit 结束后生成新的UUID请求，子进程向原raw console log回写token，eventually(10)等待；保留存活、独立SID、PPID=1、日志隔离、最终子进程退出及tail断言。probe-mode 在 root目录消失或.exit存在时正常退出，未引入FIFO阻塞open。"
+      }
+    ],
+    "resolved_review_findings": [
+      {
+        "id": "B25-T46-legacy-cleanup",
+        "severity_when_found": "Important",
+        "status": "resolved",
+        "problem": "StopRefusal 首版删除原 defer SIGKILL 后只在 defer 写release；异常返回时临时目录可能在子进程读取release前删除，新增无限等待替身可持续存活。",
+        "fix": "library.start 后同步取得并持有 child，立即 defer child.interrupt()；该对象按所持子进程身份发送SIGINT，正常完成后不会发送。最终完成等待有界；ParentExit新增probe-mode也在root消失时退出。",
+        "files": [
+          "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift",
+          "tests/VPhoneLaunchpadKitTests/LaunchTests.swift"
+        ],
+        "evidence_lines": {
+          "StopRefusalTests.swift": [
+            42,
+            43,
+            46,
+            60,
+            62
+          ],
+          "LaunchTests.swift": [
+            49,
+            52
+          ]
+        }
+      }
+    ],
+    "failure_and_reproduction_scope": {
+      "original_standard_run": "第二次标准 Swift 的5 issues来自旧StopRefusal和ParentExit断言。旧Stop替身sleep30已正常退出后仍期待running；ParentExit在固定600ms内两raw日志无增长，但存活、PPID及最终tail断言通过。日志无增长原因未查明。",
+      "controlled_red": {
+        "path": "/private/tmp/vphone-b25-t46/legacy-fixtures/controlled-red.log",
+        "scope": "受控sleep50ms以及仅ParentExit启用的请求输出模式可复现旧断言失效；该模拟不证明原ParentExit失败的原因。"
+      }
+    },
+    "verification_evidence_read": [
+      {
+        "path": "/private/tmp/vphone-b25-t46/legacy-fixtures/isolated-green.log",
+        "result": "2 tests / 2 suites passed，3.095s；PARENT_EXIT_ACK包含parent退出观察、请求和ack时间及两raw日志token。该次早于最后cleanup加强。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t46/legacy-fixtures/final-related-green.log",
+        "result": "最终cleanup版本103 tests / 24 suites passed，21.456s；实施代理报告exit0。审查代理已读取末尾实际通过记录。"
+      }
+    ],
+    "limits": [
+      "审查代理只读审查与读取测试证据，未运行SwiftPM、构建、UI、VM或系统服务。",
+      "相关103项验证不替代父任务正在进行的最终标准Swift全套验证。",
+      "早期UI仍属于同步门控修复前快照；最终源码UI验收由父任务另行执行。"
+    ]
+  },
+  "T24_final_rpath_review": {
+    "base_head": "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+    "conclusion": "三文件最终增量静态复审无剩余 Critical/Important。",
+    "sha256": {
+      "scripts/build_native_dependencies.py": "273bdbc86bc421f2957e4c6def622b47a1c0933d714db982bf09a29521181ee2",
+      "scripts/build_launchpad.sh": "e989f51767f43eac1d70dcd9d11ee12bfb8f3c743cca78eea2e3c07e718feb98",
+      "tests/test_bundle_native_dependencies.py": "964df59013a9df3c516012cc29547552f01c76bc8543784966fb0efb98f09827"
+    },
+    "reviewed_boundaries": [
+      {
+        "file": "scripts/build_native_dependencies.py",
+        "lines": [
+          92,
+          95,
+          109,
+          112,
+          122,
+          123,
+          124,
+          125,
+          128,
+          142
+        ],
+        "result": "checker 为依赖图保留root executable上下文，按(path,executable)去重。允许裸或带后缀loader/executable相对rpath，但先按对应目录展开并真实resolve符号链接、强制落在Bundle内。未知token、裸相对路径及解析后逃逸路径拒绝。"
+      },
+      {
+        "file": "scripts/build_launchpad.sh",
+        "lines": [
+          72,
+          75,
+          80,
+          83,
+          84
+        ],
+        "result": "已装配outer app在生成嵌套manifest及最终seal前执行native staging；复制嵌套CLI后再校验嵌套CLI/VM cdhash与来源一致。"
+      },
+      {
+        "file": "scripts/build_native_dependencies.py",
+        "lines": [
+          164,
+          165,
+          166,
+          233,
+          234,
+          235
+        ],
+        "result": "staging在任何load-command修改/签名前拒绝解析后落在Contents/Helpers的写入目标，包括outer root符号链接指向nested executable及outer依赖引用nested library。签名仍将CFBundleExecutable置后。"
+      }
+    ],
+    "resolved_review_findings": [
+      {
+        "id": "B25-T24-bare-token",
+        "severity_when_found": "Important",
+        "status": "resolved",
+        "problem": "checker允许裸token，但实际@rpath依赖解析与继承rpath展开原先只识别带斜线形式。",
+        "fix_lines": [
+          65,
+          66,
+          67,
+          68,
+          174,
+          175,
+          176,
+          177
+        ],
+        "tests": [
+          {
+            "line": 160,
+            "name": "test_staging_resolves_rpath_with_bare_loader_token"
+          },
+          {
+            "line": 174,
+            "name": "test_staging_resolves_library_bare_executable_token_against_host_root"
+          }
+        ]
+      },
+      {
+        "id": "B25-T24-nested-write",
+        "severity_when_found": "Important",
+        "status": "resolved",
+        "problem": "仅host_roots排除Helpers不足以保证嵌套全字节不变，递归依赖或root符号链接仍可进入nested修改与签名。",
+        "fix_lines": [
+          164,
+          165,
+          166
+        ],
+        "tests": [
+          {
+            "line": 118,
+            "name": "test_launchpad_native_staging_preserves_embedded_toolchain_bytes"
+          },
+          {
+            "line": 184,
+            "name": "test_staging_rejects_referenced_nested_library_without_changing_it"
+          },
+          {
+            "line": 200,
+            "name": "test_staging_rejects_outer_root_symlink_to_nested_executable"
+          }
+        ]
+      },
+      {
+        "id": "B25-T24-root-context",
+        "severity_when_found": "Important",
+        "status": "resolved",
+        "problem": "原visited只使用(source,destination)，共享来源库在不同executable上下文解析不同依赖时，第二root可静默复用首次选择。",
+        "fix": "缓存原始source load commands，避免重读已改写内容；按(source,destination)记录解析映射，其他上下文解析不同映射时拒绝；即使映射相同，也按root及继承rpaths继续递归验证子库。未引入多版本库克隆。",
+        "fix_lines": [
+          156,
+          157,
+          158,
+          169,
+          170,
+          184,
+          185,
+          187,
+          188,
+          189,
+          191,
+          192,
+          195,
+          210,
+          211,
+          214
+        ],
+        "tests": [
+          {
+            "line": 215,
+            "name": "test_staging_rejects_shared_library_resolution_that_differs_between_roots",
+            "scope": "真实Mach-O fixture中两个root封装前分别运行输出42/104；冲突解析必须拒绝。"
+          }
+        ]
+      }
+    ],
+    "verification_evidence_read": [
+      {
+        "path": "/private/tmp/vphone-b25-t24/rpath-fix-summary.json",
+        "scope": "签名构建初次失败与初步checker/outer staging修复记录；该版本随后按review继续加强。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-token-nested-red-independent.log",
+        "result": "15 tests / 4 failures；两种裸token实际依赖解析失败，两种nested写入反证失败。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-root-context-red.log",
+        "result": "16 tests / 1 failure；旧stage对两个不同root的不同依赖解析返回成功，触发预期拒绝断言失败。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-all-bundle-green.log",
+        "result": "21 tests passed，25.273s，含16项真实native及5项resource验证。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-launchpad-green.log",
+        "result": "23 tests passed，0.162s。"
+      },
+      {
+        "path": "/private/tmp/vphone-b25-t24/review-fixes-summary.json",
+        "scope": "最终实施报告，最终hash与审查代理读取的工作树文件一致。"
+      }
+    ],
+    "reviewer_checks": [
+      "只读diff与源码/测试检查",
+      "git diff --check 0d1dc844 -- 三文件通过",
+      "zsh -n scripts/build_launchpad.sh 通过",
+      "最终SHA-256核对"
+    ],
+    "limits": [
+      "审查代理未运行SwiftPM、native构建、签名App修改、UI、VM或系统服务。",
+      "相关native/Bundle及Launchpad测试由实施代理执行，审查代理读取结果。",
+      "最终标准Python、make launchpad重构建及重建App上的actualCLI/UI验收仍由父任务执行；现有相关测试不替代这些结果。",
+      "TCC、历史helper、实际VM及T40外部工具闭包限制保持未验状态。"
+    ]
+  }
+}

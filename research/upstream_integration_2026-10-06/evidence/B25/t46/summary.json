@@ -1,0 +1,67 @@
+{
+  "base_head": "2b6c28f75181582624c307b393ab85ef7d8e5f59",
+  "files": {
+    "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift": "56c302f1f5139c7903bbe73f21500e944fac71681a5bed1261182425181e604b",
+    "sources/VPhoneLaunchpad/Localizable.xcstrings": "88734a78b7c0dc45bf3ded792a3d2c67b17007f09031a06e9df6895614861660",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift": "5084a9bdca2eef37ffbc848f5e0fe05a6f15c17e101a040e2798e00634ca35dd",
+    "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift": "2bef823d92b6be453bee645cdbc40afc8a7917887748a7ded0cc8194d5af8ab6",
+    "tests/VPhoneLaunchpadKitTests/CreateTests.swift": "1c8f4d2058acaac79249317a2c9f4397cb68892338092fa3f54461c8e4c8fb08",
+    "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift": "1eae7e22f06adc17113ad06c60827c821a0186af6bc6cb6725b253cffee8a4d7",
+    "tests/test_launchpad_bundle.py": "0218d2333bc2af5577f7e551713f3af1b6f850560cc2201a93a3542154e612df"
+  },
+  "behavior_red": {
+    "log": "red.log",
+    "tests": 1,
+    "issues": 1,
+    "failure": "Quit.decision returned .quit while ordinary CommandLine pipe/writer active"
+  },
+  "green": {
+    "log": "final-targeted.log",
+    "tests": 3,
+    "suites": 1,
+    "seconds": 2.529
+  },
+  "affected_green": {
+    "log": "affected-green.log",
+    "tests": 101,
+    "suites": 23,
+    "seconds": 14.659
+  },
+  "affected_initial_failure": {
+    "log": "affected.log",
+    "tests": 101,
+    "issues": 1,
+    "failure": "CreateTests expected immediate .quit during final ordinary refresh",
+    "resolution": "bounded eventually(10) waiting for true drain; later change only adds explicit timeout and actual Decision failure message"
+  },
+  "python_boundaries": {
+    "log": "python-boundaries-green.log",
+    "tests": 37,
+    "status": "passed"
+  },
+  "strings": {
+    "log": "strings-green.log",
+    "keys": 282,
+    "source_literals": 282,
+    "languages": [
+      "en",
+      "zh-Hans"
+    ],
+    "issues": 0
+  },
+  "scope": "ordinary CommandLine activity covers own child, pipe EOF, synchronous callbacks, persistent writer finish/fsync/close and history; detached launch/create remains independent",
+  "remaining": [
+    "actual signed UI fixture acceptance delegated to parent",
+    "helper XPC ACK/disconnect/30-second timeout combinations unchanged and not accepted by these tests",
+    "actual VM/UI throughput not tested"
+  ],
+  "risks": [
+    "ordinary command ignoring SIGINT or escaped pipe holder cancels quit after 5 seconds; reader/writer remain active",
+    "only own ordinary child receives SIGINT; descendants are not group-signalled",
+    "final affected Swift suite predates explicit default-10s diagnostic-only test assertion edit and catalog additions; parent final aggregate verification pending"
+  ],
+  "ui_procedure": "UI-PROCEDURE.txt",
+  "ui_fixture_preparer": "prepare-ui-fixture.py",
+  "no_git_commit": true,
+  "no_UI_VM_or_system_service_started": true
+}

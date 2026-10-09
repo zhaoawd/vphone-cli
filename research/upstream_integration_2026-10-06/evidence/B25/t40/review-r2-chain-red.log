@@ -1,0 +1,43 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/18] Emitting module VPhoneCore
+[7/18] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[7/24] Write Objects.LinkFileList
+[12/26] Linking vphone-launchpad-launcher
+[13/26] Linking vphone-helper
+[14/26] Applying vphone-launchpad-launcher
+[15/26] Applying vphone-helper
+[16/26] Linking vphone-launchpad
+[17/26] Applying vphone-launchpad
+[19/26] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[19/26] Linking vphone-cli
+[20/26] Linking vphone-vm
+[21/26] Applying vphone-cli
+[22/26] Applying vphone-vm
+[24/26] Emitting module VPhoneCoreTests
+[24/26] Write Objects.LinkFileList
+[25/26] Linking vphone-cliPackageTests
+Build complete! (8.79s)
+Test Suite 'Selected tests' started at 2026-10-09 17:03:02.379.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:03:02.380.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:03:02.380.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:03:02.380.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument linkCount → 2 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument linkCount → 1 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument linkCount → 3 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+✘ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) recorded an issue with 1 argument linkCount → 1 at CreateResourceSnapshotTests.swift:222:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✘ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) recorded an issue with 1 argument linkCount → 2 at CreateResourceSnapshotTests.swift:222:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✘ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) recorded an issue with 1 argument linkCount → 3 at CreateResourceSnapshotTests.swift:222:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✘ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) with 3 test cases failed after 0.026 seconds with 3 issues.
+✘ Suite CreateResourceSnapshotTests failed after 0.026 seconds with 3 issues.
+✘ Test run with 1 test in 1 suite failed after 0.026 seconds with 3 issues.

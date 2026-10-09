@@ -1,0 +1,33 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/8] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[6/8] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[7/8] Emitting module VPhoneLaunchpadKitTests
+[7/9] Write Objects.LinkFileList
+[8/9] Linking vphone-cliPackageTests
+Build complete! (9.66s)
+Test Suite 'Selected tests' started at 2026-10-09 17:36:45.074.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:36:45.076.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:36:45.076.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:36:45.076.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ParentExitTests started.
+◇ Suite StopRefusalTests started.
+◇ Test childrenOutliveTheProcessThatStartedThem() started.
+◇ Test failedStopDoesNotInterruptLaunchpadChild() started.
+[launchpad] vm launch started, pid 660
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] vm launch pid 660 exited with status 0
+✔ Test failedStopDoesNotInterruptLaunchpadChild() passed after 1.530 seconds.
+✔ Suite StopRefusalTests passed after 1.530 seconds.
+PARENT_EXIT_ACK {"ack_observed_at":1791538608.287739,"alpha_log":"launch alpha started\nserial alpha ready\nprobe alpha CC4ECBFD-C96E-4689-A13E-3DB3CB828EBA\n","beta_log":"launch beta started\nserial beta ready\nprobe beta CC4ECBFD-C96E-4689-A13E-3DB3CB828EBA\n","child_pids":[755,756],"parent_exit_observed_at":1791538608.1380701,"parent_pid":661,"request_sent_at":1791538608.2326632,"token":"CC4ECBFD-C96E-4689-A13E-3DB3CB828EBA"}
+✔ Test childrenOutliveTheProcessThatStartedThem() passed after 3.094 seconds.
+✔ Suite ParentExitTests passed after 3.095 seconds.
+✔ Test run with 2 tests in 2 suites passed after 3.095 seconds.

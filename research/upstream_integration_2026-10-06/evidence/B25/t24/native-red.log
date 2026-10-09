@@ -1,0 +1,47 @@
+test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape) ... FAIL
+test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies) ... FAIL
+test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success) ... FAIL
+test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals) ... FAIL
+
+======================================================================
+FAIL: test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 71, in test_check_rejects_library_symlink_escape
+    self.assertEqual(result.returncode, 0, result.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : /opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 47, in test_check_rejects_resolvable_external_dependencies
+    self.assertIn('External dependency', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'External dependency' not found in "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py': [Errno 2] No such file or directory\n"
+
+======================================================================
+FAIL: test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 83, in test_missing_dependency_fails_before_success
+    self.assertIn('Unresolved dependency', result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Unresolved dependency' not found in "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py': [Errno 2] No such file or directory\n"
+
+======================================================================
+FAIL: test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 51, in test_relocated_recursive_libraries_execute_and_verify_without_originals
+    self.assertEqual(result.returncode, 0, result.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : /opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.365s
+
+FAILED (failures=4)

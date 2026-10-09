@@ -1,0 +1,55 @@
+{
+  "task": "T24",
+  "head": "2b6c28f75181582624c307b393ab85ef7d8e5f59",
+  "result": "portable_host_native_closure_implemented_and_real_bundle_verified_TCC_runtime_pending",
+  "changed_files": {
+    "scripts/build.sh": "61133788fac80caadf7a3726894bb6ec89ce8483eee9d81abb3388a6770af204",
+    "scripts/build_native_dependencies.py": "255738c70c7f09f9e2a1695c32b06c1a0c625adbbdf5c927e9e7614ddc31dddd",
+    "scripts/check_bundle.py": "dfa24baaec29801e41eac6b183227e1e5ef77e09d3365e8954725357e796da54",
+    "scripts/check_launchpad_bundle.py": "e27d713c467d969f94dfa0ac213cd1793331b5b73ca7e8dd01f6e12065a24eea",
+    "scripts/record_build_dependencies.py": "823dc06e9ad96e0c40ed92cd3ae30683ae382f3a4209bffb124d8f3452dff82e",
+    "tests/test_bundle_native_dependencies.py": "ad7c5da2f8735ebd6c53d9043e3da5fd1732a76c17a7453ef122a81c506ae486"
+  },
+  "design": [
+    "Stage the named host executables and recursively resolved non-system Mach-O libraries into Contents/Frameworks.",
+    "Rewrite non-system loads to relative @loader_path; rewrite dylib IDs to @rpath/basename; remove non-system LC_RPATH entries.",
+    "Reject unresolved references, conflicting same-name libraries, escaped library symlinks, missing architecture slices and invalid signatures.",
+    "Sign each changed host image preserving entitlements/identifier/flags, with the app CFBundleExecutable signed last.",
+    "Run read-only closure validation in CLI and Launchpad Bundle checks; record closure in Contents/Resources/build-dependencies.json host_native_libraries."
+  ],
+  "validation": {
+    "native_tests": "8 passed; native-green-final.log",
+    "bundle_tests": "13 passed / 9.169s; bundle-focused-final.log",
+    "python_suite": "602 tests / 312.273s; 2 failures, 2 skipped; python-suite.log",
+    "python_failures": [
+      "test_launchpad_bundle.LaunchpadB1BoundaryTests.test_signals_reach_only_the_own_child: HEAD existing kill(-detachedPID, 0) probe conflicts with source scan assertion; T46 coordinating correction.",
+      "test_launchpad_strings.LaunchpadStringsTests.test_repository_catalogs_pass: 2 new T46 strings absent during full run; T46 reports catalogs corrected."
+    ],
+    "actual_bundle": "actual-proof.json; check_bundle and codesign --verify --strict --deep passed; 7 native images.",
+    "homebrew_denied": "sandbox-exec denied original /opt/homebrew library read; bundled ldid entitlement extraction and trustcache v1 create/info exited 0 under same profile."
+  },
+  "limits": [
+    "No final whole-project SwiftPM build or tests run by this subtask; parent owns final build and Swift test slot.",
+    "Real artifact validation used an isolated APFS clone of the existing signed .build/vphone-cli.app with current build scripts staged; original app and guest VM were unchanged.",
+    "Host Mach-O closure does not establish Python, shell PATH/toolchain, IPSW or JB build dependency portability.",
+    "No actual TCC permission request, VM/GUI launch, service registration or TCC DB change performed.",
+    "Local location code runs inside vphone-vm; no separate location helper target. The actual responsible app/usage attribution remains unverified."
+  ],
+  "evidence": [
+    "actual-proof.json",
+    "actual-stage-final.log",
+    "actual-proof.log",
+    "native-red.log",
+    "native-red-stale-valid.log",
+    "native-red-rpath.log",
+    "native-red-sign-order.log",
+    "native-green-final.log",
+    "bundle-focused-final.log",
+    "python-suite.log",
+    "tcc-static.json",
+    "tcc-acceptance.md",
+    "tcc-attribution-filter.py",
+    "helper-inventory.json"
+  ],
+  "historical_helper": "Located archived real protocol-v1 candidate at .build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper, SHA256 bbc0917c2d5551de48b2eff7db8396c1c1d9a7d62f48eecdacf66a82da48b3c4. Embedded metadata confirms version 1; ad hoc and unconfigured with empty team and authorized-clients list. No execution or registration. Historical-helper runtime matrix remains pending."
+}

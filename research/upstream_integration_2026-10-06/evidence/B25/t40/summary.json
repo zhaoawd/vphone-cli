@@ -1,0 +1,168 @@
+{
+  "task": "T40",
+  "batch": "B25",
+  "status": "resource_snapshot_increment_implemented_tested_full_toolchain_closure_pending",
+  "task_accepted": false,
+  "worktree": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli",
+  "head": "2b6c28f75181582624c307b393ab85ef7d8e5f59",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "local_static_evidence_baseline": "11064b07ea5b754285eae0e56f8aedc912441606",
+  "create_source_baseline": "a45c91915f6343733d1fde7e20180ee80cee7b57",
+  "implemented": [
+    "Per-attempt private copy of CLI/VM, development runtime siblings, scripts, resources, guest, debs.list and dependency lock inputs; installed Contents includes metadata/signature/native Frameworks",
+    "Content-and-permission aggregate identity; dev/inode/mode/size/mtime and SHA checks, materialized links, cycle/special-node refusal, Disk.img refusal on both source and resolved target; no ownership/ACL/xattr/touch-history freeze",
+    "TaskLocal scope for firmware consumers that resolve resources internally; fixed guest-components path and captured user-root interpretation",
+    "Resume refuses unaccepted aggregate changes; accepted change selects one complete new snapshot while skipped completed stages retain previous origins",
+    "Per-attempt diagnostic manifest and stage evidence with closure_limits; quota 8 snapshots / 2 GiB plus 64 MiB capacity reserve; failures retain copies, successful/refused attempts clean their own copies",
+    "Each copy chunk is checked against the registered file size and remaining snapshot byte budget before writing; source growth cannot first write beyond admitted bytes"
+  ],
+  "validation": {
+    "behavior_red": [
+      "red.log",
+      "red-recheck.log",
+      "disk-red.log",
+      "review-r1-red.log",
+      "review-r2-chain-red.log",
+      "review-r3-red.log",
+      "review-xattr-red.log"
+    ],
+    "api_compile_red": "scope-red.log",
+    "final_related": {
+      "log": "review-related-final.log",
+      "tests": 143,
+      "suites": 9,
+      "exit_code": 0
+    },
+    "earlier_related_failure_fixed": "related-initial.log: cancellation stand-in fixture lacked newly required source inputs; fixture completed without relaxing production checks",
+    "new_test_failure_fixed": "final-green.log: URL directory-hint equality in user-root test; changed comparison to filesystem path",
+    "git_diff_check": "passed for tracked changed files; new files have no trailing whitespace",
+    "previous_final_related": {
+      "log": "final-verified.log",
+      "tests": 137,
+      "suites": 9,
+      "exit_code": 0
+    },
+    "review_fixes": {
+      "B25-R1": "debs.list copied and included in aggregate/resume identity; red and green observed",
+      "B25-R2": "Disk.img direct and resolved names checked; 1–3 link chain cases use out-of-resource-tree intermediate links; red and green observed",
+      "B25-R3": "actual target inode bytes never exceed registered file size after controlled post-fstat source growth; red and green observed",
+      "targeted_log": "review-xattr-green.log",
+      "targeted_tests": 15,
+      "targeted_suites": 2,
+      "git_diff_check": "passed"
+    },
+    "metadata_diagnosis": {
+      "initial_related_failure": "review-related-green.log: 140 tests/9 suites, one cancellation fixture source revision failure",
+      "independent_reproduction": "review-cancellation-recheck.log",
+      "stat_log": "review-cancellation-stat.log",
+      "observed_fields": "dev/ino/mode/size/mtime equal; ctime changed",
+      "process_evidence": "review-requirements-fs-usage.log: QzhddrSrv successful setxattr between inventory and copy",
+      "xattr_name": "not recorded",
+      "filter_metadata": "review-fs-usage-collection.json",
+      "fixture_wait_attempt": "review-cancellation-green.log: pre-read and bounded stability wait did not resolve the failure; test change reverted",
+      "resolution": "Parent and reviewer approved excluding ctime according to manifest content/rwx contract; deterministic afterInventory/beforeCopy xattr-only RED then GREEN; same-size rewrite with restored mtime and redirected link with different contents remain refused",
+      "guard_limits": "Excluding ctime reduces detection of transient ABA source touches. Owner/ACL/xattr/touch history are not part of the snapshot contract. Final expected SHA and second source inventory remain required."
+    }
+  },
+  "not_implemented": [
+    "Python interpreter/framework/packages/native dependency closure",
+    "External PATH tool and dylib closure outside packaged inputs; host SDK/compiler and JB compilation",
+    "Virtualization framework ROM freezing; mutable firmware/caches; existing VM cfw_input/cfw_jb_input",
+    "New VM trusted store binding publication",
+    "Actual create/restore/boot acceptance and full four-layer source matrix",
+    "File ownership, ACL, extended attributes and complete source touch-history freeze"
+  ],
+  "runtime_limits": [
+    "No VM or service was started. Cancellation test only ran prepare stand-ins.",
+    "Existing signed App original VM and copied VM both exited 9 for --help; independent original subprocess observed SIGKILL (-9). Cause unknown.",
+    "Read-only CLI resources and codesign verification are not VM execution acceptance.",
+    "Temporary failure copies can be cleared by the OS; VM attempt manifests retain content digests and declared limits."
+  ],
+  "dev_smoke": {
+    "bytes": 181699541,
+    "sha256": "32f211718c0d140cde3c86e5f2f58077d434b613b8a9ba4f2808b2164cc6674e",
+    "cli_resources_exit": 0,
+    "source_vm_help_exit": 0,
+    "vm_help_exit": 0,
+    "external_python_locked_probe": true,
+    "vm_started": false,
+    "log": "review-dev-source-smoke-final.json",
+    "debs_list_in_entries": true,
+    "entry_count": 252
+  },
+  "app_smoke": {
+    "bytes": 156051358,
+    "sha256": "a10d854284516cae7b288506ca23e1fcc89e0e5a9cc692bc6e923d8acc117672",
+    "cli_resources_exit": 0,
+    "source_vm_help_exit": 9,
+    "vm_help_exit": 9,
+    "vm_help_succeeded": false,
+    "signature_verify_exit": 0,
+    "external_python_locked_probe": false,
+    "vm_started": false
+  },
+  "files": [
+    {
+      "path": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "sha256": "a64f603c96da7a64e1d5a6c1d0d6d3a0ffd8f13cf27df46d837430e8a215c594",
+      "bytes": 18758
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "sha256": "dc78f7ed6d8d38cba66f262a7ba6a8ea76c6aeff4c34780ff96880380bff2a78",
+      "bytes": 38692
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneResources.swift",
+      "sha256": "6bd075c1a918c14fdfc837dd9d6819d723a77e13f7aab216a36d38d6ff508702",
+      "bytes": 12485
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+      "sha256": "bfbca98af8b45af04626d9a504450017745a378863af96176d0e4bb13a0d871d",
+      "bytes": 60292
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCreateLiveStages.swift",
+      "sha256": "f41160737d2358c9bd159b330495fcdad8f092e91e61d7ad7d1df0793b454ba9",
+      "bytes": 27797
+    },
+    {
+      "path": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "sha256": "8af8bd7c2958ab06ac7281010ff2caf06f1e8335838f46607f65dae8fdda7db5",
+      "bytes": 20522
+    },
+    {
+      "path": "tests/VPhoneCoreTests/ResourcesTests.swift",
+      "sha256": "a3a5dc4096ecf8b9eff968d85c670ed83be3841e574cc3b8ff63422b145d52ac",
+      "bytes": 7368
+    },
+    {
+      "path": "tests/VPhoneCLITests/CreateResourceFreezeTests.swift",
+      "sha256": "5bdafdb80ca4aae4c4cbe743d6175422f46d65ef1bab60398e08b07bab068a7a",
+      "bytes": 6095
+    },
+    {
+      "path": "tests/VPhoneCLITests/CreateCancellationEndToEndTests.swift",
+      "sha256": "54634228b0590f9df79f406d3e4384044b923d9f1bd59fd98c54ce65834f1540",
+      "bytes": 11664
+    }
+  ],
+  "scope_checks": {
+    "shared_tasks_or_README_written": false,
+    "root_TODO_read_or_written": false,
+    "launchpad_lifecycle_modified": false,
+    "TCC_or_dependency_packaging_modified": false,
+    "git_commits_created": false,
+    "swiftpm_slot_released": true
+  },
+  "previous_dev_smoke": {
+    "bytes": 181664103,
+    "sha256": "ddfba6d64ed7a43b9b2e83ab9a9f655303d82b9bdbe3f3ee8ce0fca13893f8b7",
+    "cli_resources_exit": 0,
+    "vm_help_exit": 0,
+    "external_python_locked_probe": true,
+    "vm_started": false
+  },
+  "review_status": "Three Important fixes implemented and tested; final reviewer reread requested with final source hash; full T40 acceptance remains pending"
+}

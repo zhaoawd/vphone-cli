@@ -1,0 +1,36 @@
+Scope: actual signed Launchpad UI, AppDelegate, HostSetup, CommandLine,
+ChildProcess, LineReader and Core LogWriter; controlled signed embedded CLI.
+This does not establish real firmware, VM or helper XPC behavior.
+
+1. After final build/sign, prepare the isolated fixture:
+   python3 /private/tmp/vphone-b25-t46/prepare-ui-fixture.py SOURCE_APP /private/tmp/vphone-b25-t46/T46-Launchpad.app
+   Source app is only read; fixture nested CLI and outer signature are updated.
+2. Use a separate evidence directory and isolated preferences/library, as in B24.
+   mkdir /private/tmp/vphone-b25-t46/ui-normal
+   env T46_UI_EVIDENCE=/private/tmp/vphone-b25-t46/ui-normal T46_UI_MODE=normal \
+     /private/tmp/vphone-b25-t46/T46-Launchpad.app/Contents/MacOS/vphone-launchpad \
+     -VPhoneLaunchpadOpenPanel hostSetup > /private/tmp/vphone-b25-t46/ui-normal/app.log 2>&1 &
+3. Wait until ui-normal/ready exists. Verify app.log reports embedded toolchain
+   verified and the ready PID is alive. Close the main window or issue Cmd-Q.
+   Expected: app exits after SIGINT; stdout includes
+   quit: ordinary command output drained and logs closed.
+   Find the new operation log (LaunchpadIdentity.logsDirectory) and compare
+   exactly with ordinary:0 through ordinary:9999, ordinary ready,
+   kernel panic: ordinary final tail, each followed by LF, ANSI removed.
+   Expected log count=10002 lines, final tail present, no live writer PID.
+   Capture command history while active if useful; command status=130 is a
+   cancelled command, but outputDrained=true after final writer close.
+4. Repeat with new evidence dir ui-escaped and T46_UI_MODE=escaped.
+   The doctor parent exits 0; escaped descendant moves to a separate session
+   and holds the pipe. Quit before release exists.
+   Expected: app remains alive after ~5 seconds, a cancellation alert appears,
+   stdout says quit cancelled; no complete-drain message. Reader/writer remain
+   alive and history remains running until the descendant releases its pipe.
+   Create ui-escaped/release, dismiss alert, then retry quit. Expected exact
+   10002-line log including final tail; app exits. Fixture self-releases after
+   30s if no manual release; perform timeout observation before this deadline.
+5. Record app/CLI signatures, exact source HEAD and dirty diff, control PIDs,
+   ready/quit/exit times, log file SHA256 and byte count, UI screenshots and
+   stdout; final source app must separately pass normal bundle validation.
+
+This script only prepares files; the parent agent owns actual UI acceptance.

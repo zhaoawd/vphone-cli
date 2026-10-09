@@ -1,0 +1,480 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/20] Write sources
+[6/20] Write swift-version--58304C5D6DBC2206.txt
+[8/20] Emitting module VPhoneCore
+[9/20] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[10/21] Compiling VPhoneCore VPhoneCreateRunner.swift
+[10/26] Write Objects.LinkFileList
+[11/33] Linking vphone-helper
+[12/33] Applying vphone-helper
+[14/33] Emitting module VPhoneLaunchpadKit
+[14/33] Write Objects.LinkFileList
+[17/33] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[18/34] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[19/34] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[20/34] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[20/34] Linking vphone-launchpad-launcher
+[21/34] Applying vphone-launchpad-launcher
+[22/34] Linking vphone-launchpad
+[23/34] Applying vphone-launchpad
+[25/34] Emitting module VPhoneLaunchpadKitTests
+[26/34] Emitting module VPhoneCoreTests
+[27/35] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[27/35] Write Objects.LinkFileList
+[30/40] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[31/40] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+[32/40] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[33/40] Emitting module VPhoneCLITests
+[34/40] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[34/40] Linking vphone-cli
+[35/40] Linking vphone-vm
+[36/40] Write Objects.LinkFileList
+[37/40] Applying vphone-vm
+[38/40] Applying vphone-cli
+[39/40] Linking vphone-cliPackageTests
+Build complete! (12.09s)
+Test Suite 'Selected tests' started at 2026-10-09 16:12:23.949.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 16:12:23.950.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 16:12:23.950.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 16:12:23.950.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateCancellationEndToEndTests started.
+◇ Suite CreateLiveStagesTests started.
+◇ Suite ResourcesTests started.
+◇ Suite CreateResourceFreezeTests started.
+◇ Suite CFWInvocationTests started.
+◇ Test reprobeRefusesWhileBootProcessForBundleRuns() started.
+◇ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() started.
+◇ Suite CreateResourceSnapshotTests started.
+◇ Suite NativeFirmwarePrepareTests started.
+◇ Test busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint() started.
+◇ Suite CreateLeftoverTests started.
+◇ Test stageReturnsOnlyAfterItsChildExited() started.
+◇ Test toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() started.
+◇ Test restoreReprobeRefusesWhileNativeWorkerRuns() started.
+◇ Test restoreReprobeIgnoresOtherDevices() started.
+◇ Test verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased() started.
+◇ Test toolChangeDuringRunDoesNotClaimAnUnchangedCheckpoint() started.
+◇ Suite CreateCheckpointTests started.
+◇ Test firstBootPromptTimeoutIsUnverified() started.
+◇ Test realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns() started.
+◇ Test removedArtifactRefusalLeadsWithItsCauseNotStopped() started.
+◇ Test jbFinalizeIsNeverVerifiedFromAPrintedHint() started.
+◇ Test stuckChildFailsTheStageAfterTheBound() started.
+◇ Test prepareEvidenceMustMatchBackend() started.
+◇ Test restoreReprobeRefusesWhileDeviceEndpointAnswers() started.
+◇ Test statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock() started.
+◇ Test rerunRewriteDeclarations() started.
+◇ Test unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst() started.
+◇ Test cfwReprobeRefusesWhileBundleImageIsAttached() started.
+◇ Test verifierAcceptsWhenTheLockIsReleasedWithinTheBound() started.
+◇ Test prepareRequiresExactlyOneRestoreTreeWithVersions() started.
+◇ Test verifierWaitsForARealBundleLockHolderToRelease() started.
+◇ Test patchVerificationRefusalPointsToPrepareNotPatch() started.
+◇ Test lessVerificationBootIsUnverified() started.
+◇ Test patchRequiresOneCommittedTransactionForTheVariant() started.
+◇ Test guestPathsDoNotFallBackFromInstalledBundle() started.
+◇ Test explicitPythonMustPassFullLockedProbe() started.
+◇ Test patchSelectionIdentityFollowsTheResolvedPlan() started.
+◇ Test pythonUsabilityProbeRejectsMissingAcceptsDevVenv() started.
+◇ Test venvProbesAreTotalForAMissingInterpreter() started.
+◇ Test userCacheDirHonorsVPHONERoot() started.
+◇ Test symlinkLaunchResolvesBundleAndCertificate() started.
+◇ Test devLayoutWalksUpToProjectRoot() started.
+◇ Test restoreReprobeRefusesWhileBridgeProcessRuns() started.
+◇ Test statusReportIsReadOnlyAndShowsStagesAndLiveFacts() started.
+◇ Test managedVenvOverrideBeatsVPHONERoot() started.
+◇ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() started.
+◇ Test restoreReprobeRefusesWhileBundleLockIsHeld() started.
+◇ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() started.
+◇ Test managedVenvDefaultsUnderDotVphone() started.
+◇ Test patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() started.
+◇ Test cacheDirsAreHomeRelativeAndToolsBinIsBaseRelative() started.
+◇ Test everyRefusalBeforeWriteSaysRefusedAndUnchanged() started.
+◇ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() started.
+◇ Test bundledLayoutResolvesToContentsResources() started.
+◇ Test unavailableResourceSourceRefusesBeforeReturningRunner() started.
+◇ Test inlineInvokerReachesABareShell() started.
+◇ Test rootPopupPassesTheInvokerInlineWithoutSudoIdentity() started.
+◇ Test sudoPathAddsTheInvokerToTheInheritedEnvironment() started.
+◇ Test invokerIsTheRealUserOrSudoCaller() started.
+➜ Test actualBuildResourceCopyRunsReadOnlyProbes() skipped.
+◇ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() started.
+◇ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() started.
+◇ Test unusedSnapshotWithReadOnlySourceDirectoriesIsReleased() started.
+◇ Test snapshotQuotaRefusesAdditionalCopiesWithoutDeletingEvidence() started.
+◇ Test snapshotMutationDuringFinalStageCannotBeAccepted() started.
+◇ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() started.
+◇ Test liveSocketIsNotDeleted() started.
+◇ Test recoveryHintIgnoresARecordOfAnExitedOrReusedPid() started.
+◇ Test socketOfAKilledVMChildIsDeletedAfterTheStage() started.
+◇ Test vmChildGetsTheShutdownGraceAndDeletesItsSocket() started.
+[!] fake child did not exit within 0.20s after it was stopped.
+✔ Test reprobeRefusesWhileBootProcessForBundleRuns() passed after 0.446 seconds.
+◇ Test explicitBackendAndClassicDefault() started.
+✔ Test toolChangeDuringRunDoesNotClaimAnUnchangedCheckpoint() passed after 0.447 seconds.
+◇ Test symlinkedCheckpointIsRejected() started.
+◇ Test missingCheckpointIsNotResumable() started.
+◇ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() started.
+◇ Test artifactPathEscapingBundleIsRejected() started.
+◇ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() started.
+◇ Test notApplicableWithoutVariantRuleIsRejected() started.
+◇ Test clonedOrReplacedBundleIsRefused() started.
+◇ Test runKeepsARecordWrittenByAnotherProcess() started.
+◇ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() started.
+◇ Test truncatedCheckpointIsRejected() started.
+◇ Test failureRecordWriteErrorKeepsOriginalError() started.
+◇ Test optionChangeAffectingCompletedStageIsRefused() started.
+◇ Test keepArtifactsSkipsRemoval() started.
+✔ Test busyResumeLeadsWithStopGuidanceAndKeepsTheCheckpoint() passed after 0.447 seconds.
+◇ Test resumeCannotAcceptAnUnreadableToolchainAndExecuteStages() started.
+◇ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() started.
+◇ Test restartAfterNextUnfinishedStageIsRejected() started.
+◇ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() started.
+◇ Test heldBundleLockRefusesResumeWithoutWriting() started.
+◇ Test notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test nativePrepareFailureCanResume() started.
+◇ Test artifactLookupReturnsTheLatestRecord() started.
+◇ Test pendingStageIsNeverTreatedAsNotApplicable() started.
+◇ Test heldRunLockRefusesResumeWithoutWriting() started.
+◇ Test busyLiveStateStopsResumeUntilProbeIsIdle() started.
+◇ Test freshCreateRefusesAnInitiallyUnreadableToolchain() started.
+◇ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+✔ Test restoreReprobeIgnoresOtherDevices() passed after 0.448 seconds.
+◇ Test faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() started.
+◇ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() started.
+◇ Test restartFromPrepareRegeneratesARemovedRestoreTree() started.
+◇ Test concurrentResumeAdmitsOneWriter() started.
+◇ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test variantChangeBeforePatchRecomputesApplicability() started.
+◇ Test movedArtifactRefusesResume() started.
+◇ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() started.
+◇ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() started.
+◇ Test futureSchemaIsRejected() started.
+◇ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() started.
+◇ Test rerunStageMayRewriteItsDeclaredArtifacts() started.
+◇ Test succeededWithoutVerifierIsRejected() started.
+✔ Test restoreReprobeRefusesWhileNativeWorkerRuns() passed after 0.448 seconds.
+◇ Test recoveryInputsAreKeptUntilRetainingStagesFinish() started.
+◇ Test changedMachineIdentifierIsRefused() started.
+◇ Test duplicateStageIsRejected() started.
+◇ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test toolChangeRequiresExplicitAcceptance() started.
+◇ Test runLockHeldByChildProcessRefusesUntilItExits() started.
+◇ Test movedBundleIsRefused() started.
+◇ Test freshCreateRecordsEveryStageAndOverallStatus() started.
+◇ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() started.
+◇ Test removableArtifactsFollowSynthesizedStageStates() started.
+◇ Test unverifiedStageNeverReportsOverallSuccess() started.
+◇ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() started.
+◇ Test sourceRecordRedactsOnlyURLSecrets() started.
+◇ Test writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test unknownStageIsRejected() started.
+✔ Test toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() passed after 0.449 seconds.
+✔ Test jbFinalizeIsNeverVerifiedFromAPrintedHint() passed after 0.448 seconds.
+✔ Test removedArtifactRefusalLeadsWithItsCauseNotStopped() passed after 0.448 seconds.
+✔ Test prepareEvidenceMustMatchBackend() passed after 0.448 seconds.
+✔ Test restoreReprobeRefusesWhileDeviceEndpointAnswers() passed after 0.448 seconds.
+✔ Test rerunRewriteDeclarations() passed after 0.448 seconds.
+✔ Test unrecordedLiveStateAndRunInProgressRefusalsPrintGuidanceFirst() passed after 0.448 seconds.
+✔ Test cfwReprobeRefusesWhileBundleImageIsAttached() passed after 0.449 seconds.
+✔ Test statusViewShowsRunningOnlyWhileAnotherProcessHoldsTheRunLock() passed after 0.449 seconds.
+✔ Test prepareRequiresExactlyOneRestoreTreeWithVersions() passed after 0.448 seconds.
+✔ Test stageReturnsOnlyAfterItsChildExited() passed after 0.449 seconds.
+✔ Test patchVerificationRefusalPointsToPrepareNotPatch() passed after 0.448 seconds.
+✔ Test lessVerificationBootIsUnverified() passed after 0.448 seconds.
+✔ Test firstBootPromptTimeoutIsUnverified() passed after 0.449 seconds.
+✔ Test guestPathsDoNotFallBackFromInstalledBundle() passed after 0.449 seconds.
+✔ Test patchRequiresOneCommittedTransactionForTheVariant() passed after 0.449 seconds.
+✔ Test explicitPythonMustPassFullLockedProbe() passed after 0.449 seconds.
+✔ Test patchSelectionIdentityFollowsTheResolvedPlan() passed after 0.449 seconds.
+✔ Test venvProbesAreTotalForAMissingInterpreter() passed after 0.448 seconds.
+✔ Test userCacheDirHonorsVPHONERoot() passed after 0.449 seconds.
+✔ Test symlinkLaunchResolvesBundleAndCertificate() passed after 0.449 seconds.
+✔ Test devLayoutWalksUpToProjectRoot() passed after 0.449 seconds.
+✔ Test restoreReprobeRefusesWhileBridgeProcessRuns() passed after 0.449 seconds.
+✔ Test statusReportIsReadOnlyAndShowsStagesAndLiveFacts() passed after 0.449 seconds.
+✔ Test managedVenvOverrideBeatsVPHONERoot() passed after 0.449 seconds.
+✔ Test verifierAcceptsWhenTheLockIsReleasedWithinTheBound() passed after 0.449 seconds.
+✔ Test restoreReprobeRefusesWhileBundleLockIsHeld() passed after 0.449 seconds.
+✔ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() passed after 0.449 seconds.
+✔ Test managedVenvDefaultsUnderDotVphone() passed after 0.449 seconds.
+✔ Test patchVerifierRejectsAChangedSelectionAndKeepsHistoricalEvidence() passed after 0.449 seconds.
+✔ Test cacheDirsAreHomeRelativeAndToolsBinIsBaseRelative() passed after 0.481 seconds.
+✔ Test everyRefusalBeforeWriteSaysRefusedAndUnchanged() passed after 0.542 seconds.
+✔ Test bundledLayoutResolvesToContentsResources() passed after 0.622 seconds.
+✔ Test stuckChildFailsTheStageAfterTheBound() passed after 0.623 seconds.
+✔ Test unavailableResourceSourceRefusesBeforeReturningRunner() passed after 0.622 seconds.
+✔ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() passed after 0.622 seconds.
+✔ Test rootPopupPassesTheInvokerInlineWithoutSudoIdentity() passed after 0.619 seconds.
+✔ Test sudoPathAddsTheInvokerToTheInheritedEnvironment() passed after 0.619 seconds.
+✔ Test invokerIsTheRealUserOrSudoCaller() passed after 0.619 seconds.
+◇ Test case passing 2 arguments variant → "less", skipped → [VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "regular", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "dev", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "jb", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "exp", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 1 argument restart → .patch to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .restore to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .cfw to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .firstBoot to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .verification to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 1 argument executable → "vphone-cli" to freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test case passing 1 argument executable → "vphone-vm" to freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test case passing 1 argument completed → false to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument completed → true to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument phase → "building" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "publishing" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "rollingBack" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument step → .writeTemporary to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncFile to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .rename to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncDirectory to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+✔ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() passed after 1.577 seconds.
+✔ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() passed after 1.172 seconds.
+✔ Test unusedSnapshotWithReadOnlySourceDirectoriesIsReleased() passed after 1.172 seconds.
+✔ Test inlineInvokerReachesABareShell() passed after 1.577 seconds.
+✔ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() passed after 1.173 seconds.
+✔ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() passed after 1.164 seconds.
+✔ Test verifierWaitsForARealBundleLockHolderToRelease() passed after 1.577 seconds.
+✔ Test realChildHoldingTheBundleLockHasReleasedItWhenTheStageReturns() passed after 1.577 seconds.
+✔ Test recoveryHintIgnoresARecordOfAnExitedOrReusedPid() passed after 1.164 seconds.
+✔ Test snapshotMutationDuringFinalStageCannotBeAccepted() passed after 1.165 seconds.
+✔ Test snapshotQuotaRefusesAdditionalCopiesWithoutDeletingEvidence() passed after 1.173 seconds.
+✔ Test symlinkedCheckpointIsRejected() passed after 1.130 seconds.
+✔ Test missingCheckpointIsNotResumable() passed after 1.130 seconds.
+✔ Test explicitBackendAndClassicDefault() passed after 1.131 seconds.
+✔ Test artifactPathEscapingBundleIsRejected() passed after 1.130 seconds.
+✔ Test liveSocketIsNotDeleted() passed after 1.165 seconds.
+✔ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() passed after 1.131 seconds.
+✔ Test notApplicableWithoutVariantRuleIsRejected() passed after 1.131 seconds.
+✔ Test clonedOrReplacedBundleIsRefused() passed after 1.131 seconds.
+✔ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() passed after 1.131 seconds.
+✔ Test runKeepsARecordWrittenByAnotherProcess() passed after 1.131 seconds.
+✔ Test truncatedCheckpointIsRejected() passed after 1.131 seconds.
+✔ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() passed after 1.131 seconds.
+✔ Test failureRecordWriteErrorKeepsOriginalError() passed after 1.131 seconds.
+✔ Test optionChangeAffectingCompletedStageIsRefused() passed after 1.131 seconds.
+✔ Test resumeCannotAcceptAnUnreadableToolchainAndExecuteStages() passed after 1.131 seconds.
+✔ Test keepArtifactsSkipsRemoval() passed after 1.131 seconds.
+✔ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() passed after 1.130 seconds.
+✔ Test restartAfterNextUnfinishedStageIsRejected() passed after 1.131 seconds.
+✔ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() passed after 1.131 seconds.
+✔ Test heldBundleLockRefusesResumeWithoutWriting() passed after 1.131 seconds.
+✔ Test notApplicableFollowsVariantRules(variant:skipped:) with 5 test cases passed after 1.131 seconds.
+✔ Test pythonUsabilityProbeRejectsMissingAcceptsDevVenv() passed after 1.578 seconds.
+✔ Test artifactLookupReturnsTheLatestRecord() passed after 1.131 seconds.
+✔ Test pendingStageIsNeverTreatedAsNotApplicable() passed after 1.131 seconds.
+✔ Test heldRunLockRefusesResumeWithoutWriting() passed after 1.131 seconds.
+✔ Test freshCreateRefusesAnInitiallyUnreadableToolchain() passed after 1.130 seconds.
+✔ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) with 5 test cases passed after 1.131 seconds.
+✔ Test busyLiveStateStopsResumeUntilProbeIsIdle() passed after 1.131 seconds.
+✔ Test faultMatrixFirstRunAndResume(stage:fault:) with 35 test cases passed after 1.131 seconds.
+✔ Test nativePrepareFailureCanResume() passed after 1.131 seconds.
+✔ Test verifierRejectsAfterTheBoundWhenTheLockIsNeverReleased() passed after 1.579 seconds.
+✔ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() passed after 1.130 seconds.
+✔ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() passed after 1.130 seconds.
+✔ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) with 2 test cases passed after 1.130 seconds.
+✔ Test movedArtifactRefusesResume() passed after 1.131 seconds.
+✔ Test concurrentResumeAdmitsOneWriter() passed after 1.131 seconds.
+✔ Test variantChangeBeforePatchRecomputesApplicability() passed after 1.131 seconds.
+✔ Test restartFromPrepareRegeneratesARemovedRestoreTree() passed after 1.131 seconds.
+✔ Test futureSchemaIsRejected() passed after 1.131 seconds.
+✔ Test succeededWithoutVerifierIsRejected() passed after 1.131 seconds.
+✔ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() passed after 1.131 seconds.
+✔ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() passed after 1.131 seconds.
+✔ Test rerunStageMayRewriteItsDeclaredArtifacts() passed after 1.131 seconds.
+✔ Test changedMachineIdentifierIsRefused() passed after 1.131 seconds.
+✔ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() passed after 1.131 seconds.
+✔ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) with 3 test cases passed after 1.131 seconds.
+✔ Test duplicateStageIsRejected() passed after 1.131 seconds.
+✔ Test recoveryInputsAreKeptUntilRetainingStagesFinish() passed after 1.131 seconds.
+✔ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) with 2 test cases passed after 1.131 seconds.
+✔ Test movedBundleIsRefused() passed after 1.131 seconds.
+✔ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() passed after 1.131 seconds.
+✔ Test removableArtifactsFollowSynthesizedStageStates() passed after 1.131 seconds.
+✔ Test toolChangeRequiresExplicitAcceptance() passed after 1.131 seconds.
+✔ Test freshCreateRecordsEveryStageAndOverallStatus() passed after 1.131 seconds.
+✔ Test sourceRecordRedactsOnlyURLSecrets() passed after 1.131 seconds.
+✔ Test writeFailureBeforeStageStopsWithoutExecuting(step:) with 4 test cases passed after 1.131 seconds.
+✔ Suite CFWInvocationTests passed after 1.580 seconds.
+✔ Suite CreateResourceFreezeTests passed after 1.580 seconds.
+✔ Suite CreateResourceSnapshotTests passed after 1.580 seconds.
+✔ Suite CreateLiveStagesTests passed after 1.581 seconds.
+✔ Suite ResourcesTests passed after 1.581 seconds.
+◇ Test localSourcesRejectUnsupportedRequestsAndResolveRelativePaths() started.
+✔ Test localSourcesRejectUnsupportedRequestsAndResolveRelativePaths() passed after 0.002 seconds.
+◇ Test nativePublicationBeforeCheckpointCommitCanResumeAndReverify() started.
+✔ Test unverifiedStageNeverReportsOverallSuccess() passed after 1.138 seconds.
+✔ Test unknownStageIsRejected() passed after 1.148 seconds.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test runLockHeldByChildProcessRefusesUntilItExits() passed after 1.182 seconds.
+✔ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() passed after 1.184 seconds.
+✔ Suite CreateCheckpointTests passed after 1.633 seconds.
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/DD677988-87CE-4B3A-AA13-CADF83BCE8C2/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/DD677988-87CE-4B3A-AA13-CADF83BCE8C2/vm/.firmware-prepare-backup-B2919026-CBF7-4666-9F9C-6101A5E9BE0B/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/DD677988-87CE-4B3A-AA13-CADF83BCE8C2/vm/iPhone17,3_26.1_23B85_Restore
+✔ Test nativePublicationBeforeCheckpointCommitCanResumeAndReverify() passed after 0.098 seconds.
+◇ Test checkpointRerunPreservesPreviousTreeOnlyAfterManifestSuccess() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/1F61C275-D39B-44EE-A1A0-F08E09F77D72/vm/.firmware-prepare-backup-91F71B4F-153D-49F0-9183-E07D00851F95/iPhone17,3_26.1_23B85_Restore
+✔ Test checkpointRerunPreservesPreviousTreeOnlyAfterManifestSuccess() passed after 0.056 seconds.
+◇ Test preservationRefusesAmbiguousAndLinkedInputs() started.
+✔ Test preservationRefusesAmbiguousAndLinkedInputs() passed after 0.001 seconds.
+◇ Test publicationFailureRollsBackPreviousTree() started.
+✔ Test publicationFailureRollsBackPreviousTree() passed after 0.001 seconds.
+◇ Test mergesWithoutMutatingSourcesAndRefusesRerun() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test mergesWithoutMutatingSourcesAndRefusesRerun() passed after 0.039 seconds.
+◇ Test missingReferencedComponentPreservesPreviousGeneration() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test missingReferencedComponentPreservesPreviousGeneration() passed after 0.036 seconds.
+◇ Test invalidGeneratedReferenceIsNotPublished(_:) started.
+◇ Test case passing 1 argument path → "../escape" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "/absolute" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware//test.im4p" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware/./test.im4p" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument path → "Firmware/link.im4p" to invalidGeneratedReferenceIsNotPublished(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test invalidGeneratedReferenceIsNotPublished(_:) with 6 test cases passed after 0.236 seconds.
+◇ Test manifestFailureCleansStagingAndPublishesNothing() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test manifestFailureCleansStagingAndPublishesNothing() passed after 0.034 seconds.
+◇ Test concurrentDestinationSurvivesAndInputCancellationCleansUp() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test concurrentDestinationSurvivesAndInputCancellationCleansUp() passed after 0.038 seconds.
+◇ Test rejectsArchiveLinksAndExistingDanglingRestore() started.
+✔ Test rejectsArchiveLinksAndExistingDanglingRestore() passed after 0.002 seconds.
+◇ Test heldVMLockRejectsBeforeOpeningInputs() started.
+✔ Test heldVMLockRejectsBeforeOpeningInputs() passed after 0.001 seconds.
+◇ Test selectionChangeRegeneratesFromOriginalsInsteadOfPatchingTwice() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/1F5C4833-7697-45D6-B410-F8EB48BAF468/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/1F5C4833-7697-45D6-B410-F8EB48BAF468/vm/.firmware-prepare-backup-FB9AAAF0-57A9-455D-9469-C6A6C031FB1F/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/1F5C4833-7697-45D6-B410-F8EB48BAF468/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/1F5C4833-7697-45D6-B410-F8EB48BAF468/fresh/iPhone17,3_26.1_23B85_Restore
+✔ Test selectionChangeRegeneratesFromOriginalsInsteadOfPatchingTwice() passed after 0.145 seconds.
+◇ Test repeatedAndReturnedSelectionsUseFreshArchiveBytes() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/.firmware-prepare-backup-C6AC6BCC-7D53-4103-9F6F-FFB99F904D43/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/.firmware-prepare-backup-7CDE2C0E-8CA0-4FCD-B906-ACFEB2202AA2/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/.firmware-prepare-backup-E6083415-F4B6-4C35-955B-438933367F04/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/34A7626A-C4E1-4D16-8C7F-CB9BC87A0837/vm/iPhone17,3_26.1_23B85_Restore
+✔ Test repeatedAndReturnedSelectionsUseFreshArchiveBytes() passed after 0.204 seconds.
+◇ Test badArchiveKeepsPreviousTreeAndOriginalsDirectory() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test badArchiveKeepsPreviousTreeAndOriginalsDirectory() passed after 0.043 seconds.
+◇ Test acceptedToolChangeWithAnotherSelectionRequiresRegeneration() started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/96D9136A-9C23-4AD6-AF6E-45C479603CBC/vm/iPhone17,3_26.1_23B85_Restore
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[+] Previous restore tree preserved: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/96D9136A-9C23-4AD6-AF6E-45C479603CBC/vm/.firmware-prepare-backup-60E115F6-9651-4FCD-965A-CD829B2E48B6/iPhone17,3_26.1_23B85_Restore
+[+] Classic restore tree ready: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/96D9136A-9C23-4AD6-AF6E-45C479603CBC/vm/iPhone17,3_26.1_23B85_Restore
+✔ Test acceptedToolChangeWithAnotherSelectionRequiresRegeneration() passed after 0.109 seconds.
+✔ Suite NativeFirmwarePrepareTests passed after 2.635 seconds.
+[*] Removed /tmp/vs-9B75E709/vm/vphone.sock left by the stopped VM process.
+✔ Test socketOfAKilledVMChildIsDeletedAfterTheStage() passed after 2.329 seconds.
+✔ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() passed after 3.572 seconds.
+✔ Suite CreateCancellationEndToEndTests passed after 3.572 seconds.
+✔ Test vmChildGetsTheShutdownGraceAndDeletesItsSocket() passed after 3.289 seconds.
+✔ Suite CreateLeftoverTests passed after 3.703 seconds.
+✔ Test run with 135 tests in 9 suites passed after 3.703 seconds.
+swift_test_exit=0

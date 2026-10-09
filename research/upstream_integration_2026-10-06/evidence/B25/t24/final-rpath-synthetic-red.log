@@ -1,0 +1,96 @@
+test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) ... 
+  test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@loader_path') ... FAIL
+  test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@loader_path/../Frameworks') ... FAIL
+  test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@executable_path') ... FAIL
+  test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@executable_path/../Frameworks') ... FAIL
+test_check_rejects_external_rpath_with_internal_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_external_rpath_with_internal_dependencies) ... ok
+test_check_rejects_library_symlink_escape (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_library_symlink_escape) ... ok
+test_check_rejects_relative_escape_unknown_token_and_symlink_rpaths (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_relative_escape_unknown_token_and_symlink_rpaths) ... ok
+test_check_rejects_resolvable_external_dependencies (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_rejects_resolvable_external_dependencies) ... ok
+test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_conflicting_existing_library_fails_instead_of_reusing_stale_bytes) ... ok
+test_launchpad_native_staging_preserves_embedded_toolchain_bytes (test_bundle_native_dependencies.NativeDependencyBundleTests.test_launchpad_native_staging_preserves_embedded_toolchain_bytes) ... ok
+test_main_executable_is_signed_after_nested_host_tools (test_bundle_native_dependencies.NativeDependencyBundleTests.test_main_executable_is_signed_after_nested_host_tools) ... ok
+test_missing_dependency_fails_before_success (test_bundle_native_dependencies.NativeDependencyBundleTests.test_missing_dependency_fails_before_success) ... ok
+test_recursive_rpath_uses_executable_ancestors_loader_directory (test_bundle_native_dependencies.NativeDependencyBundleTests.test_recursive_rpath_uses_executable_ancestors_loader_directory) ... ok
+test_relocated_recursive_libraries_execute_and_verify_without_originals (test_bundle_native_dependencies.NativeDependencyBundleTests.test_relocated_recursive_libraries_execute_and_verify_without_originals) ... ok
+
+======================================================================
+FAIL: test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@loader_path')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 98, in test_check_accepts_loader_and_executable_rpaths_contained_in_bundle
+    self.assertEqual(checked.returncode, 0, checked.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 210, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 205, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 108, in check_native_dependencies
+    raise ValueError(f'Nonportable rpath in {path}: {rpath}')
+ValueError: Nonportable rpath in /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-1cuswod1/test.app/Contents/MacOS/ldid: @loader_path
+
+
+======================================================================
+FAIL: test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@loader_path/../Frameworks')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 98, in test_check_accepts_loader_and_executable_rpaths_contained_in_bundle
+    self.assertEqual(checked.returncode, 0, checked.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 210, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 205, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 108, in check_native_dependencies
+    raise ValueError(f'Nonportable rpath in {path}: {rpath}')
+ValueError: Nonportable rpath in /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-1cuswod1/test.app/Contents/MacOS/ldid: @loader_path
+
+
+======================================================================
+FAIL: test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@executable_path')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 98, in test_check_accepts_loader_and_executable_rpaths_contained_in_bundle
+    self.assertEqual(checked.returncode, 0, checked.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 210, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 205, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 108, in check_native_dependencies
+    raise ValueError(f'Nonportable rpath in {path}: {rpath}')
+ValueError: Nonportable rpath in /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-1cuswod1/test.app/Contents/MacOS/ldid: @loader_path
+
+
+======================================================================
+FAIL: test_check_accepts_loader_and_executable_rpaths_contained_in_bundle (test_bundle_native_dependencies.NativeDependencyBundleTests.test_check_accepts_loader_and_executable_rpaths_contained_in_bundle) (rpath='@executable_path/../Frameworks')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_bundle_native_dependencies.py", line 98, in test_check_accepts_loader_and_executable_rpaths_contained_in_bundle
+    self.assertEqual(checked.returncode, 0, checked.stdout)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 210, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 205, in main
+    report = check_native_dependencies(args.bundle) if args.check else stage_native_dependencies(args.bundle)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build_native_dependencies.py", line 108, in check_native_dependencies
+    raise ValueError(f'Nonportable rpath in {path}: {rpath}')
+ValueError: Nonportable rpath in /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-native-1cuswod1/test.app/Contents/MacOS/ldid: @loader_path
+
+
+----------------------------------------------------------------------
+Ran 11 tests in 17.163s
+
+FAILED (failures=4)

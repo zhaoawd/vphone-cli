@@ -1273,7 +1273,10 @@
       "evidence/B23-final-readback.json",
       "evidence/B24-summary.json",
       "evidence/B24-source-review.json",
-      "evidence/B24-final-readback.json"
+      "evidence/B24-final-readback.json",
+      "evidence/B25-summary.json",
+      "evidence/B25-source-review.json",
+      "evidence/B25-evidence-manifest.json"
     ],
     "source_reconciliation": {
       "id": "T08",
@@ -1390,12 +1393,13 @@
     "historical_reason": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。",
     "original_disposition": "adapt",
     "historical_capability_acceptance_status": "fixed_overlay_memory_and_API_verified_rotation_RootHide_pending",
-    "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。",
+    "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。",
     "remaining_work": [
       "实际RootHide客户机服务验收；用户测试路径待回复",
       "services.start状态144及未生效rotation范围，原因未查明"
     ],
-    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57"
+    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57",
+    "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
   },
   {
     "id": "T09",
@@ -3669,7 +3673,13 @@
       "sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift",
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLaunchRoute.swift",
       "tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift",
-      "tests/VPhoneCLITests/ExpectedBindingCLITests.swift"
+      "tests/VPhoneCLITests/ExpectedBindingCLITests.swift",
+      "scripts/build_native_dependencies.py",
+      "scripts/build.sh",
+      "scripts/check_bundle.py",
+      "scripts/check_launchpad_bundle.py",
+      "scripts/record_build_dependencies.py",
+      "tests/test_bundle_native_dependencies.py"
     ],
     "unmapped_upstream_paths": [
       "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
@@ -3679,7 +3689,7 @@
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist",
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist"
     ],
-    "acceptance_status": "controlled_protocol_v1_rejection_matrix_verified_TCC_portability_pending",
+    "acceptance_status": "host_native_dependency_closure_verified_TCC_and_historical_helper_runtime_pending",
     "evidence": [
       "T24_host_entry_review.json",
       "evidence/T24-host-policy.log",
@@ -3724,7 +3734,10 @@
       "evidence/B23-final-readback.json",
       "evidence/B24-summary.json",
       "evidence/B24-source-review.json",
-      "evidence/B24-final-readback.json"
+      "evidence/B24-final-readback.json",
+      "evidence/B25-summary.json",
+      "evidence/B25-source-review.json",
+      "evidence/B25-evidence-manifest.json"
     ],
     "source_reconciliation": {
       "id": "T24",
@@ -3884,13 +3897,14 @@
     "historical_reason": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。",
     "original_disposition": "adapt",
     "historical_capability_acceptance_status": "real_bound_local_launcher_and_current_machine_dependencies_verified_full_security_pending",
-    "current_result": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。 B24生产客户端连接受控protocol-v1系统Mach服务，verify/install各在无日志、新日志、已有日志设置下均退出1；只调用7次version，未调用旧安装/验证方法，新日志未创建、已有日志未变。临时服务已卸载；不代表历史helper二进制、生产listener身份校验或TCC责任链。",
+    "current_result": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。 B24生产客户端连接受控protocol-v1系统Mach服务，verify/install各在无日志、新日志、已有日志设置下均退出1；只调用7次version，未调用旧安装/验证方法，新日志未创建、已有日志未变。临时服务已卸载；不代表历史helper二进制、生产listener身份校验或TCC责任链。 B25递归封装宿主Mach-O依赖至Contents/Frameworks，重写相对引用并按嵌套代码后主可执行文件顺序签名。真实副本7个宿主映像逐个及整体签名通过；沙箱确认原Homebrew库读取被拒绝，同策略ldid提取和trustcache创建/读取退出0。历史v1未配置helper实物已定位，SHA256及内嵌版本保全，只读配置检查退出78；没有安装或启动该历史服务。TCC静态链已记录，实际责任归属未验收。",
     "remaining_work": [
-      "完整TCC负责应用链实际验收",
-      "如需历史helper实物兼容性，仍需历史签名二进制；当前受控v1协议矩阵已完成",
-      "Homebrew运行依赖只验证当前机器可解析，可移植封装尚未建立"
+      "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线",
+      "历史v1 helper未配置签名团队；仍缺历史服务与最终客户端的实际XPC拒绝矩阵",
+      "Python framework、包、PATH工具和现场编译不属于本轮宿主Mach-O封装范围；部分旧证书候选当前签名信任检查失败，记录保留，未新安装"
     ],
-    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57"
+    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57",
+    "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
   },
   {
     "id": "T25",
@@ -5791,7 +5805,12 @@
       "tests/VPhoneCoreTests/CreateCheckpointTests.swift",
       "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
       "tests/VPhoneCLITests/CreateLiveStagesTests.swift",
-      "tests/VPhoneCLITests/NativeFirmwarePrepareTests.swift"
+      "tests/VPhoneCLITests/NativeFirmwarePrepareTests.swift",
+      "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "sources/VPhoneCore/VPhoneResources.swift",
+      "sources/vphone-cli/VPhoneCreateLiveStages.swift",
+      "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "tests/VPhoneCLITests/CreateResourceFreezeTests.swift"
     ],
     "unmapped_upstream_paths": [
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
@@ -5803,7 +5822,7 @@
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineAdvancedView.swift"
     ],
-    "acceptance_status": "create_stage_fingerprint_and_synthetic_bound_transfer_verified_full_origin_matrix_pending",
+    "acceptance_status": "attempt_resource_snapshot_verified_external_toolchain_and_origin_matrix_pending",
     "evidence": [
       "evidence/B06-summary.json",
       "evidence/B06-source-review.json",
@@ -5835,7 +5854,10 @@
       "evidence/B23-final-readback.json",
       "evidence/B24-summary.json",
       "evidence/B24-source-review.json",
-      "evidence/B24-final-readback.json"
+      "evidence/B24-final-readback.json",
+      "evidence/B25-summary.json",
+      "evidence/B25-source-review.json",
+      "evidence/B25-evidence-manifest.json"
     ],
     "source_reconciliation": {
       "id": "T40",
@@ -5965,15 +5987,15 @@
     "historical_reason": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。",
     "original_disposition": "adapt",
     "historical_capability_acceptance_status": "real_local_bundle_binding_boot_verified_full_origin_matrix_pending",
-    "current_result": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。 B24新增每个未完成创建阶段前CLI/配对VM摘要复验；CLI替换、VM替换及VM不可读的三种回归场景通过。实际CLI在两种归档后端完成0GiB合成VM的clone/rename/export/import，8个持久文件摘要和权限一致，保留构造的四层binding与opaque历史receipt；该receipt不提供可信store授权。 独立审查后补充初始摘要不可读、resume接受nil仍不得运行及恢复提示回归；运行中工具拒绝不再分类为checkpoint未写入。 最终a45c9191源码签名客户端再次通过native/system-tar两种合成往返，归档1272/1416字节。",
+    "current_result": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。 B24新增每个未完成创建阶段前CLI/配对VM摘要复验；CLI替换、VM替换及VM不可读的三种回归场景通过。实际CLI在两种归档后端完成0GiB合成VM的clone/rename/export/import，8个持久文件摘要和权限一致，保留构造的四层binding与opaque历史receipt；该receipt不提供可信store授权。 独立审查后补充初始摘要不可读、resume接受nil仍不得运行及恢复提示回归；运行中工具拒绝不再分类为checkpoint未写入。 最终a45c9191源码签名客户端再次通过native/system-tar两种合成往返，归档1272/1416字节。 B25每attempt使用CLI/VM及所选资源的私有副本和聚合摘要；executor/verifier/prober及内部TaskLocal解析共用副本。resume变更未经确认拒绝，确认后整体换用新副本，保留此前阶段来源。副本最多8份、合计2GiB、64MiB余量；成功或未接受attempt释放，失败已接受attempt保留。审查发现并修复debs.list遗漏、Disk.img链接别名绕过、复制增长超预算3项。开发副本只读CLI/VM探针通过；最终签名App资源副本235个entry、161310727字节，CLI resources与静态签名检查退出0；原VM及副本VM --help均退出9，原因未查明，外部Python探针不可用。",
     "remaining_work": [
-      "创建全流程冻结资源；阶段内替换、脚本/Python/guest资源及新机binding发布尚未覆盖",
-      "带可信store既有binding/receipt的实际VM clone/export/rename来源验收",
-      "kernel-only及环境升级/回退、混合版本四层来源矩阵；T12/T17/T32/T34生产能力尚未完整接入",
-      "同卷APFS副本不证明物理独立备份",
-      "完整64GiB VM归档往返空间不足：B24最终可用约16.1GiB，未执行"
+      "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、Virtualization ROM、既有cfw_input及可变缓存未形成不可变闭包",
+      "新机可信store binding/receipt发布及带可信既有binding/receipt的实际VM传输验收",
+      "kernel-only及环境升级/回退、混合版本四层来源矩阵；依赖T12/T17/T32/T34生产能力",
+      "完整64GiB VM归档往返空间仍不足；同卷APFS副本不证明物理独立备份"
     ],
-    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57"
+    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57",
+    "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
   },
   {
     "id": "T41",
@@ -6764,7 +6786,12 @@
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
       "tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift",
-      "tests/VPhoneLaunchpadKitTests/ConsoleLifecycleTests.swift"
+      "tests/VPhoneLaunchpadKitTests/ConsoleLifecycleTests.swift",
+      "sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCreation.swift",
+      "tests/VPhoneLaunchpadKitTests/CommandTerminationTests.swift",
+      "tests/VPhoneLaunchpadKitTests/StopRefusalTests.swift",
+      "tests/VPhoneLaunchpadKitTests/LaunchTests.swift"
     ],
     "unmapped_upstream_paths": [
       "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -6779,7 +6806,7 @@
       "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadLogWriter.swift",
       "VPhoneLaunchpad/Configuration/Version.xcconfig"
     ],
-    "acceptance_status": "real_UI_create_quit_and_production_output_fixtures_verified_full_lifecycle_pending",
+    "acceptance_status": "ordinary_command_drain_implemented_final_UI_blocked_by_host_lock_full_runtime_pending",
     "evidence": [
       "evidence/B05-summary.json",
       "evidence/B05-source-review.json",
@@ -6814,7 +6841,10 @@
       "evidence/B23-final-readback.json",
       "evidence/B24-summary.json",
       "evidence/B24-source-review.json",
-      "evidence/B24-final-readback.json"
+      "evidence/B24-final-readback.json",
+      "evidence/B25-summary.json",
+      "evidence/B25-source-review.json",
+      "evidence/B25-evidence-manifest.json"
     ],
     "source_reconciliation": {
       "id": "T46",
@@ -6904,12 +6934,13 @@
     "historical_reason": "修复detached父进程退出但后代仍写日志时误报完整；确认进程组消失后再次读取，修复EOF与组消失之间的尾部遗漏。两项RED复现后44项/12套件通过，复审无剩余发现；真实VM正常SIGINT停机11.352秒且保留classicAccepted及Guest stopped尾部。完整UI退出/create/实际吞吐矩阵未完成。 最新签名Launchpad在空隔离库启动、列出0台、窗口宽度970、关闭窗口并退出0；该冒烟没有活动writer，不替代尾部后立即退出应用验收。",
     "original_disposition": "adapt",
     "historical_capability_acceptance_status": "real_bound_wrapper_stop_tail_verified_full_UI_matrix_pending",
-    "current_result": "修复detached父进程退出但后代仍写日志时误报完整；确认进程组消失后再次读取，修复EOF与组消失之间的尾部遗漏。两项RED复现后44项/12套件通过，复审无剩余发现；真实VM正常SIGINT停机11.352秒且保留classicAccepted及Guest stopped尾部。完整UI退出/create/实际吞吐矩阵未完成。 最新签名Launchpad在空隔离库启动、列出0台、窗口宽度970、关闭窗口并退出0；该冒烟没有活动writer，不替代尾部后立即退出应用验收。 B24实际签名UI在受控HTTP创建过程中确认退出；应用消失后约1.045秒，已观察到的create/fw_prepare/aria2进程均退出，最终日志新增3064字节、状态interrupted、两项锁释放。新增3项生产输出链路测试覆盖并发ANSI/CRLF/无换行panic尾部、取消及轮换、100001行吞吐；受控进程持久化吞吐约2.03MB/s，不代表UI或实际VM吞吐。",
+    "current_result": "修复detached父进程退出但后代仍写日志时误报完整；确认进程组消失后再次读取，修复EOF与组消失之间的尾部遗漏。两项RED复现后44项/12套件通过，复审无剩余发现；真实VM正常SIGINT停机11.352秒且保留classicAccepted及Guest stopped尾部。完整UI退出/create/实际吞吐矩阵未完成。 最新签名Launchpad在空隔离库启动、列出0台、窗口宽度970、关闭窗口并退出0；该冒烟没有活动writer，不替代尾部后立即退出应用验收。 B24实际签名UI在受控HTTP创建过程中确认退出；应用消失后约1.045秒，已观察到的create/fw_prepare/aria2进程均退出，最终日志新增3064字节、状态interrupted、两项锁释放。新增3项生产输出链路测试覆盖并发ANSI/CRLF/无换行panic尾部、取消及轮换、100001行吞吐；受控进程持久化吞吐约2.03MB/s，不代表UI或实际VM吞吐。 B25普通命令同步关闭入口并有界等待child、pipe EOF、日志finish和history；定向及标准Swift通过。早期普通/escaped隔离UI两组日志精确匹配，但属于同步门控修改前快照。最终release隔离副本已启动doctor并观察writer存活，随后CUA报告Mac锁定；尚未执行退出操作。writer自释放后日志10002行/138939字节及panic尾部精确匹配；应用仍打开，最终退出两组待解锁复验。",
     "remaining_work": [
-      "普通活动writer在UI立即退出时的完整日志消费确认；当前实际UI验收只覆盖detached create路径",
+      "最终签名release普通/escaped两组退出复验；Mac锁屏待用户解锁，当前普通writer已自释放需重跑",
       "完整panic/取消/轮换、UI响应及实际VM吞吐矩阵",
-      "未观察到的进程组外写入者、helper异步ACK/断连/超时/写入失败组合仍需完整验收"
+      "helper异步ACK缺失/30秒超时/XPC断线/写入失败组合的完整实际验收"
     ],
-    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57"
+    "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57",
+    "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
   }
 ]

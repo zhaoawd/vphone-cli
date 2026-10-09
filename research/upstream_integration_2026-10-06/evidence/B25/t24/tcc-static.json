@@ -1,0 +1,261 @@
+{
+  "scope": "Static signature/configuration only. No TCC reset, DB changes, VM/GUI launch or authorization request performed.",
+  "artifacts": {
+    "cli": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "17cbd9f17bd4d1feb6f5cbe78ce0e838e8c7fca1081ccee8c6d563704b882c1f",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli\nIdentifier=com.vphone.cli\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=118407 flags=0x2(adhoc) hashes=3694+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=fd7c42566bebe3f06e06168ca8e8f50dd27b7386\nCandidateCDHashFull sha256=fd7c42566bebe3f06e06168ca8e8f50dd27b7386c25b6baf624ec8c18b279b62\nHash choices=sha256\nCMSDigest=fd7c42566bebe3f06e06168ca8e8f50dd27b7386c25b6baf624ec8c18b279b62\nCMSDigestType=2\nCDHash=fd7c42566bebe3f06e06168ca8e8f50dd27b7386\nSignature=adhoc\nInfo.plist entries=12\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=200\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli:\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "vm": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "41edb542839dc9cd5a580f125a742c48eaa39e8d6e99ebb4639e2d7e1d0cc67b",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-55554944f46922191a9f32be937ebe162623d03a\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=118571 flags=0x2(adhoc) hashes=3694+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=99f3f8f23611914add64a0d268adc81060994549\nCandidateCDHashFull sha256=99f3f8f23611914add64a0d268adc81060994549c73cad1dcae60ce8be9efc52\nHash choices=sha256\nCMSDigest=99f3f8f23611914add64a0d268adc81060994549c73cad1dcae60ce8be9efc52\nCMSDigestType=2\nCDHash=99f3f8f23611914add64a0d268adc81060994549\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.private.bmk.allow</key><true/><key>com.apple.private.virtualization</key><true/><key>com.apple.private.virtualization.security-research</key><true/><key>com.apple.security.get-task-allow</key><true/><key>com.apple.security.personal-information.location</key><true/><key>com.apple.security.virtualization</key><true/><key>com.apple.vm.networking</key><true/></dict></plist>\n",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm:\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "launchpad": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad",
+      "sha256": "b059fc119a257591ad137596ca5554545d3b7d816be2d3e494680a0dd046e20c",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad\nIdentifier=com.vphone.cli.launchpad\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=15729 flags=0x2(adhoc) hashes=485+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=e362299bcc45e0d32b63f092b9bac20cf16485b3\nCandidateCDHashFull sha256=e362299bcc45e0d32b63f092b9bac20cf16485b36e291065d64f25a414cb8999\nHash choices=sha256\nCMSDigest=e362299bcc45e0d32b63f092b9bac20cf16485b36e291065d64f25a414cb8999\nCMSDigestType=2\nCDHash=e362299bcc45e0d32b63f092b9bac20cf16485b3\nSignature=adhoc\nInfo.plist entries=17\nTeamIdentifier=not set\nSealed Resources version=2 rules=13 files=8\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad:\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "launcher": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher",
+      "sha256": "55b03da8bc2163aa4e5ade4043c0c61a00542200ab94a638aa68ae8615a05a35",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher\nIdentifier=com.vphone.cli.launchpad.launcher\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=11194 flags=0x2(adhoc) hashes=344+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=12bc5b3522101bfa88af100e23086e1eb1a03cf4\nCandidateCDHashFull sha256=12bc5b3522101bfa88af100e23086e1eb1a03cf4c14e0798374039fc2135c1bf\nHash choices=sha256\nCMSDigest=12bc5b3522101bfa88af100e23086e1eb1a03cf4c14e0798374039fc2135c1bf\nCMSDigestType=2\nCDHash=12bc5b3522101bfa88af100e23086e1eb1a03cf4\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "otool",
+            "-s",
+            "__TEXT",
+            "__info_plist",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher"
+          ],
+          "exit_code": 0,
+          "stdout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher:\n",
+          "stderr": ""
+        }
+      ]
+    }
+  },
+  "sources": {
+    "sources/Info.plist": {
+      "CFBundleIdentifier": "com.vphone.cli",
+      "CFBundleExecutable": "vphone-cli",
+      "CFBundleName": "vphone-cli",
+      "CFBundlePackageType": "APPL",
+      "CFBundleVersion": "1",
+      "CFBundleShortVersionString": "1.0",
+      "VPhoneBoundLaunchProtocol": "vphone.local-bound-launch.v1",
+      "LSUIElement": true,
+      "CFBundleIconFile": "AppIcon",
+      "NSLocationUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+      "NSLocationWhenInUseUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+      "NSLocationAlwaysAndWhenInUseUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation."
+    },
+    "sources/VPhoneLaunchpad-Info.plist": {
+      "CFBundleDevelopmentRegion": "en",
+      "CFBundleDisplayName": "vphone-launchpad",
+      "CFBundleExecutable": "vphone-launchpad",
+      "CFBundleIconFile": "AppIcon",
+      "CFBundleIdentifier": "com.vphone.cli.launchpad",
+      "CFBundleInfoDictionaryVersion": "6.0",
+      "CFBundleLocalizations": [
+        "en",
+        "zh-Hans"
+      ],
+      "CFBundleName": "vphone-launchpad",
+      "CFBundlePackageType": "APPL",
+      "CFBundleShortVersionString": "1.0",
+      "CFBundleVersion": "1",
+      "LSApplicationCategoryType": "public.app-category.developer-tools",
+      "LSMinimumSystemVersion": "15.0",
+      "NSLocationUsageDescription": "vphone-launchpad forwards your location to the guest VM for location simulation.",
+      "NSLocationWhenInUseUsageDescription": "vphone-launchpad forwards your location to the guest VM for location simulation.",
+      "NSLocationAlwaysAndWhenInUseUsageDescription": "vphone-launchpad forwards your location to the guest VM for location simulation.",
+      "NSPrincipalClass": "NSApplication"
+    },
+    "sources/vphone.entitlements": {
+      "com.apple.security.virtualization": true,
+      "com.apple.private.virtualization": true,
+      "com.apple.private.virtualization.security-research": true,
+      "com.apple.vm.networking": true,
+      "com.apple.security.personal-information.location": true,
+      "com.apple.security.get-task-allow": true,
+      "com.apple.private.bmk.allow": true
+    }
+  },
+  "location_helper": "No separate location helper target exists in the local Package.swift. CoreLocation calls occur in VPhoneLocationProvider in vphone-vm."
+}

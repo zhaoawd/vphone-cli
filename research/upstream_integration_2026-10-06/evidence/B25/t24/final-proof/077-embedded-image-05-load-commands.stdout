@@ -1,0 +1,277 @@
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib:
+Load command 0
+      cmd LC_SEGMENT_64
+  cmdsize 632
+  segname __TEXT
+   vmaddr 0x0000000000000000
+   vmsize 0x0000000000340000
+  fileoff 0
+ filesize 3407872
+  maxprot 0x00000005
+ initprot 0x00000005
+   nsects 7
+    flags 0x0
+Section
+  sectname __text
+   segname __TEXT
+      addr 0x0000000000000f00
+      size 0x00000000002236f0
+    offset 3840
+     align 2^7 (128)
+    reloff 0
+    nreloc 0
+     flags 0x80000400
+ reserved1 0
+ reserved2 0
+Section
+  sectname __stubs
+   segname __TEXT
+      addr 0x00000000002245f0
+      size 0x0000000000000738
+    offset 2246128
+     align 2^2 (4)
+    reloff 0
+    nreloc 0
+     flags 0x80000408
+ reserved1 0 (index into indirect symbol table)
+ reserved2 12 (size of stubs)
+Section
+  sectname __init_offsets
+   segname __TEXT
+      addr 0x0000000000224d28
+      size 0x0000000000000004
+    offset 2247976
+     align 2^2 (4)
+    reloff 0
+    nreloc 0
+     flags 0x00000016
+ reserved1 0
+ reserved2 0
+Section
+  sectname __const
+   segname __TEXT
+      addr 0x0000000000225000
+      size 0x00000000000d9b80
+    offset 2248704
+     align 2^12 (4096)
+    reloff 0
+    nreloc 0
+     flags 0x00000000
+ reserved1 0
+ reserved2 0
+Section
+  sectname __cstring
+   segname __TEXT
+      addr 0x00000000002feb80
+      size 0x0000000000038c62
+    offset 3140480
+     align 2^0 (1)
+    reloff 0
+    nreloc 0
+     flags 0x00000002
+ reserved1 0
+ reserved2 0
+Section
+  sectname __unwind_info
+   segname __TEXT
+      addr 0x00000000003377e4
+      size 0x0000000000007680
+    offset 3373028
+     align 2^2 (4)
+    reloff 0
+    nreloc 0
+     flags 0x00000000
+ reserved1 0
+ reserved2 0
+Section
+  sectname __eh_frame
+   segname __TEXT
+      addr 0x000000000033ee68
+      size 0x0000000000000370
+    offset 3403368
+     align 2^3 (8)
+    reloff 0
+    nreloc 0
+     flags 0x6800000b
+ reserved1 0
+ reserved2 0
+Load command 1
+      cmd LC_SEGMENT_64
+  cmdsize 232
+  segname __DATA_CONST
+   vmaddr 0x0000000000340000
+   vmsize 0x0000000000078000
+  fileoff 3407872
+ filesize 491520
+  maxprot 0x00000003
+ initprot 0x00000003
+   nsects 2
+    flags 0x10
+Section
+  sectname __got
+   segname __DATA_CONST
+      addr 0x0000000000340000
+      size 0x00000000000004f8
+    offset 3407872
+     align 2^3 (8)
+    reloff 0
+    nreloc 0
+     flags 0x00000006
+ reserved1 154 (index into indirect symbol table)
+ reserved2 0
+Section
+  sectname __const
+   segname __DATA_CONST
+      addr 0x00000000003404f8
+      size 0x0000000000075ec8
+    offset 3409144
+     align 2^3 (8)
+    reloff 0
+    nreloc 0
+     flags 0x00000000
+ reserved1 0
+ reserved2 0
+Load command 2
+      cmd LC_SEGMENT_64
+  cmdsize 312
+  segname __DATA
+   vmaddr 0x00000000003b8000
+   vmsize 0x0000000000004000
+  fileoff 3899392
+ filesize 16384
+  maxprot 0x00000003
+ initprot 0x00000003
+   nsects 3
+    flags 0x0
+Section
+  sectname __data
+   segname __DATA
+      addr 0x00000000003b8000
+      size 0x0000000000001eb0
+    offset 3899392
+     align 2^3 (8)
+    reloff 0
+    nreloc 0
+     flags 0x00000000
+ reserved1 0
+ reserved2 0
+Section
+  sectname __bss
+   segname __DATA
+      addr 0x00000000003b9eb0
+      size 0x0000000000001f48
+    offset 0
+     align 2^3 (8)
+    reloff 0
+    nreloc 0
+     flags 0x00000001
+ reserved1 0
+ reserved2 0
+Section
+  sectname __common
+   segname __DATA
+      addr 0x00000000003bbdf8
+      size 0x00000000000000a8
+    offset 0
+     align 2^3 (8)
+    reloff 0
+    nreloc 0
+     flags 0x00000001
+ reserved1 0
+ reserved2 0
+Load command 3
+      cmd LC_SEGMENT_64
+  cmdsize 72
+  segname __LINKEDIT
+   vmaddr 0x00000000003bc000
+   vmsize 0x00000000000e0000
+  fileoff 3915776
+ filesize 912272
+  maxprot 0x00000001
+ initprot 0x00000001
+   nsects 0
+    flags 0x0
+Load command 4
+          cmd LC_ID_DYLIB
+      cmdsize 56
+         name @rpath/libcrypto.3.dylib (offset 24)
+   time stamp 1 Thu Jan  1 08:00:01 1970
+      current version 3.0.0
+compatibility version 3.0.0
+Load command 5
+      cmd LC_DYLD_CHAINED_FIXUPS
+  cmdsize 16
+  dataoff 3915776
+ datasize 2640
+Load command 6
+      cmd LC_DYLD_EXPORTS_TRIE
+  cmdsize 16
+  dataoff 3918416
+ datasize 194512
+Load command 7
+     cmd LC_SYMTAB
+ cmdsize 24
+  symoff 4131096
+   nsyms 16883
+  stroff 4402480
+ strsize 415880
+Load command 8
+            cmd LC_DYSYMTAB
+        cmdsize 80
+      ilocalsym 0
+      nlocalsym 7723
+     iextdefsym 7723
+     nextdefsym 9001
+      iundefsym 16724
+      nundefsym 159
+         tocoff 0
+           ntoc 0
+      modtaboff 0
+        nmodtab 0
+   extrefsymoff 0
+    nextrefsyms 0
+ indirectsymoff 4401224
+  nindirectsyms 313
+      extreloff 0
+        nextrel 0
+      locreloff 0
+        nlocrel 0
+Load command 9
+     cmd LC_UUID
+ cmdsize 24
+    uuid 536FFF50-1802-319A-AF00-2B227B1855DE
+Load command 10
+      cmd LC_BUILD_VERSION
+  cmdsize 32
+ platform 1
+    minos 26.0
+      sdk 26.4
+   ntools 1
+     tool 3
+  version 1266.8
+Load command 11
+      cmd LC_SOURCE_VERSION
+  cmdsize 16
+  version 0.0
+Load command 12
+          cmd LC_LOAD_DYLIB
+      cmdsize 56
+         name /usr/lib/libSystem.B.dylib (offset 24)
+   time stamp 2 Thu Jan  1 08:00:02 1970
+      current version 1356.0.0
+compatibility version 1.0.0
+Load command 13
+      cmd LC_FUNCTION_STARTS
+  cmdsize 16
+  dataoff 4112928
+ datasize 18168
+Load command 14
+      cmd LC_DATA_IN_CODE
+  cmdsize 16
+  dataoff 4131096
+ datasize 0
+Load command 15
+      cmd LC_CODE_SIGNATURE
+  cmdsize 16
+  dataoff 4818368
+ datasize 9680

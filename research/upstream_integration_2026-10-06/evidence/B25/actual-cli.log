@@ -1,0 +1,118 @@
+zsh scripts/run_launchpad_cli_tests.sh
+=== Launchpad CLI tests: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app ===
+  VPHONE_LIBRARY_ROOT=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T//lp-cli.8kO43w
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling vphone_zip_stub.c
+[4/35] Compiling log.c
+[6/35] Compiling deviceinterfaced.c
+[6/35] Compiling locking.c
+[8/35] Compiling common.c
+[9/35] Compiling ipsw.c
+[10/35] Compiling recovery.c
+[11/35] Compiling download.c
+[12/35] Compiling fdr.c
+[13/35] Compiling idevicerestore.c
+[14/35] Compiling asr.c
+[15/35] Compiling normal.c
+[15/35] Compiling limera1n.c
+[17/35] Compiling restore.c
+[18/35] Compiling dfu.c
+[19/35] Compiling img3.c
+[20/35] Compiling img4.c
+[21/35] Compiling mbn.c
+[22/35] Compiling ace3.c
+[23/35] Compiling ftab.c
+[24/35] Compiling fls.c
+[25/35] Compiling vphone_restore_bridge.c
+[26/35] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[29/37] Compiling vphone_cli VPhoneBuildInfo.swift
+[30/39] Compiling vphone_cli VPhoneDoctorCLI.swift
+[31/39] Compiling vphone_cli VPhoneFWCLI.swift
+[31/39] Write Objects.LinkFileList
+[34/39] Linking vphone-cli
+[35/39] Linking vphone-vm
+[36/39] Applying vphone-cli
+[37/39] Applying vphone-vm
+[38/39] Linking vphone-cliPackageTests
+Build complete! (21.95s)
+Test Suite 'Selected tests' started at 2026-10-09 18:04:05.049.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 18:04:05.053.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 18:04:05.053.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 18:04:05.053.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite RealCLIEditTests started.
+◇ Test offlineEditsThroughTheEmbeddedCLI() started.
+◇ Suite RealCLICreateTests started.
+◇ Test catalogHelpAndStatusMatchTheEmbeddedCLI() started.
+[real-cli] fw catalog: iPhone17,3, 25 pairings
+[real-cli] vm create --help lists all 14 options the factories emit
+[real-cli] vm create-status: overall failed, next patch
+✔ Test catalogHelpAndStatusMatchTheEmbeddedCLI() passed after 2.888 seconds.
+✔ Suite RealCLICreateTests passed after 2.890 seconds.
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] listed 3 machines from 1 libraries
+[launchpad] listed 0 machines from 1 libraries
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] listed 0 machines from 1 libraries
+[real-cli] history: 0 vphone-cli vm config a --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1 --cpu 2 --memory 4096 --network none
+[real-cli] history: 0 vphone-cli vm config a --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1 --memory 3072
+[real-cli] history: 0 vphone-cli vm config b --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1 --memory 3072
+[real-cli] history: 0 vphone-cli vm rename a a2 --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1
+[real-cli] history: 0 vphone-cli vm clone a2 a3 --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1
+[real-cli] history: 0 vphone-cli vm export a3 --out /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/out/a3.tzst --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1
+[real-cli] history: 0 vphone-cli vm export a2 --out /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/out/a2.tzst --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1
+[real-cli] history: 0 vphone-cli vm export b --out /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/out/b.tzst --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1
+[real-cli] history: 0 vphone-cli vm import /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/out/a3.tzst --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l2
+[real-cli] history: 0 vphone-cli vm delete a3 --force --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l1
+[real-cli] history: 0 vphone-cli vm delete a3 --force --library-root /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/lpr-1FA4AA4C/l2
+✔ Test offlineEditsThroughTheEmbeddedCLI() passed after 14.007 seconds.
+◇ Test aHeldBundleLockIsRefusedAndShown() started.
+[launchpad] listed 1 machines from 1 libraries
+[real-cli] refusal: Unable to Save Settings for m | Error: VM 'm' is busy: it is held by pid 51805 running operation "boot" (instance AA2A2C85-4456-4787-A5FA-A59A74EBC862); stop the VM first
+[real-cli] refusal: Unable to Rename m | Error: VM 'm' is busy: it is held by pid 51805 running operation "boot" (instance AA2A2C85-4456-4787-A5FA-A59A74EBC862); stop the VM first
+[real-cli] refusal: Unable to Clone m | Error: VM 'm' is busy: it is held by pid 51805 running operation "boot" (instance AA2A2C85-4456-4787-A5FA-A59A74EBC862); stop the VM first
+[real-cli] refusal: Unable to Export m | Error: VM 'm' is busy: it is held by pid 51805 running operation "boot" (instance AA2A2C85-4456-4787-A5FA-A59A74EBC862); stop the VM first
+[real-cli] refusal: Unable to Delete m | Error: VM 'm' is busy: it is held by pid 51805 running operation "boot" (instance AA2A2C85-4456-4787-A5FA-A59A74EBC862); stop the VM first
+✔ Test aHeldBundleLockIsRefusedAndShown() passed after 4.539 seconds.
+◇ Test cancellingARealExportRemovesItsPartialArchive() started.
+[launchpad] listed 1 machines from 1 libraries
+[real-cli] export cancelled 2.1 s after start at 7557120 bytes; status 2
+✔ Test cancellingARealExportRemovesItsPartialArchive() passed after 9.373 seconds.
+✔ Suite RealCLIEditTests passed after 27.921 seconds.
+✔ Test run with 4 tests in 2 suites passed after 27.922 seconds.
+=== Launchpad CLI tests passed: RealCLIEditTests, RealCLICreateTests; temporary library root empty and removed ===

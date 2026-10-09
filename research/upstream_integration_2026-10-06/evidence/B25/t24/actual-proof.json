@@ -1,0 +1,288 @@
+{
+  "scope": "Signed host Mach-O closure only; Python/PATH dependencies and TCC authorization are not established.",
+  "commands": [
+    {
+      "argv": [
+        "codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app: replacing existing signature\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/record_build_dependencies.py",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app: replacing existing signature\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/check_bundle.py",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app"
+      ],
+      "exit_code": 0,
+      "stdout": "Portable host Mach-O closure verified: 7 signed images\nGuest payload metadata, entitlements and manifest checked; runtime not tested\nComplete bundle: resources, signature and entitlements verified\n",
+      "stderr": "--prepared:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-vm\n--prepared:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid\n--validated:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-vm\n--validated:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid\n--prepared:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib\n--prepared:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib\n--validated:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib\n--validated:/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib\n/private/tmp/vphone-b25-t24/portable-vphone-cli.app: valid on disk\n/private/tmp/vphone-b25-t24/portable-vphone-cli.app: satisfies its Designated Requirement\nExecutable=/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/vphone-vm\n"
+    },
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "--deep",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "otool",
+        "-L",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid:\n\t@loader_path/../Frameworks/libcrypto.3.dylib (compatibility version 3.0.0, current version 3.0.0)\n\t@loader_path/../Frameworks/libplist-2.0.4.dylib (compatibility version 12.0.0, current version 12.0.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2000.63.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "otool",
+        "-D",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid:\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "-dvvv",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Executable=/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid\nIdentifier=ldid-55554944974f87b50978373fba46a96528d8932e\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=678 flags=0x2(adhoc) hashes=15+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=6a6b9e62734a31c75068b29f24b477de3e4b6167\nCandidateCDHashFull sha256=6a6b9e62734a31c75068b29f24b477de3e4b61679a50426c1bc1ffe7d437a6d9\nHash choices=sha256\nCMSDigest=6a6b9e62734a31c75068b29f24b477de3e4b61679a50426c1bc1ffe7d437a6d9\nCMSDigestType=2\nCDHash=6a6b9e62734a31c75068b29f24b477de3e4b6167\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    {
+      "argv": [
+        "otool",
+        "-L",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache:\n\t@loader_path/../../../Frameworks/libcrypto.3.dylib (compatibility version 3.0.0, current version 3.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "otool",
+        "-D",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache:\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "-dvvv",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Executable=/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache\nIdentifier=trustcache-55554944824985bff25c3e21815e2d08660ad3bb\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=364 flags=0x2(adhoc) hashes=5+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=2d881c240c0345772ff2e5f86e19ffa409ccfa58\nCandidateCDHashFull sha256=2d881c240c0345772ff2e5f86e19ffa409ccfa58defbd6de0fe93e0b7de7f189\nHash choices=sha256\nCMSDigest=2d881c240c0345772ff2e5f86e19ffa409ccfa58defbd6de0fe93e0b7de7f189\nCMSDigestType=2\nCDHash=2d881c240c0345772ff2e5f86e19ffa409ccfa58\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    {
+      "argv": [
+        "otool",
+        "-L",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib:\n\t@rpath/libcrypto.3.dylib (compatibility version 3.0.0, current version 3.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "otool",
+        "-D",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib:\n@rpath/libcrypto.3.dylib\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "-dvvv",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Executable=/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib\nIdentifier=libcrypto.3\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=9604 flags=0x2(adhoc) hashes=295+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=ec56db58e0c108e02f133794c8b245727fb1fb6c\nCandidateCDHashFull sha256=ec56db58e0c108e02f133794c8b245727fb1fb6cdd60e9343516270b0af0f3d1\nHash choices=sha256\nCMSDigest=ec56db58e0c108e02f133794c8b245727fb1fb6cdd60e9343516270b0af0f3d1\nCMSDigestType=2\nCDHash=ec56db58e0c108e02f133794c8b245727fb1fb6c\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    {
+      "argv": [
+        "otool",
+        "-L",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib:\n\t@rpath/libplist-2.0.4.dylib (compatibility version 12.0.0, current version 12.0.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "otool",
+        "-D",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib:\n@rpath/libplist-2.0.4.dylib\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "codesign",
+        "-dvvv",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Executable=/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib\nIdentifier=libplist-2-555549447ed0d84c7fe434298db3e3f9a399bd9a\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=396 flags=0x2(adhoc) hashes=6+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=f9d39b62def3b114a8775a02a9d5ec8a0beeec2c\nCandidateCDHashFull sha256=f9d39b62def3b114a8775a02a9d5ec8a0beeec2c2a3aa821c9c1aeb408c141a7\nHash choices=sha256\nCMSDigest=f9d39b62def3b114a8775a02a9d5ec8a0beeec2c2a3aa821c9c1aeb408c141a7\nCMSDigestType=2\nCDHash=f9d39b62def3b114a8775a02a9d5ec8a0beeec2c\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-f",
+        "/private/tmp/vphone-b25-t24/homebrew-denied.sb",
+        "/bin/cat",
+        "/opt/homebrew/opt/openssl@3/lib/libcrypto.3.dylib"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "cat: /opt/homebrew/opt/openssl@3/lib/libcrypto.3.dylib: Operation not permitted\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-f",
+        "/private/tmp/vphone-b25-t24/homebrew-denied.sb",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/MacOS/ldid",
+        "-e",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/guest-resources/vphoned"
+      ],
+      "exit_code": 0,
+      "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n\t<key>com.apple.CommCenter.fine-grained</key>\n\t<array>\n\t\t<string>spi</string>\n\t\t<string>phone</string>\n\t\t<string>identity</string>\n\t\t<string>data-usage</string>\n\t\t<string>data-allowed</string>\n\t\t<string>data-allowed-write</string>\n\t</array>\n\t<key>com.apple.locationd.preauthorized</key>\n\t<true/>\n\t<key>com.apple.locationd.simulation</key>\n\t<true/>\n\t<key>com.apple.Pasteboard.background-access</key>\n\t<true/>\n\t<key>com.apple.Pasteboard.originating-bundle-id-query</key>\n\t<true/>\n\t<key>com.apple.Pasteboard.paste-unchecked</key>\n\t<true/>\n\t<key>com.apple.Pasteboard.trigger-janitor</key>\n\t<true/>\n\t<key>com.apple.QuartzCore.cache-asynchronous</key>\n\t<true/>\n\t<key>com.apple.QuartzCore.displayable-context</key>\n\t<true/>\n\t<key>com.apple.QuartzCore.global-capture</key>\n\t<true/>\n\t<key>com.apple.QuartzCore.secure-capture</key>\n\t<true/>\n\t<key>com.apple.QuartzCore.secure-mode</key>\n\t<true/>\n\t<key>com.apple.QuartzCore.system-layers</key>\n\t<true/>\n\t<key>com.apple.SystemConfiguration.SCDynamicStore-write-access</key>\n\t<true/>\n\t<key>com.apple.SystemConfiguration.SCPreferences-write-access</key>\n\t<true/>\n\t<key>com.apple.backboard.client</key>\n\t<true/>\n\t<key>com.apple.backboardd.launchapplications</key>\n\t<true/>\n\t<key>com.apple.developer.networking.HotspotHelper</key>\n\t<true/>\n\t<key>com.apple.developer.networking.vpn.api</key>\n\t<array>\n\t\t<string>allow-vpn</string>\n\t</array>\n\t<key>com.apple.developer.team-identifier</key>\n\t<string>GXZ23M5TP2</string>\n\t<key>com.apple.developer.usernotifications.critical-alerts</key>\n\t<true/>\n\t<key>com.apple.developer.usernotifications.time-sensitive</key>\n\t<true/>\n\t<key>com.apple.frontboard.launchapplications</key>\n\t<true/>\n\t<key>com.apple.frontboard.shutdown</key>\n\t<true/>\n\t<key>com.apple.gasgauge.user-access-device</key>\n\t<true/>\n\t<key>com.apple.private.IOSurface.protected-access</key>\n\t<true/>\n\t<key>com.apple.private.MobileContainerManager.allowed</key>\n\t<true/>\n\t<key>com.apple.private.allow-explicit-graphics-priority</key>\n\t<true/>\n\t<key>com.apple.private.amfi.developer-mode-control</key>\n\t<true/>\n\t<key>com.apple.private.hid.client.event-dispatch</key>\n\t<true/>\n\t<key>com.apple.private.hid.client.event-filter</key>\n\t<true/>\n\t<key>com.apple.private.hid.client.event-monitor</key>\n\t<true/>\n\t<key>com.apple.private.hid.client.service-protected</key>\n\t<true/>\n\t<key>com.apple.private.hid.manager.client</key>\n\t<true/>\n\t<key>com.apple.private.kernel.jetsam</key>\n\t<true/>\n\t<key>com.apple.private.memorystatus</key>\n\t<true/>\n\t<key>com.apple.private.persona-mgmt</key>\n\t<true/>\n\t<key>com.apple.private.security.container-manager</key>\n\t<true/>\n\t<key>com.apple.private.security.disk-device-access</key>\n\t<true/>\n\t<key>com.apple.private.security.no-container</key>\n\t<true/>\n\t<key>com.apple.private.security.storage-exempt.heritable</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.AppBundles</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.AppDataContainers</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.AppleMediaServices</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Biome</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Calendar</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CallHistory</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CarrierBundles</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CloudDocsDB</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CloudKit</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.ContactlessReader</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CoreFollowUp</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CoreKnowledge</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.CoreRoutine</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Cryptex</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.DiagnosticReports</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.DiagnosticReports.read-write</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.DoNotDisturb</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.DocumentRevisions</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.DumpPanic</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.ExposureNotification</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.FaceTime</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.FindMy</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Health</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Home</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.HomeAI</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.HomeKit</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.IdentityServices</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.IntelligencePlatform</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Keychains</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Location</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Lockdown</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Mail</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.ManagedConfiguration</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MapsSync</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Messages</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MessagesMetaData</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MobileBackup</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MobileContainerManager</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MobileDocuments</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MobileIdentityService</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.MobileStorageMounter</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.NanoTimeKit.FaceSupport</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.News</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Notes</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.PassKit</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Photos</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.PhotosLibraries</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.PrivacyAccounting</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SFAnalytics</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Safari</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SearchParty</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SecureElementService</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SensorKit</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SiriFeatureStore</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SiriInference</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SiriReferenceResolution</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SiriSELF</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SiriVocabulary</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SoC</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SoundProfileAsset</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SpeechPersonalizedLM</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Spotlight</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.StatusKit</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Stocks</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Suggestions</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.SymptomFramework</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.TCC</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.TextUnderstanding</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.TimeMachine</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Voicemail</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Weather</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.Wireless</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.adprivacyd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.amfid</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.appleaccountd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.automation-mode</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.chronod</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.ciconia</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.clipserviced</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.containers</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.coreduet_knowledge_store</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.demo_backup</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.driverkitd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.familycircled</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.fpsd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.geoanalyticsd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.geod</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.iCloudDrive</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.idcredd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.kbd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.launchd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.mobilesync</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.multimodalsearchd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.pipelined</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.preferences</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.sessionkitd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.sysdagnose.ScreenshotServicesService</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.sysdiagnose.ScreenshotServicesService</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.sysdiagnose.sysdiagnose</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.tmp</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.triald</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.trustd</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.trustd-private</key>\n\t<true/>\n\t<key>com.apple.private.security.storage.universalaccess</key>\n\t<true/>\n\t<key>com.apple.private.system-keychain</key>\n\t<true/>\n\t<key>com.apple.private.usernotifications.bundle-identifiers</key>\n\t<true/>\n\t<key>com.apple.private.usernotifications.settings</key>\n\t<array>\n\t\t<string>critical-alerts</string>\n\t</array>\n\t<key>com.apple.rootless.critical</key>\n\t<true/>\n\t<key>com.apple.rootless.datavault.metadata</key>\n\t<true/>\n\t<key>com.apple.rootless.install</key>\n\t<true/>\n\t<key>com.apple.rootless.install.heritable</key>\n\t<true/>\n\t<key>com.apple.rootless.restricted-block-devices</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.CoreAnalytics</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.CoreRoutine</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.CoreSpeech</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.ExtensibleSSO</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.MobileAssetDownload</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.MobileStorageMounter</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.MusicApp</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.QLThumbnailCache</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.RoleAccountStaging</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.amsengagementd</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.ane_model_cache</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.apfs_boot_mount</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.clientScripter</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.CarPlayAppBlacklist</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.DeviceCheck</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.DictionaryServices.dictionary2</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.DuetExpertCenterAsset</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.EmbeddedNL</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Font5</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Font6</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.HealthKit.FeatureAvailability</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.HealthKt.FeatureAvailability</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.HomeKit</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.MXLongFormVideoApps</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.MacinTalkVoiceAssets</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.MailDynamicData</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.PKITrustSupplementals</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.SharingDeviceAssets</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.SiriShortcutsMobileAsset</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.TimeZoneUpdate</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriDialogAssets</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriExperienceCam</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriFindMyConfigurationFiles</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriInferredHelpfulness</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriTextToSpeech</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAsrAssistant</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAsrHammer</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAsrUaap</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAttentionAssets</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingMorphun</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingNL</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.Trial.Siri.SiriUnderstandingNLOverrides</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.VoiceServices.CombinedVocalizerVoices</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.VoiceServices.CustomVoice</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.VoiceServices.GryphonVoice</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.VoiceServices.VoiceResources</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.VoiceServicesVocalizerVoice</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.VoiceTriggerAssets</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.MobileAsset.network.networknomicon</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.com.apple.mediaanalysisd</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.coreduet_knowledge_store</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.coreidvd</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.coreknowledge</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.coreparsec_feedbacks</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.coreparsec_uploadables</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.dmd</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.dprivacyd_storage</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.early_boot_mount</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.facekit</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.fpsd</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.nsurlsessiond</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.pearl-field-diagnostics</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.proactivepredictions</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.remotemanagementd</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.screentime</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.sensorkit</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.shortcuts</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.siriremembers</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.timezone</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.triald</key>\n\t<true/>\n\t<key>com.apple.rootless.storage.voiceshortcuts</key>\n\t<true/>\n\t<key>com.apple.rootless.volume.ISCRecovery</key>\n\t<true/>\n\t<key>com.apple.rootless.volume.Preboot</key>\n\t<true/>\n\t<key>com.apple.rootless.volume.Recovery</key>\n\t<true/>\n\t<key>com.apple.rootless.volume.Update</key>\n\t<true/>\n\t<key>com.apple.rootless.volume.VM</key>\n\t<true/>\n\t<key>com.apple.rootless.volume.iSCPreboot</key>\n\t<true/>\n\t<key>com.apple.security.iokit-user-client-class</key>\n\t<array>\n\t\t<string>AGXCommandQueue</string>\n\t\t<string>AGXDevice</string>\n\t\t<string>AGXDeviceUserClient</string>\n\t\t<string>AGXGLContext</string>\n\t\t<string>AGXSharedUserClient</string>\n\t\t<string>AppleCredentialManagerUserClient</string>\n\t\t<string>AppleHPMUserClient</string>\n\t\t<string>AppleJPEGDriverUserClient</string>\n\t\t<string>ApplePPMUserClient</string>\n\t\t<string>AppleSPUHIDDeviceUserClient</string>\n\t\t<string>AppleSPUHIDDriverUserClient</string>\n\t\t<string>AppleUSBHostDeviceUserClient</string>\n\t\t<string>H11ANEInDirectPathClient</string>\n\t\t<string>IOAVControllerConcreteUserClient</string>\n\t\t<string>IOAccelContext</string>\n\t\t<string>IOAccelContext2</string>\n\t\t<string>IOAccelDevice</string>\n\t\t<string>IOAccelDevice2</string>\n\t\t<string>IOAccelSharedUserClient</string>\n\t\t<string>IOAccelSharedUserClient2</string>\n\t\t<string>IOAccelSubmitter2</string>\n\t\t<string>IOGPUDeviceUserClient</string>\n\t\t<string>IOHIDEventServiceFastPathUserClient</string>\n\t\t<string>IOHIDLibUserClient</string>\n\t\t<string>IOMobileFramebufferUserClient</string>\n\t\t<string>IOReportUserClient</string>\n\t\t<string>IOSurfaceAcceleratorClient</string>\n\t\t<string>IOSurfaceRootUserClient</string>\n\t\t<string>RootDomainUserClient</string>\n\t</array>\n\t<key>com.apple.springboard.debugapplications</key>\n\t<true/>\n\t<key>com.apple.springboard.launchapplications</key>\n\t<true/>\n\t<key>com.apple.springboard.launchapplicationswithoptions</key>\n\t<true/>\n\t<key>com.apple.springboard.opensensitiveurl</key>\n\t<true/>\n\t<key>com.apple.springboard.openurlswhenlocked</key>\n\t<true/>\n\t<key>com.apple.usernotification.notificationregistrarproxy</key>\n\t<true/>\n\t<key>com.apple.usernotification.notificationschedulerproxy</key>\n\t<true/>\n\t<key>com.apple.usernotification.proxy</key>\n\t<true/>\n\t<key>com.apple.usernotifications.legacy-extension</key>\n\t<true/>\n\t<key>com.apple.security.exception.files.absolute-path.read-write</key>\n\t<array>\n\t\t<string>/</string>\n\t</array>\n\t<key>file-read-data</key>\n\t<true/>\n\t<key>file-read-metadata</key>\n\t<true/>\n\t<key>file-write-data</key>\n\t<true/>\n\t<key>inter-app-audio</key>\n\t<true/>\n\t<key>keychain-access-groups</key>\n\t<array>\n\t\t<string>com.82flex.TrollVNCApp</string>\n\t\t<string>GXZ23M5TP2.com.82flex.TrollVNCApp</string>\n\t</array>\n\t<key>platform-application</key>\n\t<true/>\n\t<key>uicache.app-data-container-required</key>\n\t<true/>\n\t<key>user-preference-read</key>\n\t<true/>\n\t<key>user-preference-write</key>\n\t<true/>\n</dict>\n</plist>\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-f",
+        "/private/tmp/vphone-b25-t24/homebrew-denied.sb",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache",
+        "create",
+        "-v",
+        "1",
+        "/private/tmp/vphone-b25-t24/portable.trustcache",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/guest-resources/vphoned"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-f",
+        "/private/tmp/vphone-b25-t24/homebrew-denied.sb",
+        "/private/tmp/vphone-b25-t24/portable-vphone-cli.app/Contents/Resources/.tools/bin/trustcache",
+        "info",
+        "/private/tmp/vphone-b25-t24/portable.trustcache"
+      ],
+      "exit_code": 0,
+      "stdout": "version = 1\nuuid = 839CD637-F340-4532-8A84-019DF208DAEB\nentry count = 1\n0d1f26f9ce6a5098a74f081fff44ffebff62c1fa [none] [2]\n",
+      "stderr": ""
+    }
+  ],
+  "guest_sha256": "90adb96f671a8e415c79695ec0623bc1614df3fdc552f91b53367fcdaf001c36",
+  "files": {
+    "Contents/MacOS/vphone-cli": "b0410c5c1b7e6ede4f27cb210b91bb8d1dedfceec783c099660a6e0e628f43a7",
+    "Contents/MacOS/vphone-vm": "fd5da66ff6e899e21ee0073578228e69a63eca4c10ecda3ecb53841c569561c3",
+    "Contents/MacOS/ldid": "9142c180c353b107ff1394d73c51fc5c390327d6079a43d70f559200781da525",
+    "Contents/Resources/.tools/bin/trustcache": "28fce89b5f67c0fe4094d3623804ad49d79f79316ed93577cca7941ec1fd2203",
+    "Contents/Frameworks/libcrypto.3.dylib": "f093486a86942af2d781a3425ee9a10bc7950a556221659e161fafe50fe1d24f",
+    "Contents/Frameworks/libplist-2.0.4.dylib": "cb6a1a4c75791a8238bd86bde1833eb00716e0f1f8506e2a335406ce6c369ef0"
+  }
+}

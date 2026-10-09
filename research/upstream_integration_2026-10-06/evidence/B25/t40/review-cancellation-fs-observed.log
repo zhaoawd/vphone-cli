@@ -1,0 +1,28 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-09 17:07:42.419.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 17:07:42.420.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 17:07:42.420.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 17:07:42.420.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateCancellationEndToEndTests started.
+◇ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() started.
+✘ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() recorded an issue at CreateCancellationEndToEndTests.swift:149:13: Expectation failed: (create → <NSConcreteTask: 0x104b31540>).isRunning → false
+↳ vm create exited before the stand-in started:
+  Error: Resource changed before copying: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vc-cancel-8F29D637/resources/requirements.txt; expected dev=16777233,ino=587341049,mode=33188,size=20,mtime=1791536862.595162130,ctime=1791536862.595162130; observed dev=16777233,ino=587341049,mode=33188,size=20,mtime=1791536862.595162130,ctime=1791536862.958106068
+  
+✘ Test sigintToTheCreateGroupEndsEveryStageProcessAndLeavesAnInterruptedCheckpoint() failed after 0.691 seconds with 1 issue.
+✘ Suite CreateCancellationEndToEndTests failed after 0.691 seconds with 1 issue.
+↳ /// `vm create` cancelled the way Launchpad cancels it (B4 G4): SIGINT to the
+↳ /// process group whose leader is `vm create`. The real CLI runs a fresh create
+↳ /// in temporary directories; the prepare stage's script is a stand-in.
+↳ ///
+↳ /// Foundation `Process` starts every child in a new process group, so the
+↳ /// signal reaches only `vm create`; the stand-in has a foreground child that
+↳ /// writes into the VM directory and a background grandchild that leaves the
+↳ /// stage's group (setpgid) and writes too.
+✘ Test run with 1 test in 1 suite failed after 0.691 seconds with 1 issue.
