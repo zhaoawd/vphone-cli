@@ -1,0 +1,429 @@
+zsh scripts/build.sh
+=== Building vphone-cli (f6ebd179) ===
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for production...
+[2/38] Write sources
+[6/38] Write swift-version--58304C5D6DBC2206.txt
+[8/40] Compiling AppleMobileDeviceLibrary AppleMobileDeviceLibrary.swift
+[8/40] Compiling locking.c
+[9/40] Compiling log.c
+[10/40] Compiling deviceinterfaced.c
+[11/40] Compiling fls.c
+[12/40] Compiling ace3.c
+[13/40] Compiling mbn.c
+[14/40] Compiling download.c
+[15/40] Compiling asr.c
+[16/40] Compiling fdr.c
+[17/40] Compiling recovery.c
+[18/40] Compiling limera1n.c
+[19/40] Compiling idevicerestore.c
+[19/40] Compiling normal.c
+[21/40] Compiling dfu.c
+[22/40] Compiling ipsw.c
+[23/40] Compiling vphone_zip_stub.c
+[24/40] Compiling ftab.c
+[25/40] Compiling img3.c
+[26/40] Compiling common.c
+[27/40] Compiling vphone_restore_bridge.c
+[28/40] Compiling img4.c
+[29/40] Compiling restore.c
+[30/40] Compiling MobileRecoveryCore libirecovery.c
+[32/41] Compiling VPhoneBundleStore VPhoneBundleCodeSignature.swift
+[32/43] Write Objects.LinkFileList
+[34/44] Compiling VPhoneRestore VPhoneRecoveryProbe.swift
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[34/45] Linking vphone-helper
+[36/45] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[36/45] Write Objects.LinkFileList
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[37/46] Linking vphone-launchpad
+[39/46] Compiling VPhoneLaunchpadLauncherEntry VPhoneLaunchpadLauncherProcess.swift
+[39/46] Write Objects.LinkFileList
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+[40/46] Linking vphone-launchpad-launcher
+[42/46] Compiling vphone_cli VPhoneAPIProxyOptions.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[43/48] Compiling VPhoneCommandEntry main.swift
+[44/48] Compiling VPhoneVMEntry main.swift
+[44/48] Write Objects.LinkFileList
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libssl-35ZJ0ML39KS0S.pcm
+[46/48] Linking vphone-cli
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libarchive-Q9ZZMBJEV0X6.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Dispatch-R76HXUP80TVL.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Dispatch-R76HXUP80TVL.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/os-2MV8OP7R98AN8.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/os-2MV8OP7R98AN8.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/CoreCapstone-39PFJYD86H5MV.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/CoreCapstone-39PFJYD86H5MV.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/1RTHKG2G1ED1F/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/ObjectiveC-1G8H182PQX3QE.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/ObjectiveC-1G8H182PQX3QE.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Security-3QCVXOV25KK54.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Security-3QCVXOV25KK54.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Compression-RPKE1V5WW4W9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/Compression-RPKE1V5WW4W9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2Q764KX6GUXHD/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_SwiftConcurrencyShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Foundation-24LYWIP48SHNP.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Foundation-24LYWIP48SHNP.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CoreFoundation-16SA8WK3L6MQN.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CoreFoundation-16SA8WK3L6MQN.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CommonCrypto-3LRGWQZU0RAZJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/CommonCrypto-3LRGWQZU0RAZJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/SwiftShims-2IMTS4WWRU7VJ.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/SwiftShims-2IMTS4WWRU7VJ.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/Darwin-1FXX23EKWOBA9.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_DarwinFoundation2-3J4ZFA06I5V1P.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/_DarwinFoundation2-3J4ZFA06I5V1P.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachO-20RPYVQSX341K.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/2ND52YEJ1V9WN/MachOKitC-19V08P5OGKXWR.pcm
+warning: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libssl-35ZJ0ML39KS0S.pcm: No such file or directory
+note: while processing /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/release/ModuleCache/CNE7OYNP7O3L/libssl-35ZJ0ML39KS0S.pcm
+[47/48] Linking vphone-vm
+Build complete! (37.06s)
+=== Signing with entitlements ===
+.build/release/vphone-cli: replacing existing signature
+.build/release/vphone-vm: replacing existing signature
+  signed OK → .build/release/vphone-cli
+=== Bundling .build/vphone-cli.app ===
+.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+  bundled → .build/vphone-cli.app
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc  \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"f6ebd179"' \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest/vphoned unarchive.m vphoned.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc -DLESS=1 \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"f6ebd179"' \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest/vphoned-less unarchive.m vphoned.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+=== Bundling runtime assets → .build/vphone-cli.app/Contents/Resources ===
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont
+=== Signing .build/vphone-cli.app (final Resources) ===
+.build/vphone-cli.app: replacing existing signature
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+  resealed and verified OK
+
+=== Build complete ===
+  binary : .build/release/vphone-cli
+  bundle : .build/vphone-cli.app
+  guest  : .build/guest/{vphoned,vphoned-less}
+
+Run: .build/release/vphone-cli --help

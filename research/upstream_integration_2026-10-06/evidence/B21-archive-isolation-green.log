@@ -1,0 +1,104 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/46] Compiling download.c
+[6/46] Compiling asr.c
+[6/46] Compiling fdr.c
+[6/46] Compiling ipsw.c
+[10/46] Emitting module VPhoneBundleStore
+[11/46] Compiling VPhoneBundleStore VPhoneLaunchpadLauncherRequest.swift
+[11/49] Compiling limera1n.c
+[12/49] Compiling recovery.c
+[13/49] Compiling normal.c
+[14/49] Compiling restore.c
+[15/49] Compiling dfu.c
+[16/49] Compiling img4.c
+[17/49] Compiling img3.c
+[18/49] Compiling mbn.c
+[19/49] Compiling ace3.c
+[21/49] Emitting module VPhoneAPIKit
+[21/50] Compiling ftab.c
+[22/50] Compiling fls.c
+[23/50] Compiling locking.c
+[24/50] Compiling log.c
+[25/50] Compiling deviceinterfaced.c
+[26/50] Compiling vphone_zip_stub.c
+[27/50] Compiling common.c
+[28/50] Compiling idevicerestore.c
+[29/50] Compiling vphone_restore_bridge.c
+[30/50] Compiling MobileRecoveryCore libirecovery.c
+[32/50] Emitting module VPhoneBundleStoreTests
+[33/50] Emitting module VPhoneCore
+[33/53] Write Objects.LinkFileList
+[35/54] Emitting module VPhoneHelperKitTests
+[35/55] Linking vphone-helper
+[36/55] Applying vphone-helper
+[38/55] Emitting module VPhoneLaunchpadKit
+[38/56] Write Objects.LinkFileList
+[40/57] Emitting module VPhoneLaunchpadLauncherEntry
+[40/57] Write Objects.LinkFileList
+[42/57] Compiling VPhoneArchiveKitTests ArchiveLocaleTests.swift
+[43/57] Emitting module VPhoneArchiveKitTests
+[43/57] Linking vphone-launchpad-launcher
+[44/57] Linking vphone-launchpad
+[45/57] Applying vphone-launchpad-launcher
+[46/57] Applying vphone-launchpad
+[48/57] Emitting module VPhoneLaunchpadKitTests
+[49/57] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[49/57] Write Objects.LinkFileList
+[52/58] Emitting module VPhoneCLITests
+[52/58] Write Objects.LinkFileList
+[53/58] Linking vphone-vm
+[54/58] Linking vphone-cli
+[55/58] Applying vphone-vm
+[56/58] Applying vphone-cli
+[57/58] Linking vphone-cliPackageTests
+Build complete! (13.99s)
+Test Suite 'Selected tests' started at 2026-10-09 08:29:10.291.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 08:29:10.292.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 08:29:10.292.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 08:29:10.292.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Archive names in the C locale" started.
+◇ Test "non-ASCII names and link targets round trip in the C locale" started.
+◇ Test case passing 1 argument format → .gnutar to "non-ASCII names and link targets round trip in the C locale" started.
+◇ Test case passing 1 argument format → .pax to "non-ASCII names and link targets round trip in the C locale" started.
+◇ Test case passing 1 argument format → .ustar to "non-ASCII names and link targets round trip in the C locale" started.
+✔ Test "non-ASCII names and link targets round trip in the C locale" with 3 test cases passed after 0.045 seconds.
+◇ Test "a UTF-8 flagged IPA-shaped zip is listed, read and unpacked in the C locale" started.
+✔ Test "a UTF-8 flagged IPA-shaped zip is listed, read and unpacked in the C locale" passed after 0.003 seconds.
+◇ Test "an entry whose name cannot be converted is refused, not written over the destination" started.
+✔ Test "an entry whose name cannot be converted is refused, not written over the destination" passed after 0.001 seconds.
+◇ Test "a missing non-ASCII member is reported by name in the C locale" started.
+✔ Test "a missing non-ASCII member is reported by name in the C locale" passed after 0.003 seconds.
+◇ Test "archive calls restore the calling thread's locale, including on failure" started.
+✔ Test "archive calls restore the calling thread's locale, including on failure" passed after 0.007 seconds.
+◇ Test "withArchiveLocale changes only the calling thread, and only inside the call" started.
+✔ Test "withArchiveLocale changes only the calling thread, and only inside the call" passed after 0.001 seconds.
+◇ Test "archive calls do not change other threads or the global locale" started.
+✔ Test "archive calls do not change other threads or the global locale" passed after 0.019 seconds.
+✔ Suite "Archive names in the C locale" passed after 0.082 seconds.
+✔ Test run with 7 tests in 1 suite passed after 0.082 seconds.

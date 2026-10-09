@@ -1,0 +1,108 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/44] Copying InfoPlist.xcstrings
+[2/44] Write sources
+[6/44] Write swift-version--58304C5D6DBC2206.txt
+[7/45] Compiling normal.c
+[8/45] Compiling fdr.c
+[9/45] Compiling ipsw.c
+[10/45] Compiling download.c
+[11/45] Compiling asr.c
+[12/45] Compiling recovery.c
+[13/45] Compiling restore.c
+[15/45] Emitting module VPhoneAPIKit
+[15/45] Compiling limera1n.c
+[16/45] Compiling img4.c
+[17/45] Compiling dfu.c
+[18/45] Compiling img3.c
+[19/45] Compiling ace3.c
+[20/46] Compiling ftab.c
+[21/46] Compiling mbn.c
+[22/46] Compiling log.c
+[23/47] Compiling locking.c
+[24/47] Compiling fls.c
+[25/47] Compiling vphone_zip_stub.c
+[26/47] Compiling deviceinterfaced.c
+[27/47] Compiling common.c
+[28/47] Compiling idevicerestore.c
+[29/47] Compiling vphone_restore_bridge.c
+[31/47] Emitting module VPhoneBundleStore
+[31/47] Compiling MobileRecoveryCore libirecovery.c
+[33/46] Emitting module VPhoneBundleStoreTests
+[34/46] Emitting module VPhoneCore
+[35/48] Emitting module VPhoneHelperKitTests
+[36/55] Emitting module VPhoneLaunchpadKit
+[37/55] Compiling FirmwareIntegrationTests PatchComparisonTests.swift
+[38/55] Emitting module FirmwareIntegrationTests
+[39/55] Compiling FirmwarePatcherTests KernelcacheSwapTests.swift
+[40/55] Compiling FirmwarePatcherTests LessFilesystemAcceptanceTests.swift
+[41/55] Compiling FirmwarePatcherTests GuestPayloadInstallTests.swift
+[42/55] Compiling FirmwarePatcherTests ArtifactStructuredTests.swift
+[43/55] Emitting module FirmwarePatcherTests
+[44/55] Emitting module VPhoneLaunchpadKitTests
+[45/55] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+[46/55] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[47/55] Compiling vphone_cli VPhoneBuildInfo.swift
+[47/55] Write Objects.LinkFileList
+[50/57] Emitting module VPhoneCLITests
+[51/57] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/ExpectedBindingCLITests.swift:16:21: error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+14 |         let command = try VPhoneVMLaunchCommand.parse(["vm", "--expected-binding-sha256", snapshot.sha256,
+15 |                                                      "--expected-core-bundle", snapshot.binding.bundle])
+16 |         try command.validateExpectedBinding(snapshot)
+   |                     `- error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+17 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(nil) }
+18 |         try Data(#"{"bundle":"2.6.2"}"#.utf8).write(to: path)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/ExpectedBindingCLITests.swift:17:57: error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+15 |                                                      "--expected-core-bundle", snapshot.binding.bundle])
+16 |         try command.validateExpectedBinding(snapshot)
+17 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(nil) }
+   |                                                         `- error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+18 |         try Data(#"{"bundle":"2.6.2"}"#.utf8).write(to: path)
+19 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(VPhoneMachineBinding.snapshot(root)) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/ExpectedBindingCLITests.swift:17:81: error: 'nil' requires a contextual type
+15 |                                                      "--expected-core-bundle", snapshot.binding.bundle])
+16 |         try command.validateExpectedBinding(snapshot)
+17 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(nil) }
+   |                                                                                 `- error: 'nil' requires a contextual type
+18 |         try Data(#"{"bundle":"2.6.2"}"#.utf8).write(to: path)
+19 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(VPhoneMachineBinding.snapshot(root)) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/ExpectedBindingCLITests.swift:19:57: error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+17 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(nil) }
+18 |         try Data(#"{"bundle":"2.6.2"}"#.utf8).write(to: path)
+19 |         #expect(throws: (any Error).self) { try command.validateExpectedBinding(VPhoneMachineBinding.snapshot(root)) }
+   |                                                         `- error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+20 |         let wrongVersion = try VPhoneVMLaunchCommand.parse(["vm", "--expected-binding-sha256", snapshot.sha256,
+21 |                                                           "--expected-core-bundle", "2.6.2"])
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/ExpectedBindingCLITests.swift:22:62: error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+20 |         let wrongVersion = try VPhoneVMLaunchCommand.parse(["vm", "--expected-binding-sha256", snapshot.sha256,
+21 |                                                           "--expected-core-bundle", "2.6.2"])
+22 |         #expect(throws: (any Error).self) { try wrongVersion.validateExpectedBinding(snapshot) }
+   |                                                              `- error: value of type 'VPhoneVMLaunchCommand' has no member 'validateExpectedBinding'
+23 |     }
+24 | }
+[51/57] Linking vphone-cli
+[51/57] Linking vphone-vm
+error: fatalError

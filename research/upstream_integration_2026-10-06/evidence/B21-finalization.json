@@ -1,0 +1,487 @@
+{
+  "observations": [
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.1",
+        "--log-file",
+        "/private/tmp/vphone-b21-helper-verify-output.log"
+      ],
+      "returncode": 0,
+      "stdout": "{\n  \"cdhashes\" : {\n    \"vphone-cli\" : \"c18348ecd0bf87c70c6c3df4a9ac459d4ea2ba1c\",\n    \"vphone-vm\" : \"90fd3de15ad24187eff193b55038c65257ba2da5\"\n  },\n  \"installedAt\" : \"2026-10-08T23:38:03Z\",\n  \"sha256\" : \"651224d58064c59159e47b4a5fb066ca6dc758bdd221a346d43465cd34df5420\",\n  \"version\" : \"2.6.1\"\n}\n",
+      "stderr": "Verifying Core Bundle 2.6.1\nCore Bundle operation completed\n"
+    },
+    {
+      "command": [
+        "/usr/sbin/lsof",
+        "-t",
+        "--",
+        "/private/tmp/vphone-b21-helper-verify-output.log"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 0,
+      "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n\t<key>allow-root</key>\n\t<false/>\n\t<key>authenticate-user</key>\n\t<true/>\n\t<key>class</key>\n\t<string>user</string>\n\t<key>created</key>\n\t<real>813195315.73311198</real>\n\t<key>default-prompt</key>\n\t<dict>\n\t\t<key></key>\n\t\t<string>Install verified VPhone Core Bundles</string>\n\t</dict>\n\t<key>group</key>\n\t<string>admin</string>\n\t<key>identifier</key>\n\t<string>com.vphone.cli.helper</string>\n\t<key>modified</key>\n\t<real>813195315.73311198</real>\n\t<key>requirement</key>\n\t<string>identifier \"com.vphone.cli.helper\" and anchor apple generic and certificate leaf[subject.CN] = \"Apple Development: QingLiang Zhao (Y4CD942RX6)\" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>\n\t<key>session-owner</key>\n\t<false/>\n\t<key>shared</key>\n\t<false/>\n\t<key>timeout</key>\n\t<integer>300</integer>\n\t<key>tries</key>\n\t<integer>10000</integer>\n\t<key>version</key>\n\t<integer>1</integer>\n</dict>\n</plist>\n",
+      "stderr": "YES (0)\n"
+    },
+    {
+      "command": [
+        "/bin/launchctl",
+        "bootout",
+        "system",
+        "/Library/LaunchDaemons/com.vphone.cli.helper.plist"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "remove",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "YES (0)\n"
+    },
+    {
+      "command": [
+        "/bin/launchctl",
+        "print",
+        "system/com.vphone.cli.helper"
+      ],
+      "returncode": 113,
+      "stdout": "",
+      "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+    },
+    {
+      "command": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "NO (-60005)\n"
+    },
+    {
+      "command": [
+        "/usr/sbin/lsof",
+        "-t",
+        "--",
+        "/Library/PrivilegedHelperTools/com.vphone.cli.helper"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "lsof: status error on /Library/PrivilegedHelperTools/com.vphone.cli.helper: No such file or directory\nlsof 4.91\n latest revision: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/\n latest FAQ: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/FAQ\n latest man page: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/lsof_man\n usage: [-?abhlnNoOPRtUvVX] [+|-c c] [+|-d s] [+D D] [+|-f[cgG]]\n [-F [f]] [-g [s]] [-i [i]] [+|-L [l]] [+|-M] [-o [o]] [-p s]\n [+|-r [t]] [-s [p:s]] [-S [t]] [-T [t]] [-u s] [+|-w] [-x [fl]] [--] [names]\nUse the ``-h'' option to get more help information.\n"
+    }
+  ],
+  "success_install_accepted": true,
+  "cleanup_complete": true,
+  "install_result": {
+    "command": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B15/helper-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "install-bundle",
+      "--version",
+      "2.6.1",
+      "--archive",
+      "/private/tmp/vphone-b18-VPhone-2.6.1.zip",
+      "--sha256",
+      "651224d58064c59159e47b4a5fb066ca6dc758bdd221a346d43465cd34df5420",
+      "--log-file",
+      "/private/tmp/vphone-b21-helper-install-retry-output.log"
+    ],
+    "returncode": 0,
+    "stdout": "{\n  \"cdhashes\" : {\n    \"vphone-cli\" : \"c18348ecd0bf87c70c6c3df4a9ac459d4ea2ba1c\",\n    \"vphone-vm\" : \"90fd3de15ad24187eff193b55038c65257ba2da5\"\n  },\n  \"installedAt\" : \"2026-10-08T23:38:03Z\",\n  \"sha256\" : \"651224d58064c59159e47b4a5fb066ca6dc758bdd221a346d43465cd34df5420\",\n  \"version\" : \"2.6.1\"\n}\n",
+    "stderr": "Installing Core Bundle 2.6.1\nCore Bundle operation completed\n",
+    "seconds": 159.87173391703982,
+    "log_bytes": 61,
+    "log_sha256": "46cf81983621f20586bcf8830ff78ceecf8abb49769ca6a883e3514d35320f15",
+    "mode": "0o600",
+    "owner": 2035870432,
+    "log_text": "Installing Core Bundle 2.6.1\nCore Bundle operation completed\n",
+    "lsof_exit": 1,
+    "closed_after_return": true
+  },
+  "verified_receipt": {
+    "cdhashes": {
+      "vphone-cli": "c18348ecd0bf87c70c6c3df4a9ac459d4ea2ba1c",
+      "vphone-vm": "90fd3de15ad24187eff193b55038c65257ba2da5"
+    },
+    "installedAt": "2026-10-08T23:38:03Z",
+    "sha256": "651224d58064c59159e47b4a5fb066ca6dc758bdd221a346d43465cd34df5420",
+    "version": "2.6.1"
+  },
+  "verify_log_bytes": 60,
+  "verify_log_mode": "0o600",
+  "installed_inventory": {
+    "receipt.json": {
+      "bytes": 294,
+      "sha256": "f5f300e2560fb2c257695d657c82b7969ad8305fe778db884e7d3dc35d6b47b7",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Info.plist": {
+      "bytes": 1298,
+      "sha256": "142b64736ab3604e42fe8f4065133b088562e48f77d60890b2feadf73113ab2e",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 12544,
+      "sha256": "2234e05adadc7fdf99301d9cdc65a26e12346a0e96221687ce91d1d94e9caf7f",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 194,
+      "sha256": "95ee1ea7322019779e33cd6142ce873c7a3cfc5e99e20427648eb679a447b52e",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/MacOS/vphone-cli": {
+      "bytes": 20043808,
+      "sha256": "cb08e0480f943bebe0bca6f881deccd039336b680051e9e06512ebd91125b338",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/MacOS/vphone-vm": {
+      "bytes": 14887440,
+      "sha256": "24e516719c7773c4f975b6573532215df9bb1f7e6ea676f8d250e8dce4c04e5f",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/MacOS/libswiftCompatibilitySpan.vphone.dylib": {
+      "bytes": 187856,
+      "sha256": "0ab6d0b0f7c61ca9cd2eadea1ca356baae20e28e99588e8d1692146d4cddd539",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/MacOS/vphone-escalator": {
+      "bytes": 78928,
+      "sha256": "5895c0134329822c251901ccd07494c600135edc843fc12d6a0467bde12035e3",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/Info.plist": {
+      "bytes": 1150,
+      "sha256": "5096edb2174623ce25af55e10fe7933add45c59379d72d14553b4c9c41df99ac",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/_CodeSignature/CodeResources": {
+      "bytes": 4061,
+      "sha256": "187fc695d33b4ca03e7305502ba1939f427e827e743c8d8f626171ee4b3d1393",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/MacOS/vphone-location": {
+      "bytes": 133152,
+      "sha256": "97eb0821d06a1b0f7e79ee86d4024142cfd6c6912c74f7f67d7fbaf1d2783b3f",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/Resources/zh-Hans.lproj/InfoPlist.strings": {
+      "bytes": 812,
+      "sha256": "78d8bd0d758bd4ac93d1a902e5a3294623002cf43600e71d03806035cf50d506",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/Resources/ja.lproj/InfoPlist.strings": {
+      "bytes": 894,
+      "sha256": "942096da8bcc81d25a512bad6ef2af35219777e8a90f06358a8f33961881fb29",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/Resources/en.lproj/InfoPlist.strings": {
+      "bytes": 818,
+      "sha256": "32a29c9555e518869fe1905feddfd5e9a3c56b5abce2786dbb18dc8cec463873",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/Resources/ko.lproj/InfoPlist.strings": {
+      "bytes": 931,
+      "sha256": "d12271ccbd716ef6c9754921650a50daa51afcea6c3f5634a58d773fe14202a1",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Helpers/VPhoneLocation.app/Contents/Resources/vi.lproj/InfoPlist.strings": {
+      "bytes": 896,
+      "sha256": "4ac081a8bacbeaf15822a2d206574612259029995c6195ee8eb7b305eb438ce3",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/VPhonePatchKit": {
+      "bytes": 38334016,
+      "sha256": "70b2527ba8613c3c170913149dbb405f0790bac1efdc1cd4449d355b61900bfe",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/VPhonePatchKit": {
+      "bytes": 38334016,
+      "sha256": "70b2527ba8613c3c170913149dbb405f0790bac1efdc1cd4449d355b61900bfe",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 3876,
+      "sha256": "a49e497b2e6418e319e3a275414ffe35a10d3ba193cb1684c0d642e21411c83f",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 1290,
+      "sha256": "060d279d8e982a07b8ed2a3fe47f20c25fc16ba7d0966bf2cee523182ffd569e",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Headers/VPhonePatchKit-Swift.h": {
+      "bytes": 12877,
+      "sha256": "873980d9c9268a3be68bd6dd9ec57428312bbdb8c67be2f6047ce4a85f86e4b8",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/module.modulemap": {
+      "bytes": 70,
+      "sha256": "fe166907b1cfdd90192d5780f652cc70d556419a3e6f95a9e1dc1abd383ea9e5",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/VPhonePatchKit.swiftmodule/arm64-apple-macos.swiftinterface": {
+      "bytes": 35690,
+      "sha256": "c476b856d378ac125ebcffa72a740d0cd83d2858dc01b5feadf0e603a4a37e1d",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/VPhonePatchKit.swiftmodule/arm64-apple-macos.swiftdoc": {
+      "bytes": 68620,
+      "sha256": "2c78a31cd4768f13c39c7ccdbe46c850467cbf6a3488522928955a9d66154a01",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/VPhonePatchKit.swiftmodule/arm64-apple-macos.swiftmodule": {
+      "bytes": 247772,
+      "sha256": "8c921131c73b09e58bd82dc1f178523443d12aaf7e212360a6871fec4ce63f36",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/VPhonePatchKit.swiftmodule/arm64-apple-macos.abi.json": {
+      "bytes": 936131,
+      "sha256": "879a7ee30ea68cf78b8c0faca4ec264034cfb5cab7d0faede45feccd81bfcbc7",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/VPhonePatchKit.swiftmodule/arm64-apple-macos.private.swiftinterface": {
+      "bytes": 35690,
+      "sha256": "c476b856d378ac125ebcffa72a740d0cd83d2858dc01b5feadf0e603a4a37e1d",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Frameworks/VPhonePatchKit.framework/Versions/A/Modules/VPhonePatchKit.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo": {
+      "bytes": 109076,
+      "sha256": "e1ceb0d21c9da1e88b33ce0b0c8f0a7d87b54c5d51b2c40e6d69068c7ddbb47c",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/zh-Hans.lproj/Localizable.strings": {
+      "bytes": 83199,
+      "sha256": "05d34766e0dfb4da1286889378ac43ce8de2e62fbe59b3630a9b3e6899821f96",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/zh-Hans.lproj/InfoPlist.strings": {
+      "bytes": 812,
+      "sha256": "78d8bd0d758bd4ac93d1a902e5a3294623002cf43600e71d03806035cf50d506",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/ja.lproj/Localizable.strings": {
+      "bytes": 96611,
+      "sha256": "593725c21ff7f62fd6e75af5873e93ab1860b61c1d8f395938f1faacf560e5c5",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/ja.lproj/InfoPlist.strings": {
+      "bytes": 894,
+      "sha256": "942096da8bcc81d25a512bad6ef2af35219777e8a90f06358a8f33961881fb29",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/en.lproj/Localizable.strings": {
+      "bytes": 43184,
+      "sha256": "580c7240021cbb2ee17d955d29cd6628743b498d4ee4a82532bb50391f9ba9b7",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/en.lproj/InfoPlist.strings": {
+      "bytes": 818,
+      "sha256": "32a29c9555e518869fe1905feddfd5e9a3c56b5abce2786dbb18dc8cec463873",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libAppleParavirtCompilerPluginIOGPUFamily.dylib": {
+      "bytes": 71216,
+      "sha256": "903f2a449851586b579e74a7f08446af997da4fccb7014b31cf5e9dab10bb458",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/launchdhook-vphone.dylib": {
+      "bytes": 86400,
+      "sha256": "3b7bad85d54724669bee98c0e24f9eede617b45578a5dd7d6ee093dbcc897091",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/vphoned.plist": {
+      "bytes": 630,
+      "sha256": "e1ca8cbd6fe37bc4062a80d8d434bf4b653f42ce2b4efb5e4bb01cf23d1ea3b4",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/vphoned": {
+      "bytes": 9080736,
+      "sha256": "16df3ce9e5105d4ba2eb29e1c9f691ef5b1c32ecaedc3f9410061e477dc26524",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/SystemHook-vphone.dylib": {
+      "bytes": 86880,
+      "sha256": "799df93ce87643708f538395d9cde9f7d09dd99e442bd48128bca2f519568534",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libhapticsfix.dylib": {
+      "bytes": 68640,
+      "sha256": "e5178d9f182cb02c163cf8c975a7e25d4e6df2b0c315a72f1398d5213c2ef468",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libbatteryhealthfix.dylib": {
+      "bytes": 104592,
+      "sha256": "c1f03fa94b51cf1c481bca7e00da171878af1771050a1bf4c843116266258771",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libcamfix.dylib": {
+      "bytes": 140560,
+      "sha256": "3b68cc76eeb93d0b1946d0830e7d9ad37b1056a96d7d598044cf53ee3b9a6b01",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libvcamcaptured.dylib": {
+      "bytes": 159744,
+      "sha256": "751b8b0ced847ca80f41f06abac97ad7cbcb60cb7bbbfba7bfe4ec10390695fc",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libmisfix.plist": {
+      "bytes": 1111,
+      "sha256": "7a2edd940a259d3eae402bdb953cdd5f0ee291f13d00e0c931bde72ca46cf7af",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libcamfix.plist": {
+      "bytes": 302,
+      "sha256": "cf1a36743a0151428b5da62ec411f246f161cd35b12ce5241f75b82fe3d8fa3d",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libvcamcaptured.plist": {
+      "bytes": 305,
+      "sha256": "7fbfdc2b371565d7b34876db271ff89075a483ca5054908b0f4a58ad6d1ef678",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/libmisfix.dylib": {
+      "bytes": 106848,
+      "sha256": "cee27dd38a6b0caf74b2d19861e556d94e8c66257dcd50387217694f1daccae6",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/ko.lproj/Localizable.strings": {
+      "bytes": 90202,
+      "sha256": "6c26e80093a67351f1142dce72f6133612eccede81ebefa4a24868fc45a79031",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/ko.lproj/InfoPlist.strings": {
+      "bytes": 931,
+      "sha256": "d12271ccbd716ef6c9754921650a50daa51afcea6c3f5634a58d773fe14202a1",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/vi.lproj/Localizable.strings": {
+      "bytes": 90832,
+      "sha256": "bf8bf1f7dd4cf2afc76a6fc419bed29fbb4e42065122a3b012312470a01534da",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/vi.lproj/InfoPlist.strings": {
+      "bytes": 896,
+      "sha256": "4ac081a8bacbeaf15822a2d206574612259029995c6195ee8eb7b305eb438ce3",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/patches_presets/standard.plist": {
+      "bytes": 4904,
+      "sha256": "b1441a3fb13ad161248b9034644e168e2ba0f67703251320be20de6f513de6d6",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/patches_presets/experimental.plist": {
+      "bytes": 2787,
+      "sha256": "de90832c87b95ed10801d769ec4dfdf9db0bac0c2b1901f0f21f631e8c531993",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/VPhoneVirtIOSound.driver/VPhoneVirtIOSound": {
+      "bytes": 185936,
+      "sha256": "339648f12e87922d2503d239fd72be4df0aabe0f46d8904fdfd7fe5cac5d93a4",
+      "uid": 0,
+      "mode": "0o755"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/VPhoneVirtIOSound.driver/Info.plist": {
+      "bytes": 1447,
+      "sha256": "3896a74fddcadf1d851003d679b8f2d8ad198964aaab05ecc875d99db04cb612",
+      "uid": 0,
+      "mode": "0o644"
+    },
+    "VPhone.bundle/Contents/Resources/guest-resources/VPhoneVirtIOSound.driver/_CodeSignature/CodeResources": {
+      "bytes": 1798,
+      "sha256": "1be83a9e20587b256d76febd57d84c3670fb33df617303384fbc4318c5184faf",
+      "uid": 0,
+      "mode": "0o644"
+    }
+  },
+  "original_absent_baseline_restored": true,
+  "administrator_rule_never_weakened": true,
+  "upstream_VM_or_CLI_executed": false,
+  "VM_new_started": false
+}

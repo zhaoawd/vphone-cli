@@ -123,21 +123,24 @@ public final class VPhoneLaunchpadCommandHistory {
 
 // MARK: - vphone-cli
 
-/// Runs the embedded `vphone-cli` by absolute path. Nothing here goes through
-/// a shell or `$PATH`.
+/// Runs the verified embedded CLI for library operations. Bound VM launches
+/// use the ordinary launcher and their exact root-owned Core Bundle CLI.
+/// Every executable is selected by absolute path; no shell or PATH lookup.
 @MainActor
 public struct VPhoneLaunchpadCommandLine {
     public let executable: URL
     public let history: VPhoneLaunchpadCommandHistory
     private let logsDirectory: URL?
+    private let launcher: URL?
 
     /// The only public way in: a verified embedded toolchain.
     public init(toolchain: VPhoneLaunchpadToolchain, history: VPhoneLaunchpadCommandHistory) {
-        self.init(executable: toolchain.executable, history: history, logsDirectory: VPhoneLaunchpadIdentity.logsDirectory())
+        self.init(executable: toolchain.executable, history: history, logsDirectory: VPhoneLaunchpadIdentity.logsDirectory(), launcher: toolchain.launcher)
     }
 
     /// Test seam for stand-in executables; not reachable from the app.
-    init(executable: URL, history: VPhoneLaunchpadCommandHistory, logsDirectory: URL? = nil) {
+    init(executable: URL, history: VPhoneLaunchpadCommandHistory, logsDirectory: URL? = nil, launcher: URL? = nil) {
+        self.launcher = launcher
         self.logsDirectory = logsDirectory
         self.executable = executable
         self.history = history
@@ -200,11 +203,23 @@ public struct VPhoneLaunchpadCommandLine {
         _ arguments: [String],
         logFile: URL,
         preamble: String? = nil,
+        machine: URL? = nil,
         onLine: @escaping @Sendable (String) -> Void
     ) throws -> VPhoneLaunchpadChildProcess {
+        let route = try machine.map { try VPhoneLaunchpadLaunchRoute.resolve(embedded: executable, launcher: launcher, machine: $0, arguments: arguments) }
+        if let snapshot = route?.snapshot, let machine, !snapshot.matches(machine) {
+            throw VPhoneLaunchpadError("VM binding changed before launch; no process was started.")
+        }
         let entry = history.record(Self.display(arguments))
-        let child = try VPhoneLaunchpadChildProcess(
-            executable: executable, arguments: arguments, logFile: logFile, preamble: preamble, onLine: onLine)
+        let child: VPhoneLaunchpadChildProcess
+        do {
+            child = try VPhoneLaunchpadChildProcess(
+                executable: route?.executable ?? executable, arguments: route?.arguments ?? arguments,
+                logFile: logFile, preamble: preamble, onLine: onLine)
+        } catch {
+            history.finish(entry, status: -1, outputDrained: false)
+            throw error
+        }
         let history = history
         Task {
             let completion = await child.waitForCompletion()

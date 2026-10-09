@@ -20,26 +20,28 @@ enum APIWire {
     }
 
     static func execute(_ request: APIRequest) -> APIReply {
-        do {
-            let result = try GuestAPI.execute(method: request.method, params: request.params)
-            return .json(["type": "response", "id": request.id ?? NSNull(), "result": result])
-        } catch {
-            let (code, message): (String, String) =
-                if let error = error as? IcliError {
-                    (error.code, error.message)
+        autoreleasepool { () -> APIReply in
+            do {
+                let result = try GuestAPI.execute(method: request.method, params: request.params)
+                return .json(["type": "response", "id": request.id ?? NSNull(), "result": result])
+            } catch {
+                let (code, message): (String, String) =
+                    if let error = error as? IcliError {
+                        (error.code, error.message)
+                    } else {
+                        (error is GuestAPIError ? "invalid_operation" : "operation_failed", String(describing: error))
+                    }
+                let details: [String: Any]?
+                if let icli = error as? IcliError, case let .commandFailed(output) = icli {
+                    details = output
                 } else {
-                    (error is GuestAPIError ? "invalid_operation" : "operation_failed", String(describing: error))
+                    details = nil
                 }
-            let details: [String: Any]?
-            if let icli = error as? IcliError, case let .commandFailed(output) = icli {
-                details = output
-            } else {
-                details = nil
+                return .json(status: 400, [
+                    "type": "response", "id": request.id ?? NSNull(),
+                    "error": GuestOperationFailure.response(code: code, message: message, details: details),
+                ])
             }
-            return .json(status: 400, [
-                "type": "response", "id": request.id ?? NSNull(),
-                "error": GuestOperationFailure.response(code: code, message: message, details: details),
-            ])
         }
     }
 

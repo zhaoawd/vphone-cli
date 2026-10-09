@@ -1,10 +1,35 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区未修改，现有 VM 未操作。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见下方 B21 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
-## 结果与范围
+## 当前结果（2026-10-09 B21）
+
+本轮选定 T02–T08、T24、T40、T46 共10项，新增验收完成 T03/T04/T05；其余7项未满足完整接受条件。47项中5项accepted，41项必选尚未完成，T45可选延期。基础项目独立验收依据原方案“基础修复可单独验收”；342提交的全局语义核对保持未完成。
+
+| 任务 | 结果 | 未完成范围 |
+| --- | --- | --- |
+| T03 | 65文件实际恢复一致；恢复副本启动、通信、Settings前台及SystemVersion摘要通过；正常停机退出0 | 同卷APFS写时复制不提供离盘故障保护；本EXP样本不代表五模式全组合 |
+| T04 | 已有LC_UUID保留决定保持；签名、边界和最终产物检查通过 | 空间不足仍拒绝；不引入UUID回收 |
+| T05 | 多语言、路径/链接保护、坏包及目标保留、归档互操作通过；真实CLI ustar UID/GID0往返通过 | 完整64GiB VM归档导入/导出未执行 |
+| T02 | 实际路径与已审查能力处置更新 | 303提交仍pending_semantic_review，不按标题或路径判定等价 |
+| T06 | 六组8/16KiB边界通过 | 1MiB间歇下载停在917504字节；8MiB慢读/提前断线矩阵未完成；原因未查明 |
+| T07 | 真实proxy/worker退出及重启通过；未确认缓存spawn失败返回launchd修复通过 | 完整升级确认及daemon组合未验收 |
+| T08 | 固定pin、构建和运行hash一致；40次launchd查询FD保持18 | 20次截图footprint约87→465MB；操作自动释放池未解决增长；位置返回400，RootHide/timezone矩阵待验 |
+| T24 | 普通launcher、本地受控CLI、跨进程SHA/版本核对、未知VM协议拒绝、位置权限说明通过 | TCC真实责任链及依赖闭包；不执行会自动更新guest和扩大权限的官方CLI |
+| T40 | 绑定经过launcher与本地wrapper冻结；旧官方Bundle并存证据保留 | 合法本地CoreBundle缺escalator、真实绑定启动、创建全流程和四层来源矩阵 |
+| T46 | 真正helper安装/独立verify成功，61/60字节0600日志完整且关闭 | 完整UI即时退出、detached/create/后代writer和吞吐矩阵 |
+
+独立审查发现4项Important，已在一轮修复中处理：执行sealed本地CLI而非官方CLI；传递预期binding SHA/版本；未知VM受控协议在preflight前拒绝；用无TTY真实子进程测试核验四种停止信号转发、最后输出和等待退出。没有声称完成第二次独立审查。审查者误尝试了含loopback的既有fixture，已停止，结果未用于完整验收。
+
+原始编译日志包含尾随空白，按原文保存并核对摘要。源码、文档及非日志证据的暂存差异空白检查通过。
+
+Python578项通过。首轮标准Swift1251项有1个新增fixture未满足5秒就绪条件；保留失败，并行运行时的启动时限原因尚未完全确定。将该测试加入既有计时组，原5/3秒时限不变；最终标准Swift常规1250项、计时6项、XCTest254项/3skip通过。四种停止信号红测试另复现三种信号留下VM stand-in；修复后四组通过。第二次标准Swift运行的归档清理断言失败：测试使用共享临时目录，观察到其他测试的staging文件。用无关标记稳定复现后改为专用归档父目录，保留清理断言；7项定向测试与最终标准入口通过。首次信号红测试因输出读取等待孤儿进程而阻塞，仅结束精确匹配的测试运行器和stand-in，随后改为先检查子进程退出再读尾部，保留清理记录。操作自动释放池已通过真实ObjC临时对象成功/异常路径测试。实际截图增长在修复候选上仍复现，不能宣称泄漏已修复。生产classic daemon、256字节/v3相机和原VM关键摘要保持；现代API_ONLY只在恢复副本的隔离目录运行。原VM和恢复副本均停机、磁盘释放；临时helper、授权项、AMFI驱动及debugserver均不存在，token已删除。AMFI清理脚本出现一次断言失败；后续独立readback确认进程和debugserver不存在、系统amfid由launchd管理，未将断言失败当作正常detach。
+
+新宿主诊断候选CDHash `4cea360ca924a4c651a12aae7755545b492a59b6`、SHA256 `1d21a984f4621fcc291ebc6d48bc572ec1c316752183dbcf40469a7778a4eb80`已冻结，仅增加socket类型和字节计数。精确临时AMFI范围授权待回复，未启动该候选。权限请求依据executing-plans对security-sensitive action的要求；此前授权仅覆盖B16哈希。无持久安全设置修改。证据入口：`evidence/B21-summary.json`、`evidence/B21-source-review.json`、`evidence/B21-full-tests.log`、`evidence/B21-final-swift-retry.log`、`evidence/B21-final-readback.json`。
+
+## 初始结果与范围（2026-10-06，历史记录）
 
 | 任务 | 当前结果 | 限制 |
 | --- | --- | --- |

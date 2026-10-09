@@ -1,0 +1,114 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/8] Write vphone-launchpad-launcher-entitlement.plist
+[3/20] Write sources
+[5/46] Write swift-version--58304C5D6DBC2206.txt
+[6/48] Compiling limera1n.c
+[7/48] Compiling mbn.c
+[7/48] Compiling ftab.c
+[9/48] Compiling ace3.c
+[10/48] Compiling img3.c
+[11/48] Compiling img4.c
+[12/48] Compiling dfu.c
+[13/48] Compiling download.c
+[13/48] Compiling normal.c
+[15/48] Compiling fdr.c
+[16/48] Compiling recovery.c
+[17/48] Compiling asr.c
+[18/48] Compiling ipsw.c
+[19/48] Compiling log.c
+[20/48] Compiling fls.c
+[21/48] Compiling deviceinterfaced.c
+[22/48] Compiling locking.c
+[24/48] Emitting module VPhoneBundleStore
+[25/48] Compiling VPhoneBundleStore VPhoneLaunchpadLauncherRequest.swift
+[25/48] Compiling vphone_zip_stub.c
+[26/48] Compiling common.c
+[27/48] Compiling restore.c
+[28/48] Compiling idevicerestore.c
+[29/48] Compiling vphone_restore_bridge.c
+[30/48] Compiling MobileRecoveryCore libirecovery.c
+[31/56] Write Objects.LinkFileList
+[33/58] Compiling VPhoneLaunchpadLauncherEntry VPhoneLaunchpadLauncherProcess.swift
+[34/58] Emitting module VPhoneLaunchpadLauncherEntry
+[35/58] Compiling VPhoneLaunchpadLauncherEntry main.swift
+[35/58] Write Objects.LinkFileList
+[37/58] Emitting module VPhoneHelperKit
+[38/58] Compiling VPhoneHelperKit VPhoneHelperService.swift
+[38/58] Write Objects.LinkFileList
+[39/58] Linking vphone-launchpad-launcher
+[40/62] Applying vphone-launchpad-launcher
+[41/62] Linking vphone-launchpad
+[42/62] Linking vphone-helper
+[43/62] Applying vphone-launchpad
+[44/62] Applying vphone-helper
+[46/62] Compiling vphone_cli VPhoneVMBindingCLI.swift
+[47/62] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[48/62] Compiling VPhoneLaunchpadKitTests CoreBundleTests.swift
+[49/62] Emitting module VPhoneLaunchpadKitTests
+[50/62] Emitting module VPhoneBundleStoreTests
+[51/62] Compiling VPhoneBundleStoreTests LauncherPolicyTests.swift
+[52/62] Compiling VPhoneBundleStoreTests CoreBundleStoreTests.swift
+[53/62] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[54/62] Compiling vphone_cli VPhoneCoreBundleCLI.swift
+[54/62] Write Objects.LinkFileList
+[57/62] Linking vphone-cli
+[58/62] Linking vphone-vm
+[59/62] Applying vphone-cli
+[60/62] Applying vphone-vm
+[61/62] Linking vphone-cliPackageTests
+Build complete! (9.55s)
+Test Suite 'Selected tests' started at 2026-10-09 07:40:02.380.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 07:40:02.383.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 07:40:02.383.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 07:40:02.383.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite LauncherPolicyTests started.
+◇ Test refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test refusesLegacyVersionBeforeFilesystemAccess() started.
+◇ Test refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument arguments → [] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test permitsOnlyTheStoreCLIAndVMLaunch() started.
+◇ Test permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument path → "/usr/bin/true" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", ""] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "create", "machine"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["helper", "register"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "--headless"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument path → "/tmp/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "machine", "\0"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/../2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles//2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-vm" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument version → "2.6.1-local.12345678" to permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument version → "2.6.1-ci.1234567" to permitsValidBuildNames(version:) started.
+✔ Test permitsOnlyTheStoreCLIAndVMLaunch() passed after 0.002 seconds.
+✔ Test refusesLegacyVersionBeforeFilesystemAccess() passed after 0.002 seconds.
+✔ Test refusesOtherVerbsAndInvalidArguments(arguments:) with 7 test cases passed after 0.002 seconds.
+✔ Test permitsValidBuildNames(version:) with 2 test cases passed after 0.002 seconds.
+✔ Test refusesOtherAndNoncanonicalPaths(path:) with 5 test cases passed after 0.002 seconds.
+✔ Suite LauncherPolicyTests passed after 0.002 seconds.
+✔ Test run with 5 tests in 1 suite passed after 0.003 seconds.

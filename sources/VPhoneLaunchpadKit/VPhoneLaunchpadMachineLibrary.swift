@@ -271,7 +271,7 @@ public final class VPhoneLaunchpadMachineLibrary {
         }
         panicked.remove(machine)
         do {
-            let child = try commandLine.start(arguments, logFile: log, preamble: preamble) { [weak self] line in
+            let child = try commandLine.start(arguments, logFile: log, preamble: preamble, machine: machine.url) { [weak self] line in
                 if VPhoneLaunchpadConsoleLog.isPanic(line) {
                     Task { @MainActor in self?.panicked.insert(machine) }
                 }

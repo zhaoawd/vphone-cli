@@ -1,0 +1,35 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[6/7] Emitting module VPhoneCLITests
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (4.24s)
+Test Suite 'Selected tests' started at 2026-10-09 08:25:27.454.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 08:25:27.455.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 08:25:27.455.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 08:25:27.455.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VMLaunchDiagnosticsTests started.
+◇ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 2 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 15 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+✘ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) recorded an issue with 1 argument stopSignal → 15 at VMLaunchDiagnosticsTests.swift:104:9: Expectation failed: (kill(vmPID, 0) == -1 → false) && (errno == ESRCH → <not evaluated>)
+◇ Test case passing 1 argument stopSignal → 1 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+✘ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) recorded an issue with 1 argument stopSignal → 1 at VMLaunchDiagnosticsTests.swift:104:9: Expectation failed: (kill(vmPID, 0) == -1 → false) && (errno == ESRCH → <not evaluated>)
+◇ Test case passing 1 argument stopSignal → 3 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+✘ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) recorded an issue with 1 argument stopSignal → 3 at VMLaunchDiagnosticsTests.swift:104:9: Expectation failed: (kill(vmPID, 0) == -1 → false) && (errno == ESRCH → <not evaluated>)
+✘ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) with 4 test cases failed after 8.148 seconds with 3 issues.
+✘ Suite VMLaunchDiagnosticsTests failed after 8.148 seconds with 3 issues.
+↳ /// `vm launch` end to end with stand-ins: a copy of the debug `vphone-cli`, a
+↳ /// stub `vphone-vm` next to it, a stub `boot_host_preflight.sh` under a
+↳ /// temporary resource base and a temporary library root. No VM is booted and
+↳ /// `~/.vphone/VMs` is not touched.
+✘ Test run with 1 test in 1 suite failed after 8.148 seconds with 3 issues.

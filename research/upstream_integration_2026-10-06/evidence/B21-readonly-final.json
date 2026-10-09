@@ -1,0 +1,104 @@
+{
+  "observations": [],
+  "methods": {
+    "display.rotation": {
+      "status": 200,
+      "response_bytes": 118,
+      "response_sha256": "93ce7d3cbca145a177e40dea0c25c7590269377d985a2a56b472353b6807780d",
+      "value": {
+        "id": "b21-readonly",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    "services.status": {
+      "status": 200,
+      "response_bytes": 275,
+      "response_sha256": "71cf0c88407810a2c2076758690f034c9677ef4ef7074fb1fd2833acc341522a",
+      "value": {
+        "id": "b21-readonly",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 38,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      }
+    },
+    "device.snapshot": {
+      "status": 200,
+      "response_bytes": 580,
+      "response_sha256": "1cfb670a08613d8627bf75313940183d02ee3788c415e3e2447eb24ea541c964"
+    },
+    "files.read": {
+      "status": 200,
+      "response_bytes": 11193,
+      "response_sha256": "6057fbae04ad419aa0b5342a07f4ae401c9279a260b7e36937ca00a064b2b1af"
+    },
+    "location.current": {
+      "status": 400,
+      "response_bytes": 106,
+      "response_sha256": "e53aa7bc2468f45b521dc57b049835e57b78293331f79d8bf98068e06e0ec70d"
+    }
+  },
+  "health_after": {
+    "api_version": 1,
+    "binary_hash": "ce5884b8a1c0ab361c16033783ba750da32b3bce2c411a4c56b75bd6780d803e",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "964E24B7-56B5-4025-B35A-E7D80577341A",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "status": "ok"
+  }
+}

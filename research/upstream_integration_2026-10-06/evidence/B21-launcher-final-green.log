@@ -1,0 +1,236 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/44] Write sources
+[6/44] Write swift-version--58304C5D6DBC2206.txt
+[7/43] Compiling limera1n.c
+[8/43] Compiling normal.c
+[8/43] Compiling recovery.c
+[10/43] Compiling asr.c
+[11/43] Compiling fdr.c
+[12/43] Compiling ipsw.c
+[13/43] Compiling download.c
+[14/43] Compiling img4.c
+[15/43] Compiling img3.c
+[16/43] Compiling mbn.c
+[17/43] Compiling ace3.c
+[18/43] Compiling dfu.c
+[19/43] Compiling ftab.c
+[20/43] Compiling fls.c
+[21/43] Compiling log.c
+[22/43] Compiling locking.c
+[23/43] Compiling deviceinterfaced.c
+[24/43] Compiling restore.c
+[25/43] Compiling vphone_zip_stub.c
+[26/43] Compiling common.c
+[27/43] Compiling vphone_restore_bridge.c
+[28/43] Compiling idevicerestore.c
+[29/43] Compiling MobileRecoveryCore libirecovery.c
+[31/43] Compiling VPhoneLaunchpadKit VPhoneLaunchpadLaunchRoute.swift
+[32/43] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCommandLine.swift
+[33/45] Emitting module VPhoneLaunchpadKit
+[33/46] Write Objects.LinkFileList
+[34/48] Linking vphone-launchpad
+[35/48] Applying vphone-launchpad
+[37/48] Emitting module VPhoneLaunchpadKitTests
+[38/48] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+[39/48] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[40/48] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[41/49] Compiling vphone_cli VPhoneVMCLI.swift
+[41/49] Write Objects.LinkFileList
+[44/88] Emitting module VPhoneCLITests
+[45/88] Compiling VPhoneCLITests APIProxyCLITests.swift
+[46/88] Compiling VPhoneCLITests ArchiveCLITests.swift
+[47/88] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[48/88] Compiling VPhoneCLITests CFWInvocationTests.swift
+[49/88] Compiling VPhoneCLITests CameraWriteLeaseTests.swift
+[50/88] Compiling VPhoneCLITests ClipboardEventRoutingTests.swift
+[50/93] Linking vphone-cli
+[51/93] Linking vphone-vm
+[52/93] Applying vphone-cli
+[53/93] Applying vphone-vm
+[55/93] Compiling VPhoneCLITests NativeTransferCLITests.swift
+[56/93] Compiling VPhoneCLITests PatchComponentResultTests.swift
+[57/93] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[58/93] Compiling VPhoneCLITests PatchSelectionFileMigrationTests.swift
+[59/93] Compiling VPhoneCLITests RestoreInspectCLITests.swift
+[60/93] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[61/93] Compiling VPhoneCLITests GuestShutdownTests.swift
+[62/93] Compiling VPhoneCLITests GuestTransportTests.swift
+[63/93] Compiling VPhoneCLITests HardwareKeyboardCLITests.swift
+[64/93] Compiling VPhoneCLITests HelperCLITests.swift
+[65/93] Compiling VPhoneCLITests SignCLITests.swift
+[66/93] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[67/93] Compiling VPhoneCLITests TouchRouteTests.swift
+[68/93] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[69/93] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[70/93] Compiling VPhoneCLITests HostLocationReuseTests.swift
+[71/93] Compiling VPhoneCLITests HostRPCTests.swift
+[72/93] Compiling VPhoneCLITests LocationValidationTests.swift
+[73/93] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[74/93] Compiling VPhoneCLITests NativeRestoreCLITests.swift
+[75/93] Compiling VPhoneCLITests ClipboardFocusTests.swift
+[76/93] Compiling VPhoneCLITests ClipboardMacWriterTests.swift
+[77/93] Compiling VPhoneCLITests ClipboardShortcutTests.swift
+[78/93] Compiling VPhoneCLITests CoreBundleCLITests.swift
+[79/93] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[80/93] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[81/93] Compiling VPhoneCLITests HostAPICommandTests.swift
+[82/93] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[83/93] Compiling VPhoneCLITests HostCommandServiceTests.swift
+[84/93] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[85/93] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[86/93] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[87/93] Compiling VPhoneCLITests DoctorCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[88/93] Compiling VPhoneCLITests DyldMaxSlideOptionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[89/93] Compiling VPhoneCLITests FWPlanDuplicateSelectionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[90/93] Compiling VPhoneCLITests GuestCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[91/93] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[91/93] Write Objects.LinkFileList
+[92/93] Linking vphone-cliPackageTests
+Build complete! (13.76s)
+Test Suite 'Selected tests' started at 2026-10-09 08:02:39.904.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 08:02:39.905.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 08:02:39.905.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 08:02:39.905.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputCompletionTests started.
+◇ Suite LauncherPolicyTests started.
+◇ Suite LaunchRouteTests started.
+◇ Suite ToolchainTests started.
+◇ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() started.
+◇ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() started.
+◇ Test refusesLegacyVersionBeforeFilesystemAccess() started.
+◇ Test boundMachineWithoutLauncherRefuses() started.
+◇ Test spawnFailureFinishesHistoryAndClosesLog() started.
+◇ Test releaseBundleReceivesOnlySupportedCLIArguments() started.
+◇ Test refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test permitsOnlyTheStoreCLIAndVMLaunch() started.
+◇ Test livePipeDeliversLinesBeforeWriterCloses() started.
+◇ Test exitZeroWithReadFailureIsNotACompleteCommand() started.
+◇ Test invalidBindingRefusesWithoutEmbeddedFallback() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test boundMachineUsesLauncherAndExactVersion() started.
+◇ Test refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test permitsValidBuildNames(version:) started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test logCreationFailureDoesNotLeaveRunningHistory() started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test missingBindingKeepsEmbeddedDevelopmentToolchain() started.
+◇ Test case passing 1 argument arguments → [] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test case passing 1 argument arguments → ["vm", "launch"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "--headless"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", ""] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "create", "machine"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["helper", "register"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "machine", "\0"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument version → "2.6.1-local.12345678" to permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument path → "/usr/bin/true" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/tmp/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument version → "2.6.1-ci.1234567" to permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/../2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles//2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-vm" to refusesOtherAndNoncanonicalPaths(path:) started.
+✔ Test permitsOnlyTheStoreCLIAndVMLaunch() passed after 1.554 seconds.
+✔ Test refusesLegacyVersionBeforeFilesystemAccess() passed after 1.555 seconds.
+✔ Test refusesOtherVerbsAndInvalidArguments(arguments:) with 7 test cases passed after 1.555 seconds.
+✔ Test permitsValidBuildNames(version:) with 2 test cases passed after 1.555 seconds.
+✔ Test refusesOtherAndNoncanonicalPaths(path:) with 5 test cases passed after 1.555 seconds.
+✔ Test releaseBundleReceivesOnlySupportedCLIArguments() passed after 1.593 seconds.
+✔ Test boundMachineUsesLauncherAndExactVersion() passed after 1.593 seconds.
+✔ Test boundMachineWithoutLauncherRefuses() passed after 1.594 seconds.
+✔ Test invalidBindingRefusesWithoutEmbeddedFallback() passed after 1.593 seconds.
+✔ Test missingBindingKeepsEmbeddedDevelopmentToolchain() passed after 1.593 seconds.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 1.595 seconds.
+✔ Test logCreationFailureDoesNotLeaveRunningHistory() passed after 1.595 seconds.
+✔ Suite LauncherPolicyTests passed after 1.595 seconds.
+✔ Test rejectsMissingNestedApp() passed after 1.595 seconds.
+✔ Suite LaunchRouteTests passed after 1.595 seconds.
+✔ Test spawnFailureFinishesHistoryAndClosesLog() passed after 1.595 seconds.
+✔ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() passed after 1.595 seconds.
+✔ Test exitZeroWithReadFailureIsNotACompleteCommand() passed after 1.595 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 1.620 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 1.622 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 1.622 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 1.628 seconds.
+✔ Test rejectsModifiedNestedExecutable() passed after 1.635 seconds.
+✔ Test livePipeDeliversLinesBeforeWriterCloses() passed after 1.647 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 1.689 seconds.
+✔ Test cdhashMatchesCodesign() passed after 1.811 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 2.070 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 2.091 seconds.
+✔ Suite ToolchainTests passed after 2.091 seconds.
+✔ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() passed after 2.662 seconds.
+✔ Suite OutputCompletionTests passed after 2.662 seconds.
+✔ Test run with 27 tests in 4 suites passed after 2.662 seconds.

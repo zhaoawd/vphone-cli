@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b21-rpc-rest.py", line 7, in <module>
+    rpc('display.rotation');rpc('location.current')
+                            ~~~^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 27, in rpc
+AssertionError: {'method': 'location.current', 'operation_may_continue': True, 'ok': False, 'code': 'api_timeout', 'error': 'api_timeout'}

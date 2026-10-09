@@ -1,0 +1,72 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling vphone_zip_stub.c
+[5/37] Compiling log.c
+[5/37] Compiling deviceinterfaced.c
+[5/37] Compiling locking.c
+[5/37] Compiling fls.c
+[6/37] Compiling common.c
+[10/37] Compiling idevicerestore.c
+[11/37] Compiling asr.c
+[11/37] Compiling fdr.c
+[13/37] Compiling download.c
+[14/37] Compiling recovery.c
+[15/37] Compiling ipsw.c
+[16/37] Compiling normal.c
+[17/37] Compiling img3.c
+[18/37] Compiling limera1n.c
+[19/37] Compiling dfu.c
+[20/37] Compiling img4.c
+[21/37] Compiling restore.c
+[22/37] Compiling ace3.c
+[23/37] Compiling ftab.c
+[24/37] Compiling mbn.c
+[25/37] Compiling vphone_restore_bridge.c
+[27/37] Emitting module VPhoneBundleStoreTests
+[28/37] Compiling VPhoneBundleStoreTests LauncherPolicyTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift:9:27: error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+ 7 | 
+ 8 |     @Test func permitsOnlyTheStoreCLIAndVMLaunch() throws {
+ 9 |         let request = try VPhoneLaunchpadLauncherRequest(executable: target, arguments: ["vm", "launch", "machine", "--headless"])
+   |                           `- error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+10 |         #expect(request.version == "2.6.1")
+11 |         #expect(request.arguments == ["vm", "launch", "machine", "--headless"])
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift:16:49: error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+14 |     @Test(arguments: ["/usr/bin/true", "/tmp/vphone-cli", "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/../2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli", "/Library/Application Support/vphone-launchpad/Bundles//2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli", "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-vm"])
+15 |     func refusesOtherAndNoncanonicalPaths(path: String) {
+16 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest(executable: path, arguments: ["vm", "launch", "machine"]) }
+   |                                                 `- error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+17 |     }
+18 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift:21:49: error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+19 |     @Test(arguments: [[String](), ["vm", "launch"], ["vm", "launch", ""], ["vm", "launch", "--headless"], ["vm", "create", "machine"], ["helper", "register"], ["vm", "launch", "machine", "\0"]])
+20 |     func refusesOtherVerbsAndInvalidArguments(arguments: [String]) {
+21 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest(executable: target, arguments: arguments) }
+   |                                                 `- error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+22 |     }
+23 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift:27:21: error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+25 |     func permitsValidBuildNames(version: String) throws {
+26 |         let path = target.replacingOccurrences(of: "/2.6.1/", with: "/\(version)/")
+27 |         #expect(try VPhoneLaunchpadLauncherRequest(executable: path, arguments: ["vm", "launch", "machine"]).version == version)
+   |                     `- error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+28 |     }
+29 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneBundleStoreTests/LauncherPolicyTests.swift:31:49: error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+29 | 
+30 |     @Test func refusesLegacyVersionBeforeFilesystemAccess() {
+31 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadLauncherRequest(executable: target.replacingOccurrences(of: "2.6.1", with: "2.0.8"), arguments: ["vm", "launch", "machine"]) }
+   |                                                 `- error: cannot find 'VPhoneLaunchpadLauncherRequest' in scope
+32 |     }
+33 | }
+[28/37] Compiling MobileRecoveryCore libirecovery.c
+error: fatalError

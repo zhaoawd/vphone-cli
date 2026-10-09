@@ -71,6 +71,45 @@ struct VMLaunchDiagnosticsTests {
         }
     }
 
+    @Test(arguments: [SIGINT, SIGTERM, SIGHUP, SIGQUIT])
+    func pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal: Int32) throws {
+        let rig = try Rig()
+        defer { rig.remove() }
+        try rig.preflight(exit: 0)
+        let ready = rig.directory.appendingPathComponent("runtime.pid")
+        try rig.runtime("echo $$ > '\(ready.path)'\ntrap 'printf final-tail; exit 0' INT\nwhile :; do /bin/sleep .05; done\n")
+        let pipe = Pipe()
+        let parent = Process()
+        parent.executableURL = rig.cli
+        parent.arguments = ["vm", "launch", "vm1", "--library-root", rig.library.path,
+                            "--project-root", rig.resources.path, "--no-vphoned"]
+        parent.standardInput = FileHandle.nullDevice
+        parent.standardOutput = pipe
+        parent.standardError = pipe
+        try parent.run()
+        defer {
+            if parent.isRunning { kill(parent.processIdentifier, SIGKILL); parent.waitUntilExit() }
+            if let text = try? String(contentsOf: ready, encoding: .utf8), let pid = Int32(text.trimmingCharacters(in: .whitespacesAndNewlines)), kill(pid, 0) == 0 { kill(pid, SIGKILL) }
+        }
+        let deadline = Date().addingTimeInterval(5)
+        while !FileManager.default.fileExists(atPath: ready.path), Date() < deadline { Thread.sleep(forTimeInterval: 0.02) }
+        let vmPID = try #require(Int32(String(contentsOf: ready, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)))
+        Thread.sleep(forTimeInterval: 0.1)
+        kill(parent.processIdentifier, stopSignal)
+        let stopped = Date().addingTimeInterval(3)
+        while parent.isRunning, Date() < stopped { Thread.sleep(forTimeInterval: 0.02) }
+        #expect(!parent.isRunning)
+        guard !parent.isRunning else { return }
+        parent.waitUntilExit()
+        #expect(kill(vmPID, 0) == -1 && errno == ESRCH)
+        guard kill(vmPID, 0) == -1 && errno == ESRCH else { return }
+        try pipe.fileHandleForWriting.close()
+        let output = pipe.fileHandleForReading.readDataToEndOfFile()
+        #expect(parent.terminationStatus == 0)
+        #expect(String(decoding: output, as: UTF8.self).hasSuffix("final-tail"))
+        #expect(kill(vmPID, 0) == -1 && errno == ESRCH)
+    }
+
     @Test func childFailureRule() {
         #expect(!VPhoneVMLaunchCommand.childFailed(reason: .exit, status: 0))
         #expect(VPhoneVMLaunchCommand.childFailed(reason: .exit, status: 137))

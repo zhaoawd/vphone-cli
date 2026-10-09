@@ -120,6 +120,9 @@ int vp_native_run_proxy(void) {
         if (error != 0) {
             fprintf(stderr, "vphoned proxy: posix_spawn failed: %s\n", strerror(error));
             close(pipe_fds[1]);
+            // An unconfirmed cached image must return to launchd's bundled
+            // fallback even when it cannot spawn a worker at all.
+            if (access(pending_update, F_OK) == 0) return 1;
             pause_before_retry();
         } else {
             if (stopping) {

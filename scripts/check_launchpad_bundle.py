@@ -19,6 +19,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 BUNDLE_ID = 'com.vphone.cli.launchpad'
 EXECUTABLE = 'vphone-launchpad'
+LAUNCHER = 'vphone-launchpad-launcher'
 LANGUAGES = ('en', 'zh-Hans')
 HELPER = 'Contents/Helpers/vphone-cli.app'
 MANIFEST = 'Contents/Resources/embedded-toolchain.json'
@@ -42,6 +43,10 @@ def check_info(info):
     if sorted(info.get('CFBundleLocalizations', [])) != sorted(LANGUAGES):
         raise ValueError(f'Info.plist CFBundleLocalizations is {info.get("CFBundleLocalizations")!r}, '
                          f'expected {list(LANGUAGES)!r}')
+    for key in ('NSLocationUsageDescription', 'NSLocationWhenInUseUsageDescription',
+                'NSLocationAlwaysAndWhenInUseUsageDescription'):
+        if not isinstance(info.get(key), str) or not info[key].strip():
+            raise ValueError(f'Info.plist {key} must describe host location forwarding')
     for key in HELPER_KEYS:
         if key in info:
             raise ValueError(f'Info.plist declares {key}; helper registration is deferred')
@@ -58,6 +63,8 @@ def check_layout(app):
     required = {
         'Contents': stat.S_IFDIR,
         f'Contents/MacOS/{EXECUTABLE}': stat.S_IFREG,
+        'Contents/MacOS': stat.S_IFDIR,
+        f'Contents/MacOS/{LAUNCHER}': stat.S_IFREG,
         'Contents/Resources/AppIcon.icns': stat.S_IFREG,
         MANIFEST: stat.S_IFREG,
         'Contents/Helpers': stat.S_IFDIR,
@@ -75,6 +82,8 @@ def check_layout(app):
             raise ValueError(f'Wrong file type: {relative}')
     if not os.access(app / f'Contents/MacOS/{EXECUTABLE}', os.X_OK):
         raise ValueError(f'Not executable: Contents/MacOS/{EXECUTABLE}')
+    if not os.access(app / f'Contents/MacOS/{LAUNCHER}', os.X_OK):
+        raise ValueError(f'Not executable: Contents/MacOS/{LAUNCHER}')
     if (app / 'Contents/Library').exists():
         raise ValueError('Contents/Library exists; helper registration is deferred')
     helper = (app / HELPER).resolve()

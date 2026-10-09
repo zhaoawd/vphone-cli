@@ -1,0 +1,77 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/42] Compiling fdr.c
+[5/42] Compiling download.c
+[6/42] Compiling ipsw.c
+[7/42] Compiling limera1n.c
+[8/42] Compiling asr.c
+[9/42] Compiling normal.c
+[10/42] Compiling recovery.c
+[12/42] Emitting module VPhoneAPIKit
+[12/42] Compiling restore.c
+[13/42] Compiling img4.c
+[14/42] Compiling dfu.c
+[15/42] Compiling img3.c
+[16/42] Compiling ace3.c
+[17/42] Compiling mbn.c
+[18/42] Compiling ftab.c
+[19/43] Compiling fls.c
+[20/43] Compiling locking.c
+[21/43] Compiling log.c
+[22/44] Compiling vphone_zip_stub.c
+[23/44] Compiling deviceinterfaced.c
+[24/44] Compiling common.c
+[25/44] Compiling idevicerestore.c
+[26/44] Compiling vphone_restore_bridge.c
+[28/44] Emitting module VPhoneBundleStore
+[28/44] Compiling MobileRecoveryCore libirecovery.c
+[30/45] Emitting module VPhoneBundleStoreTests
+[31/45] Emitting module VPhoneCore
+[32/45] Emitting module VPhoneHelperKitTests
+[33/46] Emitting module VPhoneLaunchpadKit
+[34/46] Emitting module VPhoneLaunchpadLauncherEntry
+[35/44] Emitting module VPhoneLaunchpadKitTests
+[36/44] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[36/44] Write Objects.LinkFileList
+[39/46] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[40/46] Emitting module VPhoneCLITests
+[40/46] Write Objects.LinkFileList
+[41/46] Linking vphone-vm
+[42/46] Linking vphone-cli
+[43/46] Applying vphone-vm
+[44/46] Applying vphone-cli
+[45/46] Linking vphone-cliPackageTests
+Build complete! (12.18s)
+Test Suite 'Selected tests' started at 2026-10-09 08:24:34.060.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 08:24:34.061.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 08:24:34.061.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 08:24:34.061.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VMLaunchDiagnosticsTests started.
+◇ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 2 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 15 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.

@@ -14,6 +14,7 @@ let package = Package(
         .executable(name: "vphone-vm", targets: ["VPhoneVMEntry"]),
         .executable(name: "vphone-helper", targets: ["VPhoneHelperEntry"]),
         .executable(name: "vphone-launchpad", targets: ["VPhoneLaunchpad"]),
+        .executable(name: "vphone-launchpad-launcher", targets: ["VPhoneLaunchpadLauncherEntry"]),
     ],
     dependencies: [
         .package(url: "https://github.com/Lakr233/AppleMobileDeviceLibrary.git",
@@ -33,6 +34,7 @@ let package = Package(
                 path: "sources/VPhoneHelperKit", linkerSettings: [.linkedFramework("Security"), .linkedFramework("ServiceManagement")]),
         .executableTarget(name: "VPhoneHelperEntry", dependencies: ["VPhoneHelperKit"], path: "sources/VPhoneHelperEntry"),
         .testTarget(name: "VPhoneHelperKitTests", dependencies: ["VPhoneHelperKit"], path: "tests/VPhoneHelperKitTests"),
+        .executableTarget(name: "VPhoneLaunchpadLauncherEntry", dependencies: ["VPhoneBundleStore", "VPhoneLaunchpadKit"], path: "sources/VPhoneLaunchpadLauncherEntry"),
         .target(name: "VPhoneAPIKit", path: "sources/VPhoneAPIKit"),
         .target(name: "VPhoneBundleStore", dependencies: ["VPhoneArchiveKit"],
                 path: "sources/VPhoneBundleStore", linkerSettings: [.linkedFramework("Security")]),
@@ -155,7 +157,7 @@ let package = Package(
         // toolchain code; the app is assembled by scripts/build_launchpad.sh.
         .target(
             name: "VPhoneLaunchpadKit",
-            dependencies: ["VPhoneCore"],
+            dependencies: ["VPhoneCore", "VPhoneBundleStore"],
             path: "sources/VPhoneLaunchpadKit",
             linkerSettings: [.linkedFramework("Security")]
         ),

@@ -1,0 +1,82 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling limera1n.c
+[5/35] Compiling recovery.c
+[5/35] Compiling asr.c
+[6/35] Compiling download.c
+[8/35] Compiling fdr.c
+[9/35] Compiling normal.c
+[10/35] Compiling ipsw.c
+[11/35] Compiling img3.c
+[12/35] Compiling ace3.c
+[13/35] Compiling dfu.c
+[14/35] Compiling ftab.c
+[15/35] Compiling img4.c
+[15/35] Compiling mbn.c
+[17/35] Compiling fls.c
+[18/35] Compiling locking.c
+[19/35] Compiling log.c
+[20/35] Compiling vphone_zip_stub.c
+[21/35] Compiling deviceinterfaced.c
+[22/35] Compiling restore.c
+[23/35] Compiling common.c
+[24/35] Compiling vphone_restore_bridge.c
+[25/35] Compiling idevicerestore.c
+[26/35] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[29/37] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[29/37] Write Objects.LinkFileList
+[32/38] Emitting module VPhoneCLITests
+[32/38] Write Objects.LinkFileList
+[33/38] Linking vphone-vm
+[33/38] Linking vphone-cli
+[35/38] Applying vphone-cli
+[36/38] Applying vphone-vm
+[37/38] Linking vphone-cliPackageTests
+Build complete! (12.99s)
+Test Suite 'Selected tests' started at 2026-10-09 08:26:05.422.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 08:26:05.423.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 08:26:05.423.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 08:26:05.423.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VMLaunchDiagnosticsTests started.
+◇ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 2 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 15 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 1 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+◇ Test case passing 1 argument stopSignal → 3 to pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) started.
+✔ Test pipedCLIForwardsStopSignalAndWaitsForVMExit(stopSignal:) with 4 test cases passed after 8.051 seconds.
+✔ Suite VMLaunchDiagnosticsTests passed after 8.052 seconds.
+✔ Test run with 1 test in 1 suite passed after 8.052 seconds.

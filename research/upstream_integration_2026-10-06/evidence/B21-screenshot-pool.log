@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b21-screenshot-pool.py", line 6, in <module>
+    for _ in range(2):rpc('screen.screenshot')
+                      ~~~^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 27, in rpc
+AssertionError: {'ok': False, 'error': 'api_timeout', 'operation_may_continue': True, 'code': 'api_timeout', 'method': 'screen.screenshot'}

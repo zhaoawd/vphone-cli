@@ -73,6 +73,7 @@ LATENCY_TESTS = "|".join((
     "cancellingARunInterruptsOnlyItsChild",
     "deadlineAndCallerCancellationEndHTTPWait",
     "supervisorRejectsFailureAndStopsTimedOutWorker",
+    "pipedCLIForwardsStopSignalAndWaitsForVMExit",
     "a changed entity or a server without ranges restarts from byte zero",
 ))
 

@@ -97,6 +97,9 @@ struct LaunchpadFixtureApp {
         try fm.copyItem(at: truePath, to: fixture.vm)
         try fm.copyItem(at: truePath, to: fixture.app.appendingPathComponent("Contents/MacOS/Fixture"))
 
+        let launcher = fixture.app.appendingPathComponent("Contents/MacOS/vphone-launchpad-launcher")
+        try fm.copyItem(at: truePath, to: launcher)
+        try LaunchpadProcess.sign(launcher, identifier: "com.vphone.cli.launchpad.launcher")
         try LaunchpadProcess.sign(fixture.vm, identifier: "com.vphone.vm")
         try LaunchpadProcess.sign(fixture.helper)
         let manifest = VPhoneLaunchpadToolchainManifest(

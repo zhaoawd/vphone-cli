@@ -1,0 +1,103 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/11] Applying vphone-launchpad
+[6/24] Compiling VPhoneLaunchpadKitTests LaunchpadFixtures.swift
+[7/25] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+[8/25] Emitting module VPhoneCLITests
+[8/25] Linking vphone-vm
+[10/25] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[10/25] Linking vphone-cli
+[11/25] Applying vphone-vm
+[12/25] Applying vphone-cli
+[14/25] Compiling VPhoneLaunchpadKitTests HostSetupTests.swift
+[15/25] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+[16/25] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[17/25] Compiling VPhoneLaunchpadKitTests EditTests.swift
+[18/25] Compiling VPhoneLaunchpadKitTests HardwareKeyboardSettingsTests.swift
+[19/25] Compiling VPhoneLaunchpadKitTests BindingPersistenceTests.swift
+[20/25] Compiling VPhoneLaunchpadKitTests BindingSnapshotTests.swift
+[21/25] Compiling VPhoneLaunchpadKitTests CoreBundleTests.swift
+[22/25] Compiling VPhoneLaunchpadKitTests CreateTests.swift
+[23/25] Emitting module VPhoneLaunchpadKitTests
+[23/25] Write Objects.LinkFileList
+[24/25] Linking vphone-cliPackageTests
+Build complete! (12.07s)
+Test Suite 'Selected tests' started at 2026-10-09 07:42:16.913.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 07:42:16.915.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 07:42:16.915.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 07:42:16.915.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ToolchainTests started.
+◇ Suite LaunchRouteTests started.
+◇ Suite ExpectedBindingCLITests started.
+◇ Suite LauncherPolicyTests started.
+◇ Test boundMachineUsesLauncherAndExactVersion() started.
+◇ Test refusesAChangedOrMissingExpectedBinding() started.
+◇ Test rejectsInvalidBindingDigest() started.
+◇ Test invalidBindingRefusesWithoutEmbeddedFallback() started.
+◇ Test missingBindingKeepsEmbeddedDevelopmentToolchain() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test boundMachineWithoutLauncherRefuses() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test permitsOnlyTheStoreCLIAndVMLaunch() started.
+◇ Test permitsValidBuildNames(version:) started.
+◇ Test refusesLegacyVersionBeforeFilesystemAccess() started.
+✔ Test missingBindingKeepsEmbeddedDevelopmentToolchain() passed after 1.761 seconds.
+✔ Test boundMachineUsesLauncherAndExactVersion() passed after 1.761 seconds.
+✔ Test invalidBindingRefusesWithoutEmbeddedFallback() passed after 1.761 seconds.
+◇ Test case passing 1 argument path → "/usr/bin/true" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/tmp/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/../2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles//2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-vm" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument arguments → [] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", ""] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "--headless"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "create", "machine"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["helper", "register"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "machine", "\0"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+✔ Test rejectsInvalidBindingDigest() passed after 1.763 seconds.
+◇ Test case passing 1 argument version → "2.6.1-local.12345678" to permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument version → "2.6.1-ci.1234567" to permitsValidBuildNames(version:) started.
+✔ Test refusesAChangedOrMissingExpectedBinding() passed after 1.763 seconds.
+✔ Test boundMachineWithoutLauncherRefuses() passed after 1.835 seconds.
+✔ Test refusesOtherAndNoncanonicalPaths(path:) with 5 test cases passed after 1.824 seconds.
+✔ Test refusesOtherVerbsAndInvalidArguments(arguments:) with 7 test cases passed after 1.824 seconds.
+✔ Test permitsOnlyTheStoreCLIAndVMLaunch() passed after 1.824 seconds.
+✔ Test permitsValidBuildNames(version:) with 2 test cases passed after 1.824 seconds.
+✔ Test refusesLegacyVersionBeforeFilesystemAccess() passed after 1.824 seconds.
+✔ Test rejectsMissingNestedApp() passed after 1.838 seconds.
+✔ Suite LaunchRouteTests passed after 1.839 seconds.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 1.838 seconds.
+✔ Suite ExpectedBindingCLITests passed after 1.839 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 1.838 seconds.
+✔ Suite LauncherPolicyTests passed after 1.839 seconds.
+✔ Test rejectsModifiedNestedExecutable() passed after 1.852 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 1.871 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 1.895 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 1.908 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 1.910 seconds.
+✔ Test cdhashMatchesCodesign() passed after 2.049 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 2.367 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 2.444 seconds.
+✔ Suite ToolchainTests passed after 2.445 seconds.
+✔ Test run with 22 tests in 4 suites passed after 2.446 seconds.

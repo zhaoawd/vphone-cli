@@ -1,0 +1,42 @@
+=== Checking .build/vphone-cli.app ===
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+=== Building vphone-launchpad (f6ebd179) ===
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Building for production...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'vphone-launchpad' complete! (1.19s)
+Building for production...
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'vphone-launchpad-launcher' complete! (0.51s)
+Launchpad strings: 280 keys, 280 source literals, 5 Info.plist keys, languages en, zh-Hans; 0 issues; needs_review: 129
+=== Assembling .build/vphone-launchpad.app ===
+.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher: replacing existing signature
+  vphone-cli cdhash 53bf1d4d061da92ec9d14a9d5eaf46310cbac7e8
+  vphone-vm  cdhash 54fe46629402a0dbb8b5bb9a091c09d5c4de7ddf
+=== Signing .build/vphone-launchpad.app ===
+.build/vphone-launchpad.app: replacing existing signature
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: satisfies its Designated Requirement
+Launchpad bundle: Info.plist, layout, localizations en, zh-Hans, cdhash vphone-cli 53bf1d4d061da92ec9d14a9d5eaf46310cbac7e8 vphone-vm 54fe46629402a0dbb8b5bb9a091c09d5c4de7ddf (= reference), nested entitlements and outer signature verified
+
+=== Launchpad build complete ===
+  app : .build/vphone-launchpad.app
+Run: open .build/vphone-launchpad.app

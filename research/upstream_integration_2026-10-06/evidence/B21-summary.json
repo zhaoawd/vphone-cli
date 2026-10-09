@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-09",
+  "selected_tasks": [
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "newly_accepted": [
+    "T03",
+    "T04",
+    "T05"
+  ],
+  "selected_unaccepted": [
+    "T02",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "all_accepted": [
+    "T00",
+    "T01",
+    "T03",
+    "T04",
+    "T05"
+  ],
+  "required_remaining": 41,
+  "results": {
+    "T02": "本轮冻结实际 launcher、连接、worker、IcliKit 与基础模块路径及测试入口，更新已核对能力的处置。342 提交的结构台账保持，303 个 pending_semantic_review 未被标记完成。全局语义审查未完成。",
+    "T03": "B21 对保留的 B18 停机恢复点执行实际恢复；65 个普通文件的大小、SHA256 和 mode 一致。恢复副本启动、classic/API通信、Settings 启动及前台核验通过，SystemVersion 数据摘要与 T03 原基线一致。恢复副本正常停机退出0、磁盘释放，原 vm-new 关键摘要保持。身份保留恢复与并发克隆策略分开；本轮未并发运行原 VM。按本项接受条件验收。",
+    "T04": "固定目标签名逻辑已复核；保留原有用户决定：只回收 LC_SOURCE_VERSION，保留 LC_UUID；仍不足明确 noRoom，输入不变。104 项基础模块测试与最终标准全量测试通过，实际签名产物严格检查通过。按既有合同调整验收。",
+    "T05": "多语言归档、路径及链接保护、坏包拒绝、私有 staging、失败不覆盖有效目标、native/system archive 互操作通过。实际 CLI 在可表示的 UID/GID 0:0 上完成中文、日文和 emoji 严格 ustar 往返。最终默认全量测试通过。接受本项；完整64GiB VM归档导入/导出未执行，不扩大为真实VM迁移全矩阵通过。",
+    "T06": "真实8191/8192/8193/16383/16384/16385字节下载长度和摘要通过。1MiB下载多次只收到917504字节并超时；另一次完整摘要通过，故仍为间歇性失败。客户机文件SHA正确，临时guest日志显示16个64KiB写入future成功；原因未查明。8MiB慢读和20次提前关闭未执行到。新宿主计数诊断候选尚未授权，不标记完成。",
+    "T07": "真实proxy死亡后worker退出；worker SIGKILL后1.2564秒恢复，instance改变、binary hash保持。新增未确认缓存worker posix_spawn失败时返回launchd的修复，失败测试由2秒超时变为通过，13项proxy测试通过。新候选实际运行hash已核对。缓存更新成功确认及完整daemon更新组合仍未验收；API_ONLY不执行agent.apply_update。",
+    "T08": "固定IcliKit0.7.16/702990b5与全部pin、实际编译checkout及运行hash一致；40次launchd查询FD保持18。新操作自动释放池的真实ObjC成功/错误路径测试通过，但20次真实截图仍从约87MB footprint增至约465MB，FD保持18；截图内存增长未解决，原因未查明。旋转、SpringBoard服务和device snapshot HTTP调用通过；location.current返回400，RootHide/timezone完整矩阵待验证。",
+    "T24": "新增普通launcher和签名校验、位置usage description及中英翻译。审查发现直接执行官方CLI会自动更新daemon、扩大权限、丢失跨进程绑定以及SIGINT生命周期；已改为只执行外层签名固定的本地CLI，核对预期binding SHA和版本。选定VM必须声明sealed本地受控启动协议，未知协议在preflight前拒绝，不执行官方CLI。无TTY的SIGINT/SIGTERM/SIGHUP/SIGQUIT均转为VM正常停机，最后输出和子进程退出测试通过。完整TCC责任链与Homebrew依赖闭包仍未完成。",
+    "T40": "本轮将绑定选择经普通launcher传给受控本地CLI，跨进程核对SHA/版本，未知VM协议明确拒绝。保留B18官方Bundle并存和真实绑定切换证据。合法本地CoreBundle仍缺vphone-escalator，实际绑定启动、创建全流程冻结和四层来源升级/回退矩阵未完成；不把官方Bundle当作本地构建。",
+    "T46": "B21在既有精确helper授权内，真实官方2.6.1安装退出0，收据一致；成功日志61字节0600，独立verify日志60字节0600，两份返回后均关闭。管理员规则未放宽，系统store/helper/right恢复缺失基线。输出、尾部、取消等夹具和无TTY wrapper信号测试通过。真实VM正常停机日志保留；全UI即时退出、detached/create/后代writer和吞吐矩阵仍未完成。"
+  },
+  "ruling": "B21 Ruling: 原方案允许基础修复单独验收；T03/T04/T05在实际相关路径、恢复/签名/归档接受证据满足后独立accepted，全局T02保持未完成，代价是后续跨模块变更仍须复验。普通launcher只执行sealed本地wrapper，不执行有自动guest更新/0777副作用的官方CLI；预期binding SHA+version跨进程核对，未知VM协议在preflight前拒绝，代价是未声明本地受控协议的官方Bundle不能通过此路线启动。操作autoreleasepool只证明临时ObjC对象释放，真实截图增长仍失败，不能接受T08。新短时限wrapper测试加入既有计时组，原时限不变，代价是未证明与大批签名工作同时运行的启动时限。新宿主4cea360c临时AMFI范围未授权，保持pending；只使用既有B16范围完成本轮VM操作并清理。",
+  "tests_logs": [
+    "evidence/B21-full-tests.log",
+    "evidence/B21-final-swift.log",
+    "evidence/B21-final-swift-retry.log"
+  ],
+  "test_results": {
+    "Python": 578,
+    "Swift_regular": 1250,
+    "Swift_timing": 6,
+    "XCTest": 254,
+    "XCTest_skipped": 3,
+    "first_full_Swift_failure": "new fixture did not meet5s startup threshold in the parallel suite; grouped with existing latency tests without widening deadlines; cause of parallel timing not fully established",
+    "second_full_Swift_failure": "archive cleanup assertion observed unrelated staging in shared TMPDIR; deterministic marker reproduction failed; private archive parent fixed test isolation while preserving cleanup assertion"
+  },
+  "final_state": "evidence/B21-final-readback.json",
+  "review_Important_initial": 4,
+  "review_fix_pass": 1,
+  "no_post_fix_independent_review_claimed": true,
+  "exact_new_AMFI_question_pending": {
+    "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B21/relay-diagnostic.app/Contents/MacOS/vphone-vm",
+    "cdhash": "4cea360ca924a4c651a12aae7755545b492a59b6",
+    "sha256": "1d21a984f4621fcc291ebc6d48bc572ec1c316752183dbcf40469a7778a4eb80",
+    "source_worktree_head": "f6ebd1799b632ee4b84f869ed70b0508e9f0ddb7",
+    "uncommitted_source_instrumentation": "Socket SO_TYPE and per-relay byte counters only; no token or payload logging",
+    "temporary_amfid_scope": {
+      "paths": [],
+      "cdhashes": [
+        "4cea360ca924a4c651a12aae7755545b492a59b6"
+      ],
+      "allow_all": false,
+      "spoof_apple": true
+    },
+    "production_sources_restored": true
+  },
+  "original_contracts_unchanged": true,
+  "source_commits": 342,
+  "pending_semantic_commits": 303,
+  "whitespace_validation": {
+    "raw_evidence_logs": "git diff --cached --check reports verbatim compiler/log trailing whitespace; retained unchanged to preserve evidence hashes",
+    "source_documents_and_non_log_evidence": "git diff --cached --check -- . :!research/upstream_integration_2026-10-06/evidence/*.log passed"
+  }
+}

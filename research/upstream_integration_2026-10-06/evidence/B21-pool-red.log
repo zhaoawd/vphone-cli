@@ -1,0 +1,16 @@
+test_success_and_error_release_temporaries_before_returning (test_daemon_operation_pool.DaemonOperationPoolTests.test_success_and_error_release_temporaries_before_returning) ... FAIL
+
+======================================================================
+FAIL: test_success_and_error_release_temporaries_before_returning (test_daemon_operation_pool.DaemonOperationPoolTests.test_success_and_error_release_temporaries_before_returning)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_operation_pool.py", line 81, in test_success_and_error_release_temporaries_before_returning
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : temporary survived operation return
+
+
+----------------------------------------------------------------------
+Ran 1 test in 1.907s
+
+FAILED (failures=1)

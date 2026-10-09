@@ -1,5 +1,6 @@
 // Host-only lifecycle harness. No UIKit, vsock, guest cache or device operations.
 #include <arpa/inet.h>
+#include <spawn.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -8,9 +9,22 @@
 #include <unistd.h>
 
 static int fixture_access(const char *path, int mode);
+static int fixture_spawn(pid_t *, const char *, const posix_spawn_file_actions_t *, const posix_spawnattr_t *, char *const[], char *const[]);
+#define posix_spawn fixture_spawn
 #define access fixture_access
 #include "../../../sources/VPhoneDaemon/Native/vphoned_proxy.c"
 #undef access
+#undef posix_spawn
+
+static int fixture_spawn(pid_t *pid, const char *path, const posix_spawn_file_actions_t *actions, const posix_spawnattr_t *attributes, char *const argv[], char *const envp[]) {
+    const char *action = getenv("VPHONE_PROXY_TEST_ACTION");
+    if (action && strcmp(action, "spawn-failure") == 0) {
+        int fd = open(getenv("VPHONE_PROXY_TEST_READY"), O_WRONLY | O_APPEND | O_CREAT, 0600);
+        if (fd >= 0) { dprintf(fd, "%d\n", getpid()); close(fd); }
+        return ENOEXEC;
+    }
+    return posix_spawn(pid, path, actions, attributes, argv, envp);
+}
 
 static int fixture_access(const char *path, int mode) {
     (void)path; (void)mode;

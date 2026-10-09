@@ -123,6 +123,11 @@ class DaemonProxyTests(unittest.TestCase):
         self.assertEqual(process.wait(timeout=4), 1)
         self.assertEqual(len(self.wait_workers()), 1)
 
+    def test_pending_update_spawn_failure_returns_without_repeated_bad_binary(self):
+        process = self.start('spawn-failure', pending=True)
+        self.assertEqual(process.wait(timeout=2), 1)
+        self.assertEqual(len(self.wait_workers()), 1)
+
     # Upstream 2e2ed0a8: fixed one-second retry and a logged reason per exit.
 
     def test_restart_delay_stays_one_second(self):

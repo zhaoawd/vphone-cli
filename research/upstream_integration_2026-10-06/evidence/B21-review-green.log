@@ -1,0 +1,177 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/45] Write sources
+[6/45] Write swift-version--58304C5D6DBC2206.txt
+[7/45] Compiling download.c
+[8/45] Compiling asr.c
+[9/45] Compiling normal.c
+[10/45] Compiling recovery.c
+[11/45] Compiling fdr.c
+[12/45] Compiling ipsw.c
+[13/45] Compiling limera1n.c
+[14/45] Compiling ace3.c
+[15/45] Compiling mbn.c
+[15/45] Compiling img4.c
+[17/45] Compiling dfu.c
+[18/45] Compiling img3.c
+[19/45] Compiling restore.c
+[20/45] Compiling ftab.c
+[21/45] Compiling log.c
+[22/45] Compiling locking.c
+[22/45] Compiling fls.c
+[24/45] Compiling deviceinterfaced.c
+[25/45] Compiling vphone_zip_stub.c
+[26/45] Compiling common.c
+[27/45] Compiling idevicerestore.c
+[29/45] Compiling VPhoneLaunchpadKit VPhoneLaunchpadLaunchRoute.swift
+[29/45] Compiling vphone_restore_bridge.c
+[30/45] Compiling MobileRecoveryCore libirecovery.c
+[32/47] Emitting module VPhoneLaunchpadKit
+[32/48] Write Objects.LinkFileList
+[34/50] Emitting module VPhoneLaunchpadLauncherEntry
+[35/50] Compiling VPhoneLaunchpadLauncherEntry main.swift
+[36/51] Compiling VPhoneLaunchpadLauncherEntry VPhoneLaunchpadLauncherProcess.swift
+[36/51] Linking vphone-launchpad
+[37/51] Write Objects.LinkFileList
+[38/51] Applying vphone-launchpad
+[39/51] Linking vphone-launchpad-launcher
+[40/51] Applying vphone-launchpad-launcher
+[42/51] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[43/51] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[44/52] Compiling vphone_cli VPhoneVMCLI.swift
+[44/52] Write Objects.LinkFileList
+[47/58] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[48/58] Compiling VPhoneCLITests APIProxyCLITests.swift
+[49/58] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+[50/58] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[51/58] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[52/58] Emitting module VPhoneCLITests
+[52/58] Write Objects.LinkFileList
+[53/58] Linking vphone-cli
+[54/58] Linking vphone-vm
+[55/58] Applying vphone-cli
+[56/58] Applying vphone-vm
+[57/58] Linking vphone-cliPackageTests
+Build complete! (10.38s)
+Test Suite 'Selected tests' started at 2026-10-09 08:17:39.254.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 08:17:39.257.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 08:17:39.257.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 08:17:39.257.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputCompletionTests started.
+◇ Suite ToolchainTests started.
+◇ Suite ExpectedBindingCLITests started.
+◇ Suite LauncherPolicyTests started.
+◇ Suite LaunchRouteTests started.
+◇ Suite VMLaunchDiagnosticsTests started.
+◇ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() started.
+◇ Test rejectsCDHashThatDiffersFromManifest() started.
+◇ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() started.
+◇ Test logCreationFailureDoesNotLeaveRunningHistory() started.
+◇ Test ignoresEnvironmentAndDefaults() started.
+◇ Test spawnFailureFinishesHistoryAndClosesLog() started.
+◇ Test livePipeDeliversLinesBeforeWriterCloses() started.
+◇ Test cdhashMatchesCodesign() started.
+◇ Test localWrapperRequiresTheExactBindingAndBundle() started.
+◇ Test exitZeroWithReadFailureIsNotACompleteCommand() started.
+◇ Test rejectsManifestEditedAfterSigning() started.
+◇ Test rejectsMissingNestedApp() started.
+◇ Test rejectsModifiedNestedExecutable() started.
+◇ Test rejectsUnknownManifestSchema() started.
+◇ Test rejectsSymbolicLinkExecutable() started.
+◇ Test verifiesSignedFixtureAndUsesNestedExecutable() started.
+◇ Test unknownVMProtocolIsRefusedBeforeExecution() started.
+◇ Test rejectsAppOutsideAnAppBundle() started.
+◇ Test rejectsSymbolicLinkHelpersDirectory() started.
+◇ Test releaseBundleSelectsLocalWrapperWithFrozenBinding() started.
+◇ Test refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test permitsValidBuildNames(version:) started.
+◇ Test refusesLegacyVersionBeforeFilesystemAccess() started.
+◇ Test boundMachineUsesLauncherAndExactVersion() started.
+◇ Test permitsOnlyTheStoreCLIAndVMLaunch() started.
+◇ Test missingBindingKeepsEmbeddedDevelopmentToolchain() started.
+◇ Test refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test invalidBindingRefusesWithoutEmbeddedFallback() started.
+◇ Test boundMachineWithoutLauncherRefuses() started.
+◇ Test childFailureRule() started.
+◇ Test case passing 1 argument path → "/usr/bin/true" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument version → "2.6.1-local.12345678" to permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument path → "/tmp/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument version → "2.6.1-ci.1234567" to permitsValidBuildNames(version:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/../2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles//2.6.1/VPhone.bundle/Contents/MacOS/vphone-cli" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument path → "/Library/Application Support/vphone-launchpad/Bundles/2.6.1/VPhone.bundle/Contents/MacOS/vphone-vm" to refusesOtherAndNoncanonicalPaths(path:) started.
+◇ Test case passing 1 argument arguments → [] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", ""] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "--headless"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "create", "machine"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["helper", "register"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+◇ Test case passing 1 argument arguments → ["vm", "launch", "machine", "\0"] to refusesOtherVerbsAndInvalidArguments(arguments:) started.
+✔ Test localWrapperRequiresTheExactBindingAndBundle() passed after 1.640 seconds.
+✔ Test unknownVMProtocolIsRefusedBeforeExecution() passed after 1.662 seconds.
+✔ Test releaseBundleSelectsLocalWrapperWithFrozenBinding() passed after 1.662 seconds.
+✔ Test refusesOtherAndNoncanonicalPaths(path:) with 5 test cases passed after 1.662 seconds.
+✔ Test permitsValidBuildNames(version:) with 2 test cases passed after 1.662 seconds.
+✔ Test refusesLegacyVersionBeforeFilesystemAccess() passed after 1.662 seconds.
+✔ Test boundMachineUsesLauncherAndExactVersion() passed after 1.662 seconds.
+✔ Test missingBindingKeepsEmbeddedDevelopmentToolchain() passed after 1.662 seconds.
+✔ Test refusesOtherVerbsAndInvalidArguments(arguments:) with 7 test cases passed after 1.662 seconds.
+✔ Test invalidBindingRefusesWithoutEmbeddedFallback() passed after 1.662 seconds.
+✔ Test permitsOnlyTheStoreCLIAndVMLaunch() passed after 1.662 seconds.
+✔ Test boundMachineWithoutLauncherRefuses() passed after 1.662 seconds.
+✔ Test logCreationFailureDoesNotLeaveRunningHistory() passed after 1.662 seconds.
+✔ Test childFailureRule() passed after 0.159 seconds.
+✔ Test rejectsAppOutsideAnAppBundle() passed after 1.662 seconds.
+✔ Suite ExpectedBindingCLITests passed after 1.663 seconds.
+✔ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() passed after 1.662 seconds.
+✔ Suite LaunchRouteTests passed after 1.663 seconds.
+✔ Suite LauncherPolicyTests passed after 1.663 seconds.
+◇ Test normalStopDoesNotPrintHostDiagnostics() started.
+✔ Test spawnFailureFinishesHistoryAndClosesLog() passed after 1.671 seconds.
+✔ Test exitZeroWithReadFailureIsNotACompleteCommand() passed after 1.671 seconds.
+✔ Test rejectsSymbolicLinkExecutable() passed after 1.673 seconds.
+✔ Test rejectsModifiedNestedExecutable() passed after 1.684 seconds.
+✔ Test livePipeDeliversLinesBeforeWriterCloses() passed after 1.692 seconds.
+✔ Test rejectsUnknownManifestSchema() passed after 1.696 seconds.
+✔ Test rejectsManifestEditedAfterSigning() passed after 1.697 seconds.
+✔ Test rejectsCDHashThatDiffersFromManifest() passed after 1.697 seconds.
+✔ Test rejectsMissingNestedApp() passed after 1.705 seconds.
+✔ Test ignoresEnvironmentAndDefaults() passed after 1.706 seconds.
+✔ Test cdhashMatchesCodesign() passed after 1.909 seconds.
+✔ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() passed after 2.105 seconds.
+✔ Suite OutputCompletionTests passed after 2.106 seconds.
+✔ Test rejectsSymbolicLinkHelpersDirectory() passed after 2.243 seconds.
+✔ Test verifiesSignedFixtureAndUsesNestedExecutable() passed after 2.249 seconds.
+✔ Suite ToolchainTests passed after 2.249 seconds.
+✔ Test normalStopDoesNotPrintHostDiagnostics() passed after 2.211 seconds.
+◇ Test preflightRejectionPrintsHostDiagnostics() started.
+✔ Test preflightRejectionPrintsHostDiagnostics() passed after 1.133 seconds.
+◇ Test runtimeExit137PrintsHostDiagnostics() started.
+✔ Test runtimeExit137PrintsHostDiagnostics() passed after 1.540 seconds.
+◇ Test runtimeSignalTerminationPrintsHostDiagnostics() started.
+✔ Test runtimeSignalTerminationPrintsHostDiagnostics() passed after 1.523 seconds.
+✔ Suite VMLaunchDiagnosticsTests passed after 8.072 seconds.
+✔ Test run with 34 tests in 6 suites passed after 8.073 seconds.

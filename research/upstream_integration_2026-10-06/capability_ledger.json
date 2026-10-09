@@ -28,10 +28,20 @@
       "T00",
       "T01"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
-    "paths": [],
-    "unmapped_upstream_paths": []
+    "disposition": "adapt",
+    "reason": "本轮冻结实际 launcher、连接、worker、IcliKit 与基础模块路径及测试入口，更新已核对能力的处置。342 提交的结构台账保持，303 个 pending_semantic_review 未被标记完成。全局语义审查未完成。",
+    "paths": [
+      "research/upstream_integration_2026-10-06/tasks.json",
+      "research/upstream_integration_2026-10-06/capability_ledger.json",
+      "research/upstream_integration_2026-10-06/commit_ledger.json",
+      "research/upstream_integration_2026-10-06/T02_merge_resolution_reviews.json"
+    ],
+    "unmapped_upstream_paths": [],
+    "acceptance_status": "in_progress",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
+    ]
   },
   {
     "id": "T03",
@@ -40,14 +50,14 @@
       "T01",
       "T02"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "new",
+    "reason": "B21 对保留的 B18 停机恢复点执行实际恢复；65 个普通文件的大小、SHA256 和 mode 一致。恢复副本启动、classic/API通信、Settings 启动及前台核验通过，SystemVersion 数据摘要与 T03 原基线一致。恢复副本正常停机退出0、磁盘释放，原 vm-new 关键摘要保持。身份保留恢复与并发克隆策略分开；本轮未并发运行原 VM。按本项接受条件验收。",
     "paths": [
-      "sources/VPhoneCore/VPhoneBootPatterns.swift",
-      "sources/VPhoneCore/VPhoneLaunchLayout.swift",
-      "sources/VPhoneCore/VPhoneLibrary.swift",
-      "sources/VPhoneCore/VPhoneVirtualMachineManifest.swift",
-      "sources/vphone-cli/VPhoneGuestEnvironment.swift"
+      "sources/VPhoneCore/VPhoneVMStopper.swift",
+      "sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+      "sources/vphone-cli/VPhoneHostControl.swift",
+      "sources/vphone-cli/VPhoneHostCommandExecutor.swift",
+      "research/upstream_integration_2026-10-06/evidence/T03-actual-drivers/"
     ],
     "unmapped_upstream_paths": [
       "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestLauncher.swift",
@@ -58,6 +68,11 @@
       "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneBootCommand.swift",
       "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneDisplayGeometry.swift",
       "VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneGuestKeyMap.swift"
+    ],
+    "acceptance_status": "accepted",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   },
   {
@@ -66,12 +81,18 @@
     "dependencies": [
       "T02"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "固定目标签名逻辑已复核；保留原有用户决定：只回收 LC_SOURCE_VERSION，保留 LC_UUID；仍不足明确 noRoom，输入不变。104 项基础模块测试与最终标准全量测试通过，实际签名产物严格检查通过。按既有合同调整验收。",
     "paths": [
-      "sources/VPhoneSign/MachO/VPhoneMachOImage.swift"
+      "sources/VPhoneSign/MachO/VPhoneMachOImage.swift",
+      "sources/VPhoneSign/Signing/VPhoneSigner.swift"
     ],
-    "unmapped_upstream_paths": []
+    "unmapped_upstream_paths": [],
+    "acceptance_status": "accepted",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
+    ]
   },
   {
     "id": "T05",
@@ -79,22 +100,23 @@
     "dependencies": [
       "T02"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "多语言归档、路径及链接保护、坏包拒绝、私有 staging、失败不覆盖有效目标、native/system archive 互操作通过。实际 CLI 在可表示的 UID/GID 0:0 上完成中文、日文和 emoji 严格 ustar 往返。最终默认全量测试通过。接受本项；完整64GiB VM归档导入/导出未执行，不扩大为真实VM迁移全矩阵通过。",
     "paths": [
-      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveError.swift",
-      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift",
       "sources/VPhoneArchiveKit/Archive/VPhoneArchiveLocale.swift",
-      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveOptions.swift",
-      "sources/VPhoneArchiveKit/Archive/VPhoneArchivePaths.swift",
-      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
       "sources/VPhoneArchiveKit/Archive/VPhoneArchiveWriter.swift",
-      "sources/VPhoneArchiveKit/Archive/VPhoneTreeFingerprint.swift",
-      "sources/VPhoneCore/VPhoneIPSWCache.swift"
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveReader.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveExtractor.swift",
+      "sources/VPhoneArchiveKit/Archive/VPhoneArchiveOutput.swift"
     ],
     "unmapped_upstream_paths": [
       "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBundleTransfer.swift",
       "VPhoneKit/VPhoneArchiveKit/Transfer/VPhoneBoardDeviceTree.swift"
+    ],
+    "acceptance_status": "accepted",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   },
   {
@@ -103,15 +125,24 @@
     "dependencies": [
       "T02"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "真实8191/8192/8193/16383/16384/16385字节下载长度和摘要通过。1MiB下载多次只收到917504字节并超时；另一次完整摘要通过，故仍为间歇性失败。客户机文件SHA正确，临时guest日志显示16个64KiB写入future成功；原因未查明。8MiB慢读和20次提前关闭未执行到。新宿主计数诊断候选尚未授权，不标记完成。",
     "paths": [
+      "sources/VPhoneAPIKit/VPhoneAPIProxy.swift",
+      "sources/VPhoneAPIKit/VPhoneAPISocket.swift",
       "sources/VPhoneDaemon/Daemon/APIWire.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
       "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
-      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift"
+      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
+      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
+      "sources/VPhoneDaemon/Daemon/APIConnectionClose.swift",
+      "tests/VPhoneAPIKitTests/"
     ],
-    "unmapped_upstream_paths": []
+    "unmapped_upstream_paths": [],
+    "acceptance_status": "real_large_download_intermittent_failure",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
+    ]
   },
   {
     "id": "T07",
@@ -119,30 +150,14 @@
     "dependencies": [
       "T06"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "真实proxy死亡后worker退出；worker SIGKILL后1.2564秒恢复，instance改变、binary hash保持。新增未确认缓存worker posix_spawn失败时返回launchd的修复，失败测试由2秒超时变为通过，13项proxy测试通过。新候选实际运行hash已核对。缓存更新成功确认及完整daemon更新组合仍未验收；API_ONLY不执行agent.apply_update。",
     "paths": [
-      "sources/VPhoneDaemon/Daemon/APIWire.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+      "sources/VPhoneDaemon/Native/vphoned_proxy.c",
       "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
-      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
-      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
-      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
-      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
-      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
-      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
-      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
-      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
-      "sources/VPhoneDaemon/Daemon/main.swift",
-      "sources/VPhoneDaemon/Native/vphoned_proxy.c"
+      "sources/VPhoneDaemon/Configuration/vphoned.plist",
+      "tests/test_daemon_proxy.py",
+      "tests/fixtures/daemon_proxy/main.c"
     ],
     "unmapped_upstream_paths": [
       "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
@@ -165,6 +180,11 @@
       "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
       "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift",
       "VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift"
+    ],
+    "acceptance_status": "worker_restart_and_pending_spawn_fix_verified_upgrade_matrix_pending",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   },
   {
@@ -175,30 +195,13 @@
       "T06",
       "T07"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "固定IcliKit0.7.16/702990b5与全部pin、实际编译checkout及运行hash一致；40次launchd查询FD保持18。新操作自动释放池的真实ObjC成功/错误路径测试通过，但20次真实截图仍从约87MB footprint增至约465MB，FD保持18；截图内存增长未解决，原因未查明。旋转、SpringBoard服务和device snapshot HTTP调用通过；location.current返回400，RootHide/timezone完整矩阵待验证。",
     "paths": [
-      "sources/VPhoneDaemon/Daemon/APIWire.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+AppDetail.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Environment.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Log.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Process.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
-      "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
-      "sources/VPhoneDaemon/Daemon/GuestEventPublisher.swift",
-      "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
-      "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
-      "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
-      "sources/VPhoneDaemon/Daemon/GuestKeychain.swift",
-      "sources/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift",
-      "sources/VPhoneDaemon/Daemon/GuestSigner.swift",
-      "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
-      "sources/VPhoneDaemon/Daemon/main.swift",
-      "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      "dependencies/daemon-api-pins.json",
+      "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+      "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "sources/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements"
     ],
     "unmapped_upstream_paths": [
       "VPhoneDaemon/Daemon/GuestAPI+SetupAssistant.swift",
@@ -220,6 +223,11 @@
       "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHide.swift",
       "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
       "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift"
+    ],
+    "acceptance_status": "real_screenshot_memory_growth_unresolved",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   },
   {
@@ -877,14 +885,27 @@
     "dependencies": [
       "T02"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "新增普通launcher和签名校验、位置usage description及中英翻译。审查发现直接执行官方CLI会自动更新daemon、扩大权限、丢失跨进程绑定以及SIGINT生命周期；已改为只执行外层签名固定的本地CLI，核对预期binding SHA和版本。选定VM必须声明sealed本地受控启动协议，未知协议在preflight前拒绝，不执行官方CLI。无TTY的SIGINT/SIGTERM/SIGHUP/SIGQUIT均转为VM正常停机，最后输出和子进程退出测试通过。完整TCC责任链与Homebrew依赖闭包仍未完成。",
     "paths": [
-      "AGENTS.md",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadToolchain.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+      "sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift",
+      "sources/VPhoneHelperKit/VPhoneHelperService.swift",
+      "sources/VPhoneHelperKit/VPhoneHelperClient.swift",
+      "sources/VPhoneHelperKit/VPhoneHelperAuthorization.swift",
+      "sources/VPhoneLaunchpad-Info.plist",
       "sources/Info.plist",
-      "sources/VPhoneLaunchpad/InfoPlist.xcstrings",
-      "sources/VPhoneLaunchpad/Localizable.xcstrings",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift"
+      "sources/vphone.entitlements",
+      "scripts/build_launchpad.sh",
+      "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+      "sources/VPhoneLaunchpadLauncherEntry/VPhoneLaunchpadLauncherProcess.swift",
+      "sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLaunchRoute.swift",
+      "tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift",
+      "tests/VPhoneCLITests/ExpectedBindingCLITests.swift"
     ],
     "unmapped_upstream_paths": [
       "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
@@ -893,6 +914,11 @@
       "VPhoneExecutable/VPhoneVirtualization/Resources/VPhoneVirtualization.entitlements",
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist",
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist"
+    ],
+    "acceptance_status": "guarded_local_launcher_validated_full_security_matrix_pending",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   },
   {
@@ -1287,17 +1313,19 @@
       "T05",
       "T24"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "本轮将绑定选择经普通launcher传给受控本地CLI，跨进程核对SHA/版本，未知VM协议明确拒绝。保留B18官方Bundle并存和真实绑定切换证据。合法本地CoreBundle仍缺vphone-escalator，实际绑定启动、创建全流程冻结和四层来源升级/回退矩阵未完成；不把官方Bundle当作本地构建。",
     "paths": [
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadConsoleView.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift"
+      "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineBinding.swift",
+      "tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift",
+      "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+      "sources/VPhoneLaunchpadLauncherEntry/VPhoneLaunchpadLauncherProcess.swift",
+      "sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLaunchRoute.swift",
+      "tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift",
+      "tests/VPhoneCLITests/ExpectedBindingCLITests.swift"
     ],
     "unmapped_upstream_paths": [
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
@@ -1308,6 +1336,11 @@
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadCreationPipeline.swift",
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
       "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadNewMachineAdvancedView.swift"
+    ],
+    "acceptance_status": "guarded_launcher_binding_validated_full_source_matrix_pending",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   },
   {
@@ -1451,18 +1484,14 @@
       "T02",
       "T24"
     ],
-    "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
+    "disposition": "adapt",
+    "reason": "B21在既有精确helper授权内，真实官方2.6.1安装退出0，收据一致；成功日志61字节0600，独立verify日志60字节0600，两份返回后均关闭。管理员规则未放宽，系统store/helper/right恢复缺失基线。输出、尾部、取消等夹具和无TTY wrapper信号测试通过。真实VM正常停机日志保留；全UI即时退出、detached/create/后代writer和吞吐矩阵仍未完成。",
     "paths": [
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadConsoleView.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineInspector.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
-      "sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLineReader.swift",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachine.swift",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
-      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLocations.swift"
+      "tests/VPhoneLaunchpadKitTests/LineSplitterTests.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+      "tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift"
     ],
     "unmapped_upstream_paths": [
       "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -1476,6 +1505,11 @@
       "VPhoneLaunchpad/VPhoneLaunchpadHelper/VPhoneLaunchpadHelperService.swift",
       "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadLogWriter.swift",
       "VPhoneLaunchpad/Configuration/Version.xcconfig"
+    ],
+    "acceptance_status": "real_helper_install_and_verify_logs_pass_full_lifecycle_matrix_pending",
+    "evidence": [
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json"
     ]
   }
 ]

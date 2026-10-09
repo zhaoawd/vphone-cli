@@ -7,6 +7,8 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "launch", abstract: "Boot a VM bundle (runs host preflight first)")
 
+    @Option(help: .hidden) var expectedBindingSha256: String?
+    @Option(help: .hidden) var expectedCoreBundle: String?
     @OptionGroup var lib: VPhoneLibraryOption
     @Argument(help: "VM name") var name: String?
     @Flag(name: .shortAndLong, help: "Boot into DFU mode (headless)") var dfu = false
@@ -46,12 +48,14 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         }
         let machine = bundle.url
         let binding = try VPhoneMachineBinding.snapshot(machine)
+        try validateExpectedBinding(binding)
         if let binding {
             guard projectRoot == nil else { throw ValidationError("A bound VM uses its verified Core Bundle resources; --project-root is refused.") }
             guard VPhoneCoreBundleVersion.supportsTargetFeatures(binding.binding.bundle) else {
                 throw ValidationError("Bound VM execution requires Core Bundle 2.6.0 or later; select and verify a compatible bundle with vm bind-core-bundle.")
             }
             return try VPhoneCoreBundleStore().withVerifiedExecutable(version: binding.binding.bundle, executable: .vm) { binary in
+                try Self.validateBoundLaunchProtocol(binary: binary)
                 try launch(bundle: bundle, name: name, v: v, bootBinary: binary,
                     resources: .resolve(executablePath: binary.path), binding: binding, machine: machine)
             }
@@ -59,6 +63,27 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
         try launch(bundle: bundle, name: name, v: v, bootBinary: VPhoneResources.vmExecutable(),
             resources: projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve(),
             binding: nil, machine: machine)
+    }
+
+    func validateExpectedBinding(_ snapshot: VPhoneMachineBinding.Snapshot?) throws {
+        guard expectedBindingSha256 != nil || expectedCoreBundle != nil else { return }
+        guard let hash = expectedBindingSha256, hash.count == 64,
+              hash.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }),
+              let expectedCoreBundle, let snapshot,
+              snapshot.sha256 == hash, snapshot.binding.bundle == expectedCoreBundle else {
+            throw ValidationError("VM binding differs from the launcher's frozen selection; no VM was started.")
+        }
+    }
+
+    // The store has already checked ownership, receipt and signatures. The
+    // sealed marker identifies our guarded VM entry, rather than inferring
+    // support from a release version or executing an unknown VM to probe it.
+    static func validateBoundLaunchProtocol(binary: URL) throws {
+        let info = binary.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
+        let values = try PropertyListSerialization.propertyList(from: Data(contentsOf: info), format: nil) as? [String: Any]
+        guard values?["VPhoneBoundLaunchProtocol"] as? String == "vphone.local-bound-launch.v1" else {
+            throw ValidationError("The selected Core Bundle VM does not declare the protected local launch protocol; no VM was started.")
+        }
     }
 
     private func launch(bundle: VPhoneBundle, name: String, v: VPhoneVerbosity, bootBinary: URL,
@@ -136,11 +161,17 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
             throw error
         }
 
-        // Forward SIGINT to the child so Ctrl+C stops the VM cleanly.
-        let sigint = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
-        signal(SIGINT, SIG_IGN)
-        sigint.setEventHandler { child.interrupt() }
-        sigint.resume()
+        // The ordinary launcher forwards these stop signals to this wrapper.
+        // Convert each to the VM's graceful SIGINT path and keep waiting so
+        // the store lock and output descriptors outlive the VM child.
+        let stopSources = [SIGINT, SIGTERM, SIGHUP, SIGQUIT].map { number in
+            let source = DispatchSource.makeSignalSource(signal: number, queue: .main)
+            signal(number, SIG_IGN)
+            source.setEventHandler { child.interrupt() }
+            source.resume()
+            return source
+        }
+        defer { stopSources.forEach { $0.cancel() } }
 
         child.waitUntilExit()
         if Self.childFailed(reason: child.terminationReason, status: child.terminationStatus) {

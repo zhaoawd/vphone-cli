@@ -1,0 +1,21 @@
+{
+  "request": {
+    "t": "shell",
+    "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; wc -c /var/root/vphone-b21-transfer/1048576; sha256sum /var/root/vphone-b21-transfer/1048576",
+    "timeout_ms": 10000,
+    "screen": false,
+    "target": {
+      "vm": "b21-restored-vm-new-20261009",
+      "pid": 70301,
+      "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+    }
+  },
+  "response": {
+    "stderr": "",
+    "truncated": false,
+    "timed_out": false,
+    "ok": true,
+    "code": 0,
+    "stdout": "1048576 /var/root/vphone-b21-transfer/1048576\n631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769  /var/root/vphone-b21-transfer/1048576\n"
+  }
+}

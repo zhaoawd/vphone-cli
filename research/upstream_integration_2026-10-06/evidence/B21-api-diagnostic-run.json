@@ -1,0 +1,232 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test ! -e /var/root/vphone-b21-api && mkdir /var/root/vphone-b21-api",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": "",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-api/vphoned",
+        "load": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B21/vphoned-instrumented",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "size": 9035840,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-api/fd-probe",
+        "load": "/private/tmp/vphone-b21-fd-probe",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "size": 62848,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -p 663,667 -o pid=,ppid=,comm=",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": "  663     1 /var/root/vphone-b13-api/vphoned\n  667   663 /private/var/root/vphone-b13-api/vphoned\n",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 663 -o comm= | tr -d \" \")\" = /var/root/vphone-b13-api/vphoned && test \"$(ps -p 667 -o comm= | tr -d \" \")\" = /private/var/root/vphone-b13-api/vphoned && kill -KILL 663; sleep 1; test -z \"$(ps -p 663,667 -o comm=)\"",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": "",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; VPHONE_API_ONLY=1 /var/root/vphone-b21-api/vphoned </dev/null >/var/root/vphone-b21-api/diagnostic.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": "",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep -E \"vphone-b21-api/vphoned|vphone-b13-api/vphoned\"",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": " 2860     1 /var/root/vphone-b21-api/vphoned\n 2861  2860 /private/var/root/vphone-b21-api/vphoned\n",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/diagnostic.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": "2026-10-08 16:54:10.801 vphoned[2861:16689] vphoned: HTTP/WebSocket API listening on vsock 1339\n2026-10-08 16:54:11.898 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer file completion success()\n",
+        "truncated": false
+      }
+    }
+  ],
+  "original_api_workers_before": "  663     1 /var/root/vphone-b13-api/vphoned\n  667   663 /private/var/root/vphone-b13-api/vphoned\n",
+  "proxy_death_reaped_worker": true,
+  "diagnostic_health": {
+    "api_version": 1,
+    "binary_hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "status": "ok"
+  },
+  "processes": " 2860     1 /var/root/vphone-b21-api/vphoned\n 2861  2860 /private/var/root/vphone-b21-api/vphoned\n",
+  "download": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/octet-stream",
+      "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+      "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+      "Content-Length": "1048576",
+      "Connection": "close"
+    },
+    "error": "TimeoutError: timed out",
+    "bytes": 917504,
+    "sha256": "1f8a11bc4767171ad80c7cf1653e746a4ba8cdeb7ef8cc2bdb717cead7486a19"
+  },
+  "trace": "2026-10-08 16:54:10.801 vphoned[2861:16689] vphoned: HTTP/WebSocket API listening on vsock 1339\n2026-10-08 16:54:11.898 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.899 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.900 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer chunk 65536 completion success()\n2026-10-08 16:54:11.901 vphoned[2861:16691] B21 transfer file completion success()\n",
+  "completed": true
+}

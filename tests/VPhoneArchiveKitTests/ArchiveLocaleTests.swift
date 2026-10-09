@@ -104,11 +104,15 @@ struct ArchiveLocaleTests {
     @Test(arguments: [VPhoneArchiveFormat.gnutar, .pax, .ustar])
     func `non-ASCII names and link targets round trip in the C locale`(format: VPhoneArchiveFormat) throws {
         let source = try Self.makeUnicodeTree()
-        let archive = Self.scratch("tar").appendingPathExtension("tar")
+        // The refusal helper checks this archive's staging cleanup. Keep its
+        // parent private so other parallel archive tests are not counted.
+        let archiveRoot = Self.scratch("archive")
+        try FileManager.default.createDirectory(at: archiveRoot, withIntermediateDirectories: true)
+        let archive = archiveRoot.appendingPathComponent("output.tar")
         let destination = Self.scratch("out")
         try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true)
         defer {
-            for url in [source, archive, destination] {
+            for url in [source, archiveRoot, destination] {
                 try? FileManager.default.removeItem(at: url)
             }
         }

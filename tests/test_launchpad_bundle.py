@@ -25,7 +25,7 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.app = Path(self.temp.name) / 'vphone-launchpad.app'
         self.info = plistlib.loads((ROOT / 'sources/VPhoneLaunchpad-Info.plist').read_bytes())
-        for relative in ('Contents/MacOS/vphone-launchpad', 'Contents/Resources/AppIcon.icns',
+        for relative in ('Contents/MacOS/vphone-launchpad', 'Contents/MacOS/vphone-launchpad-launcher', 'Contents/Resources/AppIcon.icns',
                          'Contents/Resources/embedded-toolchain.json',
                          f'{module.HELPER}/Contents/MacOS/vphone-cli', f'{module.HELPER}/Contents/MacOS/vphone-vm',
                          f'{module.HELPER}/Contents/Resources/ja.lproj/Other.strings'):
@@ -44,6 +44,15 @@ class LaunchpadBundleCheckTests(unittest.TestCase):
     def test_info_plist_template_passes(self):
         module.check_info(self.info)
         self.assertEqual(self.info['CFBundleIdentifier'], 'com.vphone.cli.launchpad')
+
+    def test_missing_location_usage_description_is_rejected(self):
+        for key in ('NSLocationUsageDescription', 'NSLocationWhenInUseUsageDescription',
+                    'NSLocationAlwaysAndWhenInUseUsageDescription'):
+            with self.subTest(key=key):
+                info = dict(self.info)
+                info.pop(key, None)
+                with self.assertRaisesRegex(ValueError, key):
+                    module.check_info(info)
 
     def test_upstream_identifier_is_rejected(self):
         self.info['CFBundleIdentifier'] = 'com.vphone.launchpad'

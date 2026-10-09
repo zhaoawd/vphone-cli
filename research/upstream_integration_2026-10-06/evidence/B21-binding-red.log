@@ -1,0 +1,72 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling recovery.c
+[5/37] Compiling asr.c
+[6/37] Compiling download.c
+[7/37] Compiling normal.c
+[8/37] Compiling fdr.c
+[9/37] Compiling ipsw.c
+[10/37] Compiling limera1n.c
+[11/37] Compiling img3.c
+[11/37] Compiling dfu.c
+[13/37] Compiling mbn.c
+[14/37] Compiling img4.c
+[15/37] Compiling ace3.c
+[16/37] Compiling restore.c
+[17/37] Compiling ftab.c
+[18/37] Compiling locking.c
+[19/37] Compiling fls.c
+[20/37] Compiling log.c
+[21/37] Compiling deviceinterfaced.c
+[22/37] Compiling vphone_zip_stub.c
+[23/37] Compiling common.c
+[24/37] Compiling idevicerestore.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift:12:25: error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+10 |         let temp = try LaunchpadTemporaryDirectory()
+11 |         let args = ["vm", "launch", "machine"]
+12 |         let route = try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: launcher, machine: temp.url, arguments: args)
+   |                         `- error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+13 |         #expect(route.executable == embedded)
+14 |         #expect(route.arguments == args)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift:19:25: error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+17 |         let temp = try LaunchpadTemporaryDirectory()
+18 |         try JSONEncoder().encode(VPhoneMachineBinding(bundle: "2.6.1-local.12345678")).write(to: temp.url.appendingPathComponent("launchpad.json"))
+19 |         let route = try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: launcher, machine: temp.url, arguments: ["vm", "launch", "machine"])
+   |                         `- error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+20 |         #expect(route.executable == launcher)
+21 |         #expect(route.arguments.first == "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.12345678/VPhone.bundle/Contents/MacOS/vphone-cli")
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift:28:49: error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+26 |         let temp = try LaunchpadTemporaryDirectory()
+27 |         try Data("{}".utf8).write(to: temp.url.appendingPathComponent("launchpad.json"))
+28 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: launcher, machine: temp.url, arguments: ["vm", "launch", "machine"]) }
+   |                                                 `- error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+29 |     }
+30 |     @Test func boundMachineWithoutLauncherRefuses() throws {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift:33:49: error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+31 |         let temp = try LaunchpadTemporaryDirectory()
+32 |         try JSONEncoder().encode(VPhoneMachineBinding(bundle: "2.6.1")).write(to: temp.url.appendingPathComponent("launchpad.json"))
+33 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: nil, machine: temp.url, arguments: ["vm", "launch", "machine"]) }
+   |                                                 `- error: cannot find 'VPhoneLaunchpadLaunchRoute' in scope
+34 |     }
+35 | }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift:33:114: error: 'nil' requires a contextual type
+31 |         let temp = try LaunchpadTemporaryDirectory()
+32 |         try JSONEncoder().encode(VPhoneMachineBinding(bundle: "2.6.1")).write(to: temp.url.appendingPathComponent("launchpad.json"))
+33 |         #expect(throws: (any Error).self) { try VPhoneLaunchpadLaunchRoute.resolve(embedded: embedded, launcher: nil, machine: temp.url, arguments: ["vm", "launch", "machine"]) }
+   |                                                                                                                  `- error: 'nil' requires a contextual type
+34 |     }
+35 | }
+[29/38] Emitting module VPhoneLaunchpadKitTests
+error: fatalError

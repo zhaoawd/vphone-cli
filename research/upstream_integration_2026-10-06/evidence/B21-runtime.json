@@ -1,0 +1,307 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 70301,
+    "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+  },
+  "observations": [
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.unlock",
+        "params": {
+          "timeout": 10
+        }
+      },
+      "response": {
+        "method": "screen.unlock",
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_screen_off": true,
+          "was_locked": true
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.Preferences"
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "pid": 1098,
+          "frontmost_verified": true
+        },
+        "method": "apps.launch"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "apps.foreground",
+        "params": {}
+      },
+      "response": {
+        "method": "apps.foreground",
+        "result": {
+          "bundle_id": "com.apple.Preferences",
+          "source": "runningboard",
+          "name": "Settings",
+          "verified": true,
+          "pid": 1098
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/System/Library/CoreServices/SystemVersion.plist"
+      },
+      "response": {
+        "size": 570,
+        "ok": true,
+        "readback": {
+          "bytes": 570,
+          "sha256": "2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test ! -e /var/root/vphone-b21-transfer && mkdir /var/root/vphone-b21-transfer; command -v lsof || true; ps -A -o pid=,ppid=,comm= | grep vphone-b13-api/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "truncated": false,
+        "timed_out": false,
+        "ok": true,
+        "code": 0,
+        "stdout": "  663     1 /var/root/vphone-b13-api/vphoned\n  667   663 /private/var/root/vphone-b13-api/vphoned\n"
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/8191",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "size": 8191,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/8192",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 8192
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/8193",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 8193
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/16383",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 16383
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/16384",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 16384
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/16385",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 16385
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer/1048576",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 1048576
+      }
+    }
+  ],
+  "health_before": {
+    "api_version": 1,
+    "binary_hash": "152dc35bd219ebccffb71623cb9e732a8e88d9f257b87f42ac0e38258f7e1749",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "44815ECE-93D0-4955-ACA1-7E3B6E3DBE5D",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "status": "ok"
+  },
+  "restored_settings_launch": {
+    "pid": 1098,
+    "frontmost_verified": true
+  },
+  "restored_foreground": {
+    "bundle_id": "com.apple.Preferences",
+    "source": "runningboard",
+    "name": "Settings",
+    "verified": true,
+    "pid": 1098
+  },
+  "key_system_data_equal": true,
+  "owned_api_processes": "  663     1 /var/root/vphone-b13-api/vphoned\n  667   663 /private/var/root/vphone-b13-api/vphoned\n"
+}

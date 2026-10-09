@@ -1,0 +1,387 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 70301,
+    "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+  },
+  "observations": [
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.unlock",
+        "params": {
+          "timeout": 10
+        }
+      },
+      "response": {
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_screen_off": false,
+          "was_locked": false
+        },
+        "method": "screen.unlock",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.Preferences"
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "pid": 1098,
+          "frontmost_verified": true
+        },
+        "method": "apps.launch"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "apps.foreground",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "bundle_id": "com.apple.Preferences",
+          "source": "runningboard",
+          "name": "Settings",
+          "pid": 1098,
+          "verified": true
+        },
+        "method": "apps.foreground"
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/System/Library/CoreServices/SystemVersion.plist"
+      },
+      "response": {
+        "size": 570,
+        "ok": true,
+        "readback": {
+          "bytes": 570,
+          "sha256": "2a2a4b045059edc470dffc0363071bd65a1a81aca81cbcfb9d4ac9f91a00aeb4"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test ! -e /var/root/vphone-b21-transfer-retry2 && mkdir /var/root/vphone-b21-transfer-retry2; command -v lsof || true; ps -A -o pid=,ppid=,comm= | grep vphone-b21-api/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "timed_out": false,
+        "code": 0,
+        "stderr": "",
+        "stdout": " 2860     1 /var/root/vphone-b21-api/vphoned\n 2861  2860 /private/var/root/vphone-b21-api/vphoned\n",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/8191",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 8191
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/8192",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "size": 8192,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/8193",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 8193
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/16383",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 16383
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/16384",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 16384
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/16385",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "ok": true,
+        "size": 16385
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "path": "/var/root/vphone-b21-transfer-retry2/1048576",
+        "data_b64": "omitted exact synthetic bytes",
+        "transport": "classic"
+      },
+      "response": {
+        "size": 1048576,
+        "ok": true
+      }
+    }
+  ],
+  "health_before": {
+    "api_version": 1,
+    "binary_hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "status": "ok"
+  },
+  "restored_settings_launch": {
+    "pid": 1098,
+    "frontmost_verified": true
+  },
+  "restored_foreground": {
+    "bundle_id": "com.apple.Preferences",
+    "source": "runningboard",
+    "name": "Settings",
+    "pid": 1098,
+    "verified": true
+  },
+  "key_system_data_equal": true,
+  "owned_api_processes": " 2860     1 /var/root/vphone-b21-api/vphoned\n 2861  2860 /private/var/root/vphone-b21-api/vphoned\n",
+  "downloads": [
+    {
+      "bytes": 8191,
+      "sha256": "a7ff4cc384f150c0763c051418a0084ded32bfa5863717ab5f35d3f43a5ffe1c",
+      "seconds": 0.002183291013352573,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+        "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+        "Content-Length": "8191",
+        "Connection": "close"
+      },
+      "slow_read": false
+    },
+    {
+      "bytes": 8192,
+      "sha256": "25df2449b2e5a35fea14e02a7158e283801a1069c9f84631b9a9dacb2f809a7f",
+      "seconds": 0.0015239170170389116,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+        "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+        "Content-Length": "8192",
+        "Connection": "close"
+      },
+      "slow_read": false
+    },
+    {
+      "bytes": 8193,
+      "sha256": "7e3691790cd64b19d4edb1a80e988214515abeb53aa0f34ffbfe4b4bf405d120",
+      "seconds": 0.0010714170057326555,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+        "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+        "Content-Length": "8193",
+        "Connection": "close"
+      },
+      "slow_read": false
+    },
+    {
+      "bytes": 16383,
+      "sha256": "e08c7d58e58b9318263144a618d6f2b6f6825974decd9e6f9371567354b6f566",
+      "seconds": 0.0011054169735871255,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+        "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+        "Content-Length": "16383",
+        "Connection": "close"
+      },
+      "slow_read": false
+    },
+    {
+      "bytes": 16384,
+      "sha256": "4348e3b98e8a327b34ced39c1da9e67cdb4cd5e48e4d7960607a3ae403d35f0c",
+      "seconds": 0.0014741250197403133,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+        "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+        "Content-Length": "16384",
+        "Connection": "close"
+      },
+      "slow_read": false
+    },
+    {
+      "bytes": 16385,
+      "sha256": "ba4f9b37402df1e3ad948a794ab43a9ed887d63e3a389c208ca4314fdd5add58",
+      "seconds": 0.0012064590118825436,
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "X-Vphone-Instance-ID": "6D2E77F7-67FA-4A45-B383-F864F86C31F7",
+        "X-Vphone-Binary-Hash": "9a94d7acb2bfc7e3e615fe84882b8b3c731d83c94be5b177aa7fe8c0f0f0bd05",
+        "Content-Length": "16385",
+        "Connection": "close"
+      },
+      "slow_read": false
+    }
+  ]
+}

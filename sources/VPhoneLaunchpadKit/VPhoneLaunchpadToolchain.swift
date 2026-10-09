@@ -59,6 +59,7 @@ public struct VPhoneLaunchpadToolchain: Sendable {
     public let helperApp: URL
     public let executable: URL
     public let vmExecutable: URL
+    public let launcher: URL
     public let manifest: VPhoneLaunchpadToolchainManifest
 
     static let helperPath = "Contents/Helpers/vphone-cli.app"
@@ -75,11 +76,14 @@ public struct VPhoneLaunchpadToolchain: Sendable {
         let helper = app.appendingPathComponent(helperPath, isDirectory: true)
         let cli = helper.appendingPathComponent("Contents/MacOS/vphone-cli")
         let vm = helper.appendingPathComponent("Contents/MacOS/vphone-vm")
+        let launcher = app.appendingPathComponent("Contents/MacOS/vphone-launchpad-launcher")
         let manifestURL = app.appendingPathComponent("Contents/Resources/\(VPhoneLaunchpadToolchainManifest.fileName)")
 
         // 1. Every component below the app is a real directory or file.
         let layout: [(String, Kind)] = [
             ("Contents", .directory),
+            ("Contents/MacOS", .directory),
+            ("Contents/MacOS/vphone-launchpad-launcher", .executable),
             ("Contents/Helpers", .directory),
             (helperPath, .directory),
             ("\(helperPath)/Contents", .directory),
@@ -97,6 +101,9 @@ public struct VPhoneLaunchpadToolchain: Sendable {
 
         // 2. The nested app, with its nested code and resources, is intact.
         if let problem = checkValidity(helper) {
+            return .failure(Failure(step: .nestedSignature, reason: problem))
+        }
+        if let problem = checkValidity(launcher) {
             return .failure(Failure(step: .nestedSignature, reason: problem))
         }
         // 3. The outer signature seals the manifest and the nested app.
@@ -126,7 +133,7 @@ public struct VPhoneLaunchpadToolchain: Sendable {
         }
 
         return .success(VPhoneLaunchpadToolchain(
-            appBundle: app, helperApp: helper, executable: cli, vmExecutable: vm, manifest: manifest
+            appBundle: app, helperApp: helper, executable: cli, vmExecutable: vm, launcher: launcher, manifest: manifest
         ))
     }
 

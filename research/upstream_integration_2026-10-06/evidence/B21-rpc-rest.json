@@ -1,0 +1,542 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "method": "screen.screenshot",
+        "result": {
+          "coordinate_scale": 3,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "height": 2796
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "coordinate_scale": 3,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "height": 2796
+        },
+        "ok": true,
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "method": "screen.screenshot",
+        "result": {
+          "coordinate_scale": 3,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "height": 2796
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "coordinate_scale": 3,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "height": 2796
+        },
+        "ok": true,
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "coordinate_scale": 3,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "height": 2796
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "services.status",
+        "params": {
+          "label": "com.apple.SpringBoard"
+        }
+      },
+      "response": {
+        "result": {
+          "last_exit_status": 0,
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "loaded": true,
+          "override": false,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "label": "com.apple.SpringBoard",
+          "running": true,
+          "pid": 38
+        },
+        "ok": true,
+        "method": "services.status"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "Preferences"
+        }
+      },
+      "response": {
+        "result": {
+          "count": 1,
+          "processes": [
+            {
+              "uid": 501,
+              "bundle_id": "com.apple.Preferences",
+              "jetsam_limit_mb": 2147483647,
+              "jetsam_priority": 0,
+              "ppid": 1,
+              "resident_bytes": 88440832,
+              "start_time": 1791503224.899197,
+              "executable": "/Applications/Preferences.app/Preferences",
+              "footprint_bytes": 34849584,
+              "pid": 1098,
+              "cpu_seconds": 1.1716430833333333,
+              "name": "Preferences"
+            }
+          ]
+        },
+        "method": "processes.list",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "services.status",
+        "params": {
+          "label": "com.apple.SpringBoard"
+        }
+      },
+      "response": {
+        "result": {
+          "last_exit_status": 0,
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "loaded": true,
+          "override": false,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "label": "com.apple.SpringBoard",
+          "running": true,
+          "pid": 38
+        },
+        "ok": true,
+        "method": "services.status"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "Preferences"
+        }
+      },
+      "response": {
+        "result": {
+          "count": 1,
+          "processes": [
+            {
+              "uid": 501,
+              "bundle_id": "com.apple.Preferences",
+              "jetsam_limit_mb": 2147483647,
+              "jetsam_priority": 0,
+              "ppid": 1,
+              "resident_bytes": 88440832,
+              "start_time": 1791503224.899197,
+              "executable": "/Applications/Preferences.app/Preferences",
+              "footprint_bytes": 34849584,
+              "pid": 1098,
+              "cpu_seconds": 1.1716430833333333,
+              "name": "Preferences"
+            }
+          ]
+        },
+        "ok": true,
+        "method": "processes.list"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "services.status",
+        "params": {
+          "label": "com.apple.SpringBoard"
+        }
+      },
+      "response": {
+        "ok": true,
+        "method": "services.status",
+        "result": {
+          "last_exit_status": 0,
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "loaded": true,
+          "override": false,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "label": "com.apple.SpringBoard",
+          "running": true,
+          "pid": 38
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "Preferences"
+        }
+      },
+      "response": {
+        "method": "processes.list",
+        "result": {
+          "count": 1,
+          "processes": [
+            {
+              "uid": 501,
+              "bundle_id": "com.apple.Preferences",
+              "jetsam_limit_mb": 2147483647,
+              "jetsam_priority": 0,
+              "ppid": 1,
+              "resident_bytes": 88440832,
+              "start_time": 1791503224.899197,
+              "executable": "/Applications/Preferences.app/Preferences",
+              "footprint_bytes": 34849584,
+              "pid": 1098,
+              "cpu_seconds": 1.1716430833333333,
+              "name": "Preferences"
+            }
+          ]
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "services.status",
+        "params": {
+          "label": "com.apple.SpringBoard"
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "last_exit_status": 0,
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "loaded": true,
+          "override": false,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "label": "com.apple.SpringBoard",
+          "running": true,
+          "pid": 38
+        },
+        "method": "services.status"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "Preferences"
+        }
+      },
+      "response": {
+        "method": "processes.list",
+        "result": {
+          "count": 1,
+          "processes": [
+            {
+              "bundle_id": "com.apple.Preferences",
+              "jetsam_limit_mb": 2147483647,
+              "uid": 501,
+              "jetsam_priority": 0,
+              "resident_bytes": 88440832,
+              "ppid": 1,
+              "start_time": 1791503224.899197,
+              "executable": "/Applications/Preferences.app/Preferences",
+              "footprint_bytes": 34849584,
+              "pid": 1098,
+              "cpu_seconds": 1.1716430833333333,
+              "name": "Preferences"
+            }
+          ]
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "services.status",
+        "params": {
+          "label": "com.apple.SpringBoard"
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "last_exit_status": 0,
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "loaded": true,
+          "override": false,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "label": "com.apple.SpringBoard",
+          "running": true,
+          "pid": 38
+        },
+        "method": "services.status"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "Preferences"
+        }
+      },
+      "response": {
+        "result": {
+          "count": 1,
+          "processes": [
+            {
+              "bundle_id": "com.apple.Preferences",
+              "jetsam_limit_mb": 2147483647,
+              "uid": 501,
+              "jetsam_priority": 0,
+              "resident_bytes": 88440832,
+              "ppid": 1,
+              "start_time": 1791503224.899197,
+              "executable": "/Applications/Preferences.app/Preferences",
+              "footprint_bytes": 34849584,
+              "pid": 1098,
+              "cpu_seconds": 1.1716430833333333,
+              "name": "Preferences"
+            }
+          ]
+        },
+        "method": "processes.list",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "display.rotation",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "degrees": 0,
+          "locked": false,
+          "device_orientation": 0,
+          "name": "portrait"
+        },
+        "method": "display.rotation"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 70301,
+          "instance_id": "5DE45341-6F2F-4273-AAD5-EDF5B2D04E94"
+        },
+        "method": "location.current",
+        "params": {}
+      },
+      "response": {
+        "method": "location.current",
+        "operation_may_continue": true,
+        "ok": false,
+        "code": "api_timeout",
+        "error": "api_timeout"
+      }
+    }
+  ]
+}

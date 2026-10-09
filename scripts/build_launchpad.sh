@@ -37,6 +37,7 @@ python3 "$SCRIPT_DIR/check_bundle.py" "$TOOLCHAIN"
 # --- Launchpad executable and compiled string catalogs ---
 echo "=== Building vphone-launchpad (${GIT_HASH}) ==="
 swift build -c release --force-resolved-versions --product vphone-launchpad
+swift build -c release --force-resolved-versions --product vphone-launchpad-launcher
 BIN_DIR="$(swift build -c release --show-bin-path)"
 BINARY="${BIN_DIR}/vphone-launchpad"
 [[ -x "$BINARY" ]] || { print -u2 -- "Missing ${BINARY}"; exit 1; }
@@ -56,6 +57,8 @@ echo "=== Assembling ${APP} ==="
 rm -rf "$APP"
 mkdir -p "${APP}/Contents/MacOS" "${APP}/Contents/Resources" "${APP}/Contents/Helpers"
 cp -f "$BINARY" "${APP}/Contents/MacOS/vphone-launchpad"
+cp -f "${BIN_DIR}/vphone-launchpad-launcher" "${APP}/Contents/MacOS/vphone-launchpad-launcher"
+codesign --force --sign - --identifier com.vphone.cli.launchpad.launcher "${APP}/Contents/MacOS/vphone-launchpad-launcher"
 cp -f "$INFO_PLIST" "${APP}/Contents/Info.plist"
 cp -f sources/AppIcon.icns "${APP}/Contents/Resources/AppIcon.icns"
 # Bundle.main and SwiftUI look in the app's Resources, so copy the compiled
