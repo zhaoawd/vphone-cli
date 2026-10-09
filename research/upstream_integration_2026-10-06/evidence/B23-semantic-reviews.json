@@ -1,0 +1,189 @@
+{
+  "scope": "16 full diffs reviewed; implementation acceptance remains per task",
+  "reviews": [
+    {
+      "sha": "915177898354d86a63d67b1a3abeedfa4ed92165",
+      "paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift"
+      ],
+      "disposition": "already_equivalent",
+      "reason": "完整差异为XPC回调@Sendable标注。本地VPhoneHelperClient未隔离到MainActor，同步请求回调不继承该actor；现有XPC拒绝、断线及ACK测试覆盖本地接口。",
+      "full_diff": "evidence/B23-upstream-91517789.diff",
+      "sha256": "a92288148b5c1bf3fba394315ee0acc1b7d5b52c069fc2015159d6602e8c95d7"
+    },
+    {
+      "sha": "7405d6aaf1159c8ac47f3f4c1559fff4551d3cd6",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-7405d6aa.diff",
+      "sha256": "5e8b416b151a5d87805bfc89dab04eb2bc58bb145da4a5f657978a19c3528242"
+    },
+    {
+      "sha": "fa8913499c8a116217544d20865938261b19ed5e",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-fa891349.diff",
+      "sha256": "de7b19e75b5a9dd0e1921606c94896d7ae1f0314d41593bc984a563cc35d4b18"
+    },
+    {
+      "sha": "16e270459abda3aa5ff5a50de608ff2b11a2b5ba",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-16e27045.diff",
+      "sha256": "b44037f3ec750f84b07c8c39ada1d15700d34e55bcbb743aac64fae4d0b9bb06"
+    },
+    {
+      "sha": "1b3189077556cfe5b456b7bf7e366c72b6a4a567",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-1b318907.diff",
+      "sha256": "70648b7c4e091a47c325ff489ab9206a72e17ed881c00c596c4ac1a35deb5e89"
+    },
+    {
+      "sha": "e48e6f4a3b64bd198752b0df5b08d6a9fcc0cb98",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-e48e6f4a.diff",
+      "sha256": "14927bccd2cf61f8e3ccda6d64c406d0d8c59fab240a9ebd840960839a1f503a"
+    },
+    {
+      "sha": "96480f8b71718981d15eee87d225a34ff908c82f",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-96480f8b.diff",
+      "sha256": "a440d3f89c9c06389c72485191784cd7c2f804e49fa1fd523da81085d569b43d"
+    },
+    {
+      "sha": "f795b5f6c673398c8b9ce44410d9ee32e61f6397",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-f795b5f6.diff",
+      "sha256": "ddbabe29a451fb2d3511ac870edf25428d44c84adb6782094aa857909d02853f"
+    },
+    {
+      "sha": "8b28ea2cb497c089da9bf2406be4c3c36a117cf4",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "full_diff": "evidence/B23-upstream-8b28ea2c.diff",
+      "sha256": "5b3e8585a877b8a910154a298b135d5719bc039fcc63ad9c62ded60d8dac568a"
+    },
+    {
+      "sha": "bc4e6984ee9fb6b428267ac8f51abe56db0317fa",
+      "paths": [
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "adapted_verified",
+      "reason": "完整差异仅为三处0.7.16 pin元数据；本地固定702990b5构建和运行来源一致，并有timezone实机证据。本条结论只覆盖pin，不表示T08所有API验收完成。",
+      "full_diff": "evidence/B23-upstream-bc4e6984.diff",
+      "sha256": "fc29064bd3e98083165ca0991ccd7736a98af21b4e8e7d08fafa52b836b2275f"
+    },
+    {
+      "sha": "3f00950be4c0fe9b275523dfb59dfcc43445444b",
+      "paths": [
+        "Skills/vphone-guest-control/references/rpc-methods.md",
+        "VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        "VPhoneDaemon/Configuration/VPhoneDaemon.entitlements",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+        "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+      ],
+      "disposition": "adaptation_planned",
+      "reason": "完整五文件差异包含0.7.14 pin、physicalinteraction entitlement和插件文档。固定0.7.16及候选entitlement已具备，Safari旋转实测通过；T18扩展provider仍待实施，不能判定整项等价。",
+      "full_diff": "evidence/B23-upstream-3f00950b.diff",
+      "sha256": "02ed51e79a56d8ff589160bdc24dfeca261e47bb31483487b490a9621adf67e7"
+    },
+    {
+      "sha": "3e80d0361ba1ebbd808a374558d1fc259de7f694",
+      "paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Application/VPhoneLaunchpadPreview.swift"
+      ],
+      "disposition": "not_applicable",
+      "reason": "完整差异只把开发Preview JSON中64/128GiB样本改为64/128GB；本地未编译该Preview样本，生产VM容量不受该提交影响。",
+      "full_diff": "evidence/B23-upstream-3e80d036.diff",
+      "sha256": "a5822f250bb68af750995bb9d80bc91415a28e428291a9f2d04b4c90bbc6126e"
+    },
+    {
+      "sha": "ad9ee8ecab26e76698d6115a61fc12909f4d7073",
+      "paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachinesView.swift"
+      ],
+      "disposition": "already_equivalent",
+      "reason": "完整单文件差异为Table FocusState及onAppear的NSText条件；本地MachinesView具有同一条件和聚焦逻辑。仅建立源码等价，未据此声称真实表格焦点验收。",
+      "full_diff": "evidence/B23-upstream-ad9ee8ec.diff",
+      "sha256": "4e7fac748d7b9e83d2aedb9c20f4e6e362dae9d7856034e0da7cc4217c2d9702"
+    },
+    {
+      "sha": "f57adf67431453f8ecbd3b568503ee7dddcfa9af",
+      "paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundleView.swift"
+      ],
+      "disposition": "adaptation_planned",
+      "reason": "完整差异只移动Check for Updates至Install Local Build之前。本地Core Bundle UI仍为只读Verify Again，安装流程未接入；在T25/T27 UI接入时适配顺序。",
+      "full_diff": "evidence/B23-upstream-f57adf67.diff",
+      "sha256": "014546a987d314aa56ea2f7105efbcbb656de9c1373a756b153559ee9a6eee31"
+    },
+    {
+      "sha": "0768ceefc0a7ea4e932306e54e65fd7dfb9542a2",
+      "paths": [
+        "VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist",
+        "VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings"
+      ],
+      "disposition": "adaptation_planned",
+      "reason": "完整差异为Info.plist解释注释及五语言CFBundleDisplayName/CFBundleName。本地en/zh-Hans仍为vphone-launchpad，保留T27本地化适配；本地独立bundle identifier继续保留。",
+      "full_diff": "evidence/B23-upstream-0768ceef.diff",
+      "sha256": "2c0103a1213df1d63e4f7914cd3c6075e69fbc49e38fb0a9c62f45348c7e9d69"
+    },
+    {
+      "sha": "86f1f88aadc53f4eaff760e3a121df26332499af",
+      "paths": [
+        "VPhoneLaunchpad/VPhoneLaunchpad/Localizable.xcstrings"
+      ],
+      "disposition": "adaptation_planned",
+      "reason": "完整差异修改11条中文Helper名称。本地目录仍含辅助工具译名且对应UI能力不同；在T27逐键适配，不宣称全目录等价。",
+      "full_diff": "evidence/B23-upstream-86f1f88a.diff",
+      "sha256": "66b95e06d96f6e695508fe56512a70c663c092a1c7557a97efdf78c567a3e35f"
+    }
+  ],
+  "pending": 202
+}

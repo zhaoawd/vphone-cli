@@ -1,0 +1,162 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 11092,
+    "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+  },
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep vphone-b23-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0,
+        "timed_out": false,
+        "stdout": " 1611     1 /var/root/vphone-b23-api/vphoned\n 1612  1611 /private/var/root/vphone-b23-api/vphoned\n"
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 1611 -o comm= | tr -d \" \")\" = /var/root/vphone-b23-api/vphoned && kill -TERM 1611",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0,
+        "timed_out": false,
+        "stdout": ""
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vphone-b23-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "code": 0,
+        "stdout": "/var/root/vphone-b23-api/vphoned\n",
+        "truncated": false,
+        "stderr": "",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vphone-b23-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "code": 0,
+        "stdout": "/var/root/vphone-b23-api/vphoned\n",
+        "truncated": false,
+        "stderr": "",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vphone-b23-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "code": 0,
+        "stdout": "",
+        "truncated": false,
+        "stderr": "",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    }
+  ],
+  "/usr/bin/vphoned": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "/var/root/Library/Caches/vphoned": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "stop": {
+    "returncode": 0,
+    "stdout": "b21-restored-vm-new-20261009: boot instance 8707EE7C-C77D-4793-A428-6D1B054EDB32\nb21-restored-vm-new-20261009: sending SIGINT to 11092\nb21-restored-vm-new-20261009: stopped\n",
+    "stderr": "",
+    "seconds": 11.35242350003682
+  }
+}

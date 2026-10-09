@@ -1,0 +1,26 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Emitting module VPhoneCoreTests
+[6/7] Compiling VPhoneCoreTests VMStopTests.swift
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (7.63s)
+Test Suite 'Selected tests' started at 2026-10-09 11:15:58.542.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:15:58.544.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:15:58.544.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:15:58.544.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VMStopTests started.
+◇ Test emptyArgvZeroCannotReadConfigFromEnvironment() started.
+✘ Test emptyArgvZeroCannotReadConfigFromEnvironment() recorded an issue at VMStopTests.swift:205:9: Expectation failed: (VPhoneProcessInfo.arguments(of: pid) → ["vphone-vm", "--config=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vmstop-96C4E1EA-B806-4508-B1EB-539C95F962AA Application Support/vm/config.plist"]) == nil
+✘ Test emptyArgvZeroCannotReadConfigFromEnvironment() recorded an issue at VMStopTests.swift:208:9: Expectation failed: !((VPhoneBootProcessLocator.livePIDs(ps.stdout, configURL: fixture.configURL) → [30629]).contains(pid → 30629) → true)
+✘ Test emptyArgvZeroCannotReadConfigFromEnvironment() failed after 0.105 seconds with 2 issues.
+✘ Suite VMStopTests failed after 0.105 seconds with 2 issues.
+✘ Test run with 1 test in 1 suite failed after 0.105 seconds with 2 issues.

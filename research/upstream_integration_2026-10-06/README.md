@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见下方 B21 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B23 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -739,3 +739,24 @@ helper注册命令被自动审批拒绝，原因为该操作改变系统特权�
 恢复副本已正常停机、原vm-new关键摘要保持，原classic及缓存SHA306ed42b恢复；测试绑定和系统Bundle store恢复缺失，helper服务/文件/right保持缺失，两个临时令牌删除。临时AMFI驱动结束时身份断言失败；独立确认驱动/debugserver不存在、amfid由launchd管理，不声明正常detach。B18和本轮停机恢复点保留；同卷APFS写时复制不证明物理独立。未操作vm-2607、未执行escalator、未升级kernel/boot-chain或部署modern相机。
 
 B21原待确认的4cea360c临时AMFI范围已由当前用户授权，按paths=[]、allow_all=false限定使用并收尾。先前B20认证等待的最终结果见B21-summary.json，系统已恢复缺失基线；README中的历史进行中状态不表示当前仍在等待。当前入口：evidence/B22-summary.json、B22-source-review.json及B22-final-readback.json。
+
+## 2026-10-09 B23 当前结果
+
+选定7项为T02/T06/T07/T08/T24/T40/T46。T06保持B22验收结果，本批新增T07 accepted；其余5项未满足原接受条件。全台账7项accepted、39项必选未完成、T45可选延期。原步骤、依赖、接受条件及历史证据保持。源码提交为`f45be6c6e79d393e99ecbbe1c891536b214ae2bf`。
+
+| 任务 | 结果 | 未完成范围 |
+| --- | --- | --- |
+| T02 | 新增16个完整差异审查，342条覆盖保持，待审218→202 | 202条全局语义核对及47项能力对账 |
+| T07 | 临时launchd job下worker KILL/TERM、proxy KILL、显式不同签名binary更新确认/回退、未确认缓存失败和不可执行缓存回退通过 | 不同binary只有签名改变；53个Mach-O section载荷相同，不代表功能升级或环境迁移 |
+| T08 | Safari 90/270度读回及横向JPEG视觉检查通过；RootHide路径纯算法测试通过 | 当前客户机rootless，缺实际RootHide样本；services.start状态144、Settings及180度旋转未生效，原因未查明 |
+| T24 | 修复空argv[0]误读env；跨UID argv不可读时合法存活记录保持busy；实际launcher四组拒绝通过 | TCC责任链与旧helper协议真实拒绝仍待验；链接替换本次由严格签名拒绝 |
+| T40 | 实际clone/rename后65文件大小/摘要/权限一致；身份保持，未并发启动 | 缺失binding/receipt保持unknown，未验已存在收据；四层更新依赖能力尚未完整接入；21GiB已分配磁盘与约20GiB空闲不足以确认完整归档往返空间 |
+| T46 | 两项detached输出竞态RED复现后修复；44项相关测试及复审通过；签名UI空库启动/列出/关窗退出0 | 未验活动writer后立即退出UI、完整create取消及实际UI吞吐；进程组外写入者不由本次检查证明 |
+
+T07的显式更新和回退分别在1.674/0.639秒取得新实例和预期hash，并确认pending移除及确认标记。无效exec缓存2.705秒回到bundled binary，后续稳定，无无界坏缓存循环。卸载响应曾断开，独立查询确认job未加载且进程消失；classic和缓存恢复原摘要。VM通过SIGINT正常停机11.352秒，日志保留classicAccepted及Guest stopped。原VM未改写，原VM和恢复副本磁盘均释放，token删除，临时helper/store/authorization right缺失。
+
+初次AMFI清理断言失败后，早期readback只查服务与PPID，遗漏旧amfid 41252处于Ts状态；该readback不足以证明正常恢复。完整测试曾阻塞，采样观察到内核查询/posix_spawn等待，原因未查明。随后恢复旧进程执行状态，精确结束旧amfid并由launchd启动原系统服务，新PID63532、PPID1、Ss；独立状态读回通过，无debugserver或临时AMFI驱动。保留失败、阻塞、清理和最终通过记录，不将初次清理写成正常detach。
+
+最终标准Swift入口：常规1254项/201套件、计时9项/8套件通过；既有3个短时限测试移入已有计时组，时限不变。相关输出44项/12套件、Python测试入口6项通过。make build、make launchpad、make check_bundle check_launchpad通过；编译仍有既有警告，字符串检查needs_review为129。最新签名产物未用于本批VM启动，不能把旧固定候选的运行证据归给新hash。完整Python和固件未在B23重跑。
+
+证据入口：`evidence/B23-summary.json`、`evidence/B23-source-review.json`、`evidence/B23-worker-matrix.json`、`evidence/B23-swift-final-after-tail.log`、`evidence/B23-final-readback.json`。

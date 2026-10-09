@@ -1,0 +1,47 @@
+commit 915177898354d86a63d67b1a3abeedfa4ed92165
+Author:     dazi2011 <uhh476301@gmail.com>
+AuthorDate: Sun Sep 27 13:19:57 2026 +0800
+Commit:     Lakr <25259084+Lakr233@users.noreply.github.com>
+CommitDate: Sun Sep 27 18:46:48 2026 +0900
+
+    Keep Launchpad XPC callbacks off the main actor
+    
+    The error and invalidation handlers run on the XPC queue. Inferred as
+    main-actor closures, they trap under Swift 6 when the helper rejects the
+    connection, so Launchpad crashed at launch instead of offering to update
+    the helper.
+
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift b/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift
+index 4f98834c..0f3c75d9 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift
+@@ -281,7 +281,10 @@ final class VPhoneLaunchpadHelperClient {
+         if let helperRequirement {
+             connection.setCodeSigningRequirement(helperRequirement)
+         }
+-        connection.invalidationHandler = { [weak self] in
++        // XPC calls this and the error handlers below on its own queue. Without
++        // @Sendable they would inherit the main actor, and Swift 6 traps when
++        // they run there.
++        connection.invalidationHandler = { @Sendable [weak self] in
+             Task { @MainActor in self?.connection = nil }
+         }
+         connection.resume()
+@@ -296,7 +299,7 @@ final class VPhoneLaunchpadHelperClient {
+         let connection = currentConnection()
+         return try await withCheckedThrowingContinuation { continuation in
+             let once = VPhoneLaunchpadResumeOnce(continuation)
+-            let proxy = connection.remoteObjectProxyWithErrorHandler { error in
++            let proxy = connection.remoteObjectProxyWithErrorHandler { @Sendable error in
+                 once.resume(.failure(error))
+             }
+             guard let helper = proxy as? VPhoneLaunchpadHelperProtocol else {
+@@ -323,7 +326,7 @@ final class VPhoneLaunchpadHelperClient {
+         let connection = currentConnection()
+         return try await withCheckedThrowingContinuation { continuation in
+             let once = VPhoneLaunchpadResumeOnce(continuation)
+-            let proxy = connection.remoteObjectProxyWithErrorHandler { error in
++            let proxy = connection.remoteObjectProxyWithErrorHandler { @Sendable error in
+                 once.resume(.failure(error))
+             }
+             DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {

@@ -1,0 +1,181 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/18] Compiling VPhoneCore VPhoneBundleGuard.swift
+[7/18] Emitting module VPhoneCore
+[8/23] Compiling VPhoneCore VPhoneMachineBindingPersistence.swift
+[9/23] Compiling VPhoneCore VPhoneRestoreInfo.swift
+[10/23] Compiling VPhoneCore VPhoneBundleOps.swift
+[11/23] Compiling VPhoneCore VPhoneIPSWCacheAdoption.swift
+[12/23] Compiling VPhoneCore VPhoneIPSWCache.swift
+[12/29] Write Objects.LinkFileList
+[13/38] Linking vphone-helper
+[15/46] Emitting module VPhoneArchiveKitTests
+[16/46] Emitting module VPhoneLaunchpadKit
+[17/46] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[18/48] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[19/48] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[19/48] Applying vphone-helper
+[21/48] Compiling vphone_cli VPhoneCLI.swift
+[22/48] Compiling vphone_cli VPhoneNativeFirmwarePreparer.swift
+[23/48] Compiling vphone_cli VPhoneFWCLI.swift
+[24/48] Compiling vphone_cli VPhoneRestoreCLI.swift
+[25/48] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[26/48] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+[27/48] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreation.swift
+[28/61] Emitting module VPhoneLaunchpadLauncherEntry
+[28/61] Write Objects.LinkFileList
+[30/61] Compiling VPhoneCoreTests VMStopTests.swift
+[31/61] Compiling VPhoneCoreTests StaleRuntimeStateTests.swift
+[32/61] Compiling VPhoneCoreTests BundleGuardTests.swift
+[33/61] Compiling VPhoneCoreTests RestoreInfoTests.swift
+[34/61] Compiling VPhoneCoreTests FirmwareRecoveryLockTests.swift
+[35/61] Emitting module VPhoneCoreTests
+[36/61] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[36/61] Write Objects.LinkFileList
+[38/61] Linking vphone-launchpad-launcher
+[40/61] Compiling VPhoneLaunchpad VPhoneLaunchpadModel.swift
+[41/61] Compiling VPhoneLaunchpad VPhoneLaunchpadNewMachineView.swift
+[42/61] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[42/62] Applying vphone-launchpad-launcher
+[44/62] Emitting module VPhoneLaunchpad
+[45/62] Compiling VPhoneLaunchpad VPhoneLaunchpadMachinesView.swift
+[45/62] Write Objects.LinkFileList
+[47/62] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[48/62] Compiling VPhoneLaunchpadKitTests MenuBarTests.swift
+[49/62] Compiling VPhoneLaunchpadKitTests RealCLIEditTests.swift
+[49/62] Linking vphone-launchpad
+[50/62] Applying vphone-launchpad
+[51/62] Linking vphone-cli
+[52/62] Linking vphone-vm
+[53/62] Applying vphone-cli
+[54/62] Applying vphone-vm
+[56/62] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[57/62] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[58/62] Compiling VPhoneLaunchpadKitTests EditTests.swift
+[59/62] Emitting module VPhoneLaunchpadKitTests
+[60/62] Compiling VPhoneLaunchpadKitTests CreateTests.swift
+[60/62] Write Objects.LinkFileList
+[61/62] Linking vphone-cliPackageTests
+Build complete! (17.85s)
+Test Suite 'Selected tests' started at 2026-10-09 11:11:58.035.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:11:58.036.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:11:58.036.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:11:58.036.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite RunStateTests started.
+◇ Suite BundleGuardTests started.
+◇ Suite VMStopTests started.
+◇ Test liveReaderPreservesExecutableAndConfigSpaces() started.
+◇ Test staleBootRecordWithReusedPIDIsStopped() started.
+◇ Test shortOperationRecordWithExitedHolderIsStopped() started.
+◇ Test requireDFUOwnerRefusesWhenRecordMissing() started.
+◇ Test nestedBundleLockOnSameDirectoryIsBusy() started.
+◇ Test dfuWithMatchingDFURecord() started.
+◇ Test stoppedWithoutBootProcessOrRecord() started.
+◇ Test liveProcessListParses() started.
+◇ Test refusedDeleteLeavesBundleBytesUnchanged() started.
+◇ Test eachMachineReadsItsOwnRecordOnce() started.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+◇ Test mapsOutcomesToExitCodes() started.
+◇ Test requireDFUOwnerRefusesWhenPIDNotABootProcess() started.
+◇ Test requireDFUOwnerReturnsRecordOnFullSuccessPath() started.
+◇ Test diskInspectionFailureCannotReportStopped() started.
+◇ Test requireDFUOwnerRefusesWhenOperationNotDFU() started.
+◇ Test refusesToSignalAForeignLockHolder() started.
+◇ Test busyWhileShortOperationHolderLives() started.
+◇ Test shortOperationRecordWithReusedPIDIsStopped() started.
+◇ Test requireDFUOwnerRefusesWhenPIDGone() started.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+◇ Test lockIsKeyedByInodeNotPathSpelling() started.
+◇ Test busyToleratesRecordTimeTruncation() started.
+◇ Test requireDFUOwnerRefusesWhenLockNotHeld() started.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+◇ Test runningFromBootProcessAlone() started.
+◇ Test requireDFUOwnerRefusesWhenPIDIsZombie() started.
+◇ Test exitedTargetAndReleasedLockStillRequireDiskRelease() started.
+◇ Test staleBootRecordDoesNotNameTheRunningInstance() started.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+◇ Test withBundleLockRunsBodyAndReturnsValue() started.
+◇ Test reportsProgressBeforeTheWaits() started.
+◇ Test reportsSignalErrorsSeparately() started.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() started.
+◇ Test runningWithMatchingBootRecord() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+✔ Test requireDFUOwnerRefusesWhenRecordMissing() passed after 1.434 seconds.
+✔ Test dfuWithMatchingDFURecord() passed after 1.434 seconds.
+✔ Test stoppedWithoutBootProcessOrRecord() passed after 1.434 seconds.
+✔ Test staleBootRecordWithReusedPIDIsStopped() passed after 1.434 seconds.
+✔ Test mapsOutcomesToExitCodes() passed after 1.434 seconds.
+✔ Test requireDFUOwnerReturnsRecordOnFullSuccessPath() passed after 1.434 seconds.
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 1.434 seconds.
+✔ Test requireDFUOwnerRefusesWhenPIDNotABootProcess() passed after 1.434 seconds.
+✔ Test requireDFUOwnerRefusesWhenOperationNotDFU() passed after 1.434 seconds.
+✔ Test eachMachineReadsItsOwnRecordOnce() passed after 1.434 seconds.
+✔ Test busyWhileShortOperationHolderLives() passed after 1.434 seconds.
+✔ Test requireDFUOwnerRefusesWhenPIDGone() passed after 1.434 seconds.
+✔ Test shortOperationRecordWithExitedHolderIsStopped() passed after 1.435 seconds.
+✔ Test shortOperationRecordWithReusedPIDIsStopped() passed after 1.434 seconds.
+✔ Test nestedBundleLockOnSameDirectoryIsBusy() passed after 1.435 seconds.
+✔ Test lockIsKeyedByInodeNotPathSpelling() passed after 1.434 seconds.
+✔ Test requireDFUOwnerRefusesWhenLockNotHeld() passed after 1.434 seconds.
+✔ Test busyToleratesRecordTimeTruncation() passed after 1.435 seconds.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 1.434 seconds.
+✔ Test runningFromBootProcessAlone() passed after 1.435 seconds.
+✔ Test requireDFUOwnerRefusesWhenPIDIsZombie() passed after 1.435 seconds.
+✔ Test exitedTargetAndReleasedLockStillRequireDiskRelease() passed after 1.434 seconds.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 1.435 seconds.
+✔ Test staleBootRecordDoesNotNameTheRunningInstance() passed after 1.435 seconds.
+✔ Test withBundleLockRunsBodyAndReturnsValue() passed after 1.435 seconds.
+✔ Test diskInspectionFailureCannotReportStopped() passed after 1.435 seconds.
+✔ Test reportsSignalErrorsSeparately() passed after 1.435 seconds.
+✔ Test liveProcessListParses() passed after 1.435 seconds.
+✔ Test liveReaderPreservesExecutableAndConfigSpaces() passed after 1.435 seconds.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 1.435 seconds.
+✔ Test refusesToSignalAForeignLockHolder() passed after 1.435 seconds.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 1.435 seconds.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 1.444 seconds.
+✔ Test runningWithMatchingBootRecord() passed after 1.443 seconds.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 1.444 seconds.
+✔ Test refusedDeleteLeavesBundleBytesUnchanged() passed after 1.444 seconds.
+✔ Suite BundleGuardTests passed after 1.445 seconds.
+✔ Suite RunStateTests passed after 1.445 seconds.
+✔ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() passed after 1.486 seconds.
+✔ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) with 2 test cases passed after 1.720 seconds.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 3.493 seconds.
+✔ Test reportsProgressBeforeTheWaits() passed after 3.493 seconds.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 7.464 seconds.
+✔ Suite VMStopTests passed after 7.465 seconds.
+✔ Test run with 41 tests in 3 suites passed after 7.466 seconds.

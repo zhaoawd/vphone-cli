@@ -39,8 +39,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "already_equivalent",
+      "reason": "完整差异为XPC回调@Sendable标注。本地VPhoneHelperClient未隔离到MainActor，同步请求回调不继承该actor；现有XPC拒绝、断线及ACK测试覆盖本地接口。",
+      "evidence": [
+        "evidence/B23-upstream-91517789.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "2b8ac4c67d32e4619eb1273cecb3a52cfc79fba4",
@@ -1212,8 +1216,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-7405d6aa.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "59903d5bca14ab3153a2000f768bff6b0fc528d3",
@@ -1356,8 +1364,12 @@
         "T02"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "not_applicable",
+      "reason": "完整差异只把开发Preview JSON中64/128GiB样本改为64/128GB；本地未编译该Preview样本，生产VM容量不受该提交影响。",
+      "evidence": [
+        "evidence/B23-upstream-3e80d036.diff",
+        "evidence/B23-semantic-reviews.json"
+      ]
     },
     {
       "sha": "da8bed71e1b3a38b8d8a6ac6d39d745dcd7192dd",
@@ -1626,8 +1638,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-fa891349.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "2b253b6eeb474588fc100b674553c26b2e23d44b",
@@ -2158,8 +2174,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-16e27045.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "e8b16dee1d0ae891baf03150f1ea892a0bfda7b7",
@@ -2896,8 +2916,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "already_equivalent",
+      "reason": "完整单文件差异为Table FocusState及onAppear的NSText条件；本地MachinesView具有同一条件和聚焦逻辑。仅建立源码等价，未据此声称真实表格焦点验收。",
+      "evidence": [
+        "evidence/B23-upstream-ad9ee8ec.diff",
+        "evidence/B23-semantic-reviews.json"
+      ]
     },
     {
       "sha": "61f76f0b4af3ab964ee86b22f8b05edf3b4362f7",
@@ -2976,8 +3000,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-1b318907.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "b7a7498a14ababd78e544e939a1f7bed1881396b",
@@ -3572,8 +3600,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-e48e6f4a.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "88120ff04354d854df37b32d08141dff452feb98",
@@ -3690,8 +3722,12 @@
         "T02"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adaptation_planned",
+      "reason": "完整差异只移动Check for Updates至Install Local Build之前。本地Core Bundle UI仍为只读Verify Again，安装流程未接入；在T25/T27 UI接入时适配顺序。",
+      "evidence": [
+        "evidence/B23-upstream-f57adf67.diff",
+        "evidence/B23-semantic-reviews.json"
+      ]
     },
     {
       "sha": "caebc24fcde1591412d33ead348e9f123a2d5827",
@@ -5059,8 +5095,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-96480f8b.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "3938171539aeefc0355be1fee4b69372f3bda0d4",
@@ -5452,8 +5492,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-f795b5f6.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "3364561354307d4f31d103ef663e82474d070d94",
@@ -5643,8 +5687,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adaptation_planned",
+      "reason": "完整五文件差异包含0.7.14 pin、physicalinteraction entitlement和插件文档。固定0.7.16及候选entitlement已具备，Safari旋转实测通过；T18扩展provider仍待实施，不能判定整项等价。",
+      "evidence": [
+        "evidence/B23-upstream-3f00950b.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "48e915e1b554158c0cd43a8e6c54cd2a4f16c4cd",
@@ -6147,8 +6195,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "superseded",
+      "reason": "完整三文件差异仅更新两份Package.resolved及project.pbxproj的中间IcliKit pin；固定目标0.7.16替代该中间pin。本条不根据提交标题推断依赖内部功能已验收。",
+      "evidence": [
+        "evidence/B23-upstream-8b28ea2c.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "59601eb60c8f9b95bb5a0c14a2e468d297f81803",
@@ -6827,8 +6879,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adapted_verified",
+      "reason": "完整差异仅为三处0.7.16 pin元数据；本地固定702990b5构建和运行来源一致，并有timezone实机证据。本条结论只覆盖pin，不表示T08所有API验收完成。",
+      "evidence": [
+        "evidence/B23-upstream-bc4e6984.diff",
+        "evidence/B23-summary.json"
+      ]
     },
     {
       "sha": "9e560b3ada18c6a08fba62213cf3aefeba3eb259",
@@ -10095,8 +10151,12 @@
         "T02"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adaptation_planned",
+      "reason": "完整差异为Info.plist解释注释及五语言CFBundleDisplayName/CFBundleName。本地en/zh-Hans仍为vphone-launchpad，保留T27本地化适配；本地独立bundle identifier继续保留。",
+      "evidence": [
+        "evidence/B23-upstream-0768ceef.diff",
+        "evidence/B23-semantic-reviews.json"
+      ]
     },
     {
       "sha": "49fdb7d3c015aa2fb732c9f4a8a278410295c8d8",
@@ -11014,8 +11074,12 @@
         "T26"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adaptation_planned",
+      "reason": "完整差异修改11条中文Helper名称。本地目录仍含辅助工具译名且对应UI能力不同；在T27逐键适配，不宣称全目录等价。",
+      "evidence": [
+        "evidence/B23-upstream-86f1f88a.diff",
+        "evidence/B23-semantic-reviews.json"
+      ]
     },
     {
       "sha": "da1179396997ddbaaf7198cdf9946ae6b0a56de3",

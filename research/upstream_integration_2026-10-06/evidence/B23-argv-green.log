@@ -1,0 +1,160 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/17] Emitting module VPhoneCore
+[6/17] Compiling VPhoneCore VPhoneProcessIdentity.swift
+[6/22] Write Objects.LinkFileList
+[12/23] Linking vphone-helper
+[13/23] Linking vphone-launchpad-launcher
+[14/23] Applying vphone-helper
+[15/23] Applying vphone-launchpad-launcher
+[16/23] Linking vphone-launchpad
+[17/23] Applying vphone-launchpad
+[18/23] Linking vphone-cli
+[19/23] Linking vphone-vm
+[20/23] Applying vphone-cli
+[21/23] Applying vphone-vm
+[22/23] Linking vphone-cliPackageTests
+Build complete! (7.95s)
+Test Suite 'Selected tests' started at 2026-10-09 11:17:08.306.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:17:08.308.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:17:08.308.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:17:08.308.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VMStopTests started.
+◇ Suite LaunchLayoutTests started.
+◇ Suite RunStateTests started.
+◇ Suite BundleGuardTests started.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+◇ Test busyWhileShortOperationHolderLives() started.
+◇ Test shortOperationRecordWithReusedPIDIsStopped() started.
+◇ Test stoppedWithoutBootProcessOrRecord() started.
+◇ Test shortOperationRecordWithExitedHolderIsStopped() started.
+◇ Test busyToleratesRecordTimeTruncation() started.
+◇ Test runningWithMatchingBootRecord() started.
+◇ Test dfuWithMatchingDFURecord() started.
+◇ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test mapsOutcomesToExitCodes() started.
+◇ Test liveReaderPreservesExecutableAndConfigSpaces() started.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+◇ Test emptyArgvZeroCannotReadConfigFromEnvironment() started.
+◇ Test exitedTargetAndReleasedLockStillRequireDiskRelease() started.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+◇ Test staleBootRecordWithReusedPIDIsStopped() started.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test liveProcessListParses() started.
+◇ Test staleBootRecordDoesNotNameTheRunningInstance() started.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test eachMachineReadsItsOwnRecordOnce() started.
+◇ Test runningFromBootProcessAlone() started.
+◇ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() started.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+◇ Test refusesToSignalAForeignLockHolder() started.
+◇ Test stageVphonedReturnsFalseWhenSourceAbsent() started.
+◇ Test reportsSignalErrorsSeparately() started.
+◇ Test reportsProgressBeforeTheWaits() started.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+◇ Test diskInspectionFailureCannotReportStopped() started.
+◇ Test dedupsSortsAndSkipsMalformedLines() started.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+◇ Test matchesBundledAppBinaryAndEqualsForm() started.
+◇ Test stageVphonedCopiesWhenSourceExists(less:) started.
+◇ Test lockIsKeyedByInodeNotPathSpelling() started.
+◇ Test requireDFUOwnerReturnsRecordOnFullSuccessPath() started.
+◇ Test resolvesArtifactPaths() started.
+◇ Test withBundleLockRunsBodyAndReturnsValue() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test stageVphonedOverwritesStaleDestination() started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test locatesBootProcessByConfigArgument() started.
+◇ Test requireDFUOwnerRefusesWhenPIDGone() started.
+◇ Test pairedRuntimeAndProcessIdentity() started.
+◇ Test requireDFUOwnerRefusesWhenLockNotHeld() started.
+◇ Test requireDFUOwnerRefusesWhenPIDIsZombie() started.
+◇ Test matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() started.
+◇ Test refusedDeleteLeavesBundleBytesUnchanged() started.
+◇ Test toolchainFingerprintIncludesBothExecutables() started.
+◇ Test nestedBundleLockOnSameDirectoryIsBusy() started.
+◇ Test matchesEitherRawOrResolvedConfigPath() started.
+◇ Test delegatesToResources() started.
+◇ Test requireDFUOwnerRefusesWhenOperationNotDFU() started.
+◇ Test requireDFUOwnerRefusesWhenRecordMissing() started.
+◇ Test resolvesToolPaths() started.
+◇ Test ignoresOtherBundlesAndUnrelatedProcesses() started.
+◇ Test requireDFUOwnerRefusesWhenPIDNotABootProcess() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test parsesLsofPIDs() started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument less → false to stageVphonedCopiesWhenSourceExists(less:) started.
+◇ Test case passing 1 argument less → true to stageVphonedCopiesWhenSourceExists(less:) started.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 0.639 seconds.
+✔ Test mapsOutcomesToExitCodes() passed after 0.639 seconds.
+✔ Test stoppedWithoutBootProcessOrRecord() passed after 0.639 seconds.
+✔ Test shortOperationRecordWithExitedHolderIsStopped() passed after 0.640 seconds.
+✔ Test dfuWithMatchingDFURecord() passed after 0.641 seconds.
+✔ Test busyWhileShortOperationHolderLives() passed after 0.641 seconds.
+✔ Test shortOperationRecordWithReusedPIDIsStopped() passed after 0.641 seconds.
+✔ Test busyToleratesRecordTimeTruncation() passed after 0.641 seconds.
+✔ Test exitedTargetAndReleasedLockStillRequireDiskRelease() passed after 0.642 seconds.
+✔ Test runningWithMatchingBootRecord() passed after 0.647 seconds.
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 0.674 seconds.
+✔ Test staleBootRecordWithReusedPIDIsStopped() passed after 0.679 seconds.
+✔ Test liveProcessListParses() passed after 0.679 seconds.
+✔ Test emptyArgvZeroCannotReadConfigFromEnvironment() passed after 0.679 seconds.
+✔ Test eachMachineReadsItsOwnRecordOnce() passed after 0.679 seconds.
+✔ Test staleBootRecordDoesNotNameTheRunningInstance() passed after 0.679 seconds.
+✔ Test liveReaderPreservesExecutableAndConfigSpaces() passed after 0.679 seconds.
+✔ Test runningFromBootProcessAlone() passed after 0.679 seconds.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 0.679 seconds.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 0.681 seconds.
+✔ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() passed after 0.681 seconds.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 0.681 seconds.
+✔ Test reportsSignalErrorsSeparately() passed after 0.681 seconds.
+✔ Test stageVphonedReturnsFalseWhenSourceAbsent() passed after 0.681 seconds.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 0.681 seconds.
+✔ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) with 2 test cases passed after 0.681 seconds.
+✔ Test dedupsSortsAndSkipsMalformedLines() passed after 0.681 seconds.
+✔ Test diskInspectionFailureCannotReportStopped() passed after 0.681 seconds.
+✔ Test matchesBundledAppBinaryAndEqualsForm() passed after 0.681 seconds.
+✔ Test lockIsKeyedByInodeNotPathSpelling() passed after 0.681 seconds.
+✔ Test stageVphonedCopiesWhenSourceExists(less:) with 2 test cases passed after 0.681 seconds.
+✔ Test requireDFUOwnerReturnsRecordOnFullSuccessPath() passed after 0.681 seconds.
+✔ Test resolvesArtifactPaths() passed after 0.681 seconds.
+✔ Test withBundleLockRunsBodyAndReturnsValue() passed after 0.681 seconds.
+✔ Test stageVphonedOverwritesStaleDestination() passed after 0.681 seconds.
+✔ Test locatesBootProcessByConfigArgument() passed after 0.680 seconds.
+✔ Test requireDFUOwnerRefusesWhenPIDGone() passed after 0.680 seconds.
+✔ Test pairedRuntimeAndProcessIdentity() passed after 0.680 seconds.
+✔ Test requireDFUOwnerRefusesWhenLockNotHeld() passed after 0.680 seconds.
+✔ Test requireDFUOwnerRefusesWhenPIDIsZombie() passed after 0.680 seconds.
+✔ Test matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() passed after 0.680 seconds.
+✔ Test toolchainFingerprintIncludesBothExecutables() passed after 0.680 seconds.
+✔ Test nestedBundleLockOnSameDirectoryIsBusy() passed after 0.680 seconds.
+✔ Test matchesEitherRawOrResolvedConfigPath() passed after 0.680 seconds.
+✔ Test delegatesToResources() passed after 0.680 seconds.
+✔ Test requireDFUOwnerRefusesWhenOperationNotDFU() passed after 0.680 seconds.
+✔ Test requireDFUOwnerRefusesWhenRecordMissing() passed after 0.680 seconds.
+✔ Test resolvesToolPaths() passed after 0.680 seconds.
+✔ Test ignoresOtherBundlesAndUnrelatedProcesses() passed after 0.680 seconds.
+✔ Test requireDFUOwnerRefusesWhenPIDNotABootProcess() passed after 0.680 seconds.
+✔ Test parsesLsofPIDs() passed after 0.680 seconds.
+✔ Suite RunStateTests passed after 0.683 seconds.
+✔ Suite LaunchLayoutTests passed after 0.683 seconds.
+✔ Test refusesToSignalAForeignLockHolder() passed after 0.845 seconds.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 0.867 seconds.
+✔ Test refusedDeleteLeavesBundleBytesUnchanged() passed after 1.981 seconds.
+✔ Suite BundleGuardTests passed after 1.984 seconds.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 2.473 seconds.
+✔ Test reportsProgressBeforeTheWaits() passed after 3.238 seconds.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 6.430 seconds.
+✔ Suite VMStopTests passed after 6.431 seconds.
+✔ Test run with 57 tests in 4 suites passed after 6.431 seconds.

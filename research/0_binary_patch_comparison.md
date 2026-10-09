@@ -1217,3 +1217,7 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-09 B22：IcliKit JPEG 源码适配
 
 新增`dependencies/daemon-api-overlays/icli-jpeg-copy.patch`，仅适配固定IcliKit0.7.16 / 702990b59ca412ad975f9f0ea5dafe95c30fac21截图编码：先复制到独立DeviceRGB位图，再生成JPEG，避免编码结果保留原screen image。manifest固定原始源码、patch及编译源码摘要，构建及运行时source marker一致；没有更改固件二进制补丁、内核/DSC/设备树或补丁计数。40次真实截图稳定采样19,071,480→4,555,256→4,555,256字节、FD15→15；90度旋转未生效，原因未查明，完整图像/服务矩阵尚未验收。证据见upstream_integration_2026-10-06/evidence/B22-summary.json及B22-bound-memory.json。
+
+### 2026-10-09 B23 宿主与客户机监督进程验收
+
+本批未修改固件补丁算法或补丁数量。T07在vm-new恢复副本的隔离API_ONLY进程中验证launchd监督、不同签名binary更新确认/回退及坏缓存回退；classic daemon和缓存恢复原摘要。不同binary的53个Mach-O section载荷相同，本结果不证明新功能、kernel或环境迁移。Safari旋转/JPEG及RootHide纯路径测试通过；实际RootHide未验。来源和限制见`upstream_integration_2026-10-06/evidence/B23-summary.json`。

@@ -1,0 +1,24 @@
+python3 scripts/check_bundle.py .build/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+python3 scripts/check_launchpad_bundle.py .build/vphone-launchpad.app --reference .build/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: satisfies its Designated Requirement
+Launchpad bundle: Info.plist, layout, localizations en, zh-Hans, cdhash vphone-cli c17fbbc4eccebe4743a5965574617ea48dad248f vphone-vm 261c588510f0f57b32297b595122f28581ac3810 (= reference), nested entitlements and outer signature verified
+python3 scripts/check_launchpad_strings.py
+Launchpad strings: 280 keys, 280 source literals, 5 Info.plist keys, languages en, zh-Hans; 0 issues; needs_review: 129

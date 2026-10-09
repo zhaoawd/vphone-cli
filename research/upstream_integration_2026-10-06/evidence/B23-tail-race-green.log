@@ -1,0 +1,172 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/11] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[6/11] Emitting module VPhoneLaunchpadKit
+[6/14] Write Objects.LinkFileList
+[9/14] Linking vphone-launchpad-launcher
+[10/14] Applying vphone-launchpad-launcher
+[11/14] Linking vphone-launchpad
+[12/14] Applying vphone-launchpad
+[13/14] Linking vphone-cliPackageTests
+Build complete! (4.60s)
+Test Suite 'Selected tests' started at 2026-10-09 11:42:46.506.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:42:46.507.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:42:46.507.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:42:46.507.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ConsoleLogTests started.
+◇ Suite CreateSummaryTests started.
+◇ Suite OutputCompletionTests started.
+◇ Suite DetachedChildTests started.
+◇ Suite LaunchTests started.
+◇ Suite ConsoleLogRotationTests started.
+◇ Suite LogFollowerTests started.
+◇ Suite LogWriterTests started.
+◇ Suite OutputAcknowledgementTests started.
+◇ Test panicLines() started.
+◇ Suite OutputXPCTests started.
+◇ Test exitLineIsAppendedOnItsOwnLine() started.
+➜ Suite LaunchParentRole skipped.
+◇ Test noCheckpointIsNil() started.
+◇ Suite ParentExitTests started.
+◇ Test detachedParentExitDoesNotConfirmDescendantOutput() started.
+◇ Test runningStageReadsAsInterruptedAndUnreadableIsAFailure() started.
+◇ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() started.
+◇ Test statusesKeepTheirCheckpointSpelling() started.
+◇ Test exitZeroWithReadFailureIsNotACompleteCommand() started.
+◇ Test livePipeDeliversLinesBeforeWriterCloses() started.
+◇ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() started.
+◇ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() started.
+◇ Test twoMachinesWriteSeparateLogs() started.
+◇ Test logCreationFailureDoesNotLeaveRunningHistory() started.
+◇ Test spawnFailureFinishesHistoryAndClosesLog() started.
+◇ Test stopRunsVMStopThenInterruptsOnlyItsOwnChild() started.
+◇ Test panicLineMarksTheMachineUntilItStartsAgain() started.
+◇ Test firstStartHasNoPreviousLog() started.
+◇ Test symbolicLinkLogIsNotRotatedAndTheStartGoesOn() started.
+◇ Test rotationStaysInTheLogsDirectory() started.
+◇ Test failedStopIsReportedWithoutInterruptingOwnChild() started.
+◇ Test replaysOnlyTheTailFromALineStart() started.
+◇ Test startRunsVMLaunchDetachedAndAppendsTheExitLine() started.
+◇ Test existingDotOneIsReplaced() started.
+◇ Test startDoesNotReplaceTheLogOfAMachineNamedDotOne() started.
+◇ Test startKeepsThePreviousRunAsDotOne() started.
+◇ Test resetsWhenTheFileIsReplaced() started.
+◇ Test resetsWhenTheFileIsTruncated() started.
+◇ Test previousLogNameKeepsTheStem() started.
+◇ Test failedWritePreventsAcknowledgementAndLateWritesAreRejected() started.
+◇ Test drainPersistsEveryLineInOrderIncludingFinalPanic() started.
+◇ Test runsInItsOwnSessionWithNullStdinAndOnlyTheLogOpen() started.
+◇ Test exitCodeMatchesProcessTerminationStatus() started.
+◇ Test startingReplacesTheLogWithANewFile() started.
+◇ Test followsAppendsAndReportsAMissingFileOnce() started.
+◇ Test interruptReachesTheRunningChildEvenWhenTheParentIgnoresSIGINT() started.
+◇ Test disconnectOrWriterFailureCannotBeTurnedIntoSuccessByLateAck() started.
+◇ Test receiverAcknowledgesOnlyAfterFullLogIsPersistedAndRejectsOtherOperation() started.
+◇ Test missingAcknowledgementDoesNotReturnSuccess() started.
+◇ Test successfulAckPermitsCompletion() started.
+◇ Test defaultMissingAcknowledgementWaitsThirtySecondsThenFails() started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+➜ Test startMachinesThenExit() skipped.
+◇ Test childrenOutliveTheProcessThatStartedThem() started.
+✔ Test panicLines() passed after 0.004 seconds.
+✔ Test replaysOnlyTheTailFromALineStart() passed after 0.006 seconds.
+✔ Test noCheckpointIsNil() passed after 0.009 seconds.
+✔ Test disconnectOrWriterFailureCannotBeTurnedIntoSuccessByLateAck() passed after 0.010 seconds.
+✔ Test followsAppendsAndReportsAMissingFileOnce() passed after 0.010 seconds.
+✔ Test resetsWhenTheFileIsReplaced() passed after 0.010 seconds.
+✔ Test successfulAckPermitsCompletion() passed after 0.010 seconds.
+✔ Test exitLineIsAppendedOnItsOwnLine() passed after 0.011 seconds.
+✔ Test statusesKeepTheirCheckpointSpelling() passed after 0.011 seconds.
+✔ Test resetsWhenTheFileIsTruncated() passed after 0.011 seconds.
+✔ Test logCreationFailureDoesNotLeaveRunningHistory() passed after 0.011 seconds.
+✔ Suite ConsoleLogTests passed after 0.012 seconds.
+✔ Test exitCodeMatchesProcessTerminationStatus() passed after 0.012 seconds.
+✔ Suite LogFollowerTests passed after 0.012 seconds.
+✔ Test runningStageReadsAsInterruptedAndUnreadableIsAFailure() passed after 0.013 seconds.
+✔ Suite CreateSummaryTests passed after 0.013 seconds.
+✔ Test failedWritePreventsAcknowledgementAndLateWritesAreRejected() passed after 0.013 seconds.
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 0.012 seconds.
+✔ Test drainPersistsEveryLineInOrderIncludingFinalPanic() passed after 0.015 seconds.
+✔ Suite LogWriterTests passed after 0.016 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 0.014 seconds.
+✔ Suite OutputXPCTests passed after 0.016 seconds.
+✔ Test missingAcknowledgementDoesNotReturnSuccess() passed after 0.015 seconds.
+✔ Test receiverAcknowledgesOnlyAfterFullLogIsPersistedAndRejectsOtherOperation() passed after 0.021 seconds.
+✔ Test spawnFailureFinishesHistoryAndClosesLog() passed after 0.033 seconds.
+✔ Test exitZeroWithReadFailureIsNotACompleteCommand() passed after 0.035 seconds.
+✔ Test readerFailureIsDistinctFromEOFAndDoesNotClaimDrain() passed after 0.035 seconds.
+✔ Test previousLogNameKeepsTheStem() passed after 0.035 seconds.
+✔ Test rotationStaysInTheLogsDirectory() passed after 0.035 seconds.
+✔ Test livePipeDeliversLinesBeforeWriterCloses() passed after 0.066 seconds.
+✔ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() passed after 0.261 seconds.
+✔ Test startingReplacesTheLogWithANewFile() passed after 0.268 seconds.
+✔ Test detachedParentExitDoesNotConfirmDescendantOutput() passed after 1.073 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 79896
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 79910
+[launchpad] vm launch pid 79896 exited with status 7
+✔ Test symbolicLinkLogIsNotRotatedAndTheStartGoesOn() passed after 1.926 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 79917
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] vm launch started, pid 79926
+✔ Test concurrentChildrenRetainSeparateTailsAndReportTruncation() passed after 2.293 seconds.
+✔ Suite OutputCompletionTests passed after 2.293 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 79937
+[launchpad] vm launch pid 79910 exited with status 7
+✔ Test firstStartHasNoPreviousLog() passed after 2.363 seconds.
+[launchpad] vm launch pid 79926 exited with status 7
+✔ Test startDoesNotReplaceTheLogOfAMachineNamedDotOne() passed after 2.636 seconds.
+[launchpad] listed 2 machines from 1 libraries
+[launchpad] vm launch started, pid 79957
+[launchpad] vm launch started, pid 79958
+[launchpad] vm launch pid 79917 exited with status 130
+[launchpad] vm launch started, pid 79963
+[launchpad] vm launch pid 79937 exited with status 7
+[launchpad] vm launch started, pid 79971
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 79984
+[launchpad] vm launch pid 79963 exited with status 130
+✔ Test panicLineMarksTheMachineUntilItStartsAgain() passed after 3.019 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 80002
+[launchpad] vm launch pid 79971 exited with status 7
+✔ Test startKeepsThePreviousRunAsDotOne() passed after 3.332 seconds.
+[launchpad] listed 3 machines from 1 libraries
+[launchpad] vm launch started, pid 80015
+[launchpad] vm launch started, pid 80016
+[launchpad] vm launch pid 79984 exited with status 7
+✔ Test existingDotOneIsReplaced() passed after 3.478 seconds.
+✔ Suite ConsoleLogRotationTests passed after 3.479 seconds.
+[launchpad] listed 1 machines from 1 libraries
+[launchpad] vm launch started, pid 80030
+✔ Test interruptReachesTheRunningChildEvenWhenTheParentIgnoresSIGINT() passed after 3.560 seconds.
+[launchpad] vm launch pid 79957 exited with status 130
+[launchpad] vm launch pid 79958 exited with status 130
+✔ Test twoMachinesWriteSeparateLogs() passed after 3.689 seconds.
+[launchpad] vm launch pid 80002 exited with status 7
+✔ Test startRunsVMLaunchDetachedAndAppendsTheExitLine() passed after 3.718 seconds.
+✔ Test runsInItsOwnSessionWithNullStdinAndOnlyTheLogOpen() passed after 3.812 seconds.
+✔ Suite DetachedChildTests passed after 3.812 seconds.
+[launchpad] vm launch pid 80030 exited with status 130
+✔ Test failedStopIsReportedWithoutInterruptingOwnChild() passed after 4.293 seconds.
+[launchpad] vm launch pid 80015 exited with status 130
+✔ Test childrenOutliveTheProcessThatStartedThem() passed after 4.713 seconds.
+✔ Suite ParentExitTests passed after 4.715 seconds.
+[launchpad] vm launch pid 80016 exited with status 130
+✔ Test stopRunsVMStopThenInterruptsOnlyItsOwnChild() passed after 5.436 seconds.
+✔ Suite LaunchTests passed after 5.437 seconds.
+✔ Test defaultMissingAcknowledgementWaitsThirtySecondsThenFails() passed after 30.006 seconds.
+✔ Suite OutputAcknowledgementTests passed after 30.007 seconds.
+✔ Test run with 44 tests in 12 suites passed after 30.008 seconds.

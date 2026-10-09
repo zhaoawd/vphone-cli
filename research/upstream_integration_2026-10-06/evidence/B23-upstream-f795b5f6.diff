@@ -1,0 +1,58 @@
+commit f795b5f6c673398c8b9ce44410d9ee32e61f6397
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Sat Oct 3 20:25:18 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Sat Oct 3 20:25:53 2026 +0900
+
+    Keep vphoned bounded over days of IcliKit calls
+    
+    icli 0.7.11 stops leaking a display-sized image on every screen
+    capture, adds the NaN/non-UTF-8 JSON guards to the rest of its
+    helpers, and makes run-loop waits safe on worker threads without a
+    run loop, which is how vphoned calls it.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 027331cc..860a8736 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "d68cde5deb8ac9da8029e14336ef9c5412f8581e",
+-        "version" : "0.7.10"
++        "revision" : "b0cc5cae2709a2b15f74258050e3ac064d09a3ec",
++        "version" : "0.7.11"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index d0f05317..ce66830d 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.10;
++				minimumVersion = 0.7.11;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index b57a8b3d..9747c112 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "d68cde5deb8ac9da8029e14336ef9c5412f8581e",
+-        "version" : "0.7.10"
++        "revision" : "b0cc5cae2709a2b15f74258050e3ac064d09a3ec",
++        "version" : "0.7.11"
+       }
+     },
+     {

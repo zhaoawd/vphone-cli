@@ -29,7 +29,7 @@
       "T01"
     ],
     "disposition": "adapt",
-    "reason": "62个合并提交全部重新审查，54个无附加解决、8个附加解决与冻结差异一致；父提交能力仍独立核对。完整审查T06收尾提交和23个待审发布提交；2.1.3含菜单实现，保留T27适配。342条覆盖保持，218条仍pending_semantic_review，全局能力映射未完成。",
+    "reason": "完整审查16个提交，覆盖XPC Sendable、依赖pin、表格焦点、开发Preview和UI本地化/按钮顺序；342条覆盖保持，202条pending_semantic_review。全局能力对账未完成。",
     "paths": [
       "research/upstream_integration_2026-10-06/tasks.json",
       "research/upstream_integration_2026-10-06/capability_ledger.json",
@@ -145,9 +145,9 @@
       "tests/VPhoneAPIKitTests/",
       "sources/VPhoneDaemon/Native/vphoned_vsock.c",
       "sources/VPhoneDaemon/Daemon/GuestPipeChannel.swift",
-      "sources/VPhoneDaemon/main.swift",
+      "sources/VPhoneDaemon/Daemon/main.swift",
       "tests/test_daemon_vsock_bridge.py",
-      "tests/test_daemon_pipe_channel.py"
+      "tests/test_daemon_pipe_ownership.py"
     ],
     "unmapped_upstream_paths": [],
     "acceptance_status": "accepted",
@@ -166,8 +166,8 @@
     "dependencies": [
       "T06"
     ],
-    "disposition": "adapt",
-    "reason": "跨线程停止唤醒和继承信号屏蔽修复，15项proxy测试及真实停止通过。缓存确认按文件身份处理/var与/private/var别名：显式agent.apply_update返回后proxy/worker退出，手动重启后健康实例改变、83075a0c摘要保持、pending移除且确认标记生成。完整临时launchd job、不同binary升级/回退及坏缓存有界失败矩阵未完成；原classic及其缓存已恢复。",
+    "disposition": "adapted_verified",
+    "reason": "真实临时launchd job验证worker KILL/TERM、proxy KILL、不同签名binary显式更新确认与回退、未确认缓存worker失败和不可执行缓存回退。监听实例和hash读回通过，无孤儿job，classic及缓存恢复。不同binary只改变代码签名，53个Mach-O section载荷一致；不证明功能升级或环境迁移。",
     "paths": [
       "sources/VPhoneDaemon/Native/vphoned_proxy.c",
       "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
@@ -216,7 +216,7 @@
       "T07"
     ],
     "disposition": "adapt",
-    "reason": "IcliKit固定0.7.16/702990b5，声明精确源码JPEG独立位图复制overlay、构建与运行marker/hash一致。实际40次截图稳定采样19,071,480→4,555,256→4,555,256字节，FD15→15；location设置/读回/NaN拒绝/清除，timezone设置/重复/无效拒绝/自动/恢复及SpringBoard服务查询通过。90度旋转返回400未生效，原因未查明；完整rotation和RootHide服务矩阵及图像视觉核验未完成。",
+    "reason": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。",
     "paths": [
       "dependencies/daemon-api-pins.json",
       "sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
@@ -924,7 +924,7 @@
       "T02"
     ],
     "disposition": "adapt",
-    "reason": "真实本地Core Bundle安装、受控普通launcher绑定启动并正常退出；19个Mach-O当前机器递归依赖检查通过，libcrypto/libplist仍来自外部Homebrew，不声明可移植闭包。新增KERN_PROCARGS2 argv识别修复含空格Bundle路径的生产VM stop，实际5.773秒正常停机。完整TCC负责应用链及旧helper/owner/link/共享可写/未知verb真实拒绝矩阵未完成。",
+    "reason": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。",
     "paths": [
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
@@ -1221,8 +1221,11 @@
       "T29"
     ],
     "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
-    "paths": [],
+    "reason": "仅定位验收入口；本任务尚未实施，不表示支持矩阵或整组恢复通过。",
+    "paths": [
+      "scripts/run_tests.py",
+      "research/upstream_integration_2026-10-06/tasks.json"
+    ],
     "unmapped_upstream_paths": []
   },
   {
@@ -1232,8 +1235,11 @@
       "T30"
     ],
     "disposition": "unknown",
-    "reason": "路径候选和字节摘要已采集；语义差异按任务复核",
-    "paths": [],
+    "reason": "仅定位验收入口；本任务尚未实施，不表示支持矩阵或整组恢复通过。",
+    "paths": [
+      "scripts/run_tests.py",
+      "research/upstream_integration_2026-10-06/tasks.json"
+    ],
     "unmapped_upstream_paths": []
   },
   {
@@ -1388,7 +1394,7 @@
       "T24"
     ],
     "disposition": "adapt",
-    "reason": "本地2.6.1-local.1208708c55574677完整打包，escalator仅编译未执行；当前机器依赖有记录。停机恢复副本完整备份139.067秒后实际绑定，受控普通launcher启动root-owned本地VM候选，classic摘要保持；未有来源收据仍为unknown。创建全流程冻结、clone/export/rename、kernel-only及guest升级/回退四层来源矩阵仍未完成；测试绑定和系统store恢复原缺失状态。",
+    "reason": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。",
     "paths": [
       "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift",
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
@@ -1481,7 +1487,11 @@
     "paths": [
       "sources/VPhoneGuestComponents/VCamCaptured/VCamFrameProtocol.h",
       "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.m",
-      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.plist"
+      "sources/VPhoneGuestComponents/VCamCaptured/libvcamcaptured.plist",
+      "sources/VPhoneGuestComponents/Tests/VirtIOSoundTests.c",
+      "sources/VPhoneGuestComponents/Tests/VirtIOSoundClockTests.c",
+      "sources/VPhoneGuestComponents/Tests/VirtIOSoundConverterTests.c",
+      "sources/VPhoneGuestComponents/Tests/VirtIOSoundLatencyTests.c"
     ],
     "unmapped_upstream_paths": [
       "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundPlugin.m",
@@ -1567,8 +1577,11 @@
       "T44"
     ],
     "disposition": "deferred",
-    "reason": "原方案默认延后",
-    "paths": [],
+    "reason": "可选任务延期；仅定位标准验收入口，未实施120Hz/FPS。",
+    "paths": [
+      "scripts/run_tests.py",
+      "research/upstream_integration_2026-10-06/tasks.json"
+    ],
     "unmapped_upstream_paths": [
       "VPhoneExecutable/VPhoneCommand/FirmwarePatcher/Kernel/CustomFirmwarePatches/Drivers/KernelCustomFirmwarePatchDisplayRefresh.swift",
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist"
@@ -1582,7 +1595,7 @@
       "T24"
     ],
     "disposition": "adapt",
-    "reason": "实际本地绑定VM经普通wrapper启动，修正后的生产stop在5.773秒发送SIGINT完成classicAccepted、Guest stopped、VM及wrapper退出0，尾部日志保留。B21真实签名helper成功install/verify和本轮完整测试证据保留。全UI立即退出、detached/create/后代writer和实际UI吞吐/轮换矩阵仍未完成。",
+    "reason": "修复detached父进程退出但后代仍写日志时误报完整；确认进程组消失后再次读取，修复EOF与组消失之间的尾部遗漏。两项RED复现后44项/12套件通过，复审无剩余发现；真实VM正常SIGINT停机11.352秒且保留classicAccepted及Guest stopped尾部。完整UI退出/create/实际吞吐矩阵未完成。 最新签名Launchpad在空隔离库启动、列出0台、窗口宽度970、关闭窗口并退出0；该冒烟没有活动writer，不替代尾部后立即退出应用验收。",
     "paths": [
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLineReader.swift",
       "tests/VPhoneLaunchpadKitTests/LineSplitterTests.swift",

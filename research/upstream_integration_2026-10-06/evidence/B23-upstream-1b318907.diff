@@ -1,0 +1,59 @@
+commit 1b3189077556cfe5b456b7bf7e366c72b6a4a567
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Wed Sep 30 18:41:07 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Wed Sep 30 18:41:07 2026 +0900
+
+    Take icli 0.7.6 so IPAs zipped on a Mac install
+    
+    IcliKit 0.7.5 counted AppleDouble sidecars as bundles: an IPA made with
+    Finder's Compress or ditto without --norsrc carries Payload/._Name.app,
+    and apps.install refused it with "IPA must contain exactly one
+    Payload/*.app". 0.7.6 skips __MACOSX and ._* files during extraction
+    and in the container bundle lookup.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 84527536..f55b1cb9 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "978fd607161a6ab7017401e1583a5dbd052b2aa3",
+-        "version" : "0.7.5"
++        "revision" : "9c5dd98b79d94f28badf031a327138c46ccc92e6",
++        "version" : "0.7.6"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index d8241e15..aa6d3eaa 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.5;
++				minimumVersion = 0.7.6;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 20977b42..87ba0d7e 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "978fd607161a6ab7017401e1583a5dbd052b2aa3",
+-        "version" : "0.7.5"
++        "revision" : "9c5dd98b79d94f28badf031a327138c46ccc92e6",
++        "version" : "0.7.6"
+       }
+     },
+     {

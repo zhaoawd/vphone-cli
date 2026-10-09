@@ -1,0 +1,147 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 11092,
+    "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+  },
+  "observations": [
+    {
+      "method": "bootstrap.status",
+      "status": 200,
+      "response_bytes": 56,
+      "response_sha256": "fc80dcb401c0f2a22580e04c2f543197ed0c1232f0cc878ead8200fdf22fc32b"
+    },
+    {
+      "method": "services.status",
+      "status": 200,
+      "response_bytes": 156,
+      "response_sha256": "679de48a0306fac910027ff4c21d9a0ca103841a2f9cde5b2ee7afdfa4c3b342"
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 11092,
+          "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+        },
+        "path": "/var/root/vphone-b23-api/service-probe.plist",
+        "load": "/private/tmp/vphone-b23-service-probe.plist",
+        "perm": "644",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "ok": true,
+        "size": 653
+      }
+    },
+    {
+      "method": "services.load",
+      "status": 200,
+      "response_bytes": 406,
+      "response_sha256": "cfd7e8e772848f7daee726abf1c5d6e2d89f67f88c87d038a8f23e384a21985f"
+    },
+    {
+      "method": "services.status",
+      "status": 200,
+      "response_bytes": 230,
+      "response_sha256": "8a8733b3e482cfe90ec9813626ccd9c1072db2c86ddf160c4866ed19de80482c"
+    },
+    {
+      "method": "services.start",
+      "status": 400,
+      "response_bytes": 142,
+      "response_sha256": "082503e52a61ffbb99ca2da852dfc5e0e2747da2feecec32fce35ff87a266dc8"
+    },
+    {
+      "method": "services.unload",
+      "status": 200,
+      "response_bytes": 333,
+      "response_sha256": "898843b574fd4553dc623ba7446bff681d00d68210ffca6d33d2cbe71a168261"
+    },
+    {
+      "method": "services.status",
+      "status": 200,
+      "response_bytes": 156,
+      "response_sha256": "679de48a0306fac910027ff4c21d9a0ca103841a2f9cde5b2ee7afdfa4c3b342"
+    }
+  ],
+  "bootstrap": {
+    "phase": "idle"
+  },
+  "before": {
+    "domains": [],
+    "enabled": true,
+    "label": "com.vphone.B23.service-probe",
+    "loaded": false,
+    "override": false,
+    "running": false
+  },
+  "load": {
+    "errors": {},
+    "loaded": true,
+    "paths": [
+      "/var/root/vphone-b23-api/service-probe.plist"
+    ],
+    "services": [
+      {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B23.service-probe",
+        "last_exit_status": 0,
+        "loaded": true,
+        "override": false,
+        "path": "/var/root/vphone-b23-api/service-probe.plist",
+        "pid": 0,
+        "program": "/var/jb/bin/sh",
+        "running": false
+      }
+    ],
+    "verified": true
+  },
+  "after_load": {
+    "domains": [
+      "system",
+      "user"
+    ],
+    "enabled": true,
+    "label": "com.vphone.B23.service-probe",
+    "last_exit_status": 0,
+    "loaded": true,
+    "override": false,
+    "pid": 0,
+    "program": "/var/jb/bin/sh",
+    "running": false
+  },
+  "unload": {
+    "errors": {},
+    "loaded": false,
+    "paths": [
+      "/var/root/vphone-b23-api/service-probe.plist"
+    ],
+    "services": [
+      {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B23.service-probe",
+        "loaded": false,
+        "override": false,
+        "path": "/var/root/vphone-b23-api/service-probe.plist",
+        "running": false
+      }
+    ],
+    "verified": true
+  },
+  "after_unload": {
+    "domains": [],
+    "enabled": true,
+    "label": "com.vphone.B23.service-probe",
+    "loaded": false,
+    "override": false,
+    "running": false
+  }
+}

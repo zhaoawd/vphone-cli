@@ -1,0 +1,146 @@
+{
+  "rows": [
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "core-bundle",
+        "install",
+        "--version",
+        "2.6.1-local.1208708c55574677",
+        "--archive",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.zip",
+        "--sha256",
+        "178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"cdhashes\" : {\n    \"vphone-cli\" : \"065045a257e370960a1b2b26da8fdf9be804184e\",\n    \"vphone-vm\" : \"4cea360ca924a4c651a12aae7755545b492a59b6\"\n  },\n  \"installedAt\" : \"2026-10-09T03:52:34Z\",\n  \"sha256\" : \"178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde\",\n  \"version\" : \"2.6.1-local.1208708c55574677\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "core-bundle",
+        "verify",
+        "--version",
+        "2.6.1-local.1208708c55574677"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"cdhashes\" : {\n    \"vphone-cli\" : \"065045a257e370960a1b2b26da8fdf9be804184e\",\n    \"vphone-vm\" : \"4cea360ca924a4c651a12aae7755545b492a59b6\"\n  },\n  \"installedAt\" : \"2026-10-09T03:52:34Z\",\n  \"sha256\" : \"178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde\",\n  \"version\" : \"2.6.1-local.1208708c55574677\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "-u",
+        "#2035870432",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher",
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "helper",
+        "register",
+        "unused"
+      ],
+      "exit": 77,
+      "stdout": "",
+      "stderr": "vphone-launchpad-launcher: refused: Launcher permits only vm launch <machine> [options]\n",
+      "case": "unknown-verb"
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "-u",
+        "#2035870432",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher",
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "vm",
+        "launch",
+        "b23-absent-machine",
+        "--library-root",
+        "/private/tmp/vphone-b23-empty-library"
+      ],
+      "exit": 77,
+      "stdout": "",
+      "stderr": "vphone-launchpad-launcher: refused: Core Bundle 2.6.1-local.1208708c55574677 is unavailable or failed verification. Unsafe bundle entry: /Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/Resources/integration-provenance.json: owner uid 2035870432, expected 0 Restore this exact verified version with bundle install, or explicitly select another verified version with vm bind-core-bundle. No default bundle was selected and no executable was run.\n",
+      "case": "wrong-owner"
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "-u",
+        "#2035870432",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher",
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "vm",
+        "launch",
+        "b23-absent-machine",
+        "--library-root",
+        "/private/tmp/vphone-b23-empty-library"
+      ],
+      "exit": 77,
+      "stdout": "",
+      "stderr": "vphone-launchpad-launcher: refused: Core Bundle 2.6.1-local.1208708c55574677 is unavailable or failed verification. Writable installed bundle entry: /Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/Resources/integration-provenance.json: mode 666 Restore this exact verified version with bundle install, or explicitly select another verified version with vm bind-core-bundle. No default bundle was selected and no executable was run.\n",
+      "case": "shared-writable-resource"
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "-u",
+        "#2035870432",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher",
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "vm",
+        "launch",
+        "b23-absent-machine",
+        "--library-root",
+        "/private/tmp/vphone-b23-empty-library"
+      ],
+      "exit": 77,
+      "stdout": "",
+      "stderr": "vphone-launchpad-launcher: refused: Core Bundle 2.6.1-local.1208708c55574677 is unavailable or failed verification. Invalid code signature at /Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle: Error Domain=NSOSStatusErrorDomain Code=-67054 \"(null)\" UserInfo={SecCSResourceAdded=(\n    \"Resources/integration-provenance.b23-backup -- file:///Library/Application%20Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/\"\n), SecCSResourceAltered=(\n    \"Resources/integration-provenance.json -- file:///Library/Application%20Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/\"\n)} Restore this exact verified version with bundle install, or explicitly select another verified version with vm bind-core-bundle. No default bundle was selected and no executable was run.\n",
+      "case": "symbolic-link-resource"
+    },
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "core-bundle",
+        "verify",
+        "--version",
+        "2.6.1-local.1208708c55574677"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"cdhashes\" : {\n    \"vphone-cli\" : \"065045a257e370960a1b2b26da8fdf9be804184e\",\n    \"vphone-vm\" : \"4cea360ca924a4c651a12aae7755545b492a59b6\"\n  },\n  \"installedAt\" : \"2026-10-09T03:52:34Z\",\n  \"sha256\" : \"178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde\",\n  \"version\" : \"2.6.1-local.1208708c55574677\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "core-bundle",
+        "verify",
+        "--version",
+        "2.6.1-local.1208708c55574677"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"cdhashes\" : {\n    \"vphone-cli\" : \"065045a257e370960a1b2b26da8fdf9be804184e\",\n    \"vphone-vm\" : \"4cea360ca924a4c651a12aae7755545b492a59b6\"\n  },\n  \"installedAt\" : \"2026-10-09T03:52:34Z\",\n  \"sha256\" : \"178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde\",\n  \"version\" : \"2.6.1-local.1208708c55574677\"\n}\n",
+      "stderr": ""
+    }
+  ],
+  "installed_version": "2.6.1-local.1208708c55574677",
+  "receipt": {
+    "cdhashes": {
+      "vphone-cli": "065045a257e370960a1b2b26da8fdf9be804184e",
+      "vphone-vm": "4cea360ca924a4c651a12aae7755545b492a59b6"
+    },
+    "installedAt": "2026-10-09T03:52:34Z",
+    "sha256": "178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde",
+    "version": "2.6.1-local.1208708c55574677"
+  },
+  "store_absent_after": true,
+  "VM_started": false,
+  "helper_registered": false,
+  "escalator_executed": false,
+  "AMFI_modified": false,
+  "scope": "Actual ordinary launcher subprocess; owner/link/write/unknown verb refusal. No TCC or old helper test."
+}

@@ -1,0 +1,875 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 11092,
+    "instance_id": "8707EE7C-C77D-4793-A428-6D1B054EDB32"
+  },
+  "observations": [
+    {
+      "method": "display.rotation",
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80"
+    },
+    {
+      "method": "apps.foreground",
+      "status": 200,
+      "response_bytes": 146,
+      "response_sha256": "947955c2d9eea058585f0dfded8b9bf5b6419ed481cbaa1b36100aa40a74fee4"
+    },
+    {
+      "method": "screen.unlock",
+      "params": {},
+      "status": 200,
+      "response_bytes": 117,
+      "response_sha256": "39cb3c0ae9e5a7bfc746851ce23b5417e8680ba69fbb3b691eda4d78acca4a17",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_locked": false,
+          "was_screen_off": false
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.Preferences"
+      },
+      "status": 200,
+      "response_bytes": 78,
+      "response_sha256": "90f05732948492ad9978ef62bc5684c40c5979bad737c0f650dad2acbe68da3c",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1770
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "status": 200,
+      "response_bytes": 123,
+      "response_sha256": "82b57f18d520df461fc596c6a3534f6500cacc7af862ecb22065b4b7c908c995",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 309354,
+      "response_sha256": "6e92da75f0415c533990baa710ea87288740d320ef51eeef7df911f68720365a"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "90"
+      },
+      "status": 400,
+      "response_bytes": 122,
+      "response_sha256": "f29a32e7aec7a52aa23eaa207cec3843da88b19cc2825e6ca93cb4c76a4b5ff9",
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 309354,
+      "response_sha256": "6e92da75f0415c533990baa710ea87288740d320ef51eeef7df911f68720365a"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "270"
+      },
+      "status": 400,
+      "response_bytes": 122,
+      "response_sha256": "f29a32e7aec7a52aa23eaa207cec3843da88b19cc2825e6ca93cb4c76a4b5ff9",
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 308604,
+      "response_sha256": "761797aa8a100cb04dfa1c1651ad778ca37588d352562e7f4c242a4ea5df31f9"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "180"
+      },
+      "status": 400,
+      "response_bytes": 122,
+      "response_sha256": "f29a32e7aec7a52aa23eaa207cec3843da88b19cc2825e6ca93cb4c76a4b5ff9",
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 308585,
+      "response_sha256": "4a5ba8ff58fc1ff12a2b071acf9c2ea4e21139c898346b00b3b530825e9edac7"
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.mobilesafari"
+      },
+      "status": 200,
+      "response_bytes": 78,
+      "response_sha256": "cc33c0fb8136e0164cd266aebb8d3719226e5be1534495a10d14c68af088e95f",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1808
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "status": 200,
+      "response_bytes": 123,
+      "response_sha256": "82b57f18d520df461fc596c6a3534f6500cacc7af862ecb22065b4b7c908c995",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 392333,
+      "response_sha256": "5fb423ec11bcd2131240939598144cbb994020503b84275f5f31c3dede0d8f50"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "90"
+      },
+      "status": 200,
+      "response_bytes": 131,
+      "response_sha256": "93206c81ca43768e68d4faefcae5c9ef75efd1c7b8b00539d361d43856ca02f5",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left",
+          "requested": 90
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 116,
+      "response_sha256": "513b8f1b8d16af7fc8269c0ffa0347931ef462609d04f8b8a171591bdb8248ae",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 340126,
+      "response_sha256": "e633aebe489b204900c091545f6ce5449328e8fec5212cabecdc6055fcda91f4"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "270"
+      },
+      "status": 200,
+      "response_bytes": 134,
+      "response_sha256": "e035589693ded5e8f69db5308b6ce209f878ea496ff75e43de299c01a0e453d7",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right",
+          "requested": 270
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 118,
+      "response_sha256": "22c46715e4c38a455c24f525afe4d78ccb3dfed216e5c0227ea6be9e7e8f8711",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 340149,
+      "response_sha256": "0c92a45dee7041eebf7fb313b29db49a2d6ef5ed11df19329fedcbbfcb7afa31"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "180"
+      },
+      "status": 400,
+      "response_bytes": 122,
+      "response_sha256": "f29a32e7aec7a52aa23eaa207cec3843da88b19cc2825e6ca93cb4c76a4b5ff9",
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "status": 200,
+      "response_bytes": 118,
+      "response_sha256": "22c46715e4c38a455c24f525afe4d78ccb3dfed216e5c0227ea6be9e7e8f8711",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "status": 200,
+      "response_bytes": 334863,
+      "response_sha256": "eb251d9a706406857b42c6522ffb7f69d1aae73c959938ee9bc6d9fcd555e658"
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "status": 200,
+      "response_bytes": 123,
+      "response_sha256": "82b57f18d520df461fc596c6a3534f6500cacc7af862ecb22065b4b7c908c995",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "status": 200,
+      "response_bytes": 109,
+      "response_sha256": "6112511e29c103006bb95ad49917b4c764c65a3099c0194c34ee49aa016aaa80",
+      "reply": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.springboard"
+      },
+      "status": 400,
+      "response_bytes": 105,
+      "response_sha256": "980e2257ec8023650daaed3c1c70b3e9e26c0a705c8447ed4011c411a9bdae6a",
+      "reply": {
+        "error": {
+          "code": "failed",
+          "message": "app not found: com.apple.springboard"
+        },
+        "id": "b23",
+        "type": "response"
+      }
+    }
+  ],
+  "matrix": [
+    {
+      "app": "com.apple.Preferences",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1770
+        },
+        "type": "response"
+      },
+      "requested": 0,
+      "change": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 222504,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "sha256": "794a85b5716bc3000de947340f2cce4ec623694d4d2bfc59276b87855ed1ec96",
+        "path": "/private/tmp/vphone-b23-Preferences-0.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.Preferences",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1770
+        },
+        "type": "response"
+      },
+      "requested": 90,
+      "change": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 222504,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "sha256": "794a85b5716bc3000de947340f2cce4ec623694d4d2bfc59276b87855ed1ec96",
+        "path": "/private/tmp/vphone-b23-Preferences-90.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.Preferences",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1770
+        },
+        "type": "response"
+      },
+      "requested": 270,
+      "change": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 221797,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "sha256": "d33e7967a89fe271355fe56b925b68f40c718adf78ce03c6ac300e0e8718bb6a",
+        "path": "/private/tmp/vphone-b23-Preferences-270.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.Preferences",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1770
+        },
+        "type": "response"
+      },
+      "requested": 180,
+      "change": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 221791,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "sha256": "42cee996691d03b20050176632ff3c72f4b9382514a26c09807d5db1700c8dda",
+        "path": "/private/tmp/vphone-b23-Preferences-180.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.mobilesafari",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1808
+        },
+        "type": "response"
+      },
+      "requested": 0,
+      "change": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 283179,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "sha256": "d9e9513d4f0360a5ac44832a2ca08bbc77136098291cdac3ed993f05d2bd9f4d",
+        "path": "/private/tmp/vphone-b23-mobilesafari-0.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.mobilesafari",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1808
+        },
+        "type": "response"
+      },
+      "requested": 90,
+      "change": {
+        "id": "b23",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left",
+          "requested": 90
+        },
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 245976,
+        "coordinate_scale": 3,
+        "height": 1290,
+        "mime_type": "image/jpeg",
+        "width": 2796,
+        "sha256": "d0b3d87a2426de4f3fbbe049777fbeab1585c5f0601b07c8275639b025dceeab",
+        "path": "/private/tmp/vphone-b23-mobilesafari-90.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.mobilesafari",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1808
+        },
+        "type": "response"
+      },
+      "requested": 270,
+      "change": {
+        "id": "b23",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right",
+          "requested": 270
+        },
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 245969,
+        "coordinate_scale": 3,
+        "height": 1290,
+        "mime_type": "image/jpeg",
+        "width": 2796,
+        "sha256": "f9a68fa758f05f5e2abf57b6f24ee72404513f3784bd8d9aeab3a4d5d324ebb9",
+        "path": "/private/tmp/vphone-b23-mobilesafari-270.jpeg"
+      }
+    },
+    {
+      "app": "com.apple.mobilesafari",
+      "opened": {
+        "id": "b23",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 1808
+        },
+        "type": "response"
+      },
+      "requested": 180,
+      "change": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "b23",
+        "type": "response"
+      },
+      "actual": {
+        "id": "b23",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "screenshot": {
+        "bytes": 242518,
+        "coordinate_scale": 3,
+        "height": 1290,
+        "mime_type": "image/jpeg",
+        "width": 2796,
+        "sha256": "5d838b7ddb55b0dbda3c75a5bec116875914aa5ef4a74c644adabaa9a529d842",
+        "path": "/private/tmp/vphone-b23-mobilesafari-180.jpeg"
+      }
+    }
+  ],
+  "baseline": {
+    "degrees": 0,
+    "device_orientation": 0,
+    "locked": false,
+    "name": "portrait"
+  },
+  "frontmost_before": {
+    "bundle_id": "com.apple.springboard",
+    "name": "Home Screen",
+    "pid": 0,
+    "source": "unavailable",
+    "verified": false
+  },
+  "unlock": {
+    "id": "b23",
+    "result": {
+      "locked": false,
+      "screen_off": false,
+      "was_locked": false,
+      "was_screen_off": false
+    },
+    "type": "response"
+  },
+  "unlock_orientation": {
+    "id": "b23",
+    "result": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait"
+    },
+    "type": "response"
+  },
+  "restore_rotation": {
+    "id": "b23",
+    "result": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait",
+      "requested": 0
+    },
+    "type": "response"
+  },
+  "restore_lock": {
+    "id": "b23",
+    "result": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait"
+    },
+    "type": "response"
+  },
+  "restore_app": {
+    "error": {
+      "code": "failed",
+      "message": "app not found: com.apple.springboard"
+    },
+    "id": "b23",
+    "type": "response"
+  }
+}

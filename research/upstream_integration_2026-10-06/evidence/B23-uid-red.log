@@ -1,0 +1,133 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/43] Compiling download.c
+[6/43] Compiling fdr.c
+[7/43] Compiling ipsw.c
+[8/43] Compiling asr.c
+[9/43] Compiling recovery.c
+[10/43] Compiling normal.c
+[11/43] Compiling limera1n.c
+[13/43] Emitting module VPhoneAPIKit
+[13/43] Compiling restore.c
+[14/43] Compiling dfu.c
+[15/43] Compiling img4.c
+[16/43] Compiling img3.c
+[17/44] Compiling ace3.c
+[18/44] Compiling mbn.c
+[19/44] Compiling ftab.c
+[20/44] Compiling fls.c
+[21/45] Compiling log.c
+[22/45] Compiling locking.c
+[23/45] Compiling deviceinterfaced.c
+[24/45] Compiling vphone_zip_stub.c
+[25/45] Compiling common.c
+[26/45] Compiling idevicerestore.c
+[27/45] Compiling vphone_restore_bridge.c
+[29/45] Emitting module VPhoneBundleStore
+[29/45] Compiling MobileRecoveryCore libirecovery.c
+[31/46] Emitting module VPhoneBundleStoreTests
+[32/46] Emitting module VPhoneCore
+[33/49] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[34/51] Emitting module VPhoneHelperKitTests
+[35/52] Emitting module VPhoneArchiveKitTests
+[36/52] Emitting module VPhoneLaunchpadKit
+[37/52] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreation.swift
+[38/52] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+[39/66] Emitting module VPhoneLaunchpadLauncherEntry
+[39/66] Write Objects.LinkFileList
+[40/66] Linking vphone-launchpad-launcher
+[41/66] Applying vphone-launchpad-launcher
+[43/66] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[44/67] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[45/67] Emitting module VPhoneCoreTests
+[46/67] Compiling VPhoneLaunchpad VPhoneLaunchpadModel.swift
+[47/67] Emitting module VPhoneLaunchpad
+[48/67] Compiling VPhoneLaunchpad VPhoneLaunchpadNewMachineView.swift
+[49/67] Compiling VPhoneLaunchpad VPhoneLaunchpadMachinesView.swift
+[49/68] Write Objects.LinkFileList
+[53/69] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[53/69] Linking vphone-launchpad
+[54/69] Applying vphone-launchpad
+[56/69] Emitting module VPhoneCLITests
+[56/69] Linking vphone-cli
+[57/69] Linking vphone-vm
+[58/69] Applying vphone-cli
+[59/69] Applying vphone-vm
+[61/69] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[62/69] Compiling VPhoneLaunchpadKitTests RealCLIEditTests.swift
+[63/69] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[64/69] Compiling VPhoneLaunchpadKitTests MenuBarTests.swift
+[65/69] Emitting module VPhoneLaunchpadKitTests
+[66/69] Compiling VPhoneLaunchpadKitTests CreateTests.swift
+[67/69] Compiling VPhoneLaunchpadKitTests EditTests.swift
+[67/69] Write Objects.LinkFileList
+[68/69] Linking vphone-cliPackageTests
+Build complete! (21.42s)
+Test Suite 'Selected tests' started at 2026-10-09 11:23:36.106.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:23:36.107.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:23:36.107.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:23:36.107.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite RunStateTests started.
+◇ Test staleBootRecordDoesNotNameTheRunningInstance() started.
+◇ Test liveReaderPreservesExecutableAndConfigSpaces() started.
+◇ Test eachMachineReadsItsOwnRecordOnce() started.
+◇ Test busyWhileShortOperationHolderLives() started.
+◇ Test unreadableBootArgumentsDoNotReportStopped(operation:) started.
+◇ Test unreadableArgumentsDoNotReviveAStaleBootRecord(zombie:) started.
+◇ Test stoppedWithoutBootProcessOrRecord() started.
+◇ Test staleBootRecordWithReusedPIDIsStopped() started.
+◇ Test dfuWithMatchingDFURecord() started.
+◇ Test runningWithMatchingBootRecord() started.
+◇ Test shortOperationRecordWithReusedPIDIsStopped() started.
+◇ Test shortOperationRecordWithExitedHolderIsStopped() started.
+◇ Test liveProcessListParses() started.
+◇ Test busyToleratesRecordTimeTruncation() started.
+◇ Test runningFromBootProcessAlone() started.
+◇ Test case passing 1 argument zombie → true to unreadableArgumentsDoNotReviveAStaleBootRecord(zombie:) started.
+◇ Test case passing 1 argument operation → "boot" to unreadableBootArgumentsDoNotReportStopped(operation:) started.
+◇ Test case passing 1 argument operation → "dfu" to unreadableBootArgumentsDoNotReportStopped(operation:) started.
+◇ Test case passing 1 argument zombie → false to unreadableArgumentsDoNotReviveAStaleBootRecord(zombie:) started.
+✔ Test stoppedWithoutBootProcessOrRecord() passed after 0.001 seconds.
+✔ Test busyWhileShortOperationHolderLives() passed after 0.002 seconds.
+✔ Test staleBootRecordWithReusedPIDIsStopped() passed after 0.002 seconds.
+✔ Test dfuWithMatchingDFURecord() passed after 0.002 seconds.
+✔ Test eachMachineReadsItsOwnRecordOnce() passed after 0.002 seconds.
+✔ Test shortOperationRecordWithReusedPIDIsStopped() passed after 0.001 seconds.
+✔ Test staleBootRecordDoesNotNameTheRunningInstance() passed after 0.002 seconds.
+✔ Test shortOperationRecordWithExitedHolderIsStopped() passed after 0.001 seconds.
+✔ Test runningWithMatchingBootRecord() passed after 0.002 seconds.
+✔ Test runningFromBootProcessAlone() passed after 0.001 seconds.
+✔ Test unreadableArgumentsDoNotReviveAStaleBootRecord(zombie:) with 2 test cases passed after 0.002 seconds.
+✔ Test busyToleratesRecordTimeTruncation() passed after 0.002 seconds.
+✘ Test unreadableBootArgumentsDoNotReportStopped(operation:) recorded an issue with 1 argument operation → "boot" at RunStateTests.swift:155:9: Expectation failed: (state → .stopped) == (.busy(operation: operation + " (process arguments unavailable)") → .busy(operation: "boot (process arguments unavailable)"))
+✘ Test unreadableBootArgumentsDoNotReportStopped(operation:) recorded an issue with 1 argument operation → "dfu" at RunStateTests.swift:155:9: Expectation failed: (state → .stopped) == (.busy(operation: operation + " (process arguments unavailable)") → .busy(operation: "dfu (process arguments unavailable)"))
+✘ Test unreadableBootArgumentsDoNotReportStopped(operation:) with 2 test cases failed after 0.002 seconds with 2 issues.
+✔ Test liveProcessListParses() passed after 0.141 seconds.
+✔ Test liveReaderPreservesExecutableAndConfigSpaces() passed after 0.157 seconds.
+✘ Suite RunStateTests failed after 0.157 seconds with 2 issues.
+✘ Test run with 15 tests in 1 suite failed after 0.157 seconds with 2 issues.

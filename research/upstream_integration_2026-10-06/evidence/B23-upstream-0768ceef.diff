@@ -1,0 +1,114 @@
+commit 0768ceefc0a7ea4e932306e54e65fd7dfb9542a2
+Author:     Jacky <me@jackyu.cn>
+AuthorDate: Mon Oct 5 15:26:18 2026 +0800
+Commit:     Jacky <me@jackyu.cn>
+CommitDate: Mon Oct 5 15:27:06 2026 +0800
+
+    Show Launchpad as "VPhone Launchpad" in Finder and the Dock
+    
+    The app showed its file name, vphone-launchpad. InfoPlist.xcstrings now
+    gives CFBundleDisplayName and CFBundleName as "VPhone Launchpad" in every
+    language. The Info.plist base values stay vphone-launchpad: Finder and
+    the Dock use the localized name only while the bundle's file name matches
+    the unlocalized CFBundleDisplayName. The .app file name, executable,
+    bundle identifier and CLI are unchanged.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist b/VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist
+index ec27a54a..cc17d1cd 100644
+--- a/VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist
++++ b/VPhoneLaunchpad/Resources/VPhoneLaunchpad.Info.plist
+@@ -4,6 +4,10 @@
+ <dict>
+ 	<key>CFBundleDevelopmentRegion</key>
+ 	<string>en</string>
++	<!-- These two stay the file name, vphone-launchpad.app: Finder and the
++	     Dock show the localized name only while the file name matches
++	     CFBundleDisplayName here. VPhoneLaunchpad/InfoPlist.xcstrings gives
++	     both as "VPhone Launchpad" in every language. -->
+ 	<key>CFBundleDisplayName</key>
+ 	<string>vphone-launchpad</string>
+ 	<key>CFBundleExecutable</key>
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings b/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings
+index 434319f9..a3e2098a 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/InfoPlist.xcstrings
+@@ -7,32 +7,32 @@
+       "localizations" : {
+         "en" : {
+           "stringUnit" : {
+-            "state" : "new",
+-            "value" : "vphone-launchpad"
++            "state" : "translated",
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "ja" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "ko" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "vi" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "zh-Hans" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         }
+       }
+@@ -43,32 +43,32 @@
+       "localizations" : {
+         "en" : {
+           "stringUnit" : {
+-            "state" : "new",
+-            "value" : "vphone-launchpad"
++            "state" : "translated",
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "ja" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "ko" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "vi" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         },
+         "zh-Hans" : {
+           "stringUnit" : {
+             "state" : "translated",
+-            "value" : "vphone-launchpad"
++            "value" : "VPhone Launchpad"
+           }
+         }
+       }

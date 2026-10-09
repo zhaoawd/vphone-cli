@@ -1,0 +1,93 @@
+{
+  "scope": "B23 host argv and detached-output fixes; reviewer did not run tests or operate VM",
+  "paths": [
+    {
+      "path": "scripts/run_tests.py",
+      "bytes": 5318,
+      "sha256": "953a946856e935c4b30026085efd73b8d5e47e8bf69715bc44c5da136f2d8865"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneBundleGuard.swift",
+      "bytes": 9120,
+      "sha256": "285efd8a6b1c0b0eaefc558ae31e6129c62081d99113009034775d977e03708d"
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneProcessIdentity.swift",
+      "bytes": 4636,
+      "sha256": "1caf884ce3814bea1f24452bbac2a03c630f84a31829136e71d31fc3d0ecb0bd"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+      "bytes": 11945,
+      "sha256": "ff7765453798ad8254bc840a3662563091f94017366ca137c5dd39c561e775db"
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadRunState.swift",
+      "bytes": 5657,
+      "sha256": "409cddba80c051b5dcb9f3ccc6756b06e5b3f4b6248925fb3678575beefe95fb"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/VMStopTests.swift",
+      "bytes": 20579,
+      "sha256": "ee0e82be238144cd8c8090d23279a819c9bfd8f7b0dd8c214e5bf64391a24238"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/OutputCompletionTests.swift",
+      "bytes": 6664,
+      "sha256": "fe44e1188a1d5c7ea28b76653299b9f56d38a3fcf396944634517fffe3f90bf4"
+    },
+    {
+      "path": "tests/VPhoneLaunchpadKitTests/RunStateTests.swift",
+      "bytes": 9203,
+      "sha256": "4aacb7a823f499d70ae237ce7914d8819bb029d292109982cb392dc859baaa1e"
+    }
+  ],
+  "independent_review": {
+    "agent": "/root/review_b22_runtime",
+    "host_initial_findings": [
+      "empty argv[0] can consume environment bytes",
+      "cross-UID unreadable argv must not become stopped"
+    ],
+    "tail_initial_findings": [
+      "live descendant can append after parent exits",
+      "final write between EOF and group disappearance can be omitted"
+    ],
+    "final_findings": {
+      "Critical": 0,
+      "Important": 0,
+      "Minor": 0
+    },
+    "limitations": [
+      "process-group check does not cover escaped descendants or outside writers",
+      "busy fallback requires a valid run record; no exact PID-reuse proof",
+      "drained callback does not acknowledge asynchronous consumers"
+    ]
+  },
+  "implementation_head": "f45be6c6e79d393e99ecbbe1c891536b214ae2bf",
+  "remaining_original_contracts": {
+    "T02": [
+      "202个pending提交及47项能力全局语义对账；不将adaptation_planned计为accepted"
+    ],
+    "T07": [],
+    "T08": [
+      "实际RootHide客户机服务验收；用户测试路径待回复",
+      "services.start状态144及未生效rotation范围，原因未查明"
+    ],
+    "T24": [
+      "完整TCC负责应用链真实验收",
+      "旧helper协议完整真实拒绝矩阵",
+      "Homebrew运行依赖只验证当前机器可解析，不声明可移植封装"
+    ],
+    "T40": [
+      "创建全流程固定工具链，已存在binding/receipt的clone/export/rename来源",
+      "kernel-only及环境升级/回退、混合版本四层来源矩阵；T12/T17/T32/T34生产能力尚未完整接入",
+      "同卷APFS副本不证明物理独立备份",
+      "完整64GiB VM归档往返未执行：Disk.img当前分配约21GiB，当前可用约20GiB，无法证明归档及导入空间充足"
+    ],
+    "T46": [
+      "全UI立即退出、create取消/后代writer完整生命周期",
+      "panic/取消/轮换、UI响应及实际VM吞吐矩阵",
+      "进程组外写入者和异步消费确认不由本次组检查证明"
+    ]
+  }
+}

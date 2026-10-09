@@ -1,0 +1,45 @@
+commit ad9ee8ecab26e76698d6115a61fc12909f4d7073
+Author:     Lakr <25259084+Lakr233@users.noreply.github.com>
+AuthorDate: Wed Sep 30 18:15:14 2026 +0900
+Commit:     GitHub <noreply@github.com>
+CommitDate: Wed Sep 30 18:15:14 2026 +0900
+
+    Focus the machine table when it appears (#535)
+    
+    The table is not in the window at launch: the machines view shows an empty placeholder until the first `vm list` returns, and only then swaps in the Table and has the library select the first machine. By then the window has already chosen its first responder, and nothing moves focus to the new table, so AppKit draws the selection unemphasized, in gray, instead of in the accent color.
+    
+    The table now takes focus through a FocusState when it appears. When it comes back because a search matches again, the search field keeps the keyboard.
+    
+    Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachinesView.swift b/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachinesView.swift
+index 8e068a8f..10436052 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachinesView.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachinesView.swift
+@@ -33,6 +33,11 @@ struct VPhoneLaunchpadMachinesView: View {
+     @State private var filter = ""
+     /// Empty keeps the order `vm list` returns; a header click replaces it.
+     @State private var sortOrder: [KeyPathComparator<VPhoneLaunchpadMachine>] = []
++    /// The table appears only once `vm list` returns, after the window has
++    /// picked its first responder, so nothing focuses it by itself. Unfocused,
++    /// AppKit draws the library's automatic selection in gray, not in the
++    /// accent color.
++    @FocusState private var tableIsFocused: Bool
+ 
+     private var library: VPhoneLaunchpadMachineLibrary {
+         model.machines
+@@ -353,6 +358,14 @@ struct VPhoneLaunchpadMachinesView: View {
+         } primaryAction: { paths in
+             start(library.machines.filter { paths.contains($0.path) && library.state(of: $0.path) == .stopped })
+         }
++        .focused($tableIsFocused)
++        .onAppear {
++            // The table comes back when a search matches again; the search
++            // field keeps the keyboard then.
++            if !(NSApp.keyWindow?.firstResponder is NSText) {
++                tableIsFocused = true
++            }
++        }
+     }
+ 
+     @ViewBuilder

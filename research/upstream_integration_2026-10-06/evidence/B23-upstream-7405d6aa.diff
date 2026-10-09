@@ -1,0 +1,63 @@
+commit 7405d6aaf1159c8ac47f3f4c1559fff4551d3cd6
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Mon Sep 28 22:33:03 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Mon Sep 28 22:33:03 2026 +0900
+
+    Take icli 0.7.1 so the Services window shows running services
+    
+    IcliKit 0.7.0's listServices read launchd's full list with the keys of a
+    one-label lookup (PID, LastExitStatus). The full list names them pid and
+    status, so services.list reported all 696 services as stopped with PID 0,
+    vphoned included, while services.status was right. 0.7.1 reads both.
+    
+    Checked on research-01: services.list now reports 299 of 696 running,
+    with vphoned and SpringBoard at the PIDs services.status gives. The
+    Program column stays empty in the list because launchd's full list has
+    no program path; the detail pane shows it.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index c6afde35..ce7ac730 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "9916a4f8b90c7b9c8585df3d98956ccc80e35365",
+-        "version" : "0.7.0"
++        "revision" : "45c92efcbee829ebbc485232122b6f94c03356da",
++        "version" : "0.7.1"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index 26f0e8f2..5764e37e 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = exactVersion;
+-				version = 0.7.0;
++				version = 0.7.1;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index eb7c4de6..e7d1eae2 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "9916a4f8b90c7b9c8585df3d98956ccc80e35365",
+-        "version" : "0.7.0"
++        "revision" : "45c92efcbee829ebbc485232122b6f94c03356da",
++        "version" : "0.7.1"
+       }
+     },
+     {

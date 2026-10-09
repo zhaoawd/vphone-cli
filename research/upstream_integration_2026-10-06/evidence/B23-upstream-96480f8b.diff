@@ -1,0 +1,59 @@
+commit 96480f8b71718981d15eee87d225a34ff908c82f
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Sat Oct 3 12:43:15 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Sat Oct 3 12:43:15 2026 +0900
+
+    Keep vphoned up when an element reports a NaN point
+    
+    ui.tap by label crashed vphoned whenever the frontmost app had an
+    accessibility element with a NaN activation point: icli's
+    icli_ax_elements_json handed the number to NSJSONSerialization, which
+    threw. icli 0.7.10 falls back to the frame's centre and turns an
+    unserializable bridge result into an error.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 789830a2..027331cc 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "66a8b8ba56281a46cd28e7ee50790ec97221604d",
+-        "version" : "0.7.9"
++        "revision" : "d68cde5deb8ac9da8029e14336ef9c5412f8581e",
++        "version" : "0.7.10"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index 4579e2bb..d0f05317 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.9;
++				minimumVersion = 0.7.10;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 13a468fd..b57a8b3d 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "66a8b8ba56281a46cd28e7ee50790ec97221604d",
+-        "version" : "0.7.9"
++        "revision" : "d68cde5deb8ac9da8029e14336ef9c5412f8581e",
++        "version" : "0.7.10"
+       }
+     },
+     {

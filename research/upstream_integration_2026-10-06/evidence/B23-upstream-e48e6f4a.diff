@@ -1,0 +1,58 @@
+commit e48e6f4a3b64bd198752b0df5b08d6a9fcc0cb98
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Wed Sep 30 23:19:53 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Wed Sep 30 23:19:53 2026 +0900
+
+    Take icli 0.7.7 so a Mac fix without altitude reaches the guest
+    
+    A Mac's CoreLocation fix has vertical accuracy -1 (no altitude). IcliKit
+    0.7.6 refused it with "vertical accuracy must be 0 or more metres", so
+    every location.set from Sync Host Location failed. 0.7.7 accepts -1 as an
+    unknown altitude.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index f55b1cb9..57008338 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "9c5dd98b79d94f28badf031a327138c46ccc92e6",
+-        "version" : "0.7.6"
++        "revision" : "9e9a6ca940ac4142771eb34cf7e052e35a7b7987",
++        "version" : "0.7.7"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index aa6d3eaa..ce03115a 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.6;
++				minimumVersion = 0.7.7;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 87ba0d7e..e593cfeb 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "9c5dd98b79d94f28badf031a327138c46ccc92e6",
+-        "version" : "0.7.6"
++        "revision" : "9e9a6ca940ac4142771eb34cf7e052e35a7b7987",
++        "version" : "0.7.7"
+       }
+     },
+     {

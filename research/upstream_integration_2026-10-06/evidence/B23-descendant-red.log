@@ -1,0 +1,81 @@
+Another instance of SwiftPM (PID: 68726) is already running using '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build', waiting until that process has finished execution...warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/42] Compiling download.c
+[5/42] Compiling fdr.c
+[6/42] Compiling ipsw.c
+[7/42] Compiling asr.c
+[9/42] Emitting module VPhoneAPIKit
+[9/42] Compiling restore.c
+[10/42] Compiling recovery.c
+[11/42] Compiling normal.c
+[12/42] Compiling limera1n.c
+[13/43] Compiling dfu.c
+[14/43] Compiling img4.c
+[15/44] Compiling ace3.c
+[16/44] Compiling img3.c
+[17/44] Compiling mbn.c
+[18/44] Compiling ftab.c
+[19/44] Compiling fls.c
+[20/44] Compiling locking.c
+[21/44] Compiling log.c
+[22/44] Compiling deviceinterfaced.c
+[23/44] Compiling vphone_zip_stub.c
+[25/44] Emitting module VPhoneBundleStore
+[25/44] Compiling common.c
+[26/44] Compiling idevicerestore.c
+[27/44] Compiling vphone_restore_bridge.c
+[28/44] Compiling MobileRecoveryCore libirecovery.c
+[30/45] Emitting module VPhoneBundleStoreTests
+[31/45] Emitting module VPhoneCore
+[32/47] Emitting module VPhoneHelperKitTests
+[33/48] Emitting module VPhoneArchiveKitTests
+[34/48] Emitting module VPhoneLaunchpadKit
+[35/49] Emitting module VPhoneLaunchpadLauncherEntry
+[36/47] Compiling VPhoneLaunchpadKitTests OutputCompletionTests.swift
+[37/47] Emitting module VPhoneLaunchpadKitTests
+[38/47] Emitting module VPhoneCoreTests
+[39/47] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[39/47] Write Objects.LinkFileList
+[42/48] Emitting module VPhoneCLITests
+[42/48] Write Objects.LinkFileList
+[43/48] Linking vphone-vm
+[44/48] Linking vphone-cli
+[45/48] Applying vphone-vm
+[45/48] Applying vphone-cli
+[47/48] Linking vphone-cliPackageTests
+Build complete! (14.34s)
+Test Suite 'Selected tests' started at 2026-10-09 11:37:57.779.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:37:57.781.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:37:57.781.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:37:57.781.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputCompletionTests started.
+◇ Test detachedParentExitDoesNotConfirmDescendantOutput() started.
+✘ Test detachedParentExitDoesNotConfirmDescendantOutput() recorded an issue at OutputCompletionTests.swift:43:9: Expectation failed: !((completion → Completion(status: 0, outputDrained: true)).outputDrained → true → true)
+✘ Test detachedParentExitDoesNotConfirmDescendantOutput() failed after 1.550 seconds with 1 issue.
+✘ Suite OutputCompletionTests failed after 1.551 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 1.551 seconds with 1 issue.

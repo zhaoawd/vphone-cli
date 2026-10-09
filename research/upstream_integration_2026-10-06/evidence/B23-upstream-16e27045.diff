@@ -1,0 +1,65 @@
+commit 16e270459abda3aa5ff5a50de608ff2b11a2b5ba
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Wed Sep 30 13:45:46 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Wed Sep 30 13:45:46 2026 +0900
+
+    Require icli 0.7.5 so the guest installs IPAs with UTF-8 names
+    
+    vphoned runs in the C locale launchd gives it, and icli's archive readers
+    converted entry names through that locale. An IPA whose ZIP entries carry
+    the UTF-8 flag, such as Payload/App.app/What’s New.html, failed apps.install
+    with "Pathname cannot be converted from UTF-8 to current locale", and a
+    deb with a PAX UTF-8 path failed the same way. icli 0.7.5 gives each
+    archive reader a thread-local UTF-8 LC_CTYPE, so vphoned needs no locale
+    handling of its own.
+    
+    Reported with a vphoned-side fix and regression harness by Yanni Pang in
+    #530; the fix moved into icli, which carries the ported tests.
+    
+    Co-Authored-By: Yanni Pang <2459177+yannip1234@users.noreply.github.com>
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index d32c18cf..84527536 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "ce271e5c9a70a5cb09005dd9d1c307d2f243426d",
+-        "version" : "0.7.4"
++        "revision" : "978fd607161a6ab7017401e1583a5dbd052b2aa3",
++        "version" : "0.7.5"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index 70e8e535..d8241e15 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.4;
++				minimumVersion = 0.7.5;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index f7c5cf5d..20977b42 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "ce271e5c9a70a5cb09005dd9d1c307d2f243426d",
+-        "version" : "0.7.4"
++        "revision" : "978fd607161a6ab7017401e1583a5dbd052b2aa3",
++        "version" : "0.7.5"
+       }
+     },
+     {

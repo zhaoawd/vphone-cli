@@ -1,0 +1,53 @@
+commit 8b28ea2cb497c089da9bf2406be4c3c36a117cf4
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Sun Oct 4 00:04:11 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Sun Oct 4 00:04:16 2026 +0900
+
+    icli 0.7.15: svc loads a plist on RootHide as its launchctl would
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 693f2fa7..5020165b 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "dc2215f86169247d182b434a1639742f834612a6",
+-        "version" : "0.7.14"
++        "revision" : "a4638d7fcd2f0c2e28fa6c6ee4d3d31aa68c27e0",
++        "version" : "0.7.15"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index 1558c598..6d418864 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.14;
++				minimumVersion = 0.7.15;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 51044121..25215bdd 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "dc2215f86169247d182b434a1639742f834612a6",
+-        "version" : "0.7.14"
++        "revision" : "a4638d7fcd2f0c2e28fa6c6ee4d3d31aa68c27e0",
++        "version" : "0.7.15"
+       }
+     },
+     {

@@ -1,0 +1,38 @@
+commit f57adf67431453f8ecbd3b568503ee7dddcfa9af
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Thu Oct 1 00:05:37 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Thu Oct 1 00:05:37 2026 +0900
+
+    Put Check for Updates before Install Local Build in Core Bundle
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundleView.swift b/VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundleView.swift
+index c641e9e9..84626f5a 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundleView.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpad/CoreBundle/VPhoneLaunchpadCoreBundleView.swift
+@@ -39,6 +39,11 @@ struct VPhoneLaunchpadCoreBundleView: View {
+             }
+             .formStyle(.grouped)
+         } accessory: {
++            Button("Check for Updates") {
++                Task { await bundles.refresh() }
++            }
++            .help("Reload releases and builds, and run host preflight again.")
++            .disabled(bundles.isInstalling)
+             Button("Install Local Build…") {
+                 chooseLocalBuild()
+             }
+@@ -46,11 +51,6 @@ struct VPhoneLaunchpadCoreBundleView: View {
+                 ? "Install a VPhone.bundle folder or .zip built on this Mac."
+                 : "Installing needs the privileged helper and Developer Tools access.")
+             .disabled(!model.canInstallBundles)
+-            Button("Check for Updates") {
+-                Task { await bundles.refresh() }
+-            }
+-            .help("Reload releases and builds, and run host preflight again.")
+-            .disabled(bundles.isInstalling)
+         } actions: {
+             Button("Done") { dismiss() }
+                 .keyboardShortcut(.defaultAction)

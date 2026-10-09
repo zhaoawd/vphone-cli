@@ -1,0 +1,41 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/12] Emitting module VPhoneLaunchpadKit
+[7/12] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[8/16] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreation.swift
+[9/16] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCreateCommand.swift
+[10/16] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCommandLine.swift
+[11/16] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineLibrary.swift
+[11/24] Write Objects.LinkFileList
+[13/24] Emitting module VPhoneLaunchpadLauncherEntry
+[13/24] Write Objects.LinkFileList
+[14/24] Linking vphone-launchpad
+[15/24] Linking vphone-launchpad-launcher
+[16/24] Applying vphone-launchpad-launcher
+[17/24] Applying vphone-launchpad
+[19/24] Compiling VPhoneLaunchpadKitTests MenuBarTests.swift
+[20/24] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[21/24] Compiling VPhoneLaunchpadKitTests OutputCompletionTests.swift
+[22/24] Emitting module VPhoneLaunchpadKitTests
+[22/24] Write Objects.LinkFileList
+[23/24] Linking vphone-cliPackageTests
+Build complete! (8.13s)
+Test Suite 'Selected tests' started at 2026-10-09 11:41:55.885.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:41:55.886.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:41:55.887.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:41:55.887.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputCompletionTests started.
+◇ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() started.
+✘ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() recorded an issue at OutputCompletionTests.swift:71:9: Expectation failed: (lines.all → []) == ["last write"]
+± removed ["last write"]
+✘ Test finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() failed after 0.264 seconds with 1 issue.
+✘ Suite OutputCompletionTests failed after 0.264 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 0.265 seconds with 1 issue.

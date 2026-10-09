@@ -1,0 +1,9 @@
+{
+  "prior_pid": 41252,
+  "new_pid": 63532,
+  "new_process": "63532 1 Ss /usr/libexec/amfid",
+  "restart": "SIGCONT old stopped process, kickstart did not change PID; exact SIGKILL, observed not running, kickstart starts new original service",
+  "debugger_attached": false,
+  "original_cleanup_readback_incomplete": true,
+  "reason_for_test_stall": "原因未查明；观察到旧 amfid 停止及多个测试线程处于内核查询或 posix_spawn"
+}

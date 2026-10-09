@@ -1,0 +1,162 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/43] Write sources
+[5/43] Write swift-version--58304C5D6DBC2206.txt
+[6/44] Compiling download.c
+[7/44] Compiling fdr.c
+[8/44] Compiling ipsw.c
+[9/44] Compiling asr.c
+[11/44] Emitting module VPhoneAPIKit
+[11/44] Compiling normal.c
+[12/44] Compiling recovery.c
+[13/44] Compiling restore.c
+[14/44] Compiling limera1n.c
+[15/44] Compiling dfu.c
+[16/44] Compiling img4.c
+[17/44] Compiling img3.c
+[18/45] Compiling ace3.c
+[19/45] Compiling mbn.c
+[20/45] Compiling ftab.c
+[21/45] Compiling fls.c
+[22/47] Compiling locking.c
+[23/47] Compiling log.c
+[24/47] Compiling deviceinterfaced.c
+[25/47] Compiling vphone_zip_stub.c
+[26/47] Compiling idevicerestore.c
+[27/47] Compiling common.c
+[28/47] Compiling vphone_restore_bridge.c
+[30/47] Emitting module VPhoneBundleStore
+[30/47] Compiling MobileRecoveryCore libirecovery.c
+[32/48] Compiling VPhoneCore VPhoneProcessIdentity.swift
+[33/48] Emitting module VPhoneBundleStoreTests
+[34/48] Emitting module VPhoneCore
+[34/53] Write Objects.LinkFileList
+[36/54] Emitting module VPhoneHelperKitTests
+[37/55] Emitting module VPhoneArchiveKitTests
+[37/55] Linking vphone-helper
+[38/55] Applying vphone-helper
+[40/55] Emitting module VPhoneLaunchpadKit
+[40/57] Write Objects.LinkFileList
+[42/59] Emitting module VPhoneLaunchpadLauncherEntry
+[42/60] Write Objects.LinkFileList
+[43/60] Linking vphone-launchpad
+[44/60] Linking vphone-launchpad-launcher
+[45/60] Applying vphone-launchpad
+[46/60] Applying vphone-launchpad-launcher
+[48/60] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[49/60] Emitting module VPhoneLaunchpadKitTests
+[50/60] Emitting module VPhoneCoreTests
+[51/60] Compiling VPhoneCoreTests VMStopTests.swift
+[52/60] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[52/60] Write Objects.LinkFileList
+[55/61] Emitting module VPhoneCLITests
+[55/61] Write Objects.LinkFileList
+[56/61] Linking vphone-cli
+[57/61] Linking vphone-vm
+[58/61] Applying vphone-cli
+[59/61] Applying vphone-vm
+[60/61] Linking vphone-cliPackageTests
+Build complete! (14.31s)
+Test Suite 'Selected tests' started at 2026-10-09 11:11:07.574.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 11:11:07.579.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 11:11:07.579.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 11:11:07.579.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite RunStateTests started.
+◇ Suite VMStopTests started.
+◇ Test busyToleratesRecordTimeTruncation() started.
+◇ Test runningWithMatchingBootRecord() started.
+◇ Test refusesToSignalAForeignLockHolder() started.
+◇ Test stoppedWithoutBootProcessOrRecord() started.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+◇ Test diskInspectionFailureCannotReportStopped() started.
+◇ Test busyWhileShortOperationHolderLives() started.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+◇ Test liveReaderPreservesExecutableAndConfigSpaces() started.
+◇ Test staleBootRecordWithReusedPIDIsStopped() started.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test dfuWithMatchingDFURecord() started.
+◇ Test reportsSignalErrorsSeparately() started.
+◇ Test eachMachineReadsItsOwnRecordOnce() started.
+◇ Test shortOperationRecordWithExitedHolderIsStopped() started.
+◇ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test runningFromBootProcessAlone() started.
+◇ Test exitedTargetAndReleasedLockStillRequireDiskRelease() started.
+◇ Test liveProcessListParses() started.
+◇ Test staleBootRecordDoesNotNameTheRunningInstance() started.
+◇ Test shortOperationRecordWithReusedPIDIsStopped() started.
+◇ Test mapsOutcomesToExitCodes() started.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+◇ Test reportsProgressBeforeTheWaits() started.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+◇ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+✘ Test liveReaderPreservesExecutableAndConfigSpaces() recorded an issue at RunStateTests.swift:144:9: Expectation failed: (VPhoneLaunchpadRunStateReader.live.state(of: vm, processList: list) → .stopped) == .running(instanceID: nil)
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+✘ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) recorded an issue with 1 argument executableName → "vphone-cli" at VMStopTests.swift:185:9: Expectation failed: (VPhoneBundleGuard.live.bootPIDs(fixture.configURL) → []) == ([boot.processIdentifier] → [22900])
+± removed [22900]
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 0.732 seconds.
+✔ Test busyToleratesRecordTimeTruncation() passed after 0.732 seconds.
+✔ Test runningWithMatchingBootRecord() passed after 0.732 seconds.
+✔ Test busyWhileShortOperationHolderLives() passed after 0.732 seconds.
+✔ Test staleBootRecordWithReusedPIDIsStopped() passed after 0.732 seconds.
+✔ Test reportsSignalErrorsSeparately() passed after 0.732 seconds.
+✔ Test dfuWithMatchingDFURecord() passed after 0.732 seconds.
+✔ Test stoppedWithoutBootProcessOrRecord() passed after 0.732 seconds.
+✔ Test eachMachineReadsItsOwnRecordOnce() passed after 0.732 seconds.
+✔ Test diskInspectionFailureCannotReportStopped() passed after 0.732 seconds.
+✔ Test runningFromBootProcessAlone() passed after 0.732 seconds.
+✔ Test exitedTargetAndReleasedLockStillRequireDiskRelease() passed after 0.732 seconds.
+✔ Test shortOperationRecordWithExitedHolderIsStopped() passed after 0.732 seconds.
+✔ Test liveProcessListParses() passed after 0.732 seconds.
+✔ Test staleBootRecordDoesNotNameTheRunningInstance() passed after 0.732 seconds.
+✔ Test shortOperationRecordWithReusedPIDIsStopped() passed after 0.732 seconds.
+✔ Test mapsOutcomesToExitCodes() passed after 0.732 seconds.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 0.732 seconds.
+✘ Test liveReaderPreservesExecutableAndConfigSpaces() failed after 0.733 seconds with 1 issue.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 0.733 seconds.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 0.732 seconds.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 0.732 seconds.
+✔ Test refusesToSignalAForeignLockHolder() passed after 0.733 seconds.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 0.732 seconds.
+✘ Suite RunStateTests failed after 0.733 seconds with 1 issue.
+✘ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) recorded an issue with 1 argument executableName → "vphone-vm" at VMStopTests.swift:185:9: Expectation failed: (VPhoneBundleGuard.live.bootPIDs(fixture.configURL) → []) == ([boot.processIdentifier] → [22896])
+± removed [22896]
+✘ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) with 2 test cases failed after 0.742 seconds with 2 issues.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 0.789 seconds.
+✔ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() passed after 0.843 seconds.
+✔ Test reportsProgressBeforeTheWaits() passed after 2.565 seconds.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 2.898 seconds.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 6.527 seconds.
+✘ Suite VMStopTests failed after 6.528 seconds with 2 issues.
+✘ Test run with 30 tests in 2 suites failed after 6.528 seconds with 3 issues.

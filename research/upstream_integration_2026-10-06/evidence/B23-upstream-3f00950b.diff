@@ -1,0 +1,101 @@
+commit 3f00950be4c0fe9b275523dfb59dfcc43445444b
+Author:     Lakr <git@qaq.wiki>
+AuthorDate: Sat Oct 3 21:41:59 2026 +0900
+Commit:     Lakr <git@qaq.wiki>
+CommitDate: Sat Oct 3 21:41:59 2026 +0900
+
+    Register apps.install plug-ins and rotate on iOS 27 with icli 0.7.14
+    
+    vphoned's apps.install registered an app's PlugIns/*.appex at their
+    paths in the temporary copy of the IPA, so LaunchServices kept no
+    record of them, and on iOS 27 it dropped them altogether: nothing could
+    find or launch an installed app's extensions. A packet tunnel provider
+    failed with NEAgentErrorDomain Code=2 and no process (#546). icli 0.7.12
+    and 0.7.13 register them at their installed paths on both, and the
+    result reports plugins and unregistered_plugins.
+    
+    SpringBoard on iOS 27 refuses the accessibility server's rotate and
+    orientation-lock requests from a client without
+    com.apple.accessibility.physicalinteraction.client, so display.rotation
+    and display.rotation_lock left the interface where it was. vphoned
+    carries that entitlement now, as icli 0.7.14 does.
+    
+    Checked on an iOS 27 RootHide guest through vphoned: an IPA with a
+    packet tunnel extension installed by apps.install lists its plug-in,
+    and the tunnel's provider launches and connects; rotation to 90, 270
+    and 0 and the orientation lock apply.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/Skills/vphone-guest-control/references/rpc-methods.md b/Skills/vphone-guest-control/references/rpc-methods.md
+index 1673ce99..f533b820 100644
+--- a/Skills/vphone-guest-control/references/rpc-methods.md
++++ b/Skills/vphone-guest-control/references/rpc-methods.md
+@@ -118,7 +118,10 @@ different meaning:
+   and vphoned **deletes the file after installing**. It re-signs and places the
+   bundle itself, bypassing installd and the profile checks, and keeps the app's
+   own entitlements (so `get-task-allow` survives, which is the way to get a
+-  debuggable test app in). It proves nothing about installd. To get the file
++  debuggable test app in). Its `PlugIns/*.appex` are registered with the app,
++  so extensions (packet tunnels, share sheets, widgets) launch; the result's
++  `plugins` lists them and `unregistered_plugins` any LaunchServices did not
++  take. It proves nothing about installd. To get the file
+   into the guest, see [guest-layout](guest-layout.md) ("Handing a file to
+   vphoned").
+ 
+diff --git a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 860a8736..693f2fa7 100644
+--- a/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhone.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -24,8 +24,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "b0cc5cae2709a2b15f74258050e3ac064d09a3ec",
+-        "version" : "0.7.11"
++        "revision" : "dc2215f86169247d182b434a1639742f834612a6",
++        "version" : "0.7.14"
+       }
+     },
+     {
+diff --git a/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements b/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements
+index bfada5c3..d51abcbe 100644
+--- a/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements
++++ b/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements
+@@ -47,6 +47,8 @@
+ 	<true/>
+ 	<key>com.apple.accessibility.api</key>
+ 	<true/>
++	<key>com.apple.accessibility.physicalinteraction.client</key>
++	<true/>
+ 	<key>com.apple.backboard.client</key>
+ 	<true/>
+ 	<key>com.apple.backboardd.launchapplications</key>
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+index ce66830d..1558c598 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj
+@@ -345,7 +345,7 @@
+ 			repositoryURL = "https://github.com/owngoal-dev/icli.git";
+ 			requirement = {
+ 				kind = upToNextMajorVersion;
+-				minimumVersion = 0.7.11;
++				minimumVersion = 0.7.14;
+ 			};
+ 		};
+ 		C10000000000000000000072 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+diff --git a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+index 9747c112..51044121 100644
+--- a/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
++++ b/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -6,8 +6,8 @@
+       "kind" : "remoteSourceControl",
+       "location" : "https://github.com/owngoal-dev/icli.git",
+       "state" : {
+-        "revision" : "b0cc5cae2709a2b15f74258050e3ac064d09a3ec",
+-        "version" : "0.7.11"
++        "revision" : "dc2215f86169247d182b434a1639742f834612a6",
++        "version" : "0.7.14"
+       }
+     },
+     {
