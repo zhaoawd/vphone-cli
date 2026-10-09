@@ -519,7 +519,7 @@ public struct VPhoneCreateOrchestrator {
                 "resume again with --iphone-source / --cloudos-source",
             ])
         case .runInProgress, .bundleBusy, .recoveryRequired, .io, .artifactMissing, .stageFailed, .stageCancelled,
-             .checkpointWriteFailed, .interrupted:
+             .checkpointWriteFailed, .interrupted, .toolChangedDuringRun:
             return nil
         }
     }

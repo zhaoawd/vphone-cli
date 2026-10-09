@@ -554,6 +554,16 @@ struct CreateLiveStagesTests {
         #expect(try Data(contentsOf: w.checkpointURL) == bytes)
     }
 
+    @Test func toolChangeDuringRunDoesNotClaimAnUnchangedCheckpoint() throws {
+        let w = try Workspace(); defer { w.cleanup() }
+        _ = try w.writeCheckpoint()
+        let error = VPhoneCreateRunError.toolChangedDuringRun(recorded: "before", current: "after")
+        #expect(!error.isRefusalBeforeWrite)
+        let lines = VPhoneCreateOrchestrator.recoveryHintLines(name: "vm", bundleURL: w.bundle, error: error)
+        #expect(lines.first?.hasPrefix("[-] vm create stopped") == true)
+        #expect(!lines.contains { $0.contains("checkpoint was not changed") || $0.contains("--resume refused") })
+    }
+
     @Test func toolChangeRefusalLeadsWithItsCauseAndLabelsTheRecordedRequirement() throws {
         // Real run 2026-09-17 printed the stored lock-held requirement as if it caused the refusal.
         let w = try Workspace(); defer { w.cleanup() }

@@ -82,6 +82,7 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
     case recoveryRequired(VPhoneCreateRecoveryRequirement)
     case optionsChanged([String])
     case toolChanged(recorded: String?, current: String?)
+    case toolChangedDuringRun(recorded: String?, current: String?)
     case contractChanged(recorded: Int, current: Int)
     case invalidRestart(String)
     case sourceRequired(String)
@@ -116,7 +117,7 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
                 + "): \(requirement.detail); \(requirement.action)"
         case let .optionsChanged(lines):
             "options differ from the checkpoint and affect stages that already ran: " + lines.joined(separator: "; ")
-        case let .toolChanged(recorded, current):
+        case let .toolChanged(recorded, current), let .toolChangedDuringRun(recorded, current):
             "CLI/VM toolchain changed since the checkpoint (\(recorded ?? "unknown") -> \(current ?? "unknown")); "
                 + "pass --accept-tool-change to resume with this build"
         case let .contractChanged(recorded, current):
@@ -148,7 +149,7 @@ public enum VPhoneCreateRunError: Error, CustomStringConvertible, LocalizedError
              .verificationFailed, .recoveryRequired, .optionsChanged, .toolChanged, .contractChanged,
              .invalidRestart, .sourceRequired:
             true
-        case .io, .artifactMissing, .stageFailed, .stageCancelled, .checkpointWriteFailed, .interrupted:
+        case .io, .artifactMissing, .stageFailed, .stageCancelled, .checkpointWriteFailed, .interrupted, .toolChangedDuringRun:
             false
         }
     }
@@ -207,6 +208,7 @@ public struct VPhoneCreateRunner {
     public var verifier: any VPhoneCreateStageVerifier
     public var prober: any VPhoneCreateStateProber
     public var storeHooks: VPhoneCreateCheckpointStore.Hooks
+    /// An unavailable fingerprint refuses execution at the stage boundary.
     public var toolFingerprint: () -> String?
     public var bundleLockHeld: (URL) -> Bool
     public var now: () -> Date
@@ -457,6 +459,14 @@ public struct VPhoneCreateRunner {
         let overrides = OptionOverrides(iphoneSource: iphoneSource, cloudosSource: cloudosSource)
         let bundleURL = store.bundleURL
         for stage in VPhoneCreateStage.allCases where !checkpoint.record(stage).status.isDone {
+            // A running create can outlive replacement of either executable.
+            // Refuse before recording or executing the next stage; resume is
+            // the explicit path for accepting a changed CLI/VM pair.
+            let currentTool = toolFingerprint()
+            guard currentTool != nil, currentTool == checkpoint.tool.executableSha256 else {
+                throw VPhoneCreateRunError.toolChangedDuringRun(
+                    recorded: checkpoint.tool.executableSha256, current: currentTool)
+            }
             let started = now()
             let inputs = Dictionary(uniqueKeysWithValues: latestArtifacts(checkpoint)
                 .filter { $0.availability == .available }

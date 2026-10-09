@@ -895,6 +895,87 @@ private let allStages = VPhoneCreateStage.allCases
         #expect(resumed.tool.executableSha256 == "tool-b")
     }
 
+    @Test func resumeCannotAcceptAnUnreadableToolchainAndExecuteStages() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        f.fake.setFault(.restore, .beforeExecution)
+        #expect(throws: VPhoneCreateRunError.self) { try f.create(f.runner()) }
+        f.fake.resetCalls()
+        #expect { try f.runner(tool: nil).resume(bundleURL: f.bundle, request: .init(acceptToolChange: true)) } throws: { error in
+            if case let VPhoneCreateRunError.toolChangedDuringRun(recorded, current) = error {
+                return recorded == nil && current == nil
+            }
+            return false
+        }
+        #expect(f.fake.executed.isEmpty)
+        #expect(try f.load().record(.restore).status == .pending)
+    }
+
+    @Test func freshCreateRefusesAnInitiallyUnreadableToolchain() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let cli = f.root.appendingPathComponent("missing-cli")
+        var runner = f.runner()
+        runner.toolFingerprint = { try? VPhoneCreateDigest.toolchain(cli: cli) }
+        #expect(throws: VPhoneCreateRunError.self) { try f.create(runner) }
+        #expect(f.fake.executed.isEmpty)
+        let checkpoint = try f.load()
+        #expect(checkpoint.tool.executableSha256 == nil)
+        #expect(checkpoint.record(.prepare).status == .pending)
+    }
+
+    @Test(arguments: ["vphone-cli", "vphone-vm"])
+    func freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable: String) throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let cli = f.root.appendingPathComponent("vphone-cli")
+        let vm = f.root.appendingPathComponent("vphone-vm")
+        try Data("original CLI".utf8).write(to: cli)
+        try Data("original VM".utf8).write(to: vm)
+        let frozen = try VPhoneCreateDigest.toolchain(cli: cli)
+        f.fake.onExecute = { stage in
+            if stage == .prepare {
+                try! Data("replacement executable".utf8).write(to: f.root.appendingPathComponent(executable))
+            }
+        }
+        var runner = f.runner()
+        runner.toolFingerprint = { try? VPhoneCreateDigest.toolchain(cli: cli) }
+        #expect { try f.create(runner) } throws: { error in
+            if case let VPhoneCreateRunError.toolChangedDuringRun(recorded, current) = error {
+                return (error as? VPhoneCreateRunError)?.isRefusalBeforeWrite == false && recorded == frozen && current != frozen && current != nil
+            }
+            return false
+        }
+        #expect(f.fake.executed == [.prepare])
+        let checkpoint = try f.load()
+        #expect(checkpoint.tool.executableSha256 == frozen)
+        #expect(checkpoint.record(.prepare).status == .succeeded)
+        #expect(checkpoint.record(.patch).status == .pending)
+        #expect(!FileManager.default.fileExists(atPath: f.bundle.appendingPathComponent("out-patch.txt").path))
+    }
+
+    @Test func freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let cli = f.root.appendingPathComponent("vphone-cli")
+        let vm = f.root.appendingPathComponent("vphone-vm")
+        try Data("original CLI".utf8).write(to: cli)
+        try Data("original VM".utf8).write(to: vm)
+        let frozen = try VPhoneCreateDigest.toolchain(cli: cli)
+        f.fake.onExecute = { stage in
+            if stage == .prepare { try! FileManager.default.removeItem(at: vm) }
+        }
+        var runner = f.runner()
+        runner.toolFingerprint = { try? VPhoneCreateDigest.toolchain(cli: cli) }
+        #expect { try f.create(runner) } throws: { error in
+            if case let VPhoneCreateRunError.toolChangedDuringRun(recorded, current) = error {
+                return (error as? VPhoneCreateRunError)?.isRefusalBeforeWrite == false && recorded == frozen && current == nil
+            }
+            return false
+        }
+        #expect(f.fake.executed == [.prepare])
+        let checkpoint = try f.load()
+        #expect(checkpoint.tool.executableSha256 == frozen)
+        #expect(checkpoint.record(.prepare).status == .succeeded)
+        #expect(checkpoint.record(.patch).status == .pending)
+    }
+
     @Test func credentialsInSourcesAreNotStoredAndMustBeResupplied() throws {
         let f = try Fixture(); defer { f.cleanup() }
         let secret = "https://user:hunter2@example.invalid/iPhone.ipsw?token=abc"

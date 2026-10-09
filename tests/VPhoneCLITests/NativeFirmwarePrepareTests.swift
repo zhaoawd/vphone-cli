@@ -96,7 +96,7 @@ struct NativeFirmwarePrepareTests {
                 if step == .rename, checkpoint.record(.prepare).status == .succeeded {
                     throw CocoaError(.fileWriteUnknown)
                 }
-            }), log: { _ in }, keepArtifacts: true)
+            }), toolFingerprint: { "native-test-toolchain" }, log: { _ in }, keepArtifacts: true)
         #expect(throws: VPhoneCreateRunError.self) {
             try interrupted.create(bundleURL: vm, options: options, iphoneSource: phone.path, cloudosSource: cloud.path)
         }
@@ -104,7 +104,7 @@ struct NativeFirmwarePrepareTests {
         #expect(first.record(.prepare).status == .running)
         #expect(VPhoneCreateLiveStages.restoreTree(vm) != nil)
         let resumed = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages,
-            log: { _ in }, keepArtifacts: true)
+            toolFingerprint: { "native-test-toolchain" }, log: { _ in }, keepArtifacts: true)
         // Later stages are deliberately stopped; no patch, restore or boot executes.
         #expect(throws: VPhoneCreateRunError.self) { try resumed.resume(bundleURL: vm) }
         let second = try VPhoneCreateCheckpointStore.load(bundleURL: vm).checkpoint
@@ -337,7 +337,7 @@ extension NativeFirmwarePrepareTests {
         let vm = root.appendingPathComponent("vm")
         try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
         let stages = SyntheticPatchCheckpointStages(bundle: vm)
-        let runner = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, log: { _ in }, keepArtifacts: true)
+        let runner = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, toolFingerprint: { "native-test-toolchain" }, log: { _ in }, keepArtifacts: true)
         #expect(throws: VPhoneCreateRunError.self) {
             try runner.create(bundleURL: vm, options: options("regular", phone: phone, cloud: cloud),
                 iphoneSource: phone.path, cloudosSource: cloud.path)
@@ -382,7 +382,7 @@ extension NativeFirmwarePrepareTests {
         try FileManager.default.createDirectory(at: fresh, withIntermediateDirectories: false)
         let freshStages = SyntheticPatchCheckpointStages(bundle: fresh)
         #expect(throws: VPhoneCreateRunError.self) {
-            try VPhoneCreateRunner(executor: freshStages, verifier: freshStages, prober: freshStages, log: { _ in }, keepArtifacts: true)
+            try VPhoneCreateRunner(executor: freshStages, verifier: freshStages, prober: freshStages, toolFingerprint: { "native-test-toolchain" }, log: { _ in }, keepArtifacts: true)
                 .create(bundleURL: fresh, options: options("jb", phone: phone, cloud: cloud),
                     iphoneSource: phone.path, cloudosSource: cloud.path)
         }
@@ -396,7 +396,7 @@ extension NativeFirmwarePrepareTests {
         let vm = root.appendingPathComponent("vm")
         try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
         let stages = SyntheticPatchCheckpointStages(bundle: vm)
-        let runner = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, log: { _ in }, keepArtifacts: true)
+        let runner = VPhoneCreateRunner(executor: stages, verifier: stages, prober: stages, toolFingerprint: { "native-test-toolchain" }, log: { _ in }, keepArtifacts: true)
         #expect(throws: VPhoneCreateRunError.self) {
             try runner.create(bundleURL: vm, options: options("regular", phone: phone, cloud: cloud),
                 iphoneSource: phone.path, cloudosSource: cloud.path)
