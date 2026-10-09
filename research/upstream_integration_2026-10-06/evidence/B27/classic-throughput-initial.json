@@ -1,0 +1,89 @@
+{
+  "scope": "Real guest classic shell response to headless host; excludes UI, helper log, console, rotation, panic and cancellation acceptance",
+  "rows": [
+    {
+      "lines": 256,
+      "expected_bytes": 18944,
+      "actual_bytes": 0,
+      "expected_sha256": "752758fabdcc897695534463c8b06dcb041f8747b169e792f5191cd31d0120f1",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete": false,
+      "seconds": 0.011017958000000001,
+      "bytes_per_second": 0.0,
+      "response": {
+        "code": 127,
+        "truncated": false,
+        "ok": true,
+        "stderr": "/var/jb/bin/sh: 1: awk: not found\n",
+        "timed_out": false
+      },
+      "request": {
+        "t": "shell",
+        "cmd": "PATH=/var/jb/usr/bin:/usr/bin:/bin; export PATH; awk 'BEGIN { for(i=0;i<256;i++) printf \"B27%05d-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n\",i }'",
+        "timeout_ms": 15000,
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84568,
+          "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+        }
+      }
+    },
+    {
+      "lines": 4096,
+      "expected_bytes": 303104,
+      "actual_bytes": 0,
+      "expected_sha256": "d86b998a292c53f85310d3b8c7c89a51b6616c65170bf144102e3c0c0000fd10",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete": false,
+      "seconds": 0.009465375000000005,
+      "bytes_per_second": 0.0,
+      "response": {
+        "code": 127,
+        "truncated": false,
+        "ok": true,
+        "stderr": "/var/jb/bin/sh: 1: awk: not found\n",
+        "timed_out": false
+      },
+      "request": {
+        "t": "shell",
+        "cmd": "PATH=/var/jb/usr/bin:/usr/bin:/bin; export PATH; awk 'BEGIN { for(i=0;i<4096;i++) printf \"B27%05d-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n\",i }'",
+        "timeout_ms": 15000,
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84568,
+          "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+        }
+      }
+    },
+    {
+      "lines": 12000,
+      "expected_bytes": 888000,
+      "actual_bytes": 0,
+      "expected_sha256": "73dfe8296dcf1452e79b1ca6fdd427e2438eb3f1b53dbd0ba58802c75fe12198",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "complete": false,
+      "seconds": 0.010843583999999996,
+      "bytes_per_second": 0.0,
+      "response": {
+        "code": 127,
+        "truncated": false,
+        "ok": true,
+        "stderr": "/var/jb/bin/sh: 1: awk: not found\n",
+        "timed_out": false
+      },
+      "request": {
+        "t": "shell",
+        "cmd": "PATH=/var/jb/usr/bin:/usr/bin:/bin; export PATH; awk 'BEGIN { for(i=0;i<12000;i++) printf \"B27%05d-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n\",i }'",
+        "timeout_ms": 15000,
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84568,
+          "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+        }
+      }
+    }
+  ]
+}

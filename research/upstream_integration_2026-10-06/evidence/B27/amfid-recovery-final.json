@@ -1,0 +1,48 @@
+[
+  {
+    "argv": [
+      "/bin/ps",
+      "-p",
+      "76623",
+      "-o",
+      "pid=,ppid=,stat=,comm="
+    ],
+    "exit": 0,
+    "stdout": "76623     1 Ss   /usr/libexec/amfid\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/bin/kill",
+      "-KILL",
+      "76623"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/bin/launchctl",
+      "kickstart",
+      "system/com.apple.MobileFileIntegrity"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/bin/ps",
+      "-axo",
+      "pid,ppid,stat,comm"
+    ],
+    "exit": 0,
+    "stdout": "92181     1 Ss   /usr/libexec/amfid\n",
+    "stderr": ""
+  }
+]

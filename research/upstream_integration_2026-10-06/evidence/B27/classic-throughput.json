@@ -1,0 +1,89 @@
+{
+  "scope": "Real guest classic shell response to headless host; excludes UI, helper log, console, rotation, panic and cancellation acceptance",
+  "rows": [
+    {
+      "lines": 256,
+      "expected_bytes": 18944,
+      "actual_bytes": 18944,
+      "expected_sha256": "752758fabdcc897695534463c8b06dcb041f8747b169e792f5191cd31d0120f1",
+      "sha256": "752758fabdcc897695534463c8b06dcb041f8747b169e792f5191cd31d0120f1",
+      "complete": true,
+      "seconds": 0.012744374999999999,
+      "bytes_per_second": 1486459.712618312,
+      "response": {
+        "code": 0,
+        "truncated": false,
+        "ok": true,
+        "stderr": "",
+        "timed_out": false
+      },
+      "request": {
+        "t": "shell",
+        "cmd": "i=0; while [ \"$i\" -lt 256 ]; do printf 'B27%05d-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n' \"$i\"; i=$((i+1)); done",
+        "timeout_ms": 15000,
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84568,
+          "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+        }
+      }
+    },
+    {
+      "lines": 4096,
+      "expected_bytes": 303104,
+      "actual_bytes": 303104,
+      "expected_sha256": "d86b998a292c53f85310d3b8c7c89a51b6616c65170bf144102e3c0c0000fd10",
+      "sha256": "d86b998a292c53f85310d3b8c7c89a51b6616c65170bf144102e3c0c0000fd10",
+      "complete": true,
+      "seconds": 0.036135458999999995,
+      "bytes_per_second": 8387993.632514812,
+      "response": {
+        "code": 0,
+        "truncated": false,
+        "ok": true,
+        "stderr": "",
+        "timed_out": false
+      },
+      "request": {
+        "t": "shell",
+        "cmd": "i=0; while [ \"$i\" -lt 4096 ]; do printf 'B27%05d-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n' \"$i\"; i=$((i+1)); done",
+        "timeout_ms": 15000,
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84568,
+          "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+        }
+      }
+    },
+    {
+      "lines": 12000,
+      "expected_bytes": 888000,
+      "actual_bytes": 888000,
+      "expected_sha256": "73dfe8296dcf1452e79b1ca6fdd427e2438eb3f1b53dbd0ba58802c75fe12198",
+      "sha256": "73dfe8296dcf1452e79b1ca6fdd427e2438eb3f1b53dbd0ba58802c75fe12198",
+      "complete": true,
+      "seconds": 0.087566917,
+      "bytes_per_second": 10140816.080118477,
+      "response": {
+        "code": 0,
+        "truncated": false,
+        "ok": true,
+        "stderr": "",
+        "timed_out": false
+      },
+      "request": {
+        "t": "shell",
+        "cmd": "i=0; while [ \"$i\" -lt 12000 ]; do printf 'B27%05d-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\n' \"$i\"; i=$((i+1)); done",
+        "timeout_ms": 15000,
+        "screen": false,
+        "target": {
+          "vm": "vm-new",
+          "pid": 84568,
+          "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+        }
+      }
+    }
+  ]
+}

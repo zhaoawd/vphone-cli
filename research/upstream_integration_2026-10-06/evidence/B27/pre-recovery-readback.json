@@ -1,0 +1,50 @@
+{
+  "processes": [
+    "35668     1 Ss   /Users/qcz3840/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm --config /Users/qcz3840/github/autophone/../vphone-cli/vm-2607/config.plist",
+    "76623     1 Ss   /usr/libexec/amfid"
+  ],
+  "disk_lsof": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "files_after": {
+    "config.plist": {
+      "exists": true,
+      "bytes": 1166,
+      "sha256": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee"
+    },
+    ".vphoned.signed": {
+      "exists": true,
+      "bytes": 240352,
+      "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+    },
+    "restore-info.json": {
+      "exists": true,
+      "bytes": 180,
+      "sha256": "b3bfcb7ddeeb56b7ed454bef0c3744777f967f78a6c07406e6ca9d4e426011fc"
+    },
+    ".vphone-runtime.json": {
+      "exists": true,
+      "bytes": 250,
+      "sha256": "34a390339b560d6a9abafd9b22ba5bc8034e518e4c9af8cf7c046de0513db287"
+    },
+    "launchpad.json": {
+      "exists": false
+    }
+  },
+  "configuration_preserved": true,
+  "host_guest_payload_preserved": true,
+  "amfi_configuration_files": {
+    "/private/tmp/vphone-b26-runtime/config/cdhashes": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/private/tmp/vphone-b26-runtime/config/paths": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "amfid_launchctl_exit": 0,
+  "disk_space": "Filesystem   1024-blocks      Used Available Capacity iused     ifree %iused  Mounted on\n/dev/disk3s5   482797652 415630348  19419968    96% 3635582 194199680    2%   /System/Volumes/Data\n"
+}

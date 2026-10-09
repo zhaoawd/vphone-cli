@@ -1,0 +1,22 @@
+{
+  "request": {
+    "t": "shell",
+    "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; id; printf 'JB_LINK='; readlink /var/jb; printf 'ROOTHIDE_SEARCH_BEGIN\\n'; find /private/var/containers/Bundle/Application -maxdepth 1 -name '.jbroot-*' -print; printf 'ROOTHIDE_SEARCH_STATUS=%s\\n' \"$?\"; for f in /private/var/db/vphoned/bootstrap.json /cores/.vphoned-boostrap-completed /var/mobile/.vphone_jb_setup_done; do ls -ld \"$f\"; done; ps -A -o pid,comm | grep -E 'vphoned|irisind'; printf 'B27_SHELL_COMPLETE\\n'",
+    "timeout_ms": 10000,
+    "target": {
+      "vm": "vm-new",
+      "pid": 84568,
+      "instance_id": "BDF66DC7-FF49-4C87-89D4-CC5139FA7D79"
+    },
+    "screen": false
+  },
+  "response": {
+    "code": 0,
+    "truncated": false,
+    "ok": true,
+    "stdout": "uid=0(root) gid=0(wheel) groups=0(wheel)\nJB_LINK=/private/preboot/B4491B383B98259E8F3C44F6517759621C73D19CF34DB50EF256FA2167A847570D1032BAB267ACA39383736C80029282/jb-vphone/procursus\nROOTHIDE_SEARCH_BEGIN\nROOTHIDE_SEARCH_STATUS=0\n-rw-r--r-- 1 root mobile 0 Sep 29 17:12 /var/mobile/.vphone_jb_setup_done\n   70 /usr/bin/vphoned\nB27_SHELL_COMPLETE\n",
+    "stderr": "ls: cannot access '/private/var/db/vphoned/bootstrap.json': No such file or directory\nls: cannot access '/cores/.vphoned-boostrap-completed': No such file or directory\n",
+    "timed_out": false
+  },
+  "seconds": 1.963585333
+}

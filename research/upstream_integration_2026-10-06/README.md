@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B26 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B27 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -840,3 +840,18 @@ T46实际UI使用53580180最终签名Launchpad的隔离副本及受控签名CLI�
 临时跨进程harness使用Apple Development同团队签名、双方identifier/Team要求及生产audit-token校验，直接复用生产service/output/receiver/writer；正常ACK、生产默认30秒无ACK、客户端连接失效及O_RDONLY描述符的真实EBADF错误均有明确结果。它未经过固定privileged Mach入口、生产Client.request和真实Store。初次框架副本签名失败及临时回调隔离SIGTRAP均保留；修复只在harness，显式@Sendable回调后重跑四行，没有关闭actor运行期检查。断线行不证明服务器worker已退出。
 
 vm-new只读挂载已清理，磁盘无打开句柄；8个所记录文件元数据与7个小文件摘要保持，Disk.img未做全量64GiB摘要。没有启动VM、修改AMFI/TCC或注册系统helper。当前冻结VM CDHash为`62a1f395413f6878c4de0042f6e77962aa2b1219`，SHA256为`c8e8be423f47c2bc85a7bca5715c306a49cbacba1442a5882416493660a5f8ff`。临时单哈希AMFI范围已生成并单独询问；此前范围只覆盖旧哈希，当前未执行。具体限制与证据见[evidence/B26-summary.json](evidence/B26-summary.json)。
+
+
+## B27 结果（2026-10-09）
+
+用户明确授权冻结源码`b4e80c57`的VM单一CDHash `62a1f395413f6878c4de0042f6e77962aa2b1219`，范围为`paths=[]`、`allow_all=false`、`spoof_apple=true`。本轮没有修改持久SIP/AMFI设置。没有新增整项验收，T08/T24/T40/T46仍未完成。
+
+`vm-new`已通过实际客户机串口及classic shell确认采用rootless布局。`/var/jb`指向Preboot下的`jb-vphone/procursus`；在`/private/var/containers/Bundle/Application`搜索`.jbroot-*`，退出0且无结果；`/private/var/db/vphoned/bootstrap.json`及`/cores/.vphoned-boostrap-completed`不存在。该样本不满足T08实际RootHide客户机验收的前提。服务状态144和部分旋转未生效的原因仍未查明。
+
+冻结VM的授权后`--help`退出0。首次无界面启动的标准输入为`/dev/null`，classic在框架停机请求期间连接，最终停机超时后强制停止、进程退出0。第二次通过独立FIFO提供串口输入；classic v1连接后实际读回布局，停机记录`classicAccepted`、`Guest stopped`及进程退出0。启动均使用`--no-vphoned-update`；未部署现代API，配置及宿主`.vphoned.signed`摘要保持。现有vm-2607未停止，vm-new的Disk.img已无打开句柄。
+
+真实guest classic shell到无界面host的三组输出分别为18944、303104、888000字节，逐字节及SHA一致，均退出0、无截断、无超时；请求往返约0.0127、0.0361、0.0876秒。初次客户机缺少awk、退出127，失败保留；最终改用shell内建printf。这仅验证该通道的有界输出完整性及一次测量，不替代UI、helper日志、console、panic/取消/轮换或端到端吞吐验收。完整TCC责任链、历史helper实际XPC矩阵、可信binding/receipt及四层升级回退矩阵保持未完成。可用空间约18.6GiB，完整64GiB归档往返未执行。
+
+AMFI清理未观察到正常detach：SIGINT后驱动未退出，SIGTERM后退出143，驱动及debugserver均不存在。`kickstart -k`被系统以150拒绝；TERM没有替换原amfid PID。随后仅结束本轮附加过的系统amfid，launchd启动新PID92181，独立核对PPID1、STAT Ss及系统服务running。空配置文件仍为空。驱动清理后及新amfid下，同工件`--help`仍返回0，原因未查明；不能据此宣称原AMFI拒绝已恢复或放行结果已完全撤销。没有重启宿主或执行缓存修改，失败记录均保留。
+
+本轮仅新增运行证据与台账，没有修改产品源码。证据入口：[B27-summary.json](evidence/B27-summary.json)、[B27-evidence-manifest.json](evidence/B27-evidence-manifest.json)。
