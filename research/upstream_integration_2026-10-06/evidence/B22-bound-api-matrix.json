@@ -1,0 +1,389 @@
+{
+  "artifact_sha256": "83075a0c9de2ff5bbfd01b211ce204f59bd18cdf9eb0efb7bd0891a62f00bc07",
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -e /var/mobile/Library/Caches/vphone-location.json && echo exists || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "ok": true,
+        "stderr": "",
+        "timed_out": false,
+        "code": 0,
+        "stdout": ""
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "path": "/var/root/vphone-b21-transfer/b22-nonutf8",
+        "load": "/private/tmp/vphone-b22-nonutf8",
+        "perm": "600",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "size": 7,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ls -ld /var/root/Library/Caches; for n in vphoned vphoned.next vphoned.api-v2 vphoned.api-v2.pending; do test ! -e /var/root/Library/Caches/$n || ls -ld /var/root/Library/Caches/$n; done",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "ok": true,
+        "stderr": "",
+        "timed_out": false,
+        "code": 0,
+        "stdout": "drwx------ 12 root wheel 416 Oct  9 10:26 /var/root/Library/Caches\n-rwxr-xr-x 1 root wheel 240352 Oct  2 17:11 /var/root/Library/Caches/vphoned\n"
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -e /var/mobile/Library/Caches/vphone-location.json && echo exists || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "ok": true,
+        "stderr": "",
+        "timed_out": false,
+        "code": 0,
+        "stdout": ""
+      }
+    }
+  ],
+  "checks": [
+    {
+      "http_method": "GET",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": true,
+          "identifier": "Asia/Shanghai",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": false,
+          "changed": true,
+          "identifier": "America/New_York",
+          "seconds_from_gmt": -14400
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "America/New_York",
+          "seconds_from_gmt": -14400
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": false,
+          "changed": true,
+          "identifier": "Asia/Tokyo",
+          "seconds_from_gmt": 32400
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "Asia/Tokyo",
+          "seconds_from_gmt": 32400
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "failed",
+          "message": "'../etc/passwd' is not a time zone in /var/db/timezone/zoneinfo/; pass an Olson name such as Asia/Shanghai"
+        },
+        "id": null,
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "failed",
+          "message": "'Mars/Olympus' is not a time zone in /var/db/timezone/zoneinfo/; pass an Olson name such as Asia/Shanghai"
+        },
+        "id": null,
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": true,
+          "changed": true,
+          "identifier": "Asia/Tokyo",
+          "seconds_from_gmt": 32400
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 200,
+      "body": {
+        "id": "b22-matrix",
+        "result": {
+          "delivery": "application_override",
+          "location": {
+            "altitude": 0,
+            "course": -1,
+            "horizontal_accuracy": 5,
+            "latitude": 31.2304,
+            "longitude": 121.4737,
+            "speed": -1,
+            "vertical_accuracy": 5
+          },
+          "simulating": true
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 200,
+      "body": {
+        "id": "b22-matrix",
+        "result": {
+          "altitude": 0,
+          "course": -1,
+          "delivery": "application_override",
+          "horizontal_accuracy": 5,
+          "latitude": 31.2304,
+          "longitude": 121.4737,
+          "simulated": true,
+          "speed": -1,
+          "vertical_accuracy": 5
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "invalid_operation",
+          "message": "invalid location coordinates or accuracy"
+        },
+        "id": "b22-matrix",
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "bad_request",
+          "message": "Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 70.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 70., NSJSONSerializationErrorIndex=70}"
+        }
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 200,
+      "body": {
+        "id": "b22-matrix",
+        "result": {
+          "content": "//4AgGFiYw==",
+          "encoding": "base64",
+          "path": "/var/root/vphone-b21-transfer/b22-nonutf8",
+          "size": 7,
+          "truncated": false
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 200,
+      "body": {
+        "id": "b22-matrix",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 39,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 200,
+      "body": {
+        "id": "b22-matrix",
+        "result": {
+          "phase": "idle"
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/rpc",
+      "status": 200,
+      "body": {
+        "id": "b22-matrix",
+        "result": {
+          "simulating": false
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": false,
+          "changed": true,
+          "identifier": "Asia/Shanghai",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "PUT",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": true,
+          "changed": true,
+          "identifier": "Asia/Shanghai",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      }
+    },
+    {
+      "http_method": "GET",
+      "path": "/v1/timezone",
+      "status": 200,
+      "body": {
+        "id": null,
+        "result": {
+          "automatic": true,
+          "identifier": "Asia/Shanghai",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      }
+    }
+  ],
+  "timezone_baseline": {
+    "automatic": true,
+    "identifier": "Asia/Shanghai",
+    "seconds_from_gmt": 28800
+  },
+  "location_initial_file_exists": false,
+  "bootstrap_query_status": 200,
+  "cache_baseline": "drwx------ 12 root wheel 416 Oct  9 10:26 /var/root/Library/Caches\n-rwxr-xr-x 1 root wheel 240352 Oct  2 17:11 /var/root/Library/Caches/vphoned\n",
+  "completed_checks": true,
+  "location_restore_status": 200,
+  "location_file_absent_after": true,
+  "timezone_restored": true
+}

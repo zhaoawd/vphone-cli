@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b22-cache-acceptance.py", line 26, in <module>
+    original=ctl('file_get',path=cache);assert original['ok'];original_data=base64.b64decode(original['data']);original_sha=hashlib.sha256(original_data).hexdigest();result['cache_original_sha256']=original_sha;result['cache_original_metadata']=shell('stat -f "%u %g %Lp %z" '+cache)
+                                                                                                                                                                                                                                                     ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 25, in shell
+AssertionError: {'timed_out': False, 'stderr': "stat: cannot read file system information for '%u %g %Lp %z': No such file or directory\n", 'code': 1, 'ok': True, 'truncated': False, 'stdout': '  File: "/var/root/Library/Caches/vphoned"\n    ID: 10000090000001a Namelen: ?       Type: apfs\nBlock size: 4096       Fundamental block size: 4096\nBlocks: Total: 15140054   Free: 9639072    Available: 9639072\nInodes: Total: 385640323  Free: 385562880\n'}

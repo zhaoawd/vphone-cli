@@ -1,0 +1,139 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 53680,
+    "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+  },
+  "health": {
+    "api_version": 1,
+    "binary_hash": "83075a0c9de2ff5bbfd01b211ce204f59bd18cdf9eb0efb7bd0891a62f00bc07",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "D3B33877-7C81-4B9A-9CE7-C06926D2DC56",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "classic_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "observations": [
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vphone-b21-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "stderr": "",
+        "code": 0,
+        "timed_out": false,
+        "stdout": "",
+        "truncated": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "path": "/var/root/vphone-b21-api/vphoned",
+        "load": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/api-cache-fixed/vphoned",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "ok": true,
+        "size": 9041056
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; VPHONE_API_ONLY=1 /var/root/vphone-b21-api/vphoned </dev/null >/var/root/vphone-b21-api/b22-bound.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "ok": true,
+        "stderr": "",
+        "code": 0,
+        "timed_out": false,
+        "stdout": "",
+        "truncated": false
+      }
+    }
+  ]
+}

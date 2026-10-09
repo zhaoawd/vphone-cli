@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/check_daemon_api.py", line 127, in <module>
+    main()
+    ~~~~^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/check_daemon_api.py", line 113, in main
+    check_checkouts(pins, args.checkouts)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/check_daemon_api.py", line 61, in check_checkouts
+    raise ValueError(f'Modified dependency checkout: {pin["identity"]}')
+ValueError: Modified dependency checkout: icli

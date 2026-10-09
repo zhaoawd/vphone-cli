@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b22-native-transfer-corrected.py", line 26, in <module>
+    x['trace']=shell('cat /var/root/vphone-b21-api/b22-vsock-v2-'+str(trial)+'.log')
+               ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 25, in shell
+AssertionError: {'stdout': '', 'code': 1, 'ok': True, 'truncated': False, 'timed_out': False, 'stderr': 'cat: /var/root/vphone-b21-api/b22-vsock-v2-0.log: No such file or directory\n'}

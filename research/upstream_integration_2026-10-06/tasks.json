@@ -843,18 +843,28 @@
           "research/upstream_integration_2026-10-06/T02_merge_resolution_reviews.json"
         ]
       },
-      "implementation_commits": [],
+      "implementation_commits": [
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
+      ],
       "verification_evidence": [
         "source_path_candidates.json",
         "commit_ledger.json",
         "capability_ledger.json",
         "T02_merge_resolution_reviews.json",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
-      "current_result": "本轮冻结实际 launcher、连接、worker、IcliKit 与基础模块路径及测试入口，更新已核对能力的处置。342 提交的结构台账保持，303 个 pending_semantic_review 未被标记完成。全局语义审查未完成。",
-      "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
+      "current_result": "62个合并提交全部重新审查，54个无附加解决、8个附加解决与冻结差异一致；父提交能力仍独立核对。完整审查T06收尾提交和23个待审发布提交；2.1.3含菜单实现，保留T27适配。342条覆盖保持，218条仍pending_semantic_review，全局能力映射未完成。",
+      "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。",
+      "remaining_work": [
+        "218个pending提交及47项能力全局语义对账；保留reviewed/adaptation_planned与accepted区别"
+      ]
     },
     {
       "id": "T03",
@@ -1165,7 +1175,7 @@
       "dependencies": [
         "T02"
       ],
-      "status": "real_large_download_intermittent_failure",
+      "status": "accepted",
       "upstream_paths": [
         "VPhoneDaemon/Daemon/APIWire.swift",
         "VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
@@ -1189,7 +1199,7 @@
         "protocol"
       ],
       "local_mapping": {
-        "state": "actual_paths_reviewed_runtime_failure_recorded",
+        "state": "source_and_real_bound_VM_contract_verified",
         "paths": [
           "sources/VPhoneAPIKit/VPhoneAPIProxy.swift",
           "sources/VPhoneAPIKit/VPhoneAPISocket.swift",
@@ -1198,18 +1208,30 @@
           "sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift",
           "sources/VPhoneDaemon/Daemon/GuestFileTransfer.swift",
           "sources/VPhoneDaemon/Daemon/APIConnectionClose.swift",
-          "tests/VPhoneAPIKitTests/"
+          "tests/VPhoneAPIKitTests/",
+          "sources/VPhoneDaemon/Native/vphoned_vsock.c",
+          "sources/VPhoneDaemon/Daemon/GuestPipeChannel.swift",
+          "sources/VPhoneDaemon/main.swift",
+          "tests/test_daemon_vsock_bridge.py",
+          "tests/test_daemon_pipe_channel.py"
         ],
         "batch_source_manifest": "evidence/B21-source-review.json"
       },
-      "implementation_commits": [],
+      "implementation_commits": [
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
+      ],
       "verification_evidence": [
         "historical: research/t06_t07_connection_worker_2026-10-01.md; current target source rechecked; real VM not revalidated",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
-      "current_result": "真实8191/8192/8193/16383/16384/16385字节下载长度和摘要通过。1MiB下载多次只收到917504字节并超时；另一次完整摘要通过，故仍为间歇性失败。客户机文件SHA正确，临时guest日志显示16个64KiB写入future成功；原因未查明。8MiB慢读和20次提前关闭未执行到。新宿主计数诊断候选尚未授权，不标记完成。",
+      "current_result": "固定83075a0c客户机候选经实际绑定VM完成8191/8192/8193/16383/16384/16385字节、1/4/8MiB快读和慢读，长度及SHA256完整；WebSocket 1/4MiB完整，20次提前关闭及取消上传无残留目标/staging，FD15→15。NIO管道所有权及对端关闭回收修复，现有写操作断线/超时测试不自动重放。完整Python597项、Swift常规1251项/计时6项、XCTest254项(跳过3项)通过。按T06原接受条件验收，后续跨模块变更仍须复验。",
       "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
     },
     {
@@ -1226,7 +1248,7 @@
       "dependencies": [
         "T06"
       ],
-      "status": "worker_restart_and_pending_spawn_fix_verified_upgrade_matrix_pending",
+      "status": "same_hash_cache_confirmation_verified_full_upgrade_matrix_pending",
       "upstream_paths": [
         "VPhoneDaemon/Native/vphoned_proxy.c",
         "VPhoneDaemon/Daemon/",
@@ -1259,15 +1281,25 @@
         ],
         "batch_source_manifest": "evidence/B21-source-review.json"
       },
-      "implementation_commits": [],
+      "implementation_commits": [
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
+      ],
       "verification_evidence": [
         "historical: research/t06_t07_connection_worker_2026-10-01.md; current target source rechecked; real VM not revalidated",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
-      "current_result": "真实proxy死亡后worker退出；worker SIGKILL后1.2564秒恢复，instance改变、binary hash保持。新增未确认缓存worker posix_spawn失败时返回launchd的修复，失败测试由2秒超时变为通过，13项proxy测试通过。新候选实际运行hash已核对。缓存更新成功确认及完整daemon更新组合仍未验收；API_ONLY不执行agent.apply_update。",
-      "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
+      "current_result": "跨线程停止唤醒和继承信号屏蔽修复，15项proxy测试及真实停止通过。缓存确认按文件身份处理/var与/private/var别名：显式agent.apply_update返回后proxy/worker退出，手动重启后健康实例改变、83075a0c摘要保持、pending移除且确认标记生成。完整临时launchd job、不同binary升级/回退及坏缓存有界失败矩阵未完成；原classic及其缓存已恢复。",
+      "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。",
+      "remaining_work": [
+        "真实临时launchd job不同binary升级、回退、坏缓存和有限重试完整矩阵"
+      ]
     },
     {
       "id": "T08",
@@ -1285,7 +1317,7 @@
         "T06",
         "T07"
       ],
-      "status": "real_screenshot_memory_growth_unresolved",
+      "status": "fixed_overlay_memory_and_API_verified_rotation_RootHide_pending",
       "upstream_paths": [
         "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         "VPhoneDaemon/Daemon/"
@@ -1316,7 +1348,10 @@
       },
       "implementation_commits": [
         "c7234c9b",
-        "7839f5b30cea3f7736acf68f5fd6dbef62810092"
+        "7839f5b30cea3f7736acf68f5fd6dbef62810092",
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
       ],
       "verification_evidence": [
         "T08-pins-red.log: old 0.7.7 fails requested 0.7.16 contract",
@@ -1335,17 +1370,23 @@
         "evidence/B14-checkpoint.json",
         "evidence/B14-final-runtime-acceptance.json",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
       "acceptance_limits": [
-        "运行hash已验证，API_ONLY未替换生产classic daemon",
-        "真实截图持续内存增长未解决；40次launchd查询FD无累积增长",
-        "location返回400，RootHide/timezone完整矩阵未验证",
-        "keychain组权限仍保留本地原范围"
+        "90度旋转未生效原因及完整rotation/RootHide service矩阵",
+        "JPEG视觉核验；本轮内存通过仅适用于记录的固定候选与恢复副本",
+        "API_ONLY独立进程，本轮未替换生产classic daemon；原classic及缓存摘要保持"
       ],
-      "current_result": "固定IcliKit0.7.16/702990b5与全部pin、实际编译checkout及运行hash一致；40次launchd查询FD保持18。新操作自动释放池的真实ObjC成功/错误路径测试通过，但20次真实截图仍从约87MB footprint增至约465MB，FD保持18；截图内存增长未解决，原因未查明。旋转、SpringBoard服务和device snapshot HTTP调用通过；location.current返回400，RootHide/timezone完整矩阵待验证。",
-      "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
+      "current_result": "IcliKit固定0.7.16/702990b5，声明精确源码JPEG独立位图复制overlay、构建与运行marker/hash一致。实际40次截图稳定采样19,071,480→4,555,256→4,555,256字节，FD15→15；location设置/读回/NaN拒绝/清除，timezone设置/重复/无效拒绝/自动/恢复及SpringBoard服务查询通过。90度旋转返回400未生效，原因未查明；完整rotation和RootHide服务矩阵及图像视觉核验未完成。",
+      "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。",
+      "remaining_work": [
+        "90度旋转未生效原因及完整rotation/RootHide service矩阵",
+        "JPEG视觉核验；本轮内存通过仅适用于记录的固定候选与恢复副本"
+      ]
     },
     {
       "id": "T09",
@@ -2492,7 +2533,7 @@
       "dependencies": [
         "T02"
       ],
-      "status": "guarded_local_launcher_validated_full_security_matrix_pending",
+      "status": "real_bound_local_launcher_and_current_machine_dependencies_verified_full_security_pending",
       "upstream_paths": [
         "AGENTS.md",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
@@ -2545,7 +2586,10 @@
       "implementation_commits": [
         "0531b903208d6ac497d85c58597f302b0e646407",
         "f604f5ad5cdcf8181253e8c9aebe5d50f5cafd25",
-        "82649fe7444b4aa6788f454ea2b8a9cbbbd23269"
+        "82649fe7444b4aa6788f454ea2b8a9cbbbd23269",
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
       ],
       "verification_evidence": [
         "T24_host_entry_review.json",
@@ -2582,16 +2626,19 @@
         "evidence/B18-summary.json",
         "evidence/B19-summary.json",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
-      "current_result": "新增普通launcher和签名校验、位置usage description及中英翻译。审查发现直接执行官方CLI会自动更新daemon、扩大权限、丢失跨进程绑定以及SIGINT生命周期；已改为只执行外层签名固定的本地CLI，核对预期binding SHA和版本。选定VM必须声明sealed本地受控启动协议，未知协议在preflight前拒绝，不执行官方CLI。无TTY的SIGINT/SIGTERM/SIGHUP/SIGQUIT均转为VM正常停机，最后输出和子进程退出测试通过。完整TCC责任链与Homebrew依赖闭包仍未完成。",
+      "current_result": "真实本地Core Bundle安装、受控普通launcher绑定启动并正常退出；19个Mach-O当前机器递归依赖检查通过，libcrypto/libplist仍来自外部Homebrew，不声明可移植闭包。新增KERN_PROCARGS2 argv识别修复含空格Bundle路径的生产VM stop，实际5.773秒正常停机。完整TCC负责应用链及旧helper/owner/link/共享可写/未知verb真实拒绝矩阵未完成。",
       "remaining_work": [
         "完整TCC负责应用链真实验收",
-        "合法本地CoreBundle和运行依赖闭包；Homebrew libcrypto/libplist仍外部依赖",
-        "原合同的权限和旧helper全矩阵验收"
+        "旧helper、owner错误、链接替换、共享可写路径和未知verb完整真实拒绝矩阵",
+        "Homebrew运行依赖只验证当前机器可解析，不声明可移植封装"
       ],
-      "latest_vm_observation": "已在限定临时 amfid 范围下验证候选 --help 和恢复副本正常启动；完整 launcher/授权责任链仍未验收。",
+      "latest_vm_observation": "受控本地Bundle绑定VM实际启动并正常停机；未完成完整TCC负责应用链。",
       "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
     },
     {
@@ -3688,7 +3735,7 @@
         "T05",
         "T24"
       ],
-      "status": "guarded_launcher_binding_validated_full_source_matrix_pending",
+      "status": "real_local_bundle_binding_boot_verified_full_origin_matrix_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -3735,7 +3782,10 @@
         "94ec7976f2ad21e6bf59e867228a6f083a6a9304",
         "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
         "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
-        "ee4a27eb734c0b455637e245a4abdee39af55279"
+        "ee4a27eb734c0b455637e245a4abdee39af55279",
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
       ],
       "verification_evidence": [
         "evidence/B06-summary.json",
@@ -3759,15 +3809,17 @@
         "evidence/B18-summary.json",
         "evidence/B19-summary.json",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
-      "current_result": "本轮将绑定选择经普通launcher传给受控本地CLI，跨进程核对SHA/版本，未知VM协议明确拒绝。保留B18官方Bundle并存和真实绑定切换证据。合法本地CoreBundle仍缺vphone-escalator，实际绑定启动、创建全流程冻结和四层来源升级/回退矩阵未完成；不把官方Bundle当作本地构建。",
+      "current_result": "本地2.6.1-local.1208708c55574677完整打包，escalator仅编译未执行；当前机器依赖有记录。停机恢复副本完整备份139.067秒后实际绑定，受控普通launcher启动root-owned本地VM候选，classic摘要保持；未有来源收据仍为unknown。创建全流程冻结、clone/export/rename、kernel-only及guest升级/回退四层来源矩阵仍未完成；测试绑定和系统store恢复原缺失状态。",
       "remaining_work": [
-        "actual locally built valid Core Bundle packaging/coexistence and creation toolchain freeze through complete workflow",
-        "kernel-only origin receipts, explicit guest upgrade/rollback and mixed-version four-origin hash/instance matrix",
-        "remaining original T40 dependencies and acceptance; no guest upgrade or bound upstream VM was executed",
-        "APFS backup is copy-on-write, not physically independent; no atomic CAS against uncooperative writers claimed"
+        "创建全流程固定工具链，clone/export/rename来源",
+        "kernel-only及显式guest升级/回退、混合版本四层来源矩阵",
+        "APFS写时复制备份不证明物理独立；不声明对不协作写入者的原子CAS"
       ],
       "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
     },
@@ -4136,7 +4188,7 @@
         "T02",
         "T24"
       ],
-      "status": "real_helper_install_and_verify_logs_pass_full_lifecycle_matrix_pending",
+      "status": "real_bound_wrapper_stop_tail_verified_full_UI_matrix_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLineReader.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -4178,7 +4230,10 @@
         "73272aa9f7c54ffbab2564fd935d27ff5bf3bff2",
         "c1cb3099ee62be0f4fc1ce9e17052252cb0ca762",
         "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
-        "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b"
+        "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+        "b5c4e482e8f724bedee224ec6399f7456d719db3",
+        "9a75de14856b9ff073f44071a619dce517ce8008",
+        "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
       ],
       "verification_evidence": [
         "evidence/B05-summary.json",
@@ -4205,13 +4260,16 @@
         "evidence/B19-summary.json",
         "evidence/B20-summary.json",
         "evidence/B21-summary.json",
-        "evidence/B21-source-review.json"
+        "evidence/B21-source-review.json",
+        "evidence/B22-summary.json",
+        "evidence/B22-source-review.json",
+        "evidence/B22-final-readback.json"
       ],
       "historical_evidence": [],
-      "current_result": "B21在既有精确helper授权内，真实官方2.6.1安装退出0，收据一致；成功日志61字节0600，独立verify日志60字节0600，两份返回后均关闭。管理员规则未放宽，系统store/helper/right恢复缺失基线。输出、尾部、取消等夹具和无TTY wrapper信号测试通过。真实VM正常停机日志保留；全UI即时退出、detached/create/后代writer和吞吐矩阵仍未完成。",
+      "current_result": "实际本地绑定VM经普通wrapper启动，修正后的生产stop在5.773秒发送SIGINT完成classicAccepted、Guest stopped、VM及wrapper退出0，尾部日志保留。B21真实签名helper成功install/verify和本轮完整测试证据保留。全UI立即退出、detached/create/后代writer和实际UI吞吐/轮换矩阵仍未完成。",
       "remaining_work": [
-        "complete operation lifecycle, detached VM/create/descendant output and immediate UI exit",
-        "panic/cancel/rotation, UI responsiveness and actual VM throughput"
+        "全UI立即退出、detached/create/后代writer和输出生命周期",
+        "panic/取消/轮换、UI响应及实际VM吞吐矩阵"
       ],
       "acceptance_dependency_state": "相关模块按实际路径独立核对；全局T02仍未完成，后续跨模块变更必须复验。"
     }
@@ -4537,6 +4595,6 @@
     "B20 Ruling: user authorized exact B19 helper scope; register original frozen signed helper and keep administrator rule unchanged. Human must complete protected SecurityAgent authentication; do not request password in chat or bypass authentication. First150s wait was too short for human interaction and timed out before store/log creation; retry once with900s and bounded post-result verification/cleanup. Cost if authentication remains pending: install acceptance cannot complete in this turn. Fixed IcliKit icli_reboot uses errno ?: EIO; treat error text as wrapper result, do not infer actual kernel errno or apply speculative patches. Firmware-free15+22 regressions establish fixture behavior only, not real VM lifecycle coverage.",
     "B21 Ruling: 原方案允许基础修复单独验收；T03/T04/T05在实际相关路径、恢复/签名/归档接受证据满足后独立accepted，全局T02保持未完成，代价是后续跨模块变更仍须复验。普通launcher只执行sealed本地wrapper，不执行有自动guest更新/0777副作用的官方CLI；预期binding SHA+version跨进程核对，未知VM协议在preflight前拒绝，代价是未声明本地受控协议的官方Bundle不能通过此路线启动。操作autoreleasepool只证明临时ObjC对象释放，真实截图增长仍失败，不能接受T08。新短时限wrapper测试加入既有计时组，原时限不变，代价是未证明与大批签名工作同时运行的启动时限。新宿主4cea360c临时AMFI范围未授权，保持pending；只使用既有B16范围完成本轮VM操作并清理。"
   ],
-  "latest_implementation_head": "82649fe7444b4aa6788f454ea2b8a9cbbbd23269",
-  "latest_validation_limitation": "B21三项新增accepted；七项原合同仍未完成。真实1MiB下载间歇失败及截图内存增长未解决；新诊断host AMFI授权待回复。"
+  "latest_implementation_head": "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d",
+  "latest_validation_limitation": "B22最终完整默认测试通过；保留此前fixture权限失败和Range间歇失败原始证据。未重跑真实固件比较。选定7项中T06接受，另6项原接受条件尚未全部满足。"
 }

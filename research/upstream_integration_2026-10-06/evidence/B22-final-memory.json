@@ -1,0 +1,461 @@
+{
+  "artifact_sha256": "4631d1044aa75699b495a4136099aba484e4f973f6ed5ddd66ef6dff3ea0e638",
+  "worker": 16937,
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep vphone-b21-api/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "16936     1 /var/root/vphone-b21-api/vphoned\n16937 16936 /private/var/root/vphone-b21-api/vphoned\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "1094afa71ca1a5c412dbe176f73c547d4a6e4018f49989113efbb578316bc97d"
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/fd-probe 16937",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "17\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 868,
+      "response_sha256": "384f77433f14edda7fb5053fd08eeb36515e62743d936bbd331fa6ffd92cef85"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "73e51252588bc890641264cd57070acbf2f16a76efc44e2392a7ae32c4786c6a"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "919bca6763cd62fa4efd0440b64db5fab5a477f992ddc5b54eb640ebbc04aa05"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "ca91f2dc6acbd86ac46bfca3420e8157379ef5270c3bb487aa42701f3a578f7a"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "4a696fc4709c27b1cbe03d1e86febe215d6a16691e41ae90a216af6d24a5584c"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "8fd75bb304a8d0e7f28ad40d4672380d3d298ee5b84df3875d7ecbba0d3a316b"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "c5a2ff9d47d4761121cf7cb4d14aaf13f0a88433a02b15af4b408e3144b80983"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "screen.screenshot",
+      "status": 200,
+      "response_bytes": 78143,
+      "response_sha256": "a535a2afd5e3cde6430b8c07d10d1dce11ce7d623d61018f275384eda8cbf205"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 875,
+      "response_sha256": "94038c97b8a2b196ffdd9ce6bc8921779daf2dabb1e011a5090af89074dd63e7"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 874,
+      "response_sha256": "a767076f089bb068ed325dbac40acb07cd2b61865a52a057e643dcdb4ca9d90a"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 873,
+      "response_sha256": "0a1d6b1a093af1abeabaabfc4ce8451e1e0bbe7a6073dc9134d891ebb72fc711"
+    },
+    {
+      "method": "processes.list",
+      "status": 200,
+      "response_bytes": 873,
+      "response_sha256": "c25eaeb530bcdec35ee5a0b0af96e05b8bd60a9adcb70e5bdbeffd4e2f47e5e5"
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/fd-probe 16937",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "17\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    }
+  ],
+  "batches": [
+    {
+      "pid": 16937,
+      "resident_bytes": 40960000,
+      "footprint_bytes": 120897992
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 40976384,
+      "footprint_bytes": 193397192
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 40976384,
+      "footprint_bytes": 236896712
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 40992768,
+      "footprint_bytes": 236880328
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 236896712
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 222396872
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 236896712
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 236896712
+    }
+  ],
+  "baseline": {
+    "pid": 16937,
+    "resident_bytes": 40894464,
+    "footprint_bytes": 53199304
+  },
+  "fd_baseline": "17\n",
+  "settled": [
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 19268040
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 4768200
+    },
+    {
+      "pid": 16937,
+      "resident_bytes": 41058304,
+      "footprint_bytes": 4768200
+    }
+  ],
+  "fd_after": "17\n",
+  "growth_bytes": -48431104,
+  "complete": true
+}

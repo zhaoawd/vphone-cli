@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b22-cache-acceptance-legacy.py", line 31, in <module>
+    result['bundled_health']=wait_health(sha)
+                             ~~~~~~~~~~~^^^^^
+  File "/private/tmp/vphone-b22-cache-acceptance-legacy.py", line 14, in wait_health
+    raise RuntimeError('Expected daemon hash did not listen: '+expected)
+RuntimeError: Expected daemon hash did not listen: 4631d1044aa75699b495a4136099aba484e4f973f6ed5ddd66ef6dff3ea0e638

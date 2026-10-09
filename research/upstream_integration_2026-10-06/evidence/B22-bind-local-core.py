@@ -1,0 +1,9 @@
+import hashlib,json,subprocess,time
+from pathlib import Path
+r=Path('/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli');vm=Path('/Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009');backup=vm.parent/'b22-before-local-binding-20261009';assert not backup.exists() and not (vm/'launchpad.json').exists();local=json.loads(Path('/private/tmp/vphone-b22-local-core-bundle.json').read_text());cli=r/'.build/vphone-cli.app/Contents/MacOS/vphone-cli';p=subprocess.run(['/usr/sbin/lsof','-t','--',str(vm/'Disk.img'),str(vm/'SEPStorage'),str(vm/'nvram.bin')],capture_output=True,text=True);assert p.returncode==1 and not p.stdout
+critical=['config.plist','.vphoned.signed','AVPBooter.vresearch1.bin','AVPSEPBooter.vresearch1.bin'];before={n:hashlib.sha256((vm/n).read_bytes()).hexdigest() for n in critical}
+args=[str(cli),'vm','bind-core-bundle','--library-root',str(vm.parent),vm.name,'--version',local['version'],'--backup',str(backup)];start=time.monotonic();p=subprocess.run(args,capture_output=True,text=True,timeout=600)
+result={'command':args,'returncode':p.returncode,'stdout':p.stdout,'stderr':p.stderr,'seconds':time.monotonic()-start,'critical_before':before,'backup':str(backup),'VM':str(vm),'complete':False}
+if p.returncode==0:
+ result['binding']=json.loads((vm/'launchpad.json').read_text());result['critical_after']={n:hashlib.sha256((vm/n).read_bytes()).hexdigest() for n in critical};result['backup_binding_absent']=not (backup/'launchpad.json').exists();result['complete']=result['critical_after']==before and result['binding']['bundle']==local['version'] and result['backup_binding_absent'];assert result['complete']
+Path('/private/tmp/vphone-b22-bind-local-core.json').write_text(json.dumps(result,indent=2)+'\n');print(result);assert p.returncode==0

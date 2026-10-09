@@ -1,0 +1,405 @@
+{
+  "candidate_sha256": "82bbc51dfc801f20240aa222121b0df66604090c9abc44a2596fef83a6977feb",
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/vphone-b21-api/vphoned",
+        "load": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/daemon-api-v2/candidate/vphoned",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "size": 9049952,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; VPHONE_API_ONLY=1 /var/root/vphone-b21-api/vphoned </dev/null >/var/root/vphone-b21-api/b22-proxy-0.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep vphone-b21-api/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": " 8808     1 /var/root/vphone-b21-api/vphoned\n 8809  8808 /private/var/root/vphone-b21-api/vphoned\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 8808 -o comm= | tr -d \" \")\" = /var/root/vphone-b21-api/vphoned && kill -TERM 8808",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": " 8808 /var/root/vphone-b21-api/vphoned\n",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; VPHONE_API_ONLY=1 /var/root/vphone-b21-api/vphoned </dev/null >/var/root/vphone-b21-api/b22-proxy-1.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep vphone-b21-api/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": " 8824     1 /var/root/vphone-b21-api/vphoned\n 8825  8824 /private/var/root/vphone-b21-api/vphoned\n",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 8824 -o comm= | tr -d \" \")\" = /var/root/vphone-b21-api/vphoned && kill -TERM 8824",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": " 8824 /var/root/vphone-b21-api/vphoned\n",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; VPHONE_API_ONLY=1 /var/root/vphone-b21-api/vphoned </dev/null >/var/root/vphone-b21-api/b22-proxy-2.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep vphone-b21-api/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "timed_out": false,
+        "stdout": " 8840     1 /var/root/vphone-b21-api/vphoned\n 8841  8840 /private/var/root/vphone-b21-api/vphoned\n",
+        "ok": true,
+        "truncated": false,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 8840 -o comm= | tr -d \" \")\" = /var/root/vphone-b21-api/vphoned && kill -TERM 8840",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": " 8840 /var/root/vphone-b21-api/vphoned\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": " 8840 /var/root/vphone-b21-api/vphoned\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    }
+  ],
+  "stops": [
+    {
+      "proxy": 8808,
+      "worker": 8809,
+      "remaining": "",
+      "elapsed": 0.21488004201091826,
+      "sha256": "82bbc51dfc801f20240aa222121b0df66604090c9abc44a2596fef83a6977feb"
+    },
+    {
+      "proxy": 8824,
+      "worker": 8825,
+      "remaining": "",
+      "elapsed": 0.2296729589579627,
+      "sha256": "82bbc51dfc801f20240aa222121b0df66604090c9abc44a2596fef83a6977feb"
+    },
+    {
+      "proxy": 8840,
+      "worker": 8841,
+      "remaining": "",
+      "elapsed": 0.46582683303859085,
+      "sha256": "82bbc51dfc801f20240aa222121b0df66604090c9abc44a2596fef83a6977feb"
+    }
+  ],
+  "complete": true
+}

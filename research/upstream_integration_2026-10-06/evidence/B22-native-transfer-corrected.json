@@ -1,0 +1,158 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test \"$(ps -p 7309 -o comm= | tr -d \" \")\" = /var/root/vphone-b21-api/vphoned && kill -KILL 7309",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vsock-probe || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/vphone-b21-api/vsock-probe",
+        "load": "/private/tmp/vphone-b22-vsock-corrected",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "ok": true,
+        "size": 98736
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 3 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-3.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": ""
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-0.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 1,
+        "ok": true,
+        "truncated": false,
+        "timed_out": false,
+        "stderr": "cat: /var/root/vphone-b21-api/b22-vsock-v2-0.log: No such file or directory\n"
+      }
+    }
+  ],
+  "downloads": [
+    {
+      "mode": 3,
+      "trial": 0,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769"
+    }
+  ]
+}

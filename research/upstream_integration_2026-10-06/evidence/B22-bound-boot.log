@@ -1,0 +1,2131 @@
+[vphone] VM lock acquired
+2026-10-09 10:32:20.728 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=8
+======== Start of iBoot serial output. ========
+89994699affdef:138
+image <<PTR>>: bdev <<PTR>> type illb offset 0x20000 len 0x95388
+78faf5021313e82:74
+78faf5021313e82:85
+ae71af5ee32b84:129
+
+
+=Loaded LLB============================
+::
+:: 🔥🌸 Supervisor iBoot for vresearch101, Copyright 2007-2025, Apple Inc.
+::
+::	Local boot, Board 0x90 (vresearch101ap)/Rev 0x0
+::
+::	BUILD_TAG: iBoot-13822.42.2
+::
+::	UUID: E309831F-E909-330F-8701-1E83AF309115
+::
+::	BUILD_STYLE: RELEASE
+::
+::	USB_SERIAL_NUMBER: SDOM:01 CPID:FE01 CPRV:00 CPFM:03 SCEP:01 BDID:90 ECID:F77952D4F70ACD5D IBFL:3D
+::
+=Loaded LLB============================
+
+490dd6a1de0c147:139
+490dd6a1de0c147:149
+490dd6a1de0c147:150
+a3fae6c53b7baa2:107
+3974bfd3d441da3:1609
+3974bfd3d441da3:1685
+2026-10-09 10:32:21.229 vphone-vm[53680:16060459] B21 API socket type=1 status=0 fd=16
+3b9107561aef41e:187
+3b9107561aef41e:254
+2dc92642a4f3ce5:39
+2dc92642a4f3ce5:39
+a60aa294185a059:983
+a60aa294185a059:986
+3bdace14b1a9a68:3646
+3bdace14b1a9a68:3975
+7ab90c923dae682:1384
+490dd6a1de0c147:139
+490dd6a1de0c147:149
+490dd6a1de0c147:150
+======== End of iBoot serial output. ========
+iBoot version: iBoot-13822.42.2
+iBoot Stage 2 version: 
+Darwin Image4 Extension Version 7.0.0: Thu Oct 23 06:29:43 PDT 2025; root:AppleImage4-349.40.4~3425/AppleImage4/RELEASE_ARM64E
+AppleImage4: no legacy blob present
+AppleImage4: no legacy blob present
+AppleImage4: magazine[pdmg]: failed to read nonce slot data: 2
+AppleImage4: magazine[d1ma]: failed to read nonce slot data: 2
+AppleImage4: magazine[c1ge]: failed to read nonce slot data: 2
+AppleImage4: magazine[c1er]: failed to read nonce slot data: 2
+AppleImage4: magazine[c1ai]: failed to read nonce slot data: 2
+AppleImage4: magazine[c1al]: failed to read nonce slot data: 2
+AppleImage4: root power domain not yet available: 19
+AMFI booted with research mode
+AMFI: UDID support enabled: 2
+AMFI: queried model name from device tree: iPhone17,3
+AMFI: disabling Swift Playgrounds JIT services on iPhone devices
+AMFI: Booted in a VM
+IOResources: not registry member at registerService()
+IOResources: not registry member at registerService()
+IOServicePH::kIOMessageSystemCapabilityChange: will 0xf->0xf
+IOServicePH::systemPowerChange to 0x30
+IOServicePH::kIOMessageSystemCapabilityChange: did 0xf->0xf
+ACMTRM: initU32FromBootArg: acm_fastsim = 0xffffffff <--- not found.
+ACMTRM: initU32FromEDTProp: /defaults/insecure_hpr = 0x0 <--- not found.
+ACMTRM: isFastSimTarget: isFastSim = NO.
+AppleCredentialManager: init: inited KE[1] (ready=NO AVP=NO SIM=NO SIMT=NO USESEP=YES) -> true.
+AppleCredentialManager: probe: probed KE[1] (ready=NO) -> true (score=0).
+ApplePSCI - PSCI version 1.1
+ApplePSCI - started
+IOPortFamily::registerService(): [Port-Virtual@1] Registering service... (providerPath: IOService:/AppleVirtualPlatformARMPE/port-virtual-1, options: 0)
+
+IOPortTransportStateUSB::setDataRole(): [@: IOPortTransportStateUSB2] Setting data role... (dataRole: 1 [Device])
+IOPortTransportStateUSB::_updateDataRole_block_invoke(): [@: IOPortTransportStateUSB2] Updating data role... (dataRole: 0 [None] -> 1 [Device], isOverride: NO, client: NULL, m_dataRole: 1 [Device], m_dataRoleOverride: -1 [Unknown])
+IOPortTransportState::start(): [Port-Virtual@1: USB2] m_parentPort->isFeatureEnabled(kIOPortFeatureTRM): NO, this->isTRMSupported(): YES, (transportType: 2, parentPortType: 1, parentPortNumber: 1)
+IOPortTransportState::registerService(): [Port-Virtual@1: USB2] Registering service USB2@... (transportType: 2, provider: Port-Virtual@1)
+Warning: arc4random not implemented
+Warning: arc4random not implemented
+Warning: arc4random not implemented
+AKSAnalytics built Oct 23 2025 06:38:43
+selected analytics domain Prototyping LibraryAKSAnalytics startedAppleARMBootPerf: Warning: profile->magic (0x42545244) != 'BTRC'
+AppleARMSFRManifest: Starting
+AppleARMSFRManifest: Error: Failed to find property sfr-manifest-hash
+AppleARMSFRManifest: Found HASH property
+AppleARMSFRManifest: Found 6 matching hash entries
+AppleARMSFRManifest: Successfully published sfr-manifest
+[AppleLockdownMode - start] started
+AppleCredentialManager: start: starting KE[1] (ready=NO) -> true.
+[AppleLockdownMode - LDMShouldEnforceParity] restoreOS check passed
+AppleCredentialManager: initImpl: called, KE[1].
+ACMFirstResponderKernelService: init: called, .
+ACMTRM-S: init: called, starting PersistentStore service.
+ACMTRM-A: init: called, starting TRM Analytics service.
+ACMTRM-C: init: called, starting AccessoryCache service.
+ACMKernelService: initValueFromBootArgAliasesUInt32: acc-cache size = 48 (default).
+ACMKernelService: initValueFromBootArgAliasesUInt32: acc-cache expiration = 2592000 (default).
+ACM: TRMAccCache_SetupEmpty: called, cacheSize=48 expiration=2592000.
+ACMTRM: init: called, starting TRM service.
+ACMTRM: initU32FromBootArg: trm_default = 0xffffffff <--- not found.
+ACMTRM: initU32FromBootArg: trm_enabled = 0xffffffff <--- not found.
+ACMTRM: initU32FromEDTProp: /defaults/trm-enabled = 0xffffffff <--- not found.
+ACMTRM: initU32FromBootArg: trm_unification = 0xffffffff <--- not found.
+ACMTRM: initU32FromBootArg: trm_all_policy_modes = 0xffffffff <--- not found.
+ACMTRM: initU32FromBootArg: trm_base_system = 0xffffffff <--- not found.
+ACMTRM: initU32FromBootArg: hidrm_default = 0xffffffff <--- not found.
+ACMTRM: initU32FromBootArg: hidrm_enabled = 0xffffffff <--- not found.
+ACMTRM: initU32FromEDTProp: /defaults/hidrm-enabled = 0xffffffff <--- not found.
+ACMTRM: initU32FromEDTProp: /options/stress-rack = 0xffffffff <--- not found.
+ACMTRM: initU32FromEDTProp: /defaults/trm-profile = 0xffffffff <--- not found.
+ACMTRM: _queryConfigProfile: profile: 3 (default=3 ?boot-arg=-1 edt-prop=-1).
+ACMTRM: initU32FromBootArg: trm_profile = 0xffffffff <--- not found.
+ACMTRM: _queryConfigProfile: profile: 3 (default=3 boot-arg=-1 ?edt-prop=-1).
+ACMKernelService: initValueFromBootArgAliasesUInt32: policy mode timeout = 259200 (default).
+ACMKernelService: initValueFromBootArgAliasesUInt32: grace period (bounded) timeout = 3600 (default).
+ACMKernelService: initValueFromBootArgAliasesUInt32: relaxed period timeout = 259200 (default).
+ACMKernelService: initValueFromBootArgAliasesUInt32: unlocked period timeout = 86400 (default).
+ACMTRM: _disableBy: [TRM ENABLED=YES] (mask=0, DISABLED BY: Def=N* Arg=N HW=N DT=N Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=YES] (mask=0, DISABLED BY: Def=N Arg=N* HW=N DT=N Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y* Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _loadDisabledByOSEnvironment: disabled by OSEnvironment: NO.
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N* Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: initU32FromEDTProp: /chosen/sepfw-load-at-boot = 0x1.
+ACMTRM: isSEPAvailable: isSEPAvailable = YES.
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N* SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N SR=N* | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _mapAndPublishTRM: set TRM_PolicyTimeout = 259200.
+ACMTRM: _mapAndPublishTRM: set TRM_PolicyReason = Unrestricted(0).
+ACMTRM: _mapAndPublishTRM: set TRM_RelaxedPeriodTimeout = 259200.
+ACMTRM: _mapAndPublishTRM: set TRM_UnlockedPeriodTimeout = 86400.
+ACMTRM: _mapAndPublishTRM: set HIDRM_PolicyEnabled = False.
+ACMTRM: _mapAndPublishTRM: sending kIOMessageServicePropertyChange(#changes=5) while LOCKED(1), TRM: 259200/U(0) 4294967295/-(255) M=255/4294967295/4294967295 ---(255)/---(255) L=255 BS=255 R=255 RP=259200/255 UP=86400/255 HID=0, CUR: U(0) -(255).
+ACMLockdownModeKernelService: init: called, .
+ACMLockdownModeKernelService: init: returning, result = true.
+AppleCredentialManager: initImpl: KE[1] INITED.
+AppleCredentialManager: initImpl: returning, KE[1] -> true.
+AppleCredentialManager: startImpl: called, KE[1].
+ACMTRM: start: security.mac.acm.root_pivot_occurred sysctl registered.
+ACMLockdownModeKernelService: start: called, .
+ACMLockdownModeKernelService: start: returning, result = true.
+AppleCredentialManager: startImpl: initializing power management.
+AppleCredentialManager: startImpl: will join SEPManager's PM tree in getSEPEndpoint().
+AppleCredentialManager: startImpl: registering notifications.
+AppleCredentialManager: startImpl: KE[1] STARTED.
+AppleCredentialManager: startImpl: returning, KE[1] -> true.
+AppleCredentialManager: start: started KE[1] (ready=YES) -> true.
+"AppleSEPKeyStore":pid:0,:327: starting (BUILT: Oct 23 2025 06:38:23) ("normal" variant 🌽 , 2155.42.1)
+"AppleSEPKeyStore":pid:0,:472: _sep_enabled = 1
+virtual bool CoreAnalyticsHub::start(IOService *)::150:CoreAnalyticsHub start
+virtual bool CoreAnalyticsHub::start(IOService *)::229:CoreAnalyticsHub start completed
+AppleS8000AES::start: registers at phys:0x0x30220000/0x0x30230000 virt:0x<ptr>/0x0x4000 / 0x<ptr>/0x0x4000
+Couldn't find sioaesdisable-offset from DeviceTree to override
+Couldn't find sioaesdisableuid1-offset from DeviceTree to override
+Couldn't find sioaesdisablegid0-offset from DeviceTree to override
+Couldn't find sioaesdisablegid1-offset from DeviceTree to override
+AppleS8000AES::start: aes-version: 3
+AppleS8000AES::start: address-width: 36
+AppleS8000AES::start: using-acg: no
+AMFI: skipping PMGRAON latch due to AVP
+AMFI: trying to get developer mode status from ACM
+AppleCredentialManager: waitForSEPEndpointOutsideACMCommandGate: waiting cmd=25.
+pci (build 06:29:57 Oct 23 2025), flags 0xc3008, log mode flags 0x4, log flags 0x80000001, log RCs 0xffffffff
+[ PCI configuration begin ]
+Failed to read AvpRtc NVRAM variable
+AppleA7IOPNub: withRegistryEntry, 47: allocated nub <ptr>
+
+[IOPCIConfigurator::configure()] PCI configuration pcie
+APV-IOSFC: start
+APV-IOSFC: success
+virtual bool AppleSEPManager::start(IOService *): 
+[ PCI configuration end, bridges 1, devices 15 ]
+virtual bool AppleARMLightEmUp::start(IOService *): starting...
+virtual bool AppleSEPManager::start(IOService *): SEP memory ISNOT coherent
+virtual bool AppleSEPManager::start(IOService *): control endpoints created
+com.apple.AppleFSCompressionTypeZlib kmod start
+void AppleSEPManager::_configurePowerStates(): SEP on during low power: EDT 0
+void AppleSEPManager::_configurePowerStates(): No SEP on during low power boot arg
+apfs_module_start:3677: load: com.apple.filesystems.apfs, v2632.40.15, apfs-2632.40.15.0.2, 2025/10/23
+void AppleSEPManager::_configurePowerStates(): SEP on during low power: 0
+com.apple.AppleFSCompressionTypeZlib load succeeded
+Setting up notifier for CoreAnalyticsHub
+install_apfs_vfs_fs:8292: apfs: speculative telemetry feature ENABLED by boot-arg
+install_apfs_vfs_fs:8294: apfs: speculative telemetry DEBUG option is set to ON via boot-arg
+is_arv_enabled:3838: ================ ARV enabled ================
+apfs_sysctl_register:1423: done registering sysctls.
+L2TP domain init
+L2TP domain init complete
+Load request for com.apple.nke.pptp failed: -603946991
+Waiting on <dict ID="0"><key>IOProviderClass</key><string ID="1">IOMedia</string><key>IOPropertyMatch</key><dict ID="2"><key>Partition ID</key><integer size="64" ID="3">0x1</integer></dict></dict>
+IOSurfaceRoot using IOSurfaceRootParavirtMapperInterface <ptr>virtual bool AppleSEPManager::start(IOService *): PM init done
+IOReturn AppleSEPManager::_setPowerState(unsigned long *): power state 0 -> 2
+TXM-SEP secure channel: 1 | 0
+static IOService *AppleSEPManager::getReadableNvram(): Waiting for IODTNVRAM
+static IOService *AppleSEPManager::getReadableNvram(): Got IODTNVRAM OK
+void AppleSEPManager::_loadFlagData(): Didn't find oblit-inprogress in NVRAM
+
+void AppleSEPManager::_loadFlagData(): Didn't find hardcoded TXM-SEP secure channel DVA
+
+void AppleSEPManager::_setupCPUTrace(): CPUTrace; pa=0x0, size=0x0
+
+static IOService *AppleSEPManager::getReadableNvram(): Waiting for IODTNVRAM
+static IOService *AppleSEPManager::getReadableNvram(): Got IODTNVRAM OK
+virtual void AppleSEPDebugArgs::_updateBuffer(): sep-debug-args: -testbool testalldigits=1234567890 testallhex=0x1234567890abcdef
+void AppleSEPBooter::_bootAction(void *, void *): Platform doesn't support SEPROM iBIC retrieval
+void AppleSEPBooter::_bootAction(void *, void *): SEP status: 1
+void AppleSEPBooter::_bootAction(void *, void *): SEP accepted Tz0
+void AppleSEPBooter::_bootAction(void *, void *): SEP status: 2
+void AppleSEPBooter::_bootAction(void *, void *): SEP status: 2
+IOReturn AppleSEPBooter::bootSEP(AppleSEPFirmware *, bool, AppleSEPSharedMemoryBuffer *, uint8_t *): SEP booting
+IOReturn AppleSEPBooter::bootSEP(AppleSEPFirmware *, bool, AppleSEPSharedMemoryBuffer *, uint8_t *): Shmbuf for SEP: { slave addr = 0x77e24000, size = 0x70000 }
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOStorageDevice.cpp::467:createBlockStorageDevice for fDeviceRole 2
+Creating 7 util devices
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 1 and regionIndex = 0
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 2 and regionIndex = 1
+Registration Done
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 3 and regionIndex = 2
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::252:Driver not present yet for region = 3, not a failure
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 7 and regionIndex = 3
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::252:Driver not present yet for region = 7, not a failure
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 4 and regionIndex = 4
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::252:Driver not present yet for region = 4, not a failure
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 5 and regionIndex = 5
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOUtilStorageDevice.cpp::221:CreateUtilDevice for regionID 6 and regionIndex = 6
+AppleVirtIOUSBDeviceController@: IOUSBDeviceController::prepareDefaults: model iPhone version 17.3
+[IOSA][Boot ] VendorID = 0x106b, deviceID = 0x1a0b
+AppleUSBXHCIPCI@0c000000: AppleUSBXHCI::createPorts: ports limit reached.  Not creating the remaining 1 ports
+AppleUSB30XHCIPort@0c200000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c300000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c400000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c100000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c500000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c800000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c600000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB30XHCIPort@0c700000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB20XHCIPort@0c900000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB20XHCIPort@0ca00000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB20XHCIPort@0cb00000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB20XHCIPort@0cc00000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB20XHCIPort@0cd00000: AppleUSBHostPort::cableChangeOccurred: powering on
+AppleUSB20XHCIPort@0ce00000: AppleUSBHostPort::cableChangeOccurred: powering on
+status = 0x0
+AppleUSB20XHCIPort@0cf00000: AppleUSBHostPort::cableChangeOccurred: powering on
+EAN Registration done 
+/Library/Caches/com.apple.xbs/Sources/AppleVirtIOStorage/Source/AppleVirtIOStorageDevice.cpp::467:createBlockStorageDevice for fDeviceRole 1
+[IOSA][Boot ] Service is registered = <ptr>
+Got boot device = IOService:/AppleVirtualPlatformARMPE/arm-io/AppleVirtualPlatformIO/pcie@30000000/AppleVirtualPlatformPCIE/pci106b,1a00@6/AppleVirtIOPCITransport/AppleVirtIOStorageDevice/AppleVirtIODiskStorageDevice@1/IOBlockStorageDriver/Apple Inc. VirtBSD root: disk0s1, major 1, minor 1
+virtual bool IOMobileFramebufferLegacy::start(IOService *)
+IOMFB: driver commit: 
+dev_init:300: disk0s1 device accelerated crypto: 0 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk0s1 device_handle block size 4096 block count 16658156 features 0 internal 
+dev_init:300: disk0s2 device accelerated crypto: 0 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk0s2 device_handle block size 4096 block count 119050 features 0 internal 
+nx_mount:1195: disk0s1 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk0s1 container cleanly-unmounted flag set.
+nx_mount:1195: disk0s2 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk0s2 container cleanly-unmounted flag set.
+void AppleSEPBooter::_bootAction(void *, void *): SEP accepted IMG4
+AppleSEPManager starting trace boot timer
+nx_mount:1512: disk0s2 checkpoint search: largest xid 4, best xid 4 @ 7
+nx_mount:1539: disk0s2 stable checkpoint indices: desc 6 data 10
+is_arv_enabled:3838: ================ ARV enabled ================
+import_iboot_forwarded_roothash:4001: importing root hash (basesystem ? 0)...
+virtual bool AppleSEPManager::start(IOService *): registered
+AppleCredentialManager: sepManagerMatchedGated: AppleSEPManager matched.
+nx_mount:1512: disk0s1 checkpoint search: largest xid 38174, best xid 38174 @ 73
+nx_mount:1539: disk0s1 stable checkpoint indices: desc 72 data 13092
+hfs_ValidateHFSPlusVolumeHeader: unknown Volume Signature : 0
+hfs_mount: hfs_mountfs returned error=22 for device unknown-dev
+apfs_vfsop_mountroot:2983: apfs: mountroot called!
+dev_init:300: disk2 device accelerated crypto: 3 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk2 device_handle block size 4096 block count 16658156 features 18 internal solidstate
+nx_mount:1195: disk2 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk2 container cleanly-unmounted flag set.
+nx_mount:1512: disk2 checkpoint search: largest xid 38174, best xid 38174 @ 73
+nx_mount:1539: disk2 stable checkpoint indices: desc 72 data 13092
+apfs_find_named_root_snapshot_xid:2055: disk2s1 failed to retrieve default root snapshot xid: No such file or directory (2)
+apfs_vfsop_mount:2732: disk2s1 failed to find named root snapshot: No such file or directory (2)
+apfs_log_op_with_proc:3297: disk2s1 mounting volume System, requested by: kernel_task (pid 0); parent: kernel_task (pid 0)
+handle_mount:834: disk2s1 vol-uuid: 61706673-7575-6964-0001-766F6C756E00 block size: 4096 block count: 16658156 (unencrypted; flags: 0x1; features: 28.0.12)
+handle_mount:847: disk2s1 setting dev block size to 4096 from 512
+apfs_log_op_with_proc:3297: disk2s1 mount-complete volume System, requested by: kernel_task (pid 0); parent: kernel_task (pid 0)
+is_arv_enabled:3838: ================ ARV enabled ================
+TXM [Error]: Errno: selector: 45 | 78
+AppleImage4: trap failed: set boot uuid
+AppleImage4: failed to set boot uuid in supervisor: 78
+AppleImage4: magazine[cptx]: failed to get nonce: 13
+AppleImage4: magazine[c1bt]: failed to get nonce: 6
+is_root_hash_authentication_required_ios:475: disk2s1 Release kext, booting xid: 0
+is_root_hash_authentication_required:558: disk2s1 Root Volume, root hash authentication is required
+INIT: virtual bool AppleMobileApNonce::start(IOService *):
+INIT:     AMAN starting
+SPEW: virtual bool AppleMobileApNonce::start(IOService *):
+SPEW:     start: _cryptoHashMethod=2
+SPEW: virtual bool AppleMobileApNonce::start(IOService *):
+SPEW:     start: _allowApNonceRetrieval=1
+SPEW: virtual bool AppleMobileApNonce::start(IOService *):
+SPEW:     start: _sandcatSupported=0
+SPEW: virtual bool AppleMobileApNonce::start(IOService *):
+SPEW:     start: _entangleNonce=0
+Darwin Ignition Sequence Version 1.0.0: Wed Oct 22 21:02:24 PDT 2025; root:libignition-58~27818/libignition_core/RELEASE_ARM64E
+libignition: 1: arguments           :
+libignition: 1:   ignition level    : 0x5
+libignition: 1:   force dylib root  : 0x0
+libignition: 1:   halt after stage  : n/a
+libignition: 1: configuration         :
+libignition: 1:   program             : launchd
+libignition: 1:   os environment      : n/a
+libignition: 1:   rd                  : n/a
+libignition: 1:   arp0                : n/a
+libignition: 1:   rp                  : n/a
+libignition: 1:   pivot src           : n/a
+libignition: 1:   root ramdisk        : 0x0
+libignition: 1:   restore             : 0x0
+libignition: 1:   root device info    : 0x0
+libignition: 1:   can haz debugger    : 0x0
+libignition: 1:   rootfs mount flags  : 0x1480d001
+libignition: 1:   ecid                : 0xf77952d4f70acd5d
+libignition: 1:   hardware target     : d47ap
+libignition: 1:   initproc            : 0x1
+libignition: 1:   single user         : 0x0
+libignition: 1:   userspace reboot    : 0x0
+libignition: 1:   secure boot level   : 0x0
+libignition: 1:   os version          : 23.2.85.0.0,0
+libignition: 1: parameters          :
+libignition: 1:   version           : 0x1
+libignition: 1:   argc              : 0x1
+libignition: 1:   log fd            : 0xffffffffffffffff
+libignition: 1:   platform          : 0x2
+libignition: 1: boot spec           :
+libignition: 1:   name              : local
+libignition: 1:   stage count       : 0x7
+libignition: 1:        hello: commence primary ignition
+libignition: 1:        hello: hello from launchd.1
+libignition: 1:      preboot: mounting preboot
+libignition: 1:      preboot: preboot device: /dev/disk2s5
+libignition: 1:      preboot: preboot mount point: /private/prebvoid AppleSEPControl::_callActiveAsync(): wait for active call, mach_absolute_time: 21278783
+static void AppleSEPControl::_notifyActiveAsync(thread_call_param_t, thread_call_param_t): mach_absolute_time: 21279130
+void AppleSEPManager::_notifyOSActiveGated(): SEP/OS is alive
+void AppleSEPControl::_cmsgAction(void *, void *): SEP info: 0x0
+oot
+libignition: 1:      preboot: mounting preboot: dev = /dev/disk2s5, uid = 0, gid = 0
+spaceman_metazone_init:173: disk2 metazone for device 0 of size 520567 blocks (encrypted: 16137589-16397872 unencrypted: 16397872-16658156)
+spaceman_datazone_init:611: disk2 allocation zone on dev 0 for allocations of 1 blocks starting at paddr 8224768
+spaceman_datazone_init:611: disk2 allocation zone on dev 0 for allocations of 2 blocks starting at paddr 7897088
+spaceman_datazone_init:611: disk2 allocation zone on dev 0 for allocations of 3 blocks starting at paddr 7929856
+spaceman_datazone_init:611: disk2 allocation zone on dev 0 for allocations of 4 blocks starting at paddr 7962624
+apfs_log_op_with_proc:3297: disk2s5 mounting volume Preboot, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+handle_mount:834: disk2s5 vol-uuid: 61706673-7575-6964-0010-766F6C756D04 block size: 4096 block count: 16658156 (unencrypted; flags: 0x1; features: 8.0.2)
+handle_mount:847: disk2s5 setting dev block size to 4096 from 512
+apfs_log_op_with_proc:3297: disk2s5 mount-complete volume Preboot, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+libignition: 1: cryptex1 sniff: detecting cryptex1 directory
+libignition: 1: cryptex1 sniff: ignition failed: 8
+libignition: 1: ignition boot failed: 8
+ignite() returned 8
+ignition disabled
+spaceman_scan_free_blocks:4449: disk2 scan took 0.017830 s (no trims)
+spaceman_fxc_print_stats:477: disk2 dev 0 smfree 11153365/16658156 table 190/190 blocks 11095879 54:58399:7897333 99.48% range 3378:16654778 99.97% scans 1
+spaceman_fxc_print_stats:496: disk2 dev 0 scan_stats[2]: foundmax 7897333 extents 7886 blocks 57486 long 54 avg 7 0.51% range 2:16628595 99.82%
+AppleUSB20XHCIPort@0ca00000: AppleUSBHostPort::enumerateDeviceComplete_block_invoke: enumerated 0x05ac/8108/0000 (Virtual USB Touch Screen / 1) at 12 Mbps
+Virtual USB Touch Screen@0ca00000: IOUSBHostDevice::setConfigurationGated: AppleUSBHostCompositeDevice selected configuration 1
+AppleUSB20XHCIPort@0c900000: AppleUSBHostPort::enumerateDeviceComplete_block_invoke: enumerated 0x05ac/8105/0000 (Virtual USB Keyboard / 2) at 12 Mbps
+Virtual USB Keyboard@0c900000: IOUSBHostDevice::setConfigurationGated: AppleUSBHostCompositeDevice selected configuration 1
+2026-10-09 10:32:22.419 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:23.468 vphone-vm[53680:16060443] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:24.523 vphone-vm[53680:16060443] B21 API socket type=1 status=0 fd=15
+set JB_ROOT_PATH = /private/preboot/B4491B383B98259E8F3C44F6517759621C73D19CF34DB50EF256FA2167A847570D1032BAB267ACA39383736C80029282/jb-vphone/procursus
+=========== hello from launchdhook.dylib ===========
+=========== bye from launchdhook.dylib ===========
+com.apple.xpc.launchd|2026-10-09 02:32:24.607145 <Notice>: hello, launchd UUID: 47663647-B933-3ABA-B20E-3127A8F25BC4
+com.apple.xpc.launchd|2026-10-09 02:32:24.609293 <Notice>: no mach port for persistent services: 2
+com.apple.xpc.launchd|2026-10-09 02:32:24.609326 <Notice>: Darwin Bootstrapper Version 7.0.0: Fri Oct 10 22:15:57 PDT 2025; root:libxpc_executables-3089.42.1~6/launchd/RELEASE_ARM64E
+com.apple.xpc.launchd|2026-10-09 02:32:24.609372 <Notice>: boot-args = serial=3 -v debug=0x2014e 
+com.apple.xpc.launchd|2026-10-09 02:32:24.610387 (system) <Notice>: entering ondemand mode
+com.apple.xpc.launchd|2026-10-09 02:32:24.610559 (system) <Notice>: created
+com.apple.xpc.launchd|2026-10-09 02:32:24.610852 (exclaves-boot) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 02:32:24.611042 (fsck) <Notice>: Doing boot task
+sendIONotification:3024: Sending notification about e0084006 for APFS volume 1.9
+** Checking the container superblock.
+   Checking the checkpoint with transaction ID 38174.
+** Checking the object map.
+** Checking volume /dev/rdisk2s1.
+** Checking the APFS volume superblock.
+   The volume System was formatted by newfs_apfs (2142.41.2.100.2) and last modified by apfs_kext (3288.1.3).
+** Checking volume /dev/rdisk2s2.
+** Checking the APFS volume superblock.
+   The volume Data was formatted by newfs_apfs (2632.40.15.0.2) and last modified by apfs_kext (2632.40.15.0.2).
+** Checking volume /dev/rdisk2s3.
+** Checking the APFS volume superblock.
+   The volume xART was formatted by newfs_apfs (2632.40.15.0.2) and last modified by apfs_kext (2632.40.15.0.2).
+** Checking volume /dev/rdisk2s4.
+** Checking the APFS volume superblock.
+   The volume Hardware was formatted by newfs_apfs (2632.40.15.0.2) and last modified by apfs_kext (2632.40.15.0.2).
+** Checking volume /dev/rdisk2s5.
+** Checking the APFS volume superblock.
+   The volume Preboot was formatted by newfs_apfs (2632.40.15.0.2) and last modified by apfs_kext (2632.40.15.0.2).
+** Checking volume /dev/rdisk2s6.
+** Checking the APFS volume superblock.
+   The volume Update was formatted by newfs_apfs (2632.40.15.0.2) and last modified by apfs_kext (2632.40.15.0.2).
+** Checking volume /dev/rdisk2s7.
+** Checking the APFS volume superblock.
+   The volume User was formatted by newfs_apfs (2632.40.15.0.2) and last modified by apfs_kext (2632.40.15.0.2).
+** QUICKCHECK ONLY; FILESYSTEM CLEAN
+sendIONotification:3024: Sending notification about e0084007 for APFS volume 1.9
+com.apple.xpc.launchd|2026-10-09 02:32:24.744880 (mount-phase-1) <Notice>: Doing boot task
+mount: found boot container: /dev/disk2, data volume: /dev/disk2s2 env: 1
+apfs_log_op_with_proc:3297: disk2s3 mounting volume xART, requested by: mount_apfs (pid 5); parent: mount (pid 4)
+handle_mount:834: disk2s3 vol-uuid: 61706673-7575-6964-0100-766F6C756D02 block size: 4096 block count: 16658156 (unencrypted; flags: 0x1; features: 8.0.2)
+handle_mount:847: disk2s3 setting dev block size to 4096 from 512
+apfs_lowdisk_check_volume:330: disk2s3 sending lowdisk notification: 131072 for with apfs_lowdisk_status: 131072
+apfs_log_op_with_proc:3297: disk2s3 mount-complete volume xART, requested by: mount_apfs (pid 5); parent: mount (pid 4)
+/dev/disk2s3 on /private/xarts (apfs, local, nodev, nosuid, journaled, noatime, nobrowse)
+com.apple.xpc.launchd|2026-10-09 02:32:24.794414 (data-protection) <Notice>: Doing boot task
+SEP firmware preloaded in memory
+init_data_protection: Gigalocker file (/private/xarts/AA.gl) exists
+apfs_rawdev_create:708: disk2s3 Enable bypass mode on inode 16 on xART@disk2 as 2.0, tidemark 4130303
+spaceman_scan_free_blocks:4419: disk2 scan took 3.813495 s, trims took 3.798188 s
+spaceman_scan_free_blocks:4423: disk2 11153365 blocks free in 8095 extents, avg 1377.80
+spaceman_scan_free_blocks:4432: disk2 11153365 blocks trimmed in 8095 extents (469 us/trim, 2131 trims/s)
+spaceman_scan_free_blocks:4435: disk2 trim distribution 1:2788 2+:1657 4+:2129 16+:1354 64+:127 256+:40
+spaceman_scan_free_blocks:4443: disk2 trims dropped: 2815 blocks 2784 extents, avg 1.01 
+init_data_protection: Gigalocker initialization completed
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART with CRC: 0x3853
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010234000113
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched USER-xART with CRC: 0xc343
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000000159000313
+com.apple.xpc.launchd|2026-10-09 02:32:24.944222 (finish-obliteration) <Notice>: Doing boot task
+void XARTDisableLog::register_disable(uint32_t): scrd registered for xART disable
+void XARTDisableLog::register_disable(uint32_t): sks  registered for xART disable
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x1b8b
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010071000413
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x1b8b
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010071000513
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x1b8b
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010071000613
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x2c66
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x00000100a2000713
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x1b8b
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010071000813
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x2c66
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x00000100a2000913
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x1b8b
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010071000a13
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x78f7
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x000001012d000b13
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x78f7
+AMFI: AMFIUpdateDeviceState
+[AppleLockdownMode - LDMShouldEnforceParity] SEP check passed
+[AppleLockdownMode - LDMShouldEnforceParity] MobileObliteration check passed
+[AppleLockdownMode - LDMShouldEnforceParity] ProtectedData check passed
+[AppleLockdownMode - LDMCheckParity] enforcing parity check
+AppleCredentialManager: getSEPEndpoint: Initializing SEP endpoint.
+SEP EP 10 enabled
+void AppleSEPManager::_updateDeviceTree(): updateDeviceTreeThread started
+AppleCredentialManager: getSEPEndpoint: SEPEndpoint enabled.
+static void AppleSEPManager::_updateDeviceTreeThread(void *): updateDeviceTree Success
+AppleCredentialManager: setPowerState: newState=1.
+AppleCredentialManager: setPowerStateGated: called, currentState=1 -> newState=1.
+AssertMacros: multiuser_flags != 0 (value: 0x0), _COMM_PAGE_MULTIUSER_CONFIG not available yet, file: /Library/Caches/com.apple.xbs/Sources/AppleCredentialManager/AppleCredentialManager/Services/ACMFirstResponderKernelService.cpp:152
+ACMFirstResponderKernelService: _detectEDUMode: returning, err = -14.
+AssertMacros: err == 0  (value: 0xfffffffffffffff2), ---, file: /Library/Caches/com.apple.xbs/Sources/AppleCredentialManager/AppleCredentialManager/Services/ACMFirstResponderKernelService.cpp:167
+ACMFirstResponderKernelService: detectEDUModeChange: returning, err = -14.
+AssertMacros: err == 0  (value: 0xfffffffffffffff2), Failed to detect EDU mode, file: /Library/Caches/com.apple.xbs/Sources/AppleCredentialManager/AppleCredentialManager/AppleCredentialManager.cpp:1363
+AMFI: ACM status 0
+ACM says dev mode is 0
+AMFI: finished: 1 1
+AssertMacros: multiuser_flags != 0 (value: 0x0), _COMM_PAGE_MULTIUSER_CONFIG not available yet, file: /Library/Caches/com.apple.xbs/Sources/AppleCredentialManager/AppleCredentialManager/Services/ACMFirstResponderKernelService.cpp:152
+ACMFirstResponderKernelService: _detectEDUMode: returning, err = -14.
+AssertMacros: err == 0  (value: 0xfffffffffffffff2), ---, file: /Library/Caches/com.apple.xbs/Sources/AppleCredentialManager/AppleCredentialManager/Services/ACMFirstResponderKernelService.cpp:167
+ACMFirstResponderKernelService: detectEDUModeChange: returning, err = -14.
+AssertMacros: err == 0  (value: 0xfffffffffffffff2), Failed to detect EDU mode, file: /Library/Caches/com.apple.xbs/Sources/AppleCredentialManager/AppleCredentialManager/AppleCredentialManager.cpp:1363
+[AppleLockdownMode - LDMCheckParity] state in ACM: 0, in nvram: 0
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x000001012d000c13
+"AppleSEPKeyStore":pid:0,:2981: SEP timeout multiplier = 1
+SEP EP 18 enabled
+"AppleSEPKeyStore":pid:0,:6200: negotiated to ipc header theirs:v2, ours:v2 -> negotiated:v2
+"AppleSEPKeyStore":pid:0,:6182: re-seeded prng with 97 bytes
+Fri Oct  9 02:32:24 2026: runningInternalBuild_block_invoke: Running on an Customer build according to OS variant [gF: 0x0000000000000000]
+Obliterator: In INIT check
+Fri Oct  9 02:32:24 2026: checkOblitNVRAMkey: IORegistryEntryGetProperty failed, may be does not exist [gF: 0x0000000000000000]
+Obliterator: No obliteration needed, continue booting, returning 0
+com.apple.xpc.launchd|2026-10-09 02:32:24.980269 (detect-installed-roots) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 02:32:24.980320 <Notice>: No cookie from system volume
+com.apple.xpc.launchd|2026-10-09 02:32:24.980346 <Notice>: No cookie: /private/preboot/B4491B383B98259E8F3C44F6517759621C73D19CF34DB50EF256FA2167A847570D1032BAB267ACA39383736C80029282/.roots-installed
+com.apple.xpc.launchd|2026-10-09 02:32:24.980356 (select-boot-mode) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 02:32:24.980364 (commit-boot-mode) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 02:32:24.980371 <Notice>: boot-mode committed: (null)
+com.apple.xpc.launchd|2026-10-09 02:32:24.980379 (restore-datapartition) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 02:32:24.983207 (restore-datapartition) <Notice>: optional boot task not present
+com.apple.xpc.launchd|2026-10-09 02:32:24.983237 (mount-phase-2) <Notice>: Doing boot task
+mount: found boot container: /dev/disk2, data volume: /dev/disk2s2 env: 1
+effaceable_is_disabled:13208: ================ no-effaceable-storage is ON ================
+effaceable_is_disabled:13208: ================ no-effaceable-storage is ON ================
+apfs_migrate_aks_key_class:2401: successfully fetched wrapped key (uuid = 4051B0B8-0158-41B4-88B9-A6F2772CB8F5, new_tag = 7)
+migrate_media_keys_if_needed:2030: disk2s1 skipping unencrypted volume at index 1
+effaceable_is_disabled:13208: ================ no-effaceable-storage is ON ================
+effaceable_is_disabled:13208: ================ no-effaceable-storage is ON ================
+effaceable_is_disabled:13208: ================ no-effaceable-storage is ON ================
+effaceable_is_disabled:13208: ================ no-effaceable-storage is ON ================
+"AppleSEPKeyStore":pid:9,:6065: disabling use of effaceable storage, using fake key, 0xffffffff
+_aks_unwrap_media_class:186: AKS unwrap_media_key_from_class succeeded for tag = 7
+apfs_migrate_aks_key_class:2401: successfully fetched wrapped key (uuid = 61706673-7575-6964-0040-766F6C756D01, new_tag = 8)
+migrate_media_keys_if_needed:2041: disk2s2 media key migration succeeded for volume at index 2
+migrate_media_keys_if_needed:2030: disk2s3 skipping unencrypted volume at index 3
+migrate_media_keys_if_needed:2030: disk2s4 skipping unencrypted volume at index 4
+migrate_media_keys_if_needed:2030: disk2s5 skipping unencrypted volume at index 5
+migrate_media_keys_if_needed:2030: disk2s6 skipping unencrypted volume at index 6
+apfs_migrate_aks_key_class:2432: failed to get wrapped media key (uuid = 61706673-7575-6964-0002-766F6C756D06, cur_tag = 2), error = 2
+migrate_media_keys_if_needed:2038: disk2s7 media key migration failed for volume at index 7, error = 2
+mount: failed to migrate Media Keys, error = c002
+_aks_unwrap_media_class:186: AKS unwrap_media_key_from_class succeeded for tag = 8
+apfs_meta_crypto_state_unwrap:1583: got key for volume 61706673-7575-6964-0040-766F6C756D01
+"AppleSEPKeyStore":pid:10,:2614: Mapping volume without a valid persona.
+"AppleSEPKeyStore":pid:10,:2692: mapped uuid 61706673-7575-6964-0040-766F6C756D01 to bag -5, persona none, compressed uuid: 2048435297, flags: 1
+"AppleSEPKeyStore":pid:10,:4521: cmd: 18, booted_from: 1, result: 0
+nx_keybag_lookup_vek:1739: successfully loaded volume class keys
+apfs_meta_crypto_state_unwrap:1669: got vek for volume 61706673-7575-6964-0040-766F6C756D01
+apfs_log_op_with_proc:3297: disk2s2 mounting volume Data, requested by: mount_apfs (pid 10); parent: mount (pid 9)
+handle_mount:834: disk2s2 vol-uuid: 61706673-7575-6964-0040-766F6C756D01 block size: 4096 block count: 16658156 (encrypted; flags: 0x900; features: 2c8.c.2)
+handle_mount:847: disk2s2 setting dev block size to 4096 from 512
+apfs_log_op_with_proc:3297: disk2s2 mount-complete volume Data, requested by: mount_apfs (pid 10); parent: mount (pid 9)
+apfs_kbn_handler_start:7601: disk2s2 keybag notification handler started
+/dev/disk2s2 on /private/var (apfs, local, nodev, nosuid, journaled, noatime, protect)
+2026-10-09 10:32:25.555 vphone-vm[53680:16060443] B21 API socket type=1 status=0 fd=15
+apfs_log_op_with_proc:3297: disk2s6 mounting volume Update, requested by: mount_apfs (pid 11); parent: mount (pid 9)
+handle_mount:834: disk2s6 vol-uuid: 61706673-7575-6964-00C0-766F6C756D05 block size: 4096 block count: 16658156 (unencrypted; flags: 0x1; features: 8.0.2)
+handle_mount:847: disk2s6 setting dev block size to 4096 from 512
+apfs_log_op_with_proc:3297: disk2s6 mount-complete volume Update, requested by: mount_apfs (pid 11); parent: mount (pid 9)
+/dev/disk2s6 on /private/var/MobileSoftwareUpdate (apfs, local, nodev, nosuid, journaled, noatime, nobrowse)
+apfs_log_op_with_proc:3297: disk2s4 mounting volume Hardware, requested by: mount_apfs (pid 12); parent: mount (pid 9)
+handle_mount:834: disk2s4 vol-uuid: 61706673-7575-6964-0140-766F6C756D03 block size: 4096 block count: 16658156 (unencrypted; flags: 0x1; features: 8.0.2)
+handle_mount:847: disk2s4 setting dev block size to 4096 from 512
+apfs_lowdisk_check_volume:330: disk2s4 sending lowdisk notification: 131072 for with apfs_lowdisk_status: 131072
+apfs_log_op_with_proc:3297: disk2s4 mount-complete volume Hardware, requested by: mount_apfs (pid 12); parent: mount (pid 9)
+/dev/disk2s4 on /private/var/hardware (apfs, local, nodev, nosuid, journaled, noatime, nobrowse)
+create_and_register_exclave_path_if_needed:872: Skipping the registration of the exclaves writable storage
+handle_overprovisioning:1634: Found container size of 68719476736 bytes
+handle_overprovisioning:1639: Using reserve size of 687194767
+handle_overprovisioning:1708: Creating overprovisioning volume
+handle_overprovisioning:1746: failed to create overprovisioning volume: -536870207
+handle_overprovisioning:1634: Found container size of 68719476736 bytes
+handle_overprovisioning:1639: Using reserve size of 687194767
+handle_overprovisioning:1708: Creating overprovisioning volume
+handle_overprovisioning:1746: failed to create overprovisioning volume: -536870207
+handle_overprovisioning:1634: Found container size of 68719476736 bytes
+handle_overprovisioning:1639: Using reserve size of 687194767
+handle_overprovisioning:1708: Creating overprovisioning volume
+handle_overprovisioning:1746: failed to create overprovisioning volume: -536870207
+mount_phase_two:2343: Overprovision setup failed - error e00002c1 (errno 13). Ignoring...
+com.apple.xpc.launchd|2026-10-09 10:32:25.067053 (init-with-data-volume) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.078178 (fixup-mobile-tmp) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.078693 (fixup-mobile-tmp) <Notice>: /private/var/mobile/tmp already exists, skipping
+com.apple.xpc.launchd|2026-10-09 10:32:25.078707 (fixup-mobile-tmp) <Notice>: Finished boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.078713 (MSUEarlyBootTask) <Notice>: Doing boot task
+MSUEarlyBootTask: MSUEarlyBootTask running
+MSUEarlyBootTask running in normal env
+main: Content from the ramdisk will be present at /private/var/MobileSoftwareUpdate//b4491b383b98259e8f3c44f6517759621c73d19cf34db50ef256fa2167a847570d1032bab267aca39383736c80029282-MSUData if it exists
+MSUEarlyBootTask: Set up ACL on log folder
+MSUEarlyBootTas: Set up ACL on log file
+com.apple.xpc.launchd|2026-10-09 10:32:25.140148 (MobileAssetEarlyBootTask) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.141259 (fips) <Notice>: Doing boot task
+10:32:25:150: [MobileAssetEarlyBootTask]: ============================Running after reboot============================
+10:32:25:152: [MobileAssetEarlyBootTask]: Attempting to graft secure assets from previous boot session
+10:32:25:154: [MobileAssetEarlyBootTask]: Attempting to graft secure assets from last boot session
+
+10:32:25:180: [MobileAssetEarlyBootTask]: Unable to determine boot plist from previous boot. Skipping grafting: Error Domain=SecureMobileAssetErrorDomain Code=10504 "Unable to load grafted asset list" UserInfo={NSDebugDescription=Unable to load grafted asset list, NSUnderlyingError=0xdc1000450 {Error Domain=NSCocoaErrorDomain Code=257 "The file b EarlyBootTaskInfo.plistb  couldnb t be opened because you donb t have permission to view it." UserInfo={NSFilePath=/private/var/MobileAsset/AssetsV2/EarlyBootTaskInfo.plist, NSURL=file:///private/var/MobileAsset/AssetsV2/EarlyBootTaskInfo.plist, NSUnderlyingError=0xdc10000c0 {Error Domain=NSPOSIXErrorDomain Code=1 "Operation not permitted"}}}}
+
+10:32:25:183: [MobileAssetEarlyBootTask]: Failed to graft secure assets from previous boot session
+10:32:25:183: [MobileAssetEarlyBootTask]: ============================Run completed============================
+About to call the FIPS_POST function in the corecrypto.dylib
+Tracing: disabled
+FIPSPOST_USER [120335595] fipspost_post:158: [FIPSPOST][Module-ID] Apple corecrypto Module v26.0 [Apple ARM, User, Software, SL1, N/A]
+FIPSPOST_USER [120383457] fipspost_post:166: PASSED: (1 ms) - fipspost_post_hmac
+FIPSPOST_USER [120414068] fipspost_post:171: PASSED: (0 ms) - fipspost_post_integrity
+FIPSPOST_USER [120434102] fipspost_post:176: PASSED: (0 ms) - fipspost_post_indicator
+FIPSPOST_USER [120442230] fipspost_post:177: PASSED: (0 ms) - fipspost_post_aes_ecb
+FIPSPOST_USER [120449663] fipspost_post:178: PASSED: (0 ms) - fipspost_post_aes_cbc
+FIPSPOST_USER [120485848] fipspost_post:179: PASSED: (1 ms) - fipspost_post_rsa_sig
+FIPSPOST_USER [120573547] fipspost_post:180: PASSED: (3 ms) - fipspost_post_ecdsa
+FIPSPOST_USER [120583917] fipspost_post:181: PASSED: (0 ms) - fipspost_post_ecdh
+FIPSPOST_USER [120591186] fipspost_post:182: PASSED: (0 ms) - fipspost_post_aes_ccm
+FIPSPOST_USER [120598209] fipspost_post:183: PASSED: (0 ms) - fipspost_post_aes_gcm
+FIPSPOST_USER [120605702] fipspost_post:184: PASSED: (0 ms) - fipspost_post_aes_cmac
+FIPSPOST_USER [120617183] fipspost_post:185: PASSED: (0 ms) - fipspost_post_hkdf
+FIPSPOST_USER [120744364] fipspost_post:186: PASSED: (4 ms) - fipspost_post_pbkdf
+FIPSPOST_USER [120752026] fipspost_post:187: PASSED: (0 ms) - fipspost_post_drbg_hmac
+FIPSPOST_USER [120759212] fipspost_post:189: PASSED: (0 ms) - fipspost_post_kdf_ctr
+FIPSPOST_USER [120766480] fipspost_post:190: PASSED: (0 ms) - fipspost_post_kdf_ctr_cmac
+FIPSPOST_USER [120773822] fipspost_post:191: PASSED: (0 ms) - fipspost_post_aes_xts
+FIPSPOST_USER [120781160] fipspost_post:192: PASSED: (0 ms) - fipspost_post_tdes_ecb
+FIPSPOST_USER [120788210] fipspost_post:193: PASSED: (0 ms) - fipspost_post_drbg_ctr
+FIPSPOST_USER [120878175] fipspost_post:195: PASSED: (3 ms) - fipspost_post_ffdh
+FIPSPOST_USER [120937824] fipspost_post:196: PASSED: (2 ms) - fipspost_post_rsa_enc_dec
+FIPSPOST_USER [120945538] fipspost_post:197: PASSED: (0 ms) - fipspost_post_shake
+FIPSPOST_USER [120962326] fipspost_post:198: PASSED: (0 ms) - fipspost_post_mlkem
+FIPSPOST_USER [121029268] fipspost_post:199: PASSED: (2 ms) - fipspost_post_mldsa
+FIPSPOST_USER [121036954] fipspost_post:219: all tests PASSED (29 ms)
+Returned from calling the FIPS_POST function in the corecrypto.dylib: result = true
+com.apple.xpc.launchd|2026-10-09 10:32:25.235342 (keybag) <Notice>: Doing boot task
+****** IN MKB_INIT ****
+MKB_INIT: Could not open /private/var/keybags/systembag.kb: No such file or directory
+MKB_INIT: Could not open /private/var/keybags/systembag.kb: No such file or directory
+MKB_INIT: Could not open /private/var/keybags/systembag.kb.writing: No such file or directory
+MKB_INIT: Unable to load keybag with No Crypto: -7
+MKB_INIT: No system keybag found on filesystem.
+MKB_INIT: dt = 1, bootarg = 0
+MKB_INIT: No system keybag loaded.
+-v debug=0x2014e MKB_INIT: Setup allow list:
+oaded.
+-v debug=0x2014e checking path: /private/var/root/.bootstrapped
+/private/var/MobileSoftwareUpdate set 4
+****** DONE MKB_INIT ****
+com.apple.xpc.launchd|2026-10-09 10:32:25.275318 (usermanagerd) <Notice>: Doing boot task
+****** IN UMD_INIT ****
+****** STARTING EARLYBOOT SETUP ****
+enhanced_apfs_enabled_helper:13235: ================ enhanced apfs is enabled ================
+enhanced_apfs_enabled_helper:13235: ================ enhanced apfs is enabled ================
+"AppleSEPKeyStore":pid:18,sel:120:7532: Loading identity D2B0F8B8-7E70-48A4-84E7-1F74CC833C18 to handle -501
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x435c
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x00000105c7000d13
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x435c
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x00000105c7000e13
+"AppleSEPKeyStore":pid:0,sel:120:823: notification for handle: 2048435297, state: 0, value: 0, flags: 0x1
+"AppleSEPKeyStore":pid:0,sel:120:823: notification for handle: -6, state: 0, value: 0, flags: 0x0
+"AppleSEPKeyStore":pid:0,sel:120:3854: Sending notification for volume 61706673-7575-6964-0040-766F6C756D01 unlocked (action 1, handle 2048435297)
+handle_async_keybag_unlock:6583: disk2s2 apfs is being UN-locked!
+"AppleSEPKeyStore":pid:18,sel:120:7391: loaded keybag, handle = 1
+"AppleSEPKeyStore":pid:0,sel:120:823: notification for handle: 2048435297, state: 5, value: 0, flags: 0x1
+"AppleSEPKeyStore":pid:0,sel:120:823: notification for handle: -501, state: 0, value: 1, flags: 0x0
+"AppleSEPKeyStore":pid:0,sel:120:823: notification for handle: -6, state: 5, value: 0, flags: 0x0
+"AppleSEPKeyStore":pid:18,sel:120:7537: Loaded identity D2B0F8B8-7E70-48A4-84E7-1F74CC833C18 as session -501
+populate_vek_if_needed:1803: disk2s2 loaded and cached vek successfully
+handle_async_keybag_unlock:6716: disk2s2 apfs is now UN-locked! (flags 0x400001c2)
+kbnh_keybag_unlock_notification:6896: disk2s2 done processing un-lock keybag notification, err 0, (flags 0x400000c2)
+"AppleSEPKeyStore":pid:0,:3869: Sending lock state change unlocked (0) for handle -6 (0x0)
+"AppleSEPKeyStore":pid:0,:3865: Sending First Unlock notification for handle -501
+"AppleSEPKeyStore":pid:0,:3869: Sending lock state change unlocked (0) for handle -501 (0x1)
+"AppleSEPKeyStore":pid:0,:3869: Sending lock state change event (5) for handle -6 (0x0)
+apfs_mount:30194: disk2s7 resizing will be cancelled as the user volume is encrypted and is changing mount state to mounted
+nx_cancel_block_out:6865: disk2 Lock is not cancellable
+_aks_unwrap_media_class:186: AKS unwrap_media_key_from_class succeeded for tag = 14
+apfs_meta_crypto_state_unwrap:1583: got key for volume 61706673-7575-6964-0002-766F6C756D06
+_aks_unwrap_media_class:186: AKS unwrap_media_key_from_class succeeded for tag = 12
+apfs_meta_crypto_state_unwrap:1651: got secondary key for volume 61706673-7575-6964-0002-766F6C756D06
+apfs_log_op_with_proc:3297: disk2s7 mounting volume User, requested by: mount_apfs (pid 19); parent: usermanagerd (pid 18)
+handle_mount:834: disk2s7 vol-uuid: 61706673-7575-6964-0002-766F6C756D06 block size: 4096 block count: 16658156 (encrypted; flags: 0x800; features: 388.c.2)
+handle_mount:847: disk2s7 setting dev block size to 4096 from 512
+apfs_log_op_with_proc:3297: disk2s7 mount-complete volume User, requested by: mount_apfs (pid 19); parent: usermanagerd (pid 18)
+apfs_kbn_handler_start:7601: disk2s7 keybag notification handler started
+"AppleSEPKeyStore":pid:18,sel:65:2692: mapped uuid 61706673-7575-6964-0002-766F6C756D06 to bag -501, persona none, compressed uuid: 118820932, flags: 0
+"AppleSEPKeyStore":pid:18,sel:65:2713: notified volume uuid 61706673-7575-6964-0002-766F6C756D06 - lock state = 104857606 (err = 0)
+"AppleSEPKeyStore":pid:0,sel:65:3854: Sending notification for volume 61706673-7575-6964-0002-766F6C756D06 unlocked (action 1, handle -501)
+handle_async_keybag_unlock:6583: disk2s7 apfs is being UN-locked!
+handle_async_keybag_unlock:6716: disk2s7 apfs is now UN-locked! (flags 0x400001c2)
+kbnh_keybag_unlock_notification:6896: disk2s7 done processing un-lock keybag notification, err 0, (flags 0x400000c2)
+****** DONE EARLYBOOT SETUP ****
+****** DONE UMD_INIT ****
+com.apple.xpc.launchd|2026-10-09 10:32:25.382679 (dirs_cleaner) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.392078 (dirs_cleaner-usr) <Notice>: Skipping boot-task
+com.apple.xpc.launchd|2026-10-09 10:32:25.392132 <Notice>: launchd logging initialized. name: com.apple.xpc.launchd pid: 1
+com.apple.xpc.launchd|2026-10-09 10:32:25.395341 (xpcroleaccountd) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.406719 (init_featureflags) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.527273 (auearlyboot) <Notice>: Doing boot task
+auearlyboot: -[FudEarlyBoot doFUDEarlyBoot:](): Starting Early Boot
+auearlyboot: -[AppleFirmwareUpdateController getEarlyBootListInternal:]: Pending critical earlyBoot entries (
+)
+auearlyboot: No Early Boot Accessories
+auearlyboot: -[FudEarlyBoot calculateTimeTakenForEarlyBootEntries] Time Taken to wait for critical earlyBoot entries: 0.000000 sec
+auearlyboot: -[FudEarlyBoot doFUDEarlyBoot:](): End Early Boot
+auearlyboot: Exitng Early Boot
+com.apple.xpc.launchd|2026-10-09 10:32:25.547500 (tzinit) <Notice>: Doing boot task
+tzinit: Latest update incompatible with system, or not newer than current: 2026d.1.0 vs. 2026d.1.0: Undefined error: 0
+com.apple.xpc.launchd|2026-10-09 10:32:25.558249 (finish-restore) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.564453 (finish-demo-restore) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.574839 (sysstatuscheck) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.581561 (prng_seedctl) <Notice>: Doing boot task
+kern.prng.user_reseed_count: (-1) (2) No such file or directory
+com.apple.xpc.launchd|2026-10-09 10:32:25.589039 (launchd_cache_loader) <Notice>: Doing boot task
+0 Found valid port: 2819 Valid: 1
+1 Found valid port: 0 Valid: 0
+2 Found valid port: 0 Valid: 0
+Using default cache paths
+Code: /System/Library/xpc/launchd.plist Sig: /System/Library/xpc/launchd.plist.sig
+Using unsecure cache: /System/Library/xpc/launchd.plist
+Trying to send bytes to launchd: 2819 16384
+Sending validated cache to launchd
+Cache sent to launchd successfully
+com.apple.xpc.launchd|2026-10-09 10:32:25.604475 (workload-properties-init) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.604510 (init-exclavekit) <Notice>: Doing boot task
+com.apple.xpc.launchd|2026-10-09 10:32:25.675038 (boot) <Notice>: Early boot complete. Continuing system boot.
+com.apple.xpc.launchd|2026-10-09 10:32:25.736896 <Notice>: Got first unlock unregistering for AKS events
+2026-10-09 10:32:26.568 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=15
+"AppleSEPKeyStore":pid:32,sel:7:66: ioreg: 1, boot_arg: 0
+AppleCredentialManagerUserClient: start: persona=YES, SUID=501.
+AppleCredentialManagerUserClient: start: persona=YES, SUID=501.
+ACMTRM: _onDaemonStarted: registering TRM notifiers.
+ACMTRM: _registerBioNotifier: Biometric driver not detected.
+ACMTRM: _onDaemonStarted: starting TRM policy engine.
+ACMTRM: _onDaemonStarted: entering startup thread (startupFlags=0x0).
+ACMTRM: _startupThreadCallHandler: _currentDeviceStateFromKeybag(system_keychain_handle) -> 0x0.
+ACMTRM: _startPolicy: startingInBaseSystem=NO startingInNormalOS=YES pivotingToNormalOS=NO | startupFlags=0x0 | initial deviceLockState=UNLOCKED(0) keybagState=0x0 consoleState=0x0.
+ACMTRM-S: _loadAll: called, isLockerAvailable=YES.
+ACM: TRMAccCache_SetupEmpty: called, cacheSize=48 expiration=2592000.
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x52ad
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010081000f13
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x52ad
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010081001013
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Fetched SEP-xART Locker with CRC: 0x52ad
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0000010081001113
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Saving SEP-xART with CRC: 0xcd7
+int gl_rec_write(struct gl_ctx *const, const struct gl_rec_id *const, const uint8_t *const, size_t): Writing record type: 2, uuid: 00000000-0000-0000-0000-000000000000, crc32: 360668838 at idx 2
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x0cd7010000001213
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Saving SEP-xART Locker with CRC: 0x4c48
+int gl_rec_write(struct gl_ctx *const, const struct gl_rec_id *const, const uint8_t *const, size_t): Writing record type: 4, uuid: D68FC4B9-B606-4A4E-1730-8B065F110107, crc32: 2412161325 at idx 7
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x4c48010000001313
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Saving SEP-xART with CRC: 0x5641
+int gl_rec_write(struct gl_ctx *const, const struct gl_rec_id *const, const uint8_t *const, size_t): Writing record type: 2, uuid: 00000000-0000-0000-0000-000000000000, crc32: 3295195362 at idx 3
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x5641010000001413
+AppleCredentialManager: sendSEPCommand: SEP cmd(38)~4 on CS[0] (perm=0x0000000000000000 SUID=-1) took 92(92) ms -> ioErr=0x0 acmErr=0.
+ACM: loadTRMStateFromMultiState: *policy* loaded (ver=15 size=105 -> size=105).
+ACM: loadTRMStateFromMultiState: [loaded] inSize=113 -> policyRead=YES configRead=NO accCacheRead=NO isMultiState=YES isGuardedState=NO.
+ACMTRM-S: _loadAll: fetching *policy* <- locker (gen=0 msLen=113 dataLen=105 ver=15).
+ACMTRM-S: _reloadFromDaemon: fetching *analytics* <- daemon (gen=0 osLen=400 dataLen=400 ver=1).
+ACMTRM-A: reloadAnalytics: *analytics* successfully loaded.
+ACMKernelService: initValueFromBootArgAliasesUInt32: analytics period = 86400 (default).
+ACMTRM-A: setProperty: propCollectionPeriod=86400 (prev=0).
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM-A: setProperty: propPolicyModeTimeout=259200 (prev=0).
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM-A: setProperty: propGracePeriodBoundedTimeout=3600 (prev=0).
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM-A: incrementCounter: cntDaemonStarted=5.
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM: _logPolicy: LOADED: ver=15 smTm=0 poRsn=0 gpTm=0 smExp=NO gpBlk=NO suTm=1791507793 svTm=1791507793 gpRsn=0 cMs=NO upTm=0 disBy=10 rpTm=0 crTm=1791004079 pFlg=0.
+ACMTRM: initU32FromEDTProp: /defaults/trm-profile = 0xffffffff <--- not found.
+ACMTRM: _queryConfigProfile: profile: 3 (default=3 ?boot-arg=-1 edt-prop=-1).
+ACMTRM: _logConfig: caller=_loadConfig ver=3 flg=0 gSw=1 GP=2 Pro=3 iPro=3 hSw=2.
+ACMTRM-A: setProperty: propGracePeriodTimeout=3600 (prev=0).
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM: _mapAndPublishTRM: set TRM_GracePeriodTimeout = 3600.
+ACMTRM: _mapAndPublishTRM: sending kIOMessageServicePropertyChange(#changes=1) while UNLOCKED(0), TRM: 259200/U(0) 3600/-(255) M=255/4294967295/4294967295 ---(255)/---(255) L=255 BS=255 R=255 RP=259200/255 UP=86400/255 HID=0, CUR: U(0) -(255).
+ACMTRM-A: setProperty: propPolicyDisabledByBits=16 (prev=0).
+ACMTRM-S: setData: saving *analytics* (dataLen=400) in 3 seconds (fullSync: NO -> NO).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N SR=N | MC=N* DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N SC=N AS=N* IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N BS=N MB=N* SC=N AS=N IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N* CP=N BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM: _disableBy: [TRM ENABLED=NO] (mask=10, DISABLED BY: Def=N Arg=N HW=N DT=Y Env=N Ext=N Dev=N SEP=N SR=N | MC=N DW=N CB=N GS=N CP=N* BS=N MB=N SC=N AS=N IB=N DM=N).
+ACMTRM-C: onPolicyStarted: *acc-cache* not found.
+ACMTRM: _startPolicy: timePolicyViolated=NO (saveTime=1791507793 bootCalTime=1791513146 (delta=5353) bootUpTime=6 nowUp=1791513146).
+ACMTRM: _startPolicy: policyViolated=NO (timePolicyViolated=NO passcodeThreshold=NO corruptedStateDetected=NO unexpectedShutdownDetected=NO).
+ACMTRM: _publish: _startPolicy UNLOCKED(0) reason=0 en=NO pro=3/3 pasThr=NO kb=0 con=0 poRsn=0 smExp=NO gpBlk=NO miss=NO seen=1791513146 now=1791513146(0) | PMT=0/0 GPT=0/0/(0) RPT=0/0 UPT=0/0.
+ACMTRM: _mapAndPublishTRM: set TRM_CacheMiss = False.
+ACMTRM: _mapAndPublishTRM: set TRM_CacheMissThreshold = 5.
+ACMTRM: _mapAndPublishTRM: set TRM_CacheMissCount = 0.
+ACMTRM: _mapAndPublishTRM: set TRM_ConfigProfile = AutomaticallyAllowWhenUnlocked(3).
+ACMTRM: _mapAndPublishTRM: set TRM_EffectiveConfigProfile = AutomaticallyAllowWhenUnlocked(3).
+ACMTRM: _mapAndPublishTRM: set TRM_DeviceLocked = False.
+ACMTRM: _mapAndPublishTRM: set TRM_BaseSystem = False.
+ACMTRM: _mapAndPublishTRM: set TRM_Recovery = False.
+ACMTRM: _mapAndPublishTRM: set TRM_RelaxedPeriod = True.
+ACMTRM: _mapAndPublishTRM: set TRM_UnlockedPeriod = True.
+ACMTRM: _mapAndPublishTRM: sending kIOMessageServicePropertyChange(#changes=10) while UNLOCKED(0), TRM: 259200/U(0) 3600/-(255) M=0/5/0 AAWU(3)/AAWU(3) L=0 BS=0 R=0 RP=259200/1 UP=86400/1 HID=0, CUR: U(0) X(0).
+ACMTRM: _logPolicy: SAVING: ver=15 smTm=0 poRsn=0 gpTm=0 smExp=NO gpBlk=NO suTm=1791513146 svTm=1791513146 gpRsn=0 cMs=NO upTm=0 disBy=10 rpTm=0 crTm=1791004079 pFlg=0.
+ACMTRM-S: setData: saving *policy* (dataLen=105) in 3 seconds (fullSync: NO -> NO).
+ACMTRM-C: notifyClients_AccCache_Refreshed: sent kACMTRMMessage_AccCache_Refreshed(0) -> 0xe00002c7.
+ACMTRM: _isTRMEnrollmentNeeded: enrollmentNeeded=NO (loadedVersion=15).
+ACMTRM: _isHIDRMEnrollmentNeeded: enrollmentReason: eraseInstall=NO updateFromPreHIDRMSystem=NO.
+ACMTRM: _isHIDRMEnrollmentNeeded: enrollmentNeeded=NO (loadedVersion=15).
+deferred rematching count 0
+Driver com.apple.AppleUserHIDDrivers has crashed 0 time(s)
+Driver com.apple.AppleUserHIDDrivers has crashed 0 time(s)
+DK: AppleUserUSBHostHIDDevice-0x10000029f waiting for server com.apple.driverkit.AppleUserHIDDrivers-10000029f
+DK: AppleUserUSBHostHIDDevice-0x10000029d waiting for server com.apple.driverkit.AppleUserHIDDrivers-10000029f
+DK: AppleUserUSBHostHIDDevice-0x10000029d::start(IOUSBHostInterface-0x10000027a) ok
+IOUSBHostFamily::validateEndpointMaxPacketSize: USB 2.0 5.[5-8].3: endpoint 0x81 invalid wMaxPacketSize 0x0080
+DK: IOUserServer(com.apple.driverkit.AppleUserHIDDrivers-0x10000029f)-0x1000002a1::systemPower(0x30) effective 1 current 1
+Driver com.apple.AppleUserHIDDrivers has crashed 0 time(s)
+DK: AppleUserUSBHostHIDDevice-0x10000029f::start(IOUSBHostInterface-0x100000275) ok
+DK: AppleUserHIDEventDriver-0x1000002a6 using existing server IOUserServer(com.apple.driverkit.AppleUserHIDDrivers-0x10000029f)-0x1000002a1
+Driver com.apple.AppleUserHIDDrivers has crashed 0 time(s)
+AppleUserUSBHostHIDDevice:0x10000029d open by AppleUserHIDEventDriver:0x1000002a6 (0x0)
+DK: AppleUserHIDEventDriver-0x1000002ab using existing server IOUserServer(com.apple.driverkit.AppleUserHIDDrivers-0x10000029f)-0x1000002a1
+DK: AppleUserHIDEventDriver-0x1000002a6::start(IOHIDInterface-0x1000002a5) ok
+AppleUserUSBHostHIDDevice:0x10000029f open by AppleUserHIDEventDriver:0x1000002ab (0x0)
+DK: AppleUserHIDEventDriver-0x1000002ab::start(IOHIDInterface-0x1000002aa) ok
+AppleCredentialManagerUserClient: start: persona=YES, SUID=501.
+localhost:/ root# status = 0x0
+status = 0x0
+AppleCredentialManagerUserClient: start: persona=YES, SUID=501.
+2026-10-09 10:32:27.628 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=15
+static IOReturn AppleMobileFileIntegrityUserClient::isCdhashInTrustCache(OSObject *, void *, IOExternalMethodArguments *): Process 125 is checking if a cdhash is in the trust cache
+static IOReturn AppleMobileFileIntegrityUserClient::isCdhashInTrustCache(OSObject *, void *, IOExternalMethodArguments *): Returning IOReturn 0x0 to process 125
+2026-10-09 10:32:28.696 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=15
+static IOReturn IOMobileFramebufferUserClient::s_map_display_type(IOMobileFramebufferUserClient *, void *, IOExternalMethodArguments *) UserClient display type is 0 
+  IOTimeSyncTimeSyncTimePort(0x8ec8e872617c0008): Created general notifier <ptr> for local clock port <ptr>
+2026-10-09 10:32:29.759 vphone-vm[53680:16060656] B21 API socket type=1 status=0 fd=15
+ACMTRM-S: _saveAll: pushing *policy* -> locker (gen=1 msLen=113 dataLen=105 ver=15).
+ACMTRM-S: _saveAll: pushing *analytics* -> daemon (gen=1 dataLen=400 ver=1).
+apfs_unwrap_key:2063: AKS unwrap_key failed, error = e007c013
+retain_crypto_states:10479: disk2s7 failed to retain file dstream crypto states (error 1)
+icp_open_retain:1942: disk2s7 retain_crypto_states failed on ino 107906 with 1
+2026-10-09 10:32:30.778 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=15
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_setProperties: no longer forcing device off USB due to "lockdownd"
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_setProperties: Got new configuration descriptor from "configd"
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::createUSBDevice: configuration: Apple Mobile Device + NCM
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::createUSBDevice:    interface: AppleUSBMux
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::createUSBDevice:    interface: AppleUSBNCMControl
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::createUSBDevice:    interface: AppleUSBNCMData
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::createUSBDevice:    interface: AppleUSBNCMControlAux
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::createUSBDevice:    interface: AppleUSBNCMDataAux
+AppleUSBDeviceMux build: Oct 23 2025 06:35:03
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_registerFunction: register function AppleUSBNCMControl
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_registerFunction: register function AppleUSBNCMControlAux
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_registerFunction: register function AppleUSBNCMDataAux
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_registerFunction: register function AppleUSBNCMData
+ nameBSDInterface() [anpi 0] returning 0x00000000
+ enableBSDInterface() [anpi0], returning 0x00000000
+ configureIPv6LLOnBSDInterface() [anpi0], IPv6 disable returning 0x00000000
+ disableTrafficShapingOnBSDInterface() [anpi0], disable traffic shaping returning 0x00000000
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::gated_registerFunction: register function AppleUSBMux
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::startUSBStack: starting usb stack
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::joinPowerPlane: IOUSBDeviceController::joinPowerPlane
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::setPowerStateGated: kPowerStateOff -> kPowerStateOn
+AppleVirtIOUSBDeviceController@0: IOUSBDeviceController::setupDeviceSetConfiguration: configuration 0 -> 1
+AppleUSBDeviceMux::message - kMessageInterfaceWasActivated
+AppleCredentialManagerUserClient: start: persona=YES, SUID=501.
+ACMTRM: _publish: _onAccessoryAuthorized GENERIC UNLOCKED(0) reason=0 en=NO pro=3/3 pasThr=NO kb=0 con=0 poRsn=0 smExp=NO gpBlk=NO miss=NO seen=1791512039 now=1791512039(0) | PMT=0/0 GPT=0/0/(0) RPT=0/0 UPT=0/0.
+ACMTRM: _logPolicy: SAVING: ver=15 smTm=0 poRsn=0 gpTm=0 smExp=NO gpBlk=NO suTm=1791512039 svTm=1791512039 gpRsn=0 cMs=NO upTm=0 disBy=10 rpTm=0 crTm=1791004079 pFlg=0.
+ACMTRM-S: setData: saving *policy* (dataLen=105) in 3 seconds (fullSync: NO -> NO).
+000010.552790 AppleUSBDeviceNCMControl::handleControlRequest: AppleUSBNCM host version 0x1b00 (27.0.0)
+000010.558901 AppleUSBDeviceNCMControl::handleControlRequest: AppleUSBNCM host version 0x1b00 (27.0.0)
+ configureDatagramSizeOnBSDInterface() [anpi0], size 1514 returning 0x00000000
+ enableBSDInterface() [anpi0], returning 0x00000000
+ configureIPv6LLOnBSDInterface() [anpi0], IPv6 enable returning 0x00000000
+ disableTrafficShapingOnBSDInterface() [anpi0], disable traffic shaping returning 0x00000000
+AppleSEPTraceBuffer finished boot timer setting periodic poll to 500000
+ACMTRM: _publish: _onAccessoryAuthorized GENERIC UNLOCKED(0) reason=0 en=NO pro=3/3 pasThr=NO kb=0 con=0 poRsn=0 smExp=NO gpBlk=NO miss=NO seen=1791513151 now=1791513151(0) | PMT=0/0 GPT=0/0/(0) RPT=0/0 UPT=0/0.
+ACMTRM: _logPolicy: SAVING: ver=15 smTm=0 poRsn=0 gpTm=0 smExp=NO gpBlk=NO suTm=1791513151 svTm=1791513151 gpRsn=0 cMs=NO upTm=0 disBy=10 rpTm=0 crTm=1791004079 pFlg=0.
+ACMTRM-S: setData: saving *policy* (dataLen=105) in 3 seconds (fullSync: NO -> NO).
+ configureDatagramSizeOnBSDInterface() [en1], size 1514 returning 0x00000000
+2026-10-09 10:32:31.849 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=15
+AppleCredentialManager: sendSEPCommand: SEP cmd(36)~13 on CS[0] (perm=0x0000000000000000 SUID=501) took 103(103) ms -> ioErr=0x0 acmErr=0.
+AppleCredentialManager: sendSEPCommand: SEP cmd(19)~15 on CS[0] (perm=0x0000000000000000 SUID=501) took 102(102) ms -> ioErr=0x0 acmErr=0.
+2026-10-09 10:32:32.922 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=15
+request_power_change fId 17 second_external 0 powerstate 1 fdisplaytype 0
+2026-10-09 10:32:33.933 vphone-vm[53680:16060656] B21 API socket type=1 status=0 fd=15
+tx_flush:1344: disk2 xid 38194 tx stats: # 20 owait 9 121887us finish 21 bar2 20 f 1 enter 248 fq 178 654 27101us close 16688us prep 658us flush 78041us
+ACMTRM: _publish: _onAccessoryAuthorized GENERIC UNLOCKED(0) reason=0 en=NO pro=3/3 pasThr=NO kb=0 con=0 poRsn=0 smExp=NO gpBlk=NO miss=NO seen=1791513154 now=1791513154(0) | PMT=0/0 GPT=0/0/(0) RPT=0/0 UPT=0/0.
+ACMTRM: _logPolicy: SAVING: ver=15 smTm=0 poRsn=0 gpTm=0 smExp=NO gpBlk=NO suTm=1791513154 svTm=1791513154 gpRsn=0 cMs=NO upTm=0 disBy=10 rpTm=0 crTm=1791004079 pFlg=0.
+ACMTRM-S: setData: saving *policy* (dataLen=105) in 3 seconds (fullSync: NO -> NO).
+IOMFB: default_fb_surface: No Default FB Surface found. Return error
+_process_matches_constraint: error: Requirement not satisfied: Constraint not matched
+tx_flush:1344: disk2 xid 38214 tx stats: # 40 owait 20 66169us finish 40 bar2 40 f 1 enter 217 fq 37 301 1788us close 0us prep 435us flush 18410us
+2026-10-09 10:32:35.005 vphone-vm[53680:16060657] B21 API socket type=1 status=0 fd=15
+tx_flush:1344: disk2 xid 38234 tx stats: # 60 owait 28 49617us finish 62 bar2 60 f 1 enter 194 fq 47 122 1057us close 585us prep 460us flush 29214us
+tx_flush:1344: disk2 xid 38254 tx stats: # 80 owait 34 41887us finish 83 bar2 80 f 2 enter 20 fq 18 22 52us close 0us prep 97us flush 7321us
+tx_flush:1344: disk2 xid 38274 tx stats: # 100 owait 34 41887us finish 103 bar2 100 f 2 enter 12 fq 17 21 55us close 0us prep 114us flush 5889us
+apfs_graft:692: disk2s2 Grafting on a PFK volume
+apfs_graft:896: disk2s2 Grafting an inode (inode 134030) that is not VEK-based.
+graft_dev_init:447: disk2 UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex.dmg GRAFT (compiled @ Oct 23 2025 06:31:07)
+graft_dev_init:451: disk2 UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex.dmg device_handle block size 4096 real block size 4096 block count 26624 features 0 internal  PFK
+nx_mount:1195: UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex.dmg initializing cache w/hash_size 512 and cache size 512
+nx_mount:1512: UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex.dmg checkpoint search: largest xid 15, best xid 15 @ 7
+nx_mount:1539: UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex.dmg stable checkpoint indices: desc 6 data 31
+apfs_log_op_with_proc:3297: UC_FM_HANDWRITING_SYNTHESIS_MUL grafting volume RevivalB13M202841.UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex, requested by: mobileassetd (pid 135); parent: launchd (pid 1)
+graft_dev_blockmap_lut_switch_to_metadata_based_if_needed:816: UC_FM_HANDWRITING_SYNTHESIS_MUL lut contains 15 extents, 2 of which contain metadata
+apfs_lookup_ge_jobj_id:5040: disk2s2 Found OBJID 0x20f2c type 3
+apfs_graft:1042: disk2s2 Graft ino 134030, jobj_id range 134857+70
+apfs_graft:1135: disk2s2 successfully grafted ino 134030 on dir 134854, dev_name [UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex.dmg]
+apfs_graft:692: disk2s2 Grafting on a PFK volume
+apfs_graft:896: disk2s2 Grafting an inode (inode 23894) that is not VEK-based.
+graft_dev_init:447: disk2 UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg GRAFT (compiled @ Oct 23 2025 06:31:07)
+graft_dev_init:451: disk2 UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg device_handle block size 4096 real block size 4096 block count 7168 features 0 internal  PFK
+nx_mount:1195: UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg initializing cache w/hash_size 512 and cache size 512
+nx_mount:1512: UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg checkpoint search: largest xid 15, best xid 15 @ 7
+nx_mount:1539: UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg stable checkpoint indices: desc 6 data 31
+apfs_log_op_with_proc:3297: UC_PHOTOS_SPATIALPHOTOSRELIVE_F grafting volume RevivalB13M202357.UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex, requested by: mobileassetd (pid 135); parent: launchd (pid 1)
+graft_dev_blockmap_lut_switch_to_metadata_based_if_needed:816: UC_PHOTOS_SPATIALPHOTOSRELIVE_F lut contains 6 extents, 2 of which contain metadata
+apfs_lookup_ge_jobj_id:5040: disk2s2 Found OBJID 0x12a9c type 3
+apfs_graft:1042: disk2s2 Graft ino 23894, jobj_id range 76409+34
+apfs_graft:1135: disk2s2 successfully grafted ino 23894 on dir 76408, dev_name [UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg]
+apfs_graft:692: disk2s2 Grafting on a PFK volume
+apfs_graft:896: disk2s2 Grafting an inode (inode 77772) that is not VEK-based.
+graft_dev_init:447: disk2 SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex.dmg GRAFT (compiled @ Oct 23 2025 06:31:07)
+graft_dev_init:451: disk2 SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex.dmg device_handle block size 4096 real block size 4096 block count 1024 features 0 internal  PFK
+nx_mount:1195: SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex.dmg initializing cache w/hash_size 512 and cache size 512
+nx_mount:1512: SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex.dmg checkpoint search: largest xid 31, best xid 31 @ 1
+nx_mount:1539: SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex.dmg stable checkpoint indices: desc 0 data 35
+apfs_log_op_with_proc:3297: SECUREPKITRUSTSTOREASSETS_SECUR grafting volume Creedence11M6270.SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex, requested by: mobileassetd (pid 135); parent: launchd (pid 1)
+graft_dev_blockmap_lut_switch_to_metadata_based_if_needed:816: SECUREPKITRUSTSTOREASSETS_SECUR lut contains 10 extents, 3 of which contain metadata
+apfs_lookup_ge_jobj_id:5040: disk2s2 Found OBJID 0x13055 type 3
+apfs_graft:1042: disk2s2 Graft ino 77772, jobj_id range 77855+34
+apfs_graft:1135: disk2s2 successfully grafted ino 77772 on dir 77852, dev_name [SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex.dmg]
+apfs_graft:692: disk2s2 Grafting on a PFK volume
+apfs_graft:896: disk2s2 Grafting an inode (inode 31934) that is not VEK-based.
+graft_dev_init:447: disk2 UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg GRAFT (compiled @ Oct 23 2025 06:31:07)
+graft_dev_init:451: disk2 UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg device_handle block size 4096 real block size 4096 block count 99328 features 0 internal  PFK
+nx_mount:1195: UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg initializing cache w/hash_size 512 and cache size 512
+2026-10-09 10:32:36.055 vphone-vm[53680:16060657] B21 API socket type=1 status=0 fd=15
+nx_mount:1512: UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg checkpoint search: largest xid 18, best xid 18 @ 1
+nx_mount:1539: UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg stable checkpoint indices: desc 0 data 16
+apfs_log_op_with_proc:3297: UC_PHOTOS_SPATIALPHOTOSRELIVE_M grafting volume RevivalB13M202357.UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex, requested by: mobileassetd (pid 135); parent: launchd (pid 1)
+graft_dev_blockmap_lut_switch_to_metadata_based_if_needed:816: UC_PHOTOS_SPATIALPHOTOSRELIVE_M lut contains 26 extents, 4 of which contain metadata
+apfs_lookup_ge_jobj_id:5040: disk2s2 Found OBJID 0x12ae0 type 3
+apfs_graft:1042: disk2s2 Graft ino 31934, jobj_id range 76445+34
+apfs_graft:1135: disk2s2 successfully grafted ino 31934 on dir 76444, dev_name [UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex.dmg]
+apfs_graft:692: disk2s2 Grafting on a PFK volume
+apfs_graft:896: disk2s2 Grafting an inode (inode 24001) that is not VEK-based.
+graft_dev_init:447: disk2 UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex.dmg GRAFT (compiled @ Oct 23 2025 06:31:07)
+graft_dev_init:451: disk2 UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex.dmg device_handle block size 4096 real block size 4096 block count 9216 features 0 internal  PFK
+nx_mount:1195: UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex.dmg initializing cache w/hash_size 512 and cache size 512
+nx_mount:1512: UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex.dmg checkpoint search: largest xid 15, best xid 15 @ 7
+nx_mount:1539: UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex.dmg stable checkpoint indices: desc 6 data 31
+apfs_log_op_with_proc:3297: UC_FM_HANDWRITING_SYNTHESIS_MUL grafting volume RevivalB13M202354.UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex, requested by: mobileassetd (pid 135); parent: launchd (pid 1)
+graft_dev_blockmap_lut_switch_to_metadata_based_if_needed:816: UC_FM_HANDWRITING_SYNTHESIS_MUL lut contains 12 extents, 2 of which contain metadata
+apfs_lookup_ge_jobj_id:5040: disk2s2 Found OBJID 0x63f8 type 3
+apfs_graft:1042: disk2s2 Graft ino 24001, jobj_id range 25533+59
+apfs_graft:1135: disk2s2 successfully grafted ino 24001 on dir 25522, dev_name [UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex.dmg]
+2026-10-09 10:32:37.070 vphone-vm[53680:16060657] B21 API socket type=1 status=0 fd=15
+ACMTRM-S: _saveAll: pushing *policy* -> locker (gen=2 msLen=113 dataLen=105 ver=15).
+tx_flush:1344: disk2 xid 38294 tx stats: # 120 owait 34 41887us finish 123 bar2 120 f 2 enter 15 fq 21 33 114us close 0us prep 115us flush 3478us
+2026-10-09 10:32:38.129 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=15
+set_dir_stats:3135: disk2s7 setting dir-stats for ino 111408 (dir-stats key 0 -> 111414), set_flags 0x789
+set_dir_stats:3135: disk2s7 setting dir-stats for ino 111418 (dir-stats key 0 -> 111425), set_flags 0x789
+2026-10-09 10:32:39.187 vphone-vm[53680:16060656] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:40.220 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:41.227 vphone-vm[53680:16060657] B21 API socket type=1 status=0 fd=15
+Allocated new StashedContext at address <ptr> for index - 0
+Assertion failure: status == -22 [File: /Library/Caches/com.apple.xbs/Sources/FairPlayIOKit/FairPlayIOKit/src/crypto/FairPlayCryptoUtilities.cpp:233]2026-10-09 10:32:42.287 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=15
+AppleCredentialManagerUserClient: start: persona=YES, SUID=501.
+[vphone] Loaded VM manifest from /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/config.plist
+=== vphone-cli ===
+Variant : exp
+ROM     : /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/AVPBooter.vresearch1.bin
+Disk    : /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/Disk.img
+NVRAM   : /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/nvram.bin
+Config  : /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/config.plist
+CPU     : 4
+Memory  : 4096 MB
+Screen: 1290x2796 @ 460 PPI (scale 3.0x)
+Kernel debug stub : auto-assigned
+SEP               : enabled
+  storage         : /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/SEPStorage
+  rom             : /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/AVPSEPBooter.vresearch1.bin
+
+[vphone] PV=3 hardware model: isSupported = true
+[vphone] Loaded machineIdentifier from config.plist (ECID stable)
+[vphone] ECID: F77952D4F70ACD5D
+[vphone] Predicted UDID: 0000FE01-F77952D4F70ACD5D
+[vphone] Wrote UDID prediction: /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/udid-prediction.txt
+[vphone] NVRAM boot-args: serial=3 debug=0x104c04
+[vphone] PL011 serial port attached (interactive)
+[vphone] Accelerator devices configured
+[vphone] USB touch screen configured
+[vphone] Entropy device configured
+[vphone] Synthetic battery configured (100%, charging)
+[vphone] Kernel GDB debug stub enabled (system-assigned port)
+[vphone] SEP coprocessor enabled (storage: /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/SEPStorage)
+[vphone] Configuration validated
+[vphone] Starting...
+[vphone] VM started - booting normally
+WARNING: Trying to access an unrecognized member: VZVirtualMachine._configuration
+[vphone] Host idle system sleep disabled while VM is running
+[location] host location forwarding ready
+[api] proxy listening on http://127.0.0.1:54173; guest VSOCK 1339; token from VPHONE_API_TOKEN
+[touchid-bk] BiometricKit already loaded
+[battery] sync 100%, connectivity=1
+[hostctl] listening on /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/vphone.sock
+[location] authorization status: 0
+[battery] sync LPM failed: not connected to vphoned
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect fai2026-10-09 10:32:43.353 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:44.416 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=15
+"AppleSEPKeyStore":pid:39,:13108: operation failed (sel: 135 ret: e00002e6)
+tx_flush:1344: disk2 xid 38314 tx stats: # 140 owait 34 41887us finish 143 bar2 140 f 2 enter 395 fq 40 55 114us close 91us prep 668us flush 21301us
+2026-10-09 10:32:45.457 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=15
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 5 cookies and 5 mappings
+tx_flush:1344: disk2 xid 38334 tx stats: # 160 owait 37 39212us finish 163 bar2 160 f 2 enter 73 fq 95 107 323us close 113us prep 286us flush 23648us
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 2 cookies and 1 mappings
+2026-10-09 10:32:46.502 vphone-vm[53680:16060656] B21 API socket type=1 status=0 fd=15
+tx_flush:1344: disk2 xid 38354 tx stats: # 180 owait 39 37223us finish 183 bar2 180 f 2 enter 14 fq 44 105 2691us close 0us prep 140us flush 13618us
+2026-10-09 10:32:47.521 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=15
+tx_flush:1344: disk2 xid 38374 tx stats: # 200 owait 40 36298us finish 204 bar2 200 f 2 enter 12 fq 16 430 133us close 0us prep 99us flush 4847us
+2026-10-09 10:32:48.537 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=15
+tx_flush:1344: disk2 xid 38394 tx stats: # 220 owait 43 34119us finish 225 bar2 220 f 2 enter 58 fq 36 84 344us close 3606us prep 288us flush 16380us
+tx_flush:1344: disk2 xid 38414 tx stats: # 240 owait 47 31277us finish 245 bar2 240 f 2 enter 61 fq 48 245 493us close 34us prep 180us flush 13195us
+2026-10-09 10:32:49.588 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=15
+tx_flush:1344: disk2 xid 38434 tx stats: # 260 owait 51 28841us finish 265 bar2 260 f 2 enter 43 fq 29 34 69us close 4us prep 150us flush 7705us
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 2 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 2 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+2026-10-09 10:32:50.658 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=18
+2026-10-09 10:32:51.720 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=18
+tx_flush:1344: disk2 xid 38454 tx stats: # 280 owait 51 28841us finish 285 bar2 280 f 2 enter 362 fq 119 181 609us close 0us prep 491us flush 19519us
+IOUC AppleVirtIONeuralEngineDeviceUserClient failed sandbox in process pid 243, callservicesd
+2026-10-09 10:32:52.740 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:53.753 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=18
+2026-10-09 10:32:54.821 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=18
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 7 cookies and 7 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+2026-10-09 10:32:55.839 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=18
+tx_flush:1344: disk2 xid 38474 tx stats: # 300 owait 55 26770us finish 305 bar2 300 f 2 enter 44 fq 53 66 116us close 121us prep 170us flush 4753us
+2026-10-09 10:32:56.847 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=18
+request_power_change fId 17 second_external 0 powerstate 0 fdisplaytype 0
+2026-10-09 10:32:57.904 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=15
+2026-10-09 10:32:58.972 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:00.005 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=16
+valid context found at index - 0Allocated new StashedContext at address <ptr> for index - 1
+Assertion failure: status == -22 [File: /Library/Caches/com.apple.xbs/Sources/FairPlayIOKit/FairPlayIOKit/src/crypto/FairPlayCryptoUtilities.cpp:233]2026-10-09 10:33:01.055 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:02.125 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:03.188 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:04.254 vphone-vm[53680:16061536] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:05.375 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:06.389 vphone-vm[53680:16060656] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:07.420 vphone-vm[53680:16061536] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:08.487 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:09.555 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=16
+tx_flush:1344: disk2 xid 38494 tx stats: # 320 owait 62 24432us finish 336 bar2 320 f 2 enter 142 fq 87 102 243us close 113us prep 679us flush 16286us
+2026-10-09 10:33:10.473 vphone-vm[53680:16060435] error messaging the mach port for IMKCFRunLoopWakeUpReliable
+2026-10-09 10:33:10.603 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:11.659 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:12.728 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=16
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+2026-10-09 10:33:13.806 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:14.875 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:15.942 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:16.970 vphone-vm[53680:16060442] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:18.034 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:19.092 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:20.157 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:21.226 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:22.295 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:23.361 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:24.419 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:25.467 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:26.521 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:27.573 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=16
+2026-10-09 10:33:28.621 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38514 tx stats: # 340 owait 65 23915us finish 356 bar2 340 f 3 enter 86 fq 84 1202 424us close 0us prep 209us flush 13127us
+2026-10-09 10:33:29.690 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:30.738 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:31.803 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:32.871 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38534 tx stats: # 360 owait 70 23401us finish 376 bar2 360 f 3 enter 132 fq 44 55 116us close 0us prep 227us flush 5191us
+2026-10-09 10:33:33.938 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:34.969 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38554 tx stats: # 380 owait 70 23401us finish 396 bar2 380 f 3 enter 26 fq 30 45 174us close 0us prep 119us flush 6526us
+2026-10-09 10:33:36.033 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:37.103 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38574 tx stats: # 400 owait 72 22959us finish 416 bar2 400 f 3 enter 33 fq 34 45 109us close 11us prep 244us flush 8381us
+2026-10-09 10:33:38.175 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:39.180 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38594 tx stats: # 420 owait 77 21876us finish 437 bar2 420 f 3 enter 130 fq 49 64 275us close 40us prep 297us flush 9354us
+tx_flush:1344: disk2 xid 38614 tx stats: # 440 owait 80 21115us finish 456 bar2 440 f 3 enter 36 fq 24 62 240us close 0us prep 84us flush 7635us
+apfs_clonegroup_cleanup_cookies:698: disk2s2 Removed 1 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 2 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+2026-10-09 10:33:40.236 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38634 tx stats: # 460 owait 81 20856us finish 476 bar2 460 f 3 enter 2 fq 19 27 56us close 0us prep 46us flush 2843us
+2026-10-09 10:33:41.306 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38654 tx stats: # 480 owait 81 20856us finish 496 bar2 480 f 3 enter 31 fq 19 25 145us close 0us prep 131us flush 5291us
+tx_flush:1344: disk2 xid 38674 tx stats: # 500 owait 82 20603us finish 516 bar2 500 f 3 enter 31 fq 23 27 58us close 0us prep 81us flush 5216us
+tx_flush:1344: disk2 xid 38694 tx stats: # 520 owait 82 20603us finish 536 bar2 520 f 3 enter 53 fq 27 36 113us close 0us prep 194us flush 18088us
+2026-10-09 10:33:42.339 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38714 tx stats: # 540 owait 82 20603us finish 556 bar2 540 f 3 enter 30 fq 22 29 88us close 1us prep 99us flush 6292us
+tx_flush:1344: disk2 xid 38734 tx stats: # 560 owait 82 20603us finish 576 bar2 560 f 3 enter 32 fq 22 27 67us close 0us prep 85us flush 3136us
+2026-10-09 10:33:43.356 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:44.388 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38754 tx stats: # 580 owait 82 20603us finish 596 bar2 580 f 3 enter 138 fq 15 27 78us close 0us prep 62us flush 2888us
+2026-10-09 10:33:45.405 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:46.457 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:47.522 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:48.588 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:49.630 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:50.701 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:51.772 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:52.787 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:53.838 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:54.908 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:55.976 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:57.047 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:58.116 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:33:59.171 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:00.239 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:01.309 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:02.359 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:03.422 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:04.493 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:05.559 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:06.626 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:07.684 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:08.755 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:09.822 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:10.892 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:11.957 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:12.976 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:13.987 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:15.002 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:16.073 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:17.145 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:18.212 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:19.282 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:20.337 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:21.408 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:22.420 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:23.491 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:24.557 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:25.629 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:26.701 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:27.752 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:28.822 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:29.886 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:30.957 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:31.987 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:33.041 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:34.114 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:35.185 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:36.257 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:37.317 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:38.373 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:39.422 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:40.493 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:41.563 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:42.632 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:43.703 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:44.753 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:45.820 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:46.891 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:47.953 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:48.986 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:50.037 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:51.108 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:52.180 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:53.252 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:54.319 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:55.369 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:56.376 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:57.410 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:34:58.430 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+Invalid denylist
+2026-10-09 10:34:59.486 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:00.555 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:01.625 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:02.696 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:03.760 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:04.820 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:05.831 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:06.898 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:07.964 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:08.983 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:10.052 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:11.122 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:12.193 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:13.262 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:14.310 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:15.360 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:16.393 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:17.411 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:18.461 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:19.466 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:20.529 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:21.602 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:22.674 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:23.743 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:24.763 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+tx_flush:1344: disk2 xid 38774 tx stats: # 600 owait 82 20603us finish 616 bar2 600 f 4 enter 615 fq 18 79 229us close 0us prep 1764us flush 11528us
+2026-10-09 10:35:25.828 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:26.897 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:27.960 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:28.986 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:30.085 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:31.161 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:32.177 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:33.244 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:34.307 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:35.377 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:36.428 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:37.494 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:38.564 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:39.635 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:40.705 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:41.757 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:42.778 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:43.844 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:44.887 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:45.956 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:46.987 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:48.046 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:49.116 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:50.187 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:51.227 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:52.293 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:53.359 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:54.373 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:55.420 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:56.487 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:57.557 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:58.627 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:35:59.695 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:00.728 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:01.797 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:02.813 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:03.885 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:04.956 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:05.970 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+clear_purgeability_log:1757: disk2s7 prepare_write_and_lock : nsurlsessiond clearing purgeability on ino 112469 (CFNetworkDownload_VKWoLU.tmp ; parent-id 68488)
+static IOReturn AppleMobileFileIntegrityUserClient::loadTrustCache(OSObject *, void *, IOExternalMethodArguments *): PID 1105 is requesting a trust cache load
+2026-10-09 10:36:06.989 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:08.059 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:09.123 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:10.192 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:11.260 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:12.323 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:13.366 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:14.414 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:15.262 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=18
+2026-10-09 10:36:15.475 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=19
+2026-10-09 10:36:15.476 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=21
+2026-10-09 10:36:15.508 vphone-vm[53680:16060659] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:36:15.516 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=20
+2026-10-09 10:36:15.516 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=22
+2026-10-09 10:36:15.518 vphone-vm[53680:16060659] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:36:15.539 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:36:15.540 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=26
+2026-10-09 10:36:27.395 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.395 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.397 vphone-vm[53680:16063288] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:36:27.959 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.959 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.966 vphone-vm[53680:16063288] B21 API relay received=[0, 8439] forwarded=[0, 8439]
+2026-10-09 10:36:27.967 vphone-vm[53680:16063288] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.967 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.968 vphone-vm[53680:16060658] B21 API relay received=[0, 8440] forwarded=[0, 8440]
+2026-10-09 10:36:27.968 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.969 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.969 vphone-vm[53680:16060658] B21 API relay received=[0, 8441] forwarded=[0, 8441]
+2026-10-09 10:36:27.970 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.970 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.971 vphone-vm[53680:16060658] B21 API relay received=[0, 16632] forwarded=[0, 16632]
+2026-10-09 10:36:27.972 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.972 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.973 vphone-vm[53680:16060658] B21 API relay received=[0, 16633] forwarded=[0, 16633]
+2026-10-09 10:36:27.974 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:27.974 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:27.974 vphone-vm[53680:16060658] B21 API relay received=[0, 16634] forwarded=[0, 16634]
+2026-10-09 10:36:28.013 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:28.014 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:28.018 vphone-vm[53680:16060662] B21 API relay received=[0, 1048827] forwarded=[0, 1048827]
+2026-10-09 10:36:28.057 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:28.057 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:28.061 vphone-vm[53680:16060662] B21 API relay received=[0, 1048827] forwarded=[0, 1048827]
+2026-10-09 10:36:28.100 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:28.101 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:28.104 vphone-vm[53680:16060662] B21 API relay received=[0, 1048827] forwarded=[0, 1048827]
+2026-10-09 10:36:28.144 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:28.145 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:28.148 vphone-vm[53680:16060662] B21 API relay received=[0, 1048827] forwarded=[0, 1048827]
+2026-10-09 10:36:28.189 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:28.189 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:28.193 vphone-vm[53680:16060662] B21 API relay received=[0, 1048827] forwarded=[0, 1048827]
+2026-10-09 10:36:28.233 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:28.234 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:30.856 vphone-vm[53680:16060662] B21 API relay received=[0, 1048827] forwarded=[0, 1048827]
+2026-10-09 10:36:31.050 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:31.051 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:31.062 vphone-vm[53680:16060658] B21 API relay received=[0, 4194555] forwarded=[0, 4194555]
+2026-10-09 10:36:31.219 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:31.219 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:41.589 vphone-vm[53680:16060658] B21 API relay received=[0, 4194555] forwarded=[0, 4194555]
+2026-10-09 10:36:41.944 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:41.944 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:41.969 vphone-vm[53680:16060662] B21 API relay received=[0, 8388859] forwarded=[0, 8388859]
+2026-10-09 10:36:42.284 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:36:42.284 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:36:50.304 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=30
+2026-10-09 10:36:51.361 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=32
+2026-10-09 10:36:51.361 vphone-vm[53680:16063951] B21 API relay received=[1000, 9918] forwarded=[1000, 9918]
+2026-10-09 10:36:56.374 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:36:56.401 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=26
+2026-10-09 10:36:58.003 vphone-vm[53680:16060659] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:36:58.008 vphone-vm[53680:16063951] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:36:58.010 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:36:58.010 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=26
+2026-10-09 10:37:03.167 vphone-vm[53680:16060662] B21 API relay received=[0, 8388859] forwarded=[0, 8388859]
+apfs_clonegroup_cleanup_cookies:698: disk2s7 Removed 1 cookies and 1 mappings
+tx_flush:1344: disk2 xid 38794 tx stats: # 620 owait 82 20603us finish 636 bar2 620 f 5 enter 77 fq 53 132 282us close 0us prep 363us flush 8921us
+2026-10-09 10:38:08.019 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:08.019 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:08.020 vphone-vm[53680:16060659] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:38:11.413 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.413 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.415 vphone-vm[53680:16060659] B21 API relay received=[0, 155899] forwarded=[0, 147707]
+2026-10-09 10:38:11.415 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.416 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.416 vphone-vm[53680:16060659] B21 API relay received=[0, 73979] forwarded=[0, 73979]
+2026-10-09 10:38:11.417 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.417 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.418 vphone-vm[53680:16060659] B21 API relay received=[0, 90112] forwarded=[0, 81920]
+2026-10-09 10:38:11.419 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.419 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.420 vphone-vm[53680:16060659] B21 API relay received=[0, 73728] forwarded=[0, 73728]
+2026-10-09 10:38:11.421 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.422 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.422 vphone-vm[53680:16060659] B21 API relay received=[0, 131323] forwarded=[0, 131072]
+2026-10-09 10:38:11.423 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.424 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.424 vphone-vm[53680:16060659] B21 API relay received=[0, 90112] forwarded=[0, 81920]
+2026-10-09 10:38:11.425 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.425 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.426 vphone-vm[53680:16060659] B21 API relay received=[0, 73728] forwarded=[0, 65536]
+2026-10-09 10:38:11.426 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.426 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.427 vphone-vm[53680:16060659] B21 API relay received=[0, 73979] forwarded=[0, 73979]
+2026-10-09 10:38:11.427 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.427 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.428 vphone-vm[53680:16060659] B21 API relay received=[0, 73728] forwarded=[0, 65536]
+2026-10-09 10:38:11.428 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.429 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.429 vphone-vm[53680:16060659] B21 API relay received=[0, 73728] forwarded=[0, 65536]
+2026-10-09 10:38:11.430 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.430 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.431 vphone-vm[53680:16060659] B21 API relay received=[0, 73979] forwarded=[0, 73979]
+2026-10-09 10:38:11.431 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.431 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.432 vphone-vm[53680:16060659] B21 API relay received=[0, 106496] forwarded=[0, 106496]
+2026-10-09 10:38:11.433 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.433 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.434 vphone-vm[53680:16060659] B21 API relay received=[0, 65536] forwarded=[0, 65536]
+2026-10-09 10:38:11.434 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.434 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.435 vphone-vm[53680:16060659] B21 API relay received=[0, 106747] forwarded=[0, 98555]
+2026-10-09 10:38:11.435 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.435 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.436 vphone-vm[53680:16060659] B21 API relay received=[0, 73979] forwarded=[0, 65787]
+2026-10-09 10:38:11.436 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.436 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.437 vphone-vm[53680:16060659] B21 API relay received=[0, 73728] forwarded=[0, 65536]
+2026-10-09 10:38:11.437 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.437 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.438 vphone-vm[53680:16060659] B21 API relay received=[0, 114688] forwarded=[0, 114688]
+2026-10-09 10:38:11.438 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.438 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.439 vphone-vm[53680:16060659] B21 API relay received=[0, 106496] forwarded=[0, 98304]
+2026-10-09 10:38:11.439 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.439 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.440 vphone-vm[53680:16060659] B21 API relay received=[0, 65536] forwarded=[0, 57344]
+2026-10-09 10:38:11.440 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.440 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.441 vphone-vm[53680:16060659] B21 API relay received=[0, 90363] forwarded=[0, 90363]
+2026-10-09 10:38:11.441 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.442 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.442 vphone-vm[53680:16060659] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:38:11.585 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:11.590 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:11.593 vphone-vm[53680:16060659] B21 API relay received=[61820, 0] forwarded=[61820, 0]
+2026-10-09 10:38:13.687 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:13.688 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:13.689 vphone-vm[53680:16063951] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:38:34.551 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:34.552 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:34.553 vphone-vm[53680:16060662] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:38:34.628 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:34.628 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:34.686 vphone-vm[53680:16060658] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:34.687 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:34.687 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:34.723 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:34.724 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:34.724 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:34.929 vphone-vm[53680:16060659] B21 API relay received=[0, 980] forwarded=[0, 980]
+2026-10-09 10:38:35.054 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.054 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.088 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.089 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.089 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.120 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.120 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.121 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.154 vphone-vm[53680:16060659] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.155 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.155 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.187 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.187 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.188 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.215 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.215 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.216 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.308 vphone-vm[53680:16063951] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:35.309 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.310 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.360 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.361 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.361 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.396 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.397 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.397 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.426 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.426 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.427 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.469 vphone-vm[53680:16060662] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.469 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.469 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.500 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.501 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.501 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.580 vphone-vm[53680:16060659] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:35.581 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.581 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.610 vphone-vm[53680:16060659] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.610 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.611 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.656 vphone-vm[53680:16060659] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.656 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.657 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.691 vphone-vm[53680:16060658] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.691 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.692 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.726 vphone-vm[53680:16060659] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.726 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.726 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.761 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.761 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.761 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.855 vphone-vm[53680:16060662] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:35.855 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.856 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.905 vphone-vm[53680:16060658] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.906 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.906 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:35.956 vphone-vm[53680:16060658] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:35.957 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:35.957 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.009 vphone-vm[53680:16060658] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.010 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.010 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.056 vphone-vm[53680:16060658] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.057 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.057 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.089 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.089 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.089 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.171 vphone-vm[53680:16063951] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:36.172 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.172 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.217 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.217 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.218 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.255 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.256 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.256 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.288 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.289 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.289 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.335 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.335 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.336 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.392 vphone-vm[53680:16060662] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.393 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.393 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.483 vphone-vm[53680:16075283] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:36.484 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.484 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.524 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.524 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.524 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.558 vphone-vm[53680:16060662] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.558 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.559 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.596 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.597 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.597 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.643 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.644 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.644 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.704 vphone-vm[53680:16060662] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.705 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.705 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.783 vphone-vm[53680:16075283] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:36.783 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.783 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.824 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.824 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.825 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.856 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.856 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.856 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.891 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.892 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.892 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.930 vphone-vm[53680:16060662] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.930 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.930 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:36.970 vphone-vm[53680:16060662] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:36.970 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:36.970 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.050 vphone-vm[53680:16063951] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:37.050 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:37.051 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.082 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:37.082 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:37.082 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.121 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:37.122 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:37.122 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.163 vphone-vm[53680:16063951] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:37.163 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:37.164 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.207 vphone-vm[53680:16075283] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:37.207 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:37.207 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.243 vphone-vm[53680:16060659] B21 API relay received=[0, 78251] forwarded=[0, 78251]
+2026-10-09 10:38:37.243 vphone-vm[53680:16060659] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:37.244 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:37.322 vphone-vm[53680:16060659] B21 API relay received=[0, 981] forwarded=[0, 981]
+2026-10-09 10:38:42.328 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:42.330 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:42.540 vphone-vm[53680:16060662] B21 API relay received=[0, 980] forwarded=[0, 980]
+2026-10-09 10:38:47.547 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:47.549 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:47.668 vphone-vm[53680:16063951] B21 API relay received=[0, 979] forwarded=[0, 979]
+2026-10-09 10:38:52.674 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:38:52.675 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:38:52.790 vphone-vm[53680:16063951] B21 API relay received=[0, 979] forwarded=[0, 979]
+2026-10-09 10:39:28.026 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.026 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.028 vphone-vm[53680:16060658] B21 API relay received=[0, 991] forwarded=[0, 991]
+2026-10-09 10:39:28.029 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.029 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.032 vphone-vm[53680:16060658] B21 API relay received=[0, 218] forwarded=[0, 218]
+2026-10-09 10:39:28.033 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.033 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.139 vphone-vm[53680:16063951] B21 API relay received=[0, 238] forwarded=[0, 238]
+2026-10-09 10:39:28.140 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.140 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.143 vphone-vm[53680:16060658] B21 API relay received=[0, 239] forwarded=[0, 239]
+2026-10-09 10:39:28.143 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.143 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.443 vphone-vm[53680:16075283] B21 API relay received=[0, 231] forwarded=[0, 231]
+2026-10-09 10:39:28.444 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.444 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.449 vphone-vm[53680:16060658] B21 API relay received=[28, 232] forwarded=[28, 232]
+2026-10-09 10:39:28.449 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.450 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.451 vphone-vm[53680:16060658] B21 API relay received=[0, 297] forwarded=[0, 297]
+2026-10-09 10:39:28.451 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.452 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.453 vphone-vm[53680:16060662] B21 API relay received=[0, 295] forwarded=[0, 295]
+2026-10-09 10:39:28.454 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.454 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.462 vphone-vm[53680:16060658] B21 API relay received=[0, 230] forwarded=[0, 230]
+2026-10-09 10:39:28.476 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.476 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.706 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=30
+2026-10-09 10:39:28.706 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=32
+2026-10-09 10:39:28.708 vphone-vm[53680:16078015] B21 API relay received=[0, 362] forwarded=[0, 362]
+2026-10-09 10:39:28.709 vphone-vm[53680:16075283] B21 API relay received=[0, 348] forwarded=[0, 348]
+2026-10-09 10:39:28.710 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.710 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.711 vphone-vm[53680:16078015] B21 API relay received=[0, 242] forwarded=[0, 242]
+2026-10-09 10:39:28.711 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:28.712 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:28.999 vphone-vm[53680:16063951] B21 API relay received=[0, 349] forwarded=[0, 349]
+2026-10-09 10:39:29.417 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:29.418 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:29.421 vphone-vm[53680:16078015] B21 API relay received=[0, 283] forwarded=[0, 283]
+2026-10-09 10:39:29.422 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:29.423 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+tx_flush:1344: disk2 xid 38814 tx stats: # 640 owait 82 20603us finish 656 bar2 640 f 6 enter 248 fq 42 73 211us close 0us prep 480us flush 14982us
+2026-10-09 10:39:31.298 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=30
+2026-10-09 10:39:31.298 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=32
+2026-10-09 10:39:31.299 vphone-vm[53680:16063951] B21 API relay received=[0, 379] forwarded=[0, 379]
+2026-10-09 10:39:31.300 vphone-vm[53680:16060658] B21 API relay received=[0, 168] forwarded=[0, 168]
+2026-10-09 10:39:31.604 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:31.605 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:31.606 vphone-vm[53680:16060658] B21 API relay received=[0, 172] forwarded=[0, 172]
+2026-10-09 10:39:31.617 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:31.618 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:31.622 vphone-vm[53680:16060658] B21 API relay received=[0, 234] forwarded=[0, 234]
+2026-10-09 10:39:31.622 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:31.622 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:31.626 vphone-vm[53680:16078015] B21 API relay received=[0, 233] forwarded=[0, 233]
+2026-10-09 10:39:31.626 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=27
+2026-10-09 10:39:31.627 vphone-vm[53680:16060435] B21 API socket type=1 status=0 fd=29
+2026-10-09 10:39:31.628 vphone-vm[53680:16078015] B21 API relay received=[0, 218] forwarded=[0, 218]
+apfs_find_gaps_middle_out:21005: disk2s7 Unexpected allocated/unwritten range for 53248 bytes at offset 819200 in inode 113379 inside the sparse extent of 65536 bytes at offset 806912
+fs_map_file_offset_ext:21741: disk2s7 Cannot construct reservation list for sparse extent for 65536 bytes at offset 806912 in inode 113379: Invalid argument(22)
+2026-10-09 10:39:57.033 vphone-vm[53680:16078014] B21 API relay received=[7964, 15601563] forwarded=[7964, 15601563]
+2026-10-09 10:39:58.098 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:39:59.152 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:00.220 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:01.282 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:02.348 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:03.418 vphone-vm[53680:16060658] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:04.479 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:05.539 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:06.577 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:07.640 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:08.707 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:09.776 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:10.843 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:11.906 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:12.972 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:14.024 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:15.057 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:16.061 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:17.178 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:18.250 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:19.319 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:20.386 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:21.394 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:22.455 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:23.517 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:24.536 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:25.607 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:26.678 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:27.747 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:28.814 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:29.867 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:30.939 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:31.978 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:33.046 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:34.058 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:35.126 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:36.134 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:37.198 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:38.234 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:39.297 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:40.301 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:41.399 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:42.531 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:43.539 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:44.542 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:45.611 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:46.679 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:47.751 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:48.820 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:49.826 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:50.895 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:51.962 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:53.031 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:54.048 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:55.057 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:56.060 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:57.127 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:58.197 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:40:59.207 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:00.270 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:01.338 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:02.401 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:03.463 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:04.525 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:05.542 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:06.603 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:07.672 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:08.676 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:09.722 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:10.756 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:11.824 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:12.851 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:13.903 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:14.972 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:16.038 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:17.062 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:18.130 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:19.183 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:20.244 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:21.307 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:22.375 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:23.436 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:24.510 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+tx_flush:1344: disk2 xid 38834 tx stats: # 660 owait 82 20603us finish 676 bar2 660 f 8 enter 276 fq 42 71 279us close 0us prep 279us flush 14759us
+2026-10-09 10:41:25.576 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:26.634 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:27.727 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:28.769 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:29.847 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:30.909 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:31.968 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:33.036 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:34.063 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:35.112 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:36.136 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:37.205 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:38.228 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:39.295 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:40.299 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:41.379 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:42.446 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+dev_init:300: disk1 device accelerated crypto: 3 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk1 device_handle block size 4096 block count 119050 features 18 internal solidstate
+nx_mount:1195: disk1 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk1 container cleanly-unmounted flag set.
+nx_mount:1512: disk1 checkpoint search: largest xid 4, best xid 4 @ 7
+nx_mount:1539: disk1 stable checkpoint indices: desc 6 data 10
+spaceman_metazone_init:111: disk1 no metazone for device 0, of size 487628800 bytes, block_size 4096
+apfs_mount:30150: disk1s1 mount for ramdisk
+spaceman_scan_free_blocks:4449: disk1 scan took 0.000725 s (no trims)
+apfs_log_op_with_proc:3297: disk1s1 mounting volume Recovery, requested by: mount_apfs (pid 2497); parent: com.apple.NRD.Up (pid 1106)
+handle_mount:834: disk1s1 vol-uuid: 61706673-7575-6964-0004-766F6C756D00 block size: 4096 block count: 119050 (unencrypted; flags: 0x1; features: 8.0.2)
+handle_mount:847: disk1s1 setting dev block size to 4096 from 512
+apfs_lowdisk_check_volume:330: disk1s1 sending lowdisk notification: 131072 for with apfs_lowdisk_status: 131072
+apfs_log_op_with_proc:3297: disk1s1 mount-complete volume Recovery, requested by: mount_apfs (pid 2497); parent: com.apple.NRD.Up (pid 1106)
+spaceman_fxc_print_stats:477: disk1 dev 0 smfree 118614/119050 table 1/127 blocks 118614 118614:118614:118614 100.00% range 436:118614 99.63% scans 1
+spaceman_scan_free_blocks:4419: disk1 scan took 0.002300 s, trims took 0.002289 s
+spaceman_scan_free_blocks:4423: disk1 118614 blocks free in 2 extents, avg 59307.00
+spaceman_scan_free_blocks:4432: disk1 118614 blocks trimmed in 2 extents (1144 us/trim, 873 trims/s)
+spaceman_scan_free_blocks:4435: disk1 trim distribution 1:0 2+:0 4+:0 16+:0 64+:0 256+:2
+2026-10-09 10:41:43.509 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+apfs_stop_bg_work_ext:935: disk1s1 Volume Recovery is unmounting, stop any bg work
+apfs_log_op_with_proc:3297: disk1s1 unmounting volume Recovery, requested by: com.apple.NRD.UpdateBrainServic (pid 1106); parent: launchd (pid 1)
+apfs_vfsop_unmount:3239: disk1s1 waiting for purgatory cleaner to finish
+apfs_vfsop_unmount:3583: disk1 nx_num_vols_mounted is 0
+container_unload:2336: vnode_close() invoked in the container unload path
+apfs: total mem allocated: 31006889 (29 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 7)
+container_get_dangling_mounts:4713: Found 0 dangling mounts on disk0s2
+dev_init:300: disk0s2 device accelerated crypto: 0 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk0s2 device_handle block size 4096 block count 119050 features 0 internal 
+nx_mount:1195: disk0s2 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk0s2 container cleanly-unmounted flag set.
+nx_mount:1512: disk0s2 checkpoint search: largest xid 1, best xid 1 @ 1
+nx_mount:1539: disk0s2 stable checkpoint indices: desc 0 data 0
+dev_init:300: disk1 device accelerated crypto: 3 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk1 device_handle block size 4096 block count 119050 features 18 internal solidstate
+nx_mount:1195: disk1 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk1 container cleanly-unmounted flag set.
+nx_mount:1512: disk1 checkpoint search: largest xid 1, best xid 1 @ 1
+nx_mount:1539: disk1 stable checkpoint indices: desc 0 data 0
+spaceman_metazone_init:111: disk1 no metazone for device 0, of size 487628800 bytes, block_size 4096
+enhanced_apfs_enabled_helper:13235: ================ enhanced apfs is enabled ================
+spaceman_scan_free_blocks:4449: disk1 scan took 0.000414 s (no trims)
+spaceman_fxc_print_stats:477: disk1 dev 0 smfree 118628/119050 table 1/127 blocks 118628 118628:118628:118628 100.00% range 422:118628 99.64% scans 1
+apfs_newfs:32033: disk1s1 FS will NOT be encrypted.
+spaceman_scan_free_blocks:4419: disk1 scan took 0.000646 s, trims took 0.000544 s
+spaceman_scan_free_blocks:4423: disk1 118628 blocks free in 2 extents, avg 59314.00
+spaceman_scan_free_blocks:4432: disk1 118628 blocks trimmed in 2 extents (272 us/trim, 3676 trims/s)
+spaceman_scan_free_blocks:4435: disk1 trim distribution 1:0 2+:0 4+:0 16+:0 64+:0 256+:2
+container_unload:2336: vnode_close() invoked in the container unload path
+dev_init:300: disk1 device accelerated crypto: 3 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk1 device_handle block size 4096 block count 119050 features 18 internal solidstate
+nx_mount:1195: disk1 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk1 container cleanly-unmounted flag set.
+nx_mount:1512: disk1 checkpoint search: largest xid 2, best xid 2 @ 3
+nx_mount:1539: disk1 stable checkpoint indices: desc 2 data 2
+spaceman_metazone_init:111: disk1 no metazone for device 0, of size 487628800 bytes, block_size 4096
+apfs_mount:30150: disk1s1 mount for ramdisk
+spaceman_scan_free_blocks:4449: disk1 scan took 0.000367 s (no trims)
+spaceman_fxc_print_stats:477: disk1 dev 0 smfree 118620/119050 table 1/127 blocks 118620 118620:118620:118620 100.00% range 430:118620 99.63% scans 1
+set_cloneinfo_id_epoch:29421: disk1s1 set cloneinfo_id_epoch to 16
+apfs_log_op_with_proc:3297: disk1s1 mounting volume Recovery, requested by: mount_apfs (pid 2513); parent: com.apple.NRD.Up (pid 1106)
+spaceman_scan_free_blocks:4419: disk1 scan took 0.000692 s, trims took 0.000685 s
+spaceman_scan_free_blocks:4423: disk1 118620 blocks free in 2 extents, avg 59310.00
+spaceman_scan_free_blocks:4432: disk1 118620 blocks trimmed in 2 extents (342 us/trim, 2919 trims/s)
+spaceman_scan_free_blocks:4435: disk1 trim distribution 1:0 2+:0 4+:0 16+:0 64+:0 256+:2
+handle_mount:834: disk1s1 vol-uuid: 61706673-7575-6964-0004-766F6C756D00 block size: 4096 block count: 119050 (unencrypted; flags: 0x1; features: 8.0.2)
+handle_mount:847: disk1s1 setting dev block size to 4096 from 512
+apfs_lowdisk_check_volume:330: disk1s1 sending lowdisk notification: 131072 for with apfs_lowdisk_status: 131072
+apfs_log_op_with_proc:3297: disk1s1 mount-complete volume Recovery, requested by: mount_apfs (pid 2513); parent: com.apple.NRD.Up (pid 1106)
+CLIENT: virtual bool AppleMobileApNonceUserClient::start(IOService *):
+CLIENT:     started
+SPEW: IOReturn AppleMobileApNonce::retrieveNonce(void *, size_t *):
+SPEW:     retrieveNonce _allowApNonceRetrieval: 1
+SPEW: IOReturn AppleMobileApNonce::_readNonce(OSString **):
+SPEW:     _readNonce: _sandcatSupported=0
+SPEW: void AppleMobileApNonce::_waitForNVRAMReadable():
+SPEW:     Waiting for IODTNVRAM
+SPEW: void AppleMobileApNonce::_waitForNVRAMReadable():
+SPEW:     Got IODTNVRAM
+SPEW: IOReturn AppleMobileApNonce::_readNonceGated(OSString **):
+SPEW:     calling _readNonceFromNVRAM
+SPEW: IOReturn AppleMobileApNonce::_readNonceGated(OSString **):
+SPEW: void AppleMobileApNonce::_readNonceFromNVRAM(OSString **):
+SPEW:     entering
+SPEW: void AppleMobileApNonce::_readNonceFromNVRAM(OSString **):
+SPEW:     leaving: 0xE00002BC 0
+SPEW:     called _readNonceFromNVRAM
+SPEW: IOReturn AppleMobileApNonce::_readNonceGated(OSString **):
+SPEW:     _readNonceFromNVRAM done: 0xE00002BC
+SPEW: IOReturn AppleMobileApNonce::_readNonce(OSString **):
+SPEW:     _readNonce call _getCommandGate action: 0xE00002BC
+SPEW: IOReturn AppleMobileApNonce::_readNonce(OSString **):
+SPEW:     _readNonce done: 0xE00002BC (general error)
+
+ERROR: IOReturn AppleMobileApNonce::_retrieveNonce(uint64_t *):
+ERROR:     _retrieveNonce: unable read nonce: e00002bc (general error)
+
+SPEW: IOReturn AppleMobileApNonce::retrieveNonce(void *, size_t *):
+SPEW:     retrieveNonce done: 0xE00002BC
+CLIENT: virtual IOReturn AppleMobileApNonceUserClient::clientClose():
+CLIENT:     closed
+apfs_stop_bg_work_ext:935: disk1s1 Volume Recovery is unmounting, stop any bg work
+apfs_log_op_with_proc:3297: disk1s1 unmounting volume Recovery, requested by: com.apple.NRD.UpdateBrainServic (pid 1106); parent: launchd (pid 1)
+apfs_vfsop_unmount:3239: disk1s1 waiting for purgatory cleaner to finish
+apfs_vfsop_unmount:3583: disk1 nx_num_vols_mounted is 0
+container_unload:2336: vnode_close() invoked in the container unload path
+apfs: total mem allocated: 31030510 (29 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 7)
+spaceman_get_max_allowed_shrink:9540: disk2 max_available_space 9615909 currently_allocated 5529399 currently_allocated_in_fixed_fs 5370
+spaceman_get_max_allowed_shrink:9542: disk2 sm_free_count: [MAIN]=11128757, [TIER2]=0    sm_reserved_space: [MAIN]=155, [TIER2]=0
+spaceman_get_max_allowed_shrink:9544: disk2 sm_fs_reserve_block_count 1518102, sm_fs_reserve_alloc_count 5370
+spaceman_get_max_allowed_shrink:9557: disk2 Used space move overhead is 86396 (based on shrink_amount 0 and currently_allocated 5529399), setting max_allowed_shrink to 9529513
+spaceman_get_max_allowed_shrink:9589: disk2 Minimal free space threshold_blocks is 25600, updating max_allowed_shrink to 9503913
+nx_get_minimal_size:5502: disk2 tier_size 16658156, sm max_allowed_shrink 9503913 (i.e. minimal_size 7154243)
+nx_get_minimal_size:5605: disk2 the maximal valid filesystem index in the nx_fs_oid array: 6
+apfs_rawdev_tidemark:815: disk2 rawdev tidemark is 4130303
+nx_get_minimal_size:5611: disk2 radev_tidemark 4130303 > max_tidemark 0, set it as new max
+nx_get_minimal_size:5655: disk2s3 Volume with quota 2560, calling fs_count_freeable_blocks(9503913, 7154243)
+nx_get_minimal_size:5666: disk2s3 Number of free blocks 1018, number of freeable blocks 0
+nx_get_minimal_size:5655: disk2s4 Volume with quota 1536, calling fs_count_freeable_blocks(9503913, 7154243)
+nx_get_minimal_size:5666: disk2s4 Number of free blocks 1527, number of freeable blocks 0
+nx_get_minimal_size:5727: disk2 orig_metadata_size 29510, new_metadata_size 16987
+nx_get_minimal_size:5739: disk2 minimal_size taking into account 2x metadata (old+new) 7247237
+nx_get_minimal_size:5742: disk2 minimal_size after roundup 7247872
+containerGetMinimalSize:5227: disk2 Minimal size for 68231806976 is 29687283712
+dev_init:300: disk1 device accelerated crypto: 3 (compiled @ Oct 23 2025 06:31:07)
+dev_init:303: disk1 device_handle block size 4096 block count 119050 features 18 internal solidstate
+nx_mount:1195: disk1 initializing cache w/hash_size 4096 and cache size 10064
+nx_mount:1341: disk1 container cleanly-unmounted flag set.
+nx_mount:1512: disk1 checkpoint search: largest xid 4, best xid 4 @ 7
+nx_mount:1539: disk1 stable checkpoint indices: desc 6 data 10
+container_unload:2336: vnode_close() invoked in the container unload path
+2026-10-09 10:41:44.541 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:45.604 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:46.655 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:47.722 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:48.791 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:49.808 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:50.873 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:51.936 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:52.997 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:54.051 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:55.121 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:56.189 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:57.261 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:58.324 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:41:59.382 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:00.449 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:01.518 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:02.543 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:03.551 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:04.617 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:05.687 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:06.759 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:07.835 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:08.879 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:09.951 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:11.026 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:12.062 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:13.122 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:14.200 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:15.262 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:16.316 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:17.356 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:18.427 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:19.487 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:20.546 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:21.618 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:22.688 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:23.762 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:24.821 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:25.879 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:26.946 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:28.008 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:29.064 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:30.129 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:31.180 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:32.247 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:33.298 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:34.394 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:35.462 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:36.512 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:37.560 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:38.622 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:39.680 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:40.738 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:41.804 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:42.867 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:43.931 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:45.000 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:46.062 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:47.134 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:48.205 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:49.263 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:50.333 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:51.391 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:52.456 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:53.528 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:54.594 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:55.662 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:56.723 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:57.787 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:58.794 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:42:59.861 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:00.922 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:01.990 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:03.052 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:04.060 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:05.062 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:06.129 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:07.195 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:08.263 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:09.328 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:10.391 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:11.452 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:12.519 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:13.544 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:14.590 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:15.649 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:16.718 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:17.785 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:18.849 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:19.917 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:21.161 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:22.230 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:23.295 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:24.364 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:25.423 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:26.491 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:27.522 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:28.548 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:29.614 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:30.680 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:31.744 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:32.811 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:33.873 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:34.943 vphone-vm[53680:16060662] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:36.077 vphone-vm[53680:16063951] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:37.143 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+2026-10-09 10:43:38.181 vphone-vm[53680:16075283] B21 API socket type=1 status=0 fd=24
+com.apple.xpc.launchd|2026-10-09 10:43:38.710025 (system) <Notice>: System shutdown initiated by: reboot[2964]<-vphoned[416]
+com.apple.xpc.launchd|2026-10-09 10:43:38.710118 (shutdown) <Notice>: shutdown UNINITIALIZED -> COMMITTED
+com.apple.xpc.launchd|2026-10-09 10:43:38.710228 (shutdown) <Notice2026-10-09 10:43:39.207 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=24
+>: shutdown Cis_system_shutting_down:961: System is shutting down - stop any apfs bg work.
+OMMITTED -> COMMITTED
+com.apple.xpc.launchd|2026-10-09 10:43:38.710229 (shutdown) <Notice>: shutdown COMMITTED -> BEGIN_SHUTDOWN
+com.apple.xpc.launchd|2026-10-09 10:43:38.710230 (shutdown) <Notice>: shutdown BEGIN_SHUTDOWN -> INVALIDATE_UNMANAGED_ENDPOINTS
+com.apple.xpc.launchd|2026-10-09 10:43:38.710230 (shutdown) <Notice>: shutdown INVALIDATE_UNMANAGED_ENDPOINTS -> BOOTOUT_SEMI_ACTIVE_SERVICES
+com.apple.xpc.launchd|2026-10-09 10:43:38.710232 (shutdown) <Notice>: shutdown BOOTOUT_SEMI_ACTIVE_SERVICES -> BOOTOUT_ACTIVE_SERVICES
+com.apple.xpc.launchd|2026-10-09 10:43:38.711266 (shutdown) <Notice>: shutdown BOOTOUT_ACTIVE_SERVICES -> BOOTOUT_SERVICES
+com.apple.xpc.launchd|2026-10-09 10:43:38.711464 (shutdown) <Notice>: shutdown BOOTOUT_SERVICES -> REMOVE_ALIASED_ENDPOINTS
+com.apple.xpc.launchd|2026-10-09 10:43:38.711466 (shutdown) <Notice>: shutdown REMOVE_ALIASED_ENDPOINTS -> SLAY_CHILD_DOMAIN
+com.apple.xpc.launchd|2026-10-09 10:43:38.712794 (shutdown) <Notice>: shutdown SLAY_CHILD_DOMAIN -> CANCEL_DEATH_SOURCE
+com.apple.xpc.launchd|2026-10-09 10:43:38.712795 (shutdown) <Notice>: shutdown CANCEL_DEATH_SOURCE -> UNPEND_REQUESTS
+com.apple.xpc.launchd|2026-10-09 10:43:38.712796 (shutdown) <Notice>: shutdown UNPEND_REQUESTS -> DOMAIN_DEACTIVATE
+2026-10-09 10:43:40.274 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=16
+  IOTimeSyncTimeSyncTimePort(0x8ec8e872617c0008): Removing general notifier <ptr> for local clock port <ptr> stop
+2026-10-09 10:43:41.342 vphone-vm[53680:16078015] B21 API socket type=1 status=0 fd=16
+com.apple.xpc.launchd|2026-10-09 10:43:41.739497 (shutdown) <Notice>: shutdown DOMAIN_DEACTIVATE -> WRITE_DISABLED
+com.apple.xpc.launchd|2026-10-09 10:43:41.739500 (shutdown) <Notice>: shutdown WRITE_DISABLED -> WAITING_ON_COALITIONS
+com.apple.xpc.launchd|2026-10-09 10:43:41.739527 (shutdown) <Notice>: shutdown WAITING_ON_COALITIONS -> WAITING_ON_SHUTDOWN_STALL_REPORT
+com.apple.xpc.launchd|2026-10-09 10:43:41.739538 (shutdown) <Notice>: shutdown WAITING_ON_SHUTDOWN_STALL_REPORT -> LAUNCH_SHUTDOWN_TEARDOWN
+com.apple.xpc.launchd|2026-10-09 10:43:41.739562 (system) <Notice>: Userspace teardown took: 3029 ms
+com.apple.xpc.launchd|2026-10-09 10:43:41.739563 (system) <Notice>: Will be calling reboot(2) with flags: 0x8
+com.apple.xpc.launchd|2026-10-09 10:43:41.739563 <Notice>: Quiescing queues
+com.apple.xpc.launchd|2026-10-09 10:43:41.739564 (shutdown) <Notice>: shutdown LAUNCH_SHUTDOWN_TEARDOWN -> WAITING_ON_QUIESCE
+launchd quiesce complete
+AppleUSBDeviceMux::message - kMessageInterfaceWasDeActivated
+AppleUSBDeviceMux::reportStats: USB mux statistics: 
+USB mux: 369 reads / 0 errors, 221 writes / 0 errors
+USB mux: 0 short packets, 0 dups
+ configureDatagramSizeOnBSDInterface() [en1], size 1514 returning 0x00000000
+ configureDatagramSizeOnBSDInterface() [anpi0], size 1514 returning 0x00000000
+ enableBSDInterface() [anpi0], returning 0x00000000
+ configureIPv6LLOnBSDInterface() [anpi0], IPv6 disable returning 0x00000000
+ disableTrafficShapingOnBSDInterface() [anpi0], disable traffic shaping returning 0x00000000
+AppleSEPManager: Received Paging off notification
+asyncReadComplete:1829 USB read status = 0xe00002eb
+asyncReadComplete:1829 USB read status = 0xe00002eb
+SEP EP 16 enabled
+void XARTDisableLog::log_disable_begin(): xART disable begin
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Saving SEP-xART with CRC: 0x1927
+int gl_rec_write(struct gl_ctx *const, const struct gl_rec_id *const, const uint8_t *const, size_t): Writing record type: 2, uuid: 00000000-0000-0000-0000-000000000000, crc32: 2441309150 at idx 2
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x1927010000001513
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Saving SEP-xART Locker with CRC: 0x129a
+int gl_rec_write(struct gl_ctx *const, const struct gl_rec_id *const, const uint8_t *const, size_t): Writing record type: 4, uuid: D68FC4B9-B606-4A4E-1730-8B065F110107, crc32: 3880272872 at idx 3
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x129a010000001613
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Saving SEP-xART with CRC: 0x2682
+int gl_rec_write(struct gl_ctx *const, const struct gl_rec_id *const, const uint8_t *const, size_t): Writing record type: 2, uuid: 00000000-0000-0000-0000-000000000000, crc32: 1484780535 at idx 7
+void AppleSEPXART::_handle_sep_driven_msg(XARTMessage *): Replied to xART app: 0x2682010000001713
+void XARTDisableLog::log_disable_acknowledge(uint32_t): sks  acknowledges xART disable
+SEP EP 16 disabled
+SEP EP 16 enabled
+apfs_rawdev_destroy:767: disk2s3 Disable bypass mode on inode 16 as 2.0 4130303
+SEP EP 16 disabled
+void XARTDisableLog::log_disable_acknowledge(uint32_t): scrd acknowledges xART disable
+apfs_vfsop_unmount:3157: disk2s7 volume has a secondary fs_root, need to cancel any running evict/resize
+apfs_log_op_with_proc:3297: disk2s7 unmounting volume User, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3183: disk2s7 resizing will be cancelled as the volume is encrypted and will no longer be accessible
+nx_cancel_block_out:6865: disk2 Lock is not cancellable
+apfs_vfsop_unmount:3239: disk2s7 waiting for purgatory cleaner to finish
+kbn_handler_thread_stop:7305: disk2s7 kbnh joined thread? 1
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 6
+apfs: total mem allocated: 28263451 (26 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 6)
+apfs_log_op_with_proc:3297: disk2s4 unmounting volume Hardware, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3239: disk2s4 waiting for purgatory cleaner to finish
+tx_flush:1344: disk2 xid 38854 tx stats: # 680 owait 83 20357us finish 696 bar2 680 f 12 enter 60 fq 171 196 311us close 0us prep 258us flush 7707us
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 5
+apfs: total mem allocated: 28263559 (26 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 5)
+apfs_log_op_with_proc:3297: disk2s6 unmounting volume Update, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3239: disk2s6 waiting for purgatory cleaner to finish
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 4
+apfs: total mem allocated: 28178603 (26 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 4)
+apfs_log_op_with_proc:3297: disk2s2 unmounting volume Data, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3183: disk2s2 resizing will be cancelled as the volume is encrypted and will no longer be accessible
+nx_cancel_block_out:6865: disk2 Lock is not cancellable
+apfs_log_op_with_proc:3297: UC_FM_HANDWRITING_SYNTHESIS_MUL ungrafting volume RevivalB13M202354.UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_GENERIC_GENERIC_H17P_Cryptex, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+graft_blockmap_lut_release:1056: reference count dropped to 0, free blockmap_lut
+apfs_log_op_with_proc:3297: UC_PHOTOS_SPATIALPHOTOSRELIVE_M ungrafting volume RevivalB13M202357.UC_PHOTOS_SPATIALPHOTOSRELIVE_MAIN_GENERIC_GENERIC_H17P_Cryptex, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+graft_blockmap_lut_release:1056: reference count dropped to 0, free blockmap_lut
+apfs_log_op_with_proc:3297: UC_PHOTOS_SPATIALPHOTOSRELIVE_F ungrafting volume RevivalB13M202357.UC_PHOTOS_SPATIALPHOTOSRELIVE_FOV_MAIN_GENERIC_GENERIC_H17P_Cryptex, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+graft_blockmap_lut_release:1056: reference count dropped to 0, free blockmap_lut
+apfs_log_op_with_proc:3297: SECUREPKITRUSTSTOREASSETS_SECUR ungrafting volume Creedence11M6270.SECUREPKITRUSTSTOREASSETS_SECUREPKITRUSTSTORE_Cryptex, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+graft_blockmap_lut_release:1056: reference count dropped to 0, free blockmap_lut
+apfs_log_op_with_proc:3297: UC_FM_HANDWRITING_SYNTHESIS_MUL ungrafting volume RevivalB13M202841.UC_FM_HANDWRITING_SYNTHESIS_MULTILINGUAL_ZHJA_GENERIC_H17P_Cryptex, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+graft_blockmap_lut_release:1056: reference count dropped to 0, free blockmap_lut
+apfs_vfsop_unmount:3239: disk2s2 waiting for purgatory cleaner to finish
+pfkur_pause:34907: joined thread? 1
+kbn_handler_thread_stop:7305: disk2s2 kbnh joined thread? 1
+"AppleSEPKeyStore":pid:1,:4551: cant get vek blob state
+apfs_keybag_unload_class_keys:3236: failed to unload volume class keys, error = e00002c2
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 3
+apfs: total mem allocated: 25381721 (24 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 3)
+apfs_log_op_with_proc:3297: disk2s3 unmounting volume xART, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3239: disk2s3 waiting for purgatory cleaner to finish
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 2
+apfs: total mem allocated: 25383681 (24 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 2)
+apfs_log_op_with_proc:3297: disk2s5 unmounting volume Preboot, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3239: disk2s5 waiting for purgatory cleaner to finish
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 1
+apfs: total mem allocated: 25354064 (24 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 1)
+DK: IOUserServer(com.apple.driverkit.AppleUserHIDDrivers-0x10000029f)-0x1000002a1::systemHalt()
+DK: 1: terminate(AppleUserUSBHostHIDDevice-0x10000029d)
+DK: 1: terminate(AppleUserUSBHostHIDDevice-0x10000029f)
+DK: 0: terminate(AppleUserHIDEventDriver-0x1000002a6)
+DK: 0: terminate(AppleUserHIDEventDriver-0x1000002ab)
+DK: AppleUserHIDEventDriver-0x1000002a6:force close (IOHIDInterface-0x1000002a5)
+AppleUserUSBHostHIDDevice:0x10000029d close by AppleUserHIDEventDriver:0x1000002a6 (0x0)
+DK: AppleUserHIDEventDriver-0x1000002a6:force close (AppleUserUSBHostHIDDevice-0x10000029d)
+DK: AppleUserHIDEventDriver-0x1000002ab:force close (IOHIDInterface-0x1000002aa)
+AppleUserUSBHostHIDDevice:0x10000029f close by AppleUserHIDEventDriver:0x1000002ab (0x0)
+DK: AppleUserHIDEventDriver-0x1000002ab:force close (AppleUserUSBHostHIDDevice-0x10000029f)
+apfs_log_op_with_proc:3297: disk2s1 unmounting volume System, requested by: launchd (pid 1); parent: kernel_task (pid 0)
+apfs_vfsop_unmount:3583: disk2 nx_num_vols_mounted is 0
+container_unload:2336: vnode_close() invoked in the container unload path
+apfs: total mem allocated: 5504 (0 mb);
+apfs_vfsop_unmount:3596: all done.  going home.  (numMountedAPFSVolumes 0)
+IONetworkController::disable
+IONetworkController::disable
+AppleUSB20XHCIPort@0c900000: AppleUSBHostPort::terminateDevice: destroying 0x05ac/8105/0000 (Virtual USB Keyboard): port is powering off
+AppleUSB20XHCIPort@0ca00000: AppleUSBHostPort::terminateDevice: destroying 0x05ac/8108/0000 (Virtual USB Touch Screen): port is powering off
+"AppleSEPKeyStore":pid:0,:3999: Preparing for System Shutdown
+SEP EP 18 disabled
+"AppleSEPKeyStore":pid:0,:4007: Ready for System Shutdown
+virtual void AppleSEPManager::systemWillShutdown(IOOptionBits): Received system will shut down notification
+
+ApplePSCI - system off
+2026-10-09 10:43:42.405 vphone-vm[53680:16078014] B21 API socket type=1 status=0 fd=22
+led: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[camera] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer". Retrying in 3s.
+[control] handshake timed out after 8s
+[control] connection lost; reconnecting in 3s...
+[camera] connected on vsock port 1338
+[control] handshake timed out after 8s
+[control] connection lost; reconnecting in 3s...
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[control] connect failed: Error Domain=NSPOSIXErrorDomain Code=54 "Connection reset by peer"
+[control] connect failed; reconnecting in 3s...
+[control] connected to vphoned v1 (192.168.64.2) iOS 26.1.0, caps: ["hid", "devmode", "file", "keychain", "location", "location_owned", "ipa_install", "clipboard", "apps_v2", "apps", "app_launch", "url", "settings", "shell", "touch", "touch_edge", "vcam_status", "vcam_receipt_v3"]
+[control] guest-side touch injection enabled (iOS 26.1.0)
+[battery] sync 100%, connectivity=1
+[battery] sync 100%, connectivity=1
+[battery] sync LPM: false
+
+[vphone] SIGINT — shutting down
+[vphone] graceful shutdown via guest power-off command over vsock
+[control] read loop ended
+[control] connection lost; reconnecting in 3s...
+[vphone] guest power-off request ended with: not connected to vphoned
+[vphone] guest shutdown request: classicAccepted; awaiting VM stop
+[control] connect failed: Error Domain=VZErrorDomain Code=3 "The virtual machine is no longer live." UserInfo={NSLocalizedFailure=Invalid virtual machine state., NSLocalizedFailureReason=The virtual machine is no longer live.}
+[control] connect failed; reconnecting in 3s...
+[vphone] Guest stopped

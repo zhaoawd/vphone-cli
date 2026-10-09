@@ -1,0 +1,846 @@
+c2175ec017adbd11b7a0689438863236040dda0d Release 2.0.9
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index c06844c9..13063229 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>9</string>
++	<string>10</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.0.8</string>
++	<string>2.0.9</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 68fd016a..5cddc150 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.0.8"
++    private static let unbundledVersion = "2.0.9"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index a0a73ad2..f80f088c 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.0.8
++MARKETING_VERSION = 2.0.9
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 7
+
+bd36b5ee64a5d2c211341cac6ee83cf81a33cd41 Release 2.1.0
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 13063229..cfd55d02 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>10</string>
++	<string>11</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.0.9</string>
++	<string>2.1.0</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 5cddc150..2efeed7e 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.0.9"
++    private static let unbundledVersion = "2.1.0"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index f80f088c..cb78cb8f 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.0.9
++MARKETING_VERSION = 2.1.0
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+-CURRENT_PROJECT_VERSION = 7
++CURRENT_PROJECT_VERSION = 8
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
+index c7104e48..a7860837 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
+@@ -70,7 +70,7 @@ nonisolated struct VPhoneLaunchpadBundleReceipt: Codable, Equatable, Sendable {
+ /// checks them to give an early message; the helper checks them because it
+ /// must not trust the app.
+ nonisolated enum VPhoneLaunchpadNames {
+-    static let minimumBundleVersion = "2.0.8"
++    static let minimumBundleVersion = "2.1.0"
+ 
+     static func isValidVersion(_ value: String) -> Bool {
+         matches(value, "^[0-9A-Za-z][0-9A-Za-z._-]{0,63}$") && !value.contains("..")
+@@ -95,7 +95,7 @@ nonisolated enum VPhoneLaunchpadNames {
+         guard parts.count == 3,
+               let major = Int(parts[0]), let minor = Int(parts[1]), let patch = Int(parts[2])
+         else { return false }
+-        return (major, minor, patch) >= (2, 0, 8)
++        return (major, minor, patch) >= (2, 1, 0)
+     }
+ 
+     static func isValidMachineName(_ value: String) -> Bool {
+
+85a4da0d09c269e1b6cb5d5ea3feb2f86d5cd320 Release 2.1.1
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index cfd55d02..f91431f0 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>11</string>
++	<string>12</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.0</string>
++	<string>2.1.1</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 2efeed7e..ae014df6 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.0"
++    private static let unbundledVersion = "2.1.1"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index cb78cb8f..062ffba6 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.1.0
++MARKETING_VERSION = 2.1.1
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 8
+
+50e7033d4acaa5d1faaf62cb66141f79e90d1359 Release 2.1.2
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index f91431f0..29f5cf65 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>12</string>
++	<string>13</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.1</string>
++	<string>2.1.2</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index ae014df6..f633c45d 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.1"
++    private static let unbundledVersion = "2.1.2"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 062ffba6..f5810afe 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.1.1
++MARKETING_VERSION = 2.1.2
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 8
+
+849c4b3c6a23eac1ab3cab33b7bbc949f4fa6300 Release 2.1.3
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 29f5cf65..12fe33a0 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>13</string>
++	<string>14</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.2</string>
++	<string>2.1.3</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuData.swift b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuData.swift
+new file mode 100644
+index 00000000..df50aa01
+--- /dev/null
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/UserInterface/Menu/VPhoneMenuData.swift
+@@ -0,0 +1,162 @@
++import AppKit
++
++// MARK: - Guest Menu
++
++/// Guest data the Mac reads and writes: files, Keychain, clipboard and
++/// preference domains.
++extension VPhoneMenuController {
++    func buildGuestMenu() -> NSMenuItem {
++        let item = NSMenuItem(title: "Guest", action: nil, keyEquivalent: "")
++        let menu = NSMenu(title: "Guest")
++        menu.autoenablesItems = false
++
++        let fileBrowser = makeItem(
++            "File Browser",
++            action: #selector(openFiles),
++            keyEquivalent: "f",
++            modifiers: [.command, .shift],
++            symbol: "folder",
++        )
++        fileBrowser.isEnabled = false
++        connectFileBrowserItem = fileBrowser
++        menu.addItem(fileBrowser)
++
++        let keychainBrowser = makeItem(
++            "Keychain Browser",
++            action: #selector(openKeychain),
++            keyEquivalent: "k",
++            modifiers: [.command, .shift],
++            symbol: "key",
++        )
++        keychainBrowser.isEnabled = false
++        connectKeychainBrowserItem = keychainBrowser
++        menu.addItem(keychainBrowser)
++
++        menu.addItem(NSMenuItem.separator())
++
++        let installBootstrap = makeItem(
++            "Install Bootstrap…",
++            action: #selector(installBootstrap),
++            symbol: "arrow.down.circle",
++        )
++        installBootstrap.isEnabled = false
++        installBootstrapItem = installBootstrap
++        menu.addItem(installBootstrap)
++        let installFromFile = makeItem(
++            "Install Bootstrap from File…",
++            action: #selector(installBootstrapFromFile),
++            modifiers: [.option],
++            symbol: "doc",
++        )
++        installFromFile.isAlternate = true
++        installFromFile.isEnabled = false
++        installBootstrapFromFileItem = installFromFile
++        menu.addItem(installFromFile)
++
++        let uninstallBootstrap = makeItem(
++            "Uninstall Bootstrap…",
++            action: #selector(uninstallBootstrap),
++            symbol: "trash",
++        )
++        uninstallBootstrap.isEnabled = false
++        uninstallBootstrapItem = uninstallBootstrap
++        menu.addItem(uninstallBootstrap)
++        let uninstallNoRestart = makeItem(
++            "Uninstall Bootstrap Without Restarting…",
++            action: #selector(uninstallBootstrapWithoutRestart),
++            modifiers: [.option],
++            symbol: "trash",
++        )
++        uninstallNoRestart.isAlternate = true
++        uninstallNoRestart.isEnabled = false
++        uninstallBootstrapNoRestartItem = uninstallNoRestart
++        menu.addItem(uninstallNoRestart)
++
++        menu.addItem(NSMenuItem.separator())
++
++        let clipGet = makeItem(
++            "Clipboard",
++            action: #selector(getClipboard),
++            keyEquivalent: "c",
++            modifiers: [.command, .shift],
++            symbol: "doc.on.clipboard",
++        )
++        clipGet.isEnabled = false
++        clipboardGetItem = clipGet
++        menu.addItem(clipGet)
++
++        let clipSet = makeItem(
++            "Set Clipboard Text…",
++            action: #selector(setClipboardText),
++            symbol: "character.cursor.ibeam",
++        )
++        clipSet.isEnabled = false
++        clipboardSetItem = clipSet
++        menu.addItem(clipSet)
++
++        menu.addItem(NSMenuItem.separator())
++
++        let settingsGet = makeItem(
++            "Preferences",
++            action: #selector(readSetting),
++            keyEquivalent: "p",
++            modifiers: [.command, .shift],
++            symbol: "gearshape",
++        )
++        settingsGet.isEnabled = false
++        settingsGetItem = settingsGet
++        menu.addItem(settingsGet)
++
++        let settingsSet = makeItem("Write Preference…", action: #selector(writeSetting), symbol: "pencil")
++        settingsSet.isEnabled = false
++        settingsSetItem = settingsSet
++        menu.addItem(settingsSet)
++
++        item.submenu = menu
++        return item
++    }
++
++    func updateSettingsAvailability(available: Bool) {
++        settingsGetItem?.isEnabled = available
++        settingsSetItem?.isEnabled = available
++    }
++
++    func updateConnectAvailability(available: Bool) {
++        connectFileBrowserItem?.isEnabled = available
++        connectKeychainBrowserItem?.isEnabled = available
++        connectDevModeStatusItem?.isEnabled = available
++        connectPingItem?.isEnabled = available
++        connectGuestHashItem?.isEnabled = available
++    }
++
++    func updateClipboardAvailability(available: Bool) {
++        clipboardGetItem?.isEnabled = available
++        clipboardSetItem?.isEnabled = available
++    }
++
++    @objc func openFiles() {
++        onFilesPressed?()
++    }
++
++    @objc func openKeychain() {
++        onKeychainPressed?()
++    }
++
++    // MARK: - Clipboard & Preferences
++
++    @objc func getClipboard() {
++        guestToolsWindowController.show(.getClipboard)
++    }
++
++    @objc func setClipboardText() {
++        guestToolsWindowController.show(.setClipboard)
++    }
++
++    @objc func readSetting() {
++        guestToolsWindowController.show(.readSetting)
++    }
++
++    @objc func writeSetting() {
++        guestToolsWindowController.show(.writeSetting)
++    }
++}
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index f633c45d..13943094 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.2"
++    private static let unbundledVersion = "2.1.3"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+
+f761a32480d3d3491b8934a9f81a0efd612b2891 Release 2.1.4
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 12fe33a0..2b2d22f8 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>14</string>
++	<string>15</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.3</string>
++	<string>2.1.4</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 13943094..4084c6aa 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.3"
++    private static let unbundledVersion = "2.1.4"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+
+32ce659fa940fb2d9b01873f1d6ce90732f9d855 Release 2.1.5
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 2b2d22f8..b9df3d81 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>15</string>
++	<string>16</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.4</string>
++	<string>2.1.5</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 4084c6aa..360d00e4 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.4"
++    private static let unbundledVersion = "2.1.5"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+
+8dc821db263745789f3b6f336668d26209d194d8 Release 2.1.6
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index b9df3d81..01a94f5c 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>16</string>
++	<string>17</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.5</string>
++	<string>2.1.6</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 360d00e4..82d21126 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.5"
++    private static let unbundledVersion = "2.1.6"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+
+e8b16dee1d0ae891baf03150f1ea892a0bfda7b7 Release 2.1.7
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 01a94f5c..57475d0a 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>17</string>
++	<string>18</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.1.6</string>
++	<string>2.1.7</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+diff --git a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+index 82d21126..0a6c5b02 100644
+--- a/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
++++ b/VPhoneKit/VPhoneCoreKit/VirtualMachine/VPhoneVirtualMachineManifest.swift
+@@ -41,7 +41,7 @@ extension VPhoneManifestError: CustomStringConvertible, LocalizedError {
+ 
+ enum VPhoneRuntimeVersion {
+     /// A plain `swift build` executable has no app bundle Info.plist.
+-    private static let unbundledVersion = "2.1.6"
++    private static let unbundledVersion = "2.1.7"
+ 
+     static var current: String {
+         let contents = VPhoneResources.runningExecutable().deletingLastPathComponent().deletingLastPathComponent()
+
+2bacd69b7cae17000177ef0b56a4b6b792ccac03 Release 2.2.1
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index d1f75f7e..a97a086e 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>18</string>
++	<string>19</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.2.0</string>
++	<string>2.2.1</string>
+ 	<key>NSLocationUsageDescription</key>
+ 	<string>Shares your location with the virtual iPhone so apps running inside it see the same location.</string>
+ 	<key>NSLocationWhenInUseUsageDescription</key>
+
+d3403e510fd1126e9d99e7686f39465e5ab586e8 Release 2.2.2
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 40c5d06f..668864e8 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>19</string>
++	<string>20</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.2.1</string>
++	<string>2.2.2</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 441b6788..1136f613 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.2.0
++MARKETING_VERSION = 2.2.2
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 9
+
+a969cd5d9206932dc1a2797348027fbc7d0ee347 Release 2.2.3
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 668864e8..78996a71 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>20</string>
++	<string>21</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.2.2</string>
++	<string>2.2.3</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 1136f613..a163e7a0 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.2.2
++MARKETING_VERSION = 2.2.3
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 9
+
+3043629ce95595e34d2c071601e697a3cd4b530e Release 2.2.4
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 78996a71..3da7681c 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>21</string>
++	<string>22</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.2.3</string>
++	<string>2.2.4</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index a163e7a0..42946f67 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.2.3
++MARKETING_VERSION = 2.2.4
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 9
+
+194da01a701abea8aa366b524f99ffecb2fbf0eb Release 2.2.5
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 3da7681c..6258b7e4 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>22</string>
++	<string>23</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.2.4</string>
++	<string>2.2.5</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 42946f67..1574ae0d 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.2.4
++MARKETING_VERSION = 2.2.5
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 9
+
+4d75b44186d3cb392c4ed79068426be3e021930d Release 2.3.0
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 6258b7e4..4b5d3d00 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>23</string>
++	<string>24</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.2.5</string>
++	<string>2.3.0</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 1574ae0d..f8ab8d72 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.2.5
++MARKETING_VERSION = 2.3.0
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 9
+
+61950afdf0ddf62f1881612b1100a6a1ed45e51f Release 2.3.1
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 4b5d3d00..cc371531 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>24</string>
++	<string>25</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.3.0</string>
++	<string>2.3.1</string>
+ </dict>
+ </plist>
+
+3938171539aeefc0355be1fee4b69372f3bda0d4 Release 2.3.2
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index cc371531..a42a2503 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>25</string>
++	<string>26</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.3.1</string>
++	<string>2.3.2</string>
+ </dict>
+ </plist>
+
+48e915e1b554158c0cd43a8e6c54cd2a4f16c4cd Release 2.4.0
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index a42a2503..978b9fb9 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>26</string>
++	<string>27</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.3.2</string>
++	<string>2.4.0</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index f8ab8d72..36a1776d 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.3.0
++MARKETING_VERSION = 2.4.0
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+-CURRENT_PROJECT_VERSION = 9
++CURRENT_PROJECT_VERSION = 10
+diff --git a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
+index 92d310d3..ca3efa35 100644
+--- a/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
++++ b/VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift
+@@ -73,8 +73,10 @@ nonisolated enum VPhoneLaunchpadNames {
+     /// 2.2.0 renamed every patch to `{component}-{effect}-{name}` and dropped
+     /// `--force-dsc-maxslide` from `cfw install`, so an older bundle neither
+     /// reports the identifiers the patch table reads nor takes the arguments
+-    /// the helper passes.
+-    private static let minimumBundleComponents = (2, 2, 0)
++    /// the helper passes. 2.4.0 added the network options of `vm config`
++    /// (`--ip`, `--mac`, `--forward`, `--mdns`, `--mac-name`), which a
++    /// machine's Settings pass.
++    private static let minimumBundleComponents = (2, 4, 0)
+     static let minimumBundleVersion =
+         "\(minimumBundleComponents.0).\(minimumBundleComponents.1).\(minimumBundleComponents.2)"
+ 
+
+4c9c1b979095b92a9d6c73e5e6f0ead2f0124e2d Release 2.4.1
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 978b9fb9..2a00703d 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>27</string>
++	<string>28</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.4.0</string>
++	<string>2.4.1</string>
+ </dict>
+ </plist>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index 52791aeb..1c592691 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+-MARKETING_VERSION = 2.4.0
++MARKETING_VERSION = 2.4.1
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+ CURRENT_PROJECT_VERSION = 11
+
+048c1e773d29863a4b62a00fec2017462befde5b Release 2.4.2
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 2a00703d..5285d57a 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,8 +9,8 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>28</string>
++	<string>29</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.4.1</string>
++	<string>2.4.2</string>
+ </dict>
+ </plist>
+
+17d5c424171e066a2b6ee699c9e0bb7909773887 Release 2.5.1
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 47a133cd..83dbb5f7 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>30</string>
++	<string>31</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.5.0</string>
++	<string>2.5.1</string>
+ 	<key>NSMicrophoneUsageDescription</key>
+ 	<string>Shares this Mac's microphone with the virtual iPhone so apps running inside it can record.</string>
+ </dict>
+
+94376fe82a576b4e80086c8e3cbbd7d3bd99122f Release 2.6.0
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 2f3f84c6..8f90cacb 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,7 +9,7 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>31</string>
++	<string>32</string>
+ 	<key>CFBundleShortVersionString</key>
+ 	<string>2.6.0</string>
+ 	<key>NSMicrophoneUsageDescription</key>
+diff --git a/VPhoneLaunchpad/Configuration/Version.xcconfig b/VPhoneLaunchpad/Configuration/Version.xcconfig
+index f3b02434..cbab6793 100644
+--- a/VPhoneLaunchpad/Configuration/Version.xcconfig
++++ b/VPhoneLaunchpad/Configuration/Version.xcconfig
+@@ -1,4 +1,4 @@
+ MARKETING_VERSION = 2.6.0
+ // Bump whenever the helper changes. The app blesses the helper again when the
+ // installed helper's version or bytes differ from the copy it embeds.
+-CURRENT_PROJECT_VERSION = 12
++CURRENT_PROJECT_VERSION = 13
+
+f9ea9015a82d29187d4b65cc15883d9bdc37a21c Release 2.6.1
+diff --git a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+index 8f90cacb..0baa1ca1 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
++++ b/VPhoneExecutable/VPhoneVirtualization/Resources/Info.plist
+@@ -9,9 +9,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>BNDL</string>
+ 	<key>CFBundleVersion</key>
+-	<string>32</string>
++	<string>33</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>2.6.0</string>
++	<string>2.6.1</string>
+ 	<key>NSMicrophoneUsageDescription</key>
+ 	<string>Shares this Mac's microphone with the virtual iPhone so apps running inside it can record.</string>
+ </dict>

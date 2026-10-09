@@ -1,0 +1,55 @@
+{
+  "status": "checkpoint_complete_remaining_six_in_progress",
+  "scope": [
+    "T02",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "accepted": [
+    "T06"
+  ],
+  "remaining": {
+    "T02": [
+      "218个pending提交及47项能力全局语义对账；保留reviewed/adaptation_planned与accepted区别"
+    ],
+    "T07": [
+      "真实临时launchd job不同binary升级、回退、坏缓存和有限重试完整矩阵"
+    ],
+    "T08": [
+      "90度旋转未生效原因及完整rotation/RootHide service矩阵",
+      "JPEG视觉核验；本轮内存通过仅适用于记录的固定候选与恢复副本"
+    ],
+    "T24": [
+      "完整TCC负责应用链真实验收",
+      "旧helper、owner错误、链接替换、共享可写路径和未知verb完整真实拒绝矩阵",
+      "Homebrew运行依赖只验证当前机器可解析，不声明可移植封装"
+    ],
+    "T40": [
+      "创建全流程固定工具链，clone/export/rename来源",
+      "kernel-only及显式guest升级/回退、混合版本四层来源矩阵",
+      "APFS写时复制备份不证明物理独立；不声明对不协作写入者的原子CAS"
+    ],
+    "T46": [
+      "全UI立即退出、detached/create/后代writer和输出生命周期",
+      "panic/取消/轮换、UI响应及实际VM吞吐矩阵"
+    ]
+  },
+  "authorization": {
+    "user": "授权，完成这7项",
+    "amfi_cdhash": "4cea360ca924a4c651a12aae7755545b492a59b6",
+    "paths": [],
+    "allow_all": false
+  },
+  "live_runtime": {
+    "VM_off": true,
+    "AMFI_driver_absent": true,
+    "debugserver_absent": true,
+    "cleanup_required": false,
+    "final_readback": "evidence/B22-final-readback.json"
+  },
+  "prior_stage_preserved": "evidence/B22-initial-stage.json"
+}

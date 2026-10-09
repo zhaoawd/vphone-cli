@@ -1,0 +1,17 @@
+F..
+======================================================================
+FAIL: test_canonical_directory_alias_confirms_the_same_cached_file (test_daemon_cache_confirmation.CacheConfirmationTests.test_canonical_directory_alias_confirms_the_same_cached_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_cache_confirmation.py", line 28, in test_canonical_directory_alias_confirms_the_same_cached_file
+    def test_canonical_directory_alias_confirms_the_same_cached_file(self):self.check_confirmation('alias')
+                                                                           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_cache_confirmation.py", line 25, in check_confirmation
+    confirmed=mode=='alias';self.assertEqual(p.returncode,0 if confirmed else 1,p.stderr)
+                            ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : 
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.597s
+
+FAILED (failures=1)

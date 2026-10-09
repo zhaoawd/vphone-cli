@@ -1,0 +1,100 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 53680,
+    "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+  },
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep vphone-b21-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "ok": true,
+        "stdout": "",
+        "code": 0,
+        "truncated": false,
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vphone-b21-api/vphoned || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stderr": "",
+        "ok": true,
+        "stdout": "",
+        "code": 0,
+        "truncated": false,
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 53680,
+          "instance_id": "822503AF-2684-43AC-8348-25248550D948"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    }
+  ],
+  "classic_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "cache_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "boot_arguments": "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.1208708c55574677/VPhone.bundle/Contents/MacOS/vphone-vm --config /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/config.plist --no-vphoned-update --api-listen 127.0.0.1:0 --binding-sha256 83d49767331cb68ca414415f931cb9c85be77c360596f1d080d8eaf272ccc238 --variant exp\n",
+  "stop": {
+    "returncode": 0,
+    "stdout": "b21-restored-vm-new-20261009: boot instance 822503AF-2684-43AC-8348-25248550D948\nb21-restored-vm-new-20261009: sending SIGINT to 53680\nb21-restored-vm-new-20261009: stopped\n",
+    "stderr": "",
+    "seconds": 5.7730493329581805
+  }
+}

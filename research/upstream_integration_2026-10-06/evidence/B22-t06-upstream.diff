@@ -1,0 +1,120 @@
+diff --git a/VPhoneDaemon/Daemon/APIWire.swift b/VPhoneDaemon/Daemon/APIWire.swift
+index dae8b71d..5a5a93d7 100644
+--- a/VPhoneDaemon/Daemon/APIWire.swift
++++ b/VPhoneDaemon/Daemon/APIWire.swift
+@@ -98,3 +98,23 @@ final class APIEventHub: @unchecked Sendable {
+         return !channels.isEmpty
+     }
+ }
++
++// MARK: - Closing
++
++extension Channel {
++    /// Ends a VSOCK connection whose last write has been flushed. Closing it
++    /// here would lose data: XNU's vsock answers close() and shutdown() with an
++    /// immediate RESET or SHUTDOWN, and drops bytes still queued in the send
++    /// buffer for host credit. A reply of about 8 to 16 KiB is truncated that
++    /// way. The host closes once it has read everything, and NIO then closes
++    /// this channel on EOF. The timer only covers a host that never closes.
++    func closeAfterPeer() {
++        let channel = self
++        let fallback = eventLoop.scheduleTask(in: .seconds(30)) {
++            channel.close(promise: nil)
++        }
++        closeFuture.whenComplete { _ in fallback.cancel() }
++        // EOF is only seen while reading, and a relay may have paused reads.
++        _ = setOption(ChannelOptions.autoRead, value: true)
++    }
++}
+diff --git a/VPhoneDaemon/Daemon/GuestFileTransfer.swift b/VPhoneDaemon/Daemon/GuestFileTransfer.swift
+index 885ba480..3b3bb37a 100644
+--- a/VPhoneDaemon/Daemon/GuestFileTransfer.swift
++++ b/VPhoneDaemon/Daemon/GuestFileTransfer.swift
+@@ -46,7 +46,7 @@ enum GuestFileTransfer {
+                 switch result {
+                 case .success:
+                     channel.writeAndFlush(HTTPServerResponsePart.end(nil)).whenComplete { _ in
+-                        channel.close(promise: nil)
++                        channel.closeAfterPeer()
+                     }
+                 case .failure:
+                     channel.close(promise: nil)
+diff --git a/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift b/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
+index d6002c85..f30bef18 100644
+--- a/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
++++ b/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
+@@ -275,7 +275,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
+             buffer.writeBytes(reply.data)
+             channel.write(HTTPServerResponsePart.body(.byteBuffer(buffer)), promise: nil)
+             channel.writeAndFlush(HTTPServerResponsePart.end(nil)).whenComplete { _ in
+-                channel.close(promise: nil)
++                channel.closeAfterPeer()
+             }
+         }
+         if channel.eventLoop.inEventLoop {
+diff --git a/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift b/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift
+index bfa96f0f..1acfaa94 100644
+--- a/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift
++++ b/VPhoneDaemon/Daemon/GuestPortForwardHandler.swift
+@@ -107,7 +107,7 @@ final class GuestPortForwardHandler: ChannelInboundHandler, @unchecked Sendable
+                     ),
+                 ),
+             ).whenComplete { _ in
+-                webSocket.close(promise: nil)
++                webSocket.closeAfterPeer()
+             }
+         default:
+             closeWithError(on: context.channel)
+@@ -157,7 +157,7 @@ final class GuestPortForwardHandler: ChannelInboundHandler, @unchecked Sendable
+                 data: data,
+             ),
+         ).whenComplete { _ in
+-            channel.close(promise: nil)
++            channel.closeAfterPeer()
+         }
+     }
+ }
+@@ -208,7 +208,9 @@ private final class GuestPortBackendHandler: ChannelInboundHandler, @unchecked S
+                 data: data,
+             ),
+         ).whenComplete { _ in
+-            self.webSocket.close(promise: nil)
++            // The last bytes of the guest stream may still be queued for
++            // host credit; closing now would reset them away.
++            self.webSocket.closeAfterPeer()
+         }
+     }
+ }
+diff --git a/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift b/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift
+index 51a52765..b6f978aa 100644
+--- a/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift
++++ b/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift
+@@ -36,7 +36,13 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
+             let pong = WebSocketFrame(fin: true, opcode: .pong, data: frame.unmaskedData)
+             context.writeAndFlush(wrapOutboundOut(pong), promise: nil)
+         case .connectionClose:
+-            context.close(promise: nil)
++            // Echo the close and let the host drop the connection, so replies
++            // still queued ahead of this frame reach it.
++            let channel = context.channel
++            let echo = WebSocketFrame(fin: true, opcode: .connectionClose, data: frame.unmaskedData)
++            context.writeAndFlush(wrapOutboundOut(echo)).whenComplete { _ in
++                channel.closeAfterPeer()
++            }
+         default:
+             break
+         }
+diff --git a/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift
+index 42381ee7..0f54258b 100644
+--- a/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift
++++ b/VPhoneExecutable/VPhoneVirtualization/UI/GuestCommunication/VPhoneGuestControl.swift
+@@ -547,6 +547,9 @@ private final class VPhoneHTTPTransaction: @unchecked Sendable {
+     }
+ 
+     func run() throws -> VPhoneHTTPResponse {
++        // vphoned waits for this side to close before it releases the
++        // connection, because its own close would reset unsent reply bytes.
++        defer { connection.close() }
+         let fd = connection.fileDescriptor
+         guard fcntl(fd, F_SETNOSIGPIPE, 1) != -1 else {
+             throw VPhoneGuestControl.ControlError.notConnected

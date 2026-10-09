@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b22-cache-manual.py", line 37, in <module>
+    result['confirm_passed']=bool(shell('test -f '+cache+'.api-v2 && test ! -e '+cache+'.api-v2.pending && echo yes').strip())
+                                  ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 25, in shell
+AssertionError: {'truncated': False, 'stderr': '', 'timed_out': False, 'stdout': '', 'ok': True, 'code': 1}

@@ -1,0 +1,575 @@
+{
+  "artifact_sha256": "4631d1044aa75699b495a4136099aba484e4f973f6ed5ddd66ef6dff3ea0e638",
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -e /var/root/Library/Caches/vphoned.B22-original && echo exists || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; for p in /var/root/Library/Caches/vphoned.next /var/root/Library/Caches/vphoned.api-v2 /var/root/Library/Caches/vphoned.api-v2.pending; do test ! -e \"$p\" || echo exists; done",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "ok": true,
+        "size": 240352,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; stat -c \"%u %g %a %s\" /var/root/Library/Caches/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "0 0 755 240352\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; mv /var/root/Library/Caches/vphoned /var/root/Library/Caches/vphoned.B22-original",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/vphone-b21-api/b22-cache-acceptance.plist",
+        "load": "/private/tmp/vphone-b22-cache-acceptance.plist",
+        "perm": "600",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "size": 695,
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vphoned </dev/null >/var/root/vphone-b21-api/b22-cache-manual.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/Library/Caches/vphoned.next",
+        "load": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/api-final/vphoned",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "ok": true,
+        "size": 9040960
+      }
+    },
+    {
+      "method": "agent.apply_update",
+      "status": 200,
+      "response_bytes": 59,
+      "response_sha256": "cb78a157b76dfca81910bf9e5fdc8b052b96a458f855ba0f30efe6766aa4ecd4"
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep -E \"(vphone-b21-api/vphoned|Library/Caches/vphoned)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vphoned </dev/null >>/var/root/vphone-b21-api/b22-cache-manual.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; for p in /var/root/Library/Caches/vphoned.api-v2 /var/root/Library/Caches/vphoned.api-v2.pending; do test ! -e \"$p\" || ls -l \"$p\"; done",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "-rw-r--r-- 1 root wheel 64 Oct  9 10:22 /var/root/Library/Caches/vphoned.api-v2.pending\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep -E \"(vphone-b21-api/vphoned|Library/Caches/vphoned)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "19943     1 /var/root/Library/Caches/vphoned\n19944 19943 /private/var/root/Library/Caches/vphoned\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -f /var/root/Library/Caches/vphoned.api-v2 && test ! -e /var/root/Library/Caches/vphoned.api-v2.pending && echo yes",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 1
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep -E \"(vphone-b21-api/vphoned|Library/Caches/vphoned)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "19943     1 /var/root/Library/Caches/vphoned\n19944 19943 /private/var/root/Library/Caches/vphoned\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; kill -TERM 19943",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o pid=,ppid=,comm= | grep -E \"(vphone-b21-api/vphoned|Library/Caches/vphoned)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/Library/Caches/vphoned.B22-original"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; rm -f /var/root/Library/Caches/vphoned /var/root/Library/Caches/vphoned.next /var/root/Library/Caches/vphoned.api-v2 /var/root/Library/Caches/vphoned.api-v2.pending; mv /var/root/Library/Caches/vphoned.B22-original /var/root/Library/Caches/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "ok": true,
+        "size": 240352,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; stat -c \"%u %g %a %s\" /var/root/Library/Caches/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "0 0 755 240352\n",
+        "ok": true,
+        "code": 0
+      }
+    }
+  ],
+  "cache_restored": true,
+  "cache_original_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "cache_original_metadata": "0 0 755 240352\n",
+  "bundled_health": {
+    "api_version": 1,
+    "binary_hash": "4631d1044aa75699b495a4136099aba484e4f973f6ed5ddd66ef6dff3ea0e638",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "camera",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "B4292442-CB61-4ACC-A797-F24C2E09AF1B",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "update_reply": {
+    "restarting": true
+  },
+  "processes_after_update_exit": "",
+  "cached_health": {
+    "api_version": 1,
+    "binary_hash": "4631d1044aa75699b495a4136099aba484e4f973f6ed5ddd66ef6dff3ea0e638",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "camera",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "7854F0EC-9590-46F9-B691-AEE2E83EB35E",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "markers_after_listen": "-rw-r--r-- 1 root wheel 64 Oct  9 10:22 /var/root/Library/Caches/vphoned.api-v2.pending\n",
+  "processes_after_listen": "19943     1 /var/root/Library/Caches/vphoned\n19944 19943 /private/var/root/Library/Caches/vphoned\n",
+  "error": "AssertionError({'truncated': False, 'stderr': '', 'timed_out': False, 'stdout': '', 'ok': True, 'code': 1})",
+  "processes_after_bootout": ""
+}

@@ -1,0 +1,91 @@
+{
+  "artifact_sha256": "4631d1044aa75699b495a4136099aba484e4f973f6ed5ddd66ef6dff3ea0e638",
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; test -e /var/root/Library/Caches/vphoned.B22-original && echo exists || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; for p in /var/root/Library/Caches/vphoned.next /var/root/Library/Caches/vphoned.api-v2 /var/root/Library/Caches/vphoned.api-v2.pending; do test ! -e \"$p\" || echo exists; done",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/Library/Caches/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; stat -f \"%u %g %Lp %z\" /var/root/Library/Caches/vphoned",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "timed_out": false,
+        "stderr": "stat: cannot read file system information for '%u %g %Lp %z': No such file or directory\n",
+        "code": 1,
+        "ok": true,
+        "truncated": false,
+        "stdout": "  File: \"/var/root/Library/Caches/vphoned\"\n    ID: 10000090000001a Namelen: ?       Type: apfs\nBlock size: 4096       Fundamental block size: 4096\nBlocks: Total: 15140054   Free: 9639072    Available: 9639072\nInodes: Total: 385640323  Free: 385562880\n"
+      }
+    }
+  ],
+  "cache_restored": false,
+  "cache_original_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "error": "AssertionError({'timed_out': False, 'stderr': \"stat: cannot read file system information for '%u %g %Lp %z': No such file or directory\\n\", 'code': 1, 'ok': True, 'truncated': False, 'stdout': '  File: \"/var/root/Library/Caches/vphoned\"\\n    ID: 10000090000001a Namelen: ?       Type: apfs\\nBlock size: 4096       Fundamental block size: 4096\\nBlocks: Total: 15140054   Free: 9639072    Available: 9639072\\nInodes: Total: 385640323  Free: 385562880\\n'})"
+}

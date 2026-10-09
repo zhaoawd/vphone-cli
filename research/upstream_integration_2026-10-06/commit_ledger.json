@@ -2,7 +2,7 @@
   "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
   "start": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
   "git_version": "git version 2.53.0",
-  "classification_scope": "path triage; pending rows are not approved for transplant",
+  "classification_scope": "Selected full-diff semantic reviews and all merge resolutions; pending rows remain unreviewed and reviewed/planned rows do not imply implementation acceptance",
   "commits": [
     {
       "sha": "ee8b70ca8a6a7410f04c5064cdde409d5f6030b8",
@@ -453,8 +453,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "30c8512c89cd4dbeddda5eaaa4f5f11cf084cb58",
@@ -882,12 +886,16 @@
         "T28"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "7a9b4f7ce1109b2cca6b3bc858ac0b9a58865649",
@@ -980,8 +988,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "发布差异还修改最低Bundle门槛及helper构建号；历史最低门槛由最终2.6.0门槛取代，但实际本地门控与调用链仍须T40验证。补丁preset及escalator资源按对应任务另审。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "4e8d7bd7ced6cb58fc4afe99e2e6e49f317c258e",
@@ -1174,8 +1186,14 @@
         "T21"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adapted_verified_T06",
+      "reason": "完整提交逐路径复核：本地发送完成后等待对端关闭并有界回收，HTTP/文件/端口代理/WebSocket收尾与宿主主动关闭均已定位。固定运行候选完成边界、大文件慢读、提前关闭、FD回收；写操作断线不自动重放由消息关联与代际测试验证。",
+      "evidence": [
+        "evidence/B22-t06-upstream.diff",
+        "evidence/B22-bound-transfers.json",
+        "evidence/B22-bound-close-ws.json",
+        "evidence/B22-swift-complete-final.log"
+      ]
     },
     {
       "sha": "7405d6aaf1159c8ac47f3f4c1559fff4551d3cd6",
@@ -1418,8 +1436,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "30082845ae35fd0d233be95c5b9c9aea37818ae4",
@@ -1513,8 +1535,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "905196e7ed9f70c62b60d1e004bbe8372afeb7f0",
@@ -1711,8 +1737,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "adaptation_planned_T27",
+      "reason": "除版本元数据外新增VPhoneMenuData.swift菜单实现，涉及files/keychain/bootstrap、剪贴板、偏好和可用状态。本地Connect菜单及Hook需要按T27适配，尚未实现或验收；不得按纯元数据略过。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "4be9972aac3494aa176ccffcf5833d710098a842",
@@ -1906,8 +1936,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "a16ea3b973b35309b79517ec976f9eacfb3dad89",
@@ -1952,8 +1986,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "ab6e5cbee57ed7c01391de8327289386a4463881",
@@ -2046,12 +2084,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "8dc821db263745789f3b6f336668d26209d194d8",
@@ -2071,8 +2113,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "7f746eedfe79a3e7ec7603cde79f3b803e990489",
@@ -2133,8 +2179,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "5922ef11810b05673f15d633b5456ec10ec111be",
@@ -3468,8 +3518,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "1df4088c7444e68c142afdfd6e26416a78d825ac",
@@ -3581,8 +3635,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "ded81cb25798b059bd16f7f60c346257334001e1",
@@ -3669,8 +3727,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "ef93c2970de86693461aa6f7e52f356f7efe2b94",
@@ -3967,12 +4029,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "fe81e693277789abc371d59165d1dbef84977f17",
@@ -4026,8 +4092,8 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。文档合并本身没有新增执行代码；后续 AX 和构建检查仍按最终组件审查。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 1066,
       "remerge_diff_sha256": "57a4e432d646f966ef12472c4ee0d5269587d3c2bf5fd51291a45799a647bd97",
@@ -4038,6 +4104,11 @@
         "T28",
         "T38",
         "T41"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-fe81e693.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -4073,12 +4144,16 @@
         "T38"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "3043629ce95595e34d2c071601e697a3cd4b530e",
@@ -4097,8 +4172,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "244c8853cc7ad1ed9e6a057c9fe71609701dcd23",
@@ -4265,8 +4344,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "4c1544fe95707c761676561f48167fb9d48f217e",
@@ -4732,12 +4815,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "54b33da7edd1e38c9c334120296a70fe7532cec0",
@@ -4759,12 +4846,16 @@
         "T21"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "c059059967a7bbeb1461cf3e65a765a1da0044af",
@@ -4800,12 +4891,16 @@
         "T43"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "4d75b44186d3cb392c4ed79068426be3e021930d",
@@ -4825,8 +4920,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "fe92e33ba958580f8ca578f19ba6d1fc4c57f451",
@@ -4886,8 +4985,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "6f058bc86998690810fdd322b28cfcdaa3a49a36",
@@ -4974,8 +5077,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "3e7a2f138cd63ced19fd56b10522c44f90c006b3",
@@ -5112,12 +5219,16 @@
         "T41"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "44032381d227c3b719a378971d0c2ec8adb48457",
@@ -5412,12 +5523,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "b51c195b1859d8ee04c0f054684fb3106a26f430",
@@ -5457,12 +5572,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "dcff5de87ed80ef41aa741109ff0b819e74b98e0",
@@ -5494,12 +5613,16 @@
         "T39"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "3f00950be4c0fe9b275523dfb59dfcc43445444b",
@@ -5543,8 +5666,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "发布差异还修改最低Bundle门槛及helper构建号；历史最低门槛由最终2.6.0门槛取代，但实际本地门控与调用链仍须T40验证。网络CLI参数能力按T41另审。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "d82c609a2d8caefb44e0e10dce0fe1fde323acaa",
@@ -5677,12 +5804,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "77d3406ae4a18524a1aa4bd9d4ca6c079237859f",
@@ -5806,12 +5937,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "95cb910686704cbc2aeb66553fce74661d454df6",
@@ -5992,7 +6127,8 @@
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json"
     },
     {
       "sha": "8b28ea2cb497c089da9bf2406be4c3c36a117cf4",
@@ -6424,12 +6560,16 @@
         "T27"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "707caa0fb8633d184dbca7dce4ace6c167e0c57f",
@@ -6452,12 +6592,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "63e2809a5bb7312c0600c08c45d9ceb1c9b8c4fb",
@@ -6497,12 +6641,16 @@
         "T38"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "6d284217eb4beba322861967bf58c81016c447db",
@@ -6561,8 +6709,8 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。缓存状态与解锁属于不同能力，不能删除任一段；用户解锁授权和音频组合验收仍需分别处理。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 1856,
       "remerge_diff_sha256": "c0825cd40a7510c8e41832483cf8912cee6303f32c1612fbf9c3bbc543df5f28",
@@ -6572,6 +6720,11 @@
         "T28",
         "T36",
         "T42"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-6d284217.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -6646,12 +6799,16 @@
         "T38"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "bc4e6984ee9fb6b428267ac8f51abe56db0317fa",
@@ -6761,8 +6918,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "fe5df2a1522920af347fea31ce6a07324c001a4d",
@@ -6852,8 +7013,8 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。原件保存、board tree 消费和权限声明须成组适配；当前固定目标版本为 2.6.1，不能复制历史版本号。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 2350,
       "remerge_diff_sha256": "684e663996e79701dd186618af700f18e624f06019dfc531d9d743bc07cc3b8a",
@@ -6864,6 +7025,11 @@
         "T24",
         "T42",
         "T44"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-ac894380.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -6976,12 +7142,16 @@
         "T45"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "e6c01aa05d215756bc954f52ddd5feb88b1473ec",
@@ -7134,8 +7304,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "571e2ad0e33aea8895ef3e6b58648a3c3f3bc8b3",
@@ -7455,8 +7629,8 @@
         "T45"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。当前目标保留该权限描述；本地应使用当前构建来源，不继承历史发布元数据。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 876,
       "remerge_diff_sha256": "ccc17bba3edcf35ede946c13784af80c88c4a805a81c351b37e2f359a0c78cc5",
@@ -7465,6 +7639,11 @@
       "resolution_tasks": [
         "T24",
         "T42"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-f343a77a.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -7522,12 +7701,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "99204127084f5bf7af534695f0d75d17ab19c8c1",
@@ -7640,12 +7823,16 @@
         "T24"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "b01257323a367311d2c713931fc48dcd0b567965",
@@ -7675,12 +7862,16 @@
         "T45"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "78bac1ecd7a802ccb35c64e86ae23c637b985c1a",
@@ -7727,8 +7918,8 @@
         "T45"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。新增文档描述默认选择变化，不构成本地字节等价或音频通过证据；ID/预设迁移与音频验收继续分开跟踪。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 1432,
       "remerge_diff_sha256": "4d25d7a267d3e8ad4b48d0cc522697b8c412ab836b26d604dcc4020d6f8e4974",
@@ -7738,6 +7929,11 @@
         "T09",
         "T28",
         "T42"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-78bac1ec.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -7838,12 +8034,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "3567057a38d048f9acc65aa49935dc1af1adfb30",
@@ -8072,12 +8272,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "62db7337e5375c2ae826da2925d748091813223d",
@@ -8120,12 +8324,16 @@
         "T42"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "88552e1ecf1f3a1fff6aa16371924b6b23049579",
@@ -8185,12 +8393,16 @@
         "T42"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "caee5a4232ac240786d95582c7856c6e5bf41416",
@@ -8271,12 +8483,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "17d5c424171e066a2b6ee699c9e0bb7909773887",
@@ -8293,8 +8509,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "完整发布差异已读：历史版本号、构建号、下载链接和版本表由固定目标取代，不逐次移植；本地发布声明仍须T29验收。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "e678a9096ea8d8175030b2cb2f581d8565dba97f",
@@ -8899,12 +9119,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "e04ae0d7dacb72c8f927e19bd08e191332a30182",
@@ -8925,12 +9149,16 @@
         "T19"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "f9dce4a0c8b941fe5e51db9c439af22820938a52",
@@ -8948,12 +9176,16 @@
         "T27"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "a43ef52d77aee53507ffacf4e5f7508468678039",
@@ -8974,12 +9206,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "dadf1193e03ceeb616208aa0740a2ccd40066822",
@@ -9042,12 +9278,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "2d283e76fcdfc6d654549c0c6b9d3097ba396a08",
@@ -9086,12 +9326,16 @@
         "T43"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "bbf36000521c4eeb15c2f2ccb5100e3a0b9db861",
@@ -9207,8 +9451,8 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。设备分类与实际应用 receipt 需一起接入；不能以 iPhone 名称判定缺少 board，也不能丢弃修复后的 live 集合。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 3159,
       "remerge_diff_sha256": "c7cdf45bde933ef0eb79ec068eef372f45620f799a1d5153744c93ade2da9a2a",
@@ -9219,6 +9463,11 @@
         "T32",
         "T33",
         "T44"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-bbf36000.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -9249,12 +9498,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "17e1352e9f87862a3bcb3bd1bdc2ff9b0d883a3b",
@@ -9305,8 +9558,8 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。历史兼容记录不扩展本地声明范围；TXM 修正与型号固件组合需按实际本地证据验收。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 2089,
       "remerge_diff_sha256": "14ec77b7b7611d1598f3ef1a3e063c12e1b4d265f3ed6147a141e36b06bf8532",
@@ -9316,6 +9569,11 @@
         "T10",
         "T28",
         "T44"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-17e1352e.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -9362,12 +9620,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "a679f49ed7d3a91d4eb8014c8386328d397bd51c",
@@ -9415,12 +9677,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "edfa61c36a33494adacfa1cc5191e52df5f3fb92",
@@ -9576,8 +9842,8 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_resolution_reviewed_adaptation_planned",
+      "reason": "附加冲突解决与已有逐项审查及冻结差异摘要一致。旧 VM 无 Restore 时仍需配置身份和可验证 board 原件；preboot 分组恢复、不可撤销状态及 receipt 不能拆开；上游无计划时全部启用的默认值不满足本轮 C2 约束。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 19848,
       "remerge_diff_sha256": "eaa4b3bb38535b7d3b5ee5724f9f60d8b887f341eca0b9a7172a335111fa90e1",
@@ -9590,6 +9856,11 @@
         "T33",
         "T42",
         "T44"
+      ],
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "resolution_review_evidence": "evidence/T02-remerge-edfa61c3.diff",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
       ]
     },
     {
@@ -9623,12 +9894,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "293a74c3dc8fd6d6ef88318a0d45d8784721350d",
@@ -9676,12 +9951,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "a40872995bb81dcab5bf338331d3235061eabb20",
@@ -9733,12 +10012,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "fe46ee2f65cc35d7559139f393c9427370265459",
@@ -9786,12 +10069,16 @@
         "T39"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "0768ceefc0a7ea4e932306e54e65fd7dfb9542a2",
@@ -9827,12 +10114,16 @@
         "T02"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "7e7e46132e6cf0a6a1734077d78cf7f05485a1dd",
@@ -9870,12 +10161,16 @@
         "T28"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "d5f84a498eb3b90a975be21856c26f459c8aca89",
@@ -9956,12 +10251,16 @@
         "T02"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "c22981bf02970292cb43c6ece12b9b4faf13f171",
@@ -9996,12 +10295,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "fdb00934c34ed188d8a883b286c0f445e9f11535",
@@ -10077,12 +10380,16 @@
         "T02"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "04a13e47c74ce9dcb01863ff4ded8b1c98f4366c",
@@ -10188,12 +10495,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "49e1538692c8b4139466f9eb4e3e1d820e8f5967",
@@ -10298,12 +10609,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "abbce12b7edd687fa7b10f174ae54411fc6a6e79",
@@ -10322,12 +10637,16 @@
         "T26"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "fe361a0b8dc06b4598b7477d86783a7f9bf5270d",
@@ -10385,12 +10704,16 @@
         "T26"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "94376fe82a576b4e80086c8e3cbbd7d3bd99122f",
@@ -10410,8 +10733,12 @@
         "T46"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "发布差异包含helper构建号12→13和CFBundle构建号31→32。最终版本元数据取代历史值，构建号不证明本地XPC协议兼容；旧helper拒绝及日志协议仍按T24/T46验证。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "34bec3cc51753b296212402a0c573b9c0af97e67",
@@ -10475,12 +10802,16 @@
         "T27"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "f5f34505d5e3653140d76289a2efeabc33102d77",
@@ -10528,12 +10859,16 @@
         "T43"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "31b138545da0ab99e0a9d340cc65e8cf2dda3c0b",
@@ -10632,12 +10967,16 @@
         "T44"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "f9ea9015a82d29187d4b65cc15883d9bdc37a21c",
@@ -10654,8 +10993,12 @@
         "T29"
       ],
       "merge": false,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖"
+      "disposition": "release_metadata_superseded",
+      "reason": "最终发布版本2.6.1和构建号33及文档已核对；本地候选来源单独记录，release_validation=false。完成T29前不把当前整合分支宣称为正式2.6.1发布。",
+      "evidence": [
+        "evidence/B22-release-audit.diff",
+        "evidence/B22-release-docs.diff"
+      ]
     },
     {
       "sha": "86f1f88aadc53f4eaff760e3a121df26332499af",
@@ -10715,12 +11058,16 @@
         "T26"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     },
     {
       "sha": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
@@ -10746,12 +11093,16 @@
         "T46"
       ],
       "merge": true,
-      "disposition": "pending_semantic_review",
-      "reason": "需结合最终状态和本地定制审查，不能按提交标题判定已覆盖",
+      "disposition": "merge_no_additional_resolution",
+      "reason": "固定 Git 版本重新合并与记录树无差异；仅完成合并提交附加内容审查，父提交能力仍须逐项核对。",
       "remerge_diff_exit_code": 0,
       "remerge_diff_bytes": 0,
       "remerge_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "resolution_review": "no_diff_with_this_git_version"
+      "resolution_review": "no_diff_with_this_git_version",
+      "remerge_review_evidence": "evidence/B22-merge-audit.json",
+      "evidence": [
+        "evidence/B22-merge-audit.json"
+      ]
     }
   ]
 }

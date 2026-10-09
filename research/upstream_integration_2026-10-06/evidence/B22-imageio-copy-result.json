@@ -1,0 +1,66 @@
+{
+  "output": "BEFORE 1474872\nCAPTURE 0 width=1290 bytes=492667 footprint=18203032\nCAPTURE 1 width=1290 bytes=492655 footprint=32686488\nBASELINE 32178584\nCAPTURE 2 width=1290 bytes=492675 footprint=47202712\nCAPTURE 3 width=1290 bytes=492666 footprint=61686168\nCAPTURE 4 width=1290 bytes=492622 footprint=76186008\nCAPTURE 5 width=1290 bytes=492640 footprint=90685848\nCAPTURE 6 width=1290 bytes=492676 footprint=90669464\nCAPTURE 7 width=1290 bytes=492680 footprint=90685848\nCAPTURE 8 width=1290 bytes=492656 footprint=90669464\nCAPTURE 9 width=1290 bytes=492634 footprint=90669464\nCAPTURE 10 width=1290 bytes=492650 footprint=90669464\nCAPTURE 11 width=1290 bytes=492647 footprint=90669464\nCAPTURE 12 width=1290 bytes=492614 footprint=90669464\nCAPTURE 13 width=1290 bytes=492615 footprint=90669464\nCAPTURE 14 width=1290 bytes=492582 footprint=90669464\nCAPTURE 15 width=1290 bytes=492570 footprint=90669464\nCAPTURE 16 width=1290 bytes=492619 footprint=90669464\nCAPTURE 17 width=1290 bytes=492594 footprint=90669464\nCAPTURE 18 width=1290 bytes=492583 footprint=90669464\nCAPTURE 19 width=1290 bytes=492544 footprint=90669464\nCAPTURE 20 width=1290 bytes=492540 footprint=90669464\nCAPTURE 21 width=1290 bytes=492473 footprint=90669464\nSETTLED 3162520\nSETTLED 3129752\nSETTLED 3129752\n",
+  "observations": [
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/vphone-b21-api/signal-mask",
+        "load": "/private/tmp/vphone-b22-signal-mask",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "ok": true,
+        "size": 97792
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/signal-mask",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "mask_rc=0 TERM=1 INT=1 HUP=1 QUIT=1\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-imageio-copy.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "BEFORE 1474872\nCAPTURE 0 width=1290 bytes=492667 footprint=18203032\nCAPTURE 1 width=1290 bytes=492655 footprint=32686488\nBASELINE 32178584\nCAPTURE 2 width=1290 bytes=492675 footprint=47202712\nCAPTURE 3 width=1290 bytes=492666 footprint=61686168\nCAPTURE 4 width=1290 bytes=492622 footprint=76186008\nCAPTURE 5 width=1290 bytes=492640 footprint=90685848\nCAPTURE 6 width=1290 bytes=492676 footprint=90669464\nCAPTURE 7 width=1290 bytes=492680 footprint=90685848\nCAPTURE 8 width=1290 bytes=492656 footprint=90669464\nCAPTURE 9 width=1290 bytes=492634 footprint=90669464\nCAPTURE 10 width=1290 bytes=492650 footprint=90669464\nCAPTURE 11 width=1290 bytes=492647 footprint=90669464\nCAPTURE 12 width=1290 bytes=492614 footprint=90669464\nCAPTURE 13 width=1290 bytes=492615 footprint=90669464\nCAPTURE 14 width=1290 bytes=492582 footprint=90669464\nCAPTURE 15 width=1290 bytes=492570 footprint=90669464\nCAPTURE 16 width=1290 bytes=492619 footprint=90669464\nCAPTURE 17 width=1290 bytes=492594 footprint=90669464\nCAPTURE 18 width=1290 bytes=492583 footprint=90669464\nCAPTURE 19 width=1290 bytes=492544 footprint=90669464\nCAPTURE 20 width=1290 bytes=492540 footprint=90669464\nCAPTURE 21 width=1290 bytes=492473 footprint=90669464\nSETTLED 3162520\nSETTLED 3129752\nSETTLED 3129752\n",
+        "ok": true,
+        "code": 0
+      }
+    }
+  ]
+}

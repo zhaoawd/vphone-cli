@@ -1,0 +1,2137 @@
+{
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vphoned$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep vsock-probe || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_put",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/var/root/vphone-b21-api/vsock-probe",
+        "load": "/private/tmp/vphone-b22-vsock-corrected",
+        "perm": "755",
+        "data_b64": "omitted exact synthetic bytes"
+      },
+      "response": {
+        "ok": true,
+        "size": 98736
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 3 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-0.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-0.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 3 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-1.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-1.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 3 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-2.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-2.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 1 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-3.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-3.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 1 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-4.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-4.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 1 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-5.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false,
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "ok": true,
+        "code": 0
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "/var/root/vphone-b21-api/vsock-probe\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-5.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 4 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-6.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-6.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=8192 errno=0\nWRITE offset=8192 ret=8192 errno=0\nWRITE offset=16384 ret=8192 errno=0\nWRITE offset=24576 ret=8192 errno=0\nWRITE offset=32768 ret=8192 errno=0\nWRITE offset=40960 ret=8192 errno=0\nWRITE offset=49152 ret=8192 errno=0\nWRITE offset=57344 ret=8192 errno=0\nWRITE offset=65536 ret=8192 errno=0\nWRITE offset=73728 ret=8192 errno=0\nWRITE offset=81920 ret=8192 errno=0\nWRITE offset=90112 ret=8192 errno=0\nWRITE offset=98304 ret=8192 errno=0\nWRITE offset=106496 ret=8192 errno=0\nWRITE offset=114688 ret=8192 errno=0\nWRITE offset=122880 ret=8192 errno=0\nWRITE offset=131072 ret=8192 errno=0\nWRITE offset=139264 ret=8192 errno=0\nWRITE offset=147456 ret=8192 errno=0\nWRITE offset=155648 ret=8192 errno=0\nWRITE offset=163840 ret=8192 errno=0\nWRITE offset=172032 ret=8192 errno=0\nWRITE offset=180224 ret=8192 errno=0\nWRITE offset=188416 ret=8192 errno=0\nWRITE offset=196608 ret=8192 errno=0\nWRITE offset=204800 ret=8192 errno=0\nWRITE offset=212992 ret=8192 errno=0\nWRITE offset=221184 ret=8192 errno=0\nWRITE offset=229376 ret=8192 errno=0\nWRITE offset=237568 ret=8192 errno=0\nWRITE offset=245760 ret=8192 errno=0\nWRITE offset=253952 ret=8192 errno=0\nWRITE offset=262144 ret=8192 errno=0\nWRITE offset=270336 ret=8192 errno=0\nWRITE offset=278528 ret=8192 errno=0\nWRITE offset=286720 ret=8192 errno=0\nWRITE offset=294912 ret=8192 errno=0\nWRITE offset=303104 ret=8192 errno=0\nWRITE offset=311296 ret=8192 errno=0\nWRITE offset=319488 ret=8192 errno=0\nWRITE offset=327680 ret=8192 errno=0\nWRITE offset=335872 ret=8192 errno=0\nWRITE offset=344064 ret=8192 errno=0\nWRITE offset=352256 ret=8192 errno=0\nWRITE offset=360448 ret=8192 errno=0\nWRITE offset=368640 ret=8192 errno=0\nWRITE offset=376832 ret=8192 errno=0\nWRITE offset=385024 ret=8192 errno=0\nWRITE offset=393216 ret=8192 errno=0\nWRITE offset=401408 ret=8192 errno=0\nWRITE offset=409600 ret=8192 errno=0\nWRITE offset=417792 ret=8192 errno=0\nWRITE offset=425984 ret=8192 errno=0\nWRITE offset=434176 ret=8192 errno=0\nWRITE offset=442368 ret=8192 errno=0\nWRITE offset=450560 ret=8192 errno=0\nWRITE offset=458752 ret=8192 errno=0\nWRITE offset=466944 ret=8192 errno=0\nWRITE offset=475136 ret=8192 errno=0\nWRITE offset=483328 ret=8192 errno=0\nWRITE offset=491520 ret=8192 errno=0\nWRITE offset=499712 ret=8192 errno=0\nWRITE offset=507904 ret=8192 errno=0\nWRITE offset=516096 ret=8192 errno=0\nWRITE offset=524288 ret=8192 errno=0\nWRITE offset=532480 ret=8192 errno=0\nWRITE offset=540672 ret=8192 errno=0\nWRITE offset=548864 ret=8192 errno=0\nWRITE offset=557056 ret=8192 errno=0\nWRITE offset=565248 ret=8192 errno=0\nWRITE offset=573440 ret=8192 errno=0\nWRITE offset=581632 ret=8192 errno=0\nWRITE offset=589824 ret=8192 errno=0\nWRITE offset=598016 ret=8192 errno=0\nWRITE offset=606208 ret=8192 errno=0\nWRITE offset=614400 ret=8192 errno=0\nWRITE offset=622592 ret=8192 errno=0\nWRITE offset=630784 ret=8192 errno=0\nWRITE offset=638976 ret=8192 errno=0\nWRITE offset=647168 ret=8192 errno=0\nWRITE offset=655360 ret=8192 errno=0\nWRITE offset=663552 ret=8192 errno=0\nWRITE offset=671744 ret=8192 errno=0\nWRITE offset=679936 ret=8192 errno=0\nWRITE offset=688128 ret=8192 errno=0\nWRITE offset=696320 ret=8192 errno=0\nWRITE offset=704512 ret=8192 errno=0\nWRITE offset=712704 ret=8192 errno=0\nWRITE offset=720896 ret=8192 errno=0\nWRITE offset=729088 ret=8192 errno=0\nWRITE offset=737280 ret=8192 errno=0\nWRITE offset=745472 ret=8192 errno=0\nWRITE offset=753664 ret=8192 errno=0\nWRITE offset=761856 ret=8192 errno=0\nWRITE offset=770048 ret=8192 errno=0\nWRITE offset=778240 ret=8192 errno=0\nWRITE offset=786432 ret=8192 errno=0\nWRITE offset=794624 ret=8192 errno=0\nWRITE offset=802816 ret=8192 errno=0\nWRITE offset=811008 ret=8192 errno=0\nWRITE offset=819200 ret=8192 errno=0\nWRITE offset=827392 ret=8192 errno=0\nWRITE offset=835584 ret=8192 errno=0\nWRITE offset=843776 ret=8192 errno=0\nWRITE offset=851968 ret=8192 errno=0\nWRITE offset=860160 ret=8192 errno=0\nWRITE offset=868352 ret=8192 errno=0\nWRITE offset=876544 ret=8192 errno=0\nWRITE offset=884736 ret=8192 errno=0\nWRITE offset=892928 ret=8192 errno=0\nWRITE offset=901120 ret=8192 errno=0\nWRITE offset=909312 ret=8192 errno=0\nWRITE offset=917504 ret=8192 errno=0\nWRITE offset=925696 ret=8192 errno=0\nWRITE offset=933888 ret=8192 errno=0\nWRITE offset=942080 ret=8192 errno=0\nWRITE offset=950272 ret=8192 errno=0\nWRITE offset=958464 ret=8192 errno=0\nWRITE offset=966656 ret=8192 errno=0\nWRITE offset=974848 ret=8192 errno=0\nWRITE offset=983040 ret=8192 errno=0\nWRITE offset=991232 ret=8192 errno=0\nWRITE offset=999424 ret=8192 errno=0\nWRITE offset=1007616 ret=8192 errno=0\nWRITE offset=1015808 ret=8192 errno=0\nWRITE offset=1024000 ret=8192 errno=0\nWRITE offset=1032192 ret=8192 errno=0\nWRITE offset=1040384 ret=8192 errno=0\nSENT total=1048576\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 4 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-7.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-7.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=8192 errno=0\nWRITE offset=8192 ret=8192 errno=0\nWRITE offset=16384 ret=8192 errno=0\nWRITE offset=24576 ret=8192 errno=0\nWRITE offset=32768 ret=8192 errno=0\nWRITE offset=40960 ret=8192 errno=0\nWRITE offset=49152 ret=8192 errno=0\nWRITE offset=57344 ret=8192 errno=0\nWRITE offset=65536 ret=8192 errno=0\nWRITE offset=73728 ret=8192 errno=0\nWRITE offset=81920 ret=8192 errno=0\nWRITE offset=90112 ret=8192 errno=0\nWRITE offset=98304 ret=8192 errno=0\nWRITE offset=106496 ret=8192 errno=0\nWRITE offset=114688 ret=8192 errno=0\nWRITE offset=122880 ret=8192 errno=0\nWRITE offset=131072 ret=8192 errno=0\nWRITE offset=139264 ret=8192 errno=0\nWRITE offset=147456 ret=8192 errno=0\nWRITE offset=155648 ret=8192 errno=0\nWRITE offset=163840 ret=8192 errno=0\nWRITE offset=172032 ret=8192 errno=0\nWRITE offset=180224 ret=8192 errno=0\nWRITE offset=188416 ret=8192 errno=0\nWRITE offset=196608 ret=8192 errno=0\nWRITE offset=204800 ret=8192 errno=0\nWRITE offset=212992 ret=8192 errno=0\nWRITE offset=221184 ret=8192 errno=0\nWRITE offset=229376 ret=8192 errno=0\nWRITE offset=237568 ret=8192 errno=0\nWRITE offset=245760 ret=8192 errno=0\nWRITE offset=253952 ret=8192 errno=0\nWRITE offset=262144 ret=8192 errno=0\nWRITE offset=270336 ret=8192 errno=0\nWRITE offset=278528 ret=8192 errno=0\nWRITE offset=286720 ret=8192 errno=0\nWRITE offset=294912 ret=8192 errno=0\nWRITE offset=303104 ret=8192 errno=0\nWRITE offset=311296 ret=8192 errno=0\nWRITE offset=319488 ret=8192 errno=0\nWRITE offset=327680 ret=8192 errno=0\nWRITE offset=335872 ret=8192 errno=0\nWRITE offset=344064 ret=8192 errno=0\nWRITE offset=352256 ret=8192 errno=0\nWRITE offset=360448 ret=8192 errno=0\nWRITE offset=368640 ret=8192 errno=0\nWRITE offset=376832 ret=8192 errno=0\nWRITE offset=385024 ret=8192 errno=0\nWRITE offset=393216 ret=8192 errno=0\nWRITE offset=401408 ret=8192 errno=0\nWRITE offset=409600 ret=8192 errno=0\nWRITE offset=417792 ret=8192 errno=0\nWRITE offset=425984 ret=8192 errno=0\nWRITE offset=434176 ret=8192 errno=0\nWRITE offset=442368 ret=8192 errno=0\nWRITE offset=450560 ret=8192 errno=0\nWRITE offset=458752 ret=8192 errno=0\nWRITE offset=466944 ret=8192 errno=0\nWRITE offset=475136 ret=8192 errno=0\nWRITE offset=483328 ret=8192 errno=0\nWRITE offset=491520 ret=8192 errno=0\nWRITE offset=499712 ret=8192 errno=0\nWRITE offset=507904 ret=8192 errno=0\nWRITE offset=516096 ret=8192 errno=0\nWRITE offset=524288 ret=8192 errno=0\nWRITE offset=532480 ret=8192 errno=0\nWRITE offset=540672 ret=8192 errno=0\nWRITE offset=548864 ret=8192 errno=0\nWRITE offset=557056 ret=8192 errno=0\nWRITE offset=565248 ret=8192 errno=0\nWRITE offset=573440 ret=8192 errno=0\nWRITE offset=581632 ret=8192 errno=0\nWRITE offset=589824 ret=8192 errno=0\nWRITE offset=598016 ret=8192 errno=0\nWRITE offset=606208 ret=8192 errno=0\nWRITE offset=614400 ret=8192 errno=0\nWRITE offset=622592 ret=8192 errno=0\nWRITE offset=630784 ret=8192 errno=0\nWRITE offset=638976 ret=8192 errno=0\nWRITE offset=647168 ret=8192 errno=0\nWRITE offset=655360 ret=8192 errno=0\nWRITE offset=663552 ret=8192 errno=0\nWRITE offset=671744 ret=8192 errno=0\nWRITE offset=679936 ret=8192 errno=0\nWRITE offset=688128 ret=8192 errno=0\nWRITE offset=696320 ret=8192 errno=0\nWRITE offset=704512 ret=8192 errno=0\nWRITE offset=712704 ret=8192 errno=0\nWRITE offset=720896 ret=8192 errno=0\nWRITE offset=729088 ret=8192 errno=0\nWRITE offset=737280 ret=8192 errno=0\nWRITE offset=745472 ret=8192 errno=0\nWRITE offset=753664 ret=8192 errno=0\nWRITE offset=761856 ret=8192 errno=0\nWRITE offset=770048 ret=8192 errno=0\nWRITE offset=778240 ret=8192 errno=0\nWRITE offset=786432 ret=8192 errno=0\nWRITE offset=794624 ret=8192 errno=0\nWRITE offset=802816 ret=8192 errno=0\nWRITE offset=811008 ret=8192 errno=0\nWRITE offset=819200 ret=8192 errno=0\nWRITE offset=827392 ret=8192 errno=0\nWRITE offset=835584 ret=8192 errno=0\nWRITE offset=843776 ret=8192 errno=0\nWRITE offset=851968 ret=8192 errno=0\nWRITE offset=860160 ret=8192 errno=0\nWRITE offset=868352 ret=8192 errno=0\nWRITE offset=876544 ret=8192 errno=0\nWRITE offset=884736 ret=8192 errno=0\nWRITE offset=892928 ret=8192 errno=0\nWRITE offset=901120 ret=8192 errno=0\nWRITE offset=909312 ret=8192 errno=0\nWRITE offset=917504 ret=8192 errno=0\nWRITE offset=925696 ret=8192 errno=0\nWRITE offset=933888 ret=8192 errno=0\nWRITE offset=942080 ret=8192 errno=0\nWRITE offset=950272 ret=8192 errno=0\nWRITE offset=958464 ret=8192 errno=0\nWRITE offset=966656 ret=8192 errno=0\nWRITE offset=974848 ret=8192 errno=0\nWRITE offset=983040 ret=8192 errno=0\nWRITE offset=991232 ret=8192 errno=0\nWRITE offset=999424 ret=8192 errno=0\nWRITE offset=1007616 ret=8192 errno=0\nWRITE offset=1015808 ret=8192 errno=0\nWRITE offset=1024000 ret=8192 errno=0\nWRITE offset=1032192 ret=8192 errno=0\nWRITE offset=1040384 ret=8192 errno=0\nSENT total=1048576\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/(vphoned|vsock-probe)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; /var/root/vphone-b21-api/vsock-probe 4 </dev/null >/var/root/vphone-b21-api/b22-vsock-v2-8.log 2>&1 &",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"vphone-b21-api/vsock-probe$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; cat /var/root/vphone-b21-api/b22-vsock-v2-8.log",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "READY vectors=1\nWRITE offset=0 ret=8192 errno=0\nWRITE offset=8192 ret=8192 errno=0\nWRITE offset=16384 ret=8192 errno=0\nWRITE offset=24576 ret=8192 errno=0\nWRITE offset=32768 ret=8192 errno=0\nWRITE offset=40960 ret=8192 errno=0\nWRITE offset=49152 ret=8192 errno=0\nWRITE offset=57344 ret=8192 errno=0\nWRITE offset=65536 ret=8192 errno=0\nWRITE offset=73728 ret=8192 errno=0\nWRITE offset=81920 ret=8192 errno=0\nWRITE offset=90112 ret=8192 errno=0\nWRITE offset=98304 ret=8192 errno=0\nWRITE offset=106496 ret=8192 errno=0\nWRITE offset=114688 ret=8192 errno=0\nWRITE offset=122880 ret=8192 errno=0\nWRITE offset=131072 ret=8192 errno=0\nWRITE offset=139264 ret=8192 errno=0\nWRITE offset=147456 ret=8192 errno=0\nWRITE offset=155648 ret=8192 errno=0\nWRITE offset=163840 ret=8192 errno=0\nWRITE offset=172032 ret=8192 errno=0\nWRITE offset=180224 ret=8192 errno=0\nWRITE offset=188416 ret=8192 errno=0\nWRITE offset=196608 ret=8192 errno=0\nWRITE offset=204800 ret=8192 errno=0\nWRITE offset=212992 ret=8192 errno=0\nWRITE offset=221184 ret=8192 errno=0\nWRITE offset=229376 ret=8192 errno=0\nWRITE offset=237568 ret=8192 errno=0\nWRITE offset=245760 ret=8192 errno=0\nWRITE offset=253952 ret=8192 errno=0\nWRITE offset=262144 ret=8192 errno=0\nWRITE offset=270336 ret=8192 errno=0\nWRITE offset=278528 ret=8192 errno=0\nWRITE offset=286720 ret=8192 errno=0\nWRITE offset=294912 ret=8192 errno=0\nWRITE offset=303104 ret=8192 errno=0\nWRITE offset=311296 ret=8192 errno=0\nWRITE offset=319488 ret=8192 errno=0\nWRITE offset=327680 ret=8192 errno=0\nWRITE offset=335872 ret=8192 errno=0\nWRITE offset=344064 ret=8192 errno=0\nWRITE offset=352256 ret=8192 errno=0\nWRITE offset=360448 ret=8192 errno=0\nWRITE offset=368640 ret=8192 errno=0\nWRITE offset=376832 ret=8192 errno=0\nWRITE offset=385024 ret=8192 errno=0\nWRITE offset=393216 ret=8192 errno=0\nWRITE offset=401408 ret=8192 errno=0\nWRITE offset=409600 ret=8192 errno=0\nWRITE offset=417792 ret=8192 errno=0\nWRITE offset=425984 ret=8192 errno=0\nWRITE offset=434176 ret=8192 errno=0\nWRITE offset=442368 ret=8192 errno=0\nWRITE offset=450560 ret=8192 errno=0\nWRITE offset=458752 ret=8192 errno=0\nWRITE offset=466944 ret=8192 errno=0\nWRITE offset=475136 ret=8192 errno=0\nWRITE offset=483328 ret=8192 errno=0\nWRITE offset=491520 ret=8192 errno=0\nWRITE offset=499712 ret=8192 errno=0\nWRITE offset=507904 ret=8192 errno=0\nWRITE offset=516096 ret=8192 errno=0\nWRITE offset=524288 ret=8192 errno=0\nWRITE offset=532480 ret=8192 errno=0\nWRITE offset=540672 ret=8192 errno=0\nWRITE offset=548864 ret=8192 errno=0\nWRITE offset=557056 ret=8192 errno=0\nWRITE offset=565248 ret=8192 errno=0\nWRITE offset=573440 ret=8192 errno=0\nWRITE offset=581632 ret=8192 errno=0\nWRITE offset=589824 ret=8192 errno=0\nWRITE offset=598016 ret=8192 errno=0\nWRITE offset=606208 ret=8192 errno=0\nWRITE offset=614400 ret=8192 errno=0\nWRITE offset=622592 ret=8192 errno=0\nWRITE offset=630784 ret=8192 errno=0\nWRITE offset=638976 ret=8192 errno=0\nWRITE offset=647168 ret=8192 errno=0\nWRITE offset=655360 ret=8192 errno=0\nWRITE offset=663552 ret=8192 errno=0\nWRITE offset=671744 ret=8192 errno=0\nWRITE offset=679936 ret=8192 errno=0\nWRITE offset=688128 ret=8192 errno=0\nWRITE offset=696320 ret=8192 errno=0\nWRITE offset=704512 ret=8192 errno=0\nWRITE offset=712704 ret=8192 errno=0\nWRITE offset=720896 ret=8192 errno=0\nWRITE offset=729088 ret=8192 errno=0\nWRITE offset=737280 ret=8192 errno=0\nWRITE offset=745472 ret=8192 errno=0\nWRITE offset=753664 ret=8192 errno=0\nWRITE offset=761856 ret=8192 errno=0\nWRITE offset=770048 ret=8192 errno=0\nWRITE offset=778240 ret=8192 errno=0\nWRITE offset=786432 ret=8192 errno=0\nWRITE offset=794624 ret=8192 errno=0\nWRITE offset=802816 ret=8192 errno=0\nWRITE offset=811008 ret=8192 errno=0\nWRITE offset=819200 ret=8192 errno=0\nWRITE offset=827392 ret=8192 errno=0\nWRITE offset=835584 ret=8192 errno=0\nWRITE offset=843776 ret=8192 errno=0\nWRITE offset=851968 ret=8192 errno=0\nWRITE offset=860160 ret=8192 errno=0\nWRITE offset=868352 ret=8192 errno=0\nWRITE offset=876544 ret=8192 errno=0\nWRITE offset=884736 ret=8192 errno=0\nWRITE offset=892928 ret=8192 errno=0\nWRITE offset=901120 ret=8192 errno=0\nWRITE offset=909312 ret=8192 errno=0\nWRITE offset=917504 ret=8192 errno=0\nWRITE offset=925696 ret=8192 errno=0\nWRITE offset=933888 ret=8192 errno=0\nWRITE offset=942080 ret=8192 errno=0\nWRITE offset=950272 ret=8192 errno=0\nWRITE offset=958464 ret=8192 errno=0\nWRITE offset=966656 ret=8192 errno=0\nWRITE offset=974848 ret=8192 errno=0\nWRITE offset=983040 ret=8192 errno=0\nWRITE offset=991232 ret=8192 errno=0\nWRITE offset=999424 ret=8192 errno=0\nWRITE offset=1007616 ret=8192 errno=0\nWRITE offset=1015808 ret=8192 errno=0\nWRITE offset=1024000 ret=8192 errno=0\nWRITE offset=1032192 ret=8192 errno=0\nWRITE offset=1040384 ret=8192 errno=0\nSENT total=1048576\n",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    }
+  ],
+  "downloads": [
+    {
+      "mode": 3,
+      "trial": 0,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 3,
+      "trial": 1,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 3,
+      "trial": 2,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 1,
+      "trial": 3,
+      "status": 200,
+      "error": "TimeoutError: timed out",
+      "bytes": 524288,
+      "sha256": "378984717e5099259b73b9a4d4acc92a83902a62a189ff376b0f7d8c6db80a6e",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 1,
+      "trial": 4,
+      "status": 200,
+      "error": "TimeoutError: timed out",
+      "bytes": 524288,
+      "sha256": "d2f44989320705011fac3d3c3c653654b5fd56611ddcbcc545764f48a6c7c137",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 1,
+      "trial": 5,
+      "status": 200,
+      "error": "TimeoutError: timed out",
+      "bytes": 524288,
+      "sha256": "45de3acb923e0d4ee791a115095fec9e1e07842e07d3ee122156e8a3e3aa57da",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=65536 errno=0\nWRITE offset=65536 ret=65536 errno=0\nWRITE offset=131072 ret=65536 errno=0\nWRITE offset=196608 ret=65536 errno=0\nWRITE offset=262144 ret=65536 errno=0\nWRITE offset=327680 ret=65536 errno=0\nWRITE offset=393216 ret=65536 errno=0\nWRITE offset=458752 ret=65536 errno=0\nWRITE offset=524288 ret=65536 errno=0\nWRITE offset=589824 ret=65536 errno=0\nWRITE offset=655360 ret=65536 errno=0\nWRITE offset=720896 ret=65536 errno=0\nWRITE offset=786432 ret=65536 errno=0\nWRITE offset=851968 ret=65536 errno=0\nWRITE offset=917504 ret=65536 errno=0\nWRITE offset=983040 ret=65536 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 4,
+      "trial": 6,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=8192 errno=0\nWRITE offset=8192 ret=8192 errno=0\nWRITE offset=16384 ret=8192 errno=0\nWRITE offset=24576 ret=8192 errno=0\nWRITE offset=32768 ret=8192 errno=0\nWRITE offset=40960 ret=8192 errno=0\nWRITE offset=49152 ret=8192 errno=0\nWRITE offset=57344 ret=8192 errno=0\nWRITE offset=65536 ret=8192 errno=0\nWRITE offset=73728 ret=8192 errno=0\nWRITE offset=81920 ret=8192 errno=0\nWRITE offset=90112 ret=8192 errno=0\nWRITE offset=98304 ret=8192 errno=0\nWRITE offset=106496 ret=8192 errno=0\nWRITE offset=114688 ret=8192 errno=0\nWRITE offset=122880 ret=8192 errno=0\nWRITE offset=131072 ret=8192 errno=0\nWRITE offset=139264 ret=8192 errno=0\nWRITE offset=147456 ret=8192 errno=0\nWRITE offset=155648 ret=8192 errno=0\nWRITE offset=163840 ret=8192 errno=0\nWRITE offset=172032 ret=8192 errno=0\nWRITE offset=180224 ret=8192 errno=0\nWRITE offset=188416 ret=8192 errno=0\nWRITE offset=196608 ret=8192 errno=0\nWRITE offset=204800 ret=8192 errno=0\nWRITE offset=212992 ret=8192 errno=0\nWRITE offset=221184 ret=8192 errno=0\nWRITE offset=229376 ret=8192 errno=0\nWRITE offset=237568 ret=8192 errno=0\nWRITE offset=245760 ret=8192 errno=0\nWRITE offset=253952 ret=8192 errno=0\nWRITE offset=262144 ret=8192 errno=0\nWRITE offset=270336 ret=8192 errno=0\nWRITE offset=278528 ret=8192 errno=0\nWRITE offset=286720 ret=8192 errno=0\nWRITE offset=294912 ret=8192 errno=0\nWRITE offset=303104 ret=8192 errno=0\nWRITE offset=311296 ret=8192 errno=0\nWRITE offset=319488 ret=8192 errno=0\nWRITE offset=327680 ret=8192 errno=0\nWRITE offset=335872 ret=8192 errno=0\nWRITE offset=344064 ret=8192 errno=0\nWRITE offset=352256 ret=8192 errno=0\nWRITE offset=360448 ret=8192 errno=0\nWRITE offset=368640 ret=8192 errno=0\nWRITE offset=376832 ret=8192 errno=0\nWRITE offset=385024 ret=8192 errno=0\nWRITE offset=393216 ret=8192 errno=0\nWRITE offset=401408 ret=8192 errno=0\nWRITE offset=409600 ret=8192 errno=0\nWRITE offset=417792 ret=8192 errno=0\nWRITE offset=425984 ret=8192 errno=0\nWRITE offset=434176 ret=8192 errno=0\nWRITE offset=442368 ret=8192 errno=0\nWRITE offset=450560 ret=8192 errno=0\nWRITE offset=458752 ret=8192 errno=0\nWRITE offset=466944 ret=8192 errno=0\nWRITE offset=475136 ret=8192 errno=0\nWRITE offset=483328 ret=8192 errno=0\nWRITE offset=491520 ret=8192 errno=0\nWRITE offset=499712 ret=8192 errno=0\nWRITE offset=507904 ret=8192 errno=0\nWRITE offset=516096 ret=8192 errno=0\nWRITE offset=524288 ret=8192 errno=0\nWRITE offset=532480 ret=8192 errno=0\nWRITE offset=540672 ret=8192 errno=0\nWRITE offset=548864 ret=8192 errno=0\nWRITE offset=557056 ret=8192 errno=0\nWRITE offset=565248 ret=8192 errno=0\nWRITE offset=573440 ret=8192 errno=0\nWRITE offset=581632 ret=8192 errno=0\nWRITE offset=589824 ret=8192 errno=0\nWRITE offset=598016 ret=8192 errno=0\nWRITE offset=606208 ret=8192 errno=0\nWRITE offset=614400 ret=8192 errno=0\nWRITE offset=622592 ret=8192 errno=0\nWRITE offset=630784 ret=8192 errno=0\nWRITE offset=638976 ret=8192 errno=0\nWRITE offset=647168 ret=8192 errno=0\nWRITE offset=655360 ret=8192 errno=0\nWRITE offset=663552 ret=8192 errno=0\nWRITE offset=671744 ret=8192 errno=0\nWRITE offset=679936 ret=8192 errno=0\nWRITE offset=688128 ret=8192 errno=0\nWRITE offset=696320 ret=8192 errno=0\nWRITE offset=704512 ret=8192 errno=0\nWRITE offset=712704 ret=8192 errno=0\nWRITE offset=720896 ret=8192 errno=0\nWRITE offset=729088 ret=8192 errno=0\nWRITE offset=737280 ret=8192 errno=0\nWRITE offset=745472 ret=8192 errno=0\nWRITE offset=753664 ret=8192 errno=0\nWRITE offset=761856 ret=8192 errno=0\nWRITE offset=770048 ret=8192 errno=0\nWRITE offset=778240 ret=8192 errno=0\nWRITE offset=786432 ret=8192 errno=0\nWRITE offset=794624 ret=8192 errno=0\nWRITE offset=802816 ret=8192 errno=0\nWRITE offset=811008 ret=8192 errno=0\nWRITE offset=819200 ret=8192 errno=0\nWRITE offset=827392 ret=8192 errno=0\nWRITE offset=835584 ret=8192 errno=0\nWRITE offset=843776 ret=8192 errno=0\nWRITE offset=851968 ret=8192 errno=0\nWRITE offset=860160 ret=8192 errno=0\nWRITE offset=868352 ret=8192 errno=0\nWRITE offset=876544 ret=8192 errno=0\nWRITE offset=884736 ret=8192 errno=0\nWRITE offset=892928 ret=8192 errno=0\nWRITE offset=901120 ret=8192 errno=0\nWRITE offset=909312 ret=8192 errno=0\nWRITE offset=917504 ret=8192 errno=0\nWRITE offset=925696 ret=8192 errno=0\nWRITE offset=933888 ret=8192 errno=0\nWRITE offset=942080 ret=8192 errno=0\nWRITE offset=950272 ret=8192 errno=0\nWRITE offset=958464 ret=8192 errno=0\nWRITE offset=966656 ret=8192 errno=0\nWRITE offset=974848 ret=8192 errno=0\nWRITE offset=983040 ret=8192 errno=0\nWRITE offset=991232 ret=8192 errno=0\nWRITE offset=999424 ret=8192 errno=0\nWRITE offset=1007616 ret=8192 errno=0\nWRITE offset=1015808 ret=8192 errno=0\nWRITE offset=1024000 ret=8192 errno=0\nWRITE offset=1032192 ret=8192 errno=0\nWRITE offset=1040384 ret=8192 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 4,
+      "trial": 7,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=8192 errno=0\nWRITE offset=8192 ret=8192 errno=0\nWRITE offset=16384 ret=8192 errno=0\nWRITE offset=24576 ret=8192 errno=0\nWRITE offset=32768 ret=8192 errno=0\nWRITE offset=40960 ret=8192 errno=0\nWRITE offset=49152 ret=8192 errno=0\nWRITE offset=57344 ret=8192 errno=0\nWRITE offset=65536 ret=8192 errno=0\nWRITE offset=73728 ret=8192 errno=0\nWRITE offset=81920 ret=8192 errno=0\nWRITE offset=90112 ret=8192 errno=0\nWRITE offset=98304 ret=8192 errno=0\nWRITE offset=106496 ret=8192 errno=0\nWRITE offset=114688 ret=8192 errno=0\nWRITE offset=122880 ret=8192 errno=0\nWRITE offset=131072 ret=8192 errno=0\nWRITE offset=139264 ret=8192 errno=0\nWRITE offset=147456 ret=8192 errno=0\nWRITE offset=155648 ret=8192 errno=0\nWRITE offset=163840 ret=8192 errno=0\nWRITE offset=172032 ret=8192 errno=0\nWRITE offset=180224 ret=8192 errno=0\nWRITE offset=188416 ret=8192 errno=0\nWRITE offset=196608 ret=8192 errno=0\nWRITE offset=204800 ret=8192 errno=0\nWRITE offset=212992 ret=8192 errno=0\nWRITE offset=221184 ret=8192 errno=0\nWRITE offset=229376 ret=8192 errno=0\nWRITE offset=237568 ret=8192 errno=0\nWRITE offset=245760 ret=8192 errno=0\nWRITE offset=253952 ret=8192 errno=0\nWRITE offset=262144 ret=8192 errno=0\nWRITE offset=270336 ret=8192 errno=0\nWRITE offset=278528 ret=8192 errno=0\nWRITE offset=286720 ret=8192 errno=0\nWRITE offset=294912 ret=8192 errno=0\nWRITE offset=303104 ret=8192 errno=0\nWRITE offset=311296 ret=8192 errno=0\nWRITE offset=319488 ret=8192 errno=0\nWRITE offset=327680 ret=8192 errno=0\nWRITE offset=335872 ret=8192 errno=0\nWRITE offset=344064 ret=8192 errno=0\nWRITE offset=352256 ret=8192 errno=0\nWRITE offset=360448 ret=8192 errno=0\nWRITE offset=368640 ret=8192 errno=0\nWRITE offset=376832 ret=8192 errno=0\nWRITE offset=385024 ret=8192 errno=0\nWRITE offset=393216 ret=8192 errno=0\nWRITE offset=401408 ret=8192 errno=0\nWRITE offset=409600 ret=8192 errno=0\nWRITE offset=417792 ret=8192 errno=0\nWRITE offset=425984 ret=8192 errno=0\nWRITE offset=434176 ret=8192 errno=0\nWRITE offset=442368 ret=8192 errno=0\nWRITE offset=450560 ret=8192 errno=0\nWRITE offset=458752 ret=8192 errno=0\nWRITE offset=466944 ret=8192 errno=0\nWRITE offset=475136 ret=8192 errno=0\nWRITE offset=483328 ret=8192 errno=0\nWRITE offset=491520 ret=8192 errno=0\nWRITE offset=499712 ret=8192 errno=0\nWRITE offset=507904 ret=8192 errno=0\nWRITE offset=516096 ret=8192 errno=0\nWRITE offset=524288 ret=8192 errno=0\nWRITE offset=532480 ret=8192 errno=0\nWRITE offset=540672 ret=8192 errno=0\nWRITE offset=548864 ret=8192 errno=0\nWRITE offset=557056 ret=8192 errno=0\nWRITE offset=565248 ret=8192 errno=0\nWRITE offset=573440 ret=8192 errno=0\nWRITE offset=581632 ret=8192 errno=0\nWRITE offset=589824 ret=8192 errno=0\nWRITE offset=598016 ret=8192 errno=0\nWRITE offset=606208 ret=8192 errno=0\nWRITE offset=614400 ret=8192 errno=0\nWRITE offset=622592 ret=8192 errno=0\nWRITE offset=630784 ret=8192 errno=0\nWRITE offset=638976 ret=8192 errno=0\nWRITE offset=647168 ret=8192 errno=0\nWRITE offset=655360 ret=8192 errno=0\nWRITE offset=663552 ret=8192 errno=0\nWRITE offset=671744 ret=8192 errno=0\nWRITE offset=679936 ret=8192 errno=0\nWRITE offset=688128 ret=8192 errno=0\nWRITE offset=696320 ret=8192 errno=0\nWRITE offset=704512 ret=8192 errno=0\nWRITE offset=712704 ret=8192 errno=0\nWRITE offset=720896 ret=8192 errno=0\nWRITE offset=729088 ret=8192 errno=0\nWRITE offset=737280 ret=8192 errno=0\nWRITE offset=745472 ret=8192 errno=0\nWRITE offset=753664 ret=8192 errno=0\nWRITE offset=761856 ret=8192 errno=0\nWRITE offset=770048 ret=8192 errno=0\nWRITE offset=778240 ret=8192 errno=0\nWRITE offset=786432 ret=8192 errno=0\nWRITE offset=794624 ret=8192 errno=0\nWRITE offset=802816 ret=8192 errno=0\nWRITE offset=811008 ret=8192 errno=0\nWRITE offset=819200 ret=8192 errno=0\nWRITE offset=827392 ret=8192 errno=0\nWRITE offset=835584 ret=8192 errno=0\nWRITE offset=843776 ret=8192 errno=0\nWRITE offset=851968 ret=8192 errno=0\nWRITE offset=860160 ret=8192 errno=0\nWRITE offset=868352 ret=8192 errno=0\nWRITE offset=876544 ret=8192 errno=0\nWRITE offset=884736 ret=8192 errno=0\nWRITE offset=892928 ret=8192 errno=0\nWRITE offset=901120 ret=8192 errno=0\nWRITE offset=909312 ret=8192 errno=0\nWRITE offset=917504 ret=8192 errno=0\nWRITE offset=925696 ret=8192 errno=0\nWRITE offset=933888 ret=8192 errno=0\nWRITE offset=942080 ret=8192 errno=0\nWRITE offset=950272 ret=8192 errno=0\nWRITE offset=958464 ret=8192 errno=0\nWRITE offset=966656 ret=8192 errno=0\nWRITE offset=974848 ret=8192 errno=0\nWRITE offset=983040 ret=8192 errno=0\nWRITE offset=991232 ret=8192 errno=0\nWRITE offset=999424 ret=8192 errno=0\nWRITE offset=1007616 ret=8192 errno=0\nWRITE offset=1015808 ret=8192 errno=0\nWRITE offset=1024000 ret=8192 errno=0\nWRITE offset=1032192 ret=8192 errno=0\nWRITE offset=1040384 ret=8192 errno=0\nSENT total=1048576\n"
+    },
+    {
+      "mode": 4,
+      "trial": 8,
+      "status": 200,
+      "bytes": 1048576,
+      "sha256": "631b84027d6b9e52b539c4e8373622d23032dfadc64d60af87339c9037e4f769",
+      "trace": "READY vectors=1\nWRITE offset=0 ret=8192 errno=0\nWRITE offset=8192 ret=8192 errno=0\nWRITE offset=16384 ret=8192 errno=0\nWRITE offset=24576 ret=8192 errno=0\nWRITE offset=32768 ret=8192 errno=0\nWRITE offset=40960 ret=8192 errno=0\nWRITE offset=49152 ret=8192 errno=0\nWRITE offset=57344 ret=8192 errno=0\nWRITE offset=65536 ret=8192 errno=0\nWRITE offset=73728 ret=8192 errno=0\nWRITE offset=81920 ret=8192 errno=0\nWRITE offset=90112 ret=8192 errno=0\nWRITE offset=98304 ret=8192 errno=0\nWRITE offset=106496 ret=8192 errno=0\nWRITE offset=114688 ret=8192 errno=0\nWRITE offset=122880 ret=8192 errno=0\nWRITE offset=131072 ret=8192 errno=0\nWRITE offset=139264 ret=8192 errno=0\nWRITE offset=147456 ret=8192 errno=0\nWRITE offset=155648 ret=8192 errno=0\nWRITE offset=163840 ret=8192 errno=0\nWRITE offset=172032 ret=8192 errno=0\nWRITE offset=180224 ret=8192 errno=0\nWRITE offset=188416 ret=8192 errno=0\nWRITE offset=196608 ret=8192 errno=0\nWRITE offset=204800 ret=8192 errno=0\nWRITE offset=212992 ret=8192 errno=0\nWRITE offset=221184 ret=8192 errno=0\nWRITE offset=229376 ret=8192 errno=0\nWRITE offset=237568 ret=8192 errno=0\nWRITE offset=245760 ret=8192 errno=0\nWRITE offset=253952 ret=8192 errno=0\nWRITE offset=262144 ret=8192 errno=0\nWRITE offset=270336 ret=8192 errno=0\nWRITE offset=278528 ret=8192 errno=0\nWRITE offset=286720 ret=8192 errno=0\nWRITE offset=294912 ret=8192 errno=0\nWRITE offset=303104 ret=8192 errno=0\nWRITE offset=311296 ret=8192 errno=0\nWRITE offset=319488 ret=8192 errno=0\nWRITE offset=327680 ret=8192 errno=0\nWRITE offset=335872 ret=8192 errno=0\nWRITE offset=344064 ret=8192 errno=0\nWRITE offset=352256 ret=8192 errno=0\nWRITE offset=360448 ret=8192 errno=0\nWRITE offset=368640 ret=8192 errno=0\nWRITE offset=376832 ret=8192 errno=0\nWRITE offset=385024 ret=8192 errno=0\nWRITE offset=393216 ret=8192 errno=0\nWRITE offset=401408 ret=8192 errno=0\nWRITE offset=409600 ret=8192 errno=0\nWRITE offset=417792 ret=8192 errno=0\nWRITE offset=425984 ret=8192 errno=0\nWRITE offset=434176 ret=8192 errno=0\nWRITE offset=442368 ret=8192 errno=0\nWRITE offset=450560 ret=8192 errno=0\nWRITE offset=458752 ret=8192 errno=0\nWRITE offset=466944 ret=8192 errno=0\nWRITE offset=475136 ret=8192 errno=0\nWRITE offset=483328 ret=8192 errno=0\nWRITE offset=491520 ret=8192 errno=0\nWRITE offset=499712 ret=8192 errno=0\nWRITE offset=507904 ret=8192 errno=0\nWRITE offset=516096 ret=8192 errno=0\nWRITE offset=524288 ret=8192 errno=0\nWRITE offset=532480 ret=8192 errno=0\nWRITE offset=540672 ret=8192 errno=0\nWRITE offset=548864 ret=8192 errno=0\nWRITE offset=557056 ret=8192 errno=0\nWRITE offset=565248 ret=8192 errno=0\nWRITE offset=573440 ret=8192 errno=0\nWRITE offset=581632 ret=8192 errno=0\nWRITE offset=589824 ret=8192 errno=0\nWRITE offset=598016 ret=8192 errno=0\nWRITE offset=606208 ret=8192 errno=0\nWRITE offset=614400 ret=8192 errno=0\nWRITE offset=622592 ret=8192 errno=0\nWRITE offset=630784 ret=8192 errno=0\nWRITE offset=638976 ret=8192 errno=0\nWRITE offset=647168 ret=8192 errno=0\nWRITE offset=655360 ret=8192 errno=0\nWRITE offset=663552 ret=8192 errno=0\nWRITE offset=671744 ret=8192 errno=0\nWRITE offset=679936 ret=8192 errno=0\nWRITE offset=688128 ret=8192 errno=0\nWRITE offset=696320 ret=8192 errno=0\nWRITE offset=704512 ret=8192 errno=0\nWRITE offset=712704 ret=8192 errno=0\nWRITE offset=720896 ret=8192 errno=0\nWRITE offset=729088 ret=8192 errno=0\nWRITE offset=737280 ret=8192 errno=0\nWRITE offset=745472 ret=8192 errno=0\nWRITE offset=753664 ret=8192 errno=0\nWRITE offset=761856 ret=8192 errno=0\nWRITE offset=770048 ret=8192 errno=0\nWRITE offset=778240 ret=8192 errno=0\nWRITE offset=786432 ret=8192 errno=0\nWRITE offset=794624 ret=8192 errno=0\nWRITE offset=802816 ret=8192 errno=0\nWRITE offset=811008 ret=8192 errno=0\nWRITE offset=819200 ret=8192 errno=0\nWRITE offset=827392 ret=8192 errno=0\nWRITE offset=835584 ret=8192 errno=0\nWRITE offset=843776 ret=8192 errno=0\nWRITE offset=851968 ret=8192 errno=0\nWRITE offset=860160 ret=8192 errno=0\nWRITE offset=868352 ret=8192 errno=0\nWRITE offset=876544 ret=8192 errno=0\nWRITE offset=884736 ret=8192 errno=0\nWRITE offset=892928 ret=8192 errno=0\nWRITE offset=901120 ret=8192 errno=0\nWRITE offset=909312 ret=8192 errno=0\nWRITE offset=917504 ret=8192 errno=0\nWRITE offset=925696 ret=8192 errno=0\nWRITE offset=933888 ret=8192 errno=0\nWRITE offset=942080 ret=8192 errno=0\nWRITE offset=950272 ret=8192 errno=0\nWRITE offset=958464 ret=8192 errno=0\nWRITE offset=966656 ret=8192 errno=0\nWRITE offset=974848 ret=8192 errno=0\nWRITE offset=983040 ret=8192 errno=0\nWRITE offset=991232 ret=8192 errno=0\nWRITE offset=999424 ret=8192 errno=0\nWRITE offset=1007616 ret=8192 errno=0\nWRITE offset=1015808 ret=8192 errno=0\nWRITE offset=1024000 ret=8192 errno=0\nWRITE offset=1032192 ret=8192 errno=0\nWRITE offset=1040384 ret=8192 errno=0\nSENT total=1048576\n"
+    }
+  ]
+}

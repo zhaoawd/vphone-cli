@@ -1,0 +1,18 @@
+setUpClass (test_daemon_api_overlays.DaemonOverlayTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_daemon_api_overlays.DaemonOverlayTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_api_overlays.py", line 16, in setUpClass
+    spec.loader.exec_module(cls.module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 755, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 892, in get_code
+  File "<frozen importlib._bootstrap_external>", line 950, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/daemon_api_overlays.py'
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.001s
+
+FAILED (errors=1)

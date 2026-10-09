@@ -1,0 +1,57 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/42] Compiling fdr.c
+[5/42] Compiling download.c
+[6/42] Compiling ipsw.c
+[7/42] Compiling asr.c
+[8/42] Compiling recovery.c
+[9/42] Compiling normal.c
+[10/42] Compiling restore.c
+[12/42] Emitting module VPhoneAPIKit
+[12/42] Compiling limera1n.c
+[13/42] Compiling img4.c
+[14/42] Compiling dfu.c
+[15/42] Compiling img3.c
+[16/42] Compiling ace3.c
+[17/42] Compiling mbn.c
+[18/42] Compiling ftab.c
+[19/42] Compiling fls.c
+[20/42] Compiling log.c
+[21/42] Compiling locking.c
+[22/43] Compiling deviceinterfaced.c
+[23/44] Compiling idevicerestore.c
+[24/44] Compiling vphone_zip_stub.c
+[25/44] Compiling common.c
+[26/44] Compiling vphone_restore_bridge.c
+[27/44] Compiling MobileRecoveryCore libirecovery.c
+[29/44] Emitting module VPhoneBundleStore
+[30/45] Emitting module VPhoneBundleStoreTests
+[31/45] Emitting module VPhoneCore
+[32/48] Emitting module VPhoneHelperKitTests
+[33/49] Emitting module VPhoneArchiveKitTests
+[34/49] Emitting module VPhoneLaunchpadKit
+[35/49] Emitting module VPhoneLaunchpadLauncherEntry
+[36/47] Emitting module VPhoneLaunchpadKitTests
+[37/47] Emitting module VPhoneCoreTests
+[38/47] Compiling VPhoneCoreTests VMStopTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/VMStopTests.swift:176:46: error: type 'VPhoneBootProcessLocator' has no member 'livePIDs'
+174 |         let ps = try VPhoneProcessRunner.runCapturing(
+175 |             URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="])
+176 |         let found = VPhoneBootProcessLocator.livePIDs(ps.stdout, configURL: fixture.configURL)
+    |                                              `- error: type 'VPhoneBootProcessLocator' has no member 'livePIDs'
+177 |         #expect(found == [boot.processIdentifier])
+178 |         #expect(!found.contains(unrelated.processIdentifier))
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError

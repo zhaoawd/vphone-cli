@@ -1,0 +1,54 @@
+{
+  "target": {
+    "vm": "b21-restored-vm-new-20261009",
+    "pid": 3664,
+    "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+  },
+  "command": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B21/relay-diagnostic.app/Contents/MacOS/vphone-vm --config /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/config.plist --variant exp --vphoned-bin /Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009/.vphoned.signed --no-vphoned-update --unlock-at-startup --api-listen 127.0.0.1:0\n",
+  "classic_guest_sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+  "observations": [
+    {
+      "request": {
+        "t": "shell",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "cmd": "PATH=/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin:/var/jb/bin; export PATH; ps -A -o comm= | grep -E \"(vphone-b21-api/vphoned|Library/Caches/vphoned)$\" || true",
+        "timeout_ms": 10000
+      },
+      "response": {
+        "stdout": "",
+        "code": 0,
+        "ok": true,
+        "truncated": false,
+        "stderr": "",
+        "timed_out": false
+      }
+    },
+    {
+      "request": {
+        "t": "file_get",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "path": "/usr/bin/vphoned"
+      },
+      "response": {
+        "size": 240352,
+        "ok": true,
+        "readback": {
+          "bytes": 240352,
+          "sha256": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001"
+        }
+      }
+    }
+  ],
+  "signal": "SIGINT",
+  "exit_confirmation_pending": true
+}

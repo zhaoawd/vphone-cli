@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-09",
+  "selected_tasks": [
+    "T02",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "newly_accepted": [
+    "T06"
+  ],
+  "selected_unaccepted": [
+    "T02",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "all_accepted": [
+    "T00",
+    "T01",
+    "T03",
+    "T04",
+    "T05",
+    "T06"
+  ],
+  "required_remaining": 40,
+  "results": {
+    "T02": "62个合并提交全部重新审查，54个无附加解决、8个附加解决与冻结差异一致；父提交能力仍独立核对。完整审查T06收尾提交和23个待审发布提交；2.1.3含菜单实现，保留T27适配。342条覆盖保持，218条仍pending_semantic_review，全局能力映射未完成。",
+    "T06": "固定83075a0c客户机候选经实际绑定VM完成8191/8192/8193/16383/16384/16385字节、1/4/8MiB快读和慢读，长度及SHA256完整；WebSocket 1/4MiB完整，20次提前关闭及取消上传无残留目标/staging，FD15→15。NIO管道所有权及对端关闭回收修复，现有写操作断线/超时测试不自动重放。完整Python597项、Swift常规1251项/计时6项、XCTest254项(跳过3项)通过。按T06原接受条件验收，后续跨模块变更仍须复验。",
+    "T07": "跨线程停止唤醒和继承信号屏蔽修复，15项proxy测试及真实停止通过。缓存确认按文件身份处理/var与/private/var别名：显式agent.apply_update返回后proxy/worker退出，手动重启后健康实例改变、83075a0c摘要保持、pending移除且确认标记生成。完整临时launchd job、不同binary升级/回退及坏缓存有界失败矩阵未完成；原classic及其缓存已恢复。",
+    "T08": "IcliKit固定0.7.16/702990b5，声明精确源码JPEG独立位图复制overlay、构建与运行marker/hash一致。实际40次截图稳定采样19,071,480→4,555,256→4,555,256字节，FD15→15；location设置/读回/NaN拒绝/清除，timezone设置/重复/无效拒绝/自动/恢复及SpringBoard服务查询通过。90度旋转返回400未生效，原因未查明；完整rotation和RootHide服务矩阵及图像视觉核验未完成。",
+    "T24": "真实本地Core Bundle安装、受控普通launcher绑定启动并正常退出；19个Mach-O当前机器递归依赖检查通过，libcrypto/libplist仍来自外部Homebrew，不声明可移植闭包。新增KERN_PROCARGS2 argv识别修复含空格Bundle路径的生产VM stop，实际5.773秒正常停机。完整TCC负责应用链及旧helper/owner/link/共享可写/未知verb真实拒绝矩阵未完成。",
+    "T40": "本地2.6.1-local.1208708c55574677完整打包，escalator仅编译未执行；当前机器依赖有记录。停机恢复副本完整备份139.067秒后实际绑定，受控普通launcher启动root-owned本地VM候选，classic摘要保持；未有来源收据仍为unknown。创建全流程冻结、clone/export/rename、kernel-only及guest升级/回退四层来源矩阵仍未完成；测试绑定和系统store恢复原缺失状态。",
+    "T46": "实际本地绑定VM经普通wrapper启动，修正后的生产stop在5.773秒发送SIGINT完成classicAccepted、Guest stopped、VM及wrapper退出0，尾部日志保留。B21真实签名helper成功install/verify和本轮完整测试证据保留。全UI立即退出、detached/create/后代writer和实际UI吞吐/轮换矩阵仍未完成。"
+  },
+  "commits": [
+    "b5c4e482e8f724bedee224ec6399f7456d719db3",
+    "9a75de14856b9ff073f44071a619dce517ce8008",
+    "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
+  ],
+  "pending_semantic_commits": 218,
+  "merge_reviews": {
+    "total": 62,
+    "empty_remerge": 54,
+    "nonempty_reviewed": 8,
+    "newly_classified": 61
+  },
+  "release_reviews": {
+    "newly_classified": 23,
+    "menu_commit_not_metadata_only": "849c4b3c"
+  },
+  "test_results": {
+    "Python": 597,
+    "Swift_regular": 1251,
+    "Swift_timing": 6,
+    "XCTest": 254,
+    "XCTest_skipped": 3,
+    "final_full_default_pass": true,
+    "previous_failures": [
+      "CoreBundle fixture implicitly allowed0777 with process umask000; explicit fixture modes fixed; production refusals kept strict",
+      "IPSW Range request intermittent mismatch in second full run; unchanged isolated case10/10 passed; third full run passed, cause unconfirmed"
+    ],
+    "zero_umask_fixture_tests": 23
+  },
+  "tests_logs": [
+    "evidence/B22-python-complete.log",
+    "evidence/B22-swift-complete-final.log",
+    "evidence/B22-swift-complete.log",
+    "evidence/B22-swift-complete-retry.log",
+    "evidence/B22-store-fixture-final-green.log",
+    "evidence/B22-cache-resume-repeat.log"
+  ],
+  "daemon_artifact": {
+    "sha256": "83075a0c9de2ff5bbfd01b211ce204f59bd18cdf9eb0efb7bd0891a62f00bc07",
+    "manifest": "evidence/B22-cache-fixed-artifact.json",
+    "overlay_marker": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55"
+  },
+  "final_state": "evidence/B22-final-readback.json",
+  "original_contracts_unchanged": true,
+  "whole_seven_tasks_accepted": false,
+  "limitations": {
+    "T02": [
+      "218个pending提交及47项能力全局语义对账；保留reviewed/adaptation_planned与accepted区别"
+    ],
+    "T07": [
+      "真实临时launchd job不同binary升级、回退、坏缓存和有限重试完整矩阵"
+    ],
+    "T08": [
+      "90度旋转未生效原因及完整rotation/RootHide service矩阵",
+      "JPEG视觉核验；本轮内存通过仅适用于记录的固定候选与恢复副本"
+    ],
+    "T24": [
+      "完整TCC负责应用链真实验收",
+      "旧helper、owner错误、链接替换、共享可写路径和未知verb完整真实拒绝矩阵",
+      "Homebrew运行依赖只验证当前机器可解析，不声明可移植封装"
+    ],
+    "T40": [
+      "创建全流程固定工具链，clone/export/rename来源",
+      "kernel-only及显式guest升级/回退、混合版本四层来源矩阵",
+      "APFS写时复制备份不证明物理独立；不声明对不协作写入者的原子CAS"
+    ],
+    "T46": [
+      "全UI立即退出、detached/create/后代writer和输出生命周期",
+      "panic/取消/轮换、UI响应及实际VM吞吐矩阵"
+    ]
+  },
+  "review": "evidence/B22-source-review.json",
+  "whitespace_validation": {
+    "verbatim_evidence": "raw logs/diffs retained byte-for-byte",
+    "hash_bound_overlay_patch": "unified-diff empty context line contains required leading space; patch bytes/hash frozen; excluded from whitespace check"
+  }
+}

@@ -716,3 +716,26 @@ helper注册命令被自动审批拒绝，原因为该操作改变系统特权�
 固定IcliKit提交702990b59ca412ad975f9f0ea5dafe95c30fac21的Sources/IcliPrivate/System.m显示：icli_reboot先清零errno，reboot3返回非零后返回errno ?: EIO。因此B19错误文本不能区分实际errno=EIO与errno仍为零时的包装回退；原始返回值和errno尚未记录，重启失败原因未查明。未据此修改guest或kernel。
 
 原1156份证据摘要核对；新增13份。原47项合同、依赖及342提交覆盖保持，44项必选仍未完整验收。入口：evidence/B20-summary.json。
+
+
+### 2026-10-09 B22：传输修复、截图内存和本地绑定运行
+
+本轮选定T02、T06、T07、T08、T24、T40、T46。T06满足原接受条件，新增accepted1项；原T00、T01、T03、T04、T05保持接受。共6项accepted、40项必选尚未完整验收，1项可选延后。其余6项继续推进，不改变原合同、依赖和回退要求。
+
+| 任务 | 结果 | 未完成内容 |
+| --- | --- | --- |
+| T02 | 62个合并提交重新核对，54个无附加解决，8个与冻结差异一致；完整审查T06及23个发布提交 | 218个pending提交及全局能力映射；Release2.1.3含菜单实现，按T27适配 |
+| T06 | 边界及1/4/8MiB快慢读摘要完整，WebSocket完整，提前关闭和取消上传回收，FD15→15；按原合同接受 | 后续跨模块变更须复验 |
+| T07 | 停止信号与文件身份缓存确认修复；同摘要显式更新后手动启动监听确认通过 | 真实launchd及不同binary升级/回退、坏缓存完整矩阵 |
+| T08 | 固定IcliKit精确overlay及运行marker；40次截图稳定内存降至4,555,256字节，FD15→15；location/timezone验证 | 90度旋转未生效，原因未查明；RootHide服务和图像视觉核验 |
+| T24 | 本地root-owned Bundle经受控普通launcher实际启动；19个Mach-O当前机器依赖解析；含空格路径停止修复 | 完整TCC及安全拒绝矩阵；Homebrew依赖不构成可移植封装 |
+| T40 | 本地local后缀Bundle完整打包，停机备份139.067秒后实际绑定启动，classic摘要保持 | 创建冻结、clone/export/rename及四层来源升级/回退矩阵 |
+| T46 | 实际wrapper/VM正常停机，classicAccepted与Guest stopped尾部保留，退出0 | 全UI立即退出、detached/create/后代writer及UI吞吐矩阵 |
+
+实现提交b5c4e482、9a75de14、1dfa2fb2。客户机传输改用有界阻塞VSOCK与NIO管道桥接，修复输出EOF未唤醒接收线程及注册错误后重复关闭；独立复核未发现剩余问题。后续宿主argv修复与测试fixture修改未独立审查，不扩大审查范围。截图overlay固定IcliKit0.7.16/702990b5，编译source marker和运行binary SHA83075a0c均核对。位图复制后JPEG不再保留原screen image；本轮证据仅针对记录的恢复副本与候选。
+
+最终Python597项、Swift常规1251项和计时6项、XCTest254项(跳过3项)通过。首次全量出现fixture权限问题，umask000定向复现后修正fixture，生产权限拒绝未放宽；第二次全量有Range间歇失败，原用例10次单独通过，第三次完整通过，原因未查明。保留所有失败日志，不把最后通过写成间歇问题已修复。真实固件比较本轮未重跑。
+
+恢复副本已正常停机、原vm-new关键摘要保持，原classic及缓存SHA306ed42b恢复；测试绑定和系统Bundle store恢复缺失，helper服务/文件/right保持缺失，两个临时令牌删除。临时AMFI驱动结束时身份断言失败；独立确认驱动/debugserver不存在、amfid由launchd管理，不声明正常detach。B18和本轮停机恢复点保留；同卷APFS写时复制不证明物理独立。未操作vm-2607、未执行escalator、未升级kernel/boot-chain或部署modern相机。
+
+B21原待确认的4cea360c临时AMFI范围已由当前用户授权，按paths=[]、allow_all=false限定使用并收尾。先前B20认证等待的最终结果见B21-summary.json，系统已恢复缺失基线；README中的历史进行中状态不表示当前仍在等待。当前入口：evidence/B22-summary.json、B22-source-review.json及B22-final-readback.json。

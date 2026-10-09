@@ -1,0 +1,20 @@
+test_inherited_signal_mask_does_not_block_proxy_stop (test_daemon_proxy.DaemonProxyTests.test_inherited_signal_mask_does_not_block_proxy_stop) ... ERROR
+
+======================================================================
+ERROR: test_inherited_signal_mask_does_not_block_proxy_stop (test_daemon_proxy.DaemonProxyTests.test_inherited_signal_mask_does_not_block_proxy_stop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_proxy.py", line 112, in test_inherited_signal_mask_does_not_block_proxy_stop
+    self.assertEqual(process.wait(timeout=2), 0)
+                     ~~~~~~~~~~~~^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1279, in wait
+    return self._wait(timeout=timeout)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 2076, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-proxy-build-dnhxksvd/proxy-harness']' timed out after 2 seconds
+
+----------------------------------------------------------------------
+Ran 1 test in 3.215s
+
+FAILED (errors=1)

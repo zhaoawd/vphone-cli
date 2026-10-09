@@ -1,0 +1,18 @@
+setUpClass (test_daemon_vsock_bridge.VsockBridgeTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_daemon_vsock_bridge.VsockBridgeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_vsock_bridge.py", line 18, in setUpClass
+    subprocess.run(['clang','-Wall','-Wextra','-Werror','-pthread',str(ROOT/'tests/fixtures/daemon_vsock_bridge/main.c'),'-o',str(cls.binary)],check=True,capture_output=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['clang', '-Wall', '-Wextra', '-Werror', '-pthread', '/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/fixtures/daemon_vsock_bridge/main.c', '-o', '/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/vphone-bridge-leri6yho/bridge']' returned non-zero exit status 1.
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.078s
+
+FAILED (errors=1)

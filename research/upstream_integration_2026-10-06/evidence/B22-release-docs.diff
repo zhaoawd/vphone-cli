@@ -1,0 +1,325 @@
+c2175ec017adbd11b7a0689438863236040dda0d
+diff --git a/Documents/Guides/bundle-integration.md b/Documents/Guides/bundle-integration.md
+index 95d69493..e8076ad8 100644
+--- a/Documents/Guides/bundle-integration.md
++++ b/Documents/Guides/bundle-integration.md
+@@ -20,7 +20,7 @@ executables and resources, not a macOS app or a dynamically loaded plug-in.
+ `Contents/MacOS` holds only programs that run on the Mac.
+ `guest-resources` holds only files installed into the guest; every Mach-O in
+ it is built for iOS. `ValidateBundle.sh` enforces both rules.
+-Launchpad 2.0.8 requires a bundle version of at least 2.0.8 and the
++Launchpad 2.0.8 and later require a bundle version of at least 2.0.8 and the
+ `vphone-escalator` executable. It does not load older bundle layouts.
+ 
+ All executable payloads use ad hoc code signatures. Only the required child
+diff --git a/Documents/README_ja.md b/Documents/README_ja.md
+index 22835bdd..dd13d569 100644
+--- a/Documents/README_ja.md
++++ b/Documents/README_ja.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac 上で仮想 iPhone を作成・実行します。vphone-cli 
+ 
+ ## はじめに
+ 
+-macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.0.8](https://github.com/Lakr233/vphone-cli/releases/download/2.0.8/vphone-launchpad-2.0.8-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
++macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
+ 
+ 1. macOS 復旧環境で `csrutil enable --without debug` と `csrutil allow-research-guests enable` を実行し、再起動します。詳しくは[ホストの設定](Guides/host-setup.md)をご覧ください。
+ 2. アーカイブを展開してアプリを開きます。**Host Setup** の案内に従い、開発者ツールへのアクセスを許可して特権ヘルパーをインストールします。
+diff --git a/Documents/README_ko.md b/Documents/README_ko.md
+index 2c4b7fc0..de15b8d2 100644
+--- a/Documents/README_ko.md
++++ b/Documents/README_ko.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac에서 가상 iPhone을 만들고 실행합니다. vphone-cli
+ 
+ ## 시작하기
+ 
+-macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.0.8](https://github.com/Lakr233/vphone-cli/releases/download/2.0.8/vphone-launchpad-2.0.8-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
++macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
+ 
+ 1. macOS 복구 환경에서 `csrutil enable --without debug`와 `csrutil allow-research-guests enable`을 실행한 다음 재시동하세요. 자세한 내용은 [호스트 설정](Guides/host-setup.md)을 참고하세요.
+ 2. 압축을 풀고 앱을 여세요. **Host Setup**의 안내에 따라 개발자 도구 접근을 허용하고 권한 있는 도우미를 설치하세요.
+diff --git a/Documents/README_zh.md b/Documents/README_zh.md
+index a251ac57..4c80b6dc 100644
+--- a/Documents/README_zh.md
++++ b/Documents/README_zh.md
+@@ -14,7 +14,7 @@
+ 
+ ## 开始使用
+ 
+-推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.0.8](https://github.com/Lakr233/vphone-cli/releases/download/2.0.8/vphone-launchpad-2.0.8-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
++推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
+ 
+ 1. 在 macOS 恢复模式中执行 `csrutil enable --without debug` 和 `csrutil allow-research-guests enable`，然后重新启动。详见[宿主机设置](Guides/host-setup.md)。
+ 2. 解压并打开 App，按 **Host Setup** 的提示授予开发者工具权限并安装特权辅助程序。
+diff --git a/README.md b/README.md
+index c5d6b2f7..a2fc99ba 100644
+--- a/README.md
++++ b/README.md
+@@ -14,7 +14,7 @@ The recommended host setup runs `csrutil enable --without debug` and `csrutil al
+ 
+ ## Get started
+ 
+-Use the notarized [vphone-launchpad 2.0.8](https://github.com/Lakr233/vphone-cli/releases/download/2.0.8/vphone-launchpad-2.0.8-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
++Use the notarized [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
+ 
+ 1. In macOS Recovery, run `csrutil enable --without debug` and `csrutil allow-research-guests enable`, then restart. See [host setup](Documents/Guides/host-setup.md) for details.
+ 2. Unzip and open the app. Complete **Host Setup**, including Developer Tools access and installation of the privileged helper.
+
+bd36b5ee64a5d2c211341cac6ee83cf81a33cd41
+diff --git a/Documents/Guides/bundle-integration.md b/Documents/Guides/bundle-integration.md
+index e8076ad8..b37f4924 100644
+--- a/Documents/Guides/bundle-integration.md
++++ b/Documents/Guides/bundle-integration.md
+@@ -20,8 +20,9 @@ executables and resources, not a macOS app or a dynamically loaded plug-in.
+ `Contents/MacOS` holds only programs that run on the Mac.
+ `guest-resources` holds only files installed into the guest; every Mach-O in
+ it is built for iOS. `ValidateBundle.sh` enforces both rules.
+-Launchpad 2.0.8 and later require a bundle version of at least 2.0.8 and the
+-`vphone-escalator` executable. It does not load older bundle layouts.
++Launchpad 2.1.0 and later require a bundle version of at least 2.1.0, which
++adds patch presets (`fw patches`, `fw set-patches`, `fw patch --preset`), and
++the `vphone-escalator` executable. It does not load older bundle layouts.
+ 
+ All executable payloads use ad hoc code signatures. Only the required child
+ processes carry private entitlements. The bundle has no `CFBundleExecutable`,
+diff --git a/Documents/Guides/launchpad-cli.md b/Documents/Guides/launchpad-cli.md
+index efadb94b..348bc9a5 100644
+--- a/Documents/Guides/launchpad-cli.md
++++ b/Documents/Guides/launchpad-cli.md
+@@ -39,7 +39,7 @@ vphone-launchpad-cli vm log research-01 --lines 100
+ vphone-launchpad-cli vm stop research-01
+ 
+ # The same checks against the release it replaces.
+-vphone-launchpad-cli bundle use 2.0.9
++vphone-launchpad-cli bundle use 2.1.0
+ ```
+ 
+ The first step that needs the helper after its five-minute authorization
+diff --git a/Documents/README_ja.md b/Documents/README_ja.md
+index dd13d569..592bddb1 100644
+--- a/Documents/README_ja.md
++++ b/Documents/README_ja.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac 上で仮想 iPhone を作成・実行します。vphone-cli 
+ 
+ ## はじめに
+ 
+-macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
++macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
+ 
+ 1. macOS 復旧環境で `csrutil enable --without debug` と `csrutil allow-research-guests enable` を実行し、再起動します。詳しくは[ホストの設定](Guides/host-setup.md)をご覧ください。
+ 2. アーカイブを展開してアプリを開きます。**Host Setup** の案内に従い、開発者ツールへのアクセスを許可して特権ヘルパーをインストールします。
+diff --git a/Documents/README_ko.md b/Documents/README_ko.md
+index de15b8d2..db017ed9 100644
+--- a/Documents/README_ko.md
++++ b/Documents/README_ko.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac에서 가상 iPhone을 만들고 실행합니다. vphone-cli
+ 
+ ## 시작하기
+ 
+-macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
++macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
+ 
+ 1. macOS 복구 환경에서 `csrutil enable --without debug`와 `csrutil allow-research-guests enable`을 실행한 다음 재시동하세요. 자세한 내용은 [호스트 설정](Guides/host-setup.md)을 참고하세요.
+ 2. 압축을 풀고 앱을 여세요. **Host Setup**의 안내에 따라 개발자 도구 접근을 허용하고 권한 있는 도우미를 설치하세요.
+diff --git a/Documents/README_zh.md b/Documents/README_zh.md
+index 4c80b6dc..70b57113 100644
+--- a/Documents/README_zh.md
++++ b/Documents/README_zh.md
+@@ -14,7 +14,7 @@
+ 
+ ## 开始使用
+ 
+-推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
++推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
+ 
+ 1. 在 macOS 恢复模式中执行 `csrutil enable --without debug` 和 `csrutil allow-research-guests enable`，然后重新启动。详见[宿主机设置](Guides/host-setup.md)。
+ 2. 解压并打开 App，按 **Host Setup** 的提示授予开发者工具权限并安装特权辅助程序。
+diff --git a/README.md b/README.md
+index a2fc99ba..2a677ac8 100644
+--- a/README.md
++++ b/README.md
+@@ -14,7 +14,7 @@ The recommended host setup runs `csrutil enable --without debug` and `csrutil al
+ 
+ ## Get started
+ 
+-Use the notarized [vphone-launchpad 2.0.9](https://github.com/Lakr233/vphone-cli/releases/download/2.0.9/vphone-launchpad-2.0.9-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
++Use the notarized [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
+ 
+ 1. In macOS Recovery, run `csrutil enable --without debug` and `csrutil allow-research-guests enable`, then restart. See [host setup](Documents/Guides/host-setup.md) for details.
+ 2. Unzip and open the app. Complete **Host Setup**, including Developer Tools access and installation of the privileged helper.
+
+85a4da0d09c269e1b6cb5d5ea3feb2f86d5cd320
+diff --git a/Documents/Guides/launchpad-cli.md b/Documents/Guides/launchpad-cli.md
+index 348bc9a5..2e0bf5c5 100644
+--- a/Documents/Guides/launchpad-cli.md
++++ b/Documents/Guides/launchpad-cli.md
+@@ -39,7 +39,7 @@ vphone-launchpad-cli vm log research-01 --lines 100
+ vphone-launchpad-cli vm stop research-01
+ 
+ # The same checks against the release it replaces.
+-vphone-launchpad-cli bundle use 2.1.0
++vphone-launchpad-cli bundle use 2.1.1
+ ```
+ 
+ The first step that needs the helper after its five-minute authorization
+diff --git a/Documents/README_ja.md b/Documents/README_ja.md
+index 592bddb1..118ad755 100644
+--- a/Documents/README_ja.md
++++ b/Documents/README_ja.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac 上で仮想 iPhone を作成・実行します。vphone-cli 
+ 
+ ## はじめに
+ 
+-macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
++macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
+ 
+ 1. macOS 復旧環境で `csrutil enable --without debug` と `csrutil allow-research-guests enable` を実行し、再起動します。詳しくは[ホストの設定](Guides/host-setup.md)をご覧ください。
+ 2. アーカイブを展開してアプリを開きます。**Host Setup** の案内に従い、開発者ツールへのアクセスを許可して特権ヘルパーをインストールします。
+diff --git a/Documents/README_ko.md b/Documents/README_ko.md
+index db017ed9..f51cac83 100644
+--- a/Documents/README_ko.md
++++ b/Documents/README_ko.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac에서 가상 iPhone을 만들고 실행합니다. vphone-cli
+ 
+ ## 시작하기
+ 
+-macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
++macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
+ 
+ 1. macOS 복구 환경에서 `csrutil enable --without debug`와 `csrutil allow-research-guests enable`을 실행한 다음 재시동하세요. 자세한 내용은 [호스트 설정](Guides/host-setup.md)을 참고하세요.
+ 2. 압축을 풀고 앱을 여세요. **Host Setup**의 안내에 따라 개발자 도구 접근을 허용하고 권한 있는 도우미를 설치하세요.
+diff --git a/Documents/README_zh.md b/Documents/README_zh.md
+index 70b57113..50df5962 100644
+--- a/Documents/README_zh.md
++++ b/Documents/README_zh.md
+@@ -14,7 +14,7 @@
+ 
+ ## 开始使用
+ 
+-推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
++推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
+ 
+ 1. 在 macOS 恢复模式中执行 `csrutil enable --without debug` 和 `csrutil allow-research-guests enable`，然后重新启动。详见[宿主机设置](Guides/host-setup.md)。
+ 2. 解压并打开 App，按 **Host Setup** 的提示授予开发者工具权限并安装特权辅助程序。
+diff --git a/README.md b/README.md
+index 2a677ac8..bdad5dad 100644
+--- a/README.md
++++ b/README.md
+@@ -14,7 +14,7 @@ The recommended host setup runs `csrutil enable --without debug` and `csrutil al
+ 
+ ## Get started
+ 
+-Use the notarized [vphone-launchpad 2.1.0](https://github.com/Lakr233/vphone-cli/releases/download/2.1.0/vphone-launchpad-2.1.0-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
++Use the notarized [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
+ 
+ 1. In macOS Recovery, run `csrutil enable --without debug` and `csrutil allow-research-guests enable`, then restart. See [host setup](Documents/Guides/host-setup.md) for details.
+ 2. Unzip and open the app. Complete **Host Setup**, including Developer Tools access and installation of the privileged helper.
+
+50e7033d4acaa5d1faaf62cb66141f79e90d1359
+diff --git a/Documents/Guides/launchpad-cli.md b/Documents/Guides/launchpad-cli.md
+index 2e0bf5c5..e0243d9b 100644
+--- a/Documents/Guides/launchpad-cli.md
++++ b/Documents/Guides/launchpad-cli.md
+@@ -39,7 +39,7 @@ vphone-launchpad-cli vm log research-01 --lines 100
+ vphone-launchpad-cli vm stop research-01
+ 
+ # The same checks against the release it replaces.
+-vphone-launchpad-cli bundle use 2.1.1
++vphone-launchpad-cli bundle use 2.1.2
+ ```
+ 
+ The first step that needs the helper after its five-minute authorization
+diff --git a/Documents/README_ja.md b/Documents/README_ja.md
+index 118ad755..252eba26 100644
+--- a/Documents/README_ja.md
++++ b/Documents/README_ja.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac 上で仮想 iPhone を作成・実行します。vphone-cli 
+ 
+ ## はじめに
+ 
+-macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
++macOS 15 以降を搭載した物理 Apple Silicon Mac では、公証済みの [vphone-launchpad 2.1.2](https://github.com/Lakr233/vphone-cli/releases/download/2.1.2/vphone-launchpad-2.1.2-notarized.zip) を使用してください。リリース版の実行に Xcode、Python、Homebrew は不要です。
+ 
+ 1. macOS 復旧環境で `csrutil enable --without debug` と `csrutil allow-research-guests enable` を実行し、再起動します。詳しくは[ホストの設定](Guides/host-setup.md)をご覧ください。
+ 2. アーカイブを展開してアプリを開きます。**Host Setup** の案内に従い、開発者ツールへのアクセスを許可して特権ヘルパーをインストールします。
+diff --git a/Documents/README_ko.md b/Documents/README_ko.md
+index f51cac83..a3e521b6 100644
+--- a/Documents/README_ko.md
++++ b/Documents/README_ko.md
+@@ -14,7 +14,7 @@ Apple Silicon Mac에서 가상 iPhone을 만들고 실행합니다. vphone-cli
+ 
+ ## 시작하기
+ 
+-macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
++macOS 15 이상을 실행하는 물리 Apple Silicon Mac에서는 공증된 [vphone-launchpad 2.1.2](https://github.com/Lakr233/vphone-cli/releases/download/2.1.2/vphone-launchpad-2.1.2-notarized.zip)를 사용하세요. 릴리스 버전을 실행할 때 Xcode, Python, Homebrew는 필요하지 않습니다.
+ 
+ 1. macOS 복구 환경에서 `csrutil enable --without debug`와 `csrutil allow-research-guests enable`을 실행한 다음 재시동하세요. 자세한 내용은 [호스트 설정](Guides/host-setup.md)을 참고하세요.
+ 2. 압축을 풀고 앱을 여세요. **Host Setup**의 안내에 따라 개발자 도구 접근을 허용하고 권한 있는 도우미를 설치하세요.
+diff --git a/Documents/README_zh.md b/Documents/README_zh.md
+index 50df5962..d1a1dc66 100644
+--- a/Documents/README_zh.md
++++ b/Documents/README_zh.md
+@@ -14,7 +14,7 @@
+ 
+ ## 开始使用
+ 
+-推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
++推荐在运行 macOS 15 或更新版本的实体 Apple Silicon Mac 上使用已公证的 [vphone-launchpad 2.1.2](https://github.com/Lakr233/vphone-cli/releases/download/2.1.2/vphone-launchpad-2.1.2-notarized.zip)。运行发布版无需 Xcode、Python 或 Homebrew。
+ 
+ 1. 在 macOS 恢复模式中执行 `csrutil enable --without debug` 和 `csrutil allow-research-guests enable`，然后重新启动。详见[宿主机设置](Guides/host-setup.md)。
+ 2. 解压并打开 App，按 **Host Setup** 的提示授予开发者工具权限并安装特权辅助程序。
+diff --git a/README.md b/README.md
+index bdad5dad..327b6558 100644
+--- a/README.md
++++ b/README.md
+@@ -14,7 +14,7 @@ The recommended host setup runs `csrutil enable --without debug` and `csrutil al
+ 
+ ## Get started
+ 
+-Use the notarized [vphone-launchpad 2.1.1](https://github.com/Lakr233/vphone-cli/releases/download/2.1.1/vphone-launchpad-2.1.1-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
++Use the notarized [vphone-launchpad 2.1.2](https://github.com/Lakr233/vphone-cli/releases/download/2.1.2/vphone-launchpad-2.1.2-notarized.zip) on a physical Apple Silicon Mac running macOS 15 or newer. The release needs no Xcode, Python, or Homebrew at runtime.
+ 
+ 1. In macOS Recovery, run `csrutil enable --without debug` and `csrutil allow-research-guests enable`, then restart. See [host setup](Documents/Guides/host-setup.md) for details.
+ 2. Unzip and open the app. Complete **Host Setup**, including Developer Tools access and installation of the privileged helper.
+
+4d75b44186d3cb392c4ed79068426be3e021930d
+diff --git a/Documents/Downloads/README.md b/Documents/Downloads/README.md
+index fe2befc4..86ad3cbd 100644
+--- a/Documents/Downloads/README.md
++++ b/Documents/Downloads/README.md
+@@ -26,6 +26,7 @@ Use a `VPhone.bundle` from the same series as Launchpad. The series is the first
+ 
+ | Launchpad | VPhone.bundle |
+ | --- | --- |
++| 2.3.x | 2.3.x |
+ | 2.2.x | 2.2.x |
+ | 2.1.x | 2.1.x |
+ | 2.0.x | 2.0.x |
+
+48e915e1b554158c0cd43a8e6c54cd2a4f16c4cd
+diff --git a/Documents/Downloads/README.md b/Documents/Downloads/README.md
+index 796092c1..c41334bc 100644
+--- a/Documents/Downloads/README.md
++++ b/Documents/Downloads/README.md
+@@ -27,6 +27,7 @@ Use a `VPhone.bundle` from the same series as Launchpad. The series is the first
+ 
+ | Launchpad | VPhone.bundle |
+ | --- | --- |
++| 2.4.x | 2.4.x |
+ | 2.3.x | 2.3.x |
+ | 2.2.x | 2.2.x |
+ | 2.1.x | 2.1.x |
+
+94376fe82a576b4e80086c8e3cbbd7d3bd99122f
+diff --git a/Documents/Downloads/README.md b/Documents/Downloads/README.md
+index 822f5497..e4a11102 100644
+--- a/Documents/Downloads/README.md
++++ b/Documents/Downloads/README.md
+@@ -12,6 +12,7 @@ Each [release](https://github.com/Lakr233/vphone-cli/releases) has up to three f
+ 
+ | Series | Notarized | Not Notarized |
+ | --- | --- | --- |
++| 2.6 | 2.6.0 | — |
+ | 2.5 | 2.5.0 | — |
+ | 2.4 | 2.4.0, 2.4.1 | — |
+ | 2.3 | 2.3.0 | — |

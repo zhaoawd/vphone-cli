@@ -1,0 +1,139 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-09 10:47:15.494.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 10:47:15.495.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 10:47:15.495.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 10:47:15.495.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CoreBundleStoreTests started.
+◇ Suite CoreBundleStoreTests started.
+◇ Test absentStoreRunsNoCommand() started.
+◇ Test refreshVerifiesEachVersionAndNothingElse() started.
+◇ Test listingSkipsHiddenEntriesAndReportsAbsentOrUnusableRoots() started.
+◇ Test unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() started.
+[launchpad] core bundle store: absent
+✔ Test absentStoreRunsNoCommand() passed after 0.002 seconds.
+✔ Test unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() passed after 0.005 seconds.
+◇ Test installsSignedBundleAndVerifiesReceipt() started.
+✔ Test listingSkipsHiddenEntriesAndReportsAbsentOrUnusableRoots() passed after 0.009 seconds.
+✘ Test installsSignedBundleAndVerifiesReceipt() recorded an issue at CoreBundleStoreTests.swift:105:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-93B0773A-9F01-435B-B7AF-FF7734BDEAB4: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test installsSignedBundleAndVerifiesReceipt() failed after 0.383 seconds with 1 issue.
+◇ Test distinctBuildsOfOneReleaseCoexistWithoutReplacingExistingFiles() started.
+✘ Test distinctBuildsOfOneReleaseCoexistWithoutReplacingExistingFiles() recorded an issue at CoreBundleStoreTests.swift:124:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-C4C68BFD-4825-4C31-BBAC-51A2B132D3E1: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test distinctBuildsOfOneReleaseCoexistWithoutReplacingExistingFiles() failed after 0.354 seconds with 1 issue.
+◇ Test acceptsUpstreamResourceBundleLayout() started.
+✘ Test acceptsUpstreamResourceBundleLayout() recorded an issue at CoreBundleStoreTests.swift:139:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-557160EC-F01B-4B30-A33B-7D47D635C161: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test acceptsUpstreamResourceBundleLayout() failed after 0.254 seconds with 1 issue.
+◇ Test invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "../2.0.8", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8/other", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8
+", reason → "Invalid Core Bundle version "2.0.8\n"" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8-local/", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "-2.0.8", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "9999999999999999999999.0.0", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-ci.XYZ1234", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-ci.abc", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.2.3-beta", reason → "Invalid Core Bundle version" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.0.8", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.1.9-local", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+◇ Test case passing 2 arguments version → "2.1.7-ci.0123abc", reason → "older than the minimum supported version 2.2.0" to invalidVersionRefusedBeforeStoreCreation(_:_:) started.
+✔ Test invalidVersionRefusedBeforeStoreCreation(_:_:) with 12 test cases passed after 0.037 seconds.
+◇ Test versionNamesFollowUpstreamStoreSuffixes() started.
+✔ Test versionNamesFollowUpstreamStoreSuffixes() passed after 0.001 seconds.
+◇ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() started.
+[launchpad] core bundle store: 3 entries, 1 verified
+✔ Test refreshVerifiesEachVersionAndNothingElse() passed after 1.065 seconds.
+✔ Suite CoreBundleStoreTests passed after 1.065 seconds.
+✘ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() recorded an issue at CoreBundleStoreTests.swift:178:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-431E0B65-E663-48DC-9E07-156B32647A8D: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test ciArtifactNameInstallsAgainstReleaseInfoPlist() failed after 0.352 seconds with 1 issue.
+◇ Test digestMismatchLeavesNoPublishedVersion() started.
+✘ Test digestMismatchLeavesNoPublishedVersion() recorded an issue at CoreBundleStoreTests.swift:190:9: Expectation failed: (message → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-FAE38A46-8162-4D2C-93AB-EA66E490E507: mode 777 has group/other write or setuid/setgid/sticky bits") == "Core Bundle archive SHA-256 mismatch."
+✘ Test digestMismatchLeavesNoPublishedVersion() recorded an issue at CoreBundleStoreTests.swift:186:6: Caught error: Error Domain=NSCocoaErrorDomain Code=260 "The folder “store” doesn’t exist." UserInfo={NSUserStringVariant=(
+    Folder
+), NSFilePath=/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-FAE38A46-8162-4D2C-93AB-EA66E490E507/store, NSURL=file:///var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-FAE38A46-8162-4D2C-93AB-EA66E490E507/store, NSUnderlyingError=0x7b4a588150 {Error Domain=NSOSStatusErrorDomain Code=-43 "fnfErr: File not found"}}
+✘ Test digestMismatchLeavesNoPublishedVersion() failed after 0.351 seconds with 2 issues.
+◇ Test duplicateInstallPreservesOriginalReceiptAndModes() started.
+✘ Test duplicateInstallPreservesOriginalReceiptAndModes() recorded an issue at CoreBundleStoreTests.swift:195:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-B4638BB8-6ADB-4F91-A403-1F4AB1B3B9BB: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test duplicateInstallPreservesOriginalReceiptAndModes() failed after 0.346 seconds with 1 issue.
+◇ Test refusedInstallLeavesExistingStoreUnchanged(_:) started.
+◇ Test case passing 1 argument mutation → "digest" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✘ Test refusedInstallLeavesExistingStoreUnchanged(_:) recorded an issue with 1 argument mutation → "digest" at CoreBundleStoreTests.swift:209:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-4B9EC525-05F3-41E3-B803-42C10B757A9D: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "old-version" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✘ Test refusedInstallLeavesExistingStoreUnchanged(_:) recorded an issue with 1 argument mutation → "old-version" at CoreBundleStoreTests.swift:209:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-73030F35-5478-4AE8-99A8-14EC84D0279D: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "plist-version" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✘ Test refusedInstallLeavesExistingStoreUnchanged(_:) recorded an issue with 1 argument mutation → "plist-version" at CoreBundleStoreTests.swift:209:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-A790D41C-65A8-4EEA-8C5B-BDEA33FA098D: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "x86_64" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✘ Test refusedInstallLeavesExistingStoreUnchanged(_:) recorded an issue with 1 argument mutation → "x86_64" at CoreBundleStoreTests.swift:209:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-60D91691-9A15-40BA-B91F-10565AE09091: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "non-regular" to refusedInstallLeavesExistingStoreUnchanged(_:) started.
+✘ Test refusedInstallLeavesExistingStoreUnchanged(_:) recorded an issue with 1 argument mutation → "non-regular" at CoreBundleStoreTests.swift:209:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-950DB1F3-F6F9-4CD6-8017-5FEDCB30D20E: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test refusedInstallLeavesExistingStoreUnchanged(_:) with 5 test cases failed after 1.779 seconds with 5 issues.
+↳ /// Refusals after a successful install change neither contents nor any mode or owner.
+◇ Test productionStoreRefusesNonRootBeforeAnyHostAccess() started.
+✔ Test productionStoreRefusesNonRootBeforeAnyHostAccess() passed after 0.001 seconds.
+◇ Test receiptFieldsAreRefusedWithSeparateReasons() started.
+✔ Test receiptFieldsAreRefusedWithSeparateReasons() passed after 0.001 seconds.
+◇ Test machOReaderReportsSlices() started.
+✔ Test machOReaderReportsSlices() passed after 0.001 seconds.
+◇ Test refusesModifiedInstallation(_:) started.
+◇ Test case passing 1 argument mutation → "receipt" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "receipt" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-7092CBDA-B0EF-48F1-81F4-765FB0013360: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "receipt-version" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "receipt-version" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-AEF29614-2C40-4043-940A-674FDD5691BA: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "cdhash" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "cdhash" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-D548E9FE-15B5-44D2-AAC8-9E7B38520EAB: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "resource" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "resource" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-1B2CFCDD-3270-487B-95C8-7078CF52DA81: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "binary" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "binary" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-5365A3C6-7F17-4A22-B802-A65151AD26A5: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "writable" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "writable" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-7B3DAFA5-78C7-47C1-9888-CF18D8A300D9: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "acl" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "acl" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-2F01BFC1-2F6B-4F5E-BCEF-9A173553342C: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "hardlink" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "hardlink" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-501BF5F1-598E-411F-A524-BF5F07F0548F: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "symlink" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "symlink" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-4FBF2D4A-581D-4FEB-81B0-FE7D86861B0F: mode 777 has group/other write or setuid/setgid/sticky bits")
+◇ Test case passing 1 argument mutation → "resigned" to refusesModifiedInstallation(_:) started.
+✘ Test refusesModifiedInstallation(_:) recorded an issue with 1 argument mutation → "resigned" at CoreBundleStoreTests.swift:294:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-C8FA3164-DDCB-4860-A898-B51501376106: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test refusesModifiedInstallation(_:) with 10 test cases failed after 3.702 seconds with 10 issues.
+◇ Test rejectsUnsafeArchive(_:) started.
+◇ Test case passing 1 argument mutation → "absolute" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "absolute" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-AF794C79-A240-476C-8A9E-78B301C06E3D: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Unsafe symbolic link")
+◇ Test case passing 1 argument mutation → "climb" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "climb" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-9C90D9DB-D5DF-474E-BF9B-4F83D2CEDF50: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Unsafe symbolic link")
+◇ Test case passing 1 argument mutation → "indirect-climb" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "indirect-climb" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-EDD250C5-075E-4FEB-A303-05BD931732B5: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Unsafe symbolic link")
+◇ Test case passing 1 argument mutation → "hardlink" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "hardlink" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-EA95F54C-67D8-4AED-A052-5291464484DF: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Unsafe or oversized archive member")
+◇ Test case passing 1 argument mutation → "setuid" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "setuid" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-90F89DEA-039B-48DC-867F-57990F33B2B5: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Unsafe or oversized archive member")
+◇ Test case passing 1 argument mutation → "fifo" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "fifo" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-E41E15C9-CD9D-4AD7-A19E-CF555AC51DE0: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Unsafe or oversized archive member")
+◇ Test case passing 1 argument mutation → "wrong-version" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "wrong-version" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-181C9C3F-EEB2-47E4-A2A7-D74AB0E072C9: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Info.plist version mismatch")
+◇ Test case passing 1 argument mutation → "unsigned" to rejectsUnsafeArchive(_:) started.
+✘ Test rejectsUnsafeArchive(_:) recorded an issue with 1 argument mutation → "unsigned" at CoreBundleStoreTests.swift:376:13: Expectation failed: (error.localizedDescription → "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-58D14470-9801-4373-B09E-4117DDAABF0E: mode 777 has group/other write or setuid/setgid/sticky bits").contains(expected → "Invalid code signature")
+✘ Test rejectsUnsafeArchive(_:) with 8 test cases failed after 0.079 seconds with 8 issues.
+◇ Test rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "symlink" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "writable" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "acl" to rejectsUnsafeStore(_:) started.
+◇ Test case passing 1 argument mutation → "lock-symlink" to rejectsUnsafeStore(_:) started.
+✔ Test rejectsUnsafeStore(_:) with 4 test cases passed after 1.465 seconds.
+◇ Test heldLeaseRefusesConcurrentInstall() started.
+✘ Test heldLeaseRefusesConcurrentInstall() recorded an issue at CoreBundleStoreTests.swift:400:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-120486B6-3F1B-4CB5-8E08-4DEE8E15DA7B: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test heldLeaseRefusesConcurrentInstall() failed after 0.347 seconds with 1 issue.
+◇ Test descriptorCopyIgnoresSharedSeekOffset() started.
+✘ Test descriptorCopyIgnoresSharedSeekOffset() recorded an issue at CoreBundleStoreTests.swift:414:6: Caught error: VPhoneBundleStoreError(message: "Unsafe ownership, type, links, or permissions: /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/bundle-store-E4438FA2-EEAA-4E8E-A391-FE31D759BB9F: mode 777 has group/other write or setuid/setgid/sticky bits")
+✘ Test descriptorCopyIgnoresSharedSeekOffset() failed after 0.346 seconds with 1 issue.
+◇ Test rejectsNonRegularDescriptor() started.
+✔ Test rejectsNonRegularDescriptor() passed after 0.006 seconds.
+◇ Test archiveReaderEntryLimit() started.
+✔ Test archiveReaderEntryLimit() passed after 0.347 seconds.
+✘ Suite CoreBundleStoreTests failed after 10.164 seconds with 32 issues.
+✘ Test run with 23 tests in 2 suites failed after 10.164 seconds with 32 issues.

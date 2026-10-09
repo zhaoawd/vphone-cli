@@ -1,0 +1,17 @@
+.F..
+======================================================================
+FAIL: test_nio_output_close_releases_peer_with_open_send_direction (test_daemon_vsock_bridge.VsockBridgeTests.test_nio_output_close_releases_peer_with_open_send_direction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_vsock_bridge.py", line 55, in test_nio_output_close_releases_peer_with_open_send_direction
+    def test_nio_output_close_releases_peer_with_open_send_direction(self):self.run_bridge(hold_open=True)
+                                                                           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_vsock_bridge.py", line 42, in run_bridge
+    self.assertEqual(p.returncode,0,(out,err))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 68 != 0 : ('active=1\n', '')
+
+----------------------------------------------------------------------
+Ran 4 tests in 8.857s
+
+FAILED (failures=1)

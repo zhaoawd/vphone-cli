@@ -1,0 +1,37 @@
+{
+  "status": "in_progress",
+  "scope": [
+    "T02",
+    "T06",
+    "T07",
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "original_tasks_accepted": false,
+  "authorization": {
+    "user": "授权，完成这7项",
+    "amfi_cdhash": "4cea360ca924a4c651a12aae7755545b492a59b6",
+    "paths": [],
+    "allow_all": false
+  },
+  "live_runtime": {
+    "vm": "/Users/qcz3840/github/vphone-cli/vm.backups/b21-restored-vm-new-20261009",
+    "pid": 3664,
+    "instance": "D7230590-2218-4142-81B1-EDCBCDA87D51",
+    "amfi_driver_session": 39566,
+    "vm_session": 7815,
+    "cleanup_required": true
+  },
+  "findings": {
+    "T06": "Baseline 3/3 large transfers failed. 8 KiB NIO handler still failed 2/3; native corrected probe blocking 3/3 passed, nonblocking 64 KiB 0/3 passed, nonblocking 8 KiB 3/3 passed. This does not establish NIO chunk candidate correctness.",
+    "T07": "Cross-thread signal delivery reproduced stuck waitpid. Guest shell inherited blocked TERM/INT/HUP/QUIT. Signal-safe liveness close plus explicit unblocking TERM/INT passes15 host tests and3 real guest stops (0.21,0.23,0.47seconds); other upgrade matrices pending.",
+    "T08": "Native capture-only releases memory. UIKit/ImageIO JPEG from original screen image retains about403MiB. Independent bitmap copy before either JPEG encoder releases to about3MiB after22captures. Dependency adaptation and full runtime matrix pending."
+  },
+  "rulings": [
+    "Failed 8KiB candidate is experimental and must not be accepted from synthetic tests. Its exact sources are preserved; product removal/replacement still pending.",
+    "Keep all7 original completion contracts unchanged. Fixed IcliKit revision must remain explicit; any local source overlay must declare exact base,patch,and compiled-source hashes."
+  ],
+  "auto_review": "Broad bulk archive/removal rejected. Safer named8-file preservation completed without deletion or overwrite; source cleanup still pending."
+}

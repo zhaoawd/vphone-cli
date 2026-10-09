@@ -1,0 +1,118 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/18] Compiling VPhoneCore VPhoneLaunchLayout.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[7/18] Emitting module VPhoneCore
+[7/24] Write Objects.LinkFileList
+[12/26] Linking vphone-helper
+[13/26] Linking vphone-launchpad-launcher
+[14/26] Applying vphone-helper
+[15/26] Linking vphone-launchpad
+[16/26] Applying vphone-launchpad-launcher
+[17/26] Applying vphone-launchpad
+[19/26] Compiling VPhoneCoreTests VMStopTests.swift
+[20/26] Emitting module VPhoneCoreTests
+[20/26] Write Objects.LinkFileList
+[21/26] Linking vphone-cli
+[22/26] Linking vphone-vm
+[23/26] Applying vphone-vm
+[24/26] Applying vphone-cli
+[25/26] Linking vphone-cliPackageTests
+Build complete! (9.19s)
+Test Suite 'Selected tests' started at 2026-10-09 10:43:40.489.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 10:43:40.490.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 10:43:40.490.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 10:43:40.490.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VMStopTests started.
+◇ Suite LaunchLayoutTests started.
+◇ Test reportsFailureWhenTheTargetSurvives() started.
+◇ Test diskInspectionFailureCannotReportStopped() started.
+◇ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() started.
+◇ Test forceKillsAProcessThatIgnoresSIGINT() started.
+◇ Test refusesToSignalAForeignLockHolder() started.
+◇ Test stageVphonedOverwritesStaleDestination() started.
+◇ Test pairedRuntimeAndProcessIdentity() started.
+◇ Test matchesEitherRawOrResolvedConfigPath() started.
+◇ Test resolvesArtifactPaths() started.
+◇ Test matchesBundledAppBinaryAndEqualsForm() started.
+◇ Test exitedTargetAndReleasedLockStillRequireDiskRelease() started.
+◇ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test reportsNotRunningWhenNothingHoldsTheLock() started.
+◇ Test delegatesToResources() started.
+◇ Test reportsSignalErrorsSeparately() started.
+◇ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test resolvesToolPaths() started.
+◇ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() started.
+◇ Test treatsAReusedPIDAsExitedAndNeverKillsIt() started.
+◇ Test ignoresOtherBundlesAndUnrelatedProcesses() started.
+◇ Test dedupsSortsAndSkipsMalformedLines() started.
+◇ Test locatesBootProcessByConfigArgument() started.
+◇ Test reportsProgressBeforeTheWaits() started.
+◇ Test parsesLsofPIDs() started.
+◇ Test mapsOutcomesToExitCodes() started.
+◇ Test matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() started.
+◇ Test locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test stageVphonedReturnsFalseWhenSourceAbsent() started.
+◇ Test stageVphonedCopiesWhenSourceExists(less:) started.
+◇ Test forceSkipsSIGINTButStillConfirms() started.
+◇ Test toolchainFingerprintIncludesBothExecutables() started.
+◇ Test identityDescribesLiveProcessAndDropsReapedOne() started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-cli" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument executableName → "vphone-vm" to locatorFindsTheFakeBootProcess(executableName:) started.
+◇ Test case passing 1 argument less → false to stageVphonedCopiesWhenSourceExists(less:) started.
+◇ Test case passing 1 argument less → true to stageVphonedCopiesWhenSourceExists(less:) started.
+✔ Test doesNotKillAPIDThatLeftTheProcessListDuringTheWait() passed after 0.761 seconds.
+✔ Test resolvesArtifactPaths() passed after 0.761 seconds.
+✔ Test reportsFailureWhenTheTargetSurvives() passed after 0.761 seconds.
+✔ Test exitedTargetAndReleasedLockStillRequireDiskRelease() passed after 0.762 seconds.
+✔ Test matchesBundledAppBinaryAndEqualsForm() passed after 0.762 seconds.
+✔ Test pairedRuntimeAndProcessIdentity() passed after 0.762 seconds.
+✔ Test matchesEitherRawOrResolvedConfigPath() passed after 0.761 seconds.
+✔ Test delegatesToResources() passed after 0.762 seconds.
+✔ Test reportsSignalErrorsSeparately() passed after 0.762 seconds.
+✔ Test stageVphonedOverwritesStaleDestination() passed after 0.762 seconds.
+✔ Test diskInspectionFailureCannotReportStopped() passed after 0.762 seconds.
+✔ Test resolvesToolPaths() passed after 0.762 seconds.
+✔ Test reportsNotRunningWhenNothingHoldsTheLock() passed after 0.762 seconds.
+✔ Test treatsAReusedPIDAsExitedAndNeverKillsIt() passed after 0.762 seconds.
+✔ Test ignoresOtherBundlesAndUnrelatedProcesses() passed after 0.762 seconds.
+✔ Test locatesBootProcessByConfigArgument() passed after 0.761 seconds.
+✔ Test dedupsSortsAndSkipsMalformedLines() passed after 0.762 seconds.
+✔ Test unlockedBundleWithOpenDiskCannotReportStoppedAndHolderIsNeverSignalled() passed after 0.762 seconds.
+✔ Test parsesLsofPIDs() passed after 0.762 seconds.
+✔ Test mapsOutcomesToExitCodes() passed after 0.762 seconds.
+✔ Test matchesConfigPathWithDotDotAndSymlinksButNotPrefixCollisions() passed after 0.762 seconds.
+✔ Test refusesToSignalAForeignLockHolder() passed after 0.762 seconds.
+✔ Test locatorFindsTheFakeBootProcess(executableName:) with 2 test cases passed after 0.762 seconds.
+✔ Test stageVphonedReturnsFalseWhenSourceAbsent() passed after 0.762 seconds.
+✔ Test stageVphonedCopiesWhenSourceExists(less:) with 2 test cases passed after 0.762 seconds.
+✔ Test toolchainFingerprintIncludesBothExecutables() passed after 0.762 seconds.
+✔ Test identityDescribesLiveProcessAndDropsReapedOne() passed after 0.762 seconds.
+✔ Suite LaunchLayoutTests passed after 0.762 seconds.
+✔ Test liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName:) with 2 test cases passed after 0.790 seconds.
+✔ Test forceSkipsSIGINTButStillConfirms() passed after 0.907 seconds.
+✔ Test forceKillsAProcessThatIgnoresSIGINT() passed after 2.647 seconds.
+✔ Test reportsProgressBeforeTheWaits() passed after 2.878 seconds.
+✔ Test neverSignalsAnotherProgramHoldingTheDiskImage(executableName:) with 2 test cases passed after 6.327 seconds.
+✔ Suite VMStopTests passed after 6.328 seconds.
+✔ Test run with 32 tests in 2 suites passed after 6.328 seconds.

@@ -1,0 +1,1216 @@
+{
+  "health": {
+    "api_version": 1,
+    "binary_hash": "7e6f916f2e7a0a5a6b2a68420df3cec411c4d4802c662c85714dffc5f6e57659",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "842A08D2-3FBA-4BA8-B870-B5FD7BBAF488",
+    "ios": "26.1.0",
+    "ip": "fe80::14fa:7eb5:e972:ad5b%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "status": "ok"
+  },
+  "observations": [
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "bytes": 58943,
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "method": "processes.list",
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 76169216,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 0.8693820416666667,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 86852064
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7847936,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6348622083333334,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2261400
+            }
+          ]
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 177029120,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "start_time": 1791508334.67001,
+              "pid": 2585,
+              "cpu_seconds": 1.037694625,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 182452776
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7847936,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6348622083333334,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2261400
+            }
+          ]
+        },
+        "method": "processes.list",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "method": "screen.screenshot",
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "method": "screen.screenshot",
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "bytes": 58943,
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "ok": true,
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "method": "processes.list",
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 277807104,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 1.1840444583333332,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 283263600
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7847936,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6348622083333334,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2261400
+            }
+          ]
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "height": 2796,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "bytes": 58943,
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "ok": true,
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "method": "screen.screenshot",
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 337526784,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 1.3823140416666668,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 363954872
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7782400,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6348622083333334,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2261400
+            }
+          ]
+        },
+        "method": "processes.list"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "ok": true,
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot",
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        },
+        "method": "screen.screenshot"
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "screen.screenshot",
+        "params": {}
+      },
+      "response": {
+        "ok": true,
+        "method": "screen.screenshot",
+        "result": {
+          "height": 2796,
+          "bytes": 58943,
+          "data": {
+            "bytes": 58943,
+            "sha256": "bf4166276a6981fbff7eaa2e946a2b3301eca976cec951b9634c614d73165046"
+          },
+          "width": 1290,
+          "mime_type": "image/jpeg",
+          "coordinate_scale": 3
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "method": "processes.list",
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 337526784,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 1.62637675,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 464683704
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7782400,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6348622083333334,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2261400
+            }
+          ]
+        },
+        "ok": true
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "method": "processes.list",
+        "ok": true,
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 337559552,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 1.76345375,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 309019320
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7864320,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6358405,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2277784
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "ok": true,
+        "method": "processes.list",
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 337510400,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 1.9465585833333332,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 323470008
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7864320,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6358405,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2277784
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": {
+        "t": "rpc",
+        "screen": false,
+        "target": {
+          "vm": "b21-restored-vm-new-20261009",
+          "pid": 3664,
+          "instance_id": "D7230590-2218-4142-81B1-EDCBCDA87D51"
+        },
+        "method": "processes.list",
+        "params": {
+          "filter": "vphoned"
+        }
+      },
+      "response": {
+        "ok": true,
+        "method": "processes.list",
+        "result": {
+          "count": 3,
+          "processes": [
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 337510400,
+              "jetsam_priority": 180,
+              "ppid": 2584,
+              "pid": 2585,
+              "start_time": 1791508334.67001,
+              "cpu_seconds": 2.087331041666667,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 308970168
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "jetsam_priority": 180,
+              "resident_bytes": 3686400,
+              "ppid": 1,
+              "pid": 2584,
+              "start_time": 1791508334.637887,
+              "cpu_seconds": 0.03168470833333333,
+              "executable": "/private/var/root/vphone-b21-api/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 1573176
+            },
+            {
+              "name": "vphoned",
+              "uid": 0,
+              "resident_bytes": 7864320,
+              "jetsam_priority": 180,
+              "ppid": 1,
+              "pid": 70,
+              "start_time": 1791507778.871568,
+              "cpu_seconds": 0.6358405,
+              "executable": "/private/var/root/Library/Caches/vphoned",
+              "jetsam_limit_mb": -1,
+              "footprint_bytes": 2277784
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "baseline": {
+    "pid": 2585,
+    "resident_bytes": 76169216,
+    "footprint_bytes": 86852064
+  },
+  "batches": [
+    {
+      "pid": 2585,
+      "resident_bytes": 177029120,
+      "footprint_bytes": 182452776
+    },
+    {
+      "pid": 2585,
+      "resident_bytes": 277807104,
+      "footprint_bytes": 283263600
+    },
+    {
+      "pid": 2585,
+      "resident_bytes": 337526784,
+      "footprint_bytes": 363954872
+    },
+    {
+      "pid": 2585,
+      "resident_bytes": 337526784,
+      "footprint_bytes": 464683704
+    }
+  ],
+  "settled": [
+    {
+      "pid": 2585,
+      "resident_bytes": 337559552,
+      "footprint_bytes": 309019320
+    },
+    {
+      "pid": 2585,
+      "resident_bytes": 337510400,
+      "footprint_bytes": 323470008
+    },
+    {
+      "pid": 2585,
+      "resident_bytes": 337510400,
+      "footprint_bytes": 308970168
+    }
+  ],
+  "retained_growth_bytes": 222118104,
+  "complete": false
+}

@@ -1,0 +1,196 @@
+{
+  "scope": "B22 source snapshots; independent review covers daemon bridge, ownership and cache confirmation, not subsequent host argv/test fixture changes",
+  "commits": [
+    "b5c4e482e8f724bedee224ec6399f7456d719db3",
+    "9a75de14856b9ff073f44071a619dce517ce8008",
+    "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d"
+  ],
+  "paths": [
+    {
+      "path": "dependencies/daemon-api-overlays/icli-jpeg-copy.patch",
+      "sha256": "e1e93ea015d9d4c4f946bb2ea79627cff0bf990c9391e760b3aa56b71e52d74e",
+      "bytes": 2329
+    },
+    {
+      "path": "dependencies/daemon-api-overlays/manifest.json",
+      "sha256": "97646e0b3f49de9039f64d876c533b1d1602d3b2d43e8ae7feb8e630387e6aba",
+      "bytes": 592
+    },
+    {
+      "path": "scripts/build_daemon_api.sh",
+      "sha256": "6baa34d964603a2066d2f231b18b6ef5b96f9873234fe711cd78c0cb4a945d84",
+      "bytes": 1857
+    },
+    {
+      "path": "scripts/check_daemon_api.py",
+      "sha256": "0054e427e208aba85f8d4b9b5858867dcf115a06852e09b75bd66ba54c239046",
+      "bytes": 6844
+    },
+    {
+      "path": "scripts/daemon_api_overlays.py",
+      "sha256": "dc793006b248063773ddfa939d748e30be5a5c7ae1a83b05b607c9f68b7794df",
+      "bytes": 3644
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneLaunchLayout.swift",
+      "sha256": "2cfe0cdd84738f1e361e363197be4479c405805499f2208eedd3aed1a695a474",
+      "bytes": 8930
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneProcessIdentity.swift",
+      "sha256": "794c51ee5051e3228e4ee46f672959ce7cd67e15549b9c74474ce1c90bc13021",
+      "bytes": 4084
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneVMStopper.swift",
+      "sha256": "2781923cf1b1be16a467ce64f1719b0f491850e96d2514634f1b3ea4f80992e7",
+      "bytes": 12441
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+      "sha256": "c62d73617810065a1a39307fa575093844f1dc970f0db6590df3a3c6ee624c2f",
+      "bytes": 820
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestAPI+TimeZone.swift",
+      "sha256": "3ef204ed4fba65c75f76b4db11191fe5cd482aefae1b7d92c5a83d0af5348a76",
+      "bytes": 894
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+      "sha256": "eb030e3f34d163357aea808b659e9a3875a8afc8cd8254fc98cd9726b7b9cf96",
+      "bytes": 22887
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift",
+      "sha256": "9eeab0a773be954ada534e23fb2ba9b057660878a82357eac180cbf2ff1f372b",
+      "bytes": 15996
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/GuestPipeChannel.swift",
+      "sha256": "9938458a91f699243cb2f792363fb04173777ea4f13ef734e4559d304a97cc5f",
+      "bytes": 1483
+    },
+    {
+      "path": "sources/VPhoneDaemon/Daemon/main.swift",
+      "sha256": "272e42340a0393407a4f850a7cb688ed1b01ca00ed684797c3ab25871761f11b",
+      "bytes": 4750
+    },
+    {
+      "path": "sources/VPhoneDaemon/Native/Include/VphonedNative.h",
+      "sha256": "74cc007a72541188c8e7e201c513fe47c0ed137fdf98a9be9bc28b6c397e8380",
+      "bytes": 1979
+    },
+    {
+      "path": "sources/VPhoneDaemon/Native/vphoned_native.m",
+      "sha256": "9728c5b1c16517190c2505422f915defef5248b671c7a132b5ef1d1aacd7d9c5",
+      "bytes": 5027
+    },
+    {
+      "path": "sources/VPhoneDaemon/Native/vphoned_proxy.c",
+      "sha256": "046fc3c0a7afbe354121bb7b4d49d2b54da1820e18a64791c0542eefc967a81d",
+      "bytes": 7151
+    },
+    {
+      "path": "sources/VPhoneDaemon/Native/vphoned_vsock.c",
+      "sha256": "12541eabb703bb9eeb5ae1bfcbab2e877ebb214ad7259e269b98ed30154060fa",
+      "bytes": 6471
+    },
+    {
+      "path": "tests/VPhoneBundleStoreTests/CoreBundleStoreTests.swift",
+      "sha256": "9d921df825d157d0dd4345a0af16ecfd2a8f9c155d32bcbe52219d1db35bef26",
+      "bytes": 25959
+    },
+    {
+      "path": "tests/VPhoneCoreTests/VMStopTests.swift",
+      "sha256": "2356b8307c664da828e08b5857d07448ca24b17e446b7f0d3df238bf29416347",
+      "bytes": 19062
+    },
+    {
+      "path": "tests/fixtures/daemon_cache_confirmation/main.c",
+      "sha256": "ecd468970b8737f02f7880ac8d38a1448dc249b3ab06b4123a51535d89d2a1de",
+      "bytes": 712
+    },
+    {
+      "path": "tests/fixtures/daemon_pipe_ownership/main.swift",
+      "sha256": "fbc10a7100252c0e25996bd87784f46d24feb8404d20be07834419457bb36d0c",
+      "bytes": 2743
+    },
+    {
+      "path": "tests/fixtures/daemon_proxy/main.c",
+      "sha256": "de9dadbf0471a9ef154f63e1e3c629e5601d343e3b04288e7014e8f6e86c4c40",
+      "bytes": 4443
+    },
+    {
+      "path": "tests/fixtures/daemon_vsock_bridge/main.c",
+      "sha256": "6d97ba32ecf7c2c0285277f24673f50867f6ac44a378a1ad4c6b1cd4acc7fc89",
+      "bytes": 1931
+    },
+    {
+      "path": "tests/test_daemon_api_overlays.py",
+      "sha256": "13de541f75226dd3723c615caf05167fa930a8f0de3e4714691b3ae6a2521192",
+      "bytes": 4023
+    },
+    {
+      "path": "tests/test_daemon_cache_confirmation.py",
+      "sha256": "1c4b07e88c845d275c1902d998911708fc711a351f44cc4ede92a18a42aee2bb",
+      "bytes": 2069
+    },
+    {
+      "path": "tests/test_daemon_pipe_ownership.py",
+      "sha256": "2a2b477020e5a5551eabd727a599d60cf087be036b49d722a76aa716ddbee813",
+      "bytes": 1749
+    },
+    {
+      "path": "tests/test_daemon_proxy.py",
+      "sha256": "43bdf8aa68ad17a4bc26a4c9b267e8dc1049b7d8f3a00338455ac32d6826bbd6",
+      "bytes": 8501
+    },
+    {
+      "path": "tests/test_daemon_timezone.py",
+      "sha256": "280a16d0e1a98efdcf399f622e1923d53566f6f5a3044e3b7cefd985f5acb780",
+      "bytes": 1963
+    },
+    {
+      "path": "tests/test_daemon_vsock_bridge.py",
+      "sha256": "6fb4a54fd23aadaa0d641cdf5635ac809afb6d0900d33e0dfedd62435d636d7d",
+      "bytes": 2467
+    }
+  ],
+  "independent_review": {
+    "agent": "/root/review_b22_runtime",
+    "initial_findings": [
+      "receive-thread leak on output EOF",
+      "NIO registration error double-close"
+    ],
+    "fix_review": "no remaining findings; cache identity change subsequently reviewed",
+    "host_argv_and_fixture_changes_independently_reviewed": false
+  },
+  "T06_upstream": "evidence/B22-t06-upstream.diff",
+  "remaining_original_contracts": {
+    "T02": [
+      "218个pending提交及47项能力全局语义对账；保留reviewed/adaptation_planned与accepted区别"
+    ],
+    "T07": [
+      "真实临时launchd job不同binary升级、回退、坏缓存和有限重试完整矩阵"
+    ],
+    "T08": [
+      "90度旋转未生效原因及完整rotation/RootHide service矩阵",
+      "JPEG视觉核验；本轮内存通过仅适用于记录的固定候选与恢复副本"
+    ],
+    "T24": [
+      "完整TCC负责应用链真实验收",
+      "旧helper、owner错误、链接替换、共享可写路径和未知verb完整真实拒绝矩阵",
+      "Homebrew运行依赖只验证当前机器可解析，不声明可移植封装"
+    ],
+    "T40": [
+      "创建全流程固定工具链，clone/export/rename来源",
+      "kernel-only及显式guest升级/回退、混合版本四层来源矩阵",
+      "APFS写时复制备份不证明物理独立；不声明对不协作写入者的原子CAS"
+    ],
+    "T46": [
+      "全UI立即退出、detached/create/后代writer和输出生命周期",
+      "panic/取消/轮换、UI响应及实际VM吞吐矩阵"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b22-rotation-probe.py", line 6, in <module>
+    r=rpc_http('display.rotation',{'orientation':str(degrees)});s=rpc_http('screen.screenshot');data=base64.b64decode(s['data']);saved={k:v for k,v in s.items() if k!='data'};saved['sha256']=hashlib.sha256(data).hexdigest();saved['jpeg_magic']=data[:3].hex();result['rotations'].append({'requested':degrees,'rotation':r,'screenshot':saved});assert r['degrees']==degrees;assert data[:3]==b'\xff\xd8\xff';assert (s['width']>s['height'])==(degrees in [90,270])
+  File "<string>", line 41, in rpc_http
+AssertionError: (400, {'error': {'code': 'unavailable', 'message': 'The device did not apply the requested rotation.'}, 'id': 'b22', 'type': 'response'})

@@ -1,0 +1,15 @@
+test_candidate_marker_binds_the_declared_overlay_set (test_daemon_api_overlays.DaemonOverlayTests.test_candidate_marker_binds_the_declared_overlay_set) ... ERROR
+
+======================================================================
+ERROR: test_candidate_marker_binds_the_declared_overlay_set (test_daemon_api_overlays.DaemonOverlayTests.test_candidate_marker_binds_the_declared_overlay_set)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_api_overlays.py", line 41, in test_candidate_marker_binds_the_declared_overlay_set
+    marker=self.module.marker(overlays)
+           ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'daemon_overlays' has no attribute 'marker'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.114s
+
+FAILED (errors=1)

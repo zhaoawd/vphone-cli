@@ -1,0 +1,19 @@
+test_failed_worker_is_restarted_and_stop_reaps_child (test_daemon_proxy.DaemonProxyTests.test_failed_worker_is_restarted_and_stop_reaps_child) ... ok
+test_invalid_worker_arguments_are_rejected (test_daemon_proxy.DaemonProxyTests.test_invalid_worker_arguments_are_rejected) ... ok
+test_pending_update_failure_returns_to_launchd_without_retry (test_daemon_proxy.DaemonProxyTests.test_pending_update_failure_returns_to_launchd_without_retry) ... ok
+test_pending_update_spawn_failure_returns_without_repeated_bad_binary (test_daemon_proxy.DaemonProxyTests.test_pending_update_spawn_failure_returns_without_repeated_bad_binary) ... ok
+test_proxy_death_closes_liveness_pipe_and_worker_exits (test_daemon_proxy.DaemonProxyTests.test_proxy_death_closes_liveness_pipe_and_worker_exits) ... ok
+test_proxy_sigterm_stops_worker (test_daemon_proxy.DaemonProxyTests.test_proxy_sigterm_stops_worker) ... ok
+test_restart_delay_stays_one_second (test_daemon_proxy.DaemonProxyTests.test_restart_delay_stays_one_second) ... ok
+test_stop_escalates_for_worker_ignoring_term_and_pipe (test_daemon_proxy.DaemonProxyTests.test_stop_escalates_for_worker_ignoring_term_and_pipe) ... ok
+test_stop_received_on_another_thread_wakes_wait_and_releases_port (test_daemon_proxy.DaemonProxyTests.test_stop_received_on_another_thread_wakes_wait_and_releases_port) ... ok
+test_successful_worker_stops_proxy_without_retry (test_daemon_proxy.DaemonProxyTests.test_successful_worker_stops_proxy_without_retry) ... ok
+test_waitpid_failure_logs_wait_error_not_later_errno (test_daemon_proxy.DaemonProxyTests.test_waitpid_failure_logs_wait_error_not_later_errno) ... ok
+test_worker_exit_status_is_logged (test_daemon_proxy.DaemonProxyTests.test_worker_exit_status_is_logged) ... ok
+test_worker_port_is_released_after_proxy_stop_or_death (test_daemon_proxy.DaemonProxyTests.test_worker_port_is_released_after_proxy_stop_or_death) ... ok
+test_worker_signal_is_logged (test_daemon_proxy.DaemonProxyTests.test_worker_signal_is_logged) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 14.043s
+
+OK

@@ -1,0 +1,828 @@
+{
+  "scope": "All 62 merge commits; automatic remerge compared with recorded merge tree; parent commits still require semantic review",
+  "merges": [
+    {
+      "sha": "30654502d1b2d40f673333d650d723f2077cf8e3",
+      "subject": "Merge branch 'main' of https://github.com/Lakr233/vphone-cli",
+      "parents": [
+        "657755eb99fb928354e8cda9e4b11437b813ed4f",
+        "be7f061ecf6a46b7ffe1bf7b8fbaa32832074c6d"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "64aa5f6b3e5a3ddeef8e0d8fcc4061fa73a8a4c8",
+      "subject": "Merge branch 'main' of https://github.com/Lakr233/vphone-cli",
+      "parents": [
+        "a0e04c8b1918575bcbecec89c5642e84f929c234",
+        "107cbd0e644858898d7bf58fa95c743b5dd56dc3"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "81cc39e8829fe678a0702a736213b58d88ca7820",
+      "subject": "Merge pull request #537 from lgzcoollg/network/tunnel-mode",
+      "parents": [
+        "862ae00490593a4c5bf519a6031a13ef0d67d117",
+        "6b08b0ce7a976ab0f620e36b13bbf11f3b8e3141"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "fe81e693277789abc371d59165d1dbef84977f17",
+      "subject": "Merge main into feat/native-ax-hierarchy",
+      "parents": [
+        "3f64e21bf42fbed1e1467a0098a8fc705ea335e9",
+        "81cc39e8829fe678a0702a736213b58d88ca7820"
+      ],
+      "bytes": 1066,
+      "remerge_sha256": "57a4e432d646f966ef12472c4ee0d5269587d3c2bf5fd51291a45799a647bd97",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "fe81e693277789abc371d59165d1dbef84977f17",
+        "subject": "Merge main into feat/native-ax-hierarchy",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "\u6587\u6863\u51b2\u7a81\u6807\u8bb0\u79fb\u9664\uff1b\u4fdd\u7559 native AX \u4e0e\u6784\u5efa producer \u6392\u7a7a\u8bb0\u5f55\u3002",
+        "integration_decision": "\u6587\u6863\u5408\u5e76\u672c\u8eab\u6ca1\u6709\u65b0\u589e\u6267\u884c\u4ee3\u7801\uff1b\u540e\u7eed AX \u548c\u6784\u5efa\u68c0\u67e5\u4ecd\u6309\u6700\u7ec8\u7ec4\u4ef6\u5ba1\u67e5\u3002",
+        "tasks": [
+          "T24",
+          "T28",
+          "T38",
+          "T41"
+        ],
+        "evidence": "evidence/T02-remerge-fe81e693.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "57a4e432d646f966ef12472c4ee0d5269587d3c2bf5fd51291a45799a647bd97",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-fe81e693.diff"
+    },
+    {
+      "sha": "11758bb87a20b5037bfb814aebd5edbb547bd8f8",
+      "subject": "Merge pull request #539 from yannip1234/feat/native-ax-hierarchy",
+      "parents": [
+        "81cc39e8829fe678a0702a736213b58d88ca7820",
+        "fe81e693277789abc371d59165d1dbef84977f17"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "a8730b87143a23e8c924254a5805c2340c449af4",
+      "subject": "Merge pull request #543 from 0xJacky/ipados",
+      "parents": [
+        "39f7ced5f2f869da2647e3cb2630def2311086fa",
+        "568643f649a2583eadccb8296d052556108ad9b6"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "54b33da7edd1e38c9c334120296a70fe7532cec0",
+      "subject": "Merge pull request #544 from 0xJacky/codex/keychain-response-shape",
+      "parents": [
+        "a8730b87143a23e8c924254a5805c2340c449af4",
+        "6821e9ba28a6a9a75f6162469d7c7b7efe98ae88"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "c059059967a7bbeb1461cf3e65a765a1da0044af",
+      "subject": "Merge pull request #545 from 0xJacky/springboard-haptics-crash",
+      "parents": [
+        "54b33da7edd1e38c9c334120296a70fe7532cec0",
+        "7c74a8215c4530ece09c90831a709a9ca2ace4fa"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "735927f9d095904482e08d550d695e7b5ceb774d",
+      "subject": "Merge pull request #549 from 0xJacky/mac-name-in-guest",
+      "parents": [
+        "3938171539aeefc0355be1fee4b69372f3bda0d4",
+        "d11da1adbbc80c369e2c66fb636fad76a6f8776f"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "3364561354307d4f31d103ef663e82474d070d94",
+      "subject": "Merge pull request #550 from 0xJacky/dev",
+      "parents": [
+        "f795b5f6c673398c8b9ce44410d9ee32e61f6397",
+        "9ab69f8813bfb0d38697685329cbbcf0c6121381"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "b51c195b1859d8ee04c0f054684fb3106a26f430",
+      "subject": "Merge pull request #551 from 0xJacky/launchpad-polish",
+      "parents": [
+        "3364561354307d4f31d103ef663e82474d070d94",
+        "5cafdfa6fae079ca726daeeaf9fa68b774c98a16"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "dcff5de87ed80ef41aa741109ff0b819e74b98e0",
+      "subject": "Merge pull request #548 from WingCH/codex/hardware-keyboard-toggle",
+      "parents": [
+        "b51c195b1859d8ee04c0f054684fb3106a26f430",
+        "ffabb07603ed2476ff7731f2f736bbb7a334e49e"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "473dff70c3066ea3851b77c73f3b0c37e18cdebe",
+      "subject": "Merge pull request #553 from 0xJacky/launchpad-per-machine-bundle",
+      "parents": [
+        "d82c609a2d8caefb44e0e10dce0fe1fde323acaa",
+        "9205fd25fd2346829efc1fef88b16b18db349688"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "5c706b47717f00af2752d0828f7320369a5ac4f9",
+      "subject": "Merge pull request #552 from 0xJacky/ipados-firmware-catalog",
+      "parents": [
+        "473dff70c3066ea3851b77c73f3b0c37e18cdebe",
+        "189b438be2cbeed767cc6ec2c4df222ae57ea456"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "d5c6a92e41e6e95069e42f3b4c9449df148e5855",
+      "subject": "Merge pull request #554 from 0xJacky/ipados27-verified",
+      "parents": [
+        "5c706b47717f00af2752d0828f7320369a5ac4f9",
+        "95cb910686704cbc2aeb66553fce74661d454df6"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "d635d3c241cc6019644cdb559fc809e608c7255f",
+      "subject": "Merge pull request #556 from 0xJacky/zh-hans-terminology",
+      "parents": [
+        "8b28ea2cb497c089da9bf2406be4c3c36a117cf4",
+        "c4abafb0067e3f4b329325362aa2ea157612e247"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "707caa0fb8633d184dbca7dce4ace6c167e0c57f",
+      "subject": "Merge pull request #557 from 0xJacky/launchpad-table-cell-crash",
+      "parents": [
+        "d635d3c241cc6019644cdb559fc809e608c7255f",
+        "62d788060964837294cce0300eec00a27b523281"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "63e2809a5bb7312c0600c08c45d9ceb1c9b8c4fb",
+      "subject": "Merge pull request #558 from 0xJacky/screen-unlock-cli",
+      "parents": [
+        "707caa0fb8633d184dbca7dce4ace6c167e0c57f",
+        "aa985d5ce50734affa0bb264c49a03ab2b1c7001"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "6d284217eb4beba322861967bf58c81016c447db",
+      "subject": "Merge upstream main into guest-audio",
+      "parents": [
+        "f23873c1481fbbd8b96323241ac3c7c6044ccdac",
+        "63e2809a5bb7312c0600c08c45d9ceb1c9b8c4fb"
+      ],
+      "bytes": 1856,
+      "remerge_sha256": "c0825cd40a7510c8e41832483cf8912cee6303f32c1612fbf9c3bbc543df5f28",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "6d284217eb4beba322861967bf58c81016c447db",
+        "subject": "Merge upstream main into guest-audio",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "\u4fdd\u7559 MobileGestalt cache/restart-pending \u4e0e screen.unlock \u4e24\u6bb5 API \u6587\u6863\u3002",
+        "integration_decision": "\u7f13\u5b58\u72b6\u6001\u4e0e\u89e3\u9501\u5c5e\u4e8e\u4e0d\u540c\u80fd\u529b\uff0c\u4e0d\u80fd\u5220\u9664\u4efb\u4e00\u6bb5\uff1b\u7528\u6237\u89e3\u9501\u6388\u6743\u548c\u97f3\u9891\u7ec4\u5408\u9a8c\u6536\u4ecd\u9700\u5206\u522b\u5904\u7406\u3002",
+        "tasks": [
+          "T28",
+          "T36",
+          "T42"
+        ],
+        "evidence": "evidence/T02-remerge-6d284217.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "c0825cd40a7510c8e41832483cf8912cee6303f32c1612fbf9c3bbc543df5f28",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-6d284217.diff"
+    },
+    {
+      "sha": "11079a305f1eb4ab75cfdf6690de90d06032d1fb",
+      "subject": "Merge pull request #559 from 0xJacky/host-timezone",
+      "parents": [
+        "63e2809a5bb7312c0600c08c45d9ceb1c9b8c4fb",
+        "436680a5d715dad46bbc0a05a2f5c89611527faa"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "ac89438058237f07976161d92155b0db249c15a2",
+      "subject": "Merge upstream main (2.4.1) into guest-audio",
+      "parents": [
+        "6d284217eb4beba322861967bf58c81016c447db",
+        "4c9c1b979095b92a9d6c73e5e6f0ead2f0124e2d"
+      ],
+      "bytes": 2350,
+      "remerge_sha256": "684e663996e79701dd186618af700f18e624f06019dfc531d9d743bc07cc3b8a",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "ac89438058237f07976161d92155b0db249c15a2",
+        "subject": "Merge upstream main (2.4.1) into guest-audio",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "DeviceTree sourceTree \u4ece pristineInput \u8bfb\u53d6\uff1b\u4fdd\u7559\u9ea6\u514b\u98ce usage description\uff0c\u66f4\u65b0\u53d1\u5e03\u7248\u672c\u81f3 2.4.1\u3002",
+        "integration_decision": "\u539f\u4ef6\u4fdd\u5b58\u3001board tree \u6d88\u8d39\u548c\u6743\u9650\u58f0\u660e\u987b\u6210\u7ec4\u9002\u914d\uff1b\u5f53\u524d\u56fa\u5b9a\u76ee\u6807\u7248\u672c\u4e3a 2.6.1\uff0c\u4e0d\u80fd\u590d\u5236\u5386\u53f2\u7248\u672c\u53f7\u3002",
+        "tasks": [
+          "T12",
+          "T24",
+          "T42",
+          "T44"
+        ],
+        "evidence": "evidence/T02-remerge-ac894380.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "684e663996e79701dd186618af700f18e624f06019dfc531d9d743bc07cc3b8a",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-ac894380.diff"
+    },
+    {
+      "sha": "4a35c5f058e2695ff420bcd123b12974b7a77307",
+      "subject": "Merge pull request #560 from 0xJacky/guest-120hz-paravirt-access",
+      "parents": [
+        "fe5df2a1522920af347fea31ce6a07324c001a4d",
+        "37ed2e65b988b1f9d1758f691772eef1d91233f9"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "f343a77a51263f275cab4cec0084050e30a8c74c",
+      "subject": "Merge upstream main (2.4.2) into guest-audio",
+      "parents": [
+        "9a8dd76b94acc0bc0d4cc580bd5b21d74b4219be",
+        "048c1e773d29863a4b62a00fec2017462befde5b"
+      ],
+      "bytes": 876,
+      "remerge_sha256": "ccc17bba3edcf35ede946c13784af80c88c4a805a81c351b37e2f359a0c78cc5",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "f343a77a51263f275cab4cec0084050e30a8c74c",
+        "subject": "Merge upstream main (2.4.2) into guest-audio",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "\u66f4\u65b0\u5386\u53f2\u7248\u672c\u81f3 2.4.2\uff0c\u4fdd\u7559\u9ea6\u514b\u98ce usage description\u3002",
+        "integration_decision": "\u5f53\u524d\u76ee\u6807\u4fdd\u7559\u8be5\u6743\u9650\u63cf\u8ff0\uff1b\u672c\u5730\u5e94\u4f7f\u7528\u5f53\u524d\u6784\u5efa\u6765\u6e90\uff0c\u4e0d\u7ee7\u627f\u5386\u53f2\u53d1\u5e03\u5143\u6570\u636e\u3002",
+        "tasks": [
+          "T24",
+          "T42"
+        ],
+        "evidence": "evidence/T02-remerge-f343a77a.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "ccc17bba3edcf35ede946c13784af80c88c4a805a81c351b37e2f359a0c78cc5",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-f343a77a.diff"
+    },
+    {
+      "sha": "aaa0dc046c29843bef4a5177b0a73877b02b8540",
+      "subject": "Merge the microphone and Control Center work into guest-audio",
+      "parents": [
+        "f343a77a51263f275cab4cec0084050e30a8c74c",
+        "7e02c7634c432e25d1dc8735dd01d55e978acacf"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "cadc2169754310ea2366c16e0e5b5b92b1afcc26",
+      "subject": "Merge pull request #561 from 0xJacky/launchpad-vm-launcher",
+      "parents": [
+        "048c1e773d29863a4b62a00fec2017462befde5b",
+        "53ce50672e2339898c7463904b12038d2d04b33f"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "b01257323a367311d2c713931fc48dcd0b567965",
+      "subject": "Merge pull request #562 from 0xJacky/standard-paravirt-clients",
+      "parents": [
+        "cadc2169754310ea2366c16e0e5b5b92b1afcc26",
+        "74629ee992ddcfc1b65fe3e86a0610c864846b91"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "78bac1ecd7a802ccb35c64e86ae23c637b985c1a",
+      "subject": "Merge upstream main into guest-audio",
+      "parents": [
+        "99204127084f5bf7af534695f0d75d17ab19c8c1",
+        "b01257323a367311d2c713931fc48dcd0b567965"
+      ],
+      "bytes": 1432,
+      "remerge_sha256": "4d25d7a267d3e8ad4b48d0cc522697b8c412ab836b26d604dcc4020d6f8e4974",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "78bac1ecd7a802ccb35c64e86ae23c637b985c1a",
+        "subject": "Merge upstream main into guest-audio",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "\u4fdd\u7559\u5ba2\u6237\u673a\u97f3\u9891\u8bb0\u5f55\u4e0e paravirtual user-client allowlist \u52a0\u5165 standard \u7684\u8bb0\u5f55\u3002",
+        "integration_decision": "\u65b0\u589e\u6587\u6863\u63cf\u8ff0\u9ed8\u8ba4\u9009\u62e9\u53d8\u5316\uff0c\u4e0d\u6784\u6210\u672c\u5730\u5b57\u8282\u7b49\u4ef7\u6216\u97f3\u9891\u901a\u8fc7\u8bc1\u636e\uff1bID/\u9884\u8bbe\u8fc1\u79fb\u4e0e\u97f3\u9891\u9a8c\u6536\u7ee7\u7eed\u5206\u5f00\u8ddf\u8e2a\u3002",
+        "tasks": [
+          "T09",
+          "T28",
+          "T42"
+        ],
+        "evidence": "evidence/T02-remerge-78bac1ec.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "4d25d7a267d3e8ad4b48d0cc522697b8c412ab836b26d604dcc4020d6f8e4974",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-78bac1ec.diff"
+    },
+    {
+      "sha": "db4f9dd4573feaa4cafad92045b530d9244498bc",
+      "subject": "Merge pull request #555 from 0xJacky/guest-audio",
+      "parents": [
+        "b01257323a367311d2c713931fc48dcd0b567965",
+        "78bac1ecd7a802ccb35c64e86ae23c637b985c1a"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "075360577c94092d4fbb3b25a6bec7bc77506108",
+      "subject": "Merge pull request #563 from 0xJacky/orphan-dhcp-leases",
+      "parents": [
+        "a5a553d4183d6ddca6047a26b7c2e32d74750c44",
+        "3567057a38d048f9acc65aa49935dc1af1adfb30"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "62db7337e5375c2ae826da2925d748091813223d",
+      "subject": "Merge pull request #564 from 0xJacky/audio-output-latency",
+      "parents": [
+        "075360577c94092d4fbb3b25a6bec7bc77506108",
+        "a8e9b818df7b3cddc963407f986c7dc2e61e6f98"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "66453e6081f87149b4e2110e2915360f501d8922",
+      "subject": "Merge pull request #565 from 0xJacky/vcam-shader-prewarm",
+      "parents": [
+        "62db7337e5375c2ae826da2925d748091813223d",
+        "88552e1ecf1f3a1fff6aa16371924b6b23049579"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "02af50e56a2faf78cdce718561476d34011faa8c",
+      "subject": "Merge pull request #566 from 0xJacky/board-tree-from-ipsw",
+      "parents": [
+        "caee5a4232ac240786d95582c7856c6e5bf41416",
+        "af753f115461122fb8c36ef1c13cb0c9a575fd16"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "8f1c55cf71b29b51b99a9ae221f9d1f71e9915ce",
+      "subject": "Merge pull request #571 from 0xJacky/unlock-at-startup",
+      "parents": [
+        "17d5c424171e066a2b6ee699c9e0bb7909773887",
+        "c6574d288dc8f2f02569fee9dcd704a5a06caca7"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "e04ae0d7dacb72c8f927e19bd08e191332a30182",
+      "subject": "Merge pull request #579 from 0xJacky/vm-stop-signals-vphone-vm",
+      "parents": [
+        "8f1c55cf71b29b51b99a9ae221f9d1f71e9915ce",
+        "bef54d3546349844f9b8bcfea131c8d0365091ca"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "f9dce4a0c8b941fe5e51db9c439af22820938a52",
+      "subject": "Merge pull request #574 from 0xJacky/vm-menu-shortcut-clashes",
+      "parents": [
+        "e04ae0d7dacb72c8f927e19bd08e191332a30182",
+        "cdf4ffd81cd67104f6dea2a2c17ffb51a2990f24"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "a43ef52d77aee53507ffacf4e5f7508468678039",
+      "subject": "Merge pull request #569 from 0xJacky/launchpad-cfw-log",
+      "parents": [
+        "f9dce4a0c8b941fe5e51db9c439af22820938a52",
+        "5ecee05d30b685d43b0e1a2ec66ea7f2259fac02"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "dadf1193e03ceeb616208aa0740a2ccd40066822",
+      "subject": "Merge pull request #570 from 0xJacky/post-creation-patches",
+      "parents": [
+        "a43ef52d77aee53507ffacf4e5f7508468678039",
+        "a153e9ddc46d1af522acb167fff4b9518eebcd1f"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "2d283e76fcdfc6d654549c0c6b9d3097ba396a08",
+      "subject": "Merge pull request #573 from 0xJacky/battery-health",
+      "parents": [
+        "dadf1193e03ceeb616208aa0740a2ccd40066822",
+        "f79c2bdabfab1e92a241be2bb9e7477c98ed5c82"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "bbf36000521c4eeb15c2f2ccb5100e3a0b9db861",
+      "subject": "Merge upstream main into other-iphone-models",
+      "parents": [
+        "80db5ac16419bde153f140a0cbeb92e66fb45724",
+        "dadf1193e03ceeb616208aa0740a2ccd40066822"
+      ],
+      "bytes": 3159,
+      "remerge_sha256": "c7cdf45bde933ef0eb79ec068eef372f45620f799a1d5153744c93ade2da9a2a",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "bbf36000521c4eeb15c2f2ccb5100e3a0b9db861",
+        "subject": "Merge upstream main into other-iphone-models",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "Installer \u7528 presentsBoard \u66ff\u4ee3 isPad \u5224\u65ad board audio \u662f\u5426\u9002\u7528\uff1b\u4fdd\u7559 patchPreboot \u8fd4\u56de live ID \u96c6\u5408\u7684\u5b9e\u73b0\u3002",
+        "integration_decision": "\u8bbe\u5907\u5206\u7c7b\u4e0e\u5b9e\u9645\u5e94\u7528 receipt \u9700\u4e00\u8d77\u63a5\u5165\uff1b\u4e0d\u80fd\u4ee5 iPhone \u540d\u79f0\u5224\u5b9a\u7f3a\u5c11 board\uff0c\u4e5f\u4e0d\u80fd\u4e22\u5f03\u4fee\u590d\u540e\u7684 live \u96c6\u5408\u3002",
+        "tasks": [
+          "T16",
+          "T32",
+          "T33",
+          "T44"
+        ],
+        "evidence": "evidence/T02-remerge-bbf36000.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "c7cdf45bde933ef0eb79ec068eef372f45620f799a1d5153744c93ade2da9a2a",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-bbf36000.diff"
+    },
+    {
+      "sha": "52ff1a54ddef472471073b9bb2e367aa07ab0155",
+      "subject": "Merge pull request #572 from 0xJacky/txm-precheck-admission",
+      "parents": [
+        "2d283e76fcdfc6d654549c0c6b9d3097ba396a08",
+        "d14bc4b48f74c95d7f29e3f1b59bbf94c3fdb4dd"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "17e1352e9f87862a3bcb3bd1bdc2ff9b0d883a3b",
+      "subject": "Merge upstream main into other-iphone-models",
+      "parents": [
+        "bbf36000521c4eeb15c2f2ccb5100e3a0b9db861",
+        "52ff1a54ddef472471073b9bb2e367aa07ab0155"
+      ],
+      "bytes": 2089,
+      "remerge_sha256": "14ec77b7b7611d1598f3ef1a3e063c12e1b4d265f3ed6147a141e36b06bf8532",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "17e1352e9f87862a3bcb3bd1bdc2ff9b0d883a3b",
+        "subject": "Merge upstream main into other-iphone-models",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "\u517c\u5bb9\u6027\u6587\u6863\u540c\u65f6\u4fdd\u7559 iOS 27.0.1 TXM admission \u9650\u5236\u548c\u5176\u4ed6 iPhone \u578b\u53f7\u7684\u5386\u53f2\u9a8c\u6536\u8868\u3002",
+        "integration_decision": "\u5386\u53f2\u517c\u5bb9\u8bb0\u5f55\u4e0d\u6269\u5c55\u672c\u5730\u58f0\u660e\u8303\u56f4\uff1bTXM \u4fee\u6b63\u4e0e\u578b\u53f7\u56fa\u4ef6\u7ec4\u5408\u9700\u6309\u5b9e\u9645\u672c\u5730\u8bc1\u636e\u9a8c\u6536\u3002",
+        "tasks": [
+          "T10",
+          "T28",
+          "T44"
+        ],
+        "evidence": "evidence/T02-remerge-17e1352e.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "14ec77b7b7611d1598f3ef1a3e063c12e1b4d265f3ed6147a141e36b06bf8532",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-17e1352e.diff"
+    },
+    {
+      "sha": "d1cd7a49367d7e5f1e63e365f71b667de02f88d7",
+      "subject": "Merge pull request #580 from 0xJacky/other-iphone-models",
+      "parents": [
+        "52ff1a54ddef472471073b9bb2e367aa07ab0155",
+        "17e1352e9f87862a3bcb3bd1bdc2ff9b0d883a3b"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "a679f49ed7d3a91d4eb8014c8386328d397bd51c",
+      "subject": "Merge pull request #581 from 0xJacky/guest-shutdown",
+      "parents": [
+        "d1cd7a49367d7e5f1e63e365f71b667de02f88d7",
+        "8af70697cce947f8c222bc43dcda74e03d6aee05"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "edfa61c36a33494adacfa1cc5191e52df5f3fb92",
+      "subject": "Merge upstream main into iphone-product-tree",
+      "parents": [
+        "e678a9096ea8d8175030b2cb2f581d8565dba97f",
+        "a679f49ed7d3a91d4eb8014c8386328d397bd51c"
+      ],
+      "bytes": 19848,
+      "remerge_sha256": "eaa4b3bb38535b7d3b5ee5724f9f60d8b887f341eca0b9a7172a335111fa90e1",
+      "additional_resolution": true,
+      "existing_review": {
+        "sha": "edfa61c36a33494adacfa1cc5191e52df5f3fb92",
+        "subject": "Merge upstream main into iphone-product-tree",
+        "review_scope": "conflict-resolution remerge diff only; all parent-side changes remain in task audits",
+        "resolution": "reviewed",
+        "result": "\u4fdd\u7559 guest apply/revert \u6587\u6863\uff1b\u4ece\u914d\u7f6e\u8bc6\u522b\u8bbe\u5907\uff0c\u6309 presentsBoard \u9009\u62e9 audio \u6216 iPhone product repair\uff1b\u4fee\u590d\u5206\u7ec4\u4e0e\u64a4\u9500/receipt \u5171\u7528 live \u96c6\u5408\uff1bBoardDeviceTree.need \u4e0d\u518d\u6392\u9664 iPhone17,3\u3002",
+        "integration_decision": "\u65e7 VM \u65e0 Restore \u65f6\u4ecd\u9700\u914d\u7f6e\u8eab\u4efd\u548c\u53ef\u9a8c\u8bc1 board \u539f\u4ef6\uff1bpreboot \u5206\u7ec4\u6062\u590d\u3001\u4e0d\u53ef\u64a4\u9500\u72b6\u6001\u53ca receipt \u4e0d\u80fd\u62c6\u5f00\uff1b\u4e0a\u6e38\u65e0\u8ba1\u5212\u65f6\u5168\u90e8\u542f\u7528\u7684\u9ed8\u8ba4\u503c\u4e0d\u6ee1\u8db3\u672c\u8f6e C2 \u7ea6\u675f\u3002",
+        "tasks": [
+          "T12",
+          "T16",
+          "T32",
+          "T33",
+          "T42",
+          "T44"
+        ],
+        "evidence": "evidence/T02-remerge-edfa61c3.diff",
+        "local_integrated": false
+      },
+      "saved_evidence_sha256": "eaa4b3bb38535b7d3b5ee5724f9f60d8b887f341eca0b9a7172a335111fa90e1",
+      "fresh_diff": "/private/tmp/vphone-b22-remerge-edfa61c3.diff"
+    },
+    {
+      "sha": "0c7a2e9feba41e177de98669d04d4cc2cfa11e20",
+      "subject": "Merge pull request #568 from muratkurt/iphone-product-tree",
+      "parents": [
+        "a679f49ed7d3a91d4eb8014c8386328d397bd51c",
+        "edfa61c36a33494adacfa1cc5191e52df5f3fb92"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "ace9757da96429867804c9624137e3e740781c0c",
+      "subject": "Merge pull request #582 from 0xJacky/launchpad-sheet-pages",
+      "parents": [
+        "0c7a2e9feba41e177de98669d04d4cc2cfa11e20",
+        "293a74c3dc8fd6d6ef88318a0d45d8784721350d"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "71c0aa05927398789c0ab13288854a478f55c075",
+      "subject": "Merge pull request #583 from 0xJacky/launchpad-edit-patches",
+      "parents": [
+        "ace9757da96429867804c9624137e3e740781c0c",
+        "a40872995bb81dcab5bf338331d3235061eabb20"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "3cd666ea760421daead6b1441cb43b25a5a9aaa7",
+      "subject": "Merge pull request #584 from 0xJacky/guest-clipboard-to-mac",
+      "parents": [
+        "71c0aa05927398789c0ab13288854a478f55c075",
+        "fe46ee2f65cc35d7559139f393c9427370265459"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "49fdb7d3c015aa2fb732c9f4a8a278410295c8d8",
+      "subject": "Merge pull request #585 from 0xJacky/launchpad-display-name",
+      "parents": [
+        "3cd666ea760421daead6b1441cb43b25a5a9aaa7",
+        "0768ceefc0a7ea4e932306e54e65fd7dfb9542a2"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "be95e9d0444419dcac71b3072708b3adcbd669ec",
+      "subject": "Merge pull request #586 from 0xJacky/launchpad-cli-background-launch",
+      "parents": [
+        "49fdb7d3c015aa2fb732c9f4a8a278410295c8d8",
+        "7e7e46132e6cf0a6a1734077d78cf7f05485a1dd"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "d4613b1b893b7f0ae0c641ee6e125dab5b366fd0",
+      "subject": "Merge pull request #589 from Lakr233/docs/owngoal-bootstrap-vphone",
+      "parents": [
+        "be95e9d0444419dcac71b3072708b3adcbd669ec",
+        "73ae8482469456bfb31d5328107069434d1e545c"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "c22981bf02970292cb43c6ece12b9b4faf13f171",
+      "subject": "Merge pull request #588 from 0xJacky/kernel-update-in-place",
+      "parents": [
+        "d4613b1b893b7f0ae0c641ee6e125dab5b366fd0",
+        "d5f84a498eb3b90a975be21856c26f459c8aca89"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "f31c6c6bf64f659a78d07783879f6fbd4a9f6b0c",
+      "subject": "Merge pull request #587 from tylinux/fix/close-button-creation-alert",
+      "parents": [
+        "c22981bf02970292cb43c6ece12b9b4faf13f171",
+        "e593029e2e8022c89080fbf5e791ce36056c1c53"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "a950076e49b957df113e6f5c5f7d997aced76130",
+      "subject": "Merge pull request #591 from 0xJacky/ramdisk-update",
+      "parents": [
+        "f31c6c6bf64f659a78d07783879f6fbd4a9f6b0c",
+        "04a13e47c74ce9dcb01863ff4ded8b1c98f4366c"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "e69ad8bd41b3d8ffe122d7671213d08a3f6946b9",
+      "subject": "Merge pull request #593 from 0xJacky/firmware-download-progress",
+      "parents": [
+        "a950076e49b957df113e6f5c5f7d997aced76130",
+        "1f7ee80d2b642fe5ede50caeade20aa8a3fd2da4"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "abbce12b7edd687fa7b10f174ae54411fc6a6e79",
+      "subject": "Merge pull request #594 from tylinux/fix/reopen-developer-tools",
+      "parents": [
+        "e69ad8bd41b3d8ffe122d7671213d08a3f6946b9",
+        "8e74ea7d92dbf12399a9311f26463825847cafe9"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "8fb0f975cdc7c5dc7540261c9dee3542e4b16010",
+      "subject": "Merge pull request #595 from 0xJacky/fix/launchpad-live-developer-tools",
+      "parents": [
+        "abbce12b7edd687fa7b10f174ae54411fc6a6e79",
+        "fe361a0b8dc06b4598b7477d86783a7f9bf5270d"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "3a819b0dd00aea8906ddd8d33c9364736a869ca0",
+      "subject": "Merge pull request #597 from 0xJacky/fix-compile-warnings",
+      "parents": [
+        "94376fe82a576b4e80086c8e3cbbd7d3bd99122f",
+        "34bec3cc51753b296212402a0c573b9c0af97e67"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "af843a021fda7bde1b1d81598558582837be1087",
+      "subject": "Merge pull request #598 from 0xJacky/fix/vcam-text-patch-race",
+      "parents": [
+        "3a819b0dd00aea8906ddd8d33c9364736a869ca0",
+        "f5f34505d5e3653140d76289a2efeabc33102d77"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "1a092dac5cdaa013b252b2803b1a4d8011cbc92b",
+      "subject": "Merge pull request #599 from 0xJacky/fix/dsc-shared-region-overflow",
+      "parents": [
+        "af843a021fda7bde1b1d81598558582837be1087",
+        "ea76afacb6861e92695613ccfc43f4aa8583e8a9"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "4ca183af541e1b58b0412707babd28fa115a6480",
+      "subject": "Merge pull request #601 from 0xJacky/fix/launchpad-helper-zh-name",
+      "parents": [
+        "f9ea9015a82d29187d4b65cc15883d9bdc37a21c",
+        "86f1f88aadc53f4eaff760e3a121df26332499af"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    },
+    {
+      "sha": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "subject": "Merge pull request #602 from 0xJacky/fix/launchpad-console-perf",
+      "parents": [
+        "4ca183af541e1b58b0412707babd28fa115a6480",
+        "da1179396997ddbaaf7198cdf9946ae6b0a56de3"
+      ],
+      "bytes": 0,
+      "remerge_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "additional_resolution": false
+    }
+  ]
+}

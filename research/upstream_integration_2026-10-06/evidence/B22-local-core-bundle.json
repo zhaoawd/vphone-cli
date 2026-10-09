@@ -1,0 +1,148 @@
+{
+  "version": "2.6.1-local.1208708c55574677",
+  "bundle": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle",
+  "archive": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.zip",
+  "archive_sha256": "178e2e16de6bd45388f3be7f089edcf200fbf5d8bdcabe5c3134b4036d537fde",
+  "provenance": {
+    "schema": "vphone.integration.local-core-candidate",
+    "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+    "host_source_base": "f6ebd1799b632ee4b84f869ed70b0508e9f0ddb7",
+    "host_candidate_evidence": "B21-final-artifacts.json",
+    "host_integration_complete": false,
+    "release_validation_complete": false,
+    "VM_SHA256": "1d21a984f4621fcc291ebc6d48bc572ec1c316752183dbcf40469a7778a4eb80",
+    "VM_CDHash": "4cea360ca924a4c651a12aae7755545b492a59b6",
+    "VM_instrumentation": "SO_TYPE and relay byte counters only; authorized frozen artifact",
+    "escalator_source_sha256": {
+      "VPhoneEscalator.c": "272aa7ae0e5439ef56988707661807fdacf1317863d38814dea16774d2b23468",
+      "LICENSE": "89fa32016507015f24f4e8e9abc8392fdccddc356ecd3da7f95f7b0499f9a115",
+      "Escalator.h": "7351fc2ad11419d90ffd7811d89556f228f0c4678236da67f9d6cf3d6ebb4d7c",
+      "AMFIDTask.c": "fd6ae5367be8387382b0f4bcb1e25dca147384f0ae2a632e40fa75c26ec4418d",
+      "Preferences.c": "3bb761ec336bc0c73949c1d1192d8c08253f69d2d66ea709b2576d27b2b1ad15",
+      "Commands.c": "9fe1dd39552b6b5fa6f17b4ef7c50f608705e70c593888eee48a15ede3e984b5",
+      "Requirements.c": "65525fe7898ea22b5eb4d76dbd43914639bc04cc2f5845f95d074d987d087cf3"
+    },
+    "escalator_executed": false,
+    "automatic_guest_update_authorized": false,
+    "external_runtime_libraries": "B22-runtime-closure.json; current Mac only; not a portable distribution",
+    "store_version": "2.6.1-local.1208708c55574677"
+  },
+  "observations": [
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-escalator"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-escalator: replacing existing signature\n"
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle: replacing existing signature\n"
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "--deep",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-cli"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/lipo",
+        "-archs",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-cli"
+      ],
+      "returncode": 0,
+      "stdout": "arm64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/lipo",
+        "-archs",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-vm"
+      ],
+      "returncode": 0,
+      "stdout": "arm64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-escalator"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/lipo",
+        "-archs",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle/Contents/MacOS/vphone-escalator"
+      ],
+      "returncode": 0,
+      "stdout": "arm64e\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/ditto",
+        "-c",
+        "-k",
+        "--keepParent",
+        "--norsrc",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.bundle",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B22/local-core/VPhone.zip"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "packaging_verified": true,
+  "installed": false,
+  "escalator_executed": false
+}

@@ -1212,3 +1212,8 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-07 B07：DSC maxSlide 共享区域拒绝条件
 
 `cfw_patch_dsc_maxslide.py` 在决定是否清零 maxSlide 前拒绝未知/非法区域容量，并拒绝缓存自身 sharedRegionSize 超过给定 kernel 区域的组合，包括 maxSlide=0、force 和 dry-run。显式 7 GiB 参数只表示调用者给定容量，不构成安装内核证明；默认仍保留既有 vphone600 6 GiB 路径。本轮没有增加内核扩容补丁或证明新区域可启动。合成缓存验证和原始日志记录在 B07 台账。
+
+
+### 2026-10-09 B22：IcliKit JPEG 源码适配
+
+新增`dependencies/daemon-api-overlays/icli-jpeg-copy.patch`，仅适配固定IcliKit0.7.16 / 702990b59ca412ad975f9f0ea5dafe95c30fac21截图编码：先复制到独立DeviceRGB位图，再生成JPEG，避免编码结果保留原screen image。manifest固定原始源码、patch及编译源码摘要，构建及运行时source marker一致；没有更改固件二进制补丁、内核/DSC/设备树或补丁计数。40次真实截图稳定采样19,071,480→4,555,256→4,555,256字节、FD15→15；90度旋转未生效，原因未查明，完整图像/服务矩阵尚未验收。证据见upstream_integration_2026-10-06/evidence/B22-summary.json及B22-bound-memory.json。

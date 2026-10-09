@@ -1,0 +1,42 @@
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[1/4] Write swift-version--58304C5D6DBC2206.txt
+[3/6] Compiling Probe main.swift
+[4/6] Emitting module Probe
+[4/7] Write Objects.LinkFileList
+[5/7] Linking Probe
+[6/7] Applying Probe
+Build complete! (1.93s)
+pipe ownership passed early
+.Probe/main.swift:13: Fatal error: bootstrap failure closed reused descriptors
+EProbe/main.swift:44: Fatal error: failure expected
+E
+======================================================================
+ERROR: test_initializer_failure_does_not_close_reused_descriptors (test_daemon_pipe_ownership.DaemonPipeOwnershipTests.test_initializer_failure_does_not_close_reused_descriptors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_pipe_ownership.py", line 24, in test_initializer_failure_does_not_close_reused_descriptors
+    def test_initializer_failure_does_not_close_reused_descriptors(self):subprocess.run([str(self.binary),'initialize'],check=True,timeout=15)
+                                                                         ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/test-daemon-pipe/.build/debug/Probe', 'initialize']' died with <Signals.SIGTRAP: 5>.
+
+======================================================================
+ERROR: test_registration_failure_does_not_close_reused_descriptors (test_daemon_pipe_ownership.DaemonPipeOwnershipTests.test_registration_failure_does_not_close_reused_descriptors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/test_daemon_pipe_ownership.py", line 25, in test_registration_failure_does_not_close_reused_descriptors
+    def test_registration_failure_does_not_close_reused_descriptors(self):subprocess.run([str(self.binary),'register'],check=True,timeout=15)
+                                                                          ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/test-daemon-pipe/.build/debug/Probe', 'register']' died with <Signals.SIGTRAP: 5>.
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.212s
+
+FAILED (errors=2)
