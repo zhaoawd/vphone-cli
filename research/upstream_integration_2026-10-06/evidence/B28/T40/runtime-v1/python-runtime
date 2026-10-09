@@ -1,0 +1,10 @@
+#!/bin/zsh
+set -euo pipefail
+runtime_root=${0:a:h}
+export PYTHONHOME="$runtime_root/Frameworks/Python.framework/Versions/3.14"
+export PYTHONPATH="$runtime_root/site-packages"
+export DYLD_FRAMEWORK_PATH="$runtime_root/Frameworks"
+export DYLD_LIBRARY_PATH="$runtime_root/lib"
+export PYTHONDONTWRITEBYTECODE=1
+unset PYTHONEXECUTABLE PYTHONUSERBASE __PYVENV_LAUNCHER__ PYTHONSTARTUP
+exec "$PYTHONHOME/bin/python3.14" -S -B "$@"

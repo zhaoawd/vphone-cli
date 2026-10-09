@@ -1,0 +1,77 @@
+{
+  "scope": "Historical-source reconstruction candidate; distinct from original B13 adhoc artifact",
+  "built": true,
+  "signed": true,
+  "configuration_result": "configured: 3AA3QL69MQ, protocol 1",
+  "artifacts": [
+    {
+      "path": "/private/tmp/vphone-b28-t24/com.vphone.cli.helper",
+      "sha256": "b9f7383e73892dbb6a89931ec233c84a4028dce4cc3a52a42ca34358e21723b4",
+      "cdhash": "c49d6e2018641d6aff8001310cca0d1a62420adb",
+      "team": "3AA3QL69MQ",
+      "signing_identity_sha1": "5620D69F097306848C7CCD69F0B796A3C588BF28",
+      "certificate_kind": "Apple Development",
+      "strict_deep_requirement_verification": true
+    },
+    {
+      "path": "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "sha256": "0422726dff884254f8c2cde09b4a59c28d73db7130e3f3746ed4cbc32cddb468",
+      "cdhash": "5160c4728d322314187a4cb187b3316d87087c6f",
+      "team": "3AA3QL69MQ",
+      "signing_identity_sha1": "5620D69F097306848C7CCD69F0B796A3C588BF28",
+      "certificate_kind": "Apple Development",
+      "strict_deep_requirement_verification": true
+    }
+  ],
+  "unsigned_main_comparison": {
+    "client": {
+      "before_sha256": "c93c8b47cd120fc531fa4a300b4cfef5dbce80d059ff660ce9d3eece6622b7ba",
+      "after_sha256": "4fac52cbf0154a61100df2b35ea55388f2d860e007bc8df648818d7aa8706e4b",
+      "raw_equal": false,
+      "signature_size_related_macho_field": {
+        "name": "LC_SEGMENT_64 __LINKEDIT.vmsize",
+        "offset": 3872,
+        "before": 11141120,
+        "after": 11157504
+      },
+      "all_other_unsigned_bytes_equal": true,
+      "comparison_excluding_vmsize_sha256": "2985f098b873efc478da6e92b375a7d084646c412389414e9f8c62c6b2195668"
+    },
+    "helper": {
+      "before_sha256": "01835a7c71909bcc69a44ef19a5ae3987ba919022ae9799a827761f4d44f7766",
+      "after_sha256": "f9904039aa25d834fe12a749200c179d3c23c6667ebd2075618fd78324d8401d",
+      "raw_equal": false,
+      "signature_size_related_macho_field": {
+        "name": "LC_SEGMENT_64 __LINKEDIT.vmsize",
+        "offset": 3392,
+        "before": 491520,
+        "after": 507904
+      },
+      "all_other_unsigned_bytes_equal": true,
+      "comparison_excluding_vmsize_sha256": "77abe9b77ecb265aabf8eeaf8f735d311964e48daa4ab00adb8cf08c970fe227"
+    }
+  },
+  "client_changed_paths": [
+    "Contents/Info.plist",
+    "Contents/MacOS/vphone-cli"
+  ],
+  "client_all_other_files_equal": true,
+  "original_final_client_manifest_unchanged": true,
+  "original_b13_helper_sha256_unchanged": "bbc0917c2d5551de48b2eff7db8396c1c1d9a7d62f48eecdacf66a82da48b3c4",
+  "production_listener_source_unchanged": true,
+  "production_audit_token_source_unchanged": true,
+  "production_per_message_requirement_source_unchanged": true,
+  "production_authorization_source_unchanged": true,
+  "swiftpm_executed": false,
+  "shared_build_modified": false,
+  "system_registration_performed": false,
+  "authorization_right_modified": false,
+  "root_daemon_started": false,
+  "final_production_client_matrix_executed": false,
+  "runtime_identity_acceptance_verified": false,
+  "limitations": [
+    "Static code-signing and helper --check-configuration prove configuration only.",
+    "The six-row production Mach service matrix remains unexecuted.",
+    "The rebuilt candidate is a debug/WMO swiftc reconstruction with historical repository modules and reused external ArchiveKit build input; it is not the original B13 artifact."
+  ]
+}

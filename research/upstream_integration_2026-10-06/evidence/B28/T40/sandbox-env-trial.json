@@ -1,0 +1,48 @@
+[
+  {
+    "label": "sandbox-env-locked",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/usr/bin/env",
+      "DYLD_FRAMEWORK_PATH=/private/tmp/vphone-b28-t40/runtime-v1/Frameworks",
+      "DYLD_LIBRARY_PATH=/private/tmp/vphone-b28-t40/runtime-v1/lib",
+      "HOME=/private/tmp/vphone-b28-t40/runtime-v1",
+      "PATH=/usr/bin:/bin",
+      "PYTHONDONTWRITEBYTECODE=1",
+      "PYTHONHOME=/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14",
+      "TMPDIR=/private/tmp/vphone-b28-t40",
+      "/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "-S",
+      "-B",
+      "/private/tmp/vphone-b28-t40/runtime-v1/run_locked.py"
+    ],
+    "returncode": 0,
+    "stdout": "sandbox-env-locked.stdout",
+    "stderr": "sandbox-env-locked.stderr"
+  },
+  {
+    "label": "sandbox-env-extended",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/usr/bin/env",
+      "DYLD_FRAMEWORK_PATH=/private/tmp/vphone-b28-t40/runtime-v1/Frameworks",
+      "DYLD_LIBRARY_PATH=/private/tmp/vphone-b28-t40/runtime-v1/lib",
+      "HOME=/private/tmp/vphone-b28-t40/runtime-v1",
+      "PATH=/usr/bin:/bin",
+      "PYTHONDONTWRITEBYTECODE=1",
+      "PYTHONHOME=/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14",
+      "TMPDIR=/private/tmp/vphone-b28-t40",
+      "/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "-S",
+      "-B",
+      "/private/tmp/vphone-b28-t40/runtime-v1/extended_probe.py"
+    ],
+    "returncode": 0,
+    "stdout": "sandbox-env-extended.stdout",
+    "stderr": "sandbox-env-extended.stderr"
+  }
+]

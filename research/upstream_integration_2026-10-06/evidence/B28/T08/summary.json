@@ -1,0 +1,29 @@
+{
+  "task": "T08",
+  "source_commit": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "report": "/private/tmp/vphone-b28-t08/report.md",
+  "references": "/private/tmp/vphone-b28-t08/references.json",
+  "facts": [
+    "services.start passes only label; RoutineStart813 tries user domain then system only on113",
+    "144 mapping text is hardcoded in fixed IcliSystem; transport vs reply.error and actual domain unknown",
+    "raw domain/message discarded first in IcliKit.serviceActionResult; APIWire exposes .failed code/message without details",
+    "Settings90/270/180 fail with unavailable; Safari90/270 pass; Safari180 preserves270",
+    "B27 vm-new actual rootless cannot accept RootHide service behavior",
+    "Two host modern binary files rehashed to83075a0c9de2ff5bbfd01b211ce204f59bd18cdf9eb0efb7bd0891a62f00bc07"
+  ],
+  "hypotheses": [
+    "user-domain144 prevents fallback (actual failed domain not recorded)",
+    "launchd caller privilege/context check (exact responsible check unknown)",
+    "foreground scene orientation support differs (no supported-mask evidence)",
+    "timing or AX/geometry fallback mismatch (no >1s sampled trace)"
+  ],
+  "remaining": [
+    "Read-only existing service/process/log observations on a future authorized running sample",
+    "Exact raw XPC and AX diagnostic logging overlay and controlled fixture reproduction",
+    "Actual RootHide sample and separate acceptance"
+  ],
+  "runtime_actions_performed": false,
+  "repository_modified": false,
+  "network_used": false,
+  "verification": "probe.py AST and --help only; all JSON parsed;22 snapshots SHA-256 verified; no VM/runtime acceptance"
+}

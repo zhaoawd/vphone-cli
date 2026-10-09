@@ -1,0 +1,37 @@
+{
+  "added_dylib": {
+    "source": "/opt/homebrew/Cellar/libusb/1.0.29/lib/libusb-1.0.0.dylib",
+    "target": "/private/tmp/vphone-b28-t40/runtime-v1/lib/libusb-1.0.dylib",
+    "bytes": 178224,
+    "sha256": "7145c467511e6ba2b71da4c4187a2fa9c4e90d02946602bd256639f422d7100a",
+    "native_links": "/opt/homebrew/Cellar/libusb/1.0.29/lib/libusb-1.0.0.dylib:\n\t/opt/homebrew/opt/libusb/lib/libusb-1.0.0.dylib (compatibility version 6.0.0, current version 6.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)\n\t/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 4040.1.255)\n\t/System/Library/Frameworks/Security.framework/Versions/A/Security (compatibility version 1.0.0, current version 61901.0.87)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n"
+  },
+  "commands": [
+    {
+      "label": "sandbox-launcher-lazy-usb-copied",
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-f",
+        "/private/tmp/vphone-b28-t40/deny-original.sb",
+        "/private/tmp/vphone-b28-t40/runtime-v1/python-runtime",
+        "/private/tmp/vphone-b28-t40/runtime-v1/lazy_usb_probe.py"
+      ],
+      "returncode": 0,
+      "stdout": "sandbox-launcher-lazy-usb-copied.stdout",
+      "stderr": "sandbox-launcher-lazy-usb-copied.stderr"
+    },
+    {
+      "label": "copy-libusb-signature",
+      "argv": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--strict",
+        "--verbose=2",
+        "/private/tmp/vphone-b28-t40/runtime-v1/lib/libusb-1.0.dylib"
+      ],
+      "returncode": 0,
+      "stdout": "copy-libusb-signature.stdout",
+      "stderr": "copy-libusb-signature.stderr"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "reviewer": "/root/b28_final_review",
+  "mode": "read_only",
+  "base_head": "3eea98a9e6b13efc4b9e477334bbcb6041ac978a",
+  "unresolved_P1_P2": [],
+  "verdict": "B28文档及证据可提交；须保全6个ignored文件并核对暂存blob",
+  "verified": [
+    "47/8accepted/38required/1optional，未选42项保持",
+    "T02状态、175planned与B24归档保持",
+    "T24六组、日志及清理范围",
+    "T46实际/预期逐字节及会话观察范围",
+    "初次manifest248文件摘要和长度",
+    "产品源码无变化及静态检查"
+  ],
+  "resolved_issue": "UI操作来源缺口已由会话观察整理及范围限定解决。",
+  "set_aside": [
+    "实际RootHide及144/旋转根因：未提供样本，诊断未运行",
+    "完整TCC、Python产品快照、可信binding/receipt、四层矩阵及64GiB往返：仍未完成",
+    "完整console/helper故障、性能及AMFI完全撤销：本轮未验"
+  ],
+  "post_review_root_correction": "暂存blob复核发现2个guest-256.stdout发生Git CRLF归一化；本目录新增* -text保全原始字节，重新暂存后逐文件核对。 历史patch及原始help输出含原有尾部空白；此证据目录关闭whitespace检查，保留原始内容。"
+}

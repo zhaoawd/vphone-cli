@@ -1,0 +1,49 @@
+[
+  {
+    "label": "sandbox-launcher-locked",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/python-runtime",
+      "/private/tmp/vphone-b28-t40/runtime-v1/project/scripts/check_python_runtime.py",
+      "--locked",
+      "--json"
+    ],
+    "environment_changes": {},
+    "returncode": 0,
+    "stdout": "sandbox-launcher-locked.stdout",
+    "stderr": "sandbox-launcher-locked.stderr"
+  },
+  {
+    "label": "sandbox-launcher-tls-default",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/python-runtime",
+      "/private/tmp/vphone-b28-t40/runtime-v1/tls_probe.py"
+    ],
+    "environment_changes": {},
+    "returncode": 0,
+    "stdout": "sandbox-launcher-tls-default.stdout",
+    "stderr": "sandbox-launcher-tls-default.stderr"
+  },
+  {
+    "label": "sandbox-launcher-tls-certifi",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/python-runtime",
+      "/private/tmp/vphone-b28-t40/runtime-v1/tls_probe.py"
+    ],
+    "environment_changes": {
+      "SSL_CERT_FILE": "/private/tmp/vphone-b28-t40/runtime-v1/site-packages/certifi/cacert.pem",
+      "SSL_CERT_DIR": "/private/tmp/vphone-b28-t40/runtime-v1/empty-ca-dir"
+    },
+    "returncode": 0,
+    "stdout": "sandbox-launcher-tls-certifi.stdout",
+    "stderr": "sandbox-launcher-tls-certifi.stderr"
+  }
+]

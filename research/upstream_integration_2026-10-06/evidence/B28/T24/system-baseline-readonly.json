@@ -1,0 +1,34 @@
+[
+  {
+    "argv": [
+      "launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "returncode": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+  },
+  {
+    "argv": [
+      "security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "returncode": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n"
+  },
+  {
+    "argv": [
+      "ls",
+      "-ld",
+      "/Library/PrivilegedHelperTools/com.vphone.cli.helper",
+      "/Library/LaunchDaemons/com.vphone.cli.helper.plist"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "ls: /Library/LaunchDaemons/com.vphone.cli.helper.plist: No such file or directory\nls: /Library/PrivilegedHelperTools/com.vphone.cli.helper: No such file or directory\n"
+  }
+]

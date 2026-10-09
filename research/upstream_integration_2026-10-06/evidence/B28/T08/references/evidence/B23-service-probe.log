@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b23-service-probe.py", line 12, in <module>
+    result['start']=rpc_http('services.start',{'label':label})
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 41, in rpc_http
+AssertionError: (400, {'error': {'code': 'failed', 'message': 'start requires launchctl service-configure privilege (launchd status 144)'}, 'id': 'b23', 'type': 'response'})

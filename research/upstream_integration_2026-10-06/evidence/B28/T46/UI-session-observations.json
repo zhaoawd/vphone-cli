@@ -1,0 +1,21 @@
+{
+  "scope": "本轮会话中CUA工具调用及只读进程观察的整理；不是系统级UI审计日志，未补造事件时间戳",
+  "source": "当前Codex会话的mcp__cua_repl.js及exec_command工具返回",
+  "sequence": [
+    {"call": "await b28ui.click(44); await b28ui.getAXState();", "observed": "Host Setup重新检查按钮disabled、进行中；受控CLI的doctor随后启动run2桥接和VM", "cross_reference": "run2/process.json"},
+    {"call": "await b28ui.getAXState();", "observed": "活动输出期间表单无变化"},
+    {"call": "await b28ui.pressKey('super+q'); await b28ui.getAXState();", "observed": "Host Setup表单仍在；随后读取interrupt.json仍缺失。本次快捷键未作为有效退出依据"},
+    {"call": "await b28ui.getAXState({disableDiffing:true});", "observed": "窗口Host Setup；重新检查disabled、进行中；按钮18完成"},
+    {"call": "await b28ui.click(18); await b28ui.getAXState();", "observed": "表单关闭，主窗口虚拟机；没有虚拟机；内嵌工具链build b4e80c57-B28-controlled-real-VM-bridge"},
+    {"call": "await b28ui.pressKey('super+q'); await b28ui.getAXState();", "observed": "主窗口短时仍存在；随后bridge记录signal2，输出尾部完成，VM正常退出0", "cross_references": ["run2/interrupt.json", "run2/bridge-output-complete.json", "run2/vm-exit.json"]},
+    {"call": "await b28ui.getAXState();", "observed": "重新出现主窗口，正在检查内嵌工具链；随后的ps观测UI PID24818启动时间22:51:21，而原测试桥接22351及VM22354已不存在", "limit": "没有记录应用退出码；仅按会话顺序记录新UI的出现，不单独证明AX工具导致重新启动"},
+    {"call": "await b28ui.pressKey('super+q');", "observed": "退出后续观察到的隔离UI；后续只读ps不再含本轮UI、桥接和VM，lsof无vm-new Disk.img句柄", "cross_reference": "final-process-readback.json"}
+  ],
+  "initial_UI_PID": {"pid": 7230, "provenance": "此前本轮会话的只读ps观察；此摘要不替代原始ps输出"},
+  "subsequent_UI_ps_observation": "24818 1 S Fri Oct 9 22:51:21 2026 /private/tmp/vphone-b28-t46-ui/T46-RealVM.app/Contents/MacOS/vphone-launchpad",
+  "limitations": [
+    "未保存系统级UI事件或原UI退出码。",
+    "完整性由持久日志逐字节对比独立验证；退出操作来源依据本轮CUA会话观察。",
+    "不将CUA首次选择App的长耗时计为应用性能数据。"
+  ]
+}

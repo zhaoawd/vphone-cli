@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "/bin/launchctl",
+        "print",
+        "system/com.vphone.cli.helper"
+      ],
+      "exit": 113,
+      "stdout": "",
+      "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+    },
+    {
+      "argv": [
+        "/usr/bin/security",
+        "authorizationdb",
+        "read",
+        "com.vphone.cli.helper.privileged"
+      ],
+      "exit": 255,
+      "stdout": "",
+      "stderr": "NO (-60005)\n"
+    }
+  ],
+  "missing_paths": [
+    "/Library/PrivilegedHelperTools/com.vphone.cli.helper",
+    "/Library/LaunchDaemons/com.vphone.cli.helper.plist",
+    "/private/var/tmp/vphone-b28-t24-system"
+  ],
+  "helper_processes": [],
+  "original_hashes_unchanged": {
+    ".build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper": "bbc0917c2d5551de48b2eff7db8396c1c1d9a7d62f48eecdacf66a82da48b3c4",
+    ".build/vphone-cli.app/Contents/MacOS/vphone-cli": "8d18f0e6a65dcd963c41a2c81c43f56922f425f708b0dba086778c7bbf458714"
+  },
+  "independent_cleanup_verified": true,
+  "first_readback_error": "Initial substring ps filter matched its own shell command text; exact executable-prefix filter used in final readback."
+}

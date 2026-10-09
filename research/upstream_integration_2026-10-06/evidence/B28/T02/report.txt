@@ -1,0 +1,67 @@
+T02只读复核
+
+结果：存在未通过检查；32项检查，2项问题。
+
+B24审查源码基线为11064b07；本次HEAD为3eea98a9，当前源码提交为b4e80c57。历史审查与当前源码范围分别记录。
+B24 source_reconciliation.acceptance_status_preserved等字段保留审查前状态；当前T02 accepted由B24_acceptance_decision和外层状态表示。
+independent-validation.json检查的是较早草稿，其inputs摘要不作为最终交付摘要；最终交付使用delivery-manifest.json与source-evidence-manifest.json。
+B24_acceptance_decision.reason写21项机器校验；保留machine-validation.json实际包含22项且均为true。此计数表述差异不改变检查结果。
+2条辅助引用当前文件存在，但未纳入B24保留归档；其可复验性依赖临时目录。此项不改变T02历史accepted状态。
+复核验证结构、覆盖、保留对象和摘要；不重新宣称202项语义结论已独立审查，不新增功能或运行验收。
+
+{
+  "counts": {
+    "checks": 32,
+    "commits": 342,
+    "original_pending_reviewed": 202,
+    "historical_preserved": 140,
+    "capabilities": 47,
+    "accepted": 8,
+    "required_remaining": 38,
+    "citations_checked": 1684
+  },
+  "dispositions": {
+    "adaptation_planned": 175,
+    "intentionally_not_adopted": 10,
+    "already_equivalent": 11,
+    "superseded": 6
+  },
+  "issues": [
+    {
+      "check": "all_202_source_citations_retained_without_temporary_path_dependency",
+      "detail": [
+        {
+          "sha": "caebc24fcde1591412d33ead348e9f123a2d5827",
+          "index": 90,
+          "field": "final_evidence",
+          "path": "/private/tmp/vphone-b24-t02/090-catalog-comparison.json",
+          "exists_now": true,
+          "sha256_now": "29070bb699013501afa1d9c25f50753791eeec7818ee6c6f8d7bd50c8486e855",
+          "problem": "existing_auxiliary_reference_not_retained_in_B24_archive"
+        },
+        {
+          "sha": "cd82fb334a349791a496a8242c43b302b0ada32f",
+          "index": 114,
+          "field": "local_evidence",
+          "path": "/private/tmp/vphone-b24-icli-source/Sources/IcliKit/Device.swift",
+          "exists_now": true,
+          "sha256_now": "57db6eefe2d2b26016a1719b7d91150c763cc899b423fb51723f413f290c63f5",
+          "problem": "existing_auxiliary_reference_not_retained_in_B24_archive"
+        }
+      ]
+    },
+    {
+      "check": "B24_acceptance_reason_machine_check_count_matches_artifact",
+      "detail": {
+        "reason_reported_count": 21,
+        "artifact_actual_count": 22,
+        "artifact_all_true": true,
+        "affected_files": [
+          "capability_ledger.json",
+          "T02_capability_reconciliation.json",
+          "local_path_map.json"
+        ]
+      }
+    }
+  ]
+}

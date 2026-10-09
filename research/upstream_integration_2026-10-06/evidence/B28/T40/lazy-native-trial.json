@@ -1,0 +1,42 @@
+[
+  {
+    "label": "source-lazy-usb",
+    "argv": [
+      "/Users/qcz3840/github/vphone-cli/..venv.generations/env-9asn3gud/bin/python3",
+      "-I",
+      "-B",
+      "-c",
+      "import json; from usb.backend.libusb1 import _load_library; lib=_load_library(); print(json.dumps(dict(libusb_loaded=True,name=lib._name)))"
+    ],
+    "returncode": 0,
+    "stdout": "source-lazy-usb.stdout",
+    "stderr": "source-lazy-usb.stderr"
+  },
+  {
+    "label": "sandbox-launcher-lazy-usb",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/python-runtime",
+      "/private/tmp/vphone-b28-t40/runtime-v1/lazy_usb_probe.py"
+    ],
+    "returncode": 1,
+    "stdout": "sandbox-launcher-lazy-usb.stdout",
+    "stderr": "sandbox-launcher-lazy-usb.stderr"
+  },
+  {
+    "label": "sandbox-launcher-bridge-help",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/python-runtime",
+      "/private/tmp/vphone-b28-t40/runtime-v1/project/scripts/pymobiledevice3_bridge.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "sandbox-launcher-bridge-help.stdout",
+    "stderr": "sandbox-launcher-bridge-help.stderr"
+  }
+]

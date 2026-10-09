@@ -1,0 +1,31 @@
+{
+  "batch": "B28",
+  "date": "2026-10-09",
+  "base_head": "3eea98a9e6b13efc4b9e477334bbcb6041ac978a",
+  "implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "product_source_changed": false,
+  "newly_accepted": [],
+  "accepted_total": 8,
+  "required_remaining": 38,
+  "optional_deferred": 1,
+  "results": {
+    "T02": "B28只读复核342项覆盖、202项处置、47项合同和保留摘要；原32项检查30项通过，两项记录问题为2条辅助引用未归档及三处机器校验计数21/22差异。现补存B28当前观察到的辅助引用并将计数更正为22；不改写B24原始归档，不新增逐项语义复审或运行验收，T02保持accepted。",
+    "T08": "B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。",
+    "T24": "B28经用户授权，将历史dd3c8002源码重建的protocol-v1 helper和最终生产客户端副本以Apple Development/Team 3AA3QL69MQ签名，临时注册真实system Mach服务。verify/install×无日志/新日志/已有日志六组均退出1并明确报告协议不匹配；新日志未创建，已有日志摘要、权限及mtime保持。listener、auditToken、逐消息要求及授权源码未改。该工件是历史源码重建，不是原B13实物或历史发行构建。临时服务、两安装文件、授权项及系统日志目录均恢复缺失基线，独立复核通过；完整TCC责任链仍未验。",
+    "T40": "B28复制当前Python 3.14.4 framework、packages及7个外部native库，在拒绝原Homebrew、venv、工作树和网络的sandbox中执行项目locked probe、bridge help及限定native探测。临时副本282620062字节，19162个文件摘要及权限一致；libusb延迟加载和CA信任库缺口已复现，追加副本库及显式certifi后对应探测通过。源framework深度签名本已失败，通用site/sysconfig/子进程闭包未验。该实验未接入产品创建快照，不替代SDK/JB/PATH/CFW缓存、可信binding/receipt或四层来源矩阵。",
+    "T46": "B28真实vm-new classic输出经受控CLI桥接进入未改动的生产UI main、reader和writer。持续输出期间从UI退出，桥接收到SIGINT后继续写入实际guest预取的受控无换行尾部；最终243257行、4734173字节与预期及SHA逐字节一致，含233批持续输出。VM正常Guest stopped并退出0，原UI/桥接/VM均退出，三个宿主小文件摘要保持。首次测试240秒自释放不能证明退出验收，已保留；重跑覆盖活动输出时退出。没有实际kernel panic；不覆盖完整console、可信启动路线、特权helper故障矩阵或性能收益。"
+  },
+  "evidence": {
+    "T02": "B28/T02/result.json",
+    "T08": "B28/T08/report.md",
+    "T24": "B28/T24/actual-six-row-matrix.json",
+    "T40": "B28/T40/findings.md",
+    "T46": "B28/T46/run2/verification.json"
+  },
+  "limits": [
+    "Historical-source helper reconstruction is not original B13 artifact or a historical release reproduction.",
+    "Full TCC chain, actual RootHide, immutable Python product integration, SDK/JB/PATH/CFW cache, trusted binding/receipt and four-layer matrix remain incomplete.",
+    "Controlled bridge UI output is not native console throughput or privileged helper fault acceptance.",
+    "No new AMFI driver; B27 full revocation remains unverified."
+  ]
+}

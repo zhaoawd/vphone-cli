@@ -1,0 +1,165 @@
+[
+  {
+    "argv": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+  },
+  {
+    "argv": [
+      "/usr/bin/security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n"
+  },
+  {
+    "argv": [
+      "/usr/bin/codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "-R=anchor apple generic and identifier \"com.vphone.cli.helper\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+      "/private/tmp/vphone-b28-t24/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/private/tmp/vphone-b28-t24/com.vphone.cli.helper",
+      "--check-configuration"
+    ],
+    "exit": 0,
+    "stdout": "configured: 3AA3QL69MQ, protocol 1\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/install",
+      "-d",
+      "-o",
+      "root",
+      "-g",
+      "wheel",
+      "-m",
+      "0755",
+      "/Library/PrivilegedHelperTools"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/install",
+      "-d",
+      "-o",
+      "root",
+      "-g",
+      "wheel",
+      "-m",
+      "0700",
+      "/private/var/tmp/vphone-b28-t24-system"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/install",
+      "-o",
+      "root",
+      "-g",
+      "wheel",
+      "-m",
+      "0755",
+      "/private/tmp/vphone-b28-t24/com.vphone.cli.helper",
+      "/Library/PrivilegedHelperTools/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/install",
+      "-o",
+      "root",
+      "-g",
+      "wheel",
+      "-m",
+      "0644",
+      "/private/tmp/vphone-b28-t24/System-Launchd.prepared.plist",
+      "/Library/LaunchDaemons/com.vphone.cli.helper.plist"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/bin/launchctl",
+      "bootstrap",
+      "system",
+      "/Library/LaunchDaemons/com.vphone.cli.helper.plist"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/bin/launchctl",
+      "kickstart",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "system/com.vphone.cli.helper = {\n\tactive count = 1\n\tpath = /Library/LaunchDaemons/com.vphone.cli.helper.plist\n\ttype = LaunchDaemon\n\tstate = running\n\n\tprogram = /Library/PrivilegedHelperTools/com.vphone.cli.helper\n\targuments = {\n\t\t/Library/PrivilegedHelperTools/com.vphone.cli.helper\n\t}\n\n\tstdout path = /private/var/tmp/vphone-b28-t24-system/helper.stdout.log\n\tstderr path = /private/var/tmp/vphone-b28-t24-system/helper.stderr.log\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tXPC_SERVICE_NAME => com.vphone.cli.helper\n\t}\n\n\tdomain = system\n\tminimum runtime = 10\n\texit timeout = 5\n\truns = 1\n\tpid = 9326\n\timmediate reason = non-ipc demand\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit code = (never exited)\n\n\tendpoints = {\n\t\t\"com.vphone.cli.helper\" = {\n\t\t\tport = 0x3723\n\t\t\tactive = 0\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t}\n\n\tresource coalition = {\n\t\tID = 96395\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tjetsam coalition = {\n\t\tID = 96396\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tspawn type = daemon (3)\n\tjetsam priority = 40\n\tjetsam memory limit (active) = (unlimited)\n\tjetsam memory limit (inactive) = (unlimited)\n\tjetsamproperties category = daemon\n\tjetsam thread limit = 32\n\tcpumon = default\n\tjob state = running\n\tsanitizer flags = 0x0\n\n\tproperties = inferred program\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/sudo",
+      "-n",
+      "/usr/bin/security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n"
+  }
+]

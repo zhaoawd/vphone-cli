@@ -1,0 +1,44 @@
+[
+  {
+    "argv": [
+      "/bin/launchctl",
+      "bootout",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/usr/bin/security",
+      "authorizationdb",
+      "remove",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "YES (0)\n"
+  },
+  {
+    "argv": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+  },
+  {
+    "argv": [
+      "/usr/bin/security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n"
+  }
+]

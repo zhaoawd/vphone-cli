@@ -1,0 +1,63 @@
+{
+  "batch": "B27",
+  "implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "documentation_base": "fd72938a47fbb8979eb44c39bddbf02a613ff514",
+  "source_changed": false,
+  "authorization": "User explicitly authorized the single artifact CDHash 62a1f395413f6878c4de0042f6e77962aa2b1219; paths=[], allow_all=false, spoof_apple=true; no persistent SIP/AMFI setting change",
+  "newly_accepted": [],
+  "selected_remaining": [
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "vm_new": {
+    "layout": "rootless",
+    "evidence": "Live serial and classic shell: /var/jb -> /private/preboot/B4491B383B98259E8F3C44F6517759621C73D19CF34DB50EF256FA2167A847570D1032BAB267ACA39383736C80029282/jb-vphone/procursus; successful .jbroot-* search in /private/var/containers/Bundle/Application returned no paths",
+    "suitable_for_actual_RootHide_acceptance": false,
+    "guest_payload_auto_update": false,
+    "classic_guest_connected": true,
+    "modern_API_deployed": false,
+    "first_boot": "stdin /dev/null; classic connected during framework shutdown; graceful timeout and forced stop, exit 0",
+    "second_boot": "independent FIFO serial input; live root readback, classic v1 connected; SIGINT classicAccepted, Guest stopped, exit 0"
+  },
+  "throughput": {
+    "scope": "Real guest classic shell response to headless host only. Excludes UI, helper logging, console, rotation, panic and cancellation",
+    "byte_counts": [
+      18944,
+      303104,
+      888000
+    ],
+    "all_complete": true,
+    "initial_failure": "awk unavailable, code 127; retained; rerun used shell builtin printf"
+  },
+  "AMFI_cleanup": {
+    "normal_detach_observed": false,
+    "driver_sigint": "did not exit",
+    "driver_sigterm": "exit 143; driver and debugserver absent",
+    "kickstart_k": "OS refused with exit 150 while SIP engaged",
+    "amfid_TERM": "did not replace PID",
+    "amfid_KILL_then_launchd_start": "new PID 92181, PPID 1, STAT Ss",
+    "configuration_files": "paths and cdhashes remain zero bytes",
+    "post_driver_cleanup_help_exit": 0,
+    "fresh_amfid_help_exit": 0,
+    "full_revocation_verified": false,
+    "limitation": "Same artifact --help still exits 0 after driver cleanup and fresh amfid. Cause undetermined; cannot claim original AMFI refusal restored. No host reboot or cache manipulation performed."
+  },
+  "preservation": {
+    "config_and_host_guest_payload_sha256": "unchanged",
+    "Disk_img_full_hash": false,
+    "disk_released": true,
+    "other_vm_pid_35668": "preserved"
+  },
+  "remaining": {
+    "T08": "Actual RootHide sample/service; status 144 and partial rotation causes undetermined",
+    "T24": "Full actual TCC responsibility chain, historical helper v1 actual XPC matrix, Python/PATH closure",
+    "T40": "External toolchain/CFW closure, trusted binding/receipt, four-layer upgrade/rollback, full 64GiB archive round trip",
+    "T46": "Production privileged helper/Client combination; full UI, panic/cancel/rotation and end-to-end throughput"
+  },
+  "tooling_failures": [
+    "First capabilities-2 invocation lacked its request file; no VM mutation; request copied and retried successfully",
+    "Initial ps without escalation was denied by sandbox; later scoped ps used escalation"
+  ]
+}

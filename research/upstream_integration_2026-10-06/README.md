@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B27 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B28 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -855,3 +855,31 @@ vm-new只读挂载已清理，磁盘无打开句柄；8个所记录文件元数�
 AMFI清理未观察到正常detach：SIGINT后驱动未退出，SIGTERM后退出143，驱动及debugserver均不存在。`kickstart -k`被系统以150拒绝；TERM没有替换原amfid PID。随后仅结束本轮附加过的系统amfid，launchd启动新PID92181，独立核对PPID1、STAT Ss及系统服务running。空配置文件仍为空。驱动清理后及新amfid下，同工件`--help`仍返回0，原因未查明；不能据此宣称原AMFI拒绝已恢复或放行结果已完全撤销。没有重启宿主或执行缓存修改，失败记录均保留。
 
 本轮仅新增运行证据与台账，没有修改产品源码。证据入口：[B27-summary.json](evidence/B27-summary.json)、[B27-evidence-manifest.json](evidence/B27-evidence-manifest.json)。
+
+## B28 结果（2026-10-09）
+
+本轮推进T02/T08/T24/T40/T46。T02保持已验收；其余四项没有新增整项验收。产品源码仍为`b4e80c57`，本轮只增加证据和台账。
+
+| 任务 | 结果 | 剩余工作 |
+| --- | --- | --- |
+| T02 | 复核342项覆盖、202项处置及47项合同；补存两条当前辅助引用，修正三处机器校验数量为22 | 本项已验收；175项`adaptation_planned`仍不计为能力完成 |
+| T08 | 固定依赖调用链和历史矩阵已保全，明确现有错误在哪一层丢失domain及原始信息 | 缺实际RootHide样本；144和部分旋转未生效的原因未查明；原始XPC/AX诊断未执行 |
+| T24 | 正常签名的历史源重建v1 helper与生产客户端副本，真实系统服务六组均明确拒绝旧协议；清理复核通过 | 完整TCC责任链；原B13未配置实物未运行，不能将重建结果归为原实物验收 |
+| T40 | 282,620,062字节Python副本通过限定隔离探测，复现libusb延迟加载及默认CA缺口 | 尚未接入产品创建快照；SDK/JB/PATH/CFW缓存、可信binding/receipt和四层矩阵；64GiB完整往返空间仍不足 |
+| T46 | 真实guest经受控桥接进入生产UI；活动输出时退出，243,257行、4,734,173字节及受控EOF尾部逐字节完整 | 完整console/特权helper故障矩阵、panic/取消/轮换及性能验收 |
+
+T24使用历史源码`dd3c800277605589ae1cb2466a2b33fa33e549d1`重建helper。用户授权的helper CDHash为`c49d6e2018641d6aff8001310cca0d1a62420adb`，客户端为`5160c4728d322314187a4cb187b3316d87087c6f`，Team为`3AA3QL69MQ`。采用标准launchd临时注册，未走SMJobBless安装；生产listener、auditToken、逐消息要求和授权源码均保持。六组verify/install×无日志/新日志/已有日志均退出1，原文为`Installed helper protocol differs from this client. Register the matching signed helper.`。新日志未创建，已有日志摘要、权限及mtime保持。没有记录服务方法调用计数，不宣称仅调用特定数量的version。空归档仅用于提供必需参数，结果不构成Bundle安装验收。
+
+首次部署后1秒读取授权项仍为缺失，准备检查失败；初次矩阵在该检查之后执行的过程记录保留。最终在授权规则及服务状态核对通过后重新执行六组，以重跑结果作为验收依据。清理恢复服务、helper/job文件、授权项及本轮系统日志目录的缺失基线，独立读取确认。客户端副本仅Info.plist和主签名变化，其他204个文件保持；去签名后仅签名尺寸相关的`__LINKEDIT.vmsize`不同，不能表述为原始字节完全相同。原B13 helper及最终生产客户端摘要保持。候选准备快照中的“未执行”字段保留准备时状态；实际运行以`actual-six-row-matrix.json`及清理读回为准。
+
+T02原32项复核有30项通过。两项记录问题分别为临时辅助引用未纳入B24归档、三处计数写21而实际机器记录含22项。本轮补存的是B28当前观察到的内容，不补写B24原始读取声明，也不改写B24冻结证据。该修正不等于重新逐项语义审查，不改变T02已验收状态。
+
+T08追踪确认RoutineStart先调用user domain，仅状态113回退system；历史144既可能来自user，也可能在user113后来自system。失败时domain及`xpc_strerror`原文已在依赖层丢失，仅改API错误包络不能恢复。旋转调用发出后仍由实际角度读回判断。应用方向策略等解释均为待验证假设。未修改调用顺序、权限或guest，未新增RootHide实际验收。
+
+T40的sandbox拒绝原Homebrew、venv、工作树及网络。副本使用显式PYTHONHOME、package及DYLD路径和`-S -B`，项目locked probe、bridge help及限定native探测通过；19,162个文件摘要和权限保持。仅有Mach-O声明闭包时，libusb延迟加载失败；复制libusb后库加载通过，未枚举USB设备。默认SSL context可构造但信任库为0；指定副本certifi后CA数量为121，未进行TLS握手。源framework在复制前深度签名已失败，副本同类失败；原因未查明。通用site/sysconfig、子进程及创建全流程未验，不能宣称完整可移植Python封装。
+
+T46首次测试在240秒后自行释放，不能证明活动输出退出，已保留。重跑由UI发起退出，桥接收到SIGINT后继续转发预先从真实guest取得的无换行受控尾部；233批持续输出完成。ANSI/CRLF归一化后的持久日志为4,734,173字节、243,257行，SHA256为`fce8d6ed9c96a5cd740113b5b34833e20e069690a3f7d298df0dfe5ac2fe2bf1`，与预期逐字节一致。尾部是受控文本，不是实际kernel panic。VM停机记录`classicAccepted`及`Guest stopped`，进程退出0。桥接22351、VM22354已退出；后续AX读取期间出现新UI PID24818，随后已再次从UI退出并核对缺失。UI退出操作来源见`UI-session-observations.json`中的本轮CUA会话观察整理，未保存系统级UI事件或应用退出码；最终进程缺失由独立ps读回确认。
+
+vm-new使用`--no-vphoned-update`，配置、`.vphoned.signed`及restore-info摘要保持；Disk.img无打开句柄。既有vm-2607 PID35668保持运行。本轮没有启动AMFI驱动或修改TCC。最终系统`com.apple.MobileFileIntegrity`服务存在、未运行，最后退出原因为`JETSAM_REASON_MEMORY_IDLE_EXIT`；没有主动重启该服务。B27同工件清理后仍可执行的原因及AMFI完全撤销仍未验证，不由本轮成功启动推定已恢复原拒绝。
+
+证据入口：[B28-summary.json](evidence/B28-summary.json)、[B28-evidence-manifest.json](evidence/B28-evidence-manifest.json)、[归档映射](evidence/B28/archive-map.json)。大输出以gzip保全，映射同时记录原始及归档摘要；不纳入App、VM或Python运行时二进制。

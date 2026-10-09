@@ -1,0 +1,68 @@
+[
+  {
+    "verb": "verify-bundle",
+    "log_case": "none",
+    "execution_status": "prepared_not_executed",
+    "expected_exit": "nonzero",
+    "expected_stderr": "Installed helper protocol differs from this client. Register the matching signed helper.",
+    "expected_new_log": null,
+    "expected_existing_log": null,
+    "expected_authorization_call": false,
+    "expected_store_operation": false
+  },
+  {
+    "verb": "verify-bundle",
+    "log_case": "new",
+    "execution_status": "prepared_not_executed",
+    "expected_exit": "nonzero",
+    "expected_stderr": "Installed helper protocol differs from this client. Register the matching signed helper.",
+    "expected_new_log": "absent",
+    "expected_existing_log": null,
+    "expected_authorization_call": false,
+    "expected_store_operation": false
+  },
+  {
+    "verb": "verify-bundle",
+    "log_case": "existing",
+    "execution_status": "prepared_not_executed",
+    "expected_exit": "nonzero",
+    "expected_stderr": "Installed helper protocol differs from this client. Register the matching signed helper.",
+    "expected_new_log": null,
+    "expected_existing_log": "sha256, mode, owner, size and mtime unchanged",
+    "expected_authorization_call": false,
+    "expected_store_operation": false
+  },
+  {
+    "verb": "install-bundle",
+    "log_case": "none",
+    "execution_status": "prepared_not_executed",
+    "expected_exit": "nonzero",
+    "expected_stderr": "Installed helper protocol differs from this client. Register the matching signed helper.",
+    "expected_new_log": null,
+    "expected_existing_log": null,
+    "expected_authorization_call": false,
+    "expected_store_operation": false
+  },
+  {
+    "verb": "install-bundle",
+    "log_case": "new",
+    "execution_status": "prepared_not_executed",
+    "expected_exit": "nonzero",
+    "expected_stderr": "Installed helper protocol differs from this client. Register the matching signed helper.",
+    "expected_new_log": "absent",
+    "expected_existing_log": null,
+    "expected_authorization_call": false,
+    "expected_store_operation": false
+  },
+  {
+    "verb": "install-bundle",
+    "log_case": "existing",
+    "execution_status": "prepared_not_executed",
+    "expected_exit": "nonzero",
+    "expected_stderr": "Installed helper protocol differs from this client. Register the matching signed helper.",
+    "expected_new_log": null,
+    "expected_existing_log": "sha256, mode, owner, size and mtime unchanged",
+    "expected_authorization_call": false,
+    "expected_store_operation": false
+  }
+]

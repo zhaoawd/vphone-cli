@@ -1,0 +1,184 @@
+[
+  {
+    "verb": "verify-bundle",
+    "log_case": "none",
+    "argv": [
+      "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "verify-bundle",
+      "--version",
+      "2.0.8"
+    ],
+    "exit": 1,
+    "seconds": 0.430993958,
+    "stdout": "",
+    "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+    "protocol_refused": true,
+    "log_before": {
+      "exists": false
+    },
+    "log_after": {
+      "exists": false
+    },
+    "log_preserved": true
+  },
+  {
+    "verb": "verify-bundle",
+    "log_case": "new",
+    "argv": [
+      "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "verify-bundle",
+      "--version",
+      "2.0.8",
+      "--log-file",
+      "/private/tmp/vphone-b28-t24/matrix/2-verify-bundle-new/operation.log"
+    ],
+    "exit": 1,
+    "seconds": 0.39110016699999994,
+    "stdout": "",
+    "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+    "protocol_refused": true,
+    "log_before": {
+      "exists": false
+    },
+    "log_after": {
+      "exists": false
+    },
+    "log_preserved": true
+  },
+  {
+    "verb": "verify-bundle",
+    "log_case": "existing",
+    "argv": [
+      "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "verify-bundle",
+      "--version",
+      "2.0.8",
+      "--log-file",
+      "/private/tmp/vphone-b28-t24/matrix/3-verify-bundle-existing/operation.log"
+    ],
+    "exit": 1,
+    "seconds": 0.4079085,
+    "stdout": "",
+    "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+    "protocol_refused": true,
+    "log_before": {
+      "exists": true,
+      "sha256": "cd42cc97d5ab8bc5317394caab2c50d27d726f884f0e23a30a9ac98234a5748a",
+      "mode": "0o640",
+      "uid": 2035870432,
+      "gid": 0,
+      "bytes": 30,
+      "mtime_ns": 1791553788862922692
+    },
+    "log_after": {
+      "exists": true,
+      "sha256": "cd42cc97d5ab8bc5317394caab2c50d27d726f884f0e23a30a9ac98234a5748a",
+      "mode": "0o640",
+      "uid": 2035870432,
+      "gid": 0,
+      "bytes": 30,
+      "mtime_ns": 1791553788862922692
+    },
+    "log_preserved": true
+  },
+  {
+    "verb": "install-bundle",
+    "log_case": "none",
+    "argv": [
+      "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "install-bundle",
+      "--version",
+      "2.0.8",
+      "--archive",
+      "/private/tmp/vphone-b28-t24/matrix/4-install-bundle-none/unused-archive.bin",
+      "--sha256",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    "exit": 1,
+    "seconds": 0.375207791,
+    "stdout": "",
+    "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+    "protocol_refused": true,
+    "log_before": {
+      "exists": false
+    },
+    "log_after": {
+      "exists": false
+    },
+    "log_preserved": true
+  },
+  {
+    "verb": "install-bundle",
+    "log_case": "new",
+    "argv": [
+      "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "install-bundle",
+      "--version",
+      "2.0.8",
+      "--archive",
+      "/private/tmp/vphone-b28-t24/matrix/5-install-bundle-new/unused-archive.bin",
+      "--sha256",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "--log-file",
+      "/private/tmp/vphone-b28-t24/matrix/5-install-bundle-new/operation.log"
+    ],
+    "exit": 1,
+    "seconds": 0.37477962500000017,
+    "stdout": "",
+    "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+    "protocol_refused": true,
+    "log_before": {
+      "exists": false
+    },
+    "log_after": {
+      "exists": false
+    },
+    "log_preserved": true
+  },
+  {
+    "verb": "install-bundle",
+    "log_case": "existing",
+    "argv": [
+      "/private/tmp/vphone-b28-t24/final-client.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "install-bundle",
+      "--version",
+      "2.0.8",
+      "--archive",
+      "/private/tmp/vphone-b28-t24/matrix/6-install-bundle-existing/unused-archive.bin",
+      "--sha256",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "--log-file",
+      "/private/tmp/vphone-b28-t24/matrix/6-install-bundle-existing/operation.log"
+    ],
+    "exit": 1,
+    "seconds": 0.37511404199999987,
+    "stdout": "",
+    "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+    "protocol_refused": true,
+    "log_before": {
+      "exists": true,
+      "sha256": "cd42cc97d5ab8bc5317394caab2c50d27d726f884f0e23a30a9ac98234a5748a",
+      "mode": "0o640",
+      "uid": 2035870432,
+      "gid": 0,
+      "bytes": 30,
+      "mtime_ns": 1791553788863784204
+    },
+    "log_after": {
+      "exists": true,
+      "sha256": "cd42cc97d5ab8bc5317394caab2c50d27d726f884f0e23a30a9ac98234a5748a",
+      "mode": "0o640",
+      "uid": 2035870432,
+      "gid": 0,
+      "bytes": 30,
+      "mtime_ns": 1791553788863784204
+    },
+    "log_preserved": true
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "label": "sandbox-baseline-denied",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "-S",
+      "-B",
+      "-c",
+      "print(40)"
+    ],
+    "returncode": 71,
+    "stdout": "sandbox-baseline-denied.stdout",
+    "stderr": "sandbox-baseline-denied.stderr"
+  },
+  {
+    "label": "sandbox-naive-copy-denied",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "-I",
+      "-S",
+      "-B",
+      "-c",
+      "print(40)"
+    ],
+    "returncode": -6,
+    "stdout": "sandbox-naive-copy-denied.stdout",
+    "stderr": "sandbox-naive-copy-denied.stderr"
+  },
+  {
+    "label": "sandbox-controlled-locked",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "-S",
+      "-B",
+      "/private/tmp/vphone-b28-t40/runtime-v1/run_locked.py"
+    ],
+    "returncode": -6,
+    "stdout": "sandbox-controlled-locked.stdout",
+    "stderr": "sandbox-controlled-locked.stderr"
+  },
+  {
+    "label": "sandbox-controlled-extended",
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/private/tmp/vphone-b28-t40/deny-original.sb",
+      "/private/tmp/vphone-b28-t40/runtime-v1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "-S",
+      "-B",
+      "/private/tmp/vphone-b28-t40/runtime-v1/extended_probe.py"
+    ],
+    "returncode": -6,
+    "stdout": "sandbox-controlled-extended.stdout",
+    "stderr": "sandbox-controlled-extended.stderr"
+  }
+]

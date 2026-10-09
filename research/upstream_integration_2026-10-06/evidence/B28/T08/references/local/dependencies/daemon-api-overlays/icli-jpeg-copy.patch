@@ -1,0 +1,52 @@
+--- a/Sources/IcliPrivate/IcliPrivate.m
++++ b/Sources/IcliPrivate/IcliPrivate.m
+@@ -751,6 +751,30 @@
+     return baked ?: raw;
+ }
+ 
++// B22 VM acceptance: encoding the original screen-backed CGImage retained
++// display-sized allocations after its UIImage was released. Copy its pixels
++// into an independent bitmap before JPEG encoding. Repeated captures settle
++// after release; the pinned IcliKit orientation and quality policy stay here.
++static NSData *icliJPEGRepresentation(UIImage *image, CGFloat quality) {
++    CGImageRef original = image.CGImage;
++    if (!original) return nil;
++    size_t width = CGImageGetWidth(original), height = CGImageGetHeight(original);
++    if (!width || !height || width > SIZE_MAX / 4 || height > SIZE_MAX / (width * 4)) return nil;
++    CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
++    if (!space) return nil;
++    CGContextRef context = CGBitmapContextCreate(NULL, width, height, 8, width * 4,
++                                                space, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
++    CGColorSpaceRelease(space);
++    if (!context) return nil;
++    CGContextDrawImage(context, CGRectMake(0, 0, width, height), original);
++    CGImageRef copy = CGBitmapContextCreateImage(context);
++    CGContextRelease(context);
++    if (!copy) return nil;
++    UIImage *detached = [UIImage imageWithCGImage:copy scale:image.scale orientation:image.imageOrientation];
++    CGImageRelease(copy);
++    return UIImageJPEGRepresentation(detached, quality);
++}
++
+ bool icli_screenshot_jpeg(const char *path, float quality, int max_bytes, bool native_resolution) {
+     icli_private_init();
+     if (!path) {
+@@ -769,15 +793,15 @@
+         if (!image) return false;
+     }
+     float q = quality > 0 ? quality : 0.7f;
+-    NSData *data = UIImageJPEGRepresentation(image, q);
++    NSData *data = icliJPEGRepresentation(image, q);
+     while (data.length == 0 && q > 0.2f) {
+         q -= 0.1f;
+-        data = UIImageJPEGRepresentation(image, q);
++        data = icliJPEGRepresentation(image, q);
+     }
+     if (max_bytes > 0) {
+         while (data.length > (NSUInteger)max_bytes && q > 0.15f) {
+             q -= 0.1f;
+-            data = UIImageJPEGRepresentation(image, q);
++            data = icliJPEGRepresentation(image, q);
+         }
+     }
+     if (data.length == 0) {
