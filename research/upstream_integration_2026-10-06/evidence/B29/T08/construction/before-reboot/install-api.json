@@ -1,0 +1,72 @@
+{
+  "status": 200,
+  "response": {
+    "id": "install",
+    "result": {
+      "app_path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Applications/irisin.app",
+      "architecture": "iphoneos-arm64e",
+      "dpkg_database_updated": true,
+      "firmware_version": "26.1.0",
+      "jbroot": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+      "layout": "roothide",
+      "maintainer_scripts_executed": false,
+      "registration": {
+        "build": "161",
+        "bundle_id": "wiki.qaq.irisin",
+        "bundle_path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Applications/irisin.app",
+        "group_containers": {},
+        "name": "Irisin",
+        "path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Applications/irisin.app",
+        "plugins": [],
+        "registered": true,
+        "signer": "0000000000",
+        "type": "System",
+        "version": "4.5.26"
+      },
+      "service_load": {
+        "errors": {},
+        "loaded": true,
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/wiki.qaq.irisind.plist"
+        ],
+        "services": [
+          {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "wiki.qaq.irisind",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/wiki.qaq.irisind.plist",
+            "pid": 0,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind",
+            "running": false
+          }
+        ],
+        "verified": true
+      },
+      "service_start_warning": "failed(\"start requires launchctl service-configure privilege (launchd status 144)\")",
+      "service_status": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "wiki.qaq.irisind",
+        "last_exit_status": 0,
+        "loaded": true,
+        "override": false,
+        "pid": 0,
+        "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind",
+        "running": false
+      },
+      "tag": "local",
+      "version": "4.5.26"
+    },
+    "type": "response"
+  },
+  "seconds": 0.8281364999711514
+}

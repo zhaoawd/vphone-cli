@@ -1,0 +1,60 @@
+{
+  "formatVersion": 1,
+  "control": "<exact decoded control text>",
+  "controlFiles": {
+    "control": {
+      "name": "blob-1",
+      "sha256": "<SHA256 of blob bytes>",
+      "md5": "<MD5 of blob bytes>",
+      "size": 0
+    },
+    "postinst": {
+      "name": "blob-2",
+      "sha256": "<SHA256 of blob bytes>",
+      "md5": "<MD5 of blob bytes>",
+      "size": 0
+    }
+  },
+  "entries": [
+    {
+      "path": "usr/bin/example",
+      "kind": "file",
+      "file": {
+        "name": "blob-1",
+        "sha256": "<SHA256 of blob bytes>",
+        "md5": "<MD5 of blob bytes>",
+        "size": 0
+      },
+      "mode": 493,
+      "uid": 0,
+      "gid": 0,
+      "modificationTime": 0
+    },
+    {
+      "path": "usr/bin",
+      "kind": "directory",
+      "mode": 493,
+      "uid": 0,
+      "gid": 0,
+      "modificationTime": 0
+    },
+    {
+      "path": "usr/bin/example-link",
+      "kind": "symbolicLink",
+      "linkTarget": "example",
+      "mode": 511,
+      "uid": 0,
+      "gid": 0,
+      "modificationTime": 0
+    },
+    {
+      "path": "usr/bin/example-hardlink",
+      "kind": "hardLink",
+      "linkTarget": "usr/bin/example",
+      "mode": 493,
+      "uid": 0,
+      "gid": 0,
+      "modificationTime": 0
+    }
+  ]
+}

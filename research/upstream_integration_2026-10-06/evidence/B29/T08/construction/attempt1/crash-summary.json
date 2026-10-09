@@ -1,0 +1,135 @@
+{
+  "procName": "vphone-vm",
+  "exception": {
+    "codes": "0x0000000000000000, 0x0000000000000000",
+    "rawCodes": [
+      0,
+      0
+    ],
+    "type": "EXC_CRASH",
+    "signal": "SIGABRT"
+  },
+  "termination": {
+    "flags": 0,
+    "code": 6,
+    "namespace": "SIGNAL",
+    "indicator": "Abort trap: 6",
+    "byProc": "vphone-vm",
+    "byPid": 44007
+  },
+  "asi": {
+    "libsystem_c.dylib": [
+      "abort() called"
+    ]
+  },
+  "frames": [
+    {
+      "imageOffset": 38480,
+      "symbol": "__pthread_kill",
+      "symbolLocation": 8,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 27004,
+      "symbol": "pthread_kill",
+      "symbolLocation": 296,
+      "imageIndex": 2
+    },
+    {
+      "imageOffset": 504920,
+      "symbol": "abort",
+      "symbolLocation": 148,
+      "imageIndex": 3
+    },
+    {
+      "imageOffset": 199552,
+      "symbol": "___RegisterApplication_block_invoke",
+      "symbolLocation": 12752,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 112032,
+      "symbol": "_dispatch_client_callout",
+      "symbolLocation": 16,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 17956,
+      "symbol": "_dispatch_once_callout",
+      "symbolLocation": 32,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 6548,
+      "symbol": "_RegisterApplication",
+      "symbolLocation": 164,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 6064,
+      "symbol": "GetCurrentProcess",
+      "symbolLocation": 36,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 13742844,
+      "symbol": "-[NSMenuBarPresentationInstance _getAggregateUIMode:withOptions:]",
+      "symbolLocation": 144,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 13746008,
+      "symbol": "_NSGetAggregateUIMode",
+      "symbolLocation": 84,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 13742128,
+      "symbol": "-[NSMenuBarPresentationInstance _isVisible]",
+      "symbolLocation": 64,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 13756252,
+      "symbol": "+[NSMenuBarPresentationInstance _isMenuBarVisible]",
+      "symbolLocation": 36,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 34480,
+      "symbol": "_NSInitializeAppContext",
+      "symbolLocation": 44,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 26192,
+      "symbol": "-[NSApplication init]",
+      "symbolLocation": 836,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 24896,
+      "symbol": "+[NSApplication sharedApplication]",
+      "symbolLocation": 128,
+      "imageIndex": 6
+    },
+    {
+      "imageOffset": 5978708,
+      "symbol": "static VPhoneEntry.runVM()",
+      "symbolLocation": 360,
+      "imageIndex": 0
+    },
+    {
+      "imageOffset": 5459636,
+      "symbol": "VPhoneVMEntry_main",
+      "symbolLocation": 12,
+      "imageIndex": 0
+    },
+    {
+      "imageOffset": 204416,
+      "symbol": "start",
+      "symbolLocation": 6688,
+      "imageIndex": 7
+    }
+  ]
+}

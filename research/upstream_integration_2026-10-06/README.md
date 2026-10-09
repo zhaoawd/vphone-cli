@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B28 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B29 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -883,3 +883,14 @@ T46首次测试在240秒后自行释放，不能证明活动输出退出，已�
 vm-new使用`--no-vphoned-update`，配置、`.vphoned.signed`及restore-info摘要保持；Disk.img无打开句柄。既有vm-2607 PID35668保持运行。本轮没有启动AMFI驱动或修改TCC。最终系统`com.apple.MobileFileIntegrity`服务存在、未运行，最后退出原因为`JETSAM_REASON_MEMORY_IDLE_EXIT`；没有主动重启该服务。B27同工件清理后仍可执行的原因及AMFI完全撤销仍未验证，不由本轮成功启动推定已恢复原拒绝。
 
 证据入口：[B28-summary.json](evidence/B28-summary.json)、[B28-evidence-manifest.json](evidence/B28-evidence-manifest.json)、[归档映射](evidence/B28/archive-map.json)。大输出以gzip保全，映射同时记录原始及归档摘要；不纳入App、VM或Python运行时二进制。
+
+
+## B29 结果（2026-10-10）
+
+按用户授权，从停机的 vm-new 创建独立 `vm-roothide-20261010`，卸载克隆内 rootless bootstrap，安装 Irisin 4.5.26 及固定 OwnGoal RootHide 软件包。实际 helper dry-run 和安装退出 0；90 条 dpkg 记录均为 install ok installed，audit 无输出。冷启动后账户数据库、SSH 密钥和软件包状态摘要一致；RootHide API 检测、显式服务激活、Irisin 加载及 OpenSSH banner 通过。没有执行 SSH 身份认证或应用交互验收，没有新增整项 accepted。
+
+旧 CFW 未自动加载 RootHide 服务，研究脚本每次启动时显式调用官方 helper 和 RootHide launchctl。实际 services.start 仍返回 api_guest_error/failed，当前包络未保留原始状态；初始安装曾记录 service_start 144。状态 144 和部分旋转未生效的原因未查明，T08 保持未完成。宿主仍依赖既有 /private/tmp 冻结 VM 工件；同摘要持久副本在另一执行路径被 SIGKILL，原因未查明。未新增 AMFI/TCC 操作或修改产品源码。
+
+按 5 GiB 设置独立 0.5 秒磁盘监控；单次 SIGINT 的模拟验证通过，没有实际填满磁盘。本轮最低记录约 32.43 GiB，最终约 34.75 GiB。已清理本轮客户机安装暂存、传输分片及宿主 prepared 目录，固定软件包及证据保留。样本正常停机并独立确认磁盘句柄释放；源 vm-new 小文件摘要及磁盘容量/mtime 保持，未做全盘摘要；既有 vm-2607 继续运行。原设备身份保留，源与克隆不得同时启动。
+
+具体构造、失败、运行范围、清理及启动依赖见 [B29 执行记录](evidence/B29/T08/REPORT.md)、[B29-summary.json](evidence/B29-summary.json)、[证据清单](evidence/B29/T08/manifest.json)。

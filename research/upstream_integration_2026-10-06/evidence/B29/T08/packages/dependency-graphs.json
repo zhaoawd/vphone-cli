@@ -1,0 +1,4088 @@
+{
+  "note": "Edges record all selected witnesses through Provides; version constraints in original metadata must still be checked. All 89 nodes retained. Static inspection, not resolver output.",
+  "preDepends": {
+    "owngoal-bootstrap-vphone": [],
+    "apt": [
+      "dpkg",
+      "system-cmds"
+    ],
+    "dpkg": [
+      "tar",
+      "libintl8"
+    ],
+    "bash": [
+      "dash",
+      "libreadline8",
+      "profile.d",
+      "debianutils"
+    ],
+    "zsh": [
+      "debianutils"
+    ],
+    "dash": [
+      "debianutils"
+    ],
+    "sudo": [],
+    "coreutils": [],
+    "debianutils": [],
+    "shell-cmds": [],
+    "system-cmds": [],
+    "file-cmds": [],
+    "diffutils": [],
+    "findutils": [],
+    "grep": [],
+    "sed": [],
+    "gawk": [],
+    "less": [],
+    "tar": [],
+    "gzip": [],
+    "xz-utils": [],
+    "ncurses-bin": [],
+    "ncurses-term": [],
+    "profile.d": [
+      "system-cmds"
+    ],
+    "ca-certificates": [],
+    "openssh-server": [],
+    "curl": [],
+    "wget": [],
+    "nano": [],
+    "vim": [],
+    "htop": [],
+    "git": [],
+    "wiki.qaq.fastfetch": [],
+    "uikittools": [],
+    "launchctl": [],
+    "owngoal-essential-apps": [],
+    "roothide": [],
+    "libiosexec1": [],
+    "libapt-pkg6.0": [],
+    "libgnutls30": [],
+    "gpgv": [],
+    "procursus-keyring": [],
+    "libintl8": [],
+    "liblzma5": [],
+    "libz-ng2": [],
+    "libzstd1": [],
+    "libmd0": [],
+    "libreadline8": [],
+    "libncursesw6": [],
+    "libpcre1": [],
+    "libedit0": [],
+    "libpam2": [],
+    "libssl3": [],
+    "libgmp10": [],
+    "libcrypt2": [],
+    "libpcre2-8-0": [],
+    "libmpfr6": [],
+    "openssh-client": [],
+    "openssh-sftp-server": [],
+    "libcurl4": [],
+    "libc-ares2": [],
+    "libnghttp2-14": [],
+    "libidn2-0": [],
+    "librtmp1": [],
+    "libhogweed6": [],
+    "libnettle8": [],
+    "libssh2-1": [],
+    "libbrotli1": [],
+    "libunistring5": [],
+    "libmagic1": [],
+    "xxd": [],
+    "libsodium23": [],
+    "wiki.qaq.irisin": [],
+    "wiki.qaq.fila": [],
+    "wiki.qaq.ighostvt": [],
+    "wiki.qaq.xrash": [],
+    "wiki.qaq.inspector": [],
+    "libgcrypt20": [],
+    "liblz4-1": [],
+    "libxxhash0": [],
+    "libp11-kit0": [],
+    "libtasn1-6": [],
+    "libassuan0": [],
+    "libgpg-error0": [],
+    "libnpth0": [],
+    "chariz-keyring": [],
+    "havoc-keyring": [],
+    "libpam-modules": [],
+    "libffi8": []
+  },
+  "depends": {
+    "owngoal-bootstrap-vphone": [
+      "apt",
+      "dpkg",
+      "bash",
+      "zsh",
+      "dash",
+      "sudo",
+      "coreutils",
+      "debianutils",
+      "shell-cmds",
+      "system-cmds",
+      "file-cmds",
+      "diffutils",
+      "findutils",
+      "grep",
+      "sed",
+      "gawk",
+      "less",
+      "tar",
+      "gzip",
+      "xz-utils",
+      "ncurses-bin",
+      "ncurses-term",
+      "profile.d",
+      "ca-certificates",
+      "openssh-server",
+      "curl",
+      "wget",
+      "nano",
+      "vim",
+      "htop",
+      "git",
+      "wiki.qaq.fastfetch",
+      "uikittools",
+      "launchctl",
+      "owngoal-essential-apps"
+    ],
+    "apt": [
+      "roothide",
+      "libiosexec1",
+      "libapt-pkg6.0",
+      "libgnutls30",
+      "gpgv",
+      "dpkg",
+      "coreutils",
+      "procursus-keyring"
+    ],
+    "dpkg": [
+      "roothide",
+      "libiosexec1",
+      "dash",
+      "coreutils",
+      "diffutils",
+      "tar",
+      "liblzma5",
+      "libintl8",
+      "libz-ng2",
+      "libzstd1",
+      "libmd0"
+    ],
+    "bash": [
+      "roothide",
+      "libiosexec1",
+      "grep",
+      "libncursesw6",
+      "libreadline8",
+      "sed",
+      "debianutils"
+    ],
+    "zsh": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6",
+      "libpcre1",
+      "debianutils"
+    ],
+    "dash": [
+      "roothide",
+      "libiosexec1",
+      "debianutils",
+      "libedit0"
+    ],
+    "sudo": [
+      "roothide",
+      "libiosexec1",
+      "libintl8",
+      "libpam2"
+    ],
+    "coreutils": [
+      "roothide",
+      "libiosexec1",
+      "dash",
+      "profile.d",
+      "libssl3",
+      "libintl8",
+      "libgmp10",
+      "libcrypt2"
+    ],
+    "debianutils": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "shell-cmds": [
+      "roothide",
+      "libiosexec1",
+      "libpam2"
+    ],
+    "system-cmds": [
+      "roothide",
+      "libiosexec1",
+      "file-cmds",
+      "libcrypt2",
+      "libpam2"
+    ],
+    "file-cmds": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "diffutils": [
+      "roothide",
+      "libiosexec1",
+      "libintl8"
+    ],
+    "findutils": [
+      "roothide",
+      "libiosexec1",
+      "dash",
+      "sed",
+      "shell-cmds",
+      "libintl8"
+    ],
+    "grep": [
+      "roothide",
+      "libiosexec1",
+      "libpcre2-8-0"
+    ],
+    "sed": [
+      "roothide",
+      "libiosexec1",
+      "libintl8"
+    ],
+    "gawk": [
+      "roothide",
+      "libiosexec1",
+      "libintl8",
+      "libreadline8",
+      "libmpfr6",
+      "libgmp10"
+    ],
+    "less": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6",
+      "libpcre2-8-0"
+    ],
+    "tar": [
+      "roothide",
+      "libiosexec1",
+      "libintl8"
+    ],
+    "gzip": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "xz-utils": [
+      "roothide",
+      "libiosexec1",
+      "liblzma5",
+      "libintl8"
+    ],
+    "ncurses-bin": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6"
+    ],
+    "ncurses-term": [
+      "roothide",
+      "libncursesw6"
+    ],
+    "profile.d": [
+      "roothide",
+      "zsh"
+    ],
+    "ca-certificates": [
+      "roothide"
+    ],
+    "openssh-server": [
+      "roothide",
+      "libiosexec1",
+      "libssl3",
+      "openssh-client",
+      "openssh-sftp-server",
+      "libcrypt2",
+      "libpam2",
+      "libmd0"
+    ],
+    "curl": [
+      "roothide",
+      "libiosexec1",
+      "libcurl4",
+      "libc-ares2",
+      "libnghttp2-14",
+      "libidn2-0",
+      "librtmp1",
+      "libgmp10",
+      "libgnutls30",
+      "libhogweed6",
+      "libnettle8",
+      "libssh2-1",
+      "libssl3",
+      "libzstd1",
+      "libbrotli1"
+    ],
+    "wget": [
+      "roothide",
+      "libiosexec1",
+      "libssl3",
+      "libpcre2-8-0",
+      "libintl8",
+      "libunistring5",
+      "libidn2-0"
+    ],
+    "nano": [
+      "roothide",
+      "libiosexec1",
+      "libmagic1",
+      "libncursesw6",
+      "libintl8"
+    ],
+    "vim": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6",
+      "xxd",
+      "libintl8",
+      "libsodium23"
+    ],
+    "htop": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6"
+    ],
+    "git": [
+      "roothide",
+      "libiosexec1",
+      "libcurl4",
+      "libssl3",
+      "libintl8",
+      "libpcre2-8-0",
+      "libidn2-0",
+      "less"
+    ],
+    "wiki.qaq.fastfetch": [],
+    "uikittools": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "launchctl": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "owngoal-essential-apps": [
+      "wiki.qaq.irisin",
+      "wiki.qaq.fila",
+      "wiki.qaq.ighostvt",
+      "wiki.qaq.xrash",
+      "wiki.qaq.inspector"
+    ],
+    "roothide": [],
+    "libiosexec1": [
+      "roothide"
+    ],
+    "libapt-pkg6.0": [
+      "roothide",
+      "libiosexec1",
+      "libgcrypt20",
+      "liblz4-1",
+      "liblzma5",
+      "libxxhash0",
+      "libzstd1"
+    ],
+    "libgnutls30": [
+      "roothide",
+      "libiosexec1",
+      "libintl8",
+      "libgmp10",
+      "libidn2-0",
+      "libunistring5",
+      "libnettle8",
+      "libhogweed6",
+      "libp11-kit0",
+      "libtasn1-6",
+      "libzstd1",
+      "libbrotli1"
+    ],
+    "gpgv": [
+      "roothide",
+      "libiosexec1",
+      "libassuan0",
+      "libgcrypt20",
+      "libgpg-error0",
+      "libintl8",
+      "libnpth0"
+    ],
+    "procursus-keyring": [
+      "roothide",
+      "chariz-keyring",
+      "havoc-keyring"
+    ],
+    "libintl8": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "liblzma5": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libz-ng2": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libzstd1": [
+      "roothide",
+      "libiosexec1",
+      "liblz4-1",
+      "liblzma5"
+    ],
+    "libmd0": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libreadline8": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6"
+    ],
+    "libncursesw6": [
+      "roothide",
+      "libiosexec1",
+      "ncurses-term"
+    ],
+    "libpcre1": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libedit0": [
+      "roothide",
+      "libiosexec1",
+      "libncursesw6"
+    ],
+    "libpam2": [
+      "roothide",
+      "libiosexec1",
+      "libpam-modules"
+    ],
+    "libssl3": [
+      "roothide",
+      "libiosexec1",
+      "ca-certificates"
+    ],
+    "libgmp10": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libcrypt2": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libpcre2-8-0": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libmpfr6": [
+      "roothide",
+      "libiosexec1",
+      "libgmp10"
+    ],
+    "openssh-client": [
+      "roothide",
+      "libiosexec1",
+      "libssl3",
+      "libcrypt2",
+      "libmd0"
+    ],
+    "openssh-sftp-server": [
+      "roothide",
+      "libiosexec1",
+      "libssl3",
+      "openssh-client",
+      "libcrypt2",
+      "libmd0"
+    ],
+    "libcurl4": [
+      "roothide",
+      "libiosexec1",
+      "libcurl4",
+      "libc-ares2",
+      "libnghttp2-14",
+      "libidn2-0",
+      "librtmp1",
+      "libgmp10",
+      "libgnutls30",
+      "libhogweed6",
+      "libnettle8",
+      "libssh2-1",
+      "libssl3",
+      "libzstd1",
+      "libbrotli1"
+    ],
+    "libc-ares2": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libnghttp2-14": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libidn2-0": [
+      "roothide",
+      "libiosexec1",
+      "libintl8",
+      "libunistring5"
+    ],
+    "librtmp1": [
+      "roothide",
+      "libiosexec1",
+      "libgnutls30",
+      "libhogweed6",
+      "libnettle8",
+      "libgmp10"
+    ],
+    "libhogweed6": [
+      "roothide",
+      "libiosexec1",
+      "libgmp10",
+      "libnettle8"
+    ],
+    "libnettle8": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libssh2-1": [
+      "roothide",
+      "libiosexec1",
+      "libssl3"
+    ],
+    "libbrotli1": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libunistring5": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libmagic1": [
+      "roothide",
+      "libiosexec1",
+      "liblzma5"
+    ],
+    "xxd": [
+      "roothide",
+      "libiosexec1",
+      "libintl8"
+    ],
+    "libsodium23": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "wiki.qaq.irisin": [],
+    "wiki.qaq.fila": [
+      "uikittools",
+      "launchctl"
+    ],
+    "wiki.qaq.ighostvt": [
+      "uikittools",
+      "launchctl",
+      "shell-cmds"
+    ],
+    "wiki.qaq.xrash": [
+      "uikittools",
+      "launchctl"
+    ],
+    "wiki.qaq.inspector": [
+      "uikittools",
+      "launchctl"
+    ],
+    "libgcrypt20": [
+      "roothide",
+      "libiosexec1",
+      "libgpg-error0"
+    ],
+    "liblz4-1": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libxxhash0": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libp11-kit0": [
+      "roothide",
+      "libiosexec1",
+      "libintl8",
+      "libffi8",
+      "ca-certificates"
+    ],
+    "libtasn1-6": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "libassuan0": [
+      "roothide",
+      "libiosexec1",
+      "libgpg-error0"
+    ],
+    "libgpg-error0": [
+      "roothide",
+      "libiosexec1",
+      "libintl8"
+    ],
+    "libnpth0": [
+      "roothide",
+      "libiosexec1"
+    ],
+    "chariz-keyring": [
+      "roothide"
+    ],
+    "havoc-keyring": [
+      "roothide"
+    ],
+    "libpam-modules": [
+      "roothide",
+      "libiosexec1",
+      "libpam2"
+    ],
+    "libffi8": [
+      "roothide",
+      "libiosexec1"
+    ]
+  },
+  "relations": [
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "apt",
+      "selected_witnesses": [
+        "apt"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "dpkg",
+      "selected_witnesses": [
+        "dpkg"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "bash",
+      "selected_witnesses": [
+        "bash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "zsh",
+      "selected_witnesses": [
+        "zsh"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "dash",
+      "selected_witnesses": [
+        "dash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "sudo",
+      "selected_witnesses": [
+        "sudo"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "coreutils",
+      "selected_witnesses": [
+        "coreutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "debianutils",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "shell-cmds",
+      "selected_witnesses": [
+        "shell-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "system-cmds",
+      "selected_witnesses": [
+        "system-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "file-cmds",
+      "selected_witnesses": [
+        "file-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "diffutils",
+      "selected_witnesses": [
+        "diffutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "findutils",
+      "selected_witnesses": [
+        "findutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "grep",
+      "selected_witnesses": [
+        "grep"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "sed",
+      "selected_witnesses": [
+        "sed"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "gawk",
+      "selected_witnesses": [
+        "gawk"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "less",
+      "selected_witnesses": [
+        "less"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "tar",
+      "selected_witnesses": [
+        "tar"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "gzip",
+      "selected_witnesses": [
+        "gzip"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "xz-utils",
+      "selected_witnesses": [
+        "xz-utils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "ncurses-bin",
+      "selected_witnesses": [
+        "ncurses-bin"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "ncurses-term",
+      "selected_witnesses": [
+        "ncurses-term"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "profile.d",
+      "selected_witnesses": [
+        "profile.d"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "ca-certificates",
+      "selected_witnesses": [
+        "ca-certificates"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "openssh-server",
+      "selected_witnesses": [
+        "openssh-server"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "curl",
+      "selected_witnesses": [
+        "curl"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "wget",
+      "selected_witnesses": [
+        "wget"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "nano",
+      "selected_witnesses": [
+        "nano"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "vim",
+      "selected_witnesses": [
+        "vim"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "htop",
+      "selected_witnesses": [
+        "htop"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "git",
+      "selected_witnesses": [
+        "git"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "wiki.qaq.fastfetch",
+      "selected_witnesses": [
+        "wiki.qaq.fastfetch"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "uikittools",
+      "selected_witnesses": [
+        "uikittools"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "launchctl",
+      "selected_witnesses": [
+        "launchctl"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-bootstrap-vphone",
+      "relation": "Depends",
+      "raw": "owngoal-essential-apps",
+      "selected_witnesses": [
+        "owngoal-essential-apps"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Pre-Depends",
+      "raw": "dpkg (>= 1.14.25-8)",
+      "selected_witnesses": [
+        "dpkg"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Pre-Depends",
+      "raw": "system-cmds (>= 854.40.2-2)",
+      "selected_witnesses": [
+        "system-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.7)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "libapt-pkg6.0 (= 2.6.0-2)",
+      "selected_witnesses": [
+        "libapt-pkg6.0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "libgnutls30",
+      "selected_witnesses": [
+        "libgnutls30"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "gpgv",
+      "selected_witnesses": [
+        "gpgv"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "dpkg (>= 1.19.0)",
+      "selected_witnesses": [
+        "dpkg"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "coreutils",
+      "selected_witnesses": [
+        "coreutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "apt",
+      "relation": "Depends",
+      "raw": "procursus-keyring",
+      "selected_witnesses": [
+        "procursus-keyring"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Pre-Depends",
+      "raw": "tar (>= 1.23)",
+      "selected_witnesses": [
+        "tar"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Pre-Depends",
+      "raw": "libintl8 (>= 0.20)",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "sh",
+      "selected_witnesses": [
+        "dash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "coreutils",
+      "selected_witnesses": [
+        "coreutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "diffutils",
+      "selected_witnesses": [
+        "diffutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "tar",
+      "selected_witnesses": [
+        "tar"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "liblzma5 (>= 5.2.5)",
+      "selected_witnesses": [
+        "liblzma5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "libz-ng2",
+      "selected_witnesses": [
+        "libz-ng2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "libzstd1",
+      "selected_witnesses": [
+        "libzstd1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dpkg",
+      "relation": "Depends",
+      "raw": "libmd0",
+      "selected_witnesses": [
+        "libmd0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Pre-Depends",
+      "raw": "dash (>= 0.5.11.3-1)",
+      "selected_witnesses": [
+        "dash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Pre-Depends",
+      "raw": "libreadline8 (>= 8.2)",
+      "selected_witnesses": [
+        "libreadline8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Pre-Depends",
+      "raw": "profile.d (>= 0-5)",
+      "selected_witnesses": [
+        "profile.d"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Pre-Depends",
+      "raw": "debianutils (>= 4.11.2)",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "grep",
+      "selected_witnesses": [
+        "grep"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "libncursesw6",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "libreadline8 (>= 8.2)",
+      "selected_witnesses": [
+        "libreadline8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "sed",
+      "selected_witnesses": [
+        "sed"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "bash",
+      "relation": "Depends",
+      "raw": "debianutils (>= 4.11.2)",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "zsh",
+      "relation": "Pre-Depends",
+      "raw": "debianutils (>= 4.11.2)",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "zsh",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "zsh",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "zsh",
+      "relation": "Depends",
+      "raw": "libncursesw6",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "zsh",
+      "relation": "Depends",
+      "raw": "libpcre1",
+      "selected_witnesses": [
+        "libpcre1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "zsh",
+      "relation": "Depends",
+      "raw": "debianutils (>= 4.11.2)",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dash",
+      "relation": "Pre-Depends",
+      "raw": "debianutils (>= 4.11.2)",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dash",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dash",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dash",
+      "relation": "Depends",
+      "raw": "debianutils (>= 4.11.2)",
+      "selected_witnesses": [
+        "debianutils"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "dash",
+      "relation": "Depends",
+      "raw": "libedit0",
+      "selected_witnesses": [
+        "libedit0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sudo",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sudo",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sudo",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sudo",
+      "relation": "Depends",
+      "raw": "libpam2",
+      "selected_witnesses": [
+        "libpam2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "sh",
+      "selected_witnesses": [
+        "dash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "profile.d",
+      "selected_witnesses": [
+        "profile.d"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "libintl8 (>= 0.20.0)",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "coreutils",
+      "relation": "Depends",
+      "raw": "libcrypt2",
+      "selected_witnesses": [
+        "libcrypt2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "debianutils",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "debianutils",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "shell-cmds",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.7)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "shell-cmds",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "shell-cmds",
+      "relation": "Depends",
+      "raw": "libpam2",
+      "selected_witnesses": [
+        "libpam2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "system-cmds",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "system-cmds",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "system-cmds",
+      "relation": "Depends",
+      "raw": "file-cmds",
+      "selected_witnesses": [
+        "file-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "system-cmds",
+      "relation": "Depends",
+      "raw": "libcrypt2",
+      "selected_witnesses": [
+        "libcrypt2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "system-cmds",
+      "relation": "Depends",
+      "raw": "libpam2",
+      "selected_witnesses": [
+        "libpam2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "file-cmds",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "file-cmds",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "diffutils",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "diffutils",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "diffutils",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "findutils",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "findutils",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "findutils",
+      "relation": "Depends",
+      "raw": "sh",
+      "selected_witnesses": [
+        "dash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "findutils",
+      "relation": "Depends",
+      "raw": "sed",
+      "selected_witnesses": [
+        "sed"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "findutils",
+      "relation": "Depends",
+      "raw": "shell-cmds",
+      "selected_witnesses": [
+        "shell-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "findutils",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "grep",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "grep",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "grep",
+      "relation": "Depends",
+      "raw": "libpcre2-8-0",
+      "selected_witnesses": [
+        "libpcre2-8-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sed",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sed",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "sed",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gawk",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gawk",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gawk",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gawk",
+      "relation": "Depends",
+      "raw": "libreadline8",
+      "selected_witnesses": [
+        "libreadline8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gawk",
+      "relation": "Depends",
+      "raw": "libmpfr6",
+      "selected_witnesses": [
+        "libmpfr6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gawk",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "less",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "less",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "less",
+      "relation": "Depends",
+      "raw": "libncursesw6",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "less",
+      "relation": "Depends",
+      "raw": "libpcre2-8-0",
+      "selected_witnesses": [
+        "libpcre2-8-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "tar",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "tar",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "tar",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gzip",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gzip",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xz-utils",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xz-utils",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xz-utils",
+      "relation": "Depends",
+      "raw": "liblzma5 (>= 5.4.1)",
+      "selected_witnesses": [
+        "liblzma5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xz-utils",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "ncurses-bin",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "ncurses-bin",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "ncurses-bin",
+      "relation": "Depends",
+      "raw": "libncursesw6 (= 6.4)",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "ncurses-term",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "ncurses-term",
+      "relation": "Depends",
+      "raw": "libncursesw6 (= 6.4)",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "profile.d",
+      "relation": "Pre-Depends",
+      "raw": "system-cmds (>=805.220.1)",
+      "selected_witnesses": [
+        "system-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "profile.d",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "profile.d",
+      "relation": "Depends",
+      "raw": "zsh",
+      "selected_witnesses": [
+        "zsh"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "ca-certificates",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "openssh-client (= 9.2p1)",
+      "selected_witnesses": [
+        "openssh-client"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "openssh-sftp-server",
+      "selected_witnesses": [
+        "openssh-sftp-server"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "libcrypt2",
+      "selected_witnesses": [
+        "libcrypt2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "libpam2",
+      "selected_witnesses": [
+        "libpam2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-server",
+      "relation": "Depends",
+      "raw": "libmd0",
+      "selected_witnesses": [
+        "libmd0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libcurl4 (= 8.0.1)",
+      "selected_witnesses": [
+        "libcurl4"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libc-ares2",
+      "selected_witnesses": [
+        "libc-ares2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libnghttp2-14",
+      "selected_witnesses": [
+        "libnghttp2-14"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libidn2-0",
+      "selected_witnesses": [
+        "libidn2-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "librtmp1",
+      "selected_witnesses": [
+        "librtmp1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libgnutls30",
+      "selected_witnesses": [
+        "libgnutls30"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libhogweed6",
+      "selected_witnesses": [
+        "libhogweed6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libnettle8",
+      "selected_witnesses": [
+        "libnettle8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libssh2-1",
+      "selected_witnesses": [
+        "libssh2-1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libzstd1",
+      "selected_witnesses": [
+        "libzstd1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "curl",
+      "relation": "Depends",
+      "raw": "libbrotli1",
+      "selected_witnesses": [
+        "libbrotli1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "libpcre2-8-0",
+      "selected_witnesses": [
+        "libpcre2-8-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "libunistring5",
+      "selected_witnesses": [
+        "libunistring5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wget",
+      "relation": "Depends",
+      "raw": "libidn2-0",
+      "selected_witnesses": [
+        "libidn2-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "nano",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "nano",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "nano",
+      "relation": "Depends",
+      "raw": "libmagic1",
+      "selected_witnesses": [
+        "libmagic1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "nano",
+      "relation": "Depends",
+      "raw": "libncursesw6",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "nano",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "vim",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "vim",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "vim",
+      "relation": "Depends",
+      "raw": "libncursesw6",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "vim",
+      "relation": "Depends",
+      "raw": "xxd",
+      "selected_witnesses": [
+        "xxd"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "vim",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "vim",
+      "relation": "Depends",
+      "raw": "libsodium23",
+      "selected_witnesses": [
+        "libsodium23"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "htop",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "htop",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "htop",
+      "relation": "Depends",
+      "raw": "libncursesw6 (>= 6.0)",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "libcurl4",
+      "selected_witnesses": [
+        "libcurl4"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "libpcre2-8-0",
+      "selected_witnesses": [
+        "libpcre2-8-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "libidn2-0",
+      "selected_witnesses": [
+        "libidn2-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "firmware (>= 14.0) | libexpat1",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "git",
+      "relation": "Depends",
+      "raw": "pager",
+      "selected_witnesses": [
+        "less"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.fastfetch",
+      "relation": "Depends",
+      "raw": "firmware (>= 15.0)",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "uikittools",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.1.0)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "uikittools",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1-2)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "launchctl",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.1.0)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "launchctl",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1-2)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-essential-apps",
+      "relation": "Depends",
+      "raw": "wiki.qaq.irisin",
+      "selected_witnesses": [
+        "wiki.qaq.irisin"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-essential-apps",
+      "relation": "Depends",
+      "raw": "wiki.qaq.fila",
+      "selected_witnesses": [
+        "wiki.qaq.fila"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-essential-apps",
+      "relation": "Depends",
+      "raw": "wiki.qaq.ighostvt",
+      "selected_witnesses": [
+        "wiki.qaq.ighostvt"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-essential-apps",
+      "relation": "Depends",
+      "raw": "wiki.qaq.xrash",
+      "selected_witnesses": [
+        "wiki.qaq.xrash"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "owngoal-essential-apps",
+      "relation": "Depends",
+      "raw": "wiki.qaq.inspector",
+      "selected_witnesses": [
+        "wiki.qaq.inspector"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libiosexec1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.1.0)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.7)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "libgcrypt20",
+      "selected_witnesses": [
+        "libgcrypt20"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "liblz4-1",
+      "selected_witnesses": [
+        "liblz4-1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "liblzma5 (>= 5.2.5)",
+      "selected_witnesses": [
+        "liblzma5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "libxxhash0",
+      "selected_witnesses": [
+        "libxxhash0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libapt-pkg6.0",
+      "relation": "Depends",
+      "raw": "libzstd1",
+      "selected_witnesses": [
+        "libzstd1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libintl8 (>= 0.20.0)",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libidn2-0",
+      "selected_witnesses": [
+        "libidn2-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libunistring5",
+      "selected_witnesses": [
+        "libunistring5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libnettle8",
+      "selected_witnesses": [
+        "libnettle8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libhogweed6",
+      "selected_witnesses": [
+        "libhogweed6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libp11-kit0",
+      "selected_witnesses": [
+        "libp11-kit0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libtasn1-6",
+      "selected_witnesses": [
+        "libtasn1-6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libzstd1",
+      "selected_witnesses": [
+        "libzstd1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgnutls30",
+      "relation": "Depends",
+      "raw": "libbrotli1",
+      "selected_witnesses": [
+        "libbrotli1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "libassuan0",
+      "selected_witnesses": [
+        "libassuan0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "libgcrypt20",
+      "selected_witnesses": [
+        "libgcrypt20"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "libgpg-error0",
+      "selected_witnesses": [
+        "libgpg-error0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "gpgv",
+      "relation": "Depends",
+      "raw": "libnpth0",
+      "selected_witnesses": [
+        "libnpth0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "procursus-keyring",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "procursus-keyring",
+      "relation": "Depends",
+      "raw": "chariz-keyring",
+      "selected_witnesses": [
+        "chariz-keyring"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "procursus-keyring",
+      "relation": "Depends",
+      "raw": "havoc-keyring",
+      "selected_witnesses": [
+        "havoc-keyring"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libintl8",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libintl8",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "liblzma5",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "liblzma5",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libz-ng2",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libz-ng2",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libzstd1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libzstd1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libzstd1",
+      "relation": "Depends",
+      "raw": "liblz4-1",
+      "selected_witnesses": [
+        "liblz4-1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libzstd1",
+      "relation": "Depends",
+      "raw": "liblzma5 (>= 5.2.5)",
+      "selected_witnesses": [
+        "liblzma5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmd0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmd0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libreadline8",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libreadline8",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libreadline8",
+      "relation": "Depends",
+      "raw": "libncursesw6",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libncursesw6",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libncursesw6",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libncursesw6",
+      "relation": "Depends",
+      "raw": "ncurses-term (= 6.4)",
+      "selected_witnesses": [
+        "ncurses-term"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpcre1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpcre1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libedit0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libedit0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libedit0",
+      "relation": "Depends",
+      "raw": "libncursesw6 (>= 6.0)",
+      "selected_witnesses": [
+        "libncursesw6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpam2",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpam2",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpam2",
+      "relation": "Depends",
+      "raw": "libpam-modules",
+      "selected_witnesses": [
+        "libpam-modules"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libssl3",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libssl3",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libssl3",
+      "relation": "Depends",
+      "raw": "ca-certificates",
+      "selected_witnesses": [
+        "ca-certificates"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgmp10",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgmp10",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcrypt2",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcrypt2",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpcre2-8-0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpcre2-8-0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmpfr6",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmpfr6",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmpfr6",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-client",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-client",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-client",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-client",
+      "relation": "Depends",
+      "raw": "libcrypt2",
+      "selected_witnesses": [
+        "libcrypt2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-client",
+      "relation": "Depends",
+      "raw": "libmd0",
+      "selected_witnesses": [
+        "libmd0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-sftp-server",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-sftp-server",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-sftp-server",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-sftp-server",
+      "relation": "Depends",
+      "raw": "openssh-client (= 9.2p1)",
+      "selected_witnesses": [
+        "openssh-client"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-sftp-server",
+      "relation": "Depends",
+      "raw": "libcrypt2",
+      "selected_witnesses": [
+        "libcrypt2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "openssh-sftp-server",
+      "relation": "Depends",
+      "raw": "libmd0",
+      "selected_witnesses": [
+        "libmd0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libcurl4 (= 8.0.1)",
+      "selected_witnesses": [
+        "libcurl4"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libc-ares2",
+      "selected_witnesses": [
+        "libc-ares2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libnghttp2-14",
+      "selected_witnesses": [
+        "libnghttp2-14"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libidn2-0",
+      "selected_witnesses": [
+        "libidn2-0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "librtmp1",
+      "selected_witnesses": [
+        "librtmp1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libgnutls30",
+      "selected_witnesses": [
+        "libgnutls30"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libhogweed6",
+      "selected_witnesses": [
+        "libhogweed6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libnettle8",
+      "selected_witnesses": [
+        "libnettle8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libssh2-1",
+      "selected_witnesses": [
+        "libssh2-1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libzstd1",
+      "selected_witnesses": [
+        "libzstd1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libcurl4",
+      "relation": "Depends",
+      "raw": "libbrotli1",
+      "selected_witnesses": [
+        "libbrotli1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libc-ares2",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libc-ares2",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libnghttp2-14",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libnghttp2-14",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libidn2-0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libidn2-0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libidn2-0",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libidn2-0",
+      "relation": "Depends",
+      "raw": "libunistring5",
+      "selected_witnesses": [
+        "libunistring5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "librtmp1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "librtmp1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "librtmp1",
+      "relation": "Depends",
+      "raw": "libgnutls30",
+      "selected_witnesses": [
+        "libgnutls30"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "librtmp1",
+      "relation": "Depends",
+      "raw": "libhogweed6",
+      "selected_witnesses": [
+        "libhogweed6"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "librtmp1",
+      "relation": "Depends",
+      "raw": "libnettle8",
+      "selected_witnesses": [
+        "libnettle8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "librtmp1",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libhogweed6",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libhogweed6",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libhogweed6",
+      "relation": "Depends",
+      "raw": "libgmp10",
+      "selected_witnesses": [
+        "libgmp10"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libhogweed6",
+      "relation": "Depends",
+      "raw": "libnettle8 (= 3.8.1)",
+      "selected_witnesses": [
+        "libnettle8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libnettle8",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libnettle8",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libssh2-1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libssh2-1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libssh2-1",
+      "relation": "Depends",
+      "raw": "libssl3",
+      "selected_witnesses": [
+        "libssl3"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libbrotli1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libbrotli1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libunistring5",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libunistring5",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmagic1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmagic1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libmagic1",
+      "relation": "Depends",
+      "raw": "liblzma5 (>= 5.2.5)",
+      "selected_witnesses": [
+        "liblzma5"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xxd",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xxd",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "xxd",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libsodium23",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libsodium23",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.irisin",
+      "relation": "Depends",
+      "raw": "firmware (>= 16.0)",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "wiki.qaq.fila",
+      "relation": "Depends",
+      "raw": "firmware (>= 15.0)",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "wiki.qaq.fila",
+      "relation": "Depends",
+      "raw": "uikittools",
+      "selected_witnesses": [
+        "uikittools"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.fila",
+      "relation": "Depends",
+      "raw": "launchctl",
+      "selected_witnesses": [
+        "launchctl"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.ighostvt",
+      "relation": "Depends",
+      "raw": "firmware (>= 15.0)",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "wiki.qaq.ighostvt",
+      "relation": "Depends",
+      "raw": "uikittools",
+      "selected_witnesses": [
+        "uikittools"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.ighostvt",
+      "relation": "Depends",
+      "raw": "launchctl",
+      "selected_witnesses": [
+        "launchctl"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.ighostvt",
+      "relation": "Depends",
+      "raw": "shell-cmds",
+      "selected_witnesses": [
+        "shell-cmds"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.xrash",
+      "relation": "Depends",
+      "raw": "firmware (>= 15.0)",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "wiki.qaq.xrash",
+      "relation": "Depends",
+      "raw": "uikittools",
+      "selected_witnesses": [
+        "uikittools"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.xrash",
+      "relation": "Depends",
+      "raw": "launchctl",
+      "selected_witnesses": [
+        "launchctl"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.inspector",
+      "relation": "Depends",
+      "raw": "firmware (>= 13.0)",
+      "selected_witnesses": [],
+      "virtual_firmware": true
+    },
+    {
+      "package": "wiki.qaq.inspector",
+      "relation": "Depends",
+      "raw": "uikittools",
+      "selected_witnesses": [
+        "uikittools"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "wiki.qaq.inspector",
+      "relation": "Depends",
+      "raw": "launchctl",
+      "selected_witnesses": [
+        "launchctl"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgcrypt20",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgcrypt20",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgcrypt20",
+      "relation": "Depends",
+      "raw": "libgpg-error0 (>= 1.37)",
+      "selected_witnesses": [
+        "libgpg-error0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "liblz4-1",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "liblz4-1",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libxxhash0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libxxhash0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libp11-kit0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libp11-kit0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libp11-kit0",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libp11-kit0",
+      "relation": "Depends",
+      "raw": "libffi8",
+      "selected_witnesses": [
+        "libffi8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libp11-kit0",
+      "relation": "Depends",
+      "raw": "ca-certificates",
+      "selected_witnesses": [
+        "ca-certificates"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libtasn1-6",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libtasn1-6",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libassuan0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libassuan0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libassuan0",
+      "relation": "Depends",
+      "raw": "libgpg-error0",
+      "selected_witnesses": [
+        "libgpg-error0"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgpg-error0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgpg-error0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libgpg-error0",
+      "relation": "Depends",
+      "raw": "libintl8",
+      "selected_witnesses": [
+        "libintl8"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libnpth0",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libnpth0",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "chariz-keyring",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "havoc-keyring",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpam-modules",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpam-modules",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libpam-modules",
+      "relation": "Depends",
+      "raw": "libpam2",
+      "selected_witnesses": [
+        "libpam2"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libffi8",
+      "relation": "Depends",
+      "raw": "roothide (>= 0.0.6)",
+      "selected_witnesses": [
+        "roothide"
+      ],
+      "virtual_firmware": false
+    },
+    {
+      "package": "libffi8",
+      "relation": "Depends",
+      "raw": "libiosexec1 (>= 1.3.1)",
+      "selected_witnesses": [
+        "libiosexec1"
+      ],
+      "virtual_firmware": false
+    }
+  ],
+  "cycles": [
+    [
+      "libncursesw6",
+      "ncurses-term"
+    ],
+    [
+      "libpam-modules",
+      "libpam2"
+    ]
+  ]
+}

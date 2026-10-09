@@ -1,0 +1,196 @@
+DOMAIN:system/wiki.qaq.irisind
+Warning: Please switch to user/foreground/wiki.qaq.irisind service identifier
+user/501/wiki.qaq.irisind = {
+	active count = 0
+	path = /private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/wiki.qaq.irisind.plist
+	type = LaunchDaemon
+	state = not running
+
+	program = /private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind
+	arguments = {
+		/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind
+	}
+
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	environment = {
+		OSLogRateLimit => 64
+		DISABLE_TWEAKS => 1
+		XPC_SERVICE_NAME => wiki.qaq.irisind
+	}
+
+	domain = user/501
+	umask = 22
+	minimum runtime = 10
+	base minimum runtime = 10
+	exit timeout = 3
+	runs = 1
+	last exit code = 0
+
+	endpoints = {
+		"wiki.qaq.irisin.service" = {
+			port = 0xff09f
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+	}
+	retain only = 0
+
+	resource coalition = {
+		ID = 783
+		type = resource
+		state = active
+		active count = 1
+		name = wiki.qaq.irisind
+	}
+
+	jetsam coalition = {
+		ID = 784
+		type = jetsam
+		state = active
+		active count = 1
+		name = wiki.qaq.irisind
+	}
+
+	spawn type = background (5)
+	jetsam priority = 40
+	jetsam memory limit (active, soft) = 6 MB
+	jetsam memory limit (inactive, hard) = 6 MB
+	jetsamproperties category = daemon
+	submitted job. ignore execute allowed
+	jetsam thread limit = 32
+	cpumon = default
+	exponential throttling grace limit = 10
+
+	properties = partial import | supports transactions | supports pressured exit | abandon process group | inferred program | exponential throttling | needs proxy
+}
+STATUS:0
+DOMAIN:user/0/wiki.qaq.irisind
+Could not print domain: 1: Operation not permitted
+STATUS:1
+DOMAIN:user/501/wiki.qaq.irisind
+user/501/wiki.qaq.irisind = {
+	active count = 0
+	path = /private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/wiki.qaq.irisind.plist
+	type = LaunchDaemon
+	state = not running
+
+	program = /private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind
+	arguments = {
+		/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind
+	}
+
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	environment = {
+		OSLogRateLimit => 64
+		DISABLE_TWEAKS => 1
+		XPC_SERVICE_NAME => wiki.qaq.irisind
+	}
+
+	domain = user/501
+	umask = 22
+	minimum runtime = 10
+	base minimum runtime = 10
+	exit timeout = 3
+	runs = 1
+	last exit code = 0
+
+	endpoints = {
+		"wiki.qaq.irisin.service" = {
+			port = 0xff09f
+			active = 0
+			managed = 1
+			reset = 0
+			hide = 0
+			watching = 1
+		}
+	}
+	retain only = 0
+
+	resource coalition = {
+		ID = 783
+		type = resource
+		state = active
+		active count = 1
+		name = wiki.qaq.irisind
+	}
+
+	jetsam coalition = {
+		ID = 784
+		type = jetsam
+		state = active
+		active count = 1
+		name = wiki.qaq.irisind
+	}
+
+	spawn type = background (5)
+	jetsam priority = 40
+	jetsam memory limit (active, soft) = 6 MB
+	jetsam memory limit (inactive, hard) = 6 MB
+	jetsamproperties category = daemon
+	submitted job. ignore execute allowed
+	jetsam thread limit = 32
+	cpumon = default
+	exponential throttling grace limit = 10
+
+	properties = partial import | supports transactions | supports pressured exit | abandon process group | inferred program | exponential throttling | needs proxy
+}
+STATUS:0
+DOMAIN:gui/501/wiki.qaq.irisind
+STATUS:125
+/private/var/containers/Bundle/Application/.jbroot-000114514191980C/bin/sh: 1: ps: not found
+Warning: Please switch to user/foreground/com.openssh.sshd service identifier
+user/501/com.openssh.sshd = {
+	active count = 0
+	path = /private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.openssh.sshd.plist
+	type = LaunchDaemon
+	state = not running
+
+	program = /var/containers/Bundle/Application/.jbroot-000114514191980C/bin/sh
+	arguments = {
+		/bin/sh
+		/usr/libexec/sshd-keygen-wrapper
+		-i
+	}
+
+	stderr path = /var/containers/Bundle/Application/.jbroot-000114514191980C/dev/null
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	environment = {
+		OSLogRateLimit => 64
+		MallocSpaceEfficient => 0
+		XPC_SERVICE_NAME => com.openssh.sshd
+	}
+
+	domain = user/501
+	minimum runtime = 10
+	base minimum runtime = 10
+	exit timeout = 3
+	runs = 0
+	last exit code = (never exited)
+
+	sockets = {
+		"SSHListener2" = {
+			type = stream
+			service name = 2222
+
+			sockets = {
+				20 (no bytes to read)
+				23 (no bytes to read)
+			}
+
+			active = 0
+			passive = 1
+			bonjour = 0
+			ipv4v6 = 0
+B29_SERVICE_PROBE_END
