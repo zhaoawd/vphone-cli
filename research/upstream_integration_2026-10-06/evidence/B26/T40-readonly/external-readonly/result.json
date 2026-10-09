@@ -1,0 +1,239 @@
+{
+  "scope": "read-only observations only; external dependencies remain mutable",
+  "commands": [
+    {
+      "label": "python-info",
+      "argv": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.venv/bin/python3",
+        "-B",
+        "-c",
+        "import json,sys,sysconfig;print(json.dumps(dict(executable=sys.executable,prefix=sys.prefix,base_prefix=sys.base_prefix,paths=sysconfig.get_paths(),sys_path=sys.path),indent=2))"
+      ],
+      "returncode": 0,
+      "stdout": "python-info.stdout",
+      "stderr": "python-info.stderr"
+    },
+    {
+      "label": "python-native-links",
+      "argv": [
+        "/usr/bin/otool",
+        "-L",
+        "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/bin/python3.14"
+      ],
+      "returncode": 0,
+      "stdout": "python-native-links.stdout",
+      "stderr": "python-native-links.stderr"
+    },
+    {
+      "label": "development-locked-probe",
+      "argv": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/check_python_runtime.py",
+        "--locked",
+        "--json"
+      ],
+      "returncode": 0,
+      "stdout": "development-locked-probe.stdout",
+      "stderr": "development-locked-probe.stderr"
+    },
+    {
+      "label": "installed-locked-probe",
+      "argv": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.venv/bin/python3",
+        "-B",
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Resources/scripts/check_python_runtime.py",
+        "--locked",
+        "--json"
+      ],
+      "returncode": 0,
+      "stdout": "installed-locked-probe.stdout",
+      "stderr": "installed-locked-probe.stderr"
+    },
+    {
+      "label": "iphoneos-sdk-path",
+      "argv": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "iphoneos",
+        "--show-sdk-path"
+      ],
+      "returncode": 0,
+      "stdout": "iphoneos-sdk-path.stdout",
+      "stderr": "iphoneos-sdk-path.stderr"
+    },
+    {
+      "label": "iphoneos-clang-path",
+      "argv": [
+        "/usr/bin/xcrun",
+        "--sdk",
+        "iphoneos",
+        "-f",
+        "clang"
+      ],
+      "returncode": 0,
+      "stdout": "iphoneos-clang-path.stdout",
+      "stderr": "iphoneos-clang-path.stderr"
+    }
+  ],
+  "files": {
+    "selected_project_python": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.venv/bin/python3",
+      "resolved_path": "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "bytes": 52448,
+      "sha256": "02a8df1726463faedb3adef289b3d1bdeabb7785c837fd8c174023aeeeb4d312"
+    },
+    "AVPBooter.vresearch1.bin": {
+      "path": "/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources/AVPBooter.vresearch1.bin",
+      "resolved_path": "/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources/AVPBooter.vresearch1.bin",
+      "bytes": 335688,
+      "sha256": "301bc973b56e86a9906bb6002d008015a57c9e07b5f191260717b97a62589072"
+    },
+    "AVPSEPBooter.vresearch1.bin": {
+      "path": "/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources/AVPSEPBooter.vresearch1.bin",
+      "resolved_path": "/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources/AVPSEPBooter.vresearch1.bin",
+      "bytes": 167936,
+      "sha256": "86d008eb3d203d99fb20962b69227af9f8ecdc98f1c9bd9fed6d3581c655f5b6"
+    },
+    "SDKSettings.plist": {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.4.sdk/SDKSettings.plist",
+      "resolved_path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist",
+      "bytes": 3134,
+      "sha256": "480d7664a09fafdaf71f7bdc8c22634e59864969507de57d88b5a4f7839b5ef6"
+    },
+    "iphoneos-clang": {
+      "path": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "resolved_path": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "bytes": 290664032,
+      "sha256": "fd143191ac2fced606ae76e1a2735bb742b1787c78c802530c8473a554ddf629"
+    }
+  },
+  "tools": {
+    "bash": {
+      "path": "/opt/homebrew/bin/bash",
+      "resolved_path": "/opt/homebrew/Cellar/bash/5.3.9/bin/bash",
+      "bytes": 891808,
+      "sha256": "94d661f8e2d6922f16d5eeb918359750f70d5e9a99fd179d438eeb27bb6ca045"
+    },
+    "zsh": {
+      "path": "/bin/zsh",
+      "resolved_path": "/bin/zsh",
+      "bytes": 2045440,
+      "sha256": "abc56520c469fa4985fca02c5f55621932ad79de4f36440a64a27526f4b535ef"
+    },
+    "python3": {
+      "path": "/opt/homebrew/bin/python3",
+      "resolved_path": "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "bytes": 52448,
+      "sha256": "02a8df1726463faedb3adef289b3d1bdeabb7785c837fd8c174023aeeeb4d312"
+    },
+    "tar": {
+      "path": "/usr/bin/tar",
+      "resolved_path": "/usr/bin/bsdtar",
+      "bytes": 421904,
+      "sha256": "ad4e73ac2e00b3d69969b2e8da466f08c7968a51f424380ecb4d9ff6779b28b9"
+    },
+    "gtar": {
+      "path": "/opt/homebrew/bin/gtar",
+      "resolved_path": "/opt/homebrew/Cellar/gnu-tar/1.35/bin/gtar",
+      "bytes": 456096,
+      "sha256": "49a0bd353ad67347674d00a7b3eeb171da58728f7e4577c9b320d8ab1e7bba66"
+    },
+    "zstd": {
+      "path": "/opt/homebrew/bin/zstd",
+      "resolved_path": "/opt/homebrew/Cellar/zstd/1.5.7_1/bin/zstd",
+      "bytes": 205776,
+      "sha256": "aff8169fb421bb925fb16c44a7e0143fa2c7a941dc45cce76b15062a2ce54917"
+    },
+    "ipsw": {
+      "path": "/opt/homebrew/bin/ipsw",
+      "resolved_path": "/opt/homebrew/Cellar/ipsw/3.1.672/bin/ipsw",
+      "bytes": 67580178,
+      "sha256": "4898166ae40d03fdfdf995dee1ccf3dc81c49426c82b0c7429f1fb9062cb6171"
+    },
+    "aea": {
+      "path": "/usr/bin/aea",
+      "resolved_path": "/usr/bin/aea",
+      "bytes": 337040,
+      "sha256": "16bfbb1c09b092ef0996191ba5e152485fad40be8b28736bf40f68f1628e6c10"
+    },
+    "ldid": {
+      "path": "/opt/homebrew/bin/ldid",
+      "resolved_path": "/opt/homebrew/Cellar/ldid-procursus/2.1.5-procursus7_2/bin/ldid",
+      "bytes": 256064,
+      "sha256": "932cfe6d92f07dca3e85a8288a43271aa8e9c0881f026fdcdecaecfbf1a7dea4"
+    },
+    "insert_dylib": {
+      "exists": false
+    },
+    "trustcache": {
+      "exists": false
+    },
+    "xcrun": {
+      "path": "/usr/bin/xcrun",
+      "resolved_path": "/usr/bin/xcrun",
+      "bytes": 199024,
+      "sha256": "bbe7671518a3905f9d3fce54312fbc77c2876b0d62aca74a0688fa869d31a8a9"
+    },
+    "clang": {
+      "path": "/usr/bin/clang",
+      "resolved_path": "/usr/bin/clang",
+      "bytes": 200560,
+      "sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+    },
+    "curl": {
+      "path": "/usr/bin/curl",
+      "resolved_path": "/usr/bin/curl",
+      "bytes": 829680,
+      "sha256": "625cd93eb0043214d5f74974d34f0b4d748977473e236a2e7f4704ecc2b95950"
+    },
+    "aria2c": {
+      "path": "/opt/homebrew/bin/aria2c",
+      "resolved_path": "/opt/homebrew/Cellar/aria2/1.37.0_2/bin/aria2c",
+      "bytes": 3347200,
+      "sha256": "4eb7484523bef8e803649b9c486abcf488ea53c645821836c7e0d604cdd4d5c9"
+    },
+    "wget": {
+      "path": "/opt/homebrew/bin/wget",
+      "resolved_path": "/opt/homebrew/Cellar/wget/1.25.0/bin/wget",
+      "bytes": 472528,
+      "sha256": "1530ca1b4052cc539c324e43ca7048d24ee260f6bda0f16e80130d1eeee95432"
+    },
+    "hdiutil": {
+      "path": "/usr/bin/hdiutil",
+      "resolved_path": "/usr/bin/hdiutil",
+      "bytes": 763552,
+      "sha256": "82b49498870a824e8dcbddee86ee8f321a0b5d3577d5e171f94c357892e555ff"
+    },
+    "diskutil": {
+      "path": "/usr/sbin/diskutil",
+      "resolved_path": "/usr/sbin/diskutil",
+      "bytes": 2971200,
+      "sha256": "81c90e225c6c28f812d2f2563be7fefa630266b592ca2fe02fe590fd67fca5ac"
+    },
+    "shasum": {
+      "path": "/usr/bin/shasum",
+      "resolved_path": "/usr/bin/shasum",
+      "bytes": 9979,
+      "sha256": "0812595f981a26f813d98dc380af14d4af427626c9339eda29eb849ae13de1e3"
+    },
+    "cp": {
+      "path": "/bin/cp",
+      "resolved_path": "/bin/cp",
+      "bytes": 251328,
+      "sha256": "d7e1aa741105cfce82c6e7b2ea1359c715a570f86ce711e492c41315632ea182"
+    },
+    "find": {
+      "path": "/usr/bin/find",
+      "resolved_path": "/usr/bin/find",
+      "bytes": 269168,
+      "sha256": "419f5b358926c458cdd439c5d50067de6a27b28f91ff6964d03f628be7c873e3"
+    }
+  },
+  "limitations": [
+    "Executable and SDKSettings hashes do not cover frameworks, stdlib, package payloads, SDK contents or compiler resources",
+    "Host PATH observation is not the rebuilt CFW PATH or immutable dependency selection",
+    "No packages, tools, SDK, ROM, existing VM inputs or caches were copied or frozen",
+    "Locked package versions and capability probe do not verify installed package bytes"
+  ]
+}

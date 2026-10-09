@@ -1,0 +1,176 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[5/38] Compiling asr.c
+[6/38] Compiling download.c
+[6/38] Compiling fdr.c
+[6/38] Compiling deviceinterfaced.c
+[7/38] Compiling recovery.c
+[10/38] Compiling ipsw.c
+[11/38] Compiling limera1n.c
+[12/38] Compiling img3.c
+[13/38] Compiling ace3.c
+[14/38] Compiling dfu.c
+[15/38] Compiling img4.c
+[16/38] Compiling normal.c
+[17/38] Compiling restore.c
+[18/38] Compiling mbn.c
+[19/38] Compiling ftab.c
+[20/38] Compiling fls.c
+[21/38] Compiling log.c
+[21/38] Compiling locking.c
+[23/38] Compiling vphone_zip_stub.c
+[24/38] Compiling common.c
+[25/38] Compiling idevicerestore.c
+[26/38] Compiling vphone_restore_bridge.c
+[27/38] Compiling MobileRecoveryCore libirecovery.c
+[29/39] Emitting module VPhoneCoreTests
+[30/39] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:34:25: error: extra arguments at positions #4, #5 in call
+ 32 | 
+ 33 |         func capture(capacity: Int64 = Int64.max) throws -> VPhoneCreateResourceSnapshot {
+ 34 |             try .capture(resources: source, executable: cli, storage: storage, romSource: rom, sepromSource: seprom, availableBytes: { _ in capacity })
+    |                         `- error: extra arguments at positions #4, #5 in call
+ 35 |         }
+ 36 |         func cleanup() { try? FileManager.default.removeItem(at: root) }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:71:49: error: value of type 'VPhoneCreateResourceSnapshot' has no member 'romSource'
+ 69 |         try Data("rom-B".utf8).write(to: f.rom)
+ 70 |         try Data("sep-B".utf8).write(to: f.seprom)
+ 71 |         #expect(try String(contentsOf: snapshot.romSource, encoding: .utf8) == "rom-A")
+    |                                                 `- error: value of type 'VPhoneCreateResourceSnapshot' has no member 'romSource'
+ 72 |         #expect(try String(contentsOf: snapshot.sepromSource, encoding: .utf8) == "sep-A")
+ 73 |         #expect(snapshot.manifest.entries.contains { $0.path == "ROMs/AVPBooter.vresearch1.bin" && $0.bytes == 5 && $0.sha256 != nil })
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:72:49: error: value of type 'VPhoneCreateResourceSnapshot' has no member 'sepromSource'
+ 70 |         try Data("sep-B".utf8).write(to: f.seprom)
+ 71 |         #expect(try String(contentsOf: snapshot.romSource, encoding: .utf8) == "rom-A")
+ 72 |         #expect(try String(contentsOf: snapshot.sepromSource, encoding: .utf8) == "sep-A")
+    |                                                 `- error: value of type 'VPhoneCreateResourceSnapshot' has no member 'sepromSource'
+ 73 |         #expect(snapshot.manifest.entries.contains { $0.path == "ROMs/AVPBooter.vresearch1.bin" && $0.bytes == 5 && $0.sha256 != nil })
+ 74 |         #expect(snapshot.manifest.entries.contains { $0.path == "ROMs/AVPSEPBooter.vresearch1.bin" && $0.bytes == 5 && $0.sha256 != nil })
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:117:53: error: extra arguments at positions #4, #5 in call
+115 |         try FileManager.default.createSymbolicLink(at: f.rom, withDestinationURL: original)
+116 |         #expect(throws: Error.self) {
+117 |             try VPhoneCreateResourceSnapshot.capture(resources: f.source, executable: f.cli, storage: f.storage,
+    |                                                     `- error: extra arguments at positions #4, #5 in call
+118 |                 romSource: f.rom, sepromSource: f.seprom, availableBytes: { _ in
+119 |                     try FileManager.default.removeItem(at: f.rom)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:132:53: error: extra arguments at positions #4, #5 in call
+130 |         defer { try? observedTarget?.close() }
+131 |         #expect(throws: Error.self) {
+132 |             try VPhoneCreateResourceSnapshot.capture(resources: f.source, executable: f.cli, storage: f.storage,
+    |                                                     `- error: extra arguments at positions #4, #5 in call
+133 |                 romSource: f.rom, sepromSource: f.seprom, availableBytes: { _ in Int64.max }, beforeCopy: { source, target in
+134 |                     guard source.path == f.rom.path else { return }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:329:53: error: extra arguments at positions #4, #5 in call
+327 |         defer { try? observedTarget?.close() }
+328 |         #expect(throws: Error.self) {
+329 |             try VPhoneCreateResourceSnapshot.capture(resources: f.source, executable: f.cli, storage: f.storage, romSource: f.rom, sepromSource: f.seprom,
+    |                                                     `- error: extra arguments at positions #4, #5 in call
+330 |                 availableBytes: { _ in Int64.max }, beforeCopy: { source, target in
+331 |                     guard source.path == growing.path else { return }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:368:64: error: extra arguments at positions #4, #5 in call
+366 |             #expect(changedMetadata)
+367 |         }
+368 |         let snapshot = try VPhoneCreateResourceSnapshot.capture(resources: f.source, executable: f.cli, storage: f.storage, romSource: f.rom, sepromSource: f.seprom,
+    |                                                                `- error: extra arguments at positions #4, #5 in call
+369 |             availableBytes: { _ in
+370 |                 if timing == "afterInventory" { try changeMetadata() }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:383:53: error: extra arguments at positions #4, #5 in call
+381 |         let f = try Fixture(); defer { f.cleanup() }
+382 |         #expect(throws: Error.self) {
+383 |             try VPhoneCreateResourceSnapshot.capture(resources: f.source, executable: f.cli, storage: f.storage, romSource: f.rom, sepromSource: f.seprom,
+    |                                                     `- error: extra arguments at positions #4, #5 in call
+384 |                 availableBytes: { _ in Int64.max }, beforeCopy: { source, _ in
+385 |                     guard source.path == f.source.fwPrepareScript.path else { return }
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift:414:53: error: extra arguments at positions #4, #5 in call
+412 |         try FileManager.default.createSymbolicLink(at: link, withDestinationURL: original)
+413 |         #expect(throws: Error.self) {
+414 |             try VPhoneCreateResourceSnapshot.capture(resources: f.source, executable: f.cli, storage: f.storage, romSource: f.rom, sepromSource: f.seprom,
+    |                                                     `- error: extra arguments at positions #4, #5 in call
+415 |                 availableBytes: { _ in
+416 |                     try FileManager.default.removeItem(at: link)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:58:25: note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 56 |     }
+ 57 | 
+ 58 |     package static func capture(resources source: VPhoneResources, executable cli: URL, storage: URL,
+    |                         `- note: 'capture(resources:executable:storage:availableBytes:beforeCopy:)' declared here
+ 59 |                                 availableBytes: (URL) throws -> Int64,
+ 60 |                                 beforeCopy: ((URL, URL) throws -> Void)? = nil) throws -> VPhoneCreateResourceSnapshot {
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError

@@ -1,0 +1,104 @@
+{
+  "batch": "B26",
+  "date": "2026-10-09",
+  "base_head": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e",
+  "implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "source_commits": [
+    "b4e80c575950d768737234f9fcefc7fb7aff6081"
+  ],
+  "selected_tasks": [
+    "T08",
+    "T24",
+    "T40",
+    "T46"
+  ],
+  "newly_accepted": [],
+  "all_tasks": {
+    "accepted": 8,
+    "required_remaining": 38,
+    "optional": 1
+  },
+  "results": {
+    "T08": {
+      "status": "fixed_overlay_memory_rotation_verified_actual_RootHide_service_pending",
+      "result": "B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。",
+      "remaining": [
+        "实际RootHide客户机状态及服务验收；vm-new当前只有rootless布局证据，需活客户机核对或已知RootHide样本",
+        "services.start状态144及部分旋转未生效，原因未查明"
+      ]
+    },
+    "T24": {
+      "status": "host_native_dependency_closure_verified_TCC_and_historical_helper_runtime_pending",
+      "result": "B26精确时间窗/路径的AMFI日志确认B25最终VM的ad hoc与restricted entitlements组合被-424拒绝；新b4e80c57冻结VM subprocess返回-9并有同类精确日志，尚未执行临时AMFI。历史v1实物仍未配置、未注册；有正常签名历史重建方案但未实施，不替代历史实物验收。",
+      "remaining": [
+        "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线；当前VM被AMFI拒绝，新工件临时范围待明确回复",
+        "历史v1 helper实物缺配置及签名团队；实际历史服务与最终客户端XPC拒绝矩阵未完成",
+        "Python framework、包、PATH工具和现场编译不属于宿主Mach-O封装闭包"
+      ]
+    },
+    "T40": {
+      "status": "attempt_resources_and_ROM_snapshot_verified_external_toolchain_and_origin_matrix_pending",
+      "result": "B26两份Virtualization ROM纳入每attempt副本、预算、manifest、fingerprint和resume身份；生产new及prepare refresh共用副本，普通vm new保持原逻辑。29 issues行为RED后定向27项/2套件通过，标准Swift及签名构建/Bundle检查通过。最终安装副本238条目、161819103字节；两ROM共503624字节与系统源摘要匹配，签名有效；显式已有项目Python依赖锁探针通过。另生产53580180 CLI的41条只读命令、10组拒绝及6组0GiB传输通过，opaque历史receipt仅验证字节保全。",
+      "remaining": [
+        "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、既有cfw_input及可变缓存仍未形成不可变闭包",
+        "新机可信store binding/receipt发布及带可信既有binding/receipt的实际VM传输验收",
+        "kernel-only及环境升级/回退、混合版本四层来源矩阵；依赖T12/T17/T32/T34生产能力",
+        "完整64GiB VM归档往返空间仍不足；vm-new当前分配约21.02GiB，尚未执行完整往返；同卷APFS副本不证明物理独立备份"
+      ]
+    },
+    "T46": {
+      "status": "ordinary_UI_quit_escaped_writer_and_cross_process_transport_faults_verified_full_runtime_pending",
+      "result": "B26解锁后完成53580180最终签名Launchpad隔离副本两组实际UI退出：普通writer立即退出；setsid后代持管道时取消退出，释放后退出。每组10002行/138939字节精确匹配，包含ANSI/CRLF和无换行panic尾部；应用/writer均退出。另正常签名的两进程临时XPCService直接复用生产service/output/receiver/writer，通过正常ACK、默认30秒无ACK、连接失效及真实只读FD的EBADF写失败。未覆盖固定privileged Mach入口、生产Client.request或真实Store；临时harness签名/actor隔离失败保留，修复仅在harness。",
+      "remaining": [
+        "完整panic/取消/轮换、UI响应及实际VM吞吐矩阵",
+        "系统特权helper与生产客户端的异步ACK缺失/30秒超时/XPC断线/写入失败完整组合；transport断线行仅证明客户端观察到失效，未直接观察服务器worker退出"
+      ]
+    }
+  },
+  "validation": {
+    "swift-standard": {
+      "command": [
+        "make",
+        "test_swift"
+      ],
+      "exit": 0,
+      "seconds": 114.43109258299228
+    },
+    "signed-build": {
+      "command": [
+        "make",
+        "launchpad",
+        "check_bundle",
+        "check_launchpad"
+      ],
+      "exit": 0,
+      "seconds": 135.68360387498979
+    },
+    "installed-snapshot": {
+      "command": [
+        "swift",
+        "test",
+        "--skip-build",
+        "--disable-sandbox",
+        "--cache-path",
+        ".build/test-cache",
+        "--filter",
+        "CreateResourceSnapshotTests.actualBuildResourceCopyRunsReadOnlyProbes"
+      ],
+      "exit": 0,
+      "seconds": 9.802283625002019,
+      "python_candidate": "/Users/qcz3840/github/vphone-cli/.venv/bin/python3"
+    }
+  },
+  "UI_source_build_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+  "ROM_source_build_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "AMFI_changed": false,
+  "TCC_changed": false,
+  "VM_booted": false,
+  "runtime_scope": "B26/runtime-prepared/scope.json",
+  "AMFI_scope_status": "prepared_pending_explicit_reply",
+  "evidence_files": 452,
+  "evidence_bytes": 8551654,
+  "helper_transport_review": "B26/helper-review.json",
+  "ROM_review": "B26/rom-review.json"
+}

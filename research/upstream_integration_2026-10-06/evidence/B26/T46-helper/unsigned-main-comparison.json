@@ -1,0 +1,48 @@
+{
+  "raw_unsigned_files": [
+    {
+      "label": "compiled",
+      "argv": [
+        "codesign",
+        "--remove-signature",
+        "/private/tmp/vphone-b26-t46-helper/compiled-unsigned-comparison"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "unsigned_sha256": "d0a01421de87761da1b19e78e7a8d695f735b4a76a004a15b8e4e7c44e40cd50"
+    },
+    {
+      "label": "client",
+      "argv": [
+        "codesign",
+        "--remove-signature",
+        "/private/tmp/vphone-b26-t46-helper/client-unsigned-comparison"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "unsigned_sha256": "e68fc572bcc624cf5e208c36b0889e89a2aa50c2f4d7ba467fb1cffdd44f723a"
+    },
+    {
+      "label": "service",
+      "argv": [
+        "codesign",
+        "--remove-signature",
+        "/private/tmp/vphone-b26-t46-helper/service-unsigned-comparison"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "unsigned_sha256": "e68fc572bcc624cf5e208c36b0889e89a2aa50c2f4d7ba467fb1cffdd44f723a"
+    }
+  ],
+  "signed_client_service_equal": true,
+  "compiled_vs_signed_only_difference": {
+    "MachO_field": "LC_SEGMENT_64 __LINKEDIT.vmsize",
+    "field_file_offset": 3472,
+    "compiled_value": 2523136,
+    "signed_value": 2506752
+  },
+  "all_other_bytes_equal": true
+}

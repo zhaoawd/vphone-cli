@@ -1,0 +1,70 @@
+{
+  "base_head": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e",
+  "implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "source_commits": [
+    "b4e80c575950d768737234f9fcefc7fb7aff6081"
+  ],
+  "files": [
+    {
+      "path": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "copy": "VPhoneCreateResourceSnapshot.final.swift",
+      "bytes": 19933,
+      "sha256": "d8076ab755e74922484e12f60a57832ee837dcecc4298a811624daa9f375b13f"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+      "copy": "VPhoneCreateOrchestrator.final.swift",
+      "bytes": 60913,
+      "sha256": "9e6ac07627cb1a468ab1ba296948deb72673eabb3d78914f9367d53667dc7dba"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "copy": "CreateResourceSnapshotTests.final.swift",
+      "bytes": 27304,
+      "sha256": "f2110fd2ff4d94994dc8822089503d7fbd44153d7670333dd29e67ce55042778"
+    },
+    {
+      "path": "tests/VPhoneCLITests/CreateResourceFreezeTests.swift",
+      "copy": "CreateResourceFreezeTests.final.swift",
+      "bytes": 8348,
+      "sha256": "cae2aadf2fec2123a4af4ad6c039c8b5f58f30ee8de005d08fbbbe1d619c22ad"
+    }
+  ],
+  "review": "B26/rom-review.json",
+  "validation": {
+    "swift-standard": {
+      "command": [
+        "make",
+        "test_swift"
+      ],
+      "exit": 0,
+      "seconds": 114.43109258299228
+    },
+    "signed-build": {
+      "command": [
+        "make",
+        "launchpad",
+        "check_bundle",
+        "check_launchpad"
+      ],
+      "exit": 0,
+      "seconds": 135.68360387498979
+    },
+    "installed-snapshot": {
+      "command": [
+        "swift",
+        "test",
+        "--skip-build",
+        "--disable-sandbox",
+        "--cache-path",
+        ".build/test-cache",
+        "--filter",
+        "CreateResourceSnapshotTests.actualBuildResourceCopyRunsReadOnlyProbes"
+      ],
+      "exit": 0,
+      "seconds": 9.802283625002019,
+      "python_candidate": "/Users/qcz3840/github/vphone-cli/.venv/bin/python3"
+    }
+  },
+  "scope": "仅T40两ROM冻结源码增量；T08/T24为只读诊断，T46为既有生产代码实际UI/transport验证。"
+}

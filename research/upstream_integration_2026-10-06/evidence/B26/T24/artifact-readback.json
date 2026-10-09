@@ -1,0 +1,218 @@
+{
+  "timestamp": "2026-10-09T11:49:03.722608+00:00",
+  "scope": "Read-only artifact validation; no VM execution, GUI, service registration, signing, TCC or AMFI changes.",
+  "head": {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e\n",
+    "stderr": ""
+  },
+  "artifacts": {
+    "vm": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "exists": true,
+      "sha256": "0dfa9ca618e10ce81fdbed8bbf428c78af1fc9457cb281bf361f2dc5a71d0034",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-555549446f18b70f10d63aef8045537beb1c345d\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=118859 flags=0x2(adhoc) hashes=3703+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=77b509d8ce341c832d54c827f0a48b724791342e\nCandidateCDHashFull sha256=77b509d8ce341c832d54c827f0a48b724791342e6d2f0dbf4f5995d9558c6ade\nHash choices=sha256\nCMSDigest=77b509d8ce341c832d54c827f0a48b724791342e6d2f0dbf4f5995d9558c6ade\nCMSDigestType=2\nCDHash=77b509d8ce341c832d54c827f0a48b724791342e\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.private.bmk.allow</key><true/><key>com.apple.private.virtualization</key><true/><key>com.apple.private.virtualization.security-research</key><true/><key>com.apple.security.get-task-allow</key><true/><key>com.apple.security.personal-information.location</key><true/><key>com.apple.security.virtualization</key><true/><key>com.apple.vm.networking</key><true/></dict></plist>\n",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    "embedded_vm": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "exists": true,
+      "sha256": "0dfa9ca618e10ce81fdbed8bbf428c78af1fc9457cb281bf361f2dc5a71d0034",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm\nIdentifier=vphone-vm-555549446f18b70f10d63aef8045537beb1c345d\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=118859 flags=0x2(adhoc) hashes=3703+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=77b509d8ce341c832d54c827f0a48b724791342e\nCandidateCDHashFull sha256=77b509d8ce341c832d54c827f0a48b724791342e6d2f0dbf4f5995d9558c6ade\nHash choices=sha256\nCMSDigest=77b509d8ce341c832d54c827f0a48b724791342e6d2f0dbf4f5995d9558c6ade\nCMSDigestType=2\nCDHash=77b509d8ce341c832d54c827f0a48b724791342e\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.private.bmk.allow</key><true/><key>com.apple.private.virtualization</key><true/><key>com.apple.private.virtualization.security-research</key><true/><key>com.apple.security.get-task-allow</key><true/><key>com.apple.security.personal-information.location</key><true/><key>com.apple.security.virtualization</key><true/><key>com.apple.vm.networking</key><true/></dict></plist>\n",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    "debug_vm": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-vm",
+      "exists": true,
+      "sha256": "e4b43220a4da6fcc50825023b45cec0e622827ad072b429b25b995d785223d38",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-vm\nIdentifier=vphone-vm-55554944288aae7e8b1a38a1a578d05daebdc8cf\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=143307 flags=0x2(adhoc) hashes=4467+7 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=6096705b546bda9763c774365b599959306bcc68\nCandidateCDHashFull sha256=6096705b546bda9763c774365b599959306bcc68ecf314ee9ada82fad1a2bfce\nHash choices=sha256\nCMSDigest=6096705b546bda9763c774365b599959306bcc68ecf314ee9ada82fad1a2bfce\nCMSDigestType=2\nCDHash=6096705b546bda9763c774365b599959306bcc68\nSignature=adhoc\nInfo.plist=not bound\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>com.apple.security.get-task-allow</key><true/></dict></plist>\n",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-vm\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-vm"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    },
+    "historical_v1_helper": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper",
+      "exists": true,
+      "sha256": "bbc0917c2d5551de48b2eff7db8396c1c1d9a7d62f48eecdacf66a82da48b3c4",
+      "checks": [
+        {
+          "argv": [
+            "codesign",
+            "-dvvv",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper\nIdentifier=com.vphone.cli.helper\nFormat=Mach-O thin (arm64)\nCodeDirectory v=20400 size=3470 flags=0x2(adhoc) hashes=103+2 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=fbc4eeacedab7ae67078d66352e0985c7b73d9a8\nCandidateCDHashFull sha256=fbc4eeacedab7ae67078d66352e0985c7b73d9a808e41d68a984620e6d9a3e8f\nHash choices=sha256\nCMSDigest=fbc4eeacedab7ae67078d66352e0985c7b73d9a808e41d68a984620e6d9a3e8f\nCMSDigestType=2\nCDHash=fbc4eeacedab7ae67078d66352e0985c7b73d9a8\nSignature=adhoc\nInfo.plist entries=5\nTeamIdentifier=not set\nSealed Resources=none\nInternal requirements count=0 size=12\nTotal signatures=1\nChosen signature=1\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "-d",
+            "--entitlements",
+            "-",
+            "--xml",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper\n"
+        },
+        {
+          "argv": [
+            "codesign",
+            "--verify",
+            "--strict",
+            "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper"
+          ],
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "configuration_check": {
+        "argv": [
+          "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B13/prior-helper-candidate/com.vphone.cli.helper",
+          "--check-configuration"
+        ],
+        "exit_code": 78,
+        "stdout": "",
+        "stderr": "Helper signing team is not configured. Supply a valid 10-character Apple Team ID and matching signing identity.\n"
+      }
+    }
+  },
+  "installed_helper_exists": false,
+  "launchd_job": {
+    "argv": [
+      "launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit_code": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n"
+  },
+  "csrutil_status": {
+    "argv": [
+      "/usr/bin/csrutil",
+      "status"
+    ],
+    "exit_code": 0,
+    "stdout": "System Integrity Protection status: unknown (Custom Configuration).\n\nConfiguration:\n\tApple Internal: disabled\n\tKext Signing: enabled\n\tFilesystem Protections: enabled\n\tDebugging Restrictions: disabled\n\tDTrace Restrictions: enabled\n\tNVRAM Protections: enabled\n\tBaseSystem Verification: enabled\n\tBoot-arg Restrictions: enabled\n\tKernel Integrity Protections: enabled\n\tAuthenticated Root Requirement: enabled\n\nThis is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.\n",
+    "stderr": ""
+  },
+  "bootargs_sandbox_probe": {
+    "argv": [
+      "/usr/sbin/sysctl",
+      "kern.bootargs"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sysctl: sysctl fmt -1 1024 1: Operation not permitted\n"
+  }
+}

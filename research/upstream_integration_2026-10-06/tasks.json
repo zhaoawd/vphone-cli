@@ -1393,7 +1393,10 @@
         "evidence/B24-final-readback.json",
         "evidence/B25-summary.json",
         "evidence/B25-source-review.json",
-        "evidence/B25-evidence-manifest.json"
+        "evidence/B25-evidence-manifest.json",
+        "evidence/B26-summary.json",
+        "evidence/B26-source-review.json",
+        "evidence/B26-evidence-manifest.json"
       ],
       "historical_evidence": [],
       "acceptance_limits": [
@@ -1401,13 +1404,14 @@
         "services.start返回144；部分app/角度旋转未生效，原因未查明",
         "内存结果仅覆盖B22固定候选和恢复副本；API_ONLY未替换生产classic"
       ],
-      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。",
+      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。",
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
       "remaining_work": [
-        "实际RootHide客户机服务验收；用户测试路径待回复",
-        "services.start状态144及未生效rotation范围，原因未查明"
+        "实际RootHide客户机状态及服务验收；vm-new当前只有rootless布局证据，需活客户机核对或已知RootHide样本",
+        "services.start状态144及部分旋转未生效，原因未查明"
       ],
-      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081"
     },
     {
       "id": "T09",
@@ -2668,18 +2672,22 @@
         "evidence/B24-final-readback.json",
         "evidence/B25-summary.json",
         "evidence/B25-source-review.json",
-        "evidence/B25-evidence-manifest.json"
+        "evidence/B25-evidence-manifest.json",
+        "evidence/B26-summary.json",
+        "evidence/B26-source-review.json",
+        "evidence/B26-evidence-manifest.json"
       ],
       "historical_evidence": [],
-      "current_result": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。 B24生产客户端连接受控protocol-v1系统Mach服务，verify/install各在无日志、新日志、已有日志设置下均退出1；只调用7次version，未调用旧安装/验证方法，新日志未创建、已有日志未变。临时服务已卸载；不代表历史helper二进制、生产listener身份校验或TCC责任链。 B25递归封装宿主Mach-O依赖至Contents/Frameworks，重写相对引用并按嵌套代码后主可执行文件顺序签名。真实副本7个宿主映像逐个及整体签名通过；沙箱确认原Homebrew库读取被拒绝，同策略ldid提取和trustcache创建/读取退出0。历史v1未配置helper实物已定位，SHA256及内嵌版本保全，只读配置检查退出78；没有安装或启动该历史服务。TCC静态链已记录，实际责任归属未验收。",
+      "current_result": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。 B24生产客户端连接受控protocol-v1系统Mach服务，verify/install各在无日志、新日志、已有日志设置下均退出1；只调用7次version，未调用旧安装/验证方法，新日志未创建、已有日志未变。临时服务已卸载；不代表历史helper二进制、生产listener身份校验或TCC责任链。 B25递归封装宿主Mach-O依赖至Contents/Frameworks，重写相对引用并按嵌套代码后主可执行文件顺序签名。真实副本7个宿主映像逐个及整体签名通过；沙箱确认原Homebrew库读取被拒绝，同策略ldid提取和trustcache创建/读取退出0。历史v1未配置helper实物已定位，SHA256及内嵌版本保全，只读配置检查退出78；没有安装或启动该历史服务。TCC静态链已记录，实际责任归属未验收。 B26精确时间窗/路径的AMFI日志确认B25最终VM的ad hoc与restricted entitlements组合被-424拒绝；新b4e80c57冻结VM subprocess返回-9并有同类精确日志，尚未执行临时AMFI。历史v1实物仍未配置、未注册；有正常签名历史重建方案但未实施，不替代历史实物验收。",
       "remaining_work": [
-        "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线",
-        "历史v1 helper未配置签名团队；仍缺历史服务与最终客户端的实际XPC拒绝矩阵",
-        "Python framework、包、PATH工具和现场编译不属于本轮宿主Mach-O封装范围；部分旧证书候选当前签名信任检查失败，记录保留，未新安装"
+        "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线；当前VM被AMFI拒绝，新工件临时范围待明确回复",
+        "历史v1 helper实物缺配置及签名团队；实际历史服务与最终客户端XPC拒绝矩阵未完成",
+        "Python framework、包、PATH工具和现场编译不属于宿主Mach-O封装闭包"
       ],
       "latest_vm_observation": "受控本地Bundle绑定VM实际启动并正常停机；未完成完整TCC负责应用链。",
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
-      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081"
     },
     {
       "id": "T25",
@@ -3781,7 +3789,7 @@
         "T05",
         "T24"
       ],
-      "status": "attempt_resource_snapshot_verified_external_toolchain_and_origin_matrix_pending",
+      "status": "attempt_resources_and_ROM_snapshot_verified_external_toolchain_and_origin_matrix_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
@@ -3830,7 +3838,7 @@
           "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
           "tests/VPhoneCLITests/CreateResourceFreezeTests.swift"
         ],
-        "batch_source_manifest": "evidence/B25-source-review.json"
+        "batch_source_manifest": "evidence/B26-source-review.json"
       },
       "implementation_commits": [
         "0cf9383c7fd2f257cb5afa60f1e327ae4dc9854a",
@@ -3844,7 +3852,8 @@
         "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d",
         "a45c91915f6343733d1fde7e20180ee80cee7b57",
         "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
-        "53580180f09819ec539ba656c15fab7a23fdc1c3"
+        "53580180f09819ec539ba656c15fab7a23fdc1c3",
+        "b4e80c575950d768737234f9fcefc7fb7aff6081"
       ],
       "verification_evidence": [
         "evidence/B06-summary.json",
@@ -3880,18 +3889,22 @@
         "evidence/B24-final-readback.json",
         "evidence/B25-summary.json",
         "evidence/B25-source-review.json",
-        "evidence/B25-evidence-manifest.json"
+        "evidence/B25-evidence-manifest.json",
+        "evidence/B26-summary.json",
+        "evidence/B26-source-review.json",
+        "evidence/B26-evidence-manifest.json"
       ],
       "historical_evidence": [],
-      "current_result": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。 B24新增每个未完成创建阶段前CLI/配对VM摘要复验；CLI替换、VM替换及VM不可读的三种回归场景通过。实际CLI在两种归档后端完成0GiB合成VM的clone/rename/export/import，8个持久文件摘要和权限一致，保留构造的四层binding与opaque历史receipt；该receipt不提供可信store授权。 独立审查后补充初始摘要不可读、resume接受nil仍不得运行及恢复提示回归；运行中工具拒绝不再分类为checkpoint未写入。 最终a45c9191源码签名客户端再次通过native/system-tar两种合成往返，归档1272/1416字节。 B25每attempt使用CLI/VM及所选资源的私有副本和聚合摘要；executor/verifier/prober及内部TaskLocal解析共用副本。resume变更未经确认拒绝，确认后整体换用新副本，保留此前阶段来源。副本最多8份、合计2GiB、64MiB余量；成功或未接受attempt释放，失败已接受attempt保留。审查发现并修复debs.list遗漏、Disk.img链接别名绕过、复制增长超预算3项。开发副本只读CLI/VM探针通过；最终签名App资源副本235个entry、161310727字节，CLI resources与静态签名检查退出0；原VM及副本VM --help均退出9，原因未查明，外部Python探针不可用。",
+      "current_result": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。 B24新增每个未完成创建阶段前CLI/配对VM摘要复验；CLI替换、VM替换及VM不可读的三种回归场景通过。实际CLI在两种归档后端完成0GiB合成VM的clone/rename/export/import，8个持久文件摘要和权限一致，保留构造的四层binding与opaque历史receipt；该receipt不提供可信store授权。 独立审查后补充初始摘要不可读、resume接受nil仍不得运行及恢复提示回归；运行中工具拒绝不再分类为checkpoint未写入。 最终a45c9191源码签名客户端再次通过native/system-tar两种合成往返，归档1272/1416字节。 B25每attempt使用CLI/VM及所选资源的私有副本和聚合摘要；executor/verifier/prober及内部TaskLocal解析共用副本。resume变更未经确认拒绝，确认后整体换用新副本，保留此前阶段来源。副本最多8份、合计2GiB、64MiB余量；成功或未接受attempt释放，失败已接受attempt保留。审查发现并修复debs.list遗漏、Disk.img链接别名绕过、复制增长超预算3项。开发副本只读CLI/VM探针通过；最终签名App资源副本235个entry、161310727字节，CLI resources与静态签名检查退出0；原VM及副本VM --help均退出9，原因未查明，外部Python探针不可用。 B26两份Virtualization ROM纳入每attempt副本、预算、manifest、fingerprint和resume身份；生产new及prepare refresh共用副本，普通vm new保持原逻辑。29 issues行为RED后定向27项/2套件通过，标准Swift及签名构建/Bundle检查通过。最终安装副本238条目、161819103字节；两ROM共503624字节与系统源摘要匹配，签名有效；显式已有项目Python依赖锁探针通过。另生产53580180 CLI的41条只读命令、10组拒绝及6组0GiB传输通过，opaque历史receipt仅验证字节保全。",
       "remaining_work": [
-        "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、Virtualization ROM、既有cfw_input及可变缓存未形成不可变闭包",
+        "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、既有cfw_input及可变缓存仍未形成不可变闭包",
         "新机可信store binding/receipt发布及带可信既有binding/receipt的实际VM传输验收",
         "kernel-only及环境升级/回退、混合版本四层来源矩阵；依赖T12/T17/T32/T34生产能力",
-        "完整64GiB VM归档往返空间仍不足；同卷APFS副本不证明物理独立备份"
+        "完整64GiB VM归档往返空间仍不足；vm-new当前分配约21.02GiB，尚未执行完整往返；同卷APFS副本不证明物理独立备份"
       ],
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
-      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081"
     },
     {
       "id": "T41",
@@ -4264,7 +4277,7 @@
         "T02",
         "T24"
       ],
-      "status": "ordinary_command_drain_implemented_final_UI_blocked_by_host_lock_full_runtime_pending",
+      "status": "ordinary_UI_quit_escaped_writer_and_cross_process_transport_faults_verified_full_runtime_pending",
       "upstream_paths": [
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLineReader.swift",
         "VPhoneLaunchpad/VPhoneLaunchpad/HostSetup/VPhoneLaunchpadHelperClient.swift",
@@ -4358,17 +4371,20 @@
         "evidence/B24-final-readback.json",
         "evidence/B25-summary.json",
         "evidence/B25-source-review.json",
-        "evidence/B25-evidence-manifest.json"
+        "evidence/B25-evidence-manifest.json",
+        "evidence/B26-summary.json",
+        "evidence/B26-source-review.json",
+        "evidence/B26-evidence-manifest.json"
       ],
       "historical_evidence": [],
-      "current_result": "修复detached父进程退出但后代仍写日志时误报完整；确认进程组消失后再次读取，修复EOF与组消失之间的尾部遗漏。两项RED复现后44项/12套件通过，复审无剩余发现；真实VM正常SIGINT停机11.352秒且保留classicAccepted及Guest stopped尾部。完整UI退出/create/实际吞吐矩阵未完成。 最新签名Launchpad在空隔离库启动、列出0台、窗口宽度970、关闭窗口并退出0；该冒烟没有活动writer，不替代尾部后立即退出应用验收。 B24实际签名UI在受控HTTP创建过程中确认退出；应用消失后约1.045秒，已观察到的create/fw_prepare/aria2进程均退出，最终日志新增3064字节、状态interrupted、两项锁释放。新增3项生产输出链路测试覆盖并发ANSI/CRLF/无换行panic尾部、取消及轮换、100001行吞吐；受控进程持久化吞吐约2.03MB/s，不代表UI或实际VM吞吐。 B25普通命令同步关闭入口并有界等待child、pipe EOF、日志finish和history；定向及标准Swift通过。早期普通/escaped隔离UI两组日志精确匹配，但属于同步门控修改前快照。最终release隔离副本已启动doctor并观察writer存活，随后CUA报告Mac锁定；尚未执行退出操作。writer自释放后日志10002行/138939字节及panic尾部精确匹配；应用仍打开，最终退出两组待解锁复验。",
+      "current_result": "修复detached父进程退出但后代仍写日志时误报完整；确认进程组消失后再次读取，修复EOF与组消失之间的尾部遗漏。两项RED复现后44项/12套件通过，复审无剩余发现；真实VM正常SIGINT停机11.352秒且保留classicAccepted及Guest stopped尾部。完整UI退出/create/实际吞吐矩阵未完成。 最新签名Launchpad在空隔离库启动、列出0台、窗口宽度970、关闭窗口并退出0；该冒烟没有活动writer，不替代尾部后立即退出应用验收。 B24实际签名UI在受控HTTP创建过程中确认退出；应用消失后约1.045秒，已观察到的create/fw_prepare/aria2进程均退出，最终日志新增3064字节、状态interrupted、两项锁释放。新增3项生产输出链路测试覆盖并发ANSI/CRLF/无换行panic尾部、取消及轮换、100001行吞吐；受控进程持久化吞吐约2.03MB/s，不代表UI或实际VM吞吐。 B25普通命令同步关闭入口并有界等待child、pipe EOF、日志finish和history；定向及标准Swift通过。早期普通/escaped隔离UI两组日志精确匹配，但属于同步门控修改前快照。最终release隔离副本已启动doctor并观察writer存活，随后CUA报告Mac锁定；尚未执行退出操作。writer自释放后日志10002行/138939字节及panic尾部精确匹配；应用仍打开，最终退出两组待解锁复验。 B26解锁后完成53580180最终签名Launchpad隔离副本两组实际UI退出：普通writer立即退出；setsid后代持管道时取消退出，释放后退出。每组10002行/138939字节精确匹配，包含ANSI/CRLF和无换行panic尾部；应用/writer均退出。另正常签名的两进程临时XPCService直接复用生产service/output/receiver/writer，通过正常ACK、默认30秒无ACK、连接失效及真实只读FD的EBADF写失败。未覆盖固定privileged Mach入口、生产Client.request或真实Store；临时harness签名/actor隔离失败保留，修复仅在harness。",
       "remaining_work": [
-        "最终签名release普通/escaped两组退出复验；Mac锁屏待用户解锁，当前普通writer已自释放需重跑",
         "完整panic/取消/轮换、UI响应及实际VM吞吐矩阵",
-        "helper异步ACK缺失/30秒超时/XPC断线/写入失败组合的完整实际验收"
+        "系统特权helper与生产客户端的异步ACK缺失/30秒超时/XPC断线/写入失败完整组合；transport断线行仅证明客户端观察到失效，未直接观察服务器worker退出"
       ],
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
-      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+      "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+      "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081"
     }
   ],
   "primary_sources": [
@@ -4692,8 +4708,8 @@
     "B20 Ruling: user authorized exact B19 helper scope; register original frozen signed helper and keep administrator rule unchanged. Human must complete protected SecurityAgent authentication; do not request password in chat or bypass authentication. First150s wait was too short for human interaction and timed out before store/log creation; retry once with900s and bounded post-result verification/cleanup. Cost if authentication remains pending: install acceptance cannot complete in this turn. Fixed IcliKit icli_reboot uses errno ?: EIO; treat error text as wrapper result, do not infer actual kernel errno or apply speculative patches. Firmware-free15+22 regressions establish fixture behavior only, not real VM lifecycle coverage.",
     "B21 Ruling: 原方案允许基础修复单独验收；T03/T04/T05在实际相关路径、恢复/签名/归档接受证据满足后独立accepted，全局T02保持未完成，代价是后续跨模块变更仍须复验。普通launcher只执行sealed本地wrapper，不执行有自动guest更新/0777副作用的官方CLI；预期binding SHA+version跨进程核对，未知VM协议在preflight前拒绝，代价是未声明本地受控协议的官方Bundle不能通过此路线启动。操作autoreleasepool只证明临时ObjC对象释放，真实截图增长仍失败，不能接受T08。新短时限wrapper测试加入既有计时组，原时限不变，代价是未证明与大批签名工作同时运行的启动时限。新宿主4cea360c临时AMFI范围未授权，保持pending；只使用既有B16范围完成本轮VM操作并清理。"
   ],
-  "latest_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
-  "latest_validation_limitation": "B25标准Python/Swift、签名构建与Bundle检查结果见B25-summary；早期UI使用受控CLI；最终release UI退出复验因Mac锁屏中断。TCC/RootHide/完整四层来源/实际VM吞吐未验。旧签名App VM --help被终止，原因未查明。",
+  "latest_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "latest_validation_limitation": "B26实际UI退出、ROM快照、标准Swift及签名Bundle检查通过；两进程transport故障矩阵边界见证据。RootHide/TCC/四层升级回退/实际VM吞吐仍未验；新VM AMFI精确范围待回复，未执行。",
   "B24_execution_state": {
     "accepted_total": 8,
     "required_remaining": 38,
@@ -4716,5 +4732,19 @@
     ],
     "implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
     "newly_accepted": []
+  },
+  "B26_execution_state": {
+    "implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+    "newly_accepted": [],
+    "accepted_total": 8,
+    "required_remaining": 38,
+    "optional_deferred": 1,
+    "selected_remaining": [
+      "T08",
+      "T24",
+      "T40",
+      "T46"
+    ],
+    "AMFI_scope_status": "prepared_pending_explicit_reply"
   }
 }

@@ -1,0 +1,74 @@
+[
+  {
+    "argv": [
+      "codesign",
+      "--verify",
+      "--strict",
+      "--deep",
+      "-R=anchor apple generic and identifier \"com.vphone.acceptance.t46.service\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "codesign",
+      "-dvvv",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Executable=/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc/Contents/MacOS/TransportHarness\nIdentifier=com.vphone.acceptance.t46.service\nFormat=bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=12997 flags=0x0(none) hashes=399+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=068f5dffa8af3db4abbf11e25e958fc15209e527\nCandidateCDHashFull sha256=068f5dffa8af3db4abbf11e25e958fc15209e5279905436b900fcd8f79632f68\nHash choices=sha256\nCMSDigest=068f5dffa8af3db4abbf11e25e958fc15209e5279905436b900fcd8f79632f68\nCMSDigestType=2\nCDHash=068f5dffa8af3db4abbf11e25e958fc15209e527\nSignature size=4785\nAuthority=Apple Development: QingLiang Zhao (Y4CD942RX6)\nAuthority=Apple Worldwide Developer Relations Certification Authority\nAuthority=Apple Root CA\nSigned Time=Oct 9, 2026 at 20:04:12\nInfo.plist entries=6\nTeamIdentifier=3AA3QL69MQ\nSealed Resources version=2 rules=13 files=1\nInternal requirements count=1 size=200\nTotal signatures=1\nChosen signature=1\n"
+  },
+  {
+    "argv": [
+      "codesign",
+      "-d",
+      "--entitlements",
+      "-",
+      "--xml",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Executable=/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc/Contents/MacOS/TransportHarness\n"
+  },
+  {
+    "argv": [
+      "codesign",
+      "--verify",
+      "--strict",
+      "--deep",
+      "-R=anchor apple generic and identifier \"com.vphone.acceptance.t46.client\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "codesign",
+      "-dvvv",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Executable=/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/MacOS/TransportHarness\nIdentifier=com.vphone.acceptance.t46.client\nFormat=app bundle with Mach-O thin (arm64)\nCodeDirectory v=20400 size=12996 flags=0x0(none) hashes=399+3 location=embedded\nHash type=sha256 size=32\nCandidateCDHash sha256=3e59e6b7b3c0ca8610a2e6db116851ccbc67ae02\nCandidateCDHashFull sha256=3e59e6b7b3c0ca8610a2e6db116851ccbc67ae0265bb715b0692a7605fb0bf4d\nHash choices=sha256\nCMSDigest=3e59e6b7b3c0ca8610a2e6db116851ccbc67ae0265bb715b0692a7605fb0bf4d\nCMSDigestType=2\nCDHash=3e59e6b7b3c0ca8610a2e6db116851ccbc67ae02\nSignature size=4785\nAuthority=Apple Development: QingLiang Zhao (Y4CD942RX6)\nAuthority=Apple Worldwide Developer Relations Certification Authority\nAuthority=Apple Root CA\nSigned Time=Oct 9, 2026 at 20:04:13\nInfo.plist entries=5\nTeamIdentifier=3AA3QL69MQ\nSealed Resources version=2 rules=13 files=2\nInternal requirements count=1 size=196\nTotal signatures=1\nChosen signature=1\n"
+  },
+  {
+    "argv": [
+      "codesign",
+      "-d",
+      "--entitlements",
+      "-",
+      "--xml",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Executable=/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/MacOS/TransportHarness\n"
+  }
+]

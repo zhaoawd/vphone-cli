@@ -1,0 +1,26 @@
+OVERVIEW: Firmware pipeline: prepare (download/merge IPSWs) and patch
+
+USAGE: vphone-cli fw <subcommand>
+
+OPTIONS:
+  -h, --help              Show help information.
+
+SUBCOMMANDS:
+  catalog                 Show the known iOS ↔ cloudOS firmware pairings
+                          (recommended per iOS build)
+  prepare                 Download + merge IPSWs into a VM bundle
+  patch                   Patch the boot chain (native Swift FirmwarePipeline)
+  record                  Inspect patch experiment records written by
+                          --record-out
+  inspect                 Read a local IPSW BuildManifest without extracting
+                          firmware
+  plan                    Resolve and print the declared patch plan for a
+                          variant (read-only; patches nothing)
+  cache                   List the shared IPSW cache, or adopt an entry that
+                          has no completion marker
+  selection-preview       Preview legacy patch ID and bundled preset migration
+                          (read-only JSON)
+  selection-migrate       Preview or atomically migrate an explicit upstream
+                          PatchSelection.plist
+
+  See 'vphone-cli help fw <subcommand>' for detailed help.

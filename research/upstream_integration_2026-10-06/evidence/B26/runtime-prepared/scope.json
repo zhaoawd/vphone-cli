@@ -1,0 +1,18 @@
+{
+  "status": "prepared_not_authorized_or_executed",
+  "source_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+  "candidate": "/private/tmp/vphone-b26-runtime/vphone-cli.app/Contents/MacOS/vphone-vm",
+  "cdhashes": [
+    "62a1f395413f6878c4de0042f6e77962aa2b1219"
+  ],
+  "sha256": "c8e8be423f47c2bc85a7bca5715c306a49cbacba1442a5882416493660a5f8ff",
+  "paths": [],
+  "allow_all": false,
+  "spoof_apple": true,
+  "configuration_directory": "/private/tmp/vphone-b26-runtime/config",
+  "driver_sha256": "40139ab2176225c1b6fafef02b2c61416e56a3e57e3b908fd2f35503ce5c538f",
+  "initial_probe": "--help only; capture negative signal return and precise AMFI log",
+  "subsequent_scope": "Controlled VM readback for T08 sample identity and authorized acceptance; preserve production guest cohort with --no-vphoned-update. New TCC prompt/grant remains a separate action-time decision.",
+  "cleanup": "Stop only this driver/debugserver, record detach outcome, independently verify exact owned process absence and system amfid state; preserve failures and do not infer normal detach.",
+  "historical_risk": "Earlier scoped AMFI cleanup failed and left amfid stopped; later independent recovery was required. No persistent SIP/AMFI setting change is proposed."
+}

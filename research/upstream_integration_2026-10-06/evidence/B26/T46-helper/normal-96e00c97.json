@@ -1,0 +1,45 @@
+{
+  "mode": "normal",
+  "label": "normal-96e00c97",
+  "argv": [
+    "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/MacOS/TransportHarness",
+    "normal",
+    "/private/tmp/vphone-b26-t46-helper/runs/normal-96e00c97"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.1412542910547927,
+  "events": [
+    {
+      "client_pid": "22116",
+      "event": "authenticated_handshake",
+      "service_pid": "22118"
+    },
+    {
+      "error": "",
+      "event": "receiver_finished",
+      "success": "true"
+    },
+    {
+      "client_pid": "22116",
+      "data": "transport-only:2.6.1-local.ab12cd34:server-pid=22118",
+      "elapsed_seconds": "0.0013026249944232404",
+      "log": "/private/tmp/vphone-b26-t46-helper/runs/normal-96e00c97/CE9796F1-4B7A-42AD-92A6-9EFFA148BB91.log",
+      "log_bytes": "75",
+      "mode": "normal",
+      "operation": "CE9796F1-4B7A-42AD-92A6-9EFFA148BB91",
+      "result": "success",
+      "service_pid": "22118"
+    }
+  ],
+  "stdout": "{\"client_pid\":\"22116\",\"event\":\"authenticated_handshake\",\"service_pid\":\"22118\"}\n{\"error\":\"\",\"event\":\"receiver_finished\",\"success\":\"true\"}\n{\"client_pid\":\"22116\",\"data\":\"transport-only:2.6.1-local.ab12cd34:server-pid=22118\",\"elapsed_seconds\":\"0.0013026249944232404\",\"log\":\"\\/private\\/tmp\\/vphone-b26-t46-helper\\/runs\\/normal-96e00c97\\/CE9796F1-4B7A-42AD-92A6-9EFFA148BB91.log\",\"log_bytes\":\"75\",\"mode\":\"normal\",\"operation\":\"CE9796F1-4B7A-42AD-92A6-9EFFA148BB91\",\"result\":\"success\",\"service_pid\":\"22118\"}\n",
+  "stderr": "",
+  "logs": [
+    {
+      "path": "/private/tmp/vphone-b26-t46-helper/runs/normal-96e00c97/CE9796F1-4B7A-42AD-92A6-9EFFA148BB91.log",
+      "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+      "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+      "mode": "0o600",
+      "bytes": 75
+    }
+  ]
+}

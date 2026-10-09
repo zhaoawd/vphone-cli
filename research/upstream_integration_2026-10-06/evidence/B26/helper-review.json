@@ -1,0 +1,164 @@
+{
+  "reviewer": "b26_rom_review",
+  "scope": "T46 app-scoped 两进程 helper 输出 transport harness 只读独立审查",
+  "result": "无剩余 Critical/Important/Minor 发现；最终四行证据在限定范围内成立",
+  "findings": [],
+  "final_artifacts": {
+    "root": "/private/tmp/vphone-b26-t46-helper",
+    "harness": "TransportHarness.swift",
+    "harness_source_sha256": "09a6f560b77dc47bd3d074dce06715dc0685dbf34189761fa56021d2fe597620",
+    "cases": [
+      "normal-96e00c97.json",
+      "missing-ack-9d00e206.json",
+      "disconnect-8644adf7.json",
+      "writer-failure-994047d0.json"
+    ],
+    "summary": "summary.json",
+    "signed_readback": "sign-readback.json",
+    "stable_manifest": "stable-input-manifest-final.json",
+    "signed_manifest": "signed-harness-manifest-final.json",
+    "cleanup": "process-final-readback.json",
+    "archived_evidence_root": "/private/tmp/vphone-b26-t46-helper/evidence"
+  },
+  "observations": [
+    {
+      "file": "TransportHarness.swift",
+      "lines": [
+        40,
+        42,
+        45,
+        106,
+        107,
+        134,
+        135
+      ],
+      "evidence": "双方启动时调用生产 verifyCode；service listener 用真实 NSXPC auditToken 调用生产 callerRejection，再设置逐消息 client requirement；client 设置 service requirement。requirements 包含 Apple anchor、独立 identifier 和同 Team OU。没有读到跳过签名或调用方检查的分支。静态签名 readback 显示 Apple Development 和 TeamIdentifier=3AA3QL69MQ，全部10个命令 exit0。没有额外执行身份拒绝负例。"
+    },
+    {
+      "file": "TransportHarness.swift",
+      "lines": [
+        46,
+        49,
+        69,
+        76,
+        81,
+        132,
+        138,
+        169
+      ],
+      "evidence": "harness 直接链接冻结生产 Service、Output、Receiver、LogWriter、Reply；仅 verify 返回 fixture Data，authorize/install 明确抛错。缺ACK/断线故障在实际 receiver 完成 writer 后注入。writer 故障通过 package initializer 注入真实 O_RDONLY FileHandle，不替换生产写入或ACK状态机。"
+    },
+    {
+      "file": "TransportHarness.swift",
+      "lines": [
+        142,
+        146,
+        152,
+        157,
+        188,
+        194,
+        201,
+        209
+      ],
+      "evidence": "最终错误处理块显式 @Sendable，编译参数未禁用 actor runtime 检查。最终正常行要求 receiver success 和精确日志；缺ACK行要求成功持久化、明确未确认/超时错误及29至40秒边界；断线行要求 transport事件、成功持久化、5秒内完成且排除客户端/ACK超时；写失败行要求负ACK、只读FD、存储NSError含EBADF、5秒内完成、明确未确认错误和原文件内容不变。初版任意failure可通过的问题已修复。"
+    },
+    {
+      "file": "build.py",
+      "lines": [
+        3,
+        4,
+        5
+      ],
+      "evidence": "构建参数仅引用临时 stable modules/objects/framework，调用 swiftc；没有调用 SwiftPM。生产默认 VPhoneHelperOutputAcknowledgement.wait(timeout:30) 未修改，channel.finish 使用无显式timeout的生产调用。client等待40秒、脚本外部50秒均大于默认30秒。"
+    },
+    {
+      "file": "stable-input-manifest-final.json",
+      "lines": [],
+      "evidence": "只读逐个核对最终111个文件/符号链接条目，其sha256、大小、权限或链接目标均匹配；原stable-input-manifest中的89个条目摘要也均匹配。初版漏记framework/objects.list/debug-original.yaml由最终完整清单补充。最终signed-harness清单34个条目均匹配，source/compiled摘要均匹配。"
+    },
+    {
+      "file": "unsigned-main-comparison.json",
+      "lines": [],
+      "evidence": "只读比较已移除签名的临时comparison文件：client与service完整字节相同；compiled与signed comparison长度相同，仅offset3472的8字节不同，与记录的LC_SEGMENT_64 __LINKEDIT.vmsize字段一致，其余字节相同。未执行codesign或修改任何实物。"
+    },
+    {
+      "file": "process-final-readback.json",
+      "lines": [],
+      "evidence": "已有记录核验本轮20个client/service PID，每个ps exit1且stdout/stderr空，matching_live_pids为空，signals_sent为空。结论限于记录时的已观测PID；本审查未再次执行进程枚举。"
+    }
+  ],
+  "case_results": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "client_pid": 22116,
+      "service_pid": 22118,
+      "operation_seconds": 0.0013026249944232404,
+      "result": "receiver完成持久化后返回成功；75字节精确两行，0600"
+    },
+    {
+      "mode": "missing-ack",
+      "exit_code": 0,
+      "client_pid": 22699,
+      "service_pid": 22705,
+      "operation_seconds": 30.012642458314076,
+      "result": "receiver持久化成功后不给ACK；明确生产未确认超时错误；75字节/0600完整日志"
+    },
+    {
+      "mode": "disconnect",
+      "exit_code": 0,
+      "client_pid": 22058,
+      "service_pid": 22097,
+      "operation_seconds": 0.0015468333149328828,
+      "result": "receiver持久化成功后同一connection失效；transport_invalidated事件与Transport invalidated失败；75字节/0600完整日志"
+    },
+    {
+      "mode": "writer-failure",
+      "exit_code": 0,
+      "client_pid": 22110,
+      "service_pid": 22114,
+      "operation_seconds": 0.006223041680641472,
+      "result": "真实O_RDONLY描述符导致Cocoa512/底层POSIX9(EBADF)，receiver负ACK后操作返回未确认错误；原10字节内容与摘要保持，0600"
+    }
+  ],
+  "retained_failed_attempts": [
+    {
+      "artifacts": [
+        "disconnect-8c674476.json",
+        "disconnect-9dc5795b.json",
+        "TransportHarness-v1-disconnect.ips",
+        "TransportHarness-v2-disconnect.ips"
+      ],
+      "result": "两个早期断线行exit=-5，不能计为通过。crash显示Harness.main proxy error block的actor隔离检查触发SIGTRAP。最终显式@Sendable修复仅发生在harness，并由最终四行重新验证。"
+    },
+    {
+      "artifacts": [
+        "sign-readback-first-failed.json",
+        "framework-topology-repair.json"
+      ],
+      "result": "初次framework签名失败保留；最终签名readback和manifest用于本审查结论，旧sign-verification.json不作为最后版本的签名证据。"
+    }
+  ],
+  "limitations": [
+    "未覆盖生产 VPhoneHelperClient.request 的固定 NSXPCConnection(machServiceName: com.vphone.cli.helper, options: .privileged) 入口及其错误处理/生命周期；harness自行建立app-scoped连接。",
+    "未覆盖 VPhoneHelperDaemon.run 的root检查、系统Mach service注册、授权项注册或真实VPhoneCoreBundleStore安装/验证。",
+    "断线行证明harness客户端观察到同一连接失效并返回failure；客户端invalidationHandler先完成reply，因此未直接观测服务端OutputChannel断线后内部ACK完成时间或worker退出。",
+    "没有独立身份拒绝负例。正向真实auditToken路径和严格签名要求已启用，不等于已验证所有错误身份分支。",
+    "只读FD故障结论限定为EBADF写失败及负ACK传播，不覆盖磁盘空间耗尽、存储设备故障或突然断电。",
+    "stable与signed最终清单是运行后生成的回读证据；矩阵行本身没有内嵌可执行文件摘要。最终源码、编译输出、签名文件摘要和签名时间一致，且中间失败记录明确保留。"
+  ],
+  "nonblocking_recommendations": [
+    {
+      "file": "run-matrix.py",
+      "line": 3,
+      "recommendation": "若未来复用该脚本，可捕获subprocess.TimeoutExpired并保全stdout/stderr、写出超时JSON和记录清理结果。当前最终四行均已在50秒以内结束，该分支未影响本轮证据。"
+    },
+    {
+      "file": "TransportHarness.swift",
+      "line": 1,
+      "recommendation": "顶部Prepared only注释与当前已编译、签名、执行状态不一致；以summary.json和最终readback作为当前状态依据。"
+    }
+  ],
+  "review_actions": "只读取代码、日志、清单和comparison文件，并在内存计算摘要/字节比较；没有运行harness、构建、测试、签名、UI、VM、AMFI、注册helper或修改仓库。仅按父任务要求写出本审查JSON。",
+  "archive_evidence_check": "已只读核对evidence中的summary、两份final manifest、最终sign-readback、process-final-readback和最终四行JSON，与临时根目录对应文件逐字节SHA一致。"
+}

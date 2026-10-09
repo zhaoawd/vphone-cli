@@ -1,0 +1,104 @@
+{
+  "task": "T40",
+  "scope": "ROM/SEPROM snapshot closure increment only",
+  "task_accepted": false,
+  "worktree": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli",
+  "head_before_commit": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e",
+  "source_files": [
+    {
+      "path": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "copy": "VPhoneCreateResourceSnapshot.final.swift",
+      "bytes": 19933,
+      "sha256": "d8076ab755e74922484e12f60a57832ee837dcecc4298a811624daa9f375b13f"
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+      "copy": "VPhoneCreateOrchestrator.final.swift",
+      "bytes": 60913,
+      "sha256": "9e6ac07627cb1a468ab1ba296948deb72673eabb3d78914f9367d53667dc7dba"
+    },
+    {
+      "path": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "copy": "CreateResourceSnapshotTests.final.swift",
+      "bytes": 27304,
+      "sha256": "f2110fd2ff4d94994dc8822089503d7fbd44153d7670333dd29e67ce55042778"
+    },
+    {
+      "path": "tests/VPhoneCLITests/CreateResourceFreezeTests.swift",
+      "copy": "CreateResourceFreezeTests.final.swift",
+      "bytes": 8348,
+      "sha256": "cae2aadf2fec2123a4af4ad6c039c8b5f58f30ee8de005d08fbbbe1d619c22ad"
+    }
+  ],
+  "implemented": [
+    "Capture both live framework ROM input files before accepting a create attempt and before allocating its VM disk; required regular files follow existing symlink materialization rules.",
+    "Use snapshot/ROMs sibling directory so the sealed VPhone.bundle is not modified.",
+    "Include ROM bytes/modes/hashes in manifest, aggregate/fingerprint, byte quota, free-space admission, source second inventory and per-attempt diagnostic manifest.",
+    "Production run calls shared createBundle consumer with the runner snapshot; prepare refresh reads the same captured boot ROM. Missing snapshot refuses only create consumers.",
+    "Keep default public capture API unchanged; injectable ROM sources are package/internal parameters with system-source defaults. Ordinary vm new and VPhoneBundleOps defaults unchanged."
+  ],
+  "red": {
+    "api": {
+      "log": "api-red.log",
+      "exit": 1,
+      "meaning": "new package/internal input APIs and consumer did not exist; not behavior proof"
+    },
+    "behavior_first": {
+      "log": "behavior-red.log",
+      "exit": 1,
+      "tests": 26,
+      "suites": 2,
+      "issues": 17
+    },
+    "behavior_complete": {
+      "log": "behavior-red-complete.log",
+      "exit": 1,
+      "tests": 27,
+      "suites": 2,
+      "issues": 29,
+      "meaning": "Original live ROM references deliberately remained during seam setup; consumer reads B, missing files accepted, capacity/growth/link guards omitted ROM, resume identity and final-stage mutation omitted ROM."
+    }
+  },
+  "green": {
+    "log": "focused-green.log",
+    "exit": 0,
+    "tests": 27,
+    "suites": 2,
+    "skipped_test": "actualBuildResourceCopyRunsReadOnlyProbes: environment selector unset",
+    "command": "swift test --disable-sandbox --cache-path .build/test-cache --filter 'CreateResourceSnapshotTests|CreateResourceFreezeTests'",
+    "git_diff_check_exit": 0
+  },
+  "coverage": [
+    "Capture A then change live boot/SEP ROM to B: actual new-bundle and prepare-refresh consumers use A.",
+    "Both missing ROM variants refuse without machine changes.",
+    "Legal ROM symlink is materialized and later target mutation does not affect the copy.",
+    "Link redirected after inventory to different bytes refuses and releases partial copy.",
+    "ROM growth after preflight refuses before output exceeds its admitted size.",
+    "ROM bytes are included in capacity admission.",
+    "Either ROM change alters aggregate; resume requires explicit tool acceptance and earlier completed stage origins are retained.",
+    "Mutating either copied ROM in the final stage fails the existing fingerprint verification."
+  ],
+  "compiler_warnings": [
+    "sources/vphone-cli/VPhoneGuestEnvironment.swift:46 Any field in Sendable struct; file unchanged by this increment.",
+    "sources/vphone-cli/VPhoneMenuRecord.swift:110 shouldReveal never used; file unchanged by this increment."
+  ],
+  "handoff": [
+    "SwiftPM slot released to parent after targeted GREEN.",
+    "Parent owns standard Swift suite, signed build, final installed snapshot smoke and independent review."
+  ],
+  "limitations": [
+    "No actual VM launch/restore/boot acceptance; test new machine has a synthetic 0 GiB disk.",
+    "No Python/framework/packages, PATH tool, SDK/JB compiler, existing CFW inputs or cache closure added.",
+    "No trusted new-machine binding/receipt or four-layer upgrade/rollback capability added."
+  ],
+  "scope_checks": {
+    "shared_research_written": false,
+    "commits_created": false,
+    "signed_build_run": false,
+    "UI_used": false,
+    "VM_started": false,
+    "real_VM_disk_accessed": false,
+    "AMFI_modified": false,
+    "ordinary_vm_new_changed": false
+  }
+}

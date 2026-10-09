@@ -1,0 +1,22 @@
+OVERVIEW: Send host-control requests to a running VM
+
+Each call opens <bundle>/vphone.sock, sends one JSON request line and
+prints the response line exactly as received.
+
+Exit status: 0 response has "ok":true; 1 response is a JSON object
+without "ok":true (still printed to stdout); 2 no valid response
+(reason on stderr, nothing on stdout).
+
+USAGE: vphone-cli guest <subcommand>
+
+OPTIONS:
+  -h, --help              Show help information.
+
+SUBCOMMANDS:
+  send                    Send one raw host-control request object
+  rpc                     Forward one guest API method through the host-control
+                          rpc command
+  env                     Check or update the guest environment libraries of a
+                          running VM
+
+  See 'vphone-cli help guest <subcommand>' for detailed help.

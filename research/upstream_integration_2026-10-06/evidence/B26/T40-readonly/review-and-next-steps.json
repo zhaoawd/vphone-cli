@@ -1,0 +1,381 @@
+{
+  "task": "T40",
+  "review_head": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e",
+  "production_source_baseline": "53580180f09819ec539ba656c15fab7a23fdc1c3",
+  "task_accepted": false,
+  "scope": {
+    "production_changed": false,
+    "SwiftPM_used": false,
+    "VM_started": false,
+    "real_VM_disk_accessed": false,
+    "store_changed": false,
+    "system_settings_changed": false,
+    "shared_research_written": false
+  },
+  "formal_task_contract": {
+    "id": "T40",
+    "title": "接入每机 Bundle 绑定与四层版本来源",
+    "phase": "M1",
+    "priority": "P1",
+    "required_for_release": true,
+    "origin": "new_scope",
+    "old_task_mapping": [
+      "T24",
+      "T25",
+      "T27"
+    ],
+    "previous_title": null,
+    "dependencies": [
+      "T02",
+      "T05",
+      "T24"
+    ],
+    "status": "attempt_resource_snapshot_verified_external_toolchain_and_origin_matrix_pending",
+    "upstream_paths": [
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/VPhoneLaunchpadMachineBinding.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadBundleStore.swift",
+      "VPhoneLaunchpad/VPhoneLaunchpad/Machines/"
+    ],
+    "interface_contract": "C10：分别记录 host Bundle、guest environment、kernel、其他 boot chain；更换绑定只改变被明确执行的层。",
+    "steps": [
+      "接入 per-VM binding 和整个创建流程固定版本，旧机器首次迁移前保存原解释和绑定。",
+      "安装新 Bundle 不切换现有机器；缺失/损坏绑定不静默选默认执行。",
+      "区分 Core Bundle >=2.6.0 代码门槛与同 major.minor 默认支持策略，跨 series 需另有验证；记录 clone/export/rename 后来源。",
+      "固定每 VM daemon/environment 同步和降级策略；切绑定和 host 回退不自动授权 guest 改写。"
+    ],
+    "acceptance": [
+      "新 host 旧 guest/旧 kernel 混合状态准确可见。",
+      "只做 update-kernel 不更新其他 boot-chain 来源；缺 Bundle 时拒绝并说明恢复路径。",
+      "不同本地构建可并存，不覆盖正在使用的产物。",
+      "不同本地构建可并存，合法 local/CI 后缀正确解析；同 series 不同 patch 不要求版本数字相同。",
+      "绑定改变、纯兼容连接、显式升级/回退的前后 guest hash 和 instance 均可追踪。"
+    ],
+    "rollback": "恢复原绑定和配置；guest/kernel 已变更时另行执行其恢复，不声称切绑定已完成回滚。",
+    "verification_profiles": [
+      "core",
+      "host"
+    ],
+    "local_mapping": {
+      "state": "real_stopped_VM_missing_Bundle_refusal_verified_full_source_matrix_pending",
+      "paths": [
+        "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift",
+        "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+        "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineBinding.swift",
+        "tests/VPhoneLaunchpadKitTests/BindingSnapshotTests.swift",
+        "sources/VPhoneLaunchpadLauncherEntry/main.swift",
+        "sources/VPhoneLaunchpadLauncherEntry/VPhoneLaunchpadLauncherProcess.swift",
+        "sources/VPhoneBundleStore/VPhoneLaunchpadLauncherRequest.swift",
+        "sources/VPhoneLaunchpadKit/VPhoneLaunchpadLaunchRoute.swift",
+        "tests/VPhoneLaunchpadKitTests/LaunchRouteTests.swift",
+        "tests/VPhoneCLITests/ExpectedBindingCLITests.swift",
+        "sources/VPhoneCore/VPhoneCreateRunner.swift",
+        "tests/VPhoneCoreTests/CreateCheckpointTests.swift",
+        "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+        "tests/VPhoneCLITests/CreateLiveStagesTests.swift",
+        "tests/VPhoneCLITests/NativeFirmwarePrepareTests.swift",
+        "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+        "sources/VPhoneCore/VPhoneResources.swift",
+        "sources/vphone-cli/VPhoneCreateLiveStages.swift",
+        "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+        "tests/VPhoneCLITests/CreateResourceFreezeTests.swift"
+      ],
+      "batch_source_manifest": "evidence/B25-source-review.json"
+    },
+    "implementation_commits": [
+      "0cf9383c7fd2f257cb5afa60f1e327ae4dc9854a",
+      "7d6f45e03907ab2b0739f9083d338322eb8a89bb",
+      "94ec7976f2ad21e6bf59e867228a6f083a6a9304",
+      "55fd8ef57a6731e42cba0727f477bc9b25f0c9ca",
+      "ee7b9ec2c6be7a0402291afbf6e2eae0136c7f3b",
+      "ee4a27eb734c0b455637e245a4abdee39af55279",
+      "b5c4e482e8f724bedee224ec6399f7456d719db3",
+      "9a75de14856b9ff073f44071a619dce517ce8008",
+      "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d",
+      "a45c91915f6343733d1fde7e20180ee80cee7b57",
+      "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
+      "53580180f09819ec539ba656c15fab7a23fdc1c3"
+    ],
+    "verification_evidence": [
+      "evidence/B06-summary.json",
+      "evidence/B06-source-review.json",
+      "evidence/B06-related.log",
+      "evidence/B06-related-serial.log",
+      "evidence/B06-t40-red.log",
+      "evidence/B06-t40-final-green.log",
+      "evidence/B12-summary.json",
+      "evidence/B12-source-review.json",
+      "evidence/B12-related-green.log",
+      "evidence/B13-summary.json",
+      "evidence/B13-source-review.json",
+      "evidence/B13-final-partition-results.json",
+      "evidence/B13-final-state.json",
+      "evidence/B14-summary.json",
+      "evidence/B14-final-state.json",
+      "evidence/B15-summary.json",
+      "evidence/B15-final-state.json",
+      "evidence/B16-summary.json",
+      "evidence/B18-summary.json",
+      "evidence/B19-summary.json",
+      "evidence/B21-summary.json",
+      "evidence/B21-source-review.json",
+      "evidence/B22-summary.json",
+      "evidence/B22-source-review.json",
+      "evidence/B22-final-readback.json",
+      "evidence/B23-summary.json",
+      "evidence/B23-source-review.json",
+      "evidence/B23-final-readback.json",
+      "evidence/B24-summary.json",
+      "evidence/B24-source-review.json",
+      "evidence/B24-final-readback.json",
+      "evidence/B25-summary.json",
+      "evidence/B25-source-review.json",
+      "evidence/B25-evidence-manifest.json"
+    ],
+    "historical_evidence": [],
+    "current_result": "实际CLI clone/rename通过，65个持久文件大小、SHA256和权限一致，身份保持且未并发启动。源绑定缺失仍保持缺失，来源unknown；不证明已存在绑定/收据或四层升级矩阵。不同签名daemon更新/回退仅覆盖T07。 B24新增每个未完成创建阶段前CLI/配对VM摘要复验；CLI替换、VM替换及VM不可读的三种回归场景通过。实际CLI在两种归档后端完成0GiB合成VM的clone/rename/export/import，8个持久文件摘要和权限一致，保留构造的四层binding与opaque历史receipt；该receipt不提供可信store授权。 独立审查后补充初始摘要不可读、resume接受nil仍不得运行及恢复提示回归；运行中工具拒绝不再分类为checkpoint未写入。 最终a45c9191源码签名客户端再次通过native/system-tar两种合成往返，归档1272/1416字节。 B25每attempt使用CLI/VM及所选资源的私有副本和聚合摘要；executor/verifier/prober及内部TaskLocal解析共用副本。resume变更未经确认拒绝，确认后整体换用新副本，保留此前阶段来源。副本最多8份、合计2GiB、64MiB余量；成功或未接受attempt释放，失败已接受attempt保留。审查发现并修复debs.list遗漏、Disk.img链接别名绕过、复制增长超预算3项。开发副本只读CLI/VM探针通过；最终签名App资源副本235个entry、161310727字节，CLI resources与静态签名检查退出0；原VM及副本VM --help均退出9，原因未查明，外部Python探针不可用。",
+    "remaining_work": [
+      "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、Virtualization ROM、既有cfw_input及可变缓存未形成不可变闭包",
+      "新机可信store binding/receipt发布及带可信既有binding/receipt的实际VM传输验收",
+      "kernel-only及环境升级/回退、混合版本四层来源矩阵；依赖T12/T17/T32/T34生产能力",
+      "完整64GiB VM归档往返空间仍不足；同卷APFS副本不证明物理独立备份"
+    ],
+    "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
+    "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3"
+  },
+  "functional_dependencies": [
+    {
+      "id": "T12",
+      "title": "将 FirmwareOriginals 接入既有 generation 和检查点",
+      "status": "source_lifecycle_audited_checkpoint_controls_validated_generation_pending",
+      "acceptance": [
+        "A→A、A→B→A 和中断续跑使用正确原件；坏原件不能成为新来源。",
+        "旧 generation 在新输入失败或取消后仍可恢复。"
+      ],
+      "remaining_work": [
+        "trusted FirmwareOriginals generation manifest and full original byte digests",
+        "device/GPU/planDigest linkage",
+        "same-plan repeated fw patch from Originals without prepare",
+        "real firmware and VM acceptance"
+      ]
+    },
+    {
+      "id": "T17",
+      "title": "接入在线更新并区分文件安装与实际激活",
+      "status": "install_reply_readback_validated_activation_coordination_pending",
+      "acceptance": [
+        "未知库、错误 hash、断线、部分写入及只读挂载恢复失败均可诊断和恢复。",
+        "SpringBoard/launchd 等仍加载旧库时不标全部生效；不无条件扩大 respring/reboot 行为。",
+        "缺字段、重复/未知组件或安装集合不一致是 protocol error/unknown outcome，不能默认空数组或 false 后报成功。",
+        "安装成功但回复丢失、更新与 Stop 交错、自动/手动同步竞争均有确定状态和恢复路径。"
+      ],
+      "remaining_work": [
+        "guest journal write failures currently ignored in some paths",
+        "restore response strictness",
+        "mode eligibility binding and per-VM write coordination",
+        "lost reply/Stop competition/mixed versions and real VM activation"
+      ]
+    },
+    {
+      "id": "T32",
+      "title": "接入分组件 Receipt 并增加实际应用证据",
+      "status": "journal_report_integrity_validated_component_receipt_pending",
+      "acceptance": [
+        "部分失败、缺关键 record、坏 receipt 和写入失败不标全成功。",
+        "kernel 更新只登记 kernel，Guest 更新只登记 Guest；不能抬升其他启动链版本。",
+        "权限沿用本地约束，拒绝未授权改写；缺旧证据不自动推断 applied。"
+      ],
+      "remaining_work": [
+        "PatchReceipt.plist import/store/component mapping",
+        "per-record output byte proof for each component",
+        "VM/generation/disk transaction linkage",
+        "Guest/kernel/boot-chain delivery, activation and acceptance"
+      ]
+    },
+    {
+      "id": "T34",
+      "title": "接入保留数据的离线 kernel 更新",
+      "status": "kernel_img4_payload_swap_verified_disk_update_pending",
+      "acceptance": [
+        "原件缺失、类型/来源不符、零/多候选均不提交。",
+        "IM4M 原字节与关键数据保留；重复同输入一致，失败可恢复。",
+        "执行成功与新内核实际启动分开记录；不把它扩展为所有 boot-chain 更新。",
+        "7 GiB 缩回 6 GiB 而当前 DSC 超界时提交前拒绝，不改磁盘/receipt；不同 generation 不复用旧 kernel 证明。"
+      ],
+      "remaining_work": [
+        "Select trusted generation original and patch plan/mode, resolve exactly one stopped-VM Preboot regular-file target and bind to proved DSC compatibility.",
+        "Publish kernel payload, kernel receipt and origins transactionally with failure rollback; CLI/Launchpad update-kernel wiring.",
+        "Verify boot, retained guest data, repeated update and rollback with vm-new. Preserved IM4M bytes do not prove signature validity."
+      ]
+    }
+  ],
+  "observed_source": [
+    {
+      "path": "sources/VPhoneCore/VPhoneResources.swift:29",
+      "result": "rebasedForCreate captures Python candidate paths and environment; it does not copy interpreter/framework/packages. pythonExecutable may bootstrap a new managed environment when candidates fail."
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift:35",
+      "result": "closureLimits explicitly excludes external runtimes, tools/SDK/JB compilation/ROM, existing VM inputs/caches and trusted store binding."
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneCreateOrchestrator.swift:230",
+      "result": "makeRunner captures selected resource snapshot before new disk allocation, but NewBundleSpec still selects live defaultROMSource/defaultSEPROMSource; refreshBootROM reads live framework source again at line638."
+    },
+    {
+      "path": "scripts/lib/cfw_common.sh:101",
+      "result": "cfw_extract_input returns immediately for existing VM cfw_input/cfw_jb_input directories, before selecting a copied archive."
+    },
+    {
+      "path": "scripts/cfw_install_host.sh:126",
+      "result": "CFW rebuilds PATH with resource .tools/bin, Python dirname, /opt/homebrew/bin and system directories; it does not exclusively select immutable copied tools."
+    },
+    {
+      "path": "scripts/cfw_install_jb.sh:64",
+      "result": "JB/EXP still build guest artifacts at install time using xcrun-selected clang and iphoneos SDK."
+    },
+    {
+      "path": "sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineOrigins.swift:14",
+      "result": "runtime is Unknown; four origins are recorded launchpad.json values, not currently applied bytes."
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneBundleReport.swift:3",
+      "result": "vm info JSON does not expose the four origins; current actual CLI transfer matrix independently reads retained files."
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMBindingCLI.swift:22",
+      "result": "binding requires trusted root store verification before persistence; fixture opaque receipt cannot authorize a successful rebind."
+    },
+    {
+      "path": "sources/vphone-cli/VPhoneVMLaunchCLI.swift:132",
+      "result": "Bound launch passes --no-vphoned-update; actual no-write compatibility must still capture guest before/after hashes and instance."
+    },
+    {
+      "path": "sources/VPhoneCore/VPhoneCoreBundleVersion.swift:23",
+      "result": "code feature bound >=2.6.0 differs from same major.minor default support policy at supportsSeries."
+    }
+  ],
+  "actual_results": {
+    "cli_matrix": "actual-final-cli/result.json",
+    "cli_commands": 41,
+    "binding_refusal_rows": 10,
+    "transfer_rows": 6,
+    "input_disk_GiB": 0,
+    "historical_receipt_authenticated": false,
+    "external_observation": "external-readonly/result.json",
+    "explicit_project_python_installed_lock_probe_exit": 0
+  },
+  "independently_reviewable_next_changes": [
+    {
+      "name": "ROM snapshot closure",
+      "smallest_change": true,
+      "changes": [
+        "Add both Virtualization framework ROM files to create snapshot inputs and aggregate digest.",
+        "Expose copied ROM/SEPROM URLs to both new bundle creation and refreshBootROM; never re-read live default inside the attempt.",
+        "Inject ROM sources for deterministic tests; preserve plain vm new behavior unless explicitly scoped."
+      ],
+      "tests": [
+        "Capture ROM A then change live source to B; initial VM copy and prepare refresh must both use A.",
+        "Missing/unreadable/link-redirection/growth source refuses before new disk allocation; per-attempt aggregate changes trigger existing resume acceptance rules.",
+        "Apply byte/entry limits to ROM copies and keep prior attempt manifests."
+      ],
+      "acceptance_limit": "Closes two small external input files only; does not complete Python/SDK/CFW closure or T40."
+    },
+    {
+      "name": "Explicit existing Python selection for acceptance",
+      "smallest_change": false,
+      "production_change_required": false,
+      "changes": [
+        "Set VPHONE_PYTHON to the existing project .venv/bin/python3 for a separately authorized invocation.",
+        "Re-run installed snapshot locked probe with this explicit candidate; no setup or environment bootstrap is required for the read-only probe."
+      ],
+      "already_verified": "Direct final installed check_python_runtime.py with the existing project interpreter passed --locked --json, as did the development script.",
+      "acceptance_limit": "Interpreter availability and package versions/capabilities only; interpreter/framework/package bytes remain external and mutable."
+    },
+    {
+      "name": "Python and PATH closure",
+      "smallest_change": false,
+      "changes": [
+        "Resolve stage-dependent required interpreter/tools before accepting attempt; avoid bootstrap or fallback selection within an accepted frozen attempt.",
+        "Either package and relocate Python.framework, stdlib, full site-packages and native dependency closure, or explicitly constrain unsupported create modes.",
+        "Copy or prebuild the required external tools with their non-system dynamic dependencies; ensure CFW rebuilt PATH selects those exact copies.",
+        "Include runtime closure manifests in aggregate/resume identity and in quota admission."
+      ],
+      "acceptance_limit": "A hash of one executable or version lock is drift evidence, not immutable closure; per-stage rehash still cannot prevent stage-internal replacement."
+    },
+    {
+      "name": "JB/EXP compilation closure",
+      "smallest_change": false,
+      "changes": [
+        "Prefer prebuilt signed guest artifacts from a verified immutable source with compiler/SDK provenance, then snapshot them.",
+        "If compiling at create time remains supported, freeze SDK/toolchain contents plus compiler resources and native dependencies, and check quota before accepting attempt."
+      ],
+      "acceptance_limit": "SDKSettings.plist hash and selected clang path do not freeze SDK/compiler resources; cross-host acceptance still required."
+    },
+    {
+      "name": "Existing CFW input closure",
+      "smallest_change": false,
+      "changes": [
+        "Select VM-local extracted inputs under stopped-VM lock with full byte manifest and proven source archive identity.",
+        "Use a private captured input directory through all signing/install consumers, or safely regenerate from frozen archive while preserving failure evidence.",
+        "Refuse unknown or conflicting stale inputs; do not silently adopt pre-existing cfw_input/cfw_jb_input."
+      ],
+      "acceptance_limit": "Requires CFW transaction/resume behavior tests; changing extraction precedence alone can alter recovery behavior."
+    },
+    {
+      "name": "New-machine trusted host binding",
+      "smallest_change": false,
+      "changes": [
+        "Add explicit trusted root-store version selection to create route and freeze verified receipt/executable identity under existing store lock.",
+        "Publish host binding transactionally with newly created machine/checkpoint; do not derive trust solely from a resource snapshot or running executable version.",
+        "Record component origins only from T12/T32 actual generation/byte proofs; keep unknown where evidence is absent."
+      ],
+      "acceptance_limit": "Current embedded CLI create path has no current trusted store binding publication. Store presently absent; cannot perform this success row under read-only scope."
+    }
+  ],
+  "required_real_acceptance_matrix": [
+    {
+      "case": "Install new host Bundle while existing VM bound to old host",
+      "route_now": "production core-bundle install plus vm bind-core-bundle exist",
+      "required_evidence": "Two trusted installed receipts and hashes; existing binding/config unchanged by installation; bound launch selects original executable; no guest/Preboot mutation.",
+      "current_limit": "Store absent; success requires authorized root-store installation and executable activation."
+    },
+    {
+      "case": "Host-only rebind and host rollback with old guest/kernel",
+      "route_now": "production bind-core-bundle exists",
+      "required_evidence": "Before/after host binding receipt+hash, guest daemon/libraries hashes+instance, kernel and other boot-chain exact bytes/source receipts; only host recorded origin changes.",
+      "current_limit": "Requires trusted bundles plus VM observation; current refusal rows cover no successful rebind."
+    },
+    {
+      "case": "Different local/CI builds coexist",
+      "route_now": "production version parser and root-store install exist",
+      "required_evidence": "Distinct installed immutable archives/receipts, no overwrite of in-use build, valid suffix parse; matching major.minor policy distinct from lower bound.",
+      "current_limit": "This batch proves parser acceptance reaches missing-store refusal, not coexistence or cross-series support."
+    },
+    {
+      "case": "New create and resume under changing inputs",
+      "route_now": "production create snapshot exists, closure incomplete",
+      "required_evidence": "Complete fixed dependency closure across all stages; resume rejection/explicit acceptance and previously completed stage provenance retained; trusted host binding published.",
+      "current_limit": "Resource snapshot tests and probes do not establish external closure or real create/restore/boot."
+    },
+    {
+      "case": "Clone/rename/export/import with trusted existing binding and receipts",
+      "route_now": "production transfer commands exist",
+      "required_evidence": "Real stopped VM persistent byte+permission inventory, trusted host receipt verified before/after transfer, component records preserved, no default fallback.",
+      "current_limit": "6 rows are 0 GiB fixture byte transfers with opaque historical receipt only; full 64GiB archive round-trip needs adequate storage."
+    },
+    {
+      "case": "Kernel-only upgrade and rollback",
+      "route_now": "no production update-kernel subcommand; T34 payload helper only",
+      "required_evidence": "T12 trusted originals; T32 per-component receipt bound to VM/generation/plan/transaction; T34 unique Preboot target/IM4M preservation/DSC compatibility; real boot, retained user data, rollback; other boot-chain origin unchanged.",
+      "current_limit": "Cannot execute this full row with current production CLI; no invented receipt or planned adaptation may count."
+    },
+    {
+      "case": "Explicit environment upgrade/rollback and mixed host/guest versions",
+      "route_now": "host/guest environment paths partial; T17 activation/write coordination pending",
+      "required_evidence": "desired/planned/generated/committed/activated/accepted separation, actual daemon+library byte hashes and instances before/after, installed-but-not-activated state and restoration evidence; automatic sync frozen.",
+      "current_limit": "T07 daemon replacement evidence does not substitute for T17 multi-component activation and T32 component proofs."
+    }
+  ],
+  "storage_limit": "Approximately 17 GiB free per parent baseline. No real 64 GiB archive attempted. Same-volume APFS clone is not a physically independent backup.",
+  "conclusion": "T40 remains partial. Current safe independent scope is completed as recorded above; full acceptance requires production capabilities and real matrix rows beyond this read-only assignment."
+}

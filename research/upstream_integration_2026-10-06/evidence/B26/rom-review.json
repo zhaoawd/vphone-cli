@@ -1,0 +1,106 @@
+{
+  "reviewer": "b26_rom_review",
+  "scope": "T40 ROM/SEPROM create snapshot 增量；只读审查四个未提交文件及相关消费者、runner 和 checkpoint 代码",
+  "base_commit": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e",
+  "result": "无发现",
+  "findings": [],
+  "observations": [
+    {
+      "file": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "lines": [
+        74,
+        115,
+        117,
+        128,
+        157,
+        160,
+        180,
+        185
+      ],
+      "evidence": "两份 ROM 通过现有必需常规文件检查进入 inventory，按实际大小进入单次及累计字节预算和容量检查；副本位于 ROMs，清单和 fingerprint 同时遍历 VPhone.bundle 与 ROMs。现有按文件大小和剩余预算检查的 copy、源文件摘要复核及失败清理同样覆盖 ROM。"
+    },
+    {
+      "file": "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+      "lines": [
+        230,
+        233,
+        341,
+        350,
+        356,
+        641,
+        646
+      ],
+      "evidence": "create 在分配 VM 磁盘前完成 capture，createBundle 的两个源路径来自同一 snapshot；makeRunner 将 snapshot 注入 live stages 的 orchestrator；prepare 的 refreshBootROM 读取 snapshot.romSource。缺少 snapshot 的两个消费者均拒绝执行。普通 vm new 的 VPhoneVMCLI.swift:120-123 保持原路径选择。"
+    },
+    {
+      "file": "sources/VPhoneCore/VPhoneCreateResourceSnapshot.swift",
+      "lines": [
+        114,
+        162,
+        178,
+        194,
+        206
+      ],
+      "evidence": "新增 ROM 副本不写入已签名 VPhone.bundle 内部；Manifest 字段和 schemaVersion 未改变，旧清单仍可由现有 retention 读取。成功和未接受尝试的清理、失败已开始尝试的保留使用既有生命周期。"
+    },
+    {
+      "file": "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "lines": [
+        358,
+        360,
+        438,
+        454,
+        474,
+        504
+      ],
+      "evidence": "ROM 变化进入 aggregate fingerprint 后按既有 toolChanged 规则要求显式 acceptToolChange；已跳过阶段的原 evidence 不被覆盖。旧 checkpoint 的较窄摘要会被视为工具变化，允许经显式接受继续；代码未尝试用新范围重算旧摘要。"
+    },
+    {
+      "file": "tests/VPhoneCLITests/CreateResourceFreezeTests.swift",
+      "lines": [
+        55,
+        62,
+        67
+      ],
+      "evidence": "消费者测试使用实际 makeRunner、createBundle、VPhoneBundleOps.create 和 refreshBootROM；源文件替换发生在 capture 后，因此能检查生产消费者是否继续使用活源路径。该测试不执行完整 create pipeline。"
+    },
+    {
+      "file": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "lines": [
+        66,
+        78,
+        89,
+        109,
+        122,
+        141,
+        161,
+        224
+      ],
+      "evidence": "新增测试覆盖两份 ROM 缺失、复制隔离、清单、恢复摘要变化、链接物化与重定向、增长预算、容量准入和最终阶段副本内容 mutation。恢复与最终阶段 mutation 测试使用测试 executor/verifier，其结论限定于 runner 身份和状态处理。"
+    }
+  ],
+  "validation_evidence": {
+    "execution": "本审查没有运行 SwiftPM、构建、测试、UI、VM、AMFI 或 helper 注册；只读取父任务提供的日志",
+    "red_log": "/private/tmp/vphone-b26-t40-rom/behavior-red-complete.log",
+    "red_result": "日志末尾报告 27 tests / 2 suites、29 issues",
+    "green_log": "/private/tmp/vphone-b26-t40-rom/focused-green.log",
+    "green_result": "日志末尾报告 27 tests / 2 suites 通过；actualBuildResourceCopyRunsReadOnlyProbes 明确 skipped",
+    "evidence_limit": "日志文件本身未记录 shell exit code；exit0 来自父任务陈述。本审查未独立验证运行退出状态、真实签名副本可执行性或 VM 行为。"
+  },
+  "nonblocking_recommendations": [
+    {
+      "file": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "line": 89,
+      "recommendation": "可增加明确的旧版无 ROM 清单/旧 aggregate checkpoint fixture，固定升级恢复需显式接受且保留旧 origins 的兼容行为；当前兼容结论来自代码路径审查。"
+    },
+    {
+      "file": "tests/VPhoneCoreTests/CreateResourceSnapshotTests.swift",
+      "line": 275,
+      "recommendation": "签名完整性与实际构建副本只读探测需由父任务的标准验证证据补充；focused 日志中该测试被跳过。"
+    }
+  ],
+  "limitations": [
+    "ROM 增量只补充输入闭包的一部分；closureLimits 仍明确记录 Python、PATH 工具、SDK/compiler、JB 编译及固件和缓存等外部依赖。",
+    "未读取根 TODO.md，未修改仓库文件。"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "mode": "missing-ack",
+  "label": "missing-ack-bd9e5ada",
+  "argv": [
+    "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/MacOS/TransportHarness",
+    "missing-ack",
+    "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-bd9e5ada"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 30.249787624983583,
+  "events": [
+    {
+      "client_pid": "14358",
+      "event": "authenticated_handshake",
+      "service_pid": "14361"
+    },
+    {
+      "error": "",
+      "event": "receiver_finished",
+      "success": "true"
+    },
+    {
+      "client_pid": "14358",
+      "elapsed_seconds": "30.01161458331626",
+      "error": "Helper output not acknowledged: Helper timed out; an install may still be running. Verify before retrying.. The operation may have committed; verify before retrying.",
+      "log": "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-bd9e5ada/6C569F8E-626D-4BAB-9B84-3E65226C3EFB.log",
+      "log_bytes": "75",
+      "mode": "missing-ack",
+      "operation": "6C569F8E-626D-4BAB-9B84-3E65226C3EFB",
+      "result": "failure",
+      "service_pid": "14361"
+    }
+  ],
+  "stdout": "{\"client_pid\":\"14358\",\"event\":\"authenticated_handshake\",\"service_pid\":\"14361\"}\n{\"error\":\"\",\"event\":\"receiver_finished\",\"success\":\"true\"}\n{\"client_pid\":\"14358\",\"elapsed_seconds\":\"30.01161458331626\",\"error\":\"Helper output not acknowledged: Helper timed out; an install may still be running. Verify before retrying.. The operation may have committed; verify before retrying.\",\"log\":\"\\/private\\/tmp\\/vphone-b26-t46-helper\\/runs\\/missing-ack-bd9e5ada\\/6C569F8E-626D-4BAB-9B84-3E65226C3EFB.log\",\"log_bytes\":\"75\",\"mode\":\"missing-ack\",\"operation\":\"6C569F8E-626D-4BAB-9B84-3E65226C3EFB\",\"result\":\"failure\",\"service_pid\":\"14361\"}\n",
+  "stderr": "",
+  "logs": [
+    {
+      "path": "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-bd9e5ada/6C569F8E-626D-4BAB-9B84-3E65226C3EFB.log",
+      "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+      "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+      "mode": "0o600",
+      "bytes": 75
+    }
+  ]
+}

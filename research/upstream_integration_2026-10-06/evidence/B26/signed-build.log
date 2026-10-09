@@ -1,0 +1,419 @@
+zsh scripts/build.sh
+=== Building vphone-cli (b4e80c57) ===
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for production...
+[2/35] Write sources
+[4/35] Write swift-version--58304C5D6DBC2206.txt
+[6/37] Compiling AppleMobileDeviceLibrary AppleMobileDeviceLibrary.swift
+[6/37] Compiling download.c
+[7/37] Compiling deviceinterfaced.c
+[8/37] Compiling asr.c
+[9/37] Compiling fdr.c
+[10/37] Compiling limera1n.c
+[11/37] Compiling normal.c
+[12/37] Compiling recovery.c
+[13/37] Compiling ipsw.c
+[14/37] Compiling dfu.c
+[15/37] Compiling img3.c
+[16/37] Compiling idevicerestore.c
+[17/37] Compiling ace3.c
+[18/37] Compiling mbn.c
+[19/37] Compiling ftab.c
+[20/37] Compiling locking.c
+[21/37] Compiling fls.c
+[21/37] Compiling img4.c
+[23/37] Compiling log.c
+[24/37] Compiling vphone_zip_stub.c
+[25/37] Compiling common.c
+[26/37] Compiling vphone_restore_bridge.c
+[27/37] Compiling restore.c
+[28/37] Compiling MobileRecoveryCore libirecovery.c
+[30/38] Compiling VPhoneRestore VPhoneRecoveryProbe.swift
+[31/38] Compiling VPhoneCore HostControlClient.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[32/44] Compiling VPhoneHelperKit VPhoneHelperAuthorization.swift
+[32/44] Write Objects.LinkFileList
+[33/44] Linking vphone-helper
+[35/44] Compiling VPhoneLaunchpadKit VPhoneLaunchpadChildProcess.swift
+[35/44] Write Objects.LinkFileList
+[37/44] Linking vphone-launchpad-launcher
+[38/44] Linking vphone-launchpad
+[40/44] Compiling FirmwarePatcher ARM64Constants.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[41/45] Compiling vphone_cli VPhoneAPIProxyOptions.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[42/47] Compiling VPhoneCommandEntry main.swift
+[43/47] Compiling VPhoneVMEntry main.swift
+[43/47] Write Objects.LinkFileList
+[45/47] Linking vphone-cli
+[46/47] Linking vphone-vm
+Build complete! (104.38s)
+=== Signing with entitlements ===
+.build/release/vphone-cli: replacing existing signature
+.build/release/vphone-vm: replacing existing signature
+  signed OK → .build/release/vphone-cli
+=== Bundling .build/vphone-cli.app ===
+.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+  bundled → .build/vphone-cli.app
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc  \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"b4e80c57"' \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest/vphoned unarchive.m vphoned.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc -DLESS=1 \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"b4e80c57"' \
+		-o /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/guest/vphoned-less unarchive.m vphoned.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+=== Bundling runtime assets → .build/vphone-cli.app/Contents/Resources ===
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Resources/.tools/bin/insert_dylib: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Resources/.tools/bin/trustcache: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli: replacing existing signature
+Portable host Mach-O closure verified: 7 signed images
+=== Signing .build/vphone-cli.app (final Resources) ===
+.build/vphone-cli.app: replacing existing signature
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Portable host Mach-O closure verified: 7 signed images
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+  resealed and verified OK
+
+=== Build complete ===
+  binary : .build/release/vphone-cli
+  bundle : .build/vphone-cli.app
+  guest  : .build/guest/{vphoned,vphoned-less}
+
+Run: .build/release/vphone-cli --help
+zsh scripts/build_launchpad.sh
+=== Checking .build/vphone-cli.app ===
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Portable host Mach-O closure verified: 7 signed images
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+=== Building vphone-launchpad (b4e80c57) ===
+Building for production...
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'vphone-launchpad' complete! (0.54s)
+Building for production...
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'vphone-launchpad-launcher' complete! (0.50s)
+Launchpad strings: 282 keys, 282 source literals, 5 Info.plist keys, languages en, zh-Hans; 0 issues; needs_review: 129
+=== Assembling .build/vphone-launchpad.app ===
+.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher: replacing existing signature
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher: replacing existing signature
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad: replacing existing signature
+Portable host Mach-O closure verified: 2 signed images
+  vphone-cli cdhash ee7e5e84362fd433f0d50300ca222f61ef8c9991
+  vphone-vm  cdhash 62a1f395413f6878c4de0042f6e77962aa2b1219
+=== Signing .build/vphone-launchpad.app ===
+.build/vphone-launchpad.app: replacing existing signature
+Portable host Mach-O closure verified: 2 signed images
+Portable host Mach-O closure verified: 7 signed images
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: satisfies its Designated Requirement
+Launchpad bundle: Info.plist, layout, localizations en, zh-Hans, cdhash vphone-cli ee7e5e84362fd433f0d50300ca222f61ef8c9991 vphone-vm 62a1f395413f6878c4de0042f6e77962aa2b1219 (= reference), nested entitlements and outer signature verified
+
+=== Launchpad build complete ===
+  app : .build/vphone-launchpad.app
+Run: open .build/vphone-launchpad.app
+python3 scripts/check_bundle.py .build/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app: satisfies its Designated Requirement
+Portable host Mach-O closure verified: 7 signed images
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+Executable=/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+Complete bundle: resources, signature and entitlements verified
+python3 scripts/check_launchpad_bundle.py .build/vphone-launchpad.app --reference .build/vphone-cli.app
+Portable host Mach-O closure verified: 2 signed images
+Portable host Mach-O closure verified: 7 signed images
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/ldid
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+--prepared:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm
+--validated:/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: valid on disk
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app: satisfies its Designated Requirement
+Launchpad bundle: Info.plist, layout, localizations en, zh-Hans, cdhash vphone-cli ee7e5e84362fd433f0d50300ca222f61ef8c9991 vphone-vm 62a1f395413f6878c4de0042f6e77962aa2b1219 (= reference), nested entitlements and outer signature verified
+python3 scripts/check_launchpad_strings.py
+Launchpad strings: 282 keys, 282 source literals, 5 Info.plist keys, languages en, zh-Hans; 0 issues; needs_review: 129

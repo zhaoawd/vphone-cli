@@ -1,0 +1,1075 @@
+{
+  "scope": "actual final CLI; synthetic 0 GiB VM fixtures only; no VM/store/system mutation",
+  "cli": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+  "cli_sha256": "89b30ee557523294ab3646b979df2caec20fcf11dfa18a47fd482ef7df2e3c3c",
+  "store_before": "absent",
+  "commands": [
+    {
+      "label": "read-only-help",
+      "argv": [
+        "--help"
+      ],
+      "returncode": 0,
+      "seconds": 0.03196579200448468,
+      "stdout": "000-read-only-help.stdout",
+      "stderr": "000-read-only-help.stderr"
+    },
+    {
+      "label": "resources",
+      "argv": [
+        "resources"
+      ],
+      "returncode": 0,
+      "seconds": 0.06462875002762303,
+      "stdout": "001-resources.stdout",
+      "stderr": "001-resources.stderr"
+    },
+    {
+      "label": "read-only-help",
+      "argv": [
+        "vm",
+        "--help"
+      ],
+      "returncode": 0,
+      "seconds": 0.03441237495280802,
+      "stdout": "002-read-only-help.stdout",
+      "stderr": "002-read-only-help.stderr"
+    },
+    {
+      "label": "read-only-help",
+      "argv": [
+        "fw",
+        "--help"
+      ],
+      "returncode": 0,
+      "seconds": 0.038326999987475574,
+      "stdout": "003-read-only-help.stdout",
+      "stderr": "003-read-only-help.stderr"
+    },
+    {
+      "label": "read-only-help",
+      "argv": [
+        "cfw",
+        "--help"
+      ],
+      "returncode": 0,
+      "seconds": 0.03727795899612829,
+      "stdout": "004-read-only-help.stdout",
+      "stderr": "004-read-only-help.stderr"
+    },
+    {
+      "label": "read-only-help",
+      "argv": [
+        "guest",
+        "--help"
+      ],
+      "returncode": 0,
+      "seconds": 0.03577524999855086,
+      "stdout": "005-read-only-help.stdout",
+      "stderr": "005-read-only-help.stderr"
+    },
+    {
+      "label": "new-0GiB-fixture",
+      "argv": [
+        "vm",
+        "new",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--disk-size",
+        "0",
+        "--rom",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/synthetic-ROM.bin",
+        "--seprom",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/synthetic-ROM.bin"
+      ],
+      "returncode": 0,
+      "seconds": 0.09252999996533617,
+      "stdout": "006-new-0GiB-fixture.stdout",
+      "stderr": "006-new-0GiB-fixture.stderr"
+    },
+    {
+      "label": "release-lower-bound",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.0",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-release-lower-bound"
+      ],
+      "returncode": 1,
+      "seconds": 0.03850150003563613,
+      "stdout": "007-release-lower-bound.stdout",
+      "stderr": "007-release-lower-bound.stderr"
+    },
+    {
+      "label": "patch-different",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.2",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-patch-different"
+      ],
+      "returncode": 1,
+      "seconds": 0.03503729205112904,
+      "stdout": "008-patch-different.stdout",
+      "stderr": "008-patch-different.stderr"
+    },
+    {
+      "label": "local-suffix",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.1-local.1208708c55574677",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-local-suffix"
+      ],
+      "returncode": 1,
+      "seconds": 0.04190025001298636,
+      "stdout": "009-local-suffix.stdout",
+      "stderr": "009-local-suffix.stderr"
+    },
+    {
+      "label": "ci-suffix",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.0-ci.abcdef0",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-ci-suffix"
+      ],
+      "returncode": 1,
+      "seconds": 0.04273612500401214,
+      "stdout": "010-ci-suffix.stdout",
+      "stderr": "010-ci-suffix.stderr"
+    },
+    {
+      "label": "cross-series-code-bound-only",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.7.0",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-cross-series-code-bound-only"
+      ],
+      "returncode": 1,
+      "seconds": 0.039235541014932096,
+      "stdout": "011-cross-series-code-bound-only.stdout",
+      "stderr": "011-cross-series-code-bound-only.stderr"
+    },
+    {
+      "label": "below-code-bound",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.5.9",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-below-code-bound"
+      ],
+      "returncode": 64,
+      "seconds": 0.044594916980713606,
+      "stdout": "012-below-code-bound.stdout",
+      "stderr": "012-below-code-bound.stderr"
+    },
+    {
+      "label": "invalid-version",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "../2.6.1",
+        "--backup",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/backup-invalid-version"
+      ],
+      "returncode": 64,
+      "seconds": 0.04078162496443838,
+      "stdout": "013-invalid-version.stdout",
+      "stderr": "013-invalid-version.stderr"
+    },
+    {
+      "label": "rebind-legacy-three-field",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.2"
+      ],
+      "returncode": 1,
+      "seconds": 0.04286383400904015,
+      "stdout": "014-rebind-legacy-three-field.stdout",
+      "stderr": "014-rebind-legacy-three-field.stderr"
+    },
+    {
+      "label": "rebind-four-field",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.2"
+      ],
+      "returncode": 1,
+      "seconds": 0.04557133297203109,
+      "stdout": "015-rebind-four-field.stdout",
+      "stderr": "015-rebind-four-field.stderr"
+    },
+    {
+      "label": "rebind-invalid-origin",
+      "argv": [
+        "vm",
+        "bind-core-bundle",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "--version",
+        "2.6.2"
+      ],
+      "returncode": 1,
+      "seconds": 0.04032450000522658,
+      "stdout": "016-rebind-invalid-origin.stdout",
+      "stderr": "016-rebind-invalid-origin.stderr"
+    },
+    {
+      "label": "native-missing-binding-clone",
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "native-missing-binding"
+      ],
+      "returncode": 0,
+      "seconds": 0.10533550003310665,
+      "stdout": "017-native-missing-binding-clone.stdout",
+      "stderr": "017-native-missing-binding-clone.stderr"
+    },
+    {
+      "label": "native-missing-binding-rename",
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "native-missing-binding",
+        "native-missing-binding-renamed"
+      ],
+      "returncode": 0,
+      "seconds": 0.0790576669969596,
+      "stdout": "018-native-missing-binding-rename.stdout",
+      "stderr": "018-native-missing-binding-rename.stderr"
+    },
+    {
+      "label": "native-missing-binding-export",
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "native-missing-binding-renamed",
+        "--out",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/native-missing-binding.txz",
+        "--max",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "seconds": 0.06818033300805837,
+      "stdout": "019-native-missing-binding-export.stdout",
+      "stderr": "019-native-missing-binding-export.stderr"
+    },
+    {
+      "label": "native-missing-binding-import",
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/native-missing-binding.txz",
+        "--name",
+        "native-missing-binding-imported",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "seconds": 0.05450712499441579,
+      "stdout": "020-native-missing-binding-import.stdout",
+      "stderr": "020-native-missing-binding-import.stderr"
+    },
+    {
+      "label": "native-legacy-three-field-clone",
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "native-legacy-three-field"
+      ],
+      "returncode": 0,
+      "seconds": 0.05771441699471325,
+      "stdout": "021-native-legacy-three-field-clone.stdout",
+      "stderr": "021-native-legacy-three-field-clone.stderr"
+    },
+    {
+      "label": "native-legacy-three-field-rename",
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "native-legacy-three-field",
+        "native-legacy-three-field-renamed"
+      ],
+      "returncode": 0,
+      "seconds": 0.05553854099707678,
+      "stdout": "022-native-legacy-three-field-rename.stdout",
+      "stderr": "022-native-legacy-three-field-rename.stderr"
+    },
+    {
+      "label": "native-legacy-three-field-export",
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "native-legacy-three-field-renamed",
+        "--out",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/native-legacy-three-field.txz",
+        "--max",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "seconds": 0.07333308400120586,
+      "stdout": "023-native-legacy-three-field-export.stdout",
+      "stderr": "023-native-legacy-three-field-export.stderr"
+    },
+    {
+      "label": "native-legacy-three-field-import",
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/native-legacy-three-field.txz",
+        "--name",
+        "native-legacy-three-field-imported",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "seconds": 0.0545637080213055,
+      "stdout": "024-native-legacy-three-field-import.stdout",
+      "stderr": "024-native-legacy-three-field-import.stderr"
+    },
+    {
+      "label": "native-four-field-clone",
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "native-four-field"
+      ],
+      "returncode": 0,
+      "seconds": 0.070756041968707,
+      "stdout": "025-native-four-field-clone.stdout",
+      "stderr": "025-native-four-field-clone.stderr"
+    },
+    {
+      "label": "native-four-field-rename",
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "native-four-field",
+        "native-four-field-renamed"
+      ],
+      "returncode": 0,
+      "seconds": 0.059556416992563754,
+      "stdout": "026-native-four-field-rename.stdout",
+      "stderr": "026-native-four-field-rename.stderr"
+    },
+    {
+      "label": "native-four-field-export",
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "native-four-field-renamed",
+        "--out",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/native-four-field.txz",
+        "--max",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "seconds": 0.09049099998082966,
+      "stdout": "027-native-four-field-export.stdout",
+      "stderr": "027-native-four-field-export.stderr"
+    },
+    {
+      "label": "native-four-field-import",
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/native-four-field.txz",
+        "--name",
+        "native-four-field-imported",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "seconds": 0.07776695798384026,
+      "stdout": "028-native-four-field-import.stdout",
+      "stderr": "028-native-four-field-import.stderr"
+    },
+    {
+      "label": "system-tar-missing-binding-clone",
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "system-tar-missing-binding"
+      ],
+      "returncode": 0,
+      "seconds": 0.08384470903547481,
+      "stdout": "029-system-tar-missing-binding-clone.stdout",
+      "stderr": "029-system-tar-missing-binding-clone.stderr"
+    },
+    {
+      "label": "system-tar-missing-binding-rename",
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "system-tar-missing-binding",
+        "system-tar-missing-binding-renamed"
+      ],
+      "returncode": 0,
+      "seconds": 0.07261274999473244,
+      "stdout": "030-system-tar-missing-binding-rename.stdout",
+      "stderr": "030-system-tar-missing-binding-rename.stderr"
+    },
+    {
+      "label": "system-tar-missing-binding-export",
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "system-tar-missing-binding-renamed",
+        "--out",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/system-tar-missing-binding.txz",
+        "--max",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "seconds": 0.16844108299119398,
+      "stdout": "031-system-tar-missing-binding-export.stdout",
+      "stderr": "031-system-tar-missing-binding-export.stderr"
+    },
+    {
+      "label": "system-tar-missing-binding-import",
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/system-tar-missing-binding.txz",
+        "--name",
+        "system-tar-missing-binding-imported",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "seconds": 0.15859825001098216,
+      "stdout": "032-system-tar-missing-binding-import.stdout",
+      "stderr": "032-system-tar-missing-binding-import.stderr"
+    },
+    {
+      "label": "system-tar-legacy-three-field-clone",
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "system-tar-legacy-three-field"
+      ],
+      "returncode": 0,
+      "seconds": 0.11107112502213567,
+      "stdout": "033-system-tar-legacy-three-field-clone.stdout",
+      "stderr": "033-system-tar-legacy-three-field-clone.stderr"
+    },
+    {
+      "label": "system-tar-legacy-three-field-rename",
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "system-tar-legacy-three-field",
+        "system-tar-legacy-three-field-renamed"
+      ],
+      "returncode": 0,
+      "seconds": 0.08393412502482533,
+      "stdout": "034-system-tar-legacy-three-field-rename.stdout",
+      "stderr": "034-system-tar-legacy-three-field-rename.stderr"
+    },
+    {
+      "label": "system-tar-legacy-three-field-export",
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "system-tar-legacy-three-field-renamed",
+        "--out",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/system-tar-legacy-three-field.txz",
+        "--max",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "seconds": 0.17728558299131691,
+      "stdout": "035-system-tar-legacy-three-field-export.stdout",
+      "stderr": "035-system-tar-legacy-three-field-export.stderr"
+    },
+    {
+      "label": "system-tar-legacy-three-field-import",
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/system-tar-legacy-three-field.txz",
+        "--name",
+        "system-tar-legacy-three-field-imported",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "seconds": 0.16042183298850432,
+      "stdout": "036-system-tar-legacy-three-field-import.stdout",
+      "stderr": "036-system-tar-legacy-three-field-import.stderr"
+    },
+    {
+      "label": "system-tar-four-field-clone",
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "source",
+        "system-tar-four-field"
+      ],
+      "returncode": 0,
+      "seconds": 0.10403870802838355,
+      "stdout": "037-system-tar-four-field-clone.stdout",
+      "stderr": "037-system-tar-four-field-clone.stderr"
+    },
+    {
+      "label": "system-tar-four-field-rename",
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "system-tar-four-field",
+        "system-tar-four-field-renamed"
+      ],
+      "returncode": 0,
+      "seconds": 0.08100191596895456,
+      "stdout": "038-system-tar-four-field-rename.stdout",
+      "stderr": "038-system-tar-four-field-rename.stderr"
+    },
+    {
+      "label": "system-tar-four-field-export",
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "system-tar-four-field-renamed",
+        "--out",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/system-tar-four-field.txz",
+        "--max",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "seconds": 0.17079004098195583,
+      "stdout": "039-system-tar-four-field-export.stdout",
+      "stderr": "039-system-tar-four-field-export.stderr"
+    },
+    {
+      "label": "system-tar-four-field-import",
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/library",
+        "/private/tmp/vphone-b26-t40/actual-final-cli/system-tar-four-field.txz",
+        "--name",
+        "system-tar-four-field-imported",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "seconds": 0.15198841696837917,
+      "stdout": "040-system-tar-four-field-import.stdout",
+      "stderr": "040-system-tar-four-field-import.stderr"
+    }
+  ],
+  "refusals": [
+    {
+      "case": "release-lower-bound",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "unavailable or failed verification"
+    },
+    {
+      "case": "patch-different",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "unavailable or failed verification"
+    },
+    {
+      "case": "local-suffix",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "unavailable or failed verification"
+    },
+    {
+      "case": "ci-suffix",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "unavailable or failed verification"
+    },
+    {
+      "case": "cross-series-code-bound-only",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "unavailable or failed verification"
+    },
+    {
+      "case": "below-code-bound",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "2.6.0 or later"
+    },
+    {
+      "case": "invalid-version",
+      "machine_unchanged": true,
+      "backup_absent": true,
+      "expected_error": "2.6.0 or later"
+    },
+    {
+      "case": "rebind-legacy-three-field",
+      "machine_unchanged": true,
+      "expected_error": "Restore this exact verified version"
+    },
+    {
+      "case": "rebind-four-field",
+      "machine_unchanged": true,
+      "expected_error": "Restore this exact verified version"
+    },
+    {
+      "case": "rebind-invalid-origin",
+      "machine_unchanged": true,
+      "expected_error": "Invalid Core Bundle origin"
+    }
+  ],
+  "transfers": [
+    {
+      "case": "native-missing-binding",
+      "inventory": {
+        "AVPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "Disk.img": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "SEPStorage": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 524288,
+          "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        },
+        "acceptance-host-receipt-copy.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 318,
+          "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4"
+        },
+        "config.plist": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 1070,
+          "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a"
+        },
+        "state.bin": {
+          "mode": 416,
+          "kind": "file",
+          "bytes": 27,
+          "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3"
+        }
+      },
+      "archive_bytes": 1200,
+      "binding_present_after": false,
+      "identical": true,
+      "receipt_authenticated": false
+    },
+    {
+      "case": "native-legacy-three-field",
+      "inventory": {
+        "AVPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "Disk.img": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "SEPStorage": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 524288,
+          "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        },
+        "acceptance-host-receipt-copy.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 318,
+          "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4"
+        },
+        "config.plist": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 1070,
+          "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a"
+        },
+        "launchpad.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 105,
+          "sha256": "1aefe844807a864286b731d943149d33428660c1651a70f8531ea3ba53ccdb63"
+        },
+        "state.bin": {
+          "mode": 416,
+          "kind": "file",
+          "bytes": 27,
+          "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3"
+        }
+      },
+      "archive_bytes": 1288,
+      "binding_present_after": true,
+      "identical": true,
+      "receipt_authenticated": false
+    },
+    {
+      "case": "native-four-field",
+      "inventory": {
+        "AVPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "Disk.img": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "SEPStorage": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 524288,
+          "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        },
+        "acceptance-host-receipt-copy.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 318,
+          "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4"
+        },
+        "config.plist": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 1070,
+          "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a"
+        },
+        "launchpad.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 124,
+          "sha256": "2a4258dbeefde2c978c2b155b08a65b5b93a9c2e60448257612b7c268bfb436c"
+        },
+        "state.bin": {
+          "mode": 416,
+          "kind": "file",
+          "bytes": 27,
+          "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3"
+        }
+      },
+      "archive_bytes": 1296,
+      "binding_present_after": true,
+      "identical": true,
+      "receipt_authenticated": false
+    },
+    {
+      "case": "system-tar-missing-binding",
+      "inventory": {
+        "AVPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "Disk.img": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "SEPStorage": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 524288,
+          "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        },
+        "acceptance-host-receipt-copy.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 318,
+          "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4"
+        },
+        "config.plist": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 1070,
+          "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a"
+        },
+        "state.bin": {
+          "mode": 416,
+          "kind": "file",
+          "bytes": 27,
+          "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3"
+        }
+      },
+      "archive_bytes": 1344,
+      "binding_present_after": false,
+      "identical": true,
+      "receipt_authenticated": false
+    },
+    {
+      "case": "system-tar-legacy-three-field",
+      "inventory": {
+        "AVPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "Disk.img": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "SEPStorage": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 524288,
+          "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        },
+        "acceptance-host-receipt-copy.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 318,
+          "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4"
+        },
+        "config.plist": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 1070,
+          "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a"
+        },
+        "launchpad.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 105,
+          "sha256": "1aefe844807a864286b731d943149d33428660c1651a70f8531ea3ba53ccdb63"
+        },
+        "state.bin": {
+          "mode": 416,
+          "kind": "file",
+          "bytes": 27,
+          "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3"
+        }
+      },
+      "archive_bytes": 1428,
+      "binding_present_after": true,
+      "identical": true,
+      "receipt_authenticated": false
+    },
+    {
+      "case": "system-tar-four-field",
+      "inventory": {
+        "AVPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 29,
+          "sha256": "c7b9dda1c755b429b6e3045523cf485ea3b39c8c7f5e3b4a12f49e6b58564c73"
+        },
+        "Disk.img": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "SEPStorage": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 524288,
+          "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        },
+        "acceptance-host-receipt-copy.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 318,
+          "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4"
+        },
+        "config.plist": {
+          "mode": 420,
+          "kind": "file",
+          "bytes": 1070,
+          "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a"
+        },
+        "launchpad.json": {
+          "mode": 384,
+          "kind": "file",
+          "bytes": 124,
+          "sha256": "2a4258dbeefde2c978c2b155b08a65b5b93a9c2e60448257612b7c268bfb436c"
+        },
+        "state.bin": {
+          "mode": 416,
+          "kind": "file",
+          "bytes": 27,
+          "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3"
+        }
+      },
+      "archive_bytes": 1428,
+      "binding_present_after": true,
+      "identical": true,
+      "receipt_authenticated": false
+    }
+  ],
+  "task_accepted": false,
+  "limitations": [
+    "No real VM archive, restore, boot or component update",
+    "Binding inputs are constructed fixtures; no actual component source established",
+    "Historical receipt bytes are opaque; this does not verify current trusted root store",
+    "Code lower bound acceptance does not establish cross-series compatibility"
+  ],
+  "historical_receipt": {
+    "input": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/research/upstream_integration_2026-10-06/evidence/B24/T40/historical-host-receipt.json",
+    "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4",
+    "provenance": "B22 actual install stdout copied in B24; no current store authorization"
+  },
+  "complete": true,
+  "store_after": "absent",
+  "cli_unchanged": true,
+  "vm_started": false
+}

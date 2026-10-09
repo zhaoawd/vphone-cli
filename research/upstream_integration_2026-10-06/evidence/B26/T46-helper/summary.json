@@ -1,0 +1,182 @@
+{
+  "task": "B26 T46 helper production-output transport fault matrix",
+  "status": "four_transport_cases_verified_root_mach_and_actual_store_pending",
+  "source_snapshot_head": "6e88b101984eef28cb162aa02fd54ac4cbd5de8e",
+  "current_output_source_manifest": "current-source-manifest.json",
+  "immutable_input_manifest": "stable-input-manifest-final.json",
+  "harness_source_sha256": "09a6f560b77dc47bd3d074dce06715dc0685dbf34189761fa56021d2fe597620",
+  "cases": [
+    {
+      "mode": "normal",
+      "evidence": "normal-96e00c97.json",
+      "harness_exit": 0,
+      "client_pid": 22116,
+      "service_pid": 22118,
+      "operation_result": "success",
+      "operation_seconds": 0.0013026249944232404,
+      "wall_seconds": 0.1412542910547927,
+      "receiver_finished": {
+        "error": "",
+        "event": "receiver_finished",
+        "success": "true"
+      },
+      "error": null,
+      "logs": [
+        {
+          "path": "/private/tmp/vphone-b26-t46-helper/runs/normal-96e00c97/CE9796F1-4B7A-42AD-92A6-9EFFA148BB91.log",
+          "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+          "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+          "mode": "0o600",
+          "bytes": 75
+        }
+      ]
+    },
+    {
+      "mode": "missing-ack",
+      "evidence": "missing-ack-9d00e206.json",
+      "harness_exit": 0,
+      "client_pid": 22699,
+      "service_pid": 22705,
+      "operation_result": "failure",
+      "operation_seconds": 30.012642458314076,
+      "wall_seconds": 30.324097667005844,
+      "receiver_finished": {
+        "error": "",
+        "event": "receiver_finished",
+        "success": "true"
+      },
+      "error": "Helper output not acknowledged: Helper timed out; an install may still be running. Verify before retrying.. The operation may have committed; verify before retrying.",
+      "logs": [
+        {
+          "path": "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-9d00e206/558F2EAC-C08B-4CEE-A73E-F479DB36B150.log",
+          "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+          "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+          "mode": "0o600",
+          "bytes": 75
+        }
+      ]
+    },
+    {
+      "mode": "disconnect",
+      "evidence": "disconnect-8644adf7.json",
+      "harness_exit": 0,
+      "client_pid": 22058,
+      "service_pid": 22097,
+      "operation_result": "failure",
+      "operation_seconds": 0.0015468333149328828,
+      "wall_seconds": 1.3584590420359746,
+      "receiver_finished": {
+        "error": "",
+        "event": "receiver_finished",
+        "success": "true"
+      },
+      "error": "Transport invalidated",
+      "logs": [
+        {
+          "path": "/private/tmp/vphone-b26-t46-helper/runs/disconnect-8644adf7/5456C49A-37CF-4618-8ABB-B2D9A5D95360.log",
+          "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+          "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+          "mode": "0o600",
+          "bytes": 75
+        }
+      ]
+    },
+    {
+      "mode": "writer-failure",
+      "evidence": "writer-failure-994047d0.json",
+      "harness_exit": 0,
+      "client_pid": 22110,
+      "service_pid": 22114,
+      "operation_result": "failure",
+      "operation_seconds": 0.006223041680641472,
+      "wall_seconds": 0.16915674996562302,
+      "receiver_finished": {
+        "error": "The file couldn’t be saved.",
+        "event": "receiver_finished",
+        "success": "false"
+      },
+      "error": "Helper output not acknowledged: The file couldn’t be saved.. The operation may have committed; verify before retrying.",
+      "logs": [
+        {
+          "path": "/private/tmp/vphone-b26-t46-helper/runs/writer-failure-994047d0/C24EA994-5FA5-44E6-981C-3B1ED20C734F.log",
+          "content": "preserved\n",
+          "sha256": "7ee0e7f63b9b65e302add82986c18196ecb8da0121575e4733219572eeac2712",
+          "mode": "0o600",
+          "bytes": 10
+        }
+      ]
+    }
+  ],
+  "identity": {
+    "team": "3AA3QL69MQ",
+    "certificate_sha1": "5620D69F097306848C7CCD69F0B796A3C588BF28",
+    "certificate_type": "Apple Development (not Developer ID)",
+    "client_identifier": "com.vphone.acceptance.t46.client",
+    "service_identifier": "com.vphone.acceptance.t46.service",
+    "client_cdhash": "992c51d1cdfa229c3b45e87d9dc361a000423776",
+    "service_cdhash": "959417963bb2228e9eaa444f6e56f39fac9511ea",
+    "strict_requirement_readback": "sign-readback.json",
+    "audit_check": "Production VPhoneHelperListener.callerRejection invoked with the actual NSXPC auditToken before each accepted connection, plus setCodeSigningRequirement for both peers. A separate negative identity runtime case was not run."
+  },
+  "production_implementation_reused": [
+    "VPhoneHelperService.verifyBundleStreaming/streaming",
+    "VPhoneHelperOutputChannel.finish (default timeout unchanged)",
+    "VPhoneHelperOutputAcknowledgement.wait (30 seconds)",
+    "VPhoneHelperOutputReceiver.helperDidFinishOutput",
+    "VPhoneLogWriter.write/finish",
+    "VPhoneHelperReply from VPhoneHelperClient.swift"
+  ],
+  "fixture_boundaries": [
+    "application-scoped embedded NSXPCService; no privileged system Mach registration",
+    "verify returns transport-only fixture Data; authorize/install refuse",
+    "missing ACK and disconnect are injected after actual receiver writer completion",
+    "writer package initializer receives an actual O_RDONLY FileHandle; original stored NSError retrieved via idempotent finish for diagnostics"
+  ],
+  "remaining_acceptance": [
+    "VPhoneHelperClient.request fixed .privileged Mach service and configured final CLI identity",
+    "VPhoneHelperDaemon root UID, authorization database registration and production listener/store combination",
+    "real Bundle install/verify and complete host/UI/VM lifecycle",
+    "original historical v1 helper is still unconfigured; reconstructed candidate is prepared_not_executed and cannot be called the original artifact"
+  ],
+  "failures_retained": [
+    {
+      "stage": "first signing",
+      "reason": "snapshot followed framework relative symlinks; codesign reported ambiguous bundle format",
+      "evidence": "sign-readback-first-failed.json",
+      "repair": "framework-topology-repair.json; scratch only"
+    },
+    {
+      "stage": "initial codesign requirement check",
+      "reason": "-R used a text argument where a requirement file was expected; corrected to -R=<requirement>",
+      "evidence": "sign-readback-v1.json"
+    },
+    {
+      "stage": "v1/v2 disconnect harness",
+      "reason": "SIGTRAP in Harness.main proxy error block actor isolation check; nonisolated main alone did not resolve; explicit @Sendable error block resolved in final matrix",
+      "evidence": [
+        "disconnect-8c674476.json",
+        "disconnect-9dc5795b.json",
+        "TransportHarness-v1-disconnect.ips",
+        "TransportHarness-v2-disconnect.ips"
+      ],
+      "production_modified": false,
+      "actor_checks_disabled": false
+    }
+  ],
+  "cleanup": {
+    "observed_exact_pids": 20,
+    "remaining_live_pids": [],
+    "signals_sent": []
+  },
+  "scope": {
+    "SwiftPM": false,
+    "production_source_modified": false,
+    "production_app_modified": false,
+    "system_helper_registered": false,
+    "AMFI_changed": false,
+    "TCC_changed": false,
+    "VM_started": false,
+    "UI_used": false,
+    "legacy_v1_built_or_registered": false
+  }
+}

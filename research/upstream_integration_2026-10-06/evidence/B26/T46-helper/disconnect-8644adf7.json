@@ -1,0 +1,48 @@
+{
+  "mode": "disconnect",
+  "label": "disconnect-8644adf7",
+  "argv": [
+    "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/MacOS/TransportHarness",
+    "disconnect",
+    "/private/tmp/vphone-b26-t46-helper/runs/disconnect-8644adf7"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 1.3584590420359746,
+  "events": [
+    {
+      "client_pid": "22058",
+      "event": "authenticated_handshake",
+      "service_pid": "22097"
+    },
+    {
+      "error": "",
+      "event": "receiver_finished",
+      "success": "true"
+    },
+    {
+      "event": "transport_invalidated"
+    },
+    {
+      "client_pid": "22058",
+      "elapsed_seconds": "0.0015468333149328828",
+      "error": "Transport invalidated",
+      "log": "/private/tmp/vphone-b26-t46-helper/runs/disconnect-8644adf7/5456C49A-37CF-4618-8ABB-B2D9A5D95360.log",
+      "log_bytes": "75",
+      "mode": "disconnect",
+      "operation": "5456C49A-37CF-4618-8ABB-B2D9A5D95360",
+      "result": "failure",
+      "service_pid": "22097"
+    }
+  ],
+  "stdout": "{\"client_pid\":\"22058\",\"event\":\"authenticated_handshake\",\"service_pid\":\"22097\"}\n{\"error\":\"\",\"event\":\"receiver_finished\",\"success\":\"true\"}\n{\"event\":\"transport_invalidated\"}\n{\"client_pid\":\"22058\",\"elapsed_seconds\":\"0.0015468333149328828\",\"error\":\"Transport invalidated\",\"log\":\"\\/private\\/tmp\\/vphone-b26-t46-helper\\/runs\\/disconnect-8644adf7\\/5456C49A-37CF-4618-8ABB-B2D9A5D95360.log\",\"log_bytes\":\"75\",\"mode\":\"disconnect\",\"operation\":\"5456C49A-37CF-4618-8ABB-B2D9A5D95360\",\"result\":\"failure\",\"service_pid\":\"22097\"}\n",
+  "stderr": "",
+  "logs": [
+    {
+      "path": "/private/tmp/vphone-b26-t46-helper/runs/disconnect-8644adf7/5456C49A-37CF-4618-8ABB-B2D9A5D95360.log",
+      "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+      "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+      "mode": "0o600",
+      "bytes": 75
+    }
+  ]
+}

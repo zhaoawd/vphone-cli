@@ -1,0 +1,28 @@
+OVERVIEW: Manage vphone VM bundles
+
+USAGE: vphone-cli vm <subcommand>
+
+OPTIONS:
+  -h, --help              Show help information.
+
+SUBCOMMANDS:
+  list                    List VM bundles
+  info                    Show one VM bundle
+  new                     Create a VM bundle
+  config                  Edit VM manifest fields (cpu/memory/network/keyboard)
+  bind-core-bundle        Select a verified host Core Bundle for a stopped VM;
+                          guest/component origins are preserved
+  rename                  Rename a VM bundle
+  delete                  Delete a VM bundle
+  clone                   Clone a stopped VM bundle, preserving its device
+                          identity and boot state
+  export                  Export a VM bundle to a compressed archive (.tzst
+                          fast / .txz max)
+  import                  Import a VM bundle from a .tzst/.txz archive
+  launch                  Boot a VM bundle (runs host preflight first)
+  stop                    Stop a running VM bundle
+  create                  Create a VM end-to-end (prepare → patch → restore →
+                          CFW → first boot)
+  create-status           Show the create checkpoint of a VM (read-only)
+
+  See 'vphone-cli help vm <subcommand>' for detailed help.

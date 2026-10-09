@@ -1,0 +1,68 @@
+[
+  {
+    "argv": [
+      "codesign",
+      "--force",
+      "--sign",
+      "5620D69F097306848C7CCD69F0B796A3C588BF28",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc/Contents/Frameworks/libarchive.framework"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "codesign",
+      "--force",
+      "--sign",
+      "5620D69F097306848C7CCD69F0B796A3C588BF28",
+      "--identifier",
+      "com.vphone.acceptance.t46.service",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc: replacing existing signature\n"
+  },
+  {
+    "argv": [
+      "codesign",
+      "--force",
+      "--sign",
+      "5620D69F097306848C7CCD69F0B796A3C588BF28",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/Frameworks/libarchive.framework"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "codesign",
+      "--force",
+      "--sign",
+      "5620D69F097306848C7CCD69F0B796A3C588BF28",
+      "--identifier",
+      "com.vphone.acceptance.t46.client",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "/private/tmp/vphone-b26-t46-helper/TransportHarness.app: replacing existing signature\n"
+  },
+  {
+    "argv": [
+      "codesign",
+      "--verify",
+      "--strict",
+      "--deep",
+      "-R",
+      "anchor apple generic and identifier \"com.vphone.acceptance.t46.service\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\"",
+      "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/XPCServices/com.vphone.acceptance.t46.service.xpc"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "anchor apple generic and identifier \"com.vphone.acceptance.t46.service\" and certificate leaf[subject.OU] = \"3AA3QL69MQ\": No such file or directory\ninvalid requirement specification\n"
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "mode": "missing-ack",
+  "label": "missing-ack-9d00e206",
+  "argv": [
+    "/private/tmp/vphone-b26-t46-helper/TransportHarness.app/Contents/MacOS/TransportHarness",
+    "missing-ack",
+    "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-9d00e206"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 30.324097667005844,
+  "events": [
+    {
+      "client_pid": "22699",
+      "event": "authenticated_handshake",
+      "service_pid": "22705"
+    },
+    {
+      "error": "",
+      "event": "receiver_finished",
+      "success": "true"
+    },
+    {
+      "client_pid": "22699",
+      "elapsed_seconds": "30.012642458314076",
+      "error": "Helper output not acknowledged: Helper timed out; an install may still be running. Verify before retrying.. The operation may have committed; verify before retrying.",
+      "log": "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-9d00e206/558F2EAC-C08B-4CEE-A73E-F479DB36B150.log",
+      "log_bytes": "75",
+      "mode": "missing-ack",
+      "operation": "558F2EAC-C08B-4CEE-A73E-F479DB36B150",
+      "result": "failure",
+      "service_pid": "22705"
+    }
+  ],
+  "stdout": "{\"client_pid\":\"22699\",\"event\":\"authenticated_handshake\",\"service_pid\":\"22705\"}\n{\"error\":\"\",\"event\":\"receiver_finished\",\"success\":\"true\"}\n{\"client_pid\":\"22699\",\"elapsed_seconds\":\"30.012642458314076\",\"error\":\"Helper output not acknowledged: Helper timed out; an install may still be running. Verify before retrying.. The operation may have committed; verify before retrying.\",\"log\":\"\\/private\\/tmp\\/vphone-b26-t46-helper\\/runs\\/missing-ack-9d00e206\\/558F2EAC-C08B-4CEE-A73E-F479DB36B150.log\",\"log_bytes\":\"75\",\"mode\":\"missing-ack\",\"operation\":\"558F2EAC-C08B-4CEE-A73E-F479DB36B150\",\"result\":\"failure\",\"service_pid\":\"22705\"}\n",
+  "stderr": "",
+  "logs": [
+    {
+      "path": "/private/tmp/vphone-b26-t46-helper/runs/missing-ack-9d00e206/558F2EAC-C08B-4CEE-A73E-F479DB36B150.log",
+      "content": "Verifying Core Bundle 2.6.1-local.ab12cd34\nCore Bundle operation completed\n",
+      "sha256": "1749b7f2d93fdf4347756908497e12f37eb6605fc6abadea5386af8cfe1e4c89",
+      "mode": "0o600",
+      "bytes": 75
+    }
+  ]
+}

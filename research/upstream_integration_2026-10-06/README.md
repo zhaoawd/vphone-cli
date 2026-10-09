@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B25 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B26 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -820,3 +820,23 @@ T40独立审查发现3项Important：开发debs.list遗漏、Disk.img链接别�
 开发资源副本CLI resources与VM --help只读探针通过。最终安装布局副本235个条目、161310727字节；CLI resources及静态签名通过，原VM及副本VM --help均退出9，原因未查明；外部Python探针不可用。签名通过不代表VM可执行。本轮未启动VM、未修改AMFI或TCC，保留客户机载荷摘要。
 
 本批源码提交为`0d1dc844`、`53580180`，最终构建基线为`53580180`。标准Python 611项（2项跳过）；Swift Testing常规1285项、计时9项；XCTest 254项（3项跳过）。签名构建、Bundle检查、实际内嵌CLI 4项及安装资源副本探针1项通过；最终原生依赖检查89条命令完成，2项Homebrew读取拒绝对照及8项沙箱工具操作符合预期。结果见[B25-summary.json](evidence/B25-summary.json)。测试原始输出、独立审查、实际UI记录和失败诊断保存在[evidence manifest](evidence/B25-evidence-manifest.json)。原始日志按`* -text`保全，最终测试结果不能替代未执行的实际VM接受条件。
+
+
+## B26 结果（2026-10-09）
+
+继续T08/T24/T40/T46，未新增整项验收。47项保持8项已验收、38项必选未完成、1项可选延期。
+
+| 任务 | 本轮结果 | 未完成范围 |
+| --- | --- | --- |
+| T08 | 用户指定vm-new已只读检查；System脚本和Preboot标记提供rootless布局证据 | Data/User加密锁定，不能排除后来另装RootHide；实际服务、状态144及部分旋转仍待验 |
+| T24 | B25与当前冻结VM均取得精确AMFI -424拒绝证据；当前subprocess返回-9 | 完整TCC责任链、历史v1实际XPC矩阵；新AMFI范围已准备并询问，尚未执行 |
+| T40 | 两ROM纳入attempt快照与摘要，新建/prepare refresh共用副本；标准Swift、签名构建和安装布局smoke通过 | Python/SDK/JB/既有CFW输入闭包、可信binding/receipt和四层升级回退矩阵、完整64GiB往返 |
+| T46 | 解锁后普通/escaped两组实际UI退出通过；两进程生产输出链正常ACK/30秒无ACK/断线/真实写失败通过 | 系统特权Mach服务与生产Client组合、完整UI/实际VM吞吐矩阵 |
+
+T40源码提交为`b4e80c57`。行为RED为27项/2套件、29 issues，定向GREEN为27项/2套件（实际签名smoke当时跳过）。标准入口XCTest254项/3skip，Swift Testing常规1294项/205套件、计时9项/8套件通过；独立审查无发现。签名重建、Bundle与Launchpad校验通过。之后显式运行最终安装副本smoke：238条目、161819103字节，两ROM共503624字节与系统源摘要一致，Bundle签名有效，已有项目Python锁检查通过。原VM与副本VM的--help均被终止，smoke通过只证明副本结果一致，不证明VM可运行。
+
+T46实际UI使用53580180最终签名Launchpad的隔离副本及受控签名CLI，保留生产AppDelegate、CommandLine、reader/writer链。两组各10002行/138939字节，SHA256为`f972c4a3f4ffda6f317183c1cb66bc06522e5f6f454d6bf19c545c8ae69eedad`。普通writer活动时退出；setsid后代持管道时取消退出，释放后退出。B25锁屏失败记录保留，本轮补齐最终退出操作。
+
+临时跨进程harness使用Apple Development同团队签名、双方identifier/Team要求及生产audit-token校验，直接复用生产service/output/receiver/writer；正常ACK、生产默认30秒无ACK、客户端连接失效及O_RDONLY描述符的真实EBADF错误均有明确结果。它未经过固定privileged Mach入口、生产Client.request和真实Store。初次框架副本签名失败及临时回调隔离SIGTRAP均保留；修复只在harness，显式@Sendable回调后重跑四行，没有关闭actor运行期检查。断线行不证明服务器worker已退出。
+
+vm-new只读挂载已清理，磁盘无打开句柄；8个所记录文件元数据与7个小文件摘要保持，Disk.img未做全量64GiB摘要。没有启动VM、修改AMFI/TCC或注册系统helper。当前冻结VM CDHash为`62a1f395413f6878c4de0042f6e77962aa2b1219`，SHA256为`c8e8be423f47c2bc85a7bca5715c306a49cbacba1442a5882416493660a5f8ff`。临时单哈希AMFI范围已生成并单独询问；此前范围只覆盖旧哈希，当前未执行。具体限制与证据见[evidence/B26-summary.json](evidence/B26-summary.json)。

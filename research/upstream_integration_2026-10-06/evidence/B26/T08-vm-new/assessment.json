@@ -1,0 +1,18 @@
+{
+  "path": "/Users/qcz3840/github/vphone-cli/vm-new",
+  "task": "T08 actual RootHide guest acceptance",
+  "result": "RootHide acceptance precondition remains unverified",
+  "observations": [
+    "restore-info.json and the create checkpoint record EXP, iOS/cloudOS 26.1 build 23B85; variant alone does not identify RootHide.",
+    "The runtime marker PID 18728 was not present, and lsof found no Disk.img holder before attachment.",
+    "Disk.img was attached using hdiutil -readonly -nomount; only System and Preboot were mounted using mount_apfs -o rdonly,nobrowse.",
+    "The active Preboot directory contains jb-vphone/procursus and the .installed_dopamine and .procursus_strapped markers.",
+    "The installed /cores/vphone_jb_setup.sh selects /private/preboot/$BOOT_HASH/jb-vphone/procursus and creates /private/var/jb pointing to that root. This is evidence of the existing rootless installation layout.",
+    "Data and User APFS volumes were encrypted and locked. The current read-only examination cannot exclude a later additional RootHide installation in Data.",
+    "This examination did not inspect a live guest, execute services.start, or establish actual RootHide service behavior.",
+    "Both mounts were removed and the exact attached base disk6 was ejected. No VM was booted and no AMFI or TCC change was made.",
+    "All eight recorded file metadata tuples remained identical; seven small-file SHA-256 values remained identical. Disk.img was not fully hashed, so this result does not assert a full 64 GiB byte comparison."
+  ],
+  "next_requirement": "A live guest readback proving an installed RootHide root and its service prerequisites, or a different known RootHide guest sample. The current final signed VM is blocked by AMFI, as separately recorded.",
+  "evidence": ["before.json", "attach.plist", "apfs-list.plist", "volume-inventory.json", "bootstrap-evidence.json", "after.json"]
+}

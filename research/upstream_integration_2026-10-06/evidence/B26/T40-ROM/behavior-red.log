@@ -1,0 +1,151 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/42] Write sources
+[4/42] Write swift-version--58304C5D6DBC2206.txt
+[6/21] Compiling VPhoneCore VPhoneCreateResourceSnapshot.swift
+[7/21] Emitting module VPhoneCore
+[8/22] Compiling VPhoneCore VPhoneCreateRunner.swift
+[8/25] Write Objects.LinkFileList
+[9/32] Linking vphone-helper
+[10/32] Applying vphone-helper
+[12/32] Emitting module VPhoneLaunchpadKit
+[12/32] Write Objects.LinkFileList
+[14/33] Linking vphone-launchpad-launcher
+[15/33] Applying vphone-launchpad-launcher
+[16/33] Linking vphone-launchpad
+[17/33] Applying vphone-launchpad
+[19/33] Compiling VPhoneCoreTests CreateResourceSnapshotTests.swift
+[20/33] Emitting module VPhoneLaunchpadKitTests
+[21/33] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[22/33] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[23/33] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[24/33] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[25/36] Emitting module VPhoneCoreTests
+[26/36] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[27/36] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[28/36] Compiling vphone_cli VPhoneRestoreCLI.swift
+[28/36] Write Objects.LinkFileList
+[30/43] Linking vphone-cli
+[31/43] Linking vphone-vm
+[33/43] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[34/43] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[35/43] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[36/43] Compiling VPhoneCLITests CFWInvocationTests.swift
+[37/43] Compiling VPhoneCLITests CreateResourceFreezeTests.swift
+[38/43] Emitting module VPhoneCLITests
+[39/43] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[39/43] Applying vphone-cli
+[40/43] Applying vphone-vm
+[41/43] Write Objects.LinkFileList
+[42/43] Linking vphone-cliPackageTests
+Build complete! (13.78s)
+Test Suite 'Selected tests' started at 2026-10-09 19:58:54.164.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 19:58:54.167.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 19:58:54.167.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 19:58:54.167.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateResourceSnapshotTests started.
+◇ Suite CreateResourceFreezeTests started.
+◇ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test snapshotMutationDuringFinalStageCannotBeAccepted() started.
+◇ Test unavailableResourceSourceRefusesBeforeReturningRunner() started.
+◇ Test createBundleWithoutSnapshotRefusesBeforeAllocatingDisk() started.
+◇ Test aVMImageCannotEnterTheResourceCopy() started.
+◇ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() started.
+◇ Test newAndPrepareRefreshUseCapturedROMBytes() started.
+◇ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+◇ Test romsCountAgainstCapacityAdmission() started.
+➜ Test actualBuildResourceCopyRunsReadOnlyProbes() skipped.
+◇ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() started.
+◇ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() started.
+◇ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() started.
+◇ Test romCopiesAreManifestedAndIsolatedFromLiveReplacement() started.
+◇ Test linkRedirectedAfterInventoryToDifferentContentIsRefused() started.
+◇ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() started.
+◇ Test unusedSnapshotWithReadOnlySourceDirectoriesIsReleased() started.
+◇ Test developmentDebListIsCopiedAndResumeRequiresAcceptanceAfterChanges() started.
+◇ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() started.
+◇ Test snapshotQuotaRefusesAdditionalCopiesWithoutDeletingEvidence() started.
+◇ Test romGrowthCannotWritePastItsAdmittedSize() started.
+◇ Test sameLengthContentRewriteWithRestoredMtimeIsRefused() started.
+◇ Test case passing 1 argument initialBytes → 0 to sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test case passing 1 argument linkCount → 1 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test case passing 1 argument linkCount → 2 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test redirectedROMAfterInventoryIsRefused() started.
+◇ Test missingROMRefusesBeforeAnyMachineChanges(sep:) started.
+◇ Test case passing 1 argument initialBytes → 1048583 to sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) started.
+◇ Test case passing 1 argument linkCount → 3 to aVMImageAliasCannotEnterTheResourceCopy(linkCount:) started.
+◇ Test romChangesRequireExplicitResumeAcceptanceAndRetainEarlierOrigins() started.
+◇ Test case passing 1 argument timing → "afterInventory" to metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+◇ Test case passing 1 argument timing → "beforeCopy" to metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) started.
+✘ Test romsCountAgainstCapacityAdmission() recorded an issue at CreateResourceSnapshotTests.swift:150:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+↳ // Seven existing fixture inputs contain eight bytes each; the two ROMs add ten bytes.
+✘ Test newAndPrepareRefreshUseCapturedROMBytes() recorded an issue at CreateResourceFreezeTests.swift:64:9: Expectation failed: try String(contentsOf: machine.url.appendingPathComponent("AVPBooter.vresearch1.bin"), encoding: .utf8) == "rom-A"
+✘ Test newAndPrepareRefreshUseCapturedROMBytes() recorded an issue at CreateResourceFreezeTests.swift:65:9: Expectation failed: try String(contentsOf: machine.url.appendingPathComponent("AVPSEPBooter.vresearch1.bin"), encoding: .utf8) == "sep-A"
+✘ Test newAndPrepareRefreshUseCapturedROMBytes() recorded an issue at CreateResourceFreezeTests.swift:68:9: Expectation failed: try String(contentsOf: machine.url.appendingPathComponent("AVPBooter.vresearch1.bin"), encoding: .utf8) == "rom-A"
+✘ Test romCopiesAreManifestedAndIsolatedFromLiveReplacement() recorded an issue at CreateResourceSnapshotTests.swift:71:9: Expectation failed: try String(contentsOf: snapshot.romSource, encoding: .utf8) == "rom-A"
+✘ Test romCopiesAreManifestedAndIsolatedFromLiveReplacement() recorded an issue at CreateResourceSnapshotTests.swift:72:9: Expectation failed: try String(contentsOf: snapshot.sepromSource, encoding: .utf8) == "sep-A"
+✘ Test romCopiesAreManifestedAndIsolatedFromLiveReplacement() recorded an issue at CreateResourceSnapshotTests.swift:73:9: Expectation failed: snapshot.manifest.entries.contains { $0.path == "ROMs/AVPBooter.vresearch1.bin" && $0.bytes == 5 && $0.sha256 != nil }
+✘ Test romCopiesAreManifestedAndIsolatedFromLiveReplacement() recorded an issue at CreateResourceSnapshotTests.swift:74:9: Expectation failed: snapshot.manifest.entries.contains { $0.path == "ROMs/AVPSEPBooter.vresearch1.bin" && $0.bytes == 5 && $0.sha256 != nil }
+✘ Test romGrowthCannotWritePastItsAdmittedSize() recorded an issue at CreateResourceSnapshotTests.swift:131:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✘ Test romGrowthCannotWritePastItsAdmittedSize() recorded an issue at CreateResourceSnapshotTests.swift:142:26: Expectation failed: observedTarget → nil
+◇ Test case passing 1 argument sep → false to missingROMRefusesBeforeAnyMachineChanges(sep:) started.
+✘ Test redirectedROMAfterInventoryIsRefused() recorded an issue at CreateResourceSnapshotTests.swift:116:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+◇ Test case passing 1 argument sep → true to missingROMRefusesBeforeAnyMachineChanges(sep:) started.
+✘ Test missingROMRefusesBeforeAnyMachineChanges(sep:) recorded an issue with 1 argument sep → false at CreateResourceSnapshotTests.swift:81:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✔ Test createBundleWithoutSnapshotRefusesBeforeAllocatingDisk() passed after 0.212 seconds.
+✔ Test aVMImageAliasCannotEnterTheResourceCopy(linkCount:) with 3 test cases passed after 0.212 seconds.
+✔ Test unavailableResourceSourceRefusesBeforeReturningRunner() passed after 0.212 seconds.
+✔ Test sourceGrowthIsRefusedBeforeWritingBeyondPreflightSize(initialBytes:) with 2 test cases passed after 0.212 seconds.
+✔ Test aVMImageCannotEnterTheResourceCopy() passed after 0.212 seconds.
+✘ Test romsCountAgainstCapacityAdmission() failed after 0.212 seconds with 1 issue.
+✔ Test metadataOnlyXattrChangePreservesTheFrozenContentContract(timing:) with 2 test cases passed after 0.212 seconds.
+✔ Test nestedResourceResolutionUsesAttemptScopeAndRestoresCaller() passed after 0.212 seconds.
+✔ Test capacityRefusalLeavesNoPartialSnapshotOrVMChanges() passed after 0.212 seconds.
+✘ Test romCopiesAreManifestedAndIsolatedFromLiveReplacement() failed after 0.212 seconds with 4 issues.
+↳ // Catch omitting either live framework ROM from the captured bytes and identity.
+✔ Test linkRedirectedAfterInventoryToDifferentContentIsRefused() passed after 0.212 seconds.
+✔ Test unusedSnapshotWithReadOnlySourceDirectoriesIsReleased() passed after 0.213 seconds.
+✔ Test snapshotMutationDuringFinalStageCannotBeAccepted() passed after 0.213 seconds.
+✘ Test newAndPrepareRefreshUseCapturedROMBytes() failed after 0.213 seconds with 3 issues.
+↳ // Catch new/prepare consumers selecting live system ROMs after snapshot capture.
+✘ Test romGrowthCannotWritePastItsAdmittedSize() failed after 0.213 seconds with 2 issues.
+✔ Test sameLengthContentRewriteWithRestoredMtimeIsRefused() passed after 0.213 seconds.
+✘ Test redirectedROMAfterInventoryIsRefused() failed after 0.213 seconds with 1 issue.
+✔ Test attemptMaterializesResourceSymlinksAndRefusesDirectoryCycles() passed after 0.213 seconds.
+✘ Test missingROMRefusesBeforeAnyMachineChanges(sep:) recorded an issue with 1 argument sep → true at CreateResourceSnapshotTests.swift:81:9: Expectation failed: an error was expected but none was thrown and "VPhoneCore.VPhoneCreateResourceSnapshot" was returned
+✘ Test missingROMRefusesBeforeAnyMachineChanges(sep:) with 2 test cases failed after 0.228 seconds with 2 issues.
+✔ Test developmentDebListIsCopiedAndResumeRequiresAcceptanceAfterChanges() passed after 0.231 seconds.
+✔ Test failedAttemptKeepsSnapshotAndAcceptedResumePreservesEarlierOrigins() passed after 0.269 seconds.
+✘ Test romChangesRequireExplicitResumeAcceptanceAndRetainEarlierOrigins() recorded an issue at CreateResourceSnapshotTests.swift:98:9: Expectation failed: (second.manifest.sha256 → "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb") != (first.manifest.sha256 → "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb")
+✔ Test attemptUsesCopiedScriptGuestArchiveAndExecutablesAfterOriginalReplacement() passed after 0.301 seconds.
+✔ Test snapshotQuotaRefusesAdditionalCopiesWithoutDeletingEvidence() passed after 0.312 seconds.
+✘ Test romChangesRequireExplicitResumeAcceptanceAndRetainEarlierOrigins() recorded an issue at CreateResourceSnapshotTests.swift:100:9: Expectation failed: an error was expected but none was thrown and "VPhoneCreateCheckpoint(schemaVersion: 1, creationId: "5955abb5-0797-4dcf-b7b5-c058092e5c18", createdAt: 2026-10-09 11:58:54 +0000, updatedAt: 2026-10-09 11:58:54 +0000, bundleIdentity: VPhoneCore.VPhoneCreateBundleIdentity(name: "machine", path: "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/machine", directoryId: "16777233:587474901", machineIdentifierSha256: nil), effectiveOptions: VPhoneCore.VPhoneCreateEffectiveOptions(variant: "regular", iphoneSource: nil, cloudosSource: nil, spoofBuild: nil, forceDscMaxSlide: false, enableFrida: false, cpuCount: 2, memoryMb: 1024, diskSizeGb: 0, restoreBackend: nil, prepareBackend: nil), inputsDigest: "097bf8c56a775c85e34f62b2b7529de3c25c7632ab415ece906627ec6a1eda1e", tool: VPhoneCore.VPhoneCreateToolRecord(executableSha256: Optional("0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb"), stageContractVersion: 1), attemptId: "df4b2ee7-e721-4afe-8775-5113b8aeadbc", resumedFrom: Optional(VPhoneCore.VPhoneCreateAttemptRef(attemptId: "527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943", checkpointSha256: "86c1c485239dceec0c1d5e741720d9f8f4a87ca8b5b06ce2ba7d76fc9974daf4", archivedAs: "attempts/527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943-86c1c485239d.json")), attempts: [VPhoneCore.VPhoneCreateAttemptRecord(attemptId: "527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943", kind: "create", startedAt: 2026-10-09 11:58:54 +0000, pid: 3029, restartFrom: nil, acceptedToolChange: false, checks: [:]), VPhoneCore.VPhoneCreateAttemptRecord(attemptId: "df4b2ee7-e721-4afe-8775-5113b8aeadbc", kind: "resume", startedAt: 2026-10-09 11:58:54 +0000, pid: 3029, restartFrom: nil, acceptedToolChange: false, checks: ["verify.patch": "verified", "verify.prepare": "verified", "verify.restore": "verified", "probe.cfw": "test idle"])], stages: [VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.prepare, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943"), pid: Optional(3029), startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), executorResult: Optional("completed"), verifierVersion: Optional("snapshot-test-verifier"), evidence: ["resource_snapshot_closure_limits": "Python interpreter, Python framework, third-party packages and their native dependencies are external; PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external; Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external; In-process code is loaded by the invoking executable; a new attempt may use another accepted build; A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding; File ownership, ACLs, extended attributes and source touch history are not frozen", "resource_snapshot_sha256": "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb", "executed": "prepare", "resource_snapshot_path": "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/snapshots/2d3a878b-7371-4128-8bcf-eebdb3d660e2"], inputs: [:], outputs: [], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.patch, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943"), pid: Optional(3029), startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), executorResult: Optional("completed"), verifierVersion: Optional("snapshot-test-verifier"), evidence: ["executed": "patch", "resource_snapshot_path": "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/snapshots/2d3a878b-7371-4128-8bcf-eebdb3d660e2", "resource_snapshot_sha256": "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb", "resource_snapshot_closure_limits": "Python interpreter, Python framework, third-party packages and their native dependencies are external; PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external; Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external; In-process code is loaded by the invoking executable; a new attempt may use another accepted build; A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding; File ownership, ACLs, extended attributes and source touch history are not frozen"], inputs: [:], outputs: [], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.restore, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943"), pid: Optional(3029), startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), executorResult: Optional("completed"), verifierVersion: Optional("snapshot-test-verifier"), evidence: ["executed": "restore", "resource_snapshot_closure_limits": "Python interpreter, Python framework, third-party packages and their native dependencies are external; PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external; Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external; In-process code is loaded by the invoking executable; a new attempt may use another accepted build; A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding; File ownership, ACLs, extended attributes and source touch history are not frozen", "resource_snapshot_path": "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/snapshots/2d3a878b-7371-4128-8bcf-eebdb3d660e2", "resource_snapshot_sha256": "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb"], inputs: [:], outputs: [], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.cfw, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("df4b2ee7-e721-4afe-8775-5113b8aeadbc"), pid: Optional(3029), startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), executorResult: Optional("completed"), verifierVersion: Optional("snapshot-test-verifier"), evidence: ["resource_snapshot_closure_limits": "Python interpreter, Python framework, third-party packages and their native dependencies are external; PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external; Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external; In-process code is loaded by the invoking executable; a new attempt may use another accepted build; A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding; File ownership, ACLs, extended attributes and source touch history are not frozen", "resource_snapshot_path": "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/snapshots/50398c37-56b0-4c0d-a74b-30f534e8a435", "resource_snapshot_sha256": "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb", "executed": "cfw"], inputs: [:], outputs: [], reason: nil, error: nil, history: [VPhoneCore.VPhoneCreateStageHistoryEntry(attemptId: Optional("527ffd9b-4fbe-4ec2-86aa-b18c0ab8d943"), status: VPhoneCore.VPhoneCreateStageStatus.failed, startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), error: Optional("VPhoneMachineBindingError(message: \"injected stage failure\")"), reason: nil, supersededBecause: "rerun after failed")]), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.firstBoot, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("df4b2ee7-e721-4afe-8775-5113b8aeadbc"), pid: Optional(3029), startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), executorResult: Optional("completed"), verifierVersion: Optional("snapshot-test-verifier"), evidence: ["resource_snapshot_closure_limits": "Python interpreter, Python framework, third-party packages and their native dependencies are external; PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external; Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external; In-process code is loaded by the invoking executable; a new attempt may use another accepted build; A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding; File ownership, ACLs, extended attributes and source touch history are not frozen", "resource_snapshot_path": "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/snapshots/50398c37-56b0-4c0d-a74b-30f534e8a435", "resource_snapshot_sha256": "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb", "executed": "first_boot"], inputs: [:], outputs: [], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.jbFinalize, status: VPhoneCore.VPhoneCreateStageStatus.notApplicable, attemptId: nil, pid: nil, startedAt: nil, finishedAt: nil, executorResult: nil, verifierVersion: nil, evidence: [:], inputs: [:], outputs: [], reason: Optional("jb_finalize applies only to variants jb and exp"), error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.verification, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("df4b2ee7-e721-4afe-8775-5113b8aeadbc"), pid: Optional(3029), startedAt: Optional(2026-10-09 11:58:54 +0000), finishedAt: Optional(2026-10-09 11:58:54 +0000), executorResult: Optional("completed"), verifierVersion: Optional("snapshot-test-verifier"), evidence: ["resource_snapshot_closure_limits": "Python interpreter, Python framework, third-party packages and their native dependencies are external; PATH tools, host SDK/compiler, Virtualization framework ROMs and JB compilation are external; Existing VM cfw_input/cfw_jb_input, firmware sources and mutable caches are external; In-process code is loaded by the invoking executable; a new attempt may use another accepted build; A resource snapshot is not a verified Core Bundle receipt and does not publish a VM binding; File ownership, ACLs, extended attributes and source touch history are not frozen", "executed": "verification", "resource_snapshot_path": "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/snapshot-tests-8C2593DB-4F8D-4360-A5AD-E75CC907B582/snapshots/50398c37-56b0-4c0d-a74b-30f534e8a435", "resource_snapshot_sha256": "0a5fb0cb01f60e994b39c382fd5736ce79f5bad02e62bb26d712baf0a3d072fb"], inputs: [:], outputs: [], reason: nil, error: nil, history: [])], artifacts: [], recoveryRequired: nil)" was returned
+✘ Test romChangesRequireExplicitResumeAcceptanceAndRetainEarlierOrigins() recorded an issue at CreateResourceSnapshotTests.swift:101:9: Expectation failed: try VPhoneCreateCheckpointStore.load(bundleURL: f.machine).data == stored.data
+✘ Test romChangesRequireExplicitResumeAcceptanceAndRetainEarlierOrigins() recorded an issue at CreateResourceSnapshotTests.swift:103:9: Expectation failed: (resumed.attempts.last?.acceptedToolChange → false) == true
+✘ Test romChangesRequireExplicitResumeAcceptanceAndRetainEarlierOrigins() failed after 0.326 seconds with 4 issues.
+✘ Suite CreateResourceSnapshotTests failed after 0.326 seconds with 14 issues.
+✔ Test newAttemptDigestChangesForScriptsGuestToolsAndDependencyLocks() passed after 0.336 seconds.
+✘ Suite CreateResourceFreezeTests failed after 0.336 seconds with 3 issues.
+✘ Test run with 26 tests in 2 suites failed after 0.337 seconds with 17 issues.
