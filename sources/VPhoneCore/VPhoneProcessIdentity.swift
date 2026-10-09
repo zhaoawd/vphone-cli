@@ -58,25 +58,33 @@ public enum VPhoneProcessInfo {
     /// environment values. Unreadable or malformed process data is refused.
     public static func arguments(of pid: pid_t) -> [String]? {
         guard pid > 0 else { return nil }
-        var limit: Int32 = 0
-        var limitSize = MemoryLayout<Int32>.size
-        var limitMIB: [Int32] = [CTL_KERN, KERN_ARGMAX]
-        guard sysctl(&limitMIB, 2, &limit, &limitSize, nil, 0) == 0,
-              limit > 0, limit <= 16 * 1024 * 1024 else { return nil }
-        var bytes = [UInt8](repeating: 0, count: Int(limit))
-        var size = bytes.count
         var mib: [Int32] = [CTL_KERN, KERN_PROCARGS2, pid]
+        var required = 0
+        guard sysctl(&mib, 3, nil, &required, nil, 0) == 0,
+              required > MemoryLayout<Int32>.size, required < 16 * 1024 * 1024 else { return nil }
+        // XNU can return a successful truncated tail when capacity is too
+        // small. Leave a spare byte and refuse a filled buffer, including a
+        // process that execs with more arguments between the two sysctls.
+        var bytes = [UInt8](repeating: 0, count: required + 1)
+        var size = bytes.count
         let result = bytes.withUnsafeMutableBytes { buffer in
             sysctl(&mib, 3, buffer.baseAddress, &size, nil, 0)
         }
-        guard result == 0, size <= bytes.count, size > MemoryLayout<Int32>.size else { return nil }
+        guard result == 0, size < bytes.count, size > MemoryLayout<Int32>.size else { return nil }
         bytes.removeSubrange(size...)
         let argc = bytes.withUnsafeBytes { $0.loadUnaligned(as: Int32.self) }
         guard argc > 0, argc <= size else { return nil }
-        var offset = MemoryLayout<Int32>.size
-        // KERN_PROCARGS2: argc, executable path, NUL padding, argv strings.
-        while offset < size, bytes[offset] != 0 { offset += 1 }
-        while offset < size, bytes[offset] == 0 { offset += 1 }
+        let headerSize = MemoryLayout<Int32>.size
+        var pathEnd = headerSize
+        while pathEnd < size, bytes[pathEnd] != 0 { pathEnd += 1 }
+        guard pathEnd < size else { return nil }
+        // macOS 15+ processes are 64-bit. XNU pads the executable path to
+        // the target's pointer width, independently of the argc header.
+        // Skipping all NULs would consume an empty argv[0] and read env as argv.
+        let pathSize = pathEnd - headerSize + 1
+        var offset = headerSize + (pathSize + 7) / 8 * 8
+        guard offset < size, bytes[pathEnd..<offset].allSatisfy({ $0 == 0 }),
+              bytes[offset] != 0 else { return nil }
         var arguments: [String] = []
         for _ in 0..<argc {
             let start = offset

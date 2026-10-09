@@ -21,9 +21,9 @@ public enum VPhoneLaunchpadRunState: Hashable, Sendable {
     case running(instanceID: String?)
     /// As `running`, and the runtime record says the boot is a DFU boot.
     case dfu(instanceID: String)
-    /// No boot process, but a live process that started no later than the
-    /// runtime record wrote a short operation (`config`, `export`, ...). A
-    /// hint only; the CLI refuses conflicting work itself while it holds the
+    /// A live process recorded a short operation (`config`, `export`, ...),
+    /// or a boot record names a live process whose arguments are unreadable.
+    /// The latter does not establish a running VM. A hint only; the CLI refuses conflicting work itself while it holds the
     /// lock.
     case busy(operation: String)
 
@@ -45,18 +45,26 @@ public struct VPhoneLaunchpadRunStateReader: Sendable {
 
     var readRecord: @Sendable (URL) -> VPhoneVMRuntimeState?
     var identity: @Sendable (pid_t) -> VPhoneProcessIdentity?
+    var bootPIDs: @Sendable (String, URL) -> [pid_t]
+    var argumentsUnavailable: @Sendable (pid_t) -> Bool
 
     public static let live = VPhoneLaunchpadRunStateReader(
         readRecord: { VPhoneVMRuntimeState.read(in: $0) },
-        identity: { VPhoneProcessInfo.identity(of: $0) }
+        identity: { VPhoneProcessInfo.identity(of: $0) },
+        bootPIDs: { VPhoneBootProcessLocator.livePIDs($0, configURL: $1) },
+        argumentsUnavailable: { VPhoneProcessInfo.arguments(of: $0) == nil }
     )
 
     init(
         readRecord: @escaping @Sendable (URL) -> VPhoneVMRuntimeState?,
-        identity: @escaping @Sendable (pid_t) -> VPhoneProcessIdentity?
+        identity: @escaping @Sendable (pid_t) -> VPhoneProcessIdentity?,
+        bootPIDs: @escaping @Sendable (String, URL) -> [pid_t] = { VPhoneBootProcessLocator.parsePIDs($0, configURL: $1) },
+        argumentsUnavailable: @escaping @Sendable (pid_t) -> Bool = { _ in false }
     ) {
         self.readRecord = readRecord
         self.identity = identity
+        self.bootPIDs = bootPIDs
+        self.argumentsUnavailable = argumentsUnavailable
     }
 
     /// The state of each machine, from one `ps -axo pid=,command=` snapshot.
@@ -72,7 +80,7 @@ public struct VPhoneLaunchpadRunStateReader: Sendable {
     }
 
     public func state(of machine: VPhoneLaunchpadMachinePath, processList: String) -> VPhoneLaunchpadRunState {
-        let bootPIDs = VPhoneBootProcessLocator.parsePIDs(processList, configURL: machine.configURL)
+        let bootPIDs = bootPIDs(processList, machine.configURL)
         let record = readRecord(machine.url)
         if !bootPIDs.isEmpty {
             // A record counts only when it names one of the boot processes:
@@ -82,11 +90,18 @@ public struct VPhoneLaunchpadRunStateReader: Sendable {
             }
             return record.isDFUOperation ? .dfu(instanceID: record.instanceID) : .running(instanceID: record.instanceID)
         }
-        guard let record, !record.isBootOperation,
+        guard let record,
               let holder = identity(record.pid), !holder.isZombie,
               holder.startedAt <= record.startedAt.timeIntervalSince1970 + Self.recordTimeTolerance
         else {
             return .stopped
+        }
+        if record.isBootOperation {
+            // `ps` may list a root process whose argv this user cannot read.
+            // Keep the valid live record as an uncertainty hint, without
+            // granting boot/DFU authority or reporting the machine stopped.
+            guard argumentsUnavailable(record.pid) else { return .stopped }
+            return .busy(operation: record.operation + " (process arguments unavailable)")
         }
         return .busy(operation: record.operation)
     }

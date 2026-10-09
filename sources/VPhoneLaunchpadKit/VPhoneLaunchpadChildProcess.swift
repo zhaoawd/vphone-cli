@@ -47,6 +47,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
         logFile: URL? = nil,
         appendingToLog: Bool = false,
         preamble: String? = nil,
+        beforeDetachedGroupCheck: @escaping @Sendable () -> Void = {},
         onLine: @escaping @Sendable (String) -> Void
     ) throws {
         process.executableURL = executable
@@ -73,7 +74,7 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
                 reap(pid)
             }
             Thread.detachNewThread { [self] in
-                tail(reader, onLine)
+                tail(reader, onLine, beforeDetachedGroupCheck: beforeDetachedGroupCheck)
             }
         } else {
             let pipe = Pipe()
@@ -177,9 +178,10 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
 
     /// Follows the log file until the child has exited and everything it
     /// wrote is read.
-    private func tail(_ reader: FileHandle, _ onLine: (String) -> Void) {
+    private func tail(_ reader: FileHandle, _ onLine: (String) -> Void, beforeDetachedGroupCheck: () -> Void) {
         var splitter = VPhoneLaunchpadLineSplitter()
         var readFailed = false
+        var groupExited = false
         while true {
             let exited = lock.withLock { hasExited }
             if !readFailed {
@@ -190,13 +192,29 @@ public final class VPhoneLaunchpadChildProcess: @unchecked Sendable {
                 } catch { readFailed = true }
             }
             if exited {
+                beforeDetachedGroupCheck()
+                // A regular file has no pipe EOF. Descendants in this
+                // detached session may still append after their parent exits.
+                // Unknown/denied group inspection must not confirm completion.
+                if let detachedPID {
+                    groupExited = kill(-detachedPID, 0) == -1 && errno == ESRCH
+                }
+                // The final writer may have appended between the preceding
+                // EOF read and leaving the group. Drain again after absence.
+                if groupExited, !readFailed {
+                    do {
+                        if let chunk = try reader.readToEnd(), !chunk.isEmpty {
+                            splitter.feed(chunk, onLine)
+                        }
+                    } catch { readFailed = true }
+                }
                 break
             }
             Thread.sleep(forTimeInterval: 0.25)
         }
         splitter.flush(onLine)
         try? reader.close()
-        finish(lock.withLock { exitCode }, outputDrained: !readFailed)
+        finish(lock.withLock { exitCode }, outputDrained: !readFailed && groupExited)
     }
 
     private typealias SetDisclaim = @convention(c) (UnsafeMutablePointer<posix_spawnattr_t?>, Int32) -> Int32

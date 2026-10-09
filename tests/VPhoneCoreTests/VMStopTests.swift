@@ -182,6 +182,30 @@ struct VMStopTests {
         #expect(!found.contains(unrelated.processIdentifier))
         let production = VPhoneVMStopper(bundleDirectory: fixture.bundle, configURL: fixture.configURL, diskURL: fixture.diskURL)
         #expect(production.listTargets() == [boot.processIdentifier])
+        #expect(VPhoneBundleGuard.live.bootPIDs(fixture.configURL) == [boot.processIdentifier])
+    }
+
+    @Test func emptyArgvZeroCannotReadConfigFromEnvironment() throws {
+        let fixture = try StopFixture(spacedPaths: true)
+        defer { fixture.terminateAll() }
+        var actions: posix_spawn_file_actions_t?
+        #expect(posix_spawn_file_actions_init(&actions) == 0)
+        defer { posix_spawn_file_actions_destroy(&actions) }
+        #expect(posix_spawn_file_actions_addopen(&actions, STDOUT_FILENO, "/dev/null", O_WRONLY, 0) == 0)
+        let arguments = ["", "vphone-vm"].map { value in value.withCString { strdup($0)! } }
+        let environment = ["--config=" + fixture.configURL.path].map { value in value.withCString { strdup($0)! } }
+        defer { (arguments + environment).forEach { free($0) } }
+        var argv: [UnsafeMutablePointer<CChar>?] = arguments.map { $0 } + [nil]
+        var env: [UnsafeMutablePointer<CChar>?] = environment.map { $0 } + [nil]
+        var pid: pid_t = 0
+        let error = posix_spawn(&pid, "/usr/bin/yes", &actions, nil, &argv, &env)
+        #expect(error == 0)
+        guard error == 0 else { return }
+        defer { kill(pid, SIGKILL); waitpid(pid, nil, 0) }
+        #expect(VPhoneProcessInfo.arguments(of: pid) == nil)
+        let ps = try VPhoneProcessRunner.runCapturing(
+            URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="])
+        #expect(!VPhoneBootProcessLocator.livePIDs(ps.stdout, configURL: fixture.configURL).contains(pid))
     }
 
     @Test(arguments: ["vphone-cli", "vphone-vm"]) func neverSignalsAnotherProgramHoldingTheDiskImage(executableName: String) throws {

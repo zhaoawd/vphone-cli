@@ -123,6 +123,50 @@ struct RunStateTests {
         #expect(reads.paths.sorted() == [machine.url.path, other.url.path].sorted())
     }
 
+    @Test func liveReaderPreservesExecutableAndConfigSpaces() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("runstate-\(UUID().uuidString) Application Support")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let vm = VPhoneLaunchpadMachinePath(libraryRoot: root.path, name: "VM with spaces")
+        try FileManager.default.createDirectory(at: vm.url, withIntermediateDirectories: false)
+        let executable = root.appendingPathComponent("vphone-vm")
+        try FileManager.default.createSymbolicLink(at: executable, withDestinationURL: URL(fileURLWithPath: "/bin/sh"))
+        let process = Process()
+        process.executableURL = executable
+        process.arguments = ["-c", "trap 'exit 0' TERM; while :; do /bin/sleep 0.1; done", "--config", vm.configURL.path]
+        process.standardInput = FileHandle.nullDevice
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        try process.run()
+        defer { process.terminate(); process.waitUntilExit() }
+        let list = try #require(VPhoneLaunchpadRunStateReader.processList())
+        #expect(VPhoneLaunchpadRunStateReader.live.state(of: vm, processList: list) == .running(instanceID: nil))
+    }
+
+    @Test(arguments: [VPhoneVMOperation.boot, VPhoneVMOperation.dfu])
+    func unreadableBootArgumentsDoNotReportStopped(operation: String) {
+        let state = VPhoneLaunchpadRunStateReader(
+            readRecord: { _ in self.record(operation, pid: 4242) },
+            identity: { _ in self.identity(4242, startedAt: -1) },
+            bootPIDs: { _, _ in [] },
+            argumentsUnavailable: { _ in true }
+        ).state(of: machine, processList: processList(bootPID: 4242))
+        #expect(state == .busy(operation: operation + " (process arguments unavailable)"))
+        #expect(!state.isRunning)
+    }
+
+    @Test(arguments: [true, false])
+    func unreadableArgumentsDoNotReviveAStaleBootRecord(zombie: Bool) {
+        let state = VPhoneLaunchpadRunStateReader(
+            readRecord: { _ in self.record(VPhoneVMOperation.boot, pid: 4242) },
+            identity: { _ in self.identity(4242, startedAt: zombie ? -1 : 5, zombie: zombie) },
+            bootPIDs: { _, _ in [] },
+            argumentsUnavailable: { _ in true }
+        ).state(of: machine, processList: processList(bootPID: 4242))
+        #expect(state == .stopped)
+    }
+
     @Test func liveProcessListParses() throws {
         let list = try #require(VPhoneLaunchpadRunStateReader.processList())
         #expect(list.contains("\(getpid()) "))

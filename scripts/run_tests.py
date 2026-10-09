@@ -74,6 +74,9 @@ LATENCY_TESTS = "|".join((
     "deadlineAndCallerCancellationEndHTTPWait",
     "supervisorRejectsFailureAndStopsTimedOutWorker",
     "pipedCLIForwardsStopSignalAndWaitsForVMExit",
+    "timeoutKillsChildIgnoringTermination",
+    "timeoutBoundsPipesInheritedByDescendant",
+    "timeoutIncludesBlockedSendAndReleasesPendingSlot",
     "a changed entity or a server without ranges restarts from byte zero",
 ))
 

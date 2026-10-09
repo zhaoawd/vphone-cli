@@ -26,6 +26,51 @@ struct OutputCompletionTests {
         }
     }
 
+    @Test func detachedParentExitDoesNotConfirmDescendantOutput() async throws {
+        let temp = try LaunchpadTemporaryDirectory()
+        let script = temp.url.appendingPathComponent("descendant")
+        let log = temp.url.appendingPathComponent("child.log")
+        let release = temp.url.appendingPathComponent("release")
+        defer { try? Data().write(to: release) }
+        try """
+        #!/bin/sh
+        ( i=0; while [ ! -e "$1" ] && [ "$i" -lt 600 ]; do /bin/sleep 0.05; i=$((i + 1)); done; printf 'late descendant tail\\n' ) &
+        echo parent
+        """.write(to: script, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: script.path)
+        let lines = LaunchpadLines()
+        let child = try VPhoneLaunchpadChildProcess(executable: script, arguments: [release.path], logFile: log) { lines.append($0) }
+        let completion = await child.waitForCompletion()
+        #expect(completion.status == 0)
+        #expect(!completion.outputDrained)
+        try Data().write(to: release)
+        // The raw detached log remains available after the reader reports
+        // incomplete output; let the finite descendant finish before cleanup.
+        #expect(await eventually(4) { (try? String(contentsOf: log, encoding: .utf8))?.contains("late descendant tail") == true })
+    }
+
+    @Test func finalWriteBeforeGroupDisappearsIsDeliveredBeforeCompletion() async throws {
+        let temp = try LaunchpadTemporaryDirectory()
+        let log = temp.url.appendingPathComponent("last-write.log")
+        let lines = LaunchpadLines()
+        let child = try VPhoneLaunchpadChildProcess(
+            executable: URL(fileURLWithPath: "/usr/bin/true"), arguments: [], logFile: log,
+            beforeDetachedGroupCheck: {
+                // Deterministic final write after the previous EOF, before
+                // the group disappearance check. The writer then closes.
+                do {
+                    let file = try FileHandle(forWritingTo: log)
+                    try file.seekToEnd()
+                    try file.write(contentsOf: Data("last write\n".utf8))
+                    try file.close()
+                } catch { Issue.record(error) }
+            }, onLine: { lines.append($0) })
+        let completion = await child.waitForCompletion()
+        #expect(completion.status == 0)
+        #expect(completion.outputDrained)
+        #expect(lines.all == ["last write"])
+    }
+
     @Test func livePipeDeliversLinesBeforeWriterCloses() async throws {
         let pipe = Pipe()
         let lines = LaunchpadLines()
