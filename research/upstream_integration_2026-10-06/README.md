@@ -1,10 +1,10 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B23 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B24 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
-## 当前结果（2026-10-09 B21）
+## B21 历史结果（2026-10-09）
 
 本轮选定 T02–T08、T24、T40、T46 共10项，新增验收完成 T03/T04/T05；其余7项未满足完整接受条件。47项中5项accepted，41项必选尚未完成，T45可选延期。基础项目独立验收依据原方案“基础修复可单独验收”；342提交的全局语义核对保持未完成。
 
@@ -760,3 +760,37 @@ T07的显式更新和回退分别在1.674/0.639秒取得新实例和预期hash�
 最终标准Swift入口：常规1254项/201套件、计时9项/8套件通过；既有3个短时限测试移入已有计时组，时限不变。相关输出44项/12套件、Python测试入口6项通过。make build、make launchpad、make check_bundle check_launchpad通过；编译仍有既有警告，字符串检查needs_review为129。最新签名产物未用于本批VM启动，不能把旧固定候选的运行证据归给新hash。完整Python和固件未在B23重跑。
 
 证据入口：`evidence/B23-summary.json`、`evidence/B23-source-review.json`、`evidence/B23-worker-matrix.json`、`evidence/B23-swift-final-after-tail.log`、`evidence/B23-final-readback.json`。
+
+
+## B24 执行记录（2026-10-09，继续 T02/T08/T24/T40/T46）
+
+本批在 `11064b07` 基础上继续执行。T02 的202项逐提交语义审查、342项历史处置覆盖和47项全局能力对账已完成，按台账合同验收。47项中8项accepted，38项必选尚未完成，T45可选延期。计划适配不计为能力已实现或验收通过。T08/T24/T40/T46的原验收合同保持不变，尚未整项验收。
+
+| 任务 | 本批结果 | 剩余工作 |
+| --- | --- | --- |
+| T02 | 202项逐提交语义审查完成、pending0；342项历史覆盖与47项合同/依赖/实际位置/验证入口对账完成；按台账合同验收 | 175项计划适配继续归属各能力任务，不计accepted |
+| T08 | 对保留 rootless 副本尝试启动；首次连接前 VM compressor panic，一次重试未建立客户机连接；两次均 SIGINT 退出0 | 实际 RootHide 路径缺失；状态144和部分旋转未生效，原因未查明 |
+| T24 | 生产客户端连接受控 v1 XPC 服务，verify/install × 三种日志设置共6行均拒绝，未调用旧方法，日志没有新增或改写 | 完整 TCC 责任链、可移植依赖闭包；历史 helper 实物矩阵未由受控服务证明 |
+| T40 | 每个未完成创建阶段前重新检查 CLI/VM 摘要；两种归档后端的合成小样本保留8个持久文件及构造 binding/历史 receipt | 全流程资源冻结、新机 binding、可信 receipt、四层升级/回退与混合版本；64GiB VM完整归档往返空间不足 |
+| T46 | 实际签名 UI 取消创建后，已观察到的进程退出、锁释放、最终尾部写入；3项生产输出链路受控测试通过 | 普通活动 writer 立即退出 UI、完整 ACK/断连/超时/写入失败、实际 VM 和 UI 吞吐矩阵 |
+
+创建检查只覆盖阶段边界的 CLI/配对 VM 字节，不使阶段内工具不可变，也未覆盖脚本、Python、客户机载荷及外部缓存。合成归档样本为0GiB磁盘；其中历史 receipt 仅作为持久文件保存，不提供可信 store 授权。首次 system-tar 探针的 runtime 文件失败及成功重试均保留。
+
+实际 UI 创建取消使用不完整 HTTP 输入，没有执行真实固件构建或 VM 启动。应用消失至已观察进程退出和最终日志尾部为1.044854秒，日志新增3064字节，最终SHA256为 `e50741560982861d01663d3a098b334d01e824dbd2613e7801f0b523ff72a972`，状态为 interrupted，两项锁释放。该结果不证明普通 CommandLine 活动 writer 的应用终止消费顺序。
+
+受控真实进程输出100001行，输入12,788,934字节，持久化11,788,926字节，最终一次标准运行用时5.796955秒，持久化吞吐约2.03MB/s。精确摘要、最后无换行 panic、4000行显示上限及96001行省略计数均验证；没有性能门槛或既有基线，不推断 UI 渲染或实际 VM 吞吐。
+
+最终 `make test_swift` 退出0：XCTest 254项（跳过3项）、Swift Testing常规1262项/202套件、计时9项/8套件通过，guest camera 124检查及 sound 算法测试通过。此前一次 XPC 超时、一次 HTTP/WebSocket/父进程退出时序失败的日志均保留，原因未查明；定向复验和最终标准入口通过，不宣称间歇失败已经修复。`make launchpad` 退出0，CLI及Launchpad Bundle校验通过；280项字符串检查无问题，129项翻译仍标记 needs_review。
+
+本批实际 UI/helper 验收使用的签名客户端及最终重新构建的产物分别记录摘要，不能互相替代。最终构建基于本批未提交源码，元数据保留基础提交 `11064b07`。本批未应用新的二进制补丁。源码及测试提交为 `a45c9191`；最终签名构建和标准测试已覆盖该源码。
+
+本批临时 helper 服务已卸载，两份令牌已删除；已观察到的 VM、UI、创建和工作进程均已退出，实际恢复副本磁盘没有打开句柄。宿主已有 amfid/debugserver 不归本批管理；本批未启动 AMFI 绕过，不推断其全局状态。
+
+证据见 [B24-summary.json](evidence/B24-summary.json)、[源码摘要](evidence/B24-source-review.json)、[最终状态](evidence/B24-final-readback.json)、[最终产物摘要](evidence/B24-signed-artifact-manifest.json) 与 `evidence/B24/` 下的原始日志和矩阵。独立代码审查初轮发现1项Important（nil/nil摘要通过）及1项Minor（运行中错误被归为未写入拒绝）；修复后复审无剩余发现，受影响118项/6套件通过。审查者读取测试日志，未独立启动验证。详见 [初审](evidence/B24-code-review.json) 与 [复审](evidence/B24-code-review-final.json)。
+
+
+B24 的202项处置为：175项 adaptation_planned、11项 already_equivalent、10项 intentionally_not_adopted、6项 superseded。历史140项（78个非合并、62个合并）保留原处置及理由，不宣称本轮重新逐项阅读；62个合并中54个空remerge、8个非空冲突解决，8份差异摘要与B22一致。T02对账源码冻结于 `11064b07`，后续 `a45c9191` 创建检查修复另有测试和独立审查。
+
+机器校验覆盖202/342唯一SHA及精确集合、47项合同/依赖/入口、原状态保留、计划适配未提升、路径实有和摘要一致；全部检查通过。独立结构检查不代表第二次完整语义审查。冻结源码对象和删除记录位于 `evidence/B24/T02/evidence-objects/`，完整diff及审查时源码压缩档位于 [source-evidence.tar.gz](evidence/B24/T02/source-evidence.tar.gz)。当前台账见 [逐提交审查](T02_commit_semantic_reviews.json)、[342提交台账](commit_ledger.json)、[47能力台账](capability_ledger.json)、[本地路径映射](local_path_map.json)。
+
+独立审查修正后的一次全量运行仍出现12项HTTP/WebSocket/XPC连接或超时失败；隔离17项/3套件通过，最终同一标准入口1262项/202套件及计时9项/8套件通过。7项WebSocket失败用例使用内存传输，不据此归因为网络；原因未查明。失败与成功日志均保留。最终客户端另通过两种归档后端的合成往返，8个持久文件一致，native/system-tar归档分别1272/1416字节；该结果不替代真实64GiB VM或可信store receipt验收。

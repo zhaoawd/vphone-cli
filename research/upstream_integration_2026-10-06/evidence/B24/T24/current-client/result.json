@@ -1,0 +1,230 @@
+{
+  "scope": "production signed client with controlled protocol-v1 system Mach service; not historical helper executable",
+  "client_sha256": "1e3a80b19b8d6d0023a9d52fcc08a144189314b830dbac81fb91b0713c4fb2bd",
+  "fixture_sha256": "e08af0b6ed5f3398ff815c4f8698b1926ece60107aa1b56bda65949c340471e8",
+  "baseline_service": {
+    "args": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n",
+    "seconds": 0.02767362497979775
+  },
+  "authorization_rule_before": {
+    "args": [
+      "/usr/bin/security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n",
+    "seconds": 0.03124395798658952
+  },
+  "store_before": {
+    "exists": false
+  },
+  "rows": [
+    {
+      "args": [
+        "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.17334350000601262,
+      "operation": "verify-bundle",
+      "mode": "no-log",
+      "log_exists_after": false
+    },
+    {
+      "args": [
+        "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34",
+        "--log-file",
+        "/private/tmp/vphone-b24-helper-v1-current/verify-bundle-new-log.log"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.14774783403845504,
+      "operation": "verify-bundle",
+      "mode": "new-log",
+      "log_exists_after": false
+    },
+    {
+      "args": [
+        "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34",
+        "--log-file",
+        "/private/tmp/vphone-b24-helper-v1-current/verify-bundle-existing-log.log"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.14739145804196596,
+      "operation": "verify-bundle",
+      "mode": "existing-log",
+      "log_exists_after": true
+    },
+    {
+      "args": [
+        "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "install-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34",
+        "--archive",
+        "/private/tmp/vphone-b24-helper-v1-current/archive.bin",
+        "--sha256",
+        "fa0ce9d0f32e6c0a3a5d884b4577ed666b037e9b193ac22a5eb25542ab51cac5"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.14725762500893325,
+      "operation": "install-bundle",
+      "mode": "no-log",
+      "log_exists_after": false
+    },
+    {
+      "args": [
+        "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "install-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34",
+        "--archive",
+        "/private/tmp/vphone-b24-helper-v1-current/archive.bin",
+        "--sha256",
+        "fa0ce9d0f32e6c0a3a5d884b4577ed666b037e9b193ac22a5eb25542ab51cac5",
+        "--log-file",
+        "/private/tmp/vphone-b24-helper-v1-current/install-bundle-new-log.log"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.15118479100055993,
+      "operation": "install-bundle",
+      "mode": "new-log",
+      "log_exists_after": false
+    },
+    {
+      "args": [
+        "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "install-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34",
+        "--archive",
+        "/private/tmp/vphone-b24-helper-v1-current/archive.bin",
+        "--sha256",
+        "fa0ce9d0f32e6c0a3a5d884b4577ed666b037e9b193ac22a5eb25542ab51cac5",
+        "--log-file",
+        "/private/tmp/vphone-b24-helper-v1-current/install-bundle-existing-log.log"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.14419129199814051,
+      "operation": "install-bundle",
+      "mode": "existing-log",
+      "log_exists_after": true
+    }
+  ],
+  "bootstrap": {
+    "args": [
+      "sudo",
+      "-n",
+      "launchctl",
+      "bootstrap",
+      "system",
+      "/private/var/tmp/vphone-b24-legacy-28a9319c-e142-4f05-83d5-5611445a4302/service.plist"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "seconds": 0.043276417010929435
+  },
+  "status": {
+    "args": [
+      "/private/tmp/vphone-b24-helper-v1-current/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "status"
+    ],
+    "exit": 0,
+    "stdout": "helper protocol: 1\n",
+    "stderr": "",
+    "seconds": 5.476725084008649
+  },
+  "fixture_log": "fixture: accepted pid=23471 uid=2035870432\nfixture: helperVersion -> 1\nfixture: accepted pid=23637 uid=2035870432\nfixture: helperVersion -> 1\nfixture: accepted pid=23641 uid=2035870432\nfixture: helperVersion -> 1\nfixture: accepted pid=23644 uid=2035870432\nfixture: helperVersion -> 1\nfixture: accepted pid=23650 uid=2035870432\nfixture: helperVersion -> 1\nfixture: accepted pid=23654 uid=2035870432\nfixture: helperVersion -> 1\nfixture: accepted pid=23657 uid=2035870432\nfixture: helperVersion -> 1\n",
+  "version_requests": 7,
+  "authorization_rule_after": {
+    "args": [
+      "/usr/bin/security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n",
+    "seconds": 0.025896667037159204
+  },
+  "store_after": {
+    "exists": false
+  },
+  "passed": true,
+  "service_before_cleanup": {
+    "args": [
+      "sudo",
+      "-n",
+      "launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "system/com.vphone.cli.helper = {\n\tactive count = 2\n\tpath = /private/var/tmp/vphone-b24-legacy-28a9319c-e142-4f05-83d5-5611445a4302/service.plist\n\ttype = LaunchDaemon\n\tstate = running\n\n\tprogram = /private/var/tmp/vphone-b24-legacy-28a9319c-e142-4f05-83d5-5611445a4302/legacy-helper-v1\n\targuments = {\n\t\t/private/var/tmp/vphone-b24-legacy-28a9319c-e142-4f05-83d5-5611445a4302/legacy-helper-v1\n\t}\n\n\tstdout path = /private/var/tmp/vphone-b24-legacy-28a9319c-e142-4f05-83d5-5611445a4302/stdout.log\n\tstderr path = /private/var/tmp/vphone-b24-legacy-28a9319c-e142-4f05-83d5-5611445a4302/stderr.log\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tXPC_SERVICE_NAME => com.vphone.cli.helper\n\t}\n\n\tdomain = system\n\tminimum runtime = 10\n\texit timeout = 5\n\truns = 1\n\tpid = 23595\n\timmediate reason = ipc (mach)\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit code = (never exited)\n\n\tendpoints = {\n\t\t\"com.vphone.cli.helper\" = {\n\t\t\tport = 0xa60db\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t}\n\n\tresource coalition = {\n\t\tID = 91166\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tjetsam coalition = {\n\t\tID = 91167\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tspawn type = daemon (3)\n\tjetsam priority = 40\n\tjetsam memory limit (active) = (unlimited)\n\tjetsam memory limit (inactive) = (unlimited)\n\tjetsamproperties category = daemon\n\tjetsam thread limit = 32\n\tcpumon = default\n\tsanitizer flags = 0x0\n\n\tproperties = inferred program\n}\n",
+    "stderr": "",
+    "seconds": 0.04337400000076741
+  },
+  "bootout": {
+    "args": [
+      "sudo",
+      "-n",
+      "launchctl",
+      "bootout",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "seconds": 0.046556999965105206
+  },
+  "final_service": {
+    "args": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n",
+    "seconds": 0.012947458017151803
+  },
+  "temporary_root_removed": true
+}

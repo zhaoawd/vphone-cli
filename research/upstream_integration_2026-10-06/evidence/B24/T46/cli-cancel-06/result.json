@@ -1,0 +1,261 @@
+{
+  "scope": "real signed production CLI with controlled incomplete HTTP input; no UI or VM",
+  "command": [
+    "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+    "vm",
+    "create",
+    "t46-create",
+    "--library-root",
+    "/private/tmp/vphone-b24-t46/cli-cancel-06/library",
+    "--disk-size",
+    "8",
+    "--variant",
+    "regular",
+    "--iphone-source",
+    "http://127.0.0.1:55498/T46-iPhone.ipsw",
+    "--cloudos-source",
+    "http://127.0.0.1:55498/T46-cloudOS.ipsw",
+    "--root-popup",
+    "--prepare-backend",
+    "script",
+    "-vvv"
+  ],
+  "environment": {
+    "VPHONE_ROOT": "/private/tmp/vphone-b24-t46/cli-cancel-06/data",
+    "VPHONE_LIBRARY_ROOT": "/private/tmp/vphone-b24-t46/cli-cancel-06/library",
+    "VPHONE_PYTHON": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.venv/bin/python"
+  },
+  "pid": 87114,
+  "cli_sha256": "8599974608b6629246cc5bb82258103db90a62868d9ef87b4c58be23aaa13c34",
+  "http_request_seen": true,
+  "http_bytes_transferred_before_signal": 65536,
+  "before_signal": [
+    {
+      "pid": 87114,
+      "ppid": 87097,
+      "pgid": 87114,
+      "stat": "Ss",
+      "command": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli vm create t46-create --library-root /private/tmp/vphone-b24-t46/cli-cancel-06/library --disk-size 8 --variant regular --iphone-source http://127.0.0.1:55498/T46-iPhone.ipsw --cloudos-source http://127.0.0.1:55498/T46-cloudOS.ipsw --root-popup --prepare-backend script -vvv"
+    },
+    {
+      "pid": 87163,
+      "ppid": 87114,
+      "pgid": 87163,
+      "stat": "S",
+      "command": "/bin/bash /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Resources/scripts/fw_prepare.sh"
+    },
+    {
+      "pid": 87188,
+      "ppid": 87163,
+      "pgid": 87163,
+      "stat": "S",
+      "command": "aria2c --allow-overwrite=true --auto-file-renaming=false -x 16 -s 16 -k 1M -c -d /private/tmp/vphone-b24-t46/cli-cancel-06/data/ipsws -o .T46-iPhone.ipsw.partial.87163 http://127.0.0.1:55498/T46-iPhone.ipsw"
+    }
+  ],
+  "before_log": {
+    "path": "/private/tmp/vphone-b24-t46/cli-cancel-06/create.log",
+    "size": 556,
+    "inode": 587088950,
+    "sha256": "8e25d2f9a69bf47b5ed49c875d8896bd7d0a034e23b300b0de3c6cd3b8a4ea89",
+    "tail": "=== prepare_firmware ===\n  Device:   iPhone17,3\n  iPhone:   http://127.0.0.1:55498/T46-iPhone.ipsw\n  CloudOS:  http://127.0.0.1:55498/T46-cloudOS.ipsw\n  IPSWs:    /private/tmp/vphone-b24-t46/cli-cancel-06/data/ipsws\n  Output:   /private/tmp/vphone-b24-t46/cli-cancel-06/library/t46-create/T46-iPhone/\n\n==> Downloading T46-iPhone.ipsw ...\n\n10/09 14:22:11 [\u001b[1;32mNOTICE\u001b[0m] Downloading 1 item(s)\n\n10/09 14:22:11 [\u001b[1;32mNOTICE\u001b[0m] Allocating disk space. Use --file-allocation=none to disable it. See --file-allocation option in man page for more details.\n"
+  },
+  "signal_elapsed": 4.112663459032774,
+  "exit_code": 130,
+  "exit_elapsed": 4.155940041993745,
+  "after_processes": [],
+  "status_exit_code": 0,
+  "status": {
+    "bundle": "/private/tmp/vphone-b24-t46/cli-cancel-06/library/t46-create",
+    "checkpoint": {
+      "artifacts": [],
+      "attempt_id": "bb0166e8-e660-444b-b42d-d43491227658",
+      "attempts": [
+        {
+          "accepted_tool_change": false,
+          "attempt_id": "bb0166e8-e660-444b-b42d-d43491227658",
+          "checks": {},
+          "kind": "create",
+          "pid": 87114,
+          "started_at": "2026-10-09T06:22:08Z"
+        }
+      ],
+      "bundle_identity": {
+        "directory_id": "16777233:587088952",
+        "name": "t46-create",
+        "path": "/tmp/vphone-b24-t46/cli-cancel-06/library/t46-create"
+      },
+      "created_at": "2026-10-09T06:22:08Z",
+      "creation_id": "8640d661-3d2f-47bc-be5c-c2686c4e3559",
+      "effective_options": {
+        "cloudos_source": {
+          "display": "http://127.0.0.1:55498/T46-cloudOS.ipsw",
+          "redacted": false,
+          "sha256": "bcd460e3cb898d0f5da8b1c98e066b055c7be9a0ff9193731f7f7263c7875851"
+        },
+        "cpu_count": 8,
+        "disk_size_gb": 8,
+        "enable_frida": false,
+        "force_dsc_max_slide": false,
+        "iphone_source": {
+          "display": "http://127.0.0.1:55498/T46-iPhone.ipsw",
+          "redacted": false,
+          "sha256": "0b1331679c89a710dfa01e05732c3ff9231cf4edabac3080c273faa7a00f572d"
+        },
+        "memory_mb": 8192,
+        "variant": "regular"
+      },
+      "inputs_digest": "3b0448abd0e81046e3c21ec6574db37c08789fe6d36d2c805baea1ce1ea906c9",
+      "schema_version": 1,
+      "stages": [
+        {
+          "attempt_id": "bb0166e8-e660-444b-b42d-d43491227658",
+          "error": "interrupted by SIGINT at 2026-10-09T06:22:12Z; every stage process ended before vm create exited",
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "pid": 87114,
+          "stage": "prepare",
+          "started_at": "2026-10-09T06:22:08Z",
+          "status": "running"
+        },
+        {
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "stage": "patch",
+          "status": "pending"
+        },
+        {
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "stage": "restore",
+          "status": "pending"
+        },
+        {
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "stage": "cfw",
+          "status": "pending"
+        },
+        {
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "stage": "first_boot",
+          "status": "pending"
+        },
+        {
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "reason": "jb_finalize applies only to variants jb and exp",
+          "stage": "jb_finalize",
+          "status": "not_applicable"
+        },
+        {
+          "evidence": {},
+          "history": [],
+          "inputs": {},
+          "outputs": [],
+          "stage": "verification",
+          "status": "pending"
+        }
+      ],
+      "tool": {
+        "executable_sha256": "e28ecf5d5e00820718ca2014c428edc7e01ffed75b120bd928e0fe68af08ab67",
+        "stage_contract_version": 1
+      },
+      "updated_at": "2026-10-09T06:22:12Z"
+    },
+    "checkpoint_overall_status": "interrupted",
+    "live": {
+      "bundle_lock_held": false,
+      "create_run_in_progress": false
+    },
+    "next_stage": "prepare",
+    "overall_status": "interrupted"
+  },
+  "files": [
+    {
+      "path": "create-status.stderr.log",
+      "size": 0,
+      "allocated_bytes": 0
+    },
+    {
+      "path": "server-ready.json",
+      "size": 260,
+      "allocated_bytes": 4096
+    },
+    {
+      "path": "create.log",
+      "size": 2147,
+      "allocated_bytes": 4096
+    },
+    {
+      "path": "create-status.stdout.json",
+      "size": 3734,
+      "allocated_bytes": 4096
+    },
+    {
+      "path": "http-events.json",
+      "size": 4743,
+      "allocated_bytes": 8192
+    },
+    {
+      "path": "data/ipsws/.T46-iPhone.ipsw.partial.87163.aria2",
+      "size": 366,
+      "allocated_bytes": 4096
+    },
+    {
+      "path": "data/ipsws/.T46-iPhone.ipsw.partial.87163",
+      "size": 67108864,
+      "allocated_bytes": 67108864
+    },
+    {
+      "path": "library/t46-create/Disk.img",
+      "size": 8589934592,
+      "allocated_bytes": 0
+    },
+    {
+      "path": "library/t46-create/AVPBooter.vresearch1.bin",
+      "size": 335688,
+      "allocated_bytes": 192512
+    },
+    {
+      "path": "library/t46-create/SEPStorage",
+      "size": 524288,
+      "allocated_bytes": 524288
+    },
+    {
+      "path": "library/t46-create/config.plist",
+      "size": 1070,
+      "allocated_bytes": 4096
+    },
+    {
+      "path": "library/t46-create/AVPSEPBooter.vresearch1.bin",
+      "size": 167936,
+      "allocated_bytes": 77824
+    },
+    {
+      "path": "library/t46-create/.create-checkpoint/checkpoint.json",
+      "size": 3155,
+      "allocated_bytes": 4096
+    }
+  ],
+  "final_log": {
+    "path": "/private/tmp/vphone-b24-t46/cli-cancel-06/create.log",
+    "size": 2147,
+    "inode": 587088950,
+    "sha256": "58065cea9b2ac4134f20aaf66967191fa93e53f8b16089e53cba165f02706647",
+    "tail": "=== prepare_firmware ===\n  Device:   iPhone17,3\n  iPhone:   http://127.0.0.1:55498/T46-iPhone.ipsw\n  CloudOS:  http://127.0.0.1:55498/T46-cloudOS.ipsw\n  IPSWs:    /private/tmp/vphone-b24-t46/cli-cancel-06/data/ipsws\n  Output:   /private/tmp/vphone-b24-t46/cli-cancel-06/library/t46-create/T46-iPhone/\n\n==> Downloading T46-iPhone.ipsw ...\n\n10/09 14:22:11 [\u001b[1;32mNOTICE\u001b[0m] Downloading 1 item(s)\n\n10/09 14:22:11 [\u001b[1;32mNOTICE\u001b[0m] Allocating disk space. Use --file-allocation=none to disable it. See --file-allocation option in man page for more details.\n[!] SIGINT received; stopping python vm_lock.py and recording the running stage as interrupted\n\n10/09 14:22:12 [\u001b[1;32mNOTICE\u001b[0m] Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown.\n\n10/09 14:22:12 [\u001b[1;32mNOTICE\u001b[0m] Download GID#ad235ac7cfae750e not complete: /private/tmp/vphone-b24-t46/cli-cancel-06/data/ipsws/.T46-iPhone.ipsw.partial.87163\n\nDownload Results:\ngid   |stat|avg speed  |path/URI\n======+====+===========+=======================================================\nad235a|INPR|   3.1MiB/s|/private/tmp/vphone-b24-t46/cli-cancel-06/data/ipsws/.T46-iPhone.ipsw.partial.87163\n\nStatus Legend:\n(INPR):download in-progress.\n\naria2 will resume download if the transfer is restarted.\nIf there are any errors, then see the log file. See '-l' option in help/man page for details.\nERROR: Failed to download 'http://127.0.0.1:55498/T46-iPhone.ipsw'\n\n=== vm new ===\ncreated /private/tmp/vphone-b24-t46/cli-cancel-06/library/t46-create\n\n=== prepare ===\n[trace] spawn /bin/bash /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Resources/scripts/fw_prepare.sh (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR)\n\n[-] vm create stopped by SIGINT during prepare; its processes have exited and prepare stays running in the checkpoint (overall: interrupted).\n    Inspect: vphone-cli vm create-status t46-create\n    Resume:  vphone-cli vm create --resume t46-create\nError: interrupted by SIGINT during stage prepare; the stage stays running in the checkpoint (overall: interrupted)\n"
+  },
+  "passed": true
+}

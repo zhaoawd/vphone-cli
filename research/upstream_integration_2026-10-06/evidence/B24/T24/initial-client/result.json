@@ -1,0 +1,112 @@
+{
+  "scope": "production signed client with controlled protocol-v1 system Mach service; not historical helper executable",
+  "client_sha256": "d5078d467598718d7c6c2d43052ec7ec11249e8b6bcc710f3d5ff13b632ce4b0",
+  "fixture_sha256": "e08af0b6ed5f3398ff815c4f8698b1926ece60107aa1b56bda65949c340471e8",
+  "baseline_service": {
+    "args": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n",
+    "seconds": 0.029574833053629845
+  },
+  "authorization_rule_before": {
+    "args": [
+      "/usr/bin/security",
+      "authorizationdb",
+      "read",
+      "com.vphone.cli.helper.privileged"
+    ],
+    "exit": 255,
+    "stdout": "",
+    "stderr": "NO (-60005)\n",
+    "seconds": 0.03276154102059081
+  },
+  "store_before": {
+    "exists": false
+  },
+  "rows": [
+    {
+      "args": [
+        "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "helper",
+        "verify-bundle",
+        "--version",
+        "2.6.1-local.ab12cd34"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Installed helper protocol differs from this client. Register the matching signed helper.\n",
+      "seconds": 0.3917784160003066,
+      "operation": "verify-bundle",
+      "mode": "no-log",
+      "log_exists_after": false
+    }
+  ],
+  "bootstrap": {
+    "args": [
+      "sudo",
+      "-n",
+      "launchctl",
+      "bootstrap",
+      "system",
+      "/private/var/tmp/vphone-b24-legacy-fcfd76a6-6201-4ed6-85bb-851e1ec37bf8/service.plist"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "seconds": 0.057135957991704345
+  },
+  "status": {
+    "args": [
+      "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/helper-candidate/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "helper",
+      "status"
+    ],
+    "exit": 0,
+    "stdout": "helper protocol: 1\n",
+    "stderr": "",
+    "seconds": 3.0306300000520423
+  },
+  "service_before_cleanup": {
+    "args": [
+      "sudo",
+      "-n",
+      "launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "system/com.vphone.cli.helper = {\n\tactive count = 2\n\tpath = /private/var/tmp/vphone-b24-legacy-fcfd76a6-6201-4ed6-85bb-851e1ec37bf8/service.plist\n\ttype = LaunchDaemon\n\tstate = running\n\n\tprogram = /private/var/tmp/vphone-b24-legacy-fcfd76a6-6201-4ed6-85bb-851e1ec37bf8/legacy-helper-v1\n\targuments = {\n\t\t/private/var/tmp/vphone-b24-legacy-fcfd76a6-6201-4ed6-85bb-851e1ec37bf8/legacy-helper-v1\n\t}\n\n\tstdout path = /private/var/tmp/vphone-b24-legacy-fcfd76a6-6201-4ed6-85bb-851e1ec37bf8/stdout.log\n\tstderr path = /private/var/tmp/vphone-b24-legacy-fcfd76a6-6201-4ed6-85bb-851e1ec37bf8/stderr.log\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tXPC_SERVICE_NAME => com.vphone.cli.helper\n\t}\n\n\tdomain = system\n\tminimum runtime = 10\n\texit timeout = 5\n\truns = 1\n\tpid = 20701\n\timmediate reason = ipc (mach)\n\tforks = 0\n\texecs = 1\n\tinitialized = 1\n\ttrampolined = 1\n\tstarted suspended = 0\n\tproxy started suspended = 0\n\tchecked allocations = 0 (queried = 1)\n\tchecked allocations reason = no host\n\tchecked allocations flags = 0x0\n\tlast exit code = (never exited)\n\n\tendpoints = {\n\t\t\"com.vphone.cli.helper\" = {\n\t\t\tport = 0xc0dcb\n\t\t\tactive = 1\n\t\t\tmanaged = 1\n\t\t\treset = 0\n\t\t\thide = 0\n\t\t\twatching = 0\n\t\t}\n\t}\n\n\tresource coalition = {\n\t\tID = 91154\n\t\ttype = resource\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tjetsam coalition = {\n\t\tID = 91155\n\t\ttype = jetsam\n\t\tstate = active\n\t\tactive count = 1\n\t\tname = com.vphone.cli.helper\n\t}\n\n\tspawn type = daemon (3)\n\tjetsam priority = 40\n\tjetsam memory limit (active) = (unlimited)\n\tjetsam memory limit (inactive) = (unlimited)\n\tjetsamproperties category = daemon\n\tjetsam thread limit = 32\n\tcpumon = default\n\tsanitizer flags = 0x0\n\n\tproperties = inferred program\n}\n",
+    "stderr": "",
+    "seconds": 0.0632445000228472
+  },
+  "bootout": {
+    "args": [
+      "sudo",
+      "-n",
+      "launchctl",
+      "bootout",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "seconds": 0.053706000035163015
+  },
+  "final_service": {
+    "args": [
+      "/bin/launchctl",
+      "print",
+      "system/com.vphone.cli.helper"
+    ],
+    "exit": 113,
+    "stdout": "",
+    "stderr": "Bad request.\nCould not find service \"com.vphone.cli.helper\" in domain for system\n",
+    "seconds": 0.01319879200309515
+  },
+  "temporary_root_removed": true
+}

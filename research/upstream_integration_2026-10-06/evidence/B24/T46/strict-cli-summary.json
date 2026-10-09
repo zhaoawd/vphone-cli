@@ -1,0 +1,45 @@
+{
+  "scope": "real signed production CLI with controlled incomplete HTTP input; no UI or VM",
+  "result": "/private/tmp/vphone-b24-t46/cli-cancel-07/result.json",
+  "pid": 99036,
+  "cli_sha256": "8599974608b6629246cc5bb82258103db90a62868d9ef87b4c58be23aaa13c34",
+  "http_request_seen": true,
+  "successful_write_and_flush_bytes_before_signal": 65536,
+  "signal_to_exit_seconds": 0.12643483298597857,
+  "exit_code": 130,
+  "observed_before_signal": [
+    {
+      "pid": 99036,
+      "ppid": 99022,
+      "pgid": 99036,
+      "stat": "Ss",
+      "command": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli vm create t46-create --library-root /private/tmp/vphone-b24-t46/cli-cancel-07/library --disk-size 8 --variant regular --iphone-source http://127.0.0.1:57532/T46-iPhone.ipsw --cloudos-source http://127.0.0.1:57532/T46-cloudOS.ipsw --root-popup --prepare-backend script -vvv"
+    },
+    {
+      "pid": 99078,
+      "ppid": 99036,
+      "pgid": 99078,
+      "stat": "S",
+      "command": "/bin/bash /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/Resources/scripts/fw_prepare.sh"
+    },
+    {
+      "pid": 99097,
+      "ppid": 99078,
+      "pgid": 99078,
+      "stat": "S",
+      "command": "aria2c --allow-overwrite=true --auto-file-renaming=false -x 16 -s 16 -k 1M -c -d /private/tmp/vphone-b24-t46/cli-cancel-07/data/ipsws -o .T46-iPhone.ipsw.partial.99078 http://127.0.0.1:57532/T46-iPhone.ipsw"
+    }
+  ],
+  "remaining_observed_processes": [],
+  "overall_status": "interrupted",
+  "live": {
+    "bundle_lock_held": false,
+    "create_run_in_progress": false
+  },
+  "passed": true,
+  "limitations": [
+    "Only previously observed descendant identities are tracked.",
+    "No helper ACK/XPC coverage is added by this fixture.",
+    "No application UI, real firmware, or VM was exercised."
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "scope": "actual CLI transfer of synthetic small VM bundle; no VM launch or firmware/runtime acceptance",
+  "cli": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+  "cli_sha256": "17cbd9f17bd4d1feb6f5cbe78ce0e838e8c7fca1081ccee8c6d563704b882c1f",
+  "commands": [
+    {
+      "argv": [
+        "vm",
+        "new",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/library",
+        "source",
+        "--disk-size",
+        "0",
+        "--rom",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/synthetic-ROM.bin",
+        "--seprom",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/synthetic-ROM.bin"
+      ],
+      "returncode": 0,
+      "stdout": "created /private/tmp/vphone-b24-t24-t40/transfer-final-native/library/source\n",
+      "stderr": "",
+      "seconds": 2.8314020840334706
+    },
+    {
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/library",
+        "source",
+        "clone"
+      ],
+      "returncode": 0,
+      "stdout": "cloned source \u2192 clone\n",
+      "stderr": "",
+      "seconds": 0.06284162495285273
+    },
+    {
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/library",
+        "clone",
+        "renamed"
+      ],
+      "returncode": 0,
+      "stdout": "renamed to renamed\n",
+      "stderr": "",
+      "seconds": 0.048274624976329505
+    },
+    {
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/library",
+        "renamed",
+        "--out",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/transfer.txz",
+        "--max",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "stdout": "exported renamed \u2192 /private/tmp/vphone-b24-t24-t40/transfer-final-native/transfer.txz\n",
+      "stderr": "",
+      "seconds": 0.07563387497793883
+    },
+    {
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/library",
+        "/private/tmp/vphone-b24-t24-t40/transfer-final-native/transfer.txz",
+        "--name",
+        "imported",
+        "--archive-backend",
+        "native"
+      ],
+      "returncode": 0,
+      "stdout": "imported \u2192 imported\n",
+      "stderr": "",
+      "seconds": 0.13237174996174872
+    }
+  ],
+  "binding_input": {
+    "kind": "constructed four-origin fixture; not runtime evidence"
+  },
+  "receipt_input": {
+    "path": "/private/tmp/vphone-b24-t24-t40/historical-host-receipt.json",
+    "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4",
+    "kind": "evidence copy; root-owned store not transferred or authenticated"
+  },
+  "complete": true,
+  "identical_file_inventory": {
+    "AVPBooter.vresearch1.bin": {
+      "sha256": "f445591ce5bde3c859c5fe9d617edeebfdb63bb51ed1d86714e9b6eee59140ae",
+      "bytes": 29,
+      "mode": 420
+    },
+    "AVPSEPBooter.vresearch1.bin": {
+      "sha256": "f445591ce5bde3c859c5fe9d617edeebfdb63bb51ed1d86714e9b6eee59140ae",
+      "bytes": 29,
+      "mode": 420
+    },
+    "Disk.img": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420
+    },
+    "SEPStorage": {
+      "sha256": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+      "bytes": 524288,
+      "mode": 420
+    },
+    "acceptance-host-receipt-copy.json": {
+      "sha256": "142c5a33bb19576af3bdc56cdf1c2b3a5d7bd9b659ef3e17e637ee27153a21f4",
+      "bytes": 318,
+      "mode": 384
+    },
+    "config.plist": {
+      "sha256": "246eab6e842d60dfd72c0c00f66a71dff4fadd90cd60a0bdf41540e5f792aa2a",
+      "bytes": 1070,
+      "mode": 420
+    },
+    "launchpad.json": {
+      "sha256": "e6884ce2ea3a181ca3dc3b4c7500227c6c92dcd5961e130f931f59a91ae69b7c",
+      "bytes": 117,
+      "mode": 384
+    },
+    "state.bin": {
+      "sha256": "a80bf7fe77e1414d8b2e14498d89a9caa8709925d70e968851236c38143f4fc3",
+      "bytes": 27,
+      "mode": 416
+    }
+  },
+  "archive_bytes": 1272,
+  "recorded_four_origins": {
+    "bundle": "2.6.1-local.1208708c55574677",
+    "guestEnvironment": "2.6.0",
+    "kernel": "2.6.1",
+    "bootChain": "2.6.0-ci.abcdef0"
+  },
+  "limitations": [
+    "Synthetic ROM and 0 GiB disk; no real VM archive or restore tested",
+    "Recorded origins retained byte-for-byte; actual host/guest/kernel/boot chain identity not established",
+    "Receipt copy retained as opaque evidence; root store verification is a separate operation"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "review_head": "11064b07ea5b754285eae0e56f8aedc912441606",
+  "scope": "当前未提交的 T40/T46 实现与受影响的 6 个代码/测试文件；只读复审",
+  "critical": [],
+  "important": [],
+  "minor": [],
+  "resolved_findings": [
+    {
+      "previous_severity": "Important",
+      "file": "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "line": 466,
+      "result": "guard 要求 currentTool 非 nil 且与 checkpoint 相等，nil/nil 不再允许阶段执行。新增初始不可读与 resume accept nil 测试覆盖原问题。"
+    },
+    {
+      "previous_severity": "Minor",
+      "file": "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "line": 467,
+      "result": "阶段边界改抛 toolChangedDuringRun，isRefusalBeforeWrite=false；恢复提示进入 stopped 分支。旧 toolChanged 保留预检拒绝分类，新增恢复提示测试覆盖错误文案。"
+    }
+  ],
+  "strengths": [
+    "检查仍在下一阶段状态写入与执行之前，已完成阶段保留。",
+    "synthetic native fixtures 显式提供稳定指纹，原有测试继续验证原定的阶段行为。",
+    "T46 的生产路径、完整持久化摘要、隔离日志和取消/轮换断言有效；未发现新增并发或取消风险。"
+  ],
+  "declined_to_judge": [
+    "阶段内部 TOCTOU 与资源冻结：明确超出范围。",
+    "UI、真实 VM 与特权 helper 吞吐和实际运行：控制子进程测试不提供相关证据。"
+  ],
+  "evidence": [
+    "git diff --check 通过。",
+    "读取 /private/tmp/vphone-b24-review-green-retry.log，构建完成；受影响的 118 tests in 6 suites passed after 3.435 seconds。",
+    "吞吐日志记录 100001 行、display_lines=4000、omitted_display_lines=96001、output_drained=true、persisted_sha256=720a521ea7620059a8b4bb1a568ba3843fbe32dfe77981a330028c7f84326ca5。"
+  ],
+  "limitations": [
+    "本审查未启动测试、构建、VM、GUI 或 helper。受影响套件结果来自父任务运行日志；最终全量 Swift 验证和签名构建需由父任务完成。"
+  ],
+  "assessment": "Ready to merge, subject to final validation"
+}

@@ -1,0 +1,306 @@
+{
+  "assigned_indices": [
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    138,
+    140,
+    144,
+    145,
+    151,
+    152,
+    154,
+    155,
+    156,
+    157,
+    158,
+    164,
+    165,
+    167
+  ],
+  "full_diff_read_count": 21,
+  "diffs": [
+    {
+      "path": "/private/tmp/vphone-b24-t02/129-9ad39f1c22.diff",
+      "sha256": "9b6294a3cd142afe9f3d321707e2dc30e5857fcc24631f219b2e3babad658a4e",
+      "line_count": 7563,
+      "read_ranges": [
+        [
+          1,
+          7563
+        ]
+      ],
+      "summary": "新增完整virtio-snd HAL输出bundle、ASD声明/stub、Factory/IOKit匹配、格式/SET_PARAMS/ring和异步write生命周期；四项VirtualAudio语义锚点补丁、speaker chainType替换；iPad board audio及Preboot修复、单次staging/re-sign/seal、打包校验与测试。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/130-0c0b501ca8.diff",
+      "sha256": "338a31285d8e9eaf12815c612a2c1d0915ff872d114195ba8202ca8b4e2cf202",
+      "line_count": 741,
+      "read_ranges": [
+        [
+          1,
+          741
+        ]
+      ],
+      "summary": "每次start重新安装device/stream I/O block；timestamp period帧数固定，速率只改时长；启动lead和计数。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/131-3622c26b61.diff",
+      "sha256": "113d284e9852e4ceaf9c555ba251ce35395847beca6ed571a5c0f3163172060d",
+      "line_count": 646,
+      "read_ranges": [
+        [
+          1,
+          646
+        ]
+      ],
+      "summary": "按board复制或删除iPad haptics；fw patch和Preboot repair命令、声明、测试贯通。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/132-62ee326762.diff",
+      "sha256": "7fe10dbda0a81dfbc418e8d1f70d763f9f9c8f8250527868506feae66e4a8b58",
+      "line_count": 1138,
+      "read_ranges": [
+        [
+          1,
+          1138
+        ]
+      ],
+      "summary": "共用board-node解析/比较，haptics比较顺序无关；plugin clock固定periodFrames、mix持有计数、silence分配失败处理及统一stop统计。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/133-59601eb60c.diff",
+      "sha256": "fa6ce3f4991b95b31c454a5e49d91630357c0fea29df225f8311271d337f6398",
+      "line_count": 509,
+      "read_ranges": [
+        [
+          1,
+          509
+        ]
+      ],
+      "summary": "patchCopy先后比较字节，不变时不替换文件；原提交在board repair改变树后从host挂载data删除MobileGestalt缓存，并新增haptics路径测试。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/134-9c7d6fa767.diff",
+      "sha256": "dcada75cb033be407bcdfaabeb4a7c48e10fb748a85e2c2117de638d43b5d48e",
+      "line_count": 820,
+      "read_ranges": [
+        [
+          1,
+          820
+        ]
+      ],
+      "summary": "提取Clock双缓冲时间线、seed发布及有界无锁读；iPhone route/ProductID；失败init由dealloc单次清理。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/135-fa50d48a18.diff",
+      "sha256": "85892b448fe2e454ac412bf2ff31706f4e084de62726f2bca1de7c656481dc4b",
+      "line_count": 1137,
+      "read_ranges": [
+        [
+          1,
+          1137
+        ]
+      ],
+      "summary": "全部guest与全部tree role删除/product/haptics，加入独立fw/Preboot gate与无需board的repair命令；替代131的iPad-only修复。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/138-5d7232a0c3.diff",
+      "sha256": "7333691e5a69c95e3dbc40a84bdd2bffabb4ee406e2064f0810681291dfc49b5",
+      "line_count": 668,
+      "read_ranges": [
+        [
+          1,
+          668
+        ]
+      ],
+      "summary": "从guest启动比较缓存和唯一Preboot树mtime，旧缓存unlink；用bootsession marker报告restart_pending；host将s3按xART命名且不从该卷删缓存，保持no-op文件mtime。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/140-23feea5d7d.diff",
+      "sha256": "8fc459a4f8c102a5706ced29368480d7933c4344da7de91c96b9c0dc3ca6fefc",
+      "line_count": 485,
+      "read_ranges": [
+        [
+          1,
+          485
+        ]
+      ],
+      "summary": "start仅发布leadRequest，首个VPMixWrite按queued减最旧period后补静音；ring维持单writer；新增静音write及queued查询和计数。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/144-5daa03ee95.diff",
+      "sha256": "04226acafb1f7fe718ccfcf36125622449178f201237f54e6645c632cccd312c",
+      "line_count": 3014,
+      "read_ranges": [
+        [
+          1,
+          3014
+        ]
+      ],
+      "summary": "双HAL设备同connection：Digital Mic输入与PuffinOutput输出；selector9四period输入、二period lead、全ring暂停、失败归零/延迟补充、stop drain/超时release；stream format转device rate；playAndRecord SP gate及宿主用途说明/本地化部署。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/145-f23873c148.diff",
+      "sha256": "4adc6f734f6c12b5e153142cf2e2498ba93db480acc4e040d17ad762f0de556f",
+      "line_count": 423,
+      "read_ranges": [
+        [
+          1,
+          423
+        ]
+      ],
+      "summary": "ASD音量/静音控制子类接受change hooks；输出流渐变gain；输入持续消费ring后按mute归零。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/151-e6c01aa05d.diff",
+      "sha256": "3e1fb4b91b8de888bbdaa8dbd46bdadd17f97dbfb1db7a7218f09eb2ca1eda10",
+      "line_count": 316,
+      "read_ranges": [
+        [
+          1,
+          316
+        ]
+      ],
+      "summary": "plugin覆盖旧ProductIDOverride，读VPhoneVirtIOSoundProductID（0保留现值）；vphoned在安装插件时持久化同值，避免每次audiomxd顺序依赖。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/152-1544f46b46.diff",
+      "sha256": "216475aec0b5340bcc31833e23b918843c1229037aff7c0a06c8112c606c5e08",
+      "line_count": 610,
+      "read_ranges": [
+        [
+          1,
+          610
+        ]
+      ],
+      "summary": "输入设备也广告44100；virtio保持48000，readInputBlock用整数phase线性pull converter读取恰当wire帧。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/154-571e2ad0e3.diff",
+      "sha256": "a810a16e58ede9cd704e54f97ab8fb6a115d6c7236231895cd11bca0b07a9347",
+      "line_count": 237,
+      "read_ranges": [
+        [
+          1,
+          237
+        ]
+      ],
+      "summary": "constructor同步安装provider hook；原provider为nil时，选择自己或首个shipped model的soun配置，NULL device建mic-only source provider；原provider透传。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/155-6e3acf74f9.diff",
+      "sha256": "6544d831f03473ccf914d9cbd806f8b4935378af72631ce4091e06c0b4b1b7b2",
+      "line_count": 288,
+      "read_ranges": [
+        [
+          1,
+          288
+        ]
+      ],
+      "summary": "mic-only provider启用时拦截AudioRemixSessionManager.startNewSessionBlocking，初版返回-16992防止创建SoundAnalysis会话；非mic-only调用原实现。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/156-830aa89dbd.diff",
+      "sha256": "f130f572c0a0d1ab260b37ab660dfd26bf09585ff66581703794ec21f78f3ea1",
+      "line_count": 316,
+      "read_ranges": [
+        [
+          1,
+          316
+        ]
+      ],
+      "summary": "mic-only的startNewSessionBlocking返回0而不创建会话，保留Start/Stop metadata marker转发；加render输入电平诊断。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/157-c812bafc7b.diff",
+      "sha256": "fbc0d016c248d0054e86c5db66e0f5538a44136c307ebfbc9e6b9b658ac2c62c",
+      "line_count": 1860,
+      "read_ranges": [
+        [
+          1,
+          1860
+        ]
+      ],
+      "summary": "删除spatial capture/Audio Mix array声明；mic general复制measurement graph/strips并清零global AUNBandEQ gain；HAL输入每period先测量/转储再120Hz高通，start重置；remix计数非有限sample。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/158-e7aa14d175.diff",
+      "sha256": "2cb720298d38a878d28094668a6d1b454a99ff733dc3baa37d07dfa02ef84c85",
+      "line_count": 487,
+      "read_ranges": [
+        [
+          1,
+          487
+        ]
+      ],
+      "summary": "speaker_*配置（排除raw/measurement）复制raw的graph/austrip/propstrip/volumeCommands；插件gain改为位置平方。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/164-c1d55f685b.diff",
+      "sha256": "5f4c67dcedca219137f9ea63899e86576c3659cc0dc5f648b759d9ada1ab0850",
+      "line_count": 759,
+      "read_ranges": [
+        [
+          1,
+          759
+        ]
+      ],
+      "summary": "按5秒窗口测最大inflight，settle后2窗上调/12窗下调；加host latency，另队列requestConfigurationChange更新speaker presentation latency；通知/load/start重读。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/165-603c1fbb7d.diff",
+      "sha256": "2e996561ebd53fb91ba34246d02d25920f2c6751aafc4c3b4500045a4b0e5d39",
+      "line_count": 587,
+      "read_ranges": [
+        [
+          1,
+          587
+        ]
+      ],
+      "summary": "host读取默认输出CoreAudio延迟，连接/变化500ms debounce发送RPC；guest验证0..1秒、10us差异、mobile CFPreferences写入及Darwin通知；插件消费。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    },
+    {
+      "path": "/private/tmp/vphone-b24-t02/167-88552e1ecf.diff",
+      "sha256": "13b7c11e48a3bcffb3675ab811c0cd774e026d7c0a4c68b12be31754652b22e7",
+      "line_count": 817,
+      "read_ranges": [
+        [
+          1,
+          817
+        ]
+      ],
+      "summary": "有paravirt Metal driver时，constructor同步从FigCapturePreloadShaders定位唯一signed block/captured-command-queue call，将该PrewarmThreadSafeSBPs调用改NOP；失败保持原样，保留其余preload。",
+      "read_method": "完整原始diff分块读取；第129条每块不超过200行。"
+    }
+  ],
+  "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "local_head": "11064b07ea5b754285eae0e56f8aedc912441606",
+  "runtime": "未运行构建、测试或VM；未联网；未修改源码/共享台账。",
+  "evidence_policy": "最终路径哈希仅固定快照身份；语义判断基于完整diff与源码调用链。",
+  "final_delta": "/private/tmp/vphone-b24-t02/audio-129-final-virtualaudio-delta.diff"
+}

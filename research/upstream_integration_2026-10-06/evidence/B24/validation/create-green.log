@@ -1,0 +1,222 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/43] Compiling vphone_zip_stub.c
+[4/43] Compiling deviceinterfaced.c
+[6/43] Compiling locking.c
+[6/43] Compiling common.c
+[8/43] Compiling ipsw.c
+[9/43] Compiling idevicerestore.c
+[10/43] Compiling fdr.c
+[11/43] Compiling asr.c
+[12/43] Compiling download.c
+[13/43] Compiling recovery.c
+[14/43] Compiling normal.c
+[15/43] Compiling limera1n.c
+[16/43] Compiling restore.c
+[17/43] Compiling dfu.c
+[18/43] Compiling img4.c
+[19/43] Compiling ace3.c
+[20/43] Compiling img3.c
+[21/43] Compiling mbn.c
+[22/43] Compiling ftab.c
+[23/43] Compiling fls.c
+[24/43] Compiling log.c
+[25/43] Compiling vphone_restore_bridge.c
+[26/43] Compiling MobileRecoveryCore libirecovery.c
+[28/43] Emitting module VPhoneCore
+[29/43] Compiling VPhoneCore VPhoneCreateRunner.swift
+[29/46] Write Objects.LinkFileList
+[34/46] Linking vphone-helper
+[35/46] Linking vphone-launchpad-launcher
+[36/46] Write Objects.LinkFileList
+[37/46] Applying vphone-helper
+[38/46] Applying vphone-launchpad-launcher
+[39/46] Linking vphone-launchpad
+[40/46] Applying vphone-launchpad
+[41/46] Linking vphone-vm
+[42/46] Linking vphone-cli
+[43/46] Applying vphone-cli
+[44/46] Applying vphone-vm
+[45/46] Linking vphone-cliPackageTests
+Build complete! (12.74s)
+Test Suite 'Selected tests' started at 2026-10-09 14:20:58.849.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 14:20:58.852.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 14:20:58.852.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 14:20:58.852.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateCheckpointTests started.
+◇ Test pendingStageIsNeverTreatedAsNotApplicable() started.
+◇ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() started.
+◇ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() started.
+◇ Test restartAfterNextUnfinishedStageIsRejected() started.
+◇ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() started.
+◇ Test succeededWithoutVerifierIsRejected() started.
+◇ Test artifactLookupReturnsTheLatestRecord() started.
+◇ Test toolChangeRequiresExplicitAcceptance() started.
+◇ Test heldRunLockRefusesResumeWithoutWriting() started.
+◇ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() started.
+◇ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() started.
+◇ Test runKeepsARecordWrittenByAnotherProcess() started.
+◇ Test variantChangeBeforePatchRecomputesApplicability() started.
+◇ Test freshCreateRecordsEveryStageAndOverallStatus() started.
+◇ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() started.
+◇ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() started.
+◇ Test restartFromPrepareRegeneratesARemovedRestoreTree() started.
+◇ Test missingCheckpointIsNotResumable() started.
+◇ Test keepArtifactsSkipsRemoval() started.
+◇ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() started.
+◇ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() started.
+◇ Test unverifiedStageNeverReportsOverallSuccess() started.
+◇ Test truncatedCheckpointIsRejected() started.
+◇ Test busyLiveStateStopsResumeUntilProbeIsIdle() started.
+◇ Test removableArtifactsFollowSynthesizedStageStates() started.
+◇ Test clonedOrReplacedBundleIsRefused() started.
+◇ Test futureSchemaIsRejected() started.
+◇ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() started.
+◇ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test rerunStageMayRewriteItsDeclaredArtifacts() started.
+◇ Test runLockHeldByChildProcessRefusesUntilItExits() started.
+◇ Test optionChangeAffectingCompletedStageIsRefused() started.
+◇ Test failureRecordWriteErrorKeepsOriginalError() started.
+◇ Test symlinkedCheckpointIsRejected() started.
+◇ Test recoveryInputsAreKeptUntilRetainingStagesFinish() started.
+◇ Test heldBundleLockRefusesResumeWithoutWriting() started.
+◇ Test movedArtifactRefusesResume() started.
+◇ Test notApplicableWithoutVariantRuleIsRejected() started.
+◇ Test sourceRecordRedactsOnlyURLSecrets() started.
+◇ Test artifactPathEscapingBundleIsRejected() started.
+◇ Test nativePrepareFailureCanResume() started.
+◇ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() started.
+◇ Test writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test changedMachineIdentifierIsRefused() started.
+◇ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() started.
+◇ Test movedBundleIsRefused() started.
+◇ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test duplicateStageIsRejected() started.
+◇ Test concurrentResumeAdmitsOneWriter() started.
+◇ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test unknownStageIsRejected() started.
+◇ Test case passing 1 argument phase → "building" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "publishing" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 1 argument phase → "rollingBack" to uncommittedFirmwareTransactionRequiresRecovery(phase:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .prepare, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .patch, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .restore, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .cfw, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .firstBoot, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .jbFinalize, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .afterExecution to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .beforeCheckpointCommit to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .cancel to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 2 arguments stage → .verification, fault → .verifierRejects to faultMatrixFirstRunAndResume(stage:fault:) started.
+◇ Test case passing 1 argument step → .writeTemporary to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncFile to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .rename to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 1 argument step → .syncDirectory to writeFailureBeforeStageStopsWithoutExecuting(step:) started.
+◇ Test case passing 2 arguments variant → "less", skipped → [VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 1 argument executable → "vphone-cli" to freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test case passing 1 argument executable → "vphone-vm" to freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test case passing 2 arguments variant → "regular", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "dev", skipped → [VPhoneCore.VPhoneCreateStage.jbFinalize] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "exp", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 2 arguments variant → "jb", skipped → [] to notApplicableFollowsVariantRules(variant:skipped:) started.
+◇ Test case passing 1 argument completed → false to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument completed → true to changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) started.
+◇ Test case passing 1 argument restart → .patch to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .restore to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .cfw to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .firstBoot to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+◇ Test case passing 1 argument restart → .verification to restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) started.
+✔ Test artifactLookupReturnsTheLatestRecord() passed after 0.713 seconds.
+✔ Test pendingStageIsNeverTreatedAsNotApplicable() passed after 0.713 seconds.
+✔ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() passed after 0.713 seconds.
+✔ Test restartAfterNextUnfinishedStageIsRejected() passed after 0.713 seconds.
+✔ Test heldRunLockRefusesResumeWithoutWriting() passed after 0.713 seconds.
+✔ Test changedArtifactAfterSuccessRefusesResumeWithoutExecuting() passed after 0.713 seconds.
+✔ Test succeededWithoutVerifierIsRejected() passed after 0.713 seconds.
+✔ Test bundleLockTakenBetweenStagesFailsTheWriteAndStops() passed after 0.713 seconds.
+✔ Test toolChangeRequiresExplicitAcceptance() passed after 0.713 seconds.
+✔ Test freshCreateRecordsEveryStageAndOverallStatus() passed after 0.713 seconds.
+✔ Test missingCheckpointIsNotResumable() passed after 0.713 seconds.
+✔ Test runKeepsARecordWrittenByAnotherProcess() passed after 0.713 seconds.
+✔ Test removedArtifactStillRefusedWhenTheRegeneratingStageRunsAfterAConsumer() passed after 0.713 seconds.
+✔ Test variantChangeBeforePatchRecomputesApplicability() passed after 0.713 seconds.
+✔ Test keptStageArtifactsAreStillValidatedWhenARemovedArtifactIsRegenerated() passed after 0.713 seconds.
+✔ Test checkpointWritesReleaseTheBundleLockAndTheRunRemovesItsRecord() passed after 0.713 seconds.
+✔ Test keepArtifactsSkipsRemoval() passed after 0.713 seconds.
+✔ Test removableArtifactsFollowSynthesizedStageStates() passed after 0.713 seconds.
+✔ Test truncatedCheckpointIsRejected() passed after 0.713 seconds.
+✔ Test restartFromPrepareWithoutKeepArtifactsRemovesTheTreeAgain() passed after 0.713 seconds.
+✔ Test unverifiedStageNeverReportsOverallSuccess() passed after 0.713 seconds.
+✔ Test futureSchemaIsRejected() passed after 0.713 seconds.
+✔ Test clonedOrReplacedBundleIsRefused() passed after 0.713 seconds.
+✔ Test restartFromPrepareRegeneratesARemovedRestoreTree() passed after 0.713 seconds.
+✔ Test uncommittedFirmwareTransactionRequiresRecovery(phase:) with 3 test cases passed after 0.713 seconds.
+✔ Test restoreBackendChangeRequiresRestartAfterRestoreHasRun() passed after 0.713 seconds.
+✔ Test credentialsInSourcesAreNotStoredAndMustBeResupplied() passed after 0.713 seconds.
+✔ Test busyLiveStateStopsResumeUntilProbeIsIdle() passed after 0.713 seconds.
+✔ Test rerunStageMayRewriteItsDeclaredArtifacts() passed after 0.713 seconds.
+✔ Test prepareBackendChangeRequiresRestartAndResumeKeepsNative() passed after 0.714 seconds.
+✔ Test faultMatrixFirstRunAndResume(stage:fault:) with 35 test cases passed after 0.713 seconds.
+✔ Test optionChangeAffectingCompletedStageIsRefused() passed after 0.713 seconds.
+✔ Test symlinkedCheckpointIsRejected() passed after 0.714 seconds.
+✔ Test recoveryInputsAreKeptUntilRetainingStagesFinish() passed after 0.713 seconds.
+✔ Test failureRecordWriteErrorKeepsOriginalError() passed after 0.714 seconds.
+✔ Test movedArtifactRefusesResume() passed after 0.713 seconds.
+✔ Test notApplicableWithoutVariantRuleIsRejected() passed after 0.713 seconds.
+✔ Test sourceRecordRedactsOnlyURLSecrets() passed after 0.713 seconds.
+✔ Test artifactPathEscapingBundleIsRejected() passed after 0.713 seconds.
+✔ Test runLockHeldByChildProcessRefusesUntilItExits() passed after 0.714 seconds.
+✔ Test writeFailureBeforeStageStopsWithoutExecuting(step:) with 4 test cases passed after 0.713 seconds.
+✔ Test movedBundleIsRefused() passed after 0.713 seconds.
+✔ Test changedMachineIdentifierIsRefused() passed after 0.713 seconds.
+✔ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) with 2 test cases passed after 0.713 seconds.
+✔ Test notApplicableFollowsVariantRules(variant:skipped:) with 5 test cases passed after 0.714 seconds.
+✔ Test patchFailureLeavingTransactionIsRecordedAsRecoveryRequired() passed after 0.713 seconds.
+✔ Test duplicateStageIsRejected() passed after 0.713 seconds.
+✔ Test restartFromStageWhoseOutputWasModifiedLaterIsRefused() passed after 0.714 seconds.
+✔ Test concurrentResumeAdmitsOneWriter() passed after 0.713 seconds.
+✔ Test heldBundleLockRefusesResumeWithoutWriting() passed after 0.714 seconds.
+✔ Test nativePrepareFailureCanResume() passed after 0.723 seconds.
+✔ Test restartAfterPrepareWithRemovedTreeIsRefusedWithoutWriting(restart:) with 5 test cases passed after 0.726 seconds.
+✔ Test unknownStageIsRejected() passed after 0.726 seconds.
+✔ Test changedDiskSizeIsRefusedEvenWhenRestartingPrepare(completed:) with 2 test cases passed after 0.737 seconds.
+✔ Suite CreateCheckpointTests passed after 0.738 seconds.
+✔ Test run with 54 tests in 1 suite passed after 0.738 seconds.

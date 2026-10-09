@@ -1,0 +1,372 @@
+import CoreLocation
+import Foundation
+import VPhoneCore
+
+/// Forwards the host Mac's location to the guest VM via vsock.
+///
+/// Uses macOS CoreLocation to track the Mac's real location and forwards
+/// every update to the guest.  Call `startForwarding()` when the guest
+/// reports "location" capability.  Safe to call multiple times (e.g.
+/// after vphoned reconnects) - re-sends the last known position.
+@MainActor
+class VPhoneLocationProvider: NSObject {
+    struct ExternalControlToken: Equatable {
+        fileprivate let revision: UInt64
+    }
+
+    struct ReplayPoint {
+        let latitude: Double
+        let longitude: Double
+        let altitude: Double
+        let horizontalAccuracy: Double
+        let verticalAccuracy: Double
+        let speed: Double
+        let course: Double
+
+        init(
+            latitude: Double,
+            longitude: Double,
+            altitude: Double = 0,
+            horizontalAccuracy: Double = 5,
+            verticalAccuracy: Double = 8,
+            speed: Double = 0,
+            course: Double = -1
+        ) {
+            self.latitude = latitude
+            self.longitude = longitude
+            self.altitude = altitude
+            self.horizontalAccuracy = horizontalAccuracy
+            self.verticalAccuracy = verticalAccuracy
+            self.speed = speed
+            self.course = course
+        }
+    }
+
+    private let control: VPhoneControl
+    private let locationStateURL: URL
+    lazy var systemLocationController = VPhoneSystemLocationController(
+        adapter: VPhoneControlLocationGuestAdapter(control: control),
+        stateStore: VPhoneSystemLocationStateStore(url: locationStateURL))
+    private var hostModeStarted = false
+    private var locationSourceRevision: UInt64 = 0
+
+    /// True once an external controller (the UDS automation surface) has taken
+    /// ownership of the guest location source. While set, reconnect logic must
+    /// NOT auto-resume host forwarding — otherwise the next connect would clobber
+    /// the externally injected fix (headless always forwards on connect; a GUI
+    /// toggle left "on" would too). Cleared when a GUI source is chosen again.
+    private(set) var externallyControlled = false
+
+    private var locationManager: CLLocationManager?
+    private var delegateProxy: LocationDelegateProxy?
+    private var lastHostLocation: CLLocation?
+    private var replayTask: Task<Void, Never>?
+    private var replayName: String?
+
+    var isReplaying: Bool {
+        replayTask != nil
+    }
+
+    init(control: VPhoneControl, locationStateURL: URL) {
+        self.control = control
+        self.locationStateURL = locationStateURL
+        super.init()
+
+        if systemLocationController.requiresExplicitSourceSelection {
+            externallyControlled = true
+            if systemLocationController.hasActiveSource {
+                print("[location] restored persisted fixed source; waiting for guest")
+            } else {
+                print("[location] persisted location restore failed; waiting for explicit source selection")
+            }
+        }
+
+        let proxy = LocationDelegateProxy { [weak self] location in
+            Task { @MainActor in
+                self?.forward(location)
+            }
+        }
+        delegateProxy = proxy
+        let mgr = CLLocationManager()
+        mgr.delegate = proxy
+        mgr.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager = mgr
+        print("[location] host location forwarding ready")
+    }
+
+    /// Take ownership of the guest location source on behalf of an external
+    /// controller (UDS `location`/`location_stop`). Stops host forwarding and
+    /// replay and records ownership so a later reconnect does not auto-resume
+    /// forwarding over the injected fix.
+    ///
+    /// Contract: ownership persists — including across a *failed* injection. A
+    /// UDS `location` command that errors or times out leaves the source stopped
+    /// and owned (the client retries), rather than silently letting forwarding
+    /// resume and clobber the retry. Ownership is released only when a GUI source
+    /// (`startForwarding`/`sendPreset`/`startReplay`) is explicitly chosen again.
+    /// This is also why there is no per-request release: a release keyed to one
+    /// request could clear a *different* concurrent request's ownership.
+    @discardableResult
+    func beginExternalControl() -> ExternalControlToken {
+        locationSourceRevision &+= 1
+        externallyControlled = true
+        stopReplay()
+        stopForwarding()
+        return ExternalControlToken(revision: locationSourceRevision)
+    }
+
+    func requireExternalControl(_ token: ExternalControlToken) throws {
+        guard externallyControlled, token.revision == locationSourceRevision else {
+            throw VPhoneSystemLocationError(
+                code: "location_owner_conflict",
+                message: "location source superseded external request")
+        }
+    }
+
+    private func beginGUIControl() -> Bool {
+        locationSourceRevision &+= 1
+        guard systemLocationController.relinquishForGUI() else { return false }
+        externallyControlled = false
+        return true
+    }
+
+    /// Begin sending location to the guest.  Safe to call on every (re)connect.
+    @discardableResult
+    func startForwarding() -> Bool {
+        guard let mgr = locationManager else { return false }
+        guard beginGUIControl() else { return false }
+        stopReplay()
+        mgr.requestAlwaysAuthorization()
+        mgr.startUpdatingLocation()
+        hostModeStarted = true
+        print("[location] started host location tracking")
+        // Re-send last known location immediately on reconnect
+        if let last = Self.reusableHostFix(lastHostLocation) {
+            forward(last)
+            print("[location] re-sent last known host location")
+        }
+        return true
+    }
+
+    /// Stop forwarding host location updates.
+    func stopForwarding() {
+        if hostModeStarted {
+            locationManager?.stopUpdatingLocation()
+            hostModeStarted = false
+            print("[location] stopped host location tracking")
+        }
+    }
+
+    /// The GUI explicitly selected "no simulated location". Invalidate any
+    /// queued external ownership claim, remove persisted owned state, stop all
+    /// local producers, and clear the guest through the legacy GUI wire path.
+    @discardableResult
+    func stopAllLocationSourcesForGUI() -> Bool {
+        guard beginGUIControl() else { return false }
+        stopReplay()
+        stopForwarding()
+        control.sendLocationStop()
+        return true
+    }
+
+    /// Send a fixed simulated location to the guest.
+    @discardableResult
+    func sendPreset(
+        name: String,
+        latitude: Double,
+        longitude: Double,
+        altitude: Double = 0
+    ) -> Bool {
+        guard beginGUIControl() else { return false }
+        stopForwarding()
+        stopReplay()
+        sendSimulatedLocation(
+            latitude: latitude,
+            longitude: longitude,
+            altitude: altitude,
+            horizontalAccuracy: 5,
+            verticalAccuracy: 8,
+            speed: 0,
+            course: -1
+        )
+        print("[location] applied preset '\(name)' (\(latitude), \(longitude))")
+        return true
+    }
+
+    /// Start replaying a list of simulated locations at a fixed interval.
+    @discardableResult
+    func startReplay(
+        name: String,
+        points: [ReplayPoint],
+        intervalSeconds: Double = 1.5,
+        loop: Bool = true
+    ) -> Bool {
+        guard !points.isEmpty, let sleepNanos = Self.replayNanoseconds(intervalSeconds) else {
+            print("[location] replay '\(name)' ignored: no points")
+            return false
+        }
+
+        guard beginGUIControl() else { return false }
+        stopForwarding()
+        stopReplay()
+
+        replayName = name
+        let revision = locationSourceRevision
+        print(
+            "[location] starting replay '\(name)' (\(points.count) points, interval \(String(format: "%.1f", intervalSeconds))s, loop=\(loop))"
+        )
+
+        replayTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer {
+                if self.locationSourceRevision == revision {
+                    self.replayTask = nil
+                    self.replayName = nil
+                }
+            }
+
+            var index = 0
+            while !Task.isCancelled {
+                let point = points[index]
+                sendSimulatedLocation(
+                    latitude: point.latitude,
+                    longitude: point.longitude,
+                    altitude: point.altitude,
+                    horizontalAccuracy: point.horizontalAccuracy,
+                    verticalAccuracy: point.verticalAccuracy,
+                    speed: point.speed,
+                    course: point.course
+                )
+
+                index += 1
+                if index >= points.count {
+                    if loop {
+                        index = 0
+                    } else {
+                        break
+                    }
+                }
+
+                try? await Task.sleep(nanoseconds: sleepNanos)
+            }
+
+            if Task.isCancelled {
+                print("[location] replay cancelled: \(name)")
+            } else {
+                print("[location] replay finished: \(name)")
+            }
+        }
+        return true
+    }
+
+    /// Stop an active replay task.
+    func stopReplay() {
+        guard let replayTask else { return }
+        replayTask.cancel()
+        self.replayTask = nil
+        if let replayName {
+            print("[location] stopped replay: \(replayName)")
+        }
+        replayName = nil
+    }
+
+    /// Cached host fixes expire independently of fixed/replay sources.
+    static func reusableHostFix(_ location: CLLocation?, now: Date = Date()) -> CLLocation? {
+        guard let location, CLLocationCoordinate2DIsValid(location.coordinate),
+              location.horizontalAccuracy.isFinite, location.horizontalAccuracy >= 0,
+              abs(location.timestamp.timeIntervalSince(now)) < 60 else { return nil }
+        return location
+    }
+
+    static func replayNanoseconds(_ interval: Double) -> UInt64? {
+        guard interval.isFinite, interval > 0 else { return nil }
+        let nanos = (max(interval, 0.1) * 1_000_000_000).rounded()
+        guard nanos.isFinite, nanos < Double(UInt64.max) else { return nil }
+        return UInt64(nanos)
+    }
+
+    private func forward(_ location: CLLocation) {
+        guard Self.reusableHostFix(location) != nil else { return }
+        lastHostLocation = location
+        // stopUpdatingLocation() can race with delegate callbacks that were
+        // already queued onto the main actor. Keep the latest host fix cached
+        // for a future explicit resume, but never let a stale callback escape
+        // after forwarding was stopped or the UDS surface took ownership.
+        guard hostModeStarted, !externallyControlled else {
+            return
+        }
+        guard control.isConnected else {
+            print("[location] forward: not connected, cached for later")
+            return
+        }
+        control.sendLocation(
+            latitude: location.coordinate.latitude,
+            longitude: location.coordinate.longitude,
+            altitude: location.altitude,
+            horizontalAccuracy: location.horizontalAccuracy,
+            verticalAccuracy: location.verticalAccuracy,
+            speed: location.speed,
+            course: location.course
+        )
+    }
+
+    private func sendSimulatedLocation(
+        latitude: Double,
+        longitude: Double,
+        altitude: Double,
+        horizontalAccuracy: Double,
+        verticalAccuracy: Double,
+        speed: Double,
+        course: Double
+    ) {
+        guard control.isConnected else {
+            print("[location] simulate: not connected, cached for later")
+            return
+        }
+
+        control.sendLocation(
+            latitude: latitude,
+            longitude: longitude,
+            altitude: altitude,
+            horizontalAccuracy: horizontalAccuracy,
+            verticalAccuracy: verticalAccuracy,
+            speed: speed,
+            course: course
+        )
+    }
+}
+
+// MARK: - CLLocationManagerDelegate Proxy
+
+/// Separate object to avoid @MainActor vs nonisolated delegate conflicts.
+private class LocationDelegateProxy: NSObject, CLLocationManagerDelegate {
+    let handler: (CLLocation) -> Void
+
+    init(handler: @escaping (CLLocation) -> Void) {
+        self.handler = handler
+    }
+
+    func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        let c = location.coordinate
+        print(
+            "[location] got location: \(String(format: "%.6f,%.6f", c.latitude, c.longitude)) (+/-\(String(format: "%.0f", location.horizontalAccuracy))m)"
+        )
+        handler(location)
+    }
+
+    func locationManager(_: CLLocationManager, didFailWithError error: any Error) {
+        let clErr = (error as NSError).code
+        // kCLErrorLocationUnknown (0) = transient, just waiting for fix
+        if clErr == 0 { return }
+        print("[location] CLLocationManager error: \(error.localizedDescription) (code \(clErr))")
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        print("[location] authorization status: \(status.rawValue)")
+        if status == .authorized || status == .authorizedAlways {
+            manager.startUpdatingLocation()
+        }
+    }
+}

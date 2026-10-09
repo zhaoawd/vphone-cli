@@ -1,0 +1,220 @@
+import Darwin
+import Foundation
+
+public enum VPhoneBundleOperations {
+    public struct NewBundleConfiguration: Sendable {
+        public let name: String
+        public let cpuCount: UInt
+        public let memoryMB: UInt64
+        public let diskSizeGB: UInt64
+        public let romSource: URL
+        public let sepromSource: URL
+
+        public init(
+            name: String,
+            cpuCount: UInt,
+            memoryMB: UInt64,
+            diskSizeGB: UInt64,
+            romSource: URL,
+            sepromSource: URL,
+        ) {
+            self.name = name; self.cpuCount = cpuCount; self.memoryMB = memoryMB
+            self.diskSizeGB = diskSizeGB; self.romSource = romSource; self.sepromSource = sepromSource
+        }
+    }
+
+    private static let frameworkResources = URL(fileURLWithPath:
+        "/System/Library/Frameworks/Virtualization.framework/Versions/A/Resources")
+
+    public static func defaultROMSource() -> URL {
+        frameworkResources.appendingPathComponent("AVPBooter.vresearch1.bin")
+    }
+
+    public static func defaultSEPROMSource() -> URL {
+        frameworkResources.appendingPathComponent("AVPSEPBooter.vresearch1.bin")
+    }
+
+    /// Public because `vm import` validates the name it is about to place into
+    /// the library, and that lives in `VPhoneArchiveKit` now.
+    public static func requireValidName(_ name: String) throws {
+        guard !name.isEmpty, !name.contains("/"), !name.hasPrefix(".") else {
+            throw VPhoneLibraryError.invalidName(name)
+        }
+    }
+
+    public static func create(_ spec: NewBundleConfiguration, in library: VPhoneLibrary) throws -> VPhoneBundle {
+        try requireValidName(spec.name)
+        let fm = FileManager.default
+        let dir = library.url(forName: spec.name)
+        if fm.fileExists(atPath: dir.path) {
+            throw VPhoneLibraryError.alreadyExists(name: spec.name)
+        }
+        // The bundle folder itself is created exclusively (mkdir, no
+        // intermediates): a folder or link another account planted after the
+        // check above makes this fail instead of being written into as root.
+        try fm.createDirectory(at: library.root, withIntermediateDirectories: true)
+        try fm.createDirectory(at: dir, withIntermediateDirectories: false)
+        // Roll back the partial bundle on any failure after the dir is created,
+        // so a retry with the same name isn't permanently blocked by the
+        // alreadyExists check.
+        do {
+            // Sparse disk image: create then truncate to size (no bytes written).
+            // Decimal GB, the unit iOS reports, so "128 GB" shows as 128 GB
+            // in the guest rather than 137.
+            let disk = dir.appendingPathComponent("Disk.img")
+            fm.createFile(atPath: disk.path, contents: nil)
+            let handle = try FileHandle(forWritingTo: disk)
+            do {
+                try handle.truncate(atOffset: spec.diskSizeGB * 1_000_000_000)
+                try handle.close()
+            } catch {
+                try? handle.close()
+                throw error
+            }
+
+            // SEP storage: 512 KB of initialized zero bytes.
+            try Data(count: 512 * 1024).write(to: dir.appendingPathComponent("SEPStorage"))
+
+            // ROMs.
+            try fm.copyItem(at: spec.romSource, to: dir.appendingPathComponent("AVPBooter.vresearch1.bin"))
+            try fm.copyItem(at: spec.sepromSource, to: dir.appendingPathComponent("AVPSEPBooter.vresearch1.bin"))
+
+            // Manifest.
+            let manifest = VPhoneVirtualMachineManifest(
+                cpuCount: spec.cpuCount,
+                memorySize: spec.memoryMB * 1024 * 1024,
+                romImages: .init(avpBooter: "AVPBooter.vresearch1.bin",
+                                 avpSEPBooter: "AVPSEPBooter.vresearch1.bin"),
+            )
+            try manifest.write(to: dir.appendingPathComponent("config.plist"))
+
+            try VPhoneHostFilePermissions.makeAccessible(at: dir)
+            try VPhoneHostFilePermissions.makeDirectoryAccessible(at: library.root)
+            try VPhoneHostFilePermissions.makeDirectoryAccessible(at: VPhoneResources.userDataRoot())
+            return VPhoneBundle(url: dir, manifest: manifest)
+        } catch {
+            try? fm.removeItem(at: dir)
+            throw error
+        }
+    }
+
+    // MARK: - Config editing
+
+    public static func updateConfig(
+        bundleNamed name: String,
+        in library: VPhoneLibrary,
+        cpuCount: UInt?,
+        memoryMB: UInt64?,
+        networkMode: VPhoneVirtualMachineManifest.NetworkConfig.NetworkMode? = nil,
+        bridgeInterface: String? = nil,
+        networkEdit: VPhoneNetworkEdit = VPhoneNetworkEdit(),
+        unlocksAtStartup: Bool? = nil,
+    ) throws -> VPhoneBundle {
+        let bundle = try library.bundle(named: name)
+        var edit = networkEdit
+        edit.mode = networkMode ?? edit.mode
+        edit.bridgeInterface = bridgeInterface ?? edit.bridgeInterface
+        let network = edit.isEmpty
+            ? nil
+            : try VPhoneNetworking.merge(into: bundle.manifest.networkConfig, edit: edit)
+        let updated = bundle.manifest.updating(
+            cpuCount: cpuCount,
+            memorySize: memoryMB.map { $0 * 1024 * 1024 },
+            networkConfig: network,
+            unlocksAtStartup: unlocksAtStartup,
+        )
+        try updated.write(to: bundle.configURL)
+        try VPhoneHostFilePermissions.makeAccessible(at: bundle.configURL)
+        return VPhoneBundle(url: bundle.url, manifest: updated)
+    }
+
+    // MARK: - Rename / delete
+
+    public static func rename(
+        bundleNamed name: String,
+        to newName: String,
+        in library: VPhoneLibrary,
+    ) throws -> VPhoneBundle {
+        try requireValidName(newName)
+        let src = try library.bundle(named: name).url
+        let dst = library.url(forName: newName)
+        if FileManager.default.fileExists(atPath: dst.path) {
+            throw VPhoneLibraryError.alreadyExists(name: newName)
+        }
+        try FileManager.default.moveItem(at: src, to: dst)
+        let renamed = try VPhoneBundle.load(at: dst)
+        // An mDNS name that `--mdns on` derived from the old name follows it;
+        // one chosen by hand stays.
+        let network = renamed.manifest.networkConfig
+        guard network.localHostName == VPhoneNetworking.localHostName(forVMName: name) else { return renamed }
+        let updated = renamed.manifest.updating(
+            networkConfig: network.with(localHostName: .some(VPhoneNetworking.localHostName(forVMName: newName))),
+        )
+        try updated.write(to: renamed.configURL)
+        try VPhoneHostFilePermissions.makeAccessible(at: renamed.configURL)
+        return VPhoneBundle(url: renamed.url, manifest: updated)
+    }
+
+    public static func delete(bundleNamed name: String, in library: VPhoneLibrary) throws {
+        let url = try library.bundle(named: name).url
+        try FileManager.default.removeItem(at: url)
+    }
+
+    // MARK: - Clone
+
+    /// Copy the whole bundle, using APFS copy-on-write when available. The
+    /// machine identifier and boot state remain unchanged in the copy.
+    public static func clone(
+        bundleNamed name: String,
+        to newName: String,
+        in library: VPhoneLibrary,
+    ) throws -> VPhoneBundle {
+        try requireValidName(newName)
+        let src = try library.bundle(named: name).url
+        let dst = library.url(forName: newName)
+        let fm = FileManager.default
+        if fm.fileExists(atPath: dst.path) {
+            throw VPhoneLibraryError.alreadyExists(name: newName)
+        }
+
+        // APFS CoW clone; fall back to a plain recursive copy off-APFS.
+        if clonefile(src.path, dst.path, 0) != 0 {
+            try? fm.removeItem(at: dst) // clear any partial clonefile output first
+            try fm.copyItem(at: src, to: dst)
+        }
+        try VPhoneHostFilePermissions.makeAccessible(at: dst)
+        return try VPhoneBundle.load(at: dst)
+    }
+
+    // MARK: - Export
+
+    /// `.vphoned.signed` is re-staged on the next launch and need not be exported.
+    /// `.ipsw-cache` holds the downloaded IPSWs of machines prepared before the
+    /// cache moved to `VPhoneResources.ipswCacheDirectory()`; it is a cache,
+    /// not part of the machine. The staging directories are left behind only
+    /// when a disk image could not be detached, and one can hold a whole
+    /// temporary cloudOS VM. None of these is `--include-ipsw`'s restore tree.
+    ///
+    /// Export itself is `VPhoneBundleTransfer` in `VPhoneArchiveKit` — it needs
+    /// libarchive, and this does not. The list stays here because it describes
+    /// what a bundle is, and `VPhoneRestoreInfo` is checked against it.
+    public static let exportExcludePatterns = [
+        "*.vphoned.signed",
+        ".ipsw-cache",
+        ".firmware-prepare-*",
+        ".pcc-restoration-*",
+        ".pcc-system-*",
+    ]
+
+    /// The directory holding each boot-chain file exactly as the restore tree laid
+    /// it down, so `fw patch` patches those bytes rather than its own output and
+    /// can be run again. `FirmwarePipeline` fills it; the name lives here because
+    /// three other things in the bundle have to agree about it: `fw prepare`
+    /// deletes it with the restore tree it describes, and export both excludes it
+    /// from a slim archive and leaves it out of the progress total.
+    ///
+    /// Deliberately outside the restore tree: `findRestoreDirectory` picks the
+    /// newest direct child whose name contains "Restore", so an originals
+    /// directory that matched would become a candidate restore tree.
+    public static let firmwareOriginalsDirectoryName = "FirmwareOriginals"
+}

@@ -1,0 +1,53 @@
+import Foundation
+import VPhoneCoreKit
+import VPhonePatchKit
+
+// MARK: - Create Options
+
+public extension VPhoneVirtualMachineCreator {
+    struct Options {
+        public var name: String
+        public var iphoneSource: String?
+        public var cloudosSource: String?
+        public var gpuDriverBundle: URL?
+        public var ipswCacheDirectory: URL
+        /// The guest device to take from an IPSW that covers several models.
+        public var device: String?
+        /// Which patch preset the new VM is built with. Individual patches are
+        /// turned on or off per VM afterwards, through its patch selection.
+        public var patchPreset: String
+        public var cpuCount: UInt
+        public var memoryMB: UInt64
+        public var diskSizeGB: UInt64
+        public var verbosity: VPhoneVerbosity
+        public var keepArtifacts: Bool
+
+        public init(
+            name: String,
+            iphoneSource: String? = nil,
+            cloudosSource: String? = nil,
+            gpuDriverBundle: URL? = nil,
+            ipswCacheDirectory: URL = VPhoneResources.ipswCacheDirectory(),
+            device: String? = nil,
+            patchPreset: String = VPhonePatchPreset.standardIdentifier,
+            cpuCount: UInt = 8,
+            memoryMB: UInt64 = 8192,
+            diskSizeGB: UInt64 = 64,
+            verbosity: VPhoneVerbosity = .quiet,
+            keepArtifacts: Bool = false,
+        ) {
+            self.name = name
+            self.iphoneSource = iphoneSource
+            self.cloudosSource = cloudosSource
+            self.gpuDriverBundle = gpuDriverBundle
+            self.ipswCacheDirectory = ipswCacheDirectory
+            self.device = device
+            self.patchPreset = patchPreset
+            self.cpuCount = cpuCount
+            self.memoryMB = memoryMB
+            self.diskSizeGB = diskSizeGB
+            self.verbosity = verbosity
+            self.keepArtifacts = keepArtifacts
+        }
+    }
+}

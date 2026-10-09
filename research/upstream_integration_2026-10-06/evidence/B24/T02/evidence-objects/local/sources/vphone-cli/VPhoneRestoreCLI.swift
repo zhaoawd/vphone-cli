@@ -1,0 +1,201 @@
+import ArgumentParser
+import Foundation
+import VPhoneCore
+
+// MARK: - restore
+
+struct VPhoneRestoreCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "restore",
+        abstract: "DFU-restore firmware into a VM bundle (requires a running DFU boot)")
+
+    @OptionGroup var lib: VPhoneLibraryOption
+    @Argument(help: "VM name") var name: String?
+    @Flag(name: .shortAndLong, help: "Only fetch the SHSH blob, do not restore") var getShsh = false
+    @Flag(name: .shortAndLong, help: "Offline restore (decrypt AEA images in place, use the cached .shsh)") var offline = false
+    @Option(name: .shortAndLong, help: "Device UDID (optional)") var udid: String?
+    @Option(name: .shortAndLong, help: "Device ECID (default: read from the bundle's udid-prediction.txt)") var ecid: String?
+    @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
+    var projectRoot: String?
+    @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
+    var verboseCount: Int
+
+    func run() throws {
+        let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
+        let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
+        let bundle = try lib.library.bundle(named: name)
+        let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
+        guard let ecidValue = VPhoneRestoreOps.resolveECID(explicit: ecid, bundle: bundle) else {
+            throw VPhoneRestoreError.ecidUnresolved
+        }
+
+        func pmd3(_ subcommand: String, extra: [String]) throws -> Int32 {
+            var args = [resources.pmd3Bridge.path, subcommand, "--vm-dir", "."]
+            if let udid { args += ["--udid", udid] }
+            args += ["--ecid", ecidValue] + extra
+            // -v (.info) → pmd3 INFO (its colorful log level), -vv/-vvv → DEBUG.
+            args += Array(repeating: "-v", count: min(v.rawValue, 2))
+            let python = try resources.pythonExecutable()
+            if v.tracesInternals {
+                print("[trace] spawning: \(python.path) \(args.joined(separator: " "))")
+            }
+            return try VPhoneProcessRunner.runStreaming(python, args, cwd: bundle.url, echo: v.showsToolDetail)
+        }
+
+        // A restore drives a device that only exists while a DFU boot runs, and
+        // that boot holds the bundle lock for its whole session. So this command
+        // cannot take the lock; it verifies the holder instead. Both paths below
+        // talk to the device, so both require the DFU session.
+        func requireDFUSession() throws {
+            let record = try VPhoneBundleGuard.requireDFUOwner(
+                directory: bundle.url, configURL: bundle.configURL)
+            if v.tracesInternals {
+                print("[trace] DFU session confirmed: pid \(record.pid), instance \(record.instanceID)")
+            }
+        }
+
+        if getShsh {
+            try requireDFUSession()
+            throw ExitCode(try pmd3("restore-get-shsh", extra: []))
+        }
+
+        let code: Int32
+        if offline {
+            let fm = FileManager.default
+            let shshes = ((try? fm.contentsOfDirectory(at: bundle.url, includingPropertiesForKeys: nil)) ?? [])
+                .filter { $0.pathExtension == "shsh" }.sorted { $0.lastPathComponent < $1.lastPathComponent }
+            guard let shsh = shshes.first else { throw VPhoneRestoreError.noSHSH }
+            let restoreDir = ((try? fm.contentsOfDirectory(at: bundle.url, includingPropertiesForKeys: nil)) ?? [])
+                .filter { $0.lastPathComponent.hasPrefix("iPhone") && $0.lastPathComponent.hasSuffix("_Restore") }
+                .sorted { $0.lastPathComponent < $1.lastPathComponent }
+                .first
+            guard let restoreDir else { throw VPhoneRestoreError.noRestoreDir }
+            print("[restore] decrypting AEA images in \(restoreDir.lastPathComponent)...")
+            // Decryption rewrites files in the bundle, so it is an exclusive
+            // offline operation and takes the lock itself. It therefore has to
+            // finish BEFORE the DFU boot that the restore step cooperates with
+            // is started — a running DFU session holds the lock and this step
+            // refuses.
+            try VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.restoreDecrypt
+            ) { _ in
+                try VPhoneRestoreOps.decryptAEAImages(inRestoreDir: restoreDir)
+            }
+            try requireDFUSession()
+            code = try pmd3("restore-update", extra: ["--tss", shsh.path])
+        } else {
+            try requireDFUSession()
+            code = try pmd3("restore-update", extra: [])
+        }
+
+        if code == 0 { recordRestoreVersions(bundle: bundle) }
+        throw ExitCode(code)
+    }
+
+    /// Snapshot the just-restored iOS + cloudOS versions to `restore-info.json`,
+    /// read host-side from the bundle's restore-dir plists. Best-effort: the
+    /// restore already succeeded, so a metadata miss is only a warning.
+    private func recordRestoreVersions(bundle: VPhoneBundle) {
+        guard let info = VPhoneRestoreInfo.derive(fromBundle: bundle) else {
+            FileHandle.standardError.write(Data("warning: could not record restore versions (metadata not found)\n".utf8))
+            return
+        }
+        do {
+            try info.write(toBundle: bundle)
+            print("[restore] recorded iOS \(info.ios.version) (\(info.ios.build)) / "
+                + "cloudOS \(info.cloudOS.version) (\(info.cloudOS.build))")
+        } catch {
+            FileHandle.standardError.write(Data("warning: could not write restore-info.json: \(error)\n".utf8))
+        }
+    }
+}
+
+// MARK: - cfw
+
+struct VPhoneCFWCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "cfw",
+        abstract: "Custom-firmware install (host-mount; VM must be off; re-execs sudo)",
+        subcommands: [VPhoneCFWInstallCommand.self, VPhoneCFWUpdateEnvironmentCommand.self])
+}
+
+struct VPhoneCFWInstallCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "install", abstract: "Install CFW into a VM bundle via host mount")
+
+    @OptionGroup var lib: VPhoneLibraryOption
+    @Argument(help: "VM name") var name: String?
+    @Option(name: [.customShort("V"), .long], help: "variant: regular | dev | jb | exp") var variant: String = "exp"
+    @Option(name: [.customShort("b"), .long], help: "(exp only) rewrite ProductBuildVersion to this build id") var spoofBuild: String?
+    @Flag(name: .customLong("root-popup"), help: "Elevate via macOS's native authentication dialog (osascript) instead of the sudo re-exec") var rootPopup = false
+    @Flag(name: .customLong("keep-artifacts"), help: "Keep the extracted CFW input dirs (cfw_input/, cfw_jb_input/) after install (default: removed to save space)") var keepArtifacts = false
+    @Option(name: .shortAndLong, help: "Resource base override (default: inferred from the running binary path)")
+    var projectRoot: String?
+    @Flag(name: .customShort("v"), help: "Increase verbosity: -v tool detail, -vv guest serial, -vvv internal trace")
+    var verboseCount: Int
+
+    func run() throws {
+        let v = max(VPhoneVerbosity.info, VPhoneVerbosity(count: verboseCount))
+        guard ["regular", "dev", "jb", "exp"].contains(variant) else {
+            throw ValidationError("unknown cfw variant '\(variant)' (regular|dev|jb|exp)")
+        }
+        let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
+        let bundle = try lib.library.bundle(named: name)
+        let resources = projectRoot.map { VPhoneResources(base: URL(fileURLWithPath: $0)) } ?? .resolve()
+
+        // Env the bundled scripts read: rides along via `sudo -E` by default;
+        // --root-popup forwards it inline (do shell script's bare env).
+        try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: resources.debsCacheDir, withIntermediateDirectories: true)
+        var scriptEnv: [String: String] = [
+            "VPHONE_PYTHON": try resources.pythonExecutable().path,
+            "IPSW_DIR": resources.ipswCacheDir.path,
+            "VPHONE_SEAL_DIR": resources.sealVolumeCacheDir.path,
+            "VPHONE_DEBS_DIR": resources.debsCacheDir.path,
+        ]
+        if let spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
+        if keepArtifacts { scriptEnv["VPHONE_KEEP_ARTIFACTS"] = "1" }
+
+        let args = [resources.cfwInstallHostScript.path, "--variant", variant, bundle.url.path]
+        // Both paths carry VPHONE_INVOKER_UID/GID so the driver returns the
+        // artifacts it creates as root (the popup sets no SUDO_UID).
+        let invocation = VPhoneCreateOrchestrator.cfwInvocation(
+            scriptEnv: scriptEnv, sudoEnvExtras: [:], rootPopup: rootPopup)
+        let code: Int32
+        if invocation.usePopup {
+            code = try VPhoneProcessRunner.runWithAdminPrivileges(
+                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail)
+        } else {
+            if v.tracesInternals {
+                print("[trace] spawning: /bin/zsh \(args.joined(separator: " ")) (env keys: VPHONE_PYTHON, IPSW_DIR, VPHONE_SEAL_DIR, \(VPhoneInvoker.uidKey), \(VPhoneInvoker.gidKey))")
+            }
+            code = try VPhoneProcessRunner.runStreaming(
+                URL(fileURLWithPath: "/bin/zsh"), args, env: invocation.env, echo: v.showsToolDetail)
+        }
+        if code == 0 {
+            // The CFW install script released its own lock when it exited, so a
+            // fresh cfw-record lock is available. Recording the variant and the
+            // optional cleanup are one lock lifetime (see recordVariant's doc).
+            // A busy lock (VM running) only skips the bookkeeping — the install
+            // already succeeded, so do not abort the process.
+            let recorded: Void? = try? VPhoneBundleGuard.withBundleLock(
+                directory: bundle.url, operation: VPhoneVMOperation.cfwRecord
+            ) { lock in
+                if let info = try? VPhoneRestoreInfo.recordVariant(variant, toBundle: bundle, holding: lock),
+                   info.variant != nil {
+                    print("[cfw] recorded variant \(variant), device \(info.device ?? "?")")
+                }
+                if !keepArtifacts,
+                   let removed = try? VPhoneRestoreInfo.removeBuiltFirmware(fromBundle: bundle, holding: lock) {
+                    print("[cfw] removed built firmware \(removed)/ to save space (--keep-artifacts to keep)")
+                }
+            }
+            if recorded == nil {
+                FileHandle.standardError.write(Data(
+                    "[cfw] Warning: skipped variant recording — the VM is busy (bundle lock held)\n".utf8))
+            }
+        }
+        throw ExitCode(code)
+    }
+}

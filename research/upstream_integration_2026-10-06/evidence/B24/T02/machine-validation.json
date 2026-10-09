@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "scope": "read-only T02 validation; source review does not assert runtime functionality",
+  "all_checks_passed": true,
+  "checks": {
+    "202_count": true,
+    "202_unique_sha": true,
+    "202_exact_indices": true,
+    "202_pending_sha_exact": true,
+    "202_all_full_diff_read": true,
+    "202_all_final_state_compared": true,
+    "202_all_semantic_review_complete": true,
+    "342_count": true,
+    "342_unique_sha": true,
+    "342_original_sha_set_preserved": true,
+    "140_original_disposition_reason_preserved": true,
+    "62_merge_coverage": true,
+    "54_empty_8_nonempty_remerge": true,
+    "8_nonempty_diff_paths_present": true,
+    "47_capability_and_map_coverage": true,
+    "47_all_contract_source_reviewed": true,
+    "47_dependencies_mapped": true,
+    "47_nonempty_local_and_verification_entrypoints": true,
+    "7_acceptance_states_preserved": true,
+    "175_planned_not_accepted": true,
+    "no_unexplained_missing_evidence_paths": true,
+    "all_diff_and_snapshot_hashes_match": true
+  },
+  "counts": {
+    "new_commits": 202,
+    "ledger_commits": 342,
+    "historical_preserved": 140,
+    "historical_nonmerge": 78,
+    "historical_merge": 62,
+    "merge_empty": 54,
+    "merge_nonempty": 8,
+    "merge_resolution_records": 8,
+    "capabilities": 47,
+    "accepted_preserved": 7,
+    "new_pending": 0,
+    "unexplained_missing_paths": 0,
+    "evidence_objects": 739,
+    "final_deleted_paths_explicit": 20
+  },
+  "new_dispositions": {
+    "adaptation_planned": 175,
+    "intentionally_not_adopted": 10,
+    "already_equivalent": 11,
+    "superseded": 6
+  },
+  "ledger_dispositions": {
+    "already_equivalent": 14,
+    "adaptation_planned": 179,
+    "intentionally_not_adopted": 11,
+    "documentation_review_T28": 37,
+    "release_metadata_superseded": 22,
+    "merge_no_additional_resolution": 53,
+    "adapted_verified_T06": 1,
+    "superseded": 14,
+    "not_applicable": 1,
+    "adaptation_planned_T27": 1,
+    "merge_resolution_reviewed_adaptation_planned": 8,
+    "adapted_verified": 1
+  },
+  "historical_dispositions": {
+    "already_equivalent": 3,
+    "intentionally_not_adopted": 1,
+    "documentation_review_T28": 37,
+    "release_metadata_superseded": 22,
+    "merge_no_additional_resolution": 53,
+    "adapted_verified_T06": 1,
+    "superseded": 8,
+    "not_applicable": 1,
+    "adaptation_planned_T27": 1,
+    "adaptation_planned": 4,
+    "merge_resolution_reviewed_adaptation_planned": 8,
+    "adapted_verified": 1
+  },
+  "capability_dispositions": {
+    "equivalent": 2,
+    "adapt": 41,
+    "new": 1,
+    "unknown": 2,
+    "deferred": 1
+  },
+  "historical_merge_evidence": [
+    {
+      "sha": "fe81e693277789abc371d59165d1dbef84977f17",
+      "diff": "evidence/T02-remerge-fe81e693.diff",
+      "exists": true,
+      "sha256": "57a4e432d646f966ef12472c4ee0d5269587d3c2bf5fd51291a45799a647bd97",
+      "B22_remerge_sha256": "57a4e432d646f966ef12472c4ee0d5269587d3c2bf5fd51291a45799a647bd97"
+    },
+    {
+      "sha": "6d284217eb4beba322861967bf58c81016c447db",
+      "diff": "evidence/T02-remerge-6d284217.diff",
+      "exists": true,
+      "sha256": "c0825cd40a7510c8e41832483cf8912cee6303f32c1612fbf9c3bbc543df5f28",
+      "B22_remerge_sha256": "c0825cd40a7510c8e41832483cf8912cee6303f32c1612fbf9c3bbc543df5f28"
+    },
+    {
+      "sha": "ac89438058237f07976161d92155b0db249c15a2",
+      "diff": "evidence/T02-remerge-ac894380.diff",
+      "exists": true,
+      "sha256": "684e663996e79701dd186618af700f18e624f06019dfc531d9d743bc07cc3b8a",
+      "B22_remerge_sha256": "684e663996e79701dd186618af700f18e624f06019dfc531d9d743bc07cc3b8a"
+    },
+    {
+      "sha": "f343a77a51263f275cab4cec0084050e30a8c74c",
+      "diff": "evidence/T02-remerge-f343a77a.diff",
+      "exists": true,
+      "sha256": "ccc17bba3edcf35ede946c13784af80c88c4a805a81c351b37e2f359a0c78cc5",
+      "B22_remerge_sha256": "ccc17bba3edcf35ede946c13784af80c88c4a805a81c351b37e2f359a0c78cc5"
+    },
+    {
+      "sha": "78bac1ecd7a802ccb35c64e86ae23c637b985c1a",
+      "diff": "evidence/T02-remerge-78bac1ec.diff",
+      "exists": true,
+      "sha256": "4d25d7a267d3e8ad4b48d0cc522697b8c412ab836b26d604dcc4020d6f8e4974",
+      "B22_remerge_sha256": "4d25d7a267d3e8ad4b48d0cc522697b8c412ab836b26d604dcc4020d6f8e4974"
+    },
+    {
+      "sha": "bbf36000521c4eeb15c2f2ccb5100e3a0b9db861",
+      "diff": "evidence/T02-remerge-bbf36000.diff",
+      "exists": true,
+      "sha256": "c7cdf45bde933ef0eb79ec068eef372f45620f799a1d5153744c93ade2da9a2a",
+      "B22_remerge_sha256": "c7cdf45bde933ef0eb79ec068eef372f45620f799a1d5153744c93ade2da9a2a"
+    },
+    {
+      "sha": "17e1352e9f87862a3bcb3bd1bdc2ff9b0d883a3b",
+      "diff": "evidence/T02-remerge-17e1352e.diff",
+      "exists": true,
+      "sha256": "14ec77b7b7611d1598f3ef1a3e063c12e1b4d265f3ed6147a141e36b06bf8532",
+      "B22_remerge_sha256": "14ec77b7b7611d1598f3ef1a3e063c12e1b4d265f3ed6147a141e36b06bf8532"
+    },
+    {
+      "sha": "edfa61c36a33494adacfa1cc5191e52df5f3fb92",
+      "diff": "evidence/T02-remerge-edfa61c3.diff",
+      "exists": true,
+      "sha256": "eaa4b3bb38535b7d3b5ee5724f9f60d8b887f341eca0b9a7172a335111fa90e1",
+      "B22_remerge_sha256": "eaa4b3bb38535b7d3b5ee5724f9f60d8b887f341eca0b9a7172a335111fa90e1"
+    }
+  ],
+  "missing_paths": [],
+  "hash_issues": [],
+  "historical_changed": [],
+  "frozen_local_changed_after_review": [
+    "sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+    "research/upstream_integration_2026-10-06/tasks.json",
+    "tests/VPhoneCLITests/NativeFirmwarePrepareTests.swift"
+  ]
+}

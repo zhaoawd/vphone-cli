@@ -1,0 +1,694 @@
+{
+  "assigned": [
+    2,
+    3,
+    5,
+    7,
+    10,
+    11,
+    14,
+    15,
+    16,
+    17,
+    20,
+    21,
+    24,
+    25,
+    27,
+    32,
+    33,
+    34,
+    37,
+    40
+  ],
+  "full_diff_count": 20,
+  "local_head": "11064b07ea5b754285eae0e56f8aedc912441606",
+  "runtime_verification": "未运行构建、测试或VM。",
+  "entries": [
+    {
+      "index": 2,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/002-374a2c5687.diff",
+        "sha256": "6914335db3a7e7ab3d204d1e159003f28abb9cae286cbdd3423dcd102bbc066b",
+        "line_count": 1145,
+        "read_ranges": [
+          [
+            1,
+            1145
+          ]
+        ],
+        "summary": "相机生产数据流接入共享VCamDataPlane：SHM格式/时间/frame index、平面边界；图像/JPEG/IOSurface统一转BGRA；graph tap预览、第三方视频delegate fallback、stream ID与格式元数据；Makefile递归生产链接。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/CamFix/libcamfix.m",
+          "sha256": "013eec571944db1f8ad1fa9bbea755e0ea7bf8ef83c6379063e145c0faae3398",
+          "lines": "108-180"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/VCamCaptured/VCamFrameReceiver.inc",
+          "sha256": "d0de5d4462ed6c1437a73abc0e0646a9b2174dfabec137cf3cd091dd42acf6ef",
+          "lines": "57-97"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/VCamCaptured/VCamViewfinderHooks.inc",
+          "sha256": "dcebe6c23cf613ef6936eebb15f1062965b1251c110f6da8be6d13a0199e7cde",
+          "lines": "13-33,80-110"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/Makefile",
+          "sha256": "36b897536ba377d7d3fd08cc82a71b74be89e510c58b67bd3b6d189a355e5287",
+          "lines": "12-20,111-130"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 3,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/003-cd013c246f.diff",
+        "sha256": "1bdfcab1005c98b80cfbd1abd68d1a746a62a5bf57e6725660d45b2e80d862dd",
+        "line_count": 5976,
+        "read_ranges": [
+          [
+            1,
+            5976
+          ]
+        ],
+        "summary": "CamFix/VCamCaptured改为隐藏跨文件接口和独立编译单元；修复copy-family retained ABI、resolved settings强ivar所有权、按uid pending请求取消/提交、weak sink、预览/SHM初始化锁和单CGImage派生JPEG。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/CamFix/libcamfix.m",
+          "sha256": "013eec571944db1f8ad1fa9bbea755e0ea7bf8ef83c6379063e145c0faae3398",
+          "lines": "629-639,1178-1215"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/VCamCaptured/VCamCaptureObservation.inc",
+          "sha256": "baf0868506a78700d69c3518aa9485a79d103383a32f8138c091a0418313a4bc",
+          "lines": "279-310"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/VCamCaptured/VCamSyntheticStreams.inc",
+          "sha256": "d9dc49d5ac7480dfd4c2113c211edc2735f388ed3c94da907d438b2f18d8af0f",
+          "lines": "241-268"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/VCamCaptured/VCamViewfinderHooks.inc",
+          "sha256": "dcebe6c23cf613ef6936eebb15f1062965b1251c110f6da8be6d13a0199e7cde",
+          "lines": "31-80"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 5,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/005-dae93457df.diff",
+        "sha256": "7849179b996b80b70d19fb7a1fdf398bc1d648846b8ea77a20c1731514fc48d9",
+        "line_count": 5165,
+        "read_ranges": [
+          [
+            1,
+            5165
+          ]
+        ],
+        "summary": "Host Setup/Core Bundle改为机器列表上的sheet；安装进度放inspector；新增GitHub Actions artifact过滤、token Keychain、SHA-256校验、zip展开和helper安装；升级Ghostty并调整签名/版本。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+          "sha256": "3ab179548a19259e0a71033a17c554ec731e60c34fa5f4adfbc25b96c34340ad",
+          "lines": "5-8,33-54"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+          "sha256": "dd1158066329b6cabbd7d5ad9711ba726792b56a0a5ce8da9c89bf70ece06e0e",
+          "lines": "51-54,88-125"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 7,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/007-6615c8bcbc.diff",
+        "sha256": "f47548301ab79667712461262f8822e064738dcbb9d73aceb63f56adf3087b7f",
+        "line_count": 2115,
+        "read_ranges": [
+          [
+            1,
+            2115
+          ]
+        ],
+        "summary": "Launchpad初始化读取host/helper/bundle状态，并发列机器；hasListed抑制首次空态；菜单栏及Dock策略；sheet文件面板；POSIX独立session/disclaim/logfile启动VM与Dock VM名称。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+          "sha256": "3ab179548a19259e0a71033a17c554ec731e60c34fa5f4adfbc25b96c34340ad",
+          "lines": "33-58"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
+          "sha256": "ff7765453798ad8254bc840a3662563091f94017366ca137c5dd39c561e775db",
+          "lines": "225-260"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCoreBundle.swift",
+          "sha256": "dd1158066329b6cabbd7d5ad9711ba726792b56a0a5ce8da9c89bf70ece06e0e",
+          "lines": "50-112"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadApp.swift",
+          "sha256": "b5c3a8494820ff988b84ae00cb92cdc17a58eb0e324cca0ddb2932d6a34dcba3",
+          "lines": "12-26,76-81"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 10,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/010-835c4db23d.diff",
+        "sha256": "d3bf2f510f85e3fb53685db5a43d6788e045dcc72515d8e604605b718c0b693a",
+        "line_count": 527,
+        "read_ranges": [
+          [
+            1,
+            527
+          ]
+        ],
+        "summary": "共享IPSW cache、CLI cache参数、按cloudOS版本/build复用GPU driver；并发下载rename后复用winner，清理一小时未写partial；export排除旧cache/staging并剪枝统计。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneResources.swift",
+          "sha256": "14b18d0bf36781ae7a27980252a9005ad43f155cb66f5c601697f3aac7a8f3ef",
+          "lines": "121-138"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFWCLI.swift",
+          "sha256": "068c1545e25c1f33d1a86e9b5ffe9fd077bc4142907805beb79c79da94519c05",
+          "lines": "93-96"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneCreateOrchestrator.swift",
+          "sha256": "bbac09206c2bcbcac4083f54aa621b37310dd908f1d3de2b6cfde2b3624c3e91",
+          "lines": "655-662"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneBundleOps.swift",
+          "sha256": "72e57a36cadbc7bb6f5f803658443eaca4ee9934e14571fd7896f7146c5fcaee",
+          "lines": "301-303,372-390"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 11,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/011-e3c0d3f1c9.diff",
+        "sha256": "ce8cfb4f74dbd27d7ccb49e7f1d2980f97f73350d8685278eebc4b26e969d6f2",
+        "line_count": 885,
+        "read_ranges": [
+          [
+            1,
+            885
+          ]
+        ],
+        "summary": "daemon notify.post/notify.state及UInt64字符串/数值解析拒绝bool；Controls通知preset/可选state/UI/本地化；IcliKit升级。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI+Device.swift",
+          "sha256": "8297dafaa0d82922d5692cdeeca1373e2339f725827ed24dcce806c19a546a00",
+          "lines": "61-81"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI+Extended.swift",
+          "sha256": "c62d73617810065a1a39307fa575093844f1dc970f0db6590df3a3c6ee624c2f",
+          "lines": "7-18"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 14,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/014-0cafa79186.diff",
+        "sha256": "fb122d523dd12147fd946e8511f2662a7882f619948b84081cf5862c71e2b91a",
+        "line_count": 748,
+        "read_ranges": [
+          [
+            1,
+            748
+          ]
+        ],
+        "summary": "control socket每connection独立worker/MainActor异步命令；所有launch启动socket；headless通过guest touch归一化和guest screenshot；windowed swipe等待完成。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneHostControl.swift",
+          "sha256": "0edfb5bb2046403b4742610d3c1b4ff3acd7f218746e2b3e78550cff7d8ff043",
+          "lines": "164-219"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneHostCommandService.swift",
+          "sha256": "cae20dfe62acf22fda93a4887e32c426299f64ec1333fa3e4c06e7334ad28e67",
+          "lines": "28-49"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneHostCommandExecutor.swift",
+          "sha256": "b2b97dd238cfc4c4d1d47b583eaace423e706bebe70f66ad8c2917b4d45a02e1",
+          "lines": "105-205"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneHostScreenAdapter.swift",
+          "sha256": "2a79080d3ab556ca4613ac0072bcb319418e372a2dab1edb736a9279972451a4",
+          "lines": "21-38"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneAppDelegate.swift",
+          "sha256": "80eaf6e25bcbe5b14e086bff05cfc03020f5b7910e4f0c47e1f121a33dabb50b",
+          "lines": "340-351"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 15,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/015-be7f061ecf.diff",
+        "sha256": "b1a4ad428797da9d9cfed71f634aa1ae907de5339a8504b98467026478871526",
+        "line_count": 1661,
+        "read_ranges": [
+          [
+            1,
+            1661
+          ]
+        ],
+        "summary": "新增stateless Launchpad CLI：same-UID 0600 Unix socket、单请求JSON行、输出事件/完成结果、disconnect取消；bundle/VM/CFW/guest/exec调用UI同一model；CLI自动后台启动app；Xcode嵌入及先签CLI。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/Package.swift",
+          "sha256": "64ea48ef67c1312f3b7c983faddbe585d0aa206def4ef357e2ceb8f8690e0988",
+          "lines": "11-17"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadModel.swift",
+          "sha256": "3ab179548a19259e0a71033a17c554ec731e60c34fa5f4adfbc25b96c34340ad",
+          "lines": "5-7,33-58"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneHostControl.swift",
+          "sha256": "0edfb5bb2046403b4742610d3c1b4ff3acd7f218746e2b3e78550cff7d8ff043",
+          "lines": "164-219"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 16,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/016-b21910e01b.diff",
+        "sha256": "b5dcf27301b95963039bae53262f99edd933f2ff763d473a58684e89012e0bfc",
+        "line_count": 1577,
+        "read_ranges": [
+          [
+            1,
+            1577
+          ]
+        ],
+        "summary": "除daemon/VM/cache/policy格式外，新增统一SheetContent/Accessory/Actions、TimelineView spinner、CommandInfoButton、安装进度布局、New Machine网络/patch editor/keepArtifacts等行为。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadSheet.swift",
+          "sha256": "8899f3a5e726c5b4cf3589acd2ce23d17c84e0af36e74d660b061576f1d4dcb3",
+          "lines": "1-80"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadStatus.swift",
+          "sha256": "b6eef8b30ba71aa2f10b94b982d3a8efdc7e60cb7da7e42f69e33bd839bf7f74",
+          "lines": "47-59"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
+          "sha256": "f4bbe3342a1ac20bbd8d5f8fe34d4c2c99ac91cec23fe3400effc380d9a3057a",
+          "lines": "377-455"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 17,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/017-657755eb99.diff",
+        "sha256": "0acd3fecb1493f7dd77b77d17a59b57af3a35f133b873b0016fb262fdce94d57",
+        "line_count": 1658,
+        "read_ranges": [
+          [
+            1,
+            1658
+          ]
+        ],
+        "summary": "Swift formatter主要调整作用域/brace/try位置及测试名称；Trailing zeros测试还将lhs强制解包改为try #require，具有失败报告行为差异。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/Package.swift",
+          "sha256": "64ea48ef67c1312f3b7c983faddbe585d0aa206def4ef357e2ceb8f8690e0988",
+          "lines": "83-90,125-129"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 20,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/020-4e8d7bd7ce.diff",
+        "sha256": "11d60334c107cea69cbf7a7a45efacc6e7e324005bcb0be2e38f8cca1c5d1fa2",
+        "line_count": 1425,
+        "read_ranges": [
+          [
+            1,
+            1425
+          ]
+        ],
+        "summary": "多选机器与按列表顺序执行批量动作、单选约束、refresh交集；sheet交接；Recent Commands table复制/状态；New Machine首个可用名称/IPSW清空与preset本地化。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+          "sha256": "4a7b0770430e5ae6a11d27b9f54af547a6fe7aa3c645de99b72bf37a60a6f3d9",
+          "lines": "175-300"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadCommandHistoryView.swift",
+          "sha256": "eae0a7695036b62b53654ddaa6694af30dec1c3a5cfe0314f9c070aadd6d0f1a",
+          "lines": "17-85"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadNewMachineView.swift",
+          "sha256": "f4bbe3342a1ac20bbd8d5f8fe34d4c2c99ac91cec23fe3400effc380d9a3057a",
+          "lines": "72-75"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadPanelQueue.swift",
+          "sha256": "c0e2396530073ad830d589cea51d4399e3b2797c6f2af06d9e1a813e39008f3f",
+          "lines": "1-70"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 21,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/021-73bbf18ba0.diff",
+        "sha256": "0a7fa59fbbdd606722786647fd7e858be9636a1ed6599befcbd73b1299e2f053",
+        "line_count": 1040,
+        "read_ranges": [
+          [
+            1,
+            1040
+          ]
+        ],
+        "summary": "进度输出新增VPHONE_PROGRESS=lines、TTY bar/lines/off模式与节流；Launchpad子进程请求lines、parser分离progress done total回调；批量export串行等待/取消/部分文件清理；批量settings只提交修改字段。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneProgressBar.swift",
+          "sha256": "44321b445e31ad2ef1462ff69c7b8ea4a47e1bab56d91be512bca705426ef161",
+          "lines": "1-64"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
+          "sha256": "0b90c27dbefb518cbc2c0bb3d01457af319e0caab2811ec429be1d96090af823",
+          "lines": "145-255"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpadKit/VPhoneLaunchpadMachineLibrary.swift",
+          "sha256": "6364dae0c206588a3d766536ebce9d09723ccac577800063f459b6a7f5e976e7",
+          "lines": "380-460"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadMachineSheets.swift",
+          "sha256": "258972b4dd225ecc9b17f17270b3719760197a15b2bfc7959979c1a7d435d509",
+          "lines": "1-135"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 24,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/024-235272673a.diff",
+        "sha256": "6f90801e649cd60eef63e897612448117036a0d2d4cd0d67b13f4de5d55a68b0",
+        "line_count": 977,
+        "read_ranges": [
+          [
+            1,
+            977
+          ]
+        ],
+        "summary": "standard改为JB基线+camera，hv concealment及八项DT/Preboot identity改为opt-in；watchdogd随hv三项成组；Preboot rewrite受plan；移除LocationFix/app JSON模拟和部署，RPC直接调用IcliKit location操作。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+          "sha256": "eb030e3f34d163357aea808b659e9a3875a8afc8cd8254fc98cd9726b7b9cf96",
+          "lines": "275-288"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/Makefile",
+          "sha256": "36b897536ba377d7d3fd08cc82a71b74be89e510c58b67bd3b6d189a355e5287",
+          "lines": "15,118-122"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/cfw_install_exp.sh",
+          "sha256": "3fc0dab9562e6f8b56daf1bc8afe084f3bb98cb1a9d6c41487d4e3c718e86b4d",
+          "lines": "429-453,703-724"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 25,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/025-59903d5bca.diff",
+        "sha256": "2708b57e409751cedcc92c52b3532aeb9acaf890082642829fd3abbb7047061a",
+        "line_count": 1149,
+        "read_ranges": [
+          [
+            1,
+            1149
+          ]
+        ],
+        "summary": "IcliKit依赖从精确0.7.1升为最低0.7.3范围，并完整删除UI Inspector各model/view/record文件；Setup Assistant frontmost修正由外部依赖提供，diff不含其实现。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/VPhoneDaemon.xcodeproj/project.pbxproj",
+          "sha256": "7cc79f4bc11e0e408db19434cd535e4dc17323d624780114ee26fc75cac92ec9",
+          "lines": "343-350"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI+Input.swift",
+          "sha256": "de490cf7adf91234d248cf4e33508a91fbc08371d358a6bd01ec4adbde26c69b",
+          "lines": "69-97"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 27,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/027-addc8c4c3b.diff",
+        "sha256": "42de30a74f4389e3857ec788a762ea7cdebe07141e24497f32e86d1974efa80f",
+        "line_count": 2241,
+        "read_ranges": [
+          [
+            1,
+            2241
+          ]
+        ],
+        "summary": "删除UI Inspector 53个本地化key及对应翻译；其余key仅发生JSON排列移动。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/Localizable.xcstrings",
+          "sha256": "dfadef10d98409a5d78aa036c6692ea5cb5828f8cb09ad6ac382838b3fd8fec8",
+          "lines": "catalog key comparison in camera-027-catalog-evidence.json"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 32,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/032-c3f7910c92.diff",
+        "sha256": "dc2d52f033ec3455bed3a088af929577f5ce9d5eed803d29985adf977f2dbb5d",
+        "line_count": 3235,
+        "read_ranges": [
+          [
+            1,
+            3235
+          ]
+        ],
+        "summary": "新增原生NSSearchField及toolbar位置；patch sheet布局/boot-essential确认/说明状态；当时移除既有机器patch编辑入口，仅创建时编辑；CommandHistory复制按钮布局和InfoPlist翻译。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadSearchField.swift",
+          "sha256": "381d70c1fb35992c8f1079bcb4b209aa00f8bfbb43a90e7075361476e73c5fda",
+          "lines": "1-53"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadMachinesView.swift",
+          "sha256": "4a7b0770430e5ae6a11d27b9f54af547a6fe7aa3c645de99b72bf37a60a6f3d9",
+          "lines": "57-88,169-171"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneLaunchpad/VPhoneLaunchpadCommandHistoryView.swift",
+          "sha256": "eae0a7695036b62b53654ddaa6694af30dec1c3a5cfe0314f9c070aadd6d0f1a",
+          "lines": "17-31"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 33,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/033-30082845ae.diff",
+        "sha256": "fa9c34102a80c29d633d746ce62f96026ac4fc277a37968d4bc1ad7a971291a3",
+        "line_count": 1719,
+        "read_ranges": [
+          [
+            1,
+            1719
+          ]
+        ],
+        "summary": "将vphone-escalator单C文件拆成AMFIDTask/Commands/Escalator.h/Preferences/Requirements/main；静态函数改为共享声明以连接独立编译单元，原功能主体移动。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/Package.swift",
+          "sha256": "64ea48ef67c1312f3b7c983faddbe585d0aa206def4ef357e2ceb8f8690e0988",
+          "lines": "11-17"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/build.sh",
+          "sha256": "ce077b93c54b997e0b73c7cb3a0d32f6444a8aae7fa8bc2b19e078c58b10a4e2",
+          "lines": "99-104"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/scripts/vphone-amfidont",
+          "sha256": "6957e55ad9e9b6e48bc882fd3539f2b23c8c11691017009bed29c00ae1d40712",
+          "lines": "13-43"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 34,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/034-0f9a949bd6.diff",
+        "sha256": "cfde2ee42b4733ea860fdf91df74abadcc7b8173033c5a6f5dfb5722f51703d7",
+        "line_count": 3201,
+        "read_ranges": [
+          [
+            1,
+            3201
+          ]
+        ],
+        "summary": "RootHide dev由/rootfs/dev修为/dev并加rootfs→/；安装/启动repair base及dpkg watcher；递归扫描MachO目录创建.jbroot；spawn/exec链持续加载SystemHook并通过有界MachO LC_RPATH/依赖遍历修复sudo/sshd loaderlinks。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+          "sha256": "4a3d9995e30a8df8accfd662fc967b38d708ceb258e8b2f58a231aee2268c10d",
+          "lines": "394-408"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/Shared/RootHideLoaderLinks.c",
+          "sha256": "dd8b0cbbcfbe09fce621f840a18c385fe0c0a2cabb2945d9d0b6a28ef02ca1e2",
+          "lines": "36-81"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/SystemHook/SystemHook-vphone.c",
+          "sha256": "71d9d5186c4f5160978c04b04a8ecddf3753f3835ab63578ea555d9a01ab0074",
+          "lines": "87-135"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 37,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/037-9d3551cfa2.diff",
+        "sha256": "8d4ab8295afe375cd1c06c63a46066b6451d53b86bf145e1cad637d11c7825bc",
+        "line_count": 647,
+        "read_ranges": [
+          [
+            1,
+            647
+          ]
+        ],
+        "summary": "移除launchd xpc cache注入；daemon启动异步按plist真实路径load；RootHide plist物理路径重写及services.load预处理；固定root并拒绝其他root。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+          "sha256": "4a3d9995e30a8df8accfd662fc967b38d708ceb258e8b2f58a231aee2268c10d",
+          "lines": "394-410"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI+Service.swift",
+          "sha256": "c0d51640db3d699c8684a49ad39d0df01e21639c8fb4aa4c971334aff5884688",
+          "lines": "53-62"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneGuestComponents/LaunchHook/launchdhook-vphone.c",
+          "sha256": "a22a81e9a420eea542ad9e9c578268fc512426763ec25f8c665951707a6de88a",
+          "lines": "225-258,280"
+        }
+      ],
+      "target_snapshots_verified": true
+    },
+    {
+      "index": 40,
+      "diff": {
+        "path": "/private/tmp/vphone-b24-t02/040-6e1b0cfe41.diff",
+        "sha256": "209f5438c3586631c58fc42bdb307e540195eb40eb200f08357f72b59188a6e8",
+        "line_count": 362,
+        "read_ranges": [
+          [
+            1,
+            362
+          ]
+        ],
+        "summary": "所有regular dropped files顺序处理：package install或upload+files.save_to_files_app；按MCMmetadata查LocalStorage，mobile owner/mode、重名编号、统一alert；能力gate和失败临时filecleanup。"
+      },
+      "local_files": [
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneVirtualMachineView.swift",
+          "sha256": "85cc1a6ba100a93950185baba5341bfc4d5d77b07b8be1f182f559af5c045fc8",
+          "lines": "205-257"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI+FileTool.swift",
+          "sha256": "ed7987cd727d72f89d4db74d34f4a0c7941fdc4139911e435862d71384c51d53",
+          "lines": "7-45"
+        },
+        {
+          "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneDaemon/Daemon/GuestAPI.swift",
+          "sha256": "eb030e3f34d163357aea808b659e9a3875a8afc8cd8254fc98cd9726b7b9cf96",
+          "lines": "57-96"
+        }
+      ],
+      "target_snapshots_verified": true
+    }
+  ]
+}

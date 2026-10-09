@@ -1,0 +1,52 @@
+{
+  "review_head": "11064b07ea5b754285eae0e56f8aedc912441606",
+  "scope": [
+    "sources/VPhoneCore/VPhoneCreateRunner.swift",
+    "tests/VPhoneCoreTests/CreateCheckpointTests.swift",
+    "tests/VPhoneLaunchpadKitTests/ConsoleLifecycleTests.swift"
+  ],
+  "critical": [],
+  "important": [
+    {
+      "file": "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "line": 464,
+      "problem": "Optional 指纹的 nil/nil 比较通过，未执行不可读拒绝。",
+      "trigger": "create 首次与阶段边界 toolFingerprint 均返回 nil；或 resume --accept-tool-change 把不可读的 currentTool=nil 写入 checkpoint 后，边界再次返回 nil。",
+      "impact": "未完成阶段仍会执行，与 T40 不可读则 toolChanged 的要求不符。",
+      "evidence": [
+        "VPhoneCreateRunner.create:260 直接保存 Optional 指纹",
+        "VPhoneCreateRunner.resume:350-353 比较并允许 acceptToolChange，随后:430 保存 currentTool",
+        "VPhoneCreateOrchestrator.makeRunner:347 使用 try? 计算双可执行文件指纹"
+      ],
+      "fix": "边界同时要求 currentTool 非 nil 且与 checkpoint 相同；补充 nil/nil 与接受不可读指纹的回归用例。"
+    }
+  ],
+  "minor": [
+    {
+      "file": "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "line": 465,
+      "problem": "新增阶段间 toolChanged 仍被 isRefusalBeforeWrite 识别为未写入拒绝。",
+      "impact": "prepare 成功并已写入 checkpoint 后，CLI recovery hint 仍输出 vm create --resume refused 和 the checkpoint was not changed。",
+      "evidence": [
+        "VPhoneCreateRunner.isRefusalBeforeWrite:142-150",
+        "VPhoneCreateOrchestrator.recoveryHintLines:448-450"
+      ],
+      "fix": "区分预检拒绝与已运行后的工具变化，或让恢复提示掌握实际写入状态；保留现有 resume 预检提示。"
+    }
+  ],
+  "strengths": [
+    "新增检查位于下一阶段 running 状态写入之前，正常非 nil 指纹变化会保留已完成阶段并阻止后续执行。",
+    "T46 用真实子进程经过生产处理路径，吞吐测试通过完整 persisted SHA256 验证所有规范化行；并发测试检查独立文件完整内容。",
+    "取消与轮换测试验证 raw ANSI/CRLF、规范化 panic 尾部、follower reset 和 previous log 内容。"
+  ],
+  "declined_to_judge": [
+    "阶段内部 TOCTOU 与资源冻结：明确不属于本次要求。",
+    "UI、真实 VM、特权 helper 吞吐与生命周期：本次控制子进程测试未覆盖。"
+  ],
+  "validation": [
+    "只读检查 HEAD、diff、生产调用路径与测试代码",
+    "git diff --check 无输出，退出码 0",
+    "本审查未运行测试或构建，未修改工作树或启动 VM/GUI/helper；父任务报告的测试结果未独立复跑"
+  ],
+  "assessment": "With fixes"
+}

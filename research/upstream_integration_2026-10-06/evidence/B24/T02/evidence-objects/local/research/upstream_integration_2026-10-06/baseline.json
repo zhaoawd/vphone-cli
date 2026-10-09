@@ -1,0 +1,80 @@
+{
+  "sampled_at": "2026-10-06T12:57:47.965422+00:00",
+  "main_checkout": "/Users/qcz3840/github/vphone-cli",
+  "main_head": "e8d825b3723d9ec72d31b050a79d353acd4b59bf",
+  "main_branch": "codex/upstream-4bab3b7-integration",
+  "integration_checkout": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli",
+  "integration_head_at_input_import": "bce469e6db5509dd4ca69f85cd05505d77becfc5",
+  "integration_branch": "codex/upstream-2d21d21-integration",
+  "main_status_porcelain": "",
+  "main_remotes": "origin\tgit@github.com:zhaoawd/vphone-cli.git (fetch)\norigin\tgit@github.com:zhaoawd/vphone-cli.git (push)",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "historical_start": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+  "previous_target": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+  "object_repository": "/private/tmp/vphone-upstream-proxy-20261006",
+  "merge_base": "87f796c62a7cb385cd37afce121f6e222d83e5b5",
+  "exclusive_main_upstream": [
+    "262",
+    "566"
+  ],
+  "ranges": [
+    {
+      "from": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+      "to": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+      "commits": 124,
+      "non_merge": 122
+    },
+    {
+      "from": "a969cd5d9206932dc1a2797348027fbc7d0ee347",
+      "to": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "commits": 218,
+      "non_merge": 158
+    },
+    {
+      "from": "9d218dedf58d4b19db5e51c8b584c1f14a96eee3",
+      "to": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+      "commits": 342,
+      "non_merge": 280
+    }
+  ],
+  "increment_changed_paths": 357,
+  "increment_code_paths": 280,
+  "increment_status_counts": {
+    "A": 157,
+    "M": 200,
+    "D": 0
+  },
+  "increment_shortstat": "357 files changed, 46978 insertions(+), 2067 deletions(-)",
+  "tools": {
+    "git": "git version 2.53.0",
+    "macos": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428",
+    "xcode": "Xcode 26.4\nBuild version 17E192",
+    "swift": "Apple Swift version 6.3 (swiftlang-6.3.0.123.5 clang-2100.0.123.102)\nTarget: arm64-apple-macosx28.0"
+  },
+  "available_bytes": 14502739968,
+  "ignored_environment": {
+    "venv": {
+      "path": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.venv",
+      "symlink_target": "/Users/qcz3840/github/vphone-cli/.venv"
+    },
+    "build_cache": "regenerable; not a source recovery point",
+    "generated_metadata": "sources/vphone-cli/VPhoneBuildInfo.swift; generated per scripts/build.sh",
+    "vendor": "local dependency copies; original git directories retained"
+  },
+  "current_fixture_presence": {
+    "/Users/qcz3840/.vphone/backups/rig-baseline-2026-10-01": false,
+    "/Users/qcz3840/.vphone/backups/t03-restorecheck.sparsebundle": false,
+    "/Users/qcz3840/vphone-b4-accept/lp-b4-accept2": false
+  },
+  "excluded_paths": [
+    "repository-root TODO.md"
+  ],
+  "verification_entries": {
+    "swift_fast": "make test_swift",
+    "python": "make test_python",
+    "firmware": "make test_firmware; complete fixtures required",
+    "signed_host": "make build in isolated worktree only",
+    "daemon": "make daemon_api_build",
+    "guest": "make test_guest_components"
+  }
+}

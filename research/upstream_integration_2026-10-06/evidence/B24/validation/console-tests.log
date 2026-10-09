@@ -1,0 +1,64 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling fdr.c
+[5/37] Compiling asr.c
+[5/37] Compiling download.c
+[5/37] Compiling recovery.c
+[5/37] Compiling normal.c
+[9/37] Compiling ipsw.c
+[10/37] Compiling limera1n.c
+[11/37] Compiling img3.c
+[12/37] Compiling img4.c
+[13/37] Compiling ace3.c
+[14/37] Compiling dfu.c
+[15/37] Compiling mbn.c
+[16/37] Compiling restore.c
+[17/37] Compiling ftab.c
+[18/37] Compiling fls.c
+[19/37] Compiling log.c
+[20/37] Compiling locking.c
+[21/37] Compiling vphone_zip_stub.c
+[22/37] Compiling common.c
+[23/37] Compiling deviceinterfaced.c
+[24/37] Compiling vphone_restore_bridge.c
+[25/37] Compiling idevicerestore.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[27/37] Write Objects.LinkFileList
+[30/37] Compiling VPhoneLaunchpadKitTests ConsoleLifecycleTests.swift
+[31/37] Emitting module VPhoneLaunchpadKitTests
+[31/37] Write Objects.LinkFileList
+[32/37] Linking vphone-cli
+[33/37] Linking vphone-vm
+[34/37] Applying vphone-vm
+[34/37] Applying vphone-cli
+[36/37] Linking vphone-cliPackageTests
+Build complete! (20.31s)
+Test Suite 'Selected tests' started at 2026-10-09 14:31:15.248.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 14:31:15.250.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 14:31:15.250.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 14:31:15.250.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ConsoleLifecycleTests started.
+◇ Test cancelledDetachedWriterKeepsPanicTailAcrossRotation() started.
+◇ Test concurrentCommandsPersistNormalizedPanicTailsInSeparateLogs() started.
+✔ Test concurrentCommandsPersistNormalizedPanicTailsInSeparateLogs() passed after 0.599 seconds.
+✔ Test cancelledDetachedWriterKeepsPanicTailAcrossRotation() passed after 1.276 seconds.
+✔ Suite ConsoleLifecycleTests passed after 1.277 seconds.
+✔ Test run with 2 tests in 1 suite passed after 1.277 seconds.

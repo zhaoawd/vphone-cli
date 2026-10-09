@@ -1,0 +1,581 @@
+import Darwin
+import Foundation
+import Observation
+
+/// `vm create`, one command at a time.
+///
+/// `vphone-cli vm create` runs the same stages in one process and asks for
+/// sudo partway through, which a GUI cannot answer. Running the stages here
+/// keeps every step visible and retryable, and keeps root to the one step
+/// that needs it: `cfw install`, run by the helper. The waits mirror
+/// VPhoneVirtualMachineCreator: the device identity file, 90 recovery probes,
+/// up to 30 seconds for the post-restore panic, 5 seconds before CFW, and up
+/// to 300 seconds for vphoned to answer on first boot.
+@MainActor
+@Observable
+final class VPhoneLaunchpadCreationPipeline {
+    struct Options: Sendable {
+        var name: String
+        /// The canonical library the machine is created in.
+        var libraryRoot: String
+        /// The installed Core Bundle every step runs with. The machine is
+        /// bound to it once `vm new` has made its folder.
+        var bundleVersion: String
+        var iphoneSource: String
+        var cloudOSSource: String
+        /// The model `fw prepare --device` picks from an IPSW that covers
+        /// several, such as the 13-inch iPad; nil takes the first.
+        var device: String?
+        var cpuCount: Int
+        var memoryMB: Int
+        var diskSizeGB: Int
+        var network: String
+        /// The preset and per-patch overrides the boot chain is built with.
+        var patches: VPhoneLaunchpadPatchSelection
+        var keepArtifacts: Bool
+
+        var machine: VPhoneLaunchpadMachinePath {
+            VPhoneLaunchpadMachinePath(libraryRoot: libraryRoot, name: name)
+        }
+    }
+
+    enum Step: Int, CaseIterable, Identifiable, Comparable {
+        case create
+        case prepare
+        case patch
+        case bootDFU
+        case waitDFU
+        case restore
+        case stopDFU
+        case installCFW
+        case firstBoot
+
+        var id: Int {
+            rawValue
+        }
+
+        static func < (lhs: Step, rhs: Step) -> Bool {
+            lhs.rawValue < rhs.rawValue
+        }
+
+        var title: String {
+            switch self {
+            case .create: String(localized: "Create machine")
+            case .prepare: String(localized: "Download and prepare firmware")
+            case .patch: String(localized: "Patch boot chain")
+            case .bootDFU: String(localized: "Boot into DFU")
+            case .waitDFU: String(localized: "Wait for DFU")
+            case .restore: String(localized: "Restore")
+            case .stopDFU: String(localized: "Stop machine")
+            case .installCFW: String(localized: "Install custom firmware")
+            case .firstBoot: String(localized: "First boot")
+            }
+        }
+
+        var needsRoot: Bool {
+            self == .installCFW
+        }
+    }
+
+    let options: Options
+    private(set) var statuses: [Step: VPhoneLaunchpadStatus] = [:]
+    private(set) var durations: [Step: TimeInterval] = [:]
+    private(set) var current: Step?
+    /// How far the IPSW `fw prepare` is downloading has come, while one is
+    /// downloading. Each of the two IPSWs counts from zero; a cached one and
+    /// a Core Bundle that reports no progress leave it nil.
+    private(set) var downloadFraction: Double?
+    /// The creation log. The sheet shows it in a terminal; the model keeps
+    /// only the last few lines, for error details.
+    private let log: VPhoneLaunchpadLogWriter
+    private(set) var failure: VPhoneLaunchpadError?
+    private(set) var isRunning = false
+
+    private let bundles: VPhoneLaunchpadCoreBundle
+    private let helper: VPhoneLaunchpadHelperClient
+    private weak var library: VPhoneLaunchpadMachineLibrary?
+    private var task: Task<Void, Never>?
+    private var dfu: VPhoneLaunchpadChildProcess?
+    private var dfuPanicked = false
+
+    init(
+        options: Options,
+        bundles: VPhoneLaunchpadCoreBundle,
+        helper: VPhoneLaunchpadHelperClient,
+        library: VPhoneLaunchpadMachineLibrary,
+    ) {
+        self.options = options
+        self.bundles = bundles
+        self.helper = helper
+        self.library = library
+        log = VPhoneLaunchpadLogWriter(url: VPhoneLaunchpadMachineLibrary.consoleLog(options.machine, suffix: "-create"))
+    }
+
+    var logFile: URL {
+        log.url
+    }
+
+    var machine: VPhoneLaunchpadMachinePath {
+        options.machine
+    }
+
+    var isFinished: Bool {
+        statuses[.firstBoot] == .passed
+    }
+
+    func status(_ step: Step) -> VPhoneLaunchpadStatus {
+        statuses[step] ?? .pending
+    }
+
+    /// The step a retry starts from: the one that failed.
+    var failedStep: Step? {
+        Step.allCases.first { statuses[$0] == .failed }
+    }
+
+    /// `fw patch`, as both the step's log line and the run build it. One array so
+    /// the command the sheet shows cannot drift from the command that runs.
+    private var patchArguments: [String] {
+        ["fw", "patch", options.name] + options.patches.presetArguments
+    }
+
+    private var deviceArguments: [String] {
+        options.device.map { ["--device", $0] } ?? []
+    }
+
+    func command(for step: Step) -> String {
+        let name = options.name
+        return switch step {
+        case .create: "vm new \(name) --cpu \(options.cpuCount) --memory \(options.memoryMB) --disk-size \(options.diskSizeGB)"
+        case .prepare: (["fw", "prepare", name] + deviceArguments).joined(separator: " ")
+        case .patch: patchArguments.joined(separator: " ")
+        case .bootDFU: "vm launch \(name) --dfu"
+        case .waitDFU: "recovery-probe --ecid …"
+        case .restore: "restore \(name)"
+        case .stopDFU: "vm stop \(name)"
+        case .installCFW: "cfw install \(name)"
+        case .firstBoot: "vm launch \(name)"
+        }
+    }
+
+    // MARK: - Control
+
+    func start(from first: Step = .create) {
+        guard !isRunning else {
+            return
+        }
+        failure = nil
+        for step in Step.allCases where step >= first {
+            statuses[step] = .pending
+            durations[step] = nil
+        }
+        isRunning = true
+        task = Task { await run(from: first) }
+    }
+
+    func cancel() {
+        task?.cancel()
+    }
+
+    private func run(from first: Step) async {
+        defer {
+            isRunning = false
+            current = nil
+            downloadFraction = nil
+            dfu?.terminate()
+            dfu = nil
+        }
+        for step in Step.allCases where step >= first {
+            current = step
+            statuses[step] = .running
+            let began = Date()
+            do {
+                // `vm launch --dfu` needs the bundle's policy exception and
+                // AMFI admission, so the version is checked before any step
+                // runs. A failure shows on the step that was about to run.
+                if step == first {
+                    try await prepareBundle()
+                }
+                try await perform(step)
+                try Task.checkCancellation()
+                statuses[step] = .passed
+                durations[step] = Date().timeIntervalSince(began)
+            } catch {
+                statuses[step] = .failed
+                durations[step] = Date().timeIntervalSince(began)
+                if error is CancellationError || Task.isCancelled {
+                    failure = VPhoneLaunchpadError(String(localized: "\(step.title) was cancelled."))
+                } else {
+                    failure = error as? VPhoneLaunchpadError
+                        ?? VPhoneLaunchpadError(String(localized: "\(step.title) failed."), detail: error.localizedDescription)
+                }
+                append("✕ \(failure?.message ?? step.title)")
+                await library?.refresh()
+                return
+            }
+        }
+        if !options.keepArtifacts {
+            await removeRestoreFiles()
+        }
+        append("● \(options.name) is ready.")
+    }
+
+    /// Removes the `iPhone*_Restore` tree once the machine has booted, as
+    /// `cfw install` does without `--keep-artifacts`. Only a real folder is
+    /// removed; a link by that name is left alone. A failure here does not
+    /// fail the creation.
+    private func removeRestoreFiles() async {
+        let bundle = machine.url
+        let lines = await Task.detached { () -> [String] in
+            let manager = FileManager.default
+            let entries = (try? manager.contentsOfDirectory(atPath: bundle.path)) ?? []
+            var lines: [String] = []
+            for name in entries where name.hasPrefix("iPhone") && name.hasSuffix("_Restore") {
+                let url = bundle.appendingPathComponent(name)
+                let values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey])
+                guard values?.isDirectory == true, values?.isSymbolicLink == false else {
+                    continue
+                }
+                do {
+                    try manager.removeItem(at: url)
+                    lines.append("removed restore files \(name)/ to save space")
+                } catch {
+                    lines.append("warning: could not remove \(name)/: \(error.localizedDescription)")
+                }
+            }
+            return lines
+        }.value
+        lines.forEach(append)
+    }
+
+    private func append(_ line: String) {
+        log.write(line)
+    }
+
+    // MARK: - Steps
+
+    /// Checks the machine's Core Bundle once per Launchpad session; later
+    /// runs return at once.
+    private func prepareBundle() async throws {
+        let version = options.bundleVersion
+        if !bundles.isChecked(version) {
+            append("checking Core Bundle \(version)")
+        }
+        try await bundles.prepare(version)
+    }
+
+    private func perform(_ step: Step) async throws {
+        let version = options.bundleVersion
+        guard let commandLine = bundles.commandLine(version: version) else {
+            throw VPhoneLaunchpadError(String(localized: "VPhone.bundle \(version) is not installed."))
+        }
+        let name = options.name
+        let library = machine.libraryArguments
+        let bundle = machine.url
+        let log = log
+        let output: @Sendable (String) -> Void = { line in log.write(line) }
+
+        func run(
+            _ arguments: [String],
+            onLine: @escaping @Sendable (String) -> Void = output,
+            onProgress: (@Sendable (Double) -> Void)? = nil,
+        ) async throws {
+            onLine("$ \(VPhoneLaunchpadCommandLine.display(arguments))")
+            try await commandLine.runChecked(arguments, onLine: onLine, onProgress: onProgress)
+        }
+
+        switch step {
+        case .create:
+            try await run(["vm", "new", name, "--cpu", String(options.cpuCount),
+                           "--memory", String(options.memoryMB), "--disk-size", String(options.diskSizeGB)] + library)
+            // The folder exists now. Every later command, here and after
+            // creation, runs with the version recorded in it.
+            do {
+                try self.library?.bind(machine, VPhoneLaunchpadMachineBinding(bundle: version, bootChain: version))
+            } catch {
+                throw VPhoneLaunchpadError(
+                    String(localized: "Unable to record the Core Bundle of \(name)."),
+                    detail: error.localizedDescription,
+                )
+            }
+            if options.network != "nat" {
+                try await run(["vm", "config", name, "--network", options.network] + library)
+            }
+            await self.library?.refresh()
+
+        case .prepare:
+            // Progress arrives on the reader thread and may land after the
+            // step has moved on, so only the firmware step takes it. A finished
+            // download clears it: extraction follows with no progress of its own.
+            defer { downloadFraction = nil }
+            try await run(["fw", "prepare", name, "--iphone-source", options.iphoneSource,
+                           "--cloudos-source", options.cloudOSSource] + deviceArguments + library,
+                onProgress: { [weak self] fraction in
+                    Task { @MainActor in
+                        guard let self, self.current == .prepare else { return }
+                        self.downloadFraction = fraction < 1 ? fraction : nil
+                    }
+                })
+
+        case .patch:
+            // The preset rides on `fw patch` itself; per-patch overrides are
+            // recorded first, the way `vm config` follows `vm new` above. Both
+            // lines reach the log. The creation log starts over on a retry, so
+            // the patch output is also kept in a log of its own for later
+            // diagnosis.
+            let patchLog = VPhoneLaunchpadLogWriter(url: VPhoneLaunchpadMachineLibrary.consoleLog(machine, suffix: "-patch"))
+            patchLog.write("# \(options.name), \(Date().formatted(.iso8601)), Core Bundle \(version)")
+            let tee: @Sendable (String) -> Void = { line in
+                log.write(line)
+                patchLog.write(line)
+            }
+            if options.patches.hasOverrides {
+                try await run(["fw", "set-patches", name] + options.patches.setPatchesArguments + library, onLine: tee)
+            }
+            try await run(patchArguments + library, onLine: tee)
+
+        case .bootDFU:
+            let arguments = ["vm", "launch", name, "--dfu"] + library
+            append("$ \(VPhoneLaunchpadCommandLine.display(arguments))")
+            dfuPanicked = false
+            dfu = try commandLine.start(
+                arguments,
+                logFile: VPhoneLaunchpadMachineLibrary.consoleLog(machine, suffix: "-dfu"),
+            ) { [weak self] line in
+                log.write("dfu  \(line)")
+                if Self.isPanic(line) {
+                    Task { @MainActor in self?.dfuPanicked = true }
+                }
+            }
+            let identity = bundle.appendingPathComponent("udid-prediction.txt")
+            for _ in 0 ..< 30 {
+                if FileManager.default.fileExists(atPath: identity.path) {
+                    return
+                }
+                try requireDFURunning()
+                try await Task.sleep(for: .seconds(1))
+            }
+            throw VPhoneLaunchpadError(String(localized: "The machine did not enter DFU mode within 30 seconds."))
+
+        case .waitDFU:
+            let ecid = try Self.ecid(in: bundle)
+            append("$ vphone-cli recovery-probe --ecid \(ecid) --timeout 2  (up to 90 attempts)")
+            for attempt in 1 ... 90 {
+                try Task.checkCancellation()
+                try requireDFURunning()
+                let result = try await commandLine.run(
+                    ["recovery-probe", "--ecid", ecid, "--timeout", "2"],
+                    recordInHistory: attempt == 1,
+                )
+                if result.succeeded {
+                    append("device endpoint is reachable")
+                    return
+                }
+                try await Task.sleep(for: .seconds(2))
+            }
+            throw VPhoneLaunchpadError(String(localized: "The machine did not respond in DFU mode."))
+
+        case .restore:
+            try requireDFURunning()
+            try await run(["restore", name] + library)
+
+        case .stopDFU:
+            append("waiting up to 30s for the post-restore reboot")
+            for _ in 0 ..< 30 {
+                if dfu?.isRunning != true || dfuPanicked {
+                    break
+                }
+                try await Task.sleep(for: .seconds(1))
+            }
+            try await run(["vm", "stop", name, "--timeout", "20"] + library)
+            dfu?.terminate()
+            dfu = nil
+            append("waiting 5s for cleanup before CFW install")
+            try await Task.sleep(for: .seconds(5))
+
+        case .installCFW:
+            let status = try await helper.installCustomFirmware(
+                bundleVersion: version,
+                machineName: name,
+                libraryRoot: Self.canonicalPath(URL(fileURLWithPath: options.libraryRoot, isDirectory: true)),
+                // The restore tree stays until first boot succeeds, so a
+                // failed boot can still be restored again without preparing
+                // the firmware anew. `removeRestoreFiles()` reclaims it then.
+                keepArtifacts: true,
+                onLine: output,
+            )
+            guard status == 0 else {
+                throw VPhoneLaunchpadError(String(localized: "Unable to install custom firmware. Check the log for details."), detail: log.tail)
+            }
+            self.library?.recordGuestEnvironment(machine, version)
+
+        case .firstBoot:
+            try await firstBoot()
+        }
+    }
+
+    /// Boots with a window, as `vm create` does, and waits for vphoned to
+    /// answer on the VM's automation socket. The machine keeps running.
+    private func firstBoot() async throws {
+        guard let library else {
+            return
+        }
+        let name = options.name
+        append("$ vphone-cli vm launch \(name)")
+        await library.start(machine)
+        guard let child = library.launchedProcess(machine) else {
+            throw VPhoneLaunchpadError(String(localized: "\(name) could not be started."))
+        }
+        let socket = machine.url.appendingPathComponent("vphone.sock").path
+        append("waiting up to 300s for vphoned")
+        for _ in 0 ..< 300 {
+            try Task.checkCancellation()
+            if library.panicked.contains(machine) {
+                throw VPhoneLaunchpadError(String(localized: "The machine had a kernel panic during first boot."), detail: String(localized: "See the machine's console."))
+            }
+            guard child.isRunning else {
+                throw VPhoneLaunchpadError(String(localized: "The machine stopped before first boot finished."))
+            }
+            if await Task.detached(operation: { Self.ping(socketPath: socket) }).value {
+                append("vphoned answered")
+                return
+            }
+            try await Task.sleep(for: .seconds(1))
+        }
+        throw VPhoneLaunchpadError(String(localized: "The machine did not finish starting within 5 minutes."))
+    }
+
+    private func requireDFURunning() throws {
+        guard dfu?.isRunning == true else {
+            throw VPhoneLaunchpadError(String(localized: "The machine stopped while in DFU mode."), detail: log.tail)
+        }
+    }
+
+    // MARK: - Helpers
+
+    nonisolated static func isPanic(_ line: String) -> Bool {
+        VPhoneLaunchpadPanicLine.matches(line)
+    }
+
+    /// The ECID the DFU boot wrote into udid-prediction.txt.
+    nonisolated static func ecid(in machine: URL) throws -> String {
+        let text = (try? String(contentsOf: machine.appendingPathComponent("udid-prediction.txt"), encoding: .utf8)) ?? ""
+        var udid = ""
+        for line in text.split(whereSeparator: \.isNewline) {
+            let pair = line.split(separator: "=", maxSplits: 1).map(String.init)
+            guard pair.count == 2 else {
+                continue
+            }
+            if pair[0] == "ECID", !pair[1].isEmpty {
+                return pair[1]
+            }
+            if pair[0] == "UDID" {
+                udid = pair[1]
+            }
+        }
+        if let suffix = udid.split(separator: "-", maxSplits: 1).last, udid.contains("-") {
+            return String(suffix)
+        }
+        throw VPhoneLaunchpadError(String(localized: "Unable to read the device ECID. Try again."))
+    }
+
+    nonisolated static func canonicalPath(_ url: URL) -> String {
+        guard let resolved = realpath(url.path, nil) else {
+            return url.path
+        }
+        defer { free(resolved) }
+        return String(cString: resolved)
+    }
+
+    /// The probe `vm create` uses: a ping over vphone.sock that vphoned
+    /// answers with `"ok": true`.
+    nonisolated static func ping(socketPath: String) -> Bool {
+        let path = socketPath.utf8CString
+        var address = sockaddr_un()
+        guard path.count <= MemoryLayout.size(ofValue: address.sun_path) else {
+            return false
+        }
+        address.sun_family = sa_family_t(AF_UNIX)
+        withUnsafeMutablePointer(to: &address.sun_path) { pointer in
+            pointer.withMemoryRebound(to: CChar.self, capacity: path.count) { destination in
+                for (index, byte) in path.enumerated() {
+                    destination[index] = byte
+                }
+            }
+        }
+        let fd = socket(AF_UNIX, SOCK_STREAM, 0)
+        guard fd >= 0 else {
+            return false
+        }
+        defer { close(fd) }
+        var timeout = timeval(tv_sec: 2, tv_usec: 0)
+        setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+        var noSigPipe: Int32 = 1
+        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &noSigPipe, socklen_t(MemoryLayout<Int32>.size))
+        let connected = withUnsafePointer(to: &address) { pointer in
+            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                connect(fd, $0, socklen_t(MemoryLayout<sockaddr_un>.size))
+            }
+        }
+        guard connected == 0 else {
+            return false
+        }
+        let request = Data("{\"t\":\"ping\",\"screen\":false}\n".utf8)
+        let written = request.withUnsafeBytes { write(fd, $0.baseAddress, $0.count) }
+        guard written == request.count else {
+            return false
+        }
+        var reply = Data()
+        var buffer = [UInt8](repeating: 0, count: 512)
+        while reply.count < 4096 {
+            let count = buffer.withUnsafeMutableBytes { read(fd, $0.baseAddress, $0.count) }
+            guard count > 0 else {
+                return false
+            }
+            reply.append(contentsOf: buffer.prefix(count))
+            if let newline = reply.firstIndex(of: 0x0A),
+               let json = try? JSONSerialization.jsonObject(with: Data(reply[..<newline])) as? [String: Any]
+            {
+                return json["ok"] as? Bool == true
+            }
+        }
+        return false
+    }
+}
+
+#if DEBUG
+    extension VPhoneLaunchpadCreationPipeline {
+        /// Running the restore, failed while preparing firmware, or partway
+        /// through downloading an IPSW.
+        func applyPreview(failed: Bool = false, downloading: Double? = nil) {
+            statuses = [:]
+            durations = [:]
+            downloadFraction = nil
+            if let downloading {
+                statuses[.create] = .passed
+                durations[.create] = 1
+                statuses[.prepare] = .running
+                downloadFraction = downloading
+                current = .prepare
+                isRunning = true
+                return
+            }
+            if failed {
+                statuses[.create] = .passed
+                durations[.create] = 0
+                statuses[.prepare] = .failed
+                durations[.prepare] = 6
+                current = nil
+                isRunning = false
+                return
+            }
+            let finished: [Step: TimeInterval] = [.create: 1, .prepare: 862, .patch: 48, .bootDFU: 6, .waitDFU: 3]
+            for (step, duration) in finished {
+                statuses[step] = .passed
+                durations[step] = duration
+            }
+            statuses[.restore] = .running
+            current = .restore
+            isRunning = true
+        }
+    }
+#endif

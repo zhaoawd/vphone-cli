@@ -1,0 +1,71 @@
+{
+  "tasks": ["T24", "T40"],
+  "source_worktree": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli",
+  "source_base": "11064b07",
+  "upstream": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "implementation": {
+    "files": [
+      "sources/VPhoneCore/VPhoneCreateRunner.swift",
+      "tests/VPhoneCoreTests/CreateCheckpointTests.swift"
+    ],
+    "behavior": "Each unfinished creation stage rechecks the CLI/VM fingerprint before recording the stage as running or executing it. A changed or newly unreadable pair raises toolChanged and preserves the completed checkpoint.",
+    "red": {
+      "runner": "parent agent",
+      "log": "/private/tmp/vphone-b24-create-red.log",
+      "reported_result": "Two tests, three parameterized scenarios, 11 issues; the previous implementation continued through patch and verification after replacing CLI/VM or deleting VM.",
+      "independent_log_read": false
+    },
+    "green": "pending parent unified validation",
+    "limits": [
+      "A stage-boundary check does not make executables immutable during a stage or eliminate replacement after the check.",
+      "The tool fingerprint covers CLI and paired VM bytes only; scripts, guest payloads, Python and external caches remain outside it.",
+      "Fresh creation does not currently publish per-VM launchpad.json binding.",
+      "This change alone does not satisfy the complete T40 creation-toolchain contract."
+    ]
+  },
+  "resource_audit": {
+    "VPhoneResources.runtimeResources": "Required-resource URL list, not a complete digest manifest. Some actual dependencies are dynamically selected Python environments or external caches.",
+    "embedded_toolchain_json": "Outer signature seals nested CLI and VM CDHashes; it does not supply a complete development/resource-override digest.",
+    "signed_CodeResources": "App sealing can cover packaged resources; there is no current uniform create-time manifest covering all runtime-selected dependencies."
+  },
+  "transfer_probe": {
+    "harness": "/private/tmp/vphone-b24-t24-t40/binding-transfer.py",
+    "cli": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+    "cli_sha256": "7d1dfc544e8471aab450153f5f235629594f29f1e6f1cad05194b6fdda0f3187",
+    "system_tar_result": "/private/tmp/vphone-b24-t24-t40/transfer-system-tar-retry/result.json",
+    "native_result": "/private/tmp/vphone-b24-t24-t40/transfer-native/result.json",
+    "result": "Actual CLI new/clone/rename/export/import completed on a synthetic 0 GiB VM bundle. Eight persistent files retain size, SHA256 and mode. Four constructed origin fields and an opaque historical receipt copy retain exact bytes.",
+    "initial_failure": "The initial source-inventory comparison included .vphone-runtime.json created by the source lock. The failed script and result are retained. The corrected persistent inventory excludes the production runtime record and control socket.",
+    "historical_receipt_source": "research/upstream_integration_2026-10-06/evidence/B22-install-local-core.json observations[0].stdout",
+    "limits": [
+      "ROM bytes are explicitly synthetic and the disk is 0 GiB. No VM launched, restored or booted.",
+      "The binding is constructed fixture data, not a binding issued by a current production store operation.",
+      "The historical receipt is copied as an opaque evidence file inside the fixture VM. Production receipt trust remains in the root-owned Bundle store, which this probe does not install, transfer or verify.",
+      "No real 64 GiB archive round trip or actual guest/kernel/environment upgrade or rollback is established."
+    ]
+  },
+  "legacy_helper_probe": {
+    "source": "/private/tmp/vphone-b24-t24-t40/legacy-helper-v1.swift",
+    "state": "source prepared; not compiled, signed, registered or executed by this subagent",
+    "purpose": "A controlled protocol-v1 XPC service returns version 1, exposes only old install/verify selectors and logs any attempted operation. Production client install/verify should reject version mismatch before requesting authorization, opening an operation log or submitting an operation.",
+    "limits": [
+      "This is a controlled compatibility fixture, not a historical helper executable.",
+      "The fixture listener itself does not implement production caller-identity checks; those checks require independent real-helper rejection evidence.",
+      "Parent agent owns build, signing, launchd installation, baseline capture and cleanup."
+    ]
+  },
+  "TCC": {
+    "static_evidence": [
+      "Launchpad and CLI Info.plist contain location usage descriptions.",
+      "VM entitlements include com.apple.security.personal-information.location.",
+      "VPhoneLocationProvider creates CLLocationManager and calls requestAlwaysAuthorization/startUpdatingLocation inside the VM executable.",
+      "The ordinary launcher spawns its child without responsibility disclaiming.",
+      "Detached create uses responsibility_spawnattrs_setdisclaim(1)."
+    ],
+    "actual_acceptance": "not executed by this subagent",
+    "remaining": "Observe the responsible process/app and allow/deny behavior for Launchpad foreground bound launch, detached create and direct CLI routes. Static metadata, preset location and guest RPC do not establish Host CoreLocation authorization."
+  },
+  "task_acceptance": {"T24": false, "T40": false},
+  "system_mutations": "none by this subagent",
+  "VM_operations": "none by this subagent"
+}

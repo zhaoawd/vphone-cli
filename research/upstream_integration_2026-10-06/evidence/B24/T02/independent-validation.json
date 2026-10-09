@@ -1,0 +1,85 @@
+{
+  "scope": "只验证 T02 成品数据结构、覆盖、声明字段、处置映射与证据路径，不独立验证 202 条语义结论，也不检查仍在写入的 capability 对账。",
+  "inputs": {
+    "commit-audit-draft.json": {
+      "path": "/private/tmp/vphone-b24-t02/commit-audit-draft.json",
+      "sha256": "6fabf793bd613f0c1d1ea67d20b1466223a0643d03c1d9ec74c1456cfa55fe9e"
+    },
+    "commit-ledger-342-draft.json": {
+      "path": "/private/tmp/vphone-b24-t02/commit-ledger-342-draft.json",
+      "sha256": "6ce7afba934af19891969d8bb5eafead65986d83ae1340feac045af721893011"
+    },
+    "pending-index.json": {
+      "path": "/private/tmp/vphone-b24-t02/pending-index.json",
+      "sha256": "29ed079343308c71bba74cae8ec3a051f36736847b25b0d9a2decbe30c73eee8"
+    }
+  },
+  "expected_fixed_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "counts": {
+    "audit_rows": 202,
+    "audit_unique_sha": 202,
+    "pending_rows": 202,
+    "pending_unique_sha": 202,
+    "ledger_rows": 342,
+    "ledger_unique_sha": 342
+  },
+  "pending_exact_sha_and_index_coverage": true,
+  "declaration_flags_true_count": {
+    "full_diff_read": 202,
+    "final_state_compared": 202,
+    "semantic_review_complete": 202
+  },
+  "fixed_target": {
+    "matching_fields": 45,
+    "mismatches": []
+  },
+  "dispositions": {
+    "audit_recommendations": {
+      "adaptation_planned": 175,
+      "intentionally_not_adopted": 10,
+      "already_equivalent": 11,
+      "superseded": 6
+    },
+    "ledger": {
+      "already_equivalent": 14,
+      "adaptation_planned": 179,
+      "intentionally_not_adopted": 11,
+      "documentation_review_T28": 37,
+      "release_metadata_superseded": 22,
+      "merge_no_additional_resolution": 53,
+      "adapted_verified_T06": 1,
+      "superseded": 14,
+      "not_applicable": 1,
+      "adaptation_planned_T27": 1,
+      "merge_resolution_reviewed_adaptation_planned": 8,
+      "adapted_verified": 1
+    },
+    "audit_original_disposition": {
+      "pending_semantic_review": 202
+    },
+    "ledger_recommendation_mismatches": [],
+    "planned_promotions": [],
+    "draft_only": true,
+    "scope_note": "Selected full-diff semantic reviews and all merge resolutions; pending rows remain unreviewed and reviewed/planned rows do not imply implementation acceptance; B24 draft recommendations only, no runtime acceptance"
+  },
+  "local_evidence_paths": {
+    "references_checked": 619,
+    "unique_paths": 180,
+    "missing_evidence_paths": [],
+    "explicit_planned_path_fields": [],
+    "classification_note": "local_evidence.path 按现有证据路径检查；planned_path/planned_paths 若存在则单独记录，不将未来路径作为缺失的现有证据。当前两个字段均未出现。"
+  },
+  "diff_evidence": {
+    "files_checked": 202,
+    "errors": [],
+    "validation": "检查 diff 文件存在、已声明摘要与行数，不把声明 full_diff_read=true 视为独立全文语义阅读。"
+  },
+  "issues": [],
+  "result": "PASS",
+  "limitations": [
+    "本审查不证明语义审查者实际阅读操作，只核查相关声明为 true。",
+    "local_evidence 路径存在不证明路径内容支持各条语义结论。",
+    "already_equivalent 等推荐处置的语义正确性未重新审查；175 条 adaptation_planned 在 ledger 中保持 planned，没有提升为 accepted。",
+    "audit 的原 disposition 保留 pending_semantic_review；完成状态由 semantic_review_complete 与 recommended_disposition 表达，ledger 已使用推荐处置。"
+  ]
+}

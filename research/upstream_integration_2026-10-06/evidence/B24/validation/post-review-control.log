@@ -1,0 +1,52 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-09 15:18:45.693.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 15:18:45.695.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 15:18:45.695.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 15:18:45.695.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite OutputXPCTests started.
+◇ Suite APIWebSocketTests started.
+◇ Suite APIHTTPTests started.
+◇ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() started.
+◇ Test remoteErrorOnlyFailsItsMatchingRequest() started.
+◇ Test cancellationAndLateReplyCannotCompleteNextRequest() started.
+◇ Test webSocketRefusesRedirect() started.
+◇ Test receivesEventsWithoutAnRPC() started.
+◇ Test deadlineAndCallerCancellationEndHTTPWait() started.
+◇ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() started.
+◇ Test realHTTPRPCHealthAndProtocolErrors() started.
+◇ Test boundsPendingRequestsAndCloseCompletesWaiters() started.
+◇ Test refusesRedirectAndOversizedResponses() started.
+◇ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() started.
+◇ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() started.
+◇ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() started.
+◇ Test preCancelledTaskDoesNotSend() started.
+◇ Test malformedMessageFailsPendingRequests() started.
+◇ Test correlatesOutOfOrderRepliesAndInterleavedEvents() started.
+◇ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() started.
+✔ Test receivesEventsWithoutAnRPC() passed after 0.004 seconds.
+✔ Test preCancelledTaskDoesNotSend() passed after 0.003 seconds.
+✔ Test clientDisconnectBeforeAcknowledgementCannotReturnSuccess() passed after 0.005 seconds.
+✔ Test malformedMessageFailsPendingRequests() passed after 0.007 seconds.
+✔ Test correlatesOutOfOrderRepliesAndInterleavedEvents() passed after 0.007 seconds.
+✔ Test boundsPendingRequestsAndCloseCompletesWaiters() passed after 0.009 seconds.
+✔ Test eventOverflowClosesConnectionInsteadOfSilentlyDropping() passed after 0.010 seconds.
+✔ Test remoteErrorOnlyFailsItsMatchingRequest() passed after 0.013 seconds.
+✔ Test cancellationAndLateReplyCannotCompleteNextRequest() passed after 0.013 seconds.
+✔ Test disconnectFailsAllAndOldGenerationCannotAffectNewSocket() passed after 0.014 seconds.
+✔ Test twoConnectionsReceiveOnlyTheirOwnPersistedOutputBeforeReply() passed after 0.014 seconds.
+✔ Suite OutputXPCTests passed after 0.014 seconds.
+✔ Test timeoutIncludesBlockedSendAndReleasesPendingSlot() passed after 0.063 seconds.
+✔ Suite APIWebSocketTests passed after 0.063 seconds.
+✔ Test webSocketRefusesRedirect() passed after 0.157 seconds.
+✔ Test realWebSocketUsesBearerAndCorrelatesConcurrentReplies() passed after 0.162 seconds.
+✔ Test refusesRedirectAndOversizedResponses() passed after 0.168 seconds.
+✔ Test realHTTPRPCHealthAndProtocolErrors() passed after 0.172 seconds.
+✔ Test deadlineAndCallerCancellationEndHTTPWait() passed after 0.212 seconds.
+✔ Suite APIHTTPTests passed after 0.212 seconds.
+✔ Test run with 17 tests in 3 suites passed after 0.212 seconds.

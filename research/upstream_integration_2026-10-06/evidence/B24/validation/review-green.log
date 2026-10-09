@@ -1,0 +1,45 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/19] Write sources
+[5/19] Write swift-version--58304C5D6DBC2206.txt
+[7/19] Emitting module VPhoneCore
+[8/19] Compiling VPhoneCore VPhoneCreateRunner.swift
+[9/21] Compiling VPhoneCore VPhoneCreateCheckpoint.swift
+[10/21] Compiling VPhoneCore VPhoneCreateCheckpointStore.swift
+[10/27] Write Objects.LinkFileList
+[13/33] Linking vphone-helper
+[14/33] Linking vphone-launchpad-launcher
+[15/33] Applying vphone-helper
+[16/33] Applying vphone-launchpad-launcher
+[17/33] Linking vphone-launchpad
+[18/33] Applying vphone-launchpad
+[20/33] Emitting module VPhoneLaunchpadKitTests
+[21/33] Compiling VPhoneCoreTests ChildCancellationTests.swift
+[22/33] Emitting module VPhoneCoreTests
+[23/33] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[24/33] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneCreateOrchestrator.swift:470:9: error: switch must be exhaustive
+ 468 |         let command = "vphone-cli vm create --resume \(name)"
+ 469 |         let recreate = "or delete the VM (`vphone-cli vm delete \(name)`) and create it again"
+ 470 |         switch error {
+     |         |- error: switch must be exhaustive
+     |         `- note: add missing case: '.toolChangedDuringRun(recorded: let recorded, current: let current)'
+ 471 |         case let .artifactUnavailable(artifact, stage, rebuild):
+ 472 |             return ("artifact \(artifact) needed by \(stage.rawValue) was removed", [
+error: fatalError

@@ -1,0 +1,307 @@
+import ArchiveKit
+import Foundation
+
+/// Creating archives, and plain decompression.
+public enum VPhoneArchiveWriter {
+    public struct Progress: Sendable {
+        public let entriesWritten: Int
+        public let bytesWritten: Int64
+        public let currentPath: String
+    }
+
+    /// Pack `root` into `archive`.
+    ///
+    /// Paths inside the archive are relative to `root`, so unpacking anywhere
+    /// reproduces the tree rather than an absolute path.
+    ///
+    /// `topLevel` puts every member under one directory of that name, and adds
+    /// an entry for the directory itself — what `tar -C <parent> <name>` does.
+    /// `vm export` needs it: an export holds exactly one top-level bundle
+    /// directory, and import checks for exactly that.
+    ///
+    /// `excluding` takes `fnmatch` patterns matched against paths relative to
+    /// `root`, not against `topLevel/...`.
+    ///
+    /// `bytesPacked` reports the running total of file bytes copied, as they
+    /// are copied. `progress` fires once per entry, which is enough for a
+    /// listing but not for a progress bar: a VM bundle is one multi-gigabyte
+    /// `Disk.img` and a handful of small files, so a per-entry bar would sit
+    /// at zero for the whole export.
+    @discardableResult
+    public static func create(
+        archive: URL,
+        from root: URL,
+        topLevel: String? = nil,
+        format: VPhoneArchiveFormat = .gnutar,
+        compression: VPhoneArchiveCompression = .none,
+        excluding patterns: [String] = [],
+        progress: ((Progress) -> Void)? = nil,
+        bytesPacked: ((Int64) -> Void)? = nil,
+        isCancelled: (() -> Bool)? = nil,
+    ) throws -> Int {
+        let resolvedRoot = try VPhoneArchivePaths.resolved(root)
+        let outputParent = try VPhoneArchivePaths.resolved(archive.deletingLastPathComponent())
+        let outputPath = outputParent.appendingPathComponent(archive.lastPathComponent).path
+        guard outputPath != resolvedRoot.path, !outputPath.hasPrefix(resolvedRoot.path == "/" ? "/" : resolvedRoot.path + "/") else {
+            throw VPhoneArchiveError.writeFailed(path: archive.path, reason: "output must be outside the source tree")
+        }
+        if let topLevel, topLevel.isEmpty || topLevel.hasPrefix("/")
+            || topLevel.split(separator: "/").contains("..") {
+            throw VPhoneArchiveError.writeFailed(path: archive.path, reason: "invalid top-level archive path")
+        }
+        return try VPhoneArchiveOutput.publish(to: archive) { temporary in
+            // Names read from disk and written to pax headers are converted
+            // through this thread's LC_CTYPE; see withArchiveLocale.
+            try withArchiveLocale {
+                try createFile(archive: temporary, from: resolvedRoot, topLevel: topLevel,
+                               format: format, compression: compression, excluding: patterns,
+                               progress: progress, bytesPacked: bytesPacked, isCancelled: isCancelled)
+            }
+        }
+    }
+
+    private static func createFile(
+        archive: URL, from root: URL, topLevel: String?,
+        format: VPhoneArchiveFormat, compression: VPhoneArchiveCompression,
+        excluding patterns: [String], progress: ((Progress) -> Void)?,
+        bytesPacked: ((Int64) -> Void)?, isCancelled: (() -> Bool)?
+    ) throws -> Int {
+        let writer = archive_write_new()
+        defer { archive_write_free(writer) }
+
+        switch format {
+        case .gnutar: archive_write_set_format_gnutar(writer)
+        case .pax: archive_write_set_format_pax_restricted(writer)
+        case .ustar: archive_write_set_format_ustar(writer)
+        }
+
+        switch compression {
+        case .none:
+            break
+        case let .zstd(level):
+            archive_write_add_filter_zstd(writer)
+            try setFilterOption(writer, "zstd", "compression-level", String(level))
+            // threads=0 means "as many as there are cores".
+            try setFilterOption(writer, "zstd", "threads", "0")
+        case let .xz(level):
+            archive_write_add_filter_xz(writer)
+            try setFilterOption(writer, "xz", "compression-level", String(level))
+            // The bundled liblzma does carry the multithreaded encoder, which
+            // is worth about 4.8x -- but only above one xz block, roughly
+            // 192 MiB at level 9. A smaller archive gets no benefit, and that
+            // is arithmetic rather than a fault. See
+            // Research/Host/libarchive_xcframework_validation.md.
+            try setFilterOption(writer, "xz", "threads", "0")
+        case let .gzip(level):
+            archive_write_add_filter_gzip(writer)
+            try setFilterOption(writer, "gzip", "compression-level", String(level))
+        }
+
+        guard archive_write_open_filename(writer, archive.path) == ARCHIVE_OK else {
+            throw VPhoneArchiveError.cannotOpen(
+                path: archive.path,
+                reason: archiveErrorString(writer),
+            )
+        }
+
+        let disk = archive_read_disk_new()
+        archive_read_disk_set_standard_lookup(disk)
+        // Read metadata by absolute path without starting libarchive's tree
+        // walker, which temporarily changes the process working directory.
+        // Other threads (including subprocess launches) must keep their cwd.
+        // Disable AppleDouble copyfile packaging as before; ACLs, xattrs,
+        // flags and sparse maps are still read by entry_from_file.
+        archive_read_disk_set_behavior(disk, 0)
+        archive_read_disk_set_symlink_physical(disk)
+        defer { archive_read_free(disk) }
+
+        // Without a link resolver, every name of a hardlinked file is packed
+        // as its own full copy, and unpacking gives back separate files. That
+        // matters here: iosbinpack64 and the procursus bootstrap are full of
+        // hardlinks, so flattening them silently doubles what lands on the
+        // guest volume and breaks anything that expected the identity. GNU tar
+        // does this by default, which is how the difference was found — see
+        // `vphone-archive fingerprint`.
+        //
+        // With the tar strategy the resolver never defers: the first name is
+        // returned as-is, and later ones come back as hardlink references with
+        // size 0, which the data copy below already skips.
+        let resolver = archive_entry_linkresolver_new()
+        archive_entry_linkresolver_set_strategy(resolver, archive_format(writer))
+        defer { archive_entry_linkresolver_free(resolver) }
+
+        let rootPath = root.path
+        var written = 0
+        var bytes: Int64 = 0
+
+        func pack(_ absolute: String) throws {
+            if isCancelled?() == true { throw VPhoneArchiveError.cancelled }
+
+            let relative = VPhoneArchivePaths.relative(absolute, under: rootPath)
+            // Prune an excluded directory before enumerating its children.
+            if !relative.isEmpty, patterns.contains(where: { matches(relative, pattern: $0) }) {
+                return
+            }
+
+            let entry = archive_entry_new()
+            defer { archive_entry_free(entry) }
+            archive_entry_set_pathname(entry, absolute)
+            let status = archive_read_disk_entry_from_file(disk, entry, -1, nil)
+            guard status == ARCHIVE_OK || status == ARCHIVE_WARN else {
+                throw VPhoneArchiveError.readFailed(path: absolute, reason: archiveErrorString(disk))
+            }
+            let isDirectory = archive_entry_filetype(entry) == UInt32(S_IFDIR)
+
+            // Without a top-level name, omit the root entry but walk its children.
+            if let stored = storedPath(relative, under: topLevel) {
+                archive_entry_set_pathname(entry, stored)
+                // Resolve hardlinks after assigning archive-relative paths.
+                var resolved: OpaquePointer? = entry
+                var deferred: OpaquePointer?
+                archive_entry_linkify(resolver, &resolved, &deferred)
+                if let resolved {
+                    guard archive_write_header(writer, resolved) == ARCHIVE_OK else {
+                        throw VPhoneArchiveError.writeFailed(path: stored, reason: archiveErrorString(writer))
+                    }
+                    if archive_entry_size(resolved) > 0 {
+                        try copyFile(at: absolute, into: writer, isCancelled: isCancelled) { chunk in
+                            bytes += chunk
+                            bytesPacked?(bytes)
+                        }
+                    }
+                    written += 1
+                    progress?(Progress(entriesWritten: written, bytesWritten: bytes, currentPath: stored))
+                }
+            }
+
+            // Only physical directories are descended into; symlink targets
+            // are stored without traversing them.
+            if isDirectory {
+                for name in try FileManager.default.contentsOfDirectory(atPath: absolute) {
+                    try pack((absolute as NSString).appendingPathComponent(name))
+                }
+            }
+        }
+        try pack(rootPath)
+
+        guard archive_write_close(writer) == ARCHIVE_OK else {
+            throw VPhoneArchiveError.writeFailed(path: archive.path, reason: archiveErrorString(writer))
+        }
+        return written
+    }
+
+    /// Decompress a single-stream file — `zstd -d`, and its xz and gzip
+    /// equivalents.
+    ///
+    /// This is not unpacking: `bootstrap-iphoneos-arm64.tar.zst` is one
+    /// compressed file, and what comes out is the tar. libarchive expresses
+    /// that as the "raw" format, which presents the stream as one nameless
+    /// entry.
+    public static func decompress(_ input: URL, to output: URL) throws {
+        try VPhoneArchiveOutput.publish(to: output) { temporary in
+            try decompressFile(input, to: temporary)
+        }
+    }
+
+    private static func decompressFile(_ input: URL, to output: URL) throws {
+        let reader = archive_read_new()
+        archive_read_support_filter_all(reader)
+        archive_read_support_format_raw(reader)
+        defer { archive_read_free(reader) }
+
+        guard archive_read_open_filename(reader, input.path, 10240) == ARCHIVE_OK else {
+            throw VPhoneArchiveError.cannotOpen(
+                path: input.path,
+                reason: archiveErrorString(reader),
+            )
+        }
+
+        var entry: OpaquePointer?
+        guard archive_read_next_header(reader, &entry) == ARCHIVE_OK else {
+            throw VPhoneArchiveError.readFailed(
+                path: input.path,
+                reason: archiveErrorString(reader),
+            )
+        }
+
+        FileManager.default.createFile(atPath: output.path, contents: nil)
+        guard let handle = FileHandle(forWritingAtPath: output.path) else {
+            throw VPhoneArchiveError.cannotOpen(path: output.path, reason: "cannot create")
+        }
+        defer { try? handle.close() }
+
+        var buffer = [UInt8](repeating: 0, count: 1 << 20)
+        while true {
+            let read = buffer.withUnsafeMutableBytes {
+                archive_read_data(reader, $0.baseAddress, $0.count)
+            }
+            if read == 0 {
+                break
+            }
+            guard read > 0 else {
+                throw VPhoneArchiveError.readFailed(
+                    path: input.path,
+                    reason: archiveErrorString(reader),
+                )
+            }
+            try handle.write(contentsOf: buffer[0 ..< Int(read)])
+        }
+    }
+
+    // MARK: - Plumbing
+
+    private static func setFilterOption(
+        _ writer: OpaquePointer?,
+        _ filter: String,
+        _ key: String,
+        _ value: String,
+    ) throws {
+        guard archive_write_set_filter_option(writer, filter, key, value) == ARCHIVE_OK else {
+            throw VPhoneArchiveError.writeFailed(
+                path: "<filter \(filter)>",
+                reason: archiveErrorString(writer),
+            )
+        }
+    }
+
+    private static func matches(_ path: String, pattern: String) -> Bool {
+        fnmatch(pattern, path, 0) == 0
+            || fnmatch(pattern, (path as NSString).lastPathComponent, 0) == 0
+    }
+
+    /// What this member is called inside the archive, or nil to skip it.
+    private static func storedPath(_ relative: String, under topLevel: String?) -> String? {
+        guard let topLevel else { return relative.isEmpty ? nil : relative }
+        return relative.isEmpty ? topLevel : topLevel + "/" + relative
+    }
+
+    private static func copyFile(
+        at path: String,
+        into writer: OpaquePointer?,
+        isCancelled: (() -> Bool)?,
+        onBytes: (Int64) -> Void,
+    ) throws {
+        guard let handle = FileHandle(forReadingAtPath: path) else {
+            throw VPhoneArchiveError.cannotOpen(path: path, reason: "cannot read")
+        }
+        defer { try? handle.close() }
+
+        while try autoreleasepool(invoking: { () throws -> Bool in
+            if isCancelled?() == true { throw VPhoneArchiveError.cancelled }
+            guard let chunk = try handle.read(upToCount: 1 << 20), !chunk.isEmpty else { return false }
+            try chunk.withUnsafeBytes { bytes in
+                var offset = 0
+                while offset < bytes.count {
+                    if isCancelled?() == true { throw VPhoneArchiveError.cancelled }
+                    let sent = archive_write_data(writer, bytes.baseAddress!.advanced(by: offset), bytes.count - offset)
+                    guard sent > 0, sent <= bytes.count - offset else {
+                        throw VPhoneArchiveError.writeFailed(path: path, reason: archiveErrorString(writer))
+                    }
+                    offset += sent
+                    onBytes(Int64(sent))
+                }
+            }
+            return true
+        }) {}
+    }
+}

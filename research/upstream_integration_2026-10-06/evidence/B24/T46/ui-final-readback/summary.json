@@ -1,0 +1,66 @@
+{
+  "scope": "real signed UI create + controlled HTTP input + confirmed Quit; no VM",
+  "readback_at": "2026-10-09T06:36:39.402896+00:00",
+  "app_pid": 3031,
+  "create_pid": 7155,
+  "known_worker_pids": [
+    7206,
+    7222
+  ],
+  "remaining_known_processes": [],
+  "create_status_exit": 0,
+  "overall_status": "interrupted",
+  "live": {
+    "bundle_lock_held": false,
+    "create_run_in_progress": false
+  },
+  "log_size": 8107,
+  "log_sha256": "e50741560982861d01663d3a098b334d01e824dbd2613e7801f0b523ff72a972",
+  "has_final_interrupted_tail": true,
+  "observer_start_epoch": 1791527716.744645,
+  "first_app_absent_elapsed": 34.92685175000224,
+  "first_create_absent_elapsed": 35.971705582982395,
+  "observer_last_elapsed": 82.58423604100244,
+  "first_app_absent_log_size": 5043,
+  "first_create_absent_log_size": 8107,
+  "limitations": [
+    "Create process exit code is not directly reaped after app exits.",
+    "The input is controlled incomplete HTTP data, not real firmware.",
+    "Only observed worker identities are established."
+  ],
+  "passed": true,
+  "observer_events": {
+    "first_sigint_log": {
+      "elapsed": 34.92685175000224,
+      "utc": "2026-10-09T06:35:51.671497+00:00",
+      "size": 5043
+    },
+    "first_app_absent": {
+      "elapsed": 34.92685175000224,
+      "utc": "2026-10-09T06:35:51.671497+00:00",
+      "size": 5043
+    },
+    "first_create_absent": {
+      "elapsed": 35.971705582982395,
+      "utc": "2026-10-09T06:35:52.716351+00:00",
+      "size": 8107
+    },
+    "first_all_workers_absent": {
+      "elapsed": 35.971705582982395,
+      "utc": "2026-10-09T06:35:52.716351+00:00",
+      "size": 8107
+    },
+    "first_final_tail": {
+      "elapsed": 35.971705582982395,
+      "utc": "2026-10-09T06:35:52.716351+00:00",
+      "size": 8107
+    }
+  },
+  "app_absence_to_final_tail_seconds": 1.0448538329801522,
+  "observer_completed_seconds": 179.98992816597456,
+  "observer_completed_samples": 860,
+  "final_observed_processes": [],
+  "final_observed_log_size": 8107,
+  "signature_verification_exit": 0,
+  "artifact_hashes": "artifact-hashes.json"
+}

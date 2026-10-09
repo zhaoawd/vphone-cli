@@ -1,0 +1,179 @@
+{
+  "bundle" : "\/private\/tmp\/vphone-b24-t46\/cli-cancel-05\/library\/t46-create",
+  "checkpoint" : {
+    "artifacts" : [
+
+    ],
+    "attempt_id" : "7db75acb-19e2-4f10-b573-6af02e7c5a8f",
+    "attempts" : [
+      {
+        "accepted_tool_change" : false,
+        "attempt_id" : "7db75acb-19e2-4f10-b573-6af02e7c5a8f",
+        "checks" : {
+
+        },
+        "kind" : "create",
+        "pid" : 84797,
+        "started_at" : "2026-10-09T06:20:34Z"
+      }
+    ],
+    "bundle_identity" : {
+      "directory_id" : "16777233:587083130",
+      "name" : "t46-create",
+      "path" : "\/tmp\/vphone-b24-t46\/cli-cancel-05\/library\/t46-create"
+    },
+    "created_at" : "2026-10-09T06:20:34Z",
+    "creation_id" : "a5ff25eb-7b12-4107-b6d4-8e030cdf3dee",
+    "effective_options" : {
+      "cloudos_source" : {
+        "display" : "http:\/\/127.0.0.1:54974\/T46-cloudOS.ipsw",
+        "redacted" : false,
+        "sha256" : "70129305bb2fab6989e208382b2afc9336b753d8cc0d94665bd9a7e804cb4679"
+      },
+      "cpu_count" : 8,
+      "disk_size_gb" : 8,
+      "enable_frida" : false,
+      "force_dsc_max_slide" : false,
+      "iphone_source" : {
+        "display" : "http:\/\/127.0.0.1:54974\/T46-iPhone.ipsw",
+        "redacted" : false,
+        "sha256" : "17e6498e2404a99bc15e58168981cfbdf58f2354d4fe49d0e09fa005a61bb6da"
+      },
+      "memory_mb" : 8192,
+      "variant" : "regular"
+    },
+    "inputs_digest" : "ed5919225ac3bdc0d3d5844d9e8b6be30e7aaceabd269d02209de0db55eb0239",
+    "schema_version" : 1,
+    "stages" : [
+      {
+        "attempt_id" : "7db75acb-19e2-4f10-b573-6af02e7c5a8f",
+        "error" : "interrupted by SIGINT at 2026-10-09T06:20:36Z; every stage process ended before vm create exited",
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "pid" : 84797,
+        "stage" : "prepare",
+        "started_at" : "2026-10-09T06:20:34Z",
+        "status" : "running"
+      },
+      {
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "stage" : "patch",
+        "status" : "pending"
+      },
+      {
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "stage" : "restore",
+        "status" : "pending"
+      },
+      {
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "stage" : "cfw",
+        "status" : "pending"
+      },
+      {
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "stage" : "first_boot",
+        "status" : "pending"
+      },
+      {
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "reason" : "jb_finalize applies only to variants jb and exp",
+        "stage" : "jb_finalize",
+        "status" : "not_applicable"
+      },
+      {
+        "evidence" : {
+
+        },
+        "history" : [
+
+        ],
+        "inputs" : {
+
+        },
+        "outputs" : [
+
+        ],
+        "stage" : "verification",
+        "status" : "pending"
+      }
+    ],
+    "tool" : {
+      "executable_sha256" : "e28ecf5d5e00820718ca2014c428edc7e01ffed75b120bd928e0fe68af08ab67",
+      "stage_contract_version" : 1
+    },
+    "updated_at" : "2026-10-09T06:20:36Z"
+  },
+  "checkpoint_overall_status" : "interrupted",
+  "live" : {
+    "bundle_lock_held" : false,
+    "create_run_in_progress" : false
+  },
+  "next_stage" : "prepare",
+  "overall_status" : "interrupted"
+}

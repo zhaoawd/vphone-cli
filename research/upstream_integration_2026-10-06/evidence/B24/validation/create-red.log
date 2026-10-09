@@ -1,0 +1,1690 @@
+warning: 'machokit': /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/202] Compiling MCRegisterInfo.c
+[3/202] Write sources
+[3/202] Copying InfoPlist.xcstrings
+[3/202] /Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cliPackageTests.derived/runner.swift
+[6/203] Compiling MCInstrDesc.c
+[6/203] Copying libusbmuxd.a
+[6/203] Copying libtatsu.a
+[9/203] Copying libssl.a
+[10/203] Write sources
+[11/203] Copying Info.plist
+[12/204] Copying libplist.a
+[12/204] Copying Localizable.xcstrings
+[12/204] Copying libimobiledevice_glue.a
+[12/204] Copying libimobiledevice.a
+[16/204] Copying libarchive.framework
+[17/204] Write sources
+[42/204] Compiling MCInst.c
+[43/204] Write sources
+[51/204] Compiling WASMModule.c
+[52/204] Compiling MCInstPrinter.c
+[53/204] Compiling MachOKitC mach-o-linux.c
+[54/204] Compiling Mapping.c
+[55/204] Compiling utils.c
+[56/204] Compiling XtensaModule.c
+[57/204] Write swift-version--58304C5D6DBC2206.txt
+[58/204] Compiling AArch64BaseInfo.c
+[59/204] Compiling cs.c
+[60/204] Compiling XtensaInstPrinter.c
+[61/204] Compiling XtensaMapping.c
+[62/204] Compiling XCoreModule.c
+[63/204] Compiling XCoreMapping.c
+[64/245] Compiling AArch64Disassembler.c
+[65/245] Compiling XtensaDisassembler.c
+[66/250] Compiling XCoreInstPrinter.c
+[67/250] Compiling XCoreDisassembler.c
+[68/250] Compiling X86Module.c
+[70/250] Emitting module OpenSSL
+[70/250] Compiling X86Mapping.c
+[71/250] Compiling X86IntelInstPrinter.c
+[72/250] Compiling X86InstPrinterCommon.c
+[73/250] Compiling X86DisassemblerDecoder.c
+[75/250] Compiling OpenSSL OpenSSL.swift
+[75/250] Compiling X86Disassembler.c
+[76/250] Compiling X86ATTInstPrinter.c
+[77/250] Compiling WASMMapping.c
+[78/250] Compiling WASMInstPrinter.c
+[79/250] Compiling WASMDisassembler.c
+[80/250] Compiling TriCoreModule.c
+[81/250] Compiling TriCoreMapping.c
+[83/250] Compiling VPhoneSign VPhoneSignBytes.swift
+[84/251] Compiling VPhoneSign VPhoneSignError.swift
+[85/251] Compiling VPhoneAPIKit VPhoneAPIWire.swift
+[86/252] Compiling VPhoneDaemonWire APIFileUploadTransaction.swift
+[87/252] Compiling VPhoneAPIKit VPhoneAPISocket.swift
+[88/252] Compiling VPhoneAPIKit VPhoneAPIUpload.swift
+[89/252] Compiling VPhoneAPIKit VPhoneAPIValue.swift
+[90/252] Compiling VPhoneAPIKit VPhoneAPIWebSocket.swift
+[90/252] Compiling TriCoreInstPrinter.c
+[92/252] Compiling VPhoneSign VPhoneMachOImage.swift
+[93/252] Compiling VPhoneAPIKit VPhoneAPIHTTPExchange.swift
+[94/252] Compiling VPhoneAPIKit VPhoneAPIProxy.swift
+[95/252] Compiling VPhoneSign VPhoneSignPKCS12.swift
+[96/252] Compiling VPhoneSign VPhoneCodeSignature.swift
+[97/252] Compiling Dynamic Logger.swift
+[98/252] Compiling Dynamic Invocation.swift
+[99/252] Compiling Dynamic TypeMapping.swift
+[100/252] Compiling Dynamic Dynamic.swift
+[101/252] Emitting module Dynamic
+[102/252] Emitting module VPhoneAPIKit
+[105/252] Compiling VPhoneAPIKit VPhoneAPIClient.swift
+[106/252] Compiling VPhoneAPIKit VPhoneAPIDownload.swift
+[107/252] Compiling VPhoneAPIKit VPhoneAPIRequestGate.swift
+[108/252] Compiling VPhoneAPIKit VPhoneAPISession.swift
+[108/252] Compiling TMS320C64xModule.c
+[110/252] Compiling FileIO system.swift
+[110/252] Compiling TriCoreDisassembler.c
+[112/252] Compiling FileIO ConcatenatedStreamedFile.swift
+[113/252] Emitting module FileIO
+[114/252] Compiling FileIO StreamedFile.swift
+[115/252] Compiling Img4tool Img4tool.swift
+[116/252] Compiling FileIO FileIO.swift
+[117/252] Compiling FileIO ConcatenatedMemoryMappedFile.swift
+[118/252] Compiling FileIO MemoryMappedFile.swift
+[119/252] Emitting module VPhoneSign
+[121/252] Compiling TMS320C64xInstPrinter.c
+[123/252] Compiling Img4tool DER.swift
+[124/252] Compiling Img4tool Crypto.swift
+[125/252] Emitting module Img4tool
+[126/252] Compiling Img4tool Decompression.swift
+[126/252] Compiling TMS320C64xMapping.c
+[127/252] Compiling SystemZModule.c
+[129/252] Compiling VPhoneDaemonWire APIRequest.swift
+[130/252] Compiling VPhoneDaemonWire EnvironmentTransaction.swift
+[131/252] Compiling VPhoneDaemonWire APISessionIdentity.swift
+[132/252] Emitting module VPhoneDaemonWire
+[132/252] Compiling TMS320C64xDisassembler.c
+[133/252] Compiling SystemZInstPrinter.c
+[134/252] Compiling SystemZMCTargetDesc.c
+[136/252] Compiling VPhoneSign VPhoneSigner.swift
+[137/252] Compiling VPhoneAPIKit VPhoneStartupUnlock.swift
+[137/256] Compiling SystemZDisassemblerExtension.c
+[138/256] Compiling SparcModule.c
+[139/256] Compiling SystemZMapping.c
+[140/264] Compiling SparcMapping.c
+[141/273] Compiling SparcDisassemblerExtension.c
+[142/273] Compiling SparcInstPrinter.c
+[143/273] Compiling SHModule.c
+[144/273] Compiling SystemZDisassembler.c
+[145/273] Compiling SparcDisassembler.c
+[146/273] Compiling SHInstPrinter.c
+[147/273] Compiling RISCVModule.c
+[148/273] Compiling RISCVDisassemblerExtension.c
+[149/273] Compiling SHDisassembler.c
+[150/273] Compiling RISCVBaseInfo.c
+[151/273] Compiling PPCModule.c
+[152/273] Compiling RISCVInstPrinter.c
+[153/273] Compiling PPCInstPrinter.c
+[154/273] Compiling RISCVDisassembler.c
+[155/273] Compiling MipsModule.c
+[156/273] Compiling PPCMapping.c
+[157/273] Compiling PPCDisassembler.c
+[158/273] Compiling RISCVMapping.c
+[159/273] Compiling MipsInstPrinter.c
+[160/273] Compiling MOS65XXModule.c
+[161/273] Compiling MOS65XXDisassembler.c
+[162/273] Compiling M68KModule.c
+[163/273] Compiling M68KInstPrinter.c
+[164/273] Compiling MipsMapping.c
+[165/273] Compiling M680XModule.c
+[166/273] Compiling M680XInstPrinter.c
+[167/273] Compiling M680XDisassembler.c
+[168/273] Compiling LoongArchModule.c
+[169/273] Compiling LoongArchInstPrinter.c
+[170/273] Compiling LoongArchDisassemblerExtension.c
+[171/273] Compiling M68KDisassembler.c
+[172/273] Compiling LoongArchMapping.c
+[173/273] Compiling HPPAModule.c
+[174/273] Compiling HPPAMapping.c
+[175/273] Compiling HPPAInstPrinter.c
+[176/273] Compiling LoongArchDisassembler.c
+[177/273] Compiling MipsDisassembler.c
+[178/273] Compiling EVMModule.c
+[179/273] Compiling HPPADisassembler.c
+[180/273] Compiling EVMMapping.c
+[181/273] Compiling EVMInstPrinter.c
+[182/273] Compiling EVMDisassembler.c
+[183/273] Compiling BPFModule.c
+[184/273] Compiling BPFMapping.c
+[185/273] Compiling BPFInstPrinter.c
+[186/273] Compiling BPFDisassembler.c
+[187/273] Compiling AlphaModule.c
+[188/273] Compiling AlphaMapping.c
+[189/273] Compiling AlphaInstPrinter.c
+[190/273] Compiling AlphaDisassembler.c
+[190/273] Compiling ARMModule.c
+[192/273] Compiling ARMDisassemblerExtension.c
+[193/273] Compiling ARMBaseInfo.c
+[194/273] Compiling ARCModule.c
+[194/273] Compiling ARMInstPrinter.c
+[196/273] Compiling ARCMapping.c
+[197/273] Compiling ARCInstPrinter.c
+[198/273] Compiling AArch64Module.c
+[199/273] Compiling ARCDisassembler.c
+[200/273] Compiling ARMMapping.c
+[201/273] Compiling AArch64DisassemblerExtension.c
+[202/273] Write sources
+[206/273] Compiling SStream.c
+[207/288] Compiling AArch64InstPrinter.c
+[208/288] Write sources
+[211/290] Emitting module ArchiveKit
+[212/290] Compiling ArchiveKit ArchiveKit.swift
+[213/290] Emitting module BinaryParseSupport
+[214/291] Compiling BinaryParseSupport MemorySequence.swift
+[215/291] Compiling BinaryParseSupport StringTableEntry.swift
+[216/291] Compiling BinaryParseSupport BitFlags.swift
+[217/291] Compiling BinaryParseSupport UnsafePointer+.swift
+[218/291] Compiling BinaryParseSupport Endian.swift
+[219/293] Compiling BinaryParseSupport BinaryParseSupport.swift
+[220/293] Compiling BinaryParseSupport Data+.swift
+[221/293] Compiling BinaryParseSupport FileHandle+.swift
+[222/293] Compiling BinaryParseSupport String+.swift
+[223/293] Compiling BinaryParseSupport LayoutWrapper.swift
+[224/293] Compiling BinaryParseSupport StringTable.swift
+[225/293] Compiling BinaryParseSupport DataSequence.swift
+[225/293] Compiling ARMDisassembler.c
+[227/303] Compiling BinaryParseSupport UnicodeStrings.swift
+[227/303] Compiling AArch64Mapping.c
+[229/310] Emitting module FileIOBinary
+[230/310] Compiling VPhoneArchiveKit VPhoneArchiveLocale.swift
+[231/310] Compiling VPhoneArchiveKit VPhoneArchiveOptions.swift
+[232/311] Compiling ArgumentParserToolInfo ToolInfo.swift
+[233/311] Emitting module ArgumentParserToolInfo
+[234/311] Compiling VPhoneArchiveKit VPhoneBoardDeviceTreeSource.swift
+[235/357] Emitting module VPhoneArchiveKit
+[236/357] Compiling ArgumentParser ArgumentVisibility.swift
+[237/357] Compiling ArgumentParser CompletionKind.swift
+[238/357] Compiling VPhoneArchiveKit VPhoneArchiveWriter.swift
+[239/357] Compiling VPhoneArchiveKit VPhoneArchivePaths.swift
+[240/357] Compiling VPhoneArchiveKit VPhoneArchiveOutput.swift
+[241/357] Compiling VPhoneArchiveKit VPhoneArchiveReader.swift
+[242/357] Compiling FileIOBinary FileIOBinary.swift
+[243/357] Compiling FileIOBinary _FileIOProtocol+.swift
+[244/357] Compiling VPhoneSignTests VPhoneSignIntegrationTests.swift
+[245/357] Compiling VPhoneSignTests VPhoneSignFixtures.swift
+[246/357] Compiling VPhoneSignTests VPhoneSignBlobs.swift
+[247/357] Compiling VPhoneSignTests VPhoneSignEntitlementsTests.swift
+[248/357] Compiling VPhoneSignTests VPhoneSignStyleTests.swift
+[249/357] Compiling VPhoneSignTests VPhoneSignParityTests.swift
+[250/530] Emitting module ArgumentParser
+[251/536] Compiling VPhoneArchiveKit VPhoneTreeFingerprint.swift
+[252/536] Compiling AppleMobileDeviceLibrary AppleMobileDeviceLibrary.swift
+[253/536] Emitting module AppleMobileDeviceLibrary
+[254/585] Emitting module VPhoneDaemonWireTests
+[255/585] Compiling VPhoneDaemonWireTests APIRequestTests.swift
+[256/585] Compiling VPhoneDaemonWireTests APIFileUploadTests.swift
+[257/585] Compiling VPhoneDaemonWireTests EnvironmentTransactionTests.swift
+[258/585] Compiling VPhoneCore VPhoneShutdownPolicy.swift
+[259/585] Compiling VPhoneCore VPhoneSystemLocationController.swift
+[260/585] Compiling VPhoneCore VPhoneVMLock.swift
+[261/585] Compiling VPhoneCore VPhoneLibrary.swift
+[262/585] Compiling VPhoneCore VPhoneLibraryLock.swift
+[263/585] Compiling VPhoneCore VPhoneLogWriter.swift
+[264/585] Emitting module VPhoneSignTests
+[265/585] Compiling VPhoneSignTests VPhoneSignCommandSpaceTests.swift
+[266/585] Compiling VPhoneBundleStore VPhoneLaunchpadLauncherRequest.swift
+[267/585] Compiling VPhoneBundleStore VPhoneMachOArchitectures.swift
+[268/585] Compiling ArgumentParser Tree.swift
+[269/585] Compiling ArgumentParser CodingKeyValidator.swift
+[270/585] Compiling ArgumentParser NonsenseFlagsValidator.swift
+[271/585] Compiling ArgumentParser ParsableArgumentsValidation.swift
+[272/585] Compiling ArgumentParser PositionalArgumentsValidator.swift
+[273/585] Compiling ArgumentParser UniqueNamesValidator.swift
+[274/585] Compiling VPhoneCore VPhoneHostSecurityPolicy.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[275/585] Compiling VPhoneCore VPhoneIPSWCache.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[276/585] Compiling VPhoneCore VPhoneIPSWCacheAdoption.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[277/585] Compiling VPhoneCore VPhoneLaunchLayout.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[278/585] Compiling VPhoneCore VPhoneResources.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[279/585] Compiling VPhoneCore VPhoneRestoreInfo.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[280/585] Compiling VPhoneCore VPhoneRestoreOps.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[281/585] Compiling VPhoneCore VPhoneCreateRunner.swift
+[282/585] Compiling VPhoneCore VPhoneDeviceIdentityCheck.swift
+[283/585] Compiling VPhoneCore VPhoneDiagnosticChecks.swift
+[284/585] Compiling VPhoneCore VPhoneDiagnostics.swift
+[285/585] Compiling VPhoneCore VPhoneFileDigest.swift
+[286/585] Compiling VPhoneCore VPhoneFirmwareCatalog.swift
+[287/585] Compiling VPhoneCore VPhoneFirmwarePicker.swift
+[288/585] Compiling VPhoneCore HostControlClient.swift
+[289/585] Compiling VPhoneCore HostControlIO.swift
+[290/585] Compiling VPhoneCore VPhoneBootPatterns.swift
+[291/585] Compiling VPhoneCore VPhoneBundle.swift
+[292/585] Compiling VPhoneCore VPhoneBundleGuard.swift
+[293/585] Compiling VPhoneCore VPhoneBundleOps.swift
+[294/585] Compiling VPhoneCore VPhoneBundleReport.swift
+[295/585] Compiling VPhoneCore VPhoneChildCancellation.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[296/585] Compiling VPhoneCore VPhoneClipboardTransfer.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[297/585] Compiling VPhoneCore VPhoneCloneCopy.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[298/585] Compiling VPhoneCore VPhoneCoreBundleVersion.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[299/585] Compiling VPhoneCore VPhoneCreateCheckpoint.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[300/585] Compiling VPhoneCore VPhoneCreateCheckpointStore.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[300/585] Compiling ipsw.c
+[301/585] Compiling fdr.c
+[302/585] Compiling restore.c
+[303/585] Compiling download.c
+[304/585] Compiling asr.c
+[305/585] Compiling recovery.c
+[306/585] Compiling normal.c
+[307/585] Compiling limera1n.c
+[309/585] Emitting module VPhoneBundleStore
+[310/585] Compiling VPhoneBundleStore VPhoneBundleReceipt.swift
+[311/585] Compiling VPhoneBundleStore VPhoneBundleCodeSignature.swift
+[312/585] Compiling VPhoneBundleStore VPhoneCoreBundleStore.swift
+[313/585] Compiling VPhoneCore VPhoneMachineBinding.swift
+[314/585] Compiling VPhoneCore VPhoneMachineBindingPersistence.swift
+[315/585] Compiling VPhoneCore VPhoneManagedProcess.swift
+[316/585] Compiling VPhoneCore VPhoneNVRAMStorage.swift
+[317/585] Compiling VPhoneCore VPhoneNativeTransfer.swift
+[318/585] Compiling VPhoneCore VPhoneNetworking.swift
+[319/585] Compiling VPhoneCore VPhonePortForwardPlan.swift
+[320/585] Compiling VPhoneCore VPhoneProcessIdentity.swift
+[321/585] Compiling VPhoneCore VPhoneProcessRunner.swift
+[322/585] Compiling MachOKit AotCodeFragment.swift
+[323/585] Compiling MachOKit AotCodeFragmentType.swift
+[324/585] Compiling MachOKit AotBranchData.swift
+[324/585] Compiling dfu.c
+[325/585] Compiling img4.c
+[326/585] Compiling img3.c
+[327/585] Compiling ace3.c
+[328/585] Compiling mbn.c
+[329/585] Compiling ftab.c
+[330/588] Compiling log.c
+[330/588] Compiling locking.c
+[332/588] Compiling fls.c
+[333/588] Compiling common.c
+[334/588] Compiling vphone_zip_stub.c
+[335/588] Compiling deviceinterfaced.c
+[336/588] Compiling idevicerestore.c
+[337/588] Compiling vphone_restore_bridge.c
+[339/588] Emitting module Capstone
+[340/588] Compiling Capstone Disassembler.swift
+[341/588] Compiling Capstone Instruction.swift
+[342/588] Compiling Capstone CapstoneError.swift
+[343/588] Compiling VPhoneBundleStoreTests LauncherPolicyTests.swift
+[343/588] Compiling MobileRecoveryCore libirecovery.c
+[345/597] Compiling VPhoneRestore VPhoneRestoreBackendError.swift
+[346/597] Compiling VPhoneRestore VPhoneRecoveryProbe.swift
+[347/597] Compiling VPhoneRestore VPhoneRestoreIdentity.swift
+[348/597] Compiling VPhoneRestore VPhoneRestoreRunner.swift
+[349/597] Compiling VPhoneRestore VPhoneRestoreOptions.swift
+[350/597] Compiling VPhoneRestore VPhoneRestoreLayout.swift
+[351/597] Compiling VPhoneRestore VPhoneRestoreService.swift
+[352/597] Emitting module VPhoneRestore
+[353/597] Compiling VPhoneRestore VPhoneRestoreTicket.swift
+[354/598] Compiling VPhoneRestore VPhoneRestoreEvent.swift
+[355/606] Compiling VPhoneAPIKitTests APIWireTests.swift
+[356/607] Emitting module VPhoneBundleStoreTests
+[357/607] Compiling VPhoneBundleStoreTests CoreBundleStoreTests.swift
+[358/607] Emitting module VPhoneRestoreTests
+[359/607] Compiling VPhoneAPIKitTests APISessionTests.swift
+[360/607] Compiling VPhoneAPIKitTests APIUploadTests.swift
+[361/607] Compiling VPhoneAPIKitTests APIWebSocketTests.swift
+[362/607] Emitting module VPhoneAPIKitTests
+[363/607] Compiling VPhoneAPIKitTests APIRequestGateTests.swift
+[366/607] Compiling VPhoneAPIKitTests APIProxyTests.swift
+[367/607] Compiling VPhoneRestoreTests RestoreOptionsTests.swift
+[368/607] Compiling VPhoneRestoreTests RestoreSafetyTests.swift
+[369/607] Compiling VPhoneRestoreTests RestoreRunnerTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneRestoreTests/RestoreRunnerTests.swift:142:13: warning: result of call to 'withTemporaryDirectory' is unused [#no-usage]
+140 |         // `VPhoneRestoreService` finds the restore tree BEFORE it starts a run,
+141 |         // so an empty bundle never reaches idevicerestore at all.
+142 |         try withTemporaryDirectory { root in
+    |             `- warning: result of call to 'withTemporaryDirectory' is unused [#no-usage]
+143 |             #expect(throws: VPhoneRestoreBackendError.noRestoreDirectory(root)) {
+144 |                 try VPhoneRestoreService.fetchSHSH(vmDir: root, ecid: nil, udid: nil, out: nil)
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneRestoreTests/RestoreRunnerTests.swift:150:13: warning: result of call to 'withTemporaryDirectory' is unused [#no-usage]
+148 | 
+149 |     @Test func `restoring stops at the missing restore tree`() throws {
+150 |         try withTemporaryDirectory { root in
+    |             `- warning: result of call to 'withTemporaryDirectory' is unused [#no-usage]
+151 |             #expect(throws: VPhoneRestoreBackendError.noRestoreDirectory(root)) {
+152 |                 try VPhoneRestoreService.restore(
+[370/607] Compiling VPhoneRestoreTests RestoreLayoutTests.swift
+[371/607] Compiling VPhoneRestoreTests RestoreIdentityTests.swift
+[372/607] Compiling VPhoneRestoreTests RestoreTicketTests.swift
+[373/607] Compiling VPhoneRestoreTests RestoreEventTests.swift
+[398/631] Compiling VPhoneAPIKitTests StartupUnlockTests.swift
+[399/631] Compiling MachOKit DataInCodeEntry.swift
+[400/631] Compiling MachOKit DependedDylib.swift
+[401/631] Compiling MachOKit DyldCacheDynamicData.swift
+[402/631] Compiling MachOKit DyldCacheFunctionVariantEntry.swift
+[403/631] Compiling MachOKit DyldCacheFunctionVariantInfo.swift
+[404/631] Compiling MachOKit DyldCacheImageInfo.swift
+[405/631] Compiling MachOKit DyldCacheImageTextInfo.swift
+[406/631] Compiling MachOKit DyldCacheLocalSymbolsEntry.swift
+[407/631] Compiling MachOKit DyldCacheLocalSymbolsInfo.swift
+[408/631] Compiling MachOKit DyldCacheMappingAndSlideInfo.swift
+[409/631] Compiling MachOKit DyldCacheMappingFlags.swift
+[410/631] Compiling MachOKit DyldCacheMappingInfo.swift
+[411/631] Compiling MachOKit DyldCachePrewarming.swift
+[412/631] Compiling MachOKit DyldCachePrewarmingEntry.swift
+[413/631] Compiling MachOKit DyldCacheTproMappingInfo.swift
+[414/631] Compiling MachOKit DyldSubCacheEntry.swift
+[415/631] Compiling MachOKit DylibIndex.swift
+[416/631] Compiling MachOKit DylibsTrieNodeContent.swift
+[417/631] Compiling MachOKit LoaderRef.swift
+[418/631] Compiling MachOKit ObjCBinaryInfo.swift
+[419/631] Compiling MachOKit PrebuiltLoader.swift
+[420/631] Compiling MachOKit PrebuiltLoaderProtocol.swift
+[421/631] Compiling MachOKit PrebuiltLoaderSet.swift
+[422/631] Compiling MachOKit PrebuiltLoader_Pre1165_3.swift
+[423/631] Compiling MachOKit Platform.swift
+[424/631] Compiling MachOKit Section+Attribute.swift
+[425/631] Compiling MachOKit Section+Flags.swift
+[426/631] Compiling MachOKit Section+Type.swift
+[427/631] Compiling MachOKit Section.swift
+[428/631] Compiling MachOKit ThreadState.swift
+[429/631] Compiling MachOKit ThreadStateFlavor.swift
+[430/631] Compiling MachOKit Tool.swift
+[431/631] Compiling MachOKit VMProtection.swift
+[432/631] Compiling MachOKit Version.swift
+[433/631] Compiling MachOKit NoteCommand.swift
+[434/631] Compiling MachOKit RpathCommand.swift
+[435/631] Compiling MachOKit SegmentCommand+Flags.swift
+[436/631] Compiling MachOKit SegmentCommand.swift
+[437/631] Compiling MachOKit SourceVersionCommand.swift
+[438/631] Compiling MachOKit SubFrameworkCommand.swift
+[439/631] Compiling MachOKit TargetTripleCommand.swift
+[440/631] Compiling MachOKit ThreadCommand.swift
+[441/631] Compiling MachOKit UUIDCommand.swift
+[442/631] Compiling MachOKit VersionMinCommand.swift
+[443/631] Compiling MachOKit MachOFile+BindOperations.swift
+[444/631] Compiling MachOKit MachOFile+CodeSign.swift
+[445/631] Compiling MachOKit MachOFile+DyldChainedFixups.swift
+[446/631] Compiling MachOKit MachOFile+ExportTrie.swift
+[447/631] Compiling MachOKit MachOFile+FunctionStarts.swift
+[468/660] Compiling MachOKit DyldCacheType.swift
+[469/660] Compiling MachOKit FatArch.swift
+[470/660] Compiling MachOKit FatHeader.swift
+[471/660] Compiling MachOKit FileType.swift
+[472/660] Compiling MachOKit MachHeader+Flags+Bit.swift
+[473/660] Compiling MachOKit MachHeader+Flags.swift
+[474/660] Compiling MachOKit MachHeader.swift
+[475/660] Compiling MachOKit Magic.swift
+[476/660] Compiling MachOKit AotMetadataCommand.swift
+[477/660] Compiling MachOKit BuildVersionCommand.swift
+[478/660] Compiling MachOKit DylibCommand.swift
+[479/660] Compiling MachOKit DylibUseCommand.swift
+[480/660] Compiling MachOKit DylinkerCommand.swift
+[481/660] Compiling MachOKit EncryptionInfoCommand.swift
+[482/660] Compiling MachOKit EntryPointCommand.swift
+[483/660] Compiling MachOKit FilesetEntryCommand.swift
+[484/660] Compiling MachOKit LinkerOptionCommand.swift
+[485/660] Compiling MachOKit LoadCommand.swift
+[486/660] Compiling MachOKit LoadCommandInfo.swift
+[487/660] Compiling MachOKit LoadCommandType.swift
+[488/660] Compiling MachOKit BuildToolVersion.swift
+[489/660] Compiling MachOKit Dylib.swift
+[490/660] Compiling MachOKit DylibUseFlags.swift
+[491/660] Compiling MachOKit AotInstructionMapIndexEntry.swift
+[492/660] Compiling MachOKit BindOpcode.swift
+[493/660] Compiling MachOKit BindOperation.swift
+[494/660] Compiling MachOKit BindOperationsKind.swift
+[495/660] Compiling MachOKit BindSpecial.swift
+[496/660] Compiling MachOKit BindType.swift
+[497/660] Compiling MachOKit ClassicBindType.swift
+[498/660] Compiling MachOKit BindingSymbol.swift
+[499/660] Compiling MachOKit ClassicBindingSymbol.swift
+[500/660] Compiling MachOKit CodeSignCodeDirectory+codeLimit64.swift
+[501/660] Compiling MachOKit CodeSignCodeDirectory+executableSegment.swift
+[502/660] Compiling MachOKit CodeSignCodeDirectory+runtime.swift
+[503/660] Compiling MachOKit CodeSignCodeDirectory+scatter.swift
+[504/660] Compiling MachOKit CodeSignCodeDirectory+teamID.swift
+[505/660] Compiling MachOKit CodeSignCodeDirectory.swift
+[506/660] Compiling MachOKit CodeSignBlobIndex.swift
+[507/660] Compiling MachOKit CodeSignExecSegmentFlags.swift
+[508/660] Compiling MachOKit CodeSignGenericBlob.swift
+[509/660] Compiling MachOKit CodeSignHashType.swift
+[510/660] Compiling MachOKit CodeSignMagic.swift
+[511/660] Compiling MachOKit CodeSignSlot.swift
+[512/660] Compiling MachOKit CodeSignSpecialSlotType.swift
+[513/660] Compiling MachOKit CodeSignSuperBlob.swift
+[514/660] Compiling MachOKit CFString.swift
+[515/660] Emitting module MachOKit
+[516/660] Compiling MachOKit AotCache+CodeFragments.swift
+[517/660] Compiling MachOKit AotCache.swift
+[518/660] Compiling MachOKit DyldCache+SubCaches.swift
+[519/660] Compiling MachOKit DyldCache+host.swift
+[520/660] Compiling MachOKit DyldCache.swift
+[521/660] Compiling MachOKit DyldCacheLoaded+SubCaches.swift
+[522/660] Compiling MachOKit DyldCacheLoaded+static.swift
+[523/660] Compiling MachOKit DyldCacheLoaded.swift
+[524/660] Compiling MachOKit Data+.swift
+[525/660] Compiling MachOKit FileHandle+.swift
+[526/660] Compiling MachOKit FixedWidthInteger+.swift
+[527/660] Compiling MachOKit Sequence+.swift
+[528/660] Compiling MachOKit String+.swift
+[529/660] Compiling MachOKit TrieTreeProtocol+.swift
+[530/660] Compiling MachOKit UUID+.swift
+[531/660] Compiling MachOKit UnsafePointer+.swift
+[532/660] Compiling MachOKit UnsafeRawPointer+.swift
+[533/660] Compiling MachOKit _FileIOProtocol+.swift
+[534/660] Compiling MachOKit dyld_chained_ptr+.swift
+[535/660] Compiling MachOKit FatFile.swift
+[536/660] Compiling MachOKit FullDyldCache+host.swift
+[537/660] Compiling MachOKit FullDyldCache.swift
+[538/660] Compiling MachOKit AotCacheHeader.swift
+[539/660] Compiling MachOKit CPU.swift
+[540/660] Compiling MachOKit CPUSubType.swift
+[559/660] Compiling VPhoneCore VPhoneVMPicker.swift
+[560/660] Compiling VPhoneCore VPhoneVMRuntimeState.swift
+[561/660] Compiling VPhoneCore VPhoneVMStopper.swift
+[562/660] Compiling VPhoneCore VPhoneVerbosity.swift
+[563/660] Compiling VPhoneCore VPhoneVirtualMachineManifest.swift
+[572/660] Emitting module VPhoneCore
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[596/660] Compiling MachOKit DyldChainedImport.swift
+[597/660] Compiling MachOKit DyldChainedImportFormat.swift
+[598/660] Compiling MachOKit DyldChainedPage.swift
+[599/660] Compiling MachOKit DyldChainedStartsInImage.swift
+[600/660] Compiling MachOKit DyldChainedStartsInSegment.swift
+[601/660] Compiling MachOKit DyldChainedStartsOffsets.swift
+[602/660] Compiling MachOKit DyldChainedSymbolsFormat.swift
+[603/660] Compiling MachOKit ExportSymbolFlags.swift
+[604/660] Compiling MachOKit ExportSymbolKind.swift
+[605/660] Compiling MachOKit ExportTrieEntry.swift
+[606/660] Compiling MachOKit ExportedSymbol.swift
+[607/660] Compiling MachOKit FunctionStart.swift
+[608/660] Compiling MachOKit IndirectSymbol.swift
+[609/660] Compiling MachOKit Rebase.swift
+[610/660] Compiling MachOKit RebaseOpcode.swift
+[611/660] Compiling MachOKit RebaseOperation.swift
+[612/660] Compiling MachOKit RebaseType.swift
+[613/660] Compiling MachOKit Relocation.swift
+[614/660] Compiling MachOKit RelocationInfo.swift
+[615/660] Compiling MachOKit RelocationLength.swift
+[616/660] Compiling MachOKit RelocationType.swift
+[617/660] Compiling MachOKit ScatteredRelocationInfo.swift
+[618/660] Compiling MachOKit Nlist.swift
+[619/660] Compiling MachOKit Stab.swift
+[620/736] Compiling VPhoneHelperKit VPhoneHelperService.swift
+[621/736] Compiling VPhoneHelperKit VPhoneHelperProtocol.swift
+[622/736] Compiling MachOKit SymbolDescription.swift
+[623/736] Compiling MachOKit SymbolFlags.swift
+[624/736] Compiling MachOKit SymbolLibraryOrdinalType.swift
+[625/736] Compiling MachOKit SymbolReferenceFlag.swift
+[626/736] Compiling MachOKit SymbolType.swift
+[627/736] Compiling MachOKit CodeSignProtocol.swift
+[628/736] Compiling MachOKit DyldCacheLocalSymbolsEntryProtocol.swift
+[629/736] Compiling MachOKit DyldCacheRepresentable.swift
+[630/736] Compiling MachOKit DyldChainedFixupsProtocol.swift
+[631/736] Compiling MachOKit DyldChainedImportProtocol.swift
+[632/736] Compiling MachOKit LoadCommandWrapper.swift
+[633/736] Compiling MachOKit LoadCommandsProtocol.swift
+[634/736] Compiling MachOKit MachORepresentable.swift
+[635/736] Compiling MachOKit SymbolProtocol.swift
+[636/736] Compiling MachOKit _DyldCacheFileRepresentable.swift
+[637/736] Compiling MachOKit CxaDemangle.swift
+[638/736] Compiling MachOKit SwiftDemangle.swift
+[639/736] Compiling MachOKit DataTrieTree.swift
+[640/736] Compiling MachOKit MemoryTrieTree.swift
+[641/736] Compiling MachOKit TrieNode.swift
+[642/736] Compiling MachOKit TrieNodeContent.swift
+[643/736] Compiling MachOKit TrieTreeProtocol.swift
+[644/736] Compiling MachOKit exported.swift
+[645/736] Compiling MachOKit global.swift
+[646/736] Compiling VPhoneHelperKit VPhoneHelperAuthorization.swift
+[647/736] Compiling VPhoneHelperKit VPhoneHelperClient.swift
+[648/736] Compiling VPhoneHelperKit VPhoneHelperOutput.swift
+[649/736] Emitting module VPhoneHelperKit
+[650/736] Compiling VPhoneArchiveKitTests NoOverwriteDirTests.swift
+[651/825] Compiling VPhoneHelperEntry main.swift
+[652/825] Emitting module VPhoneHelperEntry
+[652/825] Write Objects.LinkFileList
+[654/825] Compiling VPhoneArchiveKitTests ArchiveWorkingDirectoryTests.swift
+[655/825] Compiling VPhoneArchiveKitTests ExtractPermissionsTests.swift
+[656/825] Compiling VPhoneArchiveKitTests BoardDeviceTreeSourceTests.swift
+[657/825] Compiling FirmwarePatcher KernelJBPatchCredLabel.swift
+[658/825] Compiling FirmwarePatcher KernelJBPatchDiskImages2.swift
+[659/825] Compiling FirmwarePatcher KernelJBPatchDounmount.swift
+[660/827] Compiling FirmwarePatcher KernelJBPatchIoucSandbox.swift
+[661/827] Compiling FirmwarePatcher KernelJBPatcherBase.swift
+[662/827] Compiling FirmwarePatcher KernelPatcher.swift
+[663/827] Emitting module VPhoneLaunchpadKit
+[664/827] Compiling FirmwarePatcher KernelJBPatchExecPolicyKill.swift
+[665/827] Compiling FirmwarePatcher KernelJBPatchFpfsScopedOpen.swift
+[666/827] Compiling FirmwarePatcher KernelJBPatchHookCredLabel.swift
+[667/827] Compiling FirmwarePatcher KernelPatcherBase.swift
+[668/827] Compiling FirmwarePatcher KernelPatchApfsGraft.swift
+[669/827] Compiling FirmwarePatcher KernelPatchApfsMount.swift
+[670/827] Compiling FirmwarePatcher KernelJBPatchIomfbSwap.swift
+[671/827] Compiling FirmwarePatcher KernelJBPatchIoucMacf.swift
+[672/827] Compiling FirmwarePatcher KernelPatchApfsSeal.swift
+[673/827] Compiling FirmwarePatcher KernelPatchApfsSnapshot.swift
+[674/827] Compiling FirmwarePatcher KernelPatchBsdInit.swift
+[675/827] Compiling VPhoneArchiveKitTests ArchiveSafetyTests.swift
+[675/827] Linking vphone-helper
+[676/828] Write vphone-helper-entitlement.plist
+[678/828] Compiling FirmwarePatcher KernelJBPatchAmfiTrustcache.swift
+[679/828] Compiling FirmwarePatcher KernelJBPatchBsdInitAuth.swift
+[680/828] Compiling FirmwarePatcher KernelJBPatchContainerUpcall.swift
+[681/828] Compiling VPhoneLaunchpadKit VPhoneLaunchpadRunState.swift
+[682/828] Compiling VPhoneLaunchpadKit VPhoneLaunchpadToolchain.swift
+[683/828] Emitting module VPhoneArchiveKitTests
+[684/828] Compiling VPhoneArchiveKitTests ArchiveLocaleTests.swift
+[685/828] Compiling VPhoneArchiveKitTests ArchiveFixtureOwnership.swift
+[686/876] Compiling VPhoneArchiveKitTests RoundTripTests.swift
+[687/876] Compiling VPhoneHelperKitTests OutputAcknowledgementTests.swift
+[688/876] Compiling VPhoneHelperKitTests OutputXPCTests.swift
+[689/876] Compiling VPhoneHelperKitTests BlockingTestThread.swift
+[690/876] Compiling VPhoneHelperKitTests HelperTests.swift
+[691/876] Emitting module VPhoneHelperKitTests
+[692/876] Compiling VPhoneLaunchpadLauncherEntry VPhoneLaunchpadLauncherProcess.swift
+[693/876] Compiling VPhoneLaunchpadLauncherEntry main.swift
+[694/876] Emitting module VPhoneLaunchpadLauncherEntry
+[694/876] Write Objects.LinkFileList
+[696/876] Compiling FirmwarePatcher DeviceTreePatcher.swift
+[697/876] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[698/876] Compiling FirmwarePatcher IBootJBPatcher.swift
+[699/876] Compiling FirmwarePatcher IBootPatcher.swift
+[700/876] Compiling FirmwarePatcher KernelEXPPatchHvVmmRename.swift
+[700/881] Applying vphone-helper
+[701/881] Linking vphone-launchpad-launcher
+[702/882] Write vphone-launchpad-launcher-entitlement.plist
+[704/882] Compiling FirmwarePatcher KernelJBPatchKcall10.swift
+[705/882] Compiling FirmwarePatcher KernelJBPatchLoadDylinker.swift
+[706/882] Compiling FirmwarePatcher KernelJBPatchMacMount.swift
+[707/882] Compiling FirmwarePatcher KernelJBPatchNvram.swift
+[708/882] Compiling FirmwarePatcher KernelJBPatchPortToMap.swift
+[709/882] Compiling VPhoneCoreTests VMLockTests.swift
+[710/882] Compiling VPhoneCoreTests VMOperationTests.swift
+[711/882] Compiling VPhoneCoreTests VMPickerTests.swift
+[712/882] Compiling VPhoneCoreTests VMStopTests.swift
+[713/882] Compiling VPhoneCoreTests VerbosityTests.swift
+[714/882] Compiling FirmwarePatcher KernelJBPatchSharedRegion.swift
+[715/893] Compiling VPhoneLaunchpadKitTests ReadOnlyCommandTests.swift
+[716/893] Compiling VPhoneLaunchpadKitTests RealCLICreateTests.swift
+[717/893] Compiling VPhoneLaunchpadKitTests RealCLIEditTests.swift
+[718/895] Compiling VPhoneLaunchpadKitTests BindingPersistenceTests.swift
+[719/895] Compiling VPhoneLaunchpadKitTests BindingSnapshotTests.swift
+[720/895] Compiling VPhoneLaunchpadKitTests CoreBundleTests.swift
+[721/895] Emitting module VPhoneLaunchpad
+[722/895] Compiling VPhoneLaunchpadKitTests LogWriterTests.swift
+[723/895] Compiling VPhoneLaunchpadKitTests MachineBindingTests.swift
+[724/895] Compiling VPhoneLaunchpadKitTests OutputCompletionTests.swift
+[725/895] Compiling VPhoneLaunchpadKitTests CreateTests.swift
+[726/895] Compiling VPhoneLaunchpadKitTests LineSplitterTests.swift
+[727/895] Emitting module VPhoneLaunchpadKitTests
+[728/898] Compiling VPhoneLaunchpadKitTests HardwareKeyboardSettingsTests.swift
+[729/898] Compiling VPhoneLaunchpadKitTests HostSetupTests.swift
+[730/898] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+[732/898] Compiling VPhoneLaunchpadKitTests PanelQueueTests.swift
+[733/898] Compiling VPhoneLaunchpadKitTests PanelTestSupport.swift
+[734/898] Compiling VPhoneLaunchpad VPhoneLaunchpadWindowWidth.swift
+[735/898] Compiling VPhoneLaunchpad resource_bundle_accessor.swift
+[738/898] Compiling VPhoneLaunchpadKitTests MenuBarTests.swift
+[739/898] Compiling FirmwarePatcher KernelJBPatchSpawnPersona.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[740/898] Compiling FirmwarePatcher KernelJBPatchSyscallmask.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[741/898] Compiling FirmwarePatcher KernelJBPatchTaskConversion.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[742/898] Compiling FirmwarePatcher KernelJBPatchTaskForPid.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[743/898] Compiling FirmwarePatcher KernelJBPatchThidCrash.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[744/898] Compiling FirmwarePatcher KernelJBPatchThreadSetState.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[745/898] Compiling FirmwarePatcher KernelJBPatchVmFault.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[746/898] Compiling FirmwarePatcher KernelJBPatchVmMapDelete.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[747/898] Compiling FirmwarePatcher KernelJBPatchVmProtect.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[748/898] Compiling FirmwarePatcher KernelEXPPatcher.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[749/898] Compiling FirmwarePatcher KernelJBPatcher.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+[750/898] Compiling FirmwarePatcher ARM64Constants.swift
+[751/898] Compiling FirmwarePatcher ARM64Disassembler.swift
+[752/898] Compiling FirmwarePatcher ARM64Encoder.swift
+[753/898] Compiling FirmwarePatcher ARM64Inst.swift
+[754/898] Compiling FirmwarePatcher AVPBooterPatcher.swift
+[755/898] Compiling FirmwarePatcher BinaryBuffer.swift
+[756/898] Compiling FirmwarePatcher IM4PHandler.swift
+[757/898] Compiling FirmwarePatcher MachOHelpers.swift
+[758/898] Compiling FirmwarePatcher VPhoneKernelcacheSwap.swift
+[759/898] Compiling FirmwarePatcher PatchIdentifier.swift
+[760/898] Compiling FirmwarePatcher PatchOutcome.swift
+[761/898] Compiling FirmwarePatcher PatchRecord.swift
+[762/898] Compiling FirmwarePatcher KernelPatchLaunchConstraints.swift
+[763/898] Compiling FirmwarePatcher KernelPatchPostValidation.swift
+[764/898] Compiling FirmwarePatcher KernelPatchSandbox.swift
+[765/898] Compiling FirmwarePatcher FirmwareManifest.swift
+[766/898] Compiling FirmwarePatcher ManifestHashPatcher.swift
+[767/898] Compiling FirmwarePatcher PatchDeclaration.swift
+[768/898] Compiling FirmwarePatcher PatchDeclarationCatalog.swift
+[769/898] Compiling FirmwarePatcher PatchDeclarationCatalogData.swift
+[770/898] Compiling FirmwarePatcher PatchDeclarationGate.swift
+[771/898] Compiling FirmwarePatcher PatchSelectionFileMigration.swift
+[772/898] Compiling FirmwarePatcher PatchSelectionMigration.swift
+[778/898] Compiling VPhoneLaunchpadKitTests RunStateTests.swift
+[779/898] Compiling VPhoneLaunchpadKitTests StopRefusalTests.swift
+[780/898] Compiling VPhoneLaunchpadKitTests ToolchainTests.swift
+[781/898] Compiling FirmwarePatcher PatcherProtocol.swift
+[782/898] Compiling FirmwarePatcher StructuredPatcher.swift
+[783/898] Compiling FirmwarePatcher VPhonePatchUndoLog.swift
+[786/898] Applying vphone-launchpad-launcher
+[788/898] Compiling VPhoneLaunchpadKitTests LaunchpadFixtures.swift
+[789/898] Compiling VPhoneLaunchpadKitTests LibraryTests.swift
+[790/898] Compiling VPhoneLaunchpadKitTests EditTests.swift
+[793/898] Compiling VPhoneLaunchpadKitTests LaunchTests.swift
+[793/898] Write Objects.LinkFileList
+[794/898] Linking vphone-launchpad
+[795/899] Write vphone-launchpad-entitlement.plist
+[817/899] Emitting module FirmwarePatcher
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#no-usage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+[852/899] Compiling FirmwarePatcher KernelJBPatchAmfiExecve.swift
+[853/899] Emitting module VPhoneCoreTests
+[873/899] Applying vphone-launchpad
+[875/899] Compiling FirmwarePatcher PatchSelectionMigrationData.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[876/899] Compiling FirmwarePatcher VariantPlanResolver.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[877/899] Compiling FirmwarePatcher VariantPlanSerialization.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[878/899] Compiling FirmwarePatcher FirmwarePipeline.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[879/899] Compiling FirmwarePatcher FirmwarePlanBinding.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[880/899] Compiling FirmwarePatcher FirmwareTransaction.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[881/899] Compiling FirmwarePatcher FirmwareVersionInputs.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[882/899] Compiling FirmwarePatcher PatchExperimentRecord.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[883/899] Compiling FirmwarePatcher PatchExperimentRecorder.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[884/899] Compiling FirmwarePatcher TXMDevPatcher.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[885/899] Compiling FirmwarePatcher TXMPatcher.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[886/1010] Compiling FirmwareIntegrationTests Fixtures.swift
+[887/1010] Compiling FirmwareIntegrationTests VerboseJBDebug.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/FirmwareIntegrationTests/VerboseJBDebug.swift:12:9: warning: no calls to throwing functions occur within 'try' expression
+10 | 
+11 |         // Initialize patcher state (same as findAll() but without running patches)
+12 |         try patcher.parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+13 |         patcher.buildADRPIndex()
+14 |         patcher.buildBLIndex()
+[888/1010] Emitting module FirmwareIntegrationTests
+[889/1010] Compiling FirmwareIntegrationTests StructuredDeclarationGateTests.swift
+[890/1010] Compiling FirmwareIntegrationTests IM4PPayloadParityTests.swift
+[891/1010] Compiling FirmwareIntegrationTests PatchComparisonTests.swift
+[892/1010] Compiling vphone_cli VPhoneTouchIDMonitor.swift
+[893/1010] Compiling vphone_cli VPhoneFrameProducer.swift
+[894/1010] Compiling vphone_cli VPhoneGuestCLI.swift
+[895/1010] Compiling vphone_cli VPhoneGuestEnvironment.swift
+[896/1010] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+[897/1010] Compiling vphone_cli VPhoneGuestShutdown.swift
+[898/1010] Compiling vphone_cli VPhoneHardwareModel.swift
+[899/1013] Compiling FirmwarePatcherTests VariantPlanSerializationTests.swift
+[900/1013] Compiling FirmwarePatcherTests VariantPlanTests.swift
+[901/1013] Compiling FirmwarePatcherTests VersionKnowledgePlanTests.swift
+[902/1013] Compiling vphone_cli VPhoneProgressBar.swift
+[903/1013] Compiling vphone_cli VPhoneQuickLookController.swift
+[904/1013] Compiling vphone_cli VPhoneRemoteFile.swift
+[905/1013] Compiling vphone_cli VPhoneResourcesCLI.swift
+[906/1013] Compiling vphone_cli VPhoneRestoreCLI.swift
+[907/1013] Compiling vphone_cli VPhoneRestoreInspectCLI.swift
+[908/1013] Compiling vphone_cli VPhoneScreenRecorder.swift
+[909/1013] Compiling vphone_cli VPhoneSetupCLI.swift
+[910/1013] Compiling vphone_cli VPhoneSignCLI.swift
+[912/1023] Emitting module FirmwarePatcherTests
+[917/1023] Compiling vphone_cli VPhoneLocationProvider.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[918/1023] Compiling vphone_cli VPhoneMenuApps.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[919/1023] Compiling vphone_cli VPhoneMenuBattery.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[920/1023] Compiling vphone_cli VPhoneMenuCamera.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[921/1023] Compiling vphone_cli VPhoneMenuConnect.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[922/1023] Compiling vphone_cli VPhoneMenuController.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[923/1023] Compiling vphone_cli VPhoneMenuKeys.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[924/1023] Compiling vphone_cli VPhoneMenuLocation.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[925/1023] Compiling vphone_cli VPhoneMenuRecord.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[926/1023] Compiling vphone_cli VPhoneNativeFirmwarePreparer.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[927/1023] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[928/1023] Compiling vphone_cli VPhoneAppBrowserModel.swift
+[929/1023] Compiling vphone_cli VPhoneAppBrowserView.swift
+[930/1023] Compiling vphone_cli VPhoneAppDelegate.swift
+[931/1023] Compiling vphone_cli VPhoneAppWindowController.swift
+[932/1023] Compiling vphone_cli VPhoneArchiveCLI.swift
+[933/1023] Compiling vphone_cli VPhoneBuildInfo.swift
+[934/1023] Compiling vphone_cli VPhoneHostControl.swift
+[935/1023] Compiling vphone_cli VPhoneHostInputQueue.swift
+[936/1023] Compiling vphone_cli VPhoneHostRPC.swift
+[937/1023] Compiling vphone_cli VPhoneHostScreenAdapter.swift
+[938/1023] Compiling vphone_cli VPhoneHostTarget.swift
+[939/1023] Compiling vphone_cli VPhoneInstallPackage.swift
+[940/1023] Compiling vphone_cli VPhoneKeyHelper.swift
+[941/1023] Compiling vphone_cli VPhoneKeychainBrowserModel.swift
+[942/1023] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[943/1023] Compiling vphone_cli VPhoneKeychainItem.swift
+[944/1023] Compiling vphone_cli VPhoneKeychainWindowController.swift
+[945/1023] Compiling vphone_cli VPhoneEntry.swift
+[946/1023] Compiling vphone_cli VPhoneError.swift
+[947/1023] Compiling vphone_cli VPhoneFWCLI.swift
+[948/1023] Compiling vphone_cli VPhoneFWCacheCLI.swift
+[949/1023] Compiling vphone_cli VPhoneFWInspectCLI.swift
+[950/1023] Compiling vphone_cli VPhoneFWSelectionMigrateCLI.swift
+[951/1023] Compiling vphone_cli VPhoneFWSelectionPreviewCLI.swift
+[952/1023] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[953/1023] Compiling vphone_cli VPhoneFileBrowserView.swift
+[954/1023] Compiling vphone_cli VPhoneFileWindowController.swift
+[955/1023] Compiling vphone_cli VPhoneFirmwareSelection.swift
+[960/1023] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[961/1023] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[962/1023] Compiling vphone_cli VPhoneDoctorCLI.swift
+[964/1023] Emitting module vphone_cli
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[965/1023] Compiling vphone_cli VPhoneAPIProxyOptions.swift
+[966/1023] Compiling vphone_cli VPhoneAPIVSockConnector.swift
+[973/1023] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[974/1023] Compiling vphone_cli VPhoneCLI.swift
+[975/1023] Compiling vphone_cli VPhoneCameraServer.swift
+[976/1023] Compiling vphone_cli VPhoneTouchRoute.swift
+[977/1023] Compiling vphone_cli VPhoneVMBindingCLI.swift
+[978/1023] Compiling vphone_cli VPhoneVMCLI.swift
+[979/1023] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[980/1023] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[981/1023] Compiling vphone_cli VPhoneVMSelection.swift
+[982/1023] Compiling vphone_cli VPhoneVMTransferCLI.swift
+[983/1023] Compiling vphone_cli VPhoneVirtualMachine.swift
+[984/1023] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[985/1023] Compiling vphone_cli VPhoneWindowController.swift
+[986/1023] Compiling vphone_cli VPhoneCameraWriteLease.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[987/1023] Compiling vphone_cli VPhoneClipboardFocusSync.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[988/1023] Compiling vphone_cli VPhoneClipboardMacWriter.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[989/1023] Compiling vphone_cli VPhoneClipboardShortcutSync.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[990/1023] Compiling vphone_cli VPhoneControl.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[991/1023] Compiling vphone_cli VPhoneControlChannel.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[992/1023] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+[993/1023] Compiling vphone_cli VPhoneCoreBundleCLI.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#no-usage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#no-usage]
+17 |     }
+18 | 
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[1006/1023] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[1007/1023] Compiling vphone_cli VPhoneHostCommandService.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[1008/1067] Emitting module VPhoneCommandEntry
+[1009/1067] Compiling VPhoneCommandEntry main.swift
+[1010/1067] Emitting module VPhoneVMEntry
+[1011/1067] Compiling VPhoneVMEntry main.swift
+[1011/1067] Write Objects.LinkFileList
+[1014/1067] Compiling VPhoneCLITests CreateCancellationEndToEndTests.swift
+[1015/1067] Compiling VPhoneCLITests CreateLeftoverTests.swift
+[1016/1067] Compiling VPhoneCLITests CreateLiveStagesTests.swift
+[1017/1067] Compiling VPhoneCLITests DoctorCLITests.swift
+[1018/1067] Compiling VPhoneCLITests ClipboardFocusTests.swift
+[1019/1067] Compiling VPhoneCLITests ClipboardMacWriterTests.swift
+[1020/1067] Compiling VPhoneCLITests ClipboardShortcutTests.swift
+[1021/1067] Compiling VPhoneCLITests CoreBundleCLITests.swift
+[1021/1067] Linking vphone-cli
+[1022/1068] Write vphone-cli-entitlement.plist
+[1023/1068] Linking vphone-vm
+[1024/1069] Write vphone-vm-entitlement.plist
+[1026/1069] Emitting module VPhoneCLITests
+[1033/1074] Compiling VPhoneCLITests APIProxyCLITests.swift
+[1034/1074] Compiling VPhoneCLITests ArchiveCLITests.swift
+[1035/1074] Compiling VPhoneCLITests CFWEnvironmentUpdateTests.swift
+[1036/1074] Compiling VPhoneCLITests CFWInvocationTests.swift
+[1037/1074] Compiling VPhoneCLITests CameraWriteLeaseTests.swift
+[1038/1074] Compiling VPhoneCLITests ClipboardEventRoutingTests.swift
+[1039/1074] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[1040/1074] Compiling VPhoneCLITests GuestResourceCLITests.swift
+[1041/1074] Compiling VPhoneCLITests GuestShutdownTests.swift
+[1042/1074] Compiling VPhoneCLITests GuestTransportTests.swift
+[1043/1074] Compiling VPhoneCLITests HardwareKeyboardCLITests.swift
+[1044/1074] Compiling VPhoneCLITests HelperCLITests.swift
+[1044/1074] Applying vphone-cli
+[1044/1074] Applying vphone-vm
+[1047/1074] Compiling VPhoneCLITests HostAPICommandTests.swift
+[1048/1074] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[1049/1074] Compiling VPhoneCLITests HostCommandServiceTests.swift
+[1050/1074] Compiling VPhoneCLITests HostControlLifecycleTests.swift
+[1051/1074] Compiling VPhoneCLITests HostControlProtocolTests.swift
+[1052/1074] Compiling VPhoneCLITests NativeTransferCLITests.swift
+[1053/1074] Compiling VPhoneCLITests PatchComponentResultTests.swift
+[1054/1074] Compiling VPhoneCLITests PatchExperimentRecordCLITests.swift
+[1055/1074] Compiling VPhoneCLITests PatchSelectionFileMigrationTests.swift
+[1056/1074] Compiling VPhoneCLITests RestoreInspectCLITests.swift
+[1057/1074] Compiling VPhoneCLITests HostLocationReuseTests.swift
+[1058/1074] Compiling VPhoneCLITests HostRPCTests.swift
+[1059/1074] Compiling VPhoneCLITests LocationValidationTests.swift
+[1060/1074] Compiling VPhoneCLITests NativeFirmwarePrepareTests.swift
+[1061/1074] Compiling VPhoneCLITests NativeRestoreCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[1064/1074] Compiling VPhoneCLITests DyldMaxSlideOptionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[1065/1074] Compiling VPhoneCLITests ExpectedBindingCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[1066/1074] Compiling VPhoneCLITests FWPlanDuplicateSelectionTests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[1067/1074] Compiling VPhoneCLITests GuestCLITests.swift
+/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/tests/VPhoneCLITests/FWPlanDuplicateSelectionTests.swift:8:13: warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 6 |     @Test(arguments: ["--select", "--block"])
+ 7 |     func planRejectsDuplicateIDsBeforeSetConversion(option: String) throws {
+ 8 |         var command = try VPhoneFWPlanCommand.parse([option, "ibss-cfw-serial_label", "ibss-cfw-serial_label", "--json"])
+   |             `- warning: variable 'command' was never mutated; consider changing to 'let' constant
+ 9 |         #expect(throws: (any Error).self) { try command.run() }
+10 |     }
+[1068/1074] Compiling VPhoneCLITests SignCLITests.swift
+[1069/1074] Compiling VPhoneCLITests StartupUnlockCLITests.swift
+[1070/1074] Compiling VPhoneCLITests TouchRouteTests.swift
+[1071/1074] Compiling VPhoneCLITests VMLaunchDiagnosticsTests.swift
+[1072/1074] Compiling VPhoneCLITests VMRuntimeEntryTests.swift
+[1073/1076] Compiling vphone_cliPackageTests runner.swift
+[1074/1076] Emitting module vphone_cliPackageTests
+[1074/1076] Write Objects.LinkFileList
+[1075/1076] Linking vphone-cliPackageTests
+Build complete! (226.67s)
+Test Suite 'Selected tests' started at 2026-10-09 14:18:34.747.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 14:18:34.755.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 14:18:34.755.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 14:18:34.755.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.008) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CreateCheckpointTests started.
+◇ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() started.
+◇ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test case passing 1 argument executable → "vphone-cli" to freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+◇ Test case passing 1 argument executable → "vphone-vm" to freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) started.
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-vm" at CreateCheckpointTests.swift:913:9: Expectation failed: an error was expected but none was thrown and "VPhoneCreateCheckpoint(schemaVersion: 1, creationId: "d0dd887d-d7ff-466a-b3ea-fb1c878c2c90", createdAt: 2026-10-09 06:18:35 +0000, updatedAt: 2026-10-09 06:18:35 +0000, bundleIdentity: VPhoneCore.VPhoneCreateBundleIdentity(name: "vm", path: "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/d4-627087DA-3FE1-4B2B-8C24-1023B586D2E4/vm", directoryId: "16777233:587081875", machineIdentifierSha256: Optional("f7a7266df8b420793d51b92561955db28792ce00570593d47d44d954189b3685")), effectiveOptions: VPhoneCore.VPhoneCreateEffectiveOptions(variant: "jb", iphoneSource: Optional(VPhoneCore.VPhoneCreateSourceRecord(display: "/ipsw/iPhone.ipsw", sha256: "c754ac7362dc6da20cb353245d34f42ec42e58164880102bb8fab42acbad49ae", redacted: false)), cloudosSource: Optional(VPhoneCore.VPhoneCreateSourceRecord(display: "/ipsw/cloudOS.ipsw", sha256: "18102e091160f41634ddcb5ed25ec7d993fbbfaa67a2498f62874355fb8ba3fa", redacted: false)), spoofBuild: nil, forceDscMaxSlide: false, enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, restoreBackend: nil, prepareBackend: nil), inputsDigest: "1afb2828603bf1b4982e9cd2f06188cb70019dddd5efe0e4c8c24a4d1aa07272", tool: VPhoneCore.VPhoneCreateToolRecord(executableSha256: Optional("3e65c4f6fdbcf5059b479a79b7ee372c001cb99dbc5c2b4bd093d29782b1a53f"), stageContractVersion: 1), attemptId: "d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd", resumedFrom: nil, attempts: [VPhoneCore.VPhoneCreateAttemptRecord(attemptId: "d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd", kind: "create", startedAt: 2026-10-09 06:18:35 +0000, pid: 81961, restartFrom: nil, acceptedToolChange: false, checks: [:])], stages: [VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.prepare, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["checked": "out-prepare.txt", "ran": "prepare"], inputs: [:], outputs: ["prepare", "restore_tree"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.patch, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "patch", "checked": "out-patch.txt"], inputs: ["prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore_tree": "684d86f495c22a546b73c59c6d44111a302b80b099f91e31c7cc3c038619604e"], outputs: ["patch", "restore_tree"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.restore, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["checked": "out-restore.txt", "ran": "restore"], inputs: ["restore_tree": "e609b545dca48a1e2be43177254a2d22259d5decf92e26f7721807dd51a7f877", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9"], outputs: ["restore", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.cfw, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["checked": "out-cfw.txt", "ran": "cfw"], inputs: ["restore_tree": "e609b545dca48a1e2be43177254a2d22259d5decf92e26f7721807dd51a7f877", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "disk": "2cc2eb6fd99029a397d9f3cd5833eef14afd98a50470b7a6612d965fb31be26e"], outputs: ["cfw", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.firstBoot, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "first_boot", "checked": "out-first_boot.txt"], inputs: ["prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "restore_tree": "e609b545dca48a1e2be43177254a2d22259d5decf92e26f7721807dd51a7f877", "disk": "1428eda684e001a76353eaa9a82fea9294cf20be1836aa8094a1415662766d91", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9"], outputs: ["first_boot", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.jbFinalize, status: VPhoneCore.VPhoneCreateStageStatus.unverified, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "jb_finalize"], inputs: ["cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "restore_tree": "e609b545dca48a1e2be43177254a2d22259d5decf92e26f7721807dd51a7f877", "disk": "47d75155c85d14058099279d692ca52d094e530fd2654cdf45752dc26fc745fd", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "first_boot": "5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07"], outputs: ["jb_finalize"], reason: Optional("no guest evidence collector"), error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.verification, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("d3eb7b64-c94f-4a66-b77d-e2601e1fd9bd"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "verification", "checked": "out-verification.txt"], inputs: ["restore_tree": "e609b545dca48a1e2be43177254a2d22259d5decf92e26f7721807dd51a7f877", "disk": "47d75155c85d14058099279d692ca52d094e530fd2654cdf45752dc26fc745fd", "first_boot": "5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "jb_finalize": "a1c1897caf294cbaff486d3b80f6e21c21bbf1958f87ffa024704c7f1af6d760", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a"], outputs: ["verification", "disk"], reason: nil, error: nil, history: [])], artifacts: [VPhoneCore.VPhoneCreateArtifactRecord(name: "prepare", relativePath: "out-prepare.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a"), sizeBytes: Optional(14), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.prepare, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore_tree", relativePath: "Restore", kind: VPhoneCore.VPhoneCreateFingerprintKind.treeMetadata, fingerprint: Optional("684d86f495c22a546b73c59c6d44111a302b80b099f91e31c7cc3c038619604e"), sizeBytes: Optional(13), availability: VPhoneCore.VPhoneCreateArtifactAvailability.removed, recordedBy: VPhoneCore.VPhoneCreateStage.prepare, retainUntil: [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.verification], removedReason: Optional("removed after every retaining stage finished (default cleanup)"), rebuild: Optional("vphone-cli vm create --resume vm --restart-from prepare")), VPhoneCore.VPhoneCreateArtifactRecord(name: "patch", relativePath: "out-patch.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9"), sizeBytes: Optional(12), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.patch, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore_tree", relativePath: "Restore", kind: VPhoneCore.VPhoneCreateFingerprintKind.treeMetadata, fingerprint: Optional("e609b545dca48a1e2be43177254a2d22259d5decf92e26f7721807dd51a7f877"), sizeBytes: Optional(20), availability: VPhoneCore.VPhoneCreateArtifactAvailability.removed, recordedBy: VPhoneCore.VPhoneCreateStage.patch, retainUntil: [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.verification], removedReason: Optional("removed after every retaining stage finished (default cleanup)"), rebuild: Optional("vphone-cli vm create --resume vm --restart-from prepare")), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore", relativePath: "out-restore.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"), sizeBytes: Optional(14), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.restore, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("2cc2eb6fd99029a397d9f3cd5833eef14afd98a50470b7a6612d965fb31be26e"), sizeBytes: Optional(8), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.restore, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "cfw", relativePath: "out-cfw.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8"), sizeBytes: Optional(10), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.cfw, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("1428eda684e001a76353eaa9a82fea9294cf20be1836aa8094a1415662766d91"), sizeBytes: Optional(11), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.cfw, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "first_boot", relativePath: "out-first_boot.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07"), sizeBytes: Optional(17), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.firstBoot, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("47d75155c85d14058099279d692ca52d094e530fd2654cdf45752dc26fc745fd"), sizeBytes: Optional(21), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.firstBoot, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "jb_finalize", relativePath: "out-jb_finalize.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("a1c1897caf294cbaff486d3b80f6e21c21bbf1958f87ffa024704c7f1af6d760"), sizeBytes: Optional(18), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.jbFinalize, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "verification", relativePath: "out-verification.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("14d5a319a2f7135b2c0db78d9310e7c2f37dffa3207e4fabf84877211ec2cf2f"), sizeBytes: Optional(19), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.verification, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("0f488cb0dcb9070a595374232365028569aa6e826fbacbb989dcbc2327d65764"), sizeBytes: Optional(33), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.verification, retainUntil: [], removedReason: nil, rebuild: nil)], recoveryRequired: nil)" was returned
+✘ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() recorded an issue at CreateCheckpointTests.swift:939:9: Expectation failed: an error was expected but none was thrown and "VPhoneCreateCheckpoint(schemaVersion: 1, creationId: "a22593c7-ebeb-4b0e-b323-78e76ab1a133", createdAt: 2026-10-09 06:18:35 +0000, updatedAt: 2026-10-09 06:18:35 +0000, bundleIdentity: VPhoneCore.VPhoneCreateBundleIdentity(name: "vm", path: "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/d4-EC8FCD60-C70F-4773-BD70-B9DB523D8EFF/vm", directoryId: "16777233:587081870", machineIdentifierSha256: Optional("f7a7266df8b420793d51b92561955db28792ce00570593d47d44d954189b3685")), effectiveOptions: VPhoneCore.VPhoneCreateEffectiveOptions(variant: "jb", iphoneSource: Optional(VPhoneCore.VPhoneCreateSourceRecord(display: "/ipsw/iPhone.ipsw", sha256: "c754ac7362dc6da20cb353245d34f42ec42e58164880102bb8fab42acbad49ae", redacted: false)), cloudosSource: Optional(VPhoneCore.VPhoneCreateSourceRecord(display: "/ipsw/cloudOS.ipsw", sha256: "18102e091160f41634ddcb5ed25ec7d993fbbfaa67a2498f62874355fb8ba3fa", redacted: false)), spoofBuild: nil, forceDscMaxSlide: false, enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, restoreBackend: nil, prepareBackend: nil), inputsDigest: "1afb2828603bf1b4982e9cd2f06188cb70019dddd5efe0e4c8c24a4d1aa07272", tool: VPhoneCore.VPhoneCreateToolRecord(executableSha256: Optional("3e65c4f6fdbcf5059b479a79b7ee372c001cb99dbc5c2b4bd093d29782b1a53f"), stageContractVersion: 1), attemptId: "0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5", resumedFrom: nil, attempts: [VPhoneCore.VPhoneCreateAttemptRecord(attemptId: "0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5", kind: "create", startedAt: 2026-10-09 06:18:35 +0000, pid: 81961, restartFrom: nil, acceptedToolChange: false, checks: [:])], stages: [VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.prepare, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "prepare", "checked": "out-prepare.txt"], inputs: [:], outputs: ["prepare", "restore_tree"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.patch, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "patch", "checked": "out-patch.txt"], inputs: ["prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore_tree": "eb2e3e2e6a84b2d4a2e0bfcd48ce6deebc0f8fcf1078b1be724c483fc6656c8e"], outputs: ["patch", "restore_tree"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.restore, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "restore", "checked": "out-restore.txt"], inputs: ["prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore_tree": "cde42ac6afdf7d1ea90644edc963dc20a45e1a498b84588eb5f4c422851531a5"], outputs: ["restore", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.cfw, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "cfw", "checked": "out-cfw.txt"], inputs: ["prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore_tree": "cde42ac6afdf7d1ea90644edc963dc20a45e1a498b84588eb5f4c422851531a5", "disk": "fef4fd377a63add92a34115144e9742fc2cf8a360d43ca976f0e85f65a8ab4c6"], outputs: ["cfw", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.firstBoot, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "first_boot", "checked": "out-first_boot.txt"], inputs: ["prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "disk": "e2801cbe8672efa496e7b54d7913cf16447ba2cbbec763c4906e29ad48db31d7", "restore_tree": "cde42ac6afdf7d1ea90644edc963dc20a45e1a498b84588eb5f4c422851531a5", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8"], outputs: ["first_boot", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.jbFinalize, status: VPhoneCore.VPhoneCreateStageStatus.unverified, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "jb_finalize"], inputs: ["disk": "f8e5c32b78b4d4943a7dd8f706f2910c2361ee447ad92070d8739cfd155b56f5", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "first_boot": "5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore_tree": "cde42ac6afdf7d1ea90644edc963dc20a45e1a498b84588eb5f4c422851531a5", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"], outputs: ["jb_finalize"], reason: Optional("no guest evidence collector"), error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.verification, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("0d4a3c7c-2080-4eb2-a0c4-7a320b1697a5"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["checked": "out-verification.txt", "ran": "verification"], inputs: ["disk": "f8e5c32b78b4d4943a7dd8f706f2910c2361ee447ad92070d8739cfd155b56f5", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore_tree": "cde42ac6afdf7d1ea90644edc963dc20a45e1a498b84588eb5f4c422851531a5", "first_boot": "5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "jb_finalize": "a1c1897caf294cbaff486d3b80f6e21c21bbf1958f87ffa024704c7f1af6d760", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"], outputs: ["verification", "disk"], reason: nil, error: nil, history: [])], artifacts: [VPhoneCore.VPhoneCreateArtifactRecord(name: "prepare", relativePath: "out-prepare.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a"), sizeBytes: Optional(14), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.prepare, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore_tree", relativePath: "Restore", kind: VPhoneCore.VPhoneCreateFingerprintKind.treeMetadata, fingerprint: Optional("eb2e3e2e6a84b2d4a2e0bfcd48ce6deebc0f8fcf1078b1be724c483fc6656c8e"), sizeBytes: Optional(13), availability: VPhoneCore.VPhoneCreateArtifactAvailability.removed, recordedBy: VPhoneCore.VPhoneCreateStage.prepare, retainUntil: [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.verification], removedReason: Optional("removed after every retaining stage finished (default cleanup)"), rebuild: Optional("vphone-cli vm create --resume vm --restart-from prepare")), VPhoneCore.VPhoneCreateArtifactRecord(name: "patch", relativePath: "out-patch.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9"), sizeBytes: Optional(12), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.patch, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore_tree", relativePath: "Restore", kind: VPhoneCore.VPhoneCreateFingerprintKind.treeMetadata, fingerprint: Optional("cde42ac6afdf7d1ea90644edc963dc20a45e1a498b84588eb5f4c422851531a5"), sizeBytes: Optional(20), availability: VPhoneCore.VPhoneCreateArtifactAvailability.removed, recordedBy: VPhoneCore.VPhoneCreateStage.patch, retainUntil: [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.verification], removedReason: Optional("removed after every retaining stage finished (default cleanup)"), rebuild: Optional("vphone-cli vm create --resume vm --restart-from prepare")), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore", relativePath: "out-restore.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"), sizeBytes: Optional(14), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.restore, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("fef4fd377a63add92a34115144e9742fc2cf8a360d43ca976f0e85f65a8ab4c6"), sizeBytes: Optional(8), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.restore, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "cfw", relativePath: "out-cfw.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8"), sizeBytes: Optional(10), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.cfw, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("e2801cbe8672efa496e7b54d7913cf16447ba2cbbec763c4906e29ad48db31d7"), sizeBytes: Optional(11), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.cfw, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "first_boot", relativePath: "out-first_boot.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07"), sizeBytes: Optional(17), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.firstBoot, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("f8e5c32b78b4d4943a7dd8f706f2910c2361ee447ad92070d8739cfd155b56f5"), sizeBytes: Optional(21), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.firstBoot, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "jb_finalize", relativePath: "out-jb_finalize.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("a1c1897caf294cbaff486d3b80f6e21c21bbf1958f87ffa024704c7f1af6d760"), sizeBytes: Optional(18), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.jbFinalize, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "verification", relativePath: "out-verification.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("14d5a319a2f7135b2c0db78d9310e7c2f37dffa3207e4fabf84877211ec2cf2f"), sizeBytes: Optional(19), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.verification, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("f8a99aedfe3ec8b19ed81d8896828c8563c751115312fe2cca353510198a5f40"), sizeBytes: Optional(33), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.verification, retainUntil: [], removedReason: nil, rebuild: nil)], recoveryRequired: nil)" was returned
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-cli" at CreateCheckpointTests.swift:913:9: Expectation failed: an error was expected but none was thrown and "VPhoneCreateCheckpoint(schemaVersion: 1, creationId: "67e0e924-ad87-4699-a3f8-15dbcc5dd415", createdAt: 2026-10-09 06:18:35 +0000, updatedAt: 2026-10-09 06:18:35 +0000, bundleIdentity: VPhoneCore.VPhoneCreateBundleIdentity(name: "vm", path: "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/d4-48CAFF2D-8F12-4D55-98DD-14371B0217B8/vm", directoryId: "16777233:587081871", machineIdentifierSha256: Optional("f7a7266df8b420793d51b92561955db28792ce00570593d47d44d954189b3685")), effectiveOptions: VPhoneCore.VPhoneCreateEffectiveOptions(variant: "jb", iphoneSource: Optional(VPhoneCore.VPhoneCreateSourceRecord(display: "/ipsw/iPhone.ipsw", sha256: "c754ac7362dc6da20cb353245d34f42ec42e58164880102bb8fab42acbad49ae", redacted: false)), cloudosSource: Optional(VPhoneCore.VPhoneCreateSourceRecord(display: "/ipsw/cloudOS.ipsw", sha256: "18102e091160f41634ddcb5ed25ec7d993fbbfaa67a2498f62874355fb8ba3fa", redacted: false)), spoofBuild: nil, forceDscMaxSlide: false, enableFrida: false, cpuCount: 8, memoryMb: 8192, diskSizeGb: 64, restoreBackend: nil, prepareBackend: nil), inputsDigest: "1afb2828603bf1b4982e9cd2f06188cb70019dddd5efe0e4c8c24a4d1aa07272", tool: VPhoneCore.VPhoneCreateToolRecord(executableSha256: Optional("3e65c4f6fdbcf5059b479a79b7ee372c001cb99dbc5c2b4bd093d29782b1a53f"), stageContractVersion: 1), attemptId: "c9878732-9d12-428d-8817-94ab867f1da8", resumedFrom: nil, attempts: [VPhoneCore.VPhoneCreateAttemptRecord(attemptId: "c9878732-9d12-428d-8817-94ab867f1da8", kind: "create", startedAt: 2026-10-09 06:18:35 +0000, pid: 81961, restartFrom: nil, acceptedToolChange: false, checks: [:])], stages: [VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.prepare, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "prepare", "checked": "out-prepare.txt"], inputs: [:], outputs: ["prepare", "restore_tree"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.patch, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "patch", "checked": "out-patch.txt"], inputs: ["restore_tree": "31dbe4d67109971b218f4451643abea18eb3cf9f2c6740a1a2c1d3fd54c6e6fc", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a"], outputs: ["patch", "restore_tree"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.restore, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["checked": "out-restore.txt", "ran": "restore"], inputs: ["restore_tree": "104b5b7cba290c414df5a23b957669df66b90879ec63f13e7e75dac86d4dc403", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a"], outputs: ["restore", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.cfw, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "cfw", "checked": "out-cfw.txt"], inputs: ["restore_tree": "104b5b7cba290c414df5a23b957669df66b90879ec63f13e7e75dac86d4dc403", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "disk": "8717d90498eaea464dc95e87e7c5ed069445af13747589b38949ec965b666856", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"], outputs: ["cfw", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.firstBoot, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "first_boot", "checked": "out-first_boot.txt"], inputs: ["restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "disk": "4e4a2ca676bb82ffc48db57bccffd4661f873498d7ba42c5c80d2771b409399e", "restore_tree": "104b5b7cba290c414df5a23b957669df66b90879ec63f13e7e75dac86d4dc403", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9"], outputs: ["first_boot", "disk"], reason: nil, error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.jbFinalize, status: VPhoneCore.VPhoneCreateStageStatus.unverified, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "jb_finalize"], inputs: ["restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978", "disk": "8e6befaa02d8d669bd7b52c122dc8adee3e88391af79e3b4bed08a8f63e9b1aa", "cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "restore_tree": "104b5b7cba290c414df5a23b957669df66b90879ec63f13e7e75dac86d4dc403", "first_boot": "5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07"], outputs: ["jb_finalize"], reason: Optional("no guest evidence collector"), error: nil, history: []), VPhoneCore.VPhoneCreateStageRecord(stage: VPhoneCore.VPhoneCreateStage.verification, status: VPhoneCore.VPhoneCreateStageStatus.succeeded, attemptId: Optional("c9878732-9d12-428d-8817-94ab867f1da8"), pid: Optional(81961), startedAt: Optional(2026-10-09 06:18:35 +0000), finishedAt: Optional(2026-10-09 06:18:35 +0000), executorResult: Optional("completed"), verifierVersion: Optional("fake-verifier-1"), evidence: ["ran": "verification", "checked": "out-verification.txt"], inputs: ["cfw": "7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8", "jb_finalize": "a1c1897caf294cbaff486d3b80f6e21c21bbf1958f87ffa024704c7f1af6d760", "disk": "8e6befaa02d8d669bd7b52c122dc8adee3e88391af79e3b4bed08a8f63e9b1aa", "restore_tree": "104b5b7cba290c414df5a23b957669df66b90879ec63f13e7e75dac86d4dc403", "prepare": "50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a", "first_boot": "5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07", "patch": "bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9", "restore": "355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"], outputs: ["verification", "disk"], reason: nil, error: nil, history: [])], artifacts: [VPhoneCore.VPhoneCreateArtifactRecord(name: "prepare", relativePath: "out-prepare.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("50f5996ad392102d3dae1ccb3d61370b461322cec45a160255bab8c9c3661e3a"), sizeBytes: Optional(14), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.prepare, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore_tree", relativePath: "Restore", kind: VPhoneCore.VPhoneCreateFingerprintKind.treeMetadata, fingerprint: Optional("31dbe4d67109971b218f4451643abea18eb3cf9f2c6740a1a2c1d3fd54c6e6fc"), sizeBytes: Optional(13), availability: VPhoneCore.VPhoneCreateArtifactAvailability.removed, recordedBy: VPhoneCore.VPhoneCreateStage.prepare, retainUntil: [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.verification], removedReason: Optional("removed after every retaining stage finished (default cleanup)"), rebuild: Optional("vphone-cli vm create --resume vm --restart-from prepare")), VPhoneCore.VPhoneCreateArtifactRecord(name: "patch", relativePath: "out-patch.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("bac38c96e7bfeabe2a18327aba94a65b325b734599e7982a714e8ba45af49ac9"), sizeBytes: Optional(12), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.patch, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore_tree", relativePath: "Restore", kind: VPhoneCore.VPhoneCreateFingerprintKind.treeMetadata, fingerprint: Optional("104b5b7cba290c414df5a23b957669df66b90879ec63f13e7e75dac86d4dc403"), sizeBytes: Optional(20), availability: VPhoneCore.VPhoneCreateArtifactAvailability.removed, recordedBy: VPhoneCore.VPhoneCreateStage.patch, retainUntil: [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.verification], removedReason: Optional("removed after every retaining stage finished (default cleanup)"), rebuild: Optional("vphone-cli vm create --resume vm --restart-from prepare")), VPhoneCore.VPhoneCreateArtifactRecord(name: "restore", relativePath: "out-restore.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("355262974cfce9c19a92a13fa5652fa901c213f4b6bc7f4067db37d30e4e7978"), sizeBytes: Optional(14), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.restore, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("8717d90498eaea464dc95e87e7c5ed069445af13747589b38949ec965b666856"), sizeBytes: Optional(8), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.restore, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "cfw", relativePath: "out-cfw.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("7f62408a40ae04519d27f507f2374a372bdbe8f0d646928dd5261f4f0e431ef8"), sizeBytes: Optional(10), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.cfw, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("4e4a2ca676bb82ffc48db57bccffd4661f873498d7ba42c5c80d2771b409399e"), sizeBytes: Optional(11), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.cfw, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "first_boot", relativePath: "out-first_boot.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("5a3c5b251755ba029843a975d929ab7464ed9b1ce502db54e96ef3206f83bd07"), sizeBytes: Optional(17), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.firstBoot, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("8e6befaa02d8d669bd7b52c122dc8adee3e88391af79e3b4bed08a8f63e9b1aa"), sizeBytes: Optional(21), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.firstBoot, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "jb_finalize", relativePath: "out-jb_finalize.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("a1c1897caf294cbaff486d3b80f6e21c21bbf1958f87ffa024704c7f1af6d760"), sizeBytes: Optional(18), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.jbFinalize, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "verification", relativePath: "out-verification.txt", kind: VPhoneCore.VPhoneCreateFingerprintKind.sha256File, fingerprint: Optional("14d5a319a2f7135b2c0db78d9310e7c2f37dffa3207e4fabf84877211ec2cf2f"), sizeBytes: Optional(19), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.verification, retainUntil: [], removedReason: nil, rebuild: nil), VPhoneCore.VPhoneCreateArtifactRecord(name: "disk", relativePath: "Disk.img", kind: VPhoneCore.VPhoneCreateFingerprintKind.fileMetadata, fingerprint: Optional("891d5261bbc6d71a5a0faaac32046d7314eb013b27ba983f80656897c1ced035"), sizeBytes: Optional(33), availability: VPhoneCore.VPhoneCreateArtifactAvailability.available, recordedBy: VPhoneCore.VPhoneCreateStage.verification, retainUntil: [], removedReason: nil, rebuild: nil)], recoveryRequired: nil)" was returned
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-vm" at CreateCheckpointTests.swift:919:9: Expectation failed: (f.fake.executed → [VPhoneCore.VPhoneCreateStage.prepare, VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.jbFinalize, VPhoneCore.VPhoneCreateStage.verification]) == ([.prepare] → [VPhoneCore.VPhoneCreateStage.prepare])
+± inserted [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.jbFinalize, VPhoneCore.VPhoneCreateStage.verification]
+✘ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() recorded an issue at CreateCheckpointTests.swift:945:9: Expectation failed: (f.fake.executed → [VPhoneCore.VPhoneCreateStage.prepare, VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.jbFinalize, VPhoneCore.VPhoneCreateStage.verification]) == ([.prepare] → [VPhoneCore.VPhoneCreateStage.prepare])
+± inserted [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.jbFinalize, VPhoneCore.VPhoneCreateStage.verification]
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-cli" at CreateCheckpointTests.swift:919:9: Expectation failed: (f.fake.executed → [VPhoneCore.VPhoneCreateStage.prepare, VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.jbFinalize, VPhoneCore.VPhoneCreateStage.verification]) == ([.prepare] → [VPhoneCore.VPhoneCreateStage.prepare])
+± inserted [VPhoneCore.VPhoneCreateStage.patch, VPhoneCore.VPhoneCreateStage.restore, VPhoneCore.VPhoneCreateStage.cfw, VPhoneCore.VPhoneCreateStage.firstBoot, VPhoneCore.VPhoneCreateStage.jbFinalize, VPhoneCore.VPhoneCreateStage.verification]
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-vm" at CreateCheckpointTests.swift:923:9: Expectation failed: (checkpoint.record(.patch).status → .succeeded) == .pending
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-cli" at CreateCheckpointTests.swift:923:9: Expectation failed: (checkpoint.record(.patch).status → .succeeded) == .pending
+✘ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() recorded an issue at CreateCheckpointTests.swift:949:9: Expectation failed: (checkpoint.record(.patch).status → .succeeded) == .pending
+✘ Test freshCreateStopsBeforeNextStageWhenToolchainBecomesUnreadable() failed after 0.178 seconds with 3 issues.
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-vm" at CreateCheckpointTests.swift:924:9: Expectation failed: !((FileManager.default → <NSFileManager: 0x102b2d430>).fileExists(atPath: f.bundle.appendingPathComponent("out-patch.txt").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/d4-627087DA-3FE1-4B2B-8C24-1023B586D2E4/vm/out-patch.txt") → true)
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) recorded an issue with 1 argument executable → "vphone-cli" at CreateCheckpointTests.swift:924:9: Expectation failed: !((FileManager.default → <NSFileManager: 0x102b2d430>).fileExists(atPath: f.bundle.appendingPathComponent("out-patch.txt").path → "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/d4-48CAFF2D-8F12-4D55-98DD-14371B0217B8/vm/out-patch.txt") → true)
+✘ Test freshCreateStopsBeforeNextStageWhenAnExecutableChanges(executable:) with 2 test cases failed after 0.184 seconds with 8 issues.
+✘ Suite CreateCheckpointTests failed after 0.184 seconds with 11 issues.
+✘ Test run with 2 tests in 1 suite failed after 0.185 seconds with 11 issues.

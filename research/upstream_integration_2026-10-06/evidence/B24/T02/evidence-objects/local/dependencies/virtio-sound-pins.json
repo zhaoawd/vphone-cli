@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "upstream_revision": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "license": "MIT",
+  "scope": "VirtIOSound algorithm sources and host harnesses only; no HAL plugin, route, device-tree, kernel or capture activation",
+  "activation": "not_deployable_algorithm_sources",
+  "files": [
+    {
+      "upstream": "VPhoneGuestComponents/Tests/VirtIOSoundTests.c",
+      "local": "sources/VPhoneGuestComponents/Tests/VirtIOSoundTests.c",
+      "upstream_sha256": "238feffbb7b31857f1467dc31eabbf46bf99e12133195a1f9174fd0a04712b4e",
+      "local_sha256": "238feffbb7b31857f1467dc31eabbf46bf99e12133195a1f9174fd0a04712b4e"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/Tests/VirtIOSoundClockTests.c",
+      "local": "sources/VPhoneGuestComponents/Tests/VirtIOSoundClockTests.c",
+      "upstream_sha256": "226716d1b0c361d59d51b2c66e22a7bf176dc88e44a930c447fe2273ff86331a",
+      "local_sha256": "226716d1b0c361d59d51b2c66e22a7bf176dc88e44a930c447fe2273ff86331a"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/Tests/VirtIOSoundConverterTests.c",
+      "local": "sources/VPhoneGuestComponents/Tests/VirtIOSoundConverterTests.c",
+      "upstream_sha256": "aa7be3e4ac8c293a4e2cac88110d40ee5ac43ce10aeb6c886467ce2e2f1a4967",
+      "local_sha256": "aa7be3e4ac8c293a4e2cac88110d40ee5ac43ce10aeb6c886467ce2e2f1a4967"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/Tests/VirtIOSoundLatencyTests.c",
+      "local": "sources/VPhoneGuestComponents/Tests/VirtIOSoundLatencyTests.c",
+      "upstream_sha256": "f1ea9dca65eae7f82dcff44d23769b5f3c843a145b23163eec6c6cd63288cc2c",
+      "local_sha256": "feef6dbb5bccb247837add04000edfe862f1b54dd203cac15dbe1af503600c90"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.c",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.c",
+      "upstream_sha256": "be0f6dfbba173473dea092512e9095eba7e7714610c16795a26959f05f491cb5"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.h",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundRing.h",
+      "upstream_sha256": "ec73741d666bfa61277ae30ad2ca0a152457a1cce5cdc479bcb79a65b5ef7ad2"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.c",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.c",
+      "upstream_sha256": "9e461c1517c2b3fafe84d9ad48cf2e83095a799d7da8ef11d61d67acb99ea62b"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.h",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundClock.h",
+      "upstream_sha256": "3bf3d0bd6b38c24731e6080ab41ba447e563e46e84d5b77f3d79159aba9d3483"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.c",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.c",
+      "upstream_sha256": "f79de126d9fd606f01c156fc22436b7fa56ac7d2393c8123b64c5dbd03108b82"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.h",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundConverter.h",
+      "upstream_sha256": "c1da2b0ac6c75f51aa221bcd90fa42f421a05d24391c03c9933e808f0fa861cf"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.c",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.c",
+      "upstream_sha256": "e840490138b33e4d498e260e82f9fda826449886e5f2ed205fc08394c4402ac2"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.h",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundFilter.h",
+      "upstream_sha256": "bb55c26d8abdda4cce58e9049bb9ca052806dfbdec1f02d7e9461936d9db3f5f"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.c",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.c",
+      "upstream_sha256": "322a1b588b5d4083ef62c60ab1c7bbbfd2c87ac0067eb439578ff9f84e93a2f7",
+      "local_sha256": "12696bd625e31e112110d0288e16566c6b533691c6b1ae866d100ea5e5699899",
+      "local_adaptation": "B11: compute ceiling by quotient/remainder before UInt32 saturation to avoid uint64 addition overflow."
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.h",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundLatency.h",
+      "upstream_sha256": "8461a284c73c88ab310e0e345aa7d611f362b5122f9854d4a6e1a89d9217baec"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.c",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.c",
+      "upstream_sha256": "5b9adf8c1fa3edbd7c8889dcfa72e1acf925858be91b114a06099cb51032b7ad"
+    },
+    {
+      "upstream": "VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.h",
+      "local": "sources/VPhoneGuestComponents/VirtIOSound/VPVirtIOSoundProtocol.h",
+      "upstream_sha256": "710a4811fc6cff8e20b4fd03e1207418a346cd74c49decad6a4f61939dabb9b7"
+    }
+  ]
+}

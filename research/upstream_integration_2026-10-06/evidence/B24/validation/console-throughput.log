@@ -1,0 +1,59 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling vphone_zip_stub.c
+[5/37] Compiling locking.c
+[6/37] Compiling log.c
+[7/37] Compiling deviceinterfaced.c
+[8/37] Compiling fls.c
+[9/37] Compiling common.c
+[10/37] Compiling idevicerestore.c
+[11/37] Compiling download.c
+[12/37] Compiling asr.c
+[13/37] Compiling recovery.c
+[14/37] Compiling fdr.c
+[15/37] Compiling ipsw.c
+[16/37] Compiling limera1n.c
+[17/37] Compiling normal.c
+[18/37] Compiling img3.c
+[19/37] Compiling ace3.c
+[20/37] Compiling dfu.c
+[21/37] Compiling img4.c
+[22/37] Compiling restore.c
+[23/37] Compiling mbn.c
+[24/37] Compiling ftab.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[27/37] Write Objects.LinkFileList
+[30/37] Emitting module VPhoneLaunchpadKitTests
+[31/37] Compiling VPhoneLaunchpadKitTests ConsoleLifecycleTests.swift
+[31/37] Write Objects.LinkFileList
+[32/37] Linking vphone-cli
+[33/37] Linking vphone-vm
+[34/37] Applying vphone-vm
+[35/37] Applying vphone-cli
+[36/37] Linking vphone-cliPackageTests
+Build complete! (8.66s)
+Test Suite 'Selected tests' started at 2026-10-09 14:39:25.619.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-09 14:39:25.620.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-09 14:39:25.620.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-09 14:39:25.620.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ConsoleLifecycleTests started.
+◇ Test cancelledDetachedWriterKeepsPanicTailAcrossRotation() started.
+◇ Test productionConsolePipelineThroughput() started.
+◇ Test concurrentCommandsPersistNormalizedPanicTailsInSeparateLogs() started.
+✔ Test concurrentCommandsPersistNormalizedPanicTailsInSeparateLogs() passed after 1.123 seconds.
+✔ Test cancelledDetachedWriterKeepsPanicTailAcrossRotation() passed after 1.524 seconds.
+T46_THROUGHPUT {"display_lines":4000,"final_tail":"kernel panic: throughput final tail","input_bytes":12788934,"input_bytes_per_second":5404683.7355210464,"lines":100001,"lines_per_second":42261.049922991253,"omitted_display_lines":96001,"output_drained":true,"persisted_bytes":11788926,"persisted_bytes_per_second":4982074.0815036809,"persisted_sha256":"720a521ea7620059a8b4bb1a568ba3843fbe32dfe77981a330028c7f84326ca5","scope":"production CommandLine\/LineReader\/LogWriter with cat input fixture; no VM or UI rendering","seconds_including_spawn_read_and_writer_finish":2.3662687079999998}
+✔ Test productionConsolePipelineThroughput() passed after 2.608 seconds.
+✔ Suite ConsoleLifecycleTests passed after 2.608 seconds.
+✔ Test run with 3 tests in 1 suite passed after 2.609 seconds.

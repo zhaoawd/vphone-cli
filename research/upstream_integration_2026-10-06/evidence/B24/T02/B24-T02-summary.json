@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "task": "T02",
+  "upstream_target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+  "local_source_baseline": "11064b07ea5b754285eae0e56f8aedc912441606",
+  "scope": "本批202项逐提交语义审查；342项历史处置覆盖；47项合同、依赖、本地入口和验证入口对账",
+  "review_complete": true,
+  "acceptance_recommendation": "accepted_for_T02_ledger_contract",
+  "recommendation_reason": "T02三项验收要求均已有映射及证据：所有原任务有去向；实施项有真实文件/模块所有者/验证入口并明确unknown；格式、文档、发布及被取代提交有处置理由。无未覆盖的T02台账合同。其他能力实现和运行缺口保留独立状态。",
+  "contract_checks": [
+    {
+      "requirement": "所有原任务都有去向",
+      "result": "47个唯一T00–T46，逐项合同/依赖/处置/源码缺口映射齐全",
+      "evidence": "capability-ledger-47-draft.json"
+    },
+    {
+      "requirement": "实施任务定位真实文件、测试/验证入口和模块所有者；unknown不转缺失或完成",
+      "result": "47项local-path-map均有实际路径、模块、验证入口；T30/T31运行结果及T08外部依赖内部行为保持unknown边界",
+      "evidence": "local-path-map-47-draft.json"
+    },
+    {
+      "requirement": "格式化、文档、发布和后续修正提交明确处置",
+      "result": "202项完整差异逐项说明；历史140分类理由与来源保留，不提升旧标题/路径判断证据强度",
+      "evidence": "commit-ledger-342-draft.json"
+    }
+  ],
+  "counts": {
+    "new_commits": 202,
+    "ledger_commits": 342,
+    "historical_preserved": 140,
+    "historical_nonmerge": 78,
+    "historical_merge": 62,
+    "merge_empty": 54,
+    "merge_nonempty": 8,
+    "merge_resolution_records": 8,
+    "capabilities": 47,
+    "accepted_preserved": 7,
+    "new_pending": 0,
+    "unexplained_missing_paths": 0,
+    "evidence_objects": 739,
+    "final_deleted_paths_explicit": 20
+  },
+  "new_dispositions": {
+    "adaptation_planned": 175,
+    "intentionally_not_adopted": 10,
+    "already_equivalent": 11,
+    "superseded": 6
+  },
+  "ledger_dispositions": {
+    "already_equivalent": 14,
+    "adaptation_planned": 179,
+    "intentionally_not_adopted": 11,
+    "documentation_review_T28": 37,
+    "release_metadata_superseded": 22,
+    "merge_no_additional_resolution": 53,
+    "adapted_verified_T06": 1,
+    "superseded": 14,
+    "not_applicable": 1,
+    "adaptation_planned_T27": 1,
+    "merge_resolution_reviewed_adaptation_planned": 8,
+    "adapted_verified": 1
+  },
+  "capability_dispositions": {
+    "equivalent": 2,
+    "adapt": 41,
+    "new": 1,
+    "unknown": 2,
+    "deferred": 1
+  },
+  "accepted_capabilities_preserved": [
+    "T00",
+    "T01",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07"
+  ],
+  "acceptance_note": "草稿保持原7项accepted。父代理可依据本建议仅将T02提升为第8项，需同步tasks/capability/reconciliation；175项adaptation_planned不计accepted。",
+  "historical_provenance": {
+    "old140": {
+      "nonmerge": 78,
+      "merge": 62,
+      "new_full_diff_review_claimed": false,
+      "dispositions_preserved": true
+    },
+    "merges": {
+      "total": 62,
+      "empty_remerge": 54,
+      "nonempty_resolution": 8,
+      "source": "evidence/B22-merge-audit.json + T02_merge_resolution_reviews.json + 8 T02-remerge diff SHA-256"
+    },
+    "B23": {
+      "reviewed_commits": 16,
+      "note": "16是B23已审提交数，不是merge resolution数；其原出处和理由保留。"
+    }
+  },
+  "runtime": {
+    "executed_by_this_review": false,
+    "scope_note": "本子审查未运行构建、VM或修改系统。源码确认不自动证明restore/boot/application行为；历史运行结果保留证据范围。"
+  },
+  "later_local_change": {
+    "parent_reported_commit": "a45c9191",
+    "note": "父代理本轮创建检查/错误分类6文件修复晚于冻结11064；属于独立审查和验证，不混入本202项源码基线。"
+  },
+  "outputs": [
+    "commit-audit-draft.json",
+    "commit-ledger-342-draft.json",
+    "capability-ledger-47-draft.json",
+    "capability-reconciliation-draft.json",
+    "local-path-map-47-draft.json",
+    "machine-validation.json",
+    "evidence-objects-manifest.json"
+  ],
+  "archive": {
+    "relative_prefix": "evidence/B24/T02/",
+    "required_additional_directories": [
+      "evidence-objects"
+    ],
+    "required_additional_files": [
+      "evidence-objects-manifest.json"
+    ],
+    "note": "739路径从固定Git对象提取：294 local、445 upstream；719个实际对象，20个最终删除路径有明确缺席记录。现存临时path为工作路径；archive_path可由保留的相对目录复查。"
+  },
+  "machine_validation_all_passed": true
+}

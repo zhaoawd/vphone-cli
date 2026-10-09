@@ -1,0 +1,92 @@
+{
+  "scope": "actual CLI transfer of synthetic small VM bundle; no VM launch or firmware/runtime acceptance",
+  "cli": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B18/binding-cli.app/Contents/MacOS/vphone-cli",
+  "cli_sha256": "7d1dfc544e8471aab450153f5f235629594f29f1e6f1cad05194b6fdda0f3187",
+  "commands": [
+    {
+      "argv": [
+        "vm",
+        "new",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/library",
+        "source",
+        "--disk-size",
+        "0",
+        "--rom",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/synthetic-ROM.bin",
+        "--seprom",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/synthetic-ROM.bin"
+      ],
+      "returncode": 0,
+      "stdout": "created /private/tmp/vphone-b24-t24-t40/transfer-system-tar/library/source\n",
+      "stderr": "",
+      "seconds": 0.10513791599078104
+    },
+    {
+      "argv": [
+        "vm",
+        "clone",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/library",
+        "source",
+        "clone"
+      ],
+      "returncode": 0,
+      "stdout": "cloned source \u2192 clone\n",
+      "stderr": "",
+      "seconds": 0.37926620803773403
+    },
+    {
+      "argv": [
+        "vm",
+        "rename",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/library",
+        "clone",
+        "renamed"
+      ],
+      "returncode": 0,
+      "stdout": "renamed to renamed\n",
+      "stderr": "",
+      "seconds": 0.27492379205068573
+    },
+    {
+      "argv": [
+        "vm",
+        "export",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/library",
+        "renamed",
+        "--out",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/transfer.txz",
+        "--max",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "stdout": "exported renamed \u2192 /private/tmp/vphone-b24-t24-t40/transfer-system-tar/transfer.txz\n",
+      "stderr": "",
+      "seconds": 0.35278841701801866
+    },
+    {
+      "argv": [
+        "vm",
+        "import",
+        "--library-root",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/library",
+        "/private/tmp/vphone-b24-t24-t40/transfer-system-tar/transfer.txz",
+        "--name",
+        "imported",
+        "--archive-backend",
+        "system-tar"
+      ],
+      "returncode": 0,
+      "stdout": "imported \u2192 imported\n",
+      "stderr": "",
+      "seconds": 0.1714816670282744
+    }
+  ],
+  "binding_input": {
+    "kind": "constructed four-origin fixture; not runtime evidence"
+  }
+}

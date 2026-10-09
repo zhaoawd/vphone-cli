@@ -1,0 +1,18 @@
+{
+  "pid": 80041,
+  "binary": "/Users/qcz3840/.codex/worktrees/upstream-2d21d21-integration/vphone-cli/.build/acceptance/B21/relay-diagnostic.app/Contents/MacOS/vphone-vm",
+  "panic_lines": [
+    "panic(cpu 3 caller 0xfffffe0034524f70): Kernel data abort. at pc 0xfffffe00342131ec, lr 0x21defe00341b740c (saved state: 0xfffffe3f9892b5b0)",
+    "Nested panic detected - entry count: 2 panic_caller: 0xfffffe0033dbe9b8",
+    "c_decompress_page: c_segno 1227555 >= c_segments_available 2048, slot_ptr(0xfffffe1106afbef8), slot_data(ba12bb24) @vm_compressor.c:5411panic(cpu 3 caller 0xfffffe0034524f70): Kernel data abort. at pc 0xfffffe00342131ec, lr 0x21defe00341b740c (saved state: 0xfffffe3f9892b5b0)"
+  ],
+  "signal": "SIGINT",
+  "sent": 1791526800.0454452,
+  "VM_exit": 0,
+  "disk_released": true,
+  "critical_hashes": {
+    "config.plist": "e75cf6fa7170f3cc67fcc63077aa48ca43e6b3e2aa4d612c6878303b65053dee",
+    ".vphoned.signed": "306ed42ba743f6d5e71ebda142eeaa78f1f21fa14d3b37445dee8fc1401f9001",
+    "udid-prediction.txt": "bfde529b86a6b9fa80dd6779f9d2f1c1260b032b198f1959467dbf01a9cc52bc"
+  }
+}

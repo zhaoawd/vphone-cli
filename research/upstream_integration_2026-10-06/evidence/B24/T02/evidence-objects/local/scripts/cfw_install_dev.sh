@@ -1,0 +1,393 @@
+#!/bin/zsh
+# cfw_install_dev.sh — Install base CFW modifications on vphone (dev variant).
+#
+# Installs Cryptexes, patches system binaries, installs jailbreak tools
+# and configures LaunchDaemons for persistent SSH/VNC access.
+#
+# Files are placed directly on the VM's Disk.img volumes, which cfw_install_host.sh
+# attaches and mounts on the host; the VM must be off.
+#
+# Safe to run multiple times — always patches from original .bak files,
+# keeps decrypted Cryptex DMGs cached, handles already-mounted filesystems.
+#
+# Prerequisites:
+#   - VM restored (make restore) and powered off
+#   - `ipsw` tool installed (brew install blacktop/tap/ipsw)
+#   - `aea` tool available (macOS 12+)
+#   - Python: make setup_venv && source .venv/bin/activate
+#   - cfw_input/ or resources/cfw_input.tar.zst + resources/cfw_dev/rpcserver_ios present
+#
+# Usage: make cfw_install_dev
+set -euo pipefail
+
+# ── Restore caller's PATH — Nix /etc/zshenv resets PATH on zsh startup ─
+[[ -n "${_VPHONE_PATH:-}" ]] && export PATH="$_VPHONE_PATH"
+
+VM_DIR="${1:-.}"
+SCRIPT_DIR="${0:a:h}"
+
+# Resolve absolute paths
+VM_DIR="$(cd "$VM_DIR" && pwd)"
+
+source "$SCRIPT_DIR/lib/cfw_common.sh"
+cfw_require_runtime_and_lock
+GUEST_RESOURCES="$(cfw_guest_resources)"
+
+: "${CFW_HOST_MNT:?CFW_HOST_MNT unset — run via cfw_install_host.sh}"
+
+# ── Configuration ───────────────────────────────────────────────
+CFW_INPUT="cfw_input"
+CFW_ARCHIVE="cfw_input.tar.zst"
+TEMP_DIR="$VM_DIR/.cfw_temp"
+
+# ── Helpers ─────────────────────────────────────────────────────
+
+check_prerequisites() {
+    local missing=()
+    command -v ldid &>/dev/null || missing+=("ldid (brew install ldid-procursus)")
+    if ((${#missing[@]} > 0)); then
+        die "Missing required tools: ${missing[*]}. Run: make setup_tools"
+    fi
+}
+
+
+ldid_sign_ent() {
+    local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
+    local args=("-S$entitlements_plist" "-K$VM_DIR/$CFW_INPUT/signcert.p12")
+    [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
+    ldid "${args[@]}" "$file"
+}
+
+# Detach a DMG mountpoint if currently mounted, ignore errors
+safe_detach() {
+    cfw_detach_with "$1" sudo ${SUDO_ASKPASS:+-A} hdiutil
+}
+
+
+# ── Setup input resources ──────────────────────────────────────
+setup_cfw_input() {
+    cfw_extract_input "$CFW_INPUT" "$CFW_ARCHIVE" "Neither $CFW_INPUT/ nor $CFW_ARCHIVE found" tar --zstd
+}
+
+# ── Apply dev overlay (replace rpcserver_ios in iosbinpack64) ──
+apply_dev_overlay() {
+    local dev_bin
+    for search_dir in "$SCRIPT_DIR/resources/cfw_dev" "$SCRIPT_DIR/cfw_dev"; do
+        dev_bin="$search_dir/rpcserver_ios"
+        if [[ -f "$dev_bin" ]]; then
+            echo "  Applying dev overlay (rpcserver_ios)..."
+            local iosbinpack="$VM_DIR/$CFW_INPUT/jb/iosbinpack64.tar"
+            local tmpdir="$VM_DIR/.iosbinpack_tmp"
+            mkdir -p "$tmpdir"
+            tar -xf "$iosbinpack" -C "$tmpdir"
+            cp "$dev_bin" "$tmpdir/iosbinpack64/usr/local/bin/rpcserver_ios"
+            (cd "$tmpdir" && tar -cf "$iosbinpack" iosbinpack64)
+            rm -rf "$tmpdir"
+            return
+        fi
+    done
+    die "Dev overlay not found (cfw_dev/rpcserver_ios)"
+}
+
+# ── Cleanup trap (unmount DMGs on error) ───────────────────────
+trap cleanup_on_exit EXIT
+
+# The VM's Disk.img is attached on the host by cfw_install_host.sh; its APFS
+# volumes are mounted here and every file is placed with plain cp/chmod/etc.
+# (the VM is off — nothing runs "on the device").
+cfw_init_mounts
+
+# ════════════════════════════════════════════════════════════════
+# Main
+# ════════════════════════════════════════════════════════════════
+echo "[*] cfw_install.sh — Installing CFW on vphone..."
+
+check_prereqs
+
+RESTORE_DIR=$(find_restore_dir)
+echo "[+] Restore directory: $RESTORE_DIR"
+
+setup_cfw_input
+apply_dev_overlay
+INPUT_DIR="$VM_DIR/$CFW_INPUT"
+echo "[+] Input resources: $INPUT_DIR"
+check_prerequisites
+
+mkdir -p "$TEMP_DIR"
+
+# ── Parse Cryptex paths from BuildManifest ─────────────────────
+echo ""
+echo "[*] Parsing iPhone BuildManifest for Cryptex paths..."
+CRYPTEX_PATHS=$("$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" cryptex-paths "$RESTORE_DIR/iPhone-BuildManifest.plist")
+CRYPTEX_SYSOS=$(echo "$CRYPTEX_PATHS" | head -1)
+CRYPTEX_APPOS=$(echo "$CRYPTEX_PATHS" | tail -1)
+echo "  SystemOS: $CRYPTEX_SYSOS"
+echo "  AppOS:    $CRYPTEX_APPOS"
+
+# ═══════════ 1/7 INSTALL CRYPTEX ══════════════════════════════
+echo ""
+echo "[1/7] Installing Cryptex (SystemOS + AppOS)..."
+
+SYSOS_DMG="$TEMP_DIR/CryptexSystemOS.dmg"
+APPOS_DMG="$TEMP_DIR/CryptexAppOS.dmg"
+MNT_SYSOS="$CFW_HOST_MNT/mnt_sysos"
+MNT_APPOS="$CFW_HOST_MNT/mnt_appos"
+
+# Validate and publish SystemOS cache only after successful copy/decryption.
+cfw_cache_systemos "$RESTORE_DIR/$CRYPTEX_SYSOS" "$SYSOS_DMG"
+
+# Copy AppOS (unencrypted, cached)
+cfw_cache_appos "$RESTORE_DIR/$CRYPTEX_APPOS" "$APPOS_DMG"
+
+# Detach any leftover mounts from previous runs
+safe_detach "$MNT_SYSOS"
+safe_detach "$MNT_APPOS"
+mkdir -p "$MNT_SYSOS" "$MNT_APPOS"
+assert_mount_under_vm "$MNT_SYSOS" "SystemOS mountpoint"
+assert_mount_under_vm "$MNT_APPOS" "AppOS mountpoint"
+
+echo "  Mounting SystemOS..."
+sudo ${SUDO_ASKPASS:+-A} hdiutil attach -mountpoint "$MNT_SYSOS" "$SYSOS_DMG" -nobrowse -owners off
+echo "  Mounting AppOS..."
+sudo ${SUDO_ASKPASS:+-A} hdiutil attach -mountpoint "$MNT_APPOS" "$APPOS_DMG" -nobrowse -owners off
+
+# Mount the image's System volume (tolerate already-mounted)
+echo "  Mounting rootfs rw..."
+mount_vol s1 "$MNT1"
+
+# Patch launchd jetsum guard
+echo ""
+echo "  Patching launchd (jetsam guard)..."
+
+if ! [[ -e "$MNT1/sbin/launchd.bak" ]]; then
+    echo "  Creating backup..."
+    /bin/cp $MNT1/sbin/launchd $MNT1/sbin/launchd.bak
+fi
+
+cp "$MNT1/sbin/launchd.bak" "$TEMP_DIR/launchd"
+
+"$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-launchd-jetsam "$TEMP_DIR/launchd"
+ldid_sign "$TEMP_DIR/launchd"
+cp -R "$TEMP_DIR/launchd" "$MNT1/sbin/launchd"
+/bin/chmod 0755 $MNT1/sbin/launchd
+
+echo "  [+] launchd patched"
+
+# remove seatbelt profile and add task_for_pid-allow for debugserver
+echo ""
+echo "  Patch debugserver entitlements..."
+
+cp "$MNT1/usr/libexec/debugserver" "$TEMP_DIR/debugserver"
+ldid -e "$TEMP_DIR/debugserver" > "$TEMP_DIR/debugserver-entitlements.plist"
+plutil -remove seatbelt-profiles "$TEMP_DIR/debugserver-entitlements.plist" || true
+plutil -insert task_for_pid-allow -bool YES "$TEMP_DIR/debugserver-entitlements.plist" || true
+ldid_sign_ent "$TEMP_DIR/debugserver" "$TEMP_DIR/debugserver-entitlements.plist"
+cp -R "$TEMP_DIR/debugserver" "$MNT1/usr/libexec/debugserver"
+/bin/chmod 0755 $MNT1/usr/libexec/debugserver
+
+echo "  [+] debugserver entitlements patched"
+
+
+/bin/rm -rf $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
+/bin/mkdir -p $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
+/bin/chmod 0755 $MNT1/System/Cryptexes/App $MNT1/System/Cryptexes/OS
+
+# Copy Cryptex files onto the volume
+echo "  Copying Cryptexes..."
+cp -R "$MNT_SYSOS/." "$MNT1/System/Cryptexes/OS"
+cp -R "$MNT_APPOS/." "$MNT1/System/Cryptexes/App"
+
+# Create dyld symlinks (ln -sf is idempotent)
+echo "  Creating dyld symlinks..."
+/bin/ln -sf ../../../System/Cryptexes/OS/System/Library/Caches/com.apple.dyld \
+    $MNT1/System/Library/Caches/com.apple.dyld
+/bin/ln -sf ../../../../System/Cryptexes/OS/System/DriverKit/System/Library/dyld \
+    $MNT1/System/DriverKit/System/Library/dyld
+
+# Unmount Cryptex DMGs
+echo "  Unmounting Cryptex DMGs..."
+safe_detach "$MNT_SYSOS"
+safe_detach "$MNT_APPOS"
+
+echo "  [+] Cryptex installed"
+
+# Some userland versions send an IOMobileFramebuffer SwapEnd state whose size
+# differs from what the PCC vphone600 userclient expects (an exact
+# checkStructureInputSize check), so SwapEnd returns kIOReturnBadArgument and
+# the host VZ display stays black (guest still renders; visible over VNC).
+#
+# The accepted size is a property of the BASE KERNEL, not the userland:
+#   - 26.1 base: userclient expects 0x560
+#   - 26.4 base (xnu-12377, current): userclient expects 0x588
+# Reliably reading it from the kernelcache needs the IOMFB userclient dispatch
+# table (a blind shape-scan is ambiguous — 8 candidates), so until that dynamic
+# detection lands we key the target off the userland version as a proxy for the
+# validated base pairing:
+#   - 27.x runs on the 26.4 base           -> 0x588
+#   - 26.0/26.0.1 and 18.x validated on 26.1 base -> 0x560
+# Known userland-sent sizes: 18.x -> 0x514, 26.0/26.0.1 -> 0x548, 27.0 -> 0x6e0.
+# Patch only that immediate in the installed DSC; the patcher is semantic +
+# idempotent (rewrites the SwapEnd size to the target, no-op if already there).
+# NOTE: iOS 27 is intentionally NOT truncated here — its swap struct (0x6e0) has
+# a new layout, so size-truncation to 0x588 feeds the kernel misaligned data.
+# Instead the JB kernel patch `patchIomfbSwapEndVariableSize` makes the userclient
+# accept iOS 27's native 0x6e0 struct (variable-size dispatch), so 27 must send
+# its native size — leave it unpatched here.
+IOS_VERSION=$(/usr/bin/plutil -extract ProductVersion raw -o - "$MNT1/System/Library/CoreServices/SystemVersion.plist" 2>/dev/null || true)
+IOMFB_TARGET=""
+case "$IOS_VERSION" in
+    26.0*|18.*) IOMFB_TARGET=0x560 ;;
+esac
+if [[ -n "$IOMFB_TARGET" ]]; then
+    echo "  [*] Patching IOMobileFramebuffer SwapEnd payload size (iOS $IOS_VERSION -> $IOMFB_TARGET)..."
+    DSC_DIR="$MNT1/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld"
+    [[ -d "$DSC_DIR" ]] || die "dyld cache dir missing: $DSC_DIR"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-iomfb-swapend "$DSC_DIR" --target-size "$IOMFB_TARGET"
+fi
+
+# ═══════════ 2/7 PATCH SEPUTIL ════════════════════════════════
+echo ""
+echo "[2/7] Patching seputil..."
+
+# Always patch from .bak (original unpatched binary)
+if ! [[ -e "$MNT1/usr/libexec/seputil.bak" ]]; then
+    echo "  Creating backup..."
+    /bin/cp $MNT1/usr/libexec/seputil $MNT1/usr/libexec/seputil.bak
+fi
+
+cp "$MNT1/usr/libexec/seputil.bak" "$TEMP_DIR/seputil"
+"$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-seputil "$TEMP_DIR/seputil"
+ldid_sign "$TEMP_DIR/seputil" "com.apple.seputil"
+cp -R "$TEMP_DIR/seputil" "$MNT1/usr/libexec/seputil"
+/bin/chmod 0755 $MNT1/usr/libexec/seputil
+
+# Rename gigalocker (mv to same name is fine on re-run)
+echo "  Renaming gigalocker..."
+mount_vol s3 "$MNT3"
+mv "$MNT3"/*.gl(N) "$MNT3/AA.gl" 2>/dev/null || true
+
+echo "  [+] seputil patched"
+
+# ═══════════ 3/7 INSTALL GPU DRIVER ══════════════════════════
+echo ""
+echo "[3/7] Installing AppleParavirtGPUMetalIOGPUFamily..."
+
+cp -R "$INPUT_DIR/custom/AppleParavirtGPUMetalIOGPUFamily.tar" "$MNT1"
+"$TAR" --preserve-permissions --no-overwrite-dir \
+    -xf $MNT1/AppleParavirtGPUMetalIOGPUFamily.tar -C $MNT1
+
+BUNDLE="$MNT1/System/Library/Extensions/AppleParavirtGPUMetalIOGPUFamily.bundle"
+# Clean macOS resource fork files (._* files from tar xattrs)
+find $BUNDLE -name '._*' -delete 2>/dev/null || true
+/usr/sbin/chown -R 0:0 $BUNDLE
+/bin/chmod 0755 $BUNDLE
+/bin/chmod 0755 $BUNDLE/libAppleParavirtCompilerPluginIOGPUFamily.dylib
+/bin/chmod 0755 $BUNDLE/AppleParavirtGPUMetalIOGPUFamily
+/bin/chmod 0755 $BUNDLE/_CodeSignature
+/bin/chmod 0644 $BUNDLE/_CodeSignature/CodeResources
+/bin/chmod 0644 $BUNDLE/Info.plist
+/bin/rm -f $MNT1/AppleParavirtGPUMetalIOGPUFamily.tar
+
+echo "  [+] GPU driver installed"
+
+# ═══════════ 4/7 INSTALL IOSBINPACK64 ════════════════════════
+echo ""
+echo "[4/7] Installing iosbinpack64..."
+
+cp -R "$INPUT_DIR/jb/iosbinpack64.tar" "$MNT1"
+"$TAR" --preserve-permissions --no-overwrite-dir \
+    -xf $MNT1/iosbinpack64.tar -C $MNT1
+/bin/rm -f $MNT1/iosbinpack64.tar
+
+# dropbear host keys are generated on first boot by dropbear -R; just ensure
+# the key directory exists for it to write into.
+/bin/mkdir -p $MNT3/dropbear
+
+echo "  [+] iosbinpack64 installed"
+
+# ═══════════ 5/7 PATCH LAUNCHD_CACHE_LOADER ══════════════════
+echo ""
+echo "[5/7] Patching launchd_cache_loader..."
+
+# Always patch from .bak (original unpatched binary)
+if ! [[ -e "$MNT1/usr/libexec/launchd_cache_loader.bak" ]]; then
+    echo "  Creating backup..."
+    /bin/cp $MNT1/usr/libexec/launchd_cache_loader $MNT1/usr/libexec/launchd_cache_loader.bak
+fi
+
+cp "$MNT1/usr/libexec/launchd_cache_loader.bak" "$TEMP_DIR/launchd_cache_loader"
+"$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-launchd-cache-loader "$TEMP_DIR/launchd_cache_loader"
+ldid_sign "$TEMP_DIR/launchd_cache_loader" "com.apple.launchd_cache_loader"
+cp -R "$TEMP_DIR/launchd_cache_loader" "$MNT1/usr/libexec/launchd_cache_loader"
+/bin/chmod 0755 $MNT1/usr/libexec/launchd_cache_loader
+
+echo "  [+] launchd_cache_loader patched"
+
+# ═══════════ 6/7 PATCH MOBILEACTIVATIOND ═════════════════════
+echo ""
+echo "[6/7] Patching mobileactivationd..."
+
+# Always patch from .bak (original unpatched binary)
+if ! [[ -e "$MNT1/usr/libexec/mobileactivationd.bak" ]]; then
+    echo "  Creating backup..."
+    /bin/cp $MNT1/usr/libexec/mobileactivationd $MNT1/usr/libexec/mobileactivationd.bak
+fi
+
+cp "$MNT1/usr/libexec/mobileactivationd.bak" "$TEMP_DIR/mobileactivationd"
+"$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-mobileactivationd "$TEMP_DIR/mobileactivationd"
+ldid_sign "$TEMP_DIR/mobileactivationd"
+cp -R "$TEMP_DIR/mobileactivationd" "$MNT1/usr/libexec/mobileactivationd"
+/bin/chmod 0755 $MNT1/usr/libexec/mobileactivationd
+
+echo "  [+] mobileactivationd patched"
+
+# ═══════════ 7/7 LAUNCHDAEMONS + LAUNCHD.PLIST ══════════════
+echo ""
+echo "[7/7] Installing LaunchDaemons..."
+
+# Install vphoned (vsock HID injector daemon)
+cfw_stage_vphoned "$GUEST_RESOURCES"
+echo "  [+] vphoned installed (signed copy at .vphoned.signed)"
+
+# Send daemon plists (overwrite on re-run)
+for plist in bash.plist dropbear.plist trollvnc.plist rpcserver_ios.plist; do
+    plist_src="$INPUT_DIR/jb/LaunchDaemons/$plist"
+    if [[ "$plist" == "dropbear.plist" ]]; then
+        plist_src="$TEMP_DIR/dropbear.plist"
+        cp "$INPUT_DIR/jb/LaunchDaemons/dropbear.plist" "$plist_src"
+        "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-dropbear-plist "$plist_src"
+    fi
+    cp -R "$plist_src" "$MNT1/System/Library/LaunchDaemons/"
+    /bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/$plist
+done
+cp -R "$GUEST_RESOURCES/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/"
+/bin/chmod 0644 $MNT1/System/Library/LaunchDaemons/vphoned.plist
+
+# Always patch launchd.plist from .bak (original)
+echo "  Patching launchd.plist..."
+if ! [[ -e "$MNT1/System/Library/xpc/launchd.plist.bak" ]]; then
+    echo "  Creating backup..."
+    /bin/cp $MNT1/System/Library/xpc/launchd.plist $MNT1/System/Library/xpc/launchd.plist.bak
+fi
+
+cp "$MNT1/System/Library/xpc/launchd.plist.bak" "$TEMP_DIR/launchd.plist"
+cp "$GUEST_RESOURCES/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/"
+"$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-daemons "$TEMP_DIR/launchd.plist" "$INPUT_DIR/jb/LaunchDaemons"
+cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
+/bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
+
+echo "  [+] LaunchDaemons installed"
+
+# ═══════════ CLEANUP ═════════════════════════════════════════
+echo ""
+echo "[*] Unmounting image volumes..."
+/sbin/umount $MNT1 2>/dev/null || true
+/sbin/umount $MNT3 2>/dev/null || true
+
+echo "[*] Cleaning up temp..."
+rm -rf "$TEMP_DIR"
+
+echo ""
+echo "[+] CFW installation complete!"
+echo "    Boot to apply changes."
+echo "    After boot, SSH will be available on port 22222 (password: alpine)"
