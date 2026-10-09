@@ -9,6 +9,7 @@ import plistlib
 import re
 import subprocess
 
+from daemon_api_overlays import DIRECTORY as OVERLAY_DIRECTORY, declarations, validate_overlay, validate_marker
 from check_guest_payloads import output, validate_metadata
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,12 +53,19 @@ def check_project_requirements(project_text, pins):
 
 
 def check_checkouts(pins, checkouts):
+    overlays = {item['identity']: item for item in declarations()}
+    if set(overlays) - {pin['identity'] for pin in pins}:
+        raise ValueError('Overlay package is not pinned')
     for pin in pins:
         directory = checkouts / pin['identity']
         revision = output('/usr/bin/git', '-C', str(directory), 'rev-parse', 'HEAD').strip()
         if revision != pin['state']['revision']:
             raise ValueError(f'Unexpected dependency checkout: {pin["identity"]}')
-        if output('/usr/bin/git', '-C', str(directory), 'status', '--porcelain').strip():
+        if overlay := overlays.get(pin['identity']):
+            if overlay['revision'] != pin['state']['revision']:
+                raise ValueError('Overlay is not bound to the pinned revision')
+            validate_overlay(directory, overlay, OVERLAY_DIRECTORY / overlay['patch'])
+        elif output('/usr/bin/git', '-C', str(directory), 'status', '--porcelain').strip():
             raise ValueError(f'Modified dependency checkout: {pin["identity"]}')
     # ArchiveKit's Package.swift prefers this local override when present.
     override = checkouts / 'libarchive.xcframework/BinaryTarget/libarchive.xcframework'
@@ -81,6 +89,8 @@ def inspect_candidate(directory, ldid, pins):
     if (directory / 'vphoned.plist').read_bytes() != (PROJECT / 'Configuration/vphoned.plist').read_bytes():
         raise ValueError('Candidate launchd plist differs from the source')
     binary = directory / 'vphoned'
+    overlays = declarations()
+    validate_marker(binary.read_bytes(), overlays)
     if not os.access(binary, os.X_OK):
         raise ValueError('Candidate is not executable')
     validate_metadata(output('/usr/bin/lipo', '-archs', str(binary)),
@@ -95,7 +105,7 @@ def inspect_candidate(directory, ldid, pins):
     return {'schema_version': 1, 'role': 'isolated-api-daemon-candidate',
             'activated': False, 'runtime_validated': False, 'api_version': 1, 'vsock_port': 1339,
             'architecture': 'arm64', 'platform': 'IOS', 'deployment_target': '15.0',
-            'files_sha256': digests, 'pins': pins,
+            'files_sha256': digests, 'pins': pins, 'source_overlays': overlays,
             'dynamic_libraries': [line.strip() for line in libraries]}
 
 

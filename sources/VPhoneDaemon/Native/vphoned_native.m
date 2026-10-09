@@ -62,12 +62,21 @@ static bool cached_binary_matches_marker(int directory, int image) {
     return strcmp(actual, expected) == 0;
 }
 
+// The proxy may exec /var/root/... while dyld reports /private/var/root/...
+// for its worker. Compare the regular cache file's identity, not path spelling.
+static bool current_is_cached_binary(const char *current) {
+    struct stat cached, running;
+    return lstat(cache, &cached) == 0 && S_ISREG(cached.st_mode) &&
+           stat(current, &running) == 0 && cached.st_dev == running.st_dev &&
+           cached.st_ino == running.st_ino;
+}
+
 // MARK: - Bootstrap
 
 void vp_native_bootstrap_cached_binary(void) {
     char current[4096];
     uint32_t size = sizeof(current);
-    if (_NSGetExecutablePath(current, &size) != 0 || strcmp(current, cache) == 0) return;
+    if (_NSGetExecutablePath(current, &size) != 0 || current_is_cached_binary(current)) return;
 
     // Keep the launchd process small: hash the cache in bounded chunks. The
     // file is opened once without following a link, and the hash covers that
@@ -106,7 +115,14 @@ void vp_native_bootstrap_cached_binary(void) {
 void vp_native_confirm_cached_binary(void) {
     char current[4096];
     uint32_t size = sizeof(current);
-    if (_NSGetExecutablePath(current, &size) != 0 || strcmp(current, cache) != 0) return;
+    if (_NSGetExecutablePath(current, &size) != 0 || !current_is_cached_binary(current)) return;
     if (rename(pending, marker) != 0)
         fprintf(stderr, "vphoned: could not confirm cached binary: %s\n", strerror(errno));
+}
+
+#ifndef VP_DAEMON_OVERLAY_SHA
+#define VP_DAEMON_OVERLAY_SHA "unverified"
+#endif
+const char *vp_daemon_source_overlay(void) {
+    return "VPHONE_DAEMON_OVERLAYS:" VP_DAEMON_OVERLAY_SHA;
 }

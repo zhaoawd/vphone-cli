@@ -7,10 +7,18 @@ cd "$PROJECT_ROOT"
 output="$PROJECT_ROOT/.build/daemon-api-v2"
 project="$PROJECT_ROOT/sources/VPhoneDaemon/VPhoneDaemon.xcodeproj"
 python3 "$SCRIPT_DIR/check_daemon_api.py"
+if [[ ! -d "$output/Xcode/SourcePackages/checkouts/icli/.git" ]]; then
+  xcodebuild -resolvePackageDependencies -project "$project" -scheme vphoned \
+    -derivedDataPath "$output/Xcode" -onlyUsePackageVersionsFromResolvedFile
+fi
+python3 "$SCRIPT_DIR/daemon_api_overlays.py" --checkouts "$output/Xcode/SourcePackages/checkouts"
+python3 "$SCRIPT_DIR/check_daemon_api.py" --checkouts "$output/Xcode/SourcePackages/checkouts"
+overlay_sha=$(python3 "$SCRIPT_DIR/daemon_api_overlays.py" --fingerprint)
 xcodebuild -project "$project" -scheme vphoned -configuration Release \
   -destination 'generic/platform=iOS' -derivedDataPath "$output/Xcode" \
   -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile \
-  -jobs 4 CODE_SIGNING_ALLOWED=NO build
+  -jobs 4 CODE_SIGNING_ALLOWED=NO \
+  "GCC_PREPROCESSOR_DEFINITIONS=\$(inherited) VP_DAEMON_OVERLAY_SHA=\\\"${overlay_sha}\\\"" build
 python3 "$SCRIPT_DIR/check_daemon_api.py" --checkouts "$output/Xcode/SourcePackages/checkouts"
 stage="$output/candidate"
 mkdir -p "$stage"

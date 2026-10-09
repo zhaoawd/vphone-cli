@@ -51,6 +51,19 @@ static int bind_loopback(const char *path) {
     return fd;
 }
 
+// Deliver the stop on a non-waiting thread, as a Swift runtime can do.
+static void *stop_from_other_thread(void *unused) {
+    (void)unused;
+    for (;;) {
+        int fd = open(getenv("VPHONE_PROXY_TEST_READY"), O_RDONLY);
+        if (fd >= 0) { close(fd); break; }
+        usleep(10000);
+    }
+    usleep(100000);
+    pthread_kill(pthread_self(), SIGTERM);
+    return NULL;
+}
+
 int main(void) {
     int mode = vp_native_process_mode();
     if (mode < 0) return 64;
@@ -58,6 +71,21 @@ int main(void) {
         const char *ignore = getenv("VPHONE_PROXY_TEST_IGNORE_CHLD");
         // Ignored SIGCHLD lets the kernel reap workers, so waitpid fails.
         if (ignore && strcmp(ignore, "1") == 0) signal(SIGCHLD, SIG_IGN);
+        const char *action = getenv("VPHONE_PROXY_TEST_ACTION");
+        if (action && strcmp(action, "blocked-stop") == 0) {
+            sigset_t blocked;
+            sigemptyset(&blocked);
+            sigaddset(&blocked, SIGTERM);
+            sigaddset(&blocked, SIGINT);
+            if (pthread_sigmask(SIG_BLOCK, &blocked, NULL)) return 70;
+        }
+        if (action && strcmp(action, "threaded-stop") == 0) {
+            pthread_t stopper;
+            if (pthread_create(&stopper, NULL, stop_from_other_thread, NULL)) return 69;
+            int result = vp_native_run_proxy();
+            pthread_join(stopper, NULL);
+            return result;
+        }
         return vp_native_run_proxy();
     }
     const char *action = getenv("VPHONE_PROXY_TEST_ACTION");
@@ -65,7 +93,7 @@ int main(void) {
     int stubborn = strcmp(action, "stubborn") == 0;
     if (stubborn) signal(SIGTERM, SIG_IGN);
     else if (vp_native_watch_proxy() != 0) return 66;
-    if (strcmp(action, "bind") == 0) {
+    if (strcmp(action, "bind") == 0 || strcmp(action, "threaded-stop") == 0 || strcmp(action, "blocked-stop") == 0) {
         const char *port = getenv("VPHONE_PROXY_TEST_PORT");
         if (!port || bind_loopback(port) < 0) return 68;
     }

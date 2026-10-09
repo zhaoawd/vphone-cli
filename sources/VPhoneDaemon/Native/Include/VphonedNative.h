@@ -15,6 +15,9 @@ int vp_native_process_mode(void);
 int vp_native_run_proxy(void);
 int vp_native_watch_proxy(void);
 void vp_vcam_start(void);
+const char *vp_daemon_source_overlay(void);
+int vp_native_api_open(void);
+int vp_native_api_serve(int listener, int (*attach)(int, int));
 
 typedef struct {
     int32_t pid;

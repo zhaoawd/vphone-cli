@@ -6,6 +6,7 @@ extension GuestAPI {
     static func executeExtended(method: String, params: [String: Any]) throws -> [String: Any]? {
         let areas: [(String, [String: Any]) throws -> [String: Any]?] = [
             executeDevice,
+            executeTimeZone,
             executeInput,
             executeInterface,
             executeProcess,

@@ -104,6 +104,23 @@ class DaemonProxyTests(unittest.TestCase):
         self.assertEqual(process.wait(timeout=4), 0)
         self.assert_exited(pid)
 
+    def test_inherited_signal_mask_does_not_block_proxy_stop(self):
+        process = self.start('blocked-stop')
+        pid = self.wait_workers()[0]
+        port = int(self.ready.with_name('port').read_text())
+        process.terminate()
+        self.assertEqual(process.wait(timeout=2), 0)
+        self.assert_exited(pid)
+        self.assert_port_released(port)
+
+    def test_stop_received_on_another_thread_wakes_wait_and_releases_port(self):
+        process = self.start('threaded-stop')
+        pid = self.wait_workers()[0]
+        port = int(self.ready.with_name('port').read_text())
+        self.assertEqual(process.wait(timeout=2), 0)
+        self.assert_exited(pid)
+        self.assert_port_released(port)
+
     def test_proxy_death_closes_liveness_pipe_and_worker_exits(self):
         process = self.start()
         pid = self.wait_workers()[0]

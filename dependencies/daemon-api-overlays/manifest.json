@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "overlays": [
+    {
+      "identity": "icli",
+      "revision": "702990b59ca412ad975f9f0ea5dafe95c30fac21",
+      "path": "Sources/IcliPrivate/IcliPrivate.m",
+      "patch": "icli-jpeg-copy.patch",
+      "base_sha256": "1d688dd5ad1b76582b506a4916617fc122bb6f84b58d12cc68d8d3e050f87c15",
+      "patched_sha256": "c5fdaa443bcfd47ddb468354b08c20b7a5fe25b4546046aea220f780d22264cd",
+      "patch_sha256": "e1e93ea015d9d4c4f946bb2ea79627cff0bf990c9391e760b3aa56b71e52d74e",
+      "purpose": "B22 screen-backed JPEG memory retention; independent bitmap copy"
+    }
+  ]
+}

@@ -6,6 +6,7 @@
 #include <mach-o/dyld.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdatomic.h>
 #include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,10 +18,23 @@
 extern char **environ;
 
 static volatile sig_atomic_t stopping = 0;
+_Static_assert(ATOMIC_INT_LOCK_FREE == 2, "signal cleanup requires lock-free int atomics");
+static _Atomic int watch_write_fd = -1;
+
+// Signals can arrive on a runtime thread while the proxy's main thread is
+// blocked in waitpid. Closing the liveness writer also wakes the worker; a
+// lock-free exchange prevents an interrupted path from closing a reused fd.
+static void close_watch_writer(void) {
+    int fd = atomic_exchange_explicit(&watch_write_fd, -1, memory_order_relaxed);
+    if (fd >= 0) close(fd);
+}
 static const char *pending_update = "/var/root/Library/Caches/vphoned.api-v2.pending";
 
 static void request_stop(int signal_number) {
+    int saved_errno = errno;
     stopping = signal_number;
+    close_watch_writer();
+    errno = saved_errno;
 }
 
 static int worker_fd(void) {
@@ -69,8 +83,8 @@ static void pause_before_retry(void) {
     while (!stopping && nanosleep(&remaining, &remaining) < 0 && errno == EINTR) {}
 }
 
-static void stop_worker(pid_t pid, int write_fd) {
-    close(write_fd);
+static void stop_worker(pid_t pid) {
+    close_watch_writer();
     kill(pid, SIGTERM);
     for (int tries = 0; tries < 30; tries++) {
         pid_t waited = waitpid(pid, NULL, WNOHANG);
@@ -89,24 +103,32 @@ int vp_native_run_proxy(void) {
 
     struct sigaction action = {.sa_handler = request_stop};
     sigemptyset(&action.sa_mask);
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGINT, &action, NULL);
+    if (sigaction(SIGTERM, &action, NULL) != 0 ||
+        sigaction(SIGINT, &action, NULL) != 0) return 1;
+    // An explicit launch from a guest command can inherit blocked signals.
+    // Unblock only the two stop signals for which this proxy owns handlers.
+    sigset_t stop_signals;
+    sigemptyset(&stop_signals);
+    sigaddset(&stop_signals, SIGTERM);
+    sigaddset(&stop_signals, SIGINT);
+    if (pthread_sigmask(SIG_UNBLOCK, &stop_signals, NULL) != 0) return 1;
 
     while (!stopping) {
         int pipe_fds[2];
         if (pipe(pipe_fds) != 0) return 1;
+        atomic_store_explicit(&watch_write_fd, pipe_fds[1], memory_order_relaxed);
         posix_spawn_file_actions_t file_actions;
         int error = posix_spawn_file_actions_init(&file_actions);
         if (error != 0) {
             close(pipe_fds[0]);
-            close(pipe_fds[1]);
+            close_watch_writer();
             return 1;
         }
         error = posix_spawn_file_actions_addclose(&file_actions, pipe_fds[1]);
         if (error != 0) {
             posix_spawn_file_actions_destroy(&file_actions);
             close(pipe_fds[0]);
-            close(pipe_fds[1]);
+            close_watch_writer();
             return 1;
         }
 
@@ -119,14 +141,14 @@ int vp_native_run_proxy(void) {
         close(pipe_fds[0]);
         if (error != 0) {
             fprintf(stderr, "vphoned proxy: posix_spawn failed: %s\n", strerror(error));
-            close(pipe_fds[1]);
+            close_watch_writer();
             // An unconfirmed cached image must return to launchd's bundled
             // fallback even when it cannot spawn a worker at all.
             if (access(pending_update, F_OK) == 0) return 1;
             pause_before_retry();
         } else {
             if (stopping) {
-                stop_worker(child, pipe_fds[1]);
+                stop_worker(child);
                 break;
             }
             int status = 0;
@@ -137,11 +159,11 @@ int vp_native_run_proxy(void) {
             // close() and access() below may overwrite errno before the log.
             int wait_error = waited < 0 ? errno : 0;
             if (stopping) {
-                if (waited == child) close(pipe_fds[1]);
-                else stop_worker(child, pipe_fds[1]);
+                if (waited == child) close_watch_writer();
+                else stop_worker(child);
                 break;
             }
-            close(pipe_fds[1]);
+            close_watch_writer();
             if (waited == child && WIFEXITED(status) && WEXITSTATUS(status) == 0) {
                 // agent.apply_update exits the worker after installing the
                 // cached binary. launchd restarts us into that new image.

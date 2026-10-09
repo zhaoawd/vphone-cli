@@ -260,6 +260,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
         case (.POST, "/v1/bootstrap/firmware"): "bootstrap.firmware"
         case (.POST, "/v1/input/touch"): "input.touch"
         case (.POST, "/v1/input/hid"): "input.hid"
+        case (.GET, "/v1/timezone"), (.PUT, "/v1/timezone"): "time.timezone"
         case (.GET, "/v1/location"): "location.current"
         case (.PUT, "/v1/location"): "location.set"
         case (.DELETE, "/v1/location"): "location.clear"
