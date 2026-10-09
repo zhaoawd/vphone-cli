@@ -122,7 +122,7 @@ public struct VPhoneVMStopper {
             listTargets: {
                 guard let ps = try? VPhoneProcessRunner.runCapturing(
                     URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="]) else { return [] }
-                return VPhoneBootProcessLocator.parsePIDs(ps.stdout, configURL: configURL)
+                return VPhoneBootProcessLocator.livePIDs(ps.stdout, configURL: configURL)
             },
             lockHeld: { VPhoneVMLockProbe.isLockHeld(directory: bundleDirectory) },
             readRecord: { VPhoneVMRuntimeState.read(in: bundleDirectory) },

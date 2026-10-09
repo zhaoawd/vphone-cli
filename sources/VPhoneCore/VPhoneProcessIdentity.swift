@@ -1,4 +1,5 @@
 import Darwin
+import Foundation
 
 // MARK: - VPhoneProcessIdentity
 
@@ -51,5 +52,39 @@ public enum VPhoneProcessInfo {
             startedAt: Double(started.tv_sec) + Double(started.tv_usec) / 1_000_000,
             uid: info.kp_eproc.e_ucred.cr_uid,
             isZombie: info.kp_proc.p_stat == Int8(SZOMB))
+    }
+
+    /// Returns argv only. Never logs the sysctl buffer, which can also contain
+    /// environment values. Unreadable or malformed process data is refused.
+    public static func arguments(of pid: pid_t) -> [String]? {
+        guard pid > 0 else { return nil }
+        var limit: Int32 = 0
+        var limitSize = MemoryLayout<Int32>.size
+        var limitMIB: [Int32] = [CTL_KERN, KERN_ARGMAX]
+        guard sysctl(&limitMIB, 2, &limit, &limitSize, nil, 0) == 0,
+              limit > 0, limit <= 16 * 1024 * 1024 else { return nil }
+        var bytes = [UInt8](repeating: 0, count: Int(limit))
+        var size = bytes.count
+        var mib: [Int32] = [CTL_KERN, KERN_PROCARGS2, pid]
+        let result = bytes.withUnsafeMutableBytes { buffer in
+            sysctl(&mib, 3, buffer.baseAddress, &size, nil, 0)
+        }
+        guard result == 0, size <= bytes.count, size > MemoryLayout<Int32>.size else { return nil }
+        bytes.removeSubrange(size...)
+        let argc = bytes.withUnsafeBytes { $0.loadUnaligned(as: Int32.self) }
+        guard argc > 0, argc <= size else { return nil }
+        var offset = MemoryLayout<Int32>.size
+        // KERN_PROCARGS2: argc, executable path, NUL padding, argv strings.
+        while offset < size, bytes[offset] != 0 { offset += 1 }
+        while offset < size, bytes[offset] == 0 { offset += 1 }
+        var arguments: [String] = []
+        for _ in 0..<argc {
+            let start = offset
+            while offset < size, bytes[offset] != 0 { offset += 1 }
+            guard offset < size, let argument = String(bytes: bytes[start..<offset], encoding: .utf8) else { return nil }
+            arguments.append(argument)
+            offset += 1
+        }
+        return arguments
     }
 }

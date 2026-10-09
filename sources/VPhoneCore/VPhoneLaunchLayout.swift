@@ -103,6 +103,23 @@ public enum VPhoneBootProcessLocator {
         parsePIDs(psOutput, configPaths: configPathVariants(for: configURL))
     }
 
+    /// For live processes, `ps` supplies only candidate PIDs. Kernel argv
+    /// preserves spaces and argument boundaries; flattened text is not trusted.
+    public static func livePIDs(_ psOutput: String, configURL: URL) -> [Int32] {
+        let wanted = Set(configPathVariants(for: configURL))
+        let canonical = Set(wanted.map(canonicalConfigPath))
+        let candidates = Set(psOutput.split(whereSeparator: \.isNewline).compactMap {
+            line -> Int32? in
+            guard line.contains("vphone-cli") || line.contains("vphone-vm") else { return nil }
+            return line.split(whereSeparator: \.isWhitespace).first.flatMap { Int32($0) }
+        })
+        return candidates.filter { pid in
+            guard pid > 0, let argv = VPhoneProcessInfo.arguments(of: pid), let first = argv.first,
+                  isVPhoneBootExecutable(first) else { return false }
+            return hasConfigArgument(argv, matching: { wanted.contains($0) || canonical.contains(canonicalConfigPath($0)) })
+        }.sorted()
+    }
+
     /// Matches `--config` arguments against `configPaths` by exact spelling or
     /// by canonical path (`canonicalConfigPath`), so a launcher that passed
     /// `/a/../vms/x/config.plist` or a symlinked directory still matches. Paths

@@ -19,9 +19,9 @@ private final class StopFixture {
     let shim: URL
     private var children: [Process] = []
 
-    init(executableName: String = "vphone-cli") throws {
+    init(executableName: String = "vphone-cli", spacedPaths: Bool = false) throws {
         root = FileManager.default.temporaryDirectory
-            .appendingPathComponent("vmstop-\(UUID().uuidString)")
+            .appendingPathComponent("vmstop-\(UUID().uuidString)" + (spacedPaths ? " Application Support" : ""))
         bundle = root.appendingPathComponent("vm")
         try FileManager.default.createDirectory(at: bundle, withIntermediateDirectories: true)
         shim = root.appendingPathComponent(executableName)
@@ -37,6 +37,10 @@ private final class StopFixture {
     @discardableResult
     func spawnBoot(_ body: String) throws -> Process {
         try spawn(executable: shim, arguments: ["-c", ready(body), "--config", configURL.path])
+    }
+
+    func spawnFlattenedConfig() throws -> Process {
+        try spawn(executable: shim, arguments: ["-c", ready("true"), "--config " + configURL.path])
     }
 
     /// Starts a process that is not a boot process of this bundle.
@@ -164,6 +168,20 @@ struct VMStopTests {
             URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="])
         let found = VPhoneBootProcessLocator.parsePIDs(ps.stdout, configURL: fixture.configURL)
         #expect(found == [boot.processIdentifier])
+    }
+
+    @Test(arguments: ["vphone-cli", "vphone-vm"]) func liveLocatorPreservesSpacesAndRejectsFlattenedArgumentSpoof(executableName: String) throws {
+        let fixture = try StopFixture(executableName: executableName, spacedPaths: true)
+        defer { fixture.terminateAll() }
+        let boot = try fixture.spawnBoot("trap 'exit 0' INT")
+        let unrelated = try fixture.spawnFlattenedConfig()
+        let ps = try VPhoneProcessRunner.runCapturing(
+            URL(fileURLWithPath: "/bin/ps"), ["-axo", "pid=,command="])
+        let found = VPhoneBootProcessLocator.livePIDs(ps.stdout, configURL: fixture.configURL)
+        #expect(found == [boot.processIdentifier])
+        #expect(!found.contains(unrelated.processIdentifier))
+        let production = VPhoneVMStopper(bundleDirectory: fixture.bundle, configURL: fixture.configURL, diskURL: fixture.diskURL)
+        #expect(production.listTargets() == [boot.processIdentifier])
     }
 
     @Test(arguments: ["vphone-cli", "vphone-vm"]) func neverSignalsAnotherProgramHoldingTheDiskImage(executableName: String) throws {
