@@ -75,6 +75,10 @@ if ! cp -cR "$TOOLCHAIN" "$HELPER" 2>/dev/null; then
   cp -R "$TOOLCHAIN" "$HELPER"
 fi
 
+# Stage only the outer host roots. The embedded CLI/VM bytes and signatures
+# remain unchanged; remove absolute build-toolchain rpaths before final sealing.
+python3 "$SCRIPT_DIR/build_native_dependencies.py" "$APP"
+
 # --- Manifest of the embedded executables ---
 CLI_CDHASH="$(cdhash "${HELPER}/Contents/MacOS/vphone-cli")"
 VM_CDHASH="$(cdhash "${HELPER}/Contents/MacOS/vphone-vm")"

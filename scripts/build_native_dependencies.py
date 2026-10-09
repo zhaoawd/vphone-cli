@@ -62,6 +62,10 @@ def contained(path, bundle):
 
 def resolve_dependency(value, source, root, rpaths):
     def expand(path):
+        if path == '@loader_path':
+            return source.parent
+        if path == '@executable_path':
+            return root.parent
         if path.startswith('@loader_path/'):
             return source.parent / path[len('@loader_path/'):]
         if path.startswith('@executable_path/'):
@@ -87,24 +91,40 @@ def resolve_dependency(value, source, root, rpaths):
 
 def check_native_dependencies(bundle):
     bundle = bundle.resolve()
-    pending = host_roots(bundle)
+    roots = host_roots(bundle)
+    pending = [(path, path) for path in roots]
     frameworks = bundle / 'Contents/Frameworks'
-    if frameworks.exists():
-        pending.extend(frameworks.glob('*.dylib'))
+    unvisited_libraries = list(frameworks.glob('*.dylib')) if frameworks.exists() else []
     seen = set()
     report = {}
-    while pending:
-        path = pending.pop()
+    while pending or unvisited_libraries:
+        if not pending:
+            library = unvisited_libraries.pop().resolve()
+            if any(path == library for path, _ in seen):
+                continue
+            # Unreferenced packaged libraries must be safe for every named
+            # host executable; referenced libraries retain their actual root.
+            pending.extend((library, root) for root in roots)
+            continue
+        path, executable = pending.pop()
         contained(path, bundle)
         path = path.resolve()
-        if path in seen:
+        key = (path, executable)
+        if key in seen:
             continue
-        seen.add(path)
+        seen.add(key)
         dependencies, rpaths, identifier = load_commands(path)
         if identifier is not None and identifier != '@rpath/' + path.name:
             raise ValueError(f'Nonportable library identifier in {path}: {identifier}')
         for rpath in rpaths:
-            if not system_library(rpath):
+            if system_library(rpath):
+                continue
+            for token, directory in (('@loader_path', path.parent),
+                                     ('@executable_path', executable.parent)):
+                if rpath == token or rpath.startswith(token + '/'):
+                    contained(directory / rpath[len(token):].lstrip('/'), bundle)
+                    break
+            else:
                 raise ValueError(f'Nonportable rpath in {path}: {rpath}')
         for value in dependencies:
             if system_library(value):
@@ -119,7 +139,7 @@ def check_native_dependencies(bundle):
             actual_arches = set(output('lipo', '-archs', dependency).split())
             if not required_arches <= actual_arches:
                 raise ValueError(f'Missing architecture in {dependency}: {required_arches - actual_arches}')
-            pending.append(dependency)
+            pending.append((dependency, executable))
         subprocess.run(['codesign', '--verify', '--strict', str(path)], check=True)
         report[str(path.relative_to(bundle))] = {
             'dependencies': dependencies, 'rpaths': rpaths, 'identifier': identifier,
@@ -133,30 +153,46 @@ def stage_native_dependencies(bundle):
     bundle = bundle.resolve()
     frameworks = bundle / 'Contents/Frameworks'
     destinations = {}
-    visited = set()
+    source_commands = {}
+    dependency_plans = {}
+    visited_contexts = set()
     signed = set()
 
     def stage(source, destination, root, inherited=()):
         source = source.resolve()
         key = (source, destination)
-        if key in visited:
-            return
-        visited.add(key)
         contained(destination, bundle)
-        dependencies, rpaths, identifier = load_commands(source)
+        if destination.resolve().is_relative_to((bundle / 'Contents/Helpers').resolve()):
+            raise ValueError(f'Nested helper code is immutable during outer staging: {destination}')
+        # Keep the original commands even when source and destination are the
+        # same file; subsequent roots must not inspect already rewritten loads.
+        if source not in source_commands:
+            source_commands[source] = load_commands(source)
+        dependencies, rpaths, identifier = source_commands[source]
         expanded_rpaths = []
         for rpath in rpaths:
-            if rpath.startswith('@loader_path/'):
+            if rpath == '@loader_path':
+                expanded_rpaths.append(str(source.parent))
+            elif rpath == '@executable_path':
+                expanded_rpaths.append(str(root.parent))
+            elif rpath.startswith('@loader_path/'):
                 expanded_rpaths.append(str(source.parent / rpath[len('@loader_path/'):]))
             elif rpath.startswith('@executable_path/'):
                 expanded_rpaths.append(str(root.parent / rpath[len('@executable_path/'):]))
             else:
                 expanded_rpaths.append(rpath)
-        search_rpaths = [*expanded_rpaths, *inherited]
-        for value in dependencies:
-            if system_library(value):
-                continue
-            dependency = resolve_dependency(value, source, root, search_rpaths)
+        search_rpaths = list(dict.fromkeys([*expanded_rpaths, *inherited]))
+        resolved = [(value, resolve_dependency(value, source, root, search_rpaths))
+                    for value in dependencies if not system_library(value)]
+        first_visit = key not in dependency_plans
+        if not first_visit and dependency_plans[key] != resolved:
+            raise ValueError(f'Conflicting dependency resolution across host roots: {source} (root {root})')
+        dependency_plans[key] = resolved
+        context = (source, destination, root, tuple(search_rpaths))
+        if context in visited_contexts:
+            return
+        visited_contexts.add(context)
+        for value, dependency in resolved:
             if dependency.is_relative_to(bundle):
                 target = dependency
             else:
@@ -172,8 +208,11 @@ def stage_native_dependencies(bundle):
                     shutil.copy2(dependency, target)
                     target.chmod(target.stat().st_mode | 0o200)
             stage(dependency, target, root, search_rpaths)
-            replacement = '@loader_path/' + os.path.relpath(target, destination.parent)
-            subprocess.run(['install_name_tool', '-change', value, replacement, str(destination)], check=True)
+            if first_visit:
+                replacement = '@loader_path/' + os.path.relpath(target, destination.parent)
+                subprocess.run(['install_name_tool', '-change', value, replacement, str(destination)], check=True)
+        if not first_visit:
+            return
         if identifier is not None:
             subprocess.run(['install_name_tool', '-id', '@rpath/' + destination.name, str(destination)], check=True)
         for rpath in rpaths:
