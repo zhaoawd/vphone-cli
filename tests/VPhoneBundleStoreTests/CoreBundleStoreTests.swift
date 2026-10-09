@@ -15,11 +15,18 @@ private final class BundleFixture {
     init() throws {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("bundle-store-\(UUID().uuidString)")
             .resolvingSymlinksInPath()
+        // Keep this private parent independent of the process umask while
+        // archive fixtures run concurrently. Store validation must stay strict.
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false,
+                                                attributes: [.posixPermissions: 0o700])
         source = directory.appendingPathComponent("VPhone.bundle")
         archive = directory.appendingPathComponent("input.tar")
         store = VPhoneCoreBundleStore(testRoot: directory.appendingPathComponent("store"))
-        try FileManager.default.createDirectory(at: source.appendingPathComponent("Contents/MacOS"), withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: source.appendingPathComponent("Contents/Resources"), withIntermediateDirectories: true)
+        for path in ["", "Contents", "Contents/MacOS", "Contents/Resources"] {
+            let url = path.isEmpty ? source : source.appendingPathComponent(path)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false,
+                                                    attributes: [.posixPermissions: 0o755])
+        }
         let plist: [String: String] = ["CFBundleIdentifier": "com.vphone.store-test", "CFBundleName": "VPhone",
             "CFBundleExecutable": "vphone-cli", "CFBundlePackageType": "BNDL", "CFBundleShortVersionString": "2.2.3"]
         try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
