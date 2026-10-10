@@ -19,7 +19,9 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGES = ROOT / '.build/daemon-api-v2/Xcode/SourcePackages'
+# 独立 worktree 可只读使用已固定的依赖；checkout_state 仍核对 IcliKit revision。
+PACKAGES = Path(os.environ.get('VPHONE_DAEMON_SOURCE_PACKAGES',
+                               str(ROOT / '.build/daemon-api-v2/Xcode/SourcePackages'))).resolve()
 ICLI = PACKAGES / 'checkouts/icli'
 LIBARCHIVE = (PACKAGES / 'artifacts/libarchive.xcframework/libarchive/libarchive.xcframework'
               / 'macos-arm64_x86_64/libarchive.framework')

@@ -1,0 +1,92 @@
+{
+  "started_at": 1791651303.509362,
+  "finished_at": 1791651304.845275,
+  "roots": {
+    "code_root": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli",
+    "artifact_root": "/Users/kolar/github/vphone-cli/.build/research-b35/source",
+    "vm_root": "/Users/kolar/github/vphone-cli",
+    "work_root": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b37",
+    "evidence": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/research/upstream_integration_2026-10-06/evidence/B37/T08"
+  },
+  "frozen_artifacts": [
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+      "sha256": "d89cea7e6db3fb7c48a15371e5a6cd890cc9506d092843c3cad993e9b122ca85"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+      "sha256": "a4f8a4155a95e3d0c9067f856bb09a165df22cc9e55fcf9356f01ab16b0d11f4"
+    },
+    {
+      "path": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/daemon-api-v2/candidate/vphoned",
+      "sha256": "36005e2af21d8e72e0b944e5f38c0bdfa373b86e3bb67b889ec4245c3165dd1a"
+    }
+  ],
+  "source_input_files": 663,
+  "checks": [
+    {
+      "name": "bundle-check",
+      "command": [
+        "/Users/kolar/github/vphone-cli/..venv.generations/env-pereh1d9/bin/python3",
+        "-B",
+        "scripts/check_bundle.py",
+        "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "api-check",
+      "command": [
+        "/Users/kolar/github/vphone-cli/..venv.generations/env-pereh1d9/bin/python3",
+        "-B",
+        "scripts/check_daemon_api.py",
+        "--checkouts",
+        "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/daemon-api-v2/Xcode/SourcePackages/checkouts",
+        "--candidate",
+        "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/daemon-api-v2/candidate"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "components-check",
+      "command": [
+        "/Users/kolar/github/vphone-cli/..venv.generations/env-pereh1d9/bin/python3",
+        "-B",
+        "scripts/check_guest_components.py",
+        "--stage",
+        "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest-components-v2/stage"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "boot-path-check",
+      "command": [
+        "/Users/kolar/github/vphone-cli/..venv.generations/env-pereh1d9/bin/python3",
+        "-B",
+        "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/research/upstream_integration_2026-10-06/evidence/B37/T08/boot.py",
+        "--workspace",
+        "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/research/upstream_integration_2026-10-06/evidence/B37/T08/workspace.json",
+        "--check"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "client-path-check",
+      "command": [
+        "/Users/kolar/github/vphone-cli/..venv.generations/env-pereh1d9/bin/python3",
+        "-B",
+        "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/research/upstream_integration_2026-10-06/evidence/B37/T08/client.py",
+        "--workspace",
+        "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/research/upstream_integration_2026-10-06/evidence/B37/T08/workspace.json",
+        "--check"
+      ],
+      "exit": 0
+    }
+  ],
+  "minimum_free_bytes": 288228884480,
+  "runtime_validated": false,
+  "default_modern_acceptance": false,
+  "disk_opened": false,
+  "new_build_executed": false,
+  "scope": "existing frozen builds verified against identical current production inputs"
+}

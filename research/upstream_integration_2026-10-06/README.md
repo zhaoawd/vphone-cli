@@ -944,3 +944,7 @@ B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复
 ## B36 结果（2026-10-11）
 
 新宿主 --help 退出0；只读CFW分类full_migration_required。研究VM未启动。临时驱动SIGINT/SIGTERM未退出，SIGKILL后辅助进程退出并独立核对。源及原监测恢复healthy。完整现代迁移、真实自动激活和默认整体验收待完成。 正常 detach 未验证，失败记录保留；5 GiB 阈值未触发。后续开发按用户要求移至独立 worktree。见[B36 报告](evidence/B36/T08/REPORT.md)、[B36 摘要](evidence/B36-summary.json)。
+
+## B37 结果（2026-10-11）
+
+事项1、2离线和4离线部分已完成：显式路径配置、完整迁移差异与兼容性条件、冻结默认/现代候选静态检查和相关回归。默认仍classic；未重新构建或执行VM/磁盘迁移/AMFI。 663项生产输入摘要一致；5项静态/路径检查、68项定向回归（无跳过）、组件宿主测试通过。1337/1339控制兼容性与相机发布端切换仍需实现；T08保持未整体验收。见[B37报告](evidence/B37/T08/REPORT.md)、[迁移准备](evidence/B37/T08/MIGRATION.md)、[任务清单](evidence/B37/T08/TASKS.md)。

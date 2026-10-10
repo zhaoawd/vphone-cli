@@ -1240,3 +1240,7 @@ B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10�
 ### 2026-10-10 B35：RootHide 启动恢复源码修复
 
 现代 API daemon 在完成标记有效、RootHide 链接修复成功后异步逐项准备并加载 LaunchDaemons；保留 API_ONLY 条件。实际函数红测试 4 项失败，最终相关回归 22 项通过；隔离 API、默认完整签名 app 与六项现代组件构建通过。默认 app 仍打包 classic，未部署新候选或验证真实冷启动。新宿主 --help 被 AMFI -424 拒绝，精确临时授权待批准。未修改固件二进制补丁、内核、DSC或补丁计数。证据见`upstream_integration_2026-10-06/evidence/B35/T08/REPORT.md`。
+
+### 2026-10-11 B37：T08 离线准备
+
+本轮新增显式 worktree 路径与离线迁移计划，复核 B35 冻结产物和 663 项生产输入；未修改 firmware/kernel/CFW 二进制补丁，补丁数量保持。68 项定向回归及现有组件宿主测试通过；默认仍 classic，未执行 VM 或磁盘迁移，未新增真实运行验收。证据见 `research/upstream_integration_2026-10-06/evidence/B37/T08/REPORT.md`。

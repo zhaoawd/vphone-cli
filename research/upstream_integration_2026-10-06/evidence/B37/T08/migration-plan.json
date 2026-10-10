@@ -1,0 +1,179 @@
+{
+  "schema": "vphone.t08-offline-migration-plan/1",
+  "executed": false,
+  "saved_classification_only": true,
+  "live_disk_rechecked": false,
+  "vm": "/Users/kolar/github/vphone-cli/vm-roothide-b33-20261010",
+  "source_vm": "/Users/kolar/github/vphone-cli/vm-new",
+  "files": [
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest-components-v2/stage/launchhook/launchdhook-vphone.dylib",
+      "sha256": "04895f8ce63cd51081ab495a729aa2b36171d84673ba12c1bd26d32ccf0571a6",
+      "target": "/usr/lib/launchdhook-vphone.dylib",
+      "operation": "install_in_staged_system",
+      "mode": "0755",
+      "loaded_by": "launchd, through its /vh load command, once per guest boot"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest-components-v2/stage/systemhook/SystemHook-vphone.dylib",
+      "sha256": "ea97b6f5b1af8c349f877ba40ca267f1d0f676d725f39e087f39e1b7deb71acb",
+      "target": "/usr/lib/SystemHook-vphone.dylib",
+      "operation": "install_in_staged_system",
+      "mode": "0755",
+      "loaded_by": "processes spawned by launchd after launchdhook-vphone inserts it"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest-components-v2/stage/vcamcaptured/libvcamcaptured.dylib",
+      "sha256": "2e94e0d035a717dfd82f91f8547a789aa82f2978569a488289be95c9ede17e97",
+      "target": "/usr/lib/libvcamcaptured.dylib",
+      "operation": "install_in_staged_system",
+      "mode": "0755",
+      "loaded_by": "cameracaptured when it starts (SystemHook loads it)"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest-components-v2/stage/camfix/libcamfix.dylib",
+      "sha256": "fbf94136a3d47d0222e455248afc0362d1dfa2b2265f7bd05ab0ef2970ab3fea",
+      "target": "/usr/lib/libcamfix.dylib",
+      "operation": "install_in_staged_system",
+      "mode": "0755",
+      "loaded_by": "camera client apps when they start (SystemHook loads it)"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest-components-v2/stage/locationfix/libvlocation.dylib",
+      "sha256": "fe0ad525a4d65542481c34715d4279d33d4879328662cdc043d842ee8ab627df",
+      "target": "/usr/lib/libvlocation.dylib",
+      "operation": "install_in_staged_system",
+      "mode": "0755",
+      "loaded_by": "app processes when they start (SystemHook loads it); kept locally, see research/t20_location_2026-10-01.md"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/daemon-api-v2/candidate/vphoned",
+      "sha256": "36005e2af21d8e72e0b944e5f38c0bdfa373b86e3bb67b889ec4245c3165dd1a",
+      "target": "/usr/bin/vphoned",
+      "operation": "replace_in_staged_system",
+      "mode": "0755"
+    },
+    {
+      "source": "/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/daemon-api-v2/candidate/vphoned.plist",
+      "sha256": "e1ca8cbd6fe37bc4062a80d8d434bf4b653f42ce2b4efb5e4bb01cf23d1ea3b4",
+      "target": "/System/Library/LaunchDaemons/vphoned.plist",
+      "operation": "replace_in_staged_system",
+      "mode": "0644"
+    }
+  ],
+  "launchd": {
+    "target": "/sbin/launchd",
+    "before": [
+      "/b"
+    ],
+    "after": [
+      "/vh"
+    ],
+    "alias": {
+      "path": "/vh",
+      "target": "/usr/lib/launchdhook-vphone.dylib"
+    },
+    "preserve": [
+      "original entitlements",
+      "required jetsam patches"
+    ],
+    "procedure": "rebuild from verified original launchd.bak; patch semantic anchors; inject /vh; sign; verify load commands"
+  },
+  "camera": {
+    "modern_header_bytes": 64,
+    "compatible_with_classic_camera": false,
+    "publisher": "modern vphoned",
+    "port": 1338,
+    "required": "disable classic camera publisher and legacy hook injection before activation"
+  },
+  "host_control": {
+    "classic_port": 1337,
+    "modern_api_port": 1339,
+    "compatibility_verified": false,
+    "required": "adapt retained host controls or provide a camera-disabled classic companion; do not run two camera publishers"
+  },
+  "api": {
+    "port": 1339,
+    "pins": [
+      {
+        "identity": "icli",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/owngoal-dev/icli.git",
+        "state": {
+          "revision": "702990b59ca412ad975f9f0ea5dafe95c30fac21",
+          "version": "0.7.16"
+        }
+      },
+      {
+        "identity": "libarchive.xcframework",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/Lakr233/libarchive.xcframework.git",
+        "state": {
+          "revision": "82687c75e530917b7fbeb15cd5f9369524637155",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "identity": "swift-argument-parser",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-argument-parser.git",
+        "state": {
+          "revision": "46989693916f56d1186bd59ac15124caef896560",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-atomics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "revision": "0442cb5a3f98ab802acb777929fdb446bda11a34",
+          "version": "1.3.1"
+        }
+      },
+      {
+        "identity": "swift-collections",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "revision": "98ef3c98609a1e31b7e157b5b619579001a789d6",
+          "version": "1.7.1"
+        }
+      },
+      {
+        "identity": "swift-nio",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "revision": "34d486b01cd891297ac615e40d5999536a1e138d",
+          "version": "2.83.0"
+        }
+      },
+      {
+        "identity": "swift-system",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-system.git",
+        "state": {
+          "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+          "version": "1.8.1"
+        }
+      }
+    ],
+    "auto_update_required": "select matching modern daemon and components together"
+  },
+  "launchd_cache": {
+    "target": "/System/Library/xpc/launchd.plist",
+    "required": "replace classic com.vphone.vphoned job; preserve unrelated jobs; remove stale classic hook jobs after inventory"
+  },
+  "deferred": [
+    "live inventory of legacy /cores jobs and Preboot camera hooks",
+    "host 1337 classic control versus modern 1339 API compatibility; classic currently starts camera unconditionally",
+    "preserved original launchd verification and signed staged patch",
+    "modern default bundle/CFW selection implementation",
+    "full staged-disk transaction, validation and publication",
+    "cold-boot RootHide activation and loaded-source acceptance"
+  ],
+  "rollback": "retain B36 cold recovery copy; publish only after stopped-disk transaction succeeds; restore clone on failure; never use source vm-new as migration target",
+  "scope": "plan only; no disk mount, write, VM execution, source maintenance or AMFI",
+  "classification_sha256": "93127e1f300e8460641d4c3628ae0e8dc4f84e6b8915bd365a25c60f0135eb51"
+}
