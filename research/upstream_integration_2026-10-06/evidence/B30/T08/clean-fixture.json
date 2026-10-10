@@ -1,0 +1,125 @@
+[
+  {
+    "method": "services.start",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "start",
+        "domain": "user",
+        "label": "com.vphone.B30.service-probe",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.005537667020689696
+  },
+  {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B30.service-probe",
+        "last_exit_status": 15,
+        "loaded": true,
+        "override": false,
+        "pid": 544,
+        "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "running": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.00209500000346452
+  },
+  {
+    "method": "services.stop",
+    "params": {
+      "label": "com.vphone.B30.service-probe",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "stop",
+        "domain": "user",
+        "label": "com.vphone.B30.service-probe",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0014450830058194697
+  },
+  {
+    "method": "services.unload",
+    "params": {
+      "paths": [
+        "/var/root/vphone-b29-api/b30-service.plist"
+      ],
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "errors": {},
+        "loaded": false,
+        "paths": [
+          "/var/root/vphone-b29-api/b30-service.plist"
+        ],
+        "services": [
+          {
+            "domains": [],
+            "enabled": true,
+            "label": "com.vphone.B30.service-probe",
+            "loaded": false,
+            "override": false,
+            "path": "/var/root/vphone-b29-api/b30-service.plist",
+            "running": false
+          }
+        ],
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.0022179580410011113
+  },
+  {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B30.service-probe",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0013313330127857625
+  }
+]

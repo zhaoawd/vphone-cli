@@ -1,0 +1,18 @@
+[
+  {
+    "method": "services.start",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 400,
+    "reply": {
+      "error": {
+        "code": "failed",
+        "message": "start requires launchctl service-configure privilege (launchd status 144)"
+      },
+      "id": "B30",
+      "type": "response"
+    },
+    "seconds": 0.004866916977334768
+  }
+]

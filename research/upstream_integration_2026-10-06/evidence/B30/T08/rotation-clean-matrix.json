@@ -1,0 +1,4580 @@
+{
+  "diagnostic_library_enabled": false,
+  "baseline": {
+    "method": "display.rotation",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.02267675002804026
+  },
+  "foreground_before": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "bundle_id": "com.apple.springboard",
+        "name": "Home Screen",
+        "pid": 0,
+        "source": "unavailable",
+        "verified": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.18998154200380668
+  },
+  "matrix": [
+    {
+      "app_requested": "com.apple.Preferences",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.Preferences"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 585
+          },
+          "type": "response"
+        },
+        "seconds": 1.7135542500182055
+      },
+      "requested": 0,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "0"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait",
+            "requested": 0
+          },
+          "type": "response"
+        },
+        "seconds": 0.5330777500057593
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 2.4160253815352917e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0016642080154269934
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.2533937080297619,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004351583018433303
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.5034442080068402,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004792833002284169
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0050217080279253,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.014271416992414743
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.00262612500228,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004958042001817375
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 585,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.17071262502577156
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 228873,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "rotation-Preferences-0.jpeg",
+            "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+          },
+          "type": "response"
+        },
+        "seconds": 0.15376637503504753
+      }
+    },
+    {
+      "app_requested": "com.apple.Preferences",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.Preferences"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 585
+          },
+          "type": "response"
+        },
+        "seconds": 1.7135542500182055
+      },
+      "requested": 90,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "90"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B30",
+          "type": "response"
+        },
+        "seconds": 0.5259972920175642
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 1.7919810488820076e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0023019579821266234
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.25503191695315763,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.00472329102922231
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.505043291952461,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.005483584012836218
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.005031541979406,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.02382925001438707
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.002586041984614,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004593290970660746
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 585,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.1712520410073921
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 228873,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "rotation-Preferences-90.jpeg",
+            "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+          },
+          "type": "response"
+        },
+        "seconds": 0.1546838330104947
+      }
+    },
+    {
+      "app_requested": "com.apple.Preferences",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.Preferences"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 585
+          },
+          "type": "response"
+        },
+        "seconds": 1.7135542500182055
+      },
+      "requested": 270,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "270"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B30",
+          "type": "response"
+        },
+        "seconds": 0.5345144579769112
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 2.2500171326100826e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0029762500198557973
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.25434437504736707,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0061395419761538506
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.505038625036832,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0049331249902024865
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0008735840092413,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.022433332982473075
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.005126584030222,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.023904500005301088
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 585,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16207016695989296
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 228873,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "rotation-Preferences-270.jpeg",
+            "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+          },
+          "type": "response"
+        },
+        "seconds": 0.136261707986705
+      }
+    },
+    {
+      "app_requested": "com.apple.Preferences",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.Preferences"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 585
+          },
+          "type": "response"
+        },
+        "seconds": 1.7135542500182055
+      },
+      "requested": 180,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "180"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B30",
+          "type": "response"
+        },
+        "seconds": 0.5361575830029324
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 2.707995008677244e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0031750419875606894
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.25046050001401454,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004673542047385126
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.5024449580232613,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.006072457996197045
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0012005000025965,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.024827375018503517
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.000491666025482,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.024525541986804456
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 585,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.15849908301606774
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 228873,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "rotation-Preferences-180.jpeg",
+            "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+          },
+          "type": "response"
+        },
+        "seconds": 0.13622849999228492
+      }
+    },
+    {
+      "app_requested": "com.apple.mobilesafari",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.mobilesafari"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 645
+          },
+          "type": "response"
+        },
+        "seconds": 1.2077093750122003
+      },
+      "requested": 0,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "0"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait",
+            "requested": 0
+          },
+          "type": "response"
+        },
+        "seconds": 0.5378722079913132
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 3.08395829051733e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004152833018451929
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.2586125420057215,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.006014042010065168
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.5059405000065453,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.005452999961562455
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0025137499906123,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.028020999976433814
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.0100442499970086,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 0,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "portrait"
+              },
+              "type": "response"
+            },
+            "seconds": 0.02698979200795293
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 645,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16416116699110717
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 299248,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "rotation-mobilesafari-0.jpeg",
+            "sha256": "df0f4a1156fe62ecee4837aa59a6f6ed29735ad63301e28562c70551fad72f94"
+          },
+          "type": "response"
+        },
+        "seconds": 0.13940333400387317
+      }
+    },
+    {
+      "app_requested": "com.apple.mobilesafari",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.mobilesafari"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 645
+          },
+          "type": "response"
+        },
+        "seconds": 1.2077093750122003
+      },
+      "requested": 90,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "90"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "degrees": 90,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-left",
+            "requested": 90
+          },
+          "type": "response"
+        },
+        "seconds": 0.5206375420093536
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 5.083042196929455e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 90,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-left"
+              },
+              "type": "response"
+            },
+            "seconds": 0.003064708027523011
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.2521629170514643,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 90,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-left"
+              },
+              "type": "response"
+            },
+            "seconds": 0.003252584021538496
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.5075762920314446,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 90,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-left"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0029042920214124024
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0062737500411458,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 90,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-left"
+              },
+              "type": "response"
+            },
+            "seconds": 0.01950866699917242
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.0100357920164242,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 90,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-left"
+              },
+              "type": "response"
+            },
+            "seconds": 0.02450833300827071
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 645,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.184821542003192
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 242510,
+            "coordinate_scale": 3,
+            "height": 1290,
+            "mime_type": "image/jpeg",
+            "width": 2796,
+            "saved_file": "rotation-mobilesafari-90.jpeg",
+            "sha256": "5cf43ff5e9a3b825c111c1d5a9d41f884ff54d275db6d44f24d03603427b5363"
+          },
+          "type": "response"
+        },
+        "seconds": 0.15825933404266834
+      }
+    },
+    {
+      "app_requested": "com.apple.mobilesafari",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.mobilesafari"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 645
+          },
+          "type": "response"
+        },
+        "seconds": 1.2077093750122003
+      },
+      "requested": 270,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "270"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "degrees": 270,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-right",
+            "requested": 270
+          },
+          "type": "response"
+        },
+        "seconds": 0.5277127919835038
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 2.166023477911949e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.002343375002965331
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.2580451660323888,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004301791952457279
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.5051662080222741,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.004712124995421618
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0010431249975227,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.024702875001821667
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.0094535410171375,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.015529041003901511
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 645,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16682666598353535
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 242518,
+            "coordinate_scale": 3,
+            "height": 1290,
+            "mime_type": "image/jpeg",
+            "width": 2796,
+            "saved_file": "rotation-mobilesafari-270.jpeg",
+            "sha256": "5d838b7ddb55b0dbda3c75a5bec116875914aa5ef4a74c644adabaa9a529d842"
+          },
+          "type": "response"
+        },
+        "seconds": 0.15636387502308935
+      }
+    },
+    {
+      "app_requested": "com.apple.mobilesafari",
+      "opened": {
+        "method": "apps.launch",
+        "params": {
+          "bundle_id": "com.apple.mobilesafari"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "frontmost_verified": true,
+            "pid": 645
+          },
+          "type": "response"
+        },
+        "seconds": 1.2077093750122003
+      },
+      "requested": 180,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "180"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B30",
+          "type": "response"
+        },
+        "seconds": 0.6209054159699008
+      },
+      "samples": [
+        {
+          "actual_elapsed_after_setter_response": 2.749962732195854e-06,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0249753330135718
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.2516712499782443,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0040774159715510905
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 0.5100474169594236,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.005363665986806154
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 1.0100334999733604,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.02190625004004687
+          }
+        },
+        {
+          "actual_elapsed_after_setter_response": 2.005840207973961,
+          "rotation": {
+            "method": "display.rotation",
+            "params": {},
+            "http_status": 200,
+            "reply": {
+              "id": "B30",
+              "result": {
+                "degrees": 270,
+                "device_orientation": 0,
+                "locked": false,
+                "name": "landscape-right"
+              },
+              "type": "response"
+            },
+            "seconds": 0.0023540420224890113
+          }
+        }
+      ],
+      "frontmost": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 645,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16148054198129103
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B30",
+          "result": {
+            "bytes": 242518,
+            "coordinate_scale": 3,
+            "height": 1290,
+            "mime_type": "image/jpeg",
+            "width": 2796,
+            "saved_file": "rotation-mobilesafari-180.jpeg",
+            "sha256": "5d838b7ddb55b0dbda3c75a5bec116875914aa5ef4a74c644adabaa9a529d842"
+          },
+          "type": "response"
+        },
+        "seconds": 0.16999679105356336
+      }
+    }
+  ],
+  "unlock": {
+    "method": "screen.unlock",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "locked": false,
+        "screen_off": false,
+        "was_locked": true,
+        "was_screen_off": true
+      },
+      "type": "response"
+    },
+    "seconds": 2.356500708963722
+  },
+  "unlock_rotation": {
+    "method": "display.rotation_lock",
+    "params": {
+      "locked": false
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.507894792011939
+  },
+  "restore_rotation": {
+    "method": "display.rotation",
+    "params": {
+      "orientation": "0"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait",
+        "requested": 0
+      },
+      "type": "response"
+    },
+    "seconds": 0.5168586249928921
+  },
+  "restore_lock": {
+    "method": "display.rotation_lock",
+    "params": {
+      "locked": false
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.10865291702793911
+  },
+  "restore_home": {
+    "ok": true
+  },
+  "foreground_after": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "bundle_id": "com.apple.mobilesafari",
+        "name": "Safari",
+        "pid": 645,
+        "source": "runningboard",
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.15372387500246987
+  },
+  "observations": [
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.02267675002804026
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.springboard",
+          "name": "Home Screen",
+          "pid": 0,
+          "source": "unavailable",
+          "verified": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.18998154200380668
+    },
+    {
+      "method": "screen.unlock",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_locked": true,
+          "was_screen_off": true
+        },
+        "type": "response"
+      },
+      "seconds": 2.356500708963722
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.507894792011939
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.Preferences"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 585
+        },
+        "type": "response"
+      },
+      "seconds": 1.7135542500182055
+    },
+    {
+      "method": "apps.info",
+      "params": {
+        "bundle_id": "com.apple.Preferences"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "build": "1353.1.11.100",
+          "bundle_id": "com.apple.Preferences",
+          "bundle_path": "/Applications/Preferences.app",
+          "encrypted": false,
+          "entitlements": {
+            "abs-client": "143531244",
+            "adi-client": "166430402",
+            "allow-softwareupdated": true,
+            "application-identifier": "com.apple.Preferences",
+            "aps-connection-initiate": true,
+            "aps-environment": "development",
+            "auth-key-vault-client": "2093460704",
+            "backupd-connection-initiate": true,
+            "com.apple.accessibility.AccessibilityPersonalVoiceUsageOverride": true,
+            "com.apple.accessibility.AXSettingsShortcuts": true,
+            "com.apple.accessibility.physicalinteraction.client": true,
+            "com.apple.accessoryupdater.launchauhelper.entitled": true,
+            "com.apple.account.dca.fullaccess": true,
+            "com.apple.accounts.appleaccount.fullaccess": true,
+            "com.apple.accounts.idms.fullaccess": true,
+            "com.apple.activitysharingd": true,
+            "com.apple.aosnotification.aosnotifyd-access": true,
+            "com.apple.app-distribution.private": true,
+            "com.apple.apple-pay-trust.all-access": true,
+            "com.apple.appleaccount.ageAttestation": true,
+            "com.apple.appleaccount.ageMigration": true,
+            "com.apple.appleaccount.beneficiary": true,
+            "com.apple.appleaccount.custodian": true,
+            "com.apple.appleaccount.identity.fullaccess": false,
+            "com.apple.AppleNVMeEAN.allow": true,
+            "com.apple.appprotectiond.guard.access": true,
+            "com.apple.appprotectiond.read.access": true,
+            "com.apple.appstored.demote-apps": true,
+            "com.apple.appstored.install-apps": true,
+            "com.apple.appstored.install-system-apps": true,
+            "com.apple.appstored.private": true,
+            "com.apple.appstored.xpc.request": true,
+            "com.apple.appstored.xpc.updates": true,
+            "com.apple.asd.allow": true,
+            "com.apple.asd.client": "3298700202",
+            "com.apple.asl.access_as_root": true,
+            "com.apple.assistant.dictation.prerecorded": true,
+            "com.apple.assistant.domain.system.settings.access": true,
+            "com.apple.assistant.settings": true,
+            "com.apple.attributionkitd.developer-mode": true,
+            "com.apple.AudioAccessoryServices": true,
+            "com.apple.AudioAccessorySystemStateService": true,
+            "com.apple.authentication-services.access-credential-identities": true,
+            "com.apple.authentication-services.allow-authentication-request-any-rpid": true,
+            "com.apple.authentication-services.coordinate-account-authentication-modification": true,
+            "com.apple.authentication-services.credential-sharing-groups": true,
+            "com.apple.authkit.client.internal": true,
+            "com.apple.authkit.client.private": true,
+            "com.apple.authkit.writer.internal": true,
+            "com.apple.avfaudio.devicetest": true,
+            "com.apple.avfoundation.allow-system-wide-context": true,
+            "com.apple.avfoundation.allows-set-output-device": true,
+            "com.apple.awdd.manager-access": true,
+            "com.apple.backboard.displaybrightness": true,
+            "com.apple.backboardd.hidPersistentProperty-digitizer": true,
+            "com.apple.backboardd.launchapplications": true,
+            "com.apple.backboardd.pointerPreferences": true,
+            "com.apple.bannerkit.post": true,
+            "com.apple.batteryintelligenced.batteryanalysis-read": true,
+            "com.apple.batteryintelligenced.chargetimeestimator-read": true,
+            "com.apple.bluetooth.custom.properties.writable": true,
+            "com.apple.bluetooth.system": true,
+            "com.apple.BluetoothServices": true,
+            "com.apple.BluetoothServices.cloud": true,
+            "com.apple.BTServer.le": true,
+            "com.apple.BTServer.programmaticPairing": true,
+            "com.apple.bulletinboard.observer": true,
+            "com.apple.bulletinboard.settings": true,
+            "com.apple.businesschatd.cache": true,
+            "com.apple.businessservicesd.businessmetadata": true,
+            "com.apple.businessservicesd.cache": true,
+            "com.apple.callkit": [
+              "private-controller-api"
+            ],
+            "com.apple.CallKit.call-directory": [
+              "modify-any-extension",
+              "query-extension-priorities",
+              "modify-extension-priorities"
+            ],
+            "com.apple.CallKit.call-directory.extension-host": true,
+            "com.apple.cards.all-access": true,
+            "com.apple.cdp.followup": true,
+            "com.apple.cdp.recovery": true,
+            "com.apple.cdp.recoverykey": true,
+            "com.apple.cdp.statemachine": true,
+            "com.apple.cdp.walrus": true,
+            "com.apple.chrono.controls": true,
+            "com.apple.chronoservices": true,
+            "com.apple.ci": true,
+            "com.apple.CommCenter.fine-grained": [
+              "cellular-plan",
+              "spi",
+              "identity",
+              "data-usage",
+              "phone",
+              "data-allowed",
+              "data-allowed-write",
+              "carrier-settings",
+              "preferences-write",
+              "preferences-reset",
+              "carrier-space",
+              "developer-settings",
+              "public-cellular-plan",
+              "public-esim-qr-code",
+              "bootstrap-service"
+            ],
+            "com.apple.CommCenter.StormBreaker": true,
+            "com.apple.communicationtrustd": [
+              "read",
+              "write"
+            ],
+            "com.apple.companionappd.connect.allow": true,
+            "com.apple.companionappd.preferences.allow": true,
+            "com.apple.Contacts.database-allow": true,
+            "com.apple.coreaudio.CanRecordPastData": true,
+            "com.apple.coreaudio.CanRecordWithoutSessionActivation": true,
+            "com.apple.coreaudio.register-internal-aus": true,
+            "com.apple.corecapture.manager-access": true,
+            "com.apple.coreduetd.allow": true,
+            "com.apple.coreduetd.batterysaver.allow": true,
+            "com.apple.coreduetd.context": true,
+            "com.apple.coreduetd.people": true,
+            "com.apple.coreidvd.digital-presentment": true,
+            "com.apple.coreidvd.digital-presentment.firstpartyclient": true,
+            "com.apple.coreidvd.digital-presentment.merchants": [
+              "com.apple.ams-identity-verification",
+              "com.apple.asa-identity-verification"
+            ],
+            "com.apple.coreidvd.document-upload": true,
+            "com.apple.coreidvd.identity-proofing-data-sharing": true,
+            "com.apple.coreidvd.identity-proofing-ui": true,
+            "com.apple.coreidvd.report-a-concern": true,
+            "com.apple.coreidvd.spi": true,
+            "com.apple.coremedia.allow-protected-content-playback": true,
+            "com.apple.CoreRoutine.Application": true,
+            "com.apple.CoreRoutine.CloudSync": true,
+            "com.apple.CoreRoutine.LocationOfInterest": true,
+            "com.apple.CoreRoutine.LocationOfInterest.Delete": true,
+            "com.apple.CoreRoutine.preferences": true,
+            "com.apple.CoreRoutine.SafetyMonitor": true,
+            "com.apple.CoreRoutine.VehicleLocation": true,
+            "com.apple.corespeech.corespeechd.xpc": true,
+            "com.apple.CoreTelephony.CommCenterHelper.allow": true,
+            "com.apple.coretelephony.Identity.get": true,
+            "com.apple.developer.associated-domains": [
+              "webcredentials:wallet.apple.com"
+            ],
+            "com.apple.developer.ClassKit-environment": "production",
+            "com.apple.developer.coreml.model-deployment": true,
+            "com.apple.developer.declared-age-range": true,
+            "com.apple.developer.driverkit.userclient-access": [
+              "com.apple.DriverKit-AppleBCMWLAN"
+            ],
+            "com.apple.developer.healthkit": true,
+            "com.apple.developer.homekit": true,
+            "com.apple.developer.icloud-container-environment": "Production",
+            "com.apple.developer.icloud-container-identifiers": [
+              "com.apple.TextInput",
+              "com.apple.notes",
+              "com.apple.productkit.b389personalization",
+              "com.apple.productkit.personalization"
+            ],
+            "com.apple.developer.icloud-services": [
+              "CloudDocuments",
+              "CloudKit"
+            ],
+            "com.apple.developer.identity-document-services.settings-provider": true,
+            "com.apple.developer.in-app-identity-presentment": {
+              "document-types": [
+                "us-drivers-license"
+              ],
+              "elements": [
+                "given-name",
+                "family-name",
+                "address",
+                "issuing-authority",
+                "document-expiration-date",
+                "document-issue-date",
+                "document-number",
+                "driving-privileges",
+                "date-of-birth"
+              ]
+            },
+            "com.apple.developer.in-app-identity-presentment.merchant-identifiers": [
+              "com.apple.asa-identity-verification"
+            ],
+            "com.apple.developer.networking.wifi-info": true,
+            "com.apple.developer.pass-type-identifiers": [
+              "*.pass.com.apple.itunes.storecredit"
+            ],
+            "com.apple.developer.siri": true,
+            "com.apple.developer.team-identifier": "Apple",
+            "com.apple.developer.ubiquity-container-identifiers": "",
+            "com.apple.developer.ubiquity-kvstore-identifier": "com.apple.familycircle.checklist",
+            "com.apple.DeviceAccess": true,
+            "com.apple.DeviceAccess.private": true,
+            "com.apple.devicesharing.enrollmentassetservice.client": true,
+            "com.apple.Diagnostics.host-view-service": true,
+            "com.apple.DiagnosticsSessionAvailability.client": true,
+            "com.apple.dmd-access": true,
+            "com.apple.dmd.operation.fetch-apps": true,
+            "com.apple.dmd.operation.remove-app": true,
+            "com.apple.dmd.operation.start-managing-app": true,
+            "com.apple.dt.remotepairing.pairingmanagement": true,
+            "com.apple.duet.activityscheduler.allow": true,
+            "com.apple.duetexpertd.SettingsActions": true,
+            "com.apple.excludes-extensions": true,
+            "com.apple.extensionkit.host.extension-point-identifiers": [
+              "com.apple.link-extension",
+              "com.apple.appintents-extension"
+            ],
+            "com.apple.eyerelief.distancesampling": true,
+            "com.apple.family.ageRange": true,
+            "com.apple.FamilyControls.private-client": true,
+            "com.apple.features.all-access": true,
+            "com.apple.feedbackd.client-forms": [
+              "framework-autocorrect_S04_vi",
+              "framework-autocorrect_S03_fr",
+              "framework-autocorrect_S03_es"
+            ],
+            "com.apple.fileprovider.acl-read": true,
+            "com.apple.fileprovider.acl-write": true,
+            "com.apple.fileprovider.enumerate": true,
+            "com.apple.fileprovider.extension-host": true,
+            "com.apple.fileprovider.fetch-url": true,
+            "com.apple.filesystem-metadata-snapshotting": true,
+            "com.apple.finance.private": true,
+            "com.apple.finance.store": true,
+            "com.apple.financekit.financial-connection.host": true,
+            "com.apple.findmy.findmylocate.friendshipservice": true,
+            "com.apple.findmy.findmylocate.locationservice": true,
+            "com.apple.findmy.findmylocate.settings": true,
+            "com.apple.fitcore": true,
+            "com.apple.frontboard.delete-application-snapshots": true,
+            "com.apple.frontboard.launchapplications": true,
+            "com.apple.frontboard.shutdown": true,
+            "com.apple.frontboardservices.display-layout-monitor": true,
+            "com.apple.generativeexperiences.availabilityService": true,
+            "com.apple.generativeexperiences.availabilityService.waitlistStatus": true,
+            "com.apple.generativeexperiences.ExternalPartnerCredentialStorage": true,
+            "com.apple.geoservices.map-subscriptions": [
+              "*"
+            ],
+            "com.apple.geoservices.mapdata.load": true,
+            "com.apple.geoservices.mapdata.manage-subscriptions": true,
+            "com.apple.geoservices.mapLayerDataSizes": true,
+            "com.apple.geoservices.setanydefault": true,
+            "com.apple.HearingModeService": true,
+            "com.apple.hid.manager.user-access-keyboard": true,
+            "com.apple.hidrm": true,
+            "com.apple.homekit.private-spi-access": true,
+            "com.apple.icloud.FindMyDevice.FindMyDeviceSharedConfiguration.access": true,
+            "com.apple.icloud.findmydeviced.access": true,
+            "com.apple.icloud.fmfd.access": true,
+            "com.apple.icloud.searchpartyd.advertisementcache.access": true,
+            "com.apple.icloud.searchpartyd.advertisementcache.read": true,
+            "com.apple.icloud.searchpartyd.beaconmanager": true,
+            "com.apple.icloud.searchpartyd.beaconsharing.access": true,
+            "com.apple.icloud.searchpartyd.finderstatemanager.access": true,
+            "com.apple.icloud.searchpartyd.ownersession": true,
+            "com.apple.icloud.searchpartyd.pairingmanager": true,
+            "com.apple.icloud.searchpartyd.scheduler.access": true,
+            "com.apple.icloud.searchpartyd.settings.read": true,
+            "com.apple.icloud.searchpartyd.settings.write": true,
+            "com.apple.icloudmailagent.secret.xpc": true,
+            "com.apple.idcredd.storage.xpc": true,
+            "com.apple.idcredentials.biometrics": true,
+            "com.apple.idcredentials.storage": [
+              "ua",
+              "identity"
+            ],
+            "com.apple.identity-document-services.provider-extension-host": true,
+            "com.apple.identitylookup.classification-ui.extension-host": "",
+            "com.apple.identitylookup.message-filter.extension-host": true,
+            "com.apple.imagent": true,
+            "com.apple.imdpersistence.IMDPersistenceAgent-StorageManagement": true,
+            "com.apple.intents.extension.discovery": true,
+            "com.apple.intents.intents-helper": true,
+            "com.apple.ios.StoreKit.store-page": true,
+            "com.apple.itunesstored.private": true,
+            "com.apple.keyboardservices.textreplacement.allow": true,
+            "com.apple.keystore.auth-token": true,
+            "com.apple.keystore.bak": true,
+            "com.apple.keystore.device": true,
+            "com.apple.keystore.device.verify": true,
+            "com.apple.keystore.lockassertion": true,
+            "com.apple.keystore.sik.access": true,
+            "com.apple.keystore.stash.access": true,
+            "com.apple.launchservices.clearadvertisingid": true,
+            "com.apple.linkd.registry": true,
+            "com.apple.linkd.transcript.privileged": true,
+            "com.apple.localizationswitcher": true,
+            "com.apple.locationd.authorizeapplications": true,
+            "com.apple.locationd.defaults_access": true,
+            "com.apple.locationd.eed_precached_adr": true,
+            "com.apple.locationd.effective_bundle": true,
+            "com.apple.locationd.Proximity.FindMyCertification": true,
+            "com.apple.locationd.Proximity.TagManagement": true,
+            "com.apple.locationd.status": true,
+            "com.apple.locationd.usage_oracle": true,
+            "com.apple.logd.admin": true,
+            "com.apple.managedconfiguration.mdmd-access": true,
+            "com.apple.managedconfiguration.mdmd.push": true,
+            "com.apple.managedconfiguration.profiled-access": true,
+            "com.apple.managedconfiguration.profiled.configurationprofiles": [
+              "CloudLockedRemoval"
+            ],
+            "com.apple.managedconfiguration.profiled.get": [
+              "MDMInfo"
+            ],
+            "com.apple.managedconfiguration.profiled.provisioningprofiles": [
+              "Removal"
+            ],
+            "com.apple.managedconfiguration.profiled.set": [
+              "Passcode"
+            ],
+            "com.apple.managedconfiguration.teslad-access": true,
+            "com.apple.maps.model-access": true,
+            "com.apple.Maps.tripsharing.sharing": true,
+            "com.apple.maps.virtualgarage.vehicles": true,
+            "com.apple.matd.client": true,
+            "com.apple.matter.support.xpc.device-pairing": true,
+            "com.apple.mediastream.mstreamd-access": true,
+            "com.apple.migrationd.client": true,
+            "com.apple.mkb.usersession.delete": true,
+            "com.apple.mkb.usersession.info": true,
+            "com.apple.mkb.usersession.keybagopaquedata": true,
+            "com.apple.mkb.usersession.load": true,
+            "com.apple.mkb.usersession.loginwindow": true,
+            "com.apple.mkb.usersession.provision": true,
+            "com.apple.mobile.deleted.AllowFreeSpace": true,
+            "com.apple.mobileactivationd.device-identifiers": true,
+            "com.apple.mobileactivationd.spi": true,
+            "com.apple.MobileInternetSharing.allow": true,
+            "com.apple.mobilemail.mailservices": true,
+            "com.apple.ModeEntityScorer": true,
+            "com.apple.modelcatalog.full-access": true,
+            "com.apple.momentsd.internal": [
+              "MOUserNotifications",
+              "MOOnboardingAndSettings"
+            ],
+            "com.apple.multitasking.termination": true,
+            "com.apple.nano.nanoregistry.pairunpairobliterate": true,
+            "com.apple.nano.nanoresourcegrabber": true,
+            "com.apple.nanobackup": true,
+            "com.apple.nanosystemsettings": [
+              "watchfaces",
+              "icloud"
+            ],
+            "com.apple.nearbyd.diagnostics": true,
+            "com.apple.networkd.allow_bootstrap_cellular_service_request": true,
+            "com.apple.networkd.modify_settings": true,
+            "com.apple.networkd.set_account_identifier": true,
+            "com.apple.nfcd.hwmanager": true,
+            "com.apple.nfcd.radio.powertoggle": true,
+            "com.apple.nfcd.session.reader.internal": true,
+            "com.apple.nfcd.session.se": true,
+            "com.apple.nfcd.session.trust": true,
+            "com.apple.notificationcenter.widgetcontrollerhascontent": true,
+            "com.apple.NPKCompanionAgent.client": true,
+            "com.apple.nvram.boot-args-set-allow": true,
+            "com.apple.osintelligence.battery": true,
+            "com.apple.PairingManager.DeleteIdentity": true,
+            "com.apple.PairingManager.Read": true,
+            "com.apple.PairingManager.RemovePeer": true,
+            "com.apple.PairingManager.Write": true,
+            "com.apple.passes.add-silently": true,
+            "com.apple.passes.entangled-access": true,
+            "com.apple.PassKit.issuer-provisioning.consumer": true,
+            "com.apple.payment.all-access": true,
+            "com.apple.payment.amp-card-enrollment": true,
+            "com.apple.payment.card-on-file": true,
+            "com.apple.payment.externalized-context": true,
+            "com.apple.pds.clientid": [
+              "Notes"
+            ],
+            "com.apple.peerpayment.all-access": true,
+            "com.apple.PerformanceTrace.PassiveConfigurationAccess": true,
+            "com.apple.PerformanceTrace.Tracing": true,
+            "com.apple.photos.bourgeoisie": true,
+            "com.apple.posterboardservices.data-store": true,
+            "com.apple.posterboardservices.data-store.accessSwitcherConfiguration": true,
+            "com.apple.posterboardservices.data-store.mutateSwitcherConfiguration": true,
+            "com.apple.posterboardservices.data-store.mutateSwitcherFocusConfiguration": true,
+            "com.apple.posterboardservices.data-store.snapshot": true,
+            "com.apple.posterboardui.externalEditing": true,
+            "com.apple.powerd.lowpowermode.allow": true,
+            "com.apple.powerui.smartcharging": true,
+            "com.apple.powerui.smartcharging.AudioAccessory": true,
+            "com.apple.private.accounts.allaccounts": true,
+            "com.apple.private.accounts.bundleidspoofing": true,
+            "com.apple.private.accounts.configuration-resolve": true,
+            "com.apple.private.activitykit.activityAuthorizer": true,
+            "com.apple.private.airdrop.settings": true,
+            "com.apple.private.alarmkit.authorizationManager": true,
+            "com.apple.private.amfi.remove-trust": true,
+            "com.apple.private.amfi.schedule-profile": true,
+            "com.apple.private.amfi.set-csp": true,
+            "com.apple.private.amfi.set-trust": true,
+            "com.apple.private.appintents-bundle-absolute-paths": [
+              "/System/Library/PrivateFrameworks/Settings.framework"
+            ],
+            "com.apple.private.appintents.exception.background-task-allowed": true,
+            "com.apple.private.appintents.extension-host": true,
+            "com.apple.private.appleaccount.app-hidden-from-icloud-settings": true,
+            "com.apple.private.applecredentialmanager.allow": true,
+            "com.apple.private.applecredentialmanager.contextdataextendedmaxage.allow": true,
+            "com.apple.private.applecredentialmanager.devicerestrictedmode.allow": true,
+            "com.apple.private.applemediaservices": true,
+            "com.apple.private.AppleProcessorTrace.CarveoutProperty": true,
+            "com.apple.private.appstorecomponents": true,
+            "com.apple.private.appstorecomponents.media-clients": {
+              "SafariExtensions": {
+                "id": "com.apple.Safari.Extensions",
+                "version": "1"
+              },
+              "SupportApp": {
+                "id": "com.apple.preferences.applesupport",
+                "version": "1"
+              },
+              "TVProvider": {
+                "id": "VideoSubscriberAccount",
+                "version": "1"
+              }
+            },
+            "com.apple.private.appstored": [
+              "IAPHistory"
+            ],
+            "com.apple.private.assets.accessible-asset-types": [
+              "com.apple.MobileAsset.WalletMobileAssets",
+              "com.apple.MobileAsset.VoiceServicesVocalizerVoice",
+              "com.apple.MobileAsset.VoiceServices.CustomVoice",
+              "com.apple.MobileAsset.VoiceServices.GryphonVoice",
+              "com.apple.MobileAsset.VoiceServices.VoiceResources",
+              "com.apple.MobileAsset.VoiceServices.CombinedVocalizerVoices",
+              "com.apple.MobileAsset.AirPortUtility.devices",
+              "com.apple.MobileAsset.MacinTalkVoiceAssets",
+              "com.apple.MobileAsset.VoiceTriggerAssets",
+              "com.apple.MobileAsset.TTSAXResourceModelAssets",
+              "com.apple.MobileAsset.VoiceTriggerAssetsIPad",
+              "com.apple.MobileAsset.PurpleBuddyAssets.OnBoarding.iPhone2017Fall",
+              "com.apple.MobileAsset.ImageCaptionModel",
+              "com.apple.MobileAsset.SoundDetectionModels",
+              "com.apple.MobileAsset.AXElementVision",
+              "com.apple.MobileAsset.EmbeddedSpeech",
+              "com.apple.MobileAsset.phoneNumberResolver",
+              "com.apple.MobileAsset.AXSoundActions",
+              "com.apple.MobileAsset.AudiogramAssets",
+              "com.apple.MobileAsset.Wallpaper",
+              "com.apple.MobileAsset.VoiceTriggerHSAssets",
+              "com.apple.MobileAsset.VoiceTriggerHSAssetsIPad",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAttentionAssets",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingNLOverrides",
+              "com.apple.MobileAsset.Trial.Siri.SiriDictationAssets",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingNL",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAsrHammer",
+              "com.apple.MobileAsset.Trial.Siri.SiriExperienceCam",
+              "com.apple.MobileAsset.Trial.Siri.SiriInferredHelpfulness",
+              "com.apple.MobileAsset.Trial.Siri.SiriTextToSpeech",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAsrAssistant",
+              "com.apple.MobileAsset.Trial.Siri.SiriFindMyConfigurationFiles",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingAsrUaap",
+              "com.apple.MobileAsset.Trial.Siri.SiriUnderstandingMorphun",
+              "com.apple.MobileAsset.Trial.Siri.SiriDialogAssets",
+              "com.apple.MobileAsset.UAF.FM.GenerativeModels",
+              "com.apple.MobileAsset.UAF.Siri.TextToSpeech",
+              "com.apple.MobileAsset.UAF.Siri.Understanding"
+            ],
+            "com.apple.private.assets.bypass-asset-types-check": true,
+            "com.apple.private.assets.change-daemon-config": true,
+            "com.apple.private.associated-domains": true,
+            "com.apple.private.attribution.implicitly-assumed-identity": {
+              "type": "path",
+              "value": "/Applications/Preferences.app/Preferences"
+            },
+            "com.apple.private.avatar.store": true,
+            "com.apple.private.biome.client-identifier": "com.apple.Preferences",
+            "com.apple.private.biome.read-only": [
+              "AppLaunch",
+              "App.InFocus",
+              "App.MediaUsage",
+              "App.WebUsage",
+              "Device.Display.Backlight",
+              "FindMyLocationChange",
+              "Media.NowPlaying",
+              "Notification.Usage",
+              "ScreenTime.AppUsage"
+            ],
+            "com.apple.private.biome.read-write": [
+              "Siri.Montara.SharedPreferences",
+              "SystemSettings.SearchTerms",
+              "iCloud.Subscription",
+              "CommunicationSafetyResult",
+              "CommunicationSafetyResultWithoutImage",
+              "modeConfigurationUIFlowLoggingEvent",
+              "SystemSettings.GestureEducation.Multitasking",
+              "SystemSettings.GestureEducation.PillOutcome",
+              "Safari.AutoPlay",
+              "Safari.WebPagePerformance",
+              "Safari.Navigations",
+              "Safari.PageLoad",
+              "Safari.WindowProxy",
+              "Safari.Browsing.Assistant"
+            ],
+            "com.apple.private.biometrickit.allow-config": true,
+            "com.apple.private.biometrickit.allow-enroll": true,
+            "com.apple.private.biometrickit.allow-id-mgmt": true,
+            "com.apple.private.biometrickit.allow-match": true,
+            "com.apple.private.calendar.daemon.access-level.internal": true,
+            "com.apple.private.can-load-any-content-blocker": true,
+            "com.apple.private.canModifyAppLinkPermissions": true,
+            "com.apple.private.carkit": true,
+            "com.apple.private.carkit.dnd": true,
+            "com.apple.private.CarPlayServices.icon-layout": true,
+            "com.apple.private.ckks": true,
+            "com.apple.private.ClassKit.dashboard": true,
+            "com.apple.private.ClassKit.internal": true,
+            "com.apple.private.ClipServices": true,
+            "com.apple.private.clouddocs.account-access": true,
+            "com.apple.private.cloudkit.customAccounts": true,
+            "com.apple.private.cloudkit.displaysSystemAcceptPrompt": true,
+            "com.apple.private.cloudkit.explicitCodeOperationURL": true,
+            "com.apple.private.cloudkit.masquerade": true,
+            "com.apple.private.cloudkit.participant-pii": true,
+            "com.apple.private.cloudkit.protectiondata": true,
+            "com.apple.private.cloudkit.serviceNameForContainerMap": {
+              "com.apple.productkit.personalization": "com.apple.productkit.personalization"
+            },
+            "com.apple.private.cloudkit.setEnvironment": true,
+            "com.apple.private.cloudkit.spi": true,
+            "com.apple.private.cloudkit.systemService": true,
+            "com.apple.private.cloudphotod.access": "preferences",
+            "com.apple.private.communicationsfilter": true,
+            "com.apple.private.contacts": true,
+            "com.apple.private.contactsui": true,
+            "com.apple.private.contactsui.channel-in-process-override": true,
+            "com.apple.private.coreaudio.borrowaudiosession.allow": true,
+            "com.apple.private.CoreAuthentication.SPI": true,
+            "com.apple.private.corerecents": true,
+            "com.apple.private.corerepair.attestation": true,
+            "com.apple.private.corerepair.control-boot-intent": true,
+            "com.apple.private.corerepair.xpc": true,
+            "com.apple.private.coreservices.canmaplsdatabase": true,
+            "com.apple.private.corespotlight.internal": true,
+            "com.apple.private.corespotlight.search.internal": true,
+            "com.apple.private.corewifi.internal": true,
+            "com.apple.private.darwin-notification.restrict-post.settings.userchangedpasscode": true,
+            "com.apple.private.dmd.emergency-mode": true,
+            "com.apple.private.dmd.policy": true,
+            "com.apple.private.domain-extension": true,
+            "com.apple.private.donotdisturb.medevicestate.client-identifiers": [
+              "com.apple.focussettingsui.activity-config"
+            ],
+            "com.apple.private.donotdisturb.mode.assertion.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.mode.assertion.user-requested.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.modeconfiguration.modify.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.focussettingsui.activity-config",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.modeconfiguration.request.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.proactive.AppPredictionClient",
+              "com.apple.focussettingsui.activity-config",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.modeconfiguration.updates.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.proactive.AppPredictionClient",
+              "com.apple.focussettingsui.activity-config",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.settings.modify.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.settings.request.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.proactive.AppPredictionClient",
+              "com.apple.donotdisturb.preferences",
+              "com.apple.focussettingsui.activity-config"
+            ],
+            "com.apple.private.donotdisturb.settings.updates.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.state.request.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.donotdisturb.state.updates.client-identifiers": [
+              "com.apple.FocusSettings",
+              "com.apple.donotdisturb.preferences"
+            ],
+            "com.apple.private.dprivacyd.allow": true,
+            "com.apple.private.eligibilityd.internalState": true,
+            "com.apple.private.eligibilityd.setInput": true,
+            "com.apple.private.exposure-notification": true,
+            "com.apple.private.extensionkit.extension-management": true,
+            "com.apple.private.externalaccessory.showallaccessories": true,
+            "com.apple.private.familycircle": true,
+            "com.apple.private.familycircle.settings": true,
+            "com.apple.private.familycircle.sharing": true,
+            "com.apple.private.feedback.drafting": true,
+            "com.apple.private.feedbacklogger": true,
+            "com.apple.private.fileprovider.storage-management": true,
+            "com.apple.private.followup": true,
+            "com.apple.private.game-center": [
+              "Account",
+              "Authenticate",
+              "Profile"
+            ],
+            "com.apple.private.game-center.bypass-authentication": true,
+            "com.apple.private.healthkit": true,
+            "com.apple.private.healthkit.authorization_bypass": true,
+            "com.apple.private.healthkit.authorization_manager": [
+              "read",
+              "write",
+              "reset"
+            ],
+            "com.apple.private.healthkit.feature-availability.read-write-any": true,
+            "com.apple.private.healthkit.medicaliddata": true,
+            "com.apple.private.healthkit.obliteration": true,
+            "com.apple.private.healthkit.source.identities": [
+              "com.apple.Health"
+            ],
+            "com.apple.private.healthrecordsd": true,
+            "com.apple.private.hid.client.event-dispatch": true,
+            "com.apple.private.hid.client.event-dispatch.internal": true,
+            "com.apple.private.hid.client.event-filter": true,
+            "com.apple.private.hid.client.event-monitor": true,
+            "com.apple.private.hid.manager.client": true,
+            "com.apple.private.homeenergy": true,
+            "com.apple.private.homekit": true,
+            "com.apple.private.hsa-authentication-processing": true,
+            "com.apple.private.iad.open-privacy-view-controller": true,
+            "com.apple.private.iad.opt-in-control": true,
+            "com.apple.private.icloudinboxd.client": true,
+            "com.apple.private.ids.idquery-cache-clear": true,
+            "com.apple.private.ids.messaging": [
+              "com.apple.private.alloy.nameandphoto",
+              "com.apple.private.alloy.maps.eta",
+              "com.apple.private.alloy.sms",
+              "com.apple.private.alloy.passbook.provisioning",
+              "com.apple.private.alloy.phone.auth"
+            ],
+            "com.apple.private.ids.messaging.urgent-priority": [
+              "com.apple.private.alloy.nameandphoto"
+            ],
+            "com.apple.private.ids.nearby": true,
+            "com.apple.private.ids.phone-number-authentication": true,
+            "com.apple.private.ids.registration": [
+              "com.apple.private.alloy.nameandphoto",
+              "com.apple.private.alloy.biz",
+              "com.apple.madrid",
+              "com.apple.ess"
+            ],
+            "com.apple.private.ids.registration-control": true,
+            "com.apple.private.imcore.imdpersistence.database-access": true,
+            "com.apple.private.imcore.imremoteurlconnection": true,
+            "com.apple.private.imcore.spi.database-access": true,
+            "com.apple.private.in-app-payments": true,
+            "com.apple.private.ind.client": true,
+            "com.apple.private.InstallCoordination.allowed": true,
+            "com.apple.private.intelligenceplatform.client-identifier": "com.apple.Preferences",
+            "com.apple.private.intelligenceplatform.use-cases": {
+              "AppleIntelligenceReportExport": {
+                "Streams": {
+                  "AppleIntelligenceReport.FedStatsTransparencyLog": {
+                    "mode": "read-write"
+                  },
+                  "GenerativeExperiences.TransparencyLog": {
+                    "mode": "read-write"
+                  },
+                  "PrivateCloudCompute.RequestLog": {
+                    "mode": "read-write"
+                  }
+                }
+              },
+              "ProactiveAppPrediction": {
+                "Streams": [
+                  "Notification.Usage",
+                  "CarPlay.Connected",
+                  "App.InFocus"
+                ]
+              },
+              "SiriMontaraSyncedPreferencesBuiltinWrites": {
+                "Sets": {
+                  "Siri.Montara.SharedPreferences": {
+                    "mode": "read-write"
+                  }
+                }
+              },
+              "Tips": {
+                "Streams": {
+                  "Discoverability.Signals": {
+                    "mode": "read-write"
+                  }
+                }
+              }
+            },
+            "com.apple.private.iokit.batterydata": true,
+            "com.apple.private.iokit.batterydataprecise": true,
+            "com.apple.private.iokit.batteryhealthstate": true,
+            "com.apple.private.iokit.charging-iconography": true,
+            "com.apple.private.keychain.kcsharing.client": true,
+            "com.apple.private.keychain.sysbound": true,
+            "com.apple.private.launchservices.changedefaulthandlers": [
+              "*",
+              "https",
+              "http",
+              "mailto",
+              "otpauth",
+              "otpauth-migration"
+            ],
+            "com.apple.private.librarian.can-get-application-info": true,
+            "com.apple.private.librarian.container-proxy": true,
+            "com.apple.private.LocalAuthentication.CallerName": true,
+            "com.apple.private.LocalAuthentication.ContextData.ExtendedMaxAge": true,
+            "com.apple.private.LocalAuthentication.DTO": true,
+            "com.apple.private.LocalAuthentication.DTO.AllowUnapprovedSensor": true,
+            "com.apple.private.LocalAuthentication.DTO.FallbackToNoAuth": true,
+            "com.apple.private.LocalAuthentication.ExtractCredential": true,
+            "com.apple.private.LocalAuthentication.PasscodeServices": true,
+            "com.apple.private.LocalAuthentication.RGBCapture": true,
+            "com.apple.private.LocalAuthentication.SaveExtractableCredential": true,
+            "com.apple.private.LocalAuthentication.Storage": true,
+            "com.apple.private.LocalAuthentication.Storage.BiometricLivenessFlag": true,
+            "com.apple.private.LocalAuthentication.Storage.Preboard": true,
+            "com.apple.private.LocalAuthentication.Storage.SetDSLModeEnabled": true,
+            "com.apple.private.LocalAuthentication.Storage.SetDSLStrictModeEnabled": true,
+            "com.apple.private.locationaccessstore.administer": true,
+            "com.apple.private.lockdown.finegrained-get": [
+              "com.apple.mobile.lockdown.paired_host_info/NULL",
+              "com.apple.mobile.wireless_lockdown/EnableWifiConnections",
+              "NULL/DeviceCertificate",
+              "NULL/DeviceName",
+              "NULL/DevicePrivateKey",
+              "NULL/RegulatoryImages",
+              "NULL/UnassociatedCarrier",
+              "NULL/ActivationState",
+              "com.apple.mobile.data_sync/Sources",
+              "com.apple.mobile.data_sync/AccountNames",
+              "com.apple.mobile.data_sync/NULL",
+              "com.apple.mobile.data_sync/Contacts",
+              "com.apple.mobile.data_sync/Calendars",
+              "com.apple.mobile.data_sync/Bookmarks",
+              "com.apple.mobile.data_sync/Notes",
+              "com.apple.mobile.data_sync/Mail Accounts",
+              "com.apple.mobile.tethered_sync/Contacts",
+              "com.apple.mobile.tethered_sync/Calendars",
+              "com.apple.mobile.tethered_sync/Bookmarks",
+              "com.apple.mobile.tethered_sync/Notes",
+              "com.apple.mobile.tethered_sync/Mail Accounts",
+              "com.apple.powerlog/SubmitPowerlogs"
+            ],
+            "com.apple.private.lockdown.finegrained-set": [
+              "NULL/DeviceName",
+              "com.apple.mobile.data_sync/Sources",
+              "com.apple.mobile.data_sync/AccountNames",
+              "com.apple.mobile.data_sync/NULL",
+              "com.apple.mobile.data_sync/Contacts",
+              "com.apple.mobile.data_sync/Calendars",
+              "com.apple.mobile.data_sync/Bookmarks",
+              "com.apple.mobile.data_sync/Notes",
+              "com.apple.mobile.data_sync/Mail Accounts",
+              "com.apple.mobile.tethered_sync/Contacts",
+              "com.apple.mobile.tethered_sync/Calendars",
+              "com.apple.mobile.tethered_sync/Bookmarks",
+              "com.apple.mobile.tethered_sync/Notes",
+              "com.apple.mobile.tethered_sync/Mail Accounts",
+              "com.apple.mobile.user_preferences/UserSetLanguage",
+              "com.apple.mobile.user_preferences/UserSetLocale"
+            ],
+            "com.apple.private.lockdown.reset-pairing": true,
+            "com.apple.private.lockdown.unpair": true,
+            "com.apple.private.lockdownmoded.read-write": true,
+            "com.apple.private.logging.admin": true,
+            "com.apple.private.logging.diagnostic": true,
+            "com.apple.private.managed-settings.apply": true,
+            "com.apple.private.mediaexperience.setsilentmode.allow": true,
+            "com.apple.private.mediaexperience.useindependentinputaudioresourcesession": true,
+            "com.apple.private.messages.associated-message-extension-bundle-identifiers": [
+              "com.apple.PassbookUIService.PeerPaymentMessagesExtension",
+              "com.apple.AppleAccountUI.CustodianInviteMessageExtension"
+            ],
+            "com.apple.private.mis.online_auth_agent": true,
+            "com.apple.private.mis.trust.set": true,
+            "com.apple.private.MobileContainerManager.allowed": true,
+            "com.apple.private.MobileContainerManager.appGroup.noReference": [
+              "group.com.apple.Journal"
+            ],
+            "com.apple.private.MobileContainerManager.otherIdentifierLookup": true,
+            "com.apple.private.MobileContainerManager.otherIdLookup": true,
+            "com.apple.private.MobileContainerManager.userManagedAssets": true,
+            "com.apple.private.MobileGestalt.AllowedProtectedKeys": true,
+            "com.apple.private.mobileinstall.allowedSPI": [
+              "InstallForLaunchServices",
+              "UninstallForLaunchServices",
+              "CopyDiskUsageForLaunchServices"
+            ],
+            "com.apple.private.mobilemail.mail-recipient-vetting": true,
+            "com.apple.private.mobilerepair.xpc": true,
+            "com.apple.private.mobilesms.messages-recipient-vetting": true,
+            "com.apple.private.mobilestoredemo.enabledemo": [
+              "Manage"
+            ],
+            "com.apple.private.ndoagent": true,
+            "com.apple.private.network.socket-delegate": true,
+            "com.apple.private.network.system-token-fetch": true,
+            "com.apple.private.networkextension.configuration": "super",
+            "com.apple.private.networkserviceproxy": true,
+            "com.apple.private.nlcd-control": true,
+            "com.apple.private.octagon": true,
+            "com.apple.private.osanalytics.defaults.allow": true,
+            "com.apple.private.persona.read": true,
+            "com.apple.private.persona.write": true,
+            "com.apple.private.personas.propagate": true,
+            "com.apple.private.photoanalysisd.access": true,
+            "com.apple.private.photos.allowassetexpunge": true,
+            "com.apple.private.photos.allowmemorymutation": true,
+            "com.apple.private.Photos.CPLDiagnose": true,
+            "com.apple.private.photos.service.internal.cloud": true,
+            "com.apple.private.photos.service.internal.library": true,
+            "com.apple.private.photos.service.librarymanagement": true,
+            "com.apple.private.photos.service.multilibrary": true,
+            "com.apple.private.privacy.accounting.read": true,
+            "com.apple.private.privacy.accounting.toggle": true,
+            "com.apple.private.remotemanagement.configuration-subscriber": true,
+            "com.apple.private.replicator.controller": true,
+            "com.apple.private.rtcreportingd": true,
+            "com.apple.private.safari.can-use-bookmarks-sync-agent": true,
+            "com.apple.private.safari.cloudtabs": true,
+            "com.apple.private.Safari.History": true,
+            "com.apple.private.safari.offlinereadinglist": true,
+            "com.apple.private.safariviewcontroller.custom-network-attribution-capable": true,
+            "com.apple.private.safetycheckd.scblocking": true,
+            "com.apple.private.safetycheckd.scsharingreminders": true,
+            "com.apple.private.screen-time": true,
+            "com.apple.private.screen-time.persistence": true,
+            "com.apple.private.screentime-communication": true,
+            "com.apple.private.screentime-setup": true,
+            "com.apple.private.security.driver-management": true,
+            "com.apple.private.security.no-container": true,
+            "com.apple.private.security.no-sandbox": true,
+            "com.apple.private.security.restricted-application-groups": [
+              "group.com.apple.icloud.findmydevice.shared-configuration"
+            ],
+            "com.apple.private.security.storage-exempt.heritable": true,
+            "com.apple.private.security.storage.clipserviced": true,
+            "com.apple.private.security.storage.DiagnosticReports.read-only": true,
+            "com.apple.private.security.storage.ManagedConfiguration": true,
+            "com.apple.private.security.storage.Notes": true,
+            "com.apple.private.security.storage.os_eligibility.readonly": true,
+            "com.apple.private.security.storage.Photos": true,
+            "com.apple.private.security.storage.PrivacyAccounting": true,
+            "com.apple.private.security.storage.Safari": true,
+            "com.apple.private.security.storage.triald": true,
+            "com.apple.private.securityd.ae.disable": true,
+            "com.apple.private.seeding.client": true,
+            "com.apple.private.sensorkit.export.allow-all": true,
+            "com.apple.private.sensorkit.firstRunOnboarding.allow": true,
+            "com.apple.private.SensorKit.prerequisite.readwrite": true,
+            "com.apple.private.sensorkit.pruner.power": true,
+            "com.apple.private.sensorkit.reader.wildcard.allow": true,
+            "com.apple.private.seserviced.sereservation.client": true,
+            "com.apple.private.sharing.unlock-manager": true,
+            "com.apple.private.sirittsservice.impersonate-clients": [
+              "com.apple.siri.MultilingualReading"
+            ],
+            "com.apple.private.sleepd": true,
+            "com.apple.private.subscriptionservice.internal": true,
+            "com.apple.private.subscriptionservice.web-sources.read-write": true,
+            "com.apple.private.suggestions": true,
+            "com.apple.private.suggestions.contacts": true,
+            "com.apple.private.swc.system-app": true,
+            "com.apple.private.system-keychain": true,
+            "com.apple.private.tcc.allow": [
+              "kTCCServiceVoiceBanking",
+              "kTCCServiceBluetoothAlways",
+              "kTCCServiceMediaLibrary",
+              "kTCCServiceAddressBook",
+              "kTCCServicePhotos",
+              "kTCCServicePhotosAdd",
+              "kTCCServiceCalendar",
+              "kTCCServiceReminders",
+              "kTCCServiceCamera",
+              "kTCCServiceWillow",
+              "kTCCServiceMicrophone",
+              "kTCCServiceFaceID",
+              "kTCCServiceSpeechRecognition",
+              "kTCCServiceMicrophoneInjection",
+              "kTCCServiceWebKitIntelligentTrackingPrevention",
+              "kTCCServiceExposureNotification"
+            ],
+            "com.apple.private.tcc.icons_for_prompts": true,
+            "com.apple.private.tcc.manager": true,
+            "com.apple.private.timezoneupdates.tzd.access": true,
+            "com.apple.private.tipsd.discoverability": true,
+            "com.apple.private.translation": true,
+            "com.apple.private.trust-defaults-kvstore-identifier": true,
+            "com.apple.private.ubiquity-additional-kvstore-identifiers": [
+              "com.apple.tipsd",
+              "com.apple.MobileSMS"
+            ],
+            "com.apple.private.ubiquity-kvstore-access": [
+              "com.apple.springboard",
+              "com.apple.backboardd",
+              "com.apple.Accessibility",
+              "com.apple.Accessibility.SwitchControl",
+              "com.apple.Accessibility.TouchAccommodations",
+              "com.apple.AssistiveTouch",
+              "com.apple.HearingAids",
+              "com.apple.SpeakSelection",
+              "com.apple.VoiceOverTouch",
+              "com.apple.ZoomTouch"
+            ],
+            "com.apple.private.usage-tracking": true,
+            "com.apple.private.usernotifications.bundle-identifiers": [
+              "com.apple.Passbook",
+              "com.apple.mobileslideshow",
+              "com.apple.journal"
+            ],
+            "com.apple.private.usernotifications.settings": [
+              "read",
+              "write"
+            ],
+            "com.apple.private.vfs.snapshot": true,
+            "com.apple.private.vfs.snapshot.user": true,
+            "com.apple.private.webbookmarks.settings": true,
+            "com.apple.private.WebKit.UnrestrictedApplePay": true,
+            "com.apple.private.wifivelocity": true,
+            "com.apple.private.xpc.launchd.reboot": true,
+            "com.apple.private.xpc.launchd.userspace-reboot": true,
+            "com.apple.privatecloudcompute.admin": true,
+            "com.apple.privatecloudcompute.requests": true,
+            "com.apple.proactive.ActionPrediction.predictions": true,
+            "com.apple.proactive.appDirectory": true,
+            "com.apple.proactive.AppPrediction.predictions": true,
+            "com.apple.proactive.NotificationDigest.xpc": true,
+            "com.apple.proactive.SuggestedPages": true,
+            "com.apple.purplebuddy.budd.access": true,
+            "com.apple.QuartzCore.debug": true,
+            "com.apple.QuartzCore.global-capture": true,
+            "com.apple.QuartzCore.presets": true,
+            "com.apple.QuartzCore.secure-mode": true,
+            "com.apple.rapport.people": true,
+            "com.apple.relatived.connection": true,
+            "com.apple.relatived.tempest": true,
+            "com.apple.remotenotification.preferences": true,
+            "com.apple.rootless.datavault.metadata": true,
+            "com.apple.rootless.storage.coreduet_knowledge_store": true,
+            "com.apple.rootless.storage.proactivepredictions": true,
+            "com.apple.rootless.storage.screentime": true,
+            "com.apple.runningboard.assertions.frontboard": true,
+            "com.apple.runningboard.assertions.siri": true,
+            "com.apple.runningboard.launchprocess": true,
+            "com.apple.runningboard.posterkit.host": true,
+            "com.apple.runningboard.process-state": true,
+            "com.apple.safetyalerts.spi": true,
+            "com.apple.securebackupd.access": true,
+            "com.apple.security.application-groups": [
+              "group.com.apple.notes",
+              "group.com.apple.mail",
+              "group.is.workflow.my.app",
+              "com.apple.MailPersonaStorage",
+              "group.com.apple.icloud.fm",
+              "group.com.apple.accessibility.voicebanking",
+              "group.com.apple.tipsnext",
+              "group.com.apple.Journal",
+              "group.com.apple.weather",
+              "group.com.apple.contacts.private-access",
+              "group.tvappservices.container",
+              "group.com.apple.ScreenContinuityServices",
+              "group.com.apple.ScreenTime",
+              "group.com.apple.icloud.findmydevice.shared-configuration"
+            ],
+            "com.apple.security.attestation.access": true,
+            "com.apple.security.exception.files.absolute-path.read-only": [
+              "/private/var/mobile/Library/Application Support/locationaccessstored/",
+              "/private/var/mobile/Library/DuetExpertCenter/ModeCaches/",
+              "/private/var/mobile/Library/DuetExpertCenter/",
+              "/private/var/db/os_eligibility/eligibility.plist",
+              "/private/var/db/assetsubscriptiond/",
+              "/var/mobile/Library/UserConfigurationProfiles/EffectiveUserSettings.plist"
+            ],
+            "com.apple.security.exception.files.home-relative-path.read-only": [
+              "/Media/PhotoData/Caches/PhotosPickerLogs/",
+              "/Library/DoNotDisturb/DB/IconCache",
+              "/Library/UnifiedAssetFramework/",
+              "/Library/com.apple.PrivacyDisclosure/"
+            ],
+            "com.apple.security.exception.files.home-relative-path.read-write": [
+              "/Library/AddressBook/",
+              "/Library/Accessibility/",
+              "/Library/Application Support/com.apple.ScreenTimeAgent/"
+            ],
+            "com.apple.security.exception.mach-lookup.global-name": [
+              "com.apple.generativeexperiences.ExternalPartnerCredentialStorage",
+              "com.apple.audio.AudioSession",
+              "com.apple.locationaccessstored.registration",
+              "com.apple.softposreaderd",
+              "com.apple.identityservicesd.nsxpc",
+              "com.apple.appprotectiond.guard",
+              "com.apple.AuthenticationServices.CredentialSharingGroups",
+              "com.apple.identityservicesd.embedded.auth",
+              "com.apple.feedbackd.xpc",
+              "com.apple.posterboardui.services ",
+              "com.apple.backupd",
+              "com.apple.ak.privateemail.xpc",
+              "com.apple.networkserviceproxy",
+              "com.apple.coreidvd.report-a-concern.xpc",
+              "com.apple.icloud.searchpartyd.beaconsharingservice",
+              "com.apple.VideoSubscriberAccount.AnalyticsService",
+              "com.apple.siri.VoiceShortcuts.xpc",
+              "com.apple.springboard.SBRendererService",
+              "com.apple.proactive.NotificationDigest.xpc",
+              "com.apple.identityservicesd.pds",
+              "com.apple.donotdisturb.service",
+              "com.apple.backlightd",
+              "com.apple.icloudinboxd.xpc",
+              "com.apple.aa.identity.xpc",
+              "com.apple.asd.scoring",
+              "com.apple.commcenter.carrierspace.xpc",
+              "com.apple.absd",
+              "com.apple.appstored.xpc.request",
+              "com.apple.coreduetd.context",
+              "com.apple.coreduetd.knowledge",
+              "com.apple.siri.VoiceShortcuts.xpc",
+              "com.apple.siri.uaf.service",
+              "com.apple.siri.uaf.subscription.service",
+              "com.apple.mobileasset.autoasset",
+              "com.apple.triald.namespace-management",
+              "com.apple.triald.internal",
+              "com.apple.trial.status",
+              "com.apple.proactive.appDirectory",
+              "com.apple.proactive.ActionPrediction.predictions",
+              "com.apple.proactive.AppPrediction.predictions",
+              "com.apple.SharedWebCredentials",
+              "com.apple.coreidvd.proofing",
+              "com.apple.CarPlayApp.service",
+              "com.apple.findmy.findmylocate.friendshipservice",
+              "com.apple.findmy.findmylocate.settings",
+              "com.apple.findmy.findmylocate.locationservice",
+              "com.apple.icloud.searchpartyd.beaconmanager",
+              "com.apple.icloud.searchpartyd.pairingmanager",
+              "com.apple.icloud.searchpartyd.ownersession",
+              "com.apple.paired-unlock",
+              "com.apple.nanosystemsettings",
+              "com.apple.private.corewifi.internal-xpc",
+              "com.apple.ClipServices.clipserviced",
+              "com.apple.appstorecomponentsd.xpc",
+              "com.apple.passd.in-app-payment",
+              "com.apple.relatived.tempest",
+              "com.apple.powerd.lowpowermode",
+              "com.apple.translationd",
+              "com.apple.sleepd.sleepserver",
+              "com.apple.tipsd",
+              "com.apple.cache_delete.public",
+              "com.apple.ModeEntityScorer",
+              "com.apple.universalcontrol",
+              "com.apple.mobile.usermanagerd.xpc",
+              "com.apple.mobile.keybagd.UserManager.xpc",
+              "com.apple.mobile.keybagd.xpc",
+              "com.apple.nanotimekit.collectionserver",
+              "com.apple.avatar.service",
+              "com.apple.avatar.support",
+              "com.apple.avatarsd",
+              "com.apple.ScreenTimeAgent.store",
+              "com.apple.ScreenTimeAgent.store-subscription",
+              "com.apple.coreidvd.docUpload.xpc",
+              "com.apple.telephonyutilities.callservicesdaemon.callstatecontroller",
+              "com.apple.communicationtrustd.service",
+              "com.apple.extensionkitservice",
+              "com.apple.biome.PublicStreamAccessService",
+              "com.apple.biome.access.system",
+              "com.apple.biome.access.user",
+              "com.apple.biome.compute.publisher.service",
+              "com.apple.biome.compute.publisher.service.user",
+              "com.apple.biome.compute.source",
+              "com.apple.biome.compute.source.user",
+              "com.apple.matter.support.xpc",
+              "com.apple.linkd.extension",
+              "com.apple.activitysharingd",
+              "com.apple.ap.adprivacyd.opt-out",
+              "com.apple.voicebanking.services",
+              "com.apple.voicebanking.store",
+              "com.apple.passd.in-app-payment",
+              "com.apple.passd.library",
+              "com.apple.passd.payment",
+              "com.apple.maps.virtualgarage.server",
+              "com.apple.seserviced.sereservation.client",
+              "com.apple.eyereliefd",
+              "com.apple.Maps.MapsSync.store",
+              "com.apple.avfaudio.devicetest.service",
+              "com.apple.replicatorservices",
+              "com.apple.appprotectiond.read",
+              "com.apple.attributionkitd.xpc.developer-mode",
+              "com.apple.ind.cloudfeatures",
+              "com.apple.feedbacklogger",
+              "com.apple.usernotifications.usernotificationsettingsservice",
+              "com.apple.appprotectiond.read",
+              "com.apple.linkd.mediator",
+              "com.apple.linkd.registry",
+              "com.apple.linkd.transcript",
+              "com.apple.generativeexperiences.availabilityService",
+              "com.apple.familycircled.settings",
+              "com.apple.familycircled.sharing",
+              "com.apple.email.AccountsUISupportService",
+              "com.apple.devicesharingd.enrollmentassetservice",
+              "com.apple.MomentsUIService",
+              "com.apple.family.ageRange.xpc",
+              "com.apple.batteryintelligenced.batteryanalysis",
+              "com.apple.PerformanceTrace.ptpassivecollectiond.collectionconfig",
+              "com.apple.PerformanceTrace.PerformanceTraceService",
+              "com.apple.OSIntelligence.battery",
+              "com.apple.PassbookUISceneService.remote-ui",
+              "com.apple.migrationd",
+              "com.apple.alarmkitservices",
+              "com.apple.seserviced.storage-management-presentation",
+              "com.apple.homeenergyd.xpc"
+            ],
+            "com.apple.security.exception.shared-preference.read-only": [
+              "com.apple.anvil",
+              "com.apple.springboard",
+              "com.apple.momentsd",
+              "com.apple.devicesharingd"
+            ],
+            "com.apple.security.exception.shared-preference.read-write": [
+              "kCFPreferencesAnyApplication",
+              "com.apple.mobilenotes",
+              "group.is.workflow.my.app",
+              "com.apple.restrictionspassword",
+              "com.apple.AppStoreComponents",
+              "com.apple.universalcontrol",
+              "com.apple.animoji",
+              "com.apple.AvatarUI.Staryu",
+              "com.apple.AdPlatforms",
+              "com.apple.journal",
+              "com.apple.contacts.sharedProfile",
+              "com.apple.photos.picker",
+              "com.apple.CloudSubscriptionFeatures.optIn",
+              "com.apple.CloudSubscriptionFeatures.followup.engagement",
+              "com.apple.usernotificationskit",
+              "com.apple.messages.critical-messaging.storage",
+              "com.apple.seserviced.contactlessCredential.settings",
+              "com.apple.visionproapp.notifications",
+              "com.apple.momentsui",
+              "com.apple.siri.generativeassistantsettings",
+              "com.apple.generativepartnerservicesettings",
+              "com.apple.DeviceDiscoveryUI"
+            ],
+            "com.apple.security.iokit-user-client-class": [
+              "AppleNVMeEANUC",
+              "AppleAPFSUserClient",
+              "AppleBiometricServicesUserClient",
+              "AGXCommandQueue",
+              "AGXDevice",
+              "AGXDeviceUserClient",
+              "AGXGLContext",
+              "AGXSharedUserClient",
+              "AppleCredentialManagerUserClient",
+              "AppleHPMUserClient",
+              "AppleJPEGDriverUserClient",
+              "AppleMobileFileIntegrityUserClient",
+              "AppleUSBHostDeviceUserClient",
+              "H11ANEInDirectPathClient",
+              "IOAVControllerConcreteUserClient",
+              "IOAccelContext",
+              "IOAccelContext2",
+              "IOAccelDevice",
+              "IOAccelDevice2",
+              "IOAccelSharedUserClient",
+              "IOAccelSharedUserClient2",
+              "IOAccelSubmitter2",
+              "IOGPUDeviceUserClient",
+              "IOHIDEventServiceFastPathUserClient",
+              "IOHIDLibUserClient",
+              "IOMobileFramebufferUserClient",
+              "IOReportUserClient",
+              "IOSurfaceAcceleratorClient",
+              "IOSurfaceRootUserClient",
+              "RootDomainUserClient",
+              "AppleProcessorTraceUserClient"
+            ],
+            "com.apple.security.lockdownmode.read": true,
+            "com.apple.security.system-container": true,
+            "com.apple.security.system-groups": [
+              "systemgroup.com.apple.DeviceActivity",
+              "systemgroup.com.apple.osanalytics",
+              "systemgroup.com.apple.regulatory_images",
+              "systemgroup.com.apple.powerlog",
+              "systemgroup.com.apple.media.books.managed",
+              "systemgroup.com.apple.VideoSubscriberAccount",
+              "systemgroup.com.apple.icloud.searchpartyd.sharedsettings"
+            ],
+            "com.apple.security.temporary-exception.mach-lookup.global-name": [
+              "com.apple.suggestd.contacts",
+              "com.apple.corespeech.corespeechd.xpc"
+            ],
+            "com.apple.seld.tsmmanager": true,
+            "com.apple.SensorKit.effective-bundle": true,
+            "com.apple.SensorKitAppHelper.allow": [
+              "read"
+            ],
+            "com.apple.seserviced.kmlXpcService": true,
+            "com.apple.seserviced.seendpoints": true,
+            "com.apple.seserviced.seendpoints.certificateauthorities": true,
+            "com.apple.seserviced.settings.mach": true,
+            "com.apple.seserviced.storage-management": true,
+            "com.apple.settings.private-access-reset": true,
+            "com.apple.sh": true,
+            "com.apple.sharesheet.allow-custom-view": true,
+            "com.apple.sharing.BluetoothUserInteraction": true,
+            "com.apple.sharing.Client": true,
+            "com.apple.sharing.Services": true,
+            "com.apple.shortcuts.automation-confirmation-reset": true,
+            "com.apple.shortcuts.background-running": true,
+            "com.apple.siri.VoiceShortcuts.xpc": true,
+            "com.apple.siriknowledged": true,
+            "com.apple.SiriTTSTrainingAgent.training": true,
+            "com.apple.softposreaderd.provision": true,
+            "com.apple.sos.contacts": true,
+            "com.apple.sos.trigger": true,
+            "com.apple.spaceattribution.private": true,
+            "com.apple.springboard.addsNewIconsToHomeScreen": true,
+            "com.apple.springboard.allowallcallurls": true,
+            "com.apple.springboard.application-removability.proxy": true,
+            "com.apple.springboard.capture-button-restriction": true,
+            "com.apple.springboard.externaldisplay.displayArrangements": true,
+            "com.apple.springboard.focus-modes-home-screen-settings": true,
+            "com.apple.springboard.hardware-button-service.button-associated-hint-view": true,
+            "com.apple.springboard.hardware-button-service.event-consumption": true,
+            "com.apple.springboard.hearing-test-mode": true,
+            "com.apple.springboard.homeScreenIconStyle": true,
+            "com.apple.springboard.largeIconLayout": true,
+            "com.apple.springboard.lowDensityIconLayout": true,
+            "com.apple.springboard.opensensitiveurl": true,
+            "com.apple.springboard.presentPowerDownUI": true,
+            "com.apple.springboard.private.capture-button-events": true,
+            "com.apple.springboard.private.capture-button-full-fidelity-events": true,
+            "com.apple.springboard.private.EA0E3FBF-D56E-4897-B807-A3CA8090EE38": true,
+            "com.apple.springboard.remote-alert": true,
+            "com.apple.springboard.resetHomeScreenLayout": true,
+            "com.apple.springboard.setCarPlayIconOrder": true,
+            "com.apple.springboard.showsBadgesInAppLibrary": true,
+            "com.apple.springboard.showsHomeScreenSearchAffordance": true,
+            "com.apple.springboard.topButtonFrames": true,
+            "com.apple.springboard.wipedevice": true,
+            "com.apple.studentd-access": true,
+            "com.apple.symptom_analytics.configure": true,
+            "com.apple.symptom_analytics.query": true,
+            "com.apple.symptom_analytics.reset": true,
+            "com.apple.symptom_diagnostics.private": true,
+            "com.apple.symptoms.cosm.admin": true,
+            "com.apple.system.diagnostics.iokit-properties": true,
+            "com.apple.SystemConfiguration.SCDynamicStore-write-access": true,
+            "com.apple.SystemConfiguration.SCPreferences-write-access": [
+              "preferences.plist",
+              "com.apple.AutoWake.xml",
+              "com.apple.radios.plist",
+              "com.apple.virtualMemoryMode.plist",
+              "OSThermalStatus.plist",
+              "com.apple.jetsam.plist",
+              "com.apple.WebSheet.plist",
+              "com.apple.wifi-private-mac-networks.plist"
+            ],
+            "com.apple.systemstatus.domains": [
+              "status-bar-overrides"
+            ],
+            "com.apple.systemstatus.publisher.domains": [
+              "status-bar-overrides"
+            ],
+            "com.apple.tailspin.config-apply": true,
+            "com.apple.TapToRadarKit.service-access": true,
+            "com.apple.telephonyutilities.callservicesd": [
+              "access-call-capabilities",
+              "modify-call-capabilities",
+              "access-calls",
+              "access-call-providers",
+              "modify-call-providers"
+            ],
+            "com.apple.timed": true,
+            "com.apple.transparency.kt": true,
+            "com.apple.trial.client": [
+              "321",
+              "322",
+              "371",
+              "372",
+              "401",
+              "402",
+              "403",
+              "404",
+              "405",
+              "406",
+              "407",
+              "408",
+              "409",
+              "750",
+              "751",
+              "752",
+              "753",
+              "754",
+              "755",
+              "757",
+              "1000"
+            ],
+            "com.apple.trial.status.deployment-environment.allow": [
+              0,
+              1,
+              2
+            ],
+            "com.apple.triald.internal": true,
+            "com.apple.tzlink.allow": true,
+            "com.apple.uarp.endpoint.control": true,
+            "com.apple.UIKit.status-bar-override-allow": true,
+            "com.apple.USBCEntitlement": true,
+            "com.apple.usermanagerd.persona.background": true,
+            "com.apple.usermanagerd.persona.create": true,
+            "com.apple.usermanagerd.persona.delete": true,
+            "com.apple.usermanagerd.persona.fetch": true,
+            "com.apple.usermanagerd.persona.fetchbundle": true,
+            "com.apple.usermanagerd.persona.setbundle": true,
+            "com.apple.VideoSubscriberAccount.AnalyticsService.ReportMetricsEvents": true,
+            "com.apple.VideoSubscriberAccount.DeveloperService": true,
+            "com.apple.visioncompaniond.client": true,
+            "com.apple.visualvoicemail.client": true,
+            "com.apple.voicebanking.services": true,
+            "com.apple.voicetrigger.voicetriggerservice": true,
+            "com.apple.wallet.banner": true,
+            "com.apple.watchlist.private": true,
+            "com.apple.wifi.manager-access": true,
+            "com.apple.wifip2pd": true,
+            "com.apple.wipedevice": true,
+            "com.apple.wirelessinsightsd.manager-access": true,
+            "DataProtectionClass": "NSFileProtectionComplete",
+            "fairplay-client": "505792035",
+            "keychain-access-groups": [
+              "apple",
+              "com.apple.certificates",
+              "com.apple.hap.pairing",
+              "com.apple.identities",
+              "appleaccount",
+              "com.apple.mobilemail.smime",
+              "com.apple.preferences",
+              "com.apple.safari.credit-cards",
+              "com.apple.PassbookUIService",
+              "com.apple.ProtectedCloudStorage",
+              "com.apple.PublicCloudStorage",
+              "com.apple.VideoSubscriberAccount",
+              "com.apple.Passbook.PeerPayment",
+              "com.apple.coreservices.appleidauthentication",
+              "com.apple.coreservices.appleidauthentication.keychainaccessgroup",
+              "com.apple.sharing.appleidauthentication",
+              "com.apple.social.oauthurl",
+              "com.apple.passd",
+              "com.apple.managed.vpn.shared",
+              "com.apple.mail.identities",
+              "com.apple.AppleCareSupport-Preferences",
+              "com.apple.cfnetwork",
+              "com.apple.cfnetwork.testing",
+              "com.apple.password-manager",
+              "com.apple.password-manager.testing",
+              "com.apple.webkit.webauthn",
+              "com.apple.webkit.webauthn.testing",
+              "com.apple.cfnetwork-recently-deleted",
+              "com.apple.cfnetwork-recently-deleted.testing",
+              "com.apple.password-manager-recently-deleted",
+              "com.apple.password-manager-recently-deleted.testing",
+              "com.apple.webkit.webauthn-recently-deleted",
+              "com.apple.webkit.webauthn-recently-deleted.testing",
+              "com.apple.password-manager.personal",
+              "com.apple.password-manager.personal.testing",
+              "com.apple.password-manager.personal-recently-deleted",
+              "com.apple.password-manager.personal-recently-deleted.testing",
+              "com.apple.password-manager.generated-passwords",
+              "com.apple.password-manager.generated-passwords.testing",
+              "com.apple.Health"
+            ],
+            "keychain-cloud-circle": true,
+            "modify-anchor-certificates": true,
+            "platform-application": true
+          },
+          "executable": "/Applications/Preferences.app/Preferences",
+          "group_containers": {},
+          "minimum_os": "26.1",
+          "name": "Settings",
+          "sdk": "iphoneos26.1.internal",
+          "signer": "Apple",
+          "type": "System",
+          "version": "1"
+        },
+        "type": "response"
+      },
+      "seconds": 0.09151429100893438
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5330777500057593
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016642080154269934
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004351583018433303
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004792833002284169
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.014271416992414743
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004958042001817375
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.Preferences",
+          "name": "Settings",
+          "pid": 585,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.17071262502577156
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 228873,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "saved_file": "rotation-Preferences-0.jpeg",
+          "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+        },
+        "type": "response"
+      },
+      "seconds": 0.15376637503504753
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "90"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "B30",
+        "type": "response"
+      },
+      "seconds": 0.5259972920175642
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0023019579821266234
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.00472329102922231
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.005483584012836218
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.02382925001438707
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004593290970660746
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.Preferences",
+          "name": "Settings",
+          "pid": 585,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.1712520410073921
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 228873,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "saved_file": "rotation-Preferences-90.jpeg",
+          "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+        },
+        "type": "response"
+      },
+      "seconds": 0.1546838330104947
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "270"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "B30",
+        "type": "response"
+      },
+      "seconds": 0.5345144579769112
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0029762500198557973
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0061395419761538506
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0049331249902024865
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.022433332982473075
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.023904500005301088
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.Preferences",
+          "name": "Settings",
+          "pid": 585,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.16207016695989296
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 228873,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "saved_file": "rotation-Preferences-270.jpeg",
+          "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+        },
+        "type": "response"
+      },
+      "seconds": 0.136261707986705
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "180"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "B30",
+        "type": "response"
+      },
+      "seconds": 0.5361575830029324
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0031750419875606894
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004673542047385126
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.006072457996197045
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.024827375018503517
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.024525541986804456
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.Preferences",
+          "name": "Settings",
+          "pid": 585,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.15849908301606774
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 228873,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "saved_file": "rotation-Preferences-180.jpeg",
+          "sha256": "e1326d5b82b7a64be19c40606e3f2736bb2cc8c46c8168ebb1fde3353c091b43"
+        },
+        "type": "response"
+      },
+      "seconds": 0.13622849999228492
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.mobilesafari"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 645
+        },
+        "type": "response"
+      },
+      "seconds": 1.2077093750122003
+    },
+    {
+      "method": "apps.info",
+      "params": {
+        "bundle_id": "com.apple.mobilesafari"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "build": "8622.2.11.10.8",
+          "bundle_id": "com.apple.mobilesafari",
+          "bundle_path": "/private/var/containers/Bundle/Application/8267D05A-8582-404F-9A56-437A9750FE03/MobileSafari.app",
+          "data_path": "/private/var/mobile/Containers/Data/Application/C0CACF36-99E7-49C6-90A5-601843D00A99",
+          "encrypted": false,
+          "entitlements": {
+            "adi-client": "2463478364",
+            "application-identifier": "com.apple.mobilesafari",
+            "aps-environment": "production",
+            "com.apple.accounts.appleaccount.fullaccess": true,
+            "com.apple.app-distribution.private": true,
+            "com.apple.appattest.spi": true,
+            "com.apple.appprotectiond.read.access": true,
+            "com.apple.assistant.dictation.prerecorded": true,
+            "com.apple.authentication-services.access-credential-identities": true,
+            "com.apple.authentication-services.allow-authentication-request-any-rpid": true,
+            "com.apple.authkit.client.internal": true,
+            "com.apple.authkit.client.private": true,
+            "com.apple.bluetooth.internal": true,
+            "com.apple.chrono.invalidate-timelines": true,
+            "com.apple.chronoservices": true,
+            "com.apple.CommCenter.fine-grained": [
+              "spi",
+              "public-cellular-plan",
+              "public-esim-qr-code"
+            ],
+            "com.apple.Contacts.database-allow": true,
+            "com.apple.coreaudio.allow-amr-decode": true,
+            "com.apple.coreduetd.allow": true,
+            "com.apple.coreduetd.context": true,
+            "com.apple.coreduetd.knowledge": true,
+            "com.apple.developer.browser.app-installation": true,
+            "com.apple.developer.default-data-protection": "NSFileProtectionCompleteUntilFirstUserAuthentication",
+            "com.apple.developer.device-information.user-assigned-device-name": true,
+            "com.apple.developer.hardened-process": true,
+            "com.apple.developer.icloud-container-environment": "Production",
+            "com.apple.developer.icloud-container-identifiers": [
+              "iCloud.com.apple.mobilesafari",
+              "com.apple.SafariShared.History"
+            ],
+            "com.apple.developer.icloud-extended-share-access": [
+              "InProcessShareOwnerParticipantInfo"
+            ],
+            "com.apple.developer.icloud-services": [
+              "CloudDocuments",
+              "CloudKit"
+            ],
+            "com.apple.developer.identity-document-services.web-presentment-controller": true,
+            "com.apple.developer.networking.HotspotConfiguration": true,
+            "com.apple.developer.web-browser": true,
+            "com.apple.developer.WebKit.ServiceWorkers": true,
+            "com.apple.diagnosticpipeline.request": true,
+            "com.apple.duet.activityscheduler.allow": true,
+            "com.apple.features.all-access": true,
+            "com.apple.frontboard.launchapplications": true,
+            "com.apple.frontboardservices.display-layout-monitor": true,
+            "com.apple.generativeexperiences.availabilityService": true,
+            "com.apple.generativeexperiences.summarization": true,
+            "com.apple.geoservices.map-subscriptions.check-existence": true,
+            "com.apple.geoservices.map-subscriptions.size-estimate": true,
+            "com.apple.intelligenceplatform.View": true,
+            "com.apple.intents.extension.discovery": true,
+            "com.apple.intents.uiextension.discovery": true,
+            "com.apple.itunesstored.accounts": true,
+            "com.apple.itunesstored.downloads": true,
+            "com.apple.itunesstored.kvs": true,
+            "com.apple.itunesstored.lookup": true,
+            "com.apple.itunesstored.private": true,
+            "com.apple.itunesstored.software-library": true,
+            "com.apple.keystore.sik.access": true,
+            "com.apple.locationd.authorizeapplications": true,
+            "com.apple.locationd.effective_bundle": true,
+            "com.apple.locationd.time_zone": true,
+            "com.apple.managedconfiguration.feature-setting.allowPasswordAutoFill": true,
+            "com.apple.managedconfiguration.feature-setting.safariAcceptCookies": true,
+            "com.apple.managedconfiguration.profiled.configurationprofiles": [
+              "UIInstallation"
+            ],
+            "com.apple.mkb.usersession.info": true,
+            "com.apple.mobileactivationd.spi": true,
+            "com.apple.multitasking.systemappassertions": true,
+            "com.apple.nfcd.hwmanager": true,
+            "com.apple.nfcd.session.reader.internal": true,
+            "com.apple.payment.all-access": true,
+            "com.apple.private.accounts.allaccounts": true,
+            "com.apple.private.appintents-bundle-absolute-paths": [
+              "/System/Library/PrivateFrameworks/MobileSafari.framework"
+            ],
+            "com.apple.private.appleaccount.app-hidden-from-icloud-settings": true,
+            "com.apple.private.applemediaservices": true,
+            "com.apple.private.appstorecomponents": true,
+            "com.apple.private.appstorecomponents.media-client-id": "com.apple.searchui",
+            "com.apple.private.appstorecomponents.media-client-version": "1",
+            "com.apple.private.appstorecomponents.media-clients": {
+              "SmartAppBanner": {
+                "id": "com.apple.mobilesafari.SmartAppBanner",
+                "version": "1"
+              }
+            },
+            "com.apple.private.appstored": [
+              "Clip"
+            ],
+            "com.apple.private.assets.accessible-asset-types": [
+              "com.apple.MobileAsset.SafariCloudHistoryConfiguration",
+              "com.apple.MobileAsset.CoreSuggestions",
+              "com.apple.MobileAsset.SafariBackgroundImage",
+              "com.apple.MobileAsset.UAF.SafariBrowsingAssistant"
+            ],
+            "com.apple.private.assets.bypass-asset-types-check": true,
+            "com.apple.private.associated-domains": true,
+            "com.apple.private.BarcodeSupport.can-suppress-app-clip-code-url-authorization": true,
+            "com.apple.private.biome.read-only": [
+              "Media.NowPlaying",
+              "App.InFocus",
+              "App.Install",
+              "CarPlay.Connected",
+              "Motion.Activity",
+              "Device.ScreenLocked"
+            ],
+            "com.apple.private.biome.read-write": [
+              "App.WebUsage",
+              "Discoverability.Signals",
+              "Discoverability.Usage",
+              "Safari.AutoPlay",
+              "Safari.WebPagePerformance",
+              "Safari.Navigations",
+              "Safari.PageLoad",
+              "Safari.WindowProxy",
+              "Safari.Browsing.Assistant"
+            ],
+            "com.apple.private.can-load-any-content-blocker": true,
+            "com.apple.private.canGetAppLinkInfo": true,
+            "com.apple.private.canModifyAppLinkPermissions": true,
+            "com.apple.private.ClipServices": true,
+            "com.apple.private.cloudkit.serviceNameForContainerMap": {
+              "com.apple.SafariShared.History": "com.apple.SafariShared.History"
+            },
+            "com.apple.private.cloudkit.systemService": true,
+            "com.apple.private.contactsui": true,
+            "com.apple.private.copresence": true,
+            "com.apple.private.copresence.stable-app-identifier": "com.apple.Safari",
+            "com.apple.private.CoreAuthentication.SPI": true,
+            "com.apple.private.coreservices.canmaplsdatabase": true,
+            "com.apple.private.coreservices.lsuseractivityd.bestappsuggestion": true,
+            "com.apple.private.dmd.policy": true,
+            "com.apple.private.dprivacyd.allow": true,
+            "com.apple.private.email": true,
+            "com.apple.private.hid.client.event-dispatch.internal": true,
+            "com.apple.private.imcore.imagent": true,
+            "com.apple.private.in-app-payments": true,
+            "com.apple.private.intelligenceplatform.views.read-only": [
+              "siriRemembers"
+            ],
+            "com.apple.private.internal-style-asam": true,
+            "com.apple.private.interstellar.data-access": "*",
+            "com.apple.private.keychain.kcsharing.client": true,
+            "com.apple.private.launchservices.suppresscustomschemeprompt": "*",
+            "com.apple.private.LocalAuthentication.DTO": true,
+            "com.apple.private.MobileContainerManager.lookup": {
+              "appData": [
+                "com.apple.Passwords"
+              ]
+            },
+            "com.apple.private.MobileGestalt.AllowedProtectedKeys": [
+              "UniqueDeviceIDData",
+              "UniqueChipID",
+              "SerialNumber",
+              "UniqueDeviceID",
+              "ProvisioningUniqueDeviceID"
+            ],
+            "com.apple.private.mobileinstall.xpc-services-enabled": true,
+            "com.apple.private.networkserviceproxy": true,
+            "com.apple.private.octagon": true,
+            "com.apple.private.osanalytics.defaults.allow": true,
+            "com.apple.private.parsec.default-client": "com.apple.mobilesafari",
+            "com.apple.private.rsr-cryptex-access": true,
+            "com.apple.private.safari.can-use-bookmarks-sync-agent": true,
+            "com.apple.private.safari.can-use-history-push-agent": true,
+            "com.apple.private.safari.can-use-search-helper": true,
+            "com.apple.private.Safari.History": true,
+            "com.apple.private.safari.offlinereadinglist": true,
+            "com.apple.private.Safari.PasswordBreachHelper": true,
+            "com.apple.private.screen-time": true,
+            "com.apple.private.security.container-required": true,
+            "com.apple.private.security.enable-state-flags": [
+              "EnableQuickLookSandboxResources"
+            ],
+            "com.apple.private.security.storage.os_eligibility.readonly": true,
+            "com.apple.private.security.storage.Safari": true,
+            "com.apple.private.security.system-application": true,
+            "com.apple.private.sociallayer.highlights": true,
+            "com.apple.private.sportskit.client": true,
+            "com.apple.private.subscriptionservice.web-sources.read-write": true,
+            "com.apple.private.suggestions.events": true,
+            "com.apple.private.suggestions.urls": true,
+            "com.apple.private.tcc.allow": [
+              "kTCCServiceListenEvent",
+              "kTCCServiceCamera",
+              "kTCCServiceMicrophone",
+              "kTCCServicePhotosAdd",
+              "kTCCServiceFaceID"
+            ],
+            "com.apple.private.tcc.allow-or-regional-prompt": [
+              "kTCCServiceAddressBook"
+            ],
+            "com.apple.private.tcc.allow.overridable": [
+              "kTCCServiceCalendar"
+            ],
+            "com.apple.private.translation": true,
+            "com.apple.private.ubiquity-additional-kvstore-identifiers": [
+              "com.apple.mobilesafari",
+              "com.apple.tipsd"
+            ],
+            "com.apple.private.usernotifications.bundle-identifiers": [
+              "com.apple.Passwords"
+            ],
+            "com.apple.private.usernotifications.observation": [
+              "otc"
+            ],
+            "com.apple.private.WebClips.read-write": true,
+            "com.apple.proactive.eventtracker": true,
+            "com.apple.proactive.PersonalizationPortrait.NamedEntity.readOnly": true,
+            "com.apple.QuartzCore.global-capture": true,
+            "com.apple.remotemanagementd.ask-for-time": true,
+            "com.apple.runningboard.assertions.webkit": true,
+            "com.apple.sage.summarization": true,
+            "com.apple.security.application-groups": [
+              "group.com.apple.tipsnext",
+              "group.com.apple.sports",
+              "group.com.apple.safari"
+            ],
+            "com.apple.security.attestation.access": true,
+            "com.apple.security.device.usb": true,
+            "com.apple.security.exception.files.absolute-path.read-only": [
+              "/private/var/db/MobileIdentityData/",
+              "/private/var/containers/Bundle/Application/",
+              "/private/var/db/eligibilityd/eligibility.plist",
+              "/Applications/",
+              "/private/var/MobileDevice/ProvisioningProfiles/",
+              "/private/var/db/os_eligibility/",
+              "/private/var/MobileAsset/AssetsV2/locks/com.apple.UnifiedAssetFramework/",
+              "/private/var/MobileAsset/AssetsV2/locks/com.apple.UnifiedAssetFramework/com.apple.parsec.sba/shared_locks/",
+              "/private/var/MobileAsset/AssetsV2/com_apple_MobileAsset_UAF_SafariBrowsingAssistant/purpose_auto/",
+              "/private/var/db/assetsubscriptiond/",
+              "/private/var/mobile/Library/com.apple.PrivacyDisclosure/"
+            ],
+            "com.apple.security.exception.files.home-relative-path.read-only": [
+              "/Library/Caches/com.apple.storeservices/",
+              "/Library/Caches/com.apple.ClipServices/",
+              "/Library/UserConfigurationProfiles/EffectiveUserSettings.plist",
+              "/Library/com.apple.ManagedSettings/EffectiveSettings.plist",
+              "/Library/UnifiedAssetFramework/"
+            ],
+            "com.apple.security.exception.files.home-relative-path.read-write": [
+              "/Library/Safari/AutoFillQuirks.plist",
+              "/private/var/mobile/Library/com.apple.siri.inference/"
+            ],
+            "com.apple.security.exception.mach-lookup.global-name": [
+              "com.apple.AuthenticationServices.AuthenticationServicesAgent.CredentialUpdate",
+              "com.apple.DocumentManagerCore.Downloads",
+              "com.apple.proactive.PersonalizationPortrait.NamedEntity.readOnly",
+              "com.apple.coreservices.lsbestappsuggestionmanager.xpc",
+              "com.apple.suggestd.urls",
+              "com.apple.LORemoteUIPinService",
+              "com.apple.remotemanagementd.management-state",
+              "com.apple.SafariBookmarksSyncAgent",
+              "com.apple.Safari.SafeBrowsing.Service",
+              "com.apple.SafariCloudHistoryPushAgent",
+              "com.apple.appstored.xpc",
+              "com.apple.mobile.keybagd.xpc",
+              "com.apple.parsecd",
+              "com.apple.parsec-fbf",
+              "com.apple.coreduetd.knowledge",
+              "com.apple.internal.safaricyclerd",
+              "com.apple.watchlistd.xpc",
+              "com.apple.Safari.SandboxBroker",
+              "com.apple.BarcodeSupport.ParsingService",
+              "com.apple.managedconfiguration.profiled",
+              "com.apple.ManagedSettingsAgent",
+              "com.apple.Safari.History",
+              "com.apple.SharingServices",
+              "com.apple.SharedWebCredentials",
+              "com.apple.dmd.policy",
+              "com.apple.UsageTrackingAgent",
+              "com.apple.UsageTrackingAgent.private",
+              "com.apple.remotemanagementd.ask",
+              "com.apple.passd.account",
+              "com.apple.passd.payment",
+              "com.apple.AppSSO.service-xpc",
+              "com.apple.nfcd.hwmanager",
+              "com.apple.translationd",
+              "com.apple.ClipServices.clipserviced",
+              "com.apple.security.octagon",
+              "com.apple.WebKit.WebAuthn",
+              "com.apple.appstorecomponentsd.xpc",
+              "com.apple.datamigrator",
+              "com.apple.online-auth-agent.xpc",
+              "com.apple.Safari.SearchHelper",
+              "com.apple.misagent",
+              "com.apple.sportsd.xpc",
+              "com.apple.email.maild",
+              "com.apple.AuthenticationServices.AutoFill",
+              "com.apple.cdp.daemon",
+              "com.apple.duetactivityscheduler",
+              "com.apple.webprivacyd",
+              "com.apple.trial.status",
+              "com.apple.generativeexperiences.availabilityService",
+              "com.apple.BrowserEngineKit.Intermediary",
+              "com.apple.timed.xpc",
+              "com.apple.Safari.History.Service",
+              "com.apple.Safari.PasswordBreachHelper",
+              "com.apple.proactive.PersonalizationPortrait.SocialHighlight",
+              "com.apple.sociallayerd",
+              "com.apple.networkserviceproxy",
+              "com.apple.synapse.contentlinkingd",
+              "com.apple.synapse.link-context-service",
+              "com.apple.ind.cloudfeatures",
+              "com.apple.ak.privateemail.xpc",
+              "com.apple.donotdisturb.appconfiguration.service",
+              "com.apple.security.kcsharing",
+              "com.apple.SharePlay.GroupSessionService",
+              "com.apple.siri.sirireaderd",
+              "com.apple.sirittsd",
+              "com.apple.chronoservices",
+              "com.apple.biome.access.user",
+              "com.apple.managedappdistributiond.xpc",
+              "com.apple.AppDistributionLaunchAngel",
+              "com.apple.AuthenticationServicesCore.AuthenticationServicesAgent.CredentialExchange",
+              "com.apple.UserNotifications.OneTimeCodeService",
+              "com.apple.lsd.xpc",
+              "com.apple.ManagedSettingsAgent.publisher",
+              "com.apple.sage.summarization",
+              "com.apple.generativeexperiences.summarization",
+              "com.apple.siri.uaf.service",
+              "com.apple.mobileasset.autoasset",
+              "com.apple.mobileassetd.v2",
+              "com.apple.siri.uaf.subscription.service",
+              "com.apple.mobile.usermanagerd.xpc",
+              "com.apple.mobile.keybagd.UserManager.xpc",
+              "com.apple.intelligenceplatform.View",
+              "com.apple.appprotectiond.read",
+              "com.apple.ak.signinwithapple.xpc"
+            ],
+            "com.apple.security.exception.shared-preference.read-only": [
+              "com.apple.CloudSubscriptionFeatures.datadetectors",
+              "com.apple.gms.availability",
+              "com.apple.suggestions",
+              "com.apple.SocialLayer",
+              "com.apple.UnifiedAssetFramework"
+            ],
+            "com.apple.security.exception.shared-preference.read-write": [
+              "com.apple.mobilesafarishared",
+              "com.apple.WebUI",
+              "kCFPreferencesAnyApplication",
+              "com.apple.webinspectord",
+              "com.apple.AppStoreComponents",
+              "com.apple.newscore",
+              "com.apple.suggestions",
+              "com.apple.siri.generativeassistantsettings",
+              "com.apple.Passwords"
+            ],
+            "com.apple.security.system-groups": [
+              "systemgroup.com.apple.mobileactivationd"
+            ],
+            "com.apple.sharing.Client": true,
+            "com.apple.sharing.DeviceDiscovery": true,
+            "com.apple.sharing.Services": true,
+            "com.apple.springboard.addWebClipToHomeScreen": true,
+            "com.apple.springboard.appbackgroundstyle": true,
+            "com.apple.springboard.CFUserNotification": true,
+            "com.apple.springboard.opensensitiveurl": true,
+            "com.apple.springboard.statusbarstyleoverrides": true,
+            "com.apple.springboard.statusbarstyleoverrides.coordinator": [
+              "UIStatusBarStyleOverrideWebRTCCapture",
+              "UIStatusBarStyleOverrideWebRTCAudioCapture"
+            ],
+            "com.apple.springboard.swapIconsInProminentPositions": true,
+            "com.apple.springboard.systemNotesPresentation": true,
+            "com.apple.springboard.wallpaperAnimationSuspension": true,
+            "com.apple.springboard.webClipService": true,
+            "com.apple.symptom_analytics.configure": true,
+            "com.apple.symptom_diagnostics.report": true,
+            "com.apple.synapse.allowLinkContextRequests": true,
+            "com.apple.telephonyutilities.callservicesd": [
+              "access-call-providers"
+            ],
+            "com.apple.trial.client": [
+              "342"
+            ],
+            "com.apple.trial.status.deployment-environment.allow": [
+              2
+            ],
+            "com.apple.watchlist.private": true,
+            "fairplay-client": "511712240",
+            "keychain-access-groups": [
+              "com.apple.cfnetwork",
+              "com.apple.identities",
+              "com.apple.mobilesafari",
+              "com.apple.certificates",
+              "com.apple.safari.credit-cards",
+              "com.apple.safari.history",
+              "com.apple.safari.WebCrypto.master",
+              "com.apple.ProtectedCloudStorage",
+              "com.apple.webkit.webauthn",
+              "apple",
+              "lockdown-identities",
+              "com.apple.password-manager",
+              "com.apple.password-manager.personal",
+              "com.apple.cfnetwork-recently-deleted",
+              "com.apple.password-manager-recently-deleted",
+              "com.apple.webkit.webauthn-recently-deleted",
+              "com.apple.password-manager.personal-recently-deleted",
+              "com.apple.password-manager.generated-passwords",
+              "com.apple.cfnetwork.testing",
+              "com.apple.password-manager.testing",
+              "com.apple.webkit.webauthn.testing",
+              "com.apple.password-manager.website-metadata",
+              "com.apple.password-manager.website-metadata.testing"
+            ],
+            "platform-application": true,
+            "vm-pressure-level": true
+          },
+          "executable": "/var/containers/Bundle/Application/8267D05A-8582-404F-9A56-437A9750FE03/MobileSafari.app/MobileSafari",
+          "group_containers": {
+            "group.com.apple.safari": "/private/var/mobile/Containers/Shared/AppGroup/941A3CFF-BB1B-40CB-8A0B-18EA19C55B4D",
+            "group.com.apple.sports": "/private/var/mobile/Containers/Shared/AppGroup/510CEAF6-B722-48F4-A3ED-C508B0802D50",
+            "group.com.apple.tipsnext": "/private/var/mobile/Containers/Shared/AppGroup/02E7314A-DA1C-404C-8F73-D1424C624087"
+          },
+          "minimum_os": "26.1",
+          "name": "Safari",
+          "sdk": "iphoneos26.1.internal",
+          "signer": "0000000000",
+          "type": "System",
+          "version": "26.1"
+        },
+        "type": "response"
+      },
+      "seconds": 0.09410679101711139
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5378722079913132
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004152833018451929
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.006014042010065168
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.005452999961562455
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.028020999976433814
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.02698979200795293
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.mobilesafari",
+          "name": "Safari",
+          "pid": 645,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.16416116699110717
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 299248,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "saved_file": "rotation-mobilesafari-0.jpeg",
+          "sha256": "df0f4a1156fe62ecee4837aa59a6f6ed29735ad63301e28562c70551fad72f94"
+        },
+        "type": "response"
+      },
+      "seconds": 0.13940333400387317
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "90"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left",
+          "requested": 90
+        },
+        "type": "response"
+      },
+      "seconds": 0.5206375420093536
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "seconds": 0.003064708027523011
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "seconds": 0.003252584021538496
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0029042920214124024
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "seconds": 0.01950866699917242
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "seconds": 0.02450833300827071
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.mobilesafari",
+          "name": "Safari",
+          "pid": 645,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.184821542003192
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 242510,
+          "coordinate_scale": 3,
+          "height": 1290,
+          "mime_type": "image/jpeg",
+          "width": 2796,
+          "saved_file": "rotation-mobilesafari-90.jpeg",
+          "sha256": "5cf43ff5e9a3b825c111c1d5a9d41f884ff54d275db6d44f24d03603427b5363"
+        },
+        "type": "response"
+      },
+      "seconds": 0.15825933404266834
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "270"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right",
+          "requested": 270
+        },
+        "type": "response"
+      },
+      "seconds": 0.5277127919835038
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.002343375002965331
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004301791952457279
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004712124995421618
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.024702875001821667
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.015529041003901511
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.mobilesafari",
+          "name": "Safari",
+          "pid": 645,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.16682666598353535
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 242518,
+          "coordinate_scale": 3,
+          "height": 1290,
+          "mime_type": "image/jpeg",
+          "width": 2796,
+          "saved_file": "rotation-mobilesafari-270.jpeg",
+          "sha256": "5d838b7ddb55b0dbda3c75a5bec116875914aa5ef4a74c644adabaa9a529d842"
+        },
+        "type": "response"
+      },
+      "seconds": 0.15636387502308935
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "180"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "B30",
+        "type": "response"
+      },
+      "seconds": 0.6209054159699008
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0249753330135718
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0040774159715510905
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.005363665986806154
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.02190625004004687
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0023540420224890113
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.mobilesafari",
+          "name": "Safari",
+          "pid": 645,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.16148054198129103
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bytes": 242518,
+          "coordinate_scale": 3,
+          "height": 1290,
+          "mime_type": "image/jpeg",
+          "width": 2796,
+          "saved_file": "rotation-mobilesafari-180.jpeg",
+          "sha256": "5d838b7ddb55b0dbda3c75a5bec116875914aa5ef4a74c644adabaa9a529d842"
+        },
+        "type": "response"
+      },
+      "seconds": 0.16999679105356336
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5168586249928921
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.10865291702793911
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "bundle_id": "com.apple.mobilesafari",
+          "name": "Safari",
+          "pid": 645,
+          "source": "runningboard",
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.15372387500246987
+    }
+  ]
+}

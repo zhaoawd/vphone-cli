@@ -1,0 +1,56 @@
+[
+  {
+    "method": "files.remove",
+    "params": {
+      "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+        "removed": true,
+        "type": "file"
+      },
+      "type": "response"
+    },
+    "seconds": 0.0033533329842612147
+  },
+  {
+    "method": "files.remove",
+    "params": {
+      "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/tmp/vphone-b30-service.log",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "message": "path does not exist",
+        "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/tmp/vphone-b30-service.log",
+        "removed": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0014112080098129809
+  },
+  {
+    "method": "files.remove",
+    "params": {
+      "path": "/var/root/vphone-b29-api/b30-service.plist",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "path": "/var/root/vphone-b29-api/b30-service.plist",
+        "removed": true,
+        "type": "file"
+      },
+      "type": "response"
+    },
+    "seconds": 0.0016052090213634074
+  }
+]

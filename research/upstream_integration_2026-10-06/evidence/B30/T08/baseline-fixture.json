@@ -1,0 +1,104 @@
+[
+  {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B30.service-probe",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.004704124992713332
+  },
+  {
+    "method": "services.load",
+    "params": {
+      "paths": [
+        "/var/root/vphone-b29-api/b30-service.plist"
+      ]
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "errors": {},
+        "loaded": true,
+        "patched": [],
+        "paths": [
+          "/var/root/vphone-b29-api/b30-service.plist"
+        ],
+        "services": [
+          {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B30.service-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "path": "/var/root/vphone-b29-api/b30-service.plist",
+            "pid": 0,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": false
+          }
+        ],
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.0026457500061951578
+  },
+  {
+    "method": "services.start",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 400,
+    "reply": {
+      "error": {
+        "code": "failed",
+        "message": "start requires launchctl service-configure privilege (launchd status 144)"
+      },
+      "id": "B30",
+      "type": "response"
+    },
+    "seconds": 0.0016047090175561607
+  },
+  {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B30.service-probe",
+        "last_exit_status": 0,
+        "loaded": true,
+        "override": false,
+        "pid": 0,
+        "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0013698749826289713
+  }
+]

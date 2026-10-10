@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B29 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B30 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -894,3 +894,14 @@ vm-new使用`--no-vphoned-update`，配置、`.vphoned.signed`及restore-info摘
 按 5 GiB 设置独立 0.5 秒磁盘监控；单次 SIGINT 的模拟验证通过，没有实际填满磁盘。本轮最低记录约 32.43 GiB，最终约 34.75 GiB。已清理本轮客户机安装暂存、传输分片及宿主 prepared 目录，固定软件包及证据保留。样本正常停机并独立确认磁盘句柄释放；源 vm-new 小文件摘要及磁盘容量/mtime 保持，未做全盘摘要；既有 vm-2607 继续运行。原设备身份保留，源与克隆不得同时启动。
 
 具体构造、失败、运行范围、清理及启动依赖见 [B29 执行记录](evidence/B29/T08/REPORT.md)、[B29-summary.json](evidence/B29-summary.json)、[证据清单](evidence/B29/T08/manifest.json)。
+
+
+## B30 结果（2026-10-10）
+
+T08 的 RootHide 服务状态144已取得实际原始返回：routine813、user domain/handle501、transport0、reply.error144，原文 Requestor lacks required entitlement。单项增加 com.apple.private.xpc.service-configure 后 start/stop 返回0并观察到实际PID；恢复原签名再次144，关闭诊断库后修正候选继续通过。用户明确授权该单键产品 entitlement 修改；源配置已加入两行，候选校验及相关两组各6项测试通过，独立审查无阻塞。修正候选SHA256为177e8d9a7c103d9be206800bde2b118852bd9a64115ac6127f762035c122b59e。51个Mach-O section载荷保持，仅改变签名权限；没有Xcode全量重编译。
+
+实际RootHide内独立服务的plist路径重写、重复加载、start/status/signal/restart/stop/remove/unload通过，最终label缺失。原签名与修正签名的对照限定本次RootHide环境，不推定历史rootless失败同因。Settings仅0度成功；Safari0/90/270成功、180未生效。AX原始角度及2秒读回已记录，关闭诊断注入重跑结果一致；Info.plist的iPhone方向声明与现象一致，但运行时scene方向策略仍未取得，完整原因未查明。没有新增整项accepted。
+
+客户机恢复原API_ONLY基线，诊断库、重签副本和夹具已清理，classic及缓存摘要保持；因此未宣称默认启动产物已更新。VM正常停机并独立确认磁盘释放，源vm-new保持，vm-2607仍运行。最低余量约33.68GiB，5GiB停止阈值未触发。未修改宿主AMFI/TCC。剩余为运行时scene/完整旋转验收、旧CFW自动激活及默认产物整体验收。
+
+证据与失败限制见 [B30执行记录](evidence/B30/T08/REPORT.md)、[B30-summary.json](evidence/B30-summary.json)、[证据清单](evidence/B30/T08/manifest.json)。

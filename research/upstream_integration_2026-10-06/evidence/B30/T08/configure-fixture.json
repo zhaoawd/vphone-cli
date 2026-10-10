@@ -1,0 +1,144 @@
+[
+  {
+    "method": "services.start",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "start",
+        "domain": "user",
+        "label": "com.vphone.B30.service-probe",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.00528683396987617
+  },
+  {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B30.service-probe",
+        "last_exit_status": 0,
+        "loaded": true,
+        "override": false,
+        "pid": 496,
+        "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "running": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.002099042001646012
+  },
+  {
+    "method": "services.stop",
+    "params": {
+      "label": "com.vphone.B30.service-probe",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "stop",
+        "domain": "user",
+        "label": "com.vphone.B30.service-probe",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0022422499605454504
+  },
+  {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.service-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B30.service-probe",
+        "last_exit_status": 15,
+        "loaded": true,
+        "override": false,
+        "pid": 0,
+        "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0020405830000527203
+  },
+  {
+    "method": "services.start",
+    "params": {
+      "label": "wiki.qaq.irisind"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "start",
+        "domain": "user",
+        "label": "wiki.qaq.irisind",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0021505419863387942
+  },
+  {
+    "method": "services.status",
+    "params": {
+      "label": "wiki.qaq.irisind"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "wiki.qaq.irisind",
+        "last_exit_status": 0,
+        "loaded": true,
+        "override": false,
+        "pid": 497,
+        "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind",
+        "running": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.0018813750357367098
+  }
+]

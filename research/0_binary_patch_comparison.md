@@ -1221,3 +1221,8 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-09 B23 宿主与客户机监督进程验收
 
 本批未修改固件补丁算法或补丁数量。T07在vm-new恢复副本的隔离API_ONLY进程中验证launchd监督、不同签名binary更新确认/回退及坏缓存回退；classic daemon和缓存恢复原摘要。不同binary的53个Mach-O section载荷相同，本结果不证明新功能、kernel或环境迁移。Safari旋转/JPEG及RootHide纯路径测试通过；实际RootHide未验。来源和限制见`upstream_integration_2026-10-06/evidence/B23-summary.json`。
+
+
+### 2026-10-10 B30：RootHide 服务配置权限
+
+实际RootHide中服务start在user501返回transport0/reply.error144。单项加入`com.apple.private.xpc.service-configure`后，start/stop返回0且实际PID存在；恢复原签名再次144，关闭诊断库后对照通过。经用户明确授权，产品API daemon entitlement增加该键。51个Mach-O section载荷保持，候选签名及文件摘要变化；未修改固件二进制补丁、内核、DSC或补丁计数。RootHide真实plist重写与独立服务生命周期通过；方向scene策略与完整T08验收保持未完成。证据见`upstream_integration_2026-10-06/evidence/B30/T08/REPORT.md`。

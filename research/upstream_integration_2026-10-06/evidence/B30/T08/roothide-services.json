@@ -1,0 +1,673 @@
+{
+  "before": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B30.roothide-rewrite",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.005396958033088595
+  },
+  "put": {
+    "ok": true,
+    "size": 574
+  },
+  "load": {
+    "method": "services.load",
+    "params": {
+      "paths": [
+        "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+      ]
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "errors": {},
+        "loaded": true,
+        "patched": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ],
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ],
+        "services": [
+          {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B30.roothide-rewrite",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+            "pid": 0,
+            "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": false
+          }
+        ],
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.005104749987367541
+  },
+  "readback": {
+    "ok": true,
+    "path": "/private/tmp/vphone-b30-t08/roothide-service-after.plist",
+    "size": 782
+  },
+  "idempotent_load": {
+    "method": "services.load",
+    "params": {
+      "paths": [
+        "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+      ]
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "errors": {
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist": {
+            "code": 37,
+            "message": "Operation already in progress"
+          }
+        },
+        "loaded": true,
+        "patched": [],
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ],
+        "services": [
+          {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B30.roothide-rewrite",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+            "pid": 0,
+            "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": false
+          }
+        ],
+        "unchanged": true,
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.0033023750293068588
+  },
+  "services.start": {
+    "method": "services.start",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "start",
+        "domain": "user",
+        "label": "com.vphone.B30.roothide-rewrite",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.002497333975043148
+  },
+  "services.status": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B30.roothide-rewrite",
+        "last_exit_status": 0,
+        "loaded": true,
+        "override": false,
+        "pid": 776,
+        "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "running": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.002166040998417884
+  },
+  "services.signal": {
+    "method": "services.signal",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite",
+      "signal": "TERM",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "kill",
+        "domain": "user",
+        "label": "com.vphone.B30.roothide-rewrite",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "signal": 15,
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.008924083027523011
+  },
+  "after_signal": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [
+          "system",
+          "user"
+        ],
+        "enabled": true,
+        "label": "com.vphone.B30.roothide-rewrite",
+        "last_exit_status": 15,
+        "loaded": true,
+        "override": false,
+        "pid": 0,
+        "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0031146250548772514
+  },
+  "restart": {
+    "method": "services.start",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "start",
+        "domain": "user",
+        "label": "com.vphone.B30.roothide-rewrite",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0022685829899273813
+  },
+  "stop": {
+    "method": "services.stop",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "stop",
+        "domain": "user",
+        "label": "com.vphone.B30.roothide-rewrite",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0020715410355478525
+  },
+  "remove": {
+    "method": "services.remove",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "accepted": true,
+        "action": "remove",
+        "domain": "user",
+        "label": "com.vphone.B30.roothide-rewrite",
+        "launchd_status": 0,
+        "message": "Undefined error: 0",
+        "unchanged": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.002824084018357098
+  },
+  "unload": {
+    "method": "services.unload",
+    "params": {
+      "paths": [
+        "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+      ],
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "errors": {
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist": {
+            "code": 113,
+            "message": "Could not find specified service"
+          }
+        },
+        "loaded": false,
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ],
+        "services": [
+          {
+            "domains": [],
+            "enabled": true,
+            "label": "com.vphone.B30.roothide-rewrite",
+            "loaded": false,
+            "override": false,
+            "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+            "running": false
+          }
+        ],
+        "unchanged": true,
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.004270666977390647
+  },
+  "after_unload": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B30.roothide-rewrite"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B30.roothide-rewrite",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0028283330029807985
+  },
+  "observations": [
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "domains": [],
+          "enabled": true,
+          "label": "com.vphone.B30.roothide-rewrite",
+          "loaded": false,
+          "override": false,
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.005396958033088595
+    },
+    {
+      "method": "services.load",
+      "params": {
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ]
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "errors": {},
+          "loaded": true,
+          "patched": [
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+          ],
+          "paths": [
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+          ],
+          "services": [
+            {
+              "domains": [
+                "system",
+                "user"
+              ],
+              "enabled": true,
+              "label": "com.vphone.B30.roothide-rewrite",
+              "last_exit_status": 0,
+              "loaded": true,
+              "override": false,
+              "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+              "pid": 0,
+              "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "running": false
+            }
+          ],
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.005104749987367541
+    },
+    {
+      "method": "services.load",
+      "params": {
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ]
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "errors": {
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist": {
+              "code": 37,
+              "message": "Operation already in progress"
+            }
+          },
+          "loaded": true,
+          "patched": [],
+          "paths": [
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+          ],
+          "services": [
+            {
+              "domains": [
+                "system",
+                "user"
+              ],
+              "enabled": true,
+              "label": "com.vphone.B30.roothide-rewrite",
+              "last_exit_status": 0,
+              "loaded": true,
+              "override": false,
+              "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+              "pid": 0,
+              "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "running": false
+            }
+          ],
+          "unchanged": true,
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0033023750293068588
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B30.roothide-rewrite",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.002497333975043148
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B30.roothide-rewrite",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 776,
+          "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002166040998417884
+    },
+    {
+      "method": "services.signal",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite",
+        "signal": "TERM",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "accepted": true,
+          "action": "kill",
+          "domain": "user",
+          "label": "com.vphone.B30.roothide-rewrite",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "signal": 15,
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.008924083027523011
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B30.roothide-rewrite",
+          "last_exit_status": 15,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0031146250548772514
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B30.roothide-rewrite",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022685829899273813
+    },
+    {
+      "method": "services.stop",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "accepted": true,
+          "action": "stop",
+          "domain": "user",
+          "label": "com.vphone.B30.roothide-rewrite",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0020715410355478525
+    },
+    {
+      "method": "services.remove",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "accepted": true,
+          "action": "remove",
+          "domain": "user",
+          "label": "com.vphone.B30.roothide-rewrite",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.002824084018357098
+    },
+    {
+      "method": "services.unload",
+      "params": {
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+        ],
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "errors": {
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist": {
+              "code": 113,
+              "message": "Could not find specified service"
+            }
+          },
+          "loaded": false,
+          "paths": [
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist"
+          ],
+          "services": [
+            {
+              "domains": [],
+              "enabled": true,
+              "label": "com.vphone.B30.roothide-rewrite",
+              "loaded": false,
+              "override": false,
+              "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B30.roothide-rewrite.plist",
+              "running": false
+            }
+          ],
+          "unchanged": true,
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.004270666977390647
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B30.roothide-rewrite"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "domains": [],
+          "enabled": true,
+          "label": "com.vphone.B30.roothide-rewrite",
+          "loaded": false,
+          "override": false,
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0028283330029807985
+    }
+  ]
+}
