@@ -1,0 +1,919 @@
+{
+  "health_status": 200,
+  "health": {
+    "api_version": 1,
+    "binary_hash": "83075a0c9de2ff5bbfd01b211ce204f59bd18cdf9eb0efb7bd0891a62f00bc07",
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "32586E6A-03B7-4C6B-9E2B-C1CD01C68B13",
+    "ios": "26.1.0",
+    "ip": "fe80::ca5:419a:9fcc:54cf%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "before_list": {
+    "method": "files.list",
+    "params": {
+      "path": "/var/root/vphone-b29-api"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "entries": [
+          {
+            "is_directory": false,
+            "is_symlink": true,
+            "link_target_dir": true,
+            "modified": "2026-10-09T16:41:15Z",
+            "mtime": 1791564075,
+            "name": ".jbroot",
+            "path": "/private/var/root/vphone-b29-api/.jbroot",
+            "perm": "755",
+            "resolved_path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+            "size": 67,
+            "type": "link"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:47:15Z",
+            "mtime": 1791589635,
+            "name": "b30-clean.log",
+            "path": "/private/var/root/vphone-b29-api/b30-clean.log",
+            "perm": "666",
+            "size": 108,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:45:37Z",
+            "mtime": 1791589537,
+            "name": "b30-configure.log",
+            "path": "/private/var/root/vphone-b29-api/b30-configure.log",
+            "perm": "666",
+            "size": 2146,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:57:18Z",
+            "mtime": 1791590238,
+            "name": "b30-final-clean.log",
+            "path": "/private/var/root/vphone-b29-api/b30-final-clean.log",
+            "perm": "666",
+            "size": 109,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:58:27Z",
+            "mtime": 1791590307,
+            "name": "b30-restored.log",
+            "path": "/private/var/root/vphone-b29-api/b30-restored.log",
+            "perm": "666",
+            "size": 95,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:47:06Z",
+            "mtime": 1791589626,
+            "name": "b30-revert.log",
+            "path": "/private/var/root/vphone-b29-api/b30-revert.log",
+            "perm": "666",
+            "size": 365,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:57:17Z",
+            "mtime": 1791590237,
+            "name": "b30-rotation.log",
+            "path": "/private/var/root/vphone-b29-api/b30-rotation.log",
+            "perm": "666",
+            "size": 8323,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:45:20Z",
+            "mtime": 1791589520,
+            "name": "b30-trace.log",
+            "path": "/private/var/root/vphone-b29-api/b30-trace.log",
+            "perm": "666",
+            "size": 2681,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:28:41Z",
+            "mtime": 1791592121,
+            "name": "b31-clean.log",
+            "path": "/private/var/root/vphone-b29-api/b31-clean.log",
+            "perm": "666",
+            "size": 95,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:43:18Z",
+            "mtime": 1791592998,
+            "name": "b31-current-correct-mode.log",
+            "path": "/private/var/root/vphone-b29-api/b31-current-correct-mode.log",
+            "perm": "666",
+            "size": 108,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:40:22Z",
+            "mtime": 1791592822,
+            "name": "b31-current.log",
+            "path": "/private/var/root/vphone-b29-api/b31-current.log",
+            "perm": "666",
+            "size": 70,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:38:05Z",
+            "mtime": 1791592685,
+            "name": "b31-debug-inspect.dylib",
+            "path": "/private/var/root/vphone-b29-api/b31-debug-inspect.dylib",
+            "perm": "644",
+            "size": 80096,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:38:06Z",
+            "mtime": 1791592686,
+            "name": "b31-debug-inspect.log",
+            "path": "/private/var/root/vphone-b29-api/b31-debug-inspect.log",
+            "perm": "666",
+            "size": 1549,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:37:15Z",
+            "mtime": 1791592635,
+            "name": "b31-launch-inspect.dylib",
+            "path": "/private/var/root/vphone-b29-api/b31-launch-inspect.dylib",
+            "perm": "644",
+            "size": 80096,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:37:15Z",
+            "mtime": 1791592635,
+            "name": "b31-launch-inspect.log",
+            "path": "/private/var/root/vphone-b29-api/b31-launch-inspect.log",
+            "perm": "666",
+            "size": 2611,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:46:58Z",
+            "mtime": 1791593218,
+            "name": "b31-restored.log",
+            "path": "/private/var/root/vphone-b29-api/b31-restored.log",
+            "perm": "666",
+            "size": 96,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:24:42Z",
+            "mtime": 1791591882,
+            "name": "b31-scene-background.log",
+            "path": "/private/var/root/vphone-b29-api/b31-scene-background.log",
+            "perm": "666",
+            "size": 664,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:18:23Z",
+            "mtime": 1791591503,
+            "name": "b31-scene-probe.dylib",
+            "path": "/private/var/root/vphone-b29-api/b31-scene-probe.dylib",
+            "perm": "644",
+            "size": 80768,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:20:11Z",
+            "mtime": 1791591611,
+            "name": "b31-scene-probe.log",
+            "path": "/private/var/root/vphone-b29-api/b31-scene-probe.log",
+            "perm": "666",
+            "size": 69802,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:24:39Z",
+            "mtime": 1791591879,
+            "name": "b31-scene-query.dylib",
+            "path": "/private/var/root/vphone-b29-api/b31-scene-query.dylib",
+            "perm": "644",
+            "size": 82256,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:22:49Z",
+            "mtime": 1791591769,
+            "name": "b31-scene-query.log",
+            "path": "/private/var/root/vphone-b29-api/b31-scene-query.log",
+            "perm": "666",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:15:55Z",
+            "mtime": 1791591355,
+            "name": "launcher.log",
+            "path": "/private/var/root/vphone-b29-api/launcher.log",
+            "perm": "666",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T16:57:12Z",
+            "mtime": 1791565032,
+            "name": "reboot.log",
+            "path": "/private/var/root/vphone-b29-api/reboot.log",
+            "perm": "666",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T16:31:15Z",
+            "mtime": 1791563475,
+            "name": "start.log",
+            "path": "/private/var/root/vphone-b29-api/start.log",
+            "perm": "644",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T16:29:56Z",
+            "mtime": 1791563396,
+            "name": "vphoned",
+            "path": "/private/var/root/vphone-b29-api/vphoned",
+            "perm": "755",
+            "size": 9041056,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:43:18Z",
+            "mtime": 1791592998,
+            "name": "vphoned-b31-current",
+            "path": "/private/var/root/vphone-b29-api/vphoned-b31-current",
+            "perm": "755",
+            "size": 9041184,
+            "type": "file"
+          }
+        ],
+        "path": "/var/root/vphone-b29-api"
+      },
+      "type": "response"
+    },
+    "seconds": 0.012745624990202487
+  },
+  "removed": [
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-clean.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-clean.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.004525709024164826
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-current-correct-mode.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-current-correct-mode.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0018767500296235085
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-current.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-current.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013359590084291995
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-debug-inspect.dylib",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-debug-inspect.dylib",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014245840138755739
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-debug-inspect.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-debug-inspect.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.00166937499307096
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-launch-inspect.dylib",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-launch-inspect.dylib",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014043329865671694
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-launch-inspect.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-launch-inspect.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0017849580035544932
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-restored.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-restored.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012989580282010138
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-scene-background.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-scene-background.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013616670039482415
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-scene-probe.dylib",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-scene-probe.dylib",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0017564580193720758
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-scene-probe.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-scene-probe.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.002466083038598299
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-scene-query.dylib",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-scene-query.dylib",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.002721834054682404
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/b31-scene-query.log",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/b31-scene-query.log",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.001529583998490125
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b29-api/vphoned-b31-current",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B30",
+        "result": {
+          "path": "/var/root/vphone-b29-api/vphoned-b31-current",
+          "removed": true,
+          "type": "file"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015870410134084523
+    }
+  ],
+  "after_list": {
+    "method": "files.list",
+    "params": {
+      "path": "/var/root/vphone-b29-api"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "entries": [
+          {
+            "is_directory": false,
+            "is_symlink": true,
+            "link_target_dir": true,
+            "modified": "2026-10-09T16:41:15Z",
+            "mtime": 1791564075,
+            "name": ".jbroot",
+            "path": "/private/var/root/vphone-b29-api/.jbroot",
+            "perm": "755",
+            "resolved_path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+            "size": 67,
+            "type": "link"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:47:15Z",
+            "mtime": 1791589635,
+            "name": "b30-clean.log",
+            "path": "/private/var/root/vphone-b29-api/b30-clean.log",
+            "perm": "666",
+            "size": 108,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:45:37Z",
+            "mtime": 1791589537,
+            "name": "b30-configure.log",
+            "path": "/private/var/root/vphone-b29-api/b30-configure.log",
+            "perm": "666",
+            "size": 2146,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:57:18Z",
+            "mtime": 1791590238,
+            "name": "b30-final-clean.log",
+            "path": "/private/var/root/vphone-b29-api/b30-final-clean.log",
+            "perm": "666",
+            "size": 109,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:58:27Z",
+            "mtime": 1791590307,
+            "name": "b30-restored.log",
+            "path": "/private/var/root/vphone-b29-api/b30-restored.log",
+            "perm": "666",
+            "size": 95,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:47:06Z",
+            "mtime": 1791589626,
+            "name": "b30-revert.log",
+            "path": "/private/var/root/vphone-b29-api/b30-revert.log",
+            "perm": "666",
+            "size": 365,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:57:17Z",
+            "mtime": 1791590237,
+            "name": "b30-rotation.log",
+            "path": "/private/var/root/vphone-b29-api/b30-rotation.log",
+            "perm": "666",
+            "size": 8323,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T23:45:20Z",
+            "mtime": 1791589520,
+            "name": "b30-trace.log",
+            "path": "/private/var/root/vphone-b29-api/b30-trace.log",
+            "perm": "666",
+            "size": 2681,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T00:15:55Z",
+            "mtime": 1791591355,
+            "name": "launcher.log",
+            "path": "/private/var/root/vphone-b29-api/launcher.log",
+            "perm": "666",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T16:57:12Z",
+            "mtime": 1791565032,
+            "name": "reboot.log",
+            "path": "/private/var/root/vphone-b29-api/reboot.log",
+            "perm": "666",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T16:31:15Z",
+            "mtime": 1791563475,
+            "name": "start.log",
+            "path": "/private/var/root/vphone-b29-api/start.log",
+            "perm": "644",
+            "size": 94,
+            "type": "file"
+          },
+          {
+            "is_directory": false,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-09T16:29:56Z",
+            "mtime": 1791563396,
+            "name": "vphoned",
+            "path": "/private/var/root/vphone-b29-api/vphoned",
+            "perm": "755",
+            "size": 9041056,
+            "type": "file"
+          }
+        ],
+        "path": "/var/root/vphone-b29-api"
+      },
+      "type": "response"
+    },
+    "seconds": 0.004576665989588946
+  },
+  "rotation_restored": {
+    "method": "display.rotation",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.02338841703021899
+  },
+  "foreground": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "bundle_id": "com.apple.springboard",
+        "name": "Home Screen",
+        "pid": 0,
+        "source": "unavailable",
+        "verified": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.191061332996469
+  },
+  "device": {
+    "method": "device.info",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "agent": {
+          "binary_hash": "83075a0c9de2ff5bbfd01b211ce204f59bd18cdf9eb0efb7bd0891a62f00bc07",
+          "pid": 1076
+        },
+        "battery": {
+          "fraction": 1,
+          "state": 2
+        },
+        "boot_session_uuid": "551F87A2-1E87-4AB4-9C56-89D02151D737",
+        "boot_time": 1791591273.86383,
+        "brightness": {
+          "auto": null,
+          "value": 0.5
+        },
+        "developer_mode": {
+          "armed": false,
+          "enabled": true,
+          "writable": true
+        },
+        "host": "iphone.local",
+        "ios_version": "26.1.0",
+        "jailbreak": {
+          "jbroot": "/var/containers/Bundle/Application/.jbroot-000114514191980C",
+          "layout": "roothide",
+          "source": "libroothide"
+        },
+        "kernel": "25.1.0",
+        "lock": {
+          "locked": true,
+          "passcode_enabled": false,
+          "screen_off": true
+        },
+        "low_power_mode": {
+          "enabled": false,
+          "method": "powerd"
+        },
+        "memory_bytes": 4270800896,
+        "model": "iPhone17,3",
+        "network": {
+          "addresses": [
+            "lo0 127.0.0.1",
+            "lo0 ::1",
+            "lo0 fe80::1%lo0",
+            "en0 fe80::ca5:419a:9fcc:54cf%en0",
+            "en0 fd3c:1c1c:3f69:44f5:19:cd4:bf20:e3a7",
+            "en0 192.168.64.4",
+            "utun0 fe80::26fa:7ecf:c2d5:6d37%utun0",
+            "en1 fe80::bf:6c79:5e0b:afd0%en1",
+            "en1 169.254.252.193",
+            "anpi0 fe80::c867:32ff:fed3:d8f4%anpi0",
+            "utun1 fe80::612c:fb35:d57d:1114%utun1",
+            "utun2 fe80::71c:d2f1:ded0:5904%utun2",
+            "utun3 fe80::ce81:b1c:bd2c:69e%utun3"
+          ]
+        },
+        "processor_count": 4,
+        "rotation": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "screen": {
+          "height": 932,
+          "locked": true,
+          "orientation": 0,
+          "scale": 3,
+          "screen_off": true,
+          "width": 430
+        },
+        "storage": {
+          "available_bytes": 39183933440,
+          "total_bytes": 62013661184
+        },
+        "sysname": "Darwin",
+        "uptime_seconds": 1989.8502391666668,
+        "volume": 0.5
+      },
+      "type": "response"
+    },
+    "seconds": 0.0211268340353854
+  }
+}

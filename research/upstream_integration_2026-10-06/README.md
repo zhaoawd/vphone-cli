@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B30 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`，使用已经附加的隔离工作树。主工作区代码未修改。当前验收结果见末尾 B31 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -905,3 +905,10 @@ T08 的 RootHide 服务状态144已取得实际原始返回：routine813、user 
 客户机恢复原API_ONLY基线，诊断库、重签副本和夹具已清理，classic及缓存摘要保持；因此未宣称默认启动产物已更新。VM正常停机并独立确认磁盘释放，源vm-new保持，vm-2607仍运行。最低余量约33.68GiB，5GiB停止阈值未触发。未修改宿主AMFI/TCC。剩余为运行时scene/完整旋转验收、旧CFW自动激活及默认产物整体验收。
 
 证据与失败限制见 [B30执行记录](evidence/B30/T08/REPORT.md)、[B30-summary.json](evidence/B30-summary.json)、[证据清单](evidence/B30/T08/manifest.json)。
+
+
+## B31 结果（2026-10-10）
+
+T08新增实际RootHide旋转运行证据，未修改产品源码，未新增整项accepted。B30修正候选在无API诊断注入下完成24组方向观测：14组成功，10组拒绝并保持原角度；24张独立JPEG摘要与尺寸复核通过。控制应用的控制器声明30，UIKit解析后的控制器、场景客户端和当前场景均为26；切换portrait-only为2后横屏被拒绝，恢复30后回到26。应用内直接请求180度返回UISceneErrorDomain 101，实际支持集合排除倒置方向。该结果确认控制样本的运行时拒绝，尚未确定UIKit过滤倒置方向的具体条件；Settings/Safari直接场景值仍未取得。
+
+临时应用及容器、诊断库和候选副本已清理，原API、0度和方向锁false已恢复，classic摘要保持。样本正常停机，磁盘句柄独立确认释放，源vm-new保持，vm-2607保持运行。最低余量约33.21GiB，5GiB阈值未触发。剩余为系统应用直接场景策略、倒置方向过滤条件、旧CFW自动激活和默认产物整体验收。详见[B31执行记录](evidence/B31/T08/REPORT.md)、[B31-summary.json](evidence/B31-summary.json)、[证据清单](evidence/B31/T08/manifest.json)。

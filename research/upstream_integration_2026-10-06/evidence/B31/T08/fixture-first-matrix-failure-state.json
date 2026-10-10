@@ -1,0 +1,68 @@
+{
+  "foreground": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "bundle_id": "com.apple.springboard",
+        "name": "Home Screen",
+        "pid": 0,
+        "source": "unavailable",
+        "verified": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.16079008398810402
+  },
+  "unlock": {
+    "method": "screen.unlock",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "locked": false,
+        "screen_off": false,
+        "was_locked": true,
+        "was_screen_off": true
+      },
+      "type": "response"
+    },
+    "seconds": 2.374271625012625
+  },
+  "launch": {
+    "method": "apps.launch",
+    "params": {
+      "bundle_id": "research.vphone.b31.rotation"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "frontmost_verified": true,
+        "pid": 827
+      },
+      "type": "response"
+    },
+    "seconds": 0.7724188329884782
+  },
+  "front_after": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "bundle_id": "research.vphone.b31.rotation",
+        "name": "B31 Rotation",
+        "pid": 827,
+        "source": "runningboard",
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.15169366699410602
+  }
+}

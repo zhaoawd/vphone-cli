@@ -1226,3 +1226,8 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-10 B30：RootHide 服务配置权限
 
 实际RootHide中服务start在user501返回transport0/reply.error144。单项加入`com.apple.private.xpc.service-configure`后，start/stop返回0且实际PID存在；恢复原签名再次144，关闭诊断库后对照通过。经用户明确授权，产品API daemon entitlement增加该键。51个Mach-O section载荷保持，候选签名及文件摘要变化；未修改固件二进制补丁、内核、DSC或补丁计数。RootHide真实plist重写与独立服务生命周期通过；方向scene策略与完整T08验收保持未完成。证据见`upstream_integration_2026-10-06/evidence/B30/T08/REPORT.md`。
+
+
+### 2026-10-10 B31：RootHide旋转运行时策略
+
+B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10拒绝且保持角度。临时控制应用提供四方向集合30，但UIKit解析控制器和场景集合为26；直接请求180度返回UISceneErrorDomain101。控制器集合2的可逆对照、截图摘要及尺寸通过。Settings/Safari直接场景策略与UIKit倒置方向过滤条件未完整取得。未修改产品源码、固件二进制补丁、内核或DSC，补丁计数不变。临时工件已清理并正常停机。证据见`upstream_integration_2026-10-06/evidence/B31/T08/REPORT.md`。

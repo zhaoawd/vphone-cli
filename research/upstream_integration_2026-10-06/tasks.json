@@ -1331,7 +1331,7 @@
         "T06",
         "T07"
       ],
-      "status": "fixed_overlay_memory_rotation_verified_actual_RootHide_service_pending",
+      "status": "partial_RootHide_services_and_controlled_rotation_policy_verified_default_artifact_pending",
       "upstream_paths": [
         "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         "VPhoneDaemon/Daemon/"
@@ -1410,18 +1410,22 @@
         "evidence/B29/T08/manifest.json",
         "evidence/B30-summary.json",
         "evidence/B30/T08/REPORT.md",
-        "evidence/B30/T08/manifest.json"
+        "evidence/B30/T08/manifest.json",
+        "evidence/B31-summary.json",
+        "evidence/B31/T08/REPORT.md",
+        "evidence/B31/T08/manifest.json"
       ],
       "historical_evidence": [],
       "acceptance_limits": [
         "内存结果仅覆盖B22固定候选和恢复副本；API_ONLY未替换生产classic",
         "B29已构造实际RootHide研究样本，旧CFW仍需显式激活；完整服务、旋转及原始XPC诊断未完成",
-        "B30仅确认实际RootHide的144由service-configure entitlement缺失引起；历史rootless未独立复验；方向运行时scene策略与默认产物整体验收未完成"
+        "B30仅确认实际RootHide的144由service-configure entitlement缺失引起；历史rootless未独立复验；方向运行时scene策略与默认产物整体验收未完成",
+        "B31运行时场景策略只覆盖临时控制应用；未直接取得Settings/Safari场景集合，未确定UIKit倒置方向过滤条件；默认产物未更新"
       ],
-      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。 B29在独立克隆构造RootHide，实际安装90条dpkg记录与audit、冷启动摘要、API检测、显式官方helper激活和SSH banner通过。services.start仍返回api_guest_error/failed，原始状态未保存；旧CFW未自动激活RootHide。无SSH认证或应用交互验收。详见B29记录。 B30在实际RootHide取得user501/transport0/reply.error144；单service-configure entitlement ABA复现及关闭诊断注入对照通过。用户授权后源policy加入该键，候选校验和12项相关测试通过。RootHide plist真实路径重写与独立服务生命周期通过。旋转原始AX和2秒采样已保全，未注入重跑结果一致；静态方向声明与现象一致，运行时scene策略仍未验证。客户机恢复原API基线，默认产物未更新，T08保持部分完成。",
+      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。 B29在独立克隆构造RootHide，实际安装90条dpkg记录与audit、冷启动摘要、API检测、显式官方helper激活和SSH banner通过。services.start仍返回api_guest_error/failed，原始状态未保存；旧CFW未自动激活RootHide。无SSH认证或应用交互验收。详见B29记录。 B30在实际RootHide取得user501/transport0/reply.error144；单service-configure entitlement ABA复现及关闭诊断注入对照通过。用户授权后源policy加入该键，候选校验和12项相关测试通过。RootHide plist真实路径重写与独立服务生命周期通过。旋转原始AX和2秒采样已保全，未注入重跑结果一致；静态方向声明与现象一致，运行时scene策略仍未验证。客户机恢复原API基线，默认产物未更新，T08保持部分完成。 B31在B30修正候选、无API注入条件下新增24组方向观测，14成功10拒绝且角度保持。控制应用公开集合30，实际控制器/场景客户端/场景集合均为26；portrait-only切换为2并恢复的对照通过。直接场景180度请求返回UISceneErrorDomain101，确认控制样本的运行时拒绝；UIKit过滤倒置方向的具体条件及Settings/Safari直接运行时策略未取得。临时应用、容器、诊断库与候选副本已清理，原API恢复，样本正常停机。",
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
       "remaining_work": [
-        "运行时scene方向策略、完整旋转验收；静态声明与观测一致，完整原因未查明",
+        "Settings/Safari直接场景策略；UIKit倒置方向过滤条件进一步定位；控制样本运行时拒绝已取得",
         "旧CFW自动激活RootHide与默认产物整体验收；当前客户机已恢复原API基线"
       ],
       "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
@@ -4848,5 +4852,24 @@
     "vm_stopped": true,
     "final_free_bytes": 36167680000,
     "implementation_head": "a422e152e5d5def65b19f4ad37bad868eaebe328"
+  },
+  "B31_execution_state": {
+    "batch": "B31",
+    "T08_complete": false,
+    "accepted_task_changes": [],
+    "product_source_changed": false,
+    "current_candidate_sha256": "177e8d9a7c103d9be206800bde2b118852bd9a64115ac6127f762035c122b59e",
+    "direction_observations": 24,
+    "successful_rotation_cases": 14,
+    "rejected_unchanged_cases": 10,
+    "controlled_fixture_runtime_scene_policy_verified": true,
+    "actual_Settings_Safari_scene_policy_verified": false,
+    "upside_down_filter_condition_identified": false,
+    "original_API_restored": true,
+    "guest_fixture_cleaned": true,
+    "host_AMFI_TCC_modified": false,
+    "vm_stopped": true,
+    "minimum_free_bytes": 35663552512,
+    "post_shutdown_free_bytes": 35724140544
   }
 }

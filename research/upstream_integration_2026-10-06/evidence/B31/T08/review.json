@@ -1,0 +1,18 @@
+{
+  "reviewer": "b31_review",
+  "scope": "independent read-only local evidence review; no VM or guest commands; verify.py not run",
+  "critical": 0,
+  "important": 0,
+  "minor": 0,
+  "required_changes": [],
+  "verified": [
+    "129 original manifest entries and hashes",
+    "24 final JPEG hashes and SOF dimensions",
+    "14 successful rotations and 10 rejected unchanged cases",
+    "same fixture PID 912 policy 30/2/26/30",
+    "geometry request error scope and stale result limitation",
+    "guest cleanup and host shutdown/source identity evidence",
+    "T08 remains partial, accepted counts unchanged"
+  ],
+  "commit_note": "force-add archived logs ignored by repository rules, then verify committed Git blobs against manifest"
+}

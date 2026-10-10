@@ -1,0 +1,130 @@
+{
+  "health": {
+    "method": "health",
+    "params": {},
+    "http_status": 400,
+    "reply": {
+      "error": {
+        "code": "invalid_operation",
+        "message": "Unknown method: health"
+      },
+      "id": "B30",
+      "type": "response"
+    },
+    "seconds": 0.00408008397789672
+  },
+  "baseline": {
+    "method": "display.rotation",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.0221335839596577
+  },
+  "foreground": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "bundle_id": "com.apple.springboard",
+        "name": "Home Screen",
+        "pid": 0,
+        "source": "unavailable",
+        "verified": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.1766605000011623
+  },
+  "unlock": {
+    "method": "screen.unlock",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "locked": false,
+        "screen_off": false,
+        "was_locked": true,
+        "was_screen_off": true
+      },
+      "type": "response"
+    },
+    "seconds": 2.3816068330197595
+  },
+  "unlock_rotation": {
+    "method": "display.rotation_lock",
+    "params": {
+      "locked": false
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.8467447910225019
+  },
+  "launch": {
+    "method": "apps.launch",
+    "params": {
+      "bundle_id": "research.vphone.b31.rotation"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "frontmost_verified": true,
+        "pid": 827
+      },
+      "type": "response"
+    },
+    "seconds": 1.333392541971989
+  },
+  "info": {
+    "method": "apps.info",
+    "params": {
+      "bundle_id": "research.vphone.b31.rotation"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B30",
+      "result": {
+        "build": "1",
+        "bundle_id": "research.vphone.b31.rotation",
+        "bundle_path": "/private/var/containers/Bundle/Application/D4DC2F98-B615-4449-A755-13C96CD804D2/VPhoneB31Rotation.app",
+        "data_path": "/private/var/mobile/Containers/Data/Application/441676CA-BA10-412B-AB08-5D0C9D5A4E5B",
+        "encrypted": false,
+        "entitlements": {
+          "com.apple.private.security.container-required": "research.vphone.b31.rotation",
+          "jb.pmap_cs_custom_trust": "PMAP_CS_APP_STORE"
+        },
+        "executable": "/var/containers/Bundle/Application/D4DC2F98-B615-4449-A755-13C96CD804D2/VPhoneB31Rotation.app/VPhoneB31Rotation",
+        "group_containers": {},
+        "minimum_os": "26.0",
+        "name": "B31 Rotation",
+        "sdk": "",
+        "signer": "Apple iPhone OS Application Signing",
+        "type": "User",
+        "version": "1.0"
+      },
+      "type": "response"
+    },
+    "seconds": 0.10760941699845716
+  }
+}
