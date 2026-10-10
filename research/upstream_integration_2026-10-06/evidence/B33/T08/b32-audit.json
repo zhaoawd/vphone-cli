@@ -1,0 +1,48 @@
+{
+  "scope": "historical_evidence_only",
+  "live_reproduction": false,
+  "rows": [
+    {
+      "phase": "A-native",
+      "pid": 985,
+      "mask": 26,
+      "request_mask": 4,
+      "scene_orientation": 1,
+      "error_code": 101,
+      "samples": 4,
+      "sample_span_seconds": 0.7481520175933838,
+      "call_to_last_sample_seconds": null,
+      "jsonl_sha256": "2e0c1f64d0edacf681e13a93c39a2ea2745c045510601112c9848be81dcc2774"
+    },
+    {
+      "phase": "B-home-button-true",
+      "pid": 985,
+      "mask": 30,
+      "request_mask": 4,
+      "scene_orientation": 1,
+      "error_code": null,
+      "samples": 5,
+      "sample_span_seconds": 1.001128911972046,
+      "call_to_last_sample_seconds": 1.001659870147705,
+      "jsonl_sha256": "e4c532be65615b138dc1ed42ed66327ffd73d57bae69f2f1f4715cc6b58fbb01"
+    },
+    {
+      "phase": "A-restored",
+      "pid": 985,
+      "mask": 26,
+      "request_mask": 4,
+      "scene_orientation": 1,
+      "error_code": 101,
+      "samples": 4,
+      "sample_span_seconds": 0.7424271106719971,
+      "call_to_last_sample_seconds": null,
+      "jsonl_sha256": "6c05e130c4396fd40e92caa0341f3aaf1a83b69821b5e569d6762d6f36dfe200"
+    }
+  ],
+  "missing_evidence": [
+    "SpringBoard request receipt and processing",
+    "request completion callback or FBS server reply",
+    "long observation window",
+    "positive 90-degree request in B condition"
+  ]
+}

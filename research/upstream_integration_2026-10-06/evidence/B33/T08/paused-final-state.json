@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-10-10T04:56:23.023611+00:00",
+  "source_runtime": {
+    "bundleIdentifier": "16777231:11604029",
+    "bundlePath": "/Users/kolar/github/vphone-cli/vm-new",
+    "instanceID": "C3F2C1DA-BCE5-48BD-B4C0-22D6A51FFD25",
+    "operation": "boot",
+    "pid": 50602,
+    "startedAt": "2026-10-10T04:53:06Z"
+  },
+  "research_runtime_record": {
+    "bundleIdentifier": "16777231:196365888",
+    "bundlePath": "/Users/kolar/github/vphone-cli/vm-roothide-b33-20261010",
+    "instanceID": "D4FC7BD4-6D84-4DF7-A461-464BBE4989DB",
+    "operation": "boot",
+    "pid": 6985,
+    "startedAt": "2026-10-10T04:04:02Z"
+  },
+  "disk_handles": {
+    "source": {
+      "exit": 0,
+      "stdout": "COMMAND     PID  USER   FD   TYPE DEVICE    SIZE/OFF     NODE NAME\ncom.apple 50632 kolar   12u   REG   1,15 68719476736 11604030 /Users/kolar/github/vphone-cli/vm-new/Disk.img\n",
+      "stderr": ""
+    },
+    "research": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "process_check": {
+    "exit": 0,
+    "stdout": "50602     1 Ss   /Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm --config /Users/kolar/github/vphone-cli/vm-new/config.plist\n",
+    "stderr": ""
+  },
+  "free_bytes": 301128884224,
+  "minimum_rule_bytes": 5368709120,
+  "experiment_paused": true
+}
