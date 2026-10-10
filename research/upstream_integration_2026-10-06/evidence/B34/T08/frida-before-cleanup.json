@@ -1,0 +1,30 @@
+{
+  "method": "processes.list",
+  "params": {
+    "filter": "frida-server"
+  },
+  "http_status": 200,
+  "reply": {
+    "id": "B33",
+    "result": {
+      "count": 1,
+      "processes": [
+        {
+          "cpu_seconds": 0.6849011666666667,
+          "executable": "/private/var/root/vphone-b34-frida/frida-server",
+          "footprint_bytes": 2883968,
+          "jetsam_limit_mb": 256,
+          "jetsam_priority": 180,
+          "name": "frida-server",
+          "pid": 441,
+          "ppid": 37,
+          "resident_bytes": 13778944,
+          "start_time": 1791632560.299731,
+          "uid": 0
+        }
+      ]
+    },
+    "type": "response"
+  },
+  "seconds": 0.06747091701254249
+}

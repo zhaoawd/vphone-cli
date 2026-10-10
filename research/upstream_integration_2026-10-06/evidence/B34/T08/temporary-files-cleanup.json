@@ -1,0 +1,131 @@
+{
+  "retained": "RootHide installation and /var/root/vphone-b33-api baseline API, .jbroot and TMPDIR for subsequent research boot",
+  "paths": [
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b34-frida",
+        "recursive": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B33",
+        "result": {
+          "path": "/var/root/vphone-b34-frida",
+          "removed": true,
+          "type": "directory"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0019873338751494884
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b34-packages",
+        "recursive": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B33",
+        "result": {
+          "path": "/var/root/vphone-b34-packages",
+          "removed": true,
+          "type": "directory"
+        },
+        "type": "response"
+      },
+      "seconds": 0.4552058749832213
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b33-control",
+        "recursive": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B33",
+        "result": {
+          "path": "/var/root/vphone-b33-control",
+          "removed": true,
+          "type": "directory"
+        },
+        "type": "response"
+      },
+      "seconds": 0.00611616694368422
+    }
+  ],
+  "health": {
+    "method": null,
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "api_version": 1,
+      "binary_hash": "7f66a29680e0b527e31fa204c2306f750ffccc5a915728ac775ec1cd787ec454",
+      "capabilities": [
+        "session_identity",
+        "touch",
+        "hid",
+        "apps",
+        "url",
+        "files",
+        "file_download_identity",
+        "file_upload_identity",
+        "clipboard",
+        "location",
+        "timezone",
+        "keychain",
+        "ipa_install",
+        "bootstrap_install",
+        "bootstrap_uninstall",
+        "port_forward",
+        "screenshot",
+        "screen_unlock",
+        "device_info",
+        "display",
+        "audio",
+        "input_gestures",
+        "ui_inspection",
+        "processes",
+        "services",
+        "logs",
+        "network_capture",
+        "app_details",
+        "system_control",
+        "system_shutdown",
+        "file_tools",
+        "packages",
+        "environment_update",
+        "environment_transaction",
+        "environment_activation"
+      ],
+      "instance_id": "8DA43967-3E56-48AF-890A-DA5C183639A0",
+      "ios": "26.1.0",
+      "ip": "fe80::1470:600e:c4a:1f8a%en0",
+      "name": "vphoned",
+      "setup_pending": false,
+      "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+      "status": "ok"
+    },
+    "seconds": 0.00119629199616611
+  },
+  "bootstrap": {
+    "method": "bootstrap.inspect",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "installed": true,
+        "jbroot": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+        "layout": "roothide",
+        "roots": [
+          "/private/var/containers/Bundle/Application/.jbroot-000114514191980C"
+        ]
+      },
+      "type": "response"
+    },
+    "seconds": 0.0017268750816583633
+  }
+}

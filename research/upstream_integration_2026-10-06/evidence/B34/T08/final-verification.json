@@ -1,0 +1,59 @@
+{
+  "observed_at": 1791634668.66097,
+  "source_pid": 25784,
+  "source_alive": true,
+  "targeted_guest_roundtrip_verified": true,
+  "source_disk_holders": [
+    {
+      "pid": 25787,
+      "process": "1 /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+    }
+  ],
+  "source_disk_holder_kind_verified": "Virtualization XPC worker, launched by launchd; no claim of direct host PPID relation",
+  "health_pid": 21157,
+  "health_resumed": true,
+  "health_snapshot": {
+    "ts": 1791634666.354023,
+    "state": "healthy",
+    "uds_state": "healthy",
+    "vsock_state": "healthy",
+    "uds_window": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "vsock_window": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "uds_rt_p50_ms": 19.74,
+    "vsock_rt_p50_ms": 65.48,
+    "uds_rt_max_ms": 23.69,
+    "vsock_rt_max_ms": 67.1,
+    "last_error": null,
+    "last_probe_ts": 1791634666.354026,
+    "probe_count": 3881
+  },
+  "clone_disk_owners": [],
+  "free_bytes": 291614826496,
+  "branch": "codex/upstream-2d21d21-integration",
+  "initial_verifier_failures": [
+    "disk owner expected host PID",
+    "XPC worker parent expected host PID; actual parent launchd"
+  ]
+}

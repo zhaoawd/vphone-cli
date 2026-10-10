@@ -392,19 +392,97 @@ enum GuestIrisinInstaller {
     }
 
     static func refreshBootstrapOnStartup() {
+        let installation: (layout: String, root: String)
         do {
-            guard let installation = try completedBootstrap() else { return }
+            guard let completed = try completedBootstrap() else { return }
+            installation = completed
             if installation.layout == "roothide" {
                 try ensureRootHideLinks(root: installation.root)
             }
         } catch {
             NSLog("vphoned: could not repair RootHide loader links: %@", String(describing: error))
+            return
         }
         do {
             _ = try repairFirmwareRecord()
         } catch {
             NSLog("vphoned: could not refresh bootstrap firmware record: %@", String(describing: error))
         }
+        if installation.layout == "roothide" {
+            // 服务加载不阻塞 API 监听；已加载服务由 IcliKit 核对并接受。
+            DispatchQueue.global().async {
+                loadBootstrapDaemons(root: installation.root)
+            }
+        }
+    }
+
+    static func loadBootstrapDaemons(root: String) {
+        let directory = root + "/Library/LaunchDaemons"
+        do {
+            guard try physicalChildDirectoryExists(root: root, relative: "Library/LaunchDaemons") else { return }
+            let names = try FileManager.default.contentsOfDirectory(atPath: directory).sorted()
+            for name in names where name.hasSuffix(".plist") {
+                let path = directory + "/" + name
+                do {
+                    var info = stat()
+                    guard lstat(path, &info) == 0, info.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG) else {
+                        throw GuestAPIError.operationFailed("Bootstrap service is not a regular plist: \(path)")
+                    }
+                    try prepareBootstrapDaemon(path: path, root: root)
+                    _ = try loadServices([path], load: true, override: false)
+                } catch {
+                    NSLog("vphoned: could not load bootstrap daemon %@: %@", path, String(describing: error))
+                }
+            }
+        } catch {
+            NSLog("vphoned: could not inspect bootstrap daemons %@: %@", directory, String(describing: error))
+        }
+    }
+
+    static func prepareBootstrapDaemon(path: String, root: String) throws {
+        let fd = open(path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
+        guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        defer { close(fd) }
+        var original = stat()
+        guard fstat(fd, &original) == 0, original.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG),
+              original.st_size >= 0, original.st_size <= 1 << 20 else {
+            throw GuestAPIError.operationFailed("Bootstrap service is not a bounded regular plist: \(path)")
+        }
+        let data = try FileHandle(fileDescriptor: fd, closeOnDealloc: false).read(upToCount: (1 << 20) + 1) ?? Data()
+        guard data.count == original.st_size,
+              let job = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] else {
+            throw GuestAPIError.operationFailed("Bootstrap service plist is invalid: \(path)")
+        }
+        // 使用完成标记中的物理根；系统进程的 IcliKit 根检测可能尚未取得 RootHide。
+        guard let prepared = LaunchdPlistPaths.prepared(job, plistPath: path, root: root) else { return }
+        let updated = try PropertyListSerialization.data(fromPropertyList: prepared, format: .xml, options: 0)
+        var template = Array((URL(fileURLWithPath: path).deletingLastPathComponent().path + "/.vphoned-plist.XXXXXX").utf8CString)
+        let output = mkstemp(&template)
+        guard output >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        let temporary = String(cString: template)
+        defer { close(output); unlink(temporary) }
+        try updated.withUnsafeBytes { bytes in
+            var offset = 0
+            while offset < bytes.count {
+                let count = write(output, bytes.baseAddress!.advanced(by: offset), bytes.count - offset)
+                if count < 0 && errno == EINTR { continue }
+                guard count > 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+                offset += count
+            }
+        }
+        guard fchown(output, original.st_uid, original.st_gid) == 0,
+              fchmod(output, original.st_mode & 0o7777) == 0, fsync(output) == 0 else {
+            throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+        }
+        var current = stat()
+        guard lstat(path, &current) == 0, current.st_dev == original.st_dev,
+              current.st_ino == original.st_ino, current.st_size == original.st_size,
+              current.st_mtimespec.tv_sec == original.st_mtimespec.tv_sec,
+              current.st_mtimespec.tv_nsec == original.st_mtimespec.tv_nsec,
+              current.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG) else {
+            throw GuestAPIError.operationFailed("Bootstrap service changed during preparation: \(path)")
+        }
+        guard rename(temporary, path) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
     }
 
     /// RootHide's @loader_path references resolve through a .jbroot link in

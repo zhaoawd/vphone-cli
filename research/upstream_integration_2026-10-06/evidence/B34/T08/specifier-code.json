@@ -1,0 +1,5201 @@
+[
+  {
+    "class": "SBTraitsOrientationSupportTreeNodesSpecifier",
+    "selector": "supportedOrientations",
+    "address": "0x234832f74",
+    "module": "SpringBoard",
+    "instructions": [
+      {
+        "address": "0x234832f74",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2923e1000"
+      },
+      {
+        "address": "0x234832f78",
+        "mnemonic": "ldrsw",
+        "opStr": "x8, [x8, #0xacc]"
+      },
+      {
+        "address": "0x234832f7c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x0, x8]"
+      },
+      {
+        "address": "0x234832f80",
+        "mnemonic": "ret",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      104,
+      221,
+      46,
+      240,
+      8,
+      205,
+      138,
+      185,
+      0,
+      104,
+      104,
+      248,
+      192,
+      3,
+      95,
+      214
+    ]
+  },
+  {
+    "class": "SBTraitsOrientationSupportTreeNodesSpecifier",
+    "selector": "updateStageTreeNodesSpecifications:stageParticipantsRoles:context:",
+    "address": "0x234832da8",
+    "module": "SpringBoard",
+    "instructions": [
+      {
+        "address": "0x234832da8",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x234832dac",
+        "mnemonic": "sub",
+        "opStr": "sp, sp, #0x80"
+      },
+      {
+        "address": "0x234832db0",
+        "mnemonic": "stp",
+        "opStr": "x28, x27, [sp, #0x20]"
+      },
+      {
+        "address": "0x234832db4",
+        "mnemonic": "stp",
+        "opStr": "x26, x25, [sp, #0x30]"
+      },
+      {
+        "address": "0x234832db8",
+        "mnemonic": "stp",
+        "opStr": "x24, x23, [sp, #0x40]"
+      },
+      {
+        "address": "0x234832dbc",
+        "mnemonic": "stp",
+        "opStr": "x22, x21, [sp, #0x50]"
+      },
+      {
+        "address": "0x234832dc0",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x60]"
+      },
+      {
+        "address": "0x234832dc4",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x70]"
+      },
+      {
+        "address": "0x234832dc8",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x70"
+      },
+      {
+        "address": "0x234832dcc",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x234832dd0",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7830",
+        "target_symbol": "0x2390b7830"
+      },
+      {
+        "address": "0x234832dd4",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x234832dd8",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2923e1000"
+      },
+      {
+        "address": "0x234832ddc",
+        "mnemonic": "ldrsw",
+        "opStr": "x28, [x8, #0xacc]"
+      },
+      {
+        "address": "0x234832de0",
+        "mnemonic": "str",
+        "opStr": "xzr, [x22, x28]"
+      },
+      {
+        "address": "0x234832de4",
+        "mnemonic": "adrp",
+        "opStr": "x20, #0x28d882000"
+      },
+      {
+        "address": "0x234832de8",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x20, #0xd00]"
+      },
+      {
+        "address": "0x234832dec",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d88f000"
+      },
+      {
+        "address": "0x234832df0",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0xf20"
+      },
+      {
+        "address": "0x234832df4",
+        "mnemonic": "ldr",
+        "opStr": "x2, [x8]"
+      },
+      {
+        "address": "0x234832df8",
+        "mnemonic": "mov",
+        "opStr": "x3, x19"
+      },
+      {
+        "address": "0x234832dfc",
+        "mnemonic": "bl",
+        "opStr": "#0x234fcf440",
+        "target_symbol": "0x234fcf440 SpringBoard!objc_msgSend$findParticipantWithRole:nodeSpecifications:"
+      },
+      {
+        "address": "0x234832e00",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832e04",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b77b0",
+        "target_symbol": "0x2390b77b0"
+      },
+      {
+        "address": "0x234832e08",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x234832e0c",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d88f000"
+      },
+      {
+        "address": "0x234832e10",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0xf70"
+      },
+      {
+        "address": "0x234832e14",
+        "mnemonic": "ldr",
+        "opStr": "x23, [x8]"
+      },
+      {
+        "address": "0x234832e18",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d88f000"
+      },
+      {
+        "address": "0x234832e1c",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0xf78"
+      },
+      {
+        "address": "0x234832e20",
+        "mnemonic": "ldr",
+        "opStr": "x24, [x8]"
+      },
+      {
+        "address": "0x234832e24",
+        "mnemonic": "str",
+        "opStr": "x0, [sp, #8]"
+      },
+      {
+        "address": "0x234832e28",
+        "mnemonic": "mov",
+        "opStr": "x25, x21"
+      },
+      {
+        "address": "0x234832e2c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x20, #0xd00]"
+      },
+      {
+        "address": "0x234832e30",
+        "mnemonic": "mov",
+        "opStr": "x2, x21"
+      },
+      {
+        "address": "0x234832e34",
+        "mnemonic": "mov",
+        "opStr": "x3, x19"
+      },
+      {
+        "address": "0x234832e38",
+        "mnemonic": "bl",
+        "opStr": "#0x234fcf420",
+        "target_symbol": "0x234fcf420 SpringBoard!objc_msgSend$findParentForParticipant:nodeSpecifications:"
+      },
+      {
+        "address": "0x234832e3c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832e40",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x234832e44",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x234832e48",
+        "mnemonic": "cbz",
+        "opStr": "x21, #0x234832ee8"
+      },
+      {
+        "address": "0x234832e4c",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x234832e50",
+        "mnemonic": "bl",
+        "opStr": "#0x235013040",
+        "target_symbol": "0x235013040 SpringBoard!objc_msgSend$role"
+      },
+      {
+        "address": "0x234832e54",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832e58",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x234832e5c",
+        "mnemonic": "mov",
+        "opStr": "x2, x23"
+      },
+      {
+        "address": "0x234832e60",
+        "mnemonic": "bl",
+        "opStr": "#0x234fec4c0",
+        "target_symbol": "0x234fec4c0 SpringBoard!objc_msgSend$isEqualToString:"
+      },
+      {
+        "address": "0x234832e64",
+        "mnemonic": "mov",
+        "opStr": "x26, x0"
+      },
+      {
+        "address": "0x234832e68",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x234832e6c",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x234832e70",
+        "mnemonic": "bl",
+        "opStr": "#0x235013040",
+        "target_symbol": "0x235013040 SpringBoard!objc_msgSend$role"
+      },
+      {
+        "address": "0x234832e74",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832e78",
+        "mnemonic": "mov",
+        "opStr": "x27, x0"
+      },
+      {
+        "address": "0x234832e7c",
+        "mnemonic": "mov",
+        "opStr": "x2, x24"
+      },
+      {
+        "address": "0x234832e80",
+        "mnemonic": "bl",
+        "opStr": "#0x234fec4c0",
+        "target_symbol": "0x234fec4c0 SpringBoard!objc_msgSend$isEqualToString:"
+      },
+      {
+        "address": "0x234832e84",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x234832e88",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7760",
+        "target_symbol": "0x2390b7760"
+      },
+      {
+        "address": "0x234832e8c",
+        "mnemonic": "tbnz",
+        "opStr": "w26, #0, #0x234832e94"
+      },
+      {
+        "address": "0x234832e90",
+        "mnemonic": "cbz",
+        "opStr": "w25, #0x234832ecc"
+      },
+      {
+        "address": "0x234832e94",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x234832e98",
+        "mnemonic": "bl",
+        "opStr": "#0x235000f20",
+        "target_symbol": "0x235000f20 SpringBoard!objc_msgSend$orientationResolutionPolicyInfo"
+      },
+      {
+        "address": "0x234832e9c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832ea0",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x234832ea4",
+        "mnemonic": "bl",
+        "opStr": "#0x235011f80",
+        "target_symbol": "0x235011f80 SpringBoard!objc_msgSend$resolutionPolicy"
+      },
+      {
+        "address": "0x234832ea8",
+        "mnemonic": "mov",
+        "opStr": "x26, x0"
+      },
+      {
+        "address": "0x234832eac",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x234832eb0",
+        "mnemonic": "cbnz",
+        "opStr": "x26, #0x234832e28"
+      },
+      {
+        "address": "0x234832eb4",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x234832eb8",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc0d60",
+        "target_symbol": "0x234fc0d60 SpringBoard!objc_msgSend$currentOrientation"
+      },
+      {
+        "address": "0x234832ebc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b5040",
+        "target_symbol": "0x2390b5040"
+      },
+      {
+        "address": "0x234832ec0",
+        "mnemonic": "str",
+        "opStr": "x0, [x22, x28]"
+      },
+      {
+        "address": "0x234832ec4",
+        "mnemonic": "cbnz",
+        "opStr": "x0, #0x234832f34"
+      },
+      {
+        "address": "0x234832ec8",
+        "mnemonic": "b",
+        "opStr": "#0x234832ef0",
+        "target_symbol": "0x234832ef0 SpringBoard!-[SBTraitsOrientationSupportTreeNodesSpecifier updateStageTreeNodesSpecifications:stageParticipantsRoles:context:]"
+      },
+      {
+        "address": "0x234832ecc",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x234832ed0",
+        "mnemonic": "bl",
+        "opStr": "#0x235000ee0",
+        "target_symbol": "0x235000ee0 SpringBoard!objc_msgSend$orientationPreferences"
+      },
+      {
+        "address": "0x234832ed4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832ed8",
+        "mnemonic": "mov",
+        "opStr": "x23, x0"
+      },
+      {
+        "address": "0x234832edc",
+        "mnemonic": "bl",
+        "opStr": "#0x235046d60",
+        "target_symbol": "0x235046d60 SpringBoard!objc_msgSend$supportedOrientations"
+      },
+      {
+        "address": "0x234832ee0",
+        "mnemonic": "str",
+        "opStr": "x0, [x22, x28]"
+      },
+      {
+        "address": "0x234832ee4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7720",
+        "target_symbol": "0x2390b7720"
+      },
+      {
+        "address": "0x234832ee8",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x22, x28]"
+      },
+      {
+        "address": "0x234832eec",
+        "mnemonic": "cbnz",
+        "opStr": "x0, #0x234832f34"
+      },
+      {
+        "address": "0x234832ef0",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b5940",
+        "target_symbol": "0x2390b5940"
+      },
+      {
+        "address": "0x234832ef4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x234832ef8",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x234832efc",
+        "mnemonic": "mov",
+        "opStr": "w1, #0"
+      },
+      {
+        "address": "0x234832f00",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7a20",
+        "target_symbol": "0x2390b7a20"
+      },
+      {
+        "address": "0x234832f04",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x234832f30"
+      },
+      {
+        "address": "0x234832f08",
+        "mnemonic": "strh",
+        "opStr": "wzr, [sp, #0x10]"
+      },
+      {
+        "address": "0x234832f0c",
+        "mnemonic": "adrp",
+        "opStr": "x0, #0x234096000"
+      },
+      {
+        "address": "0x234832f10",
+        "mnemonic": "add",
+        "opStr": "x0, x0, #0"
+      },
+      {
+        "address": "0x234832f14",
+        "mnemonic": "adrp",
+        "opStr": "x3, #0x234c46000"
+      },
+      {
+        "address": "0x234832f18",
+        "mnemonic": "add",
+        "opStr": "x3, x3, #0xd74"
+      },
+      {
+        "address": "0x234832f1c",
+        "mnemonic": "add",
+        "opStr": "x4, sp, #0x10"
+      },
+      {
+        "address": "0x234832f20",
+        "mnemonic": "mov",
+        "opStr": "x1, x22"
+      },
+      {
+        "address": "0x234832f24",
+        "mnemonic": "mov",
+        "opStr": "w2, #0"
+      },
+      {
+        "address": "0x234832f28",
+        "mnemonic": "mov",
+        "opStr": "w5, #2"
+      },
+      {
+        "address": "0x234832f2c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b6e00",
+        "target_symbol": "0x2390b6e00"
+      },
+      {
+        "address": "0x234832f30",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7710",
+        "target_symbol": "0x2390b7710"
+      },
+      {
+        "address": "0x234832f34",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7700",
+        "target_symbol": "0x2390b7700"
+      },
+      {
+        "address": "0x234832f38",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #8]"
+      },
+      {
+        "address": "0x234832f3c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7790",
+        "target_symbol": "0x2390b7790"
+      },
+      {
+        "address": "0x234832f40",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x234832f44",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x70]"
+      },
+      {
+        "address": "0x234832f48",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x60]"
+      },
+      {
+        "address": "0x234832f4c",
+        "mnemonic": "ldp",
+        "opStr": "x22, x21, [sp, #0x50]"
+      },
+      {
+        "address": "0x234832f50",
+        "mnemonic": "ldp",
+        "opStr": "x24, x23, [sp, #0x40]"
+      },
+      {
+        "address": "0x234832f54",
+        "mnemonic": "ldp",
+        "opStr": "x26, x25, [sp, #0x30]"
+      },
+      {
+        "address": "0x234832f58",
+        "mnemonic": "ldp",
+        "opStr": "x28, x27, [sp, #0x20]"
+      },
+      {
+        "address": "0x234832f5c",
+        "mnemonic": "add",
+        "opStr": "sp, sp, #0x80"
+      },
+      {
+        "address": "0x234832f60",
+        "mnemonic": "autibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x234832f64",
+        "mnemonic": "eor",
+        "opStr": "x16, x30, x30, lsl #1"
+      },
+      {
+        "address": "0x234832f68",
+        "mnemonic": "tbz",
+        "opStr": "x16, #0x3e, #0x234832f70"
+      },
+      {
+        "address": "0x234832f6c",
+        "mnemonic": "brk",
+        "opStr": "#0xc471"
+      },
+      {
+        "address": "0x234832f70",
+        "mnemonic": "b",
+        "opStr": "#0x2390b7530",
+        "target_symbol": "0x2390b7530"
+      },
+      {
+        "address": "0x234832f74",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2923e1000"
+      },
+      {
+        "address": "0x234832f78",
+        "mnemonic": "ldrsw",
+        "opStr": "x8, [x8, #0xacc]"
+      },
+      {
+        "address": "0x234832f7c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x0, x8]"
+      },
+      {
+        "address": "0x234832f80",
+        "mnemonic": "ret",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      127,
+      35,
+      3,
+      213,
+      255,
+      3,
+      2,
+      209,
+      252,
+      111,
+      2,
+      169,
+      250,
+      103,
+      3,
+      169,
+      248,
+      95,
+      4,
+      169,
+      246,
+      87,
+      5,
+      169,
+      244,
+      79,
+      6,
+      169,
+      253,
+      123,
+      7,
+      169,
+      253,
+      195,
+      1,
+      145,
+      246,
+      3,
+      0,
+      170,
+      152,
+      18,
+      34,
+      149,
+      243,
+      3,
+      0,
+      170,
+      104,
+      221,
+      46,
+      240,
+      28,
+      205,
+      138,
+      185,
+      223,
+      106,
+      60,
+      248,
+      148,
+      130,
+      44,
+      144,
+      128,
+      130,
+      70,
+      249,
+      232,
+      130,
+      44,
+      176,
+      8,
+      129,
+      60,
+      145,
+      2,
+      1,
+      64,
+      249,
+      227,
+      3,
+      19,
+      170,
+      145,
+      113,
+      30,
+      148,
+      212,
+      17,
+      34,
+      149,
+      107,
+      18,
+      34,
+      149,
+      245,
+      3,
+      0,
+      170,
+      232,
+      130,
+      44,
+      176,
+      8,
+      193,
+      61,
+      145,
+      23,
+      1,
+      64,
+      249,
+      232,
+      130,
+      44,
+      176,
+      8,
+      225,
+      61,
+      145,
+      24,
+      1,
+      64,
+      249,
+      224,
+      7,
+      0,
+      249,
+      249,
+      3,
+      21,
+      170,
+      128,
+      130,
+      70,
+      249,
+      226,
+      3,
+      21,
+      170,
+      227,
+      3,
+      19,
+      170,
+      122,
+      113,
+      30,
+      148,
+      197,
+      17,
+      34,
+      149,
+      245,
+      3,
+      0,
+      170,
+      63,
+      18,
+      34,
+      149,
+      21,
+      5,
+      0,
+      180,
+      224,
+      3,
+      21,
+      170,
+      124,
+      128,
+      31,
+      148,
+      191,
+      17,
+      34,
+      149,
+      249,
+      3,
+      0,
+      170,
+      226,
+      3,
+      23,
+      170,
+      152,
+      229,
+      30,
+      148,
+      250,
+      3,
+      0,
+      170,
+      54,
+      18,
+      34,
+      149,
+      224,
+      3,
+      21,
+      170,
+      116,
+      128,
+      31,
+      148,
+      183,
+      17,
+      34,
+      149,
+      251,
+      3,
+      0,
+      170,
+      226,
+      3,
+      24,
+      170,
+      144,
+      229,
+      30,
+      148,
+      249,
+      3,
+      0,
+      170,
+      54,
+      18,
+      34,
+      149,
+      90,
+      0,
+      0,
+      55,
+      249,
+      1,
+      0,
+      52,
+      224,
+      3,
+      21,
+      170,
+      34,
+      56,
+      31,
+      148,
+      173,
+      17,
+      34,
+      149,
+      249,
+      3,
+      0,
+      170,
+      55,
+      124,
+      31,
+      148,
+      250,
+      3,
+      0,
+      170,
+      37,
+      18,
+      34,
+      149,
+      218,
+      251,
+      255,
+      181,
+      224,
+      3,
+      21,
+      170,
+      170,
+      55,
+      30,
+      148,
+      97,
+      8,
+      34,
+      149,
+      192,
+      106,
+      60,
+      248,
+      128,
+      3,
+      0,
+      181,
+      10,
+      0,
+      0,
+      20,
+      224,
+      3,
+      21,
+      170,
+      4,
+      56,
+      31,
+      148,
+      159,
+      17,
+      34,
+      149,
+      247,
+      3,
+      0,
+      170,
+      161,
+      79,
+      32,
+      148,
+      192,
+      106,
+      60,
+      248,
+      15,
+      18,
+      34,
+      149,
+      192,
+      106,
+      124,
+      248,
+      64,
+      2,
+      0,
+      181,
+      148,
+      10,
+      34,
+      149,
+      151,
+      17,
+      34,
+      149,
+      246,
+      3,
+      0,
+      170,
+      1,
+      0,
+      128,
+      82,
+      200,
+      18,
+      34,
+      149,
+      96,
+      1,
+      0,
+      52,
+      255,
+      35,
+      0,
+      121,
+      32,
+      195,
+      255,
+      144,
+      0,
+      0,
+      0,
+      145,
+      163,
+      32,
+      0,
+      144,
+      99,
+      208,
+      53,
+      145,
+      228,
+      67,
+      0,
+      145,
+      225,
+      3,
+      22,
+      170,
+      2,
+      0,
+      128,
+      82,
+      69,
+      0,
+      128,
+      82,
+      181,
+      15,
+      34,
+      149,
+      248,
+      17,
+      34,
+      149,
+      243,
+      17,
+      34,
+      149,
+      232,
+      7,
+      64,
+      249,
+      21,
+      18,
+      34,
+      149,
+      224,
+      3,
+      19,
+      170,
+      253,
+      123,
+      71,
+      169,
+      244,
+      79,
+      70,
+      169,
+      246,
+      87,
+      69,
+      169,
+      248,
+      95,
+      68,
+      169,
+      250,
+      103,
+      67,
+      169,
+      252,
+      111,
+      66,
+      169,
+      255,
+      3,
+      2,
+      145,
+      255,
+      35,
+      3,
+      213,
+      208,
+      7,
+      30,
+      202,
+      80,
+      0,
+      240,
+      182,
+      32,
+      142,
+      56,
+      212,
+      112,
+      17,
+      34,
+      21,
+      104,
+      221,
+      46,
+      240,
+      8,
+      205,
+      138,
+      185,
+      0,
+      104,
+      104,
+      248,
+      192,
+      3,
+      95,
+      214
+    ]
+  },
+  {
+    "class": "SBTraitsOrientationDefaultTreeNodesSpecifier",
+    "selector": "_activeOrientationOrderedNodesWithContext:",
+    "address": "0x2348b0000",
+    "module": "SpringBoard",
+    "instructions": [
+      {
+        "address": "0x2348b0000",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x2348b0004",
+        "mnemonic": "sub",
+        "opStr": "sp, sp, #0x160"
+      },
+      {
+        "address": "0x2348b0008",
+        "mnemonic": "stp",
+        "opStr": "x28, x27, [sp, #0x100]"
+      },
+      {
+        "address": "0x2348b000c",
+        "mnemonic": "stp",
+        "opStr": "x26, x25, [sp, #0x110]"
+      },
+      {
+        "address": "0x2348b0010",
+        "mnemonic": "stp",
+        "opStr": "x24, x23, [sp, #0x120]"
+      },
+      {
+        "address": "0x2348b0014",
+        "mnemonic": "stp",
+        "opStr": "x22, x21, [sp, #0x130]"
+      },
+      {
+        "address": "0x2348b0018",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x140]"
+      },
+      {
+        "address": "0x2348b001c",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x150]"
+      },
+      {
+        "address": "0x2348b0020",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x150"
+      },
+      {
+        "address": "0x2348b0024",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d266000"
+      },
+      {
+        "address": "0x2348b0028",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8, #0x2f8]"
+      },
+      {
+        "address": "0x2348b002c",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x2348b0030",
+        "mnemonic": "stur",
+        "opStr": "x8, [x29, #-0x60]"
+      },
+      {
+        "address": "0x2348b0034",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7830",
+        "target_symbol": "0x2390b7830"
+      },
+      {
+        "address": "0x2348b0038",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x2348b003c",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d19e000"
+      },
+      {
+        "address": "0x2348b0040",
+        "mnemonic": "ldr",
+        "opStr": "x19, [x8, #0xb18]"
+      },
+      {
+        "address": "0x2348b0044",
+        "mnemonic": "bl",
+        "opStr": "#0x234fa7680",
+        "target_symbol": "0x234fa7680 SpringBoard!objc_msgSend$acquiredParticipants"
+      },
+      {
+        "address": "0x2348b0048",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b004c",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348b0050",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbf120",
+        "target_symbol": "0x234fbf120 SpringBoard!objc_msgSend$count"
+      },
+      {
+        "address": "0x2348b0054",
+        "mnemonic": "mov",
+        "opStr": "x2, x0"
+      },
+      {
+        "address": "0x2348b0058",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b005c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fb1620",
+        "target_symbol": "0x234fb1620 SpringBoard!objc_msgSend$arrayWithCapacity:"
+      },
+      {
+        "address": "0x2348b0060",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b0064",
+        "mnemonic": "str",
+        "opStr": "x0, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b0068",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76f0",
+        "target_symbol": "0x2390b76f0"
+      },
+      {
+        "address": "0x2348b006c",
+        "mnemonic": "movi",
+        "opStr": "v0.2d, #0000000000000000"
+      },
+      {
+        "address": "0x2348b0070",
+        "mnemonic": "stp",
+        "opStr": "q0, q0, [sp, #0x50]"
+      },
+      {
+        "address": "0x2348b0074",
+        "mnemonic": "stp",
+        "opStr": "q0, q0, [sp, #0x30]"
+      },
+      {
+        "address": "0x2348b0078",
+        "mnemonic": "mov",
+        "opStr": "x0, x22"
+      },
+      {
+        "address": "0x2348b007c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fa7680",
+        "target_symbol": "0x234fa7680 SpringBoard!objc_msgSend$acquiredParticipants"
+      },
+      {
+        "address": "0x2348b0080",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b0084",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348b0088",
+        "mnemonic": "add",
+        "opStr": "x2, sp, #0x30"
+      },
+      {
+        "address": "0x2348b008c",
+        "mnemonic": "add",
+        "opStr": "x3, sp, #0x70"
+      },
+      {
+        "address": "0x2348b0090",
+        "mnemonic": "mov",
+        "opStr": "w4, #0x10"
+      },
+      {
+        "address": "0x2348b0094",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbf1e0",
+        "target_symbol": "0x234fbf1e0 SpringBoard!objc_msgSend$countByEnumeratingWithState:objects:count:"
+      },
+      {
+        "address": "0x2348b0098",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x2348b009c",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x2348b027c"
+      },
+      {
+        "address": "0x2348b00a0",
+        "mnemonic": "str",
+        "opStr": "x22, [sp, #8]"
+      },
+      {
+        "address": "0x2348b00a4",
+        "mnemonic": "mov",
+        "opStr": "x20, #0"
+      },
+      {
+        "address": "0x2348b00a8",
+        "mnemonic": "mov",
+        "opStr": "x23, #0"
+      },
+      {
+        "address": "0x2348b00ac",
+        "mnemonic": "str",
+        "opStr": "xzr, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b00b0",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x40]"
+      },
+      {
+        "address": "0x2348b00b4",
+        "mnemonic": "ldr",
+        "opStr": "x24, [x8]"
+      },
+      {
+        "address": "0x2348b00b8",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d88f000"
+      },
+      {
+        "address": "0x2348b00bc",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0xe40"
+      },
+      {
+        "address": "0x2348b00c0",
+        "mnemonic": "adrp",
+        "opStr": "x9, #0x28d88f000"
+      },
+      {
+        "address": "0x2348b00c4",
+        "mnemonic": "add",
+        "opStr": "x9, x9, #0xe48"
+      },
+      {
+        "address": "0x2348b00c8",
+        "mnemonic": "ldr",
+        "opStr": "x26, [x8]"
+      },
+      {
+        "address": "0x2348b00cc",
+        "mnemonic": "ldr",
+        "opStr": "x27, [x9]"
+      },
+      {
+        "address": "0x2348b00d0",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d88f000"
+      },
+      {
+        "address": "0x2348b00d4",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0xf50"
+      },
+      {
+        "address": "0x2348b00d8",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x2348b00dc",
+        "mnemonic": "str",
+        "opStr": "x8, [sp, #0x18]"
+      },
+      {
+        "address": "0x2348b00e0",
+        "mnemonic": "str",
+        "opStr": "x19, [sp, #0x28]"
+      },
+      {
+        "address": "0x2348b00e4",
+        "mnemonic": "mov",
+        "opStr": "x28, #0"
+      },
+      {
+        "address": "0x2348b00e8",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x40]"
+      },
+      {
+        "address": "0x2348b00ec",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x2348b00f0",
+        "mnemonic": "cmp",
+        "opStr": "x8, x24"
+      },
+      {
+        "address": "0x2348b00f4",
+        "mnemonic": "b.eq",
+        "opStr": "#0x2348b0100"
+      },
+      {
+        "address": "0x2348b00f8",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #0x28]"
+      },
+      {
+        "address": "0x2348b00fc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b75b0",
+        "target_symbol": "0x2390b75b0"
+      },
+      {
+        "address": "0x2348b0100",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x38]"
+      },
+      {
+        "address": "0x2348b0104",
+        "mnemonic": "ldr",
+        "opStr": "x19, [x8, x28, lsl #3]"
+      },
+      {
+        "address": "0x2348b0108",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b010c",
+        "mnemonic": "bl",
+        "opStr": "#0x235013040",
+        "target_symbol": "0x235013040 SpringBoard!objc_msgSend$role"
+      },
+      {
+        "address": "0x2348b0110",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b0114",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x2348b0118",
+        "mnemonic": "mov",
+        "opStr": "x2, x26"
+      },
+      {
+        "address": "0x2348b011c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fec4c0",
+        "target_symbol": "0x234fec4c0 SpringBoard!objc_msgSend$isEqualToString:"
+      },
+      {
+        "address": "0x2348b0120",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x2348b0124",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7710",
+        "target_symbol": "0x2390b7710"
+      },
+      {
+        "address": "0x2348b0128",
+        "mnemonic": "cbz",
+        "opStr": "w21, #0x2348b013c"
+      },
+      {
+        "address": "0x2348b012c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7820",
+        "target_symbol": "0x2390b7820"
+      },
+      {
+        "address": "0x2348b0130",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x2348b0134",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7720",
+        "target_symbol": "0x2390b7720"
+      },
+      {
+        "address": "0x2348b0138",
+        "mnemonic": "mov",
+        "opStr": "x23, x21"
+      },
+      {
+        "address": "0x2348b013c",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b0140",
+        "mnemonic": "bl",
+        "opStr": "#0x235013040",
+        "target_symbol": "0x235013040 SpringBoard!objc_msgSend$role"
+      },
+      {
+        "address": "0x2348b0144",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b0148",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x2348b014c",
+        "mnemonic": "mov",
+        "opStr": "x2, x27"
+      },
+      {
+        "address": "0x2348b0150",
+        "mnemonic": "bl",
+        "opStr": "#0x234fec4c0",
+        "target_symbol": "0x234fec4c0 SpringBoard!objc_msgSend$isEqualToString:"
+      },
+      {
+        "address": "0x2348b0154",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x2348b0158",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7700",
+        "target_symbol": "0x2390b7700"
+      },
+      {
+        "address": "0x2348b015c",
+        "mnemonic": "cbz",
+        "opStr": "w22, #0x2348b0170"
+      },
+      {
+        "address": "0x2348b0160",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7820",
+        "target_symbol": "0x2390b7820"
+      },
+      {
+        "address": "0x2348b0164",
+        "mnemonic": "mov",
+        "opStr": "x22, x20"
+      },
+      {
+        "address": "0x2348b0168",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348b016c",
+        "mnemonic": "b",
+        "opStr": "#0x2348b01dc",
+        "target_symbol": "0x2348b01dc SpringBoard!-[SBTraitsOrientationDefaultTreeNodesSpecifier _activeOrientationOrderedNodesWithContext:]"
+      },
+      {
+        "address": "0x2348b0170",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b0174",
+        "mnemonic": "bl",
+        "opStr": "#0x235013040",
+        "target_symbol": "0x235013040 SpringBoard!objc_msgSend$role"
+      },
+      {
+        "address": "0x2348b0178",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b017c",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x2348b0180",
+        "mnemonic": "ldr",
+        "opStr": "x2, [sp, #0x18]"
+      },
+      {
+        "address": "0x2348b0184",
+        "mnemonic": "bl",
+        "opStr": "#0x234fec4c0",
+        "target_symbol": "0x234fec4c0 SpringBoard!objc_msgSend$isEqualToString:"
+      },
+      {
+        "address": "0x2348b0188",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x2348b018c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7700",
+        "target_symbol": "0x2390b7700"
+      },
+      {
+        "address": "0x2348b0190",
+        "mnemonic": "cbz",
+        "opStr": "w22, #0x2348b01a4"
+      },
+      {
+        "address": "0x2348b0194",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7820",
+        "target_symbol": "0x2390b7820"
+      },
+      {
+        "address": "0x2348b0198",
+        "mnemonic": "ldr",
+        "opStr": "x22, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b019c",
+        "mnemonic": "str",
+        "opStr": "x0, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b01a0",
+        "mnemonic": "b",
+        "opStr": "#0x2348b01dc",
+        "target_symbol": "0x2348b01dc SpringBoard!-[SBTraitsOrientationDefaultTreeNodesSpecifier _activeOrientationOrderedNodesWithContext:]"
+      },
+      {
+        "address": "0x2348b01a4",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d253000"
+      },
+      {
+        "address": "0x2348b01a8",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, #0x9e8]"
+      },
+      {
+        "address": "0x2348b01ac",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b74d0",
+        "target_symbol": "0x2390b74d0"
+      },
+      {
+        "address": "0x2348b01b0",
+        "mnemonic": "mov",
+        "opStr": "x2, x19"
+      },
+      {
+        "address": "0x2348b01b4",
+        "mnemonic": "mov",
+        "opStr": "x3, #0"
+      },
+      {
+        "address": "0x2348b01b8",
+        "mnemonic": "bl",
+        "opStr": "#0x234fe2d40",
+        "target_symbol": "0x234fe2d40 SpringBoard!objc_msgSend$initWithParticipant:parentParticipant:"
+      },
+      {
+        "address": "0x2348b01bc",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x2348b01c0",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b01c4",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc1300",
+        "target_symbol": "0x234fc1300 SpringBoard!objc_msgSend$currentZOrderLevel"
+      },
+      {
+        "address": "0x2348b01c8",
+        "mnemonic": "mov",
+        "opStr": "x0, x22"
+      },
+      {
+        "address": "0x2348b01cc",
+        "mnemonic": "bl",
+        "opStr": "#0x23502e060",
+        "target_symbol": "0x23502e060 SpringBoard!objc_msgSend$setOrder:"
+      },
+      {
+        "address": "0x2348b01d0",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b01d4",
+        "mnemonic": "mov",
+        "opStr": "x2, x22"
+      },
+      {
+        "address": "0x2348b01d8",
+        "mnemonic": "bl",
+        "opStr": "#0x234faa940",
+        "target_symbol": "0x234faa940 SpringBoard!objc_msgSend$addObject:"
+      },
+      {
+        "address": "0x2348b01dc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7710",
+        "target_symbol": "0x2390b7710"
+      },
+      {
+        "address": "0x2348b01e0",
+        "mnemonic": "add",
+        "opStr": "x28, x28, #1"
+      },
+      {
+        "address": "0x2348b01e4",
+        "mnemonic": "cmp",
+        "opStr": "x25, x28"
+      },
+      {
+        "address": "0x2348b01e8",
+        "mnemonic": "b.ne",
+        "opStr": "#0x2348b00e8"
+      },
+      {
+        "address": "0x2348b01ec",
+        "mnemonic": "add",
+        "opStr": "x2, sp, #0x30"
+      },
+      {
+        "address": "0x2348b01f0",
+        "mnemonic": "add",
+        "opStr": "x3, sp, #0x70"
+      },
+      {
+        "address": "0x2348b01f4",
+        "mnemonic": "ldr",
+        "opStr": "x19, [sp, #0x28]"
+      },
+      {
+        "address": "0x2348b01f8",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b01fc",
+        "mnemonic": "mov",
+        "opStr": "w4, #0x10"
+      },
+      {
+        "address": "0x2348b0200",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbf1e0",
+        "target_symbol": "0x234fbf1e0 SpringBoard!objc_msgSend$countByEnumeratingWithState:objects:count:"
+      },
+      {
+        "address": "0x2348b0204",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x2348b0208",
+        "mnemonic": "cbnz",
+        "opStr": "x0, #0x2348b00e4"
+      },
+      {
+        "address": "0x2348b020c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2348b0210",
+        "mnemonic": "cbz",
+        "opStr": "x23, #0x2348b028c"
+      },
+      {
+        "address": "0x2348b0214",
+        "mnemonic": "ldr",
+        "opStr": "x22, [sp, #8]"
+      },
+      {
+        "address": "0x2348b0218",
+        "mnemonic": "ldr",
+        "opStr": "x25, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b021c",
+        "mnemonic": "cbz",
+        "opStr": "x20, #0x2348b024c"
+      },
+      {
+        "address": "0x2348b0220",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d253000"
+      },
+      {
+        "address": "0x2348b0224",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, #0x9e8]"
+      },
+      {
+        "address": "0x2348b0228",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b74d0",
+        "target_symbol": "0x2390b74d0"
+      },
+      {
+        "address": "0x2348b022c",
+        "mnemonic": "mov",
+        "opStr": "x2, x20"
+      },
+      {
+        "address": "0x2348b0230",
+        "mnemonic": "mov",
+        "opStr": "x3, x23"
+      },
+      {
+        "address": "0x2348b0234",
+        "mnemonic": "bl",
+        "opStr": "#0x234fe2d40",
+        "target_symbol": "0x234fe2d40 SpringBoard!objc_msgSend$initWithParticipant:parentParticipant:"
+      },
+      {
+        "address": "0x2348b0238",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348b023c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b0240",
+        "mnemonic": "mov",
+        "opStr": "x2, x19"
+      },
+      {
+        "address": "0x2348b0244",
+        "mnemonic": "bl",
+        "opStr": "#0x234faa940",
+        "target_symbol": "0x234faa940 SpringBoard!objc_msgSend$addObject:"
+      },
+      {
+        "address": "0x2348b0248",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2348b024c",
+        "mnemonic": "cbz",
+        "opStr": "x25, #0x2348b0294"
+      },
+      {
+        "address": "0x2348b0250",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d253000"
+      },
+      {
+        "address": "0x2348b0254",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, #0x9e8]"
+      },
+      {
+        "address": "0x2348b0258",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b74d0",
+        "target_symbol": "0x2390b74d0"
+      },
+      {
+        "address": "0x2348b025c",
+        "mnemonic": "mov",
+        "opStr": "x2, x25"
+      },
+      {
+        "address": "0x2348b0260",
+        "mnemonic": "mov",
+        "opStr": "x3, x23"
+      },
+      {
+        "address": "0x2348b0264",
+        "mnemonic": "bl",
+        "opStr": "#0x234fe2d40",
+        "target_symbol": "0x234fe2d40 SpringBoard!objc_msgSend$initWithParticipant:parentParticipant:"
+      },
+      {
+        "address": "0x2348b0268",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348b026c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b0270",
+        "mnemonic": "mov",
+        "opStr": "x2, x19"
+      },
+      {
+        "address": "0x2348b0274",
+        "mnemonic": "bl",
+        "opStr": "#0x234faa940",
+        "target_symbol": "0x234faa940 SpringBoard!objc_msgSend$addObject:"
+      },
+      {
+        "address": "0x2348b0278",
+        "mnemonic": "b",
+        "opStr": "#0x2348b0284",
+        "target_symbol": "0x2348b0284 SpringBoard!-[SBTraitsOrientationDefaultTreeNodesSpecifier _activeOrientationOrderedNodesWithContext:]"
+      },
+      {
+        "address": "0x2348b027c",
+        "mnemonic": "mov",
+        "opStr": "x23, #0"
+      },
+      {
+        "address": "0x2348b0280",
+        "mnemonic": "mov",
+        "opStr": "x20, #0"
+      },
+      {
+        "address": "0x2348b0284",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2348b0288",
+        "mnemonic": "b",
+        "opStr": "#0x2348b0294",
+        "target_symbol": "0x2348b0294 SpringBoard!-[SBTraitsOrientationDefaultTreeNodesSpecifier _activeOrientationOrderedNodesWithContext:]"
+      },
+      {
+        "address": "0x2348b028c",
+        "mnemonic": "ldr",
+        "opStr": "x22, [sp, #8]"
+      },
+      {
+        "address": "0x2348b0290",
+        "mnemonic": "ldr",
+        "opStr": "x25, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b0294",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d253000"
+      },
+      {
+        "address": "0x2348b0298",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, #0x9e0]"
+      },
+      {
+        "address": "0x2348b029c",
+        "mnemonic": "adrp",
+        "opStr": "x4, #0x29832e000"
+      },
+      {
+        "address": "0x2348b02a0",
+        "mnemonic": "add",
+        "opStr": "x4, x4, #0x878"
+      },
+      {
+        "address": "0x2348b02a4",
+        "mnemonic": "ldr",
+        "opStr": "x24, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b02a8",
+        "mnemonic": "mov",
+        "opStr": "x2, x24"
+      },
+      {
+        "address": "0x2348b02ac",
+        "mnemonic": "mov",
+        "opStr": "x3, #0"
+      },
+      {
+        "address": "0x2348b02b0",
+        "mnemonic": "bl",
+        "opStr": "#0x23504f500",
+        "target_symbol": "0x23504f500 SpringBoard!objc_msgSend$treeWithNodesSpecifications:traversalType:debugName:"
+      },
+      {
+        "address": "0x2348b02b4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b02b8",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x2348b02bc",
+        "mnemonic": "bl",
+        "opStr": "#0x2350024c0",
+        "target_symbol": "0x2350024c0 SpringBoard!objc_msgSend$participantsTopologicalSort"
+      },
+      {
+        "address": "0x2348b02c0",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b02c4",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348b02c8",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7700",
+        "target_symbol": "0x2390b7700"
+      },
+      {
+        "address": "0x2348b02cc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76f0",
+        "target_symbol": "0x2390b76f0"
+      },
+      {
+        "address": "0x2348b02d0",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7720",
+        "target_symbol": "0x2390b7720"
+      },
+      {
+        "address": "0x2348b02d4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x2348b02d8",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7730",
+        "target_symbol": "0x2390b7730"
+      },
+      {
+        "address": "0x2348b02dc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7710",
+        "target_symbol": "0x2390b7710"
+      },
+      {
+        "address": "0x2348b02e0",
+        "mnemonic": "ldur",
+        "opStr": "x8, [x29, #-0x60]"
+      },
+      {
+        "address": "0x2348b02e4",
+        "mnemonic": "adrp",
+        "opStr": "x9, #0x28d266000"
+      },
+      {
+        "address": "0x2348b02e8",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x9, #0x2f8]"
+      },
+      {
+        "address": "0x2348b02ec",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x9]"
+      },
+      {
+        "address": "0x2348b02f0",
+        "mnemonic": "cmp",
+        "opStr": "x9, x8"
+      },
+      {
+        "address": "0x2348b02f4",
+        "mnemonic": "b.ne",
+        "opStr": "#0x2348b032c"
+      },
+      {
+        "address": "0x2348b02f8",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b02fc",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x150]"
+      },
+      {
+        "address": "0x2348b0300",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x140]"
+      },
+      {
+        "address": "0x2348b0304",
+        "mnemonic": "ldp",
+        "opStr": "x22, x21, [sp, #0x130]"
+      },
+      {
+        "address": "0x2348b0308",
+        "mnemonic": "ldp",
+        "opStr": "x24, x23, [sp, #0x120]"
+      },
+      {
+        "address": "0x2348b030c",
+        "mnemonic": "ldp",
+        "opStr": "x26, x25, [sp, #0x110]"
+      },
+      {
+        "address": "0x2348b0310",
+        "mnemonic": "ldp",
+        "opStr": "x28, x27, [sp, #0x100]"
+      },
+      {
+        "address": "0x2348b0314",
+        "mnemonic": "add",
+        "opStr": "sp, sp, #0x160"
+      },
+      {
+        "address": "0x2348b0318",
+        "mnemonic": "autibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x2348b031c",
+        "mnemonic": "eor",
+        "opStr": "x16, x30, x30, lsl #1"
+      },
+      {
+        "address": "0x2348b0320",
+        "mnemonic": "tbz",
+        "opStr": "x16, #0x3e, #0x2348b0328"
+      },
+      {
+        "address": "0x2348b0324",
+        "mnemonic": "brk",
+        "opStr": "#0xc471"
+      },
+      {
+        "address": "0x2348b0328",
+        "mnemonic": "b",
+        "opStr": "#0x2390b7530",
+        "target_symbol": "0x2390b7530"
+      },
+      {
+        "address": "0x2348b032c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b6d50",
+        "target_symbol": "0x2390b6d50"
+      },
+      {
+        "address": "0x2348b0330",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x2348b0334",
+        "mnemonic": "sub",
+        "opStr": "sp, sp, #0x30"
+      },
+      {
+        "address": "0x2348b0338",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b033c",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b0340",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x20"
+      },
+      {
+        "address": "0x2348b0344",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d8fb000"
+      },
+      {
+        "address": "0x2348b0348",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8, #0xd28]"
+      },
+      {
+        "address": "0x2348b034c",
+        "mnemonic": "stp",
+        "opStr": "x0, x8, [sp]"
+      },
+      {
+        "address": "0x2348b0350",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2107e3000"
+      },
+      {
+        "address": "0x2348b0354",
+        "mnemonic": "add",
+        "opStr": "x1, x8, #0x7c5"
+      },
+      {
+        "address": "0x2348b0358",
+        "mnemonic": "mov",
+        "opStr": "x0, sp"
+      },
+      {
+        "address": "0x2348b035c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7630",
+        "target_symbol": "0x2390b7630"
+      },
+      {
+        "address": "0x2348b0360",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348b0364",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x2348b03b0"
+      },
+      {
+        "address": "0x2348b0368",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d253000"
+      },
+      {
+        "address": "0x2348b036c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, #0xa00]"
+      },
+      {
+        "address": "0x2348b0370",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b74e0",
+        "target_symbol": "0x2390b74e0"
+      },
+      {
+        "address": "0x2348b0374",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2923e2000"
+      },
+      {
+        "address": "0x2348b0378",
+        "mnemonic": "ldrsw",
+        "opStr": "x8, [x8, #0xac4]"
+      },
+      {
+        "address": "0x2348b037c",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x19, x8]"
+      },
+      {
+        "address": "0x2348b0380",
+        "mnemonic": "str",
+        "opStr": "x0, [x19, x8]"
+      },
+      {
+        "address": "0x2348b0384",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b77a0",
+        "target_symbol": "0x2390b77a0"
+      },
+      {
+        "address": "0x2348b0388",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d19e000"
+      },
+      {
+        "address": "0x2348b038c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, #0xb30]"
+      },
+      {
+        "address": "0x2348b0390",
+        "mnemonic": "mov",
+        "opStr": "w2, #0x19"
+      },
+      {
+        "address": "0x2348b0394",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc4e20",
+        "target_symbol": "0x234fc4e20 SpringBoard!objc_msgSend$dictionaryWithCapacity:"
+      },
+      {
+        "address": "0x2348b0398",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348b039c",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2923e2000"
+      },
+      {
+        "address": "0x2348b03a0",
+        "mnemonic": "ldrsw",
+        "opStr": "x8, [x8, #0xac8]"
+      },
+      {
+        "address": "0x2348b03a4",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x19, x8]"
+      },
+      {
+        "address": "0x2348b03a8",
+        "mnemonic": "str",
+        "opStr": "x0, [x19, x8]"
+      },
+      {
+        "address": "0x2348b03ac",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b77a0",
+        "target_symbol": "0x2390b77a0"
+      },
+      {
+        "address": "0x2348b03b0",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348b03b4",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348b03b8",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348b03bc",
+        "mnemonic": "add",
+        "opStr": "sp, sp, #0x30"
+      },
+      {
+        "address": "0x2348b03c0",
+        "mnemonic": "retab",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      127,
+      35,
+      3,
+      213,
+      255,
+      131,
+      5,
+      209,
+      252,
+      111,
+      16,
+      169,
+      250,
+      103,
+      17,
+      169,
+      248,
+      95,
+      18,
+      169,
+      246,
+      87,
+      19,
+      169,
+      244,
+      79,
+      20,
+      169,
+      253,
+      123,
+      21,
+      169,
+      253,
+      67,
+      5,
+      145,
+      168,
+      77,
+      44,
+      208,
+      8,
+      125,
+      65,
+      249,
+      8,
+      1,
+      64,
+      249,
+      168,
+      3,
+      26,
+      248,
+      255,
+      29,
+      32,
+      149,
+      246,
+      3,
+      0,
+      170,
+      104,
+      71,
+      44,
+      208,
+      19,
+      141,
+      69,
+      249,
+      143,
+      221,
+      27,
+      148,
+      66,
+      29,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      52,
+      60,
+      28,
+      148,
+      226,
+      3,
+      0,
+      170,
+      224,
+      3,
+      19,
+      170,
+      113,
+      5,
+      28,
+      148,
+      60,
+      29,
+      32,
+      149,
+      224,
+      11,
+      0,
+      249,
+      162,
+      29,
+      32,
+      149,
+      0,
+      228,
+      0,
+      111,
+      224,
+      131,
+      2,
+      173,
+      224,
+      131,
+      1,
+      173,
+      224,
+      3,
+      22,
+      170,
+      129,
+      221,
+      27,
+      148,
+      52,
+      29,
+      32,
+      149,
+      243,
+      3,
+      0,
+      170,
+      226,
+      195,
+      0,
+      145,
+      227,
+      195,
+      1,
+      145,
+      4,
+      2,
+      128,
+      82,
+      83,
+      60,
+      28,
+      148,
+      249,
+      3,
+      0,
+      170,
+      0,
+      15,
+      0,
+      180,
+      246,
+      7,
+      0,
+      249,
+      20,
+      0,
+      128,
+      210,
+      23,
+      0,
+      128,
+      210,
+      255,
+      19,
+      0,
+      249,
+      232,
+      35,
+      64,
+      249,
+      24,
+      1,
+      64,
+      249,
+      232,
+      126,
+      44,
+      240,
+      8,
+      1,
+      57,
+      145,
+      233,
+      126,
+      44,
+      240,
+      41,
+      33,
+      57,
+      145,
+      26,
+      1,
+      64,
+      249,
+      59,
+      1,
+      64,
+      249,
+      232,
+      126,
+      44,
+      240,
+      8,
+      65,
+      61,
+      145,
+      8,
+      1,
+      64,
+      249,
+      232,
+      15,
+      0,
+      249,
+      243,
+      23,
+      0,
+      249,
+      28,
+      0,
+      128,
+      210,
+      232,
+      35,
+      64,
+      249,
+      8,
+      1,
+      64,
+      249,
+      31,
+      1,
+      24,
+      235,
+      96,
+      0,
+      0,
+      84,
+      224,
+      23,
+      64,
+      249,
+      45,
+      29,
+      32,
+      149,
+      232,
+      31,
+      64,
+      249,
+      19,
+      121,
+      124,
+      248,
+      224,
+      3,
+      19,
+      170,
+      205,
+      139,
+      29,
+      148,
+      16,
+      29,
+      32,
+      149,
+      246,
+      3,
+      0,
+      170,
+      226,
+      3,
+      26,
+      170,
+      233,
+      240,
+      28,
+      148,
+      245,
+      3,
+      0,
+      170,
+      123,
+      29,
+      32,
+      149,
+      181,
+      0,
+      0,
+      52,
+      189,
+      29,
+      32,
+      149,
+      245,
+      3,
+      0,
+      170,
+      123,
+      29,
+      32,
+      149,
+      247,
+      3,
+      21,
+      170,
+      224,
+      3,
+      19,
+      170,
+      192,
+      139,
+      29,
+      148,
+      3,
+      29,
+      32,
+      149,
+      245,
+      3,
+      0,
+      170,
+      226,
+      3,
+      27,
+      170,
+      220,
+      240,
+      28,
+      148,
+      246,
+      3,
+      0,
+      170,
+      106,
+      29,
+      32,
+      149,
+      182,
+      0,
+      0,
+      52,
+      176,
+      29,
+      32,
+      149,
+      246,
+      3,
+      20,
+      170,
+      244,
+      3,
+      0,
+      170,
+      28,
+      0,
+      0,
+      20,
+      224,
+      3,
+      19,
+      170,
+      179,
+      139,
+      29,
+      148,
+      246,
+      28,
+      32,
+      149,
+      245,
+      3,
+      0,
+      170,
+      226,
+      15,
+      64,
+      249,
+      207,
+      240,
+      28,
+      148,
+      246,
+      3,
+      0,
+      170,
+      93,
+      29,
+      32,
+      149,
+      182,
+      0,
+      0,
+      52,
+      163,
+      29,
+      32,
+      149,
+      246,
+      19,
+      64,
+      249,
+      224,
+      19,
+      0,
+      249,
+      15,
+      0,
+      0,
+      20,
+      8,
+      77,
+      44,
+      240,
+      0,
+      245,
+      68,
+      249,
+      201,
+      28,
+      32,
+      149,
+      226,
+      3,
+      19,
+      170,
+      3,
+      0,
+      128,
+      210,
+      226,
+      202,
+      28,
+      148,
+      246,
+      3,
+      0,
+      170,
+      224,
+      3,
+      19,
+      170,
+      79,
+      68,
+      28,
+      148,
+      224,
+      3,
+      22,
+      170,
+      165,
+      247,
+      29,
+      148,
+      224,
+      11,
+      64,
+      249,
+      226,
+      3,
+      22,
+      170,
+      218,
+      233,
+      27,
+      148,
+      77,
+      29,
+      32,
+      149,
+      156,
+      7,
+      0,
+      145,
+      63,
+      3,
+      28,
+      235,
+      1,
+      248,
+      255,
+      84,
+      226,
+      195,
+      0,
+      145,
+      227,
+      195,
+      1,
+      145,
+      243,
+      23,
+      64,
+      249,
+      224,
+      3,
+      19,
+      170,
+      4,
+      2,
+      128,
+      82,
+      248,
+      59,
+      28,
+      148,
+      249,
+      3,
+      0,
+      170,
+      224,
+      246,
+      255,
+      181,
+      49,
+      29,
+      32,
+      149,
+      247,
+      3,
+      0,
+      180,
+      246,
+      7,
+      64,
+      249,
+      249,
+      19,
+      64,
+      249,
+      148,
+      1,
+      0,
+      180,
+      8,
+      77,
+      44,
+      240,
+      0,
+      245,
+      68,
+      249,
+      170,
+      28,
+      32,
+      149,
+      226,
+      3,
+      20,
+      170,
+      227,
+      3,
+      23,
+      170,
+      195,
+      202,
+      28,
+      148,
+      243,
+      3,
+      0,
+      170,
+      224,
+      11,
+      64,
+      249,
+      226,
+      3,
+      19,
+      170,
+      191,
+      233,
+      27,
+      148,
+      34,
+      29,
+      32,
+      149,
+      89,
+      2,
+      0,
+      180,
+      8,
+      77,
+      44,
+      240,
+      0,
+      245,
+      68,
+      249,
+      158,
+      28,
+      32,
+      149,
+      226,
+      3,
+      25,
+      170,
+      227,
+      3,
+      23,
+      170,
+      183,
+      202,
+      28,
+      148,
+      243,
+      3,
+      0,
+      170,
+      224,
+      11,
+      64,
+      249,
+      226,
+      3,
+      19,
+      170,
+      179,
+      233,
+      27,
+      148,
+      3,
+      0,
+      0,
+      20,
+      23,
+      0,
+      128,
+      210,
+      20,
+      0,
+      128,
+      210,
+      19,
+      29,
+      32,
+      149,
+      3,
+      0,
+      0,
+      20,
+      246,
+      7,
+      64,
+      249,
+      249,
+      19,
+      64,
+      249,
+      8,
+      77,
+      44,
+      240,
+      0,
+      241,
+      68,
+      249,
+      228,
+      211,
+      49,
+      208,
+      132,
+      224,
+      33,
+      145,
+      248,
+      11,
+      64,
+      249,
+      226,
+      3,
+      24,
+      170,
+      3,
+      0,
+      128,
+      210,
+      148,
+      124,
+      30,
+      148,
+      167,
+      28,
+      32,
+      149,
+      245,
+      3,
+      0,
+      170,
+      129,
+      72,
+      29,
+      148,
+      164,
+      28,
+      32,
+      149,
+      243,
+      3,
+      0,
+      170,
+      14,
+      29,
+      32,
+      149,
+      9,
+      29,
+      32,
+      149,
+      20,
+      29,
+      32,
+      149,
+      27,
+      29,
+      32,
+      149,
+      22,
+      29,
+      32,
+      149,
+      13,
+      29,
+      32,
+      149,
+      168,
+      3,
+      90,
+      248,
+      169,
+      77,
+      44,
+      208,
+      41,
+      125,
+      65,
+      249,
+      41,
+      1,
+      64,
+      249,
+      63,
+      1,
+      8,
+      235,
+      193,
+      1,
+      0,
+      84,
+      224,
+      3,
+      19,
+      170,
+      253,
+      123,
+      85,
+      169,
+      244,
+      79,
+      84,
+      169,
+      246,
+      87,
+      83,
+      169,
+      248,
+      95,
+      82,
+      169,
+      250,
+      103,
+      81,
+      169,
+      252,
+      111,
+      80,
+      169,
+      255,
+      131,
+      5,
+      145,
+      255,
+      35,
+      3,
+      213,
+      208,
+      7,
+      30,
+      202,
+      80,
+      0,
+      240,
+      182,
+      32,
+      142,
+      56,
+      212,
+      130,
+      28,
+      32,
+      21,
+      137,
+      26,
+      32,
+      149,
+      127,
+      35,
+      3,
+      213,
+      255,
+      195,
+      0,
+      209,
+      244,
+      79,
+      1,
+      169,
+      253,
+      123,
+      2,
+      169,
+      253,
+      131,
+      0,
+      145,
+      72,
+      130,
+      44,
+      240,
+      8,
+      149,
+      70,
+      249,
+      224,
+      35,
+      0,
+      169,
+      136,
+      249,
+      237,
+      240,
+      1,
+      21,
+      31,
+      145,
+      224,
+      3,
+      0,
+      145,
+      181,
+      28,
+      32,
+      149,
+      243,
+      3,
+      0,
+      170,
+      96,
+      2,
+      0,
+      180,
+      8,
+      77,
+      44,
+      240,
+      0,
+      1,
+      69,
+      249,
+      92,
+      28,
+      32,
+      149,
+      136,
+      217,
+      46,
+      208,
+      8,
+      197,
+      138,
+      185,
+      105,
+      106,
+      104,
+      248,
+      96,
+      106,
+      40,
+      248,
+      7,
+      29,
+      32,
+      149,
+      104,
+      71,
+      44,
+      208,
+      0,
+      153,
+      69,
+      249,
+      34,
+      3,
+      128,
+      82,
+      163,
+      82,
+      28,
+      148,
+      110,
+      28,
+      32,
+      149,
+      136,
+      217,
+      46,
+      208,
+      8,
+      201,
+      138,
+      185,
+      105,
+      106,
+      104,
+      248,
+      96,
+      106,
+      40,
+      248,
+      253,
+      28,
+      32,
+      149,
+      224,
+      3,
+      19,
+      170,
+      253,
+      123,
+      66,
+      169,
+      244,
+      79,
+      65,
+      169,
+      255,
+      195,
+      0,
+      145,
+      255,
+      15,
+      95,
+      214
+    ]
+  },
+  {
+    "class": "SBTraitsOrientationDefaultResolutionPolicySpecifier",
+    "selector": "updateStageParticipantsResolutionPolicies:context:",
+    "address": "0x2348af894",
+    "module": "SpringBoard",
+    "instructions": [
+      {
+        "address": "0x2348af894",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x2348af898",
+        "mnemonic": "sub",
+        "opStr": "sp, sp, #0x160"
+      },
+      {
+        "address": "0x2348af89c",
+        "mnemonic": "stp",
+        "opStr": "x28, x27, [sp, #0x100]"
+      },
+      {
+        "address": "0x2348af8a0",
+        "mnemonic": "stp",
+        "opStr": "x26, x25, [sp, #0x110]"
+      },
+      {
+        "address": "0x2348af8a4",
+        "mnemonic": "stp",
+        "opStr": "x24, x23, [sp, #0x120]"
+      },
+      {
+        "address": "0x2348af8a8",
+        "mnemonic": "stp",
+        "opStr": "x22, x21, [sp, #0x130]"
+      },
+      {
+        "address": "0x2348af8ac",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x140]"
+      },
+      {
+        "address": "0x2348af8b0",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x150]"
+      },
+      {
+        "address": "0x2348af8b4",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x150"
+      },
+      {
+        "address": "0x2348af8b8",
+        "mnemonic": "mov",
+        "opStr": "x21, x3"
+      },
+      {
+        "address": "0x2348af8bc",
+        "mnemonic": "mov",
+        "opStr": "x19, x1"
+      },
+      {
+        "address": "0x2348af8c0",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348af8c4",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x28d266000"
+      },
+      {
+        "address": "0x2348af8c8",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8, #0x2f8]"
+      },
+      {
+        "address": "0x2348af8cc",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x2348af8d0",
+        "mnemonic": "stur",
+        "opStr": "x8, [x29, #-0x60]"
+      },
+      {
+        "address": "0x2348af8d4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7830",
+        "target_symbol": "0x2390b7830"
+      },
+      {
+        "address": "0x2348af8d8",
+        "mnemonic": "mov",
+        "opStr": "x23, x0"
+      },
+      {
+        "address": "0x2348af8dc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7850",
+        "target_symbol": "0x2390b7850"
+      },
+      {
+        "address": "0x2348af8e0",
+        "mnemonic": "str",
+        "opStr": "x0, [sp, #8]"
+      },
+      {
+        "address": "0x2348af8e4",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x2923e2000"
+      },
+      {
+        "address": "0x2348af8e8",
+        "mnemonic": "ldrsw",
+        "opStr": "x22, [x8, #0xac0]"
+      },
+      {
+        "address": "0x2348af8ec",
+        "mnemonic": "add",
+        "opStr": "x0, x20, x22"
+      },
+      {
+        "address": "0x2348af8f0",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7610",
+        "target_symbol": "0x2390b7610"
+      },
+      {
+        "address": "0x2348af8f4",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x2348af8f8",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7700",
+        "target_symbol": "0x2390b7700"
+      },
+      {
+        "address": "0x2348af8fc",
+        "mnemonic": "cbz",
+        "opStr": "x21, #0x2348afb90"
+      },
+      {
+        "address": "0x2348af900",
+        "mnemonic": "add",
+        "opStr": "x0, x20, x22"
+      },
+      {
+        "address": "0x2348af904",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7610",
+        "target_symbol": "0x2390b7610"
+      },
+      {
+        "address": "0x2348af908",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348af90c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc2ea0",
+        "target_symbol": "0x234fc2ea0 SpringBoard!objc_msgSend$defaultKeyboardFocusDrivenRoles"
+      },
+      {
+        "address": "0x2348af910",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af914",
+        "mnemonic": "str",
+        "opStr": "x0, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348af918",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348af91c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc2b80",
+        "target_symbol": "0x234fc2b80 SpringBoard!objc_msgSend$defaultDeviceOrientationDrivenRoles"
+      },
+      {
+        "address": "0x2348af920",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af924",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x2348af928",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348af92c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc2900",
+        "target_symbol": "0x234fc2900 SpringBoard!objc_msgSend$defaultActiveOrientationBelowDrivenRoles"
+      },
+      {
+        "address": "0x2348af930",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af934",
+        "mnemonic": "str",
+        "opStr": "x0, [sp, #0x28]"
+      },
+      {
+        "address": "0x2348af938",
+        "mnemonic": "str",
+        "opStr": "x19, [sp]"
+      },
+      {
+        "address": "0x2348af93c",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348af940",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc30c0",
+        "target_symbol": "0x234fc30c0 SpringBoard!objc_msgSend$defaultOtherParticipantDrivenRoles"
+      },
+      {
+        "address": "0x2348af944",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af948",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348af94c",
+        "mnemonic": "movi",
+        "opStr": "v0.2d, #0000000000000000"
+      },
+      {
+        "address": "0x2348af950",
+        "mnemonic": "stp",
+        "opStr": "q0, q0, [sp, #0x30]"
+      },
+      {
+        "address": "0x2348af954",
+        "mnemonic": "stp",
+        "opStr": "q0, q0, [sp, #0x50]"
+      },
+      {
+        "address": "0x2348af958",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7870",
+        "target_symbol": "0x2390b7870"
+      },
+      {
+        "address": "0x2348af95c",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x2348af960",
+        "mnemonic": "add",
+        "opStr": "x2, sp, #0x30"
+      },
+      {
+        "address": "0x2348af964",
+        "mnemonic": "add",
+        "opStr": "x3, sp, #0x70"
+      },
+      {
+        "address": "0x2348af968",
+        "mnemonic": "mov",
+        "opStr": "w4, #0x10"
+      },
+      {
+        "address": "0x2348af96c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbf1e0",
+        "target_symbol": "0x234fbf1e0 SpringBoard!objc_msgSend$countByEnumeratingWithState:objects:count:"
+      },
+      {
+        "address": "0x2348af970",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x2348afb28"
+      },
+      {
+        "address": "0x2348af974",
+        "mnemonic": "mov",
+        "opStr": "x26, x0"
+      },
+      {
+        "address": "0x2348af978",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x40]"
+      },
+      {
+        "address": "0x2348af97c",
+        "mnemonic": "ldr",
+        "opStr": "x21, [x8]"
+      },
+      {
+        "address": "0x2348af980",
+        "mnemonic": "adrp",
+        "opStr": "x24, #0x28d253000"
+      },
+      {
+        "address": "0x2348af984",
+        "mnemonic": "stp",
+        "opStr": "x25, x22, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348af988",
+        "mnemonic": "mov",
+        "opStr": "x23, #0"
+      },
+      {
+        "address": "0x2348af98c",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x40]"
+      },
+      {
+        "address": "0x2348af990",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x2348af994",
+        "mnemonic": "cmp",
+        "opStr": "x8, x21"
+      },
+      {
+        "address": "0x2348af998",
+        "mnemonic": "b.eq",
+        "opStr": "#0x2348af9a4"
+      },
+      {
+        "address": "0x2348af99c",
+        "mnemonic": "mov",
+        "opStr": "x0, x25"
+      },
+      {
+        "address": "0x2348af9a0",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b75b0",
+        "target_symbol": "0x2390b75b0"
+      },
+      {
+        "address": "0x2348af9a4",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x38]"
+      },
+      {
+        "address": "0x2348af9a8",
+        "mnemonic": "ldr",
+        "opStr": "x28, [x8, x23, lsl #3]"
+      },
+      {
+        "address": "0x2348af9ac",
+        "mnemonic": "mov",
+        "opStr": "x0, x28"
+      },
+      {
+        "address": "0x2348af9b0",
+        "mnemonic": "bl",
+        "opStr": "#0x235013040",
+        "target_symbol": "0x235013040 SpringBoard!objc_msgSend$role"
+      },
+      {
+        "address": "0x2348af9b4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af9b8",
+        "mnemonic": "mov",
+        "opStr": "x27, x0"
+      },
+      {
+        "address": "0x2348af9bc",
+        "mnemonic": "mov",
+        "opStr": "x0, x22"
+      },
+      {
+        "address": "0x2348af9c0",
+        "mnemonic": "mov",
+        "opStr": "x2, x27"
+      },
+      {
+        "address": "0x2348af9c4",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbcca0",
+        "target_symbol": "0x234fbcca0 SpringBoard!objc_msgSend$containsObject:"
+      },
+      {
+        "address": "0x2348af9c8",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x2348af9dc"
+      },
+      {
+        "address": "0x2348af9cc",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x24, #0x9d8]"
+      },
+      {
+        "address": "0x2348af9d0",
+        "mnemonic": "bl",
+        "opStr": "#0x235011fa0",
+        "target_symbol": "0x235011fa0 SpringBoard!objc_msgSend$resolutionPolicyInfoDeviceOrientation"
+      },
+      {
+        "address": "0x2348af9d4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af9d8",
+        "mnemonic": "b",
+        "opStr": "#0x2348af9f8",
+        "target_symbol": "0x2348af9f8 SpringBoard!-[SBTraitsOrientationDefaultResolutionPolicySpecifier updateStageParticipantsResolutionPolicies:context:]"
+      },
+      {
+        "address": "0x2348af9dc",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #0x28]"
+      },
+      {
+        "address": "0x2348af9e0",
+        "mnemonic": "mov",
+        "opStr": "x2, x27"
+      },
+      {
+        "address": "0x2348af9e4",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbcca0",
+        "target_symbol": "0x234fbcca0 SpringBoard!objc_msgSend$containsObject:"
+      },
+      {
+        "address": "0x2348af9e8",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x2348afa00"
+      },
+      {
+        "address": "0x2348af9ec",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x24, #0x9d8]"
+      },
+      {
+        "address": "0x2348af9f0",
+        "mnemonic": "bl",
+        "opStr": "#0x235012060",
+        "target_symbol": "0x235012060 SpringBoard!objc_msgSend$resolutionPolicyInfoOrientationBelow"
+      },
+      {
+        "address": "0x2348af9f4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348af9f8",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348af9fc",
+        "mnemonic": "b",
+        "opStr": "#0x2348afaec",
+        "target_symbol": "0x2348afaec SpringBoard!-[SBTraitsOrientationDefaultResolutionPolicySpecifier updateStageParticipantsResolutionPolicies:context:]"
+      },
+      {
+        "address": "0x2348afa00",
+        "mnemonic": "mov",
+        "opStr": "x22, x24"
+      },
+      {
+        "address": "0x2348afa04",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348afa08",
+        "mnemonic": "mov",
+        "opStr": "x2, x27"
+      },
+      {
+        "address": "0x2348afa0c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbcca0",
+        "target_symbol": "0x234fbcca0 SpringBoard!objc_msgSend$containsObject:"
+      },
+      {
+        "address": "0x2348afa10",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x2348afa60"
+      },
+      {
+        "address": "0x2348afa14",
+        "mnemonic": "mov",
+        "opStr": "x24, x19"
+      },
+      {
+        "address": "0x2348afa18",
+        "mnemonic": "ldr",
+        "opStr": "x0, [sp, #8]"
+      },
+      {
+        "address": "0x2348afa1c",
+        "mnemonic": "bl",
+        "opStr": "#0x235052fa0",
+        "target_symbol": "0x235052fa0 SpringBoard!objc_msgSend$validatedInputs"
+      },
+      {
+        "address": "0x2348afa20",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afa24",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348afa28",
+        "mnemonic": "bl",
+        "opStr": "#0x234ff3860",
+        "target_symbol": "0x234ff3860 SpringBoard!objc_msgSend$keyboardInputs"
+      },
+      {
+        "address": "0x2348afa2c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afa30",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x2348afa34",
+        "mnemonic": "bl",
+        "opStr": "#0x234fd0c20",
+        "target_symbol": "0x234fd0c20 SpringBoard!objc_msgSend$focusedParticipantUniqueIdentifier"
+      },
+      {
+        "address": "0x2348afa38",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afa3c",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2348afa40",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x2348afa44",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76f0",
+        "target_symbol": "0x2390b76f0"
+      },
+      {
+        "address": "0x2348afa48",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x22, #0x9d8]"
+      },
+      {
+        "address": "0x2348afa4c",
+        "mnemonic": "cbz",
+        "opStr": "x19, #0x2348afab8"
+      },
+      {
+        "address": "0x2348afa50",
+        "mnemonic": "mov",
+        "opStr": "x2, x19"
+      },
+      {
+        "address": "0x2348afa54",
+        "mnemonic": "bl",
+        "opStr": "#0x235012020",
+        "target_symbol": "0x235012020 SpringBoard!objc_msgSend$resolutionPolicyInfoForAssociatedParticipantWithUniqueID:"
+      },
+      {
+        "address": "0x2348afa58",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afa5c",
+        "mnemonic": "b",
+        "opStr": "#0x2348afac0",
+        "target_symbol": "0x2348afac0 SpringBoard!-[SBTraitsOrientationDefaultResolutionPolicySpecifier updateStageParticipantsResolutionPolicies:context:]"
+      },
+      {
+        "address": "0x2348afa60",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348afa64",
+        "mnemonic": "mov",
+        "opStr": "x2, x27"
+      },
+      {
+        "address": "0x2348afa68",
+        "mnemonic": "bl",
+        "opStr": "#0x234fff4e0",
+        "target_symbol": "0x234fff4e0 SpringBoard!objc_msgSend$objectForKey:"
+      },
+      {
+        "address": "0x2348afa6c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afa70",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348afa74",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76f0",
+        "target_symbol": "0x2390b76f0"
+      },
+      {
+        "address": "0x2348afa78",
+        "mnemonic": "mov",
+        "opStr": "x24, x19"
+      },
+      {
+        "address": "0x2348afa7c",
+        "mnemonic": "ldr",
+        "opStr": "x19, [x22, #0x9d8]"
+      },
+      {
+        "address": "0x2348afa80",
+        "mnemonic": "cbz",
+        "opStr": "x20, #0x2348afad0"
+      },
+      {
+        "address": "0x2348afa84",
+        "mnemonic": "mov",
+        "opStr": "x0, x24"
+      },
+      {
+        "address": "0x2348afa88",
+        "mnemonic": "mov",
+        "opStr": "x2, x27"
+      },
+      {
+        "address": "0x2348afa8c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fff4e0",
+        "target_symbol": "0x234fff4e0 SpringBoard!objc_msgSend$objectForKey:"
+      },
+      {
+        "address": "0x2348afa90",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afa94",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x2348afa98",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348afa9c",
+        "mnemonic": "mov",
+        "opStr": "x2, x25"
+      },
+      {
+        "address": "0x2348afaa0",
+        "mnemonic": "bl",
+        "opStr": "#0x235012000",
+        "target_symbol": "0x235012000 SpringBoard!objc_msgSend$resolutionPolicyInfoForAssociatedParticipantWithRole:"
+      },
+      {
+        "address": "0x2348afaa4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afaa8",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348afaac",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x2348afab0",
+        "mnemonic": "ldr",
+        "opStr": "x25, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348afab4",
+        "mnemonic": "b",
+        "opStr": "#0x2348afae0",
+        "target_symbol": "0x2348afae0 SpringBoard!-[SBTraitsOrientationDefaultResolutionPolicySpecifier updateStageParticipantsResolutionPolicies:context:]"
+      },
+      {
+        "address": "0x2348afab8",
+        "mnemonic": "bl",
+        "opStr": "#0x235012060",
+        "target_symbol": "0x235012060 SpringBoard!objc_msgSend$resolutionPolicyInfoOrientationBelow"
+      },
+      {
+        "address": "0x2348afabc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afac0",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348afac4",
+        "mnemonic": "ldr",
+        "opStr": "x25, [sp, #0x10]"
+      },
+      {
+        "address": "0x2348afac8",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2348afacc",
+        "mnemonic": "b",
+        "opStr": "#0x2348afae0",
+        "target_symbol": "0x2348afae0 SpringBoard!-[SBTraitsOrientationDefaultResolutionPolicySpecifier updateStageParticipantsResolutionPolicies:context:]"
+      },
+      {
+        "address": "0x2348afad0",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x2348afad4",
+        "mnemonic": "bl",
+        "opStr": "#0x235012040",
+        "target_symbol": "0x235012040 SpringBoard!objc_msgSend$resolutionPolicyInfoIsolation"
+      },
+      {
+        "address": "0x2348afad8",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2348afadc",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2348afae0",
+        "mnemonic": "mov",
+        "opStr": "x19, x24"
+      },
+      {
+        "address": "0x2348afae4",
+        "mnemonic": "mov",
+        "opStr": "x24, x22"
+      },
+      {
+        "address": "0x2348afae8",
+        "mnemonic": "ldr",
+        "opStr": "x22, [sp, #0x18]"
+      },
+      {
+        "address": "0x2348afaec",
+        "mnemonic": "mov",
+        "opStr": "x0, x28"
+      },
+      {
+        "address": "0x2348afaf0",
+        "mnemonic": "mov",
+        "opStr": "x2, x20"
+      },
+      {
+        "address": "0x2348afaf4",
+        "mnemonic": "bl",
+        "opStr": "#0x23502e260",
+        "target_symbol": "0x23502e260 SpringBoard!objc_msgSend$setOrientationResolutionPolicyInfo:"
+      },
+      {
+        "address": "0x2348afaf8",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76f0",
+        "target_symbol": "0x2390b76f0"
+      },
+      {
+        "address": "0x2348afafc",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7760",
+        "target_symbol": "0x2390b7760"
+      },
+      {
+        "address": "0x2348afb00",
+        "mnemonic": "add",
+        "opStr": "x23, x23, #1"
+      },
+      {
+        "address": "0x2348afb04",
+        "mnemonic": "cmp",
+        "opStr": "x26, x23"
+      },
+      {
+        "address": "0x2348afb08",
+        "mnemonic": "b.ne",
+        "opStr": "#0x2348af98c"
+      },
+      {
+        "address": "0x2348afb0c",
+        "mnemonic": "add",
+        "opStr": "x2, sp, #0x30"
+      },
+      {
+        "address": "0x2348afb10",
+        "mnemonic": "add",
+        "opStr": "x3, sp, #0x70"
+      },
+      {
+        "address": "0x2348afb14",
+        "mnemonic": "mov",
+        "opStr": "x0, x25"
+      },
+      {
+        "address": "0x2348afb18",
+        "mnemonic": "mov",
+        "opStr": "w4, #0x10"
+      },
+      {
+        "address": "0x2348afb1c",
+        "mnemonic": "bl",
+        "opStr": "#0x234fbf1e0",
+        "target_symbol": "0x234fbf1e0 SpringBoard!objc_msgSend$countByEnumeratingWithState:objects:count:"
+      },
+      {
+        "address": "0x2348afb20",
+        "mnemonic": "mov",
+        "opStr": "x26, x0"
+      },
+      {
+        "address": "0x2348afb24",
+        "mnemonic": "cbnz",
+        "opStr": "x0, #0x2348af988"
+      },
+      {
+        "address": "0x2348afb28",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x2348afb2c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2348afb30",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x28]"
+      },
+      {
+        "address": "0x2348afb34",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7790",
+        "target_symbol": "0x2390b7790"
+      },
+      {
+        "address": "0x2348afb38",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7710",
+        "target_symbol": "0x2390b7710"
+      },
+      {
+        "address": "0x2348afb3c",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x20]"
+      },
+      {
+        "address": "0x2348afb40",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7790",
+        "target_symbol": "0x2390b7790"
+      },
+      {
+        "address": "0x2348afb44",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp]"
+      },
+      {
+        "address": "0x2348afb48",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7790",
+        "target_symbol": "0x2390b7790"
+      },
+      {
+        "address": "0x2348afb4c",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #8]"
+      },
+      {
+        "address": "0x2348afb50",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7790",
+        "target_symbol": "0x2390b7790"
+      },
+      {
+        "address": "0x2348afb54",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7740",
+        "target_symbol": "0x2390b7740"
+      },
+      {
+        "address": "0x2348afb58",
+        "mnemonic": "ldur",
+        "opStr": "x8, [x29, #-0x60]"
+      },
+      {
+        "address": "0x2348afb5c",
+        "mnemonic": "adrp",
+        "opStr": "x9, #0x28d266000"
+      },
+      {
+        "address": "0x2348afb60",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x9, #0x2f8]"
+      },
+      {
+        "address": "0x2348afb64",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x9]"
+      },
+      {
+        "address": "0x2348afb68",
+        "mnemonic": "cmp",
+        "opStr": "x9, x8"
+      },
+      {
+        "address": "0x2348afb6c",
+        "mnemonic": "b.ne",
+        "opStr": "#0x2348afba0"
+      },
+      {
+        "address": "0x2348afb70",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x150]"
+      },
+      {
+        "address": "0x2348afb74",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x140]"
+      },
+      {
+        "address": "0x2348afb78",
+        "mnemonic": "ldp",
+        "opStr": "x22, x21, [sp, #0x130]"
+      },
+      {
+        "address": "0x2348afb7c",
+        "mnemonic": "ldp",
+        "opStr": "x24, x23, [sp, #0x120]"
+      },
+      {
+        "address": "0x2348afb80",
+        "mnemonic": "ldp",
+        "opStr": "x26, x25, [sp, #0x110]"
+      },
+      {
+        "address": "0x2348afb84",
+        "mnemonic": "ldp",
+        "opStr": "x28, x27, [sp, #0x100]"
+      },
+      {
+        "address": "0x2348afb88",
+        "mnemonic": "add",
+        "opStr": "sp, sp, #0x160"
+      },
+      {
+        "address": "0x2348afb8c",
+        "mnemonic": "retab",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      127,
+      35,
+      3,
+      213,
+      255,
+      131,
+      5,
+      209,
+      252,
+      111,
+      16,
+      169,
+      250,
+      103,
+      17,
+      169,
+      248,
+      95,
+      18,
+      169,
+      246,
+      87,
+      19,
+      169,
+      244,
+      79,
+      20,
+      169,
+      253,
+      123,
+      21,
+      169,
+      253,
+      67,
+      5,
+      145,
+      245,
+      3,
+      3,
+      170,
+      243,
+      3,
+      1,
+      170,
+      244,
+      3,
+      0,
+      170,
+      168,
+      77,
+      44,
+      240,
+      8,
+      125,
+      65,
+      249,
+      8,
+      1,
+      64,
+      249,
+      168,
+      3,
+      26,
+      248,
+      215,
+      31,
+      32,
+      149,
+      247,
+      3,
+      0,
+      170,
+      221,
+      31,
+      32,
+      149,
+      224,
+      7,
+      0,
+      249,
+      136,
+      217,
+      46,
+      240,
+      22,
+      193,
+      138,
+      185,
+      128,
+      2,
+      22,
+      139,
+      72,
+      31,
+      32,
+      149,
+      245,
+      3,
+      0,
+      170,
+      130,
+      31,
+      32,
+      149,
+      181,
+      20,
+      0,
+      180,
+      128,
+      2,
+      22,
+      139,
+      67,
+      31,
+      32,
+      149,
+      243,
+      3,
+      0,
+      170,
+      101,
+      77,
+      28,
+      148,
+      16,
+      31,
+      32,
+      149,
+      224,
+      19,
+      0,
+      249,
+      224,
+      3,
+      19,
+      170,
+      153,
+      76,
+      28,
+      148,
+      12,
+      31,
+      32,
+      149,
+      246,
+      3,
+      0,
+      170,
+      224,
+      3,
+      19,
+      170,
+      245,
+      75,
+      28,
+      148,
+      8,
+      31,
+      32,
+      149,
+      224,
+      23,
+      0,
+      249,
+      243,
+      3,
+      0,
+      249,
+      224,
+      3,
+      19,
+      170,
+      224,
+      77,
+      28,
+      148,
+      3,
+      31,
+      32,
+      149,
+      243,
+      3,
+      0,
+      170,
+      0,
+      228,
+      0,
+      111,
+      224,
+      131,
+      1,
+      173,
+      224,
+      131,
+      2,
+      173,
+      198,
+      31,
+      32,
+      149,
+      249,
+      3,
+      0,
+      170,
+      226,
+      195,
+      0,
+      145,
+      227,
+      195,
+      1,
+      145,
+      4,
+      2,
+      128,
+      82,
+      29,
+      62,
+      28,
+      148,
+      192,
+      13,
+      0,
+      180,
+      250,
+      3,
+      0,
+      170,
+      232,
+      35,
+      64,
+      249,
+      21,
+      1,
+      64,
+      249,
+      56,
+      77,
+      44,
+      144,
+      249,
+      91,
+      1,
+      169,
+      23,
+      0,
+      128,
+      210,
+      232,
+      35,
+      64,
+      249,
+      8,
+      1,
+      64,
+      249,
+      31,
+      1,
+      21,
+      235,
+      96,
+      0,
+      0,
+      84,
+      224,
+      3,
+      25,
+      170,
+      4,
+      31,
+      32,
+      149,
+      232,
+      31,
+      64,
+      249,
+      28,
+      121,
+      119,
+      248,
+      224,
+      3,
+      28,
+      170,
+      164,
+      141,
+      29,
+      148,
+      231,
+      30,
+      32,
+      149,
+      251,
+      3,
+      0,
+      170,
+      224,
+      3,
+      22,
+      170,
+      226,
+      3,
+      27,
+      170,
+      183,
+      52,
+      28,
+      148,
+      160,
+      0,
+      0,
+      52,
+      0,
+      239,
+      68,
+      249,
+      116,
+      137,
+      29,
+      148,
+      223,
+      30,
+      32,
+      149,
+      8,
+      0,
+      0,
+      20,
+      224,
+      23,
+      64,
+      249,
+      226,
+      3,
+      27,
+      170,
+      175,
+      52,
+      28,
+      148,
+      192,
+      0,
+      0,
+      52,
+      0,
+      239,
+      68,
+      249,
+      156,
+      137,
+      29,
+      148,
+      215,
+      30,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      60,
+      0,
+      0,
+      20,
+      246,
+      3,
+      24,
+      170,
+      224,
+      19,
+      64,
+      249,
+      226,
+      3,
+      27,
+      170,
+      165,
+      52,
+      28,
+      148,
+      128,
+      2,
+      0,
+      52,
+      248,
+      3,
+      19,
+      170,
+      224,
+      7,
+      64,
+      249,
+      97,
+      141,
+      30,
+      148,
+      204,
+      30,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      142,
+      15,
+      29,
+      148,
+      201,
+      30,
+      32,
+      149,
+      249,
+      3,
+      0,
+      170,
+      123,
+      132,
+      28,
+      148,
+      198,
+      30,
+      32,
+      149,
+      243,
+      3,
+      0,
+      170,
+      64,
+      31,
+      32,
+      149,
+      43,
+      31,
+      32,
+      149,
+      192,
+      238,
+      68,
+      249,
+      115,
+      3,
+      0,
+      180,
+      226,
+      3,
+      19,
+      170,
+      115,
+      137,
+      29,
+      148,
+      190,
+      30,
+      32,
+      149,
+      25,
+      0,
+      0,
+      20,
+      224,
+      3,
+      19,
+      170,
+      226,
+      3,
+      27,
+      170,
+      158,
+      62,
+      29,
+      148,
+      185,
+      30,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      31,
+      31,
+      32,
+      149,
+      248,
+      3,
+      19,
+      170,
+      211,
+      238,
+      68,
+      249,
+      148,
+      2,
+      0,
+      180,
+      224,
+      3,
+      24,
+      170,
+      226,
+      3,
+      27,
+      170,
+      149,
+      62,
+      29,
+      148,
+      176,
+      30,
+      32,
+      149,
+      249,
+      3,
+      0,
+      170,
+      224,
+      3,
+      19,
+      170,
+      226,
+      3,
+      25,
+      170,
+      88,
+      137,
+      29,
+      148,
+      171,
+      30,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      37,
+      31,
+      32,
+      149,
+      249,
+      11,
+      64,
+      249,
+      11,
+      0,
+      0,
+      20,
+      106,
+      137,
+      29,
+      148,
+      165,
+      30,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      249,
+      11,
+      64,
+      249,
+      2,
+      31,
+      32,
+      149,
+      5,
+      0,
+      0,
+      20,
+      224,
+      3,
+      19,
+      170,
+      91,
+      137,
+      29,
+      148,
+      158,
+      30,
+      32,
+      149,
+      244,
+      3,
+      0,
+      170,
+      243,
+      3,
+      24,
+      170,
+      248,
+      3,
+      22,
+      170,
+      246,
+      15,
+      64,
+      249,
+      224,
+      3,
+      28,
+      170,
+      226,
+      3,
+      20,
+      170,
+      219,
+      249,
+      29,
+      148,
+      254,
+      30,
+      32,
+      149,
+      25,
+      31,
+      32,
+      149,
+      247,
+      6,
+      0,
+      145,
+      95,
+      3,
+      23,
+      235,
+      33,
+      244,
+      255,
+      84,
+      226,
+      195,
+      0,
+      145,
+      227,
+      195,
+      1,
+      145,
+      224,
+      3,
+      25,
+      170,
+      4,
+      2,
+      128,
+      82,
+      177,
+      61,
+      28,
+      148,
+      250,
+      3,
+      0,
+      170,
+      32,
+      243,
+      255,
+      181,
+      6,
+      31,
+      32,
+      149,
+      233,
+      30,
+      32,
+      149,
+      232,
+      23,
+      64,
+      249,
+      23,
+      31,
+      32,
+      149,
+      246,
+      30,
+      32,
+      149,
+      232,
+      19,
+      64,
+      249,
+      20,
+      31,
+      32,
+      149,
+      232,
+      3,
+      64,
+      249,
+      18,
+      31,
+      32,
+      149,
+      232,
+      7,
+      64,
+      249,
+      16,
+      31,
+      32,
+      149,
+      251,
+      30,
+      32,
+      149,
+      168,
+      3,
+      90,
+      248,
+      169,
+      77,
+      44,
+      240,
+      41,
+      125,
+      65,
+      249,
+      41,
+      1,
+      64,
+      249,
+      63,
+      1,
+      8,
+      235,
+      161,
+      1,
+      0,
+      84,
+      253,
+      123,
+      85,
+      169,
+      244,
+      79,
+      84,
+      169,
+      246,
+      87,
+      83,
+      169,
+      248,
+      95,
+      82,
+      169,
+      250,
+      103,
+      81,
+      169,
+      252,
+      111,
+      80,
+      169,
+      255,
+      131,
+      5,
+      145,
+      255,
+      15,
+      95,
+      214
+    ]
+  }
+]

@@ -1,0 +1,365 @@
+zsh scripts/build.sh
+=== Building vphone-cli (d5d179dd) ===
+warning: 'machokit': /Users/kolar/github/vphone-cli/.build/research-b35/source/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'source': dependency 'openssl-spm' is not used by any target
+warning: 'source': dependency 'openssl-spm' is not used by any target
+Building for production...
+[Computing dependencies]
+[Using on-disk description]
+[1 / 121]
+[4 / 46] vphone-helper-product
+[7 / 48] VPhoneLaunchpadKit
+[17 / 50] vphone-launchpad-product
+[23 / 57]
+[25 / 57] vphone-launchpad-launcher-product
+[27 / 57] vphone-launchpad-launcher-product
+[28 / 57] vphone-launchpad-launcher-product
+[29 / 57]
+[30 / 57] vphone-launchpad-product
+[32 / 57] vphone-launchpad-product
+[33 / 57] vphone-launchpad-product
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/FirmwarePatcher/Kernel/JBPatches/KernelJBPatchCredLabel.swift:72:33: warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#NoUsage]
+ 70 | 
+ 71 |         // 5. Recover csflags stack reload instruction bytes.
+ 72 |         guard let (csflagsInsn, csflagsDesc) = findCredLabelCSFlagsReload(funcOff: funcOff) else {
+    |                                 `- warning: immutable value 'csflagsDesc' was never used; consider replacing with '_' or removing it [#NoUsage]
+ 73 |             log("  [-] csflags stack reload (ldr x26, [x29, #imm]) not found")
+ 74 |             return .noMatch
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/FirmwarePatcher/Kernel/KernelEXPPatcher.swift:23:9: warning: no calls to throwing functions occur within 'try' expression [#UnnecessaryEffectMarker]
+21 | 
+22 |     public func findAll() throws -> [PatchRecord] {
+23 |         try parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression [#UnnecessaryEffectMarker]
+24 |         buildADRPIndex()
+25 |         buildBLIndex()
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression [#UnnecessaryEffectMarker]
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression [#UnnecessaryEffectMarker]
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+
+[#NoUsage]: <https://docs.swift.org/compiler/documentation/diagnostics/no-usage>
+[#UnnecessaryEffectMarker]: <https://docs.swift.org/compiler/documentation/diagnostics/unnecessary-effect-marker>
+[34 / 57] FirmwarePatcher
+[41 / 58] vphone-cli
+[52 / 79]
+[58 / 79]
+[61 / 79]
+[62 / 79]
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneAppDelegate.swift:296:41: warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+267 | 
+268 |             // Wire location toggle through onConnect/onDisconnect
+269 |             control.onConnect = { [weak mc, weak provider = locationProvider] caps in
+    |                                 |- note: 'self' implicitly strongly captured here
+    |                                 `- note: add 'self' as a capture list item to silence
+270 |                 mc?.updateConnectAvailability(available: true)
+271 |                 mc?.updateInstallAvailability(available: caps.contains("ipa_install"))
+    :
+294 |                 mc?.syncBatteryFromHost()
+295 |                 mc?.syncLowPowerModeFromHost()
+296 |                 Task { @MainActor [weak self] in
+    |                                         |- warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+    |                                         `- note: explicitly assign the capture list item to silence
+297 |                     await self?.installPackageIfRequested(caps: caps)
+298 |                 }
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneAppDelegate.swift:329:41: warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+314 |             // but not once the UDS surface owns the source, else every reconnect
+315 |             // would overwrite the externally injected fix with Mac forwarding.
+316 |             control.onConnect = { [weak provider = locationProvider] caps in
+    |                                 |- note: 'self' implicitly strongly captured here
+    |                                 `- note: add 'self' as a capture list item to silence
+317 |                 if caps.contains("location") {
+318 |                     if provider?.externallyControlled == true {
+    :
+327 |                     print("[location] guest does not support location simulation")
+328 |                 }
+329 |                 Task { @MainActor [weak self] in
+    |                                         |- warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+    |                                         `- note: explicitly assign the capture list item to silence
+330 |                     await self?.installPackageIfRequested(caps: caps)
+331 |                 }
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneAppDelegate.swift:431:78: warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+423 |             print("[vphone] graceful shutdown via guest power-off command over vsock")
+424 |             startGracefulTimeout()
+425 |             Task { @MainActor in
+    |                  |- note: 'self' implicitly strongly captured here
+    |                  `- note: add 'self' as a capture list item to silence
+426 |                 let api: (() async throws -> Bool)? = self.apiCanShutdown ? {
+427 |                     guard let session = self.apiSession else { return false }
+    :
+429 |                     return { if case let .object(fields) = reply { return fields["accepted"] == .bool(true) }; return false }()
+430 |                 } : nil
+431 |                 let request = VPhoneGuestShutdown(api: api, classic: { [weak self] in
+    |                                                                              |- warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+    |                                                                              `- note: explicitly assign the capture list item to silence
+432 |                     guard let self, !self.shutdownPlan.forceStopRequested else { return false }
+433 |                     return await self.control?.haltGuest() == true
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneAppDelegate.swift:434:37: warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+423 |             print("[vphone] graceful shutdown via guest power-off command over vsock")
+424 |             startGracefulTimeout()
+425 |             Task { @MainActor in
+    |                  |- note: 'self' implicitly strongly captured here
+    |                  `- note: add 'self' as a capture list item to silence
+426 |                 let api: (() async throws -> Bool)? = self.apiCanShutdown ? {
+427 |                     guard let session = self.apiSession else { return false }
+    :
+432 |                     guard let self, !self.shutdownPlan.forceStopRequested else { return false }
+433 |                     return await self.control?.haltGuest() == true
+434 |                 }, running: { [weak self] in self?.vm?.isRunning == true })
+    |                                     |- warning: 'weak' ownership of capture 'self' differs from implicitly-captured strong reference in outer scope [#ImplicitStrongCapture]
+    |                                     `- note: explicitly assign the capture list item to silence
+435 |                 let result = await request.request()
+436 |                 print("[vphone] guest shutdown request: \(result); awaiting VM stop")
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneControlChannel.swift:16:9: warning: result of call to 'fcntl' is unused [#NoUsage]
+14 |         var enabled: Int32 = 1
+15 |         setsockopt(fileDescriptor, SOL_SOCKET, SO_NOSIGPIPE, &enabled, socklen_t(MemoryLayout<Int32>.size))
+16 |         fcntl(fileDescriptor, F_SETFD, FD_CLOEXEC)
+   |         `- warning: result of call to 'fcntl' is unused [#NoUsage]
+17 |     }
+18 | 
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[#ImplicitStrongCapture]: <https://docs.swift.org/compiler/documentation/diagnostics/implicit-strong-capture>
+[#NoUsage]: <https://docs.swift.org/compiler/documentation/diagnostics/no-usage>
+[63 / 79] vphone-cli
+[71 / 81] vphone-vm-product
+[79 / 83] vphone-cli-product
+[80 / 83] vphone-vm-product
+[81 / 83] vphone-cli-product
+[82 / 83] vphone-vm-product
+Build complete! (85.10秒)
+=== Signing with entitlements ===
+.build/release/vphone-cli: replacing existing signature
+.build/release/vphone-vm: replacing existing signature
+  signed OK → .build/release/vphone-cli
+=== Bundling .build/vphone-cli.app ===
+.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+  bundled → .build/vphone-cli.app
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc  \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"d5d179dd"' \
+		-o /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest/vphoned unarchive.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m vphoned.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+=== Building vphoned (arm64, iphoneos) ===
+xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -Os -fobjc-arc -DLESS=1 \
+		-I. \
+		-Ivendor/libarchive \
+		-DVPHONED_BUILD_HASH='"d5d179dd"' \
+		-o /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/guest/vphoned-less unarchive.m vphoned_accessibility.m vphoned_apps.m vphoned_clipboard.m vphoned_devmode.m vphoned_files.m vphoned_hid.m vphoned_install.m vphoned_keychain.m vphoned_location.m vphoned_notify.m vphoned_protocol.m vphoned_settings.m vphoned_shell.m vphoned_url.m vphoned_vcam.m vphoned.m \
+		-larchive \
+		-lsqlite3 \
+		-framework Foundation \
+		-framework Security \
+		-framework CoreServices
+vphoned_vcam.m:130:28: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  130 |       (_Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                            ^~~~~~~~
+vphoned_vcam.m:133:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:154:46: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |                                              ^~~~~~~~
+vphoned_vcam.m:338:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  338 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:349:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_observe_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  349 |         (const _Atomic uint64_t *)&oh->seq, memory_order_acquire);
+      |                                    ^~~~~~~
+vphoned_vcam.m:389:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  389 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:399:36: warning: taking address of packed member 'seq' of class or structure 'vphoned_vcam_shm_header_t' may result in an unaligned pointer value [-Waddress-of-packed-member]
+  399 |         (const _Atomic uint64_t *)&hdr->seq, memory_order_acquire);
+      |                                    ^~~~~~~~
+vphoned_vcam.m:388:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  388 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:398:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  398 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:129:23: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  129 |   uint64_t prev_seq = atomic_load_explicit(
+      |                       ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:133:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  133 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:154:3: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  154 |   atomic_store_explicit((_Atomic uint64_t *)&hdr->seq, writing_seq + 1ull,
+      |   ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:142:31: note: expanded from macro 'atomic_store_explicit'
+  142 | #define atomic_store_explicit __c11_atomic_store
+      |                               ^
+vphoned_vcam.m:337:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  337 |     uint64_t seq_a = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+vphoned_vcam.m:348:22: warning: misaligned atomic operation may incur significant performance penalty; the expected alignment (8 bytes) exceeds the actual alignment (1 bytes) [-Watomic-alignment]
+  348 |     uint64_t seq_b = atomic_load_explicit(
+      |                      ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h:145:30: note: expanded from macro 'atomic_load_explicit'
+  145 | #define atomic_load_explicit __c11_atomic_load
+      |                              ^
+14 warnings generated.
+  built OK
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+=== Bundling runtime assets → .build/vphone-cli.app/Contents/Resources ===
+Guest payload metadata, entitlements and manifest checked; runtime not tested
+  bundled: scripts/ (patchers+resources), tools/, .tools/bin/{trustcache,insert_dylib}, guest-resources/, requirements.txt, debs.list, README.md, vphone-amfidont
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-cli
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-cli
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-vm
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/ldid
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/ldid
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/Frameworks/libcrypto.3.dylib: replacing existing signature
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/Frameworks/libplist-2.0.4.dylib: replacing existing signature
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/ldid: replacing existing signature
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-vm: replacing existing signature
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/Resources/.tools/bin/insert_dylib: replacing existing signature
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/Resources/.tools/bin/trustcache: replacing existing signature
+/Users/kolar/github/vphone-cli/.build/research-b35/source/.build/vphone-cli.app/Contents/MacOS/vphone-cli: replacing existing signature
+Portable host Mach-O closure verified: 7 signed images
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/.build/research-b35/source/scripts/record_build_dependencies.py", line 24, in <module>
+    'swift': output('swift', '--version'),
+             ~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kolar/github/vphone-cli/.build/research-b35/source/scripts/record_build_dependencies.py", line 17, in output
+    return subprocess.check_output(args, cwd=root, text=True, stderr=subprocess.STDOUT).strip()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '('swift', '--version')' returned non-zero exit status 1.
+make: *** [bundle] Error 1

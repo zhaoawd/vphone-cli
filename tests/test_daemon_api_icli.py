@@ -48,6 +48,20 @@ SKIP = checkout_state()
 
 @unittest.skipIf(SKIP, SKIP or '')
 class DaemonAPIIcliArchiveTests(unittest.TestCase):
+    def test_roothide_launchd_paths_and_repeated_preparation(self):
+        with tempfile.TemporaryDirectory(prefix='icli-launchd-paths-') as temporary:
+            work = Path(temporary)
+            binary = work / 'paths'
+            sources = [ICLI / 'Sources/IcliSystem/LaunchdPlistPaths.swift',
+                       ICLI / 'Tests/LaunchdPlistPaths/main.swift']
+            compiled = subprocess.run(['xcrun', 'swiftc', '-swift-version', '6',
+                                      '-module-cache-path', str(work / 'modules'),
+                                      *map(str, sources), '-o', str(binary)],
+                                     capture_output=True, text=True)
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+            result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_utf8_names_and_mac_metadata_in_c_locale(self):
         with tempfile.TemporaryDirectory() as temporary:
             work = Path(temporary)

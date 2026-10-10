@@ -1,0 +1,421 @@
+{
+  "pid": 479,
+  "executable": "VPhoneB31Rotation",
+  "classes": [
+    {
+      "class": "FBSComponentScene",
+      "methods": [
+        "clientSettings"
+      ]
+    },
+    {
+      "class": "SBUIAccessorySceneManager",
+      "methods": [
+        "scene:didUpdateSettings:",
+        "_primarySceneDidUpdateSettings:transitionContext:"
+      ]
+    },
+    {
+      "class": "FBSOrientationObserverClient",
+      "methods": [
+        "_server:registerOrientationInterest:",
+        "activeInterfaceOrientation",
+        "activeInterfaceOrientationWithCompletion:",
+        "registerOrientationInterest:",
+        "activeOrientationDidUpdate:"
+      ]
+    },
+    {
+      "class": "FBSOrientationObserver",
+      "methods": [
+        "activeInterfaceOrientation",
+        "client:handleOrientationUpdate:",
+        "activeInterfaceOrientationWithCompletion:",
+        "handleOrientationResetForClient:"
+      ]
+    },
+    {
+      "class": "FBSOrientationUpdate",
+      "methods": [
+        "orientation",
+        "initWithOrientation:sequenceNumber:duration:rotationDirection:",
+        "setOrientation:"
+      ]
+    },
+    {
+      "class": "FBScene",
+      "methods": [
+        "ui_orientationHostSceneComponent",
+        "updateSettingsWithBlock:",
+        "scene:didUpdateSettings:",
+        "updateSettings:",
+        "currentInterfaceOrientation",
+        "clientSettings",
+        "uiClientSettings",
+        "updateSettingsWithTransitionBlock:",
+        "clientToken:didUpdateClientSettings:withDiff:transitionContext:",
+        "updateSettings:withTransitionContext:",
+        "updateSettings:withTransitionContext:completion:"
+      ]
+    },
+    {
+      "class": "FBLocalSynchronousSceneClientProvider",
+      "methods": [
+        "host:didUpdateSettings:withDiff:transitionContext:completion:",
+        "registerHost:settings:initialClientSettings:fromRemnant:error:",
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ]
+    },
+    {
+      "class": "FBSceneManager",
+      "methods": [
+        "_createSceneWithDefinition:settings:initialClientSettings:transitionContext:fromRemnant:usingClientProvider:completion:"
+      ]
+    },
+    {
+      "class": "FBSceneObserver",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+        "scene:willUpdateSettings:",
+        "scene:didUpdateSettings:",
+        "scene:willUpdateSettings:withTransitionContext:"
+      ]
+    },
+    {
+      "class": "FBSceneWorkspace",
+      "methods": [
+        "scene:willUpdateSettings:"
+      ]
+    },
+    {
+      "class": "FBInterfaceOrientationService",
+      "methods": [
+        "interfaceOrientation",
+        "setInterfaceOrientation:",
+        "setInterfaceOrientation:animationSettings:direction:"
+      ]
+    },
+    {
+      "class": "FBWorkspaceScene",
+      "methods": [
+        "initWithConnection:host:settings:clientSettings:fromRemnant:"
+      ]
+    },
+    {
+      "class": "FBUIApplicationWorkspaceScene",
+      "methods": [
+        "initWithConnection:host:settings:clientSettings:fromRemnant:"
+      ]
+    },
+    {
+      "class": "FBSceneRemnant",
+      "methods": [
+        "_clientSettings"
+      ]
+    },
+    {
+      "class": "FBSceneSnapshotContext",
+      "methods": [
+        "orientation",
+        "setClientSettings:",
+        "clientSettings"
+      ]
+    },
+    {
+      "class": "FBInterfaceOrientationServiceServer",
+      "methods": [
+        "registerOrientationInterest:completion:",
+        "noteInterfaceOrientationChanged:animationSettings:direction:",
+        "requestActiveOrientationCompletion:",
+        "requestActiveOrientation",
+        "_lock_noteInterfaceOrientationChanged:animationSettings:direction:",
+        "_lock_registerOrientationInterest:connection:completion:"
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettingsDiffInspector",
+      "methods": [
+        "observePreferredInterfaceOrientationWithBlock:"
+      ]
+    },
+    {
+      "class": "FBSSceneSettingsDiffInspector",
+      "methods": [
+        "observeInterfaceOrientationWithBlock:"
+      ]
+    },
+    {
+      "class": "FBSSceneObserver",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:didUpdateSettings:",
+        "clientSettings:"
+      ]
+    },
+    {
+      "class": "SBSUIStatusBarSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:"
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertSceneClientComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:",
+        "supportedInterfaceOrientations",
+        "shouldDisableOrientationUpdates"
+      ]
+    },
+    {
+      "class": "SBSUIIdleTimerSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ]
+    },
+    {
+      "class": "SBSUICameraOverlaySceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ]
+    },
+    {
+      "class": "SBSUIHomeScreenIconStyleSceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ]
+    },
+    {
+      "class": "FBSScene",
+      "methods": [
+        "uiAlwaysSupportsAllInterfaceOrientations",
+        "uiCanReceiveDeviceOrientationEvents",
+        "uiClientSettings",
+        "ui_orientationClientSceneComponent",
+        "updateUIClientSettingsWithBlock:",
+        "updateUIClientSettingsWithTransitionBlock:",
+        "updateClientSettingsWithBlock:",
+        "updateSettings:",
+        "clientSettings",
+        "updateClientSettings:",
+        "updateClientSettingsWithTransitionBlock:",
+        "_callOutQueue_ensureCoalesceClientSettingsUpdates:",
+        "_callOutQueue_maybeCoalesceClientSettingsUpdates:",
+        "_updateClientSettings:",
+        "updateClientSettings:withTransitionContext:",
+        "updater:didUpdateSettings:withDiff:transitionContext:completion:"
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettingsCore",
+      "methods": [
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:"
+      ]
+    },
+    {
+      "class": "FBSSceneSettingsCore",
+      "methods": [
+        "interfaceOrientation",
+        "setInterfaceOrientation:"
+      ]
+    },
+    {
+      "class": "FBSSceneSpecification",
+      "methods": [
+        "affectsScreenOrientation",
+        "clientSettingsClass"
+      ]
+    },
+    {
+      "class": "SBSUISystemNotesSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ]
+    },
+    {
+      "class": "SBSUILoginUISceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ]
+    },
+    {
+      "class": "SBSUIInCallSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ]
+    },
+    {
+      "class": "SBSUIStarkNotificationsSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ]
+    },
+    {
+      "class": "FBSSceneParameters",
+      "methods": [
+        "setClientSettings:",
+        "updateSettingsWithBlock:",
+        "clientSettings"
+      ]
+    },
+    {
+      "class": "FBSMutableSceneParameters",
+      "methods": [
+        "applyClientSettings:",
+        "updateClientSettingsWithBlock:",
+        "updateSettingsWithBlock:"
+      ]
+    },
+    {
+      "class": "FBSSceneEvent",
+      "methods": [
+        "clientSettingsDiff",
+        "setClientSettingsDiff:"
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettings",
+      "methods": [
+        "SBUISA_prefersFixedPortraitOrientation",
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:",
+        "interfaceOrientationLockPreference",
+        "setInterfaceOrientationLockPreference:",
+        "_uiApplicationSceneClientSettingsShim"
+      ]
+    },
+    {
+      "class": "FBSSceneSettings",
+      "methods": [
+        "interfaceOrientation",
+        "setInterfaceOrientation:",
+        "interfaceOrientationLockState",
+        "setInterfaceOrientationLockState:"
+      ]
+    },
+    {
+      "class": "FBSSceneTransitionContext",
+      "methods": [
+        "transientLocalClientSettings"
+      ]
+    },
+    {
+      "class": "FBSWorkspaceSceneRequestOptions",
+      "methods": [
+        "initialClientSettings",
+        "setInitialClientSettings:"
+      ]
+    },
+    {
+      "class": "FBSPseudoSceneUpdater",
+      "methods": [
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ]
+    },
+    {
+      "class": "FBSWorkspaceScenesClient",
+      "methods": [
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ]
+    },
+    {
+      "class": "UIWindowScene",
+      "methods": [
+        "interfaceOrientation",
+        "_windowsIgnoreSceneClientOrientation",
+        "_referenceBoundsForOrientation:",
+        "_interfaceOrientation",
+        "_updateClientSettingsToInterfaceOrientation:withAnimationDuration:",
+        "_canReceiveDeviceOrientationEvents",
+        "_completeGeometryUpdatesWithTransitionContext:",
+        "_currentlySupportedInterfaceOrientations",
+        "_interfaceOrientationForSupportedOrientations:preferredOrientation:",
+        "_orientationDebugDescription",
+        "_orientationDebugDescriptionBuilderWithMultilinePrefix:",
+        "_orientationDebugDescriptionWithMultilinePrefix:",
+        "_performIOSGeometryRequestWithPreferences:errorHandler:",
+        "_safeAreaCornerInsetsForInterfaceOrientation:",
+        "_safeAreaInsetsForInterfaceOrientation:",
+        "_shouldRotateSafeAreaInsetsToInterfaceOrientation",
+        "_updateEffectiveGeometryIfNeeded",
+        "_windowOrientationPreferencesObserver",
+        "effectiveGeometry",
+        "requestGeometryUpdateWithPreferences:errorHandler:"
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertScene",
+      "methods": [
+        "setOrientationChangedEventsDisabled:"
+      ]
+    },
+    {
+      "class": "UIApplication",
+      "methods": [
+        "_handleDeviceOrientationChangedEvent:",
+        "interfaceOrientation",
+        "activeInterfaceOrientation",
+        "alertInterfaceOrientation",
+        "noteActiveInterfaceOrientationWillChangeToOrientation:",
+        "supportedInterfaceOrientationsForWindow:",
+        "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:",
+        "noteActiveInterfaceOrientationWillChangeToOrientation:screen:",
+        "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:screen:",
+        "statusBarOrientation",
+        "_frontMostAppOrientation",
+        "_testOrientation:options:",
+        "statusBarHeightForOrientation:",
+        "_statusBarOrientationFollowsWindow:",
+        "setStatusBarOrientation:",
+        "_statusBarOrientationForWindow:",
+        "__queuedOrientationChange",
+        "__setQueuedOrientationChange:",
+        "_canReceiveDeviceOrientationEvents",
+        "_carefulChoiceOrientation",
+        "_carefulChoiceOrientationForWindow:",
+        "_createStatusBarIfNeededWithOrientation:forWindowScene:",
+        "_createStatusBarWithRequestedStyle:orientation:hidden:",
+        "_createStatusBarWithRequestedStyle:orientation:hidden:forWindowScene:",
+        "_currentExpectedInterfaceOrientation",
+        "_defaultSceneInterfaceOrientationReturningUnknownForNilScene:",
+        "_expectedViewOrientation",
+        "_fallbackInterfaceOrientationForSupportedOrientations:preferredOrientation:currentOrientation:",
+        "_findUISceneForLegacyInterfaceOrientation",
+        "_frontMostAppInterfaceOrientationIsSignificant",
+        "_getSpringBoardOrientation",
+        "_isOrientationVerticallyCompact:",
+        "_isStatusBarForcedHiddenForOrientation:",
+        "_isStatusBarHiddenForOrientation:",
+        "_isSupportedOrientation:",
+        "_safeInterfaceOrientationForNoWindow",
+        "_safeInterfaceOrientationForWindowIfExists:",
+        "_safeInterfaceOrientationForWindowIfExists:expectNonNilWindow:",
+        "_sceneInterfaceOrientationFromWindow:",
+        "_setExpectedViewOrientation:",
+        "_setStatusBarOrientation:",
+        "_setStatusBarOrientation:animated:",
+        "_setupStatusBarWithRequestedStyle:orientation:hidden:",
+        "_supportedInterfaceOrientationsForWindow:",
+        "_updateOrientation",
+        "_viewServiceIgnoresSceneForLegacyInterfaceOrientation:",
+        "runTestForKeyboardRotationWithName:fromOrientation:withShowKeyboardBlock:withExtraResultsBlock:withCleanupBlock:",
+        "setStatusBarOrientation:animated:",
+        "setStatusBarOrientation:animation:duration:",
+        "setStatusBarOrientation:animationParameters:",
+        "setStatusBarOrientation:fromOrientation:windowScene:animationParameters:updateBlock:",
+        "statusBarFrameForOrientation:",
+        "statusBarHeightForOrientation:ignoreHidden:",
+        "statusBarOrientationAnimationDuration"
+      ]
+    }
+  ]
+}

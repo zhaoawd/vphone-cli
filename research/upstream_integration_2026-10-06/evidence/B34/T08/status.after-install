@@ -1,0 +1,1462 @@
+Package: apt
+Status: install ok installed
+Priority: required
+Section: Packaging
+Installed-Size: 4224
+Maintainer: roothide <roothideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.6.0-2
+Replaces: apt1.8, apt1.4, libapt, libapt-pkg5.0, apt-lib, apt-key
+Provides: apt1.8 (= 1:0), apt-lib (= 1:0), libapt (=1:0), apt-key (= 1:0)
+Depends: roothide (>= 0.0.7), libiosexec1 (>= 1.3.1), libapt-pkg6.0 (= 2.6.0-2), libgnutls30, gpgv, dpkg (>= 1.19.0), coreutils, procursus-keyring
+Pre-Depends: dpkg (>= 1.14.25-8), system-cmds (>= 854.40.2-2)
+Conflicts: apt7 (<<1:0), apt1.4 (<<1:0), apt1.8, libapt-pkg5.0 (<<1:0), libapt (<<1:0), apt-key (<<1:0)
+Description: commandline package manager
+ This package provides commandline tools for searching and
+ managing as well as querying information about packages
+ as a low-level access to all features of the libapt-pkg library.
+
+Package: bash
+Status: install ok installed
+Priority: optional
+Section: Terminal_Support
+Installed-Size: 3828
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 5.2.15
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), grep, libncursesw6, libreadline8 (>= 8.2), sed, debianutils (>= 4.11.2)
+Pre-Depends: dash (>= 0.5.11.3-1), libreadline8 (>= 8.2), profile.d (>= 0-5), debianutils (>= 4.11.2)
+Description: the best shell ever written by Brian Fox
+Homepage: http://www.gnu.org/software/bash/
+
+Package: ca-certificates
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Installed-Size: 220
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: all
+Multi-Arch: foreign
+Version: 20231210
+Depends: roothide (>= 0.0.6)
+Description: Common CA certificates
+ Contains the certificate authorities shipped with Mozilla's browser to allow SSL-based applications to check for the authenticity of SSL connections.
+ .
+ Please note that Procursus can neither confirm nor deny whether the certificate authorities whose certificates are included in this package have in any way been audited for trustworthiness or RFC 3647 compliance. Full responsibility to assess them belongs to the local system administrator.
+
+Package: chariz-keyring
+Status: install ok installed
+Priority: optional
+Section: Keyrings
+Installed-Size: 4
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: all
+Version: 2021.07.18
+Replaces: procursus-keyring (<< 2020.05.09-1)
+Depends: roothide (>= 0.0.6)
+Conflicts: procursus-keyring (<< 2020.05.09-1)
+Description: GnuPG keys for the Chariz repository
+
+Package: coreutils
+Status: install ok installed
+Priority: standard
+Section: Utilities
+Installed-Size: 24652
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 9.3-1
+Replaces: netatalk (<= 2.0.3-6), coreutils-bin, shell-cmds (<< 207.40.1), text-cmds (<< 1:0), file-cmds (<< 272.250.1-1)
+Provides: md5sum, sha1sum, coreutils-bin (=9.3-1), dirname, kill, mktemp, su
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), sh, profile.d, libssl3, libintl8 (>= 0.20.0), libgmp10, libcrypt2
+Conflicts: coreutils-bin (<<1:0), shell-cmds (<< 207.40.1), text-cmds (<< 1:0), file-cmds (<< 272.250.1-1), system-cmds (<< 854.40.2-3)
+Description: GNU core utilities
+ This package contains the basic file, shell and text manipulation
+ utilities which are expected to exist on every operating system.
+ .
+ Specifically, this package includes: 
+ arch base64 basename cat chcon chgrp chmod chown chroot cksum comm cp
+ csplit cut date dd df dir dircolors dirname du echo env expand expr
+ factor false flock fmt fold groups head hostid id install join link ln
+ logname ls md5sum mkdir mkfifo mknod mktemp mv nice nl nohup nproc numfmt
+ od paste pathchk pinky pr printenv printf ptx pwd readlink realpath rm 
+ rmdir runcon sha*sum seq shred sleep sort split stat stty sum sync tac 
+ tail tee test timeout touch tr true truncate tsort tty uname unexpand 
+ uniq unlink users vdir wc who whoami yes
+Homepage: http://www.gnu.org/software/coreutils/
+
+Package: curl
+Status: install ok installed
+Priority: standard
+Section: Networking
+Installed-Size: 320
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 8.0.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libcurl4 (= 8.0.1), libc-ares2, libnghttp2-14, libidn2-0, librtmp1, libgmp10, libgnutls30, libhogweed6, libnettle8, libssh2-1, libssl3, libzstd1, libbrotli1
+Description: command line tool for transferring data with URL syntax
+ curl is a command line tool for transferring data with URL syntax, supporting DICT, FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTMP, RTSP, SCP, SFTP, SMTP, SMTPS, TELNET and TFTP.
+ .
+ curl supports SSL certificates, HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, proxies, cookies, user+password authentication (Basic, Digest, NTLM, Negotiate, kerberos...), file transfer resume, proxy tunneling and a busload of other useful tricks.
+Homepage: http://curl.haxx.se/
+
+Package: dash
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Terminal_Support
+Installed-Size: 188
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 0.5.12
+Provides: sh
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), debianutils (>= 4.11.2), libedit0
+Pre-Depends: debianutils (>= 4.11.2)
+Description: POSIX-compliant shell
+ The Debian Almquist Shell (dash) is a POSIX-compliant shell derived
+ from ash.
+ .
+ Since it executes scripts faster than bash, and has fewer library
+ dependencies (making it more robust against software or hardware
+ failures), it is used as the default system shell on Debian systems.
+Homepage: http://gondor.apana.org.au/~herbert/dash/
+
+Package: debianutils
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Utilities
+Installed-Size: 300
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 5.7-1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Miscellaneous utilities specific to Debian
+ This package provides a number of small utilities which are used
+ primarily by the installation scripts of Debian packages, although
+ you may use them directly.
+ .
+ The specific utilities included are:
+ add-shell remove-shell run-parts
+
+Package: diffutils
+Status: install ok installed
+Priority: important
+Section: Development
+Installed-Size: 1716
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 3.8
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8
+Description: compare two files for differences
+Homepage: http://www.gnu.org/software/diffutils/
+
+Package: dpkg
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Packaging
+Installed-Size: 6164
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.21.21
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), sh, coreutils, diffutils, tar, liblzma5 (>= 5.2.5), libintl8, libz-ng2, libzstd1, libmd0
+Pre-Depends: tar (>= 1.23), libintl8 (>= 0.20)
+Description: package maintainance tools from Debian
+Homepage: http://wiki.debian.org/Teams/Dpkg
+
+Package: file-cmds
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 480
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 400-1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: chflags, compress, ipcrm, ipcs, pax
+
+Package: findutils
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 1960
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 4.8.0-1
+Replaces: shell-cmds (<< 207.40.1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), sh, sed, shell-cmds, libintl8
+Conflicts: shell-cmds (<< 207.40.1)
+Description: indexes and searches filesystems
+Homepage: http://www.gnu.org/software/findutils/
+
+Package: firmware
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: System
+Installed-Size: 0
+Maintainer: vphoned
+Architecture: all
+Version: 26.1.0
+Description: virtual package for this vphone iOS firmware
+
+Package: gawk
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 3236
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 5.1.0-2
+Provides: awk
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8, libreadline8, libmpfr6, libgmp10
+Description: GNU awk, a pattern scanning and processing language
+ `awk', a program that you can use to select particular records in a
+ file and perform operations upon them.
+ .
+ Gawk is the GNU Project's implementation of the AWK programming language.
+ It conforms to the definition of the language in the POSIX 1003.2 Command
+ Language And Utilities Standard. This version in turn is based on the
+ description in The AWK Programming Language, by Aho, Kernighan, and
+ Weinberger, with the additional features defined in the System V Release
+ 4 version of UNIX awk. Gawk also provides more recent Bell Labs awk
+ extensions, and some GNU-specific extensions.
+Homepage: http://www.gnu.org/software/gawk/
+
+Package: git
+Status: install ok installed
+Priority: optional
+Section: Data_Storage
+Installed-Size: 29796
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.39.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libcurl4, libssl3, libintl8, libpcre2-8-0, libidn2-0, firmware (>= 14.0) | libexpat1, pager
+Description: fast, scalable, distributed revision control system
+ Git is popular version control system designed to handle very large
+ projects with speed and efficiency; it is used for many high profile
+ open source projects, most notably the Linux kernel.
+ .
+ Git falls in the category of distributed source code management tools.
+ Every Git working directory is a full-fledged repository with full
+ revision tracking capabilities, not dependent on network access or a
+ central server.
+
+Package: gpgv
+Status: install ok installed
+Priority: standard
+Section: Security
+Installed-Size: 484
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.3.6
+Replaces: gnupg2
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libassuan0, libgcrypt20, libgpg-error0, libintl8, libnpth0
+Conflicts: gnupg2, gnupg (<< 2.3.6)
+Description: GNU privacy guard - signature verification tool
+ GnuPG is GNU's tool for secure communication and data storage.
+ .
+ gpgv is actually a stripped-down version of gpg which is only able
+ to check signatures. It is somewhat smaller than the fully-blown gpg
+ and uses a different (and simpler) way to check that the public keys
+ used to make the signature are valid. There are no configuration
+ files and only a few options are implemented.
+
+Package: grep
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 1120
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 3.10-1
+Replaces: text-cmds (<< 1:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libpcre2-8-0
+Conflicts: text-cmds (<< 1:0)
+Description: searches files for regular expressions
+Homepage: http://www.gnu.org/software/grep/
+
+Package: gzip
+Status: install ok installed
+Priority: standard
+Section: Archiving
+Installed-Size: 324
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 1.12
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: GNU compression utilities
+ This package provides the standard GNU file compression utilities, which
+ are also the default compression tools for Debian.  They typically operate
+ on files with names ending in '.gz', but can also decompress files ending
+ in '.Z' created with 'compress'.
+Homepage: http://www.gzip.org/
+
+Package: havoc-keyring
+Status: install ok installed
+Priority: optional
+Section: Keyrings
+Installed-Size: 4
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: all
+Version: 2022.06.03
+Depends: roothide (>= 0.0.6)
+Description: GnuPG keys for the Havoc repository
+
+Package: htop
+Status: install ok installed
+Priority: important
+Section: Administration
+Installed-Size: 276
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 3.2.2
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6 (>= 6.0)
+Description: interactive processes viewer
+ Htop is an ncursed-based process viewer similar to top, but it allows one to scroll the list vertically and horizontally to see all processes and their full command lines.
+ .
+ Tasks related to processes (killing, renicing) can be done without entering their PIDs.
+
+Package: launchctl
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: System
+Installed-Size: 148
+Maintainer: roothide <roothideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1:1.2.0
+Depends: roothide (>= 0.1.0), libiosexec1 (>= 1.3.1-2)
+Description: Tells launchd what to do
+Homepage: https://github.com/ProcursusTeam/launchctl
+
+Package: less
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 468
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 608
+Replaces: system-cmds (<= 433.4-11)
+Provides: more, pager
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6, libpcre2-8-0
+Description: provides less information than more does
+
+Package: libapt-pkg6.0
+Status: install ok installed
+Priority: required
+Section: Libraries
+Installed-Size: 2896
+Maintainer: roothide <roothideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.6.0-2
+Replaces: apt1.8, apt1.4, libapt, libapt-pkg5.0, apt-lib, apt-key, apt (<< 2.1.10-2)
+Provides: libapt-pkg (=2.6.0-2)
+Depends: roothide (>= 0.0.7), libiosexec1 (>= 1.3.1), libgcrypt20, liblz4-1, liblzma5 (>= 5.2.5), libxxhash0, libzstd1
+Conflicts: apt7 (<<1:0), apt1.4 (<<1:0), apt1.8 (<<1:0), libapt-pkg5.0 (<<1:0), libapt (<<1:0), apt-key (<<1:0), apt (<< 2.1.10-2)
+Description: commandline package manager
+ This package provides commandline tools for searching and
+ managing as well as querying information about packages
+ as a low-level access to all features of the libapt-pkg library.
+
+Package: libassuan0
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 172
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.5.5
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libgpg-error0
+Description: IPC library for the GnuPG components
+ Libassuan is a small library implementing the so-called "Assuan
+ protocol". This protocol is used for IPC between most newer GnuPG
+ components. Both server and client side functions are provided.
+
+Package: libbrotli1
+Status: install ok installed
+Priority: optional
+Section: Development
+Installed-Size: 920
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.0.9
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Shared libraries for the Brotli compression format
+Homepage: https://www.brotli.org/
+
+Package: libc-ares2
+Status: install ok installed
+Priority: optional
+Section: Development
+Installed-Size: 132
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.19.0
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Shared libraries for the c-ares asynchronous name resolver library.
+Homepage: https://c-ares.haxx.se/
+
+Package: libcrypt2
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 252
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 4.4.33
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: libcrypt shared library
+ libxcrypt is a modern library for one-way hashing of passwords.
+ It supports DES, MD5, NTHASH, SUNMD5, SHA-2-256, SHA-2-512, and
+ bcrypt-based password hashes
+ It provides the traditional Unix 'crypt' and 'crypt_r' interfaces,
+ as well as a set of extended interfaces like 'crypt_gensalt'.
+
+Package: libcurl4
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 532
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 8.0.1
+Replaces: curl (<< 8.0.1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libcurl4 (= 8.0.1), libc-ares2, libnghttp2-14, libidn2-0, librtmp1, libgmp10, libgnutls30, libhogweed6, libnettle8, libssh2-1, libssl3, libzstd1, libbrotli1
+Conflicts: curl (<< 8.0.1)
+Description: easy-to-use client-side URL transfer library (OpenSSL flavour)
+ libcurl is an easy-to-use client-side URL transfer library, supporting DICT, FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTMP, RTSP, SCP, SFTP, SMTP, SMTPS, TELNET and TFTP.
+ .
+ libcurl supports SSL certificates, HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, proxies, cookies, user+password authentication (Basic, Digest, NTLM, Negotiate, Kerberos), file transfer resume, http proxy tunneling and more!
+ .
+ libcurl is free, thread-safe, IPv6 compatible, feature rich, well supported, fast, thoroughly documented and is already used by many known, big and successful companies and numerous applications.
+ . 
+ SSL support is provided by OpenSSL
+Homepage: http://curl.haxx.se/
+
+Package: libedit0
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 216
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 3.1-20221030
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6 (>= 6.0)
+Description: BSD editline and history libraries
+ Command line editor library provides generic line editing,
+ history, and tokenization functions.
+ .
+ It slightly resembles GNU readline.
+
+Package: libffi8
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 108
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 3.4.2
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Foreign Function Interface library runtime
+ A foreign function interface is the popular name for the interface that
+ allows code written in one language to call code written in another
+ language.
+
+Package: libgcrypt20
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 836
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 1.10.1
+Replaces: gcrypt, libgcrypt
+Provides: gcrypt (=1.10.1), libgcrypt (=1.10.1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libgpg-error0 (>= 1.37)
+Conflicts: gcrypt (<<1:0), libgcrypt (<<1:0)
+Description: LGPL cryptographic algorithm library (Libraries)
+
+Package: libgmp10
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 560
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 6.2.1-3
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Multiprecision arithmetic library
+ GNU MP is a programmer's library for arbitrary precision
+ arithmetic (ie, a bignum package).  It can operate on signed
+ integer, rational, and floating point numeric types.
+ .
+ It has a rich set of functions, and the functions have a regular
+ interface.
+Homepage: https://gmplib.org/
+
+Package: libgnutls30
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 1884
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 3.8.0
+Replaces: gnutls (<< 1:0)
+Provides: gnutls (= 1:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8 (>= 0.20.0), libgmp10, libidn2-0, libunistring5, libnettle8, libhogweed6, libp11-kit0, libtasn1-6, libzstd1, libbrotli1
+Conflicts: gnutls (<< 1:0)
+Description: GNU TLS library - main runtime library
+ GnuTLS is a portable library which implements the Transport Layer
+ Security (TLS 1.0, 1.1, 1.2, 1.3) and Datagram
+ Transport Layer Security (DTLS 1.0, 1.2) protocols.
+ .
+ GnuTLS features support for:
+  - certificate path validation, as well as DANE and trust on first use.
+  - the Online Certificate Status Protocol (OCSP).
+  - public key methods, including RSA and Elliptic curves, as well as password
+    and key authentication methods such as SRP and PSK protocols.
+  - all the strong encryption algorithms, including AES and Camellia.
+  - CPU-assisted cryptography with VIA padlock and AES-NI instruction sets.
+  - HSMs and cryptographic tokens, via PKCS #11.
+ .
+ This package contains the main runtime library.
+Homepage: http://www.gnu.org/software/gnutls/
+
+Package: libgpg-error0
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 216
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.46
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8
+Description: GnuPG development runtime library
+ Library that defines common error values, messages, and common
+ runtime functionality for all GnuPG components.  Among these are GPG,
+ GPGSM, GPGME, GPG-Agent, libgcrypt, pinentry, SmartCard Daemon and
+ possibly more in the future.
+ .
+ It will likely be renamed "gpgrt" in the future.
+
+Package: libhogweed6
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 312
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 3.8.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libgmp10, libnettle8 (= 3.8.1)
+Description: low level cryptographic library (public-key cryptos)
+Homepage: http://www.lysator.liu.se/~nisse/nettle/
+
+Package: libidn2-0
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 396
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 2.3.4
+Replaces: libidn2 (<< 2.3.4)
+Provides: libidn2 (= 2.3.4)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8, libunistring5
+Conflicts: libidn2 (<< 2.3.4)
+Description: Internationalized domain names (IDNA2008/TR46) library
+Homepage: https://www.gnu.org/software/libidn/#libidn2
+
+Package: libintl8
+Status: install ok installed
+Section: System
+Installed-Size: 156
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 0.21.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: internationalization helper for strings
+Essental: yes
+Homepage: http://www.gnu.org/software/gettext/
+
+Package: libiosexec1
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Libraries
+Installed-Size: 76
+Maintainer: roothide <roothideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.3.1-2
+Depends: roothide (>= 0.1.0)
+Description: shim for execve w/ shell script support
+Homepage: http://github.com/ProcursusTeam/libiosexec
+
+Package: liblz4-1
+Status: install ok installed
+Priority: important
+Section: Libraries
+Installed-Size: 164
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.9.3
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Conflicts: lz4 (<< 1.9.3)
+Description: Fast LZ compression algorithm library - runtime
+Homepage: http://tukaani.org/lzma/
+
+Package: liblzma5
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 232
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 5.4.1
+Replaces: xz, lzma
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Conflicts: xz (<<1:0), lzma (<<3:0)
+Description: XZ-format compression library
+ XZ is the successor to the Lempel-Ziv/Markov-chain Algorithm
+ compression format, which provides memory-hungry but powerful
+ compression (often better than bzip2) and fast, easy decompression.
+ .
+ The native format of liblzma is XZ; it also supports raw (headerless)
+ streams and the older LZMA format used by lzma. (For 7-Zip's related
+ format, use the p7zip package instead.)
+Homepage: https://tukaani.org/xz/
+
+Package: libmagic1
+Status: install ok installed
+Priority: important
+Section: Libraries
+Installed-Size: 7996
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 5.43
+Replaces: file (<< 5.43)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), liblzma5 (>= 5.2.5)
+Conflicts: file (<< 5.43)
+Description: Recognize the type of data in a file using "magic" numbers - library
+ This library can be used to classify files according to magic number
+ tests. It implements the core functionality of the file command.
+
+Package: libmd0
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 100
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.0.4-1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: message digest functions from BSD systems - shared library
+ The libmd library provides various message digest ("hash") functions,
+ as found on various BSDs on a library with the same name and with a
+ compatible API.
+
+Package: libmpfr6
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 516
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 4.1.0
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libgmp10
+Description: multiple precision floating-point computation
+ MPFR provides a library for multiple-precision floating-point computation
+ with correct rounding.  The computation is both efficient and has a
+ well-defined semantics. It copies the good ideas from the
+ ANSI/IEEE-754 standard for double-precision floating-point arithmetic
+ (53-bit mantissa).
+Homepage: https://www.mpfr.org
+
+Package: libncursesw6
+Status: install ok installed
+Priority: required
+Section: Libraries
+Installed-Size: 776
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 6.4
+Replaces: ncurses (<< 6.4)
+Provides: ncurses (= 6.4)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), ncurses-term (= 6.4)
+Conflicts: ncurses (<< 6.4)
+Description: shared libraries for terminal handling (wide character support)
+
+Package: libnettle8
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 320
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 3.8.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: low level cryptographic library (symmetric and one-way cryptos)
+Homepage: http://www.lysator.liu.se/~nisse/nettle/
+
+Package: libnghttp2-14
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 192
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.52.0
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: library implementing HTTP/2 protocol (shared library)
+ This is an implementation of the Hypertext Transfer Protocol version
+ 2 in C. The framing layer of HTTP/2 is implemented as a reusable C
+ library.
+ .
+ This package installs a shared library.
+Homepage: https://nghttp2.org/
+
+Package: libnpth0
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 68
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 1.6-2
+Replaces: npth (<< 1.6-2)
+Provides: npth (= 1.6-2)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Conflicts: gnupth, npth (<< 1.6-2)
+Description: replacement for GNU Pth using system threads
+
+Package: libp11-kit0
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 928
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 0.24.1
+Replaces: p11-kit (<< 0.24.1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8, libffi8, ca-certificates
+Conflicts: p11-kit (<< 0.24.1)
+Description: library for loading and coordinating access to PKCS#11 modules - runtime
+ The p11-kit library provides a way to load and enumerate Public-Key
+ Cryptography Standard #11 modules, along with a standard configuration
+ setup for installing PKCS#11 modules so that they're discoverable. It
+ also solves problems with coordinating the use of PKCS#11 by different
+ components or libraries living in the same process.
+ .
+ This package contains the shared library required for applications loading
+ and accessing PKCS#11 modules.
+Homepage: https://p11-glue.github.io/p11-glue/p11-kit.html
+
+Package: libpam-modules
+Status: install ok installed
+Section: Administration
+Installed-Size: 616
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1000.0
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libpam2
+Description: Pluggable Authentication Modules for PAM
+ This package completes the set of modules for PAM. It includes the
+  pam_unix.so module as well as some specialty modules.
+
+Package: libpam2
+Status: install ok installed
+Section: Administration
+Installed-Size: 104
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 20190224
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libpam-modules
+Description: Pluggable Authentication Modules library
+ Contains the shared library for OpenPAM, a library that enables the
+ local system administrator to choose how applications authenticate users.
+ In other words, without rewriting or recompiling a PAM-aware application,
+ it is possible to switch between the authentication mechanism(s) it uses.
+ One may entirely upgrade the local authentication system without touching
+ the applications themselves.
+
+Package: libpcre1
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 460
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 8.45-1
+Replaces: pcre, libpcre
+Provides: pcre (= 1:0), libpcre (= 8.45-1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Conflicts: pcre (<< 1:0), libpcre (<< 1:0)
+Description: Old Perl 5 Compatible Regular Expression Library - runtime library
+ This is a library of functions to support regular expressions whose syntax 
+ and semantics are as close as possible to those of the Perl 5 language.
+ .
+ New packages should use the newer pcre2 packages, and existing
+ packages should migrate to pcre2.
+ .
+ This package contains the runtime library.
+
+Package: libpcre2-8-0
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 556
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 10.40-1
+Replaces: pcre2, libpcre2
+Provides: pcre2 (= 1:0), libpcre2 (= 10.40-1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Conflicts: pcre2 (<< 1:0), libpcre2 (<< 1:0)
+Description: New Perl Compatible Regular Expression Library- 8 bit runtime files
+ This is PCRE2, the new implementation of PCRE, a library of functions
+ to support regular expressions whose syntax and semantics are as
+ close as possible to those of the Perl 5 language. New projects
+ should use this library in preference to the older library.
+ .
+ This package contains the 8 bit runtime library.
+
+Package: libreadline8
+Status: install ok installed
+Priority: required
+Section: Libraries
+Installed-Size: 428
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 8.2.0-1
+Replaces: readline (<< 8.2.0-1)
+Provides: readline (= 8.2.0-1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6
+Conflicts: readline (<< 8.2.0-1)
+Description: GNU readline and history libraries, run-time libraries
+
+Package: librtmp1
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 200
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.4+20151223.gitfa8646d.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libgnutls30, libhogweed6, libnettle8, libgmp10
+Description: toolkit for RTMP streams (shared library)
+ A small dumper for media content streamed over the RTMP protocol (like BBC's
+ iPlayer high quality streams). Supplying an RTMP URL will result in a dumped
+ flv file, which can be played/transcoded with standard tools.
+ .
+ This package contains the shared libraries, header files needed by
+ programs that want to use librtmp.
+
+Package: libsodium23
+Status: install ok installed
+Section: Libraries
+Installed-Size: 256
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.0.18
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Network communication, cryptography and signaturing library
+ NaCl (pronounced "salt") is a new easy-to-use high-speed software library for
+ network communication, encryption, decryption, signatures, etc.
+ .
+ NaCl's goal is to provide all of the core operations needed to build
+ higher-level cryptographic tools.
+ .
+ Sodium is a portable, cross-compilable, installable, packageable fork of NaCl,
+ with a compatible API.
+Homepage: https://doc.libsodium.org/
+
+Package: libssh2-1
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 324
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.10.0-1
+Replaces: libssh2 (<< 1.10.0-1)
+Provides: libssh2 (= 1.10.0-1)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libssl3
+Conflicts: libssh2 (<< 1.10.0-1)
+Description: SSH2 client-side library
+Homepage: https://www.libssh2.org/
+
+Package: libssl3
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 4016
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 3.0.8
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), ca-certificates
+Description: Secure Sockets Layer toolkit - shared libraries
+ This package is part of the OpenSSL project's implementation of the SSL
+ and TLS cryptographic protocols for secure communication over the
+ Internet.
+ .
+ It provides the libssl and libcrypto shared libraries.
+
+Package: libtasn1-6
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 132
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 4.18.0
+Replaces: libtasn1 (<< 1:0)
+Provides: libtasn1 (= 4.18.0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Conflicts: libtasn1 (<< 1:0)
+Description: Manage ASN.1 structures (runtime)
+ Manage ASN1 (Abstract Syntax Notation One) structures.
+ The main features of this library are:
+   * on-line ASN1 structure management that doesn't require any C code
+     file generation.
+   * off-line ASN1 structure management with C code file generation
+     containing an array.
+   * DER (Distinguish Encoding Rules) encoding
+   * no limits for INTEGER and ENUMERATED values
+ .
+ This package contains runtime libraries.
+Homepage: https://www.gnu.org/software/libtasn1
+
+Package: libunistring5
+Status: install ok installed
+Priority: optional
+Section: Libraries
+Installed-Size: 1808
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 1.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: Unicode string library for C
+Homepage: https://www.gnu.org/software/libunistring/
+
+Package: libxxhash0
+Status: install ok installed
+Section: Libraries
+Installed-Size: 56
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 0.8.1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: shared library for xxhash
+ xxHash is an Extremely fast Hash algorithm, running at RAM speed limits.
+ It successfully completes the SMHasher test suite which evaluates collision,
+ dispersion and randomness qualities of hash functions. Code is highly portable,
+ and hashes are identical on all platforms (little / big endian).
+ .
+ This package contains the shared library.
+
+Package: libz-ng2
+Status: install ok installed
+Priority: standard
+Section: Libraries
+Installed-Size: 152
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.0.6
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1)
+Description: next gen zlib compression library - runtime
+ next generation zlib library implementing the deflate compression method
+ found in gzip and PKZIP. This package includes the shared library.
+
+Package: libzstd1
+Status: install ok installed
+Section: Libraries
+Installed-Size: 668
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.5.5
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), liblz4-1, liblzma5 (>= 5.2.5)
+Description: fast lossless compression algorithm
+ Zstd, short for Zstandard, is a fast lossless compression algorithm, targeting
+ real-time compression scenarios at zlib-level compression ratio.
+ .
+ This package contains the shared library.
+
+Package: nano
+Status: install ok installed
+Priority: standard
+Section: Text_Editors
+Installed-Size: 2764
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 7.2
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libmagic1, libncursesw6, libintl8
+Description: Completely free, modern clone of Pico.
+ GNU nano is an easy-to-use text editor originally
+ designed as a replacement for Pico, the ncurses-based
+ editor from the non-free mailer package Pine (itself now
+ available under the Apache License as Alpine). However,
+ GNU nano also implements many features missing ih Pico,
+ including:
+ - Undo/redo
+ - Line numbering
+ - Syntax coloring
+ - Soft-wrapping of overlong lines
+ - Selecting text by holding Shift
+ - Interactive search and replace
+ - A go-to line (and column) command
+ - Support for multiple file buffers
+ - Auto-identation
+ - Tab completion of filenames and search terms
+ - Toggling features while running
+ - Full internationalization support
+Homepage: https://www.nano-editor.org/
+
+Package: ncurses-bin
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 820
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 6.4
+Replaces: ncurses (<< 6.4)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6 (= 6.4)
+Conflicts: ncurses (<< 6.4)
+Description: terminal-related programs and man pages
+
+Package: ncurses-term
+Status: install ok installed
+Priority: required
+Section: System
+Installed-Size: 7452
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: all
+Version: 6.4
+Replaces: ncurses (<< 6.4)
+Depends: roothide (>= 0.0.6), libncursesw6 (= 6.4)
+Conflicts: ncurses (<< 6.4)
+Description: This package contains terminfo data files to support most types of terminals.
+
+Package: openssh-client
+Status: install ok installed
+Priority: important
+Section: Networking
+Installed-Size: 3508
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 9.2p1
+Replaces: openssh (<< 1:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libssl3, libcrypt2, libmd0
+Conflicts: openssh (<< 1:0)
+Description: secure shell (SSH) client, for secure access to remote machines
+
+Package: openssh-server
+Status: install ok installed
+Priority: important
+Section: Networking
+Installed-Size: 1356
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 9.2p1
+Replaces: openssh (<< 1:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libssl3, openssh-client (= 9.2p1), openssh-sftp-server, libcrypt2, libpam2, libmd0
+Conflicts: com.midnightchips.localhostssh, openssh (<< 1:0)
+Description: secure shell (SSH) server, for secure access from remote machines
+
+Package: openssh-sftp-server
+Status: install ok installed
+Priority: important
+Section: Networking
+Installed-Size: 136
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 9.2p1
+Replaces: openssh (<< 1:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libssl3, openssh-client (= 9.2p1), libcrypt2, libmd0
+Conflicts: openssh (<< 1:0)
+Description: secure shell (SSH) sftp server module, for SFTP access from remote machines
+
+Package: owngoal-bootstrap-vphone
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 1.0.1
+Depends: apt, dpkg, bash, zsh, dash, sudo, coreutils, debianutils, shell-cmds, system-cmds, file-cmds, diffutils, findutils, grep, sed, gawk, less, tar, gzip, xz-utils, ncurses-bin, ncurses-term, profile.d, ca-certificates, openssh-server, curl, wget, nano, vim, htop, git, wiki.qaq.fastfetch, uikittools, launchctl, owngoal-essential-apps
+Description: Base system, command-line tools and OwnGoal apps for a vphone
+ Installs apt and dpkg, bash, zsh and dash, sudo, the core command-line tools,
+ openssh-server, curl and wget, nano and vim, htop, git and fastfetch,
+ uikittools and launchctl, plus OwnGoal Essential Apps: Irisin, Fila,
+ iGhostVT, Xrash and Inspector. This package installs no files of its own.
+Name: OwnGoal Bootstrap for vphone
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Icon: https://apt.owngoal.dev/depictions/owngoal-bootstrap-vphone/ball.png
+Depiction: https://apt.owngoal.dev/depictions/owngoal-bootstrap-vphone/
+SileoDepiction: https://apt.owngoal.dev/depictions/owngoal-bootstrap-vphone/depiction.json
+
+Package: owngoal-essential-apps
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 1.0.1
+Depends: wiki.qaq.irisin, wiki.qaq.fila, wiki.qaq.ighostvt, wiki.qaq.xrash, wiki.qaq.inspector
+Description: Irisin, Fila, iGhostVT, Xrash and Inspector in one install
+ Installs the five OwnGoal apps: Irisin, Fila, iGhostVT, Xrash and Inspector.
+ Each app stays its own package and updates on its own. This package installs
+ no files of its own.
+Name: OwnGoal Essential Apps
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Icon: https://apt.owngoal.dev/depictions/owngoal-essential-apps/ball.png
+Depiction: https://apt.owngoal.dev/depictions/owngoal-essential-apps/
+SileoDepiction: https://apt.owngoal.dev/depictions/owngoal-essential-apps/depiction.json
+
+Package: procursus-keyring
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Keyrings
+Installed-Size: 4
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: all
+Version: 2020.05.09-4
+Depends: roothide (>= 0.0.6), chariz-keyring, havoc-keyring
+Description: GnuPG keys for the Procursus repo
+
+Package: profile.d
+Status: install ok installed
+Priority: standard
+Section: Administration
+Installed-Size: 12
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 0-7
+Depends: roothide (>= 0.0.6), zsh
+Pre-Depends: system-cmds (>=805.220.1)
+Description: makes packaging for /etc/profile reasonable
+
+Package: roothide
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: System
+Installed-Size: 936
+Maintainer: roothide
+Architecture: iphoneos-arm64e
+Version: 0.1.0
+Description: roothide core package
+Name: roothide core
+Author: roothide
+
+Package: sed
+Status: install ok installed
+Priority: important
+Section: Utilities
+Installed-Size: 256
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Multi-Arch: foreign
+Version: 4.9
+Replaces: text-cmds (<< 1:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8
+Conflicts: text-cmds (<< 1:0)
+Description: edits streams of text using patterns
+Homepage: http://www.gnu.org/software/sed/
+
+Package: shell-cmds
+Status: install ok installed
+Priority: important
+Section: Administration
+Installed-Size: 1040
+Maintainer: roothide <roothideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 278-2
+Provides: killall, which
+Depends: roothide (>= 0.0.7), libiosexec1 (>= 1.3.1), libpam2
+Conflicts: coreutils (<< 8.32-9)
+Description: killall, renice, script, time, which, getopt, what, hexdump, su
+
+Package: sudo
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Administration
+Installed-Size: 5492
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.9.12p2
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8, libpam2
+Description: temporarily assume root priviledges
+
+Package: system-cmds
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Administration
+Installed-Size: 2860
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 950-2
+Provides: login, passwd, reboot
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), file-cmds, libcrypt2, libpam2
+Recommends: vi
+Description: iostat, login, passwd, sync, sysctl, pw
+
+Package: tar
+Status: install ok installed
+Priority: required
+Section: Archiving
+Installed-Size: 2832
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.34
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8
+Recommends: bzip2, gzip, xz-utils, zstd
+Description: tool for making tape archives
+Homepage: http://www.gnu.org/software/tar/
+
+Package: uikittools
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Utilities
+Installed-Size: 772
+Maintainer: roothide <roothideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 2.1.8
+Depends: roothide (>= 0.1.0), libiosexec1 (>= 1.3.1-2)
+Suggests: uikittools-extra (= 2.1.8)
+Breaks: uikittools-extra (<< 2.1.6)
+Description: Command line access for UIKit/LaunchServices/CoreServices
+
+Package: vim
+Status: install ok installed
+Priority: standard
+Section: Text_Editors
+Installed-Size: 43224
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 9.0.1000
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6, xxd, libintl8, libsodium23
+Description: Vi IMproved - enhanced vi editor
+ Vim is an almost compatible version of the UNIX editor Vi.
+ .
+ Many new features have been added: multi level undo, syntax highlighting, command line history, on-line help, filename completion, block operations, folding, Unicode support, etc.
+
+Package: wget
+Status: install ok installed
+Priority: important
+Section: Networking
+Installed-Size: 596
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 1.21.3-1
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libssl3, libpcre2-8-0, libintl8, libunistring5, libidn2-0
+Description: retrieves files from the web
+ Wget is a network utility to retrieve files from the web using HTTP(S) and FTP, the two most widely used internet protocols. It works non-interactively, so it will work in the background, after having logged off. The program supports recursive retrieval of web-authoring pages as well as FTP sites -- you can use Wget to make mirrors of archives and home pages or to travel the web like a WWW robot.
+ .
+ Wget works particularly well with slow or unstable connections by continuing to retrieve a document until the document is fully downloaded. Re-getting files from where it left off works on servers (both HTTP and FTP) that support it. Both HTTP and FTP retrievals can be time stamped, so Wget can see if the remote file has changed since the last retrieval and automatically retrieve the new version if it has.
+ .
+ Wget supports proxy servers; this can lighten the network load, speed up retrieval, and provide access behind firewalls.
+
+Package: wiki.qaq.fastfetch
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Installed-Size: 1836
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 2.69.0
+Depends: firmware (>= 15.0)
+Description: System information, printed prettily
+ Run `fastfetch` in a terminal to see your device, iOS version, uptime, memory,
+ storage and more, laid out beside an Apple logo. Ready-made looks live in
+ /usr/share/fastfetch; your own settings go in
+ ~/.config/fastfetch/config.jsonc.
+Name: fastfetch
+Author: Carter Li <https://github.com/fastfetch-cli/fastfetch>
+
+Package: wiki.qaq.fila
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Installed-Size: 94596
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 0.7.4
+Depends: firmware (>= 15.0), uikittools, launchctl
+Description: Root file manager for roothide bootstraps
+ Browse and edit every file on your device, not just the ones an app is allowed
+ to see. Copy, move and rename with progress you can cancel, create and unpack
+ zip, 7z, rar and tar archives, edit text with syntax highlighting, read plists,
+ preview images and video, open a terminal, and share a folder to your computer
+ over WebDAV. Deleted files go to a trash you can restore from, and the files
+ your device needs in order to boot cannot be deleted by mistake.
+Name: Fila
+Icon: https://owngoal-dev.github.io/Fila/icon.png
+Depiction: https://owngoal-dev.github.io/Fila/
+SileoDepiction: https://owngoal-dev.github.io/Fila/depiction.json
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+
+Package: wiki.qaq.ighostvt
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Installed-Size: 19236
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 1.4.16
+Depends: firmware (>= 15.0), uikittools, launchctl, shell-cmds
+Description: Ghostty-powered terminal for iOS
+ A real terminal on your device, drawn by the same engine as Ghostty on the
+ desktop. Your shell keeps running in the background, so a build you started
+ is still going when you switch apps and still there when you come back.
+ Runs on iPhone and iPad.
+Name: iGhostVT
+Icon: https://owngoal-dev.github.io/iGhostVT/icon.png
+Depiction: https://owngoal-dev.github.io/iGhostVT/
+SileoDepiction: https://owngoal-dev.github.io/iGhostVT/depiction.json
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+
+Package: wiki.qaq.inspector
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Installed-Size: 4492
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 0.6.5
+Depends: firmware (>= 13.0), uikittools, launchctl
+Description: Live process inspector for iOS on custom firmware (roothide)
+ See what your device is actually doing. Every running process, refreshed once a
+ second, with its CPU share, memory, thread count and owner. Search by name or
+ PID, sort by any column, filter down to system, user or app processes, and
+ pause the list to hold a moment still. Open a process for its threads, open
+ files and sockets, Mach ports, loaded modules, sandbox status and disk and
+ network use, then quit it, force quit it, or export the whole report. The
+ `inspector` command answers the same questions from a terminal. Available
+ in English, Simplified Chinese, Japanese, Russian, German, French, Spanish and
+ Arabic.
+Name: Inspector
+Icon: https://owngoal-dev.github.io/Inspector/icon.png
+Depiction: https://owngoal-dev.github.io/Inspector/
+SileoDepiction: https://owngoal-dev.github.io/Inspector/depiction.json
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+
+Package: wiki.qaq.irisin
+Status: install ok installed
+Priority: optional
+Section: Applications
+Installed-Size: 18892
+Maintainer: OwnGoal Studio <no-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 4.5.26
+Depends: firmware (>= 16.0)
+Description: Modern package manager for roothide custom firmware
+ Browse your repositories, install and remove packages, keep tweaks updated
+ and read every depiction, on iPhone and iPad. The app runs without root;
+ installs go through a small on-demand root daemon whose helper installs
+ packages natively and registers apps with LaunchServices itself. No dpkg,
+ no uicache.
+Name: Irisin
+Icon: https://lakr233.github.io/Irisin/icon.png
+Depiction: https://lakr233.github.io/Irisin/
+SileoDepiction: https://lakr233.github.io/Irisin/depiction.json
+Homepage: https://github.com/Lakr233/Irisin
+Author: OwnGoal Studio <no-reply@owngoal.dev>
+
+Package: wiki.qaq.xrash
+Status: install ok installed
+Priority: optional
+Section: Utilities
+Installed-Size: 9484
+Maintainer: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+Architecture: iphoneos-arm64e
+Version: 0.5.2
+Depends: firmware (>= 15.0), uikittools, launchctl
+Description: Crash reporter and symbolicator for roothide bootstraps
+ Read every crash, hang and memory report on the device, symbolicated against
+ system frameworks and your own dSYMs, then bundle related reports into one
+ file to share.
+Name: Xrash
+Icon: https://owngoal-dev.github.io/Xrash/icon.png
+Depiction: https://owngoal-dev.github.io/Xrash/
+SileoDepiction: https://owngoal-dev.github.io/Xrash/depiction.json
+Author: OwnGoal Studio <not-gonna-reply@owngoal.dev>
+
+Package: xxd
+Status: install ok installed
+Priority: standard
+Section: Text_Editors
+Installed-Size: 120
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 9.0.1000
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libintl8
+Conflicts: vim (<< 8.2.0650)
+Description: tool to make (or reverse) a hex dump
+ xxd creates a hex dump of a given file or standard input. It can also convert a hex dump back to its original binary form.
+
+Package: xz-utils
+Status: install ok installed
+Priority: standard
+Section: Archiving
+Installed-Size: 888
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 5.4.1
+Replaces: xz, lzma
+Provides: xz (=1:0), lzma (=3:0)
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), liblzma5 (>= 5.4.1), libintl8
+Conflicts: xz (<<1:0), lzma (<<3:0)
+Description: XZ-format compression utilities
+ XZ is the successor to the Lempel-Ziv/Markov-chain Algorithm
+ compression format, which provides memory-hungry but powerful
+ compression (often better than bzip2) and fast, easy decompression.
+ .
+ This package provides the command line tools for working with XZ
+ compression, including xz, unxz, xzcat, xzgrep, and so on. They can
+ also handle the older LZMA format, and if invoked via appropriate
+ symlinks will emulate the behavior of the commands in the lzma
+ package.
+ .
+ The XZ format is similar to the older LZMA format but includes some
+ improvements for general use:
+ .
+  * 'file' magic for detecting XZ files;
+  * crc64 data integrity check;
+  * limited random-access reading support;
+  * improved support for multithreading (not used in xz-utils);
+  * support for flushing the encoder.
+Homepage: https://tukaani.org/xz/
+
+Package: zsh
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: Terminal_Support
+Installed-Size: 9720
+Maintainer: RootHide <RootHideDev@twitter>
+Architecture: iphoneos-arm64e
+Version: 5.9
+Depends: roothide (>= 0.0.6), libiosexec1 (>= 1.3.1), libncursesw6, libpcre1, debianutils (>= 4.11.2)
+Pre-Depends: debianutils (>= 4.11.2)
+Description: a shell with interactive features

@@ -1331,7 +1331,7 @@
         "T06",
         "T07"
       ],
-      "status": "partial_RootHide_services_and_system_rotation_policy_verified_default_artifact_pending",
+      "status": "partial_RootHide_startup_fix_built_VM_and_default_modern_acceptance_pending",
       "upstream_paths": [
         "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         "VPhoneDaemon/Daemon/"
@@ -1417,7 +1417,17 @@
         "evidence/B32-summary.json",
         "evidence/B32/T08/REPORT.md",
         "evidence/B32/T08/manifest.json",
-        "B33/T08/REPORT.md: 本机独立副本与0.7.16研究API准备通过；用户已批准仅在研究副本内转换/清理及正常停止源。源正常停机后12:53:06自动重启，研究副本启动前检查拒绝启动，按用户要求暂停。仍为rootless，未执行新180度复现，原因未查明。"
+        "B33/T08/REPORT.md: 本机独立副本与0.7.16研究API准备通过；用户已批准仅在研究副本内转换/清理及正常停止源。源正常停机后12:53:06自动重启，研究副本启动前检查拒绝启动，按用户要求暂停。仍为rootless；后续复现脚本与8项证据判定测试完成，实际入口未运行。源监测暂停方案等待仓库外进程操作批准，未执行新180度复现，原因未查明。",
+        "evidence/B34/T08/REPORT.md",
+        "evidence/B34/T08/causal-verification.json",
+        "evidence/B34/T08/manifest.json",
+        "evidence/B34/T08/source-restoration.json",
+        "evidence/B35/T08/REPORT.md",
+        "evidence/B35/T08/manifest.json",
+        "evidence/B35/T08/regression-entrypoint.log",
+        "evidence/B35/T08/signed-artifacts.json",
+        "evidence/B35/T08/vm-help-amfi-log.json",
+        "evidence/B35/T08/vm-validation-plan.md"
       ],
       "historical_evidence": [],
       "acceptance_limits": [
@@ -1425,13 +1435,16 @@
         "B29已构造实际RootHide研究样本，旧CFW仍需显式激活；完整服务、旋转及原始XPC诊断未完成",
         "B30仅确认实际RootHide的144由service-configure entitlement缺失引起；历史rootless未独立复验；方向运行时scene策略与默认产物整体验收未完成",
         "B31运行时场景策略只覆盖临时控制应用；未直接取得Settings/Safari场景集合，未确定UIKit倒置方向过滤条件；默认产物未更新",
-        "B32已补足B31未取得的系统应用场景策略和本样本UIKit过滤条件；受控B阶段180度未实际转动，默认产物未更新；历史范围限制仍按原记录保留"
+        "B32已补足B31未取得的系统应用场景策略和本样本UIKit过滤条件；受控B阶段180度未实际转动，默认产物未更新；历史范围限制仍按原记录保留",
+        "B34确认本机受控应用场景的SpringBoard允许条件/集合过滤原因；恢复阶段有首样本残留方向2，单独无注入复现全程未出现2。默认完整产物及旧CFW自动激活未验证。",
+        "B35启动修复已构建和主机回归验证，未执行真实冷启动；默认完整构建仍classic。新宿主精确AMFI授权待批准。"
       ],
-      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。 B29在独立克隆构造RootHide，实际安装90条dpkg记录与audit、冷启动摘要、API检测、显式官方helper激活和SSH banner通过。services.start仍返回api_guest_error/failed，原始状态未保存；旧CFW未自动激活RootHide。无SSH认证或应用交互验收。详见B29记录。 B30在实际RootHide取得user501/transport0/reply.error144；单service-configure entitlement ABA复现及关闭诊断注入对照通过。用户授权后源policy加入该键，候选校验和12项相关测试通过。RootHide plist真实路径重写与独立服务生命周期通过。旋转原始AX和2秒采样已保全，未注入重跑结果一致；静态方向声明与现象一致，运行时scene策略仍未验证。客户机恢复原API基线，默认产物未更新，T08保持部分完成。 B31在B30修正候选、无API注入条件下新增24组方向观测，14成功10拒绝且角度保持。控制应用公开集合30，实际控制器/场景客户端/场景集合均为26；portrait-only切换为2并恢复的对照通过。直接场景180度请求返回UISceneErrorDomain101，确认控制样本的运行时拒绝；UIKit过滤倒置方向的具体条件及Settings/Safari直接运行时策略未取得。临时应用、容器、诊断库与候选副本已清理，原API恢复，样本正常停机。 B32取得Settings/Safari实际场景与客户端集合2/26，UIKit私有UIApplication在原生手机且UIDevice无Home键时将集合与26相与；实际条件返回值及受控应用同PID的26→30→26对照通过。无Frida进程的原API重跑8组，4接受4拒绝且保持角度。受控B阶段180度公开请求未报告错误，但实际仍0度，未计为旋转成功。诊断应用、进程和文件最终均清理，VM正常停机；临时AMFI detach失败后系统服务恢复运行已独立验证，最终空闲退出。",
+      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。 B29在独立克隆构造RootHide，实际安装90条dpkg记录与audit、冷启动摘要、API检测、显式官方helper激活和SSH banner通过。services.start仍返回api_guest_error/failed，原始状态未保存；旧CFW未自动激活RootHide。无SSH认证或应用交互验收。详见B29记录。 B30在实际RootHide取得user501/transport0/reply.error144；单service-configure entitlement ABA复现及关闭诊断注入对照通过。用户授权后源policy加入该键，候选校验和12项相关测试通过。RootHide plist真实路径重写与独立服务生命周期通过。旋转原始AX和2秒采样已保全，未注入重跑结果一致；静态方向声明与现象一致，运行时scene策略仍未验证。客户机恢复原API基线，默认产物未更新，T08保持部分完成。 B31在B30修正候选、无API注入条件下新增24组方向观测，14成功10拒绝且角度保持。控制应用公开集合30，实际控制器/场景客户端/场景集合均为26；portrait-only切换为2并恢复的对照通过。直接场景180度请求返回UISceneErrorDomain101，确认控制样本的运行时拒绝；UIKit过滤倒置方向的具体条件及Settings/Safari直接运行时策略未取得。临时应用、容器、诊断库与候选副本已清理，原API恢复，样本正常停机。 B32取得Settings/Safari实际场景与客户端集合2/26，UIKit私有UIApplication在原生手机且UIDevice无Home键时将集合与26相与；实际条件返回值及受控应用同PID的26→30→26对照通过。无Frida进程的原API重跑8组，4接受4拒绝且保持角度。受控B阶段180度公开请求未报告错误，但实际仍0度，未计为旋转成功。诊断应用、进程和文件最终均清理，VM正常停机；临时AMFI detach失败后系统服务恢复运行已独立验证，最终空闲退出。 B34本机研究副本已转换RootHide，89包安装与冷启动通过。受控场景180度请求mask4确实到达SpringBoard且无错误；SBTraitsSceneParticipantDelegate的倒置方向允许条件为0，清理支持集合30为26。限定该场景临时允许后集合30、实际方向2；恢复条件后集合26、实际最终方向1（首样本残留2，0.25秒后为1）。撤销全部SpringBoard探针后的独立最小复现再次无错误且未出现方向2。已确认本样本原因，未修改持久策略或新增整项accepted。现代API正常关机、临时应用/Frida/输入清理、源vm-new及原健康监测恢复healthy；默认产物与旧CFW自动激活仍待验收。 B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复后异步逐项加载常规LaunchDaemons，以固定IcliKit按物理根准备plist，保留API_ONLY条件。旧实现4项失败，最终相关22项通过；隔离API、默认完整签名app与六项现代组件构建通过。默认仍classic，未部署新候选，真实自动激活及默认现代运行来源一致性未验。新VM --help退出-9，精确日志AMFI -424；单CDHash临时授权待批准。源healthy、研究副本停机。",
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
       "remaining_work": [
-        "旧CFW自动激活RootHide及默认产物完整构建、锁文件/构建/运行来源一致性与整体验收；当前客户机保持原API基线",
-        "受控Home键条件true时180度公开请求未报告错误但实际仍0度，原因未进一步查明；不能计为旋转成功"
+        "新宿主CDHash62026af109b33fdd468c2c2df2fcdb4211136bf0的精确临时AMFI授权和管理员执行；研究副本CFW只读分类及匹配现代组合的适用迁移步骤待核实",
+        "真实冷启动RootHide自动激活、daemon/组件运行来源核对与默认现代daemon打包整体验收；当前默认完整产物仍classic",
+        "倒置方向策略原因已确认于B34受控场景；未验证全部系统应用或其他客户机版本，未将反事实覆盖纳入产品"
       ],
       "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
       "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
@@ -4905,5 +4918,42 @@
     "vm_stopped": true,
     "minimum_free_bytes": 35273768960,
     "post_shutdown_free_bytes": 35653152768
+  },
+  "B34_execution_state": {
+    "task": "T08",
+    "diagnosis": "controlled_scene_cause_verified",
+    "accepted": false,
+    "research_vm": "vm-roothide-b33-20261010",
+    "source_restored": true,
+    "health_restored": true,
+    "minimum_free_bytes": 290173501440,
+    "report": "evidence/B34/T08/REPORT.md"
+  },
+  "B35_execution_state": {
+    "status": "partial_RootHide_startup_fix_built_VM_and_default_modern_acceptance_pending",
+    "head": "d5d179ddd90a40e57dc739c14dbee1bed92d1bd6",
+    "working_tree_fix": "sources/VPhoneDaemon/Daemon/GuestIrisinInstaller.swift",
+    "tests": 22,
+    "new_vm_sha256": "a4f8a4155a95e3d0c9067f856bb09a165df22cc9e55fcf9356f01ab16b0d11f4",
+    "new_vm_cdhash": "62026af109b33fdd468c2c2df2fcdb4211136bf0",
+    "temporary_amfi_authorization": "pending",
+    "runtime_validated": false,
+    "default_guest": "classic",
+    "source_stopped": false,
+    "research_vm_booted": false,
+    "report": "evidence/B35/T08/REPORT.md"
+  },
+  "B36_execution_state": {
+    "status": "partial_readonly_classification_and_cleanup_complete_runtime_pending",
+    "research_vm_booted": false,
+    "runtime_validated": false,
+    "cfw_classification": "full_migration_required",
+    "temporary_amfi_authorized": true,
+    "auxiliary_processes_cleaned": true,
+    "graceful_detach_verified": false,
+    "source_restored": true,
+    "health_restored": true,
+    "minimum_free_bytes": 287191146496,
+    "report": "evidence/B36/T08/REPORT.md"
   }
 }

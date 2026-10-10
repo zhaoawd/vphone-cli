@@ -1,0 +1,35 @@
+test_completed_roothide_loads_services_after_repair_and_continues_after_failure (test_bootstrap_startup.BootstrapStartupTests.test_completed_roothide_loads_services_after_repair_and_continues_after_failure) ... ok
+test_firmware_failure_does_not_disable_bootstrap_service_recovery (test_bootstrap_startup.BootstrapStartupTests.test_firmware_failure_does_not_disable_bootstrap_service_recovery) ... ok
+test_missing_invalid_and_repair_failure_never_load_services (test_bootstrap_startup.BootstrapStartupTests.test_missing_invalid_and_repair_failure_never_load_services) ... ok
+test_rootless_and_linked_launchdaemon_directory_are_not_activated (test_bootstrap_startup.BootstrapStartupTests.test_rootless_and_linked_launchdaemon_directory_are_not_activated) ... ok
+setUpClass (test_guest_bootstrap_state.GuestBootstrapStateTests) ... ERROR
+test_changed_revision_version_location_and_extra_package_are_rejected (test_daemon_api_build.DaemonAPIBuildTests.test_changed_revision_version_location_and_extra_package_are_rejected) ... ok
+test_duplicate_pins_are_rejected (test_daemon_api_build.DaemonAPIBuildTests.test_duplicate_pins_are_rejected) ... ok
+test_exact_pins_are_accepted (test_daemon_api_build.DaemonAPIBuildTests.test_exact_pins_are_accepted) ... ok
+test_launchd_plist_restarts_quickly_and_keeps_proxy_log (test_daemon_api_build.DaemonAPIBuildTests.test_launchd_plist_restarts_quickly_and_keeps_proxy_log) ... ok
+test_project_requirement_must_be_exact_resolved_version (test_daemon_api_build.DaemonAPIBuildTests.test_project_requirement_must_be_exact_resolved_version) ... ok
+test_repository_daemon_graph_pins_iclikit_0_7_16 (test_daemon_api_build.DaemonAPIBuildTests.test_repository_daemon_graph_pins_iclikit_0_7_16) ... ok
+test_apply_is_exact_and_idempotent (test_daemon_api_overlays.DaemonOverlayTests.test_apply_is_exact_and_idempotent) ... ok
+test_candidate_marker_binds_the_declared_overlay_set (test_daemon_api_overlays.DaemonOverlayTests.test_candidate_marker_binds_the_declared_overlay_set) ... ok
+test_modified_source_or_wrong_revision_is_rejected (test_daemon_api_overlays.DaemonOverlayTests.test_modified_source_or_wrong_revision_is_rejected) ... ok
+test_patch_tampering_is_rejected_before_write (test_daemon_api_overlays.DaemonOverlayTests.test_patch_tampering_is_rejected_before_write) ... ok
+test_path_escape_is_rejected (test_daemon_api_overlays.DaemonOverlayTests.test_path_escape_is_rejected) ... ok
+test_unrelated_or_untracked_modification_is_rejected (test_daemon_api_overlays.DaemonOverlayTests.test_unrelated_or_untracked_modification_is_rejected) ... ok
+test_validator_rejects_absent_or_mutated_overlay (test_daemon_api_overlays.DaemonOverlayTests.test_validator_rejects_absent_or_mutated_overlay) ... ok
+test_utf8_names_and_mac_metadata_in_c_locale (test_daemon_api_icli.DaemonAPIIcliArchiveTests.test_utf8_names_and_mac_metadata_in_c_locale) ... ok
+
+======================================================================
+ERROR: setUpClass (test_guest_bootstrap_state.GuestBootstrapStateTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_guest_bootstrap_state.py", line 56, in setUpClass
+    if result.returncode: raise AssertionError(result.stderr)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: <unknown>:0: error: error opening '/Users/kolar/.cache/clang/ModuleCache/Swift-7JL1KBZ3A6V3.swiftmodule' for output: /Users/kolar/.cache/clang/ModuleCache: Operation not permitted
+<unknown>:0: error: unable to load standard library for target 'arm64-apple-macosx27.0.0'
+
+
+----------------------------------------------------------------------
+Ran 18 tests in 6.819s
+
+FAILED (errors=1)

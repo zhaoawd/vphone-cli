@@ -1,0 +1,4711 @@
+{
+  "pid": 34,
+  "executable": "SpringBoard",
+  "classes": [
+    {
+      "class": "FBSComponentScene",
+      "methods": [
+        "clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBDashBoardOrientationController",
+      "methods": [
+        ".cxx_destruct",
+        "noteInterfaceOrientationChanged:duration:logMessage:",
+        "cancelOrientationUpdateDeferral",
+        "deferOrientationUpdatesWithReason:"
+      ],
+      "typed_methods": [
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "noteInterfaceOrientationChanged:duration:logMessage:",
+          "encoding": "v40@0:8q16d24@32"
+        },
+        {
+          "selector": "cancelOrientationUpdateDeferral",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "deferOrientationUpdatesWithReason:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBSystemApertureSceneElement",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "isSymmetricalForUILayoutDirectionInConfiguration:orientation:",
+        "_activateSceneWithInitialOtherSettings:clientSettings:initialLayoutMode:",
+        "_scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+        "_tryMovingToPlaceholderElementWithClientSettingsDiff:forScene:oldClientSettings:transitionContext:",
+        "activateWithInitialOtherClientSettings:",
+        "activateWithInitialOtherSceneSettings:clientSettings:transitionRequestHandler:",
+        "isFixedInOrientation",
+        "sceneClientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "isSymmetricalForUILayoutDirectionInConfiguration:orientation:",
+          "encoding": "B32@0:8@16q24"
+        },
+        {
+          "selector": "_activateSceneWithInitialOtherSettings:clientSettings:initialLayoutMode:",
+          "encoding": "v40@0:8@16@24q32"
+        },
+        {
+          "selector": "_scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "_tryMovingToPlaceholderElementWithClientSettingsDiff:forScene:oldClientSettings:transitionContext:",
+          "encoding": "B48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "activateWithInitialOtherClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "activateWithInitialOtherSceneSettings:clientSettings:transitionRequestHandler:",
+          "encoding": "v40@0:8@16@24@?32"
+        },
+        {
+          "selector": "isFixedInOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "sceneClientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBFluidSwitcherPortaledSceneLiveContentOverlay",
+      "methods": [
+        "contentOrientation",
+        "updateTopAffordanceContextMenuWithOptions:selectedActionType:layout:hidden:interfaceOrientation:",
+        "containerOrientation",
+        "preferredInterfaceOrientation",
+        "supportedInterfaceOrientations",
+        "configureWithWorkspaceEntity:referenceFrame:contentOrientation:containerOrientation:layoutRole:sbsDisplayLayoutRole:zOrderIndex:spaceConfiguration:floatingConfiguration:hasClassicAppOrientationMismatch:sizingPolicy:",
+        "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:livePortalView:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "contentOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "updateTopAffordanceContextMenuWithOptions:selectedActionType:layout:hidden:interfaceOrientation:",
+          "encoding": "v76@0:8q16q24{SBWindowControlsLayout=qB{CGPoint=dd}}32B64q68"
+        },
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "configureWithWorkspaceEntity:referenceFrame:contentOrientation:containerOrientation:layoutRole:sbsDisplayLayoutRole:zOrderIndex:spaceConfiguration:floatingConfiguration:hasClassicAppOrientationMismatch:sizingPolicy:",
+          "encoding": "v124@0:8@16{CGRect={CGPoint=dd}{CGSize=dd}}24q56q64q72q80q88q96q104B112q116"
+        },
+        {
+          "selector": "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:livePortalView:",
+          "encoding": "@64@0:8@16{CGSize=dd}24q40q48@56"
+        }
+      ]
+    },
+    {
+      "class": "SBButtonBezelGeometryInfo",
+      "methods": [
+        "buttonHWRectForButton:inView:",
+        "buttonHWRectForButton:onEmbeddedDisplayBounds:",
+        "buttonScreenEdgeForButton:",
+        "normalizedButtonHWRectForButton:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "buttonHWRectForButton:inView:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}32@0:8q16@24"
+        },
+        {
+          "selector": "buttonHWRectForButton:onEmbeddedDisplayBounds:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}56@0:8q16{CGRect={CGPoint=dd}{CGSize=dd}}24"
+        },
+        {
+          "selector": "buttonScreenEdgeForButton:",
+          "encoding": "Q24@0:8q16"
+        },
+        {
+          "selector": "normalizedButtonHWRectForButton:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBLockScreenOrientationManager",
+      "methods": [
+        ".cxx_destruct",
+        "assistantDidAppear:windowScene:",
+        "init",
+        "_lockStateChanged:",
+        "_updateDeviceOrientationIfNeededForPhoneUnlockToOrientation:",
+        "updateInterfaceOrientationWithRequestedOrientation:animated:"
+      ],
+      "typed_methods": [
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "assistantDidAppear:windowScene:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_lockStateChanged:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_updateDeviceOrientationIfNeededForPhoneUnlockToOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "updateInterfaceOrientationWithRequestedOrientation:animated:",
+          "encoding": "v28@0:8q16B24"
+        }
+      ]
+    },
+    {
+      "class": "SBTransientActiveInterfaceOrientationRequester",
+      "methods": [
+        "orientation",
+        ".cxx_destruct",
+        "reason",
+        "initWithOrientation:andReason:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "reason",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "initWithOrientation:andReason:",
+          "encoding": "@32@0:8q16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBLoginAppSceneHoster",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "updateSettingsWithTransitionBlock:",
+        "launchLoginAppWithInitialOrientation:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updateSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "launchLoginAppWithInitialOrientation:completion:",
+          "encoding": "v32@0:8q16@?24"
+        }
+      ]
+    },
+    {
+      "class": "FBSOrientationObserverClient",
+      "methods": [
+        "_setDelegate:",
+        "_connectionInterrupted:",
+        "_connection",
+        "_server:registerOrientationInterest:",
+        "activeInterfaceOrientation",
+        "_connectionInvalidated:",
+        "invalidate",
+        ".cxx_destruct",
+        "activeInterfaceOrientationWithCompletion:",
+        "_lock_remoteTarget",
+        "_lock_activate",
+        "_lock_invalidate",
+        "initWithDelegate:",
+        "_connectionActivated:",
+        "dealloc",
+        "registerOrientationInterest:",
+        "_initWithEndpoint:calloutQueue:delegate:",
+        "activeOrientationDidUpdate:",
+        "activate"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_setDelegate:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_connectionInterrupted:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_connection",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_server:registerOrientationInterest:",
+          "encoding": "v28@0:8@16I24"
+        },
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_connectionInvalidated:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientationWithCompletion:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_lock_remoteTarget",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_lock_activate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_lock_invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "initWithDelegate:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_connectionActivated:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "registerOrientationInterest:",
+          "encoding": "v20@0:8I16"
+        },
+        {
+          "selector": "_initWithEndpoint:calloutQueue:delegate:",
+          "encoding": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "activeOrientationDidUpdate:",
+          "encoding": "Vv24@0:8@16"
+        },
+        {
+          "selector": "activate",
+          "encoding": "v16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSOrientationObserver",
+      "methods": [
+        "setHandler:",
+        "activeInterfaceOrientation",
+        "_lock_setHandler:",
+        "invalidate",
+        "_getAndSetFreshestUpdateGivenUpdate:forced:",
+        "client:handleOrientationUpdate:",
+        ".cxx_destruct",
+        "handler",
+        "activeInterfaceOrientationWithCompletion:",
+        "handleOrientationResetForClient:",
+        "dealloc",
+        "_lock_getAndSetFreshestUpdateGivenUpdate:forced:",
+        "init",
+        "_initWithClient:callbackQueue:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setHandler:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_lock_setHandler:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_getAndSetFreshestUpdateGivenUpdate:forced:",
+          "encoding": "@28@0:8@16B24"
+        },
+        {
+          "selector": "client:handleOrientationUpdate:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "handler",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientationWithCompletion:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "handleOrientationResetForClient:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_lock_getAndSetFreshestUpdateGivenUpdate:forced:",
+          "encoding": "@28@0:8@16B24"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_initWithClient:callbackQueue:",
+          "encoding": "@32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneRemnant",
+      "methods": [
+        "_clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBUIAccessorySceneManager",
+      "methods": [
+        "scene:didUpdateSettings:",
+        "_primarySceneDidUpdateSettings:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_primarySceneDidUpdateSettings:transitionContext:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneSnapshotRequest",
+      "methods": [
+        "orientation",
+        "initWithSize:orientation:userInterfaceStyle:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "initWithSize:orientation:userInterfaceStyle:",
+          "encoding": "@40@0:8Q16Q24Q32"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsSceneOrientationRequestsAssistant",
+      "methods": [
+        "invalidate",
+        ".cxx_destruct",
+        "errorDomain",
+        "_startSceneOrientationRequestWithDesiredOrientations:error:",
+        "checkValidityAgainstUpdateReasons:",
+        "coalescedNotifyArbitrationUpdateNeeded:withReason:",
+        "initWithTraitsSceneDelegate:errorDomain:",
+        "setUpForTransitionContextIfNeeded:",
+        "traitsDelegate"
+      ],
+      "typed_methods": [
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "errorDomain",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_startSceneOrientationRequestWithDesiredOrientations:error:",
+          "encoding": "v32@0:8Q16o^@24"
+        },
+        {
+          "selector": "checkValidityAgainstUpdateReasons:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "coalescedNotifyArbitrationUpdateNeeded:withReason:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "initWithTraitsSceneDelegate:errorDomain:",
+          "encoding": "@32@0:8@16@24"
+        },
+        {
+          "selector": "setUpForTransitionContextIfNeeded:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "traitsDelegate",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSetInterfaceOrientationFromUserResizingEventResponse",
+      "methods": [
+        "displayItem",
+        "type",
+        ".cxx_destruct",
+        "desiredOrientation",
+        "initWithDisplayItem:desiredContentOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "displayItem",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "type",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "desiredOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "initWithDisplayItem:desiredContentOrientation:",
+          "encoding": "@32@0:8@16q24"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneOverlayViewProvider",
+      "methods": [
+        "_noteSupportedInterfaceOrientationsChanged",
+        "contentWantsSimplifiedOrientationBehavior",
+        "preferredInterfaceOrientationForPresentation",
+        "bestHomeAffordanceOrientationForOrientation:",
+        "supportedInterfaceOrientations",
+        "_contentSupportedInterfaceOrientationsRequireContainerCounterRotation",
+        "shouldFollowSceneOrientation",
+        "willDoBoundsPreservingRotationFromInterfaceOrientation:toInterfaceOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_noteSupportedInterfaceOrientationsChanged",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "contentWantsSimplifiedOrientationBehavior",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "preferredInterfaceOrientationForPresentation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "bestHomeAffordanceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "_contentSupportedInterfaceOrientationsRequireContainerCounterRotation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "shouldFollowSceneOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "willDoBoundsPreservingRotationFromInterfaceOrientation:toInterfaceOrientation:",
+          "encoding": "v32@0:8q16q24"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationAppProtectionSceneOverlayViewProvider",
+      "methods": [
+        "contentWantsSimplifiedOrientationBehavior"
+      ],
+      "typed_methods": [
+        {
+          "selector": "contentWantsSimplifiedOrientationBehavior",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneHandleBlockObserver",
+      "methods": [
+        "sceneHandle:didUpdateClientSettings:",
+        "sceneHandle:didUpdateSettingsWithDiff:previousSettings:",
+        "observeDidUpdateClientSettings:",
+        "observeDidUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "sceneHandle:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "sceneHandle:didUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "observeDidUpdateClientSettings:",
+          "encoding": "@24@0:8@?16"
+        },
+        {
+          "selector": "observeDidUpdateSettings:",
+          "encoding": "@24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationScenePlaceholderContentContext",
+      "methods": [
+        "setHasOrientationMismatchForClassicApp:",
+        "hasOrientationMismatchForClassicApp"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setHasOrientationMismatchForClassicApp:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "hasOrientationMismatchForClassicApp",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBFullScreenSwitcherSceneLiveContentOverlay",
+      "methods": [
+        "setContentReferenceSize:interfaceOrientation:",
+        "applicationSceneViewControllerDidUpdateHomeAffordanceSupportedOrientations:",
+        "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+        "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+        "sceneHandle:didUpdateClientSettings:",
+        "medusaDecoratedDeviceApplicationSceneViewControllerDidUpdateHomeAffordanceSupportedOrientations:",
+        "sceneHandle:didUpdateSettingsWithDiff:previousSettings:",
+        "updateTopAffordanceContextMenuWithOptions:selectedActionType:layout:hidden:interfaceOrientation:",
+        "setContainerOrientation:",
+        "bestHomeAffordanceOrientationForOrientation:",
+        "_updateOrientationWrapper",
+        "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+        "containerOrientation",
+        "preferredInterfaceOrientation",
+        "supportedInterfaceOrientations",
+        "configureWithWorkspaceEntity:referenceFrame:contentOrientation:containerOrientation:layoutRole:sbsDisplayLayoutRole:zOrderIndex:spaceConfiguration:floatingConfiguration:hasClassicAppOrientationMismatch:sizingPolicy:",
+        "orientationWrapperView"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setContentReferenceSize:interfaceOrientation:",
+          "encoding": "v40@0:8{CGSize=dd}16q32"
+        },
+        {
+          "selector": "applicationSceneViewControllerDidUpdateHomeAffordanceSupportedOrientations:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+          "encoding": "v32@0:8q16q24"
+        },
+        {
+          "selector": "sceneHandle:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "medusaDecoratedDeviceApplicationSceneViewControllerDidUpdateHomeAffordanceSupportedOrientations:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "sceneHandle:didUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "updateTopAffordanceContextMenuWithOptions:selectedActionType:layout:hidden:interfaceOrientation:",
+          "encoding": "v76@0:8q16q24{SBWindowControlsLayout=qB{CGPoint=dd}}32B64q68"
+        },
+        {
+          "selector": "setContainerOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "bestHomeAffordanceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "_updateOrientationWrapper",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+          "encoding": "v44@0:8q16q24@32B40"
+        },
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "configureWithWorkspaceEntity:referenceFrame:contentOrientation:containerOrientation:layoutRole:sbsDisplayLayoutRole:zOrderIndex:spaceConfiguration:floatingConfiguration:hasClassicAppOrientationMismatch:sizingPolicy:",
+          "encoding": "v124@0:8@16{CGRect={CGPoint=dd}{CGSize=dd}}24q56q64q72q80q88q96q104B112q116"
+        },
+        {
+          "selector": "orientationWrapperView",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneLayoutOrientationCoordinateSpace",
+      "methods": [
+        "convertRect:fromCoordinateSpace:",
+        "bounds",
+        "convertRect:toCoordinateSpace:",
+        "initWithInterfaceOrientation:withReferenceCoordinateSpace:inOrientation:",
+        "descriptionBuilderWithMultilinePrefix:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "convertRect:fromCoordinateSpace:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}56@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16@48"
+        },
+        {
+          "selector": "bounds",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "convertRect:toCoordinateSpace:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}56@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16@48"
+        },
+        {
+          "selector": "initWithInterfaceOrientation:withReferenceCoordinateSpace:inOrientation:",
+          "encoding": "@40@0:8q16@24q32"
+        },
+        {
+          "selector": "descriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceOrientationUpdateDeferralAssertion",
+      "methods": [
+        "isInvalidated",
+        "_setHackyBackReference:",
+        "initWithReason:",
+        "invalidate",
+        ".cxx_destruct",
+        "reason",
+        "hackyBackReference",
+        "dealloc",
+        "init",
+        "description"
+      ],
+      "typed_methods": [
+        {
+          "selector": "isInvalidated",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_setHackyBackReference:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "initWithReason:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "reason",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "hackyBackReference",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneSnapshotContext",
+      "methods": [
+        "orientation",
+        "setClientSettings:",
+        "clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneStatusBarStateProvider_Base",
+      "methods": [
+        "_statusBarHiddenGivenFallbackOrientation:",
+        "sceneWantsDeviceOrientationEventsEnabled",
+        "_fallbackInterfaceOrientation",
+        "_statusBarOrientationGivenFallbackOrientation:",
+        "statusBarOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_statusBarHiddenGivenFallbackOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "sceneWantsDeviceOrientationEventsEnabled",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_fallbackInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_statusBarOrientationGivenFallbackOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "statusBarOrientation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneStatusBarStateProxy",
+      "methods": [
+        "sceneWithIdentifier:didChangeStatusBarOrientationTo:",
+        "_statusBarHiddenGivenFallbackOrientation:",
+        "sceneWantsDeviceOrientationEventsEnabled",
+        "_fallbackInterfaceOrientation",
+        "sceneWithIdentifier:didChangeSceneInterfaceOrientationTo:",
+        "_statusBarOrientationGivenFallbackOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "sceneWithIdentifier:didChangeStatusBarOrientationTo:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "_statusBarHiddenGivenFallbackOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "sceneWantsDeviceOrientationEventsEnabled",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_fallbackInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "sceneWithIdentifier:didChangeSceneInterfaceOrientationTo:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "_statusBarOrientationGivenFallbackOrientation:",
+          "encoding": "q24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneStatusBarStateProvider",
+      "methods": [
+        "_statusBarHiddenGivenFallbackOrientation:",
+        "sceneWantsDeviceOrientationEventsEnabled",
+        "_fallbackInterfaceOrientation",
+        "sceneHandle:didUpdateClientSettings:",
+        "sceneHandle:didUpdateSettingsWithDiff:previousSettings:",
+        "_statusBarOrientationGivenFallbackOrientation:",
+        "_statusBarAppearsOutsideOfAJailedAppInOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_statusBarHiddenGivenFallbackOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "sceneWantsDeviceOrientationEventsEnabled",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_fallbackInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "sceneHandle:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "sceneHandle:didUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "_statusBarOrientationGivenFallbackOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "_statusBarAppearsOutsideOfAJailedAppInOrientation:",
+          "encoding": "B24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneViewPlaceholderContentViewProvider",
+      "methods": [
+        "_contentViewFromSceneHandle:displayConfiguration:orientation:snapshot:size:statusBarDescriptor:hasOrientationMismatchForClassicApp:customContainerBounds:",
+        "_naturalSizeForOrientation:referenceSize:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_contentViewFromSceneHandle:displayConfiguration:orientation:snapshot:size:statusBarDescriptor:hasOrientationMismatchForClassicApp:customContainerBounds:",
+          "encoding": "@108@0:8@16@24q32@40{CGSize=dd}48@64B72{CGRect={CGPoint=dd}{CGSize=dd}}76"
+        },
+        {
+          "selector": "_naturalSizeForOrientation:referenceSize:",
+          "encoding": "{CGSize=dd}40@0:8q16{CGSize=dd}24"
+        }
+      ]
+    },
+    {
+      "class": "FBWorkspaceScene",
+      "methods": [
+        "initWithConnection:host:settings:clientSettings:fromRemnant:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initWithConnection:host:settings:clientSettings:fromRemnant:",
+          "encoding": "@52@0:8@16@24@32@40B48"
+        }
+      ]
+    },
+    {
+      "class": "FBUIApplicationWorkspaceScene",
+      "methods": [
+        "initWithConnection:host:settings:clientSettings:fromRemnant:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initWithConnection:host:settings:clientSettings:fromRemnant:",
+          "encoding": "@52@0:8@16@24@32@40B48"
+        }
+      ]
+    },
+    {
+      "class": "SBOverrideInterfaceOrientationSwitcherModifier",
+      "methods": [
+        "containerViewBounds",
+        "initWithInterfaceOrientation:",
+        "switcherViewBounds",
+        "switcherInterfaceOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "containerViewBounds",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "initWithInterfaceOrientation:",
+          "encoding": "@24@0:8q16"
+        },
+        {
+          "selector": "switcherViewBounds",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "switcherInterfaceOrientation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneResizeGestureSwitcherModifier",
+      "methods": [
+        "_actionForNormalizedProgress:inOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_actionForNormalizedProgress:inOrientation:",
+          "encoding": "q32@0:8d16q24"
+        }
+      ]
+    },
+    {
+      "class": "SBZStackForegroundSceneOrderedPolicyAssistant",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "_didUpdateClientSettings:",
+        "sceneHandle:didUpdateClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_didUpdateClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "sceneHandle:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBTransientOverlayScenePresenter",
+      "methods": [
+        "transientOverlayViewControllerWillBeginRotation:toInterfaceOrientation:",
+        "defaultSupportedInterfaceOrientationsForTransientOverlayViewController:",
+        "topmostViewControllerInterfaceOrientation",
+        "transientOverlayViewControllerNeedsOrientationUpdatesDisabledUpdate:",
+        "defaultPreferredInterfaceOrientationForPresentationForTransientOverlayViewController:",
+        "transientOverlayDidUpdateSupportedInterfaceOrientations:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "transientOverlayViewControllerWillBeginRotation:toInterfaceOrientation:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "defaultSupportedInterfaceOrientationsForTransientOverlayViewController:",
+          "encoding": "Q24@0:8@16"
+        },
+        {
+          "selector": "topmostViewControllerInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "transientOverlayViewControllerNeedsOrientationUpdatesDisabledUpdate:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "defaultPreferredInterfaceOrientationForPresentationForTransientOverlayViewController:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "transientOverlayDidUpdateSupportedInterfaceOrientations:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBMedusaOrientationTestRecipe",
+      "methods": [
+        "handleVolumeIncrease",
+        "title",
+        "handleVolumeDecrease"
+      ],
+      "typed_methods": [
+        {
+          "selector": "handleVolumeIncrease",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "title",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "handleVolumeDecrease",
+          "encoding": "v16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBWorkspaceApplicationSceneTransitionContext",
+      "methods": [
+        "interfaceOrientation",
+        "interfaceOrientationOrPreferredOrientation",
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:",
+        "setInterfaceOrientation:",
+        "_lockedInterfaceOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "interfaceOrientationOrPreferredOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setPreferredInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_lockedInterfaceOrientation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBDisableActiveInterfaceOrientationChangeAssertion",
+      "methods": [
+        "invalidate",
+        "initWithReason:nudgeOrientationOnInvalidate:",
+        ".cxx_destruct",
+        "dealloc",
+        "description"
+      ],
+      "typed_methods": [
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "initWithReason:nudgeOrientationOnInvalidate:",
+          "encoding": "@28@0:8@16B24"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneLayoutWorkspaceTransaction",
+      "methods": [
+        "_overrideInterfaceOrientationForOrientationMismatch:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_overrideInterfaceOrientationForOrientationMismatch:",
+          "encoding": "B24@0:8^q16"
+        }
+      ]
+    },
+    {
+      "class": "SBRotateScenesWorkspaceTransaction",
+      "methods": [
+        "_isOrientationChanging"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_isOrientationChanging",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettingsDiffInspector",
+      "methods": [
+        "observePreferredInterfaceOrientationWithBlock:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "observePreferredInterfaceOrientationWithBlock:",
+          "encoding": "v24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSettingsDiffInspector",
+      "methods": [
+        "observeInterfaceOrientationWithBlock:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "observeInterfaceOrientationWithBlock:",
+          "encoding": "v24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsSceneParticipantDelegate",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "setOrientationActuationEnabled:",
+        "_allLegalOrientations",
+        "_bestGuessSupportedInterfaceOrientations",
+        "_evaluateOrientationTransitionContext:",
+        "_orientationMode",
+        "_preferredOrientation",
+        "_supportedOrientations",
+        "actuateOrientationAlongsideBlock",
+        "actuateOrientationSettingsAlongsideBlock",
+        "actuateOrientationSettingsWithContext:",
+        "canDetermineActiveOrientation",
+        "initialSupportedOrientationsOverride",
+        "isOrientationActuationAnimatable",
+        "isOrientationActuationAnimatable",
+        "lazyOrientationRequestActionAssistant",
+        "orientationModeOverride",
+        "sceneCurrentOrientation",
+        "scenePrefersOrientationLocked",
+        "setActuateOrientationAlongsideBlock:",
+        "setActuateOrientationSettingsAlongsideBlock:",
+        "setCanDetermineActiveOrientation:",
+        "setInitialSupportedOrientationsOverride:",
+        "setOrientationActuationAnimatable:",
+        "setOrientationModeOverride:",
+        "updateOrientationLockGrantedIfNeeded:",
+        "updateOrientationSceneSettingsForParticipant:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "setOrientationActuationEnabled:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "_allLegalOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "_bestGuessSupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "_evaluateOrientationTransitionContext:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_orientationMode",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_preferredOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_supportedOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "actuateOrientationAlongsideBlock",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "actuateOrientationSettingsAlongsideBlock",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "actuateOrientationSettingsWithContext:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "canDetermineActiveOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "initialSupportedOrientationsOverride",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "isOrientationActuationAnimatable",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "isOrientationActuationAnimatable",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "lazyOrientationRequestActionAssistant",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "orientationModeOverride",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "sceneCurrentOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "scenePrefersOrientationLocked",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "setActuateOrientationAlongsideBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "setActuateOrientationSettingsAlongsideBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "setCanDetermineActiveOrientation:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "setInitialSupportedOrientationsOverride:",
+          "encoding": "v24@0:8Q16"
+        },
+        {
+          "selector": "setOrientationActuationAnimatable:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "setOrientationModeOverride:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "updateOrientationLockGrantedIfNeeded:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "updateOrientationSceneSettingsForParticipant:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneHandle",
+      "methods": [
+        "newSceneViewWithReferenceSize:contentOrientation:containerOrientation:hostRequester:",
+        "scene:didUpdateClientSettings:",
+        "_didUpdateClientSettings:",
+        "_didUpdateSettingsWithDiff:previousSettings:",
+        "scene:didUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "newSceneViewWithReferenceSize:contentOrientation:containerOrientation:hostRequester:",
+          "encoding": "@56@0:8{CGSize=dd}16q32q40@48"
+        },
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_didUpdateClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_didUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBApplicationSceneHandle",
+      "methods": [
+        "newSceneViewWithReferenceSize:contentOrientation:containerOrientation:hostRequester:",
+        "_createApplicationSceneClientSettingsFromContext:entity:initialSceneSettings:",
+        "_modifyApplicationSceneClientSettings:fromRequestContext:entity:initialSceneSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "newSceneViewWithReferenceSize:contentOrientation:containerOrientation:hostRequester:",
+          "encoding": "@56@0:8{CGSize=dd}16q32q40@48"
+        },
+        {
+          "selector": "_createApplicationSceneClientSettingsFromContext:entity:initialSceneSettings:",
+          "encoding": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "_modifyApplicationSceneClientSettings:fromRequestContext:entity:initialSceneSettings:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneHandle",
+      "methods": [
+        "newSceneViewWithReferenceSize:contentOrientation:containerOrientation:hostRequester:",
+        "defaultStatusBarHeightForOrientation:",
+        "isCurrentStatusBarHiddenForOrientation:",
+        "_didUpdateClientSettings:",
+        "_setInitialDeviceOrientationFromSceneOrientationRequestSetup:",
+        "_safeAreaInsetsForInterfaceOrientation:isPhone:portraitSafeAreaInsets:statusBarHeight:homeAffordanceOverlayAllowance:",
+        "_classicPhoneOnPadActivationOrientationForOrientation:",
+        "_resumingInterfaceOrientationForOrientation:",
+        "_launchingInterfaceOrientationForOrientation:",
+        "statusBarOrientation",
+        "_interfaceOrientationMode",
+        "activationInterfaceOrientationForCurrentOrientation",
+        "_interfaceOrientationFromUserResizing",
+        "_supportedInterfaceOrientationsFromSceneOrientationRequestSetup",
+        "wantsDeviceOrientationEventsEnabled",
+        "supportedInterfaceOrientations",
+        "mostRecentSceneSnapshotsForScale:launchingOrientation:",
+        "defaultInterfaceOrientation",
+        "_didUpdateSettingsWithDiff:previousSettings:",
+        "_preferredSizingPolicyForContentOrientation:containerOrientation:",
+        "_classicAppPhoneOnPadSupportsOldStyleMixedOrientation",
+        "_modifyApplicationSceneClientSettings:fromRequestContext:entity:initialSceneSettings:",
+        "statusBarHeightForOrientation:",
+        "_currentClassicModeAllowsLaunchingToAnySupportedOrientation",
+        "_resetSceneOrientationRequestState",
+        "isStatusBarForcedHiddenForOrientation:",
+        "_isSettingUpSceneOrientationRequest",
+        "_setSupportedInterfaceOrientationsFromSceneOrientationRequestSetup:",
+        "_supportsMixedOrientationOnWindowScene:",
+        "_setSettingUpSceneOrientationRequest:",
+        "defaultStatusBarHiddenForOrientation:",
+        "_setInterfaceOrientationFromUserResizing:",
+        "_mainSceneSupportsInterfaceOrientation:",
+        "_supportsMixedOrientation",
+        "currentInterfaceOrientation",
+        "activationInterfaceOrientationForOrientation:",
+        "isStatusBarHiddenForActivationSettings:withOrientation:",
+        "_mainSceneSupportedInterfaceOrientations",
+        "_bestSupportedInterfaceOrientationForOrientation:",
+        "_supportedSizingPoliciesForContentOrientation:containerOrientation:",
+        "_initialDeviceOrientationFromSceneOrientationRequestSetup"
+      ],
+      "typed_methods": [
+        {
+          "selector": "newSceneViewWithReferenceSize:contentOrientation:containerOrientation:hostRequester:",
+          "encoding": "@56@0:8{CGSize=dd}16q32q40@48"
+        },
+        {
+          "selector": "defaultStatusBarHeightForOrientation:",
+          "encoding": "d24@0:8q16"
+        },
+        {
+          "selector": "isCurrentStatusBarHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_didUpdateClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_setInitialDeviceOrientationFromSceneOrientationRequestSetup:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_safeAreaInsetsForInterfaceOrientation:isPhone:portraitSafeAreaInsets:statusBarHeight:homeAffordanceOverlayAllowance:",
+          "encoding": "{UIEdgeInsets=dddd}76@0:8q16B24{UIEdgeInsets=dddd}28d60d68"
+        },
+        {
+          "selector": "_classicPhoneOnPadActivationOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "_resumingInterfaceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "_launchingInterfaceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "statusBarOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_interfaceOrientationMode",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "activationInterfaceOrientationForCurrentOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_interfaceOrientationFromUserResizing",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_supportedInterfaceOrientationsFromSceneOrientationRequestSetup",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "wantsDeviceOrientationEventsEnabled",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "mostRecentSceneSnapshotsForScale:launchingOrientation:",
+          "encoding": "@32@0:8d16q24"
+        },
+        {
+          "selector": "defaultInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_didUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_preferredSizingPolicyForContentOrientation:containerOrientation:",
+          "encoding": "q32@0:8q16q24"
+        },
+        {
+          "selector": "_classicAppPhoneOnPadSupportsOldStyleMixedOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_modifyApplicationSceneClientSettings:fromRequestContext:entity:initialSceneSettings:",
+          "encoding": "v48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "statusBarHeightForOrientation:",
+          "encoding": "d24@0:8q16"
+        },
+        {
+          "selector": "_currentClassicModeAllowsLaunchingToAnySupportedOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_resetSceneOrientationRequestState",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "isStatusBarForcedHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isSettingUpSceneOrientationRequest",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_setSupportedInterfaceOrientationsFromSceneOrientationRequestSetup:",
+          "encoding": "v24@0:8Q16"
+        },
+        {
+          "selector": "_supportsMixedOrientationOnWindowScene:",
+          "encoding": "B24@0:8@16"
+        },
+        {
+          "selector": "_setSettingUpSceneOrientationRequest:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "defaultStatusBarHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_setInterfaceOrientationFromUserResizing:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_mainSceneSupportsInterfaceOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_supportsMixedOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "currentInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "activationInterfaceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "isStatusBarHiddenForActivationSettings:withOrientation:",
+          "encoding": "B32@0:8@16q24"
+        },
+        {
+          "selector": "_mainSceneSupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "_bestSupportedInterfaceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "_supportedSizingPoliciesForContentOrientation:containerOrientation:",
+          "encoding": "Q32@0:8q16q24"
+        },
+        {
+          "selector": "_initialDeviceOrientationFromSceneOrientationRequestSetup",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBWindowSceneStatusBarLayoutManager",
+      "methods": [
+        "_updateStatusBarOrientationForTopMostActiveLayer",
+        "orientationWindowForLayoutLayer:",
+        "statusBarOrientationShouldFollowWindow:",
+        "setOrientationWindow:forStatusBarLayoutLayer:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_updateStatusBarOrientationForTopMostActiveLayer",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "orientationWindowForLayoutLayer:",
+          "encoding": "@24@0:8Q16"
+        },
+        {
+          "selector": "statusBarOrientationShouldFollowWindow:",
+          "encoding": "B24@0:8@16"
+        },
+        {
+          "selector": "setOrientationWindow:forStatusBarLayoutLayer:",
+          "encoding": "v32@0:8@16Q24"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsOrientationStageComponent",
+      "methods": [
+        "componentOrder",
+        ".cxx_destruct",
+        "preferencesType",
+        "init",
+        "initWithComponentOrder:",
+        "description"
+      ],
+      "typed_methods": [
+        {
+          "selector": "componentOrder",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "preferencesType",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "initWithComponentOrder:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsOrientationSupportTreeNodesSpecifier",
+      "methods": [
+        "updateStageTreeNodesSpecifications:stageParticipantsRoles:context:",
+        "supportedOrientations"
+      ],
+      "typed_methods": [
+        {
+          "selector": "updateStageTreeNodesSpecifications:stageParticipantsRoles:context:",
+          "encoding": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "supportedOrientations",
+          "encoding": "Q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsRoleAFollowsRoleBOrientationPolicySpecifier",
+      "methods": [
+        "force",
+        "roleB",
+        ".cxx_destruct",
+        "updateStageParticipantsResolutionPolicies:context:",
+        "animate",
+        "initWithComponentOrder:",
+        "roleA"
+      ],
+      "typed_methods": [
+        {
+          "selector": "force",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "roleB",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "updateStageParticipantsResolutionPolicies:context:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "animate",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "initWithComponentOrder:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "roleA",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsRoleResolvesOrientationInIsolationPolicySpecifier",
+      "methods": [
+        "targetRole",
+        ".cxx_destruct",
+        "updateStageParticipantsResolutionPolicies:context:",
+        "initWithComponentOrder:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "targetRole",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "updateStageParticipantsResolutionPolicies:context:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "initWithComponentOrder:",
+          "encoding": "@24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsUnlockedEnvironmentFollowsCoverSheetInsteadOfDeviceOrientation",
+      "methods": [
+        "updateStageParticipantsResolutionPolicies:context:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "updateStageParticipantsResolutionPolicies:context:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsCoverSheetFollowsSecureAppOrientationPolicySpecifier",
+      "methods": [
+        "updateStageParticipantsResolutionPolicies:context:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "updateStageParticipantsResolutionPolicies:context:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsRoleFollowsDeviceOrientationPolicySpecifier",
+      "methods": [
+        "targetRole",
+        ".cxx_destruct",
+        "updateStageParticipantsResolutionPolicies:context:",
+        "initWithComponentOrder:",
+        "setDeviceOrientationStateTypes:",
+        "deviceOrientationStateTypes"
+      ],
+      "typed_methods": [
+        {
+          "selector": "targetRole",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "updateStageParticipantsResolutionPolicies:context:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "initWithComponentOrder:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "setDeviceOrientationStateTypes:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "deviceOrientationStateTypes",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBAmbientFollowsRawDeviceOrientationPolicySpecifier",
+      "methods": [
+        "targetRole"
+      ],
+      "typed_methods": [
+        {
+          "selector": "targetRole",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsCoverSheetFollowsDeviceOrientationPolicySpecifier",
+      "methods": [
+        "targetRole"
+      ],
+      "typed_methods": [
+        {
+          "selector": "targetRole",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsOrientationDefaultTreeResolver",
+      "methods": [
+        "_mapResolverForTargetOrientation:currentOrientation:",
+        ".cxx_destruct",
+        "_node:validatesNewSettings:",
+        "resolveStagePreferencesWithContext:preferencesTree:",
+        "_targetOrientationForResolutionInfo:validatedInputs:rawInputs:participant:parent:",
+        "initWithComponentOrder:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_mapResolverForTargetOrientation:currentOrientation:",
+          "encoding": "@32@0:8q16q24"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_node:validatesNewSettings:",
+          "encoding": "B32@0:8@16@24"
+        },
+        {
+          "selector": "resolveStagePreferencesWithContext:preferencesTree:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_targetOrientationForResolutionInfo:validatedInputs:rawInputs:participant:parent:",
+          "encoding": "q56@0:8@16@24@32@40@48"
+        },
+        {
+          "selector": "initWithComponentOrder:",
+          "encoding": "@24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsOrientationDefaultTreeNodesSpecifier",
+      "methods": [
+        "updateStageTreeNodesSpecifications:stageParticipantsRoles:context:",
+        "_activeOrientationOrderedNodesWithContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "updateStageTreeNodesSpecifications:stageParticipantsRoles:context:",
+          "encoding": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "_activeOrientationOrderedNodesWithContext:",
+          "encoding": "@24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsOrientationDefaultResolutionPolicySpecifier",
+      "methods": [
+        "setDataSource:",
+        ".cxx_destruct",
+        "updateStageParticipantsResolutionPolicies:context:",
+        "dataSource",
+        "initWithComponentOrder:dataSource:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setDataSource:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "updateStageParticipantsResolutionPolicies:context:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "dataSource",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "initWithComponentOrder:dataSource:",
+          "encoding": "@32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsInputsOrientationNonFlatOverrideValidator",
+      "methods": [
+        "validateInputs:withContext:",
+        "description",
+        "setLastNonFlatOrientationOverride:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "validateInputs:withContext:",
+          "encoding": "@32@0:8@16@24"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setLastNonFlatOrientationOverride:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsInputsOrientationLockValidator",
+      "methods": [
+        "validateInputs:withContext:",
+        "setLockOrientation:",
+        ".cxx_destruct",
+        "setPrefersDeferringOrientationUpdates:",
+        "initWithValidatorOrder:",
+        "description"
+      ],
+      "typed_methods": [
+        {
+          "selector": "validateInputs:withContext:",
+          "encoding": "@32@0:8@16@24"
+        },
+        {
+          "selector": "setLockOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "setPrefersDeferringOrientationUpdates:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "initWithValidatorOrder:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBTraitsInputsAllUnknownOrientationValidator",
+      "methods": [
+        "validateInputs:withContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "validateInputs:withContext:",
+          "encoding": "@32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBOrientationLockManager",
+      "methods": [
+        "unlock",
+        "enableLockOverrideForReason:suggestOrientation:",
+        "_removeLockOverrideReason:",
+        "lock",
+        "setLockOverrideEnabled:forReason:",
+        "userLockOrientation",
+        "updateLockOverrideForCurrentDeviceOrientation",
+        ".cxx_destruct",
+        "descriptionWithMultilinePrefix:",
+        "isUserLocked",
+        "dealloc",
+        "isEffectivelyLocked",
+        "effectiveLockedOrientation",
+        "_endShimmingForReason:",
+        "lock:",
+        "_handler_runLoopObserverDispose",
+        "init",
+        "_addLockOverrideReason:orientation:force:",
+        "restoreStateFromPrefs",
+        "lockOverrideEnabled",
+        "deviceOrientationAsFarAsAppsAreConcerned",
+        "succinctDescription",
+        "enableLockOverrideForReason:forceOrientation:",
+        "_updateLockStateWithChanges:",
+        "_updateLockStateWithOrientation:forceUpdateHID:changes:",
+        "succinctDescriptionBuilder",
+        "_beginShimmingForReason:",
+        "_setupRunLoopObserverIfNecessaryForOrientation:andInitialLockState:",
+        "description",
+        "descriptionBuilderWithMultilinePrefix:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "unlock",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "enableLockOverrideForReason:suggestOrientation:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "_removeLockOverrideReason:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "lock",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "setLockOverrideEnabled:forReason:",
+          "encoding": "v28@0:8B16@20"
+        },
+        {
+          "selector": "userLockOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "updateLockOverrideForCurrentDeviceOrientation",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "descriptionWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "isUserLocked",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "isEffectivelyLocked",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "effectiveLockedOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_endShimmingForReason:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "lock:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_handler_runLoopObserverDispose",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_addLockOverrideReason:orientation:force:",
+          "encoding": "v36@0:8@16q24B32"
+        },
+        {
+          "selector": "restoreStateFromPrefs",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "lockOverrideEnabled",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "deviceOrientationAsFarAsAppsAreConcerned",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "succinctDescription",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "enableLockOverrideForReason:forceOrientation:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "_updateLockStateWithChanges:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_updateLockStateWithOrientation:forceUpdateHID:changes:",
+          "encoding": "v36@0:8q16B24@?28"
+        },
+        {
+          "selector": "succinctDescriptionBuilder",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_beginShimmingForReason:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_setupRunLoopObserverIfNecessaryForOrientation:andInitialLockState:",
+          "encoding": "v28@0:8q16B24"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "descriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBAbstractWindowSceneDelegate",
+      "methods": [
+        "windowScene:didUpdateCoordinateSpace:interfaceOrientation:traitCollection:",
+        "_windowScene:window:didUpdateSupportedInterfaceOrientations:preferredOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "windowScene:didUpdateCoordinateSpace:interfaceOrientation:traitCollection:",
+          "encoding": "v48@0:8@16@24q32@40"
+        },
+        {
+          "selector": "_windowScene:window:didUpdateSupportedInterfaceOrientations:preferredOrientation:",
+          "encoding": "v48@0:8@16@24Q32q40"
+        }
+      ]
+    },
+    {
+      "class": "SBContinuityDisplayDelayedUIWindowSceneDelegate",
+      "methods": [
+        "continuitySession:didUpdateHostedInterfaceOrientation:",
+        "setInterfaceOrientation:supportedInterfaceOrientations:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "continuitySession:didUpdateHostedInterfaceOrientation:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "setInterfaceOrientation:supportedInterfaceOrientations:",
+          "encoding": "v32@0:8q16Q24"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneObserver",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:didUpdateSettings:",
+        "clientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "clientSettings:",
+          "encoding": "v24@0:8:16"
+        }
+      ]
+    },
+    {
+      "class": "FBSScene",
+      "methods": [
+        "uiAlwaysSupportsAllInterfaceOrientations",
+        "uiCanReceiveDeviceOrientationEvents",
+        "uiClientSettings",
+        "ui_orientationClientSceneComponent",
+        "updateUIClientSettingsWithBlock:",
+        "updateUIClientSettingsWithTransitionBlock:",
+        "updateClientSettingsWithBlock:",
+        "updateSettings:",
+        "clientSettings",
+        "updateClientSettings:",
+        "updateClientSettingsWithTransitionBlock:",
+        "_callOutQueue_ensureCoalesceClientSettingsUpdates:",
+        "_callOutQueue_maybeCoalesceClientSettingsUpdates:",
+        "_updateClientSettings:",
+        "updateClientSettings:withTransitionContext:",
+        "updater:didUpdateSettings:withDiff:transitionContext:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "uiAlwaysSupportsAllInterfaceOrientations",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "uiCanReceiveDeviceOrientationEvents",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "uiClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "ui_orientationClientSceneComponent",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateUIClientSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateUIClientSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateClientSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateClientSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateClientSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_callOutQueue_ensureCoalesceClientSettingsUpdates:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_callOutQueue_maybeCoalesceClientSettingsUpdates:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_updateClientSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateClientSettings:withTransitionContext:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updater:didUpdateSettings:withDiff:transitionContext:completion:",
+          "encoding": "v56@0:8@16@24@32@40@?48"
+        }
+      ]
+    },
+    {
+      "class": "FBLocalSynchronousSceneClientProvider",
+      "methods": [
+        "host:didUpdateSettings:withDiff:transitionContext:completion:",
+        "registerHost:settings:initialClientSettings:fromRemnant:error:",
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "host:didUpdateSettings:withDiff:transitionContext:completion:",
+          "encoding": "v56@0:8@16@24@32@40@?48"
+        },
+        {
+          "selector": "registerHost:settings:initialClientSettings:fromRemnant:error:",
+          "encoding": "@56@0:8@16@24@32@40o^@48"
+        },
+        {
+          "selector": "scene:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneManager",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:",
+        "_shouldFenceTransitionForScene:updatedClientSettingsDiff:oldClientSettings:transitionContext:",
+        "_scene:didUpdateClientSettings:",
+        "_appSceneClientSettingsDiffInspector",
+        "_scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_shouldFenceTransitionForScene:updatedClientSettingsDiff:oldClientSettings:transitionContext:",
+          "encoding": "B48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "_scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_appSceneClientSettingsDiffInspector",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSystemShellExternalDisplaySceneManager",
+      "methods": [
+        "_shouldFenceTransitionForScene:updatedClientSettingsDiff:oldClientSettings:transitionContext:",
+        "_scene:didUpdateClientSettings:",
+        "_appSceneClientSettingsDiffInspector",
+        "_scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_shouldFenceTransitionForScene:updatedClientSettingsDiff:oldClientSettings:transitionContext:",
+          "encoding": "B48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "_scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_appSceneClientSettingsDiffInspector",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBMainDisplaySceneManager",
+      "methods": [
+        "_externalClientSettingsDiffInspector",
+        "_shouldFenceTransitionForScene:updatedClientSettingsDiff:oldClientSettings:transitionContext:",
+        "_scene:didUpdateClientSettings:",
+        "_appSceneClientSettingsDiffInspector",
+        "_scene:willUpdateSettings:",
+        "_internalClientSettingsDiffInspector"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_externalClientSettingsDiffInspector",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_shouldFenceTransitionForScene:updatedClientSettingsDiff:oldClientSettings:transitionContext:",
+          "encoding": "B48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "_scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_appSceneClientSettingsDiffInspector",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_internalClientSettingsDiffInspector",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneManagerCoordinator",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneSettingsUpdater",
+      "methods": [
+        "initialSupportedInterfaceOrientations",
+        "initWithScene:persistentIdentifier:level:updatesGeometry:",
+        "setInitialSupportedInterfaceOrientations:",
+        "updatesGeometry"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initialSupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "initWithScene:persistentIdentifier:level:updatesGeometry:",
+          "encoding": "@44@0:8@16@24d32B40"
+        },
+        {
+          "selector": "setInitialSupportedInterfaceOrientations:",
+          "encoding": "v24@0:8Q16"
+        },
+        {
+          "selector": "updatesGeometry",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneObserver",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+        "scene:willUpdateSettings:",
+        "scene:didUpdateSettings:",
+        "scene:willUpdateSettings:withTransitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:withTransitionContext:",
+          "encoding": "v40@0:8@16@24@32"
+        }
+      ]
+    },
+    {
+      "class": "FBScene",
+      "methods": [
+        "ui_orientationHostSceneComponent",
+        "updateSettingsWithBlock:",
+        "scene:didUpdateSettings:",
+        "updateSettings:",
+        "currentInterfaceOrientation",
+        "clientSettings",
+        "uiClientSettings",
+        "updateSettingsWithTransitionBlock:",
+        "clientToken:didUpdateClientSettings:withDiff:transitionContext:",
+        "updateSettings:withTransitionContext:",
+        "updateSettings:withTransitionContext:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "ui_orientationHostSceneComponent",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updateSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "currentInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "uiClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "clientToken:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "updateSettings:withTransitionContext:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updateSettings:withTransitionContext:completion:",
+          "encoding": "v40@0:8@16@24@?32"
+        }
+      ]
+    },
+    {
+      "class": "SBSingleSceneController",
+      "methods": [
+        "initialSupportedInterfaceOrientations",
+        "setInitialSupportedInterfaceOrientations:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initialSupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "setInitialSupportedInterfaceOrientations:",
+          "encoding": "v24@0:8Q16"
+        }
+      ]
+    },
+    {
+      "class": "SBUIKitSafeAreaSceneHostComponent",
+      "methods": [
+        "scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIStatusBarSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertSceneClientComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:",
+        "supportedInterfaceOrientations",
+        "shouldDisableOrientationUpdates"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "shouldDisableOrientationUpdates",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIIdleTimerSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUICameraOverlaySceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIHomeScreenIconStyleSceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSSKExternalDisplayServiceParticipantSceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBWindowSceneStatusBarManager",
+      "methods": [
+        "statusBarOrientation",
+        "setStatusBarOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "statusBarOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setStatusBarOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneParameters",
+      "methods": [
+        "setClientSettings:",
+        "updateSettingsWithBlock:",
+        "clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "updateSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSMutableSceneParameters",
+      "methods": [
+        "applyClientSettings:",
+        "updateClientSettingsWithBlock:",
+        "updateSettingsWithBlock:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "applyClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "updateClientSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneEvent",
+      "methods": [
+        "clientSettingsDiff",
+        "setClientSettingsDiff:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsDiff",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setClientSettingsDiff:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "FBSWorkspaceSceneRequestOptions",
+      "methods": [
+        "initialClientSettings",
+        "setInitialClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initialClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setInitialClientSettings:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "FBSPseudoSceneUpdater",
+      "methods": [
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "FBSWorkspaceScenesClient",
+      "methods": [
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSpecification",
+      "methods": [
+        "affectsScreenOrientation",
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "affectsScreenOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUISystemNotesSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUILoginUISceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIInCallSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIStarkNotificationsSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBMainDisplayInterfaceOrientationAggregator",
+      "methods": [
+        "activeInterfaceOrientation",
+        "highestActiveInterfaceOrientationSourceIgnoringSourcesAbove:",
+        ".cxx_destruct",
+        "descriptionWithMultilinePrefix:",
+        "_layoutOrientation",
+        "dealloc",
+        "highestActiveInterfaceOrientationSourceBelow:",
+        "_highestSourceAtOrBelow:amongSources:",
+        "init",
+        "_sortSources:",
+        "succinctDescription",
+        "interfaceOrientationSources",
+        "activeInterfaceOrientationBelow:",
+        "succinctDescriptionBuilder",
+        "highestActiveInterfaceOrientationSource",
+        "description",
+        "activeInterfaceOrientationAtOrBelow:",
+        "descriptionBuilderWithMultilinePrefix:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "highestActiveInterfaceOrientationSourceIgnoringSourcesAbove:",
+          "encoding": "@24@0:8d16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "descriptionWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_layoutOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "highestActiveInterfaceOrientationSourceBelow:",
+          "encoding": "@24@0:8d16"
+        },
+        {
+          "selector": "_highestSourceAtOrBelow:amongSources:",
+          "encoding": "@32@0:8d16@24"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_sortSources:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "succinctDescription",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "interfaceOrientationSources",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientationBelow:",
+          "encoding": "q24@0:8d16"
+        },
+        {
+          "selector": "succinctDescriptionBuilder",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "highestActiveInterfaceOrientationSource",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientationAtOrBelow:",
+          "encoding": "q24@0:8d16"
+        },
+        {
+          "selector": "descriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceOrientationUpdateManager",
+      "methods": [
+        ".cxx_destruct",
+        "descriptionWithMultilinePrefix:",
+        "_enqueueOrientationUpdateToDeviceOrientation:",
+        "dealloc",
+        "setLastUpdatedDeviceOrientation:",
+        "deviceOrientationUpdateDeferralAssertionWithReason:",
+        "isCurrentlyDeferringOrientationUpdates",
+        "init",
+        "succinctDescription",
+        "_endDeferringOrientationUpdatesForAssertion:",
+        "_deviceOrientationUpdateNeededForOrientation:",
+        "succinctDescriptionBuilder",
+        "description",
+        "_legacy_enqueueOrientationUpdateToDeviceOrientation:source:",
+        "descriptionBuilderWithMultilinePrefix:",
+        "lastUpdatedDeviceOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "descriptionWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_enqueueOrientationUpdateToDeviceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "setLastUpdatedDeviceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "deviceOrientationUpdateDeferralAssertionWithReason:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "isCurrentlyDeferringOrientationUpdates",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "succinctDescription",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_endDeferringOrientationUpdatesForAssertion:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_deviceOrientationUpdateNeededForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "succinctDescriptionBuilder",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_legacy_enqueueOrientationUpdateToDeviceOrientation:source:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "descriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "lastUpdatedDeviceOrientation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneWorkspace",
+      "methods": [
+        "scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "B32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneManager",
+      "methods": [
+        "_createSceneWithDefinition:settings:initialClientSettings:transitionContext:fromRemnant:usingClientProvider:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_createSceneWithDefinition:settings:initialClientSettings:transitionContext:fromRemnant:usingClientProvider:completion:",
+          "encoding": "@72@0:8@16@24@32@40@48@56@?64"
+        }
+      ]
+    },
+    {
+      "class": "FBSOrientationUpdate",
+      "methods": [
+        "orientation",
+        "duration",
+        "setSequenceNumber:",
+        "sequenceNumber",
+        "setDuration:",
+        "initWithBSXPCCoder:",
+        "initWithOrientation:sequenceNumber:duration:rotationDirection:",
+        "encodeWithBSXPCCoder:",
+        "rotationDirection",
+        "setRotationDirection:",
+        "init",
+        "description",
+        "setOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "duration",
+          "encoding": "d16@0:8"
+        },
+        {
+          "selector": "setSequenceNumber:",
+          "encoding": "v24@0:8Q16"
+        },
+        {
+          "selector": "sequenceNumber",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "setDuration:",
+          "encoding": "v24@0:8d16"
+        },
+        {
+          "selector": "initWithBSXPCCoder:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "initWithOrientation:sequenceNumber:duration:rotationDirection:",
+          "encoding": "@48@0:8q16Q24d32q40"
+        },
+        {
+          "selector": "encodeWithBSXPCCoder:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "rotationDirection",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setRotationDirection:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBScreenSharingOverlayUISceneController",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettingsCore",
+      "methods": [
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setPreferredInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSettingsCore",
+      "methods": [
+        "interfaceOrientation",
+        "setInterfaceOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneTransitionContext",
+      "methods": [
+        "pui_deviceOrientation",
+        "pui_setDeviceOrientation:",
+        "transientLocalClientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "pui_deviceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "pui_setDeviceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "transientLocalClientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettings",
+      "methods": [
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:",
+        "interfaceOrientationLockPreference",
+        "setInterfaceOrientationLockPreference:",
+        "_uiApplicationSceneClientSettingsShim",
+        "pr_injectedEditingClientSettings",
+        "SBUISA_prefersFixedPortraitOrientation",
+        "sb_effectiveInterfaceOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setPreferredInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "interfaceOrientationLockPreference",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientationLockPreference:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_uiApplicationSceneClientSettingsShim",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "pr_injectedEditingClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "SBUISA_prefersFixedPortraitOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "sb_effectiveInterfaceOrientation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSMutableSceneClientSettings",
+      "methods": [
+        "pr_setInjectedEditingClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "pr_setInjectedEditingClientSettings:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSettings",
+      "methods": [
+        "interfaceOrientationLockState",
+        "setInterfaceOrientationLockState:",
+        "interfaceOrientation",
+        "setInterfaceOrientation:",
+        "pui_deviceOrientation",
+        "sb_isEligbleForDeviceOrientationUpdates"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientationLockState",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientationLockState:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "pui_deviceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "sb_isEligbleForDeviceOrientationUpdates",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSMutableSceneSettings",
+      "methods": [
+        "pui_setDeviceOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "pui_setDeviceOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBInterfaceOrientationServiceServer",
+      "methods": [
+        "registerOrientationInterest:completion:",
+        "listener",
+        "connections",
+        "startService",
+        "_connectionInvalidated:",
+        "invalidate",
+        "noteInterfaceOrientationChanged:animationSettings:direction:",
+        ".cxx_destruct",
+        "interestedConnections",
+        "requestActiveOrientationCompletion:",
+        "initialize",
+        "init",
+        "pendingConnections",
+        "requestActiveOrientation",
+        "_initWithDomain:service:",
+        "listener:didReceiveConnection:withContext:",
+        "_lock_noteInterfaceOrientationChanged:animationSettings:direction:",
+        "_currentConnection",
+        "_lock_sendMessageToInterestedClients:",
+        "_lock_registerOrientationInterest:connection:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "registerOrientationInterest:completion:",
+          "encoding": "Vv32@0:8@16@?24"
+        },
+        {
+          "selector": "listener",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "connections",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "startService",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_connectionInvalidated:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "noteInterfaceOrientationChanged:animationSettings:direction:",
+          "encoding": "v40@0:8q16@24q32"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "interestedConnections",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "requestActiveOrientationCompletion:",
+          "encoding": "Vv24@0:8@?16"
+        },
+        {
+          "selector": "initialize",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "pendingConnections",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "requestActiveOrientation",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_initWithDomain:service:",
+          "encoding": "@32@0:8@16@24"
+        },
+        {
+          "selector": "listener:didReceiveConnection:withContext:",
+          "encoding": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "_lock_noteInterfaceOrientationChanged:animationSettings:direction:",
+          "encoding": "v40@0:8q16@24q32"
+        },
+        {
+          "selector": "_currentConnection",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_lock_sendMessageToInterestedClients:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_lock_registerOrientationInterest:connection:completion:",
+          "encoding": "v36@0:8I16@20@?28"
+        }
+      ]
+    },
+    {
+      "class": "FBInterfaceOrientationService",
+      "methods": [
+        "interfaceOrientation",
+        "startService",
+        ".cxx_destruct",
+        "initialize",
+        "init",
+        "setInterfaceOrientation:",
+        "setInterfaceOrientation:animationSettings:direction:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "startService",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "initialize",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "setInterfaceOrientation:animationSettings:direction:",
+          "encoding": "v40@0:8q16@24q32"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneOverlayBasicWrapperViewController",
+      "methods": [
+        "containerOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneOrientationFollowingWindowRootViewController",
+      "methods": [
+        "viewWillLayoutSubviews",
+        "shouldAutomaticallyForwardAppearanceMethods",
+        ".cxx_destruct",
+        "_edgeInsetsForChildViewController:insetsAreAbsolute:",
+        "supportedInterfaceOrientations",
+        "hostingViewController",
+        "setHostingViewController:",
+        "_canShowWhileLocked",
+        "overlayContentView",
+        "initWithHostingViewController:",
+        "setOverlayContentView:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "viewWillLayoutSubviews",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "shouldAutomaticallyForwardAppearanceMethods",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_edgeInsetsForChildViewController:insetsAreAbsolute:",
+          "encoding": "{UIEdgeInsets=dddd}32@0:8@16^B24"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "hostingViewController",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setHostingViewController:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_canShowWhileLocked",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "overlayContentView",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "initWithHostingViewController:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "setOverlayContentView:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "SBIsolatedSceneOrientationFollowingWrapperViewController",
+      "methods": [
+        "didChangeSettingsForParticipant:context:",
+        "overlayView",
+        "participantAssociatedWindows:",
+        "updatePreferencesForParticipant:updater:",
+        "viewWillLayoutSubviews",
+        "viewDidDisappear:",
+        "loadView",
+        "containerDidUpdateTraitsParticipant:",
+        ".cxx_destruct",
+        "viewWillAppear:",
+        "containerOrientation",
+        "appendDescriptionForParticipant:withBuilder:multilinePrefix:",
+        "_canShowWhileLocked",
+        "viewWillDisappear:",
+        "currentInterfaceOrientation",
+        "viewDidAppear:",
+        "setOrientationDelegate:",
+        "_boundsForOverlayRootView",
+        "_containerViewWillRotateFromInterfaceOrientation:toInterfaceOrientation:withAnimationSettings:",
+        "_hostOrientation",
+        "_isSceneStatusBarHidden",
+        "_updateOrientationResolutionPolicyWithContainerTraitsParticipant:",
+        "initWithContentViewController:sceneHandle:windowScene:orientationDelegate:rendersWhileLocked:",
+        "orientationDelegate"
+      ],
+      "typed_methods": [
+        {
+          "selector": "didChangeSettingsForParticipant:context:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "overlayView",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "participantAssociatedWindows:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "updatePreferencesForParticipant:updater:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "viewWillLayoutSubviews",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "viewDidDisappear:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "loadView",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "containerDidUpdateTraitsParticipant:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "viewWillAppear:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "appendDescriptionForParticipant:withBuilder:multilinePrefix:",
+          "encoding": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "_canShowWhileLocked",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "viewWillDisappear:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "currentInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "viewDidAppear:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "setOrientationDelegate:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_boundsForOverlayRootView",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}16@0:8"
+        },
+        {
+          "selector": "_containerViewWillRotateFromInterfaceOrientation:toInterfaceOrientation:withAnimationSettings:",
+          "encoding": "v40@0:8q16q24@32"
+        },
+        {
+          "selector": "_hostOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_isSceneStatusBarHidden",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_updateOrientationResolutionPolicyWithContainerTraitsParticipant:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "initWithContentViewController:sceneHandle:windowScene:orientationDelegate:rendersWhileLocked:",
+          "encoding": "@52@0:8@16@24@32@40B48"
+        },
+        {
+          "selector": "orientationDelegate",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBOrientationTransformWrapperViewController",
+      "methods": [
+        "loadView",
+        "view"
+      ],
+      "typed_methods": [
+        {
+          "selector": "loadView",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "view",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBMedusaDecoratedDeviceApplicationSceneViewController",
+      "methods": [
+        "applicationSceneViewControllerDidUpdateHomeAffordanceSupportedOrientations:",
+        "setContentReferenceSize:withContentOrientation:andContainerOrientation:",
+        "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+        "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+        "contentOrientation",
+        "sceneHandle:didUpdateClientSettings:",
+        "activeInterfaceOrientationDidChangeToOrientation:willAnimateWithDuration:fromOrientation:",
+        "updateTopAffordanceContextMenuWithOptions:selectedActionType:layout:hidden:interfaceOrientation:",
+        "bestHomeAffordanceOrientationForOrientation:",
+        "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+        "activeInterfaceOrientationWillChangeToOrientation:",
+        "containerOrientation",
+        "containerContentWrapperInterfaceOrientationChangedTo:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "applicationSceneViewControllerDidUpdateHomeAffordanceSupportedOrientations:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "setContentReferenceSize:withContentOrientation:andContainerOrientation:",
+          "encoding": "v48@0:8{CGSize=dd}16q32q40"
+        },
+        {
+          "selector": "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+          "encoding": "v32@0:8q16q24"
+        },
+        {
+          "selector": "contentOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "sceneHandle:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "activeInterfaceOrientationDidChangeToOrientation:willAnimateWithDuration:fromOrientation:",
+          "encoding": "v40@0:8q16d24q32"
+        },
+        {
+          "selector": "updateTopAffordanceContextMenuWithOptions:selectedActionType:layout:hidden:interfaceOrientation:",
+          "encoding": "v76@0:8q16q24{SBWindowControlsLayout=qB{CGPoint=dd}}32B64q68"
+        },
+        {
+          "selector": "bestHomeAffordanceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+          "encoding": "v44@0:8q16q24@32B40"
+        },
+        {
+          "selector": "activeInterfaceOrientationWillChangeToOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "containerContentWrapperInterfaceOrientationChangedTo:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneViewController",
+      "methods": [
+        "setContentReferenceSize:withContentOrientation:andContainerOrientation:",
+        "contentOrientation",
+        "containerOrientation",
+        "containerContentWrapperInterfaceOrientationChangedTo:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setContentReferenceSize:withContentOrientation:andContainerOrientation:",
+          "encoding": "v48@0:8{CGSize=dd}16q32q40"
+        },
+        {
+          "selector": "contentOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "containerContentWrapperInterfaceOrientationChangedTo:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneViewController",
+      "methods": [
+        "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+        "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+        "sceneWithIdentifier:didChangeSceneInterfaceOrientationTo:",
+        "bestHomeAffordanceOrientationForOrientation:",
+        "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+          "encoding": "v32@0:8q16q24"
+        },
+        {
+          "selector": "sceneWithIdentifier:didChangeSceneInterfaceOrientationTo:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "bestHomeAffordanceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+          "encoding": "v44@0:8q16q24@32B40"
+        }
+      ]
+    },
+    {
+      "class": "SBMainWorkspaceApplicationSceneLayoutElementViewController",
+      "methods": [
+        "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+        "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+        "bestHomeAffordanceOrientationForOrientation:",
+        "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+        "_overrideStatusBarOrientationGivenFallbackOrientation:",
+        "supportedContentInterfaceOrientations"
+      ],
+      "typed_methods": [
+        {
+          "selector": "willPerformNonAnimatedTransitionToInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "didRotateFromInterfaceOrientation:toInterfaceOrientation:",
+          "encoding": "v32@0:8q16q24"
+        },
+        {
+          "selector": "bestHomeAffordanceOrientationForOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+          "encoding": "v44@0:8q16q24@32B40"
+        },
+        {
+          "selector": "_overrideStatusBarOrientationGivenFallbackOrientation:",
+          "encoding": "q24@0:8q16"
+        },
+        {
+          "selector": "supportedContentInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneClassicAccessoryView",
+      "methods": [
+        "_sceneHandleDidUpdateClientSettings:",
+        "_sceneHandleDidUpdateSettingsWithDiff:previousSettings:",
+        "_setupPositioningAndRotationForInterfaceOrientation:offscreen:",
+        "_updateOrientationFrom:toOrientation:animationSettings:",
+        "buttonOrientation",
+        "setButtonOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_sceneHandleDidUpdateClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_sceneHandleDidUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_setupPositioningAndRotationForInterfaceOrientation:offscreen:",
+          "encoding": "v28@0:8q16B24"
+        },
+        {
+          "selector": "_updateOrientationFrom:toOrientation:animationSettings:",
+          "encoding": "v40@0:8q16q24@32"
+        },
+        {
+          "selector": "buttonOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setButtonOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBMainDisplaySceneLayoutStatusBarView",
+      "methods": [
+        "sceneWithIdentifier:didChangeStatusBarOrientationTo:",
+        "_statusBarFrameForOrientation:",
+        "layoutStatusBarForSpringBoardRotationToOrientation:",
+        "createStatusBarWithFrame:interfaceOrientation:reason:",
+        "setContainerOrientation:",
+        "containerOrientation",
+        "_anyAppViewControllerOwningInterfaceOrientation",
+        "_layoutStatusBarForOrientation:",
+        "updateStatusBarOrientationForLegacyApp"
+      ],
+      "typed_methods": [
+        {
+          "selector": "sceneWithIdentifier:didChangeStatusBarOrientationTo:",
+          "encoding": "v32@0:8@16q24"
+        },
+        {
+          "selector": "_statusBarFrameForOrientation:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "layoutStatusBarForSpringBoardRotationToOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "createStatusBarWithFrame:interfaceOrientation:reason:",
+          "encoding": "@64@0:8{CGRect={CGPoint=dd}{CGSize=dd}}16q48@56"
+        },
+        {
+          "selector": "setContainerOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "containerOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_anyAppViewControllerOwningInterfaceOrientation",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_layoutStatusBarForOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "updateStatusBarOrientationForLegacyApp",
+          "encoding": "v16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneClassicWrapperView",
+      "methods": [
+        "orientation",
+        "setOrientation:",
+        "setStartingOrientationForClassicPhoneAppRotation:",
+        "startingOrientationForClassicPhoneAppRotation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "setStartingOrientationForClassicPhoneAppRotation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "startingOrientationForClassicPhoneAppRotation",
+          "encoding": "q16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSceneView",
+      "methods": [
+        "orientation",
+        "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:hostRequester:",
+        "_setOrientation:",
+        "_containerContentWrapperInterfaceOrientationChangedTo:",
+        "_updateReferenceSize:andOrientation:",
+        "initWithSceneHandle:referenceSize:orientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:hostRequester:",
+          "encoding": "@64@0:8@16{CGSize=dd}24q40q48@56"
+        },
+        {
+          "selector": "_setOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_containerContentWrapperInterfaceOrientationChangedTo:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_updateReferenceSize:andOrientation:",
+          "encoding": "v40@0:8{CGSize=dd}16q32"
+        },
+        {
+          "selector": "initWithSceneHandle:referenceSize:orientation:",
+          "encoding": "@48@0:8@16{CGSize=dd}24q40"
+        }
+      ]
+    },
+    {
+      "class": "SBApplicationSceneView",
+      "methods": [
+        "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:hostRequester:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:hostRequester:",
+          "encoding": "@64@0:8@16{CGSize=dd}24q40q48@56"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationSceneView",
+      "methods": [
+        "_sceneHandleDidUpdateClientSettings:",
+        "_sceneHandleDidUpdateSettingsWithDiff:previousSettings:",
+        "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+        "noteApplicationClassicPhoneSceneOrientationPreferenceChangingForUserAction:",
+        "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:hostRequester:",
+        "_setOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_sceneHandleDidUpdateClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_sceneHandleDidUpdateSettingsWithDiff:previousSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "willRotateFromInterfaceOrientation:toInterfaceOrientation:alongsideContainerView:animated:",
+          "encoding": "v44@0:8q16q24@32B40"
+        },
+        {
+          "selector": "noteApplicationClassicPhoneSceneOrientationPreferenceChangingForUserAction:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "initWithSceneHandle:referenceSize:contentOrientation:containerOrientation:hostRequester:",
+          "encoding": "@64@0:8@16{CGSize=dd}24q40q48@56"
+        },
+        {
+          "selector": "_setOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "SBDeviceApplicationCounterRotatableSceneOverlayView",
+      "methods": [
+        "containingSceneWillRotateFromInterfaceOrientation:toInterfaceOrientation:animationSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "containingSceneWillRotateFromInterfaceOrientation:toInterfaceOrientation:animationSettings:",
+          "encoding": "v40@0:8q16q24@32"
+        }
+      ]
+    },
+    {
+      "class": "SBIsolatedSceneOrientationFollowingView",
+      "methods": [
+        ".cxx_destruct",
+        "containingSceneWillRotateFromInterfaceOrientation:toInterfaceOrientation:animationSettings:",
+        "initWithWrapperViewController:contentNeedsCounterRotation:delegate:"
+      ],
+      "typed_methods": [
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "containingSceneWillRotateFromInterfaceOrientation:toInterfaceOrientation:animationSettings:",
+          "encoding": "v40@0:8q16q24@32"
+        },
+        {
+          "selector": "initWithWrapperViewController:contentNeedsCounterRotation:delegate:",
+          "encoding": "@36@0:8@16B24@28"
+        }
+      ]
+    },
+    {
+      "class": "SBMainScreenActiveInterfaceOrientationWindow",
+      "methods": [
+        "hitTest:withEvent:",
+        "rootViewController",
+        "setContentViewController:",
+        "setPassesTouchesThrough:",
+        "setRootViewController:",
+        "activeInterfaceOrientationDidChangeToOrientation:willAnimateWithDuration:fromOrientation:",
+        ".cxx_destruct",
+        "descriptionWithMultilinePrefix:",
+        "activeInterfaceOrientationWillChangeToOrientation:",
+        "contentViewController",
+        "isActive",
+        "passesTouchesThrough",
+        "_canBecomeKeyWindow",
+        "succinctDescription",
+        "debugName",
+        "succinctDescriptionBuilder",
+        "description",
+        "setHidden:",
+        "descriptionBuilderWithMultilinePrefix:",
+        "initWithWindowScene:role:debugName:",
+        "_updateInterfaceOrientationToCurrentActiveInterfaceOrientationWithDuration:",
+        "_updateSupportedInterfaceOrientationsForTraitArbiterActuationIfNeeded",
+        "disableInterfaceOrientationChangesForReason:",
+        "effectiveRootViewControllerSupportedInterfaceOrientations",
+        "enableInterfaceOrientationChangesForReason:",
+        "initWithRole:debugName:",
+        "isDisablingInterfaceOrientationChanges"
+      ],
+      "typed_methods": [
+        {
+          "selector": "hitTest:withEvent:",
+          "encoding": "@40@0:8{CGPoint=dd}16@32"
+        },
+        {
+          "selector": "rootViewController",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setContentViewController:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "setPassesTouchesThrough:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "setRootViewController:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "activeInterfaceOrientationDidChangeToOrientation:willAnimateWithDuration:fromOrientation:",
+          "encoding": "v40@0:8q16d24q32"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "descriptionWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "activeInterfaceOrientationWillChangeToOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "contentViewController",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "isActive",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "passesTouchesThrough",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_canBecomeKeyWindow",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "succinctDescription",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "debugName",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "succinctDescriptionBuilder",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setHidden:",
+          "encoding": "v20@0:8B16"
+        },
+        {
+          "selector": "descriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "initWithWindowScene:role:debugName:",
+          "encoding": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "_updateInterfaceOrientationToCurrentActiveInterfaceOrientationWithDuration:",
+          "encoding": "v24@0:8d16"
+        },
+        {
+          "selector": "_updateSupportedInterfaceOrientationsForTraitArbiterActuationIfNeeded",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "disableInterfaceOrientationChangesForReason:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "effectiveRootViewControllerSupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "enableInterfaceOrientationChangesForReason:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "initWithRole:debugName:",
+          "encoding": "@32@0:8@16@24"
+        },
+        {
+          "selector": "isDisablingInterfaceOrientationChanges",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "UIApplication",
+      "methods": [
+        "_handleDeviceOrientationChangedEvent:",
+        "interfaceOrientation",
+        "activeInterfaceOrientation",
+        "alertInterfaceOrientation",
+        "noteActiveInterfaceOrientationWillChangeToOrientation:",
+        "supportedInterfaceOrientationsForWindow:",
+        "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:",
+        "noteActiveInterfaceOrientationWillChangeToOrientation:screen:",
+        "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:screen:",
+        "statusBarOrientation",
+        "_frontMostAppOrientation",
+        "_testOrientation:options:",
+        "statusBarHeightForOrientation:",
+        "_statusBarOrientationFollowsWindow:",
+        "setStatusBarOrientation:",
+        "_statusBarOrientationForWindow:",
+        "__queuedOrientationChange",
+        "__setQueuedOrientationChange:",
+        "_canReceiveDeviceOrientationEvents",
+        "_carefulChoiceOrientation",
+        "_carefulChoiceOrientationForWindow:",
+        "_createStatusBarIfNeededWithOrientation:forWindowScene:",
+        "_createStatusBarWithRequestedStyle:orientation:hidden:",
+        "_createStatusBarWithRequestedStyle:orientation:hidden:forWindowScene:",
+        "_currentExpectedInterfaceOrientation",
+        "_defaultSceneInterfaceOrientationReturningUnknownForNilScene:",
+        "_expectedViewOrientation",
+        "_fallbackInterfaceOrientationForSupportedOrientations:preferredOrientation:currentOrientation:",
+        "_findUISceneForLegacyInterfaceOrientation",
+        "_frontMostAppInterfaceOrientationIsSignificant",
+        "_getSpringBoardOrientation",
+        "_isOrientationVerticallyCompact:",
+        "_isStatusBarForcedHiddenForOrientation:",
+        "_isStatusBarHiddenForOrientation:",
+        "_isSupportedOrientation:",
+        "_safeInterfaceOrientationForNoWindow",
+        "_safeInterfaceOrientationForWindowIfExists:",
+        "_safeInterfaceOrientationForWindowIfExists:expectNonNilWindow:",
+        "_sceneInterfaceOrientationFromWindow:",
+        "_setExpectedViewOrientation:",
+        "_setStatusBarOrientation:",
+        "_setStatusBarOrientation:animated:",
+        "_setupStatusBarWithRequestedStyle:orientation:hidden:",
+        "_supportedInterfaceOrientationsForWindow:",
+        "_updateOrientation",
+        "_viewServiceIgnoresSceneForLegacyInterfaceOrientation:",
+        "runTestForKeyboardRotationWithName:fromOrientation:withShowKeyboardBlock:withExtraResultsBlock:withCleanupBlock:",
+        "setStatusBarOrientation:animated:",
+        "setStatusBarOrientation:animation:duration:",
+        "setStatusBarOrientation:animationParameters:",
+        "setStatusBarOrientation:fromOrientation:windowScene:animationParameters:updateBlock:",
+        "statusBarFrameForOrientation:",
+        "statusBarHeightForOrientation:ignoreHidden:",
+        "statusBarOrientationAnimationDuration"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_handleDeviceOrientationChangedEvent:",
+          "encoding": "v24@0:8^{__GSEvent=}16"
+        },
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "alertInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationWillChangeToOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "supportedInterfaceOrientationsForWindow:",
+          "encoding": "Q24@0:8@16"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:",
+          "encoding": "v40@0:8q16@24q32"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationWillChangeToOrientation:screen:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:screen:",
+          "encoding": "v48@0:8q16@24q32@40"
+        },
+        {
+          "selector": "statusBarOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_frontMostAppOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_testOrientation:options:",
+          "encoding": "q32@0:8@16@24"
+        },
+        {
+          "selector": "statusBarHeightForOrientation:",
+          "encoding": "d24@0:8q16"
+        },
+        {
+          "selector": "_statusBarOrientationFollowsWindow:",
+          "encoding": "B24@0:8@16"
+        },
+        {
+          "selector": "setStatusBarOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_statusBarOrientationForWindow:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "__queuedOrientationChange",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "__setQueuedOrientationChange:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_canReceiveDeviceOrientationEvents",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_carefulChoiceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_carefulChoiceOrientationForWindow:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "_createStatusBarIfNeededWithOrientation:forWindowScene:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "_createStatusBarWithRequestedStyle:orientation:hidden:",
+          "encoding": "v36@0:8q16q24B32"
+        },
+        {
+          "selector": "_createStatusBarWithRequestedStyle:orientation:hidden:forWindowScene:",
+          "encoding": "v44@0:8q16q24B32@36"
+        },
+        {
+          "selector": "_currentExpectedInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_defaultSceneInterfaceOrientationReturningUnknownForNilScene:",
+          "encoding": "q20@0:8B16"
+        },
+        {
+          "selector": "_expectedViewOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_fallbackInterfaceOrientationForSupportedOrientations:preferredOrientation:currentOrientation:",
+          "encoding": "q40@0:8Q16q24q32"
+        },
+        {
+          "selector": "_findUISceneForLegacyInterfaceOrientation",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_frontMostAppInterfaceOrientationIsSignificant",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_getSpringBoardOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_isOrientationVerticallyCompact:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isStatusBarForcedHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isStatusBarHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isSupportedOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_safeInterfaceOrientationForNoWindow",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_safeInterfaceOrientationForWindowIfExists:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "_safeInterfaceOrientationForWindowIfExists:expectNonNilWindow:",
+          "encoding": "q28@0:8@16B24"
+        },
+        {
+          "selector": "_sceneInterfaceOrientationFromWindow:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "_setExpectedViewOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_setStatusBarOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_setStatusBarOrientation:animated:",
+          "encoding": "v28@0:8q16B24"
+        },
+        {
+          "selector": "_setupStatusBarWithRequestedStyle:orientation:hidden:",
+          "encoding": "v36@0:8q16q24B32"
+        },
+        {
+          "selector": "_supportedInterfaceOrientationsForWindow:",
+          "encoding": "Q24@0:8@16"
+        },
+        {
+          "selector": "_updateOrientation",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_viewServiceIgnoresSceneForLegacyInterfaceOrientation:",
+          "encoding": "B24@0:8@16"
+        },
+        {
+          "selector": "runTestForKeyboardRotationWithName:fromOrientation:withShowKeyboardBlock:withExtraResultsBlock:withCleanupBlock:",
+          "encoding": "v56@0:8@16q24@?32@?40@?48"
+        },
+        {
+          "selector": "setStatusBarOrientation:animated:",
+          "encoding": "v28@0:8q16B24"
+        },
+        {
+          "selector": "setStatusBarOrientation:animation:duration:",
+          "encoding": "v36@0:8q16i24d28"
+        },
+        {
+          "selector": "setStatusBarOrientation:animationParameters:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "setStatusBarOrientation:fromOrientation:windowScene:animationParameters:updateBlock:",
+          "encoding": "v56@0:8q16q24@32@40@?48"
+        },
+        {
+          "selector": "statusBarFrameForOrientation:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "statusBarHeightForOrientation:ignoreHidden:",
+          "encoding": "d28@0:8q16B24"
+        },
+        {
+          "selector": "statusBarOrientationAnimationDuration",
+          "encoding": "d16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "UIWindowScene",
+      "methods": [
+        "interfaceOrientation",
+        "_windowsIgnoreSceneClientOrientation",
+        "_referenceBoundsForOrientation:",
+        "_interfaceOrientation",
+        "_updateClientSettingsToInterfaceOrientation:withAnimationDuration:",
+        "_canReceiveDeviceOrientationEvents",
+        "_completeGeometryUpdatesWithTransitionContext:",
+        "_currentlySupportedInterfaceOrientations",
+        "_interfaceOrientationForSupportedOrientations:preferredOrientation:",
+        "_orientationDebugDescription",
+        "_orientationDebugDescriptionBuilderWithMultilinePrefix:",
+        "_orientationDebugDescriptionWithMultilinePrefix:",
+        "_performIOSGeometryRequestWithPreferences:errorHandler:",
+        "_safeAreaCornerInsetsForInterfaceOrientation:",
+        "_safeAreaInsetsForInterfaceOrientation:",
+        "_shouldRotateSafeAreaInsetsToInterfaceOrientation",
+        "_updateEffectiveGeometryIfNeeded",
+        "_windowOrientationPreferencesObserver",
+        "effectiveGeometry",
+        "requestGeometryUpdateWithPreferences:errorHandler:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_windowsIgnoreSceneClientOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_referenceBoundsForOrientation:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "_interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_updateClientSettingsToInterfaceOrientation:withAnimationDuration:",
+          "encoding": "v32@0:8q16d24"
+        },
+        {
+          "selector": "_canReceiveDeviceOrientationEvents",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_completeGeometryUpdatesWithTransitionContext:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_currentlySupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "_interfaceOrientationForSupportedOrientations:preferredOrientation:",
+          "encoding": "q32@0:8Q16q24"
+        },
+        {
+          "selector": "_orientationDebugDescription",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_orientationDebugDescriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_orientationDebugDescriptionWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_performIOSGeometryRequestWithPreferences:errorHandler:",
+          "encoding": "v32@0:8@16@?24"
+        },
+        {
+          "selector": "_safeAreaCornerInsetsForInterfaceOrientation:",
+          "encoding": "{_UICornerInsets={CGSize=dd}{CGSize=dd}{CGSize=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "_safeAreaInsetsForInterfaceOrientation:",
+          "encoding": "{UIEdgeInsets=dddd}24@0:8q16"
+        },
+        {
+          "selector": "_shouldRotateSafeAreaInsetsToInterfaceOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_updateEffectiveGeometryIfNeeded",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_windowOrientationPreferencesObserver",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "effectiveGeometry",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "requestGeometryUpdateWithPreferences:errorHandler:",
+          "encoding": "v32@0:8@16@?24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertScene",
+      "methods": [
+        "setOrientationChangedEventsDisabled:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setOrientationChangedEventsDisabled:",
+          "encoding": "v20@0:8B16"
+        }
+      ]
+    },
+    {
+      "class": "SBWindowScene",
+      "methods": [
+        "_windowsIgnoreSceneClientOrientation"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_windowsIgnoreSceneClientOrientation",
+          "encoding": "B16@0:8"
+        }
+      ]
+    }
+  ]
+}

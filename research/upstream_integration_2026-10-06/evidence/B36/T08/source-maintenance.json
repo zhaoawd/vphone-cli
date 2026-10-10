@@ -1,0 +1,27 @@
+{
+  "authorized": "existing vm-new maintenance scope; SIGSTOP exact health, normal source stop, restore after research",
+  "at": 1791639774.95582,
+  "health": {
+    "pid": 21157,
+    "sock": "/Users/kolar/github/vphone-cli/vm-new/vphone.sock",
+    "state_file": "/private/tmp/autophone-rigs/vm-new/health.json",
+    "recorded_at": 1791620034.771747
+  },
+  "health_command": "/opt/homebrew/Cellar/python@3.13/3.13.14/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python -m tools.phase1.vsock_health --sock /Users/kolar/github/vphone-cli/vm-new/vphone.sock --interval 3.0 --state-file /private/tmp/autophone-rigs/vm-new/health.json --log-file /private/tmp/autophone-rigs/vm-new/health.log --on-down /Users/kolar/github/autophone/scripts/on_vphone_down.sh",
+  "health_started": "Sat Oct 10 16:13:54 2026",
+  "source_runtime": {
+    "bundleIdentifier": "16777231:11604029",
+    "bundlePath": "/Users/kolar/github/vphone-cli/vm-new",
+    "instanceID": "45E94888-1543-476D-818F-D59B02AD208B",
+    "operation": "boot",
+    "pid": 25784,
+    "startedAt": "2026-10-10T12:10:28Z"
+  },
+  "source_argv": [
+    "/Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+    "--config",
+    "/Users/kolar/github/vphone-cli/vm-new/config.plist"
+  ],
+  "health_pause_verified": "Ts",
+  "source_sigint_at": 1791639774.958335
+}

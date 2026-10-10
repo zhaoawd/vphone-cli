@@ -1,0 +1,83 @@
+{
+  "previous_attempt": "SIGTERM returned success; process remained after 2s; fixture terminate/uninstall succeeded but verification assertion ran before saving that attempt.",
+  "before": {
+    "method": "processes.list",
+    "params": {
+      "filter": "frida-server"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "count": 1,
+        "processes": [
+          {
+            "cpu_seconds": 0.6884887083333334,
+            "executable": "/private/var/root/vphone-b34-frida/frida-server",
+            "footprint_bytes": 2818432,
+            "jetsam_limit_mb": 256,
+            "jetsam_priority": 180,
+            "name": "frida-server",
+            "pid": 441,
+            "ppid": 37,
+            "resident_bytes": 13729792,
+            "start_time": 1791632560.299731,
+            "uid": 0
+          }
+        ]
+      },
+      "type": "response"
+    },
+    "seconds": 0.06420858297497034
+  },
+  "kill": {
+    "method": "processes.kill",
+    "params": {
+      "pid": 441,
+      "signal": "KILL",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "pid": 441,
+        "signal": "KILL"
+      },
+      "type": "response"
+    },
+    "seconds": 0.0015476250555366278
+  },
+  "after": {
+    "method": "processes.list",
+    "params": {
+      "filter": "frida-server"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "count": 0,
+        "processes": []
+      },
+      "type": "response"
+    },
+    "seconds": 0.05946191679686308
+  },
+  "fixture": {
+    "method": "apps.search",
+    "params": {
+      "query": "research.vphone.b31.rotation"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "apps": [],
+        "query": "research.vphone.b31.rotation"
+      },
+      "type": "response"
+    },
+    "seconds": 0.04605024983175099
+  }
+}

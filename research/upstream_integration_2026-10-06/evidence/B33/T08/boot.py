@@ -43,6 +43,19 @@ shutdown_lock = threading.Lock()
 shutdown_sent = False
 p = None
 
+def monitor_paused():
+    maintenance = repo / 'research/upstream_integration_2026-10-06/evidence/B34/T08/source-maintenance.json'
+    if not maintenance.exists():
+        return True
+    try:
+        record = json.loads(maintenance.read_text())
+        pid = record['health']['pid']
+        current = json.loads(Path('/private/tmp/autophone-rigs/vm-new/health.pid').read_text())
+        status = subprocess.run(['ps', '-p', str(pid), '-o', 'stat='], capture_output=True, text=True)
+        return current['pid'] == pid and status.returncode == 0 and 'T' in status.stdout
+    except (OSError, ValueError, KeyError):
+        return False
+
 def shutdown():
     global shutdown_sent
     with shutdown_lock:
@@ -59,6 +72,11 @@ def watch():
             stop.set()
             shutdown()
             return
+        if not monitor_paused():
+            reason = 'source_health_monitor_resumed_or_replaced_pause_experiment'
+            stop.set()
+            shutdown()
+            return
         source = subprocess.run(['/usr/sbin/lsof', '-t', str(repo / 'vm-new/Disk.img')], capture_output=True, text=True)
         if source.returncode != 1 or source.stdout or source.stderr:
             reason = 'source_active_or_check_failed_pause_experiment'
@@ -70,6 +88,8 @@ def watch():
 def drain():
     with (root / 'console-redacted.log').open('wb') as log:
         for line in iter(p.stdout.readline, b''):
+            if b'[control] location lat=' in line:
+                line = b'[control] location [coordinates omitted]\n'
             if b'[location] got location:' in line:
                 line = b'[location] got location: [coordinates omitted]\n'
             line = line.replace(token.encode(), b'[token omitted]')
@@ -82,6 +102,7 @@ started = time.monotonic()
 # 当前已有宿主工件没有 --no-vphoned-update；将该副本原 classic
 # 文件显式作为自动更新输入。该运行不用于默认产物来源一致性验收。
 args = [str(binary), '--config', str(vm / 'config.plist'), '--variant', 'exp', '--headless', '--vphoned-bin', str(vm / '.vphoned.signed'), '--api-listen', '127.0.0.1:0']
+assert monitor_paused(), 'PAUSE: source health monitor resumed or replaced'
 try:
     p = subprocess.Popen(args, stdin=fd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=dict(os.environ, VPHONE_API_TOKEN=token, NSUnbufferedIO='YES'))
     (root / 'process.json').write_text(json.dumps({'monitor_pid': os.getpid(), 'vm_pid': p.pid, 'arguments': args}, indent=2) + '\n')

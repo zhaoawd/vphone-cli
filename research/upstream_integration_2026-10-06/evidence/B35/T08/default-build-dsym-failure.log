@@ -1,0 +1,116 @@
+zsh scripts/build.sh
+=== Building vphone-cli (d5d179dd) ===
+warning: 'machokit': /Users/kolar/github/vphone-cli/.build/research-b35/source/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'source': dependency 'openssl-spm' is not used by any target
+warning: 'source': dependency 'openssl-spm' is not used by any target
+Building for production...
+[Computing dependencies]
+[Pre-planning 1 / 1012]
+[Planning 1 / 1012]
+[Planning deferred tasks]
+[Starting]
+[12 / 659]
+[159 / 659]
+[202 / 659]
+[219 / 670] VPhoneDaemonWire
+[243 / 682] CoreCapstone
+[251 / 685] CoreCapstone
+[265 / 701]
+[279 / 703] CoreCapstone
+[296 / 804]
+[319 / 804] CoreCapstone
+[332 / 804] CoreCapstone
+[350 / 804]
+[362 / 804]
+[380 / 804] CoreCapstone
+[392 / 804] CoreCapstone
+[403 / 804] CoreCapstone
+[416 / 804]
+[435 / 804]
+[448 / 804] OpenSSL
+[477 / 804]
+[491 / 804] CoreCapstone
+[502 / 804] CoreCapstone
+[521 / 804]
+[539 / 804] CoreCapstone
+[563 / 804] CoreCapstone
+[582 / 804] ArchiveKit-product
+[587 / 807]
+[589 / 807] AppleMobileDeviceLibrary
+[600 / 814] ArgumentParser
+[616 / 818] Img4tool
+[619 / 826] ArgumentParser
+[629 / 835] VPhoneArchiveKit
+[633 / 835]
+[639 / 859]
+[653 / 859] BinaryParseSupport
+[671 / 859] MobileRestoreCore
+[681 / 860] MobileRestoreCore
+[695 / 860]
+[707 / 860] MobileRestoreCore
+[713 / 860] VPhoneDaemonWire
+[734 / 861] FileIO
+[736 / 861]
+[739 / 862] MobileRecoveryCore
+[743 / 862] Img4tool
+[755 / 862] FileIOBinary
+[762 / 863] MachOKit
+[766 / 866] VPhoneArchiveKit
+[774 / 868] VPhoneBundleStore
+[776 / 869] VPhoneCore
+[793 / 902]
+[797 / 902]
+[808 / 902]
+[811 / 902]
+[812 / 902] VPhoneSign
+[818 / 902]
+[820 / 902]
+[820 / 902] VPhoneBundleStore
+[826 / 902]
+[827 / 902]
+/Users/kolar/github/vphone-cli/.build/research-b35/source/vendor/swift-argument-parser/Sources/ArgumentParser/Parsable Types/ParsableArguments.swift:76:8: warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 74 |   /// Defaults to `"\(_errorLabel): "`.
+ 75 |   public static var _errorPrefix: String {
+ 76 |     "\(_errorLabel): "
+    |        `- warning: '_errorLabel' is deprecated: Use _errorPrefix instead. [#DeprecatedDeclaration]
+ 77 |   }
+ 78 | }
+
+/Users/kolar/github/vphone-cli/.build/research-b35/source/vendor/swift-argument-parser/Sources/ArgumentParser/Usage/DumpHelpGenerator.swift:210:15: warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+208 |       self = .customAsync
+209 |     case .customDeprecated(_):
+210 |       self = .customDeprecated
+    |               `- warning: 'customDeprecated' is deprecated: Use custom instead. [#DeprecatedDeclaration]
+211 |     }
+212 |   }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[829 / 902] ArgumentParser
+[835 / 902] MachOKit
+/Users/kolar/github/vphone-cli/.build/research-b35/source/sources/VPhoneCore/VPhoneLaunchLayout.swift:157:41: warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+155 |         var buffer = [CChar](repeating: 0, count: Int(PATH_MAX) + 1)
+156 |         if last != "/", last != ".", last != "..", realpath(url.deletingLastPathComponent().path, &buffer) != nil {
+157 |             return URL(fileURLWithPath: String(cString: buffer), isDirectory: true).appendingPathComponent(last).path
+    |                                         `- warning: 'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination. [#DeprecatedDeclaration]
+158 |         }
+159 |         return url.standardizedFileURL.path
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[841 / 902] VPhoneCore
+[850 / 905] VPhoneHelperKit
+[858 / 910] VPhoneHelperKit
+[865 / 911] vphone-helper-product
+[867 / 912] vphone-helper-product
+[869 / 912] vphone-helper-product
+error: Operation not permitted
+error: GenerateDSYMFile /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/out/Products/Release/vphone-helper.dSYM /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/out/Products/Release/vphone-helper failed with a nonzero exit code. Command line:     cd /Users/kolar/github/vphone-cli/.build/research-b35/source
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/dsymutil /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/out/Products/Release/vphone-helper -o /Users/kolar/github/vphone-cli/.build/research-b35/source/.build/out/Products/Release/vphone-helper.dSYM
+error: Build failed
+make: *** [bundle] Error 1

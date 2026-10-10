@@ -1,0 +1,13 @@
+{
+  "python_command": ".venv/bin/python -m unittest discover -s tests -p test_t08_rotation_probe.py -v",
+  "python_result": "8 passed",
+  "causal_command": ".venv/bin/python research/upstream_integration_2026-10-06/evidence/B34/T08/verify-scene-gate.py",
+  "causal_result": "passed; restored stage explicitly classified as transient; independent post-detach reproduction required",
+  "syntax": "12 research Python files parsed before final; current B33/B34 Python AST and JSON parsed",
+  "privacy": "all known runtime and temporary Frida tokens absent from archived B33/B34 artifacts",
+  "diff_check": "git diff --check passed",
+  "limits": [
+    "no product build or default artifact acceptance",
+    "no new research VM run after final cleanup/shutdown/source restoration"
+  ]
+}

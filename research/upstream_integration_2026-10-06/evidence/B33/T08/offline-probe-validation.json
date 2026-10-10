@@ -1,0 +1,56 @@
+{
+  "observed_at": "2026-10-10T11:20:29.269263+00:00",
+  "branch": "codex/upstream-2d21d21-integration",
+  "source_runtime": {
+    "bundleIdentifier": "16777231:11604029",
+    "bundlePath": "/Users/kolar/github/vphone-cli/vm-new",
+    "instanceID": "9ADAB589-C178-49ED-ABDC-3A43416F071D",
+    "operation": "boot",
+    "pid": 20668,
+    "startedAt": "2026-10-10T08:13:27Z"
+  },
+  "health_monitor_identity": {
+    "pid": 21157,
+    "sock": "/Users/kolar/github/vphone-cli/vm-new/vphone.sock",
+    "state_file": "/private/tmp/autophone-rigs/vm-new/health.json",
+    "recorded_at": 1791620034.771747
+  },
+  "free_bytes": 293683200000,
+  "minimum_rule_bytes": 5368709120,
+  "source_monitor_paused": false,
+  "research_vm_started": false,
+  "RootHide_installed": false,
+  "live_rotation_executed": false,
+  "checks": [
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_t08_rotation_probe.py",
+        "-v"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "test_gaps_and_reordered_timestamps_do_not_pass (test_t08_rotation_probe.RotationEvidenceTests.test_gaps_and_reordered_timestamps_do_not_pass) ... ok\ntest_no_error_does_not_establish_rotation (test_t08_rotation_probe.RotationEvidenceTests.test_no_error_does_not_establish_rotation) ... ok\ntest_policy_background_lock_and_pid_are_preconditions (test_t08_rotation_probe.RotationEvidenceTests.test_policy_background_lock_and_pid_are_preconditions) ... ok\ntest_real_b32_short_window_is_inadequate (test_t08_rotation_probe.RotationEvidenceTests.test_real_b32_short_window_is_inadequate) ... ok\ntest_rejected_unsupported_request_requires_actual_error (test_t08_rotation_probe.RotationEvidenceTests.test_rejected_unsupported_request_requires_actual_error) ... ok\ntest_stable_actual_orientation_establishes_rotation (test_t08_rotation_probe.RotationEvidenceTests.test_stable_actual_orientation_establishes_rotation) ... ok\ntest_stale_request_samples_cannot_extend_window (test_t08_rotation_probe.RotationEvidenceTests.test_stale_request_samples_cannot_extend_window) ... ok\ntest_transient_target_is_separate_from_stable_rotation (test_t08_rotation_probe.RotationEvidenceTests.test_transient_target_is_separate_from_stable_rotation) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.001s\n\nOK\n"
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "research/upstream_integration_2026-10-06/evidence/B33/T08/rotation_probe.py",
+        "replay",
+        "research/upstream_integration_2026-10-06/evidence/B32/T08/B-home-button-true.jsonl",
+        "--request-id",
+        "B-home-button-true"
+      ],
+      "exit": 2,
+      "stdout": "{\n  \"request_id\": \"B-home-button-true\",\n  \"requested_mask\": 4,\n  \"target_orientation\": 2,\n  \"expected_supported_mask\": 30,\n  \"samples\": 5,\n  \"required_span_seconds\": 10,\n  \"verdict\": \"invalid_evidence\",\n  \"reasons\": [\n    \"observation_window_too_short\"\n  ],\n  \"sample_span_seconds\": 1.001128911972046,\n  \"pids\": [\n    985\n  ],\n  \"orientations\": [\n    1\n  ],\n  \"first_sample_time\": 1791598053.638571,\n  \"last_sample_time\": 1791598054.6397,\n  \"error_observed\": false,\n  \"target_seen\": false,\n  \"target_stable_at_end\": false\n}\n",
+      "stderr": ""
+    }
+  ],
+  "probe_sha256": "38c8ba76a53cac47db94d77f587af04fabfe52dcda685807e22b7ffe46814385"
+}

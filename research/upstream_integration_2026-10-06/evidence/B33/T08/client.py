@@ -21,6 +21,13 @@ def check():
     assert state['pid'] == json.loads((run / 'process.json').read_text())['vm_pid']
     source = subprocess.run(['/usr/sbin/lsof', '-t', str(repo / 'vm-new/Disk.img')], capture_output=True, text=True)
     assert source.returncode == 1 and not source.stdout and not source.stderr, 'PAUSE: source VM active or check failed'
+    maintenance = repo / 'research/upstream_integration_2026-10-06/evidence/B34/T08/source-maintenance.json'
+    if maintenance.exists():
+        m = json.loads(maintenance.read_text())
+        pid = str(m['health']['pid'])
+        monitor = subprocess.run(['ps', '-p', pid, '-o', 'stat='], capture_output=True, text=True)
+        recorded = json.loads(Path('/private/tmp/autophone-rigs/vm-new/health.pid').read_text())
+        assert monitor.returncode == 0 and 'T' in monitor.stdout and recorded['pid'] == int(pid), 'PAUSE: source health monitor resumed or replaced'
     return state
 
 def serial(command):

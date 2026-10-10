@@ -1,0 +1,91 @@
+{
+  "evidence": "scene-gate-1a6e985e17da/scene-gate.json",
+  "causal_counterfactual_verified": true,
+  "scope": "fixed research guest and controlled scene only",
+  "rows": [
+    {
+      "phase": "baseline-180",
+      "override": false,
+      "system_supported_mask": 26,
+      "classification": {
+        "request_id": "baseline-180-ceabaf7f1de44a78bf1bceb13da8f44f",
+        "requested_mask": 4,
+        "target_orientation": 2,
+        "expected_supported_mask": 30,
+        "samples": 46,
+        "required_span_seconds": 10,
+        "verdict": "no_error_without_rotation",
+        "reasons": [],
+        "sample_span_seconds": 11.252460956573486,
+        "pids": [
+          479
+        ],
+        "orientations": [
+          1
+        ],
+        "first_sample_time": 1791633855.308717,
+        "last_sample_time": 1791633866.561178,
+        "error_observed": false,
+        "target_seen": false,
+        "target_stable_at_end": false
+      }
+    },
+    {
+      "phase": "allowed-180",
+      "override": true,
+      "system_supported_mask": 30,
+      "classification": {
+        "request_id": "allowed-180-6c25878327e644649a7db32c5bb96b98",
+        "requested_mask": 4,
+        "target_orientation": 2,
+        "expected_supported_mask": 30,
+        "samples": 48,
+        "required_span_seconds": 10,
+        "verdict": "rotated",
+        "reasons": [],
+        "sample_span_seconds": 11.749230861663818,
+        "pids": [
+          479
+        ],
+        "orientations": [
+          1,
+          2
+        ],
+        "first_sample_time": 1791633870.057228,
+        "last_sample_time": 1791633881.806459,
+        "error_observed": false,
+        "target_seen": true,
+        "target_stable_at_end": true
+      }
+    },
+    {
+      "phase": "restored-180",
+      "override": false,
+      "system_supported_mask": 26,
+      "classification": {
+        "request_id": "restored-180-bcdd429cd0cb4509b548403fc9784215",
+        "requested_mask": 4,
+        "target_orientation": 2,
+        "expected_supported_mask": 30,
+        "samples": 47,
+        "required_span_seconds": 10,
+        "verdict": "target_seen_but_not_stable",
+        "reasons": [],
+        "sample_span_seconds": 11.502506017684937,
+        "pids": [
+          479
+        ],
+        "orientations": [
+          1,
+          2
+        ],
+        "first_sample_time": 1791633885.057529,
+        "last_sample_time": 1791633896.560035,
+        "error_observed": false,
+        "target_seen": true,
+        "target_stable_at_end": false
+      }
+    }
+  ],
+  "restoration_verified": true
+}

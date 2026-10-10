@@ -925,3 +925,22 @@ T08取得Settings/Safari实际运行时场景策略和UIKit倒置方向过滤条
 本机缺少 B32 的历史 RootHide 样本和冻结工件。按用户要求，已从本机停机的 vm-new 创建 `vm-roothide-b33-20261010`；副本恢复 shell、classic 通道和重建的固定 IcliKit 0.7.16 API 健康/布局检查通过。Irisin 4.5.26 与 89 个固定依赖下载和摘要通过，受控应用原源码编译及 Frida 工具准备完成。用户已批准仅在研究副本内卸载 rootless、安装 RootHide 和清理，并允许正常停止源；源自动重启时须暂停。正常停止源后，源于12:53:06重新启动，研究副本启动前检查拒绝启动。实验已暂停，副本仍为 rootless，未执行 RootHide 安装或新方向实验。180°实际未旋转原因仍未查明，T08 未新增整项验收。
 
 历史 B32 B 阶段只有请求后的约 1.002 秒观测，5 次采样均为方向1、集合30、锁false、无错误回调。缺少系统请求处理、较长观测窗口及 B 条件90°阳性对照；证据复核脚本通过，但不构成实际复现。副本正常停机，磁盘句柄释放。运行最低约280.07GiB，5GiB阈值未触发。最终发现源vm-new由其他进程启动，源NVRAM、SEPStorage和磁盘mtime已变化；启动来源未查明，不能宣称源完全保持。批准后源仅正常停止一次，未重复停止或修改仓库外恢复程序。恢复实验前须暂停源自动恢复并确认源停机。详见[B33准备记录](evidence/B33/T08/REPORT.md)、[本轮清单](evidence/B33/T08/TASKS.md)。
+
+B33 后续离线推进：已切回指定集成分支，准备至少10秒采样、90°对照和实际方向断言的复现脚本；8项证据判定测试通过，原始B32回放明确返回窗口不足。源仍运行，研究副本未启动；临时暂停源健康监测的具体方案已保存，仓库外进程操作等待批准。RootHide和实际旋转复现仍未完成。见[B33脚本说明](evidence/B33/T08/rotation-probe-usage.md)、[监测暂停方案](evidence/B33/T08/source-maintenance-plan.md)。
+
+
+## B34 结果（2026-10-10）
+
+B34本机研究副本已转换RootHide，89包安装与冷启动通过。受控场景180度请求mask4确实到达SpringBoard且无错误；SBTraitsSceneParticipantDelegate的倒置方向允许条件为0，清理支持集合30为26。限定该场景临时允许后集合30、实际方向2；恢复条件后集合26、实际最终方向1（首样本残留2，0.25秒后为1）。撤销全部SpringBoard探针后的独立最小复现再次无错误且未出现方向2。已确认本样本原因，未修改持久策略或新增整项accepted。现代API正常关机、临时应用/Frida/输入清理、源vm-new及原健康监测恢复healthy；默认产物与旧CFW自动激活仍待验收。
+
+诊断运行最低余量约270.24GiB，5GiB阈值未触发。恢复阶段首样本方向2与最终方向1分别记录，未把短暂结果计为稳定旋转。8项证据判定测试及实际因果回放通过。详见[B34诊断报告](evidence/B34/T08/REPORT.md)、[因果验证](evidence/B34/T08/causal-verification.json)、[恢复记录](evidence/B34/T08/source-restoration.json)、[证据清单](evidence/B34/T08/manifest.json)。
+
+## B35 结果（2026-10-10）
+
+B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复后异步逐项加载常规LaunchDaemons，以固定IcliKit按物理根准备plist，保留API_ONLY条件。旧实现4项失败，最终相关22项通过；隔离API、默认完整签名app与六项现代组件构建通过。默认仍classic，未部署新候选，真实自动激活及默认现代运行来源一致性未验。新VM --help退出-9，精确日志AMFI -424；单CDHash临时授权待批准。源healthy、研究副本停机。
+
+最终默认完整构建的资源、原生依赖、签名及entitlement校验通过；现代候选和相机64字节组件保持隔离。已有AMFI批准限定其他冻结CDHash，本次没有附加系统调试会话。最低已记录余量约269.69GiB，5GiB阈值未触发。见[B35报告](evidence/B35/T08/REPORT.md)、[具体运行验证计划](evidence/B35/T08/vm-validation-plan.md)、[产物摘要](evidence/B35/T08/signed-artifacts.json)。
+
+## B36 结果（2026-10-11）
+
+新宿主 --help 退出0；只读CFW分类full_migration_required。研究VM未启动。临时驱动SIGINT/SIGTERM未退出，SIGKILL后辅助进程退出并独立核对。源及原监测恢复healthy。完整现代迁移、真实自动激活和默认整体验收待完成。 正常 detach 未验证，失败记录保留；5 GiB 阈值未触发。后续开发按用户要求移至独立 worktree。见[B36 报告](evidence/B36/T08/REPORT.md)、[B36 摘要](evidence/B36-summary.json)。

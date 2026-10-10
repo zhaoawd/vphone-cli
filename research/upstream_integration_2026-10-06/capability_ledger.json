@@ -1252,7 +1252,7 @@
       "VPhoneDaemon/Daemon/Bootstrap/RootHide/GuestIrisinInstaller+RootHideBase.swift",
       "VPhoneDaemon/Daemon/Bootstrap/Rootless/GuestIrisinInstaller+Rootless.swift"
     ],
-    "acceptance_status": "fixed_overlay_memory_rotation_verified_actual_RootHide_service_pending",
+    "acceptance_status": "partial_RootHide_startup_fix_built_VM_and_default_modern_acceptance_pending",
     "evidence": [
       "T08-pins-red.log: old 0.7.7 fails requested 0.7.16 contract",
       "T08-pins-green.log: 6 tests passed",
@@ -1404,10 +1404,11 @@
     "historical_reason": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。",
     "original_disposition": "adapt",
     "historical_capability_acceptance_status": "fixed_overlay_memory_and_API_verified_rotation_RootHide_pending",
-    "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。",
+    "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。 B34本机研究副本已转换RootHide，89包安装与冷启动通过。受控场景180度请求mask4确实到达SpringBoard且无错误；SBTraitsSceneParticipantDelegate的倒置方向允许条件为0，清理支持集合30为26。限定该场景临时允许后集合30、实际方向2；恢复条件后集合26、实际最终方向1（首样本残留2，0.25秒后为1）。撤销全部SpringBoard探针后的独立最小复现再次无错误且未出现方向2。已确认本样本原因，未修改持久策略或新增整项accepted。现代API正常关机、临时应用/Frida/输入清理、源vm-new及原健康监测恢复healthy；默认产物与旧CFW自动激活仍待验收。 B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复后异步逐项加载常规LaunchDaemons，以固定IcliKit按物理根准备plist，保留API_ONLY条件。旧实现4项失败，最终相关22项通过；隔离API、默认完整签名app与六项现代组件构建通过。默认仍classic，未部署新候选，真实自动激活及默认现代运行来源一致性未验。新VM --help退出-9，精确日志AMFI -424；单CDHash临时授权待批准。源healthy、研究副本停机。",
     "remaining_work": [
-      "实际RootHide客户机服务验收；vm-new已实际确认rootless，不满足该项前提",
-      "services.start状态144及部分旋转未生效，原因未查明"
+      "新宿主CDHash62026af109b33fdd468c2c2df2fcdb4211136bf0的精确临时AMFI授权和管理员执行；研究副本CFW只读分类及匹配现代组合的适用迁移步骤待核实",
+      "真实冷启动RootHide自动激活、daemon/组件运行来源核对与默认现代daemon打包整体验收；当前默认完整产物仍classic",
+      "倒置方向策略原因已确认于B34受控场景；未验证全部系统应用或其他客户机版本，未将反事实覆盖纳入产品"
     ],
     "B24_implementation_head": "a45c91915f6343733d1fde7e20180ee80cee7b57",
     "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
@@ -1417,8 +1418,31 @@
     "verification_evidence": [
       "evidence/B28-summary.json",
       "evidence/B28-evidence-manifest.json",
-      "B33/T08/REPORT.md: 本机独立副本与0.7.16研究API准备通过；用户已批准仅在研究副本内转换/清理及正常停止源。源正常停机后12:53:06自动重启，研究副本启动前检查拒绝启动，按用户要求暂停。仍为rootless，未执行新180度复现，原因未查明。"
-    ]
+      "B33/T08/REPORT.md: 本机独立副本与0.7.16研究API准备通过；用户已批准仅在研究副本内转换/清理及正常停止源。源正常停机后12:53:06自动重启，研究副本启动前检查拒绝启动，按用户要求暂停。仍为rootless；后续复现脚本与8项证据判定测试完成，实际入口未运行。源监测暂停方案等待仓库外进程操作批准，未执行新180度复现，原因未查明。",
+      "evidence/B34/T08/REPORT.md",
+      "evidence/B34/T08/causal-verification.json",
+      "evidence/B34/T08/manifest.json",
+      "evidence/B34/T08/source-restoration.json",
+      "evidence/B35/T08/REPORT.md",
+      "evidence/B35/T08/manifest.json",
+      "evidence/B35/T08/regression-entrypoint.log",
+      "evidence/B35/T08/signed-artifacts.json",
+      "evidence/B35/T08/vm-help-amfi-log.json",
+      "evidence/B35/T08/vm-validation-plan.md"
+    ],
+    "B36_execution_state": {
+      "status": "partial_readonly_classification_and_cleanup_complete_runtime_pending",
+      "research_vm_booted": false,
+      "runtime_validated": false,
+      "cfw_classification": "full_migration_required",
+      "temporary_amfi_authorized": true,
+      "auxiliary_processes_cleaned": true,
+      "graceful_detach_verified": false,
+      "source_restored": true,
+      "health_restored": true,
+      "minimum_free_bytes": 287191146496,
+      "report": "evidence/B36/T08/REPORT.md"
+    }
   },
   {
     "id": "T09",

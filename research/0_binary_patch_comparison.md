@@ -1236,3 +1236,7 @@ B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10�
 ### 2026-10-10 B32：RootHide倒置方向过滤与系统场景策略
 
 实际UIKitCore UIApplication私有方向方法在原生手机且UIDevice无Home键时执行mask & 26，系统应用自然调用与受控应用同PID的26→30→26对照已取得。Settings场景/客户端集合2，Safari均26；原API无Frida进程重跑8组，4接受、4拒绝且保持角度。受控B阶段公开180度请求未报告错误但实际仍0度，未计为旋转成功。未修改产品源码、固件二进制补丁、内核或DSC，补丁计数不变；临时AMFI detach失败与恢复核对、客户机清理失败及最终清理均保留。证据见`upstream_integration_2026-10-06/evidence/B32/T08/REPORT.md`。
+
+### 2026-10-10 B35：RootHide 启动恢复源码修复
+
+现代 API daemon 在完成标记有效、RootHide 链接修复成功后异步逐项准备并加载 LaunchDaemons；保留 API_ONLY 条件。实际函数红测试 4 项失败，最终相关回归 22 项通过；隔离 API、默认完整签名 app 与六项现代组件构建通过。默认 app 仍打包 classic，未部署新候选或验证真实冷启动。新宿主 --help 被 AMFI -424 拒绝，精确临时授权待批准。未修改固件二进制补丁、内核、DSC或补丁计数。证据见`upstream_integration_2026-10-06/evidence/B35/T08/REPORT.md`。

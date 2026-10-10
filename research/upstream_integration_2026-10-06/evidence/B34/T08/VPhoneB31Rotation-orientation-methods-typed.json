@@ -1,0 +1,1531 @@
+{
+  "pid": 479,
+  "executable": "VPhoneB31Rotation",
+  "classes": [
+    {
+      "class": "FBSComponentScene",
+      "methods": [
+        "clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBUIAccessorySceneManager",
+      "methods": [
+        "scene:didUpdateSettings:",
+        "_primarySceneDidUpdateSettings:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "_primarySceneDidUpdateSettings:transitionContext:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBSOrientationObserverClient",
+      "methods": [
+        "_setDelegate:",
+        "_connectionInterrupted:",
+        "_connection",
+        "_server:registerOrientationInterest:",
+        "activeInterfaceOrientation",
+        "_connectionInvalidated:",
+        "invalidate",
+        ".cxx_destruct",
+        "activeInterfaceOrientationWithCompletion:",
+        "_lock_remoteTarget",
+        "_lock_activate",
+        "_lock_invalidate",
+        "initWithDelegate:",
+        "_connectionActivated:",
+        "dealloc",
+        "registerOrientationInterest:",
+        "_initWithEndpoint:calloutQueue:delegate:",
+        "activeOrientationDidUpdate:",
+        "activate"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_setDelegate:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_connectionInterrupted:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_connection",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_server:registerOrientationInterest:",
+          "encoding": "v28@0:8@16I24"
+        },
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_connectionInvalidated:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientationWithCompletion:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_lock_remoteTarget",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_lock_activate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_lock_invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "initWithDelegate:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_connectionActivated:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "registerOrientationInterest:",
+          "encoding": "v20@0:8I16"
+        },
+        {
+          "selector": "_initWithEndpoint:calloutQueue:delegate:",
+          "encoding": "@40@0:8@16@24@32"
+        },
+        {
+          "selector": "activeOrientationDidUpdate:",
+          "encoding": "Vv24@0:8@16"
+        },
+        {
+          "selector": "activate",
+          "encoding": "v16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSOrientationObserver",
+      "methods": [
+        "setHandler:",
+        "activeInterfaceOrientation",
+        "_lock_setHandler:",
+        "invalidate",
+        "_getAndSetFreshestUpdateGivenUpdate:forced:",
+        "client:handleOrientationUpdate:",
+        ".cxx_destruct",
+        "handler",
+        "activeInterfaceOrientationWithCompletion:",
+        "handleOrientationResetForClient:",
+        "dealloc",
+        "_lock_getAndSetFreshestUpdateGivenUpdate:forced:",
+        "init",
+        "_initWithClient:callbackQueue:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setHandler:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_lock_setHandler:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_getAndSetFreshestUpdateGivenUpdate:forced:",
+          "encoding": "@28@0:8@16B24"
+        },
+        {
+          "selector": "client:handleOrientationUpdate:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "handler",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientationWithCompletion:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "handleOrientationResetForClient:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "dealloc",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_lock_getAndSetFreshestUpdateGivenUpdate:forced:",
+          "encoding": "@28@0:8@16B24"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_initWithClient:callbackQueue:",
+          "encoding": "@32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBSOrientationUpdate",
+      "methods": [
+        "orientation",
+        "duration",
+        "setSequenceNumber:",
+        "sequenceNumber",
+        "setDuration:",
+        "initWithBSXPCCoder:",
+        "initWithOrientation:sequenceNumber:duration:rotationDirection:",
+        "encodeWithBSXPCCoder:",
+        "rotationDirection",
+        "setRotationDirection:",
+        "init",
+        "description",
+        "setOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "duration",
+          "encoding": "d16@0:8"
+        },
+        {
+          "selector": "setSequenceNumber:",
+          "encoding": "v24@0:8Q16"
+        },
+        {
+          "selector": "sequenceNumber",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "setDuration:",
+          "encoding": "v24@0:8d16"
+        },
+        {
+          "selector": "initWithBSXPCCoder:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "initWithOrientation:sequenceNumber:duration:rotationDirection:",
+          "encoding": "@48@0:8q16Q24d32q40"
+        },
+        {
+          "selector": "encodeWithBSXPCCoder:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "rotationDirection",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setRotationDirection:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "description",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBScene",
+      "methods": [
+        "ui_orientationHostSceneComponent",
+        "updateSettingsWithBlock:",
+        "scene:didUpdateSettings:",
+        "updateSettings:",
+        "currentInterfaceOrientation",
+        "clientSettings",
+        "uiClientSettings",
+        "updateSettingsWithTransitionBlock:",
+        "clientToken:didUpdateClientSettings:withDiff:transitionContext:",
+        "updateSettings:withTransitionContext:",
+        "updateSettings:withTransitionContext:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "ui_orientationHostSceneComponent",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updateSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "currentInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "uiClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "clientToken:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "updateSettings:withTransitionContext:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updateSettings:withTransitionContext:completion:",
+          "encoding": "v40@0:8@16@24@?32"
+        }
+      ]
+    },
+    {
+      "class": "FBLocalSynchronousSceneClientProvider",
+      "methods": [
+        "host:didUpdateSettings:withDiff:transitionContext:completion:",
+        "registerHost:settings:initialClientSettings:fromRemnant:error:",
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "host:didUpdateSettings:withDiff:transitionContext:completion:",
+          "encoding": "v56@0:8@16@24@32@40@?48"
+        },
+        {
+          "selector": "registerHost:settings:initialClientSettings:fromRemnant:error:",
+          "encoding": "@56@0:8@16@24@32@40o^@48"
+        },
+        {
+          "selector": "scene:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneManager",
+      "methods": [
+        "_createSceneWithDefinition:settings:initialClientSettings:transitionContext:fromRemnant:usingClientProvider:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_createSceneWithDefinition:settings:initialClientSettings:transitionContext:fromRemnant:usingClientProvider:completion:",
+          "encoding": "@72@0:8@16@24@32@40@48@56@?64"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneObserver",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+        "scene:willUpdateSettings:",
+        "scene:didUpdateSettings:",
+        "scene:willUpdateSettings:withTransitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateClientSettingsWithDiff:oldClientSettings:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:withTransitionContext:",
+          "encoding": "v40@0:8@16@24@32"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneWorkspace",
+      "methods": [
+        "scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "B32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBInterfaceOrientationService",
+      "methods": [
+        "interfaceOrientation",
+        "startService",
+        ".cxx_destruct",
+        "initialize",
+        "init",
+        "setInterfaceOrientation:",
+        "setInterfaceOrientation:animationSettings:direction:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "startService",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "initialize",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "setInterfaceOrientation:animationSettings:direction:",
+          "encoding": "v40@0:8q16@24q32"
+        }
+      ]
+    },
+    {
+      "class": "FBWorkspaceScene",
+      "methods": [
+        "initWithConnection:host:settings:clientSettings:fromRemnant:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initWithConnection:host:settings:clientSettings:fromRemnant:",
+          "encoding": "@52@0:8@16@24@32@40B48"
+        }
+      ]
+    },
+    {
+      "class": "FBUIApplicationWorkspaceScene",
+      "methods": [
+        "initWithConnection:host:settings:clientSettings:fromRemnant:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initWithConnection:host:settings:clientSettings:fromRemnant:",
+          "encoding": "@52@0:8@16@24@32@40B48"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneRemnant",
+      "methods": [
+        "_clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSceneSnapshotContext",
+      "methods": [
+        "orientation",
+        "setClientSettings:",
+        "clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "orientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBInterfaceOrientationServiceServer",
+      "methods": [
+        "registerOrientationInterest:completion:",
+        "listener",
+        "connections",
+        "startService",
+        "_connectionInvalidated:",
+        "invalidate",
+        "noteInterfaceOrientationChanged:animationSettings:direction:",
+        ".cxx_destruct",
+        "interestedConnections",
+        "requestActiveOrientationCompletion:",
+        "initialize",
+        "init",
+        "pendingConnections",
+        "requestActiveOrientation",
+        "_initWithDomain:service:",
+        "listener:didReceiveConnection:withContext:",
+        "_lock_noteInterfaceOrientationChanged:animationSettings:direction:",
+        "_currentConnection",
+        "_lock_sendMessageToInterestedClients:",
+        "_lock_registerOrientationInterest:connection:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "registerOrientationInterest:completion:",
+          "encoding": "Vv32@0:8@16@?24"
+        },
+        {
+          "selector": "listener",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "connections",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "startService",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_connectionInvalidated:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "invalidate",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "noteInterfaceOrientationChanged:animationSettings:direction:",
+          "encoding": "v40@0:8q16@24q32"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "interestedConnections",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "requestActiveOrientationCompletion:",
+          "encoding": "Vv24@0:8@?16"
+        },
+        {
+          "selector": "initialize",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "init",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "pendingConnections",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "requestActiveOrientation",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_initWithDomain:service:",
+          "encoding": "@32@0:8@16@24"
+        },
+        {
+          "selector": "listener:didReceiveConnection:withContext:",
+          "encoding": "v40@0:8@16@24@32"
+        },
+        {
+          "selector": "_lock_noteInterfaceOrientationChanged:animationSettings:direction:",
+          "encoding": "v40@0:8q16@24q32"
+        },
+        {
+          "selector": "_currentConnection",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_lock_sendMessageToInterestedClients:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_lock_registerOrientationInterest:connection:completion:",
+          "encoding": "v36@0:8I16@20@?28"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettingsDiffInspector",
+      "methods": [
+        "observePreferredInterfaceOrientationWithBlock:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "observePreferredInterfaceOrientationWithBlock:",
+          "encoding": "v24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSettingsDiffInspector",
+      "methods": [
+        "observeInterfaceOrientationWithBlock:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "observeInterfaceOrientationWithBlock:",
+          "encoding": "v24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneObserver",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:didUpdateSettings:",
+        "clientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "clientSettings:",
+          "encoding": "v24@0:8:16"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIStatusBarSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertSceneClientComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:",
+        "scene:willUpdateSettings:",
+        "supportedInterfaceOrientations",
+        "shouldDisableOrientationUpdates"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "scene:willUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "supportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "shouldDisableOrientationUpdates",
+          "encoding": "B16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIIdleTimerSceneHostComponent",
+      "methods": [
+        "scene:didUpdateClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUICameraOverlaySceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIHomeScreenIconStyleSceneClientComponent",
+      "methods": [
+        "scene:didUpdateSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateSettings:",
+          "encoding": "v32@0:8@16@24"
+        }
+      ]
+    },
+    {
+      "class": "FBSScene",
+      "methods": [
+        "uiAlwaysSupportsAllInterfaceOrientations",
+        "uiCanReceiveDeviceOrientationEvents",
+        "uiClientSettings",
+        "ui_orientationClientSceneComponent",
+        "updateUIClientSettingsWithBlock:",
+        "updateUIClientSettingsWithTransitionBlock:",
+        "updateClientSettingsWithBlock:",
+        "updateSettings:",
+        "clientSettings",
+        "updateClientSettings:",
+        "updateClientSettingsWithTransitionBlock:",
+        "_callOutQueue_ensureCoalesceClientSettingsUpdates:",
+        "_callOutQueue_maybeCoalesceClientSettingsUpdates:",
+        "_updateClientSettings:",
+        "updateClientSettings:withTransitionContext:",
+        "updater:didUpdateSettings:withDiff:transitionContext:completion:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "uiAlwaysSupportsAllInterfaceOrientations",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "uiCanReceiveDeviceOrientationEvents",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "uiClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "ui_orientationClientSceneComponent",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateUIClientSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateUIClientSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateClientSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "updateClientSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateClientSettingsWithTransitionBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_callOutQueue_ensureCoalesceClientSettingsUpdates:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_callOutQueue_maybeCoalesceClientSettingsUpdates:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_updateClientSettings:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateClientSettings:withTransitionContext:",
+          "encoding": "v32@0:8@16@24"
+        },
+        {
+          "selector": "updater:didUpdateSettings:withDiff:transitionContext:completion:",
+          "encoding": "v56@0:8@16@24@32@40@?48"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettingsCore",
+      "methods": [
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setPreferredInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSettingsCore",
+      "methods": [
+        "interfaceOrientation",
+        "setInterfaceOrientation:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSpecification",
+      "methods": [
+        "affectsScreenOrientation",
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "affectsScreenOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUISystemNotesSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUILoginUISceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIInCallSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIStarkNotificationsSceneSpecification",
+      "methods": [
+        "clientSettingsClass"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsClass",
+          "encoding": "#16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneParameters",
+      "methods": [
+        "setClientSettings:",
+        "updateSettingsWithBlock:",
+        "clientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "updateSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "clientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSMutableSceneParameters",
+      "methods": [
+        "applyClientSettings:",
+        "updateClientSettingsWithBlock:",
+        "updateSettingsWithBlock:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "applyClientSettings:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "updateClientSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "updateSettingsWithBlock:",
+          "encoding": "v24@0:8@?16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneEvent",
+      "methods": [
+        "clientSettingsDiff",
+        "setClientSettingsDiff:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "clientSettingsDiff",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setClientSettingsDiff:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneClientSettings",
+      "methods": [
+        "SBUISA_prefersFixedPortraitOrientation",
+        "preferredInterfaceOrientation",
+        "setPreferredInterfaceOrientation:",
+        "interfaceOrientationLockPreference",
+        "setInterfaceOrientationLockPreference:",
+        "_uiApplicationSceneClientSettingsShim"
+      ],
+      "typed_methods": [
+        {
+          "selector": "SBUISA_prefersFixedPortraitOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "preferredInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setPreferredInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "interfaceOrientationLockPreference",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientationLockPreference:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_uiApplicationSceneClientSettingsShim",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneSettings",
+      "methods": [
+        "interfaceOrientation",
+        "setInterfaceOrientation:",
+        "interfaceOrientationLockState",
+        "setInterfaceOrientationLockState:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "interfaceOrientationLockState",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "setInterfaceOrientationLockState:",
+          "encoding": "v24@0:8q16"
+        }
+      ]
+    },
+    {
+      "class": "FBSSceneTransitionContext",
+      "methods": [
+        "transientLocalClientSettings"
+      ],
+      "typed_methods": [
+        {
+          "selector": "transientLocalClientSettings",
+          "encoding": "@16@0:8"
+        }
+      ]
+    },
+    {
+      "class": "FBSWorkspaceSceneRequestOptions",
+      "methods": [
+        "initialClientSettings",
+        "setInitialClientSettings:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "initialClientSettings",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "setInitialClientSettings:",
+          "encoding": "v24@0:8@16"
+        }
+      ]
+    },
+    {
+      "class": "FBSPseudoSceneUpdater",
+      "methods": [
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "FBSWorkspaceScenesClient",
+      "methods": [
+        "scene:didUpdateClientSettings:withDiff:transitionContext:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "scene:didUpdateClientSettings:withDiff:transitionContext:",
+          "encoding": "v48@0:8@16@24@32@40"
+        }
+      ]
+    },
+    {
+      "class": "UIWindowScene",
+      "methods": [
+        "interfaceOrientation",
+        "_windowsIgnoreSceneClientOrientation",
+        "_referenceBoundsForOrientation:",
+        "_interfaceOrientation",
+        "_updateClientSettingsToInterfaceOrientation:withAnimationDuration:",
+        "_canReceiveDeviceOrientationEvents",
+        "_completeGeometryUpdatesWithTransitionContext:",
+        "_currentlySupportedInterfaceOrientations",
+        "_interfaceOrientationForSupportedOrientations:preferredOrientation:",
+        "_orientationDebugDescription",
+        "_orientationDebugDescriptionBuilderWithMultilinePrefix:",
+        "_orientationDebugDescriptionWithMultilinePrefix:",
+        "_performIOSGeometryRequestWithPreferences:errorHandler:",
+        "_safeAreaCornerInsetsForInterfaceOrientation:",
+        "_safeAreaInsetsForInterfaceOrientation:",
+        "_shouldRotateSafeAreaInsetsToInterfaceOrientation",
+        "_updateEffectiveGeometryIfNeeded",
+        "_windowOrientationPreferencesObserver",
+        "effectiveGeometry",
+        "requestGeometryUpdateWithPreferences:errorHandler:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_windowsIgnoreSceneClientOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_referenceBoundsForOrientation:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "_interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_updateClientSettingsToInterfaceOrientation:withAnimationDuration:",
+          "encoding": "v32@0:8q16d24"
+        },
+        {
+          "selector": "_canReceiveDeviceOrientationEvents",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_completeGeometryUpdatesWithTransitionContext:",
+          "encoding": "v24@0:8@16"
+        },
+        {
+          "selector": "_currentlySupportedInterfaceOrientations",
+          "encoding": "Q16@0:8"
+        },
+        {
+          "selector": "_interfaceOrientationForSupportedOrientations:preferredOrientation:",
+          "encoding": "q32@0:8Q16q24"
+        },
+        {
+          "selector": "_orientationDebugDescription",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_orientationDebugDescriptionBuilderWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_orientationDebugDescriptionWithMultilinePrefix:",
+          "encoding": "@24@0:8@16"
+        },
+        {
+          "selector": "_performIOSGeometryRequestWithPreferences:errorHandler:",
+          "encoding": "v32@0:8@16@?24"
+        },
+        {
+          "selector": "_safeAreaCornerInsetsForInterfaceOrientation:",
+          "encoding": "{_UICornerInsets={CGSize=dd}{CGSize=dd}{CGSize=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "_safeAreaInsetsForInterfaceOrientation:",
+          "encoding": "{UIEdgeInsets=dddd}24@0:8q16"
+        },
+        {
+          "selector": "_shouldRotateSafeAreaInsetsToInterfaceOrientation",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_updateEffectiveGeometryIfNeeded",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_windowOrientationPreferencesObserver",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "effectiveGeometry",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "requestGeometryUpdateWithPreferences:errorHandler:",
+          "encoding": "v32@0:8@16@?24"
+        }
+      ]
+    },
+    {
+      "class": "SBSUIRemoteAlertScene",
+      "methods": [
+        "setOrientationChangedEventsDisabled:"
+      ],
+      "typed_methods": [
+        {
+          "selector": "setOrientationChangedEventsDisabled:",
+          "encoding": "v20@0:8B16"
+        }
+      ]
+    },
+    {
+      "class": "UIApplication",
+      "methods": [
+        "_handleDeviceOrientationChangedEvent:",
+        "interfaceOrientation",
+        "activeInterfaceOrientation",
+        "alertInterfaceOrientation",
+        "noteActiveInterfaceOrientationWillChangeToOrientation:",
+        "supportedInterfaceOrientationsForWindow:",
+        "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:",
+        "noteActiveInterfaceOrientationWillChangeToOrientation:screen:",
+        "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:screen:",
+        "statusBarOrientation",
+        "_frontMostAppOrientation",
+        "_testOrientation:options:",
+        "statusBarHeightForOrientation:",
+        "_statusBarOrientationFollowsWindow:",
+        "setStatusBarOrientation:",
+        "_statusBarOrientationForWindow:",
+        "__queuedOrientationChange",
+        "__setQueuedOrientationChange:",
+        "_canReceiveDeviceOrientationEvents",
+        "_carefulChoiceOrientation",
+        "_carefulChoiceOrientationForWindow:",
+        "_createStatusBarIfNeededWithOrientation:forWindowScene:",
+        "_createStatusBarWithRequestedStyle:orientation:hidden:",
+        "_createStatusBarWithRequestedStyle:orientation:hidden:forWindowScene:",
+        "_currentExpectedInterfaceOrientation",
+        "_defaultSceneInterfaceOrientationReturningUnknownForNilScene:",
+        "_expectedViewOrientation",
+        "_fallbackInterfaceOrientationForSupportedOrientations:preferredOrientation:currentOrientation:",
+        "_findUISceneForLegacyInterfaceOrientation",
+        "_frontMostAppInterfaceOrientationIsSignificant",
+        "_getSpringBoardOrientation",
+        "_isOrientationVerticallyCompact:",
+        "_isStatusBarForcedHiddenForOrientation:",
+        "_isStatusBarHiddenForOrientation:",
+        "_isSupportedOrientation:",
+        "_safeInterfaceOrientationForNoWindow",
+        "_safeInterfaceOrientationForWindowIfExists:",
+        "_safeInterfaceOrientationForWindowIfExists:expectNonNilWindow:",
+        "_sceneInterfaceOrientationFromWindow:",
+        "_setExpectedViewOrientation:",
+        "_setStatusBarOrientation:",
+        "_setStatusBarOrientation:animated:",
+        "_setupStatusBarWithRequestedStyle:orientation:hidden:",
+        "_supportedInterfaceOrientationsForWindow:",
+        "_updateOrientation",
+        "_viewServiceIgnoresSceneForLegacyInterfaceOrientation:",
+        "runTestForKeyboardRotationWithName:fromOrientation:withShowKeyboardBlock:withExtraResultsBlock:withCleanupBlock:",
+        "setStatusBarOrientation:animated:",
+        "setStatusBarOrientation:animation:duration:",
+        "setStatusBarOrientation:animationParameters:",
+        "setStatusBarOrientation:fromOrientation:windowScene:animationParameters:updateBlock:",
+        "statusBarFrameForOrientation:",
+        "statusBarHeightForOrientation:ignoreHidden:",
+        "statusBarOrientationAnimationDuration"
+      ],
+      "typed_methods": [
+        {
+          "selector": "_handleDeviceOrientationChangedEvent:",
+          "encoding": "v24@0:8^{__GSEvent=}16"
+        },
+        {
+          "selector": "interfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "activeInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "alertInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationWillChangeToOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "supportedInterfaceOrientationsForWindow:",
+          "encoding": "Q24@0:8@16"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:",
+          "encoding": "v40@0:8q16@24q32"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationWillChangeToOrientation:screen:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "noteActiveInterfaceOrientationDidChangeToOrientation:willAnimateWithSettings:fromOrientation:screen:",
+          "encoding": "v48@0:8q16@24q32@40"
+        },
+        {
+          "selector": "statusBarOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_frontMostAppOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_testOrientation:options:",
+          "encoding": "q32@0:8@16@24"
+        },
+        {
+          "selector": "statusBarHeightForOrientation:",
+          "encoding": "d24@0:8q16"
+        },
+        {
+          "selector": "_statusBarOrientationFollowsWindow:",
+          "encoding": "B24@0:8@16"
+        },
+        {
+          "selector": "setStatusBarOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_statusBarOrientationForWindow:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "__queuedOrientationChange",
+          "encoding": "@?16@0:8"
+        },
+        {
+          "selector": "__setQueuedOrientationChange:",
+          "encoding": "v24@0:8@?16"
+        },
+        {
+          "selector": "_canReceiveDeviceOrientationEvents",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_carefulChoiceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_carefulChoiceOrientationForWindow:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "_createStatusBarIfNeededWithOrientation:forWindowScene:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "_createStatusBarWithRequestedStyle:orientation:hidden:",
+          "encoding": "v36@0:8q16q24B32"
+        },
+        {
+          "selector": "_createStatusBarWithRequestedStyle:orientation:hidden:forWindowScene:",
+          "encoding": "v44@0:8q16q24B32@36"
+        },
+        {
+          "selector": "_currentExpectedInterfaceOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_defaultSceneInterfaceOrientationReturningUnknownForNilScene:",
+          "encoding": "q20@0:8B16"
+        },
+        {
+          "selector": "_expectedViewOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_fallbackInterfaceOrientationForSupportedOrientations:preferredOrientation:currentOrientation:",
+          "encoding": "q40@0:8Q16q24q32"
+        },
+        {
+          "selector": "_findUISceneForLegacyInterfaceOrientation",
+          "encoding": "@16@0:8"
+        },
+        {
+          "selector": "_frontMostAppInterfaceOrientationIsSignificant",
+          "encoding": "B16@0:8"
+        },
+        {
+          "selector": "_getSpringBoardOrientation",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_isOrientationVerticallyCompact:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isStatusBarForcedHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isStatusBarHiddenForOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_isSupportedOrientation:",
+          "encoding": "B24@0:8q16"
+        },
+        {
+          "selector": "_safeInterfaceOrientationForNoWindow",
+          "encoding": "q16@0:8"
+        },
+        {
+          "selector": "_safeInterfaceOrientationForWindowIfExists:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "_safeInterfaceOrientationForWindowIfExists:expectNonNilWindow:",
+          "encoding": "q28@0:8@16B24"
+        },
+        {
+          "selector": "_sceneInterfaceOrientationFromWindow:",
+          "encoding": "q24@0:8@16"
+        },
+        {
+          "selector": "_setExpectedViewOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_setStatusBarOrientation:",
+          "encoding": "v24@0:8q16"
+        },
+        {
+          "selector": "_setStatusBarOrientation:animated:",
+          "encoding": "v28@0:8q16B24"
+        },
+        {
+          "selector": "_setupStatusBarWithRequestedStyle:orientation:hidden:",
+          "encoding": "v36@0:8q16q24B32"
+        },
+        {
+          "selector": "_supportedInterfaceOrientationsForWindow:",
+          "encoding": "Q24@0:8@16"
+        },
+        {
+          "selector": "_updateOrientation",
+          "encoding": "v16@0:8"
+        },
+        {
+          "selector": "_viewServiceIgnoresSceneForLegacyInterfaceOrientation:",
+          "encoding": "B24@0:8@16"
+        },
+        {
+          "selector": "runTestForKeyboardRotationWithName:fromOrientation:withShowKeyboardBlock:withExtraResultsBlock:withCleanupBlock:",
+          "encoding": "v56@0:8@16q24@?32@?40@?48"
+        },
+        {
+          "selector": "setStatusBarOrientation:animated:",
+          "encoding": "v28@0:8q16B24"
+        },
+        {
+          "selector": "setStatusBarOrientation:animation:duration:",
+          "encoding": "v36@0:8q16i24d28"
+        },
+        {
+          "selector": "setStatusBarOrientation:animationParameters:",
+          "encoding": "v32@0:8q16@24"
+        },
+        {
+          "selector": "setStatusBarOrientation:fromOrientation:windowScene:animationParameters:updateBlock:",
+          "encoding": "v56@0:8q16q24@32@40@?48"
+        },
+        {
+          "selector": "statusBarFrameForOrientation:",
+          "encoding": "{CGRect={CGPoint=dd}{CGSize=dd}}24@0:8q16"
+        },
+        {
+          "selector": "statusBarHeightForOrientation:ignoreHidden:",
+          "encoding": "d28@0:8q16B24"
+        },
+        {
+          "selector": "statusBarOrientationAnimationDuration",
+          "encoding": "d16@0:8"
+        }
+      ]
+    }
+  ]
+}

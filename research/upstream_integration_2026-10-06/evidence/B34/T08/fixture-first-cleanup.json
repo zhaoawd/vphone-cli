@@ -1,0 +1,58 @@
+{
+  "terminate": {
+    "method": "apps.terminate",
+    "params": {
+      "bundle_id": "research.vphone.b31.rotation"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "already_stopped": false,
+        "killed": "research.vphone.b31.rotation",
+        "pids": [
+          456
+        ]
+      },
+      "type": "response"
+    },
+    "seconds": 0.0627068339381367
+  },
+  "uninstall": {
+    "method": "apps.uninstall",
+    "params": {
+      "bundle_id": "research.vphone.b31.rotation",
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "method": "container",
+        "removed_containers": [
+          "/private/var/mobile/Containers/Data/Application/B8E2482D-E9D6-4D41-A0F7-979C92C8DFD5",
+          "/private/var/containers/Bundle/Application/F3418D2F-385F-4ECA-BCF1-A67774E42DD0"
+        ],
+        "uninstalled": "research.vphone.b31.rotation"
+      },
+      "type": "response"
+    },
+    "seconds": 0.2885657080914825
+  },
+  "search": {
+    "method": "apps.search",
+    "params": {
+      "query": "research.vphone.b31.rotation"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "apps": [],
+        "query": "research.vphone.b31.rotation"
+      },
+      "type": "response"
+    },
+    "seconds": 0.06343424995429814
+  }
+}

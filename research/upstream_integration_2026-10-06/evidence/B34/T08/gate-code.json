@@ -1,0 +1,691 @@
+[
+  {
+    "class": "SBTraitsSceneParticipantDelegate",
+    "selector": "_isAllowedToHavePortraitUpsideDown",
+    "address": "0x2340a9710",
+    "module": "SpringBoard",
+    "instructions": [
+      {
+        "address": "0x2340a9710",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x2340a9714",
+        "mnemonic": "stp",
+        "opStr": "x22, x21, [sp, #-0x30]!"
+      },
+      {
+        "address": "0x2340a9718",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x10]"
+      },
+      {
+        "address": "0x2340a971c",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x20]"
+      },
+      {
+        "address": "0x2340a9720",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x20"
+      },
+      {
+        "address": "0x2340a9724",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b6d20",
+        "target_symbol": "0x2390b6d20"
+      },
+      {
+        "address": "0x2340a9728",
+        "mnemonic": "adrp",
+        "opStr": "x20, #0x28d255000"
+      },
+      {
+        "address": "0x2340a972c",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x2340a9754"
+      },
+      {
+        "address": "0x2340a9730",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b50b0",
+        "target_symbol": "0x2390b50b0"
+      },
+      {
+        "address": "0x2340a9734",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x2340a9744"
+      },
+      {
+        "address": "0x2340a9738",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b50b0",
+        "target_symbol": "0x2390b50b0"
+      },
+      {
+        "address": "0x2340a973c",
+        "mnemonic": "cmp",
+        "opStr": "w0, #1"
+      },
+      {
+        "address": "0x2340a9740",
+        "mnemonic": "b.ne",
+        "opStr": "#0x2340a9788"
+      },
+      {
+        "address": "0x2340a9744",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b50c0",
+        "target_symbol": "0x2390b50c0"
+      },
+      {
+        "address": "0x2340a9748",
+        "mnemonic": "cmp",
+        "opStr": "x0, #2"
+      },
+      {
+        "address": "0x2340a974c",
+        "mnemonic": "cset",
+        "opStr": "w21, ne"
+      },
+      {
+        "address": "0x2340a9750",
+        "mnemonic": "b",
+        "opStr": "#0x2340a978c",
+        "target_symbol": "0x2340a978c SpringBoard!-[SBTraitsSceneParticipantDelegate _isAllowedToHavePortraitUpsideDown]"
+      },
+      {
+        "address": "0x2340a9754",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x20, #0x920]"
+      },
+      {
+        "address": "0x2340a9758",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc0900",
+        "target_symbol": "0x234fc0900 SpringBoard!objc_msgSend$currentDevice"
+      },
+      {
+        "address": "0x2340a975c",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2340a9760",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2340a9764",
+        "mnemonic": "bl",
+        "opStr": "#0x235052a40",
+        "target_symbol": "0x235052a40 SpringBoard!objc_msgSend$userInterfaceIdiom"
+      },
+      {
+        "address": "0x2340a9768",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x2340a9774"
+      },
+      {
+        "address": "0x2340a976c",
+        "mnemonic": "mov",
+        "opStr": "w21, #1"
+      },
+      {
+        "address": "0x2340a9770",
+        "mnemonic": "b",
+        "opStr": "#0x2340a9780",
+        "target_symbol": "0x2340a9780 SpringBoard!-[SBTraitsSceneParticipantDelegate _isAllowedToHavePortraitUpsideDown]"
+      },
+      {
+        "address": "0x2340a9774",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b50c0",
+        "target_symbol": "0x2390b50c0"
+      },
+      {
+        "address": "0x2340a9778",
+        "mnemonic": "cmp",
+        "opStr": "x0, #2"
+      },
+      {
+        "address": "0x2340a977c",
+        "mnemonic": "cset",
+        "opStr": "w21, ne"
+      },
+      {
+        "address": "0x2340a9780",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2340a9784",
+        "mnemonic": "b",
+        "opStr": "#0x2340a978c",
+        "target_symbol": "0x2340a978c SpringBoard!-[SBTraitsSceneParticipantDelegate _isAllowedToHavePortraitUpsideDown]"
+      },
+      {
+        "address": "0x2340a9788",
+        "mnemonic": "mov",
+        "opStr": "w21, #1"
+      },
+      {
+        "address": "0x2340a978c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x20, #0x920]"
+      },
+      {
+        "address": "0x2340a9790",
+        "mnemonic": "bl",
+        "opStr": "#0x234fc0900",
+        "target_symbol": "0x234fc0900 SpringBoard!objc_msgSend$currentDevice"
+      },
+      {
+        "address": "0x2340a9794",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b7550",
+        "target_symbol": "0x2390b7550"
+      },
+      {
+        "address": "0x2340a9798",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x2340a979c",
+        "mnemonic": "bl",
+        "opStr": "#0x235052a40",
+        "target_symbol": "0x235052a40 SpringBoard!objc_msgSend$userInterfaceIdiom"
+      },
+      {
+        "address": "0x2340a97a0",
+        "mnemonic": "mov",
+        "opStr": "x20, x0"
+      },
+      {
+        "address": "0x2340a97a4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x2340a97a8",
+        "mnemonic": "and",
+        "opStr": "x8, x20, #0xfffffffffffffffb"
+      },
+      {
+        "address": "0x2340a97ac",
+        "mnemonic": "cmp",
+        "opStr": "x8, #1"
+      },
+      {
+        "address": "0x2340a97b0",
+        "mnemonic": "cset",
+        "opStr": "w8, eq"
+      },
+      {
+        "address": "0x2340a97b4",
+        "mnemonic": "orr",
+        "opStr": "w8, w8, w21"
+      },
+      {
+        "address": "0x2340a97b8",
+        "mnemonic": "and",
+        "opStr": "w0, w8, #1"
+      },
+      {
+        "address": "0x2340a97bc",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x20]"
+      },
+      {
+        "address": "0x2340a97c0",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x10]"
+      },
+      {
+        "address": "0x2340a97c4",
+        "mnemonic": "ldp",
+        "opStr": "x22, x21, [sp], #0x30"
+      },
+      {
+        "address": "0x2340a97c8",
+        "mnemonic": "retab",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      127,
+      35,
+      3,
+      213,
+      246,
+      87,
+      189,
+      169,
+      244,
+      79,
+      1,
+      169,
+      253,
+      123,
+      2,
+      169,
+      253,
+      131,
+      0,
+      145,
+      127,
+      53,
+      64,
+      149,
+      116,
+      141,
+      44,
+      144,
+      64,
+      1,
+      0,
+      52,
+      96,
+      46,
+      64,
+      149,
+      128,
+      0,
+      0,
+      52,
+      94,
+      46,
+      64,
+      149,
+      31,
+      4,
+      0,
+      113,
+      65,
+      2,
+      0,
+      84,
+      95,
+      46,
+      64,
+      149,
+      31,
+      8,
+      0,
+      241,
+      245,
+      7,
+      159,
+      26,
+      15,
+      0,
+      0,
+      20,
+      128,
+      146,
+      68,
+      249,
+      106,
+      92,
+      60,
+      148,
+      125,
+      55,
+      64,
+      149,
+      243,
+      3,
+      0,
+      170,
+      183,
+      164,
+      62,
+      148,
+      96,
+      0,
+      0,
+      180,
+      53,
+      0,
+      128,
+      82,
+      4,
+      0,
+      0,
+      20,
+      83,
+      46,
+      64,
+      149,
+      31,
+      8,
+      0,
+      241,
+      245,
+      7,
+      159,
+      26,
+      212,
+      55,
+      64,
+      149,
+      2,
+      0,
+      0,
+      20,
+      53,
+      0,
+      128,
+      82,
+      128,
+      146,
+      68,
+      249,
+      92,
+      92,
+      60,
+      148,
+      111,
+      55,
+      64,
+      149,
+      243,
+      3,
+      0,
+      170,
+      169,
+      164,
+      62,
+      148,
+      244,
+      3,
+      0,
+      170,
+      203,
+      55,
+      64,
+      149,
+      136,
+      250,
+      125,
+      146,
+      31,
+      5,
+      0,
+      241,
+      232,
+      23,
+      159,
+      26,
+      8,
+      1,
+      21,
+      42,
+      0,
+      1,
+      0,
+      18,
+      253,
+      123,
+      66,
+      169,
+      244,
+      79,
+      65,
+      169,
+      246,
+      87,
+      195,
+      168,
+      255,
+      15,
+      95,
+      214
+    ]
+  },
+  {
+    "class": "SBTraitsSceneParticipantDelegate",
+    "selector": "_sanitizedMask:forApplication:",
+    "address": "0x23471b868",
+    "module": "SpringBoard",
+    "instructions": [
+      {
+        "address": "0x23471b868",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x23471b86c",
+        "mnemonic": "stp",
+        "opStr": "x22, x21, [sp, #-0x30]!"
+      },
+      {
+        "address": "0x23471b870",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x10]"
+      },
+      {
+        "address": "0x23471b874",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x20]"
+      },
+      {
+        "address": "0x23471b878",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x20"
+      },
+      {
+        "address": "0x23471b87c",
+        "mnemonic": "mov",
+        "opStr": "x20, x2"
+      },
+      {
+        "address": "0x23471b880",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x23471b884",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b78d0",
+        "target_symbol": "0x2390b78d0"
+      },
+      {
+        "address": "0x23471b888",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x23471b88c",
+        "mnemonic": "cmp",
+        "opStr": "x20, #4"
+      },
+      {
+        "address": "0x23471b890",
+        "mnemonic": "b.ne",
+        "opStr": "#0x23471b8a0"
+      },
+      {
+        "address": "0x23471b894",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x23471b898",
+        "mnemonic": "bl",
+        "opStr": "#0x234f7d760",
+        "target_symbol": "0x234f7d760 SpringBoard!objc_msgSend$_isAllowedToHavePortraitUpsideDown"
+      },
+      {
+        "address": "0x23471b89c",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x23471b8b0"
+      },
+      {
+        "address": "0x23471b8a0",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x23471b8a4",
+        "mnemonic": "bl",
+        "opStr": "#0x234f66fe0",
+        "target_symbol": "0x234f66fe0 SpringBoard!objc_msgSend$_allLegalOrientations"
+      },
+      {
+        "address": "0x23471b8a8",
+        "mnemonic": "and",
+        "opStr": "x20, x0, x20"
+      },
+      {
+        "address": "0x23471b8ac",
+        "mnemonic": "b",
+        "opStr": "#0x23471b8b4",
+        "target_symbol": "0x23471b8b4 SpringBoard!-[SBTraitsSceneParticipantDelegate _sanitizedMask:forApplication:]"
+      },
+      {
+        "address": "0x23471b8b0",
+        "mnemonic": "mov",
+        "opStr": "w20, #2"
+      },
+      {
+        "address": "0x23471b8b4",
+        "mnemonic": "bl",
+        "opStr": "#0x2390b76d0",
+        "target_symbol": "0x2390b76d0"
+      },
+      {
+        "address": "0x23471b8b8",
+        "mnemonic": "mov",
+        "opStr": "x0, x20"
+      },
+      {
+        "address": "0x23471b8bc",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x20]"
+      },
+      {
+        "address": "0x23471b8c0",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x10]"
+      },
+      {
+        "address": "0x23471b8c4",
+        "mnemonic": "ldp",
+        "opStr": "x22, x21, [sp], #0x30"
+      },
+      {
+        "address": "0x23471b8c8",
+        "mnemonic": "retab",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      127,
+      35,
+      3,
+      213,
+      246,
+      87,
+      189,
+      169,
+      244,
+      79,
+      1,
+      169,
+      253,
+      123,
+      2,
+      169,
+      253,
+      131,
+      0,
+      145,
+      244,
+      3,
+      2,
+      170,
+      245,
+      3,
+      0,
+      170,
+      19,
+      112,
+      38,
+      149,
+      243,
+      3,
+      0,
+      170,
+      159,
+      18,
+      0,
+      241,
+      129,
+      0,
+      0,
+      84,
+      224,
+      3,
+      21,
+      170,
+      178,
+      135,
+      33,
+      148,
+      160,
+      0,
+      0,
+      52,
+      224,
+      3,
+      21,
+      170,
+      207,
+      45,
+      33,
+      148,
+      20,
+      0,
+      20,
+      138,
+      2,
+      0,
+      0,
+      20,
+      84,
+      0,
+      128,
+      82,
+      135,
+      111,
+      38,
+      149,
+      224,
+      3,
+      20,
+      170,
+      253,
+      123,
+      66,
+      169,
+      244,
+      79,
+      65,
+      169,
+      246,
+      87,
+      195,
+      168,
+      255,
+      15,
+      95,
+      214
+    ]
+  }
+]

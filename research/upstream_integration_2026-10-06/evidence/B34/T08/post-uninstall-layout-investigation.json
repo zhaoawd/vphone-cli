@@ -1,0 +1,96 @@
+{
+  "inspect": {
+    "method": "bootstrap.inspect",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "installed": true,
+        "roots": [
+          "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+          "/var/jb"
+        ]
+      },
+      "type": "response"
+    },
+    "seconds": 0.00268958299420774
+  },
+  "device": {
+    "method": "device.info",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "jailbreak": {
+          "jbroot": "/var/jb",
+          "layout": "rootless",
+          "source": "filesystem fallback"
+        }
+      },
+      "type": "response"
+    },
+    "seconds": 0.020444707944989204
+  },
+  "var-jb": {
+    "method": "files.list",
+    "params": {
+      "path": "/var/jb"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "entries": [
+          {
+            "is_directory": true,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T11:28:04Z",
+            "mtime": 1791631684,
+            "name": "tmp",
+            "path": "/private/var/jb/tmp",
+            "perm": "755",
+            "resolved_path": "/private/var/jb/tmp",
+            "size": 64,
+            "type": "dir"
+          }
+        ],
+        "path": "/var/jb"
+      },
+      "type": "response"
+    },
+    "seconds": 0.0020965419244021177
+  },
+  "var": {
+    "method": "files.list",
+    "params": {
+      "path": "/var"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "entries": [
+          {
+            "is_directory": true,
+            "is_symlink": false,
+            "link_target_dir": false,
+            "modified": "2026-10-10T11:28:04Z",
+            "mtime": 1791631684,
+            "name": "jb",
+            "path": "/private/var/jb",
+            "perm": "755",
+            "resolved_path": "/private/var/jb",
+            "size": 96,
+            "type": "dir"
+          }
+        ],
+        "path": "/var"
+      },
+      "type": "response"
+    },
+    "seconds": 0.00669720908626914
+  }
+}

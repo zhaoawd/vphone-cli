@@ -1,0 +1,6 @@
+.build/research-b36/stop-amfi.applescript:0:166: execution error: Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-06/evidence/B36/T08/stop_amfi.py", line 43, in <module>
+    if not alive():
+  File "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-06/evidence/B36/T08/stop_amfi.py", line 24, in alive
+    assert shlex.split(command)[-3:] == ['-u', record['driver'], '--run']
+AssertionError (1)

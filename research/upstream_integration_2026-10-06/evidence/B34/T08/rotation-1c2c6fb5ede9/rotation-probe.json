@@ -1,0 +1,2819 @@
+{
+  "runtime_validated": false,
+  "front": {
+    "bundle_id": "research.vphone.b31.rotation",
+    "name": "B33 Rotation",
+    "pid": 456,
+    "source": "runningboard",
+    "verified": true
+  },
+  "health": {
+    "method": null,
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "api_version": 1,
+      "binary_hash": "7f66a29680e0b527e31fa204c2306f750ffccc5a915728ac775ec1cd787ec454",
+      "capabilities": [
+        "session_identity",
+        "touch",
+        "hid",
+        "apps",
+        "url",
+        "files",
+        "file_download_identity",
+        "file_upload_identity",
+        "clipboard",
+        "location",
+        "timezone",
+        "keychain",
+        "ipa_install",
+        "bootstrap_install",
+        "bootstrap_uninstall",
+        "port_forward",
+        "screenshot",
+        "screen_unlock",
+        "device_info",
+        "display",
+        "audio",
+        "input_gestures",
+        "ui_inspection",
+        "processes",
+        "services",
+        "logs",
+        "network_capture",
+        "app_details",
+        "system_control",
+        "system_shutdown",
+        "file_tools",
+        "packages",
+        "environment_update",
+        "environment_transaction",
+        "environment_activation"
+      ],
+      "instance_id": "8DA43967-3E56-48AF-890A-DA5C183639A0",
+      "ios": "26.1.0",
+      "ip": "fe80::1470:600e:c4a:1f8a%en0",
+      "name": "vphoned",
+      "setup_pending": false,
+      "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+      "status": "ok"
+    },
+    "seconds": 0.0035655000247061253
+  },
+  "layout": {
+    "method": "bootstrap.inspect",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "installed": true,
+        "jbroot": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+        "layout": "roothide",
+        "roots": [
+          "/private/var/containers/Bundle/Application/.jbroot-000114514191980C"
+        ]
+      },
+      "type": "response"
+    },
+    "seconds": 0.001569415908306837
+  },
+  "rotation_before": {
+    "method": "display.rotation",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B33",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.010143833933398128
+  },
+  "fixture": {
+    "source": "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-06/evidence/B32/T08/controlled-fixture-v4.m",
+    "source_sha256": "2763a6d506f38c5a67619f14a3396ef655777e1aa9e71e2b90437e937ea7af0d",
+    "argv": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-arch",
+      "arm64",
+      "-miphoneos-version-min=15.0",
+      "-fobjc-arc",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.1.sdk",
+      "/Users/kolar/github/vphone-cli/research/upstream_integration_2026-10-06/evidence/B32/T08/controlled-fixture-v4.m",
+      "-framework",
+      "Foundation",
+      "-framework",
+      "UIKit",
+      "-o",
+      "/Users/kolar/github/vphone-cli/.build/research-b33/fixture/Payload/VPhoneB31Rotation.app/VPhoneB31Rotation"
+    ],
+    "ipa": "/Users/kolar/github/vphone-cli/.build/research-b33/fixture/fixture-v4.ipa",
+    "ipa_sha256": "99510951937f247f4cb593adc816f2069bf14e688078074081c582224c8b7a86",
+    "source_unchanged_from_B32": true,
+    "info_plist_recreated": true,
+    "runtime_validated": false
+  },
+  "policy_script_sha256": "5109d862aece3dc814ad01169873042ea9a85a33d408a2e2726798115aac59f7",
+  "frida_client_version": "17.17.0",
+  "window_seconds": 10,
+  "rows": [
+    {
+      "phase": "A-baseline-0",
+      "request_id": "A-baseline-0-8501f711d68e432da1a6b64295fdd3cf",
+      "override": null,
+      "policy_before": {
+        "pid": 456,
+        "bundle_id": "research.vphone.b31.rotation",
+        "scenes": [
+          {
+            "class": "UIWindowScene",
+            "session_id": "39275F10-EB53-4363-BA29-A5FBF7BE533D",
+            "activation_state": 0,
+            "orientation": 1,
+            "current_scene_mask": 30,
+            "client_mask": 30,
+            "debug": "<UIWindowScene: 0x101800130> {\n    sceneSettings = {\n        mode = dynamic;\n        orientation = portrait (1);\n        orientationLockState = unspecified;\n    }\n    clientSettings = {\n        orientation = portrait (1);\n        supported = ( Pu Ll Lr Pd );\n        orientationLockPreference = unspecified;\n    }\n    screen = <UIScreen: 0x729048640; orientation: portrait (1); applicationFrame: {{0, 20}, {320, 460}}>;\n    windowDrivingOrientation = <UIWindow: 0x10180c910; orientation: portrait (1)> {\n        hidden = NO;\n        frame = {{0, 0}, {320, 480}};\n        bounds = {{0, 0}, {320, 480}};\n        ownsOrientation = NO;\n        ownsOrientationTransform = NO;\n        autorotationDisabled = NO;\n        windowInterfaceOrientation = portrait (1);\n        rootTransformOrientation = portrait (1);\n        viewTransformOrientation = portrait (1);\n        autorotationDisabled = NO;\n        orientationVC = <ProbeVC: 0x10180cd10> {\n            providedSupportedOrientations = ( Pu Ll Lr Pd );\n            resolvedSupportedOrientations = ( Pu Ll Lr Pd );\n            canPreferOrientation = NO;\n        };\n    };\n}",
+            "windows": [
+              {
+                "key": 1,
+                "hidden": 0,
+                "root_class": "ProbeVC",
+                "provided_mask": 30,
+                "resolved_mask": 30,
+                "private_application_mask": 30,
+                "application_mask": 30
+              }
+            ]
+          }
+        ]
+      },
+      "put": {
+        "size": 363,
+        "ok": true
+      },
+      "get_log": {
+        "path": "/Users/kolar/github/vphone-cli/.build/research-b33/rotation-1c2c6fb5ede9/A-baseline-0.jsonl",
+        "size": 79853,
+        "ok": true
+      },
+      "analysis": {
+        "request_id": "A-baseline-0-8501f711d68e432da1a6b64295fdd3cf",
+        "requested_mask": 2,
+        "target_orientation": 1,
+        "expected_supported_mask": 26,
+        "samples": 43,
+        "required_span_seconds": 10,
+        "verdict": "invalid_evidence",
+        "reasons": [
+          "current_scene_mask_unexpected",
+          "scene_client_mask_unexpected",
+          "effective_controller_mask_unexpected"
+        ],
+        "sample_span_seconds": 10.499945878982544,
+        "pids": [
+          456
+        ],
+        "orientations": [
+          1
+        ],
+        "first_sample_time": 1791632690.829863,
+        "last_sample_time": 1791632701.329809,
+        "error_observed": false,
+        "target_seen": true,
+        "target_stable_at_end": true
+      },
+      "policy_after": {
+        "pid": 456,
+        "bundle_id": "research.vphone.b31.rotation",
+        "scenes": [
+          {
+            "class": "UIWindowScene",
+            "session_id": "39275F10-EB53-4363-BA29-A5FBF7BE533D",
+            "activation_state": 0,
+            "orientation": 1,
+            "current_scene_mask": 30,
+            "client_mask": 30,
+            "debug": "<UIWindowScene: 0x101800130> {\n    sceneSettings = {\n        mode = dynamic;\n        orientation = portrait (1);\n        orientationLockState = unspecified;\n    }\n    clientSettings = {\n        orientation = portrait (1);\n        supported = ( Pu Ll Lr Pd );\n        orientationLockPreference = unspecified;\n    }\n    screen = <UIScreen: 0x729048640; orientation: portrait (1); applicationFrame: {{0, 20}, {320, 460}}>;\n    windowDrivingOrientation = <UIWindow: 0x10180c910; orientation: portrait (1)> {\n        hidden = NO;\n        frame = {{0, 0}, {320, 480}};\n        bounds = {{0, 0}, {320, 480}};\n        ownsOrientation = NO;\n        ownsOrientationTransform = NO;\n        autorotationDisabled = NO;\n        windowInterfaceOrientation = portrait (1);\n        rootTransformOrientation = portrait (1);\n        viewTransformOrientation = portrait (1);\n        autorotationDisabled = NO;\n        orientationVC = <ProbeVC: 0x10180cd10> {\n            providedSupportedOrientations = ( Pu Ll Lr Pd );\n            resolvedSupportedOrientations = ( Pu Ll Lr Pd );\n            canPreferOrientation = NO;\n        };\n    };\n}",
+            "windows": [
+              {
+                "key": 1,
+                "hidden": 0,
+                "root_class": "ProbeVC",
+                "provided_mask": 30,
+                "resolved_mask": 30,
+                "private_application_mask": 30,
+                "application_mask": 30
+              }
+            ]
+          }
+        ]
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B33",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "type": "response"
+        },
+        "seconds": 0.025864999974146485
+      },
+      "foreground": {
+        "bundle_id": "research.vphone.b31.rotation",
+        "name": "B33 Rotation",
+        "pid": 456,
+        "source": "runningboard",
+        "verified": true
+      },
+      "condition_observations": [
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "native_idiom",
+          "value": 0
+        },
+        {
+          "kind": "has_home_button",
+          "receiver": "0x2027d6700",
+          "native_value": 1,
+          "value": 1
+        }
+      ],
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B33",
+          "result": {
+            "bytes": 137998,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "A-baseline-0.jpeg",
+            "sha256": "28ad7f912ad4071913ad4e55c32508c04761dde13c24d1d5b3b49695a021f919"
+          },
+          "type": "response"
+        },
+        "seconds": 0.024071082938462496
+      }
+    }
+  ],
+  "restoration": {
+    "native_home_button": true,
+    "portrait": {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B33",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5113090840168297
+    },
+    "script_unload": true,
+    "session_detach": true
+  },
+  "condition": {
+    "receiver": "0x2027d6700",
+    "receiver_symbol": "0x2027d6700 UIKitCore!OBJC_CLASS_$_UIDevice",
+    "idiom_address": "0x19ddaf47c",
+    "home_stub": "0x1a0020a60",
+    "method": {
+      "class": "UIApplication",
+      "selector": "_supportedInterfaceOrientationsForWindow:",
+      "address": "0x19f19106c",
+      "module": "UIKitCore",
+      "instructions": [
+        {
+          "address": "0x19f19106c",
+          "mnemonic": "pacibsp",
+          "opStr": ""
+        },
+        {
+          "address": "0x19f191070",
+          "mnemonic": "sub",
+          "opStr": "sp, sp, #0x90"
+        },
+        {
+          "address": "0x19f191074",
+          "mnemonic": "stp",
+          "opStr": "x22, x21, [sp, #0x60]"
+        },
+        {
+          "address": "0x19f191078",
+          "mnemonic": "stp",
+          "opStr": "x20, x19, [sp, #0x70]"
+        },
+        {
+          "address": "0x19f19107c",
+          "mnemonic": "stp",
+          "opStr": "x29, x30, [sp, #0x80]"
+        },
+        {
+          "address": "0x19f191080",
+          "mnemonic": "add",
+          "opStr": "x29, sp, #0x80"
+        },
+        {
+          "address": "0x19f191084",
+          "mnemonic": "mov",
+          "opStr": "x19, x0"
+        },
+        {
+          "address": "0x19f191088",
+          "mnemonic": "bl",
+          "opStr": "#0x1a23358c0",
+          "target_symbol": "0x1a23358c0"
+        },
+        {
+          "address": "0x19f19108c",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1ffc74000"
+        },
+        {
+          "address": "0x19f191090",
+          "mnemonic": "ldrsw",
+          "opStr": "x8, [x8, #0xb30]"
+        },
+        {
+          "address": "0x19f191094",
+          "mnemonic": "ldr",
+          "opStr": "x8, [x19, x8]"
+        },
+        {
+          "address": "0x19f191098",
+          "mnemonic": "cbz",
+          "opStr": "x8, #0x19f1910b0"
+        },
+        {
+          "address": "0x19f19109c",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1ffc74000"
+        },
+        {
+          "address": "0x19f1910a0",
+          "mnemonic": "ldrsw",
+          "opStr": "x8, [x8, #0xb78]"
+        },
+        {
+          "address": "0x19f1910a4",
+          "mnemonic": "add",
+          "opStr": "x8, x19, x8"
+        },
+        {
+          "address": "0x19f1910a8",
+          "mnemonic": "ldrb",
+          "opStr": "w8, [x8, #7]"
+        },
+        {
+          "address": "0x19f1910ac",
+          "mnemonic": "tbnz",
+          "opStr": "w8, #1, #0x19f1910ec"
+        },
+        {
+          "address": "0x19f1910b0",
+          "mnemonic": "mov",
+          "opStr": "x20, sp"
+        },
+        {
+          "address": "0x19f1910b4",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x1fbd35000"
+        },
+        {
+          "address": "0x19f1910b8",
+          "mnemonic": "ldr",
+          "opStr": "x16, [x16, #0x820]"
+        },
+        {
+          "address": "0x19f1910bc",
+          "mnemonic": "mov",
+          "opStr": "x17, x20"
+        },
+        {
+          "address": "0x19f1910c0",
+          "mnemonic": "movk",
+          "opStr": "x17, #0x6ae1, lsl #48"
+        },
+        {
+          "address": "0x19f1910c4",
+          "mnemonic": "pacda",
+          "opStr": "x16, x17"
+        },
+        {
+          "address": "0x19f1910c8",
+          "mnemonic": "str",
+          "opStr": "x16, [sp]"
+        },
+        {
+          "address": "0x19f1910cc",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x19f997000"
+        },
+        {
+          "address": "0x19f1910d0",
+          "mnemonic": "ldr",
+          "opStr": "d0, [x8, #0x758]"
+        },
+        {
+          "address": "0x19f1910d4",
+          "mnemonic": "str",
+          "opStr": "d0, [sp, #8]"
+        },
+        {
+          "address": "0x19f1910d8",
+          "mnemonic": "add",
+          "opStr": "x8, x20, #0x10"
+        },
+        {
+          "address": "0x19f1910dc",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x19f191000"
+        },
+        {
+          "address": "0x19f1910e0",
+          "mnemonic": "add",
+          "opStr": "x16, x16, #0x1a8"
+        },
+        {
+          "address": "0x19f1910e4",
+          "mnemonic": "pacia",
+          "opStr": "x16, x8"
+        },
+        {
+          "address": "0x19f1910e8",
+          "mnemonic": "b",
+          "opStr": "#0x19f191124",
+          "target_symbol": "0x19f191124 UIKitCore!-[UIApplication _supportedInterfaceOrientationsForWindow:]"
+        },
+        {
+          "address": "0x19f1910ec",
+          "mnemonic": "add",
+          "opStr": "x20, sp, #0x30"
+        },
+        {
+          "address": "0x19f1910f0",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x1fbd35000"
+        },
+        {
+          "address": "0x19f1910f4",
+          "mnemonic": "ldr",
+          "opStr": "x16, [x16, #0x820]"
+        },
+        {
+          "address": "0x19f1910f8",
+          "mnemonic": "mov",
+          "opStr": "x17, x20"
+        },
+        {
+          "address": "0x19f1910fc",
+          "mnemonic": "movk",
+          "opStr": "x17, #0x6ae1, lsl #48"
+        },
+        {
+          "address": "0x19f191100",
+          "mnemonic": "pacda",
+          "opStr": "x16, x17"
+        },
+        {
+          "address": "0x19f191104",
+          "mnemonic": "str",
+          "opStr": "x16, [sp, #0x30]"
+        },
+        {
+          "address": "0x19f191108",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x19f997000"
+        },
+        {
+          "address": "0x19f19110c",
+          "mnemonic": "ldr",
+          "opStr": "d0, [x8, #0x758]"
+        },
+        {
+          "address": "0x19f191110",
+          "mnemonic": "str",
+          "opStr": "d0, [sp, #0x38]"
+        },
+        {
+          "address": "0x19f191114",
+          "mnemonic": "add",
+          "opStr": "x8, x20, #0x10"
+        },
+        {
+          "address": "0x19f191118",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x19f191000"
+        },
+        {
+          "address": "0x19f19111c",
+          "mnemonic": "add",
+          "opStr": "x16, x16, #0x194"
+        },
+        {
+          "address": "0x19f191120",
+          "mnemonic": "pacia",
+          "opStr": "x16, x8"
+        },
+        {
+          "address": "0x19f191124",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1fc469000"
+        },
+        {
+          "address": "0x19f191128",
+          "mnemonic": "add",
+          "opStr": "x8, x8, #0x580"
+        },
+        {
+          "address": "0x19f19112c",
+          "mnemonic": "stp",
+          "opStr": "x16, x8, [x20, #0x10]"
+        },
+        {
+          "address": "0x19f191130",
+          "mnemonic": "str",
+          "opStr": "x19, [x20, #0x20]"
+        },
+        {
+          "address": "0x19f191134",
+          "mnemonic": "bl",
+          "opStr": "#0x1a2335810",
+          "target_symbol": "0x1a2335810"
+        },
+        {
+          "address": "0x19f191138",
+          "mnemonic": "mov",
+          "opStr": "x19, x0"
+        },
+        {
+          "address": "0x19f19113c",
+          "mnemonic": "str",
+          "opStr": "x0, [x20, #0x28]"
+        },
+        {
+          "address": "0x19f191140",
+          "mnemonic": "mov",
+          "opStr": "x0, x20"
+        },
+        {
+          "address": "0x19f191144",
+          "mnemonic": "bl",
+          "opStr": "#0x19ddaf864",
+          "target_symbol": "0x19ddaf864 UIKitCore!_UISafelyGetOrientationMask"
+        },
+        {
+          "address": "0x19f191148",
+          "mnemonic": "mov",
+          "opStr": "x21, x0"
+        },
+        {
+          "address": "0x19f19114c",
+          "mnemonic": "ldr",
+          "opStr": "x8, [x20, #0x28]"
+        },
+        {
+          "address": "0x19f191150",
+          "mnemonic": "bl",
+          "opStr": "#0x1a23357f0",
+          "target_symbol": "0x1a23357f0"
+        },
+        {
+          "address": "0x19f191154",
+          "mnemonic": "bl",
+          "opStr": "#0x19ddaf47c",
+          "target_symbol": "0x19ddaf47c UIKitCore!_UIDeviceNativeUserInterfaceIdiom"
+        },
+        {
+          "address": "0x19f191158",
+          "mnemonic": "cbnz",
+          "opStr": "x0, #0x19f191178"
+        },
+        {
+          "address": "0x19f19115c",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1fc435000"
+        },
+        {
+          "address": "0x19f191160",
+          "mnemonic": "ldr",
+          "opStr": "x0, [x8, #0x7a8]"
+        },
+        {
+          "address": "0x19f191164",
+          "mnemonic": "bl",
+          "opStr": "#0x1a0020a60",
+          "target_symbol": "0x1a0020a60 UIKitCore!objc_msgSend$_hasHomeButton"
+        },
+        {
+          "address": "0x19f191168",
+          "mnemonic": "mov",
+          "opStr": "w8, #0x1a"
+        },
+        {
+          "address": "0x19f19116c",
+          "mnemonic": "and",
+          "opStr": "x8, x21, x8"
+        },
+        {
+          "address": "0x19f191170",
+          "mnemonic": "cmp",
+          "opStr": "w0, #0"
+        },
+        {
+          "address": "0x19f191174",
+          "mnemonic": "csel",
+          "opStr": "x21, x21, x8, ne"
+        },
+        {
+          "address": "0x19f191178",
+          "mnemonic": "bl",
+          "opStr": "#0x1a2335710",
+          "target_symbol": "0x1a2335710"
+        },
+        {
+          "address": "0x19f19117c",
+          "mnemonic": "mov",
+          "opStr": "x0, x21"
+        },
+        {
+          "address": "0x19f191180",
+          "mnemonic": "ldp",
+          "opStr": "x29, x30, [sp, #0x80]"
+        },
+        {
+          "address": "0x19f191184",
+          "mnemonic": "ldp",
+          "opStr": "x20, x19, [sp, #0x70]"
+        },
+        {
+          "address": "0x19f191188",
+          "mnemonic": "ldp",
+          "opStr": "x22, x21, [sp, #0x60]"
+        },
+        {
+          "address": "0x19f19118c",
+          "mnemonic": "add",
+          "opStr": "sp, sp, #0x90"
+        },
+        {
+          "address": "0x19f191190",
+          "mnemonic": "retab",
+          "opStr": ""
+        }
+      ],
+      "bytes": [
+        127,
+        35,
+        3,
+        213,
+        255,
+        67,
+        2,
+        209,
+        246,
+        87,
+        6,
+        169,
+        244,
+        79,
+        7,
+        169,
+        253,
+        123,
+        8,
+        169,
+        253,
+        3,
+        2,
+        145,
+        243,
+        3,
+        0,
+        170,
+        14,
+        146,
+        198,
+        148,
+        8,
+        87,
+        48,
+        240,
+        8,
+        49,
+        139,
+        185,
+        104,
+        106,
+        104,
+        248,
+        200,
+        0,
+        0,
+        180,
+        8,
+        87,
+        48,
+        240,
+        8,
+        121,
+        139,
+        185,
+        104,
+        2,
+        8,
+        139,
+        8,
+        29,
+        64,
+        57,
+        8,
+        2,
+        8,
+        55,
+        244,
+        3,
+        0,
+        145,
+        48,
+        93,
+        46,
+        144,
+        16,
+        18,
+        68,
+        249,
+        241,
+        3,
+        20,
+        170,
+        49,
+        92,
+        237,
+        242,
+        48,
+        10,
+        193,
+        218,
+        240,
+        3,
+        0,
+        249,
+        40,
+        64,
+        0,
+        208,
+        0,
+        173,
+        67,
+        253,
+        224,
+        7,
+        0,
+        253,
+        136,
+        66,
+        0,
+        145,
+        16,
+        0,
+        0,
+        144,
+        16,
+        162,
+        6,
+        145,
+        16,
+        1,
+        193,
+        218,
+        15,
+        0,
+        0,
+        20,
+        244,
+        195,
+        0,
+        145,
+        48,
+        93,
+        46,
+        144,
+        16,
+        18,
+        68,
+        249,
+        241,
+        3,
+        20,
+        170,
+        49,
+        92,
+        237,
+        242,
+        48,
+        10,
+        193,
+        218,
+        240,
+        27,
+        0,
+        249,
+        40,
+        64,
+        0,
+        208,
+        0,
+        173,
+        67,
+        253,
+        224,
+        31,
+        0,
+        253,
+        136,
+        66,
+        0,
+        145,
+        16,
+        0,
+        0,
+        144,
+        16,
+        82,
+        6,
+        145,
+        16,
+        1,
+        193,
+        218,
+        200,
+        150,
+        46,
+        144,
+        8,
+        1,
+        22,
+        145,
+        144,
+        34,
+        1,
+        169,
+        147,
+        18,
+        0,
+        249,
+        183,
+        145,
+        198,
+        148,
+        243,
+        3,
+        0,
+        170,
+        128,
+        22,
+        0,
+        249,
+        224,
+        3,
+        20,
+        170,
+        200,
+        121,
+        176,
+        151,
+        245,
+        3,
+        0,
+        170,
+        136,
+        22,
+        64,
+        249,
+        168,
+        145,
+        198,
+        148,
+        202,
+        120,
+        176,
+        151,
+        0,
+        1,
+        0,
+        181,
+        40,
+        149,
+        46,
+        144,
+        0,
+        213,
+        67,
+        249,
+        63,
+        62,
+        58,
+        148,
+        72,
+        3,
+        128,
+        82,
+        168,
+        2,
+        8,
+        138,
+        31,
+        0,
+        0,
+        113,
+        181,
+        18,
+        136,
+        154,
+        102,
+        145,
+        198,
+        148,
+        224,
+        3,
+        21,
+        170,
+        253,
+        123,
+        72,
+        169,
+        244,
+        79,
+        71,
+        169,
+        246,
+        87,
+        70,
+        169,
+        255,
+        67,
+        2,
+        145,
+        255,
+        15,
+        95,
+        214
+      ]
+    }
+  },
+  "initial_policy": {
+    "pid": 456,
+    "bundle_id": "research.vphone.b31.rotation",
+    "scenes": [
+      {
+        "class": "UIWindowScene",
+        "session_id": "39275F10-EB53-4363-BA29-A5FBF7BE533D",
+        "activation_state": 0,
+        "orientation": 1,
+        "current_scene_mask": 30,
+        "client_mask": 30,
+        "debug": "<UIWindowScene: 0x101800130> {\n    sceneSettings = {\n        mode = dynamic;\n        orientation = portrait (1);\n        orientationLockState = unspecified;\n    }\n    clientSettings = {\n        orientation = portrait (1);\n        supported = ( Pu Ll Lr Pd );\n        orientationLockPreference = unspecified;\n    }\n    screen = <UIScreen: 0x729048640; orientation: portrait (1); applicationFrame: {{0, 20}, {320, 460}}>;\n    windowDrivingOrientation = <UIWindow: 0x10180c910; orientation: portrait (1)> {\n        hidden = NO;\n        frame = {{0, 0}, {320, 480}};\n        bounds = {{0, 0}, {320, 480}};\n        ownsOrientation = NO;\n        ownsOrientationTransform = NO;\n        autorotationDisabled = NO;\n        windowInterfaceOrientation = portrait (1);\n        rootTransformOrientation = portrait (1);\n        viewTransformOrientation = portrait (1);\n        autorotationDisabled = NO;\n        orientationVC = <ProbeVC: 0x10180cd10> {\n            providedSupportedOrientations = ( Pu Ll Lr Pd );\n            resolvedSupportedOrientations = ( Pu Ll Lr Pd );\n            canPreferOrientation = NO;\n        };\n    };\n}",
+        "windows": [
+          {
+            "key": 1,
+            "hidden": 0,
+            "root_class": "ProbeVC",
+            "provided_mask": 30,
+            "resolved_mask": 30,
+            "private_application_mask": 30,
+            "application_mask": 30
+          }
+        ]
+      }
+    ]
+  },
+  "failure": {
+    "type": "AssertionError",
+    "message": "{'request_id': 'A-baseline-0-8501f711d68e432da1a6b64295fdd3cf', 'requested_mask': 2, 'target_orientation': 1, 'expected_supported_mask': 26, 'samples': 43, 'required_span_seconds': 10, 'verdict': 'invalid_evidence', 'reasons': ['current_scene_mask_unexpected', 'scene_client_mask_unexpected', 'effective_controller_mask_unexpected'], 'sample_span_seconds': 10.499945878982544, 'pids': [456], 'orientations': [1], 'first_sample_time': 1791632690.829863, 'last_sample_time': 1791632701.329809, 'error_observed': False, 'target_seen': True, 'target_stable_at_end': True}"
+  }
+}

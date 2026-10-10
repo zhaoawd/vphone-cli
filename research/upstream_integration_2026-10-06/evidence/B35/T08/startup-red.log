@@ -1,0 +1,91 @@
+test_completed_roothide_loads_services_after_repair_and_continues_after_failure (test_bootstrap_startup.BootstrapStartupTests.test_completed_roothide_loads_services_after_repair_and_continues_after_failure) ... FAIL
+test_firmware_failure_does_not_disable_bootstrap_service_recovery (test_bootstrap_startup.BootstrapStartupTests.test_firmware_failure_does_not_disable_bootstrap_service_recovery) ... FAIL
+test_missing_invalid_and_repair_failure_never_load_services (test_bootstrap_startup.BootstrapStartupTests.test_missing_invalid_and_repair_failure_never_load_services) ... 
+  test_missing_invalid_and_repair_failure_never_load_services (test_bootstrap_startup.BootstrapStartupTests.test_missing_invalid_and_repair_failure_never_load_services) (mode='invalid') ... FAIL
+  test_missing_invalid_and_repair_failure_never_load_services (test_bootstrap_startup.BootstrapStartupTests.test_missing_invalid_and_repair_failure_never_load_services) (mode='repair-failed') ... FAIL
+test_rootless_and_linked_launchdaemon_directory_are_not_activated (test_bootstrap_startup.BootstrapStartupTests.test_rootless_and_linked_launchdaemon_directory_are_not_activated) ... ok
+
+======================================================================
+FAIL: test_completed_roothide_loads_services_after_repair_and_continues_after_failure (test_bootstrap_startup.BootstrapStartupTests.test_completed_roothide_loads_services_after_repair_and_continues_after_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_bootstrap_startup.py", line 110, in test_completed_roothide_loads_services_after_repair_and_continues_after_failure
+    self.assertEqual(self.run_case('installed'), ['marker', 'repair', 'firmware',
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'load:a-failed.plist', 'load:b-good.plist', 'load:c-existing.plist'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['mar[21 chars]ware'] != ['mar[21 chars]ware', 'load:a-failed.plist', 'load:b-good.pli[24 chars]ist']
+
+Second list contains 3 additional elements.
+First extra element 3:
+'load:a-failed.plist'
+
+- ['marker', 'repair', 'firmware']
++ ['marker',
++  'repair',
++  'firmware',
++  'load:a-failed.plist',
++  'load:b-good.plist',
++  'load:c-existing.plist']
+
+======================================================================
+FAIL: test_firmware_failure_does_not_disable_bootstrap_service_recovery (test_bootstrap_startup.BootstrapStartupTests.test_firmware_failure_does_not_disable_bootstrap_service_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_bootstrap_startup.py", line 120, in test_firmware_failure_does_not_disable_bootstrap_service_recovery
+    self.assertEqual(self.run_case('firmware-failed'), ['marker', 'repair', 'firmware',
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'load:a-failed.plist', 'load:b-good.plist', 'load:c-existing.plist'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['mar[21 chars]ware'] != ['mar[21 chars]ware', 'load:a-failed.plist', 'load:b-good.pli[24 chars]ist']
+
+Second list contains 3 additional elements.
+First extra element 3:
+'load:a-failed.plist'
+
+- ['marker', 'repair', 'firmware']
++ ['marker',
++  'repair',
++  'firmware',
++  'load:a-failed.plist',
++  'load:b-good.plist',
++  'load:c-existing.plist']
+
+======================================================================
+FAIL: test_missing_invalid_and_repair_failure_never_load_services (test_bootstrap_startup.BootstrapStartupTests.test_missing_invalid_and_repair_failure_never_load_services) (mode='invalid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_bootstrap_startup.py", line 117, in test_missing_invalid_and_repair_failure_never_load_services
+    self.assertEqual(self.run_case(mode), events)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['marker', 'firmware'] != ['marker']
+
+First list contains 1 additional elements.
+First extra element 1:
+'firmware'
+
+- ['marker', 'firmware']
++ ['marker']
+
+======================================================================
+FAIL: test_missing_invalid_and_repair_failure_never_load_services (test_bootstrap_startup.BootstrapStartupTests.test_missing_invalid_and_repair_failure_never_load_services) (mode='repair-failed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/kolar/github/vphone-cli/tests/test_bootstrap_startup.py", line 117, in test_missing_invalid_and_repair_failure_never_load_services
+    self.assertEqual(self.run_case(mode), events)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['marker', 'repair', 'firmware'] != ['marker', 'repair']
+
+First list contains 1 additional elements.
+First extra element 2:
+'firmware'
+
+- ['marker', 'repair', 'firmware']
+?                    ------------
+
++ ['marker', 'repair']
+
+----------------------------------------------------------------------
+Ran 4 tests in 5.654s
+
+FAILED (failures=4)
