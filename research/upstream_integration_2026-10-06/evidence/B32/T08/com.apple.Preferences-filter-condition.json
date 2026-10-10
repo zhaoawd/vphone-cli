@@ -1,0 +1,767 @@
+{
+  "front": {
+    "bundle_id": "com.apple.Preferences",
+    "name": "Settings",
+    "pid": 954,
+    "source": "runningboard",
+    "verified": true
+  },
+  "condition": {
+    "receiver": "0x1ef83e700",
+    "receiver_symbol": "0x1ef83e700 UIKitCore!OBJC_CLASS_$_UIDevice",
+    "idiom_address": "0x18ae1747c",
+    "home_stub": "0x18d088a60",
+    "method": {
+      "class": "UIApplication",
+      "selector": "_supportedInterfaceOrientationsForWindow:",
+      "address": "0x18c1f906c",
+      "module": "UIKitCore",
+      "instructions": [
+        {
+          "address": "0x18c1f906c",
+          "mnemonic": "pacibsp",
+          "opStr": ""
+        },
+        {
+          "address": "0x18c1f9070",
+          "mnemonic": "sub",
+          "opStr": "sp, sp, #0x90"
+        },
+        {
+          "address": "0x18c1f9074",
+          "mnemonic": "stp",
+          "opStr": "x22, x21, [sp, #0x60]"
+        },
+        {
+          "address": "0x18c1f9078",
+          "mnemonic": "stp",
+          "opStr": "x20, x19, [sp, #0x70]"
+        },
+        {
+          "address": "0x18c1f907c",
+          "mnemonic": "stp",
+          "opStr": "x29, x30, [sp, #0x80]"
+        },
+        {
+          "address": "0x18c1f9080",
+          "mnemonic": "add",
+          "opStr": "x29, sp, #0x80"
+        },
+        {
+          "address": "0x18c1f9084",
+          "mnemonic": "mov",
+          "opStr": "x19, x0"
+        },
+        {
+          "address": "0x18c1f9088",
+          "mnemonic": "bl",
+          "opStr": "#0x18f39d8c0",
+          "target_symbol": "0x18f39d8c0"
+        },
+        {
+          "address": "0x18c1f908c",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1eccdc000"
+        },
+        {
+          "address": "0x18c1f9090",
+          "mnemonic": "ldrsw",
+          "opStr": "x8, [x8, #0xb30]"
+        },
+        {
+          "address": "0x18c1f9094",
+          "mnemonic": "ldr",
+          "opStr": "x8, [x19, x8]"
+        },
+        {
+          "address": "0x18c1f9098",
+          "mnemonic": "cbz",
+          "opStr": "x8, #0x18c1f90b0"
+        },
+        {
+          "address": "0x18c1f909c",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1eccdc000"
+        },
+        {
+          "address": "0x18c1f90a0",
+          "mnemonic": "ldrsw",
+          "opStr": "x8, [x8, #0xb78]"
+        },
+        {
+          "address": "0x18c1f90a4",
+          "mnemonic": "add",
+          "opStr": "x8, x19, x8"
+        },
+        {
+          "address": "0x18c1f90a8",
+          "mnemonic": "ldrb",
+          "opStr": "w8, [x8, #7]"
+        },
+        {
+          "address": "0x18c1f90ac",
+          "mnemonic": "tbnz",
+          "opStr": "w8, #1, #0x18c1f90ec"
+        },
+        {
+          "address": "0x18c1f90b0",
+          "mnemonic": "mov",
+          "opStr": "x20, sp"
+        },
+        {
+          "address": "0x18c1f90b4",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x1e8d9d000"
+        },
+        {
+          "address": "0x18c1f90b8",
+          "mnemonic": "ldr",
+          "opStr": "x16, [x16, #0x820]"
+        },
+        {
+          "address": "0x18c1f90bc",
+          "mnemonic": "mov",
+          "opStr": "x17, x20"
+        },
+        {
+          "address": "0x18c1f90c0",
+          "mnemonic": "movk",
+          "opStr": "x17, #0x6ae1, lsl #48"
+        },
+        {
+          "address": "0x18c1f90c4",
+          "mnemonic": "pacda",
+          "opStr": "x16, x17"
+        },
+        {
+          "address": "0x18c1f90c8",
+          "mnemonic": "str",
+          "opStr": "x16, [sp]"
+        },
+        {
+          "address": "0x18c1f90cc",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x18c9ff000"
+        },
+        {
+          "address": "0x18c1f90d0",
+          "mnemonic": "ldr",
+          "opStr": "d0, [x8, #0x758]"
+        },
+        {
+          "address": "0x18c1f90d4",
+          "mnemonic": "str",
+          "opStr": "d0, [sp, #8]"
+        },
+        {
+          "address": "0x18c1f90d8",
+          "mnemonic": "add",
+          "opStr": "x8, x20, #0x10"
+        },
+        {
+          "address": "0x18c1f90dc",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x18c1f9000"
+        },
+        {
+          "address": "0x18c1f90e0",
+          "mnemonic": "add",
+          "opStr": "x16, x16, #0x1a8"
+        },
+        {
+          "address": "0x18c1f90e4",
+          "mnemonic": "pacia",
+          "opStr": "x16, x8"
+        },
+        {
+          "address": "0x18c1f90e8",
+          "mnemonic": "b",
+          "opStr": "#0x18c1f9124",
+          "target_symbol": "0x18c1f9124 UIKitCore!-[UIApplication _supportedInterfaceOrientationsForWindow:]"
+        },
+        {
+          "address": "0x18c1f90ec",
+          "mnemonic": "add",
+          "opStr": "x20, sp, #0x30"
+        },
+        {
+          "address": "0x18c1f90f0",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x1e8d9d000"
+        },
+        {
+          "address": "0x18c1f90f4",
+          "mnemonic": "ldr",
+          "opStr": "x16, [x16, #0x820]"
+        },
+        {
+          "address": "0x18c1f90f8",
+          "mnemonic": "mov",
+          "opStr": "x17, x20"
+        },
+        {
+          "address": "0x18c1f90fc",
+          "mnemonic": "movk",
+          "opStr": "x17, #0x6ae1, lsl #48"
+        },
+        {
+          "address": "0x18c1f9100",
+          "mnemonic": "pacda",
+          "opStr": "x16, x17"
+        },
+        {
+          "address": "0x18c1f9104",
+          "mnemonic": "str",
+          "opStr": "x16, [sp, #0x30]"
+        },
+        {
+          "address": "0x18c1f9108",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x18c9ff000"
+        },
+        {
+          "address": "0x18c1f910c",
+          "mnemonic": "ldr",
+          "opStr": "d0, [x8, #0x758]"
+        },
+        {
+          "address": "0x18c1f9110",
+          "mnemonic": "str",
+          "opStr": "d0, [sp, #0x38]"
+        },
+        {
+          "address": "0x18c1f9114",
+          "mnemonic": "add",
+          "opStr": "x8, x20, #0x10"
+        },
+        {
+          "address": "0x18c1f9118",
+          "mnemonic": "adrp",
+          "opStr": "x16, #0x18c1f9000"
+        },
+        {
+          "address": "0x18c1f911c",
+          "mnemonic": "add",
+          "opStr": "x16, x16, #0x194"
+        },
+        {
+          "address": "0x18c1f9120",
+          "mnemonic": "pacia",
+          "opStr": "x16, x8"
+        },
+        {
+          "address": "0x18c1f9124",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1e94d1000"
+        },
+        {
+          "address": "0x18c1f9128",
+          "mnemonic": "add",
+          "opStr": "x8, x8, #0x580"
+        },
+        {
+          "address": "0x18c1f912c",
+          "mnemonic": "stp",
+          "opStr": "x16, x8, [x20, #0x10]"
+        },
+        {
+          "address": "0x18c1f9130",
+          "mnemonic": "str",
+          "opStr": "x19, [x20, #0x20]"
+        },
+        {
+          "address": "0x18c1f9134",
+          "mnemonic": "bl",
+          "opStr": "#0x18f39d810",
+          "target_symbol": "0x18f39d810"
+        },
+        {
+          "address": "0x18c1f9138",
+          "mnemonic": "mov",
+          "opStr": "x19, x0"
+        },
+        {
+          "address": "0x18c1f913c",
+          "mnemonic": "str",
+          "opStr": "x0, [x20, #0x28]"
+        },
+        {
+          "address": "0x18c1f9140",
+          "mnemonic": "mov",
+          "opStr": "x0, x20"
+        },
+        {
+          "address": "0x18c1f9144",
+          "mnemonic": "bl",
+          "opStr": "#0x18ae17864",
+          "target_symbol": "0x18ae17864 UIKitCore!_UISafelyGetOrientationMask"
+        },
+        {
+          "address": "0x18c1f9148",
+          "mnemonic": "mov",
+          "opStr": "x21, x0"
+        },
+        {
+          "address": "0x18c1f914c",
+          "mnemonic": "ldr",
+          "opStr": "x8, [x20, #0x28]"
+        },
+        {
+          "address": "0x18c1f9150",
+          "mnemonic": "bl",
+          "opStr": "#0x18f39d7f0",
+          "target_symbol": "0x18f39d7f0"
+        },
+        {
+          "address": "0x18c1f9154",
+          "mnemonic": "bl",
+          "opStr": "#0x18ae1747c",
+          "target_symbol": "0x18ae1747c UIKitCore!_UIDeviceNativeUserInterfaceIdiom"
+        },
+        {
+          "address": "0x18c1f9158",
+          "mnemonic": "cbnz",
+          "opStr": "x0, #0x18c1f9178"
+        },
+        {
+          "address": "0x18c1f915c",
+          "mnemonic": "adrp",
+          "opStr": "x8, #0x1e949d000"
+        },
+        {
+          "address": "0x18c1f9160",
+          "mnemonic": "ldr",
+          "opStr": "x0, [x8, #0x7a8]"
+        },
+        {
+          "address": "0x18c1f9164",
+          "mnemonic": "bl",
+          "opStr": "#0x18d088a60",
+          "target_symbol": "0x18d088a60 UIKitCore!objc_msgSend$_hasHomeButton"
+        },
+        {
+          "address": "0x18c1f9168",
+          "mnemonic": "mov",
+          "opStr": "w8, #0x1a"
+        },
+        {
+          "address": "0x18c1f916c",
+          "mnemonic": "and",
+          "opStr": "x8, x21, x8"
+        },
+        {
+          "address": "0x18c1f9170",
+          "mnemonic": "cmp",
+          "opStr": "w0, #0"
+        },
+        {
+          "address": "0x18c1f9174",
+          "mnemonic": "csel",
+          "opStr": "x21, x21, x8, ne"
+        },
+        {
+          "address": "0x18c1f9178",
+          "mnemonic": "bl",
+          "opStr": "#0x18f39d710",
+          "target_symbol": "0x18f39d710"
+        },
+        {
+          "address": "0x18c1f917c",
+          "mnemonic": "mov",
+          "opStr": "x0, x21"
+        },
+        {
+          "address": "0x18c1f9180",
+          "mnemonic": "ldp",
+          "opStr": "x29, x30, [sp, #0x80]"
+        },
+        {
+          "address": "0x18c1f9184",
+          "mnemonic": "ldp",
+          "opStr": "x20, x19, [sp, #0x70]"
+        },
+        {
+          "address": "0x18c1f9188",
+          "mnemonic": "ldp",
+          "opStr": "x22, x21, [sp, #0x60]"
+        },
+        {
+          "address": "0x18c1f918c",
+          "mnemonic": "add",
+          "opStr": "sp, sp, #0x90"
+        },
+        {
+          "address": "0x18c1f9190",
+          "mnemonic": "retab",
+          "opStr": ""
+        }
+      ],
+      "bytes": [
+        127,
+        35,
+        3,
+        213,
+        255,
+        67,
+        2,
+        209,
+        246,
+        87,
+        6,
+        169,
+        244,
+        79,
+        7,
+        169,
+        253,
+        123,
+        8,
+        169,
+        253,
+        3,
+        2,
+        145,
+        243,
+        3,
+        0,
+        170,
+        14,
+        146,
+        198,
+        148,
+        8,
+        87,
+        48,
+        240,
+        8,
+        49,
+        139,
+        185,
+        104,
+        106,
+        104,
+        248,
+        200,
+        0,
+        0,
+        180,
+        8,
+        87,
+        48,
+        240,
+        8,
+        121,
+        139,
+        185,
+        104,
+        2,
+        8,
+        139,
+        8,
+        29,
+        64,
+        57,
+        8,
+        2,
+        8,
+        55,
+        244,
+        3,
+        0,
+        145,
+        48,
+        93,
+        46,
+        144,
+        16,
+        18,
+        68,
+        249,
+        241,
+        3,
+        20,
+        170,
+        49,
+        92,
+        237,
+        242,
+        48,
+        10,
+        193,
+        218,
+        240,
+        3,
+        0,
+        249,
+        40,
+        64,
+        0,
+        208,
+        0,
+        173,
+        67,
+        253,
+        224,
+        7,
+        0,
+        253,
+        136,
+        66,
+        0,
+        145,
+        16,
+        0,
+        0,
+        144,
+        16,
+        162,
+        6,
+        145,
+        16,
+        1,
+        193,
+        218,
+        15,
+        0,
+        0,
+        20,
+        244,
+        195,
+        0,
+        145,
+        48,
+        93,
+        46,
+        144,
+        16,
+        18,
+        68,
+        249,
+        241,
+        3,
+        20,
+        170,
+        49,
+        92,
+        237,
+        242,
+        48,
+        10,
+        193,
+        218,
+        240,
+        27,
+        0,
+        249,
+        40,
+        64,
+        0,
+        208,
+        0,
+        173,
+        67,
+        253,
+        224,
+        31,
+        0,
+        253,
+        136,
+        66,
+        0,
+        145,
+        16,
+        0,
+        0,
+        144,
+        16,
+        82,
+        6,
+        145,
+        16,
+        1,
+        193,
+        218,
+        200,
+        150,
+        46,
+        144,
+        8,
+        1,
+        22,
+        145,
+        144,
+        34,
+        1,
+        169,
+        147,
+        18,
+        0,
+        249,
+        183,
+        145,
+        198,
+        148,
+        243,
+        3,
+        0,
+        170,
+        128,
+        22,
+        0,
+        249,
+        224,
+        3,
+        20,
+        170,
+        200,
+        121,
+        176,
+        151,
+        245,
+        3,
+        0,
+        170,
+        136,
+        22,
+        64,
+        249,
+        168,
+        145,
+        198,
+        148,
+        202,
+        120,
+        176,
+        151,
+        0,
+        1,
+        0,
+        181,
+        40,
+        149,
+        46,
+        144,
+        0,
+        213,
+        67,
+        249,
+        63,
+        62,
+        58,
+        148,
+        72,
+        3,
+        128,
+        82,
+        168,
+        2,
+        8,
+        138,
+        31,
+        0,
+        0,
+        113,
+        181,
+        18,
+        136,
+        154,
+        102,
+        145,
+        198,
+        148,
+        224,
+        3,
+        21,
+        170,
+        253,
+        123,
+        72,
+        169,
+        244,
+        79,
+        71,
+        169,
+        246,
+        87,
+        70,
+        169,
+        255,
+        67,
+        2,
+        145,
+        255,
+        15,
+        95,
+        214
+      ]
+    }
+  },
+  "policy": {
+    "pid": 954,
+    "bundle_id": "com.apple.Preferences",
+    "scenes": [
+      {
+        "class": "UIWindowScene",
+        "session_id": "8A5B2C08-B7AB-418D-9403-88EA245815AF",
+        "activation_state": 0,
+        "orientation": 1,
+        "current_scene_mask": 2,
+        "client_mask": 2,
+        "debug": "<UIWindowScene: 0x1016693c0> {\n    sceneSettings = {\n        mode = dynamic;\n        orientation = portrait (1);\n        orientationLockState = unspecified;\n    }\n    clientSettings = {\n        orientation = portrait (1);\n        supported = ( Pu );\n        orientationLockPreference = unspecified;\n    }\n    screen = <UIScreen: 0xcaec8c140; orientation: portrait (1); applicationFrame: {{0, 54}, {430, 878}}>;\n    windowDrivingOrientation = <UIWindow: 0x101675c70; orientation: portrait (1)> {\n        hidden = NO;\n        frame = {{0, 0}, {430, 932}};\n        bounds = {{0, 0}, {430, 932}};\n        ownsOrientation = NO;\n        ownsOrientationTransform = NO;\n        autorotationDisabled = NO;\n        windowInterfaceOrientation = portrait (1);\n        rootTransformOrientation = portrait (1);\n        viewTransformOrientation = portrait (1);\n        autorotationDisabled = NO;\n        orientationVC = <_TtGC7SwiftUI19UIHostingControllerGVS_15ModifiedContentVS_7AnyViewVS_12RootModifier__: 0xcaeddc000> {\n            providedSupportedOrientations = ( Pu Ll Lr Pd );\n            resolvedSupportedOrientations = ( Pu );\n            canPreferOrientation = NO;\n        };\n    };\n}",
+        "windows": [
+          {
+            "key": 1,
+            "hidden": 0,
+            "root_class": "_TtGC7SwiftUI19UIHostingControllerGVS_15ModifiedContentVS_7AnyViewVS_12RootModifier__",
+            "provided_mask": 30,
+            "resolved_mask": 2,
+            "private_application_mask": 2,
+            "application_mask": 2
+          }
+        ]
+      }
+    ]
+  },
+  "observations": [
+    {
+      "kind": "native_idiom",
+      "value": 0
+    },
+    {
+      "kind": "has_home_button",
+      "receiver": "0x1ef83e700",
+      "value": 0
+    },
+    {
+      "kind": "native_idiom",
+      "value": 0
+    },
+    {
+      "kind": "native_idiom",
+      "value": 0
+    },
+    {
+      "kind": "has_home_button",
+      "receiver": "0x1ef83e700",
+      "value": 0
+    },
+    {
+      "kind": "native_idiom",
+      "value": 0
+    },
+    {
+      "kind": "has_home_button",
+      "receiver": "0x1ef83e700",
+      "value": 0
+    },
+    {
+      "kind": "native_idiom",
+      "value": 0
+    },
+    {
+      "kind": "has_home_button",
+      "receiver": "0x1ef83e700",
+      "value": 0
+    }
+  ]
+}

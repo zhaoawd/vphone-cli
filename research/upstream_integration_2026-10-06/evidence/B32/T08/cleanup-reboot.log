@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b32-t08/cleanup-reboot.py", line 11, in <module>
+    save('guest-cleanup-final.json',q);assert q['remove']['http_status']==200 and q['remove']['reply']['result']['removed'];assert not any(e['name']=='vphone-b32' for e in q['root_parent']['reply']['result']['entries']);assert not any(e['name'].startswith('b32-') for e in q['api_parent']['reply']['result']['entries']);assert not q['apps']['reply']['result']['apps'];assert not any('vphone-b32' in e.get('executable','') or 'VPhoneB31Rotation' in e.get('executable','') for e in q['processes']['reply']['result']['processes']);assert q['rotation']['reply']['result']['degrees']==0 and q['rotation']['reply']['result']['locked']==False
+                                                                                                                                                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

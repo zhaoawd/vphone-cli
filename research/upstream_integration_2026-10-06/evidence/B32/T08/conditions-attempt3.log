@@ -1,0 +1,26 @@
+{'type': 'send', 'payload': {'stage': 'method-found'}}
+{'type': 'send', 'payload': {'stage': 'receiver-read', 'receiver': '0x1ef83e700'}}
+{'type': 'send', 'payload': {'stage': 'before-condition'}}
+DETACHED process-terminated
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b32-t08/conditions.py", line 13, in <module>
+    out={'front':front,'condition':script.exports_sync.condition(),'policy':script.exports_sync.policy()};save(bundle+'-filter-condition.json',out);print(bundle,{k:v for k,v in out['condition'].items() if k!='method'},flush=True)
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/qcz3840/github/autophone/.venv/lib/python3.13/site-packages/frida/__init__.py", line 222, in method
+    return script._rpc_request(["call", js_name, params], data)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qcz3840/github/autophone/.venv/lib/python3.13/site-packages/frida/__init__.py", line 914, in _rpc_request
+    raise outcome["error"]
+frida.InvalidOperationError: script has been destroyed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/vphone-b32-t08/conditions.py", line 14, in <module>
+    finally:script.unload();session.detach()
+            ~~~~~~~~~~~~~^^
+  File "/Users/qcz3840/github/autophone/.venv/lib/python3.13/site-packages/frida/__init__.py", line 824, in unload
+    return _invoke(self._impl.unload, ())
+  File "/Users/qcz3840/github/autophone/.venv/lib/python3.13/site-packages/frida/__init__.py", line 107, in _invoke
+    raise error
+frida.InvalidOperationError: script is destroyed

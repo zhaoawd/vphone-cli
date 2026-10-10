@@ -1,0 +1,595 @@
+{
+  "scope": "original API, Frida process stopped, diagnostic app uninstalled; Frida directory deletion failed before matrix and was completed in later cleanup-only boot",
+  "rows": [
+    {
+      "bundle": "com.apple.Preferences",
+      "requested": 0,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "0"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait",
+            "requested": 0
+          },
+          "type": "response"
+        },
+        "seconds": 0.5408990419236943
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0030564169865101576
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 954,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16238683299161494
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 224106,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "clean-images/com.apple.Preferences-0.jpeg",
+            "sha256": "9d6ad10beb27bf79cbc4228e0dd0074e89c4dff7c67fa62418da588ff6575909"
+          },
+          "type": "response"
+        },
+        "seconds": 0.17448074999265373
+      }
+    },
+    {
+      "bundle": "com.apple.Preferences",
+      "requested": 90,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "90"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B32",
+          "type": "response"
+        },
+        "seconds": 0.520420458051376
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0023274170234799385
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 954,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.1653314169961959
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 224106,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "clean-images/com.apple.Preferences-90.jpeg",
+            "sha256": "9d6ad10beb27bf79cbc4228e0dd0074e89c4dff7c67fa62418da588ff6575909"
+          },
+          "type": "response"
+        },
+        "seconds": 0.17369633296038955
+      }
+    },
+    {
+      "bundle": "com.apple.Preferences",
+      "requested": 270,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "270"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B32",
+          "type": "response"
+        },
+        "seconds": 0.524388249963522
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0030038750264793634
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 954,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.15098408400081098
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 224106,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "clean-images/com.apple.Preferences-270.jpeg",
+            "sha256": "9d6ad10beb27bf79cbc4228e0dd0074e89c4dff7c67fa62418da588ff6575909"
+          },
+          "type": "response"
+        },
+        "seconds": 0.1423043329268694
+      }
+    },
+    {
+      "bundle": "com.apple.Preferences",
+      "requested": 180,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "180"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B32",
+          "type": "response"
+        },
+        "seconds": 0.5239359169499949
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "type": "response"
+        },
+        "seconds": 0.003909249906428158
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.Preferences",
+            "name": "Settings",
+            "pid": 954,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16761316696647555
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 224106,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "clean-images/com.apple.Preferences-180.jpeg",
+            "sha256": "9d6ad10beb27bf79cbc4228e0dd0074e89c4dff7c67fa62418da588ff6575909"
+          },
+          "type": "response"
+        },
+        "seconds": 0.1454335420858115
+      }
+    },
+    {
+      "bundle": "com.apple.mobilesafari",
+      "requested": 0,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "0"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait",
+            "requested": 0
+          },
+          "type": "response"
+        },
+        "seconds": 0.5248348329914734
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0034425000194460154
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 428,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.1606906249653548
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 299604,
+            "coordinate_scale": 3,
+            "height": 2796,
+            "mime_type": "image/jpeg",
+            "width": 1290,
+            "saved_file": "clean-images/com.apple.mobilesafari-0.jpeg",
+            "sha256": "d36c792d1be8dbb4c9e18a3d233302da59220c813e03f949ba92d14f6411c2a9"
+          },
+          "type": "response"
+        },
+        "seconds": 0.15004099998623133
+      }
+    },
+    {
+      "bundle": "com.apple.mobilesafari",
+      "requested": 90,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "90"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 90,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-left",
+            "requested": 90
+          },
+          "type": "response"
+        },
+        "seconds": 0.5316922080237418
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 90,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-left"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0032800420885905623
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 428,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.16069270903244615
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 245960,
+            "coordinate_scale": 3,
+            "height": 1290,
+            "mime_type": "image/jpeg",
+            "width": 2796,
+            "saved_file": "clean-images/com.apple.mobilesafari-90.jpeg",
+            "sha256": "af902563cf232d0c446db9f33356148f65a18d96ddebba499412409f83647177"
+          },
+          "type": "response"
+        },
+        "seconds": 0.17196599999442697
+      }
+    },
+    {
+      "bundle": "com.apple.mobilesafari",
+      "requested": 270,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "270"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 270,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-right",
+            "requested": 270
+          },
+          "type": "response"
+        },
+        "seconds": 0.5294788340106606
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 270,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-right"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0022784590255469084
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 428,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.1524923329707235
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 245968,
+            "coordinate_scale": 3,
+            "height": 1290,
+            "mime_type": "image/jpeg",
+            "width": 2796,
+            "saved_file": "clean-images/com.apple.mobilesafari-270.jpeg",
+            "sha256": "dcfc7fa190c01b3d1552c17aeeed1f68956f40facc3a5fd562cce07c9c57b9eb"
+          },
+          "type": "response"
+        },
+        "seconds": 0.16106212500017136
+      }
+    },
+    {
+      "bundle": "com.apple.mobilesafari",
+      "requested": 180,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "180"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B32",
+          "type": "response"
+        },
+        "seconds": 0.5323787920642644
+      },
+      "api": {
+        "method": "display.rotation",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "degrees": 270,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-right"
+          },
+          "type": "response"
+        },
+        "seconds": 0.0030313340248540044
+      },
+      "front": {
+        "method": "apps.foreground",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bundle_id": "com.apple.mobilesafari",
+            "name": "Safari",
+            "pid": 428,
+            "source": "runningboard",
+            "verified": true
+          },
+          "type": "response"
+        },
+        "seconds": 0.15054545796010643
+      },
+      "screenshot": {
+        "method": "screen.screenshot",
+        "params": {},
+        "http_status": 200,
+        "reply": {
+          "id": "B32",
+          "result": {
+            "bytes": 242518,
+            "coordinate_scale": 3,
+            "height": 1290,
+            "mime_type": "image/jpeg",
+            "width": 2796,
+            "saved_file": "clean-images/com.apple.mobilesafari-180.jpeg",
+            "sha256": "5d838b7ddb55b0dbda3c75a5bec116875914aa5ef4a74c644adabaa9a529d842"
+          },
+          "type": "response"
+        },
+        "seconds": 0.15456979197915643
+      }
+    }
+  ],
+  "initial_scope_label": "original API, Frida stopped and removed, no diagnostic app; post-diagnostic clean repetition",
+  "scope_label_corrected_after_cleanup_review": true
+}

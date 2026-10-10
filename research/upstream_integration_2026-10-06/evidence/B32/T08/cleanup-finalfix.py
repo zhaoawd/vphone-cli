@@ -1,0 +1,6 @@
+from pathlib import Path
+import json,os,signal
+root=Path('/private/tmp/vphone-b32-t08');exec((root/'client.py').read_text().replace('20261010-093633-f57791e5','20261010-101205-297aa07d'))
+q={'help_log_remove':rpc('files.remove',{'path':'/var/root/vphone-b29-api/b32-frida-help.log','force':True}),'root_parent':rpc('files.list',{'path':'/var/root'}),'api_parent':rpc('files.list',{'path':'/var/root/vphone-b29-api'}),'apps':rpc('apps.search',{'query':'research.vphone.b31.rotation'}),'processes':rpc('processes.list'),'rotation':rpc('display.rotation')};save('guest-cleanup-final.json',q)
+assert q['help_log_remove']['http_status']==200 and q['help_log_remove']['reply']['result']['removed'];assert not any(e['name']=='vphone-b32' for e in q['root_parent']['reply']['result']['entries']);assert not any(e['name'].startswith('b32-') for e in q['api_parent']['reply']['result']['entries']);assert not q['apps']['reply']['result']['apps'];assert not any('vphone-b32' in e.get('executable','') or 'VPhoneB31Rotation' in e.get('executable','') for e in q['processes']['reply']['result']['processes']);assert q['rotation']['reply']['result']['degrees']==0 and q['rotation']['reply']['result']['locked']==False
+os.kill(json.loads((run/'process.json').read_text())['monitor_pid'],signal.SIGINT);print('all B32 guest paths absent; normal shutdown requested')

@@ -1231,3 +1231,8 @@ The separate full-pipeline gate also passed for PCC 26.1 / 23B85: regular 29 met
 ### 2026-10-10 B31：RootHide旋转运行时策略
 
 B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10拒绝且保持角度。临时控制应用提供四方向集合30，但UIKit解析控制器和场景集合为26；直接请求180度返回UISceneErrorDomain101。控制器集合2的可逆对照、截图摘要及尺寸通过。Settings/Safari直接场景策略与UIKit倒置方向过滤条件未完整取得。未修改产品源码、固件二进制补丁、内核或DSC，补丁计数不变。临时工件已清理并正常停机。证据见`upstream_integration_2026-10-06/evidence/B31/T08/REPORT.md`。
+
+
+### 2026-10-10 B32：RootHide倒置方向过滤与系统场景策略
+
+实际UIKitCore UIApplication私有方向方法在原生手机且UIDevice无Home键时执行mask & 26，系统应用自然调用与受控应用同PID的26→30→26对照已取得。Settings场景/客户端集合2，Safari均26；原API无Frida进程重跑8组，4接受、4拒绝且保持角度。受控B阶段公开180度请求未报告错误但实际仍0度，未计为旋转成功。未修改产品源码、固件二进制补丁、内核或DSC，补丁计数不变；临时AMFI detach失败与恢复核对、客户机清理失败及最终清理均保留。证据见`upstream_integration_2026-10-06/evidence/B32/T08/REPORT.md`。

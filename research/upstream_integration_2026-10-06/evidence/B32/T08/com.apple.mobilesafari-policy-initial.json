@@ -1,0 +1,2139 @@
+{
+  "unlock": {
+    "method": "screen.unlock",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B32",
+      "result": {
+        "locked": false,
+        "screen_off": false,
+        "was_locked": false,
+        "was_screen_off": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.00493258296046406
+  },
+  "launch": {
+    "method": "apps.launch",
+    "params": {
+      "bundle_id": "com.apple.mobilesafari"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B32",
+      "result": {
+        "frontmost_verified": true,
+        "pid": 428
+      },
+      "type": "response"
+    },
+    "seconds": 1.3190002919873223
+  },
+  "samples": [],
+  "front": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B32",
+      "result": {
+        "bundle_id": "com.apple.mobilesafari",
+        "name": "Safari",
+        "pid": 428,
+        "source": "runningboard",
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.42049887496978045
+  },
+  "initial_policy": {
+    "pid": 428,
+    "bundle_id": "com.apple.mobilesafari",
+    "scenes": [
+      {
+        "class": "BrowserWindowScene",
+        "session_id": "6ED784D8-A83B-45D3-A2AA-5E9B6E0795D5",
+        "activation_state": 0,
+        "orientation": 1,
+        "current_scene_mask": 26,
+        "client_mask": 26,
+        "debug": "<BrowserWindowScene: 0x6d0a94200> {\n    sceneSettings = {\n        mode = dynamic;\n        orientation = portrait (1);\n        orientationLockState = unspecified;\n    }\n    clientSettings = {\n        orientation = portrait (1);\n        supported = ( Pu Ll Lr );\n        orientationLockPreference = unspecified;\n    }\n    screen = <UIScreen: 0x6d0e088c0; orientation: portrait (1); applicationFrame: {{0, 54}, {430, 878}}>;\n    windowDrivingOrientation = <MobileSafariWindow: 0x6d0580800; orientation: portrait (1)> {\n        hidden = NO;\n        frame = {{0, 0}, {430, 932}};\n        bounds = {{0, 0}, {430, 932}};\n        ownsOrientation = NO;\n        ownsOrientationTransform = NO;\n        autorotationDisabled = NO;\n        windowInterfaceOrientation = portrait (1);\n        rootTransformOrientation = portrait (1);\n        viewTransformOrientation = portrait (1);\n        autorotationDisabled = NO;\n        orientationVC = <BrowserSplitViewController: 0x6d1531e00> {\n            providedSupportedOrientations = ( Pu Ll Lr Pd );\n            resolvedSupportedOrientations = ( Pu Ll Lr );\n            canPreferOrientation = NO;\n        };\n    };\n    otherWindows = {\n        <UITextEffectsWindow: 0x6d1538f00; orientation: portrait (1)> {\n            hidden = NO;\n            frame = {{0, 0}, {430, 932}};\n            bounds = {{0, 0}, {430, 932}};\n            ownsOrientation = NO;\n            ownsOrientationTransform = YES;\n            autorotationDisabled = NO;\n            windowInterfaceOrientation = portrait (1);\n            rootTransformOrientation = portrait (1);\n            viewTransformOrientation = portrait (1);\n            autorotationDisabled = NO;\n            orientationVC = <UITrackingElementWindowController: 0x6d0673200> {\n                ignoresAppSupportedOrientations = YES;\n                providedSupportedOrientations = ( Pu Ll Lr );\n                resolvedSupportedOrientations = ( Pu Ll Lr );\n                canPreferOrientation = NO;\n            };\n        };\n    }\n}",
+        "windows": [
+          {
+            "key": 1,
+            "hidden": 0,
+            "root_class": "BrowserSplitViewController",
+            "provided_mask": 30,
+            "resolved_mask": 26,
+            "application_mask": 26
+          },
+          {
+            "key": 0,
+            "hidden": 0,
+            "root_class": "UITrackingElementWindowController",
+            "provided_mask": 26,
+            "resolved_mask": 26,
+            "application_mask": 26
+          }
+        ]
+      }
+    ]
+  },
+  "method": {
+    "class": "UIViewController",
+    "selector": "__supportedInterfaceOrientations",
+    "address": "0x18ae204d8",
+    "module": "UIKitCore",
+    "instructions": [
+      {
+        "address": "0x18ae204d8",
+        "mnemonic": "pacibsp",
+        "opStr": ""
+      },
+      {
+        "address": "0x18ae204dc",
+        "mnemonic": "sub",
+        "opStr": "sp, sp, #0x140"
+      },
+      {
+        "address": "0x18ae204e0",
+        "mnemonic": "stp",
+        "opStr": "x28, x27, [sp, #0xe0]"
+      },
+      {
+        "address": "0x18ae204e4",
+        "mnemonic": "stp",
+        "opStr": "x26, x25, [sp, #0xf0]"
+      },
+      {
+        "address": "0x18ae204e8",
+        "mnemonic": "stp",
+        "opStr": "x24, x23, [sp, #0x100]"
+      },
+      {
+        "address": "0x18ae204ec",
+        "mnemonic": "stp",
+        "opStr": "x22, x21, [sp, #0x110]"
+      },
+      {
+        "address": "0x18ae204f0",
+        "mnemonic": "stp",
+        "opStr": "x20, x19, [sp, #0x120]"
+      },
+      {
+        "address": "0x18ae204f4",
+        "mnemonic": "stp",
+        "opStr": "x29, x30, [sp, #0x130]"
+      },
+      {
+        "address": "0x18ae204f8",
+        "mnemonic": "add",
+        "opStr": "x29, sp, #0x130"
+      },
+      {
+        "address": "0x18ae204fc",
+        "mnemonic": "mov",
+        "opStr": "x19, x0"
+      },
+      {
+        "address": "0x18ae20500",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x1e8d9d000"
+      },
+      {
+        "address": "0x18ae20504",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8, #0x840]"
+      },
+      {
+        "address": "0x18ae20508",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x18ae2050c",
+        "mnemonic": "stur",
+        "opStr": "x8, [x29, #-0x60]"
+      },
+      {
+        "address": "0x18ae20510",
+        "mnemonic": "bl",
+        "opStr": "#0x18d1814e0",
+        "target_symbol": "0x18d1814e0 UIKitCore!objc_msgSend$modalPresentationStyle"
+      },
+      {
+        "address": "0x18ae20514",
+        "mnemonic": "cmp",
+        "opStr": "x0, #0x10"
+      },
+      {
+        "address": "0x18ae20518",
+        "mnemonic": "b.eq",
+        "opStr": "#0x18ae2052c"
+      },
+      {
+        "address": "0x18ae2051c",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae20520",
+        "mnemonic": "bl",
+        "opStr": "#0x18d1814e0",
+        "target_symbol": "0x18d1814e0 UIKitCore!objc_msgSend$modalPresentationStyle"
+      },
+      {
+        "address": "0x18ae20524",
+        "mnemonic": "cmp",
+        "opStr": "x0, #2"
+      },
+      {
+        "address": "0x18ae20528",
+        "mnemonic": "b.ne",
+        "opStr": "#0x18ae20534"
+      },
+      {
+        "address": "0x18ae2052c",
+        "mnemonic": "mov",
+        "opStr": "w27, #1"
+      },
+      {
+        "address": "0x18ae20530",
+        "mnemonic": "b",
+        "opStr": "#0x18ae20544",
+        "target_symbol": "0x18ae20544 UIKitCore!-[UIViewController __supportedInterfaceOrientations]"
+      },
+      {
+        "address": "0x18ae20534",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae20538",
+        "mnemonic": "bl",
+        "opStr": "#0x18d1814e0",
+        "target_symbol": "0x18d1814e0 UIKitCore!objc_msgSend$modalPresentationStyle"
+      },
+      {
+        "address": "0x18ae2053c",
+        "mnemonic": "cmp",
+        "opStr": "x0, #1"
+      },
+      {
+        "address": "0x18ae20540",
+        "mnemonic": "cset",
+        "opStr": "w27, eq"
+      },
+      {
+        "address": "0x18ae20544",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae20548",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0f8380",
+        "target_symbol": "0x18d0f8380 UIKitCore!objc_msgSend$_window"
+      },
+      {
+        "address": "0x18ae2054c",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae20550",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x18ae20554",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0f8420",
+        "target_symbol": "0x18d0f8420 UIKitCore!objc_msgSend$_windowCanDynamicallySpecifySupportedInterfaceOrientations"
+      },
+      {
+        "address": "0x18ae20558",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x18ae2055c",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d740",
+        "target_symbol": "0x18f39d740"
+      },
+      {
+        "address": "0x18ae20560",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae20564",
+        "mnemonic": "bl",
+        "opStr": "#0x18d08be80",
+        "target_symbol": "0x18d08be80 UIKitCore!objc_msgSend$_ignoreAppSupportedOrientations"
+      },
+      {
+        "address": "0x18ae20568",
+        "mnemonic": "tbz",
+        "opStr": "w0, #0, #0x18ae20574"
+      },
+      {
+        "address": "0x18ae2056c",
+        "mnemonic": "mov",
+        "opStr": "w28, #0x1e"
+      },
+      {
+        "address": "0x18ae20570",
+        "mnemonic": "b",
+        "opStr": "#0x18ae205ac",
+        "target_symbol": "0x18ae205ac UIKitCore!-[UIViewController __supportedInterfaceOrientations]"
+      },
+      {
+        "address": "0x18ae20574",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x1ef857000"
+      },
+      {
+        "address": "0x18ae20578",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0x810"
+      },
+      {
+        "address": "0x18ae2057c",
+        "mnemonic": "ldr",
+        "opStr": "x21, [x8]"
+      },
+      {
+        "address": "0x18ae20580",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae20584",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0f8380",
+        "target_symbol": "0x18d0f8380 UIKitCore!objc_msgSend$_window"
+      },
+      {
+        "address": "0x18ae20588",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae2058c",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x18ae20590",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x18ae20594",
+        "mnemonic": "mov",
+        "opStr": "x2, x22"
+      },
+      {
+        "address": "0x18ae20598",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0dcf60",
+        "target_symbol": "0x18d0dcf60 UIKitCore!objc_msgSend$_supportedInterfaceOrientationsForWindow:"
+      },
+      {
+        "address": "0x18ae2059c",
+        "mnemonic": "cmp",
+        "opStr": "x0, #0"
+      },
+      {
+        "address": "0x18ae205a0",
+        "mnemonic": "mov",
+        "opStr": "w8, #0x1e"
+      },
+      {
+        "address": "0x18ae205a4",
+        "mnemonic": "csel",
+        "opStr": "x28, x8, x0, eq"
+      },
+      {
+        "address": "0x18ae205a8",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d750",
+        "target_symbol": "0x18f39d750"
+      },
+      {
+        "address": "0x18ae205ac",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae205b0",
+        "mnemonic": "bl",
+        "opStr": "#0x18d196da0",
+        "target_symbol": "0x18d196da0 UIKitCore!objc_msgSend$presentingViewController"
+      },
+      {
+        "address": "0x18ae205b4",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae205b8",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x18ae205bc",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0a5de0",
+        "target_symbol": "0x18d0a5de0 UIKitCore!objc_msgSend$_originalPresentationController"
+      },
+      {
+        "address": "0x18ae205c0",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae205c4",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x18ae205c8",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae205cc",
+        "mnemonic": "bl",
+        "opStr": "#0x18d196da0",
+        "target_symbol": "0x18d196da0 UIKitCore!objc_msgSend$presentingViewController"
+      },
+      {
+        "address": "0x18ae205d0",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae205d4",
+        "mnemonic": "mov",
+        "opStr": "x24, x0"
+      },
+      {
+        "address": "0x18ae205d8",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0aeca0",
+        "target_symbol": "0x18d0aeca0 UIKitCore!objc_msgSend$_presentationController"
+      },
+      {
+        "address": "0x18ae205dc",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae205e0",
+        "mnemonic": "mov",
+        "opStr": "x23, x0"
+      },
+      {
+        "address": "0x18ae205e4",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d760",
+        "target_symbol": "0x18f39d760"
+      },
+      {
+        "address": "0x18ae205e8",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d770",
+        "target_symbol": "0x18f39d770"
+      },
+      {
+        "address": "0x18ae205ec",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d750",
+        "target_symbol": "0x18f39d750"
+      },
+      {
+        "address": "0x18ae205f0",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d740",
+        "target_symbol": "0x18f39d740"
+      },
+      {
+        "address": "0x18ae205f4",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae205f8",
+        "mnemonic": "bl",
+        "opStr": "#0x18d196da0",
+        "target_symbol": "0x18d196da0 UIKitCore!objc_msgSend$presentingViewController"
+      },
+      {
+        "address": "0x18ae205fc",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae20600",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x18ae20604",
+        "mnemonic": "cmp",
+        "opStr": "x0, #0"
+      },
+      {
+        "address": "0x18ae20608",
+        "mnemonic": "cset",
+        "opStr": "w8, eq"
+      },
+      {
+        "address": "0x18ae2060c",
+        "mnemonic": "orr",
+        "opStr": "w8, w8, w27"
+      },
+      {
+        "address": "0x18ae20610",
+        "mnemonic": "tbnz",
+        "opStr": "w8, #0, #0x18ae20698"
+      },
+      {
+        "address": "0x18ae20614",
+        "mnemonic": "cmp",
+        "opStr": "x22, x23"
+      },
+      {
+        "address": "0x18ae20618",
+        "mnemonic": "b.eq",
+        "opStr": "#0x18ae20698"
+      },
+      {
+        "address": "0x18ae2061c",
+        "mnemonic": "mov",
+        "opStr": "x20, x25"
+      },
+      {
+        "address": "0x18ae20620",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae20624",
+        "mnemonic": "bl",
+        "opStr": "#0x18d196da0",
+        "target_symbol": "0x18d196da0 UIKitCore!objc_msgSend$presentingViewController"
+      },
+      {
+        "address": "0x18ae20628",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae2062c",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x18ae206bc"
+      },
+      {
+        "address": "0x18ae20630",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x18ae20634",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0f8380",
+        "target_symbol": "0x18d0f8380 UIKitCore!objc_msgSend$_window"
+      },
+      {
+        "address": "0x18ae20638",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae2063c",
+        "mnemonic": "mov",
+        "opStr": "x23, x0"
+      },
+      {
+        "address": "0x18ae20640",
+        "mnemonic": "bl",
+        "opStr": "#0x18d215560",
+        "target_symbol": "0x18d215560 UIKitCore!objc_msgSend$traitCollection"
+      },
+      {
+        "address": "0x18ae20644",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae20648",
+        "mnemonic": "mov",
+        "opStr": "x24, x0"
+      },
+      {
+        "address": "0x18ae2064c",
+        "mnemonic": "mov",
+        "opStr": "x0, x23"
+      },
+      {
+        "address": "0x18ae20650",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0e3720",
+        "target_symbol": "0x18d0e3720 UIKitCore!objc_msgSend$_traitCollectionWhenRotated"
+      },
+      {
+        "address": "0x18ae20654",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae20658",
+        "mnemonic": "mov",
+        "opStr": "x25, x0"
+      },
+      {
+        "address": "0x18ae2065c",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x1ef80e000"
+      },
+      {
+        "address": "0x18ae20660",
+        "mnemonic": "ldrsw",
+        "opStr": "x8, [x8, #0xdd4]"
+      },
+      {
+        "address": "0x18ae20664",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x22, x8]"
+      },
+      {
+        "address": "0x18ae20668",
+        "mnemonic": "mov",
+        "opStr": "x2, x24"
+      },
+      {
+        "address": "0x18ae2066c",
+        "mnemonic": "mov",
+        "opStr": "x3, x25"
+      },
+      {
+        "address": "0x18ae20670",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0d38e0",
+        "target_symbol": "0x18d0d38e0 UIKitCore!objc_msgSend$_shouldAdaptFromTraitCollection:toTraitCollection:"
+      },
+      {
+        "address": "0x18ae20674",
+        "mnemonic": "mov",
+        "opStr": "x26, x0"
+      },
+      {
+        "address": "0x18ae20678",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d780",
+        "target_symbol": "0x18f39d780"
+      },
+      {
+        "address": "0x18ae2067c",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d770",
+        "target_symbol": "0x18f39d770"
+      },
+      {
+        "address": "0x18ae20680",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d760",
+        "target_symbol": "0x18f39d760"
+      },
+      {
+        "address": "0x18ae20684",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d750",
+        "target_symbol": "0x18f39d750"
+      },
+      {
+        "address": "0x18ae20688",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d740",
+        "target_symbol": "0x18f39d740"
+      },
+      {
+        "address": "0x18ae2068c",
+        "mnemonic": "mov",
+        "opStr": "x25, x20"
+      },
+      {
+        "address": "0x18ae20690",
+        "mnemonic": "tbnz",
+        "opStr": "w26, #0, #0x18ae206ac"
+      },
+      {
+        "address": "0x18ae20694",
+        "mnemonic": "b",
+        "opStr": "#0x18ae206c4",
+        "target_symbol": "0x18ae206c4 UIKitCore!-[UIViewController __supportedInterfaceOrientations]"
+      },
+      {
+        "address": "0x18ae20698",
+        "mnemonic": "cmp",
+        "opStr": "x21, #0"
+      },
+      {
+        "address": "0x18ae2069c",
+        "mnemonic": "cset",
+        "opStr": "w9, eq"
+      },
+      {
+        "address": "0x18ae206a0",
+        "mnemonic": "eor",
+        "opStr": "w20, w9, w8"
+      },
+      {
+        "address": "0x18ae206a4",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d740",
+        "target_symbol": "0x18f39d740"
+      },
+      {
+        "address": "0x18ae206a8",
+        "mnemonic": "tbz",
+        "opStr": "w20, #0, #0x18ae206c4"
+      },
+      {
+        "address": "0x18ae206ac",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae206b0",
+        "mnemonic": "bl",
+        "opStr": "#0x18d196da0",
+        "target_symbol": "0x18d196da0 UIKitCore!objc_msgSend$presentingViewController"
+      },
+      {
+        "address": "0x18ae206b4",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae206b8",
+        "mnemonic": "b",
+        "opStr": "#0x18ae206c8",
+        "target_symbol": "0x18ae206c8 UIKitCore!-[UIViewController __supportedInterfaceOrientations]"
+      },
+      {
+        "address": "0x18ae206bc",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d740",
+        "target_symbol": "0x18f39d740"
+      },
+      {
+        "address": "0x18ae206c0",
+        "mnemonic": "mov",
+        "opStr": "x25, x20"
+      },
+      {
+        "address": "0x18ae206c4",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d8b0",
+        "target_symbol": "0x18f39d8b0"
+      },
+      {
+        "address": "0x18ae206c8",
+        "mnemonic": "mov",
+        "opStr": "x21, x0"
+      },
+      {
+        "address": "0x18ae206cc",
+        "mnemonic": "bl",
+        "opStr": "#0x18d207160",
+        "target_symbol": "0x18d207160 UIKitCore!objc_msgSend$supportedInterfaceOrientations"
+      },
+      {
+        "address": "0x18ae206d0",
+        "mnemonic": "mov",
+        "opStr": "x22, x0"
+      },
+      {
+        "address": "0x18ae206d4",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x18ae206d8",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0a6660",
+        "target_symbol": "0x18d0a6660 UIKitCore!objc_msgSend$_overrideInterfaceOrientationMechanics"
+      },
+      {
+        "address": "0x18ae206dc",
+        "mnemonic": "cbnz",
+        "opStr": "x0, #0x18ae20798"
+      },
+      {
+        "address": "0x18ae206e0",
+        "mnemonic": "mov",
+        "opStr": "x0, x21"
+      },
+      {
+        "address": "0x18ae206e4",
+        "mnemonic": "bl",
+        "opStr": "#0x18d0f5120",
+        "target_symbol": "0x18d0f5120 UIKitCore!objc_msgSend$_viewControllersWhoseOrientationsMustCoincide"
+      },
+      {
+        "address": "0x18ae206e8",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d530",
+        "target_symbol": "0x18f39d530"
+      },
+      {
+        "address": "0x18ae206ec",
+        "mnemonic": "mov",
+        "opStr": "x23, x0"
+      },
+      {
+        "address": "0x18ae206f0",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x18ae20794"
+      },
+      {
+        "address": "0x18ae206f4",
+        "mnemonic": "str",
+        "opStr": "w25, [sp, #0xc]"
+      },
+      {
+        "address": "0x18ae206f8",
+        "mnemonic": "movi",
+        "opStr": "v0.2d, #0000000000000000"
+      },
+      {
+        "address": "0x18ae206fc",
+        "mnemonic": "stp",
+        "opStr": "q0, q0, [sp, #0x30]"
+      },
+      {
+        "address": "0x18ae20700",
+        "mnemonic": "stp",
+        "opStr": "q0, q0, [sp, #0x10]"
+      },
+      {
+        "address": "0x18ae20704",
+        "mnemonic": "add",
+        "opStr": "x2, sp, #0x10"
+      },
+      {
+        "address": "0x18ae20708",
+        "mnemonic": "add",
+        "opStr": "x3, sp, #0x50"
+      },
+      {
+        "address": "0x18ae2070c",
+        "mnemonic": "mov",
+        "opStr": "x0, x23"
+      },
+      {
+        "address": "0x18ae20710",
+        "mnemonic": "mov",
+        "opStr": "w4, #0x10"
+      },
+      {
+        "address": "0x18ae20714",
+        "mnemonic": "bl",
+        "opStr": "#0x18d125b20",
+        "target_symbol": "0x18d125b20 UIKitCore!objc_msgSend$countByEnumeratingWithState:objects:count:"
+      },
+      {
+        "address": "0x18ae20718",
+        "mnemonic": "cbz",
+        "opStr": "x0, #0x18ae20784"
+      },
+      {
+        "address": "0x18ae2071c",
+        "mnemonic": "mov",
+        "opStr": "x24, x0"
+      },
+      {
+        "address": "0x18ae20720",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x20]"
+      },
+      {
+        "address": "0x18ae20724",
+        "mnemonic": "ldr",
+        "opStr": "x25, [x8]"
+      },
+      {
+        "address": "0x18ae20728",
+        "mnemonic": "mov",
+        "opStr": "x26, x22"
+      },
+      {
+        "address": "0x18ae2072c",
+        "mnemonic": "mov",
+        "opStr": "x20, #0"
+      },
+      {
+        "address": "0x18ae20730",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x20]"
+      },
+      {
+        "address": "0x18ae20734",
+        "mnemonic": "ldr",
+        "opStr": "x8, [x8]"
+      },
+      {
+        "address": "0x18ae20738",
+        "mnemonic": "cmp",
+        "opStr": "x8, x25"
+      },
+      {
+        "address": "0x18ae2073c",
+        "mnemonic": "b.eq",
+        "opStr": "#0x18ae20748"
+      },
+      {
+        "address": "0x18ae20740",
+        "mnemonic": "mov",
+        "opStr": "x0, x23"
+      },
+      {
+        "address": "0x18ae20744",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d580",
+        "target_symbol": "0x18f39d580"
+      },
+      {
+        "address": "0x18ae20748",
+        "mnemonic": "ldr",
+        "opStr": "x8, [sp, #0x18]"
+      },
+      {
+        "address": "0x18ae2074c",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8, x20, lsl #3]"
+      },
+      {
+        "address": "0x18ae20750",
+        "mnemonic": "bl",
+        "opStr": "#0x18d207160",
+        "target_symbol": "0x18d207160 UIKitCore!objc_msgSend$supportedInterfaceOrientations"
+      },
+      {
+        "address": "0x18ae20754",
+        "mnemonic": "and",
+        "opStr": "x26, x0, x26"
+      },
+      {
+        "address": "0x18ae20758",
+        "mnemonic": "add",
+        "opStr": "x20, x20, #1"
+      },
+      {
+        "address": "0x18ae2075c",
+        "mnemonic": "cmp",
+        "opStr": "x24, x20"
+      },
+      {
+        "address": "0x18ae20760",
+        "mnemonic": "b.ne",
+        "opStr": "#0x18ae20730"
+      },
+      {
+        "address": "0x18ae20764",
+        "mnemonic": "add",
+        "opStr": "x2, sp, #0x10"
+      },
+      {
+        "address": "0x18ae20768",
+        "mnemonic": "add",
+        "opStr": "x3, sp, #0x50"
+      },
+      {
+        "address": "0x18ae2076c",
+        "mnemonic": "mov",
+        "opStr": "x0, x23"
+      },
+      {
+        "address": "0x18ae20770",
+        "mnemonic": "mov",
+        "opStr": "w4, #0x10"
+      },
+      {
+        "address": "0x18ae20774",
+        "mnemonic": "bl",
+        "opStr": "#0x18d125b20",
+        "target_symbol": "0x18d125b20 UIKitCore!objc_msgSend$countByEnumeratingWithState:objects:count:"
+      },
+      {
+        "address": "0x18ae20778",
+        "mnemonic": "mov",
+        "opStr": "x24, x0"
+      },
+      {
+        "address": "0x18ae2077c",
+        "mnemonic": "cbnz",
+        "opStr": "x0, #0x18ae2072c"
+      },
+      {
+        "address": "0x18ae20780",
+        "mnemonic": "b",
+        "opStr": "#0x18ae20788",
+        "target_symbol": "0x18ae20788 UIKitCore!-[UIViewController __supportedInterfaceOrientations]"
+      },
+      {
+        "address": "0x18ae20784",
+        "mnemonic": "mov",
+        "opStr": "x26, x22"
+      },
+      {
+        "address": "0x18ae20788",
+        "mnemonic": "cmp",
+        "opStr": "x26, #0"
+      },
+      {
+        "address": "0x18ae2078c",
+        "mnemonic": "csel",
+        "opStr": "x22, x22, x26, eq"
+      },
+      {
+        "address": "0x18ae20790",
+        "mnemonic": "ldr",
+        "opStr": "w25, [sp, #0xc]"
+      },
+      {
+        "address": "0x18ae20794",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d760",
+        "target_symbol": "0x18f39d760"
+      },
+      {
+        "address": "0x18ae20798",
+        "mnemonic": "cmp",
+        "opStr": "x22, #0"
+      },
+      {
+        "address": "0x18ae2079c",
+        "mnemonic": "cset",
+        "opStr": "w8, ne"
+      },
+      {
+        "address": "0x18ae207a0",
+        "mnemonic": "ands",
+        "opStr": "x22, x22, x28"
+      },
+      {
+        "address": "0x18ae207a4",
+        "mnemonic": "csel",
+        "opStr": "w8, wzr, w8, ne"
+      },
+      {
+        "address": "0x18ae207a8",
+        "mnemonic": "and",
+        "opStr": "w8, w25, w8"
+      },
+      {
+        "address": "0x18ae207ac",
+        "mnemonic": "orn",
+        "opStr": "w8, w27, w8"
+      },
+      {
+        "address": "0x18ae207b0",
+        "mnemonic": "tbnz",
+        "opStr": "w8, #0, #0x18ae20808"
+      },
+      {
+        "address": "0x18ae207b4",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae207b8",
+        "mnemonic": "bl",
+        "opStr": "#0x18d1f9620",
+        "target_symbol": "0x18d1f9620 UIKitCore!objc_msgSend$shouldAutorotate"
+      },
+      {
+        "address": "0x18ae207bc",
+        "mnemonic": "cbz",
+        "opStr": "w0, #0x18ae20808"
+      },
+      {
+        "address": "0x18ae207c0",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x1ef857000"
+      },
+      {
+        "address": "0x18ae207c4",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0x810"
+      },
+      {
+        "address": "0x18ae207c8",
+        "mnemonic": "ldr",
+        "opStr": "x0, [x8]"
+      },
+      {
+        "address": "0x18ae207cc",
+        "mnemonic": "bl",
+        "opStr": "#0x18d098380",
+        "target_symbol": "0x18d098380 UIKitCore!objc_msgSend$_isSpringBoard"
+      },
+      {
+        "address": "0x18ae207d0",
+        "mnemonic": "tbnz",
+        "opStr": "w0, #0, #0x18ae20808"
+      },
+      {
+        "address": "0x18ae207d4",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x1e8d11000"
+      },
+      {
+        "address": "0x18ae207d8",
+        "mnemonic": "ldr",
+        "opStr": "x20, [x8, #0xf30]"
+      },
+      {
+        "address": "0x18ae207dc",
+        "mnemonic": "adrp",
+        "opStr": "x8, #0x1e94d1000"
+      },
+      {
+        "address": "0x18ae207e0",
+        "mnemonic": "add",
+        "opStr": "x8, x8, #0x2f0"
+      },
+      {
+        "address": "0x18ae207e4",
+        "mnemonic": "ldr",
+        "opStr": "x23, [x8]"
+      },
+      {
+        "address": "0x18ae207e8",
+        "mnemonic": "mov",
+        "opStr": "x0, x19"
+      },
+      {
+        "address": "0x18ae207ec",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d680",
+        "target_symbol": "0x18f39d680"
+      },
+      {
+        "address": "0x18ae207f0",
+        "mnemonic": "str",
+        "opStr": "x0, [sp]"
+      },
+      {
+        "address": "0x18ae207f4",
+        "mnemonic": "adrp",
+        "opStr": "x3, #0x1f1ef3000"
+      },
+      {
+        "address": "0x18ae207f8",
+        "mnemonic": "add",
+        "opStr": "x3, x3, #0x970"
+      },
+      {
+        "address": "0x18ae207fc",
+        "mnemonic": "mov",
+        "opStr": "x0, x20"
+      },
+      {
+        "address": "0x18ae20800",
+        "mnemonic": "mov",
+        "opStr": "x2, x23"
+      },
+      {
+        "address": "0x18ae20804",
+        "mnemonic": "bl",
+        "opStr": "#0x18d19ae40",
+        "target_symbol": "0x18d19ae40 UIKitCore!objc_msgSend$raise:format:"
+      },
+      {
+        "address": "0x18ae20808",
+        "mnemonic": "bl",
+        "opStr": "#0x18f39d740",
+        "target_symbol": "0x18f39d740"
+      },
+      {
+        "address": "0x18ae2080c",
+        "mnemonic": "ldur",
+        "opStr": "x8, [x29, #-0x60]"
+      },
+      {
+        "address": "0x18ae20810",
+        "mnemonic": "adrp",
+        "opStr": "x9, #0x1e8d9d000"
+      },
+      {
+        "address": "0x18ae20814",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x9, #0x840]"
+      },
+      {
+        "address": "0x18ae20818",
+        "mnemonic": "ldr",
+        "opStr": "x9, [x9]"
+      },
+      {
+        "address": "0x18ae2081c",
+        "mnemonic": "cmp",
+        "opStr": "x9, x8"
+      },
+      {
+        "address": "0x18ae20820",
+        "mnemonic": "b.ne",
+        "opStr": "#0x18ae20848"
+      },
+      {
+        "address": "0x18ae20824",
+        "mnemonic": "mov",
+        "opStr": "x0, x22"
+      },
+      {
+        "address": "0x18ae20828",
+        "mnemonic": "ldp",
+        "opStr": "x29, x30, [sp, #0x130]"
+      },
+      {
+        "address": "0x18ae2082c",
+        "mnemonic": "ldp",
+        "opStr": "x20, x19, [sp, #0x120]"
+      },
+      {
+        "address": "0x18ae20830",
+        "mnemonic": "ldp",
+        "opStr": "x22, x21, [sp, #0x110]"
+      },
+      {
+        "address": "0x18ae20834",
+        "mnemonic": "ldp",
+        "opStr": "x24, x23, [sp, #0x100]"
+      },
+      {
+        "address": "0x18ae20838",
+        "mnemonic": "ldp",
+        "opStr": "x26, x25, [sp, #0xf0]"
+      },
+      {
+        "address": "0x18ae2083c",
+        "mnemonic": "ldp",
+        "opStr": "x28, x27, [sp, #0xe0]"
+      },
+      {
+        "address": "0x18ae20840",
+        "mnemonic": "add",
+        "opStr": "sp, sp, #0x140"
+      },
+      {
+        "address": "0x18ae20844",
+        "mnemonic": "retab",
+        "opStr": ""
+      }
+    ],
+    "bytes": [
+      127,
+      35,
+      3,
+      213,
+      255,
+      3,
+      5,
+      209,
+      252,
+      111,
+      14,
+      169,
+      250,
+      103,
+      15,
+      169,
+      248,
+      95,
+      16,
+      169,
+      246,
+      87,
+      17,
+      169,
+      244,
+      79,
+      18,
+      169,
+      253,
+      123,
+      19,
+      169,
+      253,
+      195,
+      4,
+      145,
+      243,
+      3,
+      0,
+      170,
+      232,
+      251,
+      46,
+      176,
+      8,
+      33,
+      68,
+      249,
+      8,
+      1,
+      64,
+      249,
+      168,
+      3,
+      26,
+      248,
+      244,
+      131,
+      141,
+      148,
+      31,
+      64,
+      0,
+      241,
+      160,
+      0,
+      0,
+      84,
+      224,
+      3,
+      19,
+      170,
+      240,
+      131,
+      141,
+      148,
+      31,
+      8,
+      0,
+      241,
+      97,
+      0,
+      0,
+      84,
+      59,
+      0,
+      128,
+      82,
+      5,
+      0,
+      0,
+      20,
+      224,
+      3,
+      19,
+      170,
+      234,
+      131,
+      141,
+      148,
+      31,
+      4,
+      0,
+      241,
+      251,
+      23,
+      159,
+      26,
+      224,
+      3,
+      19,
+      170,
+      142,
+      95,
+      139,
+      148,
+      249,
+      243,
+      21,
+      149,
+      245,
+      3,
+      0,
+      170,
+      179,
+      95,
+      139,
+      148,
+      249,
+      3,
+      0,
+      170,
+      121,
+      244,
+      21,
+      149,
+      224,
+      3,
+      19,
+      170,
+      71,
+      174,
+      137,
+      148,
+      96,
+      0,
+      0,
+      54,
+      220,
+      3,
+      128,
+      82,
+      15,
+      0,
+      0,
+      20,
+      168,
+      81,
+      50,
+      240,
+      8,
+      65,
+      32,
+      145,
+      21,
+      1,
+      64,
+      249,
+      224,
+      3,
+      19,
+      170,
+      127,
+      95,
+      139,
+      148,
+      234,
+      243,
+      21,
+      149,
+      246,
+      3,
+      0,
+      170,
+      224,
+      3,
+      21,
+      170,
+      226,
+      3,
+      22,
+      170,
+      114,
+      242,
+      138,
+      148,
+      31,
+      0,
+      0,
+      241,
+      200,
+      3,
+      128,
+      82,
+      28,
+      1,
+      128,
+      154,
+      106,
+      244,
+      21,
+      149,
+      224,
+      3,
+      19,
+      170,
+      252,
+      217,
+      141,
+      148,
+      223,
+      243,
+      21,
+      149,
+      245,
+      3,
+      0,
+      170,
+      9,
+      22,
+      138,
+      148,
+      220,
+      243,
+      21,
+      149,
+      246,
+      3,
+      0,
+      170,
+      224,
+      3,
+      19,
+      170,
+      245,
+      217,
+      141,
+      148,
+      216,
+      243,
+      21,
+      149,
+      248,
+      3,
+      0,
+      170,
+      178,
+      57,
+      138,
+      148,
+      213,
+      243,
+      21,
+      149,
+      247,
+      3,
+      0,
+      170,
+      95,
+      244,
+      21,
+      149,
+      98,
+      244,
+      21,
+      149,
+      89,
+      244,
+      21,
+      149,
+      84,
+      244,
+      21,
+      149,
+      224,
+      3,
+      19,
+      170,
+      234,
+      217,
+      141,
+      148,
+      205,
+      243,
+      21,
+      149,
+      245,
+      3,
+      0,
+      170,
+      31,
+      0,
+      0,
+      241,
+      232,
+      23,
+      159,
+      26,
+      8,
+      1,
+      27,
+      42,
+      72,
+      4,
+      0,
+      55,
+      223,
+      2,
+      23,
+      235,
+      0,
+      4,
+      0,
+      84,
+      244,
+      3,
+      25,
+      170,
+      224,
+      3,
+      19,
+      170,
+      223,
+      217,
+      141,
+      148,
+      194,
+      243,
+      21,
+      149,
+      128,
+      4,
+      0,
+      180,
+      246,
+      3,
+      0,
+      170,
+      83,
+      95,
+      139,
+      148,
+      190,
+      243,
+      21,
+      149,
+      247,
+      3,
+      0,
+      170,
+      200,
+      211,
+      143,
+      148,
+      187,
+      243,
+      21,
+      149,
+      248,
+      3,
+      0,
+      170,
+      224,
+      3,
+      23,
+      170,
+      52,
+      12,
+      139,
+      148,
+      183,
+      243,
+      21,
+      149,
+      249,
+      3,
+      0,
+      170,
+      104,
+      79,
+      50,
+      208,
+      8,
+      213,
+      141,
+      185,
+      192,
+      106,
+      104,
+      248,
+      226,
+      3,
+      24,
+      170,
+      227,
+      3,
+      25,
+      170,
+      156,
+      204,
+      138,
+      148,
+      250,
+      3,
+      0,
+      170,
+      66,
+      244,
+      21,
+      149,
+      61,
+      244,
+      21,
+      149,
+      56,
+      244,
+      21,
+      149,
+      51,
+      244,
+      21,
+      149,
+      46,
+      244,
+      21,
+      149,
+      249,
+      3,
+      20,
+      170,
+      250,
+      0,
+      0,
+      55,
+      12,
+      0,
+      0,
+      20,
+      191,
+      2,
+      0,
+      241,
+      233,
+      23,
+      159,
+      26,
+      52,
+      1,
+      8,
+      74,
+      39,
+      244,
+      21,
+      149,
+      244,
+      0,
+      0,
+      54,
+      224,
+      3,
+      19,
+      170,
+      188,
+      217,
+      141,
+      148,
+      159,
+      243,
+      21,
+      149,
+      4,
+      0,
+      0,
+      20,
+      33,
+      244,
+      21,
+      149,
+      249,
+      3,
+      20,
+      170,
+      123,
+      244,
+      21,
+      149,
+      245,
+      3,
+      0,
+      170,
+      165,
+      154,
+      143,
+      148,
+      246,
+      3,
+      0,
+      170,
+      224,
+      3,
+      21,
+      170,
+      226,
+      23,
+      138,
+      148,
+      224,
+      5,
+      0,
+      181,
+      224,
+      3,
+      21,
+      170,
+      143,
+      82,
+      139,
+      148,
+      146,
+      243,
+      21,
+      149,
+      247,
+      3,
+      0,
+      170,
+      32,
+      5,
+      0,
+      180,
+      249,
+      15,
+      0,
+      185,
+      0,
+      228,
+      0,
+      111,
+      224,
+      131,
+      1,
+      173,
+      224,
+      131,
+      0,
+      173,
+      226,
+      67,
+      0,
+      145,
+      227,
+      67,
+      1,
+      145,
+      224,
+      3,
+      23,
+      170,
+      4,
+      2,
+      128,
+      82,
+      3,
+      21,
+      140,
+      148,
+      96,
+      3,
+      0,
+      180,
+      248,
+      3,
+      0,
+      170,
+      232,
+      19,
+      64,
+      249,
+      25,
+      1,
+      64,
+      249,
+      250,
+      3,
+      22,
+      170,
+      20,
+      0,
+      128,
+      210,
+      232,
+      19,
+      64,
+      249,
+      8,
+      1,
+      64,
+      249,
+      31,
+      1,
+      25,
+      235,
+      96,
+      0,
+      0,
+      84,
+      224,
+      3,
+      23,
+      170,
+      143,
+      243,
+      21,
+      149,
+      232,
+      15,
+      64,
+      249,
+      0,
+      121,
+      116,
+      248,
+      132,
+      154,
+      143,
+      148,
+      26,
+      0,
+      26,
+      138,
+      148,
+      6,
+      0,
+      145,
+      31,
+      3,
+      20,
+      235,
+      129,
+      254,
+      255,
+      84,
+      226,
+      67,
+      0,
+      145,
+      227,
+      67,
+      1,
+      145,
+      224,
+      3,
+      23,
+      170,
+      4,
+      2,
+      128,
+      82,
+      235,
+      20,
+      140,
+      148,
+      248,
+      3,
+      0,
+      170,
+      128,
+      253,
+      255,
+      181,
+      2,
+      0,
+      0,
+      20,
+      250,
+      3,
+      22,
+      170,
+      95,
+      3,
+      0,
+      241,
+      214,
+      2,
+      154,
+      154,
+      249,
+      15,
+      64,
+      185,
+      243,
+      243,
+      21,
+      149,
+      223,
+      2,
+      0,
+      241,
+      232,
+      7,
+      159,
+      26,
+      214,
+      2,
+      28,
+      234,
+      232,
+      19,
+      136,
+      26,
+      40,
+      3,
+      8,
+      10,
+      104,
+      3,
+      40,
+      42,
+      200,
+      2,
+      0,
+      55,
+      224,
+      3,
+      19,
+      170,
+      154,
+      99,
+      143,
+      148,
+      96,
+      2,
+      0,
+      52,
+      168,
+      81,
+      50,
+      240,
+      8,
+      65,
+      32,
+      145,
+      0,
+      1,
+      64,
+      249,
+      237,
+      222,
+      137,
+      148,
+      192,
+      1,
+      0,
+      55,
+      136,
+      247,
+      46,
+      176,
+      20,
+      153,
+      71,
+      249,
+      136,
+      53,
+      47,
+      176,
+      8,
+      193,
+      11,
+      145,
+      23,
+      1,
+      64,
+      249,
+      224,
+      3,
+      19,
+      170,
+      165,
+      243,
+      21,
+      149,
+      224,
+      3,
+      0,
+      249,
+      131,
+      134,
+      51,
+      240,
+      99,
+      192,
+      37,
+      145,
+      224,
+      3,
+      20,
+      170,
+      226,
+      3,
+      23,
+      170,
+      143,
+      233,
+      141,
+      148,
+      206,
+      243,
+      21,
+      149,
+      168,
+      3,
+      90,
+      248,
+      233,
+      251,
+      46,
+      176,
+      41,
+      33,
+      68,
+      249,
+      41,
+      1,
+      64,
+      249,
+      63,
+      1,
+      8,
+      235,
+      65,
+      1,
+      0,
+      84,
+      224,
+      3,
+      22,
+      170,
+      253,
+      123,
+      83,
+      169,
+      244,
+      79,
+      82,
+      169,
+      246,
+      87,
+      81,
+      169,
+      248,
+      95,
+      80,
+      169,
+      250,
+      103,
+      79,
+      169,
+      252,
+      111,
+      78,
+      169,
+      255,
+      3,
+      5,
+      145,
+      255,
+      15,
+      95,
+      214
+    ]
+  }
+}
