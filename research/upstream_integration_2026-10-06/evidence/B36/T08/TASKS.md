@@ -9,10 +9,9 @@
 - 源 VM 原命令恢复、客户机往返和原健康监测 healthy 验证通过。
 - 记录失败与限制；5 GiB 阈值未触发。
 
-## 进行中
-
-- 在 codex/upstream-2d21d21-integration 提交全部当前改动。
-- 主 checkout 切回 codex/handoff-20261001，创建独立 worktree。
+- 本轮实现及证据已提交为 c94b6167，分支 codex/upstream-2d21d21-integration。
+- 主 checkout 已切回 codex/handoff-20261001，工作区干净。
+- 独立 worktree 已创建并附加：/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli，使用集成分支。
 
 ## 待办
 
