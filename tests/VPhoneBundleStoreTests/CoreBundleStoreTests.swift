@@ -12,7 +12,7 @@ private final class BundleFixture {
     let store: VPhoneCoreBundleStore
     var installed: URL { store.root.appendingPathComponent("2.2.3-local") }
 
-    init() throws {
+    init(localProtocol: String? = nil, includeEscalator: Bool = true) throws {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("bundle-store-\(UUID().uuidString)")
             .resolvingSymlinksInPath()
         // Keep this private parent independent of the process umask while
@@ -27,11 +27,12 @@ private final class BundleFixture {
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false,
                                                     attributes: [.posixPermissions: 0o755])
         }
-        let plist: [String: String] = ["CFBundleIdentifier": "com.vphone.store-test", "CFBundleName": "VPhone",
+        var plist: [String: String] = ["CFBundleIdentifier": "com.vphone.store-test", "CFBundleName": "VPhone",
             "CFBundleExecutable": "vphone-cli", "CFBundlePackageType": "BNDL", "CFBundleShortVersionString": "2.2.3"]
+        if let localProtocol { plist["VPhoneBoundLaunchProtocol"] = localProtocol }
         try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
             .write(to: source.appendingPathComponent("Contents/Info.plist"))
-        for name in ["vphone-cli", "vphone-vm", "vphone-escalator"] {
+        for name in (["vphone-cli", "vphone-vm"] + (includeEscalator ? ["vphone-escalator"] : [])) {
             let executable = source.appendingPathComponent("Contents/MacOS/\(name)")
             try FileManager.default.copyItem(at: URL(fileURLWithPath: "/usr/bin/true"), to: executable)
         }
@@ -55,7 +56,7 @@ private final class BundleFixture {
     func pack(sign: Bool = true) throws -> String {
         if sign {
             // Sign after the final Info.plist edits, matching StageBundle.sh.
-            for name in ["vphone-cli", "vphone-vm", "vphone-escalator"] {
+            for name in ["vphone-cli", "vphone-vm", "vphone-escalator"] where FileManager.default.fileExists(atPath: source.appendingPathComponent("Contents/MacOS/\(name)").path) {
                 try Self.run("/usr/bin/codesign", ["--force", "--sign", "-", "--identifier", "com.vphone.test.\(name)",
                                                   source.appendingPathComponent("Contents/MacOS/\(name)").path])
             }
@@ -440,5 +441,85 @@ struct CoreBundleStoreTests {
         let fixture = try BundleFixture()
         _ = try fixture.pack()
         #expect(throws: (any Error).self) { try VPhoneArchiveReader.entries(of: fixture.archive, maximumEntries: 1) }
+    }
+}
+
+struct LocalBundleLayoutTests {
+    @Test func localProtocolInstallsWithoutEscalator() throws {
+        let fixture = try BundleFixture(localProtocol: "vphone.local-bound-launch.v1", includeEscalator: false)
+        let receipt = try fixture.install()
+        #expect(receipt.cdhashes.keys.sorted() == ["vphone-cli", "vphone-vm"])
+        #expect(try fixture.store.verify(version: "2.2.3-local").cdhashes == receipt.cdhashes)
+    }
+
+    @Test func legacyBundleStillRequiresEscalator() throws {
+        let fixture = try BundleFixture(includeEscalator: false)
+        #expect(throws: (any Error).self) { try fixture.install() }
+        #expect(!FileManager.default.fileExists(atPath: fixture.installed.path))
+    }
+
+    @Test func unknownLocalProtocolRefusesPublication() throws {
+        let fixture = try BundleFixture(localProtocol: "vphone.local-bound-launch.v2")
+        #expect(throws: (any Error).self) { try fixture.install() }
+        #expect(!FileManager.default.fileExists(atPath: fixture.installed.path))
+    }
+
+    @Test func localLayoutStillRejectsChangedSignedResources() throws {
+        let fixture = try BundleFixture(localProtocol: VPhoneBoundLaunchProtocol.localV1, includeEscalator: false)
+        _ = try fixture.pack()
+        try Data("tampered".utf8).write(to: fixture.source.appendingPathComponent("Contents/Resources/data"))
+        let archive = fixture.directory.appendingPathComponent("tampered.tar")
+        try VPhoneArchiveWriter.create(archive: archive, from: fixture.source, topLevel: "VPhone.bundle")
+        let digest = SHA256.hash(data: try Data(contentsOf: archive)).map { String(format: "%02x", $0) }.joined()
+        let input = try FileHandle(forReadingFrom: archive)
+        defer { try? input.close() }
+        let message = BundleFixture.message {
+            _ = try fixture.store.install(version: "2.2.3-local", archive: input, sha256: digest)
+        }
+        #expect(message?.contains("Invalid code signature") == true, "\(message ?? "accepted")")
+        #expect(!FileManager.default.fileExists(atPath: fixture.installed.path))
+    }
+
+    @Test func localLayoutStillRejectsSharedWritableInstallation() throws {
+        let fixture = try BundleFixture(localProtocol: VPhoneBoundLaunchProtocol.localV1, includeEscalator: false)
+        _ = try fixture.install()
+        try FileManager.default.setAttributes([.posixPermissions: 0o777], ofItemAtPath: fixture.installed.path)
+        let message = BundleFixture.message { _ = try fixture.store.verify(version: "2.2.3-local") }
+        #expect(message?.contains("group/other write") == true, "\(message ?? "accepted")")
+    }
+
+    @Test func localProtocolRequiresTheCLIAsMainExecutable() throws {
+        let fixture = try BundleFixture(localProtocol: VPhoneBoundLaunchProtocol.localV1, includeEscalator: false)
+        let path = fixture.source.appendingPathComponent("Contents/Info.plist")
+        var plist = try PropertyListSerialization.propertyList(from: Data(contentsOf: path), format: nil) as! [String: String]
+        plist["CFBundleExecutable"] = "vphone-vm"
+        try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0).write(to: path)
+        #expect(throws: (any Error).self) { try fixture.install() }
+        #expect(!FileManager.default.fileExists(atPath: fixture.installed.path))
+    }
+
+}
+
+/// Opt-in acceptance of the actual signed local host Bundle, never a root store.
+struct FrozenLocalHostBundleTests {
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VPHONE_T24_ARCHIVE"] != nil,
+                   "Requires a frozen signed host archive and expected digest"))
+    func signedHostArchiveUsesTheLocalLayoutAndPreservesReceipt() throws {
+        let environment = ProcessInfo.processInfo.environment
+        let path = try #require(environment["VPHONE_T24_ARCHIVE"])
+        let version = try #require(environment["VPHONE_T24_VERSION"])
+        let digest = try #require(environment["VPHONE_T24_SHA256"])
+        let expectedVM = try #require(environment["VPHONE_T24_VM_CDHASH"])
+        let fixture = try BundleFixture()
+        let input = try FileHandle(forReadingFrom: URL(fileURLWithPath: path))
+        defer { try? input.close() }
+        let receipt = try fixture.store.install(version: version, archive: input, sha256: digest)
+        let verified = try fixture.store.verify(version: version)
+        #expect(receipt.sha256 == digest && verified.sha256 == digest)
+        #expect(receipt.cdhashes == verified.cdhashes)
+        #expect(verified.cdhashes["vphone-vm"] == expectedVM)
+        let bundle = fixture.store.root.appendingPathComponent(version).appendingPathComponent("VPhone.bundle")
+        #expect(!FileManager.default.fileExists(atPath: bundle.appendingPathComponent("Contents/MacOS/vphone-escalator").path))
+        #expect(FileManager.default.fileExists(atPath: bundle.appendingPathComponent("Contents/Resources/guest-resources/api/manifest.json").path))
     }
 }

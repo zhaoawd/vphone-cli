@@ -170,7 +170,19 @@ public struct VPhoneCoreBundleStore: Sendable {
             throw VPhoneBundleStoreError("Core Bundle Info.plist version mismatch: CFBundleShortVersionString \(VPhoneBundleVersion.quoted(actual)), requested \(version).")
         }
         try VPhoneBundleVersion.require(actual)
-        for name in VPhoneBundleExecutable.allCases.map(\.rawValue) + ["vphone-escalator"] {
+        let additionalExecutables: [String]
+        if let declared = properties["VPhoneBoundLaunchProtocol"] {
+            guard declared as? String == VPhoneBoundLaunchProtocol.localV1,
+                  properties["CFBundleExecutable"] as? String == VPhoneBundleExecutable.cli.rawValue else {
+                throw VPhoneBundleStoreError("Unsupported Core Bundle local launch protocol or main executable.")
+            }
+            // The local protocol provides no privilege-execution entrypoint.
+            // Ownership, complete signatures and the receipt are checked for both layouts.
+            additionalExecutables = []
+        } else {
+            additionalExecutables = ["vphone-escalator"]
+        }
+        for name in VPhoneBundleExecutable.allCases.map(\.rawValue) + additionalExecutables {
             let file = bundle.appendingPathComponent("Contents/MacOS/\(name)")
             let info = try requireEntry(file, type: S_IFREG)
             guard info.st_mode & 0o111 != 0 else { throw VPhoneBundleStoreError("Not executable: \(file.path)") }

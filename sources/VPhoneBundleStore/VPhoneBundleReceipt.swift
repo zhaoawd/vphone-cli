@@ -28,6 +28,11 @@ public struct VPhoneBundleReceipt: Codable, Equatable, Sendable {
     }
 }
 
+/// The signed marker shared by the local store layout and guarded VM entry.
+public enum VPhoneBoundLaunchProtocol {
+    public static let localV1 = "vphone.local-bound-launch.v1"
+}
+
 public enum VPhoneBundleExecutable: String, CaseIterable, Sendable {
     case cli = "vphone-cli"
     case vm = "vphone-vm"

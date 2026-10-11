@@ -81,7 +81,7 @@ struct VPhoneVMLaunchCommand: ParsableCommand {
     static func validateBoundLaunchProtocol(binary: URL) throws {
         let info = binary.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
         let values = try PropertyListSerialization.propertyList(from: Data(contentsOf: info), format: nil) as? [String: Any]
-        guard values?["VPhoneBoundLaunchProtocol"] as? String == "vphone.local-bound-launch.v1" else {
+        guard values?["VPhoneBoundLaunchProtocol"] as? String == VPhoneBoundLaunchProtocol.localV1 else {
             throw ValidationError("The selected Core Bundle VM does not declare the protected local launch protocol; no VM was started.")
         }
     }
