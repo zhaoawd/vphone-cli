@@ -166,3 +166,16 @@ cfw_stage_vphoned() {
     /bin/chmod 0755 "$MNT1/usr/bin/vphoned"
     cp "$TEMP_DIR/vphoned" "$VM_DIR/.vphoned.signed"
 }
+
+
+# 独立 API 使用独立可执行文件和 launchd 标识，不替换 classic 1337 载荷。
+cfw_stage_api() {
+    local guest="$1" python
+    python="${VPHONE_PYTHON:-${PYTHON3:-python3}}"
+    "$python" "$SCRIPT_DIR/check_guest_api.py" "$guest"
+    /bin/mkdir -p "$MNT1/usr/libexec" "$MNT1/System/Library/LaunchDaemons"
+    cp "$guest/api/vphoned" "$MNT1/usr/libexec/vphoned-api"
+    /bin/chmod 0755 "$MNT1/usr/libexec/vphoned-api"
+    cp "$guest/api/vphoned.plist" "$MNT1/System/Library/LaunchDaemons/vphoned-api.plist"
+    /bin/chmod 0644 "$MNT1/System/Library/LaunchDaemons/vphoned-api.plist"
+}

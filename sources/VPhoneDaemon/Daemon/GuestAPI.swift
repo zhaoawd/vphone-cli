@@ -48,6 +48,10 @@ enum GuestAPI {
         var result: [String: Any] = [
             "name": "vphoned",
             "api_version": 1,
+            "agent_role": "api",
+            "bootstrap_startup_enabled": !apiOnly,
+            "camera_publisher_enabled": cameraEnabled,
+            "cache_path": String(cString: vp_native_api_cache_path()),
             "status": "ok",
             "binary_hash": binaryHash,
             "source_overlay": String(cString: vp_daemon_source_overlay()),
@@ -95,7 +99,7 @@ enum GuestAPI {
                 "environment_activation",
             ],
         ]
-        if apiOnly, var capabilities = result["capabilities"] as? [String] {
+        if !cameraEnabled, var capabilities = result["capabilities"] as? [String] {
             capabilities.removeAll { $0 == "camera" }
             result["capabilities"] = capabilities
         }
@@ -104,7 +108,7 @@ enum GuestAPI {
     }
 
     static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
-        if apiOnly && (method.hasPrefix("camera.") || method == "agent.apply_update") {
+        if (!cameraEnabled && method.hasPrefix("camera.")) || (apiOnly && method == "agent.apply_update") {
             throw GuestAPIError.unsupportedMethod(method)
         }
         switch method {
@@ -355,7 +359,7 @@ enum GuestAPI {
             )
         case "agent.apply_update":
             let expected = try string(params, "sha256")
-            let cache = "/var/root/Library/Caches/vphoned"
+            let cache = String(cString: vp_native_api_cache_path())
             let next = cache + ".next"
             let data = try Data(contentsOf: URL(fileURLWithPath: next), options: .mappedIfSafe)
             let actual = sha256Hex(data)

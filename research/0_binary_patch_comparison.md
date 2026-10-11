@@ -1244,3 +1244,7 @@ B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10�
 ### 2026-10-11 B37：T08 离线准备
 
 本轮新增显式 worktree 路径与离线迁移计划，复核 B35 冻结产物和 663 项生产输入；未修改 firmware/kernel/CFW 二进制补丁，补丁数量保持。68 项定向回归及现有组件宿主测试通过；默认仍 classic，未执行 VM 或磁盘迁移，未新增真实运行验收。证据见 `research/upstream_integration_2026-10-06/evidence/B37/T08/REPORT.md`。
+
+## 2026-10-11：T08 独立 API 的默认 CFW 安装
+
+B38 保留 classic `/usr/bin/vphoned`、1337 控制和 256 字节相机头。新增 `/usr/libexec/vphoned-api` 和 `com.vphone.vphoned-api`；API 的缓存为 `/var/root/Library/Caches/vphoned-api`，launchd 环境关闭 API 相机发布，RootHide 启动恢复继续执行。regular/dev/jb/exp 安装将其 plist 写入 System LaunchDaemons 及合并 launchd.plist 的 LaunchDaemons 字典；less 不安装该 API。没有新增内核或 Mach-O 指令替换，classic `/b` 环境保持。固定 7 项依赖、当前源码构建及默认 Bundle 校验通过；研究副本两次冷启动的 API 摘要与默认载荷一致，RootHide 服务自动加载，classic 缓存保持。106 项定向回归和组件 124 项检查通过；完整现代环境/相机迁移不在本次 T08 验收内。证据见 `research/upstream_integration_2026-10-06/evidence/B38/T08/REPORT.md`。

@@ -28,3 +28,8 @@ class CacheConfirmationTests(unittest.TestCase):
  def test_canonical_directory_alias_confirms_the_same_cached_file(self):self.check_confirmation('alias')
  def test_different_executable_does_not_confirm(self):self.check_confirmation('other')
  def test_symlinked_cache_entry_is_not_confirmed(self):self.check_confirmation('symlink')
+
+ def test_api_cache_does_not_replace_classic_control_cache(self):
+  p=subprocess.run([str(self.binary),'--cache'],capture_output=True,text=True,check=True)
+  self.assertEqual(p.stdout.strip(),'/var/root/Library/Caches/vphoned-api')
+  self.assertNotEqual(p.stdout.strip(),'/var/root/Library/Caches/vphoned')

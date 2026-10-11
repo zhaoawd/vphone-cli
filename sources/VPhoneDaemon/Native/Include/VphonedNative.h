@@ -8,6 +8,7 @@
 
 /// Sign all executable code in an extracted app. Returns a malloc-owned error or NULL.
 char *vp_sign_app_for_install(const char *appPath, const char *certificatePath);
+const char *vp_native_api_cache_path(void);
 void vp_native_bootstrap_cached_binary(void);
 void vp_native_confirm_cached_binary(void);
 /// 0 = launchd proxy, 1 = --io worker, -1 = invalid arguments.

@@ -9,7 +9,9 @@
 #include <unistd.h>
 
 static const char *cache_directory = "/var/root/Library/Caches";
-static const char *cache = "/var/root/Library/Caches/vphoned";
+static const char *cache = "/var/root/Library/Caches/vphoned-api";
+
+const char *vp_native_api_cache_path(void) { return cache; }
 static const char *marker = "/var/root/Library/Caches/vphoned.api-v2";
 static const char *pending = "/var/root/Library/Caches/vphoned.api-v2.pending";
 

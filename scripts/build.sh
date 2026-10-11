@@ -84,10 +84,13 @@ for t in trustcache insert_dylib; do
   else echo "Error: .tools/bin/$t missing — run ./scripts/setup_tools.sh first" >&2; exit 1; fi
 done
 python3 "$SCRIPT_DIR/check_guest_payloads.py" .build/guest
+python3 "$SCRIPT_DIR/check_guest_api.py" .build/guest
 mkdir -p "${RES}/guest-resources"
 for name in vphoned vphoned-less vphoned.plist vphoned.entitlements.plist manifest.json; do
   cp -f ".build/guest/$name" "${RES}/guest-resources/$name"
 done
+cp -R .build/guest/api "${RES}/guest-resources/api"
+cp -f .build/guest/cohort.json "${RES}/guest-resources/cohort.json"
 # requirements.txt lets the app provision its own ~/.vphone/venv on first run
 # (see VPhoneResources.pythonExecutable) — the app carries no venv itself.
 cp -f requirements.txt "${RES}/requirements.txt"

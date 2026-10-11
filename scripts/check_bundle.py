@@ -31,6 +31,9 @@ REQUIRED = (
     'guest-resources/vphoned', 'guest-resources/vphoned-less',
     'guest-resources/vphoned.plist', 'guest-resources/vphoned.entitlements.plist',
     'guest-resources/manifest.json', 'vphone-amfidont',
+    'guest-resources/cohort.json', 'guest-resources/api/vphoned',
+    'guest-resources/api/vphoned.plist', 'guest-resources/api/vphoned.entitlements.plist',
+    'guest-resources/api/manifest.json', 'scripts/check_guest_api.py',
     'scripts/check_guest_payloads.py', 'scripts/build_native_dependencies.py',
 )
 
@@ -64,6 +67,9 @@ def main():
     subprocess.run([os.sys.executable, str(Path(__file__).resolve().parent / 'build_native_dependencies.py'),
                     str(bundle), '--check'], check=True)
     subprocess.run([os.sys.executable, str(resources / 'scripts/check_guest_payloads.py'),
+                    str(resources / 'guest-resources'), '--ldid',
+                    str(bundle / 'Contents/MacOS/ldid')], check=True)
+    subprocess.run([os.sys.executable, '-B', str(resources / 'scripts/check_guest_api.py'),
                     str(resources / 'guest-resources'), '--ldid',
                     str(bundle / 'Contents/MacOS/ldid')], check=True)
     binary = bundle / 'Contents/MacOS/vphone-cli'

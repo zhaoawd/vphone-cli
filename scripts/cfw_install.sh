@@ -391,6 +391,7 @@ echo "[7/7] Installing LaunchDaemons..."
 
 # Install vphoned (vsock HID injector daemon)
 cfw_stage_vphoned "$GUEST_RESOURCES"
+cfw_stage_api "$GUEST_RESOURCES"
 echo "  [+] vphoned installed (signed copy at .vphoned.signed)"
 
 # Send daemon plists (overwrite on re-run)
@@ -416,6 +417,7 @@ fi
 
 cp "$MNT1/System/Library/xpc/launchd.plist.bak" "$TEMP_DIR/launchd.plist"
 cp "$GUEST_RESOURCES/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/"
+cp "$GUEST_RESOURCES/api/vphoned.plist" "$INPUT_DIR/jb/LaunchDaemons/vphoned-api.plist"
 "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-daemons "$TEMP_DIR/launchd.plist" "$INPUT_DIR/jb/LaunchDaemons"
 cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
 /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist

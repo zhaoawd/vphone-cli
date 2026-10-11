@@ -5,7 +5,9 @@ import NIOPosix
 import NIOWebSocket
 import VphonedNative
 
-let apiOnly = ProcessInfo.processInfo.environment["VPHONE_API_ONLY"] == "1"
+let daemonMode = GuestDaemonMode(environment: ProcessInfo.processInfo.environment)
+let apiOnly = daemonMode.apiOnly
+let cameraEnabled = daemonMode.cameraEnabled
 let mode = vp_native_process_mode()
 if mode != 1 {
     guard mode == 0 else { exit(64) }
@@ -15,7 +17,7 @@ if mode != 1 {
 
 guard vp_native_watch_proxy() == 0 else { exit(1) }
 if !apiOnly {
-    vp_vcam_start()
+    if cameraEnabled { vp_vcam_start() }
     GuestIrisinInstaller.refreshBootstrapOnStartup()
 }
 

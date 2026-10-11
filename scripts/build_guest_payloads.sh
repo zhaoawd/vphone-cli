@@ -19,3 +19,7 @@ done
 cp "$SCRIPT_DIR/vphoned/vphoned.plist" "$GUEST_OUT/vphoned.plist"
 cp "$SCRIPT_DIR/vphoned/entitlements.plist" "$GUEST_OUT/vphoned.entitlements.plist"
 python3 "$SCRIPT_DIR/check_guest_payloads.py" "$GUEST_OUT" --record
+
+# 默认组合：classic 控制/相机和独立固定 API，不覆盖 classic 更新载荷。
+zsh "$SCRIPT_DIR/build_daemon_api.sh"
+python3 "$SCRIPT_DIR/check_guest_api.py" --stage-api "$PROJECT_ROOT/.build/daemon-api-v2/candidate" "$GUEST_OUT" --record

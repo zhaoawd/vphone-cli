@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.vphone.vphoned</string>
+	<string>com.vphone.vphoned-api</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/bin/vphoned</string>
+		<string>/usr/libexec/vphoned-api</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
@@ -17,8 +17,13 @@
 	<key>ProcessType</key>
 	<string>Interactive</string>
 	<key>StandardOutPath</key>
-	<string>/var/log/vphoned.log</string>
+	<string>/var/log/vphoned-api.log</string>
 	<key>StandardErrorPath</key>
-	<string>/var/log/vphoned.log</string>
+	<string>/var/log/vphoned-api.log</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>VPHONE_DISABLE_CAMERA</key>
+		<string>1</string>
+	</dict>
 </dict>
 </plist>

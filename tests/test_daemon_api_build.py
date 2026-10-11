@@ -77,7 +77,8 @@ class DaemonAPIBuildTests(unittest.TestCase):
         # the proxy after one second, and boot-time throttling does not apply.
         plist = plistlib.loads((module.PROJECT / 'Configuration/vphoned.plist').read_bytes())
         self.assertEqual(plist, {
-            'Label': 'com.vphone.vphoned', 'ProgramArguments': ['/usr/bin/vphoned'],
+            'Label': 'com.vphone.vphoned-api', 'ProgramArguments': ['/usr/libexec/vphoned-api'],
             'RunAtLoad': True, 'KeepAlive': True, 'ThrottleInterval': 1, 'ProcessType': 'Interactive',
-            'StandardOutPath': '/var/log/vphoned.log', 'StandardErrorPath': '/var/log/vphoned.log',
+            'StandardOutPath': '/var/log/vphoned-api.log', 'StandardErrorPath': '/var/log/vphoned-api.log',
+            'EnvironmentVariables': {'VPHONE_DISABLE_CAMERA': '1'},
         })
