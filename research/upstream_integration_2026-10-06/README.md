@@ -959,4 +959,4 @@ T08按固定IcliKit 0.7.16依赖及接口合同accepted。默认组合保留clas
 
 ### 2026-10-11 B39 / T24
 
-修复当前已知local-bound协议Bundle无escalator时的store布局阻塞，保留严格权限/签名/receipt与旧布局要求。52项定向Swift、实际签名宿主归档private testRoot安装1项、4项脱敏回归通过，签名候选已冻结。新VM --help被SIGKILL终止，原因未查明；实际系统store与两条完整TCC路线等待本轮批准，T24尚未验收。见evidence/B39/T24/REPORT.md、acceptance.json与vm-validation-plan.md。源VM及现有AMFI会话未由本轮修改。
+修复当前已知local-bound协议Bundle无escalator时的store布局阻塞，保留严格权限/签名/receipt与旧布局要求。52项定向Swift、实际签名宿主归档private testRoot安装1项、5项脱敏回归通过，签名候选已冻结。新VM --help被SIGKILL终止，精确时间窗确认AMFI -424拒绝；实际系统store与两条完整TCC路线等待本轮批准，T24尚未验收。见evidence/B39/T24/REPORT.md、acceptance.json与vm-validation-plan.md。源VM及现有AMFI会话未由本轮修改。

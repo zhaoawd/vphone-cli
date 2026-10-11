@@ -3,7 +3,7 @@ import argparse, json, re, sys
 ROLES = re.compile(r'(responsible|requesting|accessing|client)\s*[=:]\s*\{([^}]*)\}', re.I)
 FIELDS = re.compile(r'\b(identifier|pid|auid|euid|binary_path)\s*[=:]\s*([^,;}\n]+)')
 ACTORS = re.compile(r'com\.vphone\.[A-Za-z0-9_.-]+|vphone-(?:cli|vm|launchpad(?:-launcher)?)')
-STAMP = re.compile(r'\d{4}-\d{2}-\d{2}T[0-9:.+-]+Z?')
+STAMP = re.compile(r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:?\d{2})?')
 
 def integer(value):
     return value if type(value) is int and value >= 0 else None

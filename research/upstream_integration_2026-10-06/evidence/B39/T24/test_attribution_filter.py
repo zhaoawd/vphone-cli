@@ -11,6 +11,11 @@ class AttributionEvidenceTests(unittest.TestCase):
         self.assertNotIn('121.987654', json.dumps(result))
         self.assertNotIn('eventMessage', result)
 
+    def test_accepts_the_observed_unified_log_timestamp_format(self):
+        stamp = '2026-10-11 15:11:04.546562+0000'
+        result = tcc({'eventMessage': 'AUTH request vphone-vm client={pid=10}', 'timestamp': stamp}, set(), {'vphone-vm'})
+        self.assertEqual(result['timestamp'], stamp)
+
     def test_unknown_identity_remains_unconfirmed(self):
         result = tcc({'eventMessage': 'request vphone-vm accessing={identifier=37.123456, binary_path=/vphone-vm/121.987654, pid=<private>}', 'timestamp': '37.123456', 'processID': '121.987654'}, set(), {'vphone-vm'})
         self.assertEqual(result['identities'], [{'role': 'accessing'}])

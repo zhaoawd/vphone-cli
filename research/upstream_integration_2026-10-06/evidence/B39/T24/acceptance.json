@@ -15,8 +15,9 @@
     "source": "frozen-host-layout.txt.gz"
   },
   "attribution_filter_tests": {
-    "passed": 4,
-    "failed": 0
+    "passed": 5,
+    "failed": 0,
+    "source": "attribution-timestamp-green.txt.gz"
   },
   "full_tcc_direct_cli": "not_run",
   "full_tcc_launchpad_launcher_store": "not_run",
@@ -25,7 +26,9 @@
   "new_scoped_amfi": "not_run",
   "vm_help": {
     "exit": -9,
-    "cause": "unknown; no exact candidate path event in queried 5-minute AMFI log window"
+    "cause": "AMFI -424: ad hoc signed file contains restricted entitlements",
+    "source": "amfi-exact-window.json",
+    "path_and_precise_window_matched": true
   },
   "minimum_recorded_free_bytes": 274325315584,
   "disk_floor_bytes": 5368709120,
@@ -249,6 +252,48 @@
       "seconds": 25.189226999878883,
       "minimum_free_bytes": 275441938432,
       "final_free_bytes": 275513032704
+    },
+    "attribution-timestamp-green-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "research/upstream_integration_2026-10-06/evidence/B39/T24",
+        "-p",
+        "test_attribution_filter.py",
+        "-v"
+      ],
+      "pid": 50518,
+      "pgid": 50518,
+      "started_at_utc": "2026-10-11T15:34:40.413399+00:00",
+      "ended_at_utc": "2026-10-11T15:34:40.920594+00:00",
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 0.5072353750001639,
+      "minimum_free_bytes": 276985610240,
+      "final_free_bytes": 276985606144
+    },
+    "attribution-timestamp-red-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "research/upstream_integration_2026-10-06/evidence/B39/T24",
+        "-p",
+        "test_attribution_filter.py",
+        "-v"
+      ],
+      "exit": 1,
+      "reason": "completed",
+      "seconds": 0.507239209022373,
+      "minimum_free_bytes": 276996554752,
+      "final_free_bytes": 276996546560
     }
   },
   "implementation_commit": "3f50c591add2d8af6d9aceeb60db2be8ef05f365"

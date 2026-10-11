@@ -27,7 +27,7 @@
 
 ## 验证顺序与证据
 
-1. 重新校验冻结签名、摘要、guest cohort 与 Package.resolved；先确保 VM --help 能执行。当前 --help 退出 -9；查询的5分钟日志未得到本候选精确路径的 AMFI 错误，终止原因未查明。
+1. 重新校验冻结签名、摘要、guest cohort 与 Package.resolved；先确保 VM --help 能执行。当前 --help 退出 -9；精确25秒时间窗同一路径AMFI日志确认-424拒绝，原因是ad hoc签名包含restricted entitlements。原五分钟查询未覆盖失败时刻；保留两次查询证据。
 2. 在源停机且研究副本未绑定时，直接已签名 CLI `boot --config <副本/config.plist> --variant jb --no-vphoned-update`。不加 headless/dfu/no-vphoned。记录 PID 从 CLI exec 为配对 VM 的路径及签名身份。
 3. GUI 启动完成、guest location capability 可用后，操作 `Location > Sync Host Location`；记录请求调用、授权状态和样本标记；请求没有提示也须记录实际状态。失败边界明确保留，不从菜单点击或 started host location tracking 推定已授权。
 4. 研究 VM 正常停机后才安装/绑定、运行第二条路线。设置 `VPHONE_LIBRARY_ROOT=/Users/kolar/github/vphone-cli`，只选择研究副本；Launchpad 实际 GUI → 签名 launcher → 冻结内嵌 CLI wrapper → 可信 store VM。检查完整 PID/路径及绑定 SHA；bound 路线自动传 no-vphoned-update。不要把直接运行 launcher 的命令冒充 GUI 路线。
@@ -37,6 +37,6 @@
 
 ## 已完成的独立验证
 
-52项定向 Swift 回归通过，涵盖 store/policy/调用方 route/frozen selection/toolchain；6项新布局回归含未知协议、旧布局缺 escalator、错误主程序、已签资源篡改及0777目录拒绝。实际冻结宿主归档在 private testRoot安装和复验通过；此结果不证明 root-owned系统store或跨UID运行。4项脱敏回归通过。CLI签名资源解析在仓库外工作目录和符号链接入口通过。宿主7个Mach-O、Launchpad外层2个Mach-O及嵌入7个Mach-O校验通过。
+52项定向 Swift 回归通过，涵盖 store/policy/调用方 route/frozen selection/toolchain；6项新布局回归含未知协议、旧布局缺 escalator、错误主程序、已签资源篡改及0777目录拒绝。实际冻结宿主归档在 private testRoot安装和复验通过；此结果不证明 root-owned系统store或跨UID运行。5项脱敏回归通过。CLI签名资源解析在仓库外工作目录和符号链接入口通过。宿主7个Mach-O、Launchpad外层2个Mach-O及嵌入7个Mach-O校验通过。
 
 外部 Python 3.14.5 环境的版本锁及能力探针通过。Python解释器/framework/site-packages、managed venv及其原生依赖、PATH选出的bootstrap Python和现场clang编译不属于上述宿主Mach-O封装校验；字节闭包尚未建立，继续在T40记录，不将版本锁探针等同于封装完整性。

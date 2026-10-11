@@ -1252,4 +1252,4 @@ B38 保留 classic `/usr/bin/vphoned`、1337 控制和 256 字节相机头。新
 
 ## 2026-10-11：T24 本地 Bundle 布局
 
-B39将已知签名local-bound协议的CLI/VM布局与旧版含escalator布局区分；未知协议和错误主程序拒绝，store所有权、签名、receipt和锁定执行检查保持。没有新增firmware/kernel/CFW指令替换或二进制补丁，补丁数量保持。52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及4项脱敏回归通过；实际系统store与完整TCC路线等待本轮批准，不增加运行验收结论。证据见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md。
+B39将已知签名local-bound协议的CLI/VM布局与旧版含escalator布局区分；未知协议和错误主程序拒绝，store所有权、签名、receipt和锁定执行检查保持。没有新增firmware/kernel/CFW指令替换或二进制补丁，补丁数量保持。52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及5项脱敏回归通过；实际系统store与完整TCC路线等待本轮批准，不增加运行验收结论。证据见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md。

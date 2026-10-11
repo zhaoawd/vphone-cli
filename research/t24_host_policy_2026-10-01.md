@@ -119,4 +119,4 @@
 
 当前本地签名Bundle声明vphone.local-bound-launch.v1且没有escalator；原store布局无条件要求escalator，导致安装拒绝。store与VM入口现共享协议常量；仅已知协议且CFBundleExecutable为vphone-cli的本地布局要求CLI/VM，无marker旧布局继续要求escalator。未知marker、错误主程序拒绝；严格owner/链接/ACL/架构/签名/receipt及锁定执行要求保持。本文前述2026-10-01的三程序要求是该日期的历史实现。
 
-B39通过52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及4项脱敏回归；签名CLI/Launchpad、宿主Mach-O依赖和资源解析、外部Python版本锁探针通过。实际系统store、两条GUI TCC路线尚未执行。新VM --help为SIGKILL终止，当前日志未确认原因；已有AMFI会话占用系统amfid，所需临时替换与恢复及新版本系统安装、源维护、定位授权须本轮明确批准。具体证据与限制见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md及vm-validation-plan.md。T24保持完整TCC待验。
+B39通过52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及5项脱敏回归；签名CLI/Launchpad、宿主Mach-O依赖和资源解析、外部Python版本锁探针通过。实际系统store、两条GUI TCC路线尚未执行。新VM --help为SIGKILL终止，精确时间窗AMFI日志确认-424拒绝：ad hoc签名包含restricted entitlements；已有AMFI会话占用系统amfid，所需临时替换与恢复及新版本系统安装、源维护、定位授权须本轮明确批准。具体证据与限制见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md及vm-validation-plan.md。T24保持完整TCC待验。

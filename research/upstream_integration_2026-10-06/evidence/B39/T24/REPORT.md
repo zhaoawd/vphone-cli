@@ -16,14 +16,16 @@
 | --- | --- | --- |
 | swift test --disable-sandbox --force-resolved-versions --cache-path .build/research-b39/swiftpm-cache --filter 'LocalBundleLayoutTests\|CoreBundleStoreTests\|LauncherPolicyTests\|LaunchRouteTests\|ExpectedBindingCLITests\|ToolchainTests' | 52项通过 | store/policy及调用方route、冻结选择、签名toolchain；不启动VM |
 | 同上，filter 'FrozenLocalHostBundleTests\|LocalBundleLayoutTests'，输入冻结archive/version/SHA256/VM CDHash | 7项通过，含实际归档1项 | 实际宿主Bundle安装到private testRoot并复验；不证明系统root store和跨UID行为 |
-| python3 -B -m unittest discover -s research/upstream_integration_2026-10-06/evidence/B39/T24 -p test_attribution_filter.py -v | 4项通过 | 过滤未知字段/身份、坐标和无关事件；样本仅保留标记 |
+| python3 -B -m unittest discover -s research/upstream_integration_2026-10-06/evidence/B39/T24 -p test_attribution_filter.py -v | 5项通过 | 过滤未知字段/身份、坐标和无关事件；样本仅保留标记 |
 | zsh scripts/build.sh --no-vphoned；zsh scripts/build_launchpad.sh | 两者退出0 | 采用固定解析输入、现有已校验guest组合；CLI宿主7个Mach-O、Launchpad外层2个及嵌入7个通过签名/依赖校验 |
 | python3 -B scripts/check_bundle.py .build/vphone-cli.app --execute | 退出0 | 完整资源/签名/entitlements及仓库外工作目录、符号链接资源解析 |
 | 主checkout现有.venv执行封装check_python_runtime.py --locked --json | 退出0，differences为空 | Python3.14.5版本锁与能力；不是字节闭包 |
 | python3 -B research/upstream_integration_2026-10-06/evidence/B39/T24/scoped_amfi.py --check | 退出0 | 输入SHA/CDHash与工具存在性；未附加系统进程 |
-| 冻结VM --help | -9 | SIGKILL终止；查询未得到候选精确路径AMFI日志，原因未查明 |
+| 冻结VM --help | -9 | SIGKILL终止；精确时间窗同一路径AMFI日志确认-424：ad hoc签名包含restricted entitlements |
 
-命令完整参数、退出码和磁盘余量见 `*-result.json`，离线日志摘要及压缩件见 `log-manifest.json`。测试去重后为53项Swift与4项Python；不将重复运行重复计为独立测试。
+命令完整参数、退出码和磁盘余量见 `*-result.json`，离线日志摘要及压缩件见 `log-manifest.json`。测试去重后为53项Swift与5项Python；不将重复运行重复计为独立测试。
+
+实际统一日志的时间戳采用空格分隔日期时间；原过滤器只接受T分隔，新增回归先失败1项，放行两种严格时间戳格式后5项通过，见attribution-timestamp-red/green结果。后续运行守护新增UTC起止时间、PID/PGID和信号终止原因，避免依赖文件mtime确定窗口。AMFI精确查询以旧结果文件mtime和elapsed界定25秒窗口；仅找到候选完整路径的-424事件，见amfi-exact-window.json。该证据说明VM执行前的签名准入失败，未观察CoreLocation授权调用。
 
 ## 冻结与身份
 

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "/usr/bin/log",
+    "show",
+    "--start",
+    "2026-10-11 23:10:54",
+    "--end",
+    "2026-10-11 23:11:19",
+    "--info",
+    "--debug",
+    "--style",
+    "ndjson",
+    "--timezone",
+    "UTC",
+    "--predicate",
+    "(process == \"amfid\" OR process == \"kernel\") AND (eventMessage CONTAINS \"vphone-vm\")"
+  ],
+  "exit": 0,
+  "window_timezone": "CST",
+  "help_result_mtime": "2026-10-11T23:11:04.546616+08:00",
+  "window_bound": "result file mtime and elapsed command seconds; PID not recorded by initial guard",
+  "events": [
+    {
+      "timestamp": "2026-10-11 15:11:04.546562+0000",
+      "processID": 6968,
+      "processImagePath": "/usr/libexec/amfid",
+      "eventMessage": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm not valid: Error Domain=AppleMobileFileIntegrityError Code=-424 \"The file is adhoc signed but contains restricted entitlements\" UserInfo={NSURL=file:///Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm, NSLocalizedDescription=The file is adhoc signed but contains restricted entitlements}"
+    }
+  ]
+}
