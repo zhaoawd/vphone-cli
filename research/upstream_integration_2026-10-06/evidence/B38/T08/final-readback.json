@@ -1,0 +1,89 @@
+{
+  "at": 1791684868.783624,
+  "source": {
+    "command": [
+      "ps",
+      "-p",
+      "59774",
+      "-o",
+      "command="
+    ],
+    "exit": 0,
+    "stdout": "/Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm --config /Users/kolar/github/vphone-cli/vm-new/config.plist\n",
+    "stderr": ""
+  },
+  "monitor": {
+    "command": [
+      "ps",
+      "-p",
+      "92285",
+      "-o",
+      "stat=,lstart=,command="
+    ],
+    "exit": 0,
+    "stdout": "SNs  Sun Oct 11 02:00:32 2026     /opt/homebrew/Cellar/python@3.13/3.13.14/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python -m tools.phase1.vsock_health --sock /Users/kolar/github/vphone-cli/vm-new/vphone.sock --interval 3.0 --state-file /private/tmp/autophone-rigs/vm-new/health.json --log-file /private/tmp/autophone-rigs/vm-new/health.log --on-down /Users/kolar/github/autophone/scripts/on_vphone_down.sh\n",
+    "stderr": ""
+  },
+  "source_health": {
+    "ts": 1791684865.960832,
+    "state": "healthy",
+    "uds_state": "healthy",
+    "vsock_state": "healthy",
+    "uds_window": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "vsock_window": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "uds_rt_p50_ms": 19.34,
+    "vsock_rt_p50_ms": 67.13,
+    "uds_rt_max_ms": 21.76,
+    "vsock_rt_max_ms": 68.17,
+    "last_error": null,
+    "last_probe_ts": 1791684865.9608378,
+    "probe_count": 9216
+  },
+  "research_disk_handles": {
+    "command": [
+      "/usr/sbin/lsof",
+      "-t",
+      "/Users/kolar/github/vphone-cli/vm-roothide-b33-20261010/Disk.img"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "research_images_attached": false,
+  "free_bytes": 284725571584,
+  "new_amfi_attachment": false,
+  "other_amfi_session": {
+    "command": [
+      "ps",
+      "-p",
+      "38515,38530",
+      "-o",
+      "pid=,ppid=,lstart=,command="
+    ],
+    "exit": 0,
+    "stdout": "38515     1 Sun Oct 11 01:13:48 2026     /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -m amfidont --spoof-apple --path /Users/kolar/github/vphone-cli --cdhash 137689278b29d01a5029da7a8a9bf9711006c083\n38530 38515 Sun Oct 11 01:13:48 2026     /Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Resources/debugserver --native-regs --setsid --fd=3\n",
+    "stderr": ""
+  }
+}

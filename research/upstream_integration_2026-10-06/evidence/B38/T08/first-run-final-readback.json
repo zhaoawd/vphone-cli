@@ -1,0 +1,231 @@
+{
+  "home": {
+    "method": "input.button",
+    "params": {
+      "name": "home"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "button": "home"
+      },
+      "type": "response"
+    },
+    "seconds": 0.10882008401677012
+  },
+  "frontmost": {
+    "method": "apps.foreground",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "bundle_id": "com.apple.mobilesafari",
+        "name": "Safari",
+        "pid": 514,
+        "source": "runningboard",
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.18655574996955693
+  },
+  "location_file": {
+    "method": "files.read",
+    "params": {
+      "path": "/var/mobile/Library/Caches/vphone-location.json",
+      "binary": true
+    },
+    "http_status": 400,
+    "reply": {
+      "error": {
+        "code": "operation_failed",
+        "message": "Error Domain=NSCocoaErrorDomain Code=4 \"The file “vphone-location.json” doesn’t exist.\" UserInfo={NSFilePath=/var/mobile/Library/Caches/vphone-location.json, NSUnderlyingError=0x8fac306f0 {Error Domain=NSPOSIXErrorDomain Code=2 \"No such file or directory\"}}"
+      },
+      "id": "B38",
+      "type": "response"
+    },
+    "seconds": 0.001460209023207426
+  },
+  "timezone": {
+    "method": "time.timezone",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "automatic": false,
+        "identifier": "Asia/Hong_Kong",
+        "seconds_from_gmt": 28800
+      },
+      "type": "response"
+    },
+    "seconds": 0.001821374986320734
+  },
+  "orientation": {
+    "method": "display.rotation",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "type": "response"
+    },
+    "seconds": 0.041630374966189265
+  },
+  "com.vphone.B38.fd-probe": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B38.fd-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B38.fd-probe",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0014801251236349344
+  },
+  "com.vphone.B38.roothide-service": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B38.roothide-service"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B38.roothide-service",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.00159054109826684
+  },
+  "com.vphone.B38.signal-probe": {
+    "method": "services.status",
+    "params": {
+      "label": "com.vphone.B38.signal-probe"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "domains": [],
+        "enabled": true,
+        "label": "com.vphone.B38.signal-probe",
+        "loaded": false,
+        "override": false,
+        "running": false
+      },
+      "type": "response"
+    },
+    "seconds": 0.0013255830854177475
+  },
+  "device_info": {
+    "method": "device.info",
+    "params": {},
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "agent": {
+          "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+          "pid": 569
+        },
+        "battery": {
+          "fraction": 1,
+          "state": 2
+        },
+        "boot_session_uuid": "AD69269D-DBAC-4216-BC36-6B4F2D88DA8C",
+        "boot_time": 1791683415,
+        "brightness": {
+          "auto": null,
+          "value": 0.5
+        },
+        "developer_mode": {
+          "armed": false,
+          "enabled": true,
+          "writable": true
+        },
+        "host": "iphone.local",
+        "ios_version": "26.1.0",
+        "jailbreak": {
+          "jbroot": null,
+          "layout": null,
+          "source": "not detected"
+        },
+        "kernel": "25.1.0",
+        "lock": {
+          "locked": false,
+          "passcode_enabled": false,
+          "screen_off": false
+        },
+        "low_power_mode": {
+          "enabled": false,
+          "method": "powerd"
+        },
+        "memory_bytes": 8565768192,
+        "model": "iPhone99,11",
+        "network": {
+          "addresses": [
+            "lo0 127.0.0.1",
+            "lo0 ::1",
+            "lo0 fe80::1%lo0",
+            "en0 fe80::1470:600e:c4a:1f8a%en0",
+            "en0 fd5c:d8f7:3ae8:24d7:1081:bf52:48d2:41c1",
+            "en0 192.168.64.3",
+            "utun0 fe80::88a5:664e:293d:1146%utun0",
+            "en1 fe80::4f3:384f:8159:a3a7%en1",
+            "en1 169.254.228.189",
+            "anpi0 fe80::187b:deff:fee5:a3e3%anpi0",
+            "utun1 fe80::8e82:5c3e:230a:1fab%utun1",
+            "utun2 fe80::908f:9a67:2b7d:f187%utun2",
+            "utun3 fe80::ce81:b1c:bd2c:69e%utun3"
+          ]
+        },
+        "processor_count": 8,
+        "rotation": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "screen": {
+          "height": 932,
+          "locked": false,
+          "orientation": 0,
+          "scale": 3,
+          "screen_off": false,
+          "width": 430
+        },
+        "storage": {
+          "available_bytes": 43663859712,
+          "total_bytes": 68702658560
+        },
+        "sysname": "Darwin",
+        "uptime_seconds": 967.809239875,
+        "volume": 0.5
+      },
+      "type": "response"
+    },
+    "seconds": 0.008085582870990038
+  }
+}

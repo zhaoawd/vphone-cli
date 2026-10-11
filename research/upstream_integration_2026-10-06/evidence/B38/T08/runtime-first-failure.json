@@ -1,0 +1,525 @@
+{
+  "checks": [
+    {
+      "method": "device.info",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "agent": {
+            "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+            "pid": 112
+          },
+          "battery": {
+            "fraction": 1,
+            "state": 2
+          },
+          "boot_session_uuid": "AD69269D-DBAC-4216-BC36-6B4F2D88DA8C",
+          "boot_time": 1791683415,
+          "brightness": {
+            "auto": null,
+            "value": 0.5
+          },
+          "developer_mode": {
+            "armed": false,
+            "enabled": true,
+            "writable": true
+          },
+          "host": "iphone.local",
+          "ios_version": "26.1.0",
+          "jailbreak": {
+            "jbroot": null,
+            "layout": null,
+            "source": "not detected"
+          },
+          "kernel": "25.1.0",
+          "lock": {
+            "locked": true,
+            "passcode_enabled": false,
+            "screen_off": true
+          },
+          "low_power_mode": {
+            "enabled": false,
+            "method": "powerd"
+          },
+          "memory_bytes": 8565768192,
+          "model": "iPhone99,11",
+          "network": {
+            "addresses": [
+              "lo0 127.0.0.1",
+              "lo0 ::1",
+              "lo0 fe80::1%lo0",
+              "en0 fe80::1470:600e:c4a:1f8a%en0",
+              "en0 fd5c:d8f7:3ae8:24d7:1081:bf52:48d2:41c1",
+              "en0 192.168.64.3",
+              "utun0 fe80::88a5:664e:293d:1146%utun0",
+              "en1 fe80::4f3:384f:8159:a3a7%en1",
+              "en1 169.254.228.189",
+              "anpi0 fe80::187b:deff:fee5:a3e3%anpi0",
+              "utun1 fe80::8e82:5c3e:230a:1fab%utun1",
+              "utun2 fe80::908f:9a67:2b7d:f187%utun2",
+              "utun3 fe80::ce81:b1c:bd2c:69e%utun3"
+            ]
+          },
+          "processor_count": 8,
+          "rotation": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "screen": {
+            "height": 932,
+            "locked": true,
+            "orientation": 0,
+            "scale": 3,
+            "screen_off": true,
+            "width": 430
+          },
+          "storage": {
+            "available_bytes": 43781275648,
+            "total_bytes": 68702658560
+          },
+          "sysname": "Darwin",
+          "uptime_seconds": 265.55678562500003,
+          "volume": 0.5
+        },
+        "type": "response"
+      },
+      "seconds": 0.012691207928583026
+    },
+    {
+      "method": "screen.unlock",
+      "params": {
+        "timeout": 10
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_locked": true,
+          "was_screen_off": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.5594758752267808
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0051990419160574675
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "bundle_id": "com.apple.springboard",
+          "name": "Home Screen",
+          "pid": 0,
+          "source": "unavailable",
+          "verified": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.12107037496753037
+    },
+    {
+      "method": "time.timezone",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.002694791881367564
+    },
+    {
+      "method": "files.mkdir",
+      "params": {
+        "path": "/var/root/vphone-b38-api"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "created": true,
+          "path": "/var/root/vphone-b38-api"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012092499528080225
+    },
+    {
+      "method": "files.chmod",
+      "params": {
+        "path": "/var/root/vphone-b38-api/fd-probe",
+        "mode": "755"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "mode": "755",
+          "path": "/var/root/vphone-b38-api/fd-probe"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012197080068290234
+    },
+    {
+      "method": "services.load",
+      "params": {
+        "paths": [
+          "/var/root/vphone-b38-api/fd.plist"
+        ]
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "errors": {},
+          "loaded": true,
+          "paths": [
+            "/var/root/vphone-b38-api/fd.plist"
+          ],
+          "services": [
+            {
+              "domains": [
+                "system",
+                "user"
+              ],
+              "enabled": true,
+              "label": "com.vphone.B38.fd-probe",
+              "last_exit_status": 0,
+              "loaded": true,
+              "override": false,
+              "path": "/var/root/vphone-b38-api/fd.plist",
+              "pid": 0,
+              "program": "/var/root/vphone-b38-api/fd-probe",
+              "running": false
+            }
+          ],
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002303000073879957
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B38.fd-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B38.fd-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001726916991174221
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "Asia/Hong_Kong"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013390830717980862
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "automatic": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013112497981637716
+    },
+    {
+      "method": "time.timezone",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012731251772493124
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5269210829865187
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.11289204191416502
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.springboard"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "failed",
+          "message": "app not found: com.apple.springboard"
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.09831225010566413
+    },
+    {
+      "method": "services.unload",
+      "params": {
+        "paths": [
+          "/var/root/vphone-b38-api/fd.plist"
+        ],
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "errors": {},
+          "loaded": false,
+          "paths": [
+            "/var/root/vphone-b38-api/fd.plist"
+          ],
+          "services": [
+            {
+              "domains": [],
+              "enabled": true,
+              "label": "com.vphone.B38.fd-probe",
+              "loaded": false,
+              "override": false,
+              "path": "/var/root/vphone-b38-api/fd.plist",
+              "running": false
+            }
+          ],
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015724168624728918
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b38-api",
+        "recursive": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "path": "/var/root/vphone-b38-api",
+          "removed": true,
+          "type": "directory"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015117081347852945
+    }
+  ],
+  "memory_batches": [],
+  "restoration": {
+    "timezone_identifier": {
+      "automatic": false,
+      "changed": false,
+      "identifier": "Asia/Hong_Kong",
+      "seconds_from_gmt": 28800
+    },
+    "timezone_automatic": {
+      "automatic": false,
+      "changed": false,
+      "identifier": "Asia/Hong_Kong",
+      "seconds_from_gmt": 28800
+    },
+    "timezone_readback": {
+      "automatic": false,
+      "identifier": "Asia/Hong_Kong",
+      "seconds_from_gmt": 28800
+    },
+    "orientation": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait",
+      "requested": 0
+    },
+    "rotation_lock": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait"
+    },
+    "frontmost": {
+      "failure": "{'method': 'apps.launch', 'params': {'bundle_id': 'com.apple.springboard'}, 'http_status': 400, 'reply': {'error': {'code': 'failed', 'message': 'app not found: com.apple.springboard'}, 'id': 'B38', 'type': 'response'}, 'seconds': 0.09831225010566413}"
+    },
+    "fd_probe_unload": {
+      "errors": {},
+      "loaded": false,
+      "paths": [
+        "/var/root/vphone-b38-api/fd.plist"
+      ],
+      "services": [
+        {
+          "domains": [],
+          "enabled": true,
+          "label": "com.vphone.B38.fd-probe",
+          "loaded": false,
+          "override": false,
+          "path": "/var/root/vphone-b38-api/fd.plist",
+          "running": false
+        }
+      ],
+      "verified": true
+    },
+    "test_files": {
+      "path": "/var/root/vphone-b38-api",
+      "removed": true,
+      "type": "directory"
+    }
+  },
+  "health_before": {
+    "agent_role": "api",
+    "api_version": 1,
+    "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+    "bootstrap_startup_enabled": true,
+    "cache_path": "/var/root/Library/Caches/vphoned-api",
+    "camera_publisher_enabled": false,
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "D53D8081-DDED-4F64-9609-532EB6C8E414",
+    "ios": "26.1.0",
+    "ip": "fe80::1470:600e:c4a:1f8a%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "worker_pid": 112,
+  "failure": {
+    "type": "AssertionError",
+    "message": "fd probe output not produced"
+  }
+}

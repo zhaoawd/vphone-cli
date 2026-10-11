@@ -1,0 +1,36 @@
+{
+  "unchanged_since_B35": [
+    "scripts/vphoned",
+    "sources/VPhoneCore/VPhoneResources.swift",
+    "sources/vphone-cli/VPhoneCLI.swift",
+    "sources/vphone-cli/VPhoneControl.swift",
+    "sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+    "sources/vphone-cli/VPhoneAppDelegate.swift"
+  ],
+  "source_diff": {
+    "command": [
+      "git",
+      "-C",
+      "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli",
+      "diff",
+      "a422e152e5d5def65b19f4ad37bad868eaebe328",
+      "--",
+      "scripts/vphoned",
+      "sources/VPhoneCore/VPhoneResources.swift",
+      "sources/vphone-cli/VPhoneCLI.swift",
+      "sources/vphone-cli/VPhoneControl.swift",
+      "sources/vphone-cli/VPhoneVMLaunchCLI.swift",
+      "sources/vphone-cli/VPhoneAppDelegate.swift"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "host_auto_update_resource": "guest-resources/vphoned (classic)",
+  "modern_api_resource": "guest-resources/api/vphoned",
+  "classic_cache": "/var/root/Library/Caches/vphoned",
+  "modern_cache": "/var/root/Library/Caches/vphoned-api",
+  "runtime_auto_update_policy": "--no-vphoned-update",
+  "unflagged_old_guest_auto_update_retested": false,
+  "limits": "源码核对及实际独立 API 更新保持 classic；没有重新执行无禁更标志的旧 guest 全部升级流程。"
+}

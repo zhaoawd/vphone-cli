@@ -1,6 +1,6 @@
 # 固定上游整合执行记录（2026-10-06）
 
-本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`。历史批次使用已经附加的隔离工作树；B33 在本机 `/Users/kolar/github/vphone-cli` 继续。当前结果见末尾 B33 记录；后续章节保留各批次当时的状态。
+本轮目标为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。主工作区基线为 `e8d825b3723d9ec72d31b050a79d353acd4b59bf`，实施分支为 `codex/upstream-2d21d21-integration`。历史批次使用已经附加的隔离工作树；B33 在本机 `/Users/kolar/github/vphone-cli` 继续，B37起开发位于 `/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli`。当前结果见末尾 B38 记录；后续章节保留各批次当时的状态。
 
 `inputs/` 保存用户提供的三份附件原文；来源路径、摘要与大小见 `input_manifest.json`。附件内的历史状态、旧 sandbox 链接和实施授权字段仅表示原文状态。本轮授权来自用户“开始推进”“继续”；实际状态记录在 `tasks.json`。
 
@@ -948,3 +948,10 @@ B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复
 ## B37 结果（2026-10-11）
 
 事项1、2离线和4离线部分已完成：显式路径配置、完整迁移差异与兼容性条件、冻结默认/现代候选静态检查和相关回归。默认仍classic；未重新构建或执行VM/磁盘迁移/AMFI。 663项生产输入摘要一致；5项静态/路径检查、68项定向回归（无跳过）、组件宿主测试通过。1337/1339控制兼容性与相机发布端切换仍需实现；T08保持未整体验收。见[B37报告](evidence/B37/T08/REPORT.md)、[迁移准备](evidence/B37/T08/MIGRATION.md)、[任务清单](evidence/B37/T08/TASKS.md)。
+
+
+## B38 结果（2026-10-11）
+
+T08按固定IcliKit 0.7.16依赖及接口合同accepted。默认组合保留classic控制/相机，增加独立1339 API、独立缓存和RootHide启动恢复。7项pin、当前源码构建/Bundle/写盘/实际运行摘要一致；两次RootHide冷启动自动加载Irisin及SSH，实际banner与classic往返通过。服务生命周期、定位、时区、非UTF-8、旋转读回、40并发查询及60次重复截图通过；worker FD13→13，未观察到已知逐次累积泄漏。显式API更新实际重启并确认，classic缓存保持。106项回归无跳过，组件124项检查通过。
+
+副本正常停止，源vm-new原命令及同一监测恢复healthy；最低余量262.7GiB，5GiB阈值未触发。本轮未附加AMFI，其他会话未操作。实际使用与新Bundle字节相同的B35原冻结VM路径；完整现代环境/相机迁移、新Bundle路径独立启动、当前API完整RootHide路径转换、无禁更标志的旧guest全部自动升级流程及长期内存行为不计为已验证。全台账9项accepted，37项必需任务尚未accepted，T45仍为可选任务。详见[B38报告](evidence/B38/T08/REPORT.md)、[验收断言](evidence/B38/T08/acceptance.json)、[B38摘要](evidence/B38-summary.json)。

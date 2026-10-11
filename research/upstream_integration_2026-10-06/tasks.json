@@ -1331,7 +1331,7 @@
         "T06",
         "T07"
       ],
-      "status": "offline_preparation_verified_runtime_pending",
+      "status": "accepted",
       "upstream_paths": [
         "VPhoneDaemon/VPhoneDaemon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         "VPhoneDaemon/Daemon/"
@@ -1366,7 +1366,8 @@
         "b5c4e482e8f724bedee224ec6399f7456d719db3",
         "9a75de14856b9ff073f44071a619dce517ce8008",
         "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d",
-        "a422e152e5d5def65b19f4ad37bad868eaebe328"
+        "a422e152e5d5def65b19f4ad37bad868eaebe328",
+        "1c0a80cb"
       ],
       "verification_evidence": [
         "T08-pins-red.log: old 0.7.7 fails requested 0.7.16 contract",
@@ -1427,26 +1428,26 @@
         "evidence/B35/T08/regression-entrypoint.log",
         "evidence/B35/T08/signed-artifacts.json",
         "evidence/B35/T08/vm-help-amfi-log.json",
-        "evidence/B35/T08/vm-validation-plan.md"
+        "evidence/B35/T08/vm-validation-plan.md",
+        "evidence/B37/T08/REPORT.md",
+        "evidence/B38/T08/REPORT.md",
+        "evidence/B38/T08/acceptance.json",
+        "evidence/B38/T08/manifest.json",
+        "evidence/B38/T08/source-restoration.json"
       ],
-      "historical_evidence": [],
+      "historical_evidence": [
+        "evidence/B38/T08/prior-task-state.json: B37以前的完整T08当前结果、限制与待办保留"
+      ],
       "acceptance_limits": [
-        "内存结果仅覆盖B22固定候选和恢复副本；API_ONLY未替换生产classic",
-        "B29已构造实际RootHide研究样本，旧CFW仍需显式激活；完整服务、旋转及原始XPC诊断未完成",
-        "B30仅确认实际RootHide的144由service-configure entitlement缺失引起；历史rootless未独立复验；方向运行时scene策略与默认产物整体验收未完成",
-        "B31运行时场景策略只覆盖临时控制应用；未直接取得Settings/Safari场景集合，未确定UIKit倒置方向过滤条件；默认产物未更新",
-        "B32已补足B31未取得的系统应用场景策略和本样本UIKit过滤条件；受控B阶段180度未实际转动，默认产物未更新；历史范围限制仍按原记录保留",
-        "B34确认本机受控应用场景的SpringBoard允许条件/集合过滤原因；恢复阶段有首样本残留方向2，单独无注入复现全程未出现2。默认完整产物及旧CFW自动激活未验证。",
-        "B35启动修复已构建和主机回归验证，未执行真实冷启动；默认完整构建仍classic。新宿主精确AMFI授权待批准。"
+        "B38默认保留classic控制/相机，独立API关闭相机发布；未执行完整现代环境迁移或现代相机验收。",
+        "当前API的device.info.jailbreak字段为空；自动启动恢复依据有效RootHide标记，服务夹具使用明确物理根，不证明该进程完整路径转换环境。",
+        "实际运行使用B35原冻结VM路径，字节与新Bundle相同；新路径--help退出-9且原因未独立查明，可能依赖既有AMFI会话；本轮没有新增附加或操作其他会话。",
+        "旧guest保持由未改classic资源/更新源码及实际独立缓存更新证明；运行带--no-vphoned-update，未重跑无该标志的全部旧guest自动升级流程。",
+        "内存结果限定本次60次截图和短时静置采样；B34旋转原因限定受控样本；历史结果完整保存在prior-task-state.json及各轮报告。"
       ],
-      "current_result": "固定0.7.16/702990b5及B22 JPEG overlay证据保留。Safari 90/270度设置及读回通过，JPEG为2796x1290且已视觉检查；Settings旋转返回400，180度未生效，原因未查明。RootHide路径纯算法测试通过；当前客户机rootless，实际RootHide未验。services.load/unload通过，services.start返回service-configure privilege状态144，原因未查明。 B24对保留rootless副本尝试启动：首次在连接前发生VM compressor panic；一次受控重试出现classic日志但未连接。两次均SIGINT退出0，未新增RootHide/services/rotation验收。 B25只读核对固定IcliKit的domain选择和状态144说明；未新增VM验收。实际RootHide路径待回复，状态144与部分旋转未生效的原因未查明。 B26按用户指定只读检查vm-new。System初始化脚本与Preboot的jb-vphone/procursus及两个安装标记提供既有rootless布局证据；Data/User加密锁定，不能排除后来另装RootHide，实际RootHide前提仍未确认。只读挂载均清理，8个文件元数据及7个小文件摘要保持；没有全量Disk.img摘要或客户机运行验收。 B27在用户单哈希AMFI授权后启动vm-new，以串口和classic shell实际读回：/var/jb指向Preboot的jb-vphone/procursus；对/private/var/containers/Bundle/Application的.jbroot-*搜索退出0且无结果，bootstrap记录不存在。该样本采用rootless布局，不满足实际RootHide验收。没有部署现代API或自动更新guest；状态144和部分旋转未生效的原因未查明。 B28固定IcliKit源码追踪确认：RoutineStart先user domain，仅113回退system；现有144消息无法区分user144或user113后system144。失败时domain及原始xpc_strerror在依赖层丢失。旋转setter发出调用后由读回判断结果。已保全调用链、历史方向矩阵及未执行的诊断方案；未部署现代API，未新增实际RootHide验收，原因未查明。 B29在独立克隆构造RootHide，实际安装90条dpkg记录与audit、冷启动摘要、API检测、显式官方helper激活和SSH banner通过。services.start仍返回api_guest_error/failed，原始状态未保存；旧CFW未自动激活RootHide。无SSH认证或应用交互验收。详见B29记录。 B30在实际RootHide取得user501/transport0/reply.error144；单service-configure entitlement ABA复现及关闭诊断注入对照通过。用户授权后源policy加入该键，候选校验和12项相关测试通过。RootHide plist真实路径重写与独立服务生命周期通过。旋转原始AX和2秒采样已保全，未注入重跑结果一致；静态方向声明与现象一致，运行时scene策略仍未验证。客户机恢复原API基线，默认产物未更新，T08保持部分完成。 B31在B30修正候选、无API注入条件下新增24组方向观测，14成功10拒绝且角度保持。控制应用公开集合30，实际控制器/场景客户端/场景集合均为26；portrait-only切换为2并恢复的对照通过。直接场景180度请求返回UISceneErrorDomain101，确认控制样本的运行时拒绝；UIKit过滤倒置方向的具体条件及Settings/Safari直接运行时策略未取得。临时应用、容器、诊断库与候选副本已清理，原API恢复，样本正常停机。 B32取得Settings/Safari实际场景与客户端集合2/26，UIKit私有UIApplication在原生手机且UIDevice无Home键时将集合与26相与；实际条件返回值及受控应用同PID的26→30→26对照通过。无Frida进程的原API重跑8组，4接受4拒绝且保持角度。受控B阶段180度公开请求未报告错误，但实际仍0度，未计为旋转成功。诊断应用、进程和文件最终均清理，VM正常停机；临时AMFI detach失败后系统服务恢复运行已独立验证，最终空闲退出。 B34本机研究副本已转换RootHide，89包安装与冷启动通过。受控场景180度请求mask4确实到达SpringBoard且无错误；SBTraitsSceneParticipantDelegate的倒置方向允许条件为0，清理支持集合30为26。限定该场景临时允许后集合30、实际方向2；恢复条件后集合26、实际最终方向1（首样本残留2，0.25秒后为1）。撤销全部SpringBoard探针后的独立最小复现再次无错误且未出现方向2。已确认本样本原因，未修改持久策略或新增整项accepted。现代API正常关机、临时应用/Frida/输入清理、源vm-new及原健康监测恢复healthy；默认产物与旧CFW自动激活仍待验收。 B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复后异步逐项加载常规LaunchDaemons，以固定IcliKit按物理根准备plist，保留API_ONLY条件。旧实现4项失败，最终相关22项通过；隔离API、默认完整签名app与六项现代组件构建通过。默认仍classic，未部署新候选，真实自动激活及默认现代运行来源一致性未验。新VM --help退出-9，精确日志AMFI -424；单CDHash临时授权待批准。源healthy、研究副本停机。",
+      "current_result": "B38默认独立固定API与classic组合完成构建、签名、Bundle及CFW安装；全部7项pin、当前源码/构建/运行摘要一致。实际RootHide两次冷启动自动加载Irisin/SSH，banner和classic往返通过；定位、时区、非UTF-8、旋转读回、服务生命周期、40并发查询和60次截图通过，worker FD13→13，静置最大增长14483456字节，未观察到已知逐次累积泄漏。显式API更新实际proxy/worker重启并确认，classic缓存摘要保持。106项回归无跳过，组件124项检查通过。受控180°原因沿用B34场景条件因果证据。副本正常关闭，源及原监测恢复healthy。按固定依赖合同accepted；完整现代环境/相机迁移、新Bundle路径独立运行、全部应用/版本及长期内存不计入验收。",
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
-      "remaining_work": [
-        "完整现代默认打包、CFW选择及自动更新组合尚未实现；本轮只核对已冻结产物，默认仍classic",
-        "实现或选择宿主1337控制兼容性和单一相机发布端方案，完成暂存磁盘迁移及恢复验证；本轮只生成离线计划",
-        "真实RootHide冷启动自动激活、实际daemon/库来源及T08整体验收；本轮用户限定离线，未执行",
-        "B34只确认受控场景倒置方向原因；未验证全部系统应用或其他客户机版本"
-      ],
+      "remaining_work": [],
       "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
       "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
       "B27_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
@@ -1469,7 +1470,8 @@
         "runtime_validated": false,
         "minimum_free_bytes": 288190423040,
         "report": "evidence/B37/T08/REPORT.md"
-      }
+      },
+      "accepted": true
     },
     {
       "id": "T09",
@@ -4783,8 +4785,8 @@
     "B20 Ruling: user authorized exact B19 helper scope; register original frozen signed helper and keep administrator rule unchanged. Human must complete protected SecurityAgent authentication; do not request password in chat or bypass authentication. First150s wait was too short for human interaction and timed out before store/log creation; retry once with900s and bounded post-result verification/cleanup. Cost if authentication remains pending: install acceptance cannot complete in this turn. Fixed IcliKit icli_reboot uses errno ?: EIO; treat error text as wrapper result, do not infer actual kernel errno or apply speculative patches. Firmware-free15+22 regressions establish fixture behavior only, not real VM lifecycle coverage.",
     "B21 Ruling: 原方案允许基础修复单独验收；T03/T04/T05在实际相关路径、恢复/签名/归档接受证据满足后独立accepted，全局T02保持未完成，代价是后续跨模块变更仍须复验。普通launcher只执行sealed本地wrapper，不执行有自动guest更新/0777副作用的官方CLI；预期binding SHA+version跨进程核对，未知VM协议在preflight前拒绝，代价是未声明本地受控协议的官方Bundle不能通过此路线启动。操作autoreleasepool只证明临时ObjC对象释放，真实截图增长仍失败，不能接受T08。新短时限wrapper测试加入既有计时组，原时限不变，代价是未证明与大批签名工作同时运行的启动时限。新宿主4cea360c临时AMFI范围未授权，保持pending；只使用既有B16范围完成本轮VM操作并清理。"
   ],
-  "latest_implementation_head": "a422e152e5d5def65b19f4ad37bad868eaebe328",
-  "latest_validation_limitation": "B37 only T08 offline items 1/2/4: frozen artifacts and current inputs checked; no new build, VM, disk migration or modern default runtime acceptance",
+  "latest_implementation_head": "1c0a80cb",
+  "latest_validation_limitation": "B38 T08按固定依赖及接口合同accepted；完整现代环境/相机迁移、新Bundle路径独立运行及长期任意负载尚未验证。其他未验任务保持原状态。",
   "B24_execution_state": {
     "accepted_total": 8,
     "required_remaining": 38,
@@ -4992,5 +4994,34 @@
     "runtime_validated": false,
     "minimum_free_bytes": 288190423040,
     "report": "evidence/B37/T08/REPORT.md"
+  },
+  "B38_execution_state": {
+    "accepted": true,
+    "task": "T08",
+    "api_sha256": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+    "pins": 7,
+    "source_inputs": 75,
+    "regression_tests": 106,
+    "skips": 0,
+    "repeated_screenshots": 60,
+    "worker_fds": [
+      13,
+      13
+    ],
+    "settled_growth_bytes": 14483456,
+    "cold_starts": 2,
+    "source_restored_healthy": true,
+    "minimum_runtime_free_bytes": 282088140800,
+    "scope": "fixed API dependency contract; classic control/camera plus independent default API; full modern environment/camera migration excluded",
+    "implementation_head": "1c0a80cb",
+    "status": "accepted",
+    "newly_accepted": [
+      "T08"
+    ],
+    "accepted_total": 9,
+    "required_remaining": 37,
+    "report": "evidence/B38/T08/REPORT.md",
+    "full_modern_environment_migrated": false,
+    "new_amfi_attachment": false
   }
 }

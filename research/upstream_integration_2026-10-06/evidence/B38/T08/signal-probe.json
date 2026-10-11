@@ -1,0 +1,2890 @@
+{
+  "observations": [
+    {
+      "method": "bootstrap.inspect",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "installed": true,
+          "jbroot": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+          "layout": "roothide",
+          "roots": [
+            "/private/var/containers/Bundle/Application/.jbroot-000114514191980C"
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.002382833044975996
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "loaded": false,
+          "override": false,
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015362079720944166
+    },
+    {
+      "method": "files.write",
+      "params": {
+        "path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist",
+        "encoding": "base64",
+        "content": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHBsaXN0IFBVQkxJQyAiLS8vQXBwbGUvL0RURCBQTElTVCAxLjAvL0VOIiAiaHR0cDovL3d3dy5hcHBsZS5jb20vRFREcy9Qcm9wZXJ0eUxpc3QtMS4wLmR0ZCI+CjxwbGlzdCB2ZXJzaW9uPSIxLjAiPgo8ZGljdD4KCTxrZXk+S2VlcEFsaXZlPC9rZXk+Cgk8ZmFsc2UvPgoJPGtleT5MYWJlbDwva2V5PgoJPHN0cmluZz5jb20udnBob25lLkIzOC5zaWduYWwtcHJvYmU8L3N0cmluZz4KCTxrZXk+UHJvZ3JhbUFyZ3VtZW50czwva2V5PgoJPGFycmF5PgoJCTxzdHJpbmc+L3ByaXZhdGUvdmFyL2NvbnRhaW5lcnMvQnVuZGxlL0FwcGxpY2F0aW9uLy5qYnJvb3QtMDAwMTE0NTE0MTkxOTgwQy91c3IvYmluL3NsZWVwPC9zdHJpbmc+CgkJPHN0cmluZz42MDwvc3RyaW5nPgoJPC9hcnJheT4KCTxrZXk+UnVuQXRMb2FkPC9rZXk+Cgk8ZmFsc2UvPgoJPGtleT5Vc2VyTmFtZTwva2V5PgoJPHN0cmluZz5yb290PC9zdHJpbmc+CjwvZGljdD4KPC9wbGlzdD4K"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "bytes": 531,
+          "path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0037696249783039093
+    },
+    {
+      "method": "services.load",
+      "params": {
+        "paths": [
+          "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist"
+        ]
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "errors": {},
+          "loaded": true,
+          "paths": [
+            "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist"
+          ],
+          "services": [
+            {
+              "domains": [
+                "system",
+                "user"
+              ],
+              "enabled": true,
+              "label": "com.vphone.B38.signal-probe",
+              "last_exit_status": 0,
+              "loaded": true,
+              "override": false,
+              "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist",
+              "pid": 0,
+              "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "running": false
+            }
+          ],
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001984792063012719
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0020232079550623894
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016806249041110277
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05750070791691542
+    },
+    {
+      "method": "services.signal",
+      "params": {
+        "label": "com.vphone.B38.signal-probe",
+        "signal": "TERM",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "kill",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "signal": 15,
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.002012917073443532
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015316670760512352
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05395525018684566
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001586708938702941
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.056447708047926426
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001596959074959159
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05409479094669223
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0017032912001013756
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05795616679824889
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015885420143604279
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05374233308248222
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014455420896410942
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05222866707481444
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014273750130087137
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011197541666666666,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05627791699953377
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001699791057035327
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011254125,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1671456,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3768320,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.06402491708286107
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0018660828936845064
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011254125,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1671456,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3768320,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.06741524999961257
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 564,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016580000519752502
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011254125,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1671456,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3768320,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05938591714948416
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.011254125,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1671456,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 564,
+              "ppid": 1,
+              "resident_bytes": 3768320,
+              "start_time": 1791684088.468568,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.056321582989767194
+    },
+    {
+      "method": "processes.kill",
+      "params": {
+        "pid": 564,
+        "signal": "KILL",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "pid": 564,
+          "signal": "KILL"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013977501075714827
+    },
+    {
+      "method": "services.stop",
+      "params": {
+        "label": "com.vphone.B38.signal-probe",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "stop",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001441541826352477
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013448749668896198
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014934591017663479
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015874579548835754
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015932079404592514
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015667080879211426
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001785708125680685
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001393333077430725
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001519917044788599
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001440458931028843
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05614854209125042
+    },
+    {
+      "method": "processes.kill",
+      "params": {
+        "pid": 565,
+        "signal": "TERM",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "pid": 565,
+          "signal": "TERM"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0010387080255895853
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001528583001345396
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05452975002117455
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016250000335276127
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05393337504938245
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0021799581591039896
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05629458394832909
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001604291144758463
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05582850007340312
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014462079852819443
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05781837506219745
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001588999992236495
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05465820780955255
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015378750395029783
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.057323083048686385
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0017027088906615973
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007785708333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.059842415852472186
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001425707945600152
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007834,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.0782809171359986
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 565,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002231125021353364
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007834,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05669112503528595
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007834,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1687840,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleep",
+              "pid": 565,
+              "ppid": 1,
+              "resident_bytes": 3784704,
+              "start_time": 1791684098.639201,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.05510033294558525
+    },
+    {
+      "method": "processes.kill",
+      "params": {
+        "pid": 565,
+        "signal": "KILL",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "pid": 565,
+          "signal": "KILL"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0011465409770607948
+    },
+    {
+      "method": "services.stop",
+      "params": {
+        "label": "com.vphone.B38.signal-probe",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "stop",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013843339402228594
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014580420684069395
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014921659603714943
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001562874997034669
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001551707973703742
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0019348340574651957
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.002543959068134427
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0019978750497102737
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015589580871164799
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 566,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0020583749283105135
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 2,
+          "processes": [
+            {
+              "cpu_seconds": 0.007276208333333333,
+              "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+              "footprint_bytes": 1704224,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 10,
+              "name": "sleep",
+              "pid": 566,
+              "ppid": 1,
+              "resident_bytes": 3801088,
+              "start_time": 1791684108.763347,
+              "uid": 0
+            },
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.0653799579013139
+    },
+    {
+      "method": "services.signal",
+      "params": {
+        "label": "com.vphone.B38.signal-probe",
+        "signal": "KILL",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "kill",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "signal": 9,
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014298749156296253
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.signal-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.signal-probe",
+          "last_exit_status": 9,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0021432500798255205
+    },
+    {
+      "method": "processes.list",
+      "params": {
+        "filter": "sleep"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "count": 1,
+          "processes": [
+            {
+              "cpu_seconds": 0.07909941666666667,
+              "executable": "/System/Library/PrivateFrameworks/SleepDaemon.framework/sleepd",
+              "footprint_bytes": 3228080,
+              "jetsam_limit_mb": -1,
+              "jetsam_priority": 0,
+              "name": "sleepd",
+              "pid": 90,
+              "ppid": 1,
+              "resident_bytes": 15187968,
+              "start_time": 1791683416.333198,
+              "uid": 501
+            }
+          ]
+        },
+        "type": "response"
+      },
+      "seconds": 0.0821863750461489
+    },
+    {
+      "method": "services.stop",
+      "params": {
+        "label": "com.vphone.B38.signal-probe",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "stop",
+          "domain": "user",
+          "label": "com.vphone.B38.signal-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012769168242812157
+    }
+  ],
+  "trials": [
+    {
+      "route": "launchd-TERM",
+      "pid": 564,
+      "before": {
+        "cpu_seconds": 0.011197541666666666,
+        "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "footprint_bytes": 1687840,
+        "jetsam_limit_mb": -1,
+        "jetsam_priority": 10,
+        "name": "sleep",
+        "pid": 564,
+        "ppid": 1,
+        "resident_bytes": 3784704,
+        "start_time": 1791684088.468568,
+        "uid": 0
+      },
+      "samples": [
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 0,
+            "loaded": true,
+            "override": false,
+            "pid": 564,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        }
+      ]
+    },
+    {
+      "route": "direct-TERM",
+      "pid": 565,
+      "before": {
+        "cpu_seconds": 0.007785708333333333,
+        "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "footprint_bytes": 1704224,
+        "jetsam_limit_mb": -1,
+        "jetsam_priority": 10,
+        "name": "sleep",
+        "pid": 565,
+        "ppid": 1,
+        "resident_bytes": 3801088,
+        "start_time": 1791684098.639201,
+        "uid": 0
+      },
+      "samples": [
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        },
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 565,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": true
+          },
+          "process_present": true
+        }
+      ]
+    },
+    {
+      "route": "launchd-KILL",
+      "pid": 566,
+      "before": {
+        "cpu_seconds": 0.007276208333333333,
+        "executable": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+        "footprint_bytes": 1704224,
+        "jetsam_limit_mb": -1,
+        "jetsam_priority": 10,
+        "name": "sleep",
+        "pid": 566,
+        "ppid": 1,
+        "resident_bytes": 3801088,
+        "start_time": 1791684108.763347,
+        "uid": 0
+      },
+      "samples": [
+        {
+          "service": {
+            "domains": [
+              "system",
+              "user"
+            ],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "last_exit_status": 9,
+            "loaded": true,
+            "override": false,
+            "pid": 0,
+            "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/bin/sleep",
+            "running": false
+          },
+          "process_present": false
+        }
+      ]
+    }
+  ],
+  "unload": {
+    "method": "services.unload",
+    "params": {
+      "paths": [
+        "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist"
+      ],
+      "force": true
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "errors": {},
+        "loaded": false,
+        "paths": [
+          "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist"
+        ],
+        "services": [
+          {
+            "domains": [],
+            "enabled": true,
+            "label": "com.vphone.B38.signal-probe",
+            "loaded": false,
+            "override": false,
+            "path": "/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist",
+            "running": false
+          }
+        ],
+        "verified": true
+      },
+      "type": "response"
+    },
+    "seconds": 0.0017607081681489944
+  },
+  "cleanup": {
+    "method": "files.remove",
+    "params": {
+      "path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist"
+    },
+    "http_status": 200,
+    "reply": {
+      "id": "B38",
+      "result": {
+        "path": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/Library/LaunchDaemons/com.vphone.B38.signal-probe.plist",
+        "removed": true,
+        "type": "file"
+      },
+      "type": "response"
+    },
+    "seconds": 0.0016302908770740032
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "bootstrap_root": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C",
+  "services": {
+    "wiki.qaq.irisind": {
+      "domains": [
+        "system",
+        "user"
+      ],
+      "enabled": true,
+      "label": "wiki.qaq.irisind",
+      "last_exit_status": 0,
+      "loaded": true,
+      "override": false,
+      "pid": 0,
+      "program": "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind",
+      "running": false
+    },
+    "com.openssh.sshd": {
+      "domains": [
+        "system",
+        "user"
+      ],
+      "enabled": true,
+      "label": "com.openssh.sshd",
+      "last_exit_status": 0,
+      "loaded": true,
+      "override": true,
+      "pid": 0,
+      "program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/bin/sh",
+      "running": false
+    },
+    "com.vphone.vphoned-api": {
+      "domains": [
+        "system",
+        "user"
+      ],
+      "enabled": true,
+      "label": "com.vphone.vphoned-api",
+      "last_exit_status": 0,
+      "loaded": true,
+      "override": false,
+      "pid": 38,
+      "program": "/usr/libexec/vphoned-api",
+      "running": true
+    }
+  },
+  "jobs": {
+    "wiki.qaq.irisind": {
+      "AbandonProcessGroup": true,
+      "EnvironmentVariables": {
+        "DISABLE_TWEAKS": "1"
+      },
+      "Label": "wiki.qaq.irisind",
+      "MachServices": {
+        "wiki.qaq.irisin.service": true
+      },
+      "ProcessType": "Background",
+      "ProgramArguments": [
+        "/private/var/containers/Bundle/Application/.jbroot-000114514191980C/usr/libexec/irisind"
+      ],
+      "Umask": 18,
+      "UserName": "root",
+      "__Patched": true
+    },
+    "com.openssh.sshd": {
+      "ExecuteAllowed": true,
+      "Label": "com.openssh.sshd",
+      "POSIXSpawnType": "Interactive",
+      "ProcessType": "Interactive",
+      "Program": "/var/containers/Bundle/Application/.jbroot-000114514191980C/bin/sh",
+      "ProgramArguments": [
+        "/bin/sh",
+        "/usr/libexec/sshd-keygen-wrapper",
+        "-i"
+      ],
+      "SessionCreate": true,
+      "Sockets": {
+        "SSHListener": {
+          "SockServiceName": "ssh"
+        },
+        "SSHListener2": {
+          "SockServiceName": "2222"
+        }
+      },
+      "StandardErrorPath": "/var/containers/Bundle/Application/.jbroot-000114514191980C/dev/null",
+      "__Patched": true,
+      "inetdCompatibility": {
+        "Wait": false
+      }
+    }
+  },
+  "cache_vphoned": {
+    "http_status": 200,
+    "sha256": "03b0bd17289bd1e0820041ebda0a3ca70febede0f175456d5d992d36f18475d5"
+  },
+  "cache_vphoned-api": {
+    "http_status": 400
+  },
+  "ssh_banner": "SSH-2.0-OpenSSH_9.2\r\n",
+  "api_health": {
+    "agent_role": "api",
+    "api_version": 1,
+    "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+    "bootstrap_startup_enabled": true,
+    "cache_path": "/var/root/Library/Caches/vphoned-api",
+    "camera_publisher_enabled": false,
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "EAC83CEF-B0F3-4FE6-A390-356BE14FAC09",
+    "ios": "26.1.0",
+    "ip": "fe80::1470:600e:c4a:1f8a%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "processes": {
+    "count": 3,
+    "processes": [
+      {
+        "cpu_seconds": 0.09278583333333333,
+        "executable": "/private/var/root/Library/Caches/vphoned",
+        "footprint_bytes": 2851224,
+        "jetsam_limit_mb": -1,
+        "jetsam_priority": 180,
+        "name": "vphoned",
+        "pid": 66,
+        "ppid": 1,
+        "resident_bytes": 32129024,
+        "start_time": 1791684439.56768,
+        "uid": 0
+      },
+      {
+        "cpu_seconds": 0.9474301666666666,
+        "executable": "/usr/libexec/vphoned-api",
+        "footprint_bytes": 19333552,
+        "jetsam_limit_mb": -1,
+        "jetsam_priority": 180,
+        "name": "vphoned-api",
+        "pid": 112,
+        "ppid": 38,
+        "resident_bytes": 39747584,
+        "start_time": 1791684439.782357,
+        "uid": 0
+      },
+      {
+        "cpu_seconds": 0.03030358333333333,
+        "executable": "/usr/libexec/vphoned-api",
+        "footprint_bytes": 1392928,
+        "jetsam_limit_mb": -1,
+        "jetsam_priority": 30,
+        "name": "vphoned-api",
+        "pid": 38,
+        "ppid": 1,
+        "resident_bytes": 3244032,
+        "start_time": 1791684439.555747,
+        "uid": 0
+      }
+    ]
+  },
+  "classic_roundtrip": {
+    "apps": [
+      {
+        "state": "running",
+        "version": "6.44.0",
+        "data_container": "/private/var/mobile/Containers/Data/Application/FF7DD32D-2663-420F-92F5-EBCE7CD34724",
+        "pid": 397,
+        "path": "/private/var/containers/Bundle/Application/C83C7F76-3B76-47E8-ABF6-80C70247565A/Super_PH_Client_Prod.app",
+        "bundle_id": "com.yum.pizzahut.prod.enterprise",
+        "name": "必胜客Prod",
+        "type": "user"
+      },
+      {
+        "path": "/private/var/containers/Bundle/Application/8E024195-D1A6-4934-9F79-5142CA2D02A7/SUPER_APP_Prod.app",
+        "version": "6.36.0",
+        "bundle_id": "com.yum.kfc.brand.prod.enterprise",
+        "state": "running",
+        "type": "user",
+        "name": "肯德基Prod",
+        "data_container": "/private/var/mobile/Containers/Data/Application/C37BD34C-587B-4066-A37D-F9C5F54E9306",
+        "pid": 399
+      },
+      {
+        "pid": 327,
+        "path": "/Applications/PosterBoard.app",
+        "state": "running",
+        "bundle_id": "com.apple.PosterBoard",
+        "name": "PosterBoard",
+        "type": "system",
+        "data_container": "/private/var/mobile/Containers/Data/Application/1428E51B-05FA-48A2-8E8C-69A36CD0BE9E",
+        "version": "1.0"
+      },
+      {
+        "state": "running",
+        "data_container": "/private/var/mobile/Containers/Data/Application/B7F01592-8168-424B-9F25-051A08037A81",
+        "path": "/Applications/WidgetRenderer_Default.app",
+        "bundle_id": "com.apple.chrono.WidgetRenderer-Default",
+        "type": "system",
+        "pid": 359,
+        "version": "1.0",
+        "name": "WidgetRenderer_Default"
+      },
+      {
+        "data_container": "/private/var/mobile/Containers/Data/Application/47242B61-7B82-4000-B85A-15D832A9EC92",
+        "name": "Journaling Suggestions",
+        "type": "system",
+        "bundle_id": "com.apple.MomentsUIService",
+        "path": "/Applications/MomentsUIService.app",
+        "version": "",
+        "state": "running",
+        "pid": 398
+      },
+      {
+        "path": "/private/var/containers/Bundle/Application/A5EF24BF-AA70-4E95-BCFB-A7953C53D7FB/MobileSafari.app",
+        "pid": 396,
+        "state": "running",
+        "version": "26.1",
+        "type": "system",
+        "data_container": "/private/var/mobile/Containers/Data/Application/F266535F-6CA9-4FDD-A5B9-C97A536E929D",
+        "name": "Safari",
+        "bundle_id": "com.apple.mobilesafari"
+      },
+      {
+        "type": "system",
+        "path": "/private/var/containers/Bundle/Application/5FD718AA-6E81-43A5-9A98-38F23C4F9591/Weather.app",
+        "data_container": "/private/var/mobile/Containers/Data/Application/4FC8D12F-2555-42BE-9B99-1056837FD233",
+        "state": "running",
+        "version": "6.0",
+        "pid": 393,
+        "bundle_id": "com.apple.weather",
+        "name": "Weather"
+      },
+      {
+        "bundle_id": "com.apple.mobilecal",
+        "data_container": "/private/var/mobile/Containers/Data/Application/DDDE0209-0A47-45D4-AB60-B49CCA2E52DC",
+        "path": "/private/var/containers/Bundle/Application/BB7B4A09-3982-4489-918F-2D89892D317D/MobileCal.app",
+        "state": "running",
+        "type": "system",
+        "pid": 412,
+        "version": "1.0",
+        "name": "Calendar"
+      }
+    ],
+    "ok": true
+  },
+  "automatic_loading_verified": true
+}

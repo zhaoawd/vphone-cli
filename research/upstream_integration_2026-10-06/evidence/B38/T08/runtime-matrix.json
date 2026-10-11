@@ -1,0 +1,3662 @@
+{
+  "checks": [
+    {
+      "method": "device.info",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "agent": {
+            "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+            "pid": 112
+          },
+          "battery": {
+            "fraction": 1,
+            "state": 2
+          },
+          "boot_session_uuid": "AD69269D-DBAC-4216-BC36-6B4F2D88DA8C",
+          "boot_time": 1791683415,
+          "brightness": {
+            "auto": null,
+            "value": 0.5
+          },
+          "developer_mode": {
+            "armed": false,
+            "enabled": true,
+            "writable": true
+          },
+          "host": "iphone.local",
+          "ios_version": "26.1.0",
+          "jailbreak": {
+            "jbroot": null,
+            "layout": null,
+            "source": "not detected"
+          },
+          "kernel": "25.1.0",
+          "lock": {
+            "locked": false,
+            "passcode_enabled": false,
+            "screen_off": false
+          },
+          "low_power_mode": {
+            "enabled": false,
+            "method": "powerd"
+          },
+          "memory_bytes": 8565768192,
+          "model": "iPhone99,11",
+          "network": {
+            "addresses": [
+              "lo0 127.0.0.1",
+              "lo0 ::1",
+              "lo0 fe80::1%lo0",
+              "en0 fe80::1470:600e:c4a:1f8a%en0",
+              "en0 fd5c:d8f7:3ae8:24d7:1081:bf52:48d2:41c1",
+              "en0 192.168.64.3",
+              "utun0 fe80::88a5:664e:293d:1146%utun0",
+              "en1 fe80::4f3:384f:8159:a3a7%en1",
+              "en1 169.254.228.189",
+              "anpi0 fe80::187b:deff:fee5:a3e3%anpi0",
+              "utun1 fe80::8e82:5c3e:230a:1fab%utun1",
+              "utun2 fe80::908f:9a67:2b7d:f187%utun2",
+              "utun3 fe80::ce81:b1c:bd2c:69e%utun3"
+            ]
+          },
+          "processor_count": 8,
+          "rotation": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait"
+          },
+          "screen": {
+            "height": 932,
+            "locked": false,
+            "orientation": 0,
+            "scale": 3,
+            "screen_off": false,
+            "width": 430
+          },
+          "storage": {
+            "available_bytes": 43783364608,
+            "total_bytes": 68702658560
+          },
+          "sysname": "Darwin",
+          "uptime_seconds": 401.06323050000003,
+          "volume": 0.5
+        },
+        "type": "response"
+      },
+      "seconds": 0.026943207951262593
+    },
+    {
+      "method": "screen.unlock",
+      "params": {
+        "timeout": 10
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "locked": false,
+          "screen_off": false,
+          "was_locked": false,
+          "was_screen_off": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0020205420441925526
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0019008331000804901
+    },
+    {
+      "method": "apps.foreground",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "bundle_id": "com.apple.springboard",
+          "name": "Home Screen",
+          "pid": 0,
+          "source": "unavailable",
+          "verified": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.12701916694641113
+    },
+    {
+      "method": "time.timezone",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014139169361442327
+    },
+    {
+      "method": "files.mkdir",
+      "params": {
+        "path": "/var/root/vphone-b38-api"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "created": true,
+          "path": "/var/root/vphone-b38-api"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014594579115509987
+    },
+    {
+      "method": "files.chmod",
+      "params": {
+        "path": "/var/root/vphone-b38-api/fd-probe",
+        "mode": "755"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "mode": "755",
+          "path": "/var/root/vphone-b38-api/fd-probe"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0013949580024927855
+    },
+    {
+      "method": "services.load",
+      "params": {
+        "paths": [
+          "/var/root/vphone-b38-api/fd.plist"
+        ]
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "errors": {},
+          "loaded": true,
+          "paths": [
+            "/var/root/vphone-b38-api/fd.plist"
+          ],
+          "services": [
+            {
+              "domains": [
+                "system",
+                "user"
+              ],
+              "enabled": true,
+              "label": "com.vphone.B38.fd-probe",
+              "last_exit_status": 0,
+              "loaded": true,
+              "override": false,
+              "path": "/var/root/vphone-b38-api/fd.plist",
+              "pid": 0,
+              "program": "/var/root/vphone-b38-api/fd-probe",
+              "running": false
+            }
+          ],
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0025631249882280827
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B38.fd-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B38.fd-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0027033749502152205
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.vphone.B38.fd-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.vphone.B38.fd-probe",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 0,
+          "program": "/var/root/vphone-b38-api/fd-probe",
+          "running": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001768917078152299
+    },
+    {
+      "method": "services.stop",
+      "params": {
+        "label": "com.vphone.B38.fd-probe",
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "stop",
+          "domain": "user",
+          "label": "com.vphone.B38.fd-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016180409584194422
+    },
+    {
+      "method": "camera.status",
+      "params": {},
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "invalid_operation",
+          "message": "Unknown method: camera.status"
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.0013208750169724226
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "America/New_York"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": true,
+          "identifier": "America/New_York",
+          "seconds_from_gmt": -14400
+        },
+        "type": "response"
+      },
+      "seconds": 0.0109399170614779
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "America/New_York"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "America/New_York",
+          "seconds_from_gmt": -14400
+        },
+        "type": "response"
+      },
+      "seconds": 0.0014001671224832535
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "Asia/Tokyo"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": true,
+          "identifier": "Asia/Tokyo",
+          "seconds_from_gmt": 32400
+        },
+        "type": "response"
+      },
+      "seconds": 0.002355166943743825
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "Asia/Tokyo"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "Asia/Tokyo",
+          "seconds_from_gmt": 32400
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016662089619785547
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "../etc/passwd"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "failed",
+          "message": "'../etc/passwd' is not a time zone in /var/db/timezone/zoneinfo/; pass an Olson name such as Asia/Shanghai"
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.0012603332288563251
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "Mars/Olympus"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "failed",
+          "message": "'Mars/Olympus' is not a time zone in /var/db/timezone/zoneinfo/; pass an Olson name such as Asia/Shanghai"
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.0017047091387212276
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "automatic": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": true,
+          "changed": true,
+          "identifier": "Asia/Tokyo",
+          "seconds_from_gmt": 32400
+        },
+        "type": "response"
+      },
+      "seconds": 0.005085499957203865
+    },
+    {
+      "method": "location.set",
+      "params": {
+        "latitude": 31.2345,
+        "longitude": 121.5678
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "delivery": "application_override",
+          "location": {
+            "altitude": 0,
+            "course": -1,
+            "horizontal_accuracy": 5,
+            "latitude": 31.2345,
+            "longitude": 121.5678,
+            "speed": -1,
+            "vertical_accuracy": 5
+          },
+          "simulating": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002335333963856101
+    },
+    {
+      "method": "location.current",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "altitude": 0,
+          "course": -1,
+          "delivery": "application_override",
+          "horizontal_accuracy": 5,
+          "latitude": 31.2345,
+          "longitude": 121.5678,
+          "simulated": true,
+          "speed": -1,
+          "vertical_accuracy": 5
+        },
+        "type": "response"
+      },
+      "seconds": 0.0016607081051915884
+    },
+    {
+      "method": "location.set",
+      "params": {
+        "latitude": 91,
+        "longitude": 0
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "invalid_operation",
+          "message": "invalid location coordinates or accuracy"
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.0011208329815417528
+    },
+    {
+      "method": "location.set",
+      "params": {
+        "latitude": {
+          "nonfinite_number": "NaN"
+        },
+        "longitude": 0
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "bad_request",
+          "message": "Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 50.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 50., NSJSONSerializationErrorIndex=50}"
+        }
+      },
+      "seconds": 0.0013349170330911875
+    },
+    {
+      "method": "location.set",
+      "params": {
+        "latitude": {
+          "nonfinite_number": "Infinity"
+        },
+        "longitude": 0
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "bad_request",
+          "message": "Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 50.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 50., NSJSONSerializationErrorIndex=50}"
+        }
+      },
+      "seconds": 0.0011881671380251646
+    },
+    {
+      "method": "files.read",
+      "params": {
+        "path": "/var/root/vphone-b38-api/nonutf8"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "content": "//4AgGFiYw==",
+          "encoding": "base64",
+          "path": "/var/root/vphone-b38-api/nonutf8",
+          "size": 7,
+          "truncated": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012319590896368027
+    },
+    {
+      "method": "files.write",
+      "params": {
+        "path": "/var/root/vphone-b38-api/multilingual",
+        "content": "中文 Ελληνικά 日本語\n"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "bytes": 34,
+          "path": "/var/root/vphone-b38-api/multilingual"
+        },
+        "type": "response"
+      },
+      "seconds": 0.001966040814295411
+    },
+    {
+      "method": "files.read",
+      "params": {
+        "path": "/var/root/vphone-b38-api/multilingual"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "content": "中文 Ελληνικά 日本語\n",
+          "encoding": "utf8",
+          "path": "/var/root/vphone-b38-api/multilingual",
+          "size": 34,
+          "truncated": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012092089746147394
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.12471762509085238
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.mobilesafari"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "frontmost_verified": true,
+          "pid": 514
+        },
+        "type": "response"
+      },
+      "seconds": 0.1957465000450611
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "90"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left",
+          "requested": 90
+        },
+        "type": "response"
+      },
+      "seconds": 0.6253124161157757
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 90,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-left"
+        },
+        "type": "response"
+      },
+      "seconds": 0.001864542020484805
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 243548,
+          "coordinate_scale": 3,
+          "height": 1290,
+          "mime_type": "image/jpeg",
+          "width": 2796,
+          "jpeg_sha256": "d112ef7d9cac04508ef47e0dc86d33f5c6d3de9b2cd02666ca29e813d874b45d",
+          "jpeg_bytes": 243548
+        }
+      },
+      "seconds": 0.14502358296886086
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "270"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right",
+          "requested": 270
+        },
+        "type": "response"
+      },
+      "seconds": 0.5732539161108434
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 270,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "landscape-right"
+        },
+        "type": "response"
+      },
+      "seconds": 0.001915500033646822
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 245969,
+          "coordinate_scale": 3,
+          "height": 1290,
+          "mime_type": "image/jpeg",
+          "width": 2796,
+          "jpeg_sha256": "d4a5d56ce1bcd6ec916ead9f1936ac8988b4995832c35913f42168628cfdfe9c",
+          "jpeg_bytes": 245969
+        }
+      },
+      "seconds": 0.13104162481613457
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5174470418132842
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0017451250459998846
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 300594,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "efaec264219c035e6d2deb63a580b8412e21a9387a8f4266fcf88e4590f1db74",
+          "jpeg_bytes": 300594
+        }
+      },
+      "seconds": 0.11829304182901978
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "180"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "unavailable",
+          "message": "The device did not apply the requested rotation."
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.5142638748511672
+    },
+    {
+      "method": "display.rotation",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.0018691669683903456
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 298350,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "26a0a592542e929205c3ac21abbdc8ce645330cc1f90f80e139e41d0fa15674a",
+          "jpeg_bytes": 298350
+        }
+      },
+      "seconds": 0.10700979200191796
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 298350,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "26a0a592542e929205c3ac21abbdc8ce645330cc1f90f80e139e41d0fa15674a",
+          "jpeg_bytes": 298350
+        }
+      },
+      "seconds": 0.1190607079770416
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 298350,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "26a0a592542e929205c3ac21abbdc8ce645330cc1f90f80e139e41d0fa15674a",
+          "jpeg_bytes": 298350
+        }
+      },
+      "seconds": 0.10229379194788635
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 298350,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "26a0a592542e929205c3ac21abbdc8ce645330cc1f90f80e139e41d0fa15674a",
+          "jpeg_bytes": 298350
+        }
+      },
+      "seconds": 0.10041620815172791
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 298350,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "26a0a592542e929205c3ac21abbdc8ce645330cc1f90f80e139e41d0fa15674a",
+          "jpeg_bytes": 298350
+        }
+      },
+      "seconds": 0.11111495899967849
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.11522495816461742
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09674237505532801
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09974895790219307
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09834670787677169
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.1071895828936249
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09369858307763934
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09645429183728993
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09722808399237692
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10531112505123019
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09637679089792073
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09823216591030359
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09915787493810058
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10415991581976414
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09411954204551876
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10184216708876193
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09366149990819395
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10111699998378754
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09768804186023772
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09378354181535542
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10856433305889368
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.1071187499910593
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09360341588035226
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09623233298771083
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.15985033405013382
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.13157391687855124
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.14203774998895824
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.1267542908899486
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.0931969159282744
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.34175170795060694
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10146491695195436
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09273804188705981
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09614891582168639
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10283441701903939
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09978616703301668
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09309795801527798
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09426199994049966
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09168058400973678
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10046350001357496
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09027291601523757
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.0897745001129806
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.10285083414055407
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08965420792810619
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08948774985037744
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09029033314436674
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09664858295582235
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09084679186344147
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08929679193533957
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08964208303950727
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09540579188615084
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08967391704209149
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08995550009422004
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08986358297988772
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09644374996423721
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08874779101461172
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08867466589435935
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09204245801083744
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.09648291696794331
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08963537495583296
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08854666701517999
+    },
+    {
+      "method": "screen.screenshot",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "result": {
+          "bytes": 297415,
+          "coordinate_scale": 3,
+          "height": 2796,
+          "mime_type": "image/jpeg",
+          "width": 1290,
+          "jpeg_sha256": "6f3db36f2acaf89b485d225f32baf45af8cbc8817aa5fbed836e598ee55cfa1e",
+          "jpeg_bytes": 297415
+        }
+      },
+      "seconds": 0.08932937495410442
+    },
+    {
+      "method": "services.start",
+      "params": {
+        "label": "com.vphone.B38.fd-probe"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "accepted": true,
+          "action": "start",
+          "domain": "user",
+          "label": "com.vphone.B38.fd-probe",
+          "launchd_status": 0,
+          "message": "Undefined error: 0",
+          "unchanged": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.001795999938622117
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "identifier": "Asia/Hong_Kong"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": true,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.004453792003914714
+    },
+    {
+      "method": "time.timezone",
+      "params": {
+        "automatic": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "changed": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.0011646668426692486
+    },
+    {
+      "method": "time.timezone",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "automatic": false,
+          "identifier": "Asia/Hong_Kong",
+          "seconds_from_gmt": 28800
+        },
+        "type": "response"
+      },
+      "seconds": 0.001308457925915718
+    },
+    {
+      "method": "location.clear",
+      "params": {},
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "simulating": false
+        },
+        "type": "response"
+      },
+      "seconds": 0.0012758751399815083
+    },
+    {
+      "method": "display.rotation",
+      "params": {
+        "orientation": "0"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait",
+          "requested": 0
+        },
+        "type": "response"
+      },
+      "seconds": 0.5168605837970972
+    },
+    {
+      "method": "display.rotation_lock",
+      "params": {
+        "locked": false
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "degrees": 0,
+          "device_orientation": 0,
+          "locked": false,
+          "name": "portrait"
+        },
+        "type": "response"
+      },
+      "seconds": 0.11164095788262784
+    },
+    {
+      "method": "apps.launch",
+      "params": {
+        "bundle_id": "com.apple.springboard"
+      },
+      "http_status": 400,
+      "reply": {
+        "error": {
+          "code": "failed",
+          "message": "app not found: com.apple.springboard"
+        },
+        "id": "B38",
+        "type": "response"
+      },
+      "seconds": 0.09061841596849263
+    },
+    {
+      "method": "services.unload",
+      "params": {
+        "paths": [
+          "/var/root/vphone-b38-api/fd.plist"
+        ],
+        "force": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "errors": {},
+          "loaded": false,
+          "paths": [
+            "/var/root/vphone-b38-api/fd.plist"
+          ],
+          "services": [
+            {
+              "domains": [],
+              "enabled": true,
+              "label": "com.vphone.B38.fd-probe",
+              "loaded": false,
+              "override": false,
+              "path": "/var/root/vphone-b38-api/fd.plist",
+              "running": false
+            }
+          ],
+          "verified": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.00185887492261827
+    },
+    {
+      "method": "files.remove",
+      "params": {
+        "path": "/var/root/vphone-b38-api",
+        "recursive": true
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "path": "/var/root/vphone-b38-api",
+          "removed": true,
+          "type": "directory"
+        },
+        "type": "response"
+      },
+      "seconds": 0.001313291024416685
+    }
+  ],
+  "memory_batches": [
+    {
+      "batch": 0,
+      "screenshots": 20,
+      "burst": {
+        "pid": 112,
+        "ppid": 38,
+        "footprint_bytes": 48923104,
+        "resident_bytes": 57212928,
+        "start_time": 1791683416.527535
+      },
+      "settled": {
+        "pid": 112,
+        "ppid": 38,
+        "footprint_bytes": 5407200,
+        "resident_bytes": 57196544,
+        "start_time": 1791683416.527535
+      }
+    },
+    {
+      "batch": 1,
+      "screenshots": 20,
+      "burst": {
+        "pid": 112,
+        "ppid": 38,
+        "footprint_bytes": 63455712,
+        "resident_bytes": 57245696,
+        "start_time": 1791683416.527535
+      },
+      "settled": {
+        "pid": 112,
+        "ppid": 38,
+        "footprint_bytes": 19907040,
+        "resident_bytes": 57196544,
+        "start_time": 1791683416.527535
+      }
+    },
+    {
+      "batch": 2,
+      "screenshots": 20,
+      "burst": {
+        "pid": 112,
+        "ppid": 38,
+        "footprint_bytes": 48923104,
+        "resident_bytes": 57212928,
+        "start_time": 1791683416.527535
+      },
+      "settled": {
+        "pid": 112,
+        "ppid": 38,
+        "footprint_bytes": 5423584,
+        "resident_bytes": 57212928,
+        "start_time": 1791683416.527535
+      }
+    }
+  ],
+  "restoration": {
+    "timezone_identifier": {
+      "automatic": false,
+      "changed": true,
+      "identifier": "Asia/Hong_Kong",
+      "seconds_from_gmt": 28800
+    },
+    "timezone_automatic": {
+      "automatic": false,
+      "changed": false,
+      "identifier": "Asia/Hong_Kong",
+      "seconds_from_gmt": 28800
+    },
+    "timezone_readback": {
+      "automatic": false,
+      "identifier": "Asia/Hong_Kong",
+      "seconds_from_gmt": 28800
+    },
+    "location": {
+      "simulating": false
+    },
+    "orientation": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait",
+      "requested": 0
+    },
+    "rotation_lock": {
+      "degrees": 0,
+      "device_orientation": 0,
+      "locked": false,
+      "name": "portrait"
+    },
+    "frontmost": {
+      "failure": "{'method': 'apps.launch', 'params': {'bundle_id': 'com.apple.springboard'}, 'http_status': 400, 'reply': {'error': {'code': 'failed', 'message': 'app not found: com.apple.springboard'}, 'id': 'B38', 'type': 'response'}, 'seconds': 0.09061841596849263}"
+    },
+    "fd_probe_unload": {
+      "errors": {},
+      "loaded": false,
+      "paths": [
+        "/var/root/vphone-b38-api/fd.plist"
+      ],
+      "services": [
+        {
+          "domains": [],
+          "enabled": true,
+          "label": "com.vphone.B38.fd-probe",
+          "loaded": false,
+          "override": false,
+          "path": "/var/root/vphone-b38-api/fd.plist",
+          "running": false
+        }
+      ],
+      "verified": true
+    },
+    "test_files": {
+      "path": "/var/root/vphone-b38-api",
+      "removed": true,
+      "type": "directory"
+    }
+  },
+  "health_before": {
+    "agent_role": "api",
+    "api_version": 1,
+    "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+    "bootstrap_startup_enabled": true,
+    "cache_path": "/var/root/Library/Caches/vphoned-api",
+    "camera_publisher_enabled": false,
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "D53D8081-DDED-4F64-9609-532EB6C8E414",
+    "ios": "26.1.0",
+    "ip": "fe80::1470:600e:c4a:1f8a%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "worker_pid": 112,
+  "fd_before": {
+    "pid": 112,
+    "fds": 13,
+    "at": 1791683818
+  },
+  "concurrent_service_queries": [
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.005084458971396089
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.00302545796148479
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022481661289930344
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.005046834005042911
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0028329999186098576
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.005192874930799007
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002256375038996339
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0035559171810746193
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022656668443232775
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0031887919176369905
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022486660163849592
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022035830188542604
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002691082889214158
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0021583749912679195
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0030305839609354734
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0021430000197142363
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022457910235971212
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.00226724985986948
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002668792149052024
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.00292516709305346
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0023085828870534897
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002251832978799939
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001830916153267026
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0023385421372950077
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0020457501523196697
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002538957865908742
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002322833053767681
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002554125152528286
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002334624994546175
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0028868750669062138
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0054067501332610846
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002448459155857563
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002575709018856287
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.002096625044941902
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0021478747949004173
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015207920223474503
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001906750025227666
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0015820839907974005
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.001791791059076786
+    },
+    {
+      "method": "services.status",
+      "params": {
+        "label": "com.apple.SpringBoard"
+      },
+      "http_status": 200,
+      "reply": {
+        "id": "B38",
+        "result": {
+          "domains": [
+            "system",
+            "user"
+          ],
+          "enabled": true,
+          "label": "com.apple.SpringBoard",
+          "last_exit_status": 0,
+          "loaded": true,
+          "override": false,
+          "pid": 33,
+          "program": "/System/Library/CoreServices/SpringBoard.app/SpringBoard",
+          "running": true
+        },
+        "type": "response"
+      },
+      "seconds": 0.0022217498626559973
+    }
+  ],
+  "rotation_matrix": [
+    {
+      "requested": 90,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "90"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B38",
+          "result": {
+            "degrees": 90,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-left",
+            "requested": 90
+          },
+          "type": "response"
+        },
+        "seconds": 0.6253124161157757
+      },
+      "actual": {
+        "degrees": 90,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "landscape-left"
+      },
+      "screenshot": {
+        "bytes": 243548,
+        "coordinate_scale": 3,
+        "height": 1290,
+        "mime_type": "image/jpeg",
+        "width": 2796,
+        "jpeg_sha256": "d112ef7d9cac04508ef47e0dc86d33f5c6d3de9b2cd02666ca29e813d874b45d",
+        "jpeg_bytes": 243548
+      },
+      "image": "safari-90.jpeg"
+    },
+    {
+      "requested": 270,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "270"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B38",
+          "result": {
+            "degrees": 270,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "landscape-right",
+            "requested": 270
+          },
+          "type": "response"
+        },
+        "seconds": 0.5732539161108434
+      },
+      "actual": {
+        "degrees": 270,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "landscape-right"
+      },
+      "screenshot": {
+        "bytes": 245969,
+        "coordinate_scale": 3,
+        "height": 1290,
+        "mime_type": "image/jpeg",
+        "width": 2796,
+        "jpeg_sha256": "d4a5d56ce1bcd6ec916ead9f1936ac8988b4995832c35913f42168628cfdfe9c",
+        "jpeg_bytes": 245969
+      },
+      "image": "safari-270.jpeg"
+    },
+    {
+      "requested": 0,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "0"
+        },
+        "http_status": 200,
+        "reply": {
+          "id": "B38",
+          "result": {
+            "degrees": 0,
+            "device_orientation": 0,
+            "locked": false,
+            "name": "portrait",
+            "requested": 0
+          },
+          "type": "response"
+        },
+        "seconds": 0.5174470418132842
+      },
+      "actual": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "screenshot": {
+        "bytes": 300594,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "jpeg_sha256": "efaec264219c035e6d2deb63a580b8412e21a9387a8f4266fcf88e4590f1db74",
+        "jpeg_bytes": 300594
+      },
+      "image": "safari-0.jpeg"
+    },
+    {
+      "requested": 180,
+      "change": {
+        "method": "display.rotation",
+        "params": {
+          "orientation": "180"
+        },
+        "http_status": 400,
+        "reply": {
+          "error": {
+            "code": "unavailable",
+            "message": "The device did not apply the requested rotation."
+          },
+          "id": "B38",
+          "type": "response"
+        },
+        "seconds": 0.5142638748511672
+      },
+      "actual": {
+        "degrees": 0,
+        "device_orientation": 0,
+        "locked": false,
+        "name": "portrait"
+      },
+      "screenshot": {
+        "bytes": 298350,
+        "coordinate_scale": 3,
+        "height": 2796,
+        "mime_type": "image/jpeg",
+        "width": 1290,
+        "jpeg_sha256": "26a0a592542e929205c3ac21abbdc8ce645330cc1f90f80e139e41d0fa15674a",
+        "jpeg_bytes": 298350
+      },
+      "image": "safari-180.jpeg"
+    }
+  ],
+  "memory_baseline": {
+    "pid": 112,
+    "ppid": 38,
+    "footprint_bytes": 5439968,
+    "resident_bytes": 56901632,
+    "start_time": 1791683416.527535
+  },
+  "memory_final_samples": [
+    {
+      "pid": 112,
+      "ppid": 38,
+      "footprint_bytes": 5423584,
+      "resident_bytes": 57212928,
+      "start_time": 1791683416.527535
+    },
+    {
+      "pid": 112,
+      "ppid": 38,
+      "footprint_bytes": 5439968,
+      "resident_bytes": 57245696,
+      "start_time": 1791683416.527535
+    },
+    {
+      "pid": 112,
+      "ppid": 38,
+      "footprint_bytes": 19923424,
+      "resident_bytes": 57229312,
+      "start_time": 1791683416.527535
+    }
+  ],
+  "fd_after": {
+    "pid": 112,
+    "fds": 13,
+    "at": 1791683888
+  },
+  "settled_growth_bytes": 14483456,
+  "health_after": {
+    "agent_role": "api",
+    "api_version": 1,
+    "binary_hash": "6a95c0c0eed2028bf191cdd187adf6df9480187924e33d5f7be1f8037b96733b",
+    "bootstrap_startup_enabled": true,
+    "cache_path": "/var/root/Library/Caches/vphoned-api",
+    "camera_publisher_enabled": false,
+    "capabilities": [
+      "session_identity",
+      "touch",
+      "hid",
+      "apps",
+      "url",
+      "files",
+      "file_download_identity",
+      "file_upload_identity",
+      "clipboard",
+      "location",
+      "timezone",
+      "keychain",
+      "ipa_install",
+      "bootstrap_install",
+      "bootstrap_uninstall",
+      "port_forward",
+      "screenshot",
+      "screen_unlock",
+      "device_info",
+      "display",
+      "audio",
+      "input_gestures",
+      "ui_inspection",
+      "processes",
+      "services",
+      "logs",
+      "network_capture",
+      "app_details",
+      "system_control",
+      "system_shutdown",
+      "file_tools",
+      "packages",
+      "environment_update",
+      "environment_transaction",
+      "environment_activation"
+    ],
+    "instance_id": "D53D8081-DDED-4F64-9609-532EB6C8E414",
+    "ios": "26.1.0",
+    "ip": "fe80::1470:600e:c4a:1f8a%en0",
+    "name": "vphoned",
+    "setup_pending": false,
+    "source_overlay": "VPHONE_DAEMON_OVERLAYS:bc214662ea41c281c3baf3d35805c59fdebaa307ff6163bbce61a4fe6cb46c55",
+    "status": "ok"
+  },
+  "classic_after": {
+    "apps": [
+      {
+        "pid": 409,
+        "type": "user",
+        "path": "/private/var/containers/Bundle/Application/C83C7F76-3B76-47E8-ABF6-80C70247565A/Super_PH_Client_Prod.app",
+        "version": "6.44.0",
+        "bundle_id": "com.yum.pizzahut.prod.enterprise",
+        "state": "running",
+        "data_container": "/private/var/mobile/Containers/Data/Application/FF7DD32D-2663-420F-92F5-EBCE7CD34724",
+        "name": "必胜客Prod"
+      },
+      {
+        "pid": 412,
+        "version": "6.36.0",
+        "name": "肯德基Prod",
+        "data_container": "/private/var/mobile/Containers/Data/Application/C37BD34C-587B-4066-A37D-F9C5F54E9306",
+        "bundle_id": "com.yum.kfc.brand.prod.enterprise",
+        "path": "/private/var/containers/Bundle/Application/8E024195-D1A6-4934-9F79-5142CA2D02A7/SUPER_APP_Prod.app",
+        "type": "user",
+        "state": "running"
+      },
+      {
+        "type": "system",
+        "version": "1.0",
+        "path": "/Applications/Spotlight.app",
+        "pid": 466,
+        "state": "running",
+        "bundle_id": "com.apple.Spotlight",
+        "name": "Spotlight",
+        "data_container": ""
+      },
+      {
+        "version": "1.0",
+        "bundle_id": "com.apple.PosterBoard",
+        "type": "system",
+        "state": "running",
+        "data_container": "/private/var/mobile/Containers/Data/Application/1428E51B-05FA-48A2-8E8C-69A36CD0BE9E",
+        "name": "PosterBoard",
+        "path": "/Applications/PosterBoard.app",
+        "pid": 327
+      },
+      {
+        "version": "1.0",
+        "path": "/Applications/WidgetRenderer_Default.app",
+        "bundle_id": "com.apple.chrono.WidgetRenderer-Default",
+        "state": "running",
+        "pid": 373,
+        "type": "system",
+        "name": "WidgetRenderer_Default",
+        "data_container": "/private/var/mobile/Containers/Data/Application/B7F01592-8168-424B-9F25-051A08037A81"
+      },
+      {
+        "pid": 406,
+        "path": "/Applications/MomentsUIService.app",
+        "name": "Journaling Suggestions",
+        "state": "running",
+        "bundle_id": "com.apple.MomentsUIService",
+        "version": "",
+        "type": "system",
+        "data_container": "/private/var/mobile/Containers/Data/Application/47242B61-7B82-4000-B85A-15D832A9EC92"
+      },
+      {
+        "bundle_id": "com.apple.mobilesafari",
+        "path": "/private/var/containers/Bundle/Application/A5EF24BF-AA70-4E95-BCFB-A7953C53D7FB/MobileSafari.app",
+        "state": "running",
+        "type": "system",
+        "pid": 514,
+        "version": "26.1",
+        "data_container": "/private/var/mobile/Containers/Data/Application/F266535F-6CA9-4FDD-A5B9-C97A536E929D",
+        "name": "Safari"
+      },
+      {
+        "pid": 408,
+        "path": "/private/var/containers/Bundle/Application/5FD718AA-6E81-43A5-9A98-38F23C4F9591/Weather.app",
+        "type": "system",
+        "name": "Weather",
+        "version": "6.0",
+        "bundle_id": "com.apple.weather",
+        "state": "running",
+        "data_container": "/private/var/mobile/Containers/Data/Application/4FC8D12F-2555-42BE-9B99-1056837FD233"
+      },
+      {
+        "version": "1.0",
+        "bundle_id": "com.apple.mobilecal",
+        "name": "Calendar",
+        "state": "running",
+        "pid": 418,
+        "data_container": "/private/var/mobile/Containers/Data/Application/DDDE0209-0A47-45D4-AB60-B49CCA2E52DC",
+        "path": "/private/var/containers/Bundle/Application/BB7B4A09-3982-4489-918F-2D89892D317D/MobileCal.app",
+        "type": "system"
+      }
+    ],
+    "ok": true
+  },
+  "complete": true,
+  "evidence_encoding": {
+    "nonfinite_number": "非有限输入用对象记录；实际请求体仍为 Python json.dumps 发出的 NaN/Infinity，原记录见 runtime-matrix.original-json.txt.gz。"
+  }
+}
