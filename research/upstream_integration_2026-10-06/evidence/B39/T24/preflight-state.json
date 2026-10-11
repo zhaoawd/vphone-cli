@@ -1,0 +1,93 @@
+{
+  "observed_at_utc": "2026-10-11T15:16:51Z",
+  "source_runtime": {
+    "bundleIdentifier": "16777231:11604029",
+    "bundlePath": "/Users/kolar/github/vphone-cli/vm-new",
+    "instanceID": "59CB7EFD-4B2F-4FF4-9B9F-16D88748D752",
+    "operation": "boot",
+    "pid": 71457,
+    "startedAt": "2026-10-11T02:32:24Z"
+  },
+  "source_ps": "71457     1 Ss   /Users/kolar/github/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm --config /Users/kolar/github/vphone-cli/vm-new/config.plist",
+  "monitor_candidates": [
+    {
+      "pid": 72155,
+      "ppid": 1,
+      "state": "Ss",
+      "argv": [
+        "/opt/homebrew/Cellar/python@3.13/3.13.14/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python",
+        "-m",
+        "tools.phase1.vsock_health",
+        "--sock",
+        "/Users/kolar/github/vphone-cli/vm-new/vphone.sock",
+        "--interval",
+        "3.0",
+        "--state-file",
+        "/private/tmp/autophone-rigs/vm-new/health.json",
+        "--log-file",
+        "/private/tmp/autophone-rigs/vm-new/health.log",
+        "--on-down",
+        "/Users/kolar/github/autophone/scripts/on_vphone_down.sh"
+      ]
+    }
+  ],
+  "preexisting_amfi_sessions": [
+    {
+      "pid": 38515,
+      "ppid": 1,
+      "state": "Ss",
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "-m",
+        "amfidont",
+        "--spoof-apple",
+        "--path",
+        "/Users/kolar/github/vphone-cli",
+        "--cdhash",
+        "137689278b29d01a5029da7a8a9bf9711006c083"
+      ]
+    }
+  ],
+  "store_state": [
+    {
+      "path": "/Library/Application Support/vphone-launchpad",
+      "exists": false
+    },
+    {
+      "path": "/Library/Application Support/vphone-launchpad/Bundles",
+      "exists": false
+    }
+  ],
+  "research_metadata": {
+    "config.plist": {
+      "sha256": "db424e7fe079ebc9561078dd954bcb775b7e83b0eb03168c8a888821f7f18c93",
+      "size": 1166
+    },
+    "launchpad.json": {
+      "exists": false
+    },
+    ".vphone-runtime.json": {
+      "sha256": "eda9060341a728dc770a391eb295268c5907d2cb237ca2432ca515113d1649b5",
+      "size": 266
+    }
+  },
+  "source_health_keys": [
+    "last_error",
+    "last_probe_ts",
+    "probe_count",
+    "state",
+    "ts",
+    "uds_rt_max_ms",
+    "uds_rt_p50_ms",
+    "uds_state",
+    "uds_window",
+    "vsock_rt_max_ms",
+    "vsock_rt_p50_ms",
+    "vsock_state",
+    "vsock_window"
+  ],
+  "amfid_ps": "6968 38530     4804 /usr/libexec/amfid",
+  "amfid_traced": true,
+  "source_health_state": "healthy",
+  "source_health_timestamp": 1791732001.3869991
+}

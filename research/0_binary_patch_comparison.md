@@ -1248,3 +1248,8 @@ B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10�
 ## 2026-10-11：T08 独立 API 的默认 CFW 安装
 
 B38 保留 classic `/usr/bin/vphoned`、1337 控制和 256 字节相机头。新增 `/usr/libexec/vphoned-api` 和 `com.vphone.vphoned-api`；API 的缓存为 `/var/root/Library/Caches/vphoned-api`，launchd 环境关闭 API 相机发布，RootHide 启动恢复继续执行。regular/dev/jb/exp 安装将其 plist 写入 System LaunchDaemons 及合并 launchd.plist 的 LaunchDaemons 字典；less 不安装该 API。没有新增内核或 Mach-O 指令替换，classic `/b` 环境保持。固定 7 项依赖、当前源码构建及默认 Bundle 校验通过；研究副本两次冷启动的 API 摘要与默认载荷一致，RootHide 服务自动加载，classic 缓存保持。106 项定向回归和组件 124 项检查通过；完整现代环境/相机迁移不在本次 T08 验收内。证据见 `research/upstream_integration_2026-10-06/evidence/B38/T08/REPORT.md`。
+
+
+## 2026-10-11：T24 本地 Bundle 布局
+
+B39将已知签名local-bound协议的CLI/VM布局与旧版含escalator布局区分；未知协议和错误主程序拒绝，store所有权、签名、receipt和锁定执行检查保持。没有新增firmware/kernel/CFW指令替换或二进制补丁，补丁数量保持。52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及4项脱敏回归通过；实际系统store与完整TCC路线等待本轮批准，不增加运行验收结论。证据见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md。

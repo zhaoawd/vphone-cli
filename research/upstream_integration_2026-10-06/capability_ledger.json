@@ -3720,7 +3720,7 @@
       "T02"
     ],
     "disposition": "adapt",
-    "reason": "Helper/Launcher 有严格身份、封装请求及专用执行路由，保留较窄权限；上游 arm64e.x1、自检/EndpointSecurity/TCC 的全链未移植。没有将开放 0777 视为可接受替代。",
+    "reason": "Helper/Launcher 有严格身份、封装请求及专用执行路由，保留较窄权限；上游 arm64e.x1、自检/EndpointSecurity/TCC 的全链未移植。没有将开放 0777 视为可接受替代。 B39已修复已知local-bound协议Bundle的无escalator布局阻塞；52项定向Swift与实际签名归档private testRoot安装1项、4项脱敏回归通过。完整系统store/TCC路线尚未执行，等待本轮明确批准。",
     "paths": [
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
       "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
@@ -3755,7 +3755,7 @@
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/standard.plist",
       "VPhoneExecutable/VPhoneVirtualization/Resources/patches_presets/experimental.plist"
     ],
-    "acceptance_status": "historical_source_v1_protocol_refusal_verified_full_TCC_pending",
+    "acceptance_status": "local_host_bundle_fixture_verified_full_TCC_pending",
     "evidence": [
       "T24_host_entry_review.json",
       "evidence/T24-host-policy.log",

@@ -2618,7 +2618,7 @@
       "dependencies": [
         "T02"
       ],
-      "status": "historical_source_v1_protocol_refusal_verified_full_TCC_pending",
+      "status": "local_host_bundle_fixture_verified_full_TCC_pending",
       "upstream_paths": [
         "AGENTS.md",
         "VPhoneLaunchpad/VPhoneLaunchpadShared/VPhoneLaunchpadLauncherPolicy.swift",
@@ -2645,7 +2645,7 @@
         "bundle"
       ],
       "local_mapping": {
-        "state": "source_reviewed_build_fix_validated",
+        "state": "local_protocol_layout_fixed_signed_host_fixture_verified",
         "paths": [
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadChildProcess.swift",
           "sources/VPhoneLaunchpadKit/VPhoneLaunchpadCommandLine.swift",
@@ -2670,7 +2670,9 @@
           "scripts/check_bundle.py",
           "scripts/check_launchpad_bundle.py",
           "scripts/record_build_dependencies.py",
-          "tests/test_bundle_native_dependencies.py"
+          "tests/test_bundle_native_dependencies.py",
+          "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift",
+          "tests/VPhoneBundleStoreTests/CoreBundleStoreTests.swift"
         ],
         "batch_source_manifest": "evidence/B25-source-review.json"
       },
@@ -2683,7 +2685,8 @@
         "1dfa2fb2cda6439f6d5531933c2e50b3d720f68d",
         "f45be6c6e79d393e99ecbbe1c891536b214ae2bf",
         "0d1dc844a224c34fbd9e3d47762bf323872ad22e",
-        "53580180f09819ec539ba656c15fab7a23fdc1c3"
+        "53580180f09819ec539ba656c15fab7a23fdc1c3",
+        "3f50c591add2d8af6d9aceeb60db2be8ef05f365"
       ],
       "verification_evidence": [
         "T24_host_entry_review.json",
@@ -2739,20 +2742,27 @@
         "evidence/B27-summary.json",
         "evidence/B27-evidence-manifest.json",
         "evidence/B28-summary.json",
-        "evidence/B28-evidence-manifest.json"
+        "evidence/B28-evidence-manifest.json",
+        "evidence/B39/T24/REPORT.md",
+        "evidence/B39/T24/acceptance.json",
+        "evidence/B39/T24/frozen-candidates.json",
+        "evidence/B39/T24/vm-validation-plan.md",
+        "evidence/B39/T24/log-manifest.json"
       ],
       "historical_evidence": [],
-      "current_result": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。 B24生产客户端连接受控protocol-v1系统Mach服务，verify/install各在无日志、新日志、已有日志设置下均退出1；只调用7次version，未调用旧安装/验证方法，新日志未创建、已有日志未变。临时服务已卸载；不代表历史helper二进制、生产listener身份校验或TCC责任链。 B25递归封装宿主Mach-O依赖至Contents/Frameworks，重写相对引用并按嵌套代码后主可执行文件顺序签名。真实副本7个宿主映像逐个及整体签名通过；沙箱确认原Homebrew库读取被拒绝，同策略ldid提取和trustcache创建/读取退出0。历史v1未配置helper实物已定位，SHA256及内嵌版本保全，只读配置检查退出78；没有安装或启动该历史服务。TCC静态链已记录，实际责任归属未验收。 B26精确时间窗/路径的AMFI日志确认B25最终VM的ad hoc与restricted entitlements组合被-424拒绝；新b4e80c57冻结VM subprocess返回-9并有同类精确日志，尚未执行临时AMFI。历史v1实物仍未配置、未注册；有正常签名历史重建方案但未实施，不替代历史实物验收。 B27用户已明确授权冻结b4e80c57单一CDHash；--help退出0，实际vm-new无界面启动、classic连接和最终正常停机通过。完整TCC责任链及历史v1实际XPC矩阵仍未验。临时驱动和debugserver已退出，新系统amfid正常；正常detach未完成。清理及新amfid后同工件--help仍退出0，原因未查明，未证明原AMFI拒绝恢复。 B28经用户授权，将历史dd3c8002源码重建的protocol-v1 helper和最终生产客户端副本以Apple Development/Team 3AA3QL69MQ签名，临时注册真实system Mach服务。verify/install×无日志/新日志/已有日志六组均退出1并明确报告协议不匹配；新日志未创建，已有日志摘要、权限及mtime保持。listener、auditToken、逐消息要求及授权源码未改。该工件是历史源码重建，不是原B13实物或历史发行构建。临时服务、两安装文件、授权项及系统日志目录均恢复缺失基线，独立复核通过；完整TCC责任链仍未验。",
+      "current_result": "生产BundleGuard与Launchpad采用内核argv识别含空格路径。修复空argv[0]读取环境变量误识别；跨UID argv不可读取时，合法存活run record返回busy，保留身份限制。真实root UID探针确认不可读取。完整TCC责任链及真实拒绝矩阵未完成。 实际普通launcher对未知verb、owner错误、666共享可写文件、链接替换均返回77；最后一项由严格代码签名拒绝，不单独证明链接类型检查。测试store恢复缺失。 B24生产客户端连接受控protocol-v1系统Mach服务，verify/install各在无日志、新日志、已有日志设置下均退出1；只调用7次version，未调用旧安装/验证方法，新日志未创建、已有日志未变。临时服务已卸载；不代表历史helper二进制、生产listener身份校验或TCC责任链。 B25递归封装宿主Mach-O依赖至Contents/Frameworks，重写相对引用并按嵌套代码后主可执行文件顺序签名。真实副本7个宿主映像逐个及整体签名通过；沙箱确认原Homebrew库读取被拒绝，同策略ldid提取和trustcache创建/读取退出0。历史v1未配置helper实物已定位，SHA256及内嵌版本保全，只读配置检查退出78；没有安装或启动该历史服务。TCC静态链已记录，实际责任归属未验收。 B26精确时间窗/路径的AMFI日志确认B25最终VM的ad hoc与restricted entitlements组合被-424拒绝；新b4e80c57冻结VM subprocess返回-9并有同类精确日志，尚未执行临时AMFI。历史v1实物仍未配置、未注册；有正常签名历史重建方案但未实施，不替代历史实物验收。 B27用户已明确授权冻结b4e80c57单一CDHash；--help退出0，实际vm-new无界面启动、classic连接和最终正常停机通过。完整TCC责任链及历史v1实际XPC矩阵仍未验。临时驱动和debugserver已退出，新系统amfid正常；正常detach未完成。清理及新amfid后同工件--help仍退出0，原因未查明，未证明原AMFI拒绝恢复。 B28经用户授权，将历史dd3c8002源码重建的protocol-v1 helper和最终生产客户端副本以Apple Development/Team 3AA3QL69MQ签名，临时注册真实system Mach服务。verify/install×无日志/新日志/已有日志六组均退出1并明确报告协议不匹配；新日志未创建，已有日志摘要、权限及mtime保持。listener、auditToken、逐消息要求及授权源码未改。该工件是历史源码重建，不是原B13实物或历史发行构建。临时服务、两安装文件、授权项及系统日志目录均恢复缺失基线，独立复核通过；完整TCC责任链仍未验。 B39修复已知local-bound协议Bundle无escalator时的存储布局阻塞；旧布局继续要求escalator，未知协议或错误主程序拒绝，严格owner/签名/receipt/锁定执行检查保持。52项定向Swift回归、实际冻结宿主归档private testRoot安装复验1项与脱敏回归4项通过；默认CLI/Launchpad签名及宿主Mach-O/资源解析、外部Python锁探针通过。新VM --help返回-9，查询未得到候选精确路径AMFI事件，原因未查明。系统store缺失、研究副本无绑定，源healthy；已有amfidont占用系统amfid。具体新版本/哈希运行恢复方案已准备并请求本轮批准，尚未执行系统store、VM、TCC授权变化或新AMFI。完整TCC链保持待验；Python字节闭包仍未建立。",
       "remaining_work": [
-        "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线；B27已执行单哈希授权下的无界面VM读回，未验完整TCC链",
-        "Python framework、包、PATH工具和现场编译不属于宿主Mach-O封装闭包"
+        "按B39具体方案获得本轮仓库外修改批准，完成直接CLI与Launchpad→launcher→可信store的实际GUI定位、负责应用/usage/entitlement/签名及授权回调证据；当前没有完整TCC验收",
+        "Python framework、包、PATH工具和现场编译不属于宿主Mach-O封装闭包；版本锁探针通过，字节闭包仍未建立，T40继续跟踪"
       ],
       "latest_vm_observation": "受控本地Bundle绑定VM实际启动并正常停机；未完成完整TCC负责应用链。",
       "acceptance_dependency_state": "B24完成T02静态台账对账；各能力仍按自身接口及运行验收合同独立验证，跨模块修改须复验。",
       "B25_implementation_head": "53580180f09819ec539ba656c15fab7a23fdc1c3",
       "B26_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
       "B27_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
-      "B28_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081"
+      "B28_implementation_head": "b4e80c575950d768737234f9fcefc7fb7aff6081",
+      "B39_scope": "offline_layout_fix_signed_host_fixture_and_runtime_preparation_pending_approval",
+      "B39_implementation_head": "3f50c591add2d8af6d9aceeb60db2be8ef05f365"
     },
     {
       "id": "T25",

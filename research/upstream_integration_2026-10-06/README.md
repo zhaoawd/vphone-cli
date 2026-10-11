@@ -955,3 +955,8 @@ B35修复现代daemon的RootHide启动恢复：有效完成标记和链接修复
 T08按固定IcliKit 0.7.16依赖及接口合同accepted。默认组合保留classic控制/相机，增加独立1339 API、独立缓存和RootHide启动恢复。7项pin、当前源码构建/Bundle/写盘/实际运行摘要一致；两次RootHide冷启动自动加载Irisin及SSH，实际banner与classic往返通过。服务生命周期、定位、时区、非UTF-8、旋转读回、40并发查询及60次重复截图通过；worker FD13→13，未观察到已知逐次累积泄漏。显式API更新实际重启并确认，classic缓存保持。106项回归无跳过，组件124项检查通过。
 
 副本正常停止，源vm-new原命令及同一监测恢复healthy；最低余量262.7GiB，5GiB阈值未触发。本轮未附加AMFI，其他会话未操作。实际使用与新Bundle字节相同的B35原冻结VM路径；完整现代环境/相机迁移、新Bundle路径独立启动、当前API完整RootHide路径转换、无禁更标志的旧guest全部自动升级流程及长期内存行为不计为已验证。全台账9项accepted，37项必需任务尚未accepted，T45仍为可选任务。详见[B38报告](evidence/B38/T08/REPORT.md)、[验收断言](evidence/B38/T08/acceptance.json)、[B38摘要](evidence/B38-summary.json)。
+
+
+### 2026-10-11 B39 / T24
+
+修复当前已知local-bound协议Bundle无escalator时的store布局阻塞，保留严格权限/签名/receipt与旧布局要求。52项定向Swift、实际签名宿主归档private testRoot安装1项、4项脱敏回归通过，签名候选已冻结。新VM --help被SIGKILL终止，原因未查明；实际系统store与两条完整TCC路线等待本轮批准，T24尚未验收。见evidence/B39/T24/REPORT.md、acceptance.json与vm-validation-plan.md。源VM及现有AMFI会话未由本轮修改。

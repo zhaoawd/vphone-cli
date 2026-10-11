@@ -1,0 +1,668 @@
+{
+  "archive": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/2.6.1-local.f183c705c87b.tar",
+  "archive_sha256": "3bae87c809c93e3868a0a77c3bc00a5c1bc3a789fc3292487bfd8da3f22d6552",
+  "artifacts": {
+    "cli_app": {
+      "executables": {
+        "Contents/MacOS/ldid": {
+          "cdhash": "6a6b9e62734a31c75068b29f24b477de3e4b6167",
+          "entitlements": {},
+          "identifier": "ldid-55554944974f87b50978373fba46a96528d8932e",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/MacOS/ldid",
+          "sha256": "9142c180c353b107ff1394d73c51fc5c390327d6079a43d70f559200781da525"
+        },
+        "Contents/MacOS/vphone-cli": {
+          "cdhash": "bcd8f2789e80ffd08a1aa3fa8281b1bb8620b74c",
+          "entitlements": {},
+          "identifier": "com.vphone.cli",
+          "info_plist_binding": null,
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-cli",
+          "sha256": "dfe2175c3899f6b013a855ba583bbe63bb95063385da91ba7a3e473736de0cd3"
+        },
+        "Contents/MacOS/vphone-vm": {
+          "cdhash": "26a49260cdfea504e17202693802cd6c3a3574c6",
+          "entitlements": {
+            "com.apple.private.bmk.allow": true,
+            "com.apple.private.virtualization": true,
+            "com.apple.private.virtualization.security-research": true,
+            "com.apple.security.get-task-allow": true,
+            "com.apple.security.personal-information.location": true,
+            "com.apple.security.virtualization": true,
+            "com.apple.vm.networking": true
+          },
+          "identifier": "vphone-vm-555549442c7d8ac6a69b3048ab8b8805ef298593",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/MacOS/vphone-vm",
+          "sha256": "75229dd9e23dd3d5acdef50a162011f61d7c21888b5625f285badf27e62f2e52"
+        },
+        "Contents/Resources/.tools/bin/insert_dylib": {
+          "cdhash": "3f8d6678abc69c95b4a9147ce9017bb7bdc95185",
+          "entitlements": {},
+          "identifier": "insert_dylib-55554944fa28619ff3743653ae4b2f935b9cc6a0",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/Resources/.tools/bin/insert_dylib",
+          "sha256": "3e05098108b0969aabb56b050dadf5116e73a3d4bd4c2ae221e38c956030e7d6"
+        },
+        "Contents/Resources/.tools/bin/trustcache": {
+          "cdhash": "807834016102991c4ec491d7a74beaae3de448bf",
+          "entitlements": {},
+          "identifier": "trustcache-5555494467371348a433347d83f944b2f158fff1",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app/Contents/Resources/.tools/bin/trustcache",
+          "sha256": "4b12acdaf277bd8e3fbf4d8c5918bc154cb71a0e0b3761afad852af814d66fdd"
+        }
+      },
+      "full_signature_verified": true,
+      "info_plist": {
+        "CFBundleExecutable": "vphone-cli",
+        "CFBundleIconFile": "AppIcon",
+        "CFBundleIdentifier": "com.vphone.cli",
+        "CFBundleName": "vphone-cli",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1",
+        "LSUIElement": true,
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+        "NSLocationUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+        "NSLocationWhenInUseUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+        "VPhoneBoundLaunchProtocol": "vphone.local-bound-launch.v1"
+      },
+      "native_closure": {
+        "Contents/Frameworks/libcrypto.3.dylib": {
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": "@rpath/libcrypto.3.dylib",
+          "rpaths": []
+        },
+        "Contents/Frameworks/libplist-2.0.4.dylib": {
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": "@rpath/libplist-2.0.4.dylib",
+          "rpaths": []
+        },
+        "Contents/MacOS/ldid": {
+          "dependencies": [
+            "@loader_path/../Frameworks/libcrypto.3.dylib",
+            "@loader_path/../Frameworks/libplist-2.0.4.dylib",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": null,
+          "rpaths": []
+        },
+        "Contents/MacOS/vphone-cli": {
+          "dependencies": [
+            "/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization",
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+            "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+            "/System/Library/Frameworks/ServiceManagement.framework/Versions/A/ServiceManagement",
+            "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+            "/System/Library/Frameworks/SwiftUI.framework/Versions/A/SwiftUI",
+            "/System/Library/Frameworks/CoreLocation.framework/Versions/A/CoreLocation",
+            "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation",
+            "/usr/lib/libcurl.4.dylib",
+            "/usr/lib/libz.1.dylib",
+            "/usr/lib/libbz2.1.0.dylib",
+            "/usr/lib/libiconv.2.dylib",
+            "/usr/lib/libxml2.2.dylib",
+            "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+            "/usr/lib/libobjc.A.dylib",
+            "/usr/lib/libSystem.B.dylib",
+            "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+            "/System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage",
+            "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia",
+            "/System/Library/Frameworks/CoreTransferable.framework/Versions/A/CoreTransferable",
+            "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo",
+            "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+            "/System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO",
+            "/System/Library/Frameworks/LocalAuthentication.framework/Versions/A/LocalAuthentication",
+            "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/libcompression.dylib",
+            "/usr/lib/swift/libswiftAVFoundation.dylib",
+            "/usr/lib/swift/libswiftCompression.dylib",
+            "/usr/lib/swift/libswiftCore.dylib",
+            "/usr/lib/swift/libswiftCoreAudio.dylib",
+            "/usr/lib/swift/libswiftCoreFoundation.dylib",
+            "/usr/lib/swift/libswiftCoreImage.dylib",
+            "/usr/lib/swift/libswiftCoreLocation.dylib",
+            "/usr/lib/swift/libswiftCoreMIDI.dylib",
+            "/usr/lib/swift/libswiftDarwin.dylib",
+            "/usr/lib/swift/libswiftDispatch.dylib",
+            "/usr/lib/swift/libswiftIOKit.dylib",
+            "/usr/lib/swift/libswiftMetal.dylib",
+            "/usr/lib/swift/libswiftOSLog.dylib",
+            "/usr/lib/swift/libswiftObjectiveC.dylib",
+            "/usr/lib/swift/libswiftObservation.dylib",
+            "/usr/lib/swift/libswiftQuartzCore.dylib",
+            "/usr/lib/swift/libswiftQuickLookUI.dylib",
+            "/usr/lib/swift/libswiftSpatial.dylib",
+            "/usr/lib/swift/libswiftSynchronization.dylib",
+            "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+            "/usr/lib/swift/libswiftXPC.dylib",
+            "/usr/lib/swift/libswift_Builtin_float.dylib",
+            "/usr/lib/swift/libswift_Concurrency.dylib",
+            "/usr/lib/swift/libswiftos.dylib",
+            "/usr/lib/swift/libswiftsimd.dylib",
+            "/usr/lib/swift/libswiftCoreMedia.dylib",
+            "/usr/lib/swift/libswift_errno.dylib",
+            "/usr/lib/swift/libswift_stdio.dylib",
+            "/usr/lib/swift/libswift_signal.dylib"
+          ],
+          "identifier": null,
+          "rpaths": [
+            "/usr/lib/swift"
+          ]
+        },
+        "Contents/MacOS/vphone-vm": {
+          "dependencies": [
+            "/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization",
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+            "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+            "/System/Library/Frameworks/ServiceManagement.framework/Versions/A/ServiceManagement",
+            "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+            "/System/Library/Frameworks/SwiftUI.framework/Versions/A/SwiftUI",
+            "/System/Library/Frameworks/CoreLocation.framework/Versions/A/CoreLocation",
+            "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation",
+            "/usr/lib/libcurl.4.dylib",
+            "/usr/lib/libz.1.dylib",
+            "/usr/lib/libbz2.1.0.dylib",
+            "/usr/lib/libiconv.2.dylib",
+            "/usr/lib/libxml2.2.dylib",
+            "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+            "/usr/lib/libobjc.A.dylib",
+            "/usr/lib/libSystem.B.dylib",
+            "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+            "/System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage",
+            "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia",
+            "/System/Library/Frameworks/CoreTransferable.framework/Versions/A/CoreTransferable",
+            "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo",
+            "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+            "/System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO",
+            "/System/Library/Frameworks/LocalAuthentication.framework/Versions/A/LocalAuthentication",
+            "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/libcompression.dylib",
+            "/usr/lib/swift/libswiftAVFoundation.dylib",
+            "/usr/lib/swift/libswiftCompression.dylib",
+            "/usr/lib/swift/libswiftCore.dylib",
+            "/usr/lib/swift/libswiftCoreAudio.dylib",
+            "/usr/lib/swift/libswiftCoreFoundation.dylib",
+            "/usr/lib/swift/libswiftCoreImage.dylib",
+            "/usr/lib/swift/libswiftCoreLocation.dylib",
+            "/usr/lib/swift/libswiftCoreMIDI.dylib",
+            "/usr/lib/swift/libswiftDarwin.dylib",
+            "/usr/lib/swift/libswiftDispatch.dylib",
+            "/usr/lib/swift/libswiftIOKit.dylib",
+            "/usr/lib/swift/libswiftMetal.dylib",
+            "/usr/lib/swift/libswiftOSLog.dylib",
+            "/usr/lib/swift/libswiftObjectiveC.dylib",
+            "/usr/lib/swift/libswiftObservation.dylib",
+            "/usr/lib/swift/libswiftQuartzCore.dylib",
+            "/usr/lib/swift/libswiftQuickLookUI.dylib",
+            "/usr/lib/swift/libswiftSpatial.dylib",
+            "/usr/lib/swift/libswiftSynchronization.dylib",
+            "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+            "/usr/lib/swift/libswiftXPC.dylib",
+            "/usr/lib/swift/libswift_Builtin_float.dylib",
+            "/usr/lib/swift/libswift_Concurrency.dylib",
+            "/usr/lib/swift/libswiftos.dylib",
+            "/usr/lib/swift/libswiftsimd.dylib",
+            "/usr/lib/swift/libswiftCoreMedia.dylib",
+            "/usr/lib/swift/libswift_errno.dylib",
+            "/usr/lib/swift/libswift_stdio.dylib",
+            "/usr/lib/swift/libswift_signal.dylib"
+          ],
+          "identifier": null,
+          "rpaths": [
+            "/usr/lib/swift"
+          ]
+        },
+        "Contents/Resources/.tools/bin/insert_dylib": {
+          "dependencies": [
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": null,
+          "rpaths": []
+        },
+        "Contents/Resources/.tools/bin/trustcache": {
+          "dependencies": [
+            "@loader_path/../../../Frameworks/libcrypto.3.dylib",
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": null,
+          "rpaths": []
+        }
+      },
+      "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-cli.app"
+    },
+    "launchpad_app": {
+      "embedded_cli": {
+        "cdhash": "bcd8f2789e80ffd08a1aa3fa8281b1bb8620b74c",
+        "entitlements": {},
+        "identifier": "com.vphone.cli",
+        "info_plist_binding": null,
+        "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-cli",
+        "sha256": "dfe2175c3899f6b013a855ba583bbe63bb95063385da91ba7a3e473736de0cd3"
+      },
+      "embedded_vm": {
+        "cdhash": "26a49260cdfea504e17202693802cd6c3a3574c6",
+        "entitlements": {
+          "com.apple.private.bmk.allow": true,
+          "com.apple.private.virtualization": true,
+          "com.apple.private.virtualization.security-research": true,
+          "com.apple.security.get-task-allow": true,
+          "com.apple.security.personal-information.location": true,
+          "com.apple.security.virtualization": true,
+          "com.apple.vm.networking": true
+        },
+        "identifier": "vphone-vm-555549442c7d8ac6a69b3048ab8b8805ef298593",
+        "info_plist_binding": "not bound",
+        "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-launchpad.app/Contents/Helpers/vphone-cli.app/Contents/MacOS/vphone-vm",
+        "sha256": "75229dd9e23dd3d5acdef50a162011f61d7c21888b5625f285badf27e62f2e52"
+      },
+      "executables": {
+        "Contents/MacOS/vphone-launchpad": {
+          "cdhash": "3ed38c2b8b63c0540f697b6e010eef839bf04b09",
+          "entitlements": {},
+          "identifier": "com.vphone.cli.launchpad",
+          "info_plist_binding": null,
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad",
+          "sha256": "c4f794f237cd74dc770be23439e5e854fbfee4c8a28f1acb6ac65e8f1e9d80e9"
+        },
+        "Contents/MacOS/vphone-launchpad-launcher": {
+          "cdhash": "e297fe7e047f86cffc409f828c5f60fc8ad6c00c",
+          "entitlements": {},
+          "identifier": "com.vphone.cli.launchpad.launcher",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-launchpad.app/Contents/MacOS/vphone-launchpad-launcher",
+          "sha256": "bd545a673517bf0683405eec6b8d6e3487927879d253e958a04032681eaa6755"
+        }
+      },
+      "full_signature_verified": true,
+      "info_plist": {
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "vphone-launchpad",
+        "CFBundleExecutable": "vphone-launchpad",
+        "CFBundleIconFile": "AppIcon",
+        "CFBundleIdentifier": "com.vphone.cli.launchpad",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleLocalizations": [
+          "en",
+          "zh-Hans"
+        ],
+        "CFBundleName": "vphone-launchpad",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1",
+        "LSApplicationCategoryType": "public.app-category.developer-tools",
+        "LSMinimumSystemVersion": "15.0",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "vphone-launchpad forwards your location to the guest VM for location simulation.",
+        "NSLocationUsageDescription": "vphone-launchpad forwards your location to the guest VM for location simulation.",
+        "NSLocationWhenInUseUsageDescription": "vphone-launchpad forwards your location to the guest VM for location simulation.",
+        "NSPrincipalClass": "NSApplication"
+      },
+      "native_closure": {
+        "Contents/MacOS/vphone-launchpad": {
+          "dependencies": [
+            "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+            "/System/Library/Frameworks/SwiftUI.framework/Versions/A/SwiftUI",
+            "/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization",
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/usr/lib/libz.1.dylib",
+            "/usr/lib/libbz2.1.0.dylib",
+            "/usr/lib/libiconv.2.dylib",
+            "/usr/lib/libxml2.2.dylib",
+            "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+            "/usr/lib/libobjc.A.dylib",
+            "/usr/lib/libSystem.B.dylib",
+            "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+            "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+            "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/swift/libswiftCore.dylib",
+            "/usr/lib/swift/libswiftCoreAudio.dylib",
+            "/usr/lib/swift/libswiftCoreFoundation.dylib",
+            "/usr/lib/swift/libswiftCoreImage.dylib",
+            "/usr/lib/swift/libswiftDarwin.dylib",
+            "/usr/lib/swift/libswiftDispatch.dylib",
+            "/usr/lib/swift/libswiftIOKit.dylib",
+            "/usr/lib/swift/libswiftMetal.dylib",
+            "/usr/lib/swift/libswiftOSLog.dylib",
+            "/usr/lib/swift/libswiftObjectiveC.dylib",
+            "/usr/lib/swift/libswiftObservation.dylib",
+            "/usr/lib/swift/libswiftQuartzCore.dylib",
+            "/usr/lib/swift/libswiftSpatial.dylib",
+            "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+            "/usr/lib/swift/libswiftXPC.dylib",
+            "/usr/lib/swift/libswift_Builtin_float.dylib",
+            "/usr/lib/swift/libswift_Concurrency.dylib",
+            "/usr/lib/swift/libswiftos.dylib",
+            "/usr/lib/swift/libswiftsimd.dylib",
+            "/usr/lib/swift/libswift_errno.dylib",
+            "/usr/lib/swift/libswift_signal.dylib"
+          ],
+          "identifier": null,
+          "rpaths": [
+            "/usr/lib/swift"
+          ]
+        },
+        "Contents/MacOS/vphone-launchpad-launcher": {
+          "dependencies": [
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization",
+            "/usr/lib/libz.1.dylib",
+            "/usr/lib/libbz2.1.0.dylib",
+            "/usr/lib/libiconv.2.dylib",
+            "/usr/lib/libxml2.2.dylib",
+            "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+            "/usr/lib/libobjc.A.dylib",
+            "/usr/lib/libSystem.B.dylib",
+            "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+            "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/swift/libswiftCore.dylib",
+            "/usr/lib/swift/libswiftCoreFoundation.dylib",
+            "/usr/lib/swift/libswiftCoreImage.dylib",
+            "/usr/lib/swift/libswiftDarwin.dylib",
+            "/usr/lib/swift/libswiftDispatch.dylib",
+            "/usr/lib/swift/libswiftIOKit.dylib",
+            "/usr/lib/swift/libswiftMetal.dylib",
+            "/usr/lib/swift/libswiftOSLog.dylib",
+            "/usr/lib/swift/libswiftObjectiveC.dylib",
+            "/usr/lib/swift/libswiftObservation.dylib",
+            "/usr/lib/swift/libswiftQuartzCore.dylib",
+            "/usr/lib/swift/libswiftSpatial.dylib",
+            "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+            "/usr/lib/swift/libswiftXPC.dylib",
+            "/usr/lib/swift/libswift_Builtin_float.dylib",
+            "/usr/lib/swift/libswift_Concurrency.dylib",
+            "/usr/lib/swift/libswiftos.dylib",
+            "/usr/lib/swift/libswiftsimd.dylib",
+            "/usr/lib/swift/libswift_errno.dylib",
+            "/usr/lib/swift/libswift_signal.dylib"
+          ],
+          "identifier": null,
+          "rpaths": [
+            "/usr/lib/swift"
+          ]
+        }
+      },
+      "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/vphone-launchpad.app"
+    },
+    "local_core_bundle": {
+      "executables": {
+        "Contents/MacOS/ldid": {
+          "cdhash": "6a6b9e62734a31c75068b29f24b477de3e4b6167",
+          "entitlements": {},
+          "identifier": "ldid-55554944974f87b50978373fba46a96528d8932e",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/core-candidate/VPhone.bundle/Contents/MacOS/ldid",
+          "sha256": "9142c180c353b107ff1394d73c51fc5c390327d6079a43d70f559200781da525"
+        },
+        "Contents/MacOS/vphone-cli": {
+          "cdhash": "e04ccdd5c0907a2d90ac8235e13aa773a0fe8d29",
+          "entitlements": {},
+          "identifier": "com.vphone.cli",
+          "info_plist_binding": null,
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/core-candidate/VPhone.bundle/Contents/MacOS/vphone-cli",
+          "sha256": "a674e77fb16aec51ab8d6e8444dde8e4b25d096c6e7cfc599a7329f83fbee100"
+        },
+        "Contents/MacOS/vphone-vm": {
+          "cdhash": "26a49260cdfea504e17202693802cd6c3a3574c6",
+          "entitlements": {
+            "com.apple.private.bmk.allow": true,
+            "com.apple.private.virtualization": true,
+            "com.apple.private.virtualization.security-research": true,
+            "com.apple.security.get-task-allow": true,
+            "com.apple.security.personal-information.location": true,
+            "com.apple.security.virtualization": true,
+            "com.apple.vm.networking": true
+          },
+          "identifier": "vphone-vm-555549442c7d8ac6a69b3048ab8b8805ef298593",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/core-candidate/VPhone.bundle/Contents/MacOS/vphone-vm",
+          "sha256": "75229dd9e23dd3d5acdef50a162011f61d7c21888b5625f285badf27e62f2e52"
+        },
+        "Contents/Resources/.tools/bin/insert_dylib": {
+          "cdhash": "3f8d6678abc69c95b4a9147ce9017bb7bdc95185",
+          "entitlements": {},
+          "identifier": "insert_dylib-55554944fa28619ff3743653ae4b2f935b9cc6a0",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/core-candidate/VPhone.bundle/Contents/Resources/.tools/bin/insert_dylib",
+          "sha256": "3e05098108b0969aabb56b050dadf5116e73a3d4bd4c2ae221e38c956030e7d6"
+        },
+        "Contents/Resources/.tools/bin/trustcache": {
+          "cdhash": "807834016102991c4ec491d7a74beaae3de448bf",
+          "entitlements": {},
+          "identifier": "trustcache-5555494467371348a433347d83f944b2f158fff1",
+          "info_plist_binding": "not bound",
+          "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/core-candidate/VPhone.bundle/Contents/Resources/.tools/bin/trustcache",
+          "sha256": "4b12acdaf277bd8e3fbf4d8c5918bc154cb71a0e0b3761afad852af814d66fdd"
+        }
+      },
+      "full_signature_verified": true,
+      "info_plist": {
+        "CFBundleExecutable": "vphone-cli",
+        "CFBundleIconFile": "AppIcon",
+        "CFBundleIdentifier": "com.vphone.cli",
+        "CFBundleName": "vphone-cli",
+        "CFBundlePackageType": "BNDL",
+        "CFBundleShortVersionString": "2.6.1",
+        "CFBundleVersion": "1",
+        "LSUIElement": true,
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+        "NSLocationUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+        "NSLocationWhenInUseUsageDescription": "vphone-cli forwards your location to the guest VM for location simulation.",
+        "VPhoneBoundLaunchProtocol": "vphone.local-bound-launch.v1"
+      },
+      "native_closure": {
+        "Contents/Frameworks/libcrypto.3.dylib": {
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": "@rpath/libcrypto.3.dylib",
+          "rpaths": []
+        },
+        "Contents/Frameworks/libplist-2.0.4.dylib": {
+          "dependencies": [
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": "@rpath/libplist-2.0.4.dylib",
+          "rpaths": []
+        },
+        "Contents/MacOS/ldid": {
+          "dependencies": [
+            "@loader_path/../Frameworks/libcrypto.3.dylib",
+            "@loader_path/../Frameworks/libplist-2.0.4.dylib",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": null,
+          "rpaths": []
+        },
+        "Contents/MacOS/vphone-cli": {
+          "dependencies": [
+            "/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization",
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+            "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+            "/System/Library/Frameworks/ServiceManagement.framework/Versions/A/ServiceManagement",
+            "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+            "/System/Library/Frameworks/SwiftUI.framework/Versions/A/SwiftUI",
+            "/System/Library/Frameworks/CoreLocation.framework/Versions/A/CoreLocation",
+            "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation",
+            "/usr/lib/libcurl.4.dylib",
+            "/usr/lib/libz.1.dylib",
+            "/usr/lib/libbz2.1.0.dylib",
+            "/usr/lib/libiconv.2.dylib",
+            "/usr/lib/libxml2.2.dylib",
+            "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+            "/usr/lib/libobjc.A.dylib",
+            "/usr/lib/libSystem.B.dylib",
+            "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+            "/System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage",
+            "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia",
+            "/System/Library/Frameworks/CoreTransferable.framework/Versions/A/CoreTransferable",
+            "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo",
+            "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+            "/System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO",
+            "/System/Library/Frameworks/LocalAuthentication.framework/Versions/A/LocalAuthentication",
+            "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/libcompression.dylib",
+            "/usr/lib/swift/libswiftAVFoundation.dylib",
+            "/usr/lib/swift/libswiftCompression.dylib",
+            "/usr/lib/swift/libswiftCore.dylib",
+            "/usr/lib/swift/libswiftCoreAudio.dylib",
+            "/usr/lib/swift/libswiftCoreFoundation.dylib",
+            "/usr/lib/swift/libswiftCoreImage.dylib",
+            "/usr/lib/swift/libswiftCoreLocation.dylib",
+            "/usr/lib/swift/libswiftCoreMIDI.dylib",
+            "/usr/lib/swift/libswiftDarwin.dylib",
+            "/usr/lib/swift/libswiftDispatch.dylib",
+            "/usr/lib/swift/libswiftIOKit.dylib",
+            "/usr/lib/swift/libswiftMetal.dylib",
+            "/usr/lib/swift/libswiftOSLog.dylib",
+            "/usr/lib/swift/libswiftObjectiveC.dylib",
+            "/usr/lib/swift/libswiftObservation.dylib",
+            "/usr/lib/swift/libswiftQuartzCore.dylib",
+            "/usr/lib/swift/libswiftQuickLookUI.dylib",
+            "/usr/lib/swift/libswiftSpatial.dylib",
+            "/usr/lib/swift/libswiftSynchronization.dylib",
+            "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+            "/usr/lib/swift/libswiftXPC.dylib",
+            "/usr/lib/swift/libswift_Builtin_float.dylib",
+            "/usr/lib/swift/libswift_Concurrency.dylib",
+            "/usr/lib/swift/libswiftos.dylib",
+            "/usr/lib/swift/libswiftsimd.dylib",
+            "/usr/lib/swift/libswiftCoreMedia.dylib",
+            "/usr/lib/swift/libswift_errno.dylib",
+            "/usr/lib/swift/libswift_stdio.dylib",
+            "/usr/lib/swift/libswift_signal.dylib"
+          ],
+          "identifier": null,
+          "rpaths": [
+            "/usr/lib/swift"
+          ]
+        },
+        "Contents/MacOS/vphone-vm": {
+          "dependencies": [
+            "/System/Library/Frameworks/Virtualization.framework/Versions/A/Virtualization",
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+            "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+            "/System/Library/Frameworks/ServiceManagement.framework/Versions/A/ServiceManagement",
+            "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+            "/System/Library/Frameworks/SwiftUI.framework/Versions/A/SwiftUI",
+            "/System/Library/Frameworks/CoreLocation.framework/Versions/A/CoreLocation",
+            "/System/Library/Frameworks/AVFoundation.framework/Versions/A/AVFoundation",
+            "/usr/lib/libcurl.4.dylib",
+            "/usr/lib/libz.1.dylib",
+            "/usr/lib/libbz2.1.0.dylib",
+            "/usr/lib/libiconv.2.dylib",
+            "/usr/lib/libxml2.2.dylib",
+            "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+            "/usr/lib/libobjc.A.dylib",
+            "/usr/lib/libSystem.B.dylib",
+            "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+            "/System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage",
+            "/System/Library/Frameworks/CoreMedia.framework/Versions/A/CoreMedia",
+            "/System/Library/Frameworks/CoreTransferable.framework/Versions/A/CoreTransferable",
+            "/System/Library/Frameworks/CoreVideo.framework/Versions/A/CoreVideo",
+            "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+            "/System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO",
+            "/System/Library/Frameworks/LocalAuthentication.framework/Versions/A/LocalAuthentication",
+            "/System/Library/Frameworks/QuickLookUI.framework/Versions/A/QuickLookUI",
+            "/usr/lib/libc++.1.dylib",
+            "/usr/lib/libcompression.dylib",
+            "/usr/lib/swift/libswiftAVFoundation.dylib",
+            "/usr/lib/swift/libswiftCompression.dylib",
+            "/usr/lib/swift/libswiftCore.dylib",
+            "/usr/lib/swift/libswiftCoreAudio.dylib",
+            "/usr/lib/swift/libswiftCoreFoundation.dylib",
+            "/usr/lib/swift/libswiftCoreImage.dylib",
+            "/usr/lib/swift/libswiftCoreLocation.dylib",
+            "/usr/lib/swift/libswiftCoreMIDI.dylib",
+            "/usr/lib/swift/libswiftDarwin.dylib",
+            "/usr/lib/swift/libswiftDispatch.dylib",
+            "/usr/lib/swift/libswiftIOKit.dylib",
+            "/usr/lib/swift/libswiftMetal.dylib",
+            "/usr/lib/swift/libswiftOSLog.dylib",
+            "/usr/lib/swift/libswiftObjectiveC.dylib",
+            "/usr/lib/swift/libswiftObservation.dylib",
+            "/usr/lib/swift/libswiftQuartzCore.dylib",
+            "/usr/lib/swift/libswiftQuickLookUI.dylib",
+            "/usr/lib/swift/libswiftSpatial.dylib",
+            "/usr/lib/swift/libswiftSynchronization.dylib",
+            "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+            "/usr/lib/swift/libswiftXPC.dylib",
+            "/usr/lib/swift/libswift_Builtin_float.dylib",
+            "/usr/lib/swift/libswift_Concurrency.dylib",
+            "/usr/lib/swift/libswiftos.dylib",
+            "/usr/lib/swift/libswiftsimd.dylib",
+            "/usr/lib/swift/libswiftCoreMedia.dylib",
+            "/usr/lib/swift/libswift_errno.dylib",
+            "/usr/lib/swift/libswift_stdio.dylib",
+            "/usr/lib/swift/libswift_signal.dylib"
+          ],
+          "identifier": null,
+          "rpaths": [
+            "/usr/lib/swift"
+          ]
+        },
+        "Contents/Resources/.tools/bin/insert_dylib": {
+          "dependencies": [
+            "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": null,
+          "rpaths": []
+        },
+        "Contents/Resources/.tools/bin/trustcache": {
+          "dependencies": [
+            "@loader_path/../../../Frameworks/libcrypto.3.dylib",
+            "/usr/lib/libSystem.B.dylib"
+          ],
+          "identifier": null,
+          "rpaths": []
+        }
+      },
+      "path": "/Users/kolar/.codex/worktrees/t08-roothide/vphone-cli/.build/research-b39/core-candidate/VPhone.bundle"
+    }
+  },
+  "implementation_commit": "3f50c591add2d8af6d9aceeb60db2be8ef05f365",
+  "packaging_info_changes": {
+    "CFBundlePackageType": {
+      "new": "BNDL",
+      "old": "APPL"
+    },
+    "CFBundleShortVersionString": {
+      "new": "2.6.1",
+      "old": "1.0"
+    }
+  },
+  "source": {
+    "base_commit": "2c119ae60996ddd59783327b063a2a4aeeb297b1",
+    "inputs_sha256": {
+      "Package.resolved": "8ec7fc111e1c962e417a94211bc2fb1c821948e798fd734d5ee65e6c540bfe46",
+      "Package.swift": "64ea48ef67c1312f3b7c983faddbe585d0aa206def4ef357e2ceb8f8690e0988",
+      "sources/Info.plist": "931d5ca082e233f188cf3861d910f15af7d29b58f1f0e26cb7f80bc6a620bbaf",
+      "sources/VPhoneBundleStore/VPhoneBundleReceipt.swift": "a362dabeeca88ed74850804195b275c74a27552b603bb8c0c558b59df9275c2a",
+      "sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift": "6dcb7ba77c7b2ed7175e1d51287e1e4a6334f0ae80149237ed237ed8557040df",
+      "sources/vphone-cli/VPhoneVMLaunchCLI.swift": "e34297945400e7522d6e471730390c6167f88f4bb84bb824e83435ac37311c96",
+      "sources/vphone.entitlements": "657fabfa12fceb85931fec7c432f2472c269bce8ae2297591c1dc0d2a7161fe0"
+    },
+    "production_diff_sha256": "37ee61eda127bdf947c5d154eddf56b2749adbfbc93e3903480a30f97700a5df"
+  },
+  "source_digest": "f183c705c87b2b3d11bb3e6eeefcb8543464eca70865c79c85bab129d5233549",
+  "store_target": "/Library/Application Support/vphone-launchpad/Bundles/2.6.1-local.f183c705c87b",
+  "version": "2.6.1-local.f183c705c87b",
+  "version_provenance": "B39 research packaging identifier; not an upstream release claim"
+}

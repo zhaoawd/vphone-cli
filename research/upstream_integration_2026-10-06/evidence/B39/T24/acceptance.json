@@ -1,0 +1,255 @@
+{
+  "task": "T24",
+  "batch": "B39",
+  "state": "offline_complete_runtime_pending_approval",
+  "base_commit": "2c119ae60996ddd59783327b063a2a4aeeb297b1",
+  "implementation": "Known signed local launch protocol accepts CLI/VM layout without escalator; legacy still requires escalator; ownership/signature/receipt unchanged",
+  "directed_swift_tests": {
+    "passed": 52,
+    "failed": 0,
+    "source": "layout-final-retry.txt.gz"
+  },
+  "actual_signed_host_archive": {
+    "passed": 1,
+    "test_root_only": true,
+    "source": "frozen-host-layout.txt.gz"
+  },
+  "attribution_filter_tests": {
+    "passed": 4,
+    "failed": 0
+  },
+  "full_tcc_direct_cli": "not_run",
+  "full_tcc_launchpad_launcher_store": "not_run",
+  "system_store_install": "not_run",
+  "source_maintenance": "not_run",
+  "new_scoped_amfi": "not_run",
+  "vm_help": {
+    "exit": -9,
+    "cause": "unknown; no exact candidate path event in queried 5-minute AMFI log window"
+  },
+  "minimum_recorded_free_bytes": 274325315584,
+  "disk_floor_bytes": 5368709120,
+  "native_image_counts": {
+    "cli_app": 7,
+    "launchpad_outer": 2,
+    "launchpad_embedded_cli_app": 7,
+    "local_core_bundle": 7
+  },
+  "python": {
+    "locked_probe": "passed",
+    "external_framework_and_packages_byte_closure": "not_verified"
+  },
+  "approvals": "requested_and_pending",
+  "frozen_version": "2.6.1-local.f183c705c87b",
+  "archive_sha256": "3bae87c809c93e3868a0a77c3bc00a5c1bc3a789fc3292487bfd8da3f22d6552",
+  "results": {
+    "signed-host-result": {
+      "command": [
+        "zsh",
+        "scripts/build.sh",
+        "--no-vphoned"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 76.58708687499166,
+      "minimum_free_bytes": 274333949952,
+      "final_free_bytes": 274384629760
+    },
+    "scoped-amfi-check-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "research/upstream_integration_2026-10-06/evidence/B39/T24/scoped_amfi.py",
+        "--check"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 0.5068608748260885,
+      "minimum_free_bytes": 277054881792,
+      "final_free_bytes": 277054873600
+    },
+    "locked-python-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        ".build/vphone-cli.app/Contents/Resources/scripts/check_python_runtime.py",
+        "--locked",
+        "--json"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 2.0149887087754905,
+      "minimum_free_bytes": 277102219264,
+      "final_free_bytes": 277102354432
+    },
+    "layout-red-result": {
+      "command": [
+        "swift",
+        "test",
+        "--disable-sandbox",
+        "--cache-path",
+        ".build/research-b39/swiftpm-cache",
+        "--filter",
+        "LocalBundleLayoutTests"
+      ],
+      "exit": -15,
+      "reason": "completed",
+      "seconds": 63.50452295783907,
+      "minimum_free_bytes": 275530354688,
+      "final_free_bytes": 275529797632
+    },
+    "vm-help-result": {
+      "command": [
+        ".build/vphone-cli.app/Contents/MacOS/vphone-vm",
+        "--help"
+      ],
+      "exit": -9,
+      "reason": "completed",
+      "seconds": 0.09411925007589161,
+      "minimum_free_bytes": 277367689216,
+      "final_free_bytes": 277367685120
+    },
+    "bundle-probe-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "scripts/check_bundle.py",
+        ".build/vphone-cli.app",
+        "--execute"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 1.0031559159979224,
+      "minimum_free_bytes": 277054840832,
+      "final_free_bytes": 277054054400
+    },
+    "freeze-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "research/upstream_integration_2026-10-06/evidence/B39/T24/freeze_candidates.py"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 2.516905792057514,
+      "minimum_free_bytes": 277137920000,
+      "final_free_bytes": 277138173952
+    },
+    "frozen-host-layout-result": {
+      "command": [
+        "swift",
+        "test",
+        "--disable-sandbox",
+        "--force-resolved-versions",
+        "--cache-path",
+        ".build/research-b39/swiftpm-cache",
+        "--filter",
+        "FrozenLocalHostBundleTests|LocalBundleLayoutTests"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 9.06038804189302,
+      "minimum_free_bytes": 276836057088,
+      "final_free_bytes": 277075525632
+    },
+    "signed-launchpad-result": {
+      "command": [
+        "zsh",
+        "scripts/build_launchpad.sh"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 20.82829837501049,
+      "minimum_free_bytes": 274528862208,
+      "final_free_bytes": 274528866304
+    },
+    "attribution-filter-tests-result": {
+      "command": [
+        "/Users/kolar/github/vphone-cli/.venv/bin/python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "research/upstream_integration_2026-10-06/evidence/B39/T24",
+        "-p",
+        "test_attribution_filter.py",
+        "-v"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 0.5066676668357104,
+      "minimum_free_bytes": 277056622592,
+      "final_free_bytes": 277056598016
+    },
+    "layout-final-retry-result": {
+      "command": [
+        "swift",
+        "test",
+        "--disable-sandbox",
+        "--force-resolved-versions",
+        "--cache-path",
+        ".build/research-b39/swiftpm-cache",
+        "--filter",
+        "LocalBundleLayoutTests|CoreBundleStoreTests|LauncherPolicyTests|LaunchRouteTests|ExpectedBindingCLITests|ToolchainTests"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 7.623058582888916,
+      "minimum_free_bytes": 274526191616,
+      "final_free_bytes": 274527711232
+    },
+    "layout-final-result": {
+      "command": [
+        "swift",
+        "test",
+        "--disable-sandbox",
+        "--force-resolved-versions",
+        "--cache-path",
+        ".build/research-b39/swiftpm-cache",
+        "--filter",
+        "LocalBundleLayoutTests|CoreBundleStoreTests|LauncherPolicyTests|LaunchRouteTests|ExpectedBindingCLITests|ToolchainTests"
+      ],
+      "exit": 1,
+      "reason": "completed",
+      "seconds": 46.84149249992333,
+      "minimum_free_bytes": 274325315584,
+      "final_free_bytes": 274375979008
+    },
+    "layout-green-result": {
+      "command": [
+        "swift",
+        "test",
+        "--disable-sandbox",
+        "--force-resolved-versions",
+        "--cache-path",
+        ".build/research-b39/swiftpm-cache",
+        "--filter",
+        "LocalBundleLayoutTests|CoreBundleStoreTests|LauncherPolicyTests|LaunchRouteTests|ExpectedBindingCLITests|ToolchainTests"
+      ],
+      "exit": 0,
+      "reason": "completed",
+      "seconds": 15.615583000006154,
+      "minimum_free_bytes": 275480944640,
+      "final_free_bytes": 275491938304
+    },
+    "layout-red-pinned-result": {
+      "command": [
+        "swift",
+        "test",
+        "--disable-sandbox",
+        "--force-resolved-versions",
+        "--cache-path",
+        ".build/research-b39/swiftpm-cache",
+        "--filter",
+        "LocalBundleLayoutTests"
+      ],
+      "exit": 1,
+      "reason": "completed",
+      "seconds": 25.189226999878883,
+      "minimum_free_bytes": 275441938432,
+      "final_free_bytes": 275513032704
+    }
+  },
+  "implementation_commit": "3f50c591add2d8af6d9aceeb60db2be8ef05f365"
+}

@@ -113,3 +113,10 @@
 - 真实 helper 注册、SMJobBless、生产 Core Bundle 安装与跨 UID 读取（按 9 月 30 日决定继续暂缓）。接受时 audit token 复核只在匿名 listener 与自身 token 上测试，未经 launchd 特权 helper 实测。
 - 以 sudo 运行的真实 CFW 安装中的所有权恢复（测试使用 chown 替身与非 root 临时目录，未覆盖 root 所有条目）。
 - 上游 2.2.x Core Bundle 发布包在本地存储中的安装。
+
+
+## 2026-10-11 B39：本地协议布局与实际TCC准备
+
+当前本地签名Bundle声明vphone.local-bound-launch.v1且没有escalator；原store布局无条件要求escalator，导致安装拒绝。store与VM入口现共享协议常量；仅已知协议且CFBundleExecutable为vphone-cli的本地布局要求CLI/VM，无marker旧布局继续要求escalator。未知marker、错误主程序拒绝；严格owner/链接/ACL/架构/签名/receipt及锁定执行要求保持。本文前述2026-10-01的三程序要求是该日期的历史实现。
+
+B39通过52项定向Swift回归、实际签名宿主归档private testRoot安装复验1项及4项脱敏回归；签名CLI/Launchpad、宿主Mach-O依赖和资源解析、外部Python版本锁探针通过。实际系统store、两条GUI TCC路线尚未执行。新VM --help为SIGKILL终止，当前日志未确认原因；已有AMFI会话占用系统amfid，所需临时替换与恢复及新版本系统安装、源维护、定位授权须本轮明确批准。具体证据与限制见research/upstream_integration_2026-10-06/evidence/B39/T24/REPORT.md及vm-validation-plan.md。T24保持完整TCC待验。

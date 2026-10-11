@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/usr/bin/log",
+    "show",
+    "--last",
+    "5m",
+    "--info",
+    "--debug",
+    "--style",
+    "ndjson",
+    "--predicate",
+    "(process == \"amfid\" OR process == \"kernel\") AND (eventMessage CONTAINS \"vphone-vm\")"
+  ],
+  "exit": 0,
+  "candidate_events": []
+}

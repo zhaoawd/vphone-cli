@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/usr/bin/log",
+    "show",
+    "--last",
+    "2m",
+    "--style",
+    "ndjson",
+    "--info",
+    "--debug",
+    "--predicate",
+    "process == \"tccd\" OR process == \"locationd\""
+  ],
+  "exit": 0,
+  "filter_exit": 0,
+  "stderr": "",
+  "events": 0,
+  "scope": "只读既有日志；未请求或改变定位权限，未保存原消息。"
+}
