@@ -21,6 +21,7 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
     public let applyFrida: Bool
     /// Absent on historical/default reports to preserve their selection identity.
     public let experimentalV2RootRemount: Bool?
+    public let guestEnvironmentV2: Bool?
 
     public init(
         variant: String,
@@ -32,7 +33,8 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
         excGuardActive: Bool,
         applyIOS27: Bool,
         applyFrida: Bool,
-        experimentalV2RootRemount: Bool = false
+        experimentalV2RootRemount: Bool = false,
+        guestEnvironmentV2: Bool? = nil
     ) {
         self.variant = variant
         self.iosBaseIs18 = iosBaseIs18
@@ -44,6 +46,7 @@ public struct PatchGateSnapshot: Codable, Sendable, Equatable {
         self.applyIOS27 = applyIOS27
         self.applyFrida = applyFrida
         self.experimentalV2RootRemount = experimentalV2RootRemount ? true : nil
+        self.guestEnvironmentV2 = guestEnvironmentV2
     }
 
     /// Compact one-line description used in `notApplicable` reasons.

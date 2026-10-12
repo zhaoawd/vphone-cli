@@ -2,7 +2,7 @@
 // Sources: research/t09_patch_id_mapping_2026-10-01.json and
 // research/upstream_integration_2026-10-06/T09_declaration_delta.json.
 // Canonical IDs also require reviewed T09_target_applicability.json decisions.
-// The two less IDs remain local. Recognition alone never enables execution.
+// The less and guest installation IDs remain local. Recognition alone never enables execution.
 
 extension PatchSelectionMigration {
     static let aliases: [String: String] = [
@@ -242,14 +242,23 @@ extension PatchSelectionMigration {
         "preboot-cfw-devicetree_iphone_product",
         "preboot-cfw-devicetree_microphone_array",
         "preboot-exp-devicetree_identity",
+        "preboot-exp-vcam-install",
+        "preboot-jb-bootstrap-install",
+        "preboot-jb-tweakloader-install",
         "system-campo-cfw-entitlements",
+        "system-cryptex-boot-install",
         "system-debugserver-cfw-install",
         "system-diskimagesiod-cfw-is_mount_complete",
         "system-extensions-boot-gpu_bundle",
         "system-gigalocker-boot-rename",
+        "system-iosbinpack-boot-install",
+        "system-jb-basebin-install",
+        "system-jb-firstboot-install",
         "system-launchd-boot-jetsam_panic_guard_bypass",
+        "system-launchd-jb-hook",
         "system-launchd_cache_loader-boot-unsecure_cache_gate",
         "system-launchdaemons-boot-environment",
+        "system-launchdaemons-boot-install",
         "system-mobileactivationd-boot-should_hactivate",
         "system-seputil-boot-gigalocker_uuid",
         "system-systemversion-cfw-build_version",

@@ -1290,3 +1290,15 @@ B38 保留 classic `/usr/bin/vphoned`、1337 控制和 256 字节相机头。新
 root-remount 仅在显式 regular-v2 实验路径启用，默认关闭，调用已有 `KernelJBPatcher.mountOnly` 路径。固件事务同时记录实验选项、冻结 plan、versionInputs 和 planBinding；未改写既有内核补丁算法。旧检查点省略新增可选字段时保持摘要兼容。
 
 本轮 `make test_python`（679 项、无跳过）、`make test_swift`、现代组件构建及完整签名 app 构建通过；完整夹具下的 `make test_firmware` 共 15 项、12 个 suite 通过；不能据此确定恢复、启动、重挂或应用功能。Python 最终复跑与签名构建结果记录在 `research/handoff_merge_2026-10-12.md`。本轮未部署候选或启动 VM，历史验收保留原日期和组合范围。
+
+## 2026-10-13：Task 5 guest 写入使用冻结计划
+
+固定上游仍为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。Swift 向现有 CFW Python/zsh 入口传递当前已验证 desired record 的原始字节摘要、semantic planDigest、VM/磁盘/generation/catalog 身份及实际 variant/profile。写入入口再次验证同一记录、写锁、私有暂存目录和证据文件；未知声明、未声明目标、变更计划、模式覆盖和旧 nil profile 均拒绝新增写入。直接 Python 写入也拒绝符号链接父目录。
+
+本轮新增 9 个本地 guest 安装声明，保留固定上游 141 个声明及 2 个 local less 声明的来源区分，共 152 个 canonical ID。安装目标表由 `scripts/generate_guest_target_rules.py` 从明确路径及内置归档成员生成，SHA256 为 `7ac7230b7c075388d0d0dd2822acf896a82244e95f844e3faff451c3f190ba2f`；摘要进入冻结 recordRules。`guestEnvironmentV2` 为可选冻结字段，旧 nil 保持原编码但不获得新执行资格。less 仅通过已选 filesystem 声明授权已有三个 Python 子操作。EXP 专属声明继续受 EXP 范围约束；既有二进制补丁算法未改变。
+
+Cryptex OS/App 分别作为两个精确完整目录树目标：原始镜像绑定 generation，未知来源缓存通过受控生成过程重建，挂载关系及完整拷贝成员读回需一致。操作证据记录声明、精确目标、实际前后摘要及同一 planDigest。该证据不等同于 Task6 component receipt 或最终应用结果；atomic Disk.img 交换后的身份重绑仍依赖 Task10。
+
+最终命令、源码清单及原始日志的 gzip/SHA256 索引见 `research/evidence/2026-10-13-task5-frozen-guest/manifest.json`。合成目录树和命令替身测试不能证明真实镜像安装、恢复或启动成功。本轮未进行真实 mount、VM、AMFI/TCC 或系统安装操作；最终冻结工件的真实验收仍属 Task12。
+
+本轮相关 Swift 58 项/5套通过，最终受影响 Python 41 项通过，三个生成器及六个 zsh 语法检查通过。完整 Python 运行 704 项，保留 3 个旧夹具失败和 3 个环境跳过的原始结果；三个失败在随后受影响 41 项测试中修正并通过，完整套件未重复。不能将该记录表述为完整标准套件全通过。

@@ -36,7 +36,7 @@ set -euo pipefail
 SCRIPT_DIR="${0:a:h}"
 PROJ="${SCRIPT_DIR:h}"
 
-VARIANT=exp
+VARIANT="${VPHONE_CFW_VARIANT:-}"
 MODE=install
 GUEST_ENVIRONMENT=classic
 GUEST_ENVIRONMENT_GIVEN=0
@@ -98,6 +98,12 @@ V2_RECORD_PATTERN='"guest_environment"[[:space:]]*:[[:space:]]*"v2"'
 if [[ "$MODE" == install && "$GUEST_ENVIRONMENT" == classic && -f "$VM_DIR/restore-info.json" ]] \
     && [[ "$(<"$VM_DIR/restore-info.json")" =~ $V2_RECORD_PATTERN ]]; then
   echo "[-] this VM records v2; reinstall with --guest-environment v2" >&2; exit 1
+fi
+
+# A direct script invocation cannot invent defaults or bypass Swift validation.
+if [[ "$MODE" != check ]]; then
+  [[ -n "$VARIANT" && "$VARIANT" == "${VPHONE_CFW_VARIANT:-}" ]] || { echo "[-] variant differs from bound frozen plan" >&2; exit 1; }
+  "${VPHONE_PYTHON:-$PROJ/.venv/bin/python3}" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 fi
 
 # Re-exec as root; owners-honored mounts + chown/cp require it.
@@ -189,6 +195,7 @@ if ! "$PY" "$SCRIPT_DIR/vm_lock.py" --check-inherited "$VM_DIR"; then
   export VPHONE_CFW_LOCK_REEXEC=1
   exec "$PY" "$SCRIPT_DIR/vm_lock.py" "$VM_DIR" cfw -- /bin/zsh "$0" "${MODE_ARGS[@]}" "$VM_DIR"
 fi
+"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 GUEST_COMPONENTS="${VPHONE_GUEST_COMPONENTS:-$PROJ/.build/guest-components-v2/stage}"
 API_DAEMON="${VPHONE_API_DAEMON:-$PROJ/.build/daemon-api-v2/candidate-v2}"
 
@@ -277,6 +284,7 @@ hand_back_artifacts() {
 exec {DISK_FD}<"$IMG"
 CFW_DISK_WORK=$(mktemp -d "$VM_DIR/.cfw_disk.XXXXXXXX")
 CFW_STAGED_IMG=""
+export VPHONE_GUEST_EVIDENCE="$CFW_DISK_WORK/guest-changes.jsonl"
 TXN_STATE=none
 txn() {
   local command="$1"; shift
@@ -450,6 +458,7 @@ if [[ "$MODE" != environment ]]; then
 fi
 
 echo "[*] publishing the staged copy as $IMG (exchange rename)..."
+"$PY" "$SCRIPT_DIR/patchers/plan_gate.py" entry "${0:t}" || exit $?
 txn publish || exit $?
 TXN_STATE=published
 trap - EXIT INT TERM HUP

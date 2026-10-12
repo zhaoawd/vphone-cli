@@ -1021,6 +1021,10 @@ public struct VPhoneCreateOrchestrator {
     func runCFWInstall(options: VPhoneCreateEffectiveOptions, runtime: VPhoneCreateRuntime, bundleURL: URL) throws {
         let v = runtime.verbosity
         let sudoEnvExtras = runtime.sudoEnvExtras
+        let frozen = try VPhoneBundleGuard.withBundleLock(directory: bundleURL, operation: VPhoneVMOperation.cfwRecord) { _ in
+            try VPhoneCFWFrozenContext.prepare(in: bundleURL, requestedVariant: options.variant,
+                guestEnvironment: options.effectiveGuestEnvironment.rawValue, spoofBuild: options.spoofBuild ?? "")
+        }
         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.debsCacheDir, withIntermediateDirectories: true)
@@ -1032,6 +1036,7 @@ public struct VPhoneCreateOrchestrator {
             "VPHONE_GUEST_COMPONENTS": resources.guestComponentsStage.path,
             "PYTHONDONTWRITEBYTECODE": "1",
         ]
+        scriptEnv.merge(try frozen.environment) { _, bound in bound }
         if let spoofBuild = options.spoofBuild { scriptEnv["SPOOF_BUILD"] = spoofBuild }
         if options.forceDscMaxSlide { scriptEnv["FORCE_DSC_MAXSLIDE"] = "1" }
         if options.enableFrida { scriptEnv["VPHONE_FRIDA"] = "1" }

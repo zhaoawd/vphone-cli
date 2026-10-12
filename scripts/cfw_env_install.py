@@ -83,7 +83,7 @@ def daemon_candidate(directory, profile):
 
 
 def install_mounted(root, vm, components, daemon, report_path, *, variant='regular',
-                    owner=(0, 0), runner=run_command, transaction_id=None):
+                    owner=(0, 0), runner=run_command, transaction_id=None, frozen_plan=None):
     root, vm, components, daemon, report_path = map(Path, (root, vm, components, daemon, report_path))
     root = root.resolve()
     record = {'schema': SCHEMA, 'profile': 'v2', 'variant': variant, 'result': 'failed',
@@ -143,18 +143,33 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
     def write(relative, data, mode):
         path = target_path(root, relative)
         previous = environment.sha256_path(path) if path.is_file() and not path.is_symlink() else None
+        if frozen_plan is not None:
+            from patchers import plan_gate as gate
+            target = 'system:/' + relative.lstrip('/')
+            gate.authorize(frozen_plan, 'system-launchdaemons-boot-environment', target)
+            actual_before = gate.snapshot(path)
         atomic_write(path, data, mode, owner)
+        if frozen_plan is not None:
+            gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', target, path, actual_before, gate.snapshot(path))
         record['files'].append({'path': '/' + relative.lstrip('/'), 'before': previous,
                                 'after_sha256': environment.sha256_path(path), 'mode': f'{mode:04o}',
                                 'owner': f'{owner[0]}:{owner[1]}'})
 
+    (vm / '.cfw_temp').mkdir(mode=0o700, exist_ok=True)
     try:
         for entry in manifest['libraries']:
             write(entry['guest'], Path(expected[entry['name']]['source']).read_bytes(), 0o755)
         alias = root / manifest['load_alias']['path']
         if not os.path.lexists(alias):
+            if frozen_plan is not None:
+                from patchers import plan_gate as gate
+                target = 'system:/' + manifest['load_alias']['path'].lstrip('/')
+                gate.authorize(frozen_plan, 'system-launchdaemons-boot-environment', target)
+                actual_before = gate.snapshot(alias)
             os.symlink(manifest['load_alias']['target'], alias)
             os.lchown(alias, *owner)
+            if frozen_plan is not None:
+                gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', target, alias, actual_before, gate.snapshot(alias))
         before_loads = environment.dylib_loads(launchd)
         launchd_before = environment.sha256_path(launchd)
         entitlements = command(runner, ['ldid', '-e', launchd])
@@ -164,7 +179,7 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
             backup = root / (manifest['launchd'] + '.bak')
             if not os.path.lexists(backup):
                 write(manifest['launchd'] + '.bak', launchd.read_bytes(), 0o755)
-            with tempfile.TemporaryDirectory(prefix='.vphone-launchd-', dir=launchd.parent) as temp:
+            with tempfile.TemporaryDirectory(prefix='.vphone-launchd-', dir=vm / '.cfw_temp') as temp:
                 patched = Path(temp) / 'launchd'
                 patched.write_bytes(launchd.read_bytes())
                 patched.chmod(0o755)
@@ -187,7 +202,7 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
         write(api['program'], (daemon / 'vphoned').read_bytes(), 0o755)
         write(api['plist'], (daemon / 'vphoned-api.plist').read_bytes(), 0o644)
         plist_before = environment.sha256_path(target_plist)
-        with tempfile.TemporaryDirectory(prefix='.vphone-daemon-', dir=target_plist.parent) as temp:
+        with tempfile.TemporaryDirectory(prefix='.vphone-daemon-', dir=vm / '.cfw_temp') as temp:
             injected = Path(temp) / 'launchd.plist'
             injected.write_bytes(target_plist.read_bytes())
             inject_daemon(injected, daemon / 'vphoned-api.plist', api['launchd_key'])
@@ -223,15 +238,22 @@ def main(argv=None):
     parser.add_argument('--variant', default='regular')
     parser.add_argument('--transaction-id')
     args = parser.parse_args(argv)
+    from patchers import plan_gate as gate
+    plan = gate.from_environment()
+    gate.validate_entry(plan, 'cfw_install_host.sh')
+    if plan.context['guestEnvironment'] != 'v2' or args.variant != plan.context['variant']:
+        raise environment.Refused('v2 install mode/profile differs from frozen plan')
+    gate.require_write_context(plan)
     vm = Path(args.vm).resolve(strict=True)
     mountpoint = Path(args.mount)
     if vm not in mountpoint.resolve().parents:
         raise environment.Refused(f'mountpoint {mountpoint} must be inside {vm}')
+    if str(vm) != plan.context['vmDirectory']: raise environment.Refused('v2 install VM differs from frozen plan')
     mountpoint.mkdir(mode=0o700, exist_ok=True)
     environment.mount_volume(args.device, mountpoint, readonly=False)
     try:
         return install_mounted(mountpoint, vm, args.components, args.daemon, args.report,
-                               variant=args.variant, transaction_id=args.transaction_id)
+                               variant=args.variant, transaction_id=args.transaction_id, frozen_plan=plan)
     finally:
         try:
             environment.unmount(mountpoint)

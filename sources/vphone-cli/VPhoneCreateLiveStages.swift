@@ -172,7 +172,8 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
                 defer { try? FirmwareGeneration.discard(prepared) }
                 let plan = try FirmwarePipeline(vmDirectory: bundleURL, variant: variant.pipelineVariant,
                     verbose: false, enableFrida: options.enableFrida,
-                    experimentalV2RootRemount: options.experimentalV2RootRemount == true).resolvedPlan()
+                    experimentalV2RootRemount: options.experimentalV2RootRemount == true,
+                    guestEnvironmentV2: options.effectiveGuestEnvironment == .v2).resolvedPlan()
                 let generation = try FirmwareGeneration.publish(prepared, planSHA256: FirmwareGeneration.planDigest(plan))
                 let desired = try FirmwareDesiredPlanStore.prepare(in: bundleURL, plan: plan, generation: generation)
                 _ = try FirmwareDesiredPlanStore.publish(desired, expectedSHA256: desired.expectedSHA256)

@@ -113,6 +113,12 @@ public enum VariantPlanResolver {
         if gates.experimentalV2RootRemount == true, variant != .regular {
             throw PatcherError.invalidFormat("experimental v2 root remount requires variant regular")
         }
+        guard !guestEnvironmentV2 || gates.guestEnvironmentV2 == true else {
+            throw PatcherError.invalidFormat("guest environment v2 must be frozen in gates")
+        }
+        guard gates.guestEnvironmentV2 != true || variant == .regular else {
+            throw PatcherError.invalidFormat("guest environment v2 requires regular")
+        }
         try PatchDeclarationCatalog.validateStructure(catalog)
         guard gates.variant == variant.rawValue else {
             throw PatchDeclarationCatalog.CatalogError.variantMismatch(
@@ -162,7 +168,7 @@ public enum VariantPlanResolver {
                     throw PatchDeclarationCatalog.CatalogError.guestOverrideUnsupported(id: declaration.id)
                 }
                 if declaration.variants.contains(variantName) {
-                    if declaration.optIn == .guestEnvironmentV2 && !guestEnvironmentV2 {
+                    if declaration.optIn == .guestEnvironmentV2 && gates.guestEnvironmentV2 != true {
                         excludedByOptIn.append(entry(declaration, .excludedByOptIn, "needs guest environment v2 opt-in"))
                         continue
                     }
@@ -171,7 +177,7 @@ public enum VariantPlanResolver {
                         continue
                     }
                     guestUncovered.append(entry(declaration, .guestUncovered,
-                        "guest Python/zsh step: declaration-only this round, execution not gated"))
+                        "guest Python/zsh declaration frozen; execution requires exact target evidence"))
                 }
                 continue
             case .swift:

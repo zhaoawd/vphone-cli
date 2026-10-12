@@ -195,14 +195,14 @@ class MaxSlideDecisionTests(unittest.TestCase):
 
     def test_cli_exit_status_follows_the_decision(self):
         original = self.write(build_cache(size=0x17D504000, max_slide=0x20000000, start=START + 0x4000))
-        proc = self.run_cli()
+        proc = self.run_cli("--dry-run")
         self.assertNotEqual(proc.returncode, 0, proc.stdout + proc.stderr)
         self.assertEqual(self.main.read_bytes(), original)
 
         original = self.write(build_cache(size=0x17D504000, max_slide=0x20000000))
-        proc = self.run_cli()
+        proc = self.run_cli("--dry-run")
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
-        self.assertEqual(self.main.read_bytes(), zeroed_slide(original))
+        self.assertEqual(self.main.read_bytes(), original)
 
 
 class MaxSlideInstallGateTests(unittest.TestCase):

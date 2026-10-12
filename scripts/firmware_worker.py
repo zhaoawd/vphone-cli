@@ -42,7 +42,8 @@ def main():
         signal.signal(signal.SIGINT, forward)
         signal.signal(signal.SIGTERM, forward)
         child = subprocess.Popen(command, cwd=transaction / "work", stdin=subprocess.DEVNULL,
-                                 start_new_session=True)
+                                 start_new_session=True, pass_fds=(fd,),
+                                 env=dict(os.environ, VPHONE_FIRMWARE_WORKER_FD=str(fd)))
         for signum in pending_signals:
             forward(signum, None)
         code = child.wait()

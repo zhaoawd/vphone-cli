@@ -139,6 +139,17 @@ if __name__ == '__main__':
     if sys.argv[1] == 'umount':
         sys.exit(umount(sys.argv[2]))
     module = load(sys.argv[1])
+    # Disk-transaction tests isolate mount/publication with command doubles.
+    # The real Swift -> Python -> zsh capability chain is covered separately.
+    if sys.argv[2] in ('apply', 'install'):
+        from types import SimpleNamespace
+        from patchers import plan_gate
+        plan_gate.from_environment = lambda: SimpleNamespace(context={
+            'vmDirectory': str(Path(sys.argv[-1]).resolve()), 'guestEnvironment':'v2', 'variant':'regular'})
+        plan_gate.validate_entry = lambda *_: None
+        plan_gate.require_write_context = lambda *_: None
+        plan_gate.authorize = lambda *_: None
+        plan_gate.append_evidence = lambda *_: None
     if Path(sys.argv[1]).stem == 'cfw_env_install':
         import plistlib
         import subprocess

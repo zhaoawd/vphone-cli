@@ -30,7 +30,7 @@ def render():
         raise ValueError("Migration delta differs from the verified fixed source snapshot")
     local_ids = {r["id"] for r in reviewed_declarations()}
     known = target | local_ids
-    if len(target) != 141 or len(known) != 143 or not set(aliases.values()) <= target:
+    if len(target) != 141 or len(known) != 152 or not set(aliases.values()) <= target:
         raise ValueError("Migration vocabulary differs from reviewed target/local IDs")
     if set(aliases) & known:
         raise ValueError("Alias is also a canonical ID; chained/ambiguous mapping refused")
@@ -38,7 +38,7 @@ def render():
              "// Sources: research/t09_patch_id_mapping_2026-10-01.json and",
              "// research/upstream_integration_2026-10-06/T09_declaration_delta.json.",
              "// Canonical IDs also require reviewed T09_target_applicability.json decisions.",
-             "// The two less IDs remain local. Recognition alone never enables execution.",
+             "// The less and guest installation IDs remain local. Recognition alone never enables execution.",
              "", "extension PatchSelectionMigration {", "    static let aliases: [String: String] = ["]
     lines += [f"        {json.dumps(k)}: {json.dumps(v)}," for k, v in sorted(aliases.items())]
     lines += ["    ]", "", "    static let knownIDs: Set<String> = ["]
@@ -55,7 +55,7 @@ def main():
     if args.check:
         if OUTPUT.read_text() != generated:
             parser.error("Generated migration table differs; regenerate from the reviewed research maps")
-        print("Migration vocabulary matches reviewed sources: 118 aliases, 143 canonical IDs")
+        print("Migration vocabulary matches reviewed sources: 118 aliases, 152 canonical IDs")
     else:
         sys.stdout.write(generated)
 

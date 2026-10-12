@@ -85,10 +85,13 @@ public final class FirmwarePipeline {
     let forceExcGuard: Bool
     let enableFrida: Bool
     let experimentalV2RootRemount: Bool
+    let requestedGuestEnvironmentV2: Bool?
+    var guestEnvironmentV2 = false
     let generationID: String?
     let loader: any FirmwareLoader
     private var transaction: FirmwareTransaction?
     private var executionPlan: VariantPlanResolver.VariantPlan?
+    private var guestWriteEnvironment: [String: String]?
     private var versionInputs: FirmwareVersionInputs?
     private var baseVersionKnown = false
 
@@ -121,6 +124,7 @@ public final class FirmwarePipeline {
         enableFrida: Bool = false,
         experimentalV2RootRemount: Bool = false,
         generationID: String? = nil,
+        guestEnvironmentV2: Bool? = nil,
         loader: (any FirmwareLoader)? = nil
     ) {
         self.vmDirectory = vmDirectory
@@ -132,6 +136,7 @@ public final class FirmwarePipeline {
         self.enableFrida = enableFrida
         self.experimentalV2RootRemount = experimentalV2RootRemount
         self.generationID = generationID
+        self.requestedGuestEnvironmentV2 = guestEnvironmentV2
         self.loader = loader ?? ContainerFirmwareLoader()
     }
 
@@ -206,6 +211,16 @@ public final class FirmwarePipeline {
             throw PatcherError.invalidFormat("experimental v2 root remount requires variant regular")
         }
         let restoreDir = try findRestoreDirectory()
+        if let requestedGuestEnvironmentV2 {
+            guestEnvironmentV2 = requestedGuestEnvironmentV2
+        } else if case .ready(let desired) = try FirmwareDesiredPlanStore.read(in: vmDirectory) {
+            guestEnvironmentV2 = desired.plan.gates.guestEnvironmentV2 == true
+        } else {
+            guestEnvironmentV2 = false
+        }
+        guard !guestEnvironmentV2 || variant == .regular else {
+            throw PatcherError.invalidFormat("guest environment v2 requires regular")
+        }
         if let plan = executionPlan {
             guard let versionInputs else {
                 throw PatcherError.invalidFormat("Frozen plan has no version input snapshot")
@@ -262,7 +277,8 @@ public final class FirmwarePipeline {
             excGuardActive: variant == .dev || iosBaseIs18 || forceExcGuard,
             applyIOS27: iosBaseIs27,
             applyFrida: enableFrida && cloudOSIsFridaCapable,
-            experimentalV2RootRemount: experimentalV2RootRemount
+            experimentalV2RootRemount: experimentalV2RootRemount,
+            guestEnvironmentV2: guestEnvironmentV2
         )
     }
 
@@ -332,9 +348,10 @@ public final class FirmwarePipeline {
         do {
             let staged = FirmwarePipeline(vmDirectory: transaction.stage, variant: variant, verbose: verbose,
                 noBinpack: noBinpack, noVphoned: noVphoned, forceExcGuard: forceExcGuard,
-                enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, loader: loader)
+                enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, guestEnvironmentV2: guestEnvironmentV2, loader: loader)
             staged.transaction = transaction
             staged.executionPlan = plan
+            if variant == .less { staged.guestWriteEnvironment = try FirmwareGuestWriteContext.environment(record: bound, directory: vmDirectory, transaction: transaction.root) }
             staged.versionInputs = versionInputs
             staged.trace = trace
             if variant == .less {
@@ -878,6 +895,7 @@ public final class FirmwarePipeline {
                     [{ data, verbose in
                         let patcher = CryptexFilesystemPatcher(buildManiest: data, restoreDir: try! self.findRestoreDirectory(), verbose: verbose, noBinpack: self.noBinpack, noVphoned: self.noVphoned)
                         patcher.transaction = self.transaction
+                        patcher.guestWriteEnvironment = self.guestWriteEnvironment
                         return patcher
                     }]
                 case .regular, .dev, .jb, .exp:

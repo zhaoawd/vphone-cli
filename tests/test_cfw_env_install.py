@@ -213,11 +213,9 @@ class InstallTests(unittest.TestCase):
     def test_single_daemon_command_preserves_unrelated_entries(self):
         target = self.system / 'System/Library/xpc/launchd.plist'
         before = plistlib.loads(target.read_bytes())
-        proc = subprocess.run([sys.executable, str(ROOT / 'scripts/patchers/cfw.py'), 'inject-daemon',
-                               str(target), str(self.daemon / 'vphoned-api.plist'),
-                               '/System/Library/LaunchDaemons/vphoned-api.plist'],
-                              capture_output=True, text=True)
-        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        from patchers.cfw import inject_daemon
+        inject_daemon(str(target), str(self.daemon / 'vphoned-api.plist'),
+                      '/System/Library/LaunchDaemons/vphoned-api.plist')
         after = plistlib.loads(target.read_bytes())
         self.assertEqual(after['LaunchDaemons']['vphoned'], before['LaunchDaemons']['vphoned'])
         self.assertEqual(len(after['LaunchDaemons']), len(before['LaunchDaemons']) + 1)
@@ -231,7 +229,7 @@ class InstallTests(unittest.TestCase):
         source.write_text('int main(void) { return 0; }\n')
         binary = self.base / 'test-launchd'
         subprocess.run(['/usr/bin/clang', str(source), '-o', str(binary)], check=True, capture_output=True)
-        proc = subprocess.run([sys.executable, str(ROOT / 'scripts/patchers/cfw.py'), 'inject-dylib', str(binary), '/vh'],
+        proc = subprocess.run([str(ROOT / '.tools/bin/insert_dylib'), '--weak', '--inplace', '--all-yes', '/vh', str(binary)],
                               capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
         loads = self.installer.environment.dylib_loads(binary)
@@ -259,7 +257,10 @@ class InstallTests(unittest.TestCase):
         args = ['install', str(self.vm), '--device', '/dev/test', '--mount', str(self.system),
                 '--components', str(self.stage), '--daemon', str(self.daemon), '--report', str(self.report)]
         error = self.installer.environment.DiskAccess('unmount', 'test unmount failed')
-        with patch.object(self.installer.environment, 'mount_volume'), \
+        with patch('patchers.plan_gate.from_environment', return_value=type('Plan', (), {'context': {'vmDirectory':str(self.vm.resolve()), 'guestEnvironment':'v2', 'variant':'regular'}})()), \
+                patch('patchers.plan_gate.validate_entry'), patch('patchers.plan_gate.require_write_context'), \
+                patch('patchers.plan_gate.authorize'), patch('patchers.plan_gate.append_evidence'), \
+                patch.object(self.installer.environment, 'mount_volume'), \
                 patch.object(self.installer.environment, 'unmount', side_effect=error), \
                 patch.object(self.installer, 'install_mounted', side_effect=local_install):
             with self.assertRaises(self.installer.environment.DiskAccess):

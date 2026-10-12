@@ -116,9 +116,11 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
 public struct DeclarationRecordRule: Sendable, Hashable, Codable {
     public let literal: String
     public let hexadecimalOffsetSuffix: Bool
-    public init(literal: String, hexadecimalOffsetSuffix: Bool = false) {
+    public let guestTargetRulesSHA256: String?
+    public init(literal: String, hexadecimalOffsetSuffix: Bool = false, guestTargetRulesSHA256: String? = nil) {
         self.literal = literal
         self.hexadecimalOffsetSuffix = hexadecimalOffsetSuffix
+        self.guestTargetRulesSHA256 = guestTargetRulesSHA256
     }
     public func matches(_ record: PatchRecord) -> Bool {
         if hexadecimalOffsetSuffix {
@@ -133,6 +135,10 @@ extension DeclarationRecordRules {
         if id == "kernel-boot-handle_get_dev_by_role" {
             return [DeclarationRecordRule(literal: "kernel.handle_get_dev_by_role.gate_", hexadecimalOffsetSuffix: true)]
         }
+        if id == "filesystem-less-cryptex_merge" {
+            return [DeclarationRecordRule(literal: "filesystem.cryptex.merge", guestTargetRulesSHA256: GuestTargetRules.digest)]
+        }
+        if let rules = GuestTargetRules.rules(for: id) { return rules }
         return (DeclarationRecordRules.exact[id] ?? []).map { DeclarationRecordRule(literal: $0) }
     }
 }

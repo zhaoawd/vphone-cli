@@ -34,12 +34,17 @@ import Testing
         #expect(declaration.coverage == .guestStep)
         let gates = Self.snapshots(.regular)[0]
         let classic = try VariantPlanResolver.resolve(variant: .regular, gates: gates)
-        let v2 = try VariantPlanResolver.resolve(variant: .regular, gates: gates, guestEnvironmentV2: true)
+        let v2Gates = PatchGateSnapshot(variant: "regular", iosBaseIs18: false, iosBaseIs27: false,
+            cloudOSIsFridaCapable: true, forceExcGuard: false, enableFrida: false,
+            excGuardActive: false, applyIOS27: false, applyFrida: false, guestEnvironmentV2: true)
+        let v2 = try VariantPlanResolver.resolve(variant: .regular, gates: v2Gates, guestEnvironmentV2: true)
+        #expect(throws: (any Error).self) { try VariantPlanResolver.resolve(variant: .regular, gates: gates, guestEnvironmentV2: true) }
         #expect(classic.excludedByOptIn.contains { $0.id == id })
         #expect(v2.guestUncovered.contains { $0.id == id })
         #expect(classic.enabledSteps == v2.enabledSteps)
-        let dev = try VariantPlanResolver.resolve(variant: .dev, gates: Self.snapshots(.dev)[0], guestEnvironmentV2: true)
-        #expect(!dev.guestUncovered.contains { $0.id == id })
+        #expect(throws: (any Error).self) {
+            try VariantPlanResolver.resolve(variant: .dev, gates: Self.snapshots(.dev)[0], guestEnvironmentV2: true)
+        }
     }
 
     static let allVariants: [FirmwarePipeline.Variant] = [.regular, .dev, .jb, .exp, .less]

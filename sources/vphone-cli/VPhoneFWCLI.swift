@@ -377,6 +377,7 @@ struct VPhoneFWDesiredPlanCommand: ParsableCommand {
     @Option(help: "Verified firmware generation ID") var generation: String?
     @Option(name: [.customShort("V"), .long]) var variant: PatchFirmwareCLI.VariantOption = .regular
     @Flag var forceExcGuard = false
+    @Option var guestEnvironment: VPhoneGuestEnvironmentProfile = .classic
     @Flag var frida = false
     @Option(name: .customLong("select"), parsing: .upToNextOption) var select: [String] = []
     @Option(name: .customLong("block"), parsing: .upToNextOption) var block: [String] = []
@@ -389,6 +390,7 @@ struct VPhoneFWDesiredPlanCommand: ParsableCommand {
     @Flag(help: "Reconcile uncertain publication without executing patchers") var readback = false
 
     func validate() throws {
+        try guestEnvironment.validateVariant(variant.rawValue)
         if readback || show {
             guard !(readback && show), !apply, generation == nil, !importLegacy, !expectedMissing, expectedSha256 == nil else {
                 throw ValidationError("--show and --readback are exclusive and cannot be combined with plan publication")
@@ -432,7 +434,8 @@ struct VPhoneFWDesiredPlanCommand: ParsableCommand {
         }
         guard let generation else { throw ValidationError("--generation is required") }
         let prepared = try FirmwarePipeline(vmDirectory: bundle.url, variant: variant.pipelineVariant,
-            verbose: false, forceExcGuard: forceExcGuard, enableFrida: frida)
+            verbose: false, forceExcGuard: forceExcGuard, enableFrida: frida,
+            guestEnvironmentV2: guestEnvironment == .v2)
             .saveDesiredPlan(generationID: generation, apply: apply, expectedSHA256: expectedSha256,
                              importLegacy: importLegacy, expectedLegacySHA256: expectedLegacySha256, select: select, block: block)
         struct Preview: Encodable {

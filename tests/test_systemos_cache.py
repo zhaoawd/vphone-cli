@@ -69,6 +69,11 @@ elif name == 'sudo':
 elif name == 'python-stub':
     if args and args[0].endswith('cfw.py'):
         print('SystemOS.dmg.aea\nAppOS.dmg')
+    elif args and args[0].endswith('plan_gate.py'):
+        if 'write' in args: os.execvp(args[2], args[2:])
+        if len(args)>2 and args[1]=='cache':
+            if args[2]=='systemos': os.execv(sys.executable,[sys.executable,str(pathlib.Path(args[0]).parents[1]/'cache_systemos.py')]+args[3:])
+            if args[2]=='appos': shutil.copyfile(args[3],args[4])
     elif args and args[0].endswith('check_python_runtime.py'): pass
     elif args and args[0] in ('-c', '--version'): pass
     else: os.execv(sys.executable, [sys.executable] + args)

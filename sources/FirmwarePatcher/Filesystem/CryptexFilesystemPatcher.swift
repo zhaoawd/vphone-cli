@@ -53,6 +53,7 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     var rebuiltData: Data?
     var tmpDirectories: [URL] = []
     var transaction: FirmwareTransaction?
+    var guestWriteEnvironment: [String: String]?
     
     // MARK: - Init
     
@@ -934,7 +935,12 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     
     // attachImage returns the device and mount point
     func attachImage(path: URL, readonly: Bool = false, forceRW: Bool = false) throws -> (String, String) {
-        let arguments = readonly ? ["attach", "-readonly", "-plist", path.path] : ["attach", "-plist", path.path]
+        var arguments = readonly ? ["attach", "-readonly", "-plist", path.path] : ["attach", "-plist", path.path]
+        if transaction != nil {
+            let mount = try createTmpDir().appendingPathComponent("mount")
+            try FileManager.default.createDirectory(at: mount, withIntermediateDirectories: false)
+            arguments += ["-mountpoint", mount.path]
+        }
         let data = if let transaction {
             try transaction.runTool("/usr/bin/hdiutil", arguments)
         } else {
@@ -969,6 +975,11 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
     func runProcess(_ launchPath: String, _ arguments: [String], sudo: Bool = false, output: URL? = nil) throws -> String {
         if let transaction {
             if sudo && geteuid() != 0 { throw ProcessError.failed(42, "This operation requires root") }
+            if arguments.first == resources.cfwPy.path {
+                guard let guestWriteEnvironment else { throw PatcherError.invalidFormat("Missing frozen less filesystem guest context") }
+                return String(decoding: try transaction.runTool("/usr/bin/env",
+                    guestWriteEnvironment.sorted { $0.key < $1.key }.map { $0.key + "=" + $0.value } + [launchPath] + arguments, output: output), as: UTF8.self)
+            }
             return String(decoding: try transaction.runTool(launchPath, arguments, output: output), as: UTF8.self)
         }
         let process = Process()

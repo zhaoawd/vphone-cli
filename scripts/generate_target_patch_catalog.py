@@ -137,11 +137,11 @@ def reviewed_declarations(root=ROOT):
         declarations.append(declaration)
     declarations += decisions["localOnly"]
     if {r["id"] for r in decisions["localOnly"]} != {
-            "filesystem-less-cryptex_merge", "manifest-less-hash_rewrite"}:
-        raise ValueError("The two local less declarations must remain explicit")
+            "filesystem-less-cryptex_merge", "manifest-less-hash_rewrite", 'system-cryptex-boot-install', 'system-iosbinpack-boot-install', 'system-launchdaemons-boot-install', 'system-launchd-jb-hook', 'preboot-jb-bootstrap-install', 'system-jb-basebin-install', 'preboot-jb-tweakloader-install', 'system-jb-firstboot-install', 'preboot-exp-vcam-install'}:
+        raise ValueError("Local less and guest declarations must remain explicit")
     if any(r["upstreamIDs"] for r in decisions["localOnly"]):
-        raise ValueError("Local less declarations cannot claim target IDs")
-    if len({r["id"] for r in declarations}) != 143:
+        raise ValueError("Local declarations cannot claim target IDs")
+    if len({r["id"] for r in declarations}) != 152:
         raise ValueError("Duplicate declaration IDs")
     return declarations
 
@@ -184,7 +184,7 @@ def main():
     if args.check:
         if (ROOT / OUTPUT).read_text() != generated:
             parser.error("Generated catalog differs from the reviewed fixed-target decisions")
-        print("Fixed target catalog matches: 141 target decisions, 2 local less declarations")
+        print("Fixed target catalog matches: 141 target decisions, 2 local less and 9 local guest declarations")
     else:
         sys.stdout.write(generated)
 

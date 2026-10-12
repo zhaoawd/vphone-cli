@@ -665,7 +665,7 @@ def save(path, report):
     os.replace(temporary, path)
 
 
-def apply_mounted(root, vm, components, report_path, manifest=None):
+def apply_mounted(root, vm, components, report_path, manifest=None, *, frozen_plan=None):
     manifest = manifest or load_manifest()
     root = Path(root)
     record = {'schema': SCHEMA, 'operation': 'offline_environment_update', 'started_at': now(),
@@ -692,7 +692,14 @@ def apply_mounted(root, vm, components, report_path, manifest=None):
     try:
         for name in before['replace']:
             row = rows[name]
-            replace_file(row['expected_source'], root / row['guest_path'].lstrip('/'))
+            target = root / row['guest_path'].lstrip('/')
+            if frozen_plan is not None:
+                from patchers import plan_gate as gate
+                gate.authorize(frozen_plan, 'system-launchdaemons-boot-environment', 'system:/' + row['guest_path'].lstrip('/'))
+                actual_before = gate.snapshot(target)
+            replace_file(row['expected_source'], target)
+            if frozen_plan is not None:
+                gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', 'system:/' + row['guest_path'].lstrip('/'), target, actual_before, gate.snapshot(target))
             record['replaced'].append(name)
             print(f'  [+] {row["guest_path"]}: {row["actual_sha256"][:16]} -> {row["expected_sha256"][:16]}')
         after = assess(root, vm, components, manifest)
@@ -720,13 +727,20 @@ def apply_mounted(root, vm, components, report_path, manifest=None):
 
 
 def apply(args):
+    from patchers import plan_gate as gate
+    plan = gate.from_environment()
+    gate.validate_entry(plan, 'cfw_install_host.sh')
+    if plan.context['guestEnvironment'] != 'v2': raise Refused('environment update requires frozen v2 profile')
+    gate.require_write_context(plan)
     vm = Path(args.vm).resolve(strict=True)
+    if str(vm) != plan.context['vmDirectory']: raise Refused('environment update VM differs from frozen context')
     mountpoint = Path(args.mount)
     if vm not in mountpoint.resolve().parents:
         raise Refused(f'mountpoint {mountpoint} must be inside {vm}')
     mountpoint.mkdir(mode=0o700, exist_ok=True)
     mount_volume(args.device, mountpoint, readonly=False)
-    return apply_mounted(mountpoint, vm, Path(args.components), Path(args.report))
+    if str(vm) != plan.context['vmDirectory']: raise Refused('environment update VM differs from frozen context')
+    return apply_mounted(mountpoint, vm, Path(args.components), Path(args.report), frozen_plan=plan)
 
 
 def compare_identity(report_path, vm):

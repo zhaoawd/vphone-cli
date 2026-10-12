@@ -55,7 +55,7 @@ exit 0
         for name in ('lsof', 'hdiutil', 'diskutil', 'umount', 'python', 'chown'):
             (bins / name).symlink_to(stub)
         self.env = dict(os.environ, TEST_LOG=str(self.root / 'calls'),
-                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
+                        VPHONE_PYTHON=str(bins / 'python'), VPHONE_CFW_VARIANT='regular', VPHONE_KEEP_ARTIFACTS='1', TEST_PYTHON=sys.executable,
                         TEST_TXN_HARNESS=str(ROOT / 'tests/cfw_disk_txn_faults.py'))
         for name in ('REAL_LSOF', 'FAIL_SNAP', 'CFW_TXN_FAULTS', 'VPHONE_VM_LOCK_FD', 'VPHONE_CFW_LOCK_REEXEC'):
             self.env.pop(name, None)
@@ -104,7 +104,7 @@ exit ${INSTALL_EXIT:-0}
     # Variables the doubles and the driver need on the authentication-dialog
     # path, where vphone-cli passes every variable inline (see bare_env).
     INLINE_KEYS = ('TEST_LOG', 'VPHONE_PYTHON', 'VPHONE_KEEP_ARTIFACTS', 'TEST_PYTHON', 'TEST_TXN_HARNESS',
-                   'TEST_ATTACH_PLIST', 'ZDOTDIR')
+                   'TEST_ATTACH_PLIST', 'ZDOTDIR', 'VPHONE_CFW_VARIANT')
 
     def bare_env(self):
         """Environment of `do shell script ... with administrator privileges`.
@@ -124,7 +124,7 @@ exit ${INSTALL_EXIT:-0}
             (vm / 'Disk.img').touch()
         base = self.bare_env() if bare else self.env
         proc = subprocess.Popen(['/bin/zsh', str(self.driver), '--variant', variant, str(vm)],
-                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **env), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+                                    env=dict(base, TEST_MOUNTS=str(vm / "mount-table"), **dict(env, VPHONE_CFW_VARIANT=variant)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
         def stop():
             try:
                 os.killpg(proc.pid, signal.SIGKILL)

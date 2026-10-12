@@ -86,8 +86,8 @@ class GuestAPICohortTests(unittest.TestCase):
             classic = {'Label': 'com.vphone.vphoned', 'ProgramArguments': ['/usr/bin/vphoned']}
             (jobs / 'vphoned.plist').write_bytes(plistlib.dumps(classic))
             (jobs / 'vphoned-api.plist').write_bytes(plistlib.dumps(self.job))
-            result = subprocess.run([sys.executable, '-B', str(ROOT / 'scripts/patchers/cfw.py'), 'inject-daemons', str(target), str(jobs)], env=env, capture_output=True, text=True, timeout=10)
-            self.assertEqual(result.returncode, 0, result.stderr)
+            from patchers.cfw import inject_daemons
+            inject_daemons(str(target), str(jobs))
             entries = plistlib.loads(target.read_bytes())['LaunchDaemons']
             self.assertEqual(entries['existing'], {'Label': 'existing'})
             self.assertEqual(entries['/System/Library/LaunchDaemons/vphoned.plist'], classic)
