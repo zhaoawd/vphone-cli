@@ -371,3 +371,360 @@ class FrozenGateTests(unittest.TestCase):
         self.assertEqual(outside.read_bytes(),original)
         self.assertEqual((directory/'dyld_shared_cache_arm64e').read_bytes(),original)
         self.assertEqual(self.evidence.read_bytes(),b'')
+
+    def test_explicit_signer_records_patch_sign_copy_and_rejects_code_restoration(self):
+        from patchers import component_effects as effects
+        from tests.test_component_signatures import signed_macho
+        target=self.mount/'mnt1/usr/libexec/seputil';target.parent.mkdir(parents=True)
+        source=self.stage/'seputil';source.write_bytes(signed_macho(b'00000000'))
+        plan=self.load();gate.require_write_context(plan)
+        store=self.evidence.parent/'effect-blobs'
+        before=effects.capture_input(source,store); before_row=gate.snapshot(source)
+        data=bytearray(source.read_bytes());data[256]=ord('1');source.write_bytes(data)
+        first=effects.capture_change(before,source,store)
+        gate.append_evidence(plan,'system-seputil-boot-gigalocker_uuid','system:/usr/libexec/seputil',source,before_row,gate.snapshot(source),effect=first)
+        signer=self.root/'ldid';signed=self.root/'signed';signed.write_bytes(signed_macho(b'10000000',{'new':True}))
+        signer.write_text('#!/bin/sh\nfor final; do :; done\n/bin/cp '+str(signed)+' "$final"\n');signer.chmod(0o755)
+        guest_write.sign(plan,[str(signer),'-S','-M',str(source)])
+        guest_write.run(plan,['cp',str(source),str(target)])
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},store)
+        self.assertEqual(rows[1]['effect']['operation'],'sign')
+        self.assertEqual(rows[1]['effect']['signerArguments'],['-S','-M',str(source)])
+        signed.write_bytes(signed_macho(b'00000000',{'new':True}))
+        with self.assertRaisesRegex(ValueError,'executable bytes'):
+            guest_write.sign(plan,[str(signer),'-S','-M',str(source)])
+
+    def test_signing_unknown_private_basename_refuses_before_signer(self):
+        plan=self.load();source=self.stage/'unknown';source.write_bytes(b'original')
+        signer=self.root/'ldid';signer.write_text('#!/bin/sh\nexit 42\n');signer.chmod(0o755)
+        with self.assertRaisesRegex(ValueError,'signing source'):
+            guest_write.sign(plan,[str(signer),'-S',str(source)])
+        self.assertEqual(source.read_bytes(),b'original')
+
+    def test_common_signing_function_emits_producer_evidence(self):
+        from tests.test_component_signatures import signed_macho
+        source=self.stage/'seputil';source.write_bytes(signed_macho())
+        signed=self.root/'signed';signed.write_bytes(signed_macho(entitlements={'new':1}))
+        signer=self.root/'ldid';signer.write_text('#!/bin/sh\nfor final; do :; done\n/bin/cp '+str(signed)+' "$final"\n');signer.chmod(0o755)
+        env=dict(os.environ,PATH=str(self.root)+':'+os.environ['PATH'],PYTHON3=sys.executable,
+                 SCRIPT_DIR=str(ROOT/'scripts'),VM_DIR=str(self.vm),CFW_INPUT='cfw_input',TEMP_DIR=str(self.stage))
+        result=subprocess.run(['/bin/zsh','-c','set -euo pipefail\nsource "$SCRIPT_DIR/lib/cfw_common.sh"\nldid_sign "$TEMP_DIR/seputil" com.apple.seputil'],env=env,pass_fds=(self.lock_fd,),capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertTrue(self.evidence.exists(),'actual common signer emitted no producer evidence')
+        row=json.loads(self.evidence.read_text().splitlines()[-1])
+        self.assertEqual(row['effect']['operation'],'sign')
+        self.assertEqual(row['effect']['signerArguments'],['-S','-M','-K'+str(self.vm/'cfw_input/signcert.p12'),'-Icom.apple.seputil',str(source)])
+
+    def test_campo_patch_is_verified_as_final_embedded_entitlements(self):
+        from patchers import component_effects as effects
+        from tests.test_component_signatures import signed_macho
+        _,digest=guest_write.target_table()
+        self.entries.append(dict(id='system-campo-cfw-entitlements',disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':system-campo-cfw-entitlements',hexadecimalOffsetSuffix=False)]))
+        self.publish();os.environ.update(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
+        source=self.stage/'Campo';source.write_bytes(signed_macho())
+        ent=self.stage/'Campo.entitlements';ent.write_bytes(plistlib.dumps({'test':True}))
+        with patch.object(sys,'argv',['cfw.py','patch-campo-entitlements',str(ent)]),contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(SystemExit) as result: cfw.main()
+            self.assertEqual(result.exception.code,0)
+        signed=self.root/'signed';signed.write_bytes(signed_macho(entitlements=plistlib.loads(ent.read_bytes())))
+        signer=self.root/'ldid';signer.write_text('#!/bin/sh\nfor final; do :; done\n/bin/cat '+str(signed)+' > "$final"\n');signer.chmod(0o755)
+        plan=self.load();guest_write.sign(plan,[str(signer),'-S'+str(ent),'-M',str(source)])
+        target=self.mount/'mnt1/Applications/Campo.app/Campo';target.parent.mkdir(parents=True)
+        guest_write.run(plan,['cp',str(source),str(target)])
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+        rows[1]['effect']['entitlementsSource']['path']=str(self.stage/'unrelated')
+        with self.assertRaises(ValueError): effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+
+    def test_v2_signing_uses_registered_private_directory(self):
+        from tests.test_component_signatures import signed_macho
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        plan=self.load();gate.require_write_context(plan)
+        signer=self.root/'ldid';signer.write_text('#!/bin/sh\nexit 0\n');signer.chmod(0o755)
+        with guest_write.signing_directory(plan) as directory:
+            source=directory/'launchd';source.write_bytes(signed_macho())
+            guest_write.sign(plan,[str(signer),'-S',str(source)])
+            for mode in [0o770,0o777]:
+                directory.chmod(mode)
+                with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
+            directory.chmod(0o700)
+            self.stage.chmod(0o777)
+            with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
+            self.stage.chmod(0o755)
+            with patch.object(os,'geteuid',return_value=os.geteuid()+1):
+                with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
+            nested=directory/'nested';nested.mkdir();(nested/'launchd').write_bytes(signed_macho())
+            with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(nested/'launchd')])
+            external=self.root/'external-launchd';external.write_bytes(source.read_bytes());source.unlink();source.symlink_to(external)
+            with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
+            source.unlink();source.write_bytes(external.read_bytes())
+            wrong=directory/'seputil';wrong.write_bytes(signed_macho())
+            with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(wrong)])
+        fake=self.stage/'.vphone-launchd-abcdefgh';fake.mkdir(mode=0o700)
+        source=fake/'launchd';source.write_bytes(signed_macho())
+        with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
+
+    def test_v2_reinstallation_writes_have_final_effects(self):
+        from tests.test_cfw_env_install import InstallTests
+        from tests.test_cfw_env_update import macho, LC_LOAD_WEAK_DYLIB, LC_LOAD_DYLIB
+        from patchers import component_effects as effects
+        import shutil
+        fixture=InstallTests();fixture.setUp();self.addCleanup(fixture.doCleanups)
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        self.assertEqual(fixture.install(),0)
+        shutil.copytree(fixture.vm/'.create-checkpoint',self.vm/'.create-checkpoint')
+        system=self.mount/'mnt1'
+        shutil.copytree(fixture.system,system,dirs_exist_ok=True,symlinks=True)
+        shutil.copytree(fixture.vm/'cfw_input',self.vm/'cfw_input')
+        plan=self.load();gate.require_write_context(plan)
+        code=fixture.installer.install_mounted(system,self.vm,fixture.stage,fixture.daemon,self.root/'v2-report.json',
+             variant='regular',owner=(os.getuid(),os.getgid()),runner=fixture.runner,frozen_plan=plan)
+        self.assertEqual(code,0,(self.root/'v2-report.json').read_text())
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        self.assertTrue(rows)
+        effects.verify_rows(plan,rows,{'system':system},self.evidence.parent/'effect-blobs')
+
+    def test_archive_two_real_moves_and_consumption_preserve_required_member(self):
+        from patchers import component_effects as effects
+        import tarfile
+        table=json.loads(json.dumps(guest_write.target_table()[0]))
+        names=['var','var/jb','var/jb/usr','var/jb/usr/bin','var/jb/usr/bin/apt']
+        table['archives']['bootstrap-iphoneos-arm64.tar']={name:table['archives']['bootstrap-iphoneos-arm64.tar'][name] for name in names}
+        digest=hashlib.sha256(gate.canonical(table)).hexdigest()
+        declaration='preboot-jb-bootstrap-install'
+        self.entries[:]=[dict(id=declaration,disposition='guestUncovered',recordRules=[dict(literal='guest-target-map-v1:'+digest+':'+declaration,hexadecimalOffsetSuffix=False)])]
+        self.plan.update(variant='jb');self.plan['gates']['variant']='jb';self.context['variant']='jb';self.publish()
+        boot='A'*96;base=self.mount/'mnt5'/boot/'jb-vphone';base.mkdir(parents=True)
+        source=self.stage/'bootstrap-iphoneos-arm64.tar'
+        with tarfile.open(source,'w') as archive:
+            for name in names:
+                member=tarfile.TarInfo(name);member.mode=0o755
+                if name.endswith('/apt'):
+                    member.size=8;archive.addfile(member,io.BytesIO(b'required'))
+                else: member.type=tarfile.DIRTYPE;archive.addfile(member)
+        archive_path=base.parent/source.name
+        with patch.object(guest_write,'target_table',return_value=(table,digest)):
+            plan=self.load()
+            guest_write.run(plan,['cp',str(source),str(archive_path)])
+            guest_write.run(plan,['tar','-xf',str(archive_path),'-C',str(base)])
+            lines=(ROOT/'scripts/cfw_install_jb.sh').read_text().splitlines()
+            moves=[line for line in lines if 'cfw_guest_write' in line and 'mv ' in line and '/procursus' in line]
+            for line in moves:
+                emit='cfw_guest_write() { '+sys.executable+" -c 'import json,sys;print(json.dumps(sys.argv[1:]))' \"$@\"; }\n"
+                result=subprocess.run(['/bin/zsh','-c',emit+line.removesuffix(' 2>/dev/null || true')],
+                    env=dict(os.environ,MNT5=str(self.mount/'mnt5'),BOOT_HASH=boot,JB_DIR_NAME='jb-vphone'),capture_output=True,text=True)
+                self.assertEqual(result.returncode,0,result.stderr)
+                guest_write.run(plan,json.loads(result.stdout))
+            guest_write.run(plan,['rm','-rf',str(base/'procursus/jb')])
+            guest_write.run(plan,['rm','-f',str(archive_path)])
+            rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+            effects.verify_rows(plan,rows,{'preboot':self.mount/'mnt5'},self.evidence.parent/'effect-blobs')
+            guest_write.run(plan,['rm','-f',str(base/'procursus/usr/bin/apt')])
+            rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+            with self.assertRaises(ValueError):effects.verify_rows(plan,rows,{'preboot':self.mount/'mnt5'},self.evidence.parent/'effect-blobs')
+
+    def test_cryptex_image_member_effects_before_and_after_tree_copy_compose(self):
+        from patchers import component_effects as effects, cryptex_source
+        from tests.test_component_signatures import signed_macho
+        import struct
+        import shutil
+        def cache(code):
+            data=bytearray(signed_macho(code));data[:16]=b'dyld_v1 arm64e'.ljust(16,b' ')
+            struct.pack_into('<QQ',data,0x28,4096,len(data)-4096)
+            data[4168:4200]=hashlib.sha256(data[:4096]).digest();return data
+        _,digest=guest_write.target_table()
+        for declaration in ['system-cryptex-boot-install','dyld-exp-hv_vmm','dyld-cfw-camera']:
+            self.entries.append(dict(id=declaration,disposition='guestUncovered',recordRules=[dict(literal='guest-target-map-v1:'+digest+':'+declaration,hexadecimalOffsetSuffix=False)]))
+        self.plan['variant']='exp';self.plan['gates']['variant']='exp';self.context['variant']='exp';self.publish()
+        plan=self.load();gate.require_write_context(plan);store=self.evidence.parent/'effect-blobs'
+        relative=Path('System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e')
+        earlier=self.mount/'mnt_sysos_hv_vmm'/relative;earlier.parent.mkdir(parents=True)
+        image=self.stage/'CryptexSystemOS.dmg';image.write_bytes(b'image association fixture')
+        original=self.vm/'.firmware-generations'/self.context['generationID']/'originals/SystemOS.dmg'
+        original.parent.mkdir(parents=True);original.write_bytes(b'original fixture')
+        initial=cryptex_source.observation(image)
+        binding=dict(schemaVersion=1,generationID=self.context['generationID'],planDigest=plan.record['planSHA256'],source=str(original),sourceSHA256=cryptex_source.file_sha(original),cacheSHA256=initial['sha256'],imageBefore=initial)
+        earlier.write_bytes(cache(b'00000000'));before=effects.capture_input(earlier,store);observed=gate.snapshot(earlier)
+        (self.mount/'mnt_sysos_hv_vmm'/'required-sibling').write_bytes(b'unchanged sibling')
+        binding['baselineTree']=cryptex_source.tree(self.mount/'mnt_sysos_hv_vmm')
+        cryptex_source.marker(image).write_bytes(gate.canonical(binding))
+        earlier.write_bytes(cache(b'10000000'))
+        gate.append_evidence(plan,'dyld-exp-hv_vmm','dsc:/'+earlier.name,earlier,observed,gate.snapshot(earlier),source_image=image,source_binding=cryptex_source.proof(plan,image),effect=effects.capture_change(before,earlier,store))
+        image.write_bytes(b'changed image fixture')
+        with patch.object(cryptex_source.subprocess,'check_output',return_value=plistlib.dumps({'images':[]})):
+            cryptex_source.refresh(plan,image)
+        source=self.mount/'mnt_sysos';shutil.copytree(self.mount/'mnt_sysos_hv_vmm',source)
+        (source/'required-sibling').write_bytes(b'unchanged sibling')
+        destination=self.mount/'mnt1/System/Cryptexes/OS';destination.mkdir(parents=True)
+        info=plistlib.dumps({'images':[{'image-path':str(image),'system-entities':[{'mount-point':str(source)}]}]})
+        with patch.object(cryptex_source.subprocess,'check_output',return_value=info):
+            guest_write.run(plan,['cp','-R',str(source)+'/.',str(destination)])
+        final=destination/relative;before=effects.capture_input(final,store);observed=gate.snapshot(final)
+        final.write_bytes(cache(b'10000001'))
+        gate.append_evidence(plan,'dyld-cfw-camera','dsc:/'+final.name,final,observed,gate.snapshot(final),effect=effects.capture_change(before,final,store))
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        roots={'system':self.mount/'mnt1','dsc':final.parent}
+        effects.verify_rows(plan,rows,roots,store)
+        import copy
+        forged=copy.deepcopy(rows);forged[1]['sourceImageProof']['image']['sha256']='0'*64
+        with self.assertRaises(ValueError): effects.verify_rows(plan,forged,roots,store)
+        forged=copy.deepcopy(rows);forged[1]['sourceImageProof']['bindingSHA256']=forged[0]['sourceImageProof']['bindingSHA256']
+        with self.assertRaises(ValueError): effects.verify_rows(plan,forged,roots,store)
+        (destination/'required-sibling').unlink()
+        with self.assertRaises(ValueError): effects.verify_rows(plan,rows,roots,store)
+
+    def test_later_unrelated_copy_cannot_discard_installed_content(self):
+        from patchers import component_effects as effects
+        plan=self.load();source=self.stage/'dropbear.plist'
+        target=self.mount/'mnt1/System/Library/LaunchDaemons/dropbear.plist';target.parent.mkdir(parents=True)
+        source.write_bytes(b'required first installation');guest_write.run(plan,['cp',str(source),str(target)])
+        source.write_bytes(b'unrelated replacement');guest_write.run(plan,['cp',str(source),str(target)])
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        with self.assertRaises(ValueError): effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+
+    def test_actual_jb_daemon_injection_preserves_earlier_plist_changes(self):
+        from patchers import component_effects as effects
+        self.plan['variant']='jb';self.plan['gates']['variant']='jb';self.context['variant']='jb'
+        self.entries[:]=[e for e in self.entries if e['id']!='system-launchdaemons-boot-environment'];self.publish()
+        os.environ.update(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
+        plan=self.load();target=self.mount/'mnt1/System/Library/xpc/launchd.plist';target.parent.mkdir(parents=True)
+        target.write_bytes(plistlib.dumps({'LaunchDaemons':{'existing':{'Label':'existing'}}}))
+        source=self.stage/'launchd.plist'
+        for name,resource in [('jb-setup','vphone_jb_setup.plist'),('sshd','vphone_sshd.plist')]:
+            guest_write.run(plan,['cp',str(target),str(source)])
+            with patch.object(sys,'argv',['cfw.py','inject-jb-daemon',str(source),str(ROOT/'scripts'/resource),'/System/Library/LaunchDaemons/com.vphone.'+name+'.plist']):
+                cfw.main()
+            guest_write.run(plan,['cp',str(source),str(target)])
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+        self.assertEqual(len(plistlib.loads(target.read_bytes())['LaunchDaemons']),3)
+
+    def test_production_final_reader_qualifies_staged_image_and_mounts(self):
+        from patchers import final_guest, component_effects as effects
+        import cfw_disk_txn
+        plan=self.load();source=self.stage/'dropbear.plist';source.write_bytes(b'required')
+        target=self.mount/'mnt1/System/Library/LaunchDaemons/dropbear.plist';target.parent.mkdir(parents=True)
+        guest_write.run(plan,['cp',str(source),str(target)])
+        work=self.evidence.parent;image=work/'Disk.img';image.write_bytes(b'staged fixture')
+        (work/'transaction.json').write_text(json.dumps({'version':1,'status':'staged','vm':str(self.vm),'staged':cfw_disk_txn.identity(image.stat())}))
+        readonly=True
+        def query(argv):
+            if argv==['/usr/sbin/diskutil','info','-plist','/dev/disk42s1']:
+                return plistlib.dumps({'DeviceIdentifier':'disk42s1','MountPoint':str(self.mount/'mnt1'),'ReadOnlyVolume':readonly})
+            if argv==['/usr/bin/hdiutil','info','-plist']:
+                return plistlib.dumps({'images':[{'image-path':str(image),'system-entities':[{'dev-entry':'/dev/disk41'}]}]})
+            if argv==['/usr/sbin/diskutil','apfs','list','-plist']:
+                return plistlib.dumps({'Containers':[{'ContainerReference':'disk42','PhysicalStores':[{'DeviceIdentifier':'disk41s1'}],
+                    'Volumes':[{'DeviceIdentifier':'disk42s1','MountPoint':str(self.mount/'mnt1')}]}]})
+            self.fail(str(argv))
+        with patch.object(final_guest.subprocess,'check_output',side_effect=query):
+            result=final_guest.run(plan)
+            self.assertEqual(result['operationsSHA256'],effects.digest(self.evidence))
+            target.write_bytes(b'overwritten')
+            with self.assertRaises(ValueError): final_guest.run(plan)
+            target.write_bytes(b'required')
+            readonly=False
+            with patch.object(final_guest.subprocess,'run'):
+                with self.assertRaises(ValueError): final_guest.run(plan)
+            with patch.object(final_guest.subprocess,'run',side_effect=subprocess.CalledProcessError(1,['umount'])):
+                with self.assertRaises(subprocess.CalledProcessError): final_guest.run(plan)
+            # Simulate the filesystem visibility change at the mount seam.
+            # These are directory renames; no real mount command is executed.
+            root=self.mount/'mnt1';hidden=self.mount/'hidden-system';commands=[]
+            def remount(argv,**kwargs):
+                nonlocal readonly
+                commands.append(argv)
+                if argv[0]=='/sbin/umount': root.rename(hidden)
+                else:
+                    root.rmdir();hidden.rename(root);readonly=True
+            with patch.object(final_guest.subprocess,'run',side_effect=remount):
+                final_guest.run(plan)
+            self.assertEqual(commands,[['/sbin/umount',str(root)],
+                ['/sbin/mount_apfs','-o','rdonly','/dev/disk42s1',str(root)]])
+            readonly=True
+        with patch.object(final_guest.subprocess,'check_output',return_value=plistlib.dumps({'images':[]})):
+            with self.assertRaises(ValueError): final_guest.run(plan)
+        replacement=work/'replacement';replacement.write_bytes(image.read_bytes());replacement.replace(image)
+        with patch.object(final_guest.subprocess,'check_output',side_effect=query):
+            with self.assertRaises((ValueError,cfw_disk_txn.Refused)): final_guest.run(plan)
+
+    def test_actual_tree_preparation_and_final_member_readback(self):
+        from patchers import component_effects as effects
+        helper,plan,source,mounted,target,info=self.cryptex_fixture()
+        (target/'obsolete').write_bytes(b'old tree')
+        with patch.object(helper.subprocess,'check_output',return_value=info):
+            guest_write.run(plan,['rm','-rf',str(target)])
+            guest_write.run(plan,['mkdir','-p',str(target)])
+            guest_write.run(plan,['chmod','0755',str(target)])
+            guest_write.run(plan,['cp','-R',str(mounted)+'/.',str(target)])
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+
+    def test_v2_initial_install_actual_loader_producer_and_controlled_signer(self):
+        from tests.test_cfw_env_install import InstallTests
+        from tests.test_component_signatures import signed_macho
+        from patchers import component_effects as effects, component_signatures as signatures
+        import shutil
+        import struct
+        fixture=InstallTests();fixture.setUp();self.addCleanup(fixture.doCleanups)
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        os.environ.update(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
+        shutil.copytree(fixture.vm/'.create-checkpoint',self.vm/'.create-checkpoint')
+        system=self.mount/'mnt1';shutil.copytree(fixture.system,system,dirs_exist_ok=True,symlinks=True)
+        shutil.copytree(fixture.vm/'cfw_input',self.vm/'cfw_input')
+        launchd=system/'sbin/launchd';launchd.write_bytes(signed_macho(entitlements={'original-entitlement':True}))
+        def runner(args):
+            args=list(map(str,args))
+            if 'inject-dylib' in args:
+                with patch.object(sys,'argv',args[1:]):
+                    try: cfw.main()
+                    except SystemExit as result: self.assertEqual(result.code,0)
+            elif '-e' in args:
+                return subprocess.CompletedProcess(args,0,plistlib.dumps(signatures.entitlements(args[-1])[0]),b'')
+            else:
+                path=Path(args[-1]);body=bytearray(path.read_bytes()[:4096]);body.extend(b'\0'*(4096-len(body)))
+                count,size=struct.unpack_from('<II',body,16)
+                struct.pack_into('<II',body,16,count+1,size+16)
+                tail=signed_macho(entitlements={'original-entitlement':True})[4096:]
+                struct.pack_into('<IIII',body,32+size,0x1d,16,4096,len(tail))
+                data=body+tail;data[4168:4200]=hashlib.sha256(data[:4096]).digest();path.write_bytes(data)
+            return subprocess.CompletedProcess(args,0,b'',b'')
+        plan=self.load();gate.require_write_context(plan)
+        boot_plist=(system/'System/Library/xpc/launchd.plist').resolve();store=self.evidence.parent/'effect-blobs'
+        old=gate.snapshot(boot_plist);before=effects.capture_input(boot_plist,store)
+        value=plistlib.loads(boot_plist.read_bytes());value['LaunchDaemons']['preserved-boot-job']={'Label':'preserved-boot-job'}
+        boot_plist.write_bytes(plistlib.dumps(value))
+        gate.append_evidence(plan,'system-launchdaemons-boot-install','system:/System/Library/xpc/launchd.plist',boot_plist,old,gate.snapshot(boot_plist),effect=effects.capture_change(before,boot_plist,store))
+        code=fixture.installer.install_mounted(system,self.vm,fixture.stage,fixture.daemon,self.root/'v2-initial-report.json',
+             variant='regular',owner=(os.getuid(),os.getgid()),runner=runner,frozen_plan=plan)
+        self.assertEqual(code,0,(self.root/'v2-initial-report.json').read_text())
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        effects.verify_rows(plan,rows,{'system':system},self.evidence.parent/'effect-blobs')
+        self.assertTrue(any(row['effect']['operation']=='sign' for row in rows))
+
+    def test_unknown_transport_operation_does_not_gain_proof(self):
+        from patchers import component_effects as effects
+        plan=self.load();source=self.stage/'dropbear.plist';source.write_bytes(b'payload')
+        target=self.mount/'mnt1/System/Library/LaunchDaemons/dropbear.plist';target.parent.mkdir(parents=True)
+        guest_write.run(plan,['cp',str(source),str(target)])
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        rows[0]['effect']['command']='unrecognized'
+        with self.assertRaises(ValueError): effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+
+    def test_regular_v2_boot_plist_copy_keeps_exact_boot_owner(self):
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        plan=self.load();source=self.stage/'launchd.plist';source.write_bytes(plistlib.dumps({'LaunchDaemons':{}}))
+        target=self.mount/'mnt1/System/Library/xpc/launchd.plist';target.parent.mkdir(parents=True)
+        guest_write.run(plan,['cp',str(source),str(target)])
+        row=json.loads(self.evidence.read_text().splitlines()[-1])
+        self.assertEqual(row['declarationID'],'system-launchdaemons-boot-install')
+
+    def test_v2_boot_copy_cannot_choose_the_environment_owner_when_boot_writer_is_missing(self):
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2'
+        self.entries[:]=[entry for entry in self.entries if entry['id']!='system-launchdaemons-boot-install'];self.publish()
+        source=self.stage/'launchd.plist';source.write_bytes(b'unknown copy')
+        target=self.mount/'mnt1/System/Library/xpc/launchd.plist';target.parent.mkdir(parents=True);target.write_bytes(b'preserve')
+        with self.assertRaises(ValueError): guest_write.run(self.load(),['cp',str(source),str(target)])
+        self.assertEqual(target.read_bytes(),b'preserve')

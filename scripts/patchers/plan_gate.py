@@ -267,7 +267,7 @@ def snapshot(path):
     raise ValueError('unsupported guest target file type: ' + str(path))
 
 
-def append_evidence(plan, declaration, target, path, before, after, source_image=None, effect=None):
+def append_evidence(plan, declaration, target, path, before, after, source_image=None, effect=None, source_binding=None):
     record = record_change(plan, declaration, target, before, after)
     record['path'] = str(Path(path).absolute())
     if effect is not None: record['effect'] = effect
@@ -275,7 +275,9 @@ def append_evidence(plan, declaration, target, path, before, after, source_image
     if isinstance(after, FileSnapshot): record['afterMetadata'] = after.metadata
     from .guest_write import logical
     record['phase'] = 'filesystem-staging' if plan.context['variant'] == 'less' else 'guest' if logical(path) is not None or target.startswith('dsc:') else 'staging'
-    if source_image is not None: record['sourceImage'] = str(source_image)
+    if source_image is not None:
+        record['sourceImage'] = str(source_image)
+        record['sourceImageProof'] = source_binding
     destination = Path(os.environ['VPHONE_GUEST_EVIDENCE'])
     fd = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_NOFOLLOW, 0o600)
     try:
@@ -311,6 +313,13 @@ def validate_entry(plan, entry):
 
 def main():
     plan = from_environment()
+    if len(sys.argv) == 2 and sys.argv[1] == 'verify-final':
+        from .final_guest import run
+        result=run(plan)
+        destination=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'guest-effects-final.json'
+        if destination.is_symlink(): raise ValueError('linked final evidence destination')
+        destination.write_bytes(canonical(result))
+        return
     if len(sys.argv) == 3 and sys.argv[1] == 'entry':
         validate_entry(plan, Path(sys.argv[2]).name)
         return
@@ -325,6 +334,10 @@ def main():
     if len(sys.argv) == 3 and sys.argv[1] == 'cache-detached':
         from .cryptex_source import refresh
         refresh(plan, sys.argv[2])
+        return
+    if len(sys.argv) >= 4 and sys.argv[1] == 'sign':
+        from .guest_write import sign
+        sign(plan, sys.argv[2:])
         return
     if len(sys.argv) >= 3 and sys.argv[1] == 'write':
         from .guest_write import run

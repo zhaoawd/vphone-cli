@@ -1319,3 +1319,16 @@ Cryptex OS/App 分别作为两个精确完整目录树目标：原始镜像绑�
 6A1 的初始 receipt 仅表示 generated/committed 工件证据模型；本次未接入事务发布或 origin 写入。签名结构与 CodeDirectory 解析器仅为后续组合验证提供基础。shell 签名调用、Campo 嵌入 entitlement、DSC 同页摘要及 archive/move/消费关系由 6A2 接续。未完成的消费验证不会被调用来阻断现有受控写入；显式请求最终验证时，缺少上述关系的记录拒绝证明。Task6A 及 Task6 整体仍未完成。
 
 最终聚焦测试命令、结果、源文件 SHA256 和全部 RED/GREEN 日志的原始/gzip 摘要见 `research/evidence/2026-10-13-task6a1/manifest.json`。本轮只使用安全合成文件、目录和命令替身；没有执行真实 mount、VM、sudo、AMFI/TCC 或系统安装。真实加密工具、挂载和 OS 签名接受行为仍需 Task12 验证。
+
+
+## 2026-10-13：Task 6A2 签名、DSC 摘要和安装成员效果组合
+
+固定上游仍为 `2d21d21fbdd4f51f013616273ceda9b35a3e0789`。本轮将已有 ldid 调用接入显式生产操作，记录实际输入、输出、参数和 entitlement 来源。签名验证解析每个 Mach-O/FAT slice 的结构和 CodeDirectory，保留先前代码及加载命令效果，并检查最终被覆盖页摘要。Campo 源 plist 的修改通过显式签名关系核对最终二进制内的 entitlement。该验证不证明 OS 接受签名。
+
+`cfw_patch_dsc_maxslide.py` 的数值选择、默认 6 GiB 门槛、dry-run/no-op 和模式保持不变。当实际修改的头部页被已识别 CodeDirectory 覆盖时，操作先检查该页原摘要，再从现有 DSC mapping 推导修改页 VMA，并调用已有 `reattest_modified_pages` 更新对应槽。该变化新增 CodeDirectory 槽字节输出差异；此前只有 maxSlide 头部字段变化。未覆盖页不增加槽写入，坏的原页摘要拒绝修改。最终组合验证保留各次原始代码修改，并按最终页内容检查共享槽，拒绝恢复先前代码或写入错误页摘要。
+
+固定上游二进制比较须将“maxSlide 字段变化”和“本地新增 CodeDirectory 槽更新”分别列出；不能把新增槽差异计为固定上游逐字节一致。本轮使用带 CodeDirectory 的安全合成缓存运行实际 maxSlide 入口，未重新执行真实固件对照或真实镜像验收。
+
+归档、复制、两段 bootstrap 移动及删除容器通过实际来源成员和操作标识组合。EXP 在源 Cryptex 挂载上的 DSC 修改记录镜像身份、前后摘要、原始成员清单和操作行摘要；只读重挂载核验成员后，复制到最终 System 根。JB/EXP 的两个 LaunchDaemon plist 注入复用已有算法并增加显式效果记录。正常安装在 installer/v2 结束后、cleanup 前，只读挂载同一 staged Disk.img 并验证最终目标；该阶段早于后续 `apfs_snap_rename.py` 和 Disk.img 发布。此证据不能作为发布后磁盘摘要、receipt、origin 或启动验收。
+
+最终受影响测试和失败日志、源码 SHA256、原始及 gzip 日志 SHA256 见本轮 `research/evidence/2026-10-13-task6a2/manifest.json`。本轮没有执行真实挂载、VM、sudo 系统安装或 AMFI/TCC 修改。Task6B/C 及真实系统验收仍由后续任务完成。

@@ -7,6 +7,8 @@ import json
 from pathlib import Path, PurePosixPath
 import subprocess
 import tarfile
+import tempfile
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'scripts/patchers/guest-targets.json'
@@ -52,6 +54,7 @@ def render():
             name=line.split('#')[0].split('?')[0].rsplit('/',1)[-1]
             add('preboot-jb-bootstrap-install','preboot:/<boot-hash>/debs/'+name)
     archives = {}
+    moves=[]
     def archive(outer, inner, declaration, prefix, compressed=False):
         data = subprocess.check_output(['/usr/bin/tar','-xOf',str(ROOT/'scripts/resources'/outer),inner])
         if compressed: data = subprocess.check_output(['zstd','-dc'],input=data)
@@ -63,6 +66,10 @@ def render():
                 if name.startswith('/') or '..' in PurePosixPath(name).parts: raise ValueError('unsafe bundled member')
                 table[name] = {'type': member.type.decode(), 'link': member.linkname}
                 if compressed:
+                    moves.append([prefix+name,prefix+str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var'))])
+                    if name.startswith('var/jb/'):
+                        moves.append([prefix+str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var')),
+                                      prefix+str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var/jb'))])
                     for sub in [name, str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var')),
                                 str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var/jb')) if name == 'var/jb' or name.startswith('var/jb/') else name]:
                         add(declaration, prefix+sub)
@@ -76,8 +83,22 @@ def render():
     # Explicit directory metadata has a declaration; descendant writes still need
     # their own exact member. No directory-prefix ownership is used.
     system('system-vphoned-boot-install','/usr/libexec','/System/Library/LaunchDaemons')
-    commands={'patch-seputil': ('system-seputil-boot-gigalocker_uuid', 'system:/usr/libexec/seputil'), 'patch-launchd-cache-loader': ('system-launchd_cache_loader-boot-unsecure_cache_gate', 'system:/usr/libexec/launchd_cache_loader'), 'patch-mobileactivationd': ('system-mobileactivationd-boot-should_hactivate', 'system:/usr/libexec/mobileactivationd'), 'patch-launchd-jetsam': ('system-launchd-boot-jetsam_panic_guard_bypass', 'system:/sbin/launchd'), 'patch-watchdogd': ('system-watchdogd-exp-hv_vmm_cache', 'system:/usr/libexec/watchdogd'), 'patch-diskimagesiod': ('system-diskimagesiod-cfw-is_mount_complete', 'system:/usr/libexec/diskimagesiod'), 'patch-dropbear-plist': ('system-launchdaemons-boot-install', 'system:/System/Library/LaunchDaemons/dropbear.plist'), 'inject-daemons': ('system-launchdaemons-boot-install', 'system:/System/Library/xpc/launchd.plist'), 'inject-daemon': ('system-launchdaemons-boot-environment', 'system:/System/Library/xpc/launchd.plist'), 'patch-post-restore-dt': ('preboot-exp-devicetree_identity', 'preboot:/<boot-hash>/usr/standalone/firmware/devicetree.img4'), 'patch-build-version': ('system-systemversion-cfw-build_version', 'system:/System/Library/CoreServices/SystemVersion.plist'), 'patch-campo-entitlements': ('system-campo-cfw-entitlements', 'system:/Applications/Campo.app/Campo')}
+    commands={'patch-seputil': ('system-seputil-boot-gigalocker_uuid', 'system:/usr/libexec/seputil'), 'patch-launchd-cache-loader': ('system-launchd_cache_loader-boot-unsecure_cache_gate', 'system:/usr/libexec/launchd_cache_loader'), 'patch-mobileactivationd': ('system-mobileactivationd-boot-should_hactivate', 'system:/usr/libexec/mobileactivationd'), 'patch-launchd-jetsam': ('system-launchd-boot-jetsam_panic_guard_bypass', 'system:/sbin/launchd'), 'patch-watchdogd': ('system-watchdogd-exp-hv_vmm_cache', 'system:/usr/libexec/watchdogd'), 'patch-diskimagesiod': ('system-diskimagesiod-cfw-is_mount_complete', 'system:/usr/libexec/diskimagesiod'), 'patch-dropbear-plist': ('system-launchdaemons-boot-install', 'system:/System/Library/LaunchDaemons/dropbear.plist'), 'inject-jb-daemon': ('system-launchdaemons-boot-install', 'system:/System/Library/xpc/launchd.plist'), 'inject-daemons': ('system-launchdaemons-boot-install', 'system:/System/Library/xpc/launchd.plist'), 'inject-daemon': ('system-launchdaemons-boot-environment', 'system:/System/Library/xpc/launchd.plist'), 'patch-post-restore-dt': ('preboot-exp-devicetree_identity', 'preboot:/<boot-hash>/usr/standalone/firmware/devicetree.img4'), 'patch-build-version': ('system-systemversion-cfw-build_version', 'system:/System/Library/CoreServices/SystemVersion.plist'), 'patch-campo-entitlements': ('system-campo-cfw-entitlements', 'system:/Applications/Campo.app/Campo')}
     dsc_commands={'patch-hv-vmm-dsc': 'dyld-exp-hv_vmm', 'patch-camera-dsc': 'dyld-cfw-camera', 'patch-iomfb-swapend': 'dyld-boot-iomfb_swapend', 'patch-iomfb-force-kern': 'dyld-boot-iomfb_force_kern', 'patch-dsc-maxslide': 'dyld-boot-maxslide', 'patch-lsd-embedded-reg': 'dyld-boot-lsd_embedded_reg', 'patch-xpc-lwcr': 'dyld-boot-xpc_lwcr', 'patch-lockdown-mode': 'dyld-boot-lockdown_mode'}
+    signing = {}
+    for name, command in [('seputil','patch-seputil'),('launchd_cache_loader','patch-launchd-cache-loader'),
+                          ('mobileactivationd','patch-mobileactivationd'),('diskimagesiod','patch-diskimagesiod'),
+                          ('watchdogd','patch-watchdogd'),('launchd','patch-launchd-jetsam'),('Campo','patch-campo-entitlements')]:
+        declaration,target=commands[command]
+        signing['.cfw_temp/'+name]={'declaration':declaration,'target':target}
+    for source,declaration,target in [
+        ('.cfw_temp/debugserver','system-debugserver-cfw-install','system:/usr/libexec/debugserver'),
+        ('.cfw_temp/b','system-jb-basebin-install','system:/b'),
+        ('.cfw_temp/TweakLoader.dylib','preboot-jb-tweakloader-install','preboot:/<boot-hash>/jb-vphone/procursus/usr/lib/TweakLoader.dylib'),
+        ('.cfw_temp/vpregister','system-jb-firstboot-install','system:/cores/vpregister'),
+        *[('.cfw_temp/'+name,'preboot-exp-vcam-install','preboot:/<boot-hash>/jb-vphone/procursus/Library/MobileSubstrate/DynamicLibraries/'+name) for name in ['libvcamcaptured.dylib','libcamfix.dylib']],
+        *[('cfw_jb_input/basebin/'+name,'system-jb-basebin-install','system:/cores/'+name) for name in ['launchdhook.dylib','libellekit.dylib','systemhook.dylib']]]:
+        signing[source]={'declaration':declaration,'target':target}
     slots={
         'preboot':r'^preboot:/[0-9A-Fa-f]{96}/',
         'hardware':r'hardware:/(?:[0-9A-Fa-f-]{36}|AA)\.gl',
@@ -87,7 +108,10 @@ def render():
         ('system:/System/Cryptexes/OS','mnt_sysos','CryptexSystemOS.dmg'),
         ('system:/System/Cryptexes/App','mnt_appos','CryptexAppOS.dmg')]}
     less_commands={'patch-mobileactivationd':'system:/usr/libexec/mobileactivationd','patch-launchd-cache-loader':'system:/usr/libexec/launchd_cache_loader','inject-daemons':'system:/System/Library/xpc/launchd.plist'}
-    targets = json.dumps({'schemaVersion':1,'owners':owners,'archives':archives,'lessCommands':less_commands,'commands':commands,'dscCommands':dsc_commands,'slots':slots,'treeTargets':tree_targets},sort_keys=True,separators=(',',':')).encode()
+    sequence=tempfile._RandomNameSequence()
+    v2_signing={'relativePattern':r'\.cfw_temp/\.vphone-launchd-['+re.escape(sequence.characters)+']{'+str(len(next(sequence)))+r'}/launchd',
+                'declaration':'system-launchdaemons-boot-environment','target':'system:/sbin/launchd'}
+    targets = json.dumps({'schemaVersion':1,'owners':owners,'signing':signing,'v2Signing':v2_signing,'moves':moves,'consumedDirectories':['preboot:/<boot-hash>/jb-vphone/procursus/jb'],'archives':archives,'lessCommands':less_commands,'commands':commands,'dscCommands':dsc_commands,'slots':slots,'treeTargets':tree_targets},sort_keys=True,separators=(',',':')).encode()
     digest=hashlib.sha256(targets).hexdigest()
     ids=sorted({i for values in owners.values() for i in values})
     swift='''// Generated by scripts/generate_guest_target_rules.py. Exact target-table identity.

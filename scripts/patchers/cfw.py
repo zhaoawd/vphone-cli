@@ -293,7 +293,7 @@ def _dispatch(*, dry_run=False):
             sys.exit(1)
         inject_daemons(sys.argv[2], sys.argv[3])
 
-    elif cmd == "inject-daemon":
+    elif cmd in ("inject-daemon", "inject-jb-daemon"):
         if len(sys.argv) != 5:
             print("Usage: cfw.py inject-daemon <launchd.plist> <daemon.plist> <launchd_key>")
             sys.exit(1)
@@ -370,11 +370,19 @@ def main():
     table = target_table()[0]
     mapping, dsc = table['commands'], table['dscCommands']
     if len(sys.argv) < 3: raise ValueError("guest patch target missing")
+    if command == 'inject-jb-daemon':
+        sources={str(Path(__file__).resolve().parents[1]/('vphone_'+name+'.plist')):
+                 '/System/Library/LaunchDaemons/com.vphone.'+key+'.plist'
+                 for name,key in [('jb_setup','jb-setup'),('sshd','sshd')]}
+        if plan.context['variant'] not in ('jb','exp') or len(sys.argv)!=5 or sources.get(sys.argv[3])!=sys.argv[4]:
+            raise ValueError('unknown JB daemon producer source/key')
+
     path = Path(os.path.abspath(sys.argv[2]))
     observations = []
     from patchers import component_effects
     effect_store = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent / 'effect-blobs'
     source_image = None
+    source_binding = None
     if plan.context['variant'] == 'less':
         from patchers.guest_write import target_table
         target = target_table()[0]['lessCommands'].get(command)
@@ -399,6 +407,8 @@ def main():
         if mount / 'mnt_sysos_hv_vmm' in path.parents:
             from patchers.cryptex_source import mounted
             source_image = mounted(plan, mount / 'mnt_sysos_hv_vmm')
+            from patchers.cryptex_source import proof
+            source_binding = proof(plan,source_image)
         for item in sorted(path.iterdir()):
             if item.name.startswith('dyld_shared_cache_arm64e') and not item.name.endswith('.map') and not re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
                 raise ValueError("undeclared DSC write member: " + item.name)
@@ -433,7 +443,7 @@ def main():
     finally:
         for item, target, before, effect_input in observations:
             effect = component_effects.capture_change(effect_input, item, effect_store)
-            gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image, effect=effect)
+            gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image, effect=effect, source_binding=source_binding)
 
 
 if __name__ == "__main__":

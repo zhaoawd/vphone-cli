@@ -212,6 +212,20 @@ def verify_command_changes(changes,groups):
 
 
 def file_projection(old,new):
+    with regular(old) as stream: old_magic=stream.read(5)
+    with regular(new) as stream: new_magic=stream.read(5)
+    if old_magic==new_magic==b'dyld_':
+        from . import component_signatures as signatures
+        if signatures.layouts(old)[0]['signature']==signatures.layouts(new)[0]['signature']==(0,0):
+            return {'kind':'bytes','ranges':ranges(old,new)}
+        first,last=signatures.directories(old),signatures.directories(new)
+        if not first or first!=last or old.stat().st_size!=new.stat().st_size:
+            raise ValueError('DSC signature layout changed')
+        excluded=signatures.slot_ranges(new)
+        changes=ranges(old,new,excluded)
+        slots=signatures.changed_slots(old,new,[(r['offset'],r['count']) for r in ranges(old,new)])
+        signatures.verify_slots(new,slots)
+        return {'kind':'dsc','ranges':changes,'slots':slots,'directories':last}
     first,last=plist(old),plist(new)
     if first is not None and last is not None:
         return {'kind':'plist','changes':projection(first,last)}
@@ -328,26 +342,42 @@ def validate_state(value):
 def validate_proof(proof):
     if not isinstance(proof,dict) or type(proof.get('schemaVersion')) is not int or proof['schemaVersion']!=1:
         raise ValueError('unknown operation proof')
-    if proof.get('operation') not in ('copy','change'): raise ValueError('unknown operation')
+    if proof.get('operation') not in ('copy','change','sign'): raise ValueError('unknown operation')
     for field in ('before','after'): validate_state(proof.get(field))
     projected=proof.get('projection')
     if not isinstance(projected,dict): raise ValueError('missing operation projection')
-    if proof['operation']=='copy':
+    if proof['operation']=='sign':
+        if proof['before']['kind']!='file' or proof['after']['kind']!='file' or projected!={'kind':'signature'}: raise ValueError('invalid signature proof')
+    elif proof['operation']=='copy':
         validate_state(proof.get('source'))
         if projected!={'kind':'copy'}: raise ValueError('unknown copy projection')
     elif proof['before']['kind']=='file' and proof['after']['kind']=='file':
-        if projected.get('kind') not in ('plist','bytes','macho'): raise ValueError('unknown file projection')
+        if projected.get('kind') not in ('plist','bytes','macho','dsc'): raise ValueError('unknown file projection')
     else:
         after=proof['after']
         kind='materialized-file' if after['kind']=='file' else 'directory' if after['kind']=='directory' and 'children' not in after else 'state'
         if projected!={'kind':kind}: raise ValueError('incompatible operation projection')
 
 
-def verify(proofs,path,store):
+def verify(proofs,path,store,*,_final_state=None):
     if not proofs: raise ValueError('missing operation effects')
     for proof in proofs: validate_proof(proof)
+    # A sign operation preserves all executable bytes and loader commands.
+    # Verify earlier effects against its actual input, then require that same
+    # executable content in the final output. Signature data itself is replaced.
+    sign_index=next((i for i,p in enumerate(proofs) if p['operation']=='sign'),None)
+    if sign_index is not None and sign_index>0:
+        from . import component_signatures as signatures
+        boundary=proofs[sign_index]['before']
+        verify(proofs[:sign_index],blob(store,boundary['sha256']),store,_final_state=boundary)
+        signatures.verify_signing(blob(store,boundary['sha256']),path)
+        for earlier in proofs[:sign_index]:
+            for key in ('mode','uid','gid'):
+                if earlier['before'].get(key)!=earlier['after'].get(key) and state(path,False).get(key)!=earlier['after'].get(key):
+                    raise ValueError('required metadata effect was overwritten')
+        proofs=proofs[sign_index:]
     recursive=any('children' in p['after'] for p in proofs)
-    final=state(path,recursive);previous=None
+    final=state(path,recursive) if _final_state is None else _final_state;previous=None
     for index,proof in enumerate(proofs):
         before,after=proof['before'],proof['after']
         if previous is not None and before!=previous and not (proof['operation']=='copy' and proof.get('source')==previous): raise ValueError('operation inputs are not the preceding output')
@@ -358,6 +388,14 @@ def verify(proofs,path,store):
             if content(source)!=content(after): raise ValueError('copy source association differs')
             if index!=0 and content(before)!=content(after) and source!=proofs[index-1]['after']: raise ValueError('later copy cannot replace an earlier required effect')
             if after['kind']=='file': blob(store,after['sha256'])
+            continue
+        if proof['operation']=='sign':
+            from . import component_signatures as signatures
+            old,new=blob(store,before['sha256']),blob(store,after['sha256'])
+            signatures.verify_signing(old,new)
+            signatures.verify_signing(new,path)
+            if [encode_value(v) for v in signatures.entitlements(new)]!=[encode_value(v) for v in signatures.entitlements(path)]:
+                raise ValueError('required embedded entitlements were overwritten')
             continue
         kind=proof['projection']['kind']
         if before['kind']=='file' and after['kind']=='file':
@@ -382,7 +420,12 @@ def verify(proofs,path,store):
             verify_command_changes(proof['projection']['commands'],layout['groups'])
             verify_command_changes(proof['projection']['dylibChanges'],
                 {entry['name']:[base64.b64decode(entry['raw'])] for entry in layout['entries']})
-        if kind in ('bytes','macho'):
+        if kind=='dsc':
+            from . import component_signatures as signatures
+            if signatures.directories(path)!=proof['projection']['directories']:
+                raise ValueError('final DSC signature layout differs')
+            signatures.verify_slots(path,proof['projection']['slots'])
+        if kind in ('bytes','macho','dsc'):
             expected=blob(store,after['sha256'])
             with regular(path) as actual,regular(expected) as wanted:
                 for span in proof['projection']['ranges']:
@@ -423,10 +466,6 @@ def verify_rows(plan,rows,roots,store):
         proof=row.get('effect')
         if proof is None: raise ValueError('legacy operation has no final effect proof')
         validate_proof(proof)
-        # A2 supplies the explicit transport/consumption graph. Capturing these
-        # rows remains enabled, but a partial validator cannot accept them.
-        if proof.get('command') in ('mv','rm','tar','gtar'):
-            raise ValueError('final transport/consumption proof is not integrated')
         for field in ('before','after'):
             observed=proof[field]
             if observed['kind']=='file':
@@ -443,9 +482,39 @@ def verify_rows(plan,rows,roots,store):
         root=Path(roots[volume]);path=root/relative.lstrip('/')
         parent=path.parent
         while parent!=root:
-            if parent.is_symlink() or not parent.is_dir(): raise ValueError('linked final target parent')
+            if parent.is_symlink(): raise ValueError('linked final target parent')
             parent=parent.parent
         grouped.setdefault(target,[]).append((row,path))
     if not grouped: raise ValueError('missing operation evidence')
+    transported=[];embedded=[]
     for entries in grouped.values():
-        verify([dict(row['effect'],owner=row['declarationID']) for row,_ in entries],entries[0][1],store)
+        path=entries[0][1]
+        remaining=[]
+        for row,_ in entries:
+            proof=row['effect']
+            if row['declarationID']=='system-campo-cfw-entitlements' and proof['projection']['kind']=='plist':
+                source=str(Path(plan.context['vmDirectory'])/'.cfw_temp/Campo.entitlements')
+                if row['path']!=source: raise ValueError('Campo entitlement source differs')
+                signers=[r['effect'] for r,_ in entries if r['effect']['operation']=='sign'
+                         and r['effect'].get('entitlementsSource')=={'path':source,'state':proof['after']}]
+                if len(signers)!=1: raise ValueError('Campo entitlements have no unique signer consumption')
+                expected=file_projection(blob(store,proof['before']['sha256']),blob(store,proof['after']['sha256']))
+                if canonical(expected)!=canonical(proof['projection']): raise ValueError('Campo plist projection differs')
+                embedded.append((row['target'],hashlib.sha256(canonical(row)).hexdigest()))
+                from .component_signatures import entitlements
+                for actual in entitlements(path):
+                    for change in expected['changes']:
+                        found,value=lookup(actual,change['path'])
+                        if change.get('deleted'):
+                            if found: raise ValueError('required embedded entitlement deletion was reversed')
+                        elif not found or encode_value(value)!=change['value']:
+                            raise ValueError('required embedded entitlement effect was overwritten')
+            else: transported.append(row)
+    from .component_transport import verify as verify_transport
+    admitted={id(row) for row in transported}
+    outputs=verify_transport([row for row in rows if id(row) in admitted],roots,store,plan)
+    for target,identifier in embedded:
+        matches=[output for output in outputs if output['target']==target]
+        if len(matches)!=1: raise ValueError('embedded entitlement has no unique final output')
+        matches[0]['effects']=sorted(set(matches[0]['effects'])|{identifier})
+    return outputs

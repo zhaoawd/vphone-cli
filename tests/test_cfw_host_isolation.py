@@ -46,6 +46,7 @@ case "${0:t}:$1" in
  hdiutil:detach|diskutil:eject) [[ ${FAIL_CLEANUP:-0} == 1 ]] && exit 1; if [[ -f "$TEST_MOUNTS" ]]; then "$TEST_PYTHON" -c 'import os,pathlib,sys; p=pathlib.Path(os.environ["TEST_MOUNTS"]); p.write_text("".join(l for l in p.read_text().splitlines(True) if " on "+sys.argv[1]+" (" not in l))' "$2"; fi; exit 0;;
  python:*) if [[ "$1" == */vm_lock.py || "$1" == -c ]]; then exec "$TEST_PYTHON" "$@"; fi
    if [[ "$1" == */cfw_disk_txn.py ]]; then exec "$TEST_PYTHON" "$TEST_TXN_HARNESS" "$@"; fi
+   if [[ "$1" == */patchers/plan_gate.py && "$2" == verify-final ]]; then exit ${FAIL_FINAL_EFFECT:-0}; fi
    if [[ "$1" == */apfs_snap_rename.py ]]; then [[ ${FAIL_SNAP:-0} == 1 ]] && exit 5; exec "$TEST_PYTHON" -c 'import sys; f=open(sys.argv[1],"r+b"); f.seek(1024); f.write(b"SNAPSHOT-FLIPPED")' "$2"; fi
    exit 0;;
 esac
@@ -423,6 +424,16 @@ class HostIsolationTests(HostDriverFixture):
         rc, _ = self.finish(p)
         self.assertNotEqual(rc, 0)
         self.assertNotIn('apfs_snap_rename.py', (self.root / 'calls').read_text())
+
+    def test_final_effect_failure_prevents_snapshot_and_publish(self):
+        _, process = self.start(FAIL_FINAL_EFFECT='43')
+        rc, output = self.finish(process)
+        self.assertEqual(rc, 43, output)
+        calls = (self.root / 'calls').read_text()
+        self.assertIn('verify-final', calls)
+        self.assertNotIn('apfs_snap_rename.py', calls)
+        self.assertNotIn(' publish ', calls)
+        self.assertIn('hdiutil detach /dev/disk91', calls)
 
     def test_installer_failure_survives_cleanup_failure(self):
         _, p = self.start(INSTALL_EXIT='37', FAIL_CLEANUP='1')

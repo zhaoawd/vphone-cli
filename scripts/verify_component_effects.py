@@ -38,17 +38,6 @@ def run(mode, mount, proof_path):
                 raise ValueError('unknown nested filesystem operation')
             gate.authorize(plan,row['declarationID'],row['target'])
             grouped.setdefault(row['target'],[]).append(row)
-        for target,group in grouped.items():
-            path=mount/target.removeprefix('system:/')
-            before=group[-1].get('effect',{}).get('after')
-            if before is None: raise ValueError('nested operation lacks preserved effect')
-            # This producer stage includes its explicit chmod/signing actions.
-            # Their actual changes compose with, but cannot erase, earlier effects.
-            final=effects.capture_change(before,path,store)
-            effects.verify([r['effect'] for r in group]+[final],path,store)
-            previous=gate.FileSnapshot(before['sha256'],{k:before[k] for k in ('mode','uid','gid')})
-            gate.append_evidence(plan,group[-1]['declarationID'],target,path,previous,gate.snapshot(path),effect=final)
-        rows=[json.loads(line) for line in gate.strict_bytes(evidence).splitlines() if line]
         effects.verify_rows(plan,rows,{'system':mount},store)
         record={'schemaVersion':1,'generationID':plan.record['generationID'],
                 'planDigest':plan.record['planSHA256'],'desiredSHA256':plan.raw_sha256,

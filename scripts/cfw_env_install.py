@@ -140,17 +140,25 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
         environment.save(report_path, record)
         return 3
 
-    def write(relative, data, mode):
+    def write(relative, data, mode, source):
         path = target_path(root, relative)
         previous = environment.sha256_path(path) if path.is_file() and not path.is_symlink() else None
         if frozen_plan is not None:
             from patchers import plan_gate as gate
             target = 'system:/' + relative.lstrip('/')
             gate.authorize(frozen_plan, 'system-launchdaemons-boot-environment', target)
+            from patchers import component_effects as effects
+            store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
             actual_before = gate.snapshot(path)
+            effect_before=effects.capture_input(path,store)
+            source_state=effects.capture_input(source,store)
+            if source_state.get('sha256')!=hashlib.sha256(data).hexdigest():
+                raise environment.Refused('v2 write data differs from source')
         atomic_write(path, data, mode, owner)
         if frozen_plan is not None:
-            gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', target, path, actual_before, gate.snapshot(path))
+            effect=effects.capture_copy(source_state,path,store,before=effect_before)
+            effect.update(command='cp',sourcePath=str(source))
+            gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', target, path, actual_before, gate.snapshot(path),effect=effect)
         record['files'].append({'path': '/' + relative.lstrip('/'), 'before': previous,
                                 'after_sha256': environment.sha256_path(path), 'mode': f'{mode:04o}',
                                 'owner': f'{owner[0]}:{owner[1]}'})
@@ -158,18 +166,21 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
     (vm / '.cfw_temp').mkdir(mode=0o700, exist_ok=True)
     try:
         for entry in manifest['libraries']:
-            write(entry['guest'], Path(expected[entry['name']]['source']).read_bytes(), 0o755)
+            write(entry['guest'], Path(expected[entry['name']]['source']).read_bytes(), 0o755, Path(expected[entry['name']]['source']))
         alias = root / manifest['load_alias']['path']
         if not os.path.lexists(alias):
             if frozen_plan is not None:
                 from patchers import plan_gate as gate
                 target = 'system:/' + manifest['load_alias']['path'].lstrip('/')
                 gate.authorize(frozen_plan, 'system-launchdaemons-boot-environment', target)
+                from patchers import component_effects as effects
+                store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
                 actual_before = gate.snapshot(alias)
+                effect_before=effects.capture_input(alias,store)
             os.symlink(manifest['load_alias']['target'], alias)
             os.lchown(alias, *owner)
             if frozen_plan is not None:
-                gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', target, alias, actual_before, gate.snapshot(alias))
+                gate.append_evidence(frozen_plan, 'system-launchdaemons-boot-environment', target, alias, actual_before, gate.snapshot(alias),effect=effects.capture_change(effect_before,alias,store))
         before_loads = environment.dylib_loads(launchd)
         launchd_before = environment.sha256_path(launchd)
         entitlements = command(runner, ['ldid', '-e', launchd])
@@ -178,35 +189,50 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
         if '/vh' not in before_loads:
             backup = root / (manifest['launchd'] + '.bak')
             if not os.path.lexists(backup):
-                write(manifest['launchd'] + '.bak', launchd.read_bytes(), 0o755)
-            with tempfile.TemporaryDirectory(prefix='.vphone-launchd-', dir=vm / '.cfw_temp') as temp:
+                write(manifest['launchd'] + '.bak', launchd.read_bytes(), 0o755, launchd)
+            from patchers import guest_write
+            directory=guest_write.signing_directory(frozen_plan) if frozen_plan is not None else tempfile.TemporaryDirectory(prefix='.vphone-launchd-', dir=vm / '.cfw_temp')
+            with directory as temp:
                 patched = Path(temp) / 'launchd'
-                patched.write_bytes(launchd.read_bytes())
+                if frozen_plan is None: patched.write_bytes(launchd.read_bytes())
+                else: guest_write.run(frozen_plan,['cp',str(launchd),str(patched)])
                 patched.chmod(0o755)
                 ents = Path(temp) / 'entitlements.plist'
                 ents.write_bytes(entitlements)
                 command(runner, [sys.executable, SCRIPT_DIR / 'patchers/cfw.py', 'inject-dylib', patched, '/vh'])
-                command(runner, ['ldid', '-S' + str(ents), '-M', '-K' + str(certificate), patched])
+                signing_args=['ldid', '-S' + str(ents), '-M', '-K' + str(certificate), str(patched)]
+                if frozen_plan is not None:
+                    guest_write.sign(frozen_plan,signing_args,execute=lambda args: command(runner,args))
+                else: command(runner,signing_args)
                 after_entitlements = plistlib.loads(command(runner, ['ldid', '-e', patched]))
                 if after_entitlements != entitlements_object:
                     raise environment.Refused('launchd entitlements changed during signing')
                 if '/vh' not in environment.dylib_loads(patched) or not environment.has_code_signature(patched):
                     raise environment.Refused('signed launchd has no /vh load command or code signature')
-                write(manifest['launchd'], patched.read_bytes(), 0o755)
+                write(manifest['launchd'], patched.read_bytes(), 0o755, patched)
         record['launchd'] = {'before_sha256': launchd_before, 'after_sha256': environment.sha256_path(launchd),
                              'load_commands_before': before_loads, 'load_commands_after': environment.dylib_loads(launchd),
                              'entitlements_sha256_before': entitlements_digest,
                              'entitlements_sha256_after': entitlements_digest,
                              'result': 'unchanged' if '/vh' in before_loads else 'injected'}
         api = profile['api_daemon']
-        write(api['program'], (daemon / 'vphoned').read_bytes(), 0o755)
-        write(api['plist'], (daemon / 'vphoned-api.plist').read_bytes(), 0o644)
+        write(api['program'], (daemon / 'vphoned').read_bytes(), 0o755, daemon / 'vphoned')
+        write(api['plist'], (daemon / 'vphoned-api.plist').read_bytes(), 0o644, daemon / 'vphoned-api.plist')
         plist_before = environment.sha256_path(target_plist)
         with tempfile.TemporaryDirectory(prefix='.vphone-daemon-', dir=vm / '.cfw_temp') as temp:
             injected = Path(temp) / 'launchd.plist'
-            injected.write_bytes(target_plist.read_bytes())
+            if frozen_plan is None: injected.write_bytes(target_plist.read_bytes())
+            else:
+                from patchers import guest_write, component_effects as effects, plan_gate as gate
+                guest_write.run(frozen_plan,['cp',str(target_plist),str(injected)])
+                gate.authorize(frozen_plan,'system-launchdaemons-boot-environment','system:/System/Library/xpc/launchd.plist')
+                store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
+                plist_snapshot=gate.snapshot(injected);plist_input=effects.capture_input(injected,store)
             inject_daemon(injected, daemon / 'vphoned-api.plist', api['launchd_key'])
-            write('System/Library/xpc/launchd.plist', injected.read_bytes(), 0o644)
+            if frozen_plan is not None:
+                gate.append_evidence(frozen_plan,'system-launchdaemons-boot-environment','system:/System/Library/xpc/launchd.plist',
+                    injected,plist_snapshot,gate.snapshot(injected),effect=effects.capture_change(plist_input,injected,store))
+            write('System/Library/xpc/launchd.plist', injected.read_bytes(), 0o644, injected)
         record['launchd_plist'] = {'key': api['launchd_key'], 'before_sha256': plist_before,
                                    'after_sha256': environment.sha256_path(target_plist)}
         after = environment.assess(root, vm, components, manifest)

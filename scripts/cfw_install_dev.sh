@@ -58,7 +58,7 @@ ldid_sign_ent() {
     local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
     local args=("-S$entitlements_plist" "-K$VM_DIR/$CFW_INPUT/signcert.p12")
     [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    ldid "${args[@]}" "$file"
+    cfw_guest_sign "${args[@]}" "$file"
 }
 
 # Detach a DMG mountpoint if currently mounted, ignore errors

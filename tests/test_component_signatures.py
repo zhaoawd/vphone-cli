@@ -48,6 +48,9 @@ class ComponentSignatureTests(unittest.TestCase):
     def test_fat_first_signature_preserves_both_architectures(self):
         def fat(first,second):
             offset1=4096;offset2=12288
+            second=bytearray(second);struct.pack_into('<I',second,8,2)
+            if len(second)>4096: second[4168:4200]=hashlib.sha256(second[:4096]).digest()
+            second=bytes(second)
             header=struct.pack('>II',0xcafebabe,2)+struct.pack('>IIIII',0x100000c,0,offset1,len(first),12)+struct.pack('>IIIII',0x100000c,2,offset2,len(second),12)
             return header+b'\0'*(offset1-len(header))+first+b'\0'*(offset2-offset1-len(first))+second
         with tempfile.TemporaryDirectory() as tmp:
@@ -73,3 +76,84 @@ class ComponentSignatureTests(unittest.TestCase):
             signatures.verify_slots(final,requirements)
             data=bytearray(final.read_bytes());data[4096+28+44]^=1;final.write_bytes(data)
             with self.assertRaises(ValueError): signatures.verify_slots(final,requirements)
+
+    def test_overlapping_signature_blobs_and_header_hash_table_refuse(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'binary'
+            data=bytearray(signed_macho())
+            # Two slots point to the same CodeDirectory.
+            struct.pack_into('>I',data,4096+24,28)
+            path.write_bytes(data)
+            with self.assertRaises(ValueError): signatures.directories(path)
+            data=bytearray(signed_macho())
+            # A code slot cannot alias the CodeDirectory header.
+            struct.pack_into('>I',data,4096+28+16,8)
+            path.write_bytes(data)
+            with self.assertRaises(ValueError): signatures.directories(path)
+
+    def test_fat_cpu_identity_must_match_its_slice_header(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'binary'
+            body=signed_macho()
+            path.write_bytes(struct.pack('>IIIIIII',0xcafebabe,1,0x100000c,2,4096,len(body),12)+b'\0'*(4096-28)+body)
+            with self.assertRaises(ValueError): signatures.layouts(path)
+
+    def test_signer_requires_code_directory_for_each_fat_slice(self):
+        def fat(second):
+            first=signed_macho();offset=12288
+            header=struct.pack('>II',0xcafebabe,2)+struct.pack('>IIIII',0x100000c,0,4096,len(first),12)+struct.pack('>IIIII',0x100000c,2,offset,len(second),12)
+            return header+b'\0'*(4096-len(header))+first+b'\0'*(offset-4096-len(first))+second
+        with tempfile.TemporaryDirectory() as tmp:
+            before,after=Path(tmp)/'old',Path(tmp)/'new'
+            second=bytearray(signed_macho());struct.pack_into('<I',second,8,2)
+            second[4168:4200]=hashlib.sha256(second[:4096]).digest()
+            before.write_bytes(fat(second))
+            # Keep a well-formed entitlements-only SuperBlob on the second slice.
+            ent=plistlib.dumps({'test':True});blob=struct.pack('>II',0xfade7171,len(ent)+8)+ent
+            size=20+len(blob);body=second[:4096];struct.pack_into('<I',body,44,size)
+            after.write_bytes(fat(body+struct.pack('>IIIII',0xfade0cc0,size,1,5,20)+blob))
+            with self.assertRaises(ValueError): signatures.verify_signing(before,after)
+
+    def test_signer_cannot_discard_non_signature_trailer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old,new=Path(tmp)/'old',Path(tmp)/'new'
+            old.write_bytes(signed_macho()+b'required trailer')
+            new.write_bytes(signed_macho())
+            with self.assertRaises(ValueError): signatures.verify_signing(old,new)
+
+    def test_linkedit_resize_must_describe_actual_signature_layout(self):
+        def binary(vmsize):
+            data=bytearray(signed_macho());struct.pack_into('<II',data,16,2,88)
+            command=bytearray(72);struct.pack_into('<II16sQQQQIIII',command,0,0x19,72,b'__LINKEDIT',0x100000000,vmsize,4096,len(data)-4096,1,1,0,0)
+            data[48:120]=command;data[4168:4200]=hashlib.sha256(data[:4096]).digest();return data
+        with tempfile.TemporaryDirectory() as tmp:
+            old,new=Path(tmp)/'old',Path(tmp)/'new'
+            old.write_bytes(binary(4096));new.write_bytes(binary(16384))
+            signatures.verify_signing(old,new)
+            new.write_bytes(binary(1<<40))
+            with self.assertRaises(ValueError): signatures.verify_signing(old,new)
+
+    def test_signer_cannot_promote_an_unknown_input_signature_structure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old,new=Path(tmp)/'old',Path(tmp)/'new'
+            data=bytearray(signed_macho());data[4096]=0
+            old.write_bytes(data);new.write_bytes(signed_macho())
+            with self.assertRaises(ValueError): signatures.verify_signing(old,new)
+
+    def test_noncontiguous_code_directory_requires_supported_page_mapping(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'binary';data=bytearray(signed_macho());cd=4096+28
+            data[cd+44:cd+44]=b'\0'*4
+            struct.pack_into('>I',data,cd+4,80)
+            struct.pack_into('>I',data,cd+8,0x20100)
+            struct.pack_into('>I',data,cd+16,48)
+            struct.pack_into('>I',data,4096+4,len(data)-4096)
+            struct.pack_into('>I',data,4096+24,108)
+            struct.pack_into('<I',data,44,len(data)-4096)
+            data[cd+48:cd+80]=hashlib.sha256(data[:4096]).digest()
+            path.write_bytes(data)
+            signatures.verify_slots(path,signatures.changed_slots(path,path,[(256,1)]))
+            struct.pack_into('>I',data,cd+44,72)
+            path.write_bytes(data)
+            with self.assertRaisesRegex(ValueError,'scatter'):
+                signatures.directories(path)

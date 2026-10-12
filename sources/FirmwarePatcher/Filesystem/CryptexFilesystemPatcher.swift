@@ -243,10 +243,11 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
             patcherPath.path, "patch-launchd-cache-loader",
             launchdCacheLoaderPath.path
         ])
-        _ = try runProcess("/bin/chmod", ["0755", launchdCacheLoaderPath.path])
+        _ = try runProcess(pythonPath.path, [resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "write", "/bin/chmod", "0755", launchdCacheLoaderPath.path])
         
         let signingCertificatePath = cfwInput.appending(path: "cfw_input/signcert.p12")
-        _ = try runProcess("/opt/homebrew/bin/ldid", [
+        _ = try runProcess(pythonPath.path, [
+            resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "sign", "/opt/homebrew/bin/ldid",
             "-S", "-M", "-K\(signingCertificatePath.path)",
             "-Icom.apple.launchd_cache_loader",
             launchdCacheLoaderPath.path
@@ -347,10 +348,11 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
             resources.cfwPy.path, "patch-mobileactivationd",
             mobileActivationdPath.path
         ])
-        _ = try runProcess("/bin/chmod", ["0755", mobileActivationdPath.path])
+        _ = try runProcess(pythonPath.path, [resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "write", "/bin/chmod", "0755", mobileActivationdPath.path])
         
         let signingCertificatePath = cfwInput.appending(path: "cfw_input/signcert.p12")
-        _ = try runProcess("/opt/homebrew/bin/ldid", [
+        _ = try runProcess(pythonPath.path, [
+            resources.scriptsDir.appendingPathComponent("patchers/plan_gate.py").path, "sign", "/opt/homebrew/bin/ldid",
             "-S", "-M", "-K\(signingCertificatePath.path)",
             mobileActivationdPath.path
         ])

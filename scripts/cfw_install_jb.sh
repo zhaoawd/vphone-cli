@@ -61,7 +61,7 @@ ldid_sign_ent() {
     local file="$1" entitlements_plist="$2" bundle_id="${3:-}"
     local args=("-S$entitlements_plist" "-K$VM_DIR/$CFW_INPUT/signcert.p12")
     [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    ldid "${args[@]}" "$file"
+    cfw_guest_sign "${args[@]}" "$file"
 }
 
 build_tweakloader() {
@@ -199,7 +199,7 @@ fi
 
 # Re-sign with original entitlements to avoid "operation not permitted" on spawn
 if [[ -s "$TEMP_DIR/launchd.entitlements" ]]; then
-    ldid -S"$TEMP_DIR/launchd.entitlements" -M "-K$VM_DIR/$CFW_INPUT/signcert.p12" "$TEMP_DIR/launchd"
+    cfw_guest_sign -S"$TEMP_DIR/launchd.entitlements" -M "-K$VM_DIR/$CFW_INPUT/signcert.p12" "$TEMP_DIR/launchd"
 else
     ldid_sign "$TEMP_DIR/launchd"
 fi
@@ -412,16 +412,8 @@ if [[ -f "$SETUP_PLIST" ]]; then
     # Inject into launchd.plist so launchd starts it at boot
     echo "  Injecting com.vphone.jb-setup into launchd.plist..."
     cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
-    "$PYTHON3" -c "
-import plistlib, sys
-with open(sys.argv[1], 'rb') as f:
-    target = plistlib.load(f)
-with open(sys.argv[2], 'rb') as f:
-    daemon = plistlib.load(f)
-target.setdefault('LaunchDaemons', {})['/System/Library/LaunchDaemons/com.vphone.jb-setup.plist'] = daemon
-with open(sys.argv[1], 'wb') as f:
-    plistlib.dump(target, f, sort_keys=False)
-" "$TEMP_DIR/launchd.plist" "$SETUP_PLIST"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$TEMP_DIR/launchd.plist" "$SETUP_PLIST" \
+        "/System/Library/LaunchDaemons/com.vphone.jb-setup.plist"
     cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
     cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
     echo "  [+] com.vphone.jb-setup.plist injected into launchd.plist"
@@ -443,16 +435,8 @@ if [[ -f "$SSHD_PLIST" ]]; then
     # Inject into launchd.plist so launchd starts it at boot
     echo "  Injecting com.vphone.sshd into launchd.plist..."
     cfw_guest_write cp "$MNT1/System/Library/xpc/launchd.plist" "$TEMP_DIR/launchd.plist"
-    "$PYTHON3" -c "
-import plistlib, sys
-with open(sys.argv[1], 'rb') as f:
-    target = plistlib.load(f)
-with open(sys.argv[2], 'rb') as f:
-    daemon = plistlib.load(f)
-target.setdefault('LaunchDaemons', {})['/System/Library/LaunchDaemons/com.vphone.sshd.plist'] = daemon
-with open(sys.argv[1], 'wb') as f:
-    plistlib.dump(target, f, sort_keys=False)
-" "$TEMP_DIR/launchd.plist" "$SSHD_PLIST"
+    "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" inject-jb-daemon "$TEMP_DIR/launchd.plist" "$SSHD_PLIST" \
+        "/System/Library/LaunchDaemons/com.vphone.sshd.plist"
     cfw_guest_write cp -R "$TEMP_DIR/launchd.plist" "$MNT1/System/Library/xpc/launchd.plist"
     cfw_guest_write /bin/chmod 0644 $MNT1/System/Library/xpc/launchd.plist
     echo "  [+] com.vphone.sshd.plist injected into launchd.plist"

@@ -164,6 +164,10 @@ if __name__ == '__main__':
             return subprocess.CompletedProcess(args, 0, output, b'')
         real_install = module.install_mounted
         def install(*args, **kwargs):
+            # This tar-backed harness tests disk publication/rollback only.
+            # Frozen producer evidence uses real plans and signers in
+            # test_patch_plan_gate and CFWFrozenPlanTests.
+            kwargs['frozen_plan'] = None
             return real_install(*args, **kwargs, owner=(os.getuid(), os.getgid()), runner=signer)
         module.install_mounted = install
         if 'install-second' in os.environ.get('CFW_ENV_FAULTS', '').split(','):

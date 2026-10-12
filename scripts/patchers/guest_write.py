@@ -7,6 +7,9 @@ import re
 import stat
 import subprocess
 import tarfile
+import contextlib
+import tempfile
+import uuid
 from . import plan_gate as gate
 
 
@@ -42,10 +45,11 @@ def normalized(target):
 def logical(path):
     path = Path(os.path.abspath(path))
     root = Path(os.environ['CFW_HOST_MNT'])
-    for directory, volume in [('mnt1', 'system'), ('mnt3', 'hardware'), ('mnt5', 'preboot')]:
-        base = root / directory
-        if path == base or base in path.parents:
-            return volume + ':/' + str(path.relative_to(base)) if path != base else volume + ':/'
+    for base_root in (root,root.resolve()):
+        for directory, volume in [('mnt1', 'system'), ('mnt3', 'hardware'), ('mnt5', 'preboot')]:
+            base = base_root / directory
+            if path == base or base in path.parents:
+                return volume + ':/' + str(path.relative_to(base)) if path != base else volume + ':/'
     return None
 
 
@@ -77,9 +81,13 @@ def owner(plan, target, hint=None):
     else:
         # Shared launchd input/output has an explicit writer relationship. The
         # injected command itself separately records the hook/environment effect.
-        preferred = {'system:/sbin/launchd':'system-launchd-boot-jetsam_panic_guard_bypass',
+        preferred = {'system:/System/Library/xpc/launchd.plist':'system-launchdaemons-boot-install',
+                     'system:/System/Library/xpc/launchd.plist.bak':'system-launchdaemons-boot-install',
+                     'system:/sbin/launchd':'system-launchd-boot-jetsam_panic_guard_bypass',
                      'system:/usr/libexec/vphoned-api':'system-vphoned-boot-install',
                      'system:/System/Library/LaunchDaemons/vphoned-api.plist':'system-vphoned-boot-install'}
+        if target in ('system:/System/Library/xpc/launchd.plist','system:/System/Library/xpc/launchd.plist.bak') and preferred[target] not in allowed:
+            raise ValueError('exact shell boot plist writer is not selected')
         selected = preferred.get(target) if preferred.get(target) in allowed else None
         if selected is None:
             if len(allowed) != 1: raise ValueError('unknown or ambiguous guest target: ' + target)
@@ -143,6 +151,8 @@ def copy_targets(source, destination):
 def run(plan, argv):
     gate.require_write_context(plan)
     command = Path(argv[0]).name
+    if plan.context['variant']=='less':
+        return less_metadata(plan,argv)
     if command not in {'cp','mv','rm','mkdir','chmod','chown','ln','gtar','tar','find'}:
         raise ValueError('unsupported guarded guest command: ' + command)
     args = argv[1:]
@@ -172,8 +182,11 @@ def run(plan, argv):
         for source in operands[:-1]:
             if not logical(source): gate.private_path(plan, source)
     targets = []
+    staged_targets={}
     copy_sources = {}
     cryptex_copies = []
+    source_images = {}
+    source_bindings = {}
     if command in {'cp','mv'} and len(operands)>=2:
         destination=operands[-1]
         for source in operands[:-1]:
@@ -181,8 +194,9 @@ def run(plan, argv):
                 if logical(destination) in {'system:/System/Cryptexes/OS','system:/System/Cryptexes/App'} and Path(source).is_dir():
                     expected_mount = Path(os.environ['CFW_HOST_MNT']) / target_table()[0]['treeTargets'][logical(destination)]['sourceMount']
                     if Path(source) != expected_mount: raise ValueError('Cryptex source differs from invocation-local image mount')
-                    from .cryptex_source import mounted, tree
-                    mounted(plan, expected_mount)
+                    from .cryptex_source import mounted, tree, proof
+                    source_images[Path(destination)]=mounted(plan, expected_mount)
+                    source_bindings[Path(destination)]=proof(plan,source_images[Path(destination)])
                     if any(Path(destination).iterdir()): raise ValueError('Cryptex replacement destination is not empty')
                     cryptex_copies.append((Path(destination),tree(source)))
                     # Inspect the complete source member table before its whole-image
@@ -197,6 +211,12 @@ def run(plan, argv):
                     source_path = Path(source)
                     source_items = list(walk(source_path)) if source_path.is_dir() and not source_path.is_symlink() else [source_path]
                     copy_sources.update(zip(copied,source_items))
+            elif logical(source) and command=='cp':
+                copied=copy_targets(source,destination)
+                originals=list(walk(source)) if Path(source).is_dir() and not Path(source).is_symlink() else [Path(source)]
+                targets+=copied
+                copy_sources.update(zip(copied,originals))
+                staged_targets.update({target:logical(original) for target,original in zip(copied,originals)})
             if command=='mv' and logical(source): targets += list(walk(source))
     elif command in {'chmod','chown'}:
         for path in operands[1:]:
@@ -231,7 +251,7 @@ def run(plan, argv):
     archive_associations = {}
     if command in {'tar','gtar'} and targets:
         flag=next(i for i,a in enumerate(args) if a in ('-xf','-f'))
-        archive_path=Path(args[flag+1]);archive_digest=component_effects.digest(archive_path)
+        archive_path=Path(args[flag+1]);archive_digest=component_effects.persist(archive_path,effect_store)
         destination=Path(args[args.index('-C')+1])
         with tarfile.open(archive_path) as archive:
             for member in archive:
@@ -240,7 +260,6 @@ def run(plan, argv):
                 target=destination/name
                 source_state={'mode':member.mode,'uid':member.uid,'gid':member.gid}
                 if member.isfile():
-                    import tempfile
                     fd,temporary=tempfile.mkstemp(prefix='.archive-member-',dir=effect_store)
                     try:
                         with os.fdopen(fd,'wb') as out,archive.extractfile(member) as source:
@@ -252,7 +271,7 @@ def run(plan, argv):
                 elif member.isdir(): source_state.update(kind='directory')
                 else: raise ValueError('unsupported archive effect member')
                 source_states[target]=source_state
-                archive_associations[target]={'archiveSHA256':archive_digest,'member':name}
+                archive_associations[target]={'archiveSHA256':archive_digest,'archivePath':str(archive_path),'archiveTarget':logical(archive_path),'archiveName':archive_path.name,'destination':logical(destination),'member':name}
         if component_effects.digest(archive_path)!=archive_digest: raise ValueError('archive changed during source capture')
     observations=[]
     for path in targets:
@@ -260,7 +279,7 @@ def run(plan, argv):
             from .cryptex_source import mounted
             mounted(plan,Path(os.environ['CFW_HOST_MNT'])/('mnt_sysos' if logical(path).endswith('/OS') else 'mnt_appos'))
         no_link_parents(path)
-        target=logical(path)
+        target=logical(path) or staged_targets.get(path)
         declaration=owner(plan,target)
         if path.is_symlink() and command not in {'rm','mv','ln'}:
             raise ValueError('guest operation follows target symlink')
@@ -270,6 +289,8 @@ def run(plan, argv):
         observations.append((path,target,declaration,state(path),component_effects.capture_input(path,effect_store,recursive),recursive))
     gate.recheck(plan)
     binaries={'cp':'/bin/cp','mv':'/bin/mv','rm':'/bin/rm','mkdir':'/bin/mkdir','chmod':'/bin/chmod','chown':'/usr/sbin/chown','ln':'/bin/ln','find':'/usr/bin/find','tar':'/usr/bin/tar','gtar':'/opt/homebrew/bin/gtar'}
+    operation_id=uuid.uuid4().hex
+    move_targets={source:logical(target) for target,source in copy_sources.items()} if command=='mv' else {}
     result=subprocess.run([binaries[command]]+args,check=False)
     for destination,expected in cryptex_copies:
         from .cryptex_source import tree
@@ -277,10 +298,126 @@ def run(plan, argv):
     for path,target,declaration,before,effect_input,recursive in observations:
         if path in source_states:
             effect=component_effects.capture_copy(source_states[path],path,effect_store,before=effect_input,recursive=recursive)
-            if path in copy_sources: effect['sourcePath']=str(copy_sources[path])
+            if path in copy_sources:
+                effect['sourcePath']=str(copy_sources[path])
+                effect['sourceTarget']=logical(copy_sources[path])
             if path in archive_associations: effect['sourceArchive']=archive_associations[path]
         else:
             effect=component_effects.capture_change(effect_input,path,effect_store,recursive)
         effect['command']=command
-        gate.append_evidence(plan,declaration,target,path,before,state(path),effect=effect)
+        effect['operationID']=operation_id
+        if path in move_targets: effect['transportTarget']=move_targets[path]
+        gate.append_evidence(plan,declaration,target,path,before,state(path),source_image=source_images.get(path),effect=effect,source_binding=source_bindings.get(path))
     if result.returncode: raise SystemExit(result.returncode)
+
+
+def sign(plan, argv, *, execute=None):
+    """Observe an explicit signer, after exact source/target authorization."""
+    from . import component_effects as effects
+    from . import component_signatures as signatures
+    gate.require_write_context(plan)
+    if len(argv)<3 or Path(argv[0]).name!='ldid': raise ValueError('unsupported signing command')
+    source=Path(os.path.abspath(argv[-1]));vm=Path(plan.context['vmDirectory'])
+    args=argv[1:-1]
+    if not any(a.startswith('-S') for a in args) or any(not (a=='-M' or a.startswith(('-S','-K','-I'))) for a in args):
+        raise ValueError('unsupported signing options')
+    if plan.context['variant']=='less':
+        target=less_target(plan,source)
+        rule={'target':target,'declaration':'filesystem-less-cryptex_merge'}
+    else:
+        rule=target_table()[0]['signing'].get(str(source.relative_to(vm))) if vm in source.parents else None
+        if rule is None: rule=v2_signing_rule(plan,source)
+        if rule is None: raise ValueError('unknown exact signing source')
+        gate.private_path(plan,source)
+    is_v2=source.parent in _signing_directories
+    target=rule['target']
+    if '<boot-hash>' in target:
+        boot=os.environ.get('VPHONE_SIGN_BOOT_HASH','')
+        if re.fullmatch('[0-9A-Fa-f]{96}',boot) is None: raise ValueError('missing exact signing boot target')
+        target=target.replace('<boot-hash>',boot)
+    declaration=rule['declaration'];gate.authorize(plan,declaration,target)
+    store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
+    before=effects.capture_input(source,store);snapshot=gate.snapshot(source)
+    ent_paths=[Path(arg[2:]) for arg in args if arg.startswith('-S') and len(arg)>2]
+    if len(ent_paths)>1: raise ValueError('ambiguous signing entitlements')
+    ent_state=effects.capture_input(ent_paths[0],store) if ent_paths else None
+    if ent_paths and effects.plist(ent_paths[0]) is None: raise ValueError('invalid signing entitlements')
+    gate.recheck(plan)
+    if execute is None: subprocess.run(argv,check=True)
+    else: execute(argv)
+    gate.private_path(plan,source) if plan.context['variant']!='less' else less_target(plan,source)
+    if is_v2: v2_signing_rule(plan,source)
+    after=effects.capture_input(source,store)
+    signatures.verify_signing(effects.blob(store,before['sha256']),source)
+    if ent_paths:
+        if effects.state(ent_paths[0])!=ent_state: raise ValueError('signing entitlements changed')
+        expected=effects.encode_value(effects.plist(ent_paths[0]))
+        if any(effects.encode_value(value)!=expected for value in signatures.entitlements(source)):
+            raise ValueError('signer embedded entitlements differ from source')
+    proof={'schemaVersion':1,'operation':'sign','before':before,'after':after,
+           'projection':{'kind':'signature'},'signerArguments':argv[1:]}
+    if ent_paths: proof['entitlementsSource']={'path':str(ent_paths[0]),'state':ent_state}
+    gate.append_evidence(plan,declaration,target,source,snapshot,gate.snapshot(source),effect=proof)
+
+
+def less_target(plan,path):
+    work=Path(plan.context['filesystemTransaction'])/'work'
+    path=Path(os.path.abspath(path))
+    if work not in path.parents: raise ValueError('less signing source outside transaction work')
+    current=path
+    while current!=work:
+        if current.is_symlink(): raise ValueError('linked less signing source')
+        current=current.parent
+    targets=[target for target in target_table()[0]['lessCommands'].values()
+             if str(path).endswith(target.removeprefix('system:'))]
+    if len(targets)!=1: raise ValueError('unknown less signing source')
+    gate.authorize(plan,'filesystem-less-cryptex_merge',targets[0])
+    return targets[0]
+
+
+def less_metadata(plan,argv):
+    from . import component_effects as effects
+    if len(argv)!=3 or Path(argv[0]).name!='chmod' or argv[1]!='0755':
+        raise ValueError('unsupported less metadata operation')
+    path=Path(argv[-1]);target=less_target(plan,path)
+    store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
+    before=effects.capture_input(path,store);observed=gate.snapshot(path)
+    gate.recheck(plan);subprocess.run(['/bin/chmod',*argv[1:]],check=True)
+    proof=effects.capture_change(before,path,store);proof['command']='chmod'
+    gate.append_evidence(plan,'filesystem-less-cryptex_merge',target,path,observed,gate.snapshot(path),effect=proof)
+
+
+_signing_directories={}
+
+@contextlib.contextmanager
+def signing_directory(plan):
+    """Register only this producer's live tempfile directory; never deserialize it."""
+    gate.require_write_context(plan)
+    if plan.context['variant']!='regular' or plan.context['guestEnvironment']!='v2':
+        raise ValueError('private signing directory requires regular/v2')
+    parent=gate.private_path(plan,Path(plan.context['vmDirectory'])/'.cfw_temp')
+    with tempfile.TemporaryDirectory(prefix='.vphone-launchd-',dir=parent) as temporary:
+        path=Path(temporary);fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+        _signing_directories[path]=(fd,os.fstat(fd),plan.raw_sha256)
+        try: yield path
+        finally:
+            _signing_directories.pop(path,None);os.close(fd)
+
+
+def v2_signing_rule(plan,source):
+    rule=target_table()[0]['v2Signing']
+    relative=str(source.relative_to(Path(plan.context['vmDirectory'])))
+    if re.fullmatch(rule['relativePattern'],relative) is None: return None
+    if plan.context['variant']!='regular' or plan.context['guestEnvironment']!='v2':
+        raise ValueError('signing source differs from v2 context')
+    parent=source.parent.parent.lstat()
+    if not stat.S_ISDIR(parent.st_mode) or parent.st_uid!=os.geteuid() or stat.S_IMODE(parent.st_mode)&0o022:
+        raise ValueError('signing directory parent is not private to the producer')
+    registered=_signing_directories.get(source.parent)
+    if registered is None: raise ValueError('signing source has no live producer directory')
+    fd,original,desired=registered;actual=os.fstat(fd);named=source.parent.lstat()
+    if desired!=plan.raw_sha256 or any((info.st_dev,info.st_ino)!=(original.st_dev,original.st_ino)
+                                     or info.st_uid!=os.geteuid() or stat.S_IMODE(info.st_mode)!=0o700
+                                     for info in (actual,named)):
+        raise ValueError('signing source private directory identity/owner/mode changed')
+    return rule

@@ -229,3 +229,26 @@ class MaxSlideInstallGateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class SignedMaxSlideTests(unittest.TestCase):
+    def test_real_maxslide_patch_reattests_only_covered_header_page(self):
+        import hashlib
+        from patchers import component_signatures as signatures
+        from tests.test_component_signatures import signed_macho
+        data=bytearray(signed_macho())
+        header=build_cache(size=REGION-0x4000,max_slide=0x20000000)
+        data[:len(header)]=header
+        struct.pack_into('<QQ',data,0x28,4096,len(data)-4096)
+        data[4168:4200]=hashlib.sha256(data[:4096]).digest()
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/MAIN;path.write_bytes(data)
+            slots=signatures.changed_slots(path,path,[(OFF_MAX_SLIDE,8)])
+            with contextlib.redirect_stdout(io.StringIO()):patch_dsc_maxslide(tmp)
+            signatures.verify_slots(path,slots)
+            changed=path.read_bytes()
+            self.assertEqual(changed[:OFF_MAX_SLIDE],data[:OFF_MAX_SLIDE])
+            self.assertEqual(changed[OFF_MAX_SLIDE+8:4168],data[OFF_MAX_SLIDE+8:4168])
+            self.assertEqual(changed[4200:],data[4200:])
+            broken=bytearray(data);broken[4168]^=1;path.write_bytes(broken)
+            with self.assertRaises(ValueError),contextlib.redirect_stdout(io.StringIO()):patch_dsc_maxslide(tmp)
+            self.assertEqual(path.read_bytes(),broken)

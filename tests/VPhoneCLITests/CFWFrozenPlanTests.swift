@@ -49,8 +49,11 @@ private final class CFWFrozenTestBundle: NSObject {}
         throw ValidationError("scratch vphone-cli executable missing")
     }
 
-    @Test(arguments: [false, true]) func actualSwiftVerifierDrivesPythonAndZshWrites(profile: Bool) throws {
-        let vm = try fixture(profile: profile)
+    @Test(arguments: [(false, "regular"), (true, "regular"), (false, "dev"), (false, "jb"), (false, "exp")])
+    func actualSwiftVerifierDrivesPythonAndZshWrites(settings: (Bool, String)) throws {
+        let (profile, variantName) = settings
+        let variant = try #require(FirmwarePipeline.Variant(rawValue: variantName))
+        let vm = try fixture(profile: profile, variant: variant)
         defer { try? FileManager.default.removeItem(at: vm) }
         let context = try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil,
             guestEnvironment: profile ? "v2" : "classic", spoofBuild: "")
@@ -71,15 +74,36 @@ private final class CFWFrozenTestBundle: NSObject {}
         env["CFW_HOST_MNT"] = mount.path
         env["VPHONE_GUEST_EVIDENCE"] = vm.appendingPathComponent(".cfw_disk.fixture/guest-changes.jsonl").path
         env["TEST_SOURCE"] = source.path; env["TEST_TARGET"] = target.path
+        env["VM_DIR"] = vm.path; env["CFW_INPUT"] = "cfw_input"
+        env["TEST_VARIANT"] = variantName
         env["SCRIPT_DIR"] = root.appendingPathComponent("scripts").path
         env["PYTHON3"] = root.appendingPathComponent(".venv/bin/python3").path
         let body = #"""
         set -euo pipefail
         source "$SCRIPT_DIR/lib/cfw_common.sh"
-        "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" entry cfw_install.sh
+        installer=cfw_install.sh
+        [[ "$TEST_VARIANT" == regular ]] || installer="cfw_install_${TEST_VARIANT}.sh"
+        "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" entry "$installer"
         if [[ "$VPHONE_GUEST_ENVIRONMENT" == classic ]]; then
             "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-dropbear-plist "$TEST_SOURCE"
         fi
+        "$PYTHON3" - <<'PYSIGN'
+        import os, sys
+        from pathlib import Path
+        root=Path(os.environ['SCRIPT_DIR']).parent;sys.path.insert(0,str(root))
+        from tests.test_component_signatures import signed_macho
+        vm=Path(os.environ['VM_DIR']);unsigned=bytearray(signed_macho()[:4096])
+        unsigned[16:24]=b'\0'*8;unsigned[32:48]=b'\0'*16
+        (vm/'.cfw_temp/seputil').write_bytes(unsigned)
+        (vm/'signed.fixture').write_bytes(signed_macho(entitlements={'fixture':True}))
+        directory=vm/'fixture-bin';directory.mkdir()
+        signer=directory/'ldid';signer.write_text('#!/bin/sh\nfor target; do :; done\n/bin/cat "$VM_DIR/signed.fixture" > "$target"\n');signer.chmod(0o755)
+        (Path(os.environ['CFW_HOST_MNT'])/'mnt1/usr/libexec').mkdir(parents=True,exist_ok=True)
+        PYSIGN
+        export PATH="$VM_DIR/fixture-bin:$PATH"
+        ldid_sign "$VM_DIR/.cfw_temp/seputil" com.apple.seputil
+        cfw_guest_write /bin/cp "$VM_DIR/.cfw_temp/seputil" "$CFW_HOST_MNT/mnt1/usr/libexec/seputil"
+        cfw_guest_write /bin/chmod 0755 "$CFW_HOST_MNT/mnt1/usr/libexec/seputil"
         cfw_guest_write /bin/cp "$TEST_SOURCE" "$TEST_TARGET"
         "$PYTHON3" - <<'PYVERIFY'
         import os, sys, json
@@ -104,7 +128,7 @@ private final class CFWFrozenTestBundle: NSObject {}
         #expect(last["planDigest"] as? String == context.planSHA256)
         #expect(last["beforeSHA256"] as? String == SHA256.hash(data: Data("old".utf8)).map { String(format: "%02x", $0) }.joined())
         #expect(last["afterSHA256"] as? String == SHA256.hash(data: try Data(contentsOf: target)).map { String(format: "%02x", $0) }.joined())
-        #expect(throws: (any Error).self) { try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: "exp", guestEnvironment: profile ? "v2" : "classic", spoofBuild: "") }
+        #expect(throws: (any Error).self) { try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: variantName == "exp" ? "dev" : "exp", guestEnvironment: profile ? "v2" : "classic", spoofBuild: "") }
         #expect(throws: (any Error).self) { try VPhoneCFWFrozenContext.prepare(in: vm, requestedVariant: nil, guestEnvironment: profile ? "classic" : "v2", spoofBuild: "") }
     }
     @Test func lessFilesystemSuboperationUsesSameVerifiedPlan() throws {

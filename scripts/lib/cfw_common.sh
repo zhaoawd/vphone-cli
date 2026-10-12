@@ -25,7 +25,7 @@ ldid_sign() {
     local file="$1" bundle_id="${2:-}"
     local args=(-S -M "-K$VM_DIR/$CFW_INPUT/signcert.p12")
     [[ -n "$bundle_id" ]] && args+=("-I$bundle_id")
-    ldid "${args[@]}" "$file"
+    cfw_guest_sign "${args[@]}" "$file"
 }
 
 host_hdiutil() {
@@ -179,4 +179,9 @@ cfw_stage_api() {
 # Run the original command after exact target authorization; record real bytes.
 cfw_guest_write() {
     "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" write "$@"
+}
+
+# Keep original ldid options while capturing the explicit producer operation.
+cfw_guest_sign() {
+    VPHONE_SIGN_BOOT_HASH="${BOOT_HASH:-}" "$PYTHON3" "$SCRIPT_DIR/patchers/plan_gate.py" sign "$(command -v ldid)" "$@"
 }

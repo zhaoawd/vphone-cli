@@ -32,7 +32,8 @@ def layouts(path):
             for index in range(count):
                 row=read(f,8+index*width,width,size)
                 cpu,sub,offset,length,align=struct.unpack('>IIQQI' if wide else '>IIIII',row[:28] if wide else row)
-                if offset+length>size or offset<8+count*width: raise ValueError('invalid fat slice')
+                if offset+length>size or offset<8+count*width or align>30 or offset%(1<<align) or length<32:
+                    raise ValueError('invalid fat slice')
                 if any(offset<old+span and old<offset+length for old,span,_ in slices): raise ValueError('overlapping fat slices')
                 slices.append((offset,length,f'{cpu}:{sub}'))
             if len({identity for _,_,identity in slices})!=len(slices): raise ValueError('duplicate fat architecture')
@@ -40,9 +41,11 @@ def layouts(path):
         for base,length,identity in slices:
             header=read(f,base,32,size)
             if header[:4]!=b'\xcf\xfa\xed\xfe': raise ValueError('unsupported signing container')
+            if identity!='thin' and identity!='%d:%d'%struct.unpack_from('<II',header,4):
+                raise ValueError('fat architecture differs from slice header')
             ncmds,command_size=struct.unpack_from('<II',header,16)
             if command_size>16<<20 or ncmds>65536 or 32+command_size>length: raise ValueError('invalid signing load commands')
-            commands=read(f,base+32,command_size,size);position=0;normalized=[];signature=None
+            commands=read(f,base+32,command_size,size);position=0;normalized=[];signature=None;linkedit=None
             for _ in range(ncmds):
                 if position+8>len(commands): raise ValueError('truncated signing command')
                 cmd,count=struct.unpack_from('<II',commands,position)
@@ -55,13 +58,14 @@ def layouts(path):
                     signature=(base+start,span)
                 else:
                     if cmd==0x19 and raw[8:24].rstrip(b'\0')==b'__LINKEDIT':
-                        if count<72: raise ValueError('invalid linkedit command')
+                        if count!=72 or linkedit is not None: raise ValueError('invalid linkedit command')
+                        linkedit=struct.unpack_from('<QQQ',raw,32)
                         raw[32:40]=b'\0'*8;raw[48:56]=b'\0'*8
                     normalized.append(bytes(raw))
                 position+=count
             if position!=command_size: raise ValueError('load command size differs')
             masked=header[:16]+b'\0'*8+header[24:]
-            result.append(dict(base=base,size=length,identity=identity,signature=signature,commands=normalized,end=32+command_size,header=masked))
+            result.append(dict(base=base,size=length,identity=identity,signature=signature,commands=normalized,end=32+command_size,header=masked,linkedit=linkedit))
         return result
 
 
@@ -74,7 +78,7 @@ def directories(path):
             start,span=layout['signature'];head=read(f,start,12,size)
             magic,length,count=struct.unpack('>III',head)
             if magic!=0xfade0cc0 or length>span or count>256 or length<12+count*8: raise ValueError('invalid signature SuperBlob')
-            slots=set()
+            slots=set(); intervals=[]
             for index in range(count):
                 slot,offset=struct.unpack('>II',read(f,start+12+index*8,8,size))
                 if slot in slots: raise ValueError('duplicate signature slot')
@@ -82,12 +86,26 @@ def directories(path):
                 if offset<12+count*8 or offset+8>length: raise ValueError('invalid signature blob offset')
                 tag,blob_size=struct.unpack('>II',read(f,start+offset,8,size))
                 if blob_size<8 or offset+blob_size>length: raise ValueError('invalid signature blob length')
+                if any(offset<end and beginning<offset+blob_size for beginning,end in intervals):
+                    raise ValueError('overlapping signature blobs')
+                intervals.append((offset,offset+blob_size))
+                if slot==0 or 0x1000<=slot<0x1006:
+                    if tag!=0xfade0c02: raise ValueError('invalid CodeDirectory slot')
+                elif tag==0xfade0c02: raise ValueError('CodeDirectory in wrong signature slot')
                 if tag!=0xfade0c02: continue
                 cd=start+offset;raw=read(f,cd,min(blob_size,64),size)
                 if len(raw)<44: raise ValueError('truncated CodeDirectory')
                 version,hash_offset,nslots,limit=struct.unpack_from('>I',raw,8)[0],struct.unpack_from('>I',raw,16)[0],struct.unpack_from('>I',raw,28)[0],struct.unpack_from('>I',raw,32)[0]
                 hash_size,hash_type,page_power=raw[36],raw[37],raw[39]
                 if version>=0x20300 and limit==0 and len(raw)>=64: limit=struct.unpack_from('>Q',raw,56)[0]
+                minimum=44
+                for threshold,header_size in [(0x20100,48),(0x20200,52),(0x20300,64),(0x20400,88),(0x20500,96),(0x20600,108)]:
+                    if version>=threshold: minimum=header_size
+                special=struct.unpack_from('>I',raw,24)[0]
+                if version>0x20600 or blob_size<minimum or hash_offset-special*hash_size<minimum:
+                    raise ValueError('invalid CodeDirectory header/hash bounds')
+                if version>=0x20100 and struct.unpack_from('>I',raw,44)[0]:
+                    raise ValueError('unsupported CodeDirectory scatter mapping')
                 if not 0<page_power<=20 or not 0<hash_size<=64 or hash_offset+nslots*hash_size>blob_size or limit>layout['size'] or limit>start-layout['base']:
                     raise ValueError('invalid CodeDirectory table bounds')
                 page_size=1<<page_power
@@ -133,6 +151,7 @@ def verify_slots(path, requirements):
 
 
 def entitlements(path):
+    directories(path)
     from .component_effects import regular
     size=Path(path).stat().st_size;result=[]
     with regular(path) as f:
@@ -155,12 +174,26 @@ def entitlements(path):
 def verify_signing(before, after):
     from .component_effects import regular, CHUNK
     old,new=layouts(before),layouts(after)
+    directories(before)
     if len(old)!=len(new): raise ValueError('signing changed architecture count')
     with regular(before) as a,regular(after) as b:
         for left,right in zip(old,new):
             if left['identity']!=right['identity'] or left['identity']=='dsc' or left['header']!=right['header'] or left['commands']!=right['commands']:
                 raise ValueError('signing changed executable headers')
             if right['signature'] is None: raise ValueError('signer produced no signature')
+            for stream,row,path in [(a,left,before),(b,right,after)]:
+                if row.get('linkedit') is not None:
+                    vmsize,fileoff,filesize=row['linkedit']
+                    end=row['size'] if row['signature'] is None else sum(row['signature'])-row['base']
+                    if fileoff+filesize!=end or vmsize not in {((filesize+page-1)//page)*page for page in (4096,16384)}:
+                        raise ValueError('linkedit sizes do not describe actual signature layout')
+                if row['signature'] is not None:
+                    position=sum(row['signature']);end=row['base']+row['size']
+                    while position<end:
+                        count=min(CHUNK,end-position)
+                        if any(read(stream,position,count,Path(path).stat().st_size)):
+                            raise ValueError('non-signature trailer cannot be excluded')
+                        position+=count
             start=max(left['end'],right['end'])
             for stream,row,path in [(a,left,before),(b,right,after)]:
                 if row['end']<start and any(read(stream,row['base']+row['end'],start-row['end'],Path(path).stat().st_size)):
@@ -179,5 +212,6 @@ def verify_signing(before, after):
                     if any(read(stream,row['base']+position,count,Path(path).stat().st_size)): raise ValueError('signing removed non-padding bytes')
                     position+=count
     cds=directories(after)
-    if not cds: raise ValueError('signer produced no CodeDirectory')
+    if {cd['identity'] for cd in cds if cd['slot']==0}!={row['identity'] for row in new}:
+        raise ValueError('signer produced no primary CodeDirectory for a slice')
     verify_slots(after,[dict(identity=cd['identity'],slot=cd['slot'],pages=list(range(cd['count']))) for cd in cds])

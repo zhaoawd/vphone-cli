@@ -1,4 +1,5 @@
 """Prove a Cryptex mount comes from this generation's verified image chain."""
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,43 @@ from . import plan_gate as gate
 
 def file_sha(path):
     return gate.snapshot(path).sha256
+
+
+def observation(path):
+    """Bind a stable regular image's identity and bytes in one observation."""
+    from . import component_effects as effects
+    with effects.regular(path) as stream:
+        info=os.fstat(stream.fileno());digest=hashlib.sha256()
+        while block:=stream.read(effects.CHUNK): digest.update(block)
+    return {'device':info.st_dev,'inode':info.st_ino,'size':info.st_size,'sha256':digest.hexdigest()}
+
+
+def proof(plan, cache):
+    from . import component_effects as effects
+    binding=json.loads(gate.strict_bytes(marker(cache)))
+    if binding.get('planDigest')!=plan.record['planSHA256'] or binding.get('generationID')!=plan.context['generationID']:
+        raise ValueError('image binding belongs to another frozen plan')
+    store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
+    return {'bindingSHA256':effects.persist(marker(cache),store),'image':observation(cache)}
+
+
+def image_rows(plan, cache):
+    evidence=Path(os.environ['VPHONE_GUEST_EVIDENCE'])
+    rows=[json.loads(line) for line in gate.strict_bytes(evidence).splitlines()] if evidence.exists() else []
+    return [row for row in rows if row.get('sourceImage')==str(cache) and row.get('target','').startswith('dsc:')
+            and row.get('planDigest')==plan.record['planSHA256']]
+
+
+def expected_tree(binding, rows):
+    from . import component_effects as effects
+    result=dict(binding['baselineTree'])
+    for row in rows:
+        relative='System/Library/Caches/com.apple.dyld/'+row['target'].removeprefix('dsc:/')
+        effect=row.get('effect')
+        if effect is None or effect['operation']!='change' or effects.content(effect['before'])!=result.get(relative):
+            raise ValueError('Cryptex member lacks original/preceding source relation')
+        result[relative]=effects.content(effect['after'])
+    return result
 
 
 def marker(cache): return Path(cache).with_name('.' + Path(cache).name + '.source.json')
@@ -31,6 +69,10 @@ def attach(plan, cache, root):
     if root.name!='mnt_sysos_hv_vmm': command.append('-readonly')
     subprocess.run(command,check=True)
     stamp['cacheSHA256']=file_sha(cache)
+    if root.name=='mnt_sysos_hv_vmm':
+        if stamp.get('transition'): raise ValueError('Cryptex transformation cannot be restarted')
+        stamp['imageBefore']=observation(cache)
+        stamp['baselineTree']=tree(root)
     marker(cache).write_bytes(gate.canonical(stamp))
     mounted(plan,root)
 
@@ -63,11 +105,20 @@ def mounted(plan, root):
     stamp=json.loads(gate.strict_bytes(marker(expected)))
     if stamp.get('generationID')!=plan.context['generationID'] or stamp.get('planDigest')!=plan.record['planSHA256']:
         raise ValueError('Cryptex cache differs from bound generation/transformation')
-    if stamp.get('cacheSHA256')!=file_sha(expected):
-        rows=[json.loads(line) for line in gate.strict_bytes(os.environ['VPHONE_GUEST_EVIDENCE']).splitlines()]
-        changes={row['path']:row for row in rows if row.get('sourceImage')==str(expected) and row.get('planDigest')==plan.record['planSHA256']}
-        if plan.context['variant']!='exp' or not changes or any(row['afterSHA256']!=file_sha(path) for path,row in changes.items()):
-            raise ValueError('Cryptex changed without matching declared DSC readback')
+    observed=observation(expected)
+    rows=image_rows(plan,expected)
+    if root.name=='mnt_sysos_hv_vmm':
+        initial=stamp.get('imageBefore')
+        if initial is None or any(initial[key]!=observed[key] for key in ('device','inode')):
+            raise ValueError('writable Cryptex image identity changed')
+        if tree(root)!=expected_tree(stamp,rows):
+            raise ValueError('Cryptex tree contains unproved member changes')
+    else:
+        if stamp.get('cacheSHA256')!=observed['sha256']:
+            raise ValueError('Cryptex final image digest changed')
+        if stamp.get('transition'):
+            if observed!=stamp['transition']['after'] or tree(root)!=expected_tree(stamp,rows):
+                raise ValueError('remounted Cryptex differs from proved image/member transition')
     if file_sha(stamp['source'])!=stamp['sourceSHA256']: raise ValueError('Cryptex original changed')
     info=plistlib.loads(subprocess.check_output(['/usr/bin/hdiutil','info','-plist']))
     matches=[image for image in info.get('images',[]) if Path(image.get('image-path','')).resolve()==expected.resolve()
@@ -83,13 +134,23 @@ def refresh(plan, cache):
         raise ValueError('Cryptex transformation belongs to another plan')
     # This transition is available only after a declared EXP DSC operation has
     # recorded this exact image, and after hdiutil has released all its mounts.
-    rows=[json.loads(line) for line in gate.strict_bytes(os.environ['VPHONE_GUEST_EVIDENCE']).splitlines()]
-    if plan.context['variant']!='exp' or not any(r.get('sourceImage')==str(cache) and r.get('planDigest')==plan.record['planSHA256'] and r.get('declarationID') in ('dyld-exp-hv_vmm','dyld-cfw-camera') for r in rows):
-        raise ValueError('Cryptex refresh has no declared DSC evidence')
+    from . import component_effects as effects
+    rows=image_rows(plan,cache)
+    baseline_digest=effects.persist(stamp,Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs')
+    if (plan.context['variant']!='exp' or not rows or binding.get('transition') or
+        any(row.get('declarationID') not in ('dyld-exp-hv_vmm','dyld-cfw-camera') or
+            row.get('sourceImageProof',{}).get('bindingSHA256')!=baseline_digest for row in rows)):
+        raise ValueError('Cryptex refresh has no bound declared DSC evidence')
+    expected_tree(binding,rows)
+    final=observation(cache);initial=binding['imageBefore']
+    if any(initial[key]!=final[key] for key in ('device','inode')):
+        raise ValueError('Cryptex image replaced during transformation')
     info=plistlib.loads(subprocess.check_output(['/usr/bin/hdiutil','info','-plist']))
     if any(Path(image.get('image-path','')).resolve()==cache.resolve() for image in info.get('images',[])):
         raise ValueError('Cryptex refresh requires detached image')
-    binding['cacheSHA256']=file_sha(cache);binding['transformation']='declared-exp-dsc'
+    binding['cacheSHA256']=final['sha256'];binding['transformation']='declared-exp-dsc'
+    binding['transition']={'baselineBinding':baseline_digest,'before':initial,'after':final,
+        'rows':[hashlib.sha256(gate.canonical(row)).hexdigest() for row in rows]}
     stamp.write_bytes(gate.canonical(binding))
 
 

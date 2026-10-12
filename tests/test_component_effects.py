@@ -146,8 +146,11 @@ class LessFinalEffectsTests(unittest.TestCase):
 
     def test_final_producer_tree_survives_safe_encode_decode_standin(self):
         self.configure_less()
-        # Stand-in for the producer's later signing operation: disjoint bytes.
+        # Explicit second producer operation; final capture cannot infer writes.
+        before=gate.snapshot(self.file);preserved=effects.capture_input(self.file,self.store)
         self.file.write_bytes(b'Original-Binary')
+        gate.append_evidence(self.load(),'filesystem-less-cryptex_merge','system:/usr/libexec/mobileactivationd',
+            self.file,before,gate.snapshot(self.file),effect=effects.capture_change(preserved,self.file,self.store))
         verify_component_effects.run('capture',self.final_mount,self.proof)
         final=self.transaction/'work/final-mount'
         import shutil
@@ -430,3 +433,56 @@ class EffectsReviewRegressionTests(unittest.TestCase):
             struct.pack_into('<I',modified,48,257)
             path.write_bytes(modified);second=effects.capture_change(before,path,store)
             with self.assertRaises(ValueError): effects.verify([first,second],path,store)
+
+class SignatureCompositionTests(unittest.TestCase):
+    def test_dsc_same_page_effects_compose_and_cannot_restore_code(self):
+        import hashlib
+        import struct
+        from tests.test_component_signatures import signed_macho
+        def cache(code):
+            data=bytearray(signed_macho(code))
+            data[:16]=b'dyld_v1 arm64e'.ljust(16,b' ')
+            struct.pack_into('<QQ',data,0x28,4096,len(data)-4096)
+            data[4168:4200]=hashlib.sha256(data[:4096]).digest()
+            return data
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp); path=root/'cache'; store=root/'proofs'
+            path.write_bytes(cache(b'00000000'))
+            before=effects.capture_input(path,store)
+            path.write_bytes(cache(b'10000000')); first=effects.capture_change(before,path,store)
+            before=effects.capture_input(path,store)
+            path.write_bytes(cache(b'10000001')); second=effects.capture_change(before,path,store)
+            effects.verify([first,second],path,store)
+            before=effects.capture_input(path,store)
+            path.write_bytes(cache(b'00000001')); restore=effects.capture_change(before,path,store)
+            with self.assertRaisesRegex(ValueError,'overwritten'):
+                effects.verify([first,second,restore],path,store)
+            data=cache(b'10000001');data[4168]^=1;path.write_bytes(data)
+            with self.assertRaises(ValueError): effects.capture_change(before,path,store)
+
+class LessSigningTests(unittest.TestCase):
+    setUp=LessFinalEffectsTests.setUp
+    publish=LessFinalEffectsTests.publish
+    load=LessFinalEffectsTests.load
+    configure_less=LessFinalEffectsTests.configure_less
+
+    def test_explicit_less_sign_and_mode_then_final_readback(self):
+        from tests.test_component_signatures import signed_macho
+        self.configure_less();self.evidence.write_bytes(b'')
+        self.file.write_bytes(signed_macho(b'00000000'))
+        old=gate.snapshot(self.file);before=effects.capture_input(self.file,self.store)
+        data=bytearray(self.file.read_bytes());data[256]=ord('1');self.file.write_bytes(data)
+        gate.append_evidence(self.load(),'filesystem-less-cryptex_merge','system:/usr/libexec/mobileactivationd',
+            self.file,old,gate.snapshot(self.file),effect=effects.capture_change(before,self.file,self.store))
+        guest_write.run(self.load(),['/bin/chmod','0755',str(self.file)])
+        signer=self.root/'ldid';signed=self.root/'signed';signed.write_bytes(signed_macho(b'10000000'))
+        signer.write_text('#!/bin/sh\nfor final; do :; done\n/bin/cat '+str(signed)+' > "$final"\n');signer.chmod(0o755)
+        guest_write.sign(self.load(),[str(signer),'-S','-M',str(self.file)])
+        verify_component_effects.run('capture',self.final_mount,self.proof)
+        verify_component_effects.run('verify',self.final_mount,self.proof)
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        self.assertEqual([row['effect']['operation'] for row in rows],['change','change','sign'])
+
+    def test_final_capture_cannot_infer_unrecorded_mutation(self):
+        self.configure_less();self.file.write_bytes(b'Original-Binary')
+        with self.assertRaises(ValueError): verify_component_effects.run('capture',self.final_mount,self.proof)
