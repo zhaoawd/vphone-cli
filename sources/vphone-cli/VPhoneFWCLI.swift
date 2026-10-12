@@ -133,7 +133,7 @@ struct VPhoneFWPatchCommand: ParsableCommand {
                 + "component.Patcher / full id. An ablation run does NOT write firmware unless "
                 + "--allow-ablation-output is given."))
     var ablate: [String] = []
-    @Flag(name: .customLong("allow-ablation-output"), help: "Write firmware back even on an ablation run.")
+    @Flag(name: .customLong("allow-ablation-output"), help: "Write firmware on an ablation run only when all required declarations have execution evidence.")
     var allowAblationOutput = false
     @Option(name: .customLong("report-out"), help: "Optional path to write the structured PatchRunReport JSON.")
     var reportOut: String?
@@ -190,7 +190,7 @@ struct VPhoneFWPatchCommand: ParsableCommand {
         if report.isAblationRun {
             let mode = allowAblationOutput
                 ? "firmware written (--allow-ablation-output)"
-                : "firmware NOT written (pass --allow-ablation-output to write)"
+                : "firmware NOT written (--allow-ablation-output also requires complete required declaration evidence)"
             print("[fw patch] ABLATION RUN\(allowAblationOutput ? "" : " (dry)"): \(report.ablation.count) step(s) ablated; \(mode)")
         }
         print("[fw patch] applied \(report.allRecords.count) patches for \(variant.rawValue)")

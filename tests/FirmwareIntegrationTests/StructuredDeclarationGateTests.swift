@@ -52,7 +52,8 @@ struct StructuredDeclarationGateTests {
             components: [execution.report], ablation: [])
         #expect(!execution.report.records.isEmpty)
         #expect(report.failedRequired.isEmpty)
-        try PatchDeclarationGate.enforce(report: report, plan: plan)
+        #expect(PatchDeclarationGate.violations(in: report, plan: plan).filter { $0.kind != .requiredDeclarationMissing }.isEmpty)
+        #expect(throws: (any Error).self) { try PatchDeclarationGate.enforce(report: report, plan: plan) }
         // Exercise refusal on actual emitted records, with their real patch IDs and
         // bytes: removing the ownership results must not allow publication.
         let orphan = ComponentReport(component: execution.report.component, coverage: .structured,
@@ -89,7 +90,8 @@ struct StructuredDeclarationGateTests {
             !serialIndices.contains($0.offset)
         }.map(\.element))
         let report = PatchRunReport(variant: "regular", gates: gates, components: [blocked.report], ablation: [])
-        try PatchDeclarationGate.enforce(report: report, plan: blockedPlan)
+        #expect(PatchDeclarationGate.violations(in: report, plan: blockedPlan).filter { $0.kind != .requiredDeclarationMissing }.isEmpty)
+        #expect(throws: (any Error).self) { try PatchDeclarationGate.enforce(report: report, plan: blockedPlan) }
     }
 
 }

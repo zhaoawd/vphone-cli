@@ -60,7 +60,13 @@ import Testing
             #expect(Set(versions.keys) == ["18", "26", "27", "other"])
             let expected = try #require(versions[base == 99 ? "other" : String(base)])
             let declaration = try #require(PatchDeclarationCatalog.byID[row.id])
-            #expect(declaration == row.declaration)
+            // The historical intent fixture predates execution evidence rules.
+            var actual = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(declaration)) as? [String: Any])
+            actual.removeValue(forKey: "recordRules")
+            var expectedDeclaration = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(row.declaration)) as? [String: Any])
+            actual["variants"] = declaration.variants.sorted()
+            expectedDeclaration["variants"] = row.declaration.variants.sorted()
+            #expect(NSDictionary(dictionary: actual).isEqual(to: expectedDeclaration))
             if declaration.coverage == .guestStep && !declaration.variants.contains(variant) {
                 #expect(expected == "excludedByVariant")
                 #expect(!entries.contains { $0.id == row.id })

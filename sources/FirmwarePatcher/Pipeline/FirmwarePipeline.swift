@@ -225,11 +225,12 @@ public final class FirmwarePipeline {
     ///   an ablated step. Unknown values throw before any component is loaded.
     /// - `allowOutput`: when false (the default for an ablation run), patched firmware
     ///   is NOT written back — the report is still produced. A non-ablation run always
-    ///   writes.
+    ///   requests publication. Publication still requires every selected required declaration
+    ///   to have verified execution evidence; ablation does not waive this gate.
     ///
     /// This method does not throw on required failures; callers inspect
     /// ``PatchRunReport/failedRequired``. It throws only on hard I/O / format errors
-    /// (missing files, unreadable payloads, unknown ablation ids).
+    /// (missing files, unreadable payloads, unknown ablation ids) and declaration-gate violations.
     public func patchAllStructured(ablate ablateValues: [String] = [], allowOutput: Bool = true) throws -> PatchRunReport {
         trace = FirmwareRunTrace()
         executionPlan = nil

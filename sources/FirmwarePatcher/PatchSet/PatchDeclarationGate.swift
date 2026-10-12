@@ -11,7 +11,8 @@
 // StructuredExecution assigns each step the record-count delta, including records
 // emitted before a failure. Check these records regardless of the reported outcome.
 // Ablated and not-applicable results cannot own writes; already-applied results may
-// legitimately omit records. The gate runs before publishing staged firmware.
+// satisfy publication only with record-specific verified output evidence. The gate
+// runs before publishing staged firmware.
 
 import Foundation
 
@@ -26,6 +27,8 @@ public enum PatchDeclarationGate {
             case unattributedRecord
             case unexpectedRecords
             case planMismatch
+            case declarationEvidence
+            case requiredDeclarationMissing
         }
 
         public let step: String
@@ -114,6 +117,11 @@ public enum PatchDeclarationGate {
             found.append(Violation(step: "run", kind: .planMismatch,
                 detail: "report variant or gates differ from the frozen plan"))
         }
+        for entry in plan.selected where entry.recordRules == nil {
+            found.append(Violation(step: entry.id, kind: .planMismatch,
+                detail: "legacy plan has no frozen record rules; read/recovery only"))
+        }
+        var proven = Set<String>()
         for component in report.components {
             for result in component.results {
                 let step = result.id.description
@@ -123,11 +131,47 @@ public enum PatchDeclarationGate {
                 }
                 guard !result.recordIndices.isEmpty
                     || result.outcome == .applied || result.outcome == .alreadyApplied else { continue }
+                for index in result.recordIndices where component.records.indices.contains(index) {
+                    let record = component.records[index]
+                    let owners = plan.selected.filter { $0.swiftSteps.contains(step)
+                        && ($0.recordRules ?? []).contains { $0.matches(record) } }
+                    guard owners.count == 1, let owner = owners.first else {
+                        found.append(Violation(step: step, kind: .declarationEvidence,
+                            detail: "record \(index) (\(record.patchID)) has \(owners.count) selected declaration owners"))
+                        continue
+                    }
+                    if result.outcome == .alreadyApplied {
+                        let evidence = (result.declarationEvidence ?? []).filter {
+                            $0.declarationID == owner.id && $0.recordIndex == index
+                        }
+                        guard evidence.count == 1, let proof = evidence.first,
+                              proof.verifiedPayloadSHA256?.count == 64,
+                              proof.component == record.component, proof.fileOffset == record.fileOffset,
+                              proof.byteCount == record.patchedBytes.count,
+                              proof.verifiedOutputSHA256 == DeclarationExecutionEvidence.digest(record.patchedBytes),
+                              !record.patchedBytes.isEmpty else {
+                            found.append(Violation(step: step, kind: .declarationEvidence,
+                                detail: "alreadyApplied record \(index) lacks verified current output"))
+                            continue
+                        }
+                    }
+                    if result.outcome == .applied || result.outcome == .alreadyApplied {
+                        proven.insert(owner.id)
+                    }
+                }
+                if result.outcome == .alreadyApplied && result.recordIndices.isEmpty {
+                    found.append(Violation(step: step, kind: .declarationEvidence,
+                        detail: "alreadyApplied has no declaration-specific output evidence"))
+                }
                 if !plan.enabledStepIDs.contains(step) {
                     found.append(Violation(step: step, kind: .notEnabled,
                         detail: "step is absent from the frozen plan"))
                 }
             }
+        }
+        for entry in plan.selected where entry.required && !proven.contains(entry.id) {
+            found.append(Violation(step: entry.id, kind: .requiredDeclarationMissing,
+                detail: "required declaration has no successful record evidence in this run"))
         }
         return found
     }

@@ -45,7 +45,7 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
     /// Who writes the patch.
     public let coverage: Coverage
     /// Local Swift step `PatchID.description` values this declaration authorizes.
-    /// A record emitted by one of these steps is attributed to this declaration.
+    /// Record identity must also match an explicit rule before attribution.
     /// Empty for `.guestStep` / `.notImplemented`. One step may be bound by more than
     /// one declaration when upstream splits a single local method into several ids
     /// (`patchApfsMount`, `patchSandbox`).
@@ -74,6 +74,8 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
     /// Reviewed implementation limitation, especially why an upstream ID cannot run.
     /// Optional so historical encoded declarations remain readable.
     public let implementationNote: String?
+    /// Explicit record grammar, included in catalog encoding and copied into the frozen plan.
+    public let recordRules: [DeclarationRecordRule]?
 
     public init(
         id: String,
@@ -89,7 +91,8 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
         requires: [String],
         conflicts: [String],
         after: [String],
-        implementationNote: String? = nil
+        implementationNote: String? = nil,
+        recordRules: [DeclarationRecordRule]? = nil
     ) {
         self.id = id
         self.title = title
@@ -105,5 +108,31 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
         self.conflicts = conflicts
         self.after = after
         self.implementationNote = implementationNote
+        self.recordRules = recordRules ?? DeclarationRecordRules.rules(for: id)
+    }
+}
+
+/// A bounded record-ID grammar, frozen into the selected plan.
+public struct DeclarationRecordRule: Sendable, Hashable, Codable {
+    public let literal: String
+    public let hexadecimalOffsetSuffix: Bool
+    public init(literal: String, hexadecimalOffsetSuffix: Bool = false) {
+        self.literal = literal
+        self.hexadecimalOffsetSuffix = hexadecimalOffsetSuffix
+    }
+    public func matches(_ record: PatchRecord) -> Bool {
+        if hexadecimalOffsetSuffix {
+            return record.patchID == literal + String(record.fileOffset, radix: 16, uppercase: true)
+        }
+        return record.patchID == literal
+    }
+}
+
+extension DeclarationRecordRules {
+    static func rules(for id: String) -> [DeclarationRecordRule] {
+        if id == "kernel-boot-handle_get_dev_by_role" {
+            return [DeclarationRecordRule(literal: "kernel.handle_get_dev_by_role.gate_", hexadecimalOffsetSuffix: true)]
+        }
+        return (DeclarationRecordRules.exact[id] ?? []).map { DeclarationRecordRule(literal: $0) }
     }
 }

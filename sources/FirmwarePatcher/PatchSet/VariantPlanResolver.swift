@@ -37,6 +37,7 @@ public enum VariantPlanResolver {
         public let optIn: String
         public let swiftSteps: [String]
         public let upstreamIDs: [String]
+        public var recordRules: [DeclarationRecordRule]? = nil
     }
 
     /// The resolved plan for a variant + gate snapshot.
@@ -288,6 +289,7 @@ public enum VariantPlanResolver {
         Entry(
             id: declaration.id, title: declaration.title, disposition: disposition, reason: reason,
             required: declaration.required, optIn: declaration.optIn.rawValue,
-            swiftSteps: declaration.swiftSteps, upstreamIDs: declaration.upstreamIDs)
+            swiftSteps: declaration.swiftSteps, upstreamIDs: declaration.upstreamIDs,
+            recordRules: declaration.recordRules)
     }
 }

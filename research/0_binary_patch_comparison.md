@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-12 逐声明执行证据门（T10）
+
+发布门新增冻结声明的显式记录归属、完整必需声明检查及 alreadyApplied 当前载荷读回证据。缺单项或缺整个组件均拒绝提交，全组件 ablation 保留只读报告。未改变补丁算法或字节。独立 scratch 的 FirmwarePatcherTests 与完整历史固件对照共 313 个测试通过；五模式完整证据及缺单项不改变原固件的故障测试通过。证据、接口边界和未验证行为见 [执行证据记录](upstream_integration_2026-10-06/T10_execution_evidence_2026-10-12.md)。这些结果不建立固定上游字节等价或 VM 验收。
+
 ## 2026-10-12 固定上游声明目录（T09）
 
 声明目录现对应固定上游 `2d21d21fbdd4f51f013616273ceda9b35a3e0789` 的全部 141 个 ID，并保留 2 个本地 less ID。原有 119 个声明的执行步骤、模式成员、版本规则和显式选项保持原值；24 个新增目标 ID 均标记 `notImplemented`，各自记录原因，显式选择时拒绝。决定及五模式版本矩阵见 [T09_target_applicability.json](upstream_integration_2026-10-06/T09_target_applicability.json)。本轮未新增二进制补丁或修改匹配及写入逻辑。声明身份和步骤成员关系不建立上游字节等价；真实固件、恢复和 VM 启动行为未验证。

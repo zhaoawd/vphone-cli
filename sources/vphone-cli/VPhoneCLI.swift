@@ -234,7 +234,7 @@ struct PatchFirmwareCLI: ParsableCommand {
 
     @Flag(
         name: .customLong("allow-ablation-output"),
-        help: "Write the (partially-patched) firmware back even on an ablation run. Off by default."
+        help: "Write firmware on an ablation run only when all required declarations have execution evidence. Off by default."
     )
     var allowAblationOutput: Bool = false
 
@@ -309,7 +309,7 @@ struct PatchFirmwareCLI: ParsableCommand {
             if allowAblationOutput {
                 print("[patch-firmware] ABLATION RUN: \(report.ablation.count) step(s) ablated; firmware written (--allow-ablation-output)")
             } else {
-                print("[patch-firmware] ABLATION RUN (dry): \(report.ablation.count) step(s) ablated; firmware NOT written (pass --allow-ablation-output to write)")
+                print("[patch-firmware] ABLATION RUN (dry): \(report.ablation.count) step(s) ablated; firmware NOT written (--allow-ablation-output also requires complete required declaration evidence)")
             }
         }
 

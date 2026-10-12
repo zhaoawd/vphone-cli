@@ -51,7 +51,7 @@ import Testing
 
         @discardableResult
         func run(variant: FirmwarePipeline.Variant = .regular, forceExcGuard: Bool = false,
-                 ablate: [String] = PatchExperimentRecordTests.allComponents, allowOutput: Bool = true,
+                 ablate: [String] = PatchExperimentRecordTests.allComponents, allowOutput: Bool = false,
                  loader: any FirmwarePipeline.FirmwareLoader = PassThroughLoader(),
                  hook: @escaping (URL, PatchExperimentRecord.WriteStep) throws -> Void = { _, _ in },
                  diagnostics: @escaping (String) -> Void = { _ in }) throws -> PatchRunReport {
@@ -89,8 +89,8 @@ import Testing
         try a.run(); try b.run()
         let left = try a.record(), right = try b.record()
         #expect(left.status == .succeeded)
-        #expect(left.transaction.state == "committed")
-        #expect(left.outputs.availability == "available")
+        #expect(left.transaction.state == "none")
+        #expect(left.outputs.availability == "unavailable")
         #expect(left.conditions.firmware.iPhone.buildVersion.value == "23B85")
         #expect(left.conditions.firmware.cloudOS.buildVersion.value == "23B5046f")
         #expect(left.conditions.firmware.origin.value == nil && left.conditions.firmware.origin.reason != nil)
@@ -98,8 +98,8 @@ import Testing
         let comparison = try PatchExperimentRecord.compare(left, right)
         #expect(comparison.conditions.result == .same)
         #expect(comparison.patchResults.result == .same)
-        #expect(comparison.artifacts.result == .same)
-        #expect(comparison.allSame)
+        #expect(comparison.artifacts.result == .undetermined)
+        #expect(!comparison.allSame)
         #expect(left.conditionDigest == right.conditionDigest)
         let excluded = comparison.excluded.map(\.path)
         #expect(excluded.contains("runID"))
@@ -136,7 +136,7 @@ import Testing
             #expect(paths.contains("conditions.inputs.files[\(kernelPath)].digest"))
             #expect(paths.contains("conditions.inputs.roots[\(Self.restoreName)].digest"))
             #expect(paths.allSatisfy { $0.hasPrefix("conditions.inputs.") })
-            #expect(comparison.artifacts.result == .different)
+            #expect(comparison.artifacts.result == .undetermined)
         }
     }
 
@@ -144,7 +144,7 @@ import Testing
 
     @Test func requiredFailureAfterPartialSuccessKeepsCompletedParts() throws {
         let f = try Fixture()
-        let report = try f.run(ablate: ["avpbooter"])
+        let report = try f.run(ablate: ["avpbooter"], allowOutput: true)
         #expect(!report.failedRequired.isEmpty)
         let record = try f.record()
         #expect(record.status == .failed)
@@ -163,7 +163,7 @@ import Testing
     @Test func cancellationAfterPartialSuccessKeepsOriginalError() throws {
         let f = try Fixture()
         #expect(throws: CancellationError.self) {
-            try f.run(loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"))
+            try f.run(allowOutput: true, loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"))
         }
         let record = try f.record()
         #expect(record.status == .cancelled)
@@ -200,7 +200,7 @@ import Testing
             if counter.records == 2, current == step { throw POSIXError(code) }
         }
         #expect(throws: CancellationError.self) {
-            try f.run(loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"), hook: hook,
+            try f.run(allowOutput: true, loader: CancellingLoader(file: "iBSS.vresearch101.RELEASE.im4p"), hook: hook,
                       diagnostics: { messages.append($0) })
         }
         #expect(messages.count == 1)
@@ -337,7 +337,7 @@ import Testing
         #expect(summary == record.summary())
         #expect(summary.contains("status:     succeeded"))
         #expect(summary.contains("23B85"))
-        #expect(summary.contains("transaction: committed"))
+        #expect(summary.contains("transaction: none"))
         #expect(PatchExperimentRecord.summaryURL(for: URL(fileURLWithPath: "/x/run.json")).lastPathComponent == "run.summary.txt")
     }
 
