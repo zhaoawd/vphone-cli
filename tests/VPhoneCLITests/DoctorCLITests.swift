@@ -1,5 +1,5 @@
 import ArgumentParser
-import FirmwarePatcher
+@testable import FirmwarePatcher
 import Foundation
 import Testing
 import Virtualization
@@ -50,6 +50,21 @@ struct DoctorCLITests {
                 fromPropertyList: ["ProductVersion": "26.1", "ProductBuildVersion": "23B85"], format: .xml, options: 0)
                 .write(to: restore.appendingPathComponent(name))
         }
+        // Establish the new preflight requirement using a test-only internal Source.
+        // The assertion below must still exercise a real AVPBooter patch failure.
+        let vm = dir.appendingPathComponent("vm").standardizedFileURL.resolvingSymlinksInPath()
+        let pipeline = FirmwarePipeline(vmDirectory: vm, verbose: false)
+        let plan = try pipeline.resolvedPlan()
+        let inputs = try pipeline.transactionRoots()
+        let source = FirmwareGeneration.Source(provenance: .init(recognition: "fresh-local-ipsw-prepare-v1",
+            inputManifestSHA256: [:], archiveSHA256: [:], builds: [:], device: "synthetic-test",
+            gpuInputs: [], bootROMSHA256: String(repeating: "0", count: 64)), originals: try inputs.map {
+                FirmwareGeneration.Original(name: $0.lastPathComponent, sha256: try FirmwareGeneration.treeDigest($0))
+            }.sorted { $0.name < $1.name }, directory: vm)
+        let generation = try FirmwareGeneration.publish(FirmwareGeneration.prepare(in: vm, inputs: inputs, source: source),
+            planSHA256: FirmwareGeneration.planDigest(plan))
+        _ = try FirmwareDesiredPlanStore.publish(FirmwareDesiredPlanStore.prepare(in: vm, plan: plan, generation: generation),
+            expectedSHA256: nil)
         let record = dir.appendingPathComponent("records/run.json")
         try FileManager.default.createDirectory(at: record.deletingLastPathComponent(), withIntermediateDirectories: true)
         var patch = try PatchFirmwareCLI.parse(["--vm-directory", dir.appendingPathComponent("vm").path,

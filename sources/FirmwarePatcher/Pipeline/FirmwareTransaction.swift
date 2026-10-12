@@ -174,6 +174,13 @@ final class FirmwareTransaction {
 
     /// Reads the existing report; no applied set is inferred from enabled steps.
     private func validateReport(forCommit: Bool) throws {
+        if forCommit, let expected = journal.options["desiredSHA256"] {
+            guard case .ready(let desired) = try FirmwareDesiredPlanStore.read(in: vmDirectory),
+                  try desired.sha256 == expected, desired.plan == journal.plan,
+                  desired.generationID == journal.options["generationID"] else {
+                throw RecordFailure.bindingMismatch("desired plan changed")
+            }
+        }
         guard let expected = journal.reportSHA256 else { return }
         let path = root.appendingPathComponent("report.json")
         let fd = open(path.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)

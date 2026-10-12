@@ -36,6 +36,7 @@ import Virtualization
             try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation, "diskImage": "Disk.img"], format: .xml, options: 0).write(to: vm.appendingPathComponent("config.plist"))
             try manifest(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"], "iPhone-BuildManifest.plist")
             try manifest(["ProductVersion": "26.1", "ProductBuildVersion": "23B5046f"], "BuildManifest.plist")
+            try saveSyntheticDesiredPlan(FirmwarePipeline(vmDirectory: vm, verbose: false))
         }
         deinit { try? fm.removeItem(at: root) }
 

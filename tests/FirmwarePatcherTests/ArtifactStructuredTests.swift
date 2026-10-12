@@ -115,6 +115,7 @@ struct ArtifactStructuredTests {
         try manifest.write(to: dir.appendingPathComponent("FixtureRestore/iPhone-BuildManifest.plist"))
         let pipeline = FirmwarePipeline(vmDirectory: dir, variant: .dev, verbose: false)
         // Later component inputs deliberately do not exist: accessing them would throw.
+        try saveSyntheticDesiredPlan(pipeline)
         let report = try pipeline.patchAllStructured()
         #expect(report.components.count == 1)
         #expect(!report.failedRequired.isEmpty)
@@ -146,6 +147,7 @@ struct ArtifactStructuredTests {
                 variant: try #require(FirmwarePipeline.Variant(rawValue: variant)),
                 verbose: false, forceExcGuard: force)
             // The first required failure returns a real prepare() snapshot before later I/O.
+            try saveSyntheticDesiredPlan(pipeline)
             let report = try pipeline.patchAllStructured()
             let active = variant == "dev" || ios18 || force
             #expect(report.gates.iosBaseIs18 == ios18)

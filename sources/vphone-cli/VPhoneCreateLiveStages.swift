@@ -164,6 +164,9 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
                 preserveExistingRestore: !context.checkpoint.record(.prepare).history.isEmpty, captureGeneration: true)
             guard let source else { throw FirmwareGeneration.Failure(message: "Prepare produced no verified generation source") }
             return try VPhoneBundleGuard.withBundleLock(directory: bundleURL, operation: VPhoneVMOperation.fwPrepare) { _ in
+                if case .legacy = try FirmwareDesiredPlanStore.read(in: bundleURL) {
+                    throw PatcherError.invalidFormat("Legacy selection requires explicit fw desired-plan --import-legacy")
+                }
                 let prepared = try FirmwareGeneration.prepare(in: bundleURL,
                     inputs: source.originals.map { bundleURL.appendingPathComponent($0.name) }, source: source)
                 defer { try? FirmwareGeneration.discard(prepared) }
@@ -171,6 +174,8 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
                     verbose: false, enableFrida: options.enableFrida,
                     experimentalV2RootRemount: options.experimentalV2RootRemount == true).resolvedPlan()
                 let generation = try FirmwareGeneration.publish(prepared, planSHA256: FirmwareGeneration.planDigest(plan))
+                let desired = try FirmwareDesiredPlanStore.prepare(in: bundleURL, plan: plan, generation: generation)
+                _ = try FirmwareDesiredPlanStore.publish(desired, expectedSHA256: desired.expectedSHA256)
                 return ["fw_prepare_exit": "0", "prepare_backend": options.effectivePrepareBackend.rawValue,
                         "firmware_generation_id": generation.id]
             }

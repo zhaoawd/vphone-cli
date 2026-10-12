@@ -10,7 +10,7 @@ struct VPhoneFWCommand: ParsableCommand {
         subcommands: [VPhoneFWCatalogCommand.self, VPhoneFWPrepareCommand.self, VPhoneFWPatchCommand.self,
                       VPhoneFWRecordCommand.self, VPhoneFWInspectCommand.self, VPhoneFWPlanCommand.self,
                       VPhoneFWCacheCommand.self, VPhoneFWSelectionPreviewCommand.self,
-                      VPhoneFWSelectionMigrateCommand.self])
+                      VPhoneFWSelectionMigrateCommand.self, VPhoneFWDesiredPlanCommand.self])
 }
 
 // MARK: - catalog
@@ -364,5 +364,86 @@ struct VPhoneFWPlanCommand: ParsableCommand {
         section("guest (uncovered this round)", plan.guestUncovered)
         section("not implemented", plan.notImplemented)
         print("   selected swift steps: \(plan.enabledStepIDs.count)")
+    }
+}
+
+// MARK: - desired plan
+
+struct VPhoneFWDesiredPlanCommand: ParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "desired-plan",
+        abstract: "Preview or save a generation-bound desired plan; explicitly read back uncertain publication")
+    @OptionGroup var lib: VPhoneLibraryOption
+    @Argument(help: "VM name") var name: String?
+    @Option(help: "Verified firmware generation ID") var generation: String?
+    @Option(name: [.customShort("V"), .long]) var variant: PatchFirmwareCLI.VariantOption = .regular
+    @Flag var forceExcGuard = false
+    @Flag var frida = false
+    @Option(name: .customLong("select"), parsing: .upToNextOption) var select: [String] = []
+    @Option(name: .customLong("block"), parsing: .upToNextOption) var block: [String] = []
+    @Flag var apply = false
+    @Flag var expectedMissing = false
+    @Option var expectedSha256: String?
+    @Flag var importLegacy = false
+    @Option var expectedLegacySha256: String?
+    @Flag(help: "Export the validated desired record and raw file SHA-256 as JSON") var show = false
+    @Flag(help: "Reconcile uncertain publication without executing patchers") var readback = false
+
+    func validate() throws {
+        if readback || show {
+            guard !(readback && show), !apply, generation == nil, !importLegacy, !expectedMissing, expectedSha256 == nil else {
+                throw ValidationError("--show and --readback are exclusive and cannot be combined with plan publication")
+            }
+        } else {
+            guard generation != nil else { throw ValidationError("--generation is required") }
+            if apply, expectedMissing == (expectedSha256 != nil) {
+                throw ValidationError("--apply requires exactly one of --expected-missing or --expected-sha256")
+            }
+        }
+    }
+    func run() throws {
+        let name = try VPhoneVMSelection.resolveExisting(name, in: lib.library)
+        let bundle = try lib.library.bundle(named: name)
+        if show {
+            struct Export: Encodable {
+                let schemaVersion = 1
+                let state: String
+                let rawSHA256: String?
+                let record: FirmwareDesiredPlanStore.Record?
+                let legacy: PatchSelectionFileMigration.Preview?
+            }
+            let output: Export
+            switch try FirmwarePipeline.readDesiredPlan(in: bundle.url) {
+            case .missing: output = Export(state: "missing", rawSHA256: nil, record: nil, legacy: nil)
+            case .legacy(let legacy): output = Export(state: "legacy", rawSHA256: nil, record: nil, legacy: legacy)
+            case .ready(let record): output = Export(state: "ready", rawSHA256: try record.sha256, record: record, legacy: nil)
+            }
+            let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            print(String(decoding: try encoder.encode(output), as: UTF8.self))
+            return
+        }
+        if readback {
+            let result = try FirmwarePipeline.readbackDesiredPlan(in: bundle.url)
+            switch result {
+            case .missing: print("desired plan: missing")
+            case .legacy: print("desired plan: legacy selection requires explicit import")
+            case .ready(let record): print("desired plan: ready \(try record.sha256)")
+            }
+            return
+        }
+        guard let generation else { throw ValidationError("--generation is required") }
+        let prepared = try FirmwarePipeline(vmDirectory: bundle.url, variant: variant.pipelineVariant,
+            verbose: false, forceExcGuard: forceExcGuard, enableFrida: frida)
+            .saveDesiredPlan(generationID: generation, apply: apply, expectedSHA256: expectedSha256,
+                             importLegacy: importLegacy, expectedLegacySHA256: expectedLegacySha256, select: select, block: block)
+        struct Preview: Encodable {
+            let expectedSHA256: String?
+            let expectedMissing: Bool
+            let expectedLegacySHA256: String?
+            let record: FirmwareDesiredPlanStore.Record
+            let applied: Bool
+        }
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        print(String(decoding: try encoder.encode(Preview(expectedSHA256: prepared.expectedSHA256,
+            expectedMissing: prepared.expectedSHA256 == nil, expectedLegacySHA256: prepared.expectedLegacySHA256, record: prepared.record, applied: apply)), as: UTF8.self))
     }
 }

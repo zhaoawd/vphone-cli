@@ -85,11 +85,22 @@ struct FirmwarePlanBinding: Codable, Equatable {
             }
         }
         if currentCatalog {
+            try Self.validateCurrentPlan(payload.plan)
             guard payload.catalogRevision == PatchDeclarationCatalog.upstreamTag,
                   try Self.catalogDigest() == payload.catalogSHA256 else {
                 throw FirmwareTransaction.RecordFailure.bindingMismatch("catalog")
             }
         }
+    }
+
+    /// Legacy nil recordRules are recovery-only; never fill them from today's catalog.
+    static func validateCurrentPlan(_ plan: VariantPlanResolver.VariantPlan) throws {
+        guard let variant = FirmwarePipeline.Variant(rawValue: plan.variant) else {
+            throw FirmwareDesiredPlanStore.Failure.invalidPlan
+        }
+        let blocked = Set(plan.excludedByOptIn.filter { $0.reason == "blocked by request" }.map(\.id))
+        let current = try VariantPlanResolver.resolve(variant: variant, gates: plan.gates, block: blocked)
+        guard current == plan else { throw FirmwareDesiredPlanStore.Failure.invalidPlan }
     }
 
     private static func sources(_ entries: [FirmwareTransaction.Entry]) -> [Source] {

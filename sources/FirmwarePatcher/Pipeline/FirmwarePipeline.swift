@@ -15,6 +15,7 @@
 import Darwin
 import Foundation
 import CryptoKit
+import VPhoneCore
 
 /// Orchestrates firmware patching for all boot-chain components.
 ///
@@ -155,10 +156,48 @@ public final class FirmwarePipeline {
     }
 
     /// Resolve the same gates and declarations used by the transaction preflight.
-    public func resolvedPlan() throws -> VariantPlanResolver.VariantPlan {
+    public func resolvedPlan(select: Set<String> = [], block: Set<String> = []) throws -> VariantPlanResolver.VariantPlan {
         let (_, gates) = try prepare()
         return try VariantPlanResolver.resolve(variant: variant, gates: gates,
-            baseVersionKnown: baseVersionKnown, cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil)
+            baseVersionKnown: baseVersionKnown, cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil, select: select, block: block)
+    }
+
+    /// The CLI adapter owns the bundle lock across observation, validation and publication.
+    public func saveDesiredPlan(generationID: String, apply: Bool, expectedSHA256: String?,
+                                importLegacy: Bool = false, expectedLegacySHA256: String? = nil,
+                                select: [String] = [], block: [String] = []) throws -> FirmwareDesiredPlanStore.Prepared {
+        try VPhoneBundleGuard.withBundleLock(directory: vmDirectory, operation: VPhoneVMOperation.fwPatch) { _ in
+            guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
+                throw PatcherError.invalidFormat("Pending firmware transaction; recover first")
+            }
+            try PatchSelectionMigration.validateExplicitInputs(select: select, block: block)
+            if importLegacy, !select.isEmpty || !block.isEmpty {
+                throw PatcherError.invalidFormat("Import legacy selection separately from explicit overrides")
+            }
+            var selected = Set(select), blocked = Set(block)
+            if case .legacy(let legacy) = try FirmwareDesiredPlanStore.read(in: vmDirectory) {
+                guard importLegacy else { throw PatcherError.invalidFormat("Legacy selection requires explicit --import-legacy") }
+                if apply, legacy.sourceSHA256 != expectedLegacySHA256 { throw FirmwareDesiredPlanStore.Failure.changedSincePreview }
+                selected = Set(legacy.selection.selected); blocked = Set(legacy.selection.blocked)
+            } else if importLegacy { throw PatcherError.invalidFormat("No legacy selection to import") }
+            let generation = try FirmwareGeneration.loadVerified(in: vmDirectory, id: generationID)
+            let prepared = try FirmwareDesiredPlanStore.prepare(in: vmDirectory,
+                plan: resolvedPlan(select: selected, block: blocked), generation: generation)
+            if apply { _ = try FirmwareDesiredPlanStore.publish(prepared, expectedSHA256: expectedSHA256) }
+            return prepared
+        }
+    }
+
+    public static func readDesiredPlan(in directory: URL) throws -> FirmwareDesiredPlanStore.Read {
+        try VPhoneBundleGuard.withBundleLock(directory: directory, operation: VPhoneVMOperation.fwPatch) { _ in
+            try FirmwareDesiredPlanStore.read(in: directory)
+        }
+    }
+
+    public static func readbackDesiredPlan(in directory: URL) throws -> FirmwareDesiredPlanStore.Read {
+        try VPhoneBundleGuard.withBundleLock(directory: directory, operation: VPhoneVMOperation.fwPatch) { _ in
+            try FirmwareDesiredPlanStore.readback(in: directory)
+        }
     }
 
     /// Read manifests and compute the gate snapshot used for necessity rules.
@@ -248,6 +287,10 @@ public final class FirmwarePipeline {
         guard !FirmwareTransaction.exists(vmDirectory.appendingPathComponent(".firmware-transaction")) else {
             throw PatcherError.invalidFormat("Pending firmware transaction; run patch-firmware --recover first")
         }
+        // Neither a journal nor its archived plan grants a fresh execution.
+        let desired = try FirmwareDesiredPlanStore.read(in: vmDirectory)
+        let bound: FirmwareDesiredPlanStore.Record?
+        if case .ready(let record) = desired { bound = record } else { bound = nil }
         let ablate = Set(ablateValues)
         let unknown = ablate.subtracting(knownAblationTargets(buildComponentList()))
         guard unknown.isEmpty else {
@@ -258,16 +301,20 @@ public final class FirmwarePipeline {
             trace.stage = .finished
             return report
         }
+        guard let bound else { throw FirmwareDesiredPlanStore.Failure.missing }
+        if let generationID, generationID != bound.generationID { throw FirmwareDesiredPlanStore.Failure.identityMismatch }
         trace.stage = .prepare
         let (_, gates) = try prepare()
         let plan = try VariantPlanResolver.resolve(
             variant: variant, gates: gates, baseVersionKnown: baseVersionKnown,
-            cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil)
+            cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil,
+            block: Set(bound.plan.excludedByOptIn.filter { $0.reason == "blocked by request" }.map(\.id)))
         // Every variant's iBEC/LLB boot arguments depend on the iPhone base,
         // even when EXC_GUARD activation is independently known (dev/forced).
         guard baseVersionKnown else {
             throw PatcherError.invalidFormat("iPhone base version is unknown; boot argument parameters cannot be resolved")
         }
+        guard plan == bound.plan else { throw FirmwareDesiredPlanStore.Failure.invalidPlan }
         executionPlan = plan
         let roots = try transactionRoots()
         trace.stage = .stageInputs
@@ -277,7 +324,8 @@ public final class FirmwarePipeline {
             "ablate": ablateValues.joined(separator: ","),
         ]
         if experimentalV2RootRemount { transactionOptions["experimentalV2RootRemount"] = "true" }
-        if let generationID { transactionOptions["generationID"] = generationID }
+        transactionOptions["generationID"] = bound.generationID
+        transactionOptions["desiredSHA256"] = try bound.sha256
         let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots,
             options: transactionOptions, plan: plan, versionInputs: versionInputs)
         trace.transaction = transaction

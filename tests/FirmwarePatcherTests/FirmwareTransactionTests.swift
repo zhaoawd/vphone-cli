@@ -300,6 +300,7 @@ import Virtualization
         }
         let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false,
             experimentalV2RootRemount: true, loader: FailingLoader(failRead: true))
+        try saveSyntheticDesiredPlan(pipeline)
         #expect(throws: (any Error).self) { try pipeline.patchAllStructured() }
         #expect(pipeline.trace.gates?.experimentalV2RootRemount == true)
         let journal = try JSONDecoder().decode(FirmwareTransaction.Journal.self,
@@ -320,6 +321,7 @@ import Virtualization
             try manifest.write(to: f.restore.appendingPathComponent(name))
         }
         let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false, loader: FailingLoader(failRead: failRead))
+        try saveSyntheticDesiredPlan(pipeline)
         #expect(throws: (any Error).self) {
             try pipeline.patchAllStructured(ablate: ["avpbooter"], allowOutput: true)
         }
