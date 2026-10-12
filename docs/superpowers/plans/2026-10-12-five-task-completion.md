@@ -129,6 +129,10 @@ Task6C 分为 C1 和 C2，原验收范围保持不变。C1 完成来源读取、
 
 运行实例的在线更新使用实际 `.vm` Bundle 核验、daemon 事务及每 VM 操作协调；已有 VM 锁内的 Store 获取必须非阻塞，不能复用 C1 离线挂载资格。Task7 覆盖现有 classic vphoned 自动更新、bootstrap、手动更新/回退及 shutdown/Stop，不新增环境库自动升级。Task7 完成真实来源/上传/读回链及协议协调；在线 guest 的同 journal 来源发布与恢复仍必需，由 C2/Task10 实现并独立审查，不以 decoded 回报或独立 sidecar 提升来源（Ruling22、23）。
 
+透明 HTTP/WebSocket API proxy 对已标记连接拒绝维护请求，并提示使用具备 per-VM coordinator 的 host RPC/CLI；普通查询和媒体转发保留。proxy 开放前须由当前 daemon 的 fresh health/capability 确认限制生效；连接标记覆盖后续 HTTP keep-alive 请求及 WebSocket 消息，旧或未知 daemon 拒绝开放（Ruling25）。
+
+内部 VPhoneAPISession 使用仅进程内随机 token；原用户 token 标识外部连接。外部连接的 capability/instance 预检在同一 guest socket 执行，成功后只允许一个原 HTTP 请求或 WebSocket upgrade，保留既有 HTTP 关闭行为；后续请求不能撤销连接分类，不新增通用 keep-alive 支持（Ruling26）。
+
 ### Task 7：T17 在线安装、激活、回退与 Stop 协调
 
 **Files:** 修改 `VPhoneGuestEnvironment.swift`、`EnvironmentTransaction.swift` 及其 daemon 调用方；扩展 `tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift`、`tests/VPhoneDaemonWireTests/EnvironmentTransactionTests.swift`。

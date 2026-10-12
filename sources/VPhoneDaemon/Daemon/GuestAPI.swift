@@ -60,6 +60,7 @@ enum GuestAPI {
             "ip": ip ?? "",
             "capabilities": [
                 APISessionIdentity.capability,
+                GuestProxyAdmission.capability,
                 "touch",
                 "hid",
                 "apps",
@@ -110,8 +111,8 @@ enum GuestAPI {
 
     static let maintenance = GuestMaintenanceGate()
 
-    static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
-        try maintenance.run(method: method) { try executeUncoordinated(method: method, params: params) }
+    static func execute(method: String, params: [String: Any], externalProxy: Bool = false) throws -> [String: Any] {
+        try maintenance.run(method: method, externalProxy: externalProxy) { try executeUncoordinated(method: method, params: params) }
     }
 
     private static func executeUncoordinated(method: String, params: [String: Any]) throws -> [String: Any] {

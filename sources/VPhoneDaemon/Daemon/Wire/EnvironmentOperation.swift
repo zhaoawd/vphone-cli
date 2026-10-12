@@ -24,7 +24,10 @@ final class GuestMaintenanceGate: @unchecked Sendable {
     private let lock = NSLock()
     private var stopped = false
     static let writers: Set<String> = ["environment.install", "environment.restore", "bootstrap.install", "bootstrap.uninstall", "bootstrap.firmware", "system.shutdown", "system.reboot", "system.respring", "agent.apply_update"]
-    func run<T>(method: String, _ body: () throws -> T) throws -> T {
+    func run<T>(method: String, externalProxy: Bool = false, _ body: () throws -> T) throws -> T {
+        if externalProxy && Self.writers.contains(method) {
+            throw EnvironmentTransaction.Failure.invalid("External API proxy maintenance is disabled; use the host RPC or CLI so guest writes coordinate with Stop")
+        }
         guard Self.writers.contains(method) || method == "environment.status" else { return try body() }
         guard lock.try() else { throw EnvironmentTransaction.Failure.invalid("Guest maintenance operation is busy; inspect status after it converges") }
         defer { lock.unlock() }

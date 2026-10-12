@@ -1,0 +1,51 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/13] Emitting module VPhoneAPIKit
+[7/13] Compiling VPhoneAPIKit VPhoneAPIRequestGate.swift
+[8/13] Compiling VPhoneAPIKit VPhoneAPIProxy.swift
+[9/21] Emitting module VPhoneAPIKitTests
+[10/21] Compiling VPhoneAPIKitTests APIProxyTests.swift
+[11/21] Compiling vphone_cli VPhoneAPIVSockConnector.swift
+[12/21] Compiling vphone_cli VPhoneEntry.swift
+[13/21] Compiling vphone_cli VPhoneAppDelegate.swift
+[14/21] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:47:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 45 |     let code: String
+ 46 |     let message: String
+ 47 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 48 | 
+ 49 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[14/21] Write Objects.LinkFileList
+[17/22] Linking vphone-vm
+[18/22] Linking vphone-cli
+[19/22] Applying vphone-vm
+[20/22] Applying vphone-cli
+[21/22] Linking vphone-cliPackageTests
+Build complete! (6.96s)
+Test Suite 'Selected tests' started at 2026-10-13 06:31:51.584.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 06:31:51.584.
+Test Suite 'GuestProxyMaintenanceTests' started at 2026-10-13 06:31:51.584.
+Test Case '-[VPhoneCLITests.GuestProxyMaintenanceTests testExternalMaintenanceMustProbeSameSocketBeforeForwarding]' started.
+Test Case '-[VPhoneCLITests.GuestProxyMaintenanceTests testExternalMaintenanceMustProbeSameSocketBeforeForwarding]' passed (0.017 seconds).
+Test Suite 'GuestProxyMaintenanceTests' passed at 2026-10-13 06:31:51.602.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.017 (0.017) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 06:31:51.602.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.017 (0.018) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 06:31:51.602.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.017 (0.018) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

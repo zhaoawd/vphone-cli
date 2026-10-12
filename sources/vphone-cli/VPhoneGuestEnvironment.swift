@@ -571,12 +571,21 @@ final class VPhoneGuestEnvironmentUpdater {
             throw VPhoneGuestEnvironmentRefusal("api_protocol", "Restore journal lacks matching VM, mode and frozen generation")
         }
         let expected = try restoreEntries(matching[0], id: id, manifest: manifest)
+        var originalFinal = matching[0]["before_files"] as! [String: String]
+        for row in expected {
+            let name = row["name"] as! String
+            originalFinal[name] = row[["replaced", "restore_failed"].contains(row["state"] as! String) ? "sha256" : "previous_sha256"] as? String
+        }
+        guard matching[0]["after_files"] as? [String: String] == originalFinal,
+              originalFinal == before.sha256 else {
+            throw VPhoneGuestEnvironmentRefusal("api_protocol", "Original transaction full file evidence does not match its states and current installed files")
+        }
         guard expected.contains(where: { $0["state"] as? String == "replaced" }),
               expected.allSatisfy({ row in
                   row["state"] as? String != "replaced" || before.sha256[row["name"] as! String] == row["sha256"] as? String
               }) else { throw VPhoneGuestEnvironmentRefusal("api_protocol", "transaction does not match installed files") }
         let context = operationContext(session)
-        pendingOperation = VPhoneGuestEnvironmentRecovery(context: context, transaction: id, before: before.sha256, requested: Dictionary(uniqueKeysWithValues: expected.filter { $0["state"] as? String == "replaced" }.map { ($0["name"] as! String, $0["previous_sha256"] as! String) }), restoring: true)
+        pendingOperation = VPhoneGuestEnvironmentRecovery(context: context, transaction: id, before: before.sha256, requested: Dictionary(uniqueKeysWithValues: expected.filter { $0["state"] as? String == "replaced" }.map { ($0["name"] as! String, $0["previous_sha256"] as! String) }), restoring: true, originalRows: expected.map { $0.compactMapValues { $0 as? String } }, originalContext: original, originalBefore: matching[0]["before_files"] as? [String: String])
         let value: VPhoneJSONValue
         do {
             try check(session, generation)
@@ -595,7 +604,7 @@ final class VPhoneGuestEnvironmentUpdater {
         guard result["restore_context"] as? [String: String] == context else {
             throw VPhoneGuestEnvironmentRefusal("api_protocol", "Restore reply belongs to another operation or generation", ["outcome": "pending_recovery", "operation_may_continue": true])
         }
-        let rows = try validateRestore(result, id: id, expected: expected, manifest: manifest)
+        let rows = try validateRestore(result, id: id, expected: expected, original: matching[0], manifest: manifest)
         let restored = rows.filter { $0["state"] as? String == "restored" }.compactMap { $0["name"] as? String }
         let after = try await GuestStatus.read(session, generation)
         try eligible(after, session, generation)
@@ -633,7 +642,17 @@ final class VPhoneGuestEnvironmentUpdater {
                 ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
         }
         guard value["id"] as? String == id,
-              let rows = value["libraries"] as? [[String: Any]], !rows.isEmpty else { throw refuse() }
+              let rows = value["libraries"] as? [[String: Any]], !rows.isEmpty,
+              let beforeFiles = value["before_files"] as? [String: String],
+              let afterFiles = value["after_files"] as? [String: String],
+              [beforeFiles, afterFiles].allSatisfy({ hashes in
+                  Set(hashes.keys) == Set(manifest.names) && hashes.values.allSatisfy { $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } }
+              }), let context = value["context"] as? [String: String], context["operation"] == id,
+              ["operation", "generation", "daemon_instance", "vm_instance"].allSatisfy({ context[$0].flatMap(UUID.init(uuidString:)) != nil }),
+              ["plan_sha256", "desired_sha256", "executable_sha256", "daemon_sha256"].allSatisfy({ key in
+                  context[key].map { $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } } == true
+              }), context["mode"] == "regular-v2", context["firmware_generation"]?.isEmpty == false,
+              context["bundle_version"]?.isEmpty == false else { throw refuse() }
         var names = Set<String>()
         for row in rows {
             guard let name = row["name"] as? String, manifest.names.contains(name), names.insert(name).inserted,
@@ -645,17 +664,20 @@ final class VPhoneGuestEnvironmentUpdater {
                       hash.allSatisfy({ "0123456789abcdef".contains($0) }) else { throw refuse() }
             }
         }
+        guard rows.allSatisfy({ row in beforeFiles[row["name"] as! String] == row["previous_sha256"] as? String }) else { throw refuse() }
         return rows
     }
 
-    private func validateRestore(_ value: [String: Any], id: String, expected: [[String: Any]],
+    private func validateRestore(_ value: [String: Any], id: String, expected: [[String: Any]], original: [String: Any],
                                  manifest: VPhoneGuestEnvironmentManifest) throws -> [[String: Any]] {
         let rows = try restoreEntries(value, id: id, manifest: manifest)
         func refuse() -> VPhoneGuestEnvironmentRefusal {
             VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment.restore result",
                 ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
         }
-        guard rows.count == expected.count, value["reboot_required"] is Bool, value["root_read_only"] is Bool,
+        guard value["before_files"] as? [String: String] == original["before_files"] as? [String: String],
+              value["context"] as? [String: String] == original["context"] as? [String: String],
+              rows.count == expected.count, value["reboot_required"] is Bool, value["root_read_only"] is Bool,
               let state = value["state"] as? String, ["restored", "restore_incomplete"].contains(state),
               let restored = value["restored"] as? [String], Set(restored).count == restored.count else { throw refuse() }
         var failed = false

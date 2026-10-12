@@ -1,0 +1,31 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/10] Compiling VPhoneAPIKitTests APIProxyTests.swift
+[7/10] Emitting module VPhoneAPIKitTests
+[8/11] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[9/11] Emitting module VPhoneCLITests
+[9/11] Write Objects.LinkFileList
+[10/11] Linking vphone-cliPackageTests
+Build complete! (5.43s)
+Test Suite 'Selected tests' started at 2026-10-13 06:42:25.817.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 06:42:25.818.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 06:42:25.818.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering]' started.
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:932: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering] : XCTAssertEqual failed: ("Optional(true)") is not equal to ("Optional(false)") - before_files
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:933: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering] : XCTAssertFalse failed - before_files
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:932: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering] : XCTAssertEqual failed: ("Optional(true)") is not equal to ("Optional(false)") - after_files
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:933: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering] : XCTAssertFalse failed - after_files
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering]' failed (0.858 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' failed at 2026-10-13 06:42:26.676.
+	 Executed 1 test, with 4 failures (0 unexpected) in 0.858 (0.858) seconds
+Test Suite 'vphone-cliPackageTests.xctest' failed at 2026-10-13 06:42:26.676.
+	 Executed 1 test, with 4 failures (0 unexpected) in 0.858 (0.858) seconds
+Test Suite 'Selected tests' failed at 2026-10-13 06:42:26.676.
+	 Executed 1 test, with 4 failures (0 unexpected) in 0.858 (0.859) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

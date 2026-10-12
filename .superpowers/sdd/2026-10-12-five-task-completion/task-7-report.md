@@ -106,3 +106,74 @@ exit0：`BUILD SUCCEEDED`。依赖来自既有 managed worktree 固定本地副�
 尚未验收的边界：真实 guest remount、LC_CODE_SIGNATURE 的密码学/系统有效性、实际进程/相机/定位行为、旧 daemon 的真实停机兼容操作，以及 Task10 的 online same-journal host receipt/origin 发布与恢复。失去完整终止证据时，Stop 可持续 busy，GUI/SIGINT 持续等待；不以超时、transport 换代或未知 JSON 自动放行。
 
 三份既有 untracked research 文档未修改、未 stage；未读取或写入根 TODO.md。没有真实 VM/磁盘写入、mount、sudo、系统服务安装、AMFI/TCC 修改或 push。
+
+## Fix1：独立审查 Important 1–4
+
+本轮 BASE 为 `379bb75b96ea88620f8e82c85b5e118e8f18d634`。四项 Important 已逐项实施和验证，仍待独立 scoped review；本节不将原 Task7、Task6 或五项整体验收标为完成。提交 subject 延用 `fix: coordinate and verify guest environment transactions`，标识以本节所在提交及最终交付消息为准。
+
+### 修复和实际调用方
+
+1. **旧恢复读回不能释放新 writer 的锁。** coordinator 每次保留 recovery 时生成独立标识，await 后重新检查同一 recovery、pending 状态和 `!active`。确定性交错测试启动两次实际 status 读回，先完成一次、插入持有真实 online-operation fd 的新 writer，再完成旧读回；normal/force Stop 均不发信号。原 RED 记录旧实现发送三次模拟信号并可取得该锁；新 writer 退出后锁可正常取得。
+2. **部分和重复回退的完整集合。** recovery 保存原 journal 的全部行，以及本次 `replaced` 子集。逐行比较名称、安装摘要、前置摘要、backup 和状态；本次回退行遵循顺序及停止规则，其他行保持原状态。测试使用实际 `EnvironmentTransaction.prepare/apply/prepareRestore/bindRestore/applyRestore/finalize/journal`、真实临时旧/新文件和持久 journal，覆盖 partial install 的 failed/not_attempted 行、以前 restored/restore_failed 行，以及本次剩余 replaced 行。只在受控 transport 映射中把临时 backup 根路径投影为协议固定根路径；摘要和状态均来自实际 journal。回退回复丢失时不重发，完整读回后释放锁。
+3. **原始和回复证据。** restore 先验证完整五库 before_files/after_files、摘要格式、context 标识与摘要字段、operation/id、冻结计划/VM/mode，并核对原 journal 状态推导的完整输出及实际安装摘要。回复必须保留同一 before_files 和原 context；after_files 必须与实际读回一致。reconciliation 同样要求原 context/before_files。缺失、篡改请求组件或未请求组件的证据均拒绝；原始证据错误在发送 restore 前拒绝。旧成功 fixture 改为由真实临时文件经过生产 journal 生成，不补写假定的 before_files。若原事务之后完整安装集合发生变化，本次回退失败关闭，要求先检查安装状态。
+4. **外部 proxy 维护入口。** 按 Ruling25/26，原用户 token 固定为 external；内部 `VPhoneAPISession` 使用同一 proxy 生成的随机进程内 internalToken，未写日志、环境、文件或用户输出。初始认证删除所有大小写变体/重复的客户端分类头和 nonce 头。external 连接在同一 guest socket 执行 `/v1/proxy-admission`，核对新 capability、daemon instance UUID、完整 binary hash、external 分类及新 nonce，然后仅转发一个原 HTTP 请求或 WS upgrade。旧、缺失、畸形、错误 nonce 或断连均不转发，并返回 `proxy_maintenance_unavailable` 及使用 host RPC/CLI 或停机更新 daemon 的诊断。
+
+`GuestProxyAdmission` 固定连接分类并只允许消费一次原请求；HTTP job 和 WS job 把固定分类传到 `APIWire.execute`、`GuestAPI.execute`、`GuestMaintenanceGate.run`。既定九个维护方法在执行 body 前拒绝 external，提示使用受协调的 host RPC/CLI。普通查询与媒体继续转发。内部实际 `VPhoneAPISession → HostCommandExecutor → coordinator → proxy → gate` 的 bootstrap 测试保持真实 online fd，normal/force Stop 均 busy 且不 signal；并发 external shutdown 被拒绝，普通 read 可完成。没有改变原 Store/VM/online-operation 锁顺序，没有全局串行 API，也没有新增自动环境更新。
+
+自审发现固定 NIO 的 `HTTPServerUpgradeHandler` 会在首个非 upgrade 请求后移除自己。若 admission 由普通 HTTP handler 处理，随后 WS upgrade 会失败。专用 `GuestProxyAdmissionHandler` 因此放在 HTTP decoder 之后、upgrade handler 之前，消费一次预检后移除自身，使原请求仍能升级。既有单请求 HTTP 关闭和 WS 生命周期保留。独立小 harness 使用同一生产 handler/class 与固定本地 NIO，验证真实 pipeline；不添加主 Package 的 NIO 依赖。
+
+### RED/GREEN 与精确证据
+
+证据目录为 `research/evidence/2026-10-13-task7-fix1/`。26 次运行均保存完整 `.log`、`.log.gz`、精确 argv/exit 的 `.command.json` 和运行前 `.source.json`；manifest 记录所有 raw/gzip SHA-256。Swift 命令共同前缀为：
+
+```text
+swift test --scratch-path /private/tmp/vphone-five-tasks-swift-20261012 --force-resolved-versions --filter
+```
+
+下表 selector 是紧接前缀的一个完整参数；各 run 由 `.venv/bin/python3 research/evidence/2026-10-13-task7-fix1/run.py <run> <argv...>` 执行。
+
+| 问题 | selector | RED | GREEN |
+| --- | --- | --- | --- |
+| 并发恢复 | `GuestEnvironmentUpdateTests/testConcurrentOldReconciliationCannotReleaseNewWriterLease` | reconcile-red：exit1，2 failures，Stop signal=3 | reconcile-green：exit0 |
+| 完整回退集合 | `GuestEnvironmentUpdateTests/testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback` | partial-restore-red3：exit1，4 failures，两个分支均保留已完成操作的锁 | partial-restore-green：exit0 |
+| 原始/回复证据 | `GuestEnvironmentUpdateTests/testRestoreRejectsMissingOrTamperedOriginalAndReplyEvidence` | restore-evidence-red：exit1，22 failures | restore-evidence-green：exit0，含相关5 tests |
+| 恢复读回证据 | `GuestEnvironmentUpdateTests/testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback` | recovery-evidence-red：exit1，4 failures，缺失 before_files/context 仍释放 | restore-evidence-green：exit0 |
+| 未请求组件完整摘要 | `GuestEnvironmentUpdateTests/testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering` | original-fullset-red：exit1，4 failures | original-fullset-green：exit0，含实际部分/重复回退共2 tests |
+| proxy 预检 | `GuestProxyMaintenanceTests` | proxy-admission-red：exit1，2 failures，实际转发 POST 而非 admission | proxy-admission-green：exit0；proxy-callers-green2：5 tests通过 |
+| daemon gate | `EnvironmentOperationTests/externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed` | proxy-gate-red2：exit1，九个维护方法共18 issues | proxy-gate-green：exit0 |
+
+中间失败全部保留：partial-restore-red 为测试局部函数 MainActor 声明错误；red2 在首个锁取得错误后提前结束，red3 改为两分支完整断言。proxy-callers-green 为测试泛型推断、semaphore async 和 await/autoclosure 编译错误，修正测试声明后 green2 通过。proxy-gate-red 使用共享 gate 被 shutdown seal 干扰，red2 每方法独立 gate 得到完整行为失败。gate 的新增默认参数声明本身没有改变行为，18-issue RED 在实现拒绝逻辑前运行。
+
+NIO 的精确命令：
+
+```text
+env SWIFTCI_USE_LOCAL_DEPS=1 swift test --package-path /private/tmp/vphone-task7-fix1-nio-harness --scratch-path /private/tmp/vphone-task7-fix1-nio-scratch --force-resolved-versions
+```
+
+nio-upgrade-red 在 pass-through 声明阶段运行，预检经普通 handler 后实际得到 `200 OK` 而非 WS `101`，exit1/2 failures。消费预检后 nio-upgrade-green 仍 exit1：EmbeddedEventLoop 中升级回调尚未执行；显式驱动该测试事件循环后 green2 exit0。`nio-harness-red/`、`nio-harness-green1/`、`nio-harness/` 保存对应 Package、测试和生产源拷贝及摘要，manifest 对应各 run。依赖全部来自此前固定的 `/private/tmp/vphone-task7-daemon-packages/checkouts/`，包括 swift-nio/atomics/collections/system；没有 fetch 或修改主 Package.resolved。
+
+### 最终冻结验证
+
+最终源码 `sourceSHA256 = 3042e191bb16691287bb34b0cf4958279469cba5fea1993ad7d358e6ad0d511b`。20 个源码/测试/Package 文件逐项摘要见 manifest；`final-source-overlay.tar.gz` 包括新文件，`final-source.patch` 保存 tracked diff。以下五次 final source snapshot 完全一致，且与当前文件和 overlay 核对一致。
+
+```text
+swift test --scratch-path /private/tmp/vphone-five-tasks-swift-20261012 --force-resolved-versions --filter 'GuestEnvironment|GuestWriteCoordinationTests|GuestProxyMaintenanceTests|VPhoneAPIKitTests|EnvironmentOperationTests|HostRPCTests|VMStopTests|GuestTransportTests'
+```
+
+`final-swift-affected` exit0：105 XCTest 无失败，65 Swift Testing/11 suites 通过。`final-nio` 使用上列 NIO 命令，exit0/1 test。没有重复全标准或固件 suite。
+
+```text
+.venv/bin/python3 -m unittest discover -s tests -p test_daemon_api_build.py
+.venv/bin/python3 scripts/check_daemon_api.py --checkouts /private/tmp/vphone-task7-daemon-packages/checkouts
+xcodebuild -project /private/tmp/vphone-task7-daemon-source.snapshot/sources/VPhoneDaemon/VPhoneDaemon.xcodeproj -scheme vphoned -configuration Release -destination generic/platform=iOS -derivedDataPath /private/tmp/vphone-task7-daemon-build -clonedSourcePackagesDirPath /private/tmp/vphone-task7-daemon-packages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates -jobs 4 CODE_SIGNING_ALLOWED=NO build
+```
+
+`final-python-daemon` exit0/9 tests；`final-daemon-pins` exit0；`final-daemon-snapshot-build` exit0/BUILD SUCCEEDED。69 个 snapshot 文件包括新增 handler/class、现有 signer 脚本和 shared header，全部有源码 SHA。producer、import、link 的 signer 路径均在 snapshot `.build`；主目录五份 signer 的本轮前后 hash/mtime 一致，见 `main-signer-baseline.json`、`daemon-isolation-verification.json`。这只能证明 Fix1 未再次修改这些文件，不能恢复或撤销初轮已披露的覆盖。iOS 输出仍有既有 deprecated `init(cString:)` 警告，不宣称无警告。
+
+### 文件、自审和边界
+
+新增生产文件为 `GuestProxyAdmissionHandler.swift` 和 `Wire/GuestProxyAdmission.swift`；新增测试为 `GuestProxyMaintenanceTests.swift`。修改 coordinator/recovery/updater、APIProxy/RequestGate、AppDelegate、daemon APIWire/GuestAPI/HTTP/WS/main/gate，以及对应 tests。`Package.swift` 仅为 VPhoneCLITests 增加现有 VPhoneDaemonWire target 的测试依赖，以运行真实 journal/gate；未新增或升级包依赖。`tests/fixtures/host_api/server.py` 为既有 proxy 传输测试实现新 admission 协议；backpressure 测试使用内部凭据独立验证已通过资格检查后的转发，external 拒绝路径由新实际 proxy 测试覆盖。README 更新 external 客户端的兼容限制。纳入 root 授权的计划两段 Ruling25/26 说明，不改其他计划。
+
+源码、测试、Package、README、计划及本报告的定向 `git diff --check` 通过。raw 日志按原字节保存，未清理编译器行尾空白。证据目录的 `.gitattributes` 对 `*.log` 设置 `-text`，防止 Git 对日志内 HTTP CRLF 做换行转换；暂存 blob 与 raw/gzip 再次逐项核对。自动审批曾拒绝从 HEAD 覆盖整个 HTTP handler 的命令，未执行该命令；随后使用定向补丁迁移 admission 代码，保留其他未提交修改，未绕过审批。
+
+自审核对：恢复标识在 await 后复验；实际 partial/repeated journal 和 before/context 缺失不误释放；external 分类不能通过客户端头、后续 HTTP head 或 WS method 改为 internal；每个 external socket 新预检，不复用另一 socket 的 health；真实内部 RPC 仍进入同一 coordinator。没有真实 VM、磁盘写入、mount、系统服务或签名执行验收。Task10/C2 same-journal origin 发布与 Task12 真实 VM、激活和业务验收仍未完成。三份既有 untracked research 保留。

@@ -1,0 +1,921 @@
+diff --git a/Package.swift b/Package.swift
+index a1c92df6..d983b2e2 100644
+--- a/Package.swift
++++ b/Package.swift
+@@ -134,7 +134,7 @@ let package = Package(
+         ),
+         .testTarget(
+             name: "VPhoneCLITests",
+-            dependencies: ["vphone-cli"],
++            dependencies: ["vphone-cli", "VPhoneDaemonWire"],
+             path: "tests/VPhoneCLITests"
+         ),
+         .testTarget(
+diff --git a/sources/VPhoneAPIKit/VPhoneAPIProxy.swift b/sources/VPhoneAPIKit/VPhoneAPIProxy.swift
+index cd70ec22..3b7ea1da 100644
+--- a/sources/VPhoneAPIKit/VPhoneAPIProxy.swift
++++ b/sources/VPhoneAPIKit/VPhoneAPIProxy.swift
+@@ -8,6 +8,7 @@ public final class VPhoneAPIProxy {
+     public typealias Connector = @Sendable (@escaping @Sendable (Result<VPhoneAPISocket, any Error>) -> Void) -> Void
+     public static let maximumConnections = 16
+     private let token: String
++    package let internalToken = UUID().uuidString + UUID().uuidString
+     private let connector: Connector
+     private let state = Clients()
+     private let timing: Timing
+@@ -59,7 +60,7 @@ public final class VPhoneAPIProxy {
+         }
+         guard result == 0 else { throw VPhoneAPISocket.failure() }
+         let source = DispatchSource.makeReadSource(fileDescriptor: fd, queue: DispatchQueue(label: "vphone.api.accept"))
+-        let state = state, connector = connector, token = token, timing = timing
++        let state = state, connector = connector, token = token, internalToken = internalToken, timing = timing
+         source.setEventHandler { @Sendable in
+             while !state.isStopped {
+                 let accepted = accept(fd, nil, nil)
+@@ -69,7 +70,7 @@ public final class VPhoneAPIProxy {
+                 guard state.add(client) else { continue }
+                 DispatchQueue.global(qos: .userInitiated).async {
+                     defer { client.stop(); client.releaseSockets(); state.remove(client) }
+-                    Self.serve(client, state: state, token: token, timing: timing, connector: connector)
++                    Self.serve(client, state: state, token: token, internalToken: internalToken, timing: timing, connector: connector)
+                 }
+             }
+         }
+@@ -150,11 +151,12 @@ public final class VPhoneAPIProxy {
+         }
+     }
+ 
+-    private nonisolated static func serve(_ client: Client, state: Clients, token: String, timing: Timing, connector: Connector) {
++    private nonisolated static func serve(_ client: Client, state: Clients, token: String, internalToken: String, timing: Timing, connector: Connector) {
+         let host = client.hostDescriptor
+         let deadline = ContinuousClock.now + .seconds(timing.admission)
+         var received = Data()
+         var admitted: Data?
++        var internalClient = false
+         while !client.isStopped, ContinuousClock.now < deadline {
+             guard wait(host, events: Int16(POLLIN), until: deadline) else { return }
+             var buffer = [UInt8](repeating: 0, count: 4096)
+@@ -162,7 +164,12 @@ public final class VPhoneAPIProxy {
+             if count < 0, errno == EINTR || errno == EAGAIN { continue }
+             guard count > 0 else { return }
+             received.append(contentsOf: buffer.prefix(count))
+-            switch VPhoneAPIRequestGate.evaluate(received, token: token) {
++            let decision: VPhoneAPIRequestGate.Decision
++            if case let .accept(data) = VPhoneAPIRequestGate.evaluate(received, token: internalToken) {
++                internalClient = true
++                decision = .accept(data)
++            } else { decision = VPhoneAPIRequestGate.evaluate(received, token: token) }
++            switch decision {
+             case .needMore: continue
+             case .reject:
+                 _ = write(VPhoneAPIRequestGate.unauthorizedResponse, to: host, until: .now + .seconds(timing.write))
+@@ -187,10 +194,52 @@ public final class VPhoneAPIProxy {
+             sendFailure(connected == .success ? 502 : 504, to: host, timing: timing)
+             return
+         }
++        if !internalClient, !admitExternal(guest.descriptor, timing: timing) {
++            let body = #"{"type":"response","id":null,"error":{"code":"proxy_maintenance_unavailable","message":"External API proxy requires a daemon supporting external_proxy_maintenance_v1 on this connection; use the host RPC/CLI or stop the VM and update its daemon"}}"#
++            let head = "HTTP/1.1 503 External proxy unavailable\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n"
++            _ = write(Data((head + body).utf8), to: host, until: .now + .seconds(timing.write))
++            return
++        }
+         guard write(admitted, to: guest.descriptor, until: .now + .seconds(timing.write)) else { return }
+         relay(client, guest: guest, timing: timing)
+     }
+ 
++    /// Probe the socket that will carry the user's request. A different socket,
++    /// cached host session, or old daemon cannot authorize this relay.
++    private nonisolated static func admitExternal(_ fd: Int32, timing: Timing) -> Bool {
++        let nonce = UUID().uuidString
++        let request = "GET /v1/proxy-admission HTTP/1.1\r\nHost: vphoned\r\nX-Vphone-Proxy-Class: external\r\nX-Vphone-Proxy-Nonce: \(nonce)\r\nContent-Length: 0\r\n\r\n"
++        let deadline = ContinuousClock.now + .seconds(timing.connect)
++        guard write(Data(request.utf8), to: fd, until: deadline) else { return false }
++        var head = Data(), byte: UInt8 = 0
++        while head.count < 32768, head.suffix(4) != Data("\r\n\r\n".utf8) {
++            guard wait(fd, events: Int16(POLLIN), until: deadline), read(fd, &byte, 1) == 1 else { return false }
++            head.append(byte)
++        }
++        guard let text = String(data: head, encoding: .ascii) else { return false }
++        let lines = text.components(separatedBy: "\r\n")
++        guard lines.first == "HTTP/1.1 200 OK" else { return false }
++        let lengths = lines.filter { $0.lowercased().hasPrefix("content-length:") }
++        guard lengths.count == 1, !lines.contains(where: { $0.lowercased().hasPrefix("transfer-encoding:") }),
++              let count = Int(lengths[0].dropFirst("content-length:".count).trimmingCharacters(in: .whitespaces)),
++              count > 0, count <= 65536 else { return false }
++        var body = Data()
++        while body.count < count {
++            guard wait(fd, events: Int16(POLLIN), until: deadline) else { return false }
++            var bytes = [UInt8](repeating: 0, count: min(4096, count - body.count))
++            let n = read(fd, &bytes, bytes.count)
++            guard n > 0 else { return false }
++            body.append(contentsOf: bytes.prefix(n))
++        }
++        guard let health = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
++              health["proxy_class"] as? String == "external", health["proxy_nonce"] as? String == nonce,
++              (health["capabilities"] as? [String])?.contains("external_proxy_maintenance_v1") == true,
++              let instance = health["instance_id"] as? String, UUID(uuidString: instance) != nil,
++              let hash = health["binary_hash"] as? String, hash.count == 64,
++              hash.allSatisfy({ "0123456789abcdef".contains($0) }) else { return false }
++        return true
++    }
++
+     private nonisolated static func sendFailure(_ status: Int, to fd: Int32, timing: Timing) {
+         let head = "HTTP/1.1 \(status) API unavailable\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+         _ = write(Data(head.utf8), to: fd, until: .now + .seconds(timing.write))
+diff --git a/sources/VPhoneAPIKit/VPhoneAPIRequestGate.swift b/sources/VPhoneAPIKit/VPhoneAPIRequestGate.swift
+index 106cc286..1bfdfb3b 100644
+--- a/sources/VPhoneAPIKit/VPhoneAPIRequestGate.swift
++++ b/sources/VPhoneAPIKit/VPhoneAPIRequestGate.swift
+@@ -198,6 +198,7 @@ public enum VPhoneAPIRequestGate {
+                 lines[0] = "\(method) \(path) \(version)"
+             }
+             for field in fields {
++                if ["x-vphone-proxy-class", "x-vphone-proxy-nonce"].contains(field.name.lowercased()) { continue }
+                 if field.name.caseInsensitiveCompare("Authorization") == .orderedSame {
+                     continue
+                 }
+diff --git a/sources/VPhoneDaemon/Daemon/APIWire.swift b/sources/VPhoneDaemon/Daemon/APIWire.swift
+index 1070685d..8d39f659 100644
+--- a/sources/VPhoneDaemon/Daemon/APIWire.swift
++++ b/sources/VPhoneDaemon/Daemon/APIWire.swift
+@@ -19,10 +19,10 @@ enum APIWire {
+         try APIRequest.decode(data)
+     }
+ 
+-    static func execute(_ request: APIRequest) -> APIReply {
++    static func execute(_ request: APIRequest, externalProxy: Bool) -> APIReply {
+         autoreleasepool { () -> APIReply in
+             do {
+-                let result = try GuestAPI.execute(method: request.method, params: request.params)
++                let result = try GuestAPI.execute(method: request.method, params: request.params, externalProxy: externalProxy)
+                 return .json(["type": "response", "id": request.id ?? NSNull(), "result": result])
+             } catch {
+                 let (code, message): (String, String) =
+diff --git a/sources/VPhoneDaemon/Daemon/GuestAPI.swift b/sources/VPhoneDaemon/Daemon/GuestAPI.swift
+index 79602709..a3e80d5a 100644
+--- a/sources/VPhoneDaemon/Daemon/GuestAPI.swift
++++ b/sources/VPhoneDaemon/Daemon/GuestAPI.swift
+@@ -60,6 +60,7 @@ enum GuestAPI {
+             "ip": ip ?? "",
+             "capabilities": [
+                 APISessionIdentity.capability,
++                GuestProxyAdmission.capability,
+                 "touch",
+                 "hid",
+                 "apps",
+@@ -110,8 +111,8 @@ enum GuestAPI {
+ 
+     static let maintenance = GuestMaintenanceGate()
+ 
+-    static func execute(method: String, params: [String: Any]) throws -> [String: Any] {
+-        try maintenance.run(method: method) { try executeUncoordinated(method: method, params: params) }
++    static func execute(method: String, params: [String: Any], externalProxy: Bool = false) throws -> [String: Any] {
++        try maintenance.run(method: method, externalProxy: externalProxy) { try executeUncoordinated(method: method, params: params) }
+     }
+ 
+     private static func executeUncoordinated(method: String, params: [String: Any]) throws -> [String: Any] {
+diff --git a/sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift b/sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
+index 332a842d..4742332f 100644
+--- a/sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
++++ b/sources/VPhoneDaemon/Daemon/GuestHyperTextHandler.swift
+@@ -14,11 +14,12 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
+     private var body = Data()
+     private var exceededLimit = false
+     private var upload: GuestFileUpload?
+-    private var requestStarted = false
++    private let proxyAdmission: GuestProxyAdmission
+     private let maximumJSONBody = 1 << 20
+ 
+-    init(hub: APIEventHub, fileIO: NonBlockingFileIO) {
++    init(hub: APIEventHub, fileIO: NonBlockingFileIO, proxyAdmission: GuestProxyAdmission) {
+         self.hub = hub
++        self.proxyAdmission = proxyAdmission
+         self.fileIO = fileIO
+     }
+ 
+@@ -28,12 +29,11 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
+             // The host proxy checks only the first request head on a
+             // connection, and replies no longer close the connection first.
+             // A later request is answered with an error and not executed.
+-            guard !requestStarted else {
++            guard proxyAdmission.consumeRequest() else {
+                 head = nil
+                 Self.send(APIWire.error("One request per connection"), on: context.channel)
+                 return
+             }
+-            requestStarted = true
+             head = request
+             body.removeAll(keepingCapacity: true)
+             exceededLimit = false
+@@ -166,7 +166,7 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
+                 }
+                 request = APIRequest(method: method, params: params, id: nil)
+             }
+-            let job = HTTPJob(channel: channel, request: request, hub: hub)
++            let job = HTTPJob(channel: channel, request: request, hub: hub, externalProxy: proxyAdmission.external)
+             GuestAPI.queue.async { job.run() }
+         } catch {
+             Self.send(APIWire.error(String(describing: error)), on: channel)
+@@ -323,16 +323,18 @@ final class GuestHyperTextHandler: ChannelInboundHandler, RemovableChannelHandle
+ private final class HTTPJob: @unchecked Sendable {
+     let channel: Channel
+     let request: APIRequest
++    let externalProxy: Bool
+     let hub: APIEventHub
+ 
+-    init(channel: Channel, request: APIRequest, hub: APIEventHub) {
++    init(channel: Channel, request: APIRequest, hub: APIEventHub, externalProxy: Bool) {
+         self.channel = channel
+         self.request = request
++        self.externalProxy = externalProxy
+         self.hub = hub
+     }
+ 
+     func run() {
+-        let reply = APIWire.execute(request)
++        let reply = APIWire.execute(request, externalProxy: externalProxy)
+         if reply.status == 200 {
+             hub.broadcast(name: "operation.completed", data: ["method": request.method])
+         }
+diff --git a/sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift b/sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift
+index ce86abfe..0b803c7f 100644
+--- a/sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift
++++ b/sources/VPhoneDaemon/Daemon/GuestWebSocketHandler.swift
+@@ -7,9 +7,11 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
+     typealias OutboundOut = WebSocketFrame
+ 
+     private let hub: APIEventHub
++    private let externalProxy: Bool
+     private var closing = false
+-    init(hub: APIEventHub) {
++    init(hub: APIEventHub, externalProxy: Bool) {
+         self.hub = hub
++        self.externalProxy = externalProxy
+     }
+ 
+     func handlerAdded(context: ChannelHandlerContext) {
+@@ -28,7 +30,7 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
+             guard let bytes = buffer.readBytes(length: buffer.readableBytes) else { return }
+             do {
+                 let request = try APIWire.decode(Data(bytes))
+-                let job = WebSocketJob(channel: context.channel, request: request, hub: hub)
++                let job = WebSocketJob(channel: context.channel, request: request, hub: hub, externalProxy: externalProxy)
+                 GuestAPI.queue.async { job.run() }
+             } catch {
+                 let reply = APIReply.json(["type": "response", "id": NSNull(),
+@@ -81,16 +83,18 @@ final class GuestWebSocketHandler: ChannelInboundHandler, @unchecked Sendable {
+ private final class WebSocketJob: @unchecked Sendable {
+     let channel: Channel
+     let request: APIRequest
++    let externalProxy: Bool
+     let hub: APIEventHub
+ 
+-    init(channel: Channel, request: APIRequest, hub: APIEventHub) {
++    init(channel: Channel, request: APIRequest, hub: APIEventHub, externalProxy: Bool) {
+         self.channel = channel
+         self.request = request
++        self.externalProxy = externalProxy
+         self.hub = hub
+     }
+ 
+     func run() {
+-        let reply = APIWire.execute(request)
++        let reply = APIWire.execute(request, externalProxy: externalProxy)
+         GuestWebSocketHandler.send(reply.data, on: channel)
+         if reply.status == 200 {
+             hub.broadcast(name: "operation.completed", data: ["method": request.method])
+diff --git a/sources/VPhoneDaemon/Daemon/Wire/EnvironmentOperation.swift b/sources/VPhoneDaemon/Daemon/Wire/EnvironmentOperation.swift
+index 9f86be0f..476789f1 100644
+--- a/sources/VPhoneDaemon/Daemon/Wire/EnvironmentOperation.swift
++++ b/sources/VPhoneDaemon/Daemon/Wire/EnvironmentOperation.swift
+@@ -24,7 +24,10 @@ final class GuestMaintenanceGate: @unchecked Sendable {
+     private let lock = NSLock()
+     private var stopped = false
+     static let writers: Set<String> = ["environment.install", "environment.restore", "bootstrap.install", "bootstrap.uninstall", "bootstrap.firmware", "system.shutdown", "system.reboot", "system.respring", "agent.apply_update"]
+-    func run<T>(method: String, _ body: () throws -> T) throws -> T {
++    func run<T>(method: String, externalProxy: Bool = false, _ body: () throws -> T) throws -> T {
++        if externalProxy && Self.writers.contains(method) {
++            throw EnvironmentTransaction.Failure.invalid("External API proxy maintenance is disabled; use the host RPC or CLI so guest writes coordinate with Stop")
++        }
+         guard Self.writers.contains(method) || method == "environment.status" else { return try body() }
+         guard lock.try() else { throw EnvironmentTransaction.Failure.invalid("Guest maintenance operation is busy; inspect status after it converges") }
+         defer { lock.unlock() }
+diff --git a/sources/VPhoneDaemon/Daemon/main.swift b/sources/VPhoneDaemon/Daemon/main.swift
+index c4350ffa..62a5ff72 100644
+--- a/sources/VPhoneDaemon/Daemon/main.swift
++++ b/sources/VPhoneDaemon/Daemon/main.swift
+@@ -29,7 +29,8 @@ let hub = APIEventHub()
+ let eventPublisher = GuestEventPublisher(hub: hub)
+ 
+ @Sendable func initializeAPIChannel(_ channel: Channel) -> EventLoopFuture<Void> {
+-    let http = GuestHyperTextHandler(hub: hub, fileIO: fileIO)
++    let proxyAdmission = GuestProxyAdmission()
++    let http = GuestHyperTextHandler(hub: hub, fileIO: fileIO, proxyAdmission: proxyAdmission)
+     let upgrader = NIOWebSocketServerUpgrader(
+         maxFrameSize: 1 << 20,
+         shouldUpgrade: { channel, request in
+@@ -38,7 +39,7 @@ let eventPublisher = GuestEventPublisher(hub: hub)
+             // request then reaches GuestHyperTextHandler, which replies 403.
+             let allowed = GuestHyperTextHandler.isLocalClient(request.headers) &&
+                 (request.uri == "/v1/events" || GuestPortForwardHandler.port(from: request.uri) != nil)
+-            guard allowed else { return channel.eventLoop.makeSucceededFuture(nil) }
++            guard allowed, proxyAdmission.consumeRequest() else { return channel.eventLoop.makeSucceededFuture(nil) }
+             // A client that gave the host proxy its token as a WebSocket
+             // subprotocol expects the server to select that protocol.
+             var headers = HTTPHeaders()
+@@ -73,7 +74,7 @@ let eventPublisher = GuestEventPublisher(hub: hub)
+                             maxAccumulatedFrameCount: 32,
+                             maxAccumulatedFrameSize: 1 << 20,
+                         ),
+-                        GuestWebSocketHandler(hub: hub),
++                        GuestWebSocketHandler(hub: hub, externalProxy: proxyAdmission.external),
+                     ])
+                 }
+             }
+@@ -81,7 +82,12 @@ let eventPublisher = GuestEventPublisher(hub: hub)
+     )
+     return channel.pipeline.configureHTTPServerPipeline(
+         withServerUpgrade: (upgraders: [upgrader], completionHandler: { _ in }),
+-    ).flatMap { channel.pipeline.addHandler(http) }
++    ).flatMapThrowing {
++        let sync = channel.pipeline.syncOperations
++        let upgrade = try sync.handler(type: HTTPServerUpgradeHandler.self)
++        try sync.addHandler(GuestProxyAdmissionHandler(admission: proxyAdmission, health: GuestAPI.health), position: .before(upgrade))
++        try sync.addHandler(http)
++    }
+ }
+ 
+ // NIO owns independent pipes. The native relay keeps AF_VSOCK blocking and
+diff --git a/sources/vphone-cli/VPhoneAppDelegate.swift b/sources/vphone-cli/VPhoneAppDelegate.swift
+index 63aff754..e8c03cb9 100644
+--- a/sources/vphone-cli/VPhoneAppDelegate.swift
++++ b/sources/vphone-cli/VPhoneAppDelegate.swift
+@@ -159,7 +159,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
+                     apiProxy = proxy
+                     if let vmLock {
+                         let session = VPhoneAPISession(
+-                            client: try VPhoneAPIClient(baseURL: url, token: apiOptions.token, timeout: 5),
++                            client: try VPhoneAPIClient(baseURL: url, token: proxy.internalToken, timeout: 5),
+                             vmInstanceID: vmLock.state.instanceID)
+                         apiSession = session
+                         let persistedUnlock = try VPhoneVirtualMachineManifest.load(from: options.configURL).usesStartupUnlock
+diff --git a/sources/vphone-cli/VPhoneGuestEnvironment.swift b/sources/vphone-cli/VPhoneGuestEnvironment.swift
+index 9c2dba10..b8478695 100644
+--- a/sources/vphone-cli/VPhoneGuestEnvironment.swift
++++ b/sources/vphone-cli/VPhoneGuestEnvironment.swift
+@@ -571,12 +571,21 @@ final class VPhoneGuestEnvironmentUpdater {
+             throw VPhoneGuestEnvironmentRefusal("api_protocol", "Restore journal lacks matching VM, mode and frozen generation")
+         }
+         let expected = try restoreEntries(matching[0], id: id, manifest: manifest)
++        var originalFinal = matching[0]["before_files"] as! [String: String]
++        for row in expected {
++            let name = row["name"] as! String
++            originalFinal[name] = row[["replaced", "restore_failed"].contains(row["state"] as! String) ? "sha256" : "previous_sha256"] as? String
++        }
++        guard matching[0]["after_files"] as? [String: String] == originalFinal,
++              originalFinal == before.sha256 else {
++            throw VPhoneGuestEnvironmentRefusal("api_protocol", "Original transaction full file evidence does not match its states and current installed files")
++        }
+         guard expected.contains(where: { $0["state"] as? String == "replaced" }),
+               expected.allSatisfy({ row in
+                   row["state"] as? String != "replaced" || before.sha256[row["name"] as! String] == row["sha256"] as? String
+               }) else { throw VPhoneGuestEnvironmentRefusal("api_protocol", "transaction does not match installed files") }
+         let context = operationContext(session)
+-        pendingOperation = VPhoneGuestEnvironmentRecovery(context: context, transaction: id, before: before.sha256, requested: Dictionary(uniqueKeysWithValues: expected.filter { $0["state"] as? String == "replaced" }.map { ($0["name"] as! String, $0["previous_sha256"] as! String) }), restoring: true)
++        pendingOperation = VPhoneGuestEnvironmentRecovery(context: context, transaction: id, before: before.sha256, requested: Dictionary(uniqueKeysWithValues: expected.filter { $0["state"] as? String == "replaced" }.map { ($0["name"] as! String, $0["previous_sha256"] as! String) }), restoring: true, originalRows: expected.map { $0.compactMapValues { $0 as? String } }, originalContext: original, originalBefore: matching[0]["before_files"] as? [String: String])
+         let value: VPhoneJSONValue
+         do {
+             try check(session, generation)
+@@ -595,7 +604,7 @@ final class VPhoneGuestEnvironmentUpdater {
+         guard result["restore_context"] as? [String: String] == context else {
+             throw VPhoneGuestEnvironmentRefusal("api_protocol", "Restore reply belongs to another operation or generation", ["outcome": "pending_recovery", "operation_may_continue": true])
+         }
+-        let rows = try validateRestore(result, id: id, expected: expected, manifest: manifest)
++        let rows = try validateRestore(result, id: id, expected: expected, original: matching[0], manifest: manifest)
+         let restored = rows.filter { $0["state"] as? String == "restored" }.compactMap { $0["name"] as? String }
+         let after = try await GuestStatus.read(session, generation)
+         try eligible(after, session, generation)
+@@ -633,7 +642,17 @@ final class VPhoneGuestEnvironmentUpdater {
+                 ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
+         }
+         guard value["id"] as? String == id,
+-              let rows = value["libraries"] as? [[String: Any]], !rows.isEmpty else { throw refuse() }
++              let rows = value["libraries"] as? [[String: Any]], !rows.isEmpty,
++              let beforeFiles = value["before_files"] as? [String: String],
++              let afterFiles = value["after_files"] as? [String: String],
++              [beforeFiles, afterFiles].allSatisfy({ hashes in
++                  Set(hashes.keys) == Set(manifest.names) && hashes.values.allSatisfy { $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } }
++              }), let context = value["context"] as? [String: String], context["operation"] == id,
++              ["operation", "generation", "daemon_instance", "vm_instance"].allSatisfy({ context[$0].flatMap(UUID.init(uuidString:)) != nil }),
++              ["plan_sha256", "desired_sha256", "executable_sha256", "daemon_sha256"].allSatisfy({ key in
++                  context[key].map { $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } } == true
++              }), context["mode"] == "regular-v2", context["firmware_generation"]?.isEmpty == false,
++              context["bundle_version"]?.isEmpty == false else { throw refuse() }
+         var names = Set<String>()
+         for row in rows {
+             guard let name = row["name"] as? String, manifest.names.contains(name), names.insert(name).inserted,
+@@ -645,17 +664,20 @@ final class VPhoneGuestEnvironmentUpdater {
+                       hash.allSatisfy({ "0123456789abcdef".contains($0) }) else { throw refuse() }
+             }
+         }
++        guard rows.allSatisfy({ row in beforeFiles[row["name"] as! String] == row["previous_sha256"] as? String }) else { throw refuse() }
+         return rows
+     }
+ 
+-    private func validateRestore(_ value: [String: Any], id: String, expected: [[String: Any]],
++    private func validateRestore(_ value: [String: Any], id: String, expected: [[String: Any]], original: [String: Any],
+                                  manifest: VPhoneGuestEnvironmentManifest) throws -> [[String: Any]] {
+         let rows = try restoreEntries(value, id: id, manifest: manifest)
+         func refuse() -> VPhoneGuestEnvironmentRefusal {
+             VPhoneGuestEnvironmentRefusal("api_protocol", "malformed environment.restore result",
+                 ["outcome": "unknown", "operation_may_continue": true, "transaction": id])
+         }
+-        guard rows.count == expected.count, value["reboot_required"] is Bool, value["root_read_only"] is Bool,
++        guard value["before_files"] as? [String: String] == original["before_files"] as? [String: String],
++              value["context"] as? [String: String] == original["context"] as? [String: String],
++              rows.count == expected.count, value["reboot_required"] is Bool, value["root_read_only"] is Bool,
+               let state = value["state"] as? String, ["restored", "restore_incomplete"].contains(state),
+               let restored = value["restored"] as? [String], Set(restored).count == restored.count else { throw refuse() }
+         var failed = false
+diff --git a/sources/vphone-cli/VPhoneGuestEnvironmentRecovery.swift b/sources/vphone-cli/VPhoneGuestEnvironmentRecovery.swift
+index d6d03fe1..71e8a74f 100644
+--- a/sources/vphone-cli/VPhoneGuestEnvironmentRecovery.swift
++++ b/sources/vphone-cli/VPhoneGuestEnvironmentRecovery.swift
+@@ -9,6 +9,9 @@ struct VPhoneGuestEnvironmentRecovery {
+     let before: [String: String]
+     let requested: [String: String]
+     let restoring: Bool
++    var originalRows: [[String: String]] = []
++    var originalContext: [String: String]? = nil
++    var originalBefore: [String: String]? = nil
+ 
+     @MainActor
+     func hasTerminated(_ session: any VPhoneHostAPISession) async -> Bool {
+@@ -36,13 +39,31 @@ struct VPhoneGuestEnvironmentRecovery {
+               let rows = journal["libraries"] as? [[String: Any]] else { return false }
+         if !restoring, journal["before_files"] as? [String: String] != before { return false }
+         var expected = before, seen = Set<String>()
++        if restoring {
++            guard let originalContext, let originalBefore,
++                  journal["context"] as? [String: String] == originalContext,
++                  journal["before_files"] as? [String: String] == originalBefore,
++                  rows.count == originalRows.count else { return false }
++            var failed = false
++            for (row, original) in zip(rows, originalRows) {
++                guard let name = original["name"], seen.insert(name).inserted,
++                      ["name", "sha256", "previous_sha256", "backup"].allSatisfy({ row[$0] as? String == original[$0] }),
++                      let result = row["state"] as? String else { return false }
++                if let wanted = requested[name] {
++                    guard original["state"] == "replaced", original["previous_sha256"] == wanted else { return false }
++                    if failed { guard result == "replaced" else { return false } }
++                    else if result == "restore_failed" { failed = true }
++                    else { guard result == "restored" else { return false }; expected[name] = wanted }
++                } else { guard result == original["state"] else { return false } }
++            }
++            return (state == "restored") == !failed && status.sha256 == expected
++        }
+         for row in rows {
+             guard let name = row["name"] as? String, seen.insert(name).inserted,
+-                  let wanted = requested[name],
+-                  row[restoring ? "previous_sha256" : "sha256"] as? String == wanted,
++                  let wanted = requested[name], row["sha256"] as? String == wanted,
+                   let result = row["state"] as? String else { return false }
+-            if result == (restoring ? "restored" : "replaced") { expected[name] = wanted }
+-            else if !(restoring ? ["replaced", "restore_failed"] : ["failed", "not_attempted"]).contains(result) { return false }
++            if result == "replaced" { expected[name] = wanted }
++            else if !["failed", "not_attempted"].contains(result) { return false }
+         }
+         return seen == Set(requested.keys) && status.sha256 == expected
+     }
+diff --git a/sources/vphone-cli/VPhoneGuestWriteCoordinator.swift b/sources/vphone-cli/VPhoneGuestWriteCoordinator.swift
+index a640668c..dc8a7429 100644
+--- a/sources/vphone-cli/VPhoneGuestWriteCoordinator.swift
++++ b/sources/vphone-cli/VPhoneGuestWriteCoordinator.swift
+@@ -12,6 +12,7 @@ final class VPhoneGuestWriteCoordinator {
+     private var lease: VPhoneOnlineOperationLock?
+     private(set) var pendingRecovery = false
+     private var recovery: VPhoneGuestEnvironmentRecovery?
++    private var recoveryID: UUID?
+     private var waiters: [CheckedContinuation<Void, Never>] = []
+     private var stopped: [CheckedContinuation<Void, Never>] = []
+     private(set) var operationID: String?
+@@ -43,12 +44,15 @@ final class VPhoneGuestWriteCoordinator {
+         sealed = true
+         pendingRecovery = true
+         recovery = record
++        recoveryID = UUID()
+     }
+ 
+     func reconcile(_ session: (any VPhoneHostAPISession)?) async {
+-        guard pendingRecovery, !active, let recovery, let session else { return }
+-        guard await recovery.hasTerminated(session) else { return }
++        guard pendingRecovery, !active, let recovery, let recoveryID, let session else { return }
++        guard await recovery.hasTerminated(session), pendingRecovery, !active,
++              self.recoveryID == recoveryID else { return }
+         self.recovery = nil
++        self.recoveryID = nil
+         pendingRecovery = false
+         lease = nil
+         sealed = stopping
+diff --git a/tests/VPhoneAPIKitTests/APIProxyTests.swift b/tests/VPhoneAPIKitTests/APIProxyTests.swift
+index c2875c9e..c044107a 100644
+--- a/tests/VPhoneAPIKitTests/APIProxyTests.swift
++++ b/tests/VPhoneAPIKitTests/APIProxyTests.swift
+@@ -320,7 +320,8 @@ final class APIProxyTests: XCTestCase {
+         defer { close(fd) }
+         var bufferSize: Int32 = 4096
+         setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufferSize, socklen_t(MemoryLayout<Int32>.size))
+-        let data = request("Authorization: Bearer \(token)\r\nContent-Length: 4194304\r\n") + Data(repeating: 65, count: 4 * 1024 * 1024)
++        // This is the already-qualified internal transport; the external admission refusal has separate coverage.
++        let data = request("Authorization: Bearer \(proxy.internalToken)\r\nContent-Length: 4194304\r\n") + Data(repeating: 65, count: 4 * 1024 * 1024)
+         XCTAssertFalse(proxyWrite(fd, data), "The guest never drains its socket; forwarding must terminate")
+         XCTAssertTrue(proxyRead(fd).isEmpty)
+     }
+diff --git a/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift b/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift
+index 66e76bd5..23f53f83 100644
+--- a/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift
++++ b/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift
+@@ -2,6 +2,7 @@ import ArgumentParser
+ import CryptoKit
+ import Foundation
+ @testable import VPhoneAPIKit
++@testable import VPhoneDaemonWire
+ import XCTest
+ import VPhoneCore
+ @testable import vphone_cli
+@@ -15,6 +16,9 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
+     var caps = ["session_identity", "files", "file_upload_identity", "processes",
+                 "environment_update", "environment_transaction", "environment_transaction_v2", "environment_activation"]
+     var sourceContext: [String: String] = [:]
++    var journalOverride: [String: VPhoneJSONValue]?
++    var mutateOriginal: ((inout [String: VPhoneJSONValue]) -> Void)?
++    var performRestore: (([String: VPhoneJSONValue]) throws -> VPhoneJSONValue)?
+     var hideInstallJournal = false
+     var workerIdle = true
+     var instanceID = "6A5A4D0B-6D53-4A4B-8F2B-0B8E7E3F7A11"
+@@ -35,6 +39,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
+     var mutateInstall: ((inout [String: VPhoneJSONValue]) -> Void)?
+     var invalidInstallValue: VPhoneJSONValue?
+     var beforeUpload: (() async -> Void)?
++    var beforeStatus: (() async -> Void)?
+     var mutateRestore: ((inout [String: VPhoneJSONValue]) -> Void)?
+     /// pid -> (name, [library: stale?]); nil stale means current.
+     var processes: [Int: (name: String, maps: [String: Bool])] = [:]
+@@ -75,6 +80,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
+         calls.append((method, params))
+         switch method {
+         case "environment.status":
++            if let beforeStatus { await beforeStatus() }
+             return .object([
+                 "libraries": .array(daemonLibraries.map { name in
+                     .object(["name": .string(name), "sha256": (installed[name] ?? nil).map { .string($0) } ?? .null,
+@@ -133,6 +139,7 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
+             if loseInstallReply { throw URLError(.networkConnectionLost) }
+             return invalidInstallValue ?? .object(response)
+         case "environment.restore":
++            if let performRestore { return try performRestore(params) }
+             var result = restoreJournal
+             result["state"] = .string("restored")
+             result["restored"] = .array([.string("libcamfix.dylib"), .string("libvlocation.dylib")])
+@@ -178,16 +185,42 @@ final class EnvironmentDaemonFake: VPhoneHostAPISession {
+     }
+ 
+     var restoreJournal: [String: VPhoneJSONValue] {
+-        let id = "0000018f2a3b4c5d-1a2b3c4d"
+-        return ["id": .string(id), "state": .string("complete"),
+-                "context": .object(sourceContext.mapValues(VPhoneJSONValue.string)),
+-                "journal": .string("/var/root/Library/Caches/vphone-environment/transactions/" + id + "/journal.json"),
+-                "libraries": .array(["libcamfix.dylib", "libvlocation.dylib"].map { name in
+-                    .object(["name": .string(name), "state": .string("replaced"),
+-                             "sha256": .string(Self.digest(Data(("new-" + name).utf8))),
+-                             "previous_sha256": .string(Self.digest(Data(("old-" + name).utf8))),
+-                             "backup": .string("/var/root/Library/Caches/vphone-environment/transactions/" + id + "/backup/" + name)])
+-                })]
++        if journalOverride == nil { journalOverride = makeRestoreJournal() }
++        var value = journalOverride!
++        mutateOriginal?(&value)
++        return value
++    }
++
++    private func makeRestoreJournal() -> [String: VPhoneJSONValue] {
++        // Persist real old/new temporary bytes through the production journal before exposing fixture evidence.
++        let root = FileManager.default.temporaryDirectory.appendingPathComponent("restore-fixture-" + UUID().uuidString)
++        defer { try? FileManager.default.removeItem(at: root) }
++        do {
++            let libs = root.appendingPathComponent("lib"), stage = root.appendingPathComponent("stage")
++            try FileManager.default.createDirectory(at: libs, withIntermediateDirectories: true)
++            try FileManager.default.createDirectory(at: stage, withIntermediateDirectories: true)
++            let names = VPhoneGuestEnvironmentTestSupport.names
++            for name in names {
++                try Data(("old-" + name).utf8).write(to: libs.appendingPathComponent(name))
++                try Data(("new-" + name).utf8).write(to: stage.appendingPathComponent(name))
++            }
++            let tx = EnvironmentTransaction(libraries: names, libraryDirectory: libs.path, stagingDirectory: stage.path)
++            let id = "0000018f-2a3b-4c5d-a123-00001a2b3c4d"
++            var context = sourceContext
++            context["operation"] = id
++            context["generation"] = generation.uuidString
++            context["daemon_instance"] = instanceID
++            var journal = try tx.prepare(try tx.validate(["libcamfix.dylib", "libvlocation.dylib"].map {
++                ["name": $0, "sha256": EnvironmentTransaction.sha256(atPath: tx.staged($0))!]
++            }), operation: id, context: context)
++            try tx.apply(&journal) { input, output in try Data(contentsOf: URL(fileURLWithPath: input)).write(to: URL(fileURLWithPath: output)) }
++            try tx.finalize(&journal, rootReadOnly: true)
++            var value = try XCTUnwrap(tx.journal(id: id)).dictionary
++            var rows = value["libraries"] as! [[String: Any]]
++            for index in rows.indices { rows[index]["backup"] = "/var/root/Library/Caches/vphone-environment/transactions/" + id + "/backup/" + (rows[index]["name"] as! String) }
++            value["libraries"] = rows
++            return try JSONDecoder().decode([String: VPhoneJSONValue].self, from: JSONSerialization.data(withJSONObject: value))
++        } catch { XCTFail("cannot produce fixture journal: \(error)"); return [:] }
+     }
+ 
+     var methods: [String] { calls.map(\.method) }
+@@ -329,6 +362,138 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
+         XCTAssertEqual(api.methods.filter { $0 == "environment.install" }.count, 1)
+     }
+ 
++    func testConcurrentOldReconciliationCannotReleaseNewWriterLease() async throws {
++        let api = EnvironmentDaemonFake()
++        api.vmInstanceID = sourceFixture.runtime.state.instanceID
++        current(api, except: ["libcamfix.dylib"])
++        api.loseInstallReply = true
++        api.hideInstallJournal = true
++        let writes = VPhoneGuestWriteCoordinator(directory: sourceFixture.machine)
++        try await writes.run {
++            try await sourceFixture.withSource { source in
++                let outcome = await VPhoneGuestEnvironmentUpdater(session: api, manifestURL: source.manifest, source: source)
++                    .execute("environment_update", request: ["components": stage.path])
++                writes.retainForRecovery(try XCTUnwrap(outcome.recovery))
++            }
++        }
++        api.hideInstallJournal = false
++        var reads: [CheckedContinuation<Void, Never>] = []
++        api.beforeStatus = { await withCheckedContinuation { reads.append($0) } }
++        let first = Task { await writes.reconcile(api) }
++        while reads.count < 1 { await Task.yield() }
++        let second = Task { await writes.reconcile(api) }
++        while reads.count < 2 { await Task.yield() }
++        reads[0].resume()
++        await first.value
++        XCTAssertFalse(writes.pendingRecovery)
++        var finishWriter: CheckedContinuation<Void, Never>?
++        let writer = Task { try await writes.run { await withCheckedContinuation { finishWriter = $0 } } }
++        while finishWriter == nil { await Task.yield() }
++        reads[1].resume()
++        await second.value
++        var signals = 0
++        let stop = VPhoneVMStopper(listTargets: { [123] },
++            identity: { _ in VPhoneProcessIdentity(pid: 123, startedAt: 1, uid: getuid()) },
++            send: { _, _ in signals += 1; return 0 }, lockHeld: { true }, sleep: { _ in },
++            acquireOnlineOperation: { try VPhoneOnlineOperationLock(directory: self.sourceFixture.machine) })
++        for force in [false, true] { XCTAssertEqual(stop.stop(timeout: 0, force: force).exitCode, 1) }
++        XCTAssertEqual(signals, 0, "stale reconciliation released the active writer's Stop lease")
++        XCTAssertThrowsError(try VPhoneOnlineOperationLock(directory: sourceFixture.machine))
++        finishWriter?.resume()
++        try await writer.value
++        let released = try VPhoneOnlineOperationLock(directory: sourceFixture.machine)
++        withExtendedLifetime(released) {}
++    }
++
++    func testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback() async throws {
++        for repeated in [false, true] {
++            let api = EnvironmentDaemonFake()
++            api.vmInstanceID = sourceFixture.runtime.state.instanceID
++            let root = FileManager.default.temporaryDirectory.appendingPathComponent("restore-journal-" + UUID().uuidString)
++            defer { try? FileManager.default.removeItem(at: root) }
++            let libs = root.appendingPathComponent("usr/lib"), stage = root.appendingPathComponent("stage")
++            try FileManager.default.createDirectory(at: libs, withIntermediateDirectories: true)
++            try FileManager.default.createDirectory(at: stage, withIntermediateDirectories: true)
++            let names = VPhoneGuestEnvironmentTestSupport.names
++            for name in names {
++                try Data(("old-" + name).utf8).write(to: libs.appendingPathComponent(name))
++                try Data(("new-" + name).utf8).write(to: stage.appendingPathComponent(name))
++            }
++            let transaction = EnvironmentTransaction(libraries: names, libraryDirectory: libs.path, stagingDirectory: stage.path)
++            func replace(_ input: String, _ output: String) throws { try Data(contentsOf: URL(fileURLWithPath: input)).write(to: URL(fileURLWithPath: output)) }
++            let writes = VPhoneGuestWriteCoordinator(directory: sourceFixture.machine)
++            let outcome = try await writes.run {
++                try await sourceFixture.withSource { source in
++                    var context = source.context
++                    context["operation"] = UUID().uuidString.lowercased()
++                    context["generation"] = api.generation.uuidString
++                    context["daemon_instance"] = api.instanceID
++                    context["daemon_sha256"] = api.snapshot.health!.binaryHash
++                    var journal = try transaction.prepare(try transaction.validate(names.map { ["name": $0, "sha256": EnvironmentTransaction.sha256(atPath: transaction.staged($0))!] }), operation: context["operation"], context: context)
++                    var index = 0
++                    try transaction.apply(&journal) { input, output in
++                        defer { index += 1 }
++                        if !repeated && index == 2 { throw URLError(.cannotWriteToFile) }
++                        try replace(input, output)
++                    }
++                    if repeated {
++                        try transaction.bindRestore(&journal, context: context)
++                        var index = 0
++                        try transaction.applyRestore(&journal) { input, output in
++                            defer { index += 1 }
++                            if index == 1 { throw URLError(.cannotWriteToFile) }
++                            try replace(input, output)
++                        }
++                    }
++                    try transaction.finalize(&journal, rootReadOnly: true)
++                    @MainActor func publish() throws {
++                        // Project only the controlled root path; every hash/state comes from the persisted daemon journal.
++                        var value = try XCTUnwrap(transaction.journal(id: journal.id)).dictionary
++                        var rows = value["libraries"] as! [[String: Any]]
++                        for i in rows.indices { rows[i]["backup"] = "/var/root/Library/Caches/vphone-environment/transactions/" + journal.id + "/backup/" + (rows[i]["name"] as! String) }
++                        value["libraries"] = rows
++                        api.journalOverride = try JSONDecoder().decode([String: VPhoneJSONValue].self, from: JSONSerialization.data(withJSONObject: value))
++                        api.installed = try transaction.completeHashes().mapValues { Optional($0) }
++                    }
++                    try publish()
++                    api.performRestore = { params in
++                        let contextValue = try XCTUnwrap(params["context"])
++                        let data = try JSONEncoder().encode(contextValue)
++                        let restoreContext = try JSONDecoder().decode([String: String].self, from: data)
++                        journal = try transaction.prepareRestore(id: journal.id)
++                        try transaction.bindRestore(&journal, context: restoreContext)
++                        try transaction.applyRestore(&journal, replace: replace)
++                        try transaction.finalize(&journal, rootReadOnly: true)
++                        try publish()
++                        throw URLError(.networkConnectionLost)
++                    }
++                    let outcome = await VPhoneGuestEnvironmentUpdater(session: api, manifestURL: source.manifest, source: source)
++                        .execute("environment_rollback", request: ["transaction": journal.id])
++                    writes.retainForRecovery(try XCTUnwrap(outcome.recovery))
++                    return outcome
++                }
++            }
++            XCTAssertFalse(outcome.ok)
++            XCTAssertThrowsError(try VPhoneOnlineOperationLock(directory: sourceFixture.machine))
++            let correct = try XCTUnwrap(api.journalOverride)
++            api.journalOverride?.removeValue(forKey: "before_files")
++            await writes.reconcile(api)
++            XCTAssertTrue(writes.pendingRecovery, "missing original before_files released lease")
++            api.journalOverride = correct
++            api.journalOverride?["context"] = .object([:])
++            await writes.reconcile(api)
++            XCTAssertTrue(writes.pendingRecovery, "changed original context released lease")
++            api.journalOverride = correct
++            await writes.reconcile(api)
++            XCTAssertFalse(writes.pendingRecovery, "repeated=\(repeated)")
++            do {
++                let released = try VPhoneOnlineOperationLock(directory: sourceFixture.machine)
++                withExtendedLifetime(released) {}
++            } catch { XCTFail("completed restore retained lease: \(error), repeated=\(repeated)") }
++            XCTAssertEqual(api.methods.filter { $0 == "environment.restore" }.count, 1)
++        }
++    }
++
+     func testDaemonInstanceChangeAfterUploadRefusesInstall() async throws {
+         let api = EnvironmentDaemonFake()
+         api.beforeUpload = { api.instanceID = UUID().uuidString }
+@@ -734,10 +899,45 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
+         XCTAssertEqual(commands["environment_rollback"], true)
+     }
+ 
++    func testRestoreRejectsMissingOrTamperedOriginalAndReplyEvidence() async throws {
++        let mutations: [(inout [String: VPhoneJSONValue]) -> Void] = [
++            { $0.removeValue(forKey: "before_files") },
++            { value in if case var .object(hashes)? = value["before_files"] { hashes["libcamfix.dylib"] = .string(String(repeating: "0", count: 64)); value["before_files"] = .object(hashes) } },
++            { value in if case var .object(hashes)? = value["before_files"] { hashes.removeValue(forKey: "libvcamcaptured.dylib"); value["before_files"] = .object(hashes) } },
++            { $0.removeValue(forKey: "context") },
++            { value in if case var .object(context)? = value["context"] { context["generation"] = .string("invalid-generation"); value["context"] = .object(context) } },
++        ]
++        for reply in [false, true] {
++            for (index, mutation) in mutations.enumerated() {
++                let api = EnvironmentDaemonFake(restoreFixture: true)
++                if reply { api.mutateRestore = mutation } else { api.mutateOriginal = mutation }
++                let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
++                XCTAssertEqual(result["ok"] as? Bool, false, "reply=\(reply), mutation=\(index)")
++                XCTAssertEqual(result["code"] as? String, "api_protocol")
++                if !reply { XCTAssertFalse(api.methods.contains("environment.restore"), "invalid original evidence must refuse before mutation") }
++            }
++        }
++    }
++
++    func testRestoreRejectsOriginalAfterFilesAndUnrequestedBeforeHashTampering() async throws {
++        for key in ["before_files", "after_files"] {
++            let api = EnvironmentDaemonFake(restoreFixture: true)
++            api.mutateOriginal = { value in
++                if case var .object(hashes)? = value[key] {
++                    hashes["libvcamcaptured.dylib"] = .string(String(repeating: "0", count: 64))
++                    value[key] = .object(hashes)
++                }
++            }
++            let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
++            XCTAssertEqual(result["ok"] as? Bool, false, key)
++            XCTAssertFalse(api.methods.contains("environment.restore"), key)
++        }
++    }
++
+     func testRollbackMissingComponentEvidenceIsRefused() async throws {
+         let api = EnvironmentDaemonFake(restoreFixture: true)
+         api.mutateRestore = { $0.removeValue(forKey: "libraries") }
+-        let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f2a3b4c5d-1a2b3c4d"])
++        let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+         XCTAssertEqual(result["ok"] as? Bool, false)
+         XCTAssertEqual(result["code"] as? String, "api_protocol")
+         XCTAssertFalse(api.methods.contains("environment.loaded"))
+@@ -764,7 +964,7 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
+         for mutate in mutations {
+             let api = EnvironmentDaemonFake(restoreFixture: true)
+             api.mutateRestore = mutate
+-            let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f2a3b4c5d-1a2b3c4d"])
++            let result = try await run(api, ["t": "environment_rollback", "transaction": "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+             XCTAssertEqual(result["ok"] as? Bool, false)
+             XCTAssertEqual(result["code"] as? String, "api_protocol")
+             XCTAssertFalse(api.methods.contains("environment.loaded"))
+@@ -773,7 +973,7 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
+ 
+     func testRollbackNamesTheTransaction() async throws {
+         let api = EnvironmentDaemonFake(restoreFixture: true)
+-        let id = "0000018f2a3b4c5d-1a2b3c4d"
++        let id = "0000018f-2a3b-4c5d-a123-00001a2b3c4d"
+         var result = try await run(api, ["t": "environment_rollback", "transaction": id])
+         XCTAssertEqual(result["ok"] as? Bool, true, "\(result)")
+         XCTAssertEqual(api.calls.first?.method, "environment.status")
+@@ -811,9 +1011,9 @@ final class GuestEnvironmentUpdateTests: XCTestCase {
+         let statusRequest = try XCTUnwrap(JSONSerialization.jsonObject(with: status.request()) as? [String: Any])
+         XCTAssertEqual(statusRequest["t"] as? String, "environment_status")
+         XCTAssertNotNil(statusRequest["components"] as? String)
+-        let rollback = try VPhoneGuestEnvRollbackCommand.parse(["vm", "0000018f2a3b4c5d-1a2b3c4d"])
++        let rollback = try VPhoneGuestEnvRollbackCommand.parse(["vm", "0000018f-2a3b-4c5d-a123-00001a2b3c4d"])
+         let rollbackRequest = try XCTUnwrap(JSONSerialization.jsonObject(with: rollback.request()) as? [String: Any])
+-        XCTAssertEqual(rollbackRequest["transaction"] as? String, "0000018f2a3b4c5d-1a2b3c4d")
++        XCTAssertEqual(rollbackRequest["transaction"] as? String, "0000018f-2a3b-4c5d-a123-00001a2b3c4d")
+         XCTAssertThrowsError(try VPhoneGuestEnvRollbackCommand.parse(["vm", "../x"]))
+     }
+ 
+diff --git a/tests/VPhoneDaemonWireTests/EnvironmentOperationTests.swift b/tests/VPhoneDaemonWireTests/EnvironmentOperationTests.swift
+index 5d5c5753..9be13f47 100644
+--- a/tests/VPhoneDaemonWireTests/EnvironmentOperationTests.swift
++++ b/tests/VPhoneDaemonWireTests/EnvironmentOperationTests.swift
+@@ -32,6 +32,35 @@ struct EnvironmentOperationTests {
+         #expect(throws: Error.self) { try guest.transaction.prepare(entries, operation: valid["operation"], context: valid) }
+     }
+ 
++    @Test func externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() throws {
++        let gate = GuestMaintenanceGate()
++        for method in GuestMaintenanceGate.writers {
++            let gate = GuestMaintenanceGate()
++            var mutated = false
++            #expect(throws: Error.self) { try gate.run(method: method, externalProxy: true) { mutated = true } }
++            #expect(!mutated, "external proxy executed \(method)")
++        }
++        #expect(try gate.run(method: "device.info", externalProxy: true) { 42 } == 42)
++        #expect(try gate.run(method: "environment.status", externalProxy: true) { 42 } == 42)
++        #expect(try gate.run(method: "bootstrap.install") { 42 } == 42)
++    }
++
++    @Test func proxyAdmissionIsOneUseAndCannotBeReclassifiedAfterRequest() {
++        let admission = GuestProxyAdmission(), nonce = UUID().uuidString
++        #expect(admission.admit(classes: ["internal"], nonces: [nonce]) == nil)
++        #expect(admission.admit(classes: ["external", "internal"], nonces: [nonce]) == nil)
++        #expect(admission.admit(classes: ["external"], nonces: ["invalid"]) == nil)
++        #expect(admission.admit(classes: ["external"], nonces: [nonce]) == nonce)
++        #expect(admission.admit(classes: ["external"], nonces: [nonce]) == nil)
++        #expect(admission.consumeRequest())
++        #expect(!admission.consumeRequest())
++        #expect(admission.external)
++        let internalConnection = GuestProxyAdmission()
++        #expect(internalConnection.consumeRequest())
++        #expect(internalConnection.admit(classes: ["external"], nonces: [nonce]) == nil)
++        #expect(!internalConnection.external)
++    }
++
+     @Test func guestGateExcludesConcurrentWritersWithoutBlockingOrdinaryReads() async throws {
+         let gate = GuestMaintenanceGate()
+         let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
+diff --git a/tests/fixtures/host_api/server.py b/tests/fixtures/host_api/server.py
+index e5b9f278..3c76c10f 100644
+--- a/tests/fixtures/host_api/server.py
++++ b/tests/fixtures/host_api/server.py
+@@ -25,6 +25,9 @@ if managed:
+     health.update(instance_id=str(uuid.uuid4()), capabilities=['files', 'session_identity', 'file_download_identity', 'file_upload_identity'])
+ if host_commands:
+     health['capabilities'].append('apps')
++if behind_proxy:
++    health.setdefault('instance_id', str(uuid.uuid4()))
++    health['capabilities'].append('external_proxy_maintenance_v1')
+ 
+ 
+ class Handler(BaseHTTPRequestHandler):
+@@ -72,6 +75,18 @@ class Handler(BaseHTTPRequestHandler):
+     def do_GET(self):
+         if not self.authorized():
+             return self.reply(401, {'error': 'unauthorized'})
++        if behind_proxy and self.path == '/v1/proxy-admission':
++            nonce = self.headers.get('X-Vphone-Proxy-Nonce')
++            if self.headers.get('X-Vphone-Proxy-Class') != 'external' or not nonce:
++                return self.reply(400, {'error': 'invalid admission'})
++            value = dict(health, proxy_class='external', proxy_nonce=nonce)
++            data = json.dumps(value).encode()
++            self.send_response(200)
++            self.send_header('Content-Length', str(len(data)))
++            self.send_header('Connection', 'keep-alive')
++            self.end_headers()
++            self.wfile.write(data)
++            return
+         if urlsplit(self.path).path == '/v1/files/content':
+             return self.download()
+         if self.path.startswith('/redirect/'):

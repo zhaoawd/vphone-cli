@@ -9,6 +9,9 @@ struct VPhoneGuestEnvironmentRecovery {
     let before: [String: String]
     let requested: [String: String]
     let restoring: Bool
+    var originalRows: [[String: String]] = []
+    var originalContext: [String: String]? = nil
+    var originalBefore: [String: String]? = nil
 
     @MainActor
     func hasTerminated(_ session: any VPhoneHostAPISession) async -> Bool {
@@ -36,13 +39,31 @@ struct VPhoneGuestEnvironmentRecovery {
               let rows = journal["libraries"] as? [[String: Any]] else { return false }
         if !restoring, journal["before_files"] as? [String: String] != before { return false }
         var expected = before, seen = Set<String>()
+        if restoring {
+            guard let originalContext, let originalBefore,
+                  journal["context"] as? [String: String] == originalContext,
+                  journal["before_files"] as? [String: String] == originalBefore,
+                  rows.count == originalRows.count else { return false }
+            var failed = false
+            for (row, original) in zip(rows, originalRows) {
+                guard let name = original["name"], seen.insert(name).inserted,
+                      ["name", "sha256", "previous_sha256", "backup"].allSatisfy({ row[$0] as? String == original[$0] }),
+                      let result = row["state"] as? String else { return false }
+                if let wanted = requested[name] {
+                    guard original["state"] == "replaced", original["previous_sha256"] == wanted else { return false }
+                    if failed { guard result == "replaced" else { return false } }
+                    else if result == "restore_failed" { failed = true }
+                    else { guard result == "restored" else { return false }; expected[name] = wanted }
+                } else { guard result == original["state"] else { return false } }
+            }
+            return (state == "restored") == !failed && status.sha256 == expected
+        }
         for row in rows {
             guard let name = row["name"] as? String, seen.insert(name).inserted,
-                  let wanted = requested[name],
-                  row[restoring ? "previous_sha256" : "sha256"] as? String == wanted,
+                  let wanted = requested[name], row["sha256"] as? String == wanted,
                   let result = row["state"] as? String else { return false }
-            if result == (restoring ? "restored" : "replaced") { expected[name] = wanted }
-            else if !(restoring ? ["replaced", "restore_failed"] : ["failed", "not_attempted"]).contains(result) { return false }
+            if result == "replaced" { expected[name] = wanted }
+            else if !["failed", "not_attempted"].contains(result) { return false }
         }
         return seen == Set(requested.keys) && status.sha256 == expected
     }

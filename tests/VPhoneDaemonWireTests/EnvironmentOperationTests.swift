@@ -32,6 +32,35 @@ struct EnvironmentOperationTests {
         #expect(throws: Error.self) { try guest.transaction.prepare(entries, operation: valid["operation"], context: valid) }
     }
 
+    @Test func externalProxyMaintenanceRefusesBeforeAnyMutationWhileReadsProceed() throws {
+        let gate = GuestMaintenanceGate()
+        for method in GuestMaintenanceGate.writers {
+            let gate = GuestMaintenanceGate()
+            var mutated = false
+            #expect(throws: Error.self) { try gate.run(method: method, externalProxy: true) { mutated = true } }
+            #expect(!mutated, "external proxy executed \(method)")
+        }
+        #expect(try gate.run(method: "device.info", externalProxy: true) { 42 } == 42)
+        #expect(try gate.run(method: "environment.status", externalProxy: true) { 42 } == 42)
+        #expect(try gate.run(method: "bootstrap.install") { 42 } == 42)
+    }
+
+    @Test func proxyAdmissionIsOneUseAndCannotBeReclassifiedAfterRequest() {
+        let admission = GuestProxyAdmission(), nonce = UUID().uuidString
+        #expect(admission.admit(classes: ["internal"], nonces: [nonce]) == nil)
+        #expect(admission.admit(classes: ["external", "internal"], nonces: [nonce]) == nil)
+        #expect(admission.admit(classes: ["external"], nonces: ["invalid"]) == nil)
+        #expect(admission.admit(classes: ["external"], nonces: [nonce]) == nonce)
+        #expect(admission.admit(classes: ["external"], nonces: [nonce]) == nil)
+        #expect(admission.consumeRequest())
+        #expect(!admission.consumeRequest())
+        #expect(admission.external)
+        let internalConnection = GuestProxyAdmission()
+        #expect(internalConnection.consumeRequest())
+        #expect(internalConnection.admit(classes: ["external"], nonces: [nonce]) == nil)
+        #expect(!internalConnection.external)
+    }
+
     @Test func guestGateExcludesConcurrentWritersWithoutBlockingOrdinaryReads() async throws {
         let gate = GuestMaintenanceGate()
         let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)

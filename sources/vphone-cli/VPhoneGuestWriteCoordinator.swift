@@ -12,6 +12,7 @@ final class VPhoneGuestWriteCoordinator {
     private var lease: VPhoneOnlineOperationLock?
     private(set) var pendingRecovery = false
     private var recovery: VPhoneGuestEnvironmentRecovery?
+    private var recoveryID: UUID?
     private var waiters: [CheckedContinuation<Void, Never>] = []
     private var stopped: [CheckedContinuation<Void, Never>] = []
     private(set) var operationID: String?
@@ -43,12 +44,15 @@ final class VPhoneGuestWriteCoordinator {
         sealed = true
         pendingRecovery = true
         recovery = record
+        recoveryID = UUID()
     }
 
     func reconcile(_ session: (any VPhoneHostAPISession)?) async {
-        guard pendingRecovery, !active, let recovery, let session else { return }
-        guard await recovery.hasTerminated(session) else { return }
+        guard pendingRecovery, !active, let recovery, let recoveryID, let session else { return }
+        guard await recovery.hasTerminated(session), pendingRecovery, !active,
+              self.recoveryID == recoveryID else { return }
         self.recovery = nil
+        self.recoveryID = nil
         pendingRecovery = false
         lease = nil
         sealed = stopping

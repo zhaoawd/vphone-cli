@@ -134,7 +134,7 @@ let package = Package(
         ),
         .testTarget(
             name: "VPhoneCLITests",
-            dependencies: ["vphone-cli"],
+            dependencies: ["vphone-cli", "VPhoneDaemonWire"],
             path: "tests/VPhoneCLITests"
         ),
         .testTarget(

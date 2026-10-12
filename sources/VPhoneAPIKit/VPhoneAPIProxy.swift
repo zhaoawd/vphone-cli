@@ -8,6 +8,7 @@ public final class VPhoneAPIProxy {
     public typealias Connector = @Sendable (@escaping @Sendable (Result<VPhoneAPISocket, any Error>) -> Void) -> Void
     public static let maximumConnections = 16
     private let token: String
+    package let internalToken = UUID().uuidString + UUID().uuidString
     private let connector: Connector
     private let state = Clients()
     private let timing: Timing
@@ -59,7 +60,7 @@ public final class VPhoneAPIProxy {
         }
         guard result == 0 else { throw VPhoneAPISocket.failure() }
         let source = DispatchSource.makeReadSource(fileDescriptor: fd, queue: DispatchQueue(label: "vphone.api.accept"))
-        let state = state, connector = connector, token = token, timing = timing
+        let state = state, connector = connector, token = token, internalToken = internalToken, timing = timing
         source.setEventHandler { @Sendable in
             while !state.isStopped {
                 let accepted = accept(fd, nil, nil)
@@ -69,7 +70,7 @@ public final class VPhoneAPIProxy {
                 guard state.add(client) else { continue }
                 DispatchQueue.global(qos: .userInitiated).async {
                     defer { client.stop(); client.releaseSockets(); state.remove(client) }
-                    Self.serve(client, state: state, token: token, timing: timing, connector: connector)
+                    Self.serve(client, state: state, token: token, internalToken: internalToken, timing: timing, connector: connector)
                 }
             }
         }
@@ -150,11 +151,12 @@ public final class VPhoneAPIProxy {
         }
     }
 
-    private nonisolated static func serve(_ client: Client, state: Clients, token: String, timing: Timing, connector: Connector) {
+    private nonisolated static func serve(_ client: Client, state: Clients, token: String, internalToken: String, timing: Timing, connector: Connector) {
         let host = client.hostDescriptor
         let deadline = ContinuousClock.now + .seconds(timing.admission)
         var received = Data()
         var admitted: Data?
+        var internalClient = false
         while !client.isStopped, ContinuousClock.now < deadline {
             guard wait(host, events: Int16(POLLIN), until: deadline) else { return }
             var buffer = [UInt8](repeating: 0, count: 4096)
@@ -162,7 +164,12 @@ public final class VPhoneAPIProxy {
             if count < 0, errno == EINTR || errno == EAGAIN { continue }
             guard count > 0 else { return }
             received.append(contentsOf: buffer.prefix(count))
-            switch VPhoneAPIRequestGate.evaluate(received, token: token) {
+            let decision: VPhoneAPIRequestGate.Decision
+            if case let .accept(data) = VPhoneAPIRequestGate.evaluate(received, token: internalToken) {
+                internalClient = true
+                decision = .accept(data)
+            } else { decision = VPhoneAPIRequestGate.evaluate(received, token: token) }
+            switch decision {
             case .needMore: continue
             case .reject:
                 _ = write(VPhoneAPIRequestGate.unauthorizedResponse, to: host, until: .now + .seconds(timing.write))
@@ -187,8 +194,50 @@ public final class VPhoneAPIProxy {
             sendFailure(connected == .success ? 502 : 504, to: host, timing: timing)
             return
         }
+        if !internalClient, !admitExternal(guest.descriptor, timing: timing) {
+            let body = #"{"type":"response","id":null,"error":{"code":"proxy_maintenance_unavailable","message":"External API proxy requires a daemon supporting external_proxy_maintenance_v1 on this connection; use the host RPC/CLI or stop the VM and update its daemon"}}"#
+            let head = "HTTP/1.1 503 External proxy unavailable\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n"
+            _ = write(Data((head + body).utf8), to: host, until: .now + .seconds(timing.write))
+            return
+        }
         guard write(admitted, to: guest.descriptor, until: .now + .seconds(timing.write)) else { return }
         relay(client, guest: guest, timing: timing)
+    }
+
+    /// Probe the socket that will carry the user's request. A different socket,
+    /// cached host session, or old daemon cannot authorize this relay.
+    private nonisolated static func admitExternal(_ fd: Int32, timing: Timing) -> Bool {
+        let nonce = UUID().uuidString
+        let request = "GET /v1/proxy-admission HTTP/1.1\r\nHost: vphoned\r\nX-Vphone-Proxy-Class: external\r\nX-Vphone-Proxy-Nonce: \(nonce)\r\nContent-Length: 0\r\n\r\n"
+        let deadline = ContinuousClock.now + .seconds(timing.connect)
+        guard write(Data(request.utf8), to: fd, until: deadline) else { return false }
+        var head = Data(), byte: UInt8 = 0
+        while head.count < 32768, head.suffix(4) != Data("\r\n\r\n".utf8) {
+            guard wait(fd, events: Int16(POLLIN), until: deadline), read(fd, &byte, 1) == 1 else { return false }
+            head.append(byte)
+        }
+        guard let text = String(data: head, encoding: .ascii) else { return false }
+        let lines = text.components(separatedBy: "\r\n")
+        guard lines.first == "HTTP/1.1 200 OK" else { return false }
+        let lengths = lines.filter { $0.lowercased().hasPrefix("content-length:") }
+        guard lengths.count == 1, !lines.contains(where: { $0.lowercased().hasPrefix("transfer-encoding:") }),
+              let count = Int(lengths[0].dropFirst("content-length:".count).trimmingCharacters(in: .whitespaces)),
+              count > 0, count <= 65536 else { return false }
+        var body = Data()
+        while body.count < count {
+            guard wait(fd, events: Int16(POLLIN), until: deadline) else { return false }
+            var bytes = [UInt8](repeating: 0, count: min(4096, count - body.count))
+            let n = read(fd, &bytes, bytes.count)
+            guard n > 0 else { return false }
+            body.append(contentsOf: bytes.prefix(n))
+        }
+        guard let health = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+              health["proxy_class"] as? String == "external", health["proxy_nonce"] as? String == nonce,
+              (health["capabilities"] as? [String])?.contains("external_proxy_maintenance_v1") == true,
+              let instance = health["instance_id"] as? String, UUID(uuidString: instance) != nil,
+              let hash = health["binary_hash"] as? String, hash.count == 64,
+              hash.allSatisfy({ "0123456789abcdef".contains($0) }) else { return false }
+        return true
     }
 
     private nonisolated static func sendFailure(_ status: Int, to fd: Int32, timing: Timing) {

@@ -1,0 +1,47 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/12] Linking vphone-vm
+[5/12] Linking vphone-cli
+[7/12] Emitting module VPhoneCLITests
+[8/12] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[8/13] Applying vphone-vm
+[9/13] Applying vphone-cli
+[11/13] Compiling VPhoneCLITests GuestEnvironmentSourceTests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentSourceTests.swift:76:31: warning: result of call to 'withSource' is unused [#no-usage]
+ 74 |         try FileManager.default.createSymbolicLink(at: original, withDestinationURL: outside)
+ 75 |         do {
+ 76 |             try await fixture.withSource { _ in Issue.record("linked candidate parent qualified") }
+    |                               `- warning: result of call to 'withSource' is unused [#no-usage]
+ 77 |         } catch {}
+ 78 |     }
+
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentSourceTests.swift:102:52: warning: result of call to 'withVerifiedInput(runtime:version:executable:effectiveExecutable:requestedStage:verifyBundle:body:)' is unused [#no-usage]
+100 |         } catch {}
+101 |         do {
+102 |             try await VPhoneGuestEnvironmentSource.withVerifiedInput(runtime: fixture.runtime, version: fixture.version,
+    |                                                    `- warning: result of call to 'withVerifiedInput(runtime:version:executable:effectiveExecutable:requestedStage:verifyBundle:body:)' is unused [#no-usage]
+103 |                 executable: fixture.executable, effectiveExecutable: fixture.executable, requestedStage: "/tmp/untrusted",
+104 |                 verifyBundle: {}) { _ in Issue.record("untrusted stage accepted") }
+[11/13] Write Objects.LinkFileList
+[12/13] Linking vphone-cliPackageTests
+Build complete! (6.70s)
+Test Suite 'Selected tests' started at 2026-10-13 06:26:25.675.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 06:26:25.676.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 06:26:25.676.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback]' started.
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:453: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback] : XCTAssertFalse failed - repeated=false
+/Users/qcz3840/github/vphone-cli/sources/VPhoneCore/VPhoneOnlineOperationLock.swift:33: error: -[VPhoneCLITests.GuestEnvironmentUpdateTests testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback] : failed: caught error: "VPhoneMachineBindingError(message: "VM guest write operation is busy; no Stop signal was sent")"
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testActualPartialAndRepeatedRestoreLostReplyReleaseLeaseAfterFullReadback]' failed (0.719 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' failed at 2026-10-13 06:26:26.395.
+	 Executed 1 test, with 2 failures (1 unexpected) in 0.719 (0.719) seconds
+Test Suite 'vphone-cliPackageTests.xctest' failed at 2026-10-13 06:26:26.395.
+	 Executed 1 test, with 2 failures (1 unexpected) in 0.719 (0.719) seconds
+Test Suite 'Selected tests' failed at 2026-10-13 06:26:26.395.
+	 Executed 1 test, with 2 failures (1 unexpected) in 0.719 (0.720) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

@@ -159,7 +159,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                     apiProxy = proxy
                     if let vmLock {
                         let session = VPhoneAPISession(
-                            client: try VPhoneAPIClient(baseURL: url, token: apiOptions.token, timeout: 5),
+                            client: try VPhoneAPIClient(baseURL: url, token: proxy.internalToken, timeout: 5),
                             vmInstanceID: vmLock.state.instanceID)
                         apiSession = session
                         let persistedUnlock = try VPhoneVirtualMachineManifest.load(from: options.configURL).usesStartupUnlock

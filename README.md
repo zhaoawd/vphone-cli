@@ -327,8 +327,14 @@ that socket every three seconds. Failures clear readiness and trigger a fresh
 handshake; submitted operations are never replayed. Unix-socket `capabilities`
 adds `api_session` for discovery; classic command availability remains separate.
 The SHA is self-reported unless a library caller supplies an expected hash.
-Older API daemons can still use the raw proxy but cannot establish this managed
-session. See the [session report](research/p2_api_session_integration_2026-09-28.md).
+External clients require the daemon's `external_proxy_maintenance_v1`
+capability, checked through a fresh admission exchange on each guest connection.
+The external connection rejects environment install/restore, bootstrap maintenance,
+system shutdown/reboot/respring and agent updates; use the host RPC/CLI commands
+for these operations so they coordinate with Stop. Ordinary queries and media
+remain available. Older or unknown daemons refuse external proxy admission with
+an update diagnostic. The managed host session uses a separate random credential
+kept only in memory. See the [session report](research/p2_api_session_integration_2026-09-28.md).
 
 Unix-socket callers can explicitly select the API session for read-only app
 commands: `{"t":"app_list","transport":"api","filter":"user"}` and
