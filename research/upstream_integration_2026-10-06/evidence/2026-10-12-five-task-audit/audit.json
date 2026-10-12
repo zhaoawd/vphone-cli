@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "branch": "codex/upstream-2d21d21-integration",
+  "base": "0d76f6365049c5baeba89867678fc7999a4cd505",
+  "state": "scope_and_design_approved_implementation_plan_review_pending",
+  "proposed_tasks": [
+    {
+      "id": "T24",
+      "title": "前置宿主安全构建与 launcher 约束",
+      "status": "historical_source_v1_protocol_refusal_verified_full_TCC_pending",
+      "interface_contract": "宿主入口继续限制身份、路径、owner 和专用 verb；launcher 与 Bundle 不能成为通用特权执行入口。",
+      "steps": [
+        "将宿主安全审查从原后段移到所有写盘/新入口之前；核对本地与上游 AGENTS 冲突，保留本地多模式和严格权限。",
+        "适配 root-owned Bundle store、签名/receipt 核验；分别确认 launcher、VM 和定位 helper 的权限职责。",
+        "按实际工程构建，核验架构 slice、entitlements、资源和运行依赖闭包。",
+        "审查 throughLauncher 的 direct fallback：合法开发构建缺 launcher 可按原普通规则运行，违反身份/路径/权限门槛不得借 fallback 绕过。"
+      ],
+      "acceptance": [
+        "旧 helper、owner 错误、链接替换、共享可写路径和未知 verb 均正确拒绝。",
+        "产物的运行依赖可验证；不把上游 0777 策略或单一 JB 文档覆盖本地约束。",
+        "同时核对 policy 和调用方 fallback；实际负责授权的 app/helper 的 entitlement、usage description 和签名完整。"
+      ],
+      "remaining_work": [
+        "完整TCC负责应用链实际验收，包括直接CLI与Launchpad→launcher→可信store路线；B27已执行单哈希授权下的无界面VM读回，未验完整TCC链",
+        "Python framework、包、PATH工具和现场编译不属于宿主Mach-O封装闭包"
+      ]
+    },
+    {
+      "id": "T40",
+      "title": "接入每机 Bundle 绑定与四层版本来源",
+      "status": "attempt_resources_and_ROM_snapshot_verified_external_toolchain_and_origin_matrix_pending",
+      "interface_contract": "C10：分别记录 host Bundle、guest environment、kernel、其他 boot chain；更换绑定只改变被明确执行的层。",
+      "steps": [
+        "接入 per-VM binding 和整个创建流程固定版本，旧机器首次迁移前保存原解释和绑定。",
+        "安装新 Bundle 不切换现有机器；缺失/损坏绑定不静默选默认执行。",
+        "区分 Core Bundle >=2.6.0 代码门槛与同 major.minor 默认支持策略，跨 series 需另有验证；记录 clone/export/rename 后来源。",
+        "固定每 VM daemon/environment 同步和降级策略；切绑定和 host 回退不自动授权 guest 改写。"
+      ],
+      "acceptance": [
+        "新 host 旧 guest/旧 kernel 混合状态准确可见。",
+        "只做 update-kernel 不更新其他 boot-chain 来源；缺 Bundle 时拒绝并说明恢复路径。",
+        "不同本地构建可并存，不覆盖正在使用的产物。",
+        "不同本地构建可并存，合法 local/CI 后缀正确解析；同 series 不同 patch 不要求版本数字相同。",
+        "绑定改变、纯兼容连接、显式升级/回退的前后 guest hash 和 instance 均可追踪。"
+      ],
+      "remaining_work": [
+        "Python interpreter/framework/包、PATH工具、宿主SDK/JB现场编译、既有cfw_input及可变缓存仍未形成不可变闭包",
+        "新机可信store binding/receipt发布及带可信既有binding/receipt的实际VM传输验收",
+        "kernel-only及环境升级/回退、混合版本四层来源矩阵；依赖T12/T17/T32/T34生产能力",
+        "完整64GiB VM归档往返空间仍不足；vm-new当前分配约21.02GiB，尚未执行完整往返；同卷APFS副本不证明物理独立备份"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "修订补丁 ID 预设与旧配置迁移",
+      "status": "selection_file_migration_validated_applicability_pending",
+      "interface_contract": "版本化 ID 映射保留显式用户选择；regular/exp 与 standard/experimental 不做名称等同。",
+      "steps": [
+        "列出本地已使用 ID、上游新旧声明、模式适用性和默认值变化。",
+        "处理 extended/experimental、旧点号 ID 及 kernel-exp-paravirt_user_clients 的后续更名，保留显式开关意图。",
+        "迁移先输出差异预览并保存原文件，再原子提交；未知或歧义映射停止执行。"
+      ],
+      "acceptance": [
+        "一对一、拆分、合并、移除均有明确决定；迁移幂等。",
+        "显式关闭不会因新默认开启而丢失；未知/重复 ID 不降级为全部启用。"
+      ],
+      "remaining_work": [
+        "C2 持久化身份/输入/catalog/schema/planDigest 绑定与错误区分",
+        "重验 141 目标声明的实现、五模式、版本和默认适用性",
+        "T24 宿主入口约束审查"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "复用声明体系并强化五模式执行 Gate",
+      "status": "swift_frozen_plan_execution_validated_remaining_gates_pending",
+      "interface_contract": "C1：resolve(mode, OS, selection, catalog) 产生冻结计划；执行只接受该计划允许的声明和实际 patch records。此为逻辑接口，T02 映射本地类型。",
+      "steps": [
+        "冻结本地五模式的允许/禁止和 Hook/auth/Irisin 行为矩阵。",
+        "将上游声明接入已有策略；所有新入口读取真实模式，消除移植路径中的硬编码 .jb。",
+        "拒绝未声明 record、依赖缺失、冲突、环和不可判定版本；启动必需项逐项核验。"
+      ],
+      "acceptance": [
+        "五模式策略测试均通过，用户 override 不越过模式约束。",
+        "单个必需补丁缺失时，即使同一 patcher 其他补丁成功也不得放行。",
+        "外部可执行 patchset 默认关闭，root 不加载其代码。"
+      ],
+      "remaining_work": [
+        "固定目标声明与 T09 显式选择迁移；可写 CLI 选择接口尚未接入",
+        "按单个声明和实际 patchID 校验组合步骤，核验单个必需补丁缺失",
+        "guest Python/zsh 写入接入同一计划",
+        "默认完整测试、固定上游二进制等价及真实 VM 验收；现有固件对照只覆盖本地历史 Python 参考"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "修订计划持久化和损坏状态处理",
+      "status": "transaction_context_binding_validated_desired_store_pending",
+      "interface_contract": "C2：冻结计划绑定 VM 身份、mode、输入 build/digest、catalog/target、schema 和 planDigest；缺失、损坏、未知 schema 分别表达。",
+      "steps": [
+        "复用已有计划和 manifest，补足来源与 digest，避免另起一套平行配置源。",
+        "将未知旧 VM 导入单独识别流程，禁止读取/解码失败后采用宽松默认。",
+        "原子保存新计划并保留旧版本，检查计划与磁盘/generation 对应。"
+      ],
+      "acceptance": [
+        "缺失、权限拒绝、坏 plist、不支持 schema、VM 不匹配各有确定错误。",
+        "只有已识别并记录边界的 legacy 可使用兼容路线；默认不能写盘。"
+      ],
+      "remaining_work": [
+        "复用原记录做 desired-plan 原子保存/显式导入，保留迁移前记录",
+        "首次启动前后与 legacy VM 的稳定运行身份和更新资格",
+        "绑定实际磁盘/generation，验收迁移备份与恢复；事务证据不作为重新执行授权"
+      ]
+    }
+  ],
+  "proposed_execution_order": [
+    "T24 read-only preflight",
+    "T09",
+    "T10",
+    "T11",
+    "T24 acceptance",
+    "T40 dependency implementation and acceptance"
+  ],
+  "scope_constraints": [
+    "Preserve all original acceptance criteria; do not mark a task accepted on unit tests alone",
+    "T40 requires unfinished T12/T17/T32/T34 capabilities; their prerequisites remain applicable",
+    "Do not rebuild the main workspace or operate existing VMs during preparation",
+    "Current artifact-specific AMFI authorization has not been obtained"
+  ],
+  "baseline": {
+    "first_attempt_exit": 1,
+    "first_attempt_errors": "SwiftPM sandbox denied cache and build database writes; 55 tests still ran",
+    "rerun_exit": 0,
+    "tests": 55,
+    "suites": 8,
+    "implementation_changed": false,
+    "accepted_task_count_changed": false
+  },
+  "runtime": {
+    "cli_help_exit": 0,
+    "vm_help_returncode": -9,
+    "strict_signature_exit": 0,
+    "amfid_error_code": -424,
+    "amfid_message": "The file is adhoc signed but contains restricted entitlements",
+    "vm_cdhash": "cce2b11198b668d5bf8e9ec662d18548a12f6444",
+    "vm_sha256": "bf573a1c800b6169af8ec98701063dd30225eb47737bd89f3055abebd254e209",
+    "system_security_changed": false,
+    "vm_started": false
+  },
+  "catalog": {
+    "target": "2d21d21fbdd4f51f013616273ceda9b35a3e0789",
+    "fixed_commit_recovered": true,
+    "declarations": 141,
+    "historical_id_set_matches": true,
+    "applicability_verified": false,
+    "binary_equivalence_verified": false
+  },
+  "evidence": {
+    "baseline-tests-unsandboxed.log.gz": "3471b57fafd7cc54ec2279b2d23751f78317b25aef676f4de06bc5ae785faf65",
+    "baseline-tests.log.gz": "e3a67841d814e150fdbcd517704b416a3955920f841b3cdc62f83991c95d7130",
+    "catalog-source.json": "a98e3ae68c20bdf94532a2503e3d02ae313991b66e65b99246b3cd716d0ff2d5",
+    "cli-help.log.gz": "32324f5f88fb0c0345d68b8dc6c9f094d0c0235a7563b967af0a09cfc5d4e7da",
+    "entitlements.log.gz": "8aa1b550542baf53b4d8d5fa4f84fd526a00bb89b191d19196cd78a810ce8132",
+    "fixed-target-source-manifest.json": "d64fbd706507cd16011b09b83b03ef404d8bbde8002ca609a567c3cf876dcf17",
+    "identity.log.gz": "8272ea0e90e305dde440617cc67034898f42ac889c7d7481de4cd8088acccf9e",
+    "runtime.json": "00cc3dfdf83da6e0c4d4f626699f18c17b4fd95fcf7e3a7c034c378a26452473",
+    "signature.log.gz": "789191b4bdb0ff7eedfe0fd198cec388ec4eeafe0d9072ebc76669bb00348294",
+    "system-runtime.log.gz": "aee02c17349aae524025a8fd33e54926e3c39a8fd34f8f1d2f9e9df517c03c2e",
+    "target-declarations/FirmwareBootChainPatchSet.swift.gz": "cf3bf0a60deb0158db5fb2983ff4f89266aa69c6e41021c6dabb45049042bafd",
+    "target-declarations/FirmwareDeviceTreePatchSet.swift.gz": "f8a2572b3c62ebc8c7cf606ab7ad5f85753f4ea70e7dd248741ae88e31b233d4",
+    "target-declarations/FirmwareGuestDisplayPatchSet.swift.gz": "82a8ab7370a4c6764b20d3c7b6b70e1cfb3fdbf647f4fddaa7d2f9165b57a2f6",
+    "target-declarations/FirmwareGuestIdentityPatchSet.swift.gz": "2621127de8c4fc22a8be8b1966d91b972c5dbee8b6ec1b4756386b5fda3cf89d",
+    "target-declarations/FirmwareGuestSystemPatchSet.swift.gz": "b37c049d3f02074cd2782eaee29d4644e2e65198d05dc80e820b5aaed7fec9e8",
+    "target-declarations/FirmwareKernelBasePatchSet.swift.gz": "2ba53737dc2d1773d1b76c6e827e98e131c8d04d7718f525c0200ce298e86932",
+    "target-declarations/FirmwareKernelCustomFirmwarePatchSet.swift.gz": "c347b940667d67d8f8fcc310d4223d4cb085857b59b9736516f8aeda8caa7c39",
+    "target-declarations/FirmwareKernelFridaPatchSet.swift.gz": "4aa3edbc54ac130e0df00e287e3fcfd1d9e7d99fe8fddd3ef0e2312926a05d46",
+    "target-declarations/FirmwareKernelHypervisorPatchSet.swift.gz": "b119185fd3fbec0a61e234929dc97b0ac41eba5a43018cd14ddea90a60be3f28",
+    "vm-help.log.gz": "5cf378b220b8a8065ad0a4dcb2ef9f635f7367181dc13262d5696d00b93528e0"
+  },
+  "user_approval": {
+    "tasks": "按建议推进 T24、T40、T09、T10、T11",
+    "design": "同意，按这个方向推进"
+  },
+  "implementation_plan": "docs/superpowers/plans/2026-10-12-five-task-completion.md"
+}
