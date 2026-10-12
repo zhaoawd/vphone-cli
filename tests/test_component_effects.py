@@ -213,3 +213,152 @@ class CaptureCompatibilityTests(unittest.TestCase):
         self.assertFalse(target.exists())
         rows=[json.loads(line) for line in self.evidence.read_bytes().splitlines()]
         with self.assertRaises(ValueError): effects.verify_rows(self.load(),rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+
+
+class EffectsReviewRegressionTests(unittest.TestCase):
+    @staticmethod
+    def macho(libs, flags=0, uuid=b'\0'*16, signature=b'\0'*8):
+        import struct
+        commands=b''
+        for name in libs:
+            raw=name.encode()+b'\0';size=(24+len(raw)+7)//8*8
+            commands+=struct.pack('<IIIIII',0x80000018,size,24,0,0,0)+raw+b'\0'*(size-24-len(raw))
+        commands+=struct.pack('<II',0x1b,24)+uuid
+        commands+=struct.pack('<IIII',0x1d,16,512,len(signature))
+        header=struct.pack('<IIIIIIII',0xfeedfacf,0x100000c,0,2,len(libs)+2,len(commands),flags,0)
+        return header+commands+b'\0'*(512-len(header)-len(commands))+signature
+
+    def test_plist_scalar_types_survive_disjoint_edits_but_not_reversion(self):
+        for old,new in [(1,True),(False,0),(1,1.0),(0.0,False),(-0.0,0.0),([1],[True])]:
+            with self.subTest(old=old,new=new),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'plist';store=Path(tmp)/'proofs'
+                path.write_bytes(plistlib.dumps({'Nested':{'Enabled':old}}))
+                before=effects.capture_input(path,store)
+                path.write_bytes(plistlib.dumps({'Nested':{'Enabled':new}}))
+                first=effects.capture_change(before,path,store)
+                before=effects.capture_input(path,store)
+                path.write_bytes(plistlib.dumps({'Nested':{'Enabled':new},'Other':2},fmt=plistlib.FMT_BINARY))
+                second=effects.capture_change(before,path,store)
+                effects.verify([first,second],path,store)
+                before=effects.capture_input(path,store)
+                path.write_bytes(plistlib.dumps({'Nested':{'Enabled':old},'Other':2}))
+                reverted=effects.capture_change(before,path,store)
+                with self.assertRaises(ValueError): effects.verify([first,second,reverted],path,store)
+
+    def test_macho_header_load_command_and_signature_effects_cannot_be_erased(self):
+        for field in ('flags','uuid','signature'):
+            with self.subTest(field=field),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+                path.write_bytes(self.macho([]))
+                before=effects.capture_input(path,store)
+                changed={'flags':1} if field=='flags' else {field:b'X'+b'\0'*(15 if field=='uuid' else 7)}
+                path.write_bytes(self.macho(['/b'],**changed))
+                first=effects.capture_change(before,path,store)
+                before=effects.capture_input(path,store)
+                path.write_bytes(self.macho(['/b','/vh']))
+                reverted=effects.capture_change(before,path,store)
+                with self.assertRaises(ValueError): effects.verify([first,reverted],path,store)
+
+    def test_disjoint_shifted_load_command_effects_compose(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+            path.write_bytes(self.macho([]))
+            before=effects.capture_input(path,store)
+            path.write_bytes(self.macho(['/b'],flags=1,uuid=b'X'+b'\0'*15))
+            first=effects.capture_change(before,path,store)
+            before=effects.capture_input(path,store)
+            path.write_bytes(self.macho(['/b','/vh'],flags=1,uuid=b'XY'+b'\0'*14))
+            second=effects.capture_change(before,path,store)
+            effects.verify([first,second],path,store)
+
+    def test_unknown_operation_projection_and_missing_state_refuse(self):
+        import copy
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'file';store=Path(tmp)/'proofs';path.write_bytes(b'original')
+            before=effects.capture_input(path,store);path.write_bytes(b'Original')
+            changed=effects.capture_change(before,path,store)
+            copied=effects.capture_copy(path,path,store)
+            mutations=[('operation',changed,lambda p:p.update(operation='unsupported-operation')),
+                       ('copy-projection',copied,lambda p:p.update(projection={'kind':'unknown'})),
+                       ('copy-extra-field',copied,lambda p:p.update(projection={'kind':'copy','unknown':True})),
+                       ('copy-as-change',copied,lambda p:p.update(operation='change')),
+                       ('change-as-copy',changed,lambda p:p.update(operation='copy',source=p['after'])),
+                       ('missing-state',changed,lambda p:p.pop('before')),
+                       ('bool-schema',changed,lambda p:p.update(schemaVersion=True))]
+            for name,original,mutate in mutations:
+                with self.subTest(case=name):
+                    proof=copy.deepcopy(original);mutate(proof)
+                    with self.assertRaises(ValueError): effects.verify([proof],path,store)
+
+    def test_actual_insert_dylib_chain_preserves_header_and_code_effects(self):
+        import struct
+        import subprocess
+        tool=Path(__file__).resolve().parents[1]/'.tools/bin/insert_dylib'
+        if not tool.is_file(): self.skipTest('insert_dylib tool unavailable')
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+            path.write_bytes(self.macho([],signature=b'signatur'))
+            before=effects.capture_input(path,store)
+            data=bytearray(path.read_bytes());struct.pack_into('<I',data,24,1);data[400]=42
+            path.write_bytes(data)
+            proofs=[effects.capture_change(before,path,store)]
+            for library in ('/b','/vh'):
+                before=effects.capture_input(path,store)
+                result=subprocess.run([str(tool),'--weak','--inplace','--all-yes',library,str(path)],capture_output=True,text=True)
+                self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+                proofs.append(effects.capture_change(before,path,store))
+            effects.verify(proofs,path,store)
+            self.assertEqual([entry['name'] for entry in effects.libraries(path)],['/b','/vh'])
+
+    def test_unknown_command_bytes_and_dylib_padding_are_required(self):
+        import struct
+        for field in ('unknown-command','dylib-padding'):
+            with self.subTest(field=field),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+                original=bytearray(self.macho([]));struct.pack_into('<I',original,32,0x12345678)
+                path.write_bytes(original);before=effects.capture_input(path,store)
+                modified=bytearray(self.macho(['/b']))
+                struct.pack_into('<I',modified,64,0x12345678)
+                modified[72 if field=='unknown-command' else 63]=1
+                path.write_bytes(modified);first=effects.capture_change(before,path,store)
+                before=effects.capture_input(path,store)
+                reverted=bytearray(self.macho(['/b','/vh']));struct.pack_into('<I',reverted,96,0x12345678)
+                path.write_bytes(reverted);second=effects.capture_change(before,path,store)
+                with self.assertRaises(ValueError): effects.verify([first,second],path,store)
+
+    def test_malformed_command_and_growth_into_code_refuse(self):
+        import struct
+        for case in ('bad-size','bad-count','bad-signature-range','truncated-area','growth-into-code'):
+            with self.subTest(case=case),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+                beforebytes=bytearray(self.macho([]))
+                if case=='growth-into-code': beforebytes[90]=42
+                path.write_bytes(beforebytes);before=effects.capture_input(path,store)
+                after=bytearray(self.macho(['/b']))
+                if case=='bad-size': struct.pack_into('<I',after,36,7)
+                if case=='bad-count': struct.pack_into('<I',after,16,4)
+                if case=='bad-signature-range': struct.pack_into('<I',after,96,9999)
+                if case=='truncated-area':
+                    after=after[:104];struct.pack_into('<I',after,20,80);struct.pack_into('<II',after,96,0,0)
+                path.write_bytes(after)
+                with self.assertRaises(ValueError): effects.capture_change(before,path,store)
+
+    def test_reordered_load_commands_cannot_lose_order_effect(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+            path.write_bytes(self.macho([]));before=effects.capture_input(path,store)
+            reordered=bytearray(self.macho(['/b']))
+            reordered[64:104]=reordered[88:104]+reordered[64:88]
+            path.write_bytes(reordered);first=effects.capture_change(before,path,store)
+            before=effects.capture_input(path,store)
+            path.write_bytes(self.macho(['/b','/vh']));second=effects.capture_change(before,path,store)
+            with self.assertRaises(ValueError): effects.verify([first,second],path,store)
+
+    def test_later_loader_cannot_reverse_established_dependency_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+            path.write_bytes(self.macho(['/a']));before=effects.capture_input(path,store)
+            path.write_bytes(self.macho(['/a','/b']));first=effects.capture_change(before,path,store)
+            before=effects.capture_input(path,store)
+            path.write_bytes(self.macho(['/b','/a','/vh']));second=effects.capture_change(before,path,store)
+            with self.assertRaises(ValueError): effects.verify([first,second],path,store)

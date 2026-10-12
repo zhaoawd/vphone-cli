@@ -125,7 +125,7 @@ def projection(before,after,path=()):
                 else: changes.append({'path':list(path+(key,)),'value':encode_value(after[key])})
             else: changes.extend(projection(before[key],after[key],path+(key,)))
         return changes
-    if before==after: return []
+    if encode_value(before)==encode_value(after): return []
     return [{'path':list(path),'value':encode_value(after)}]
 
 
@@ -133,7 +133,7 @@ def encode_value(value):
     return base64.b64encode(plistlib.dumps({'value':value},fmt=plistlib.FMT_BINARY,sort_keys=True)).decode()
 
 
-def libraries(path):
+def macho_layout(path):
     """Thin 64-bit Mach-O load commands; unknown containers use byte effects."""
     with regular(path) as stream:
         header=stream.read(32)
@@ -141,11 +141,16 @@ def libraries(path):
         ncmds,size=struct.unpack_from('<II',header,16)
         if size>16*CHUNK or ncmds>65536: raise ValueError('invalid Mach-O load command bounds')
         commands=stream.read(size)
-    result=[];offset=0
+        if len(commands)!=size: raise ValueError('truncated load command area')
+    result=[];groups={};order=[];offset=0
     for _ in range(ncmds):
         if offset+8>len(commands): raise ValueError('truncated load command')
         cmd,length=struct.unpack_from('<II',commands,offset)
         if length<8 or offset+length>len(commands): raise ValueError('invalid load command')
+        if cmd==0x1d:
+            if length!=16: raise ValueError('invalid code signature command')
+            start,count=struct.unpack_from('<II',commands,offset+8)
+            if start+count>path.stat().st_size: raise ValueError('invalid code signature region')
         if cmd in (0xc,0x80000018,0x8000001f,0x20,0x80000023):
             if length<24: raise ValueError('invalid dylib command')
             name=struct.unpack_from('<I',commands,offset+8)[0]
@@ -154,40 +159,66 @@ def libraries(path):
             if b'\0' not in raw: raise ValueError('unterminated dylib name')
             timestamp,current_version,compatibility=struct.unpack_from('<III',commands,offset+12)
             result.append({'command':cmd,'name':raw.split(b'\0',1)[0].decode(),
-                           'timestamp':timestamp,'currentVersion':current_version,'compatibilityVersion':compatibility})
+                           'timestamp':timestamp,'currentVersion':current_version,'compatibilityVersion':compatibility,
+                           'raw':base64.b64encode(commands[offset:offset+length]).decode()})
+            order.append(('dylib',canonical(result[-1]).decode()))
+        else:
+            group=groups.setdefault(str(cmd),[])
+            order.append((str(cmd),len(group)))
+            group.append(commands[offset:offset+length])
         offset+=length
     if offset!=len(commands): raise ValueError('load command size differs')
-    return result
+    if len({canonical(entry) for entry in result})!=len(result):
+        raise ValueError('ambiguous duplicate dylib command')
+    return {'entries':result,'groups':groups,'order':order,'size':size}
 
 
-def macho_exclusions(path):
-    # Load-command layout is represented semantically. Code-signature bytes are
-    # replaced by later signing; all other changed bytes remain required.
-    with regular(path) as stream:
-        header=stream.read(32);ncmds,size=struct.unpack_from('<II',header,16)
-        commands=stream.read(size)
-    excluded=[(0,32+size)];offset=0
-    for _ in range(ncmds):
-        cmd,length=struct.unpack_from('<II',commands,offset)
-        if cmd==0x1d:
-            if length!=16: raise ValueError('invalid code signature command')
-            start,count=struct.unpack_from('<II',commands,offset+8)
-            if start+count>path.stat().st_size: raise ValueError('invalid code signature region')
-            excluded.append((start,start+count))
-        offset+=length
-    return excluded
+def libraries(path):
+    layout=macho_layout(path)
+    return None if layout is None else layout['entries']
+
+
+def command_projection(first,last):
+    changes=[]
+    for cmd in sorted(set(first)|set(last)):
+        old,new=first.get(cmd,[]),last.get(cmd,[])
+        if old==new: continue
+        if len(old)!=len(new) or any(len(a)!=len(b) for a,b in zip(old,new)):
+            changes.append({'command':cmd,'exact':[base64.b64encode(c).decode() for c in new]})
+        else:
+            for index,(a,b) in enumerate(zip(old,new)):
+                edits=[{'offset':i,'value':value} for i,value in enumerate(b) if a[i]!=value]
+                if edits: changes.append({'command':cmd,'count':len(new),'index':index,'size':len(b),'edits':edits})
+    return changes
 
 
 def file_projection(old,new):
     first,last=plist(old),plist(new)
     if first is not None and last is not None:
         return {'kind':'plist','changes':projection(first,last)}
-    first,last=libraries(old),libraries(new)
-    added=[] if first is None or last is None else [entry for entry in last if entry not in first]
+    first,last=macho_layout(old),macho_layout(new)
+    added=[] if first is None or last is None else [entry for entry in last['entries'] if entry not in first['entries']]
     if added:
-        removed=[entry for entry in first if entry not in last]
-        return {'kind':'macho','entries':added,'removed':removed,
-                'ranges':ranges(old,new,macho_exclusions(old)+macho_exclusions(new))}
+        common=set(first['order']) & set(last['order'])
+        if [key for key in first['order'] if key in common]!=[key for key in last['order'] if key in common]:
+            # Reordering existing commands has no supported semantic identity
+            # relation; preserve the concrete byte effects without exclusions.
+            return {'kind':'bytes','ranges':ranges(old,new)}
+        # Only ncmds/sizeofcmds and command positions are structural. Every
+        # command byte is represented by its complete dylib identity or a
+        # command-relative effect. Signature data remains ordinary byte data.
+        if last['size']>first['size']:
+            with regular(old) as stream:
+                stream.seek(32+first['size'])
+                padding=stream.read(last['size']-first['size'])
+            if len(padding)!=last['size']-first['size'] or any(padding):
+                raise ValueError('load command growth consumes non-padding bytes')
+        result={'kind':'macho','entries':added,'order':[list(key) for key in last['order']],
+                'removed':[entry for entry in first['entries'] if entry not in last['entries']],
+                'commands':command_projection(first['groups'],last['groups']),
+                'ranges':ranges(old,new,[(16,24),(32,32+max(first['size'],last['size']))])}
+        if old.stat().st_size!=new.stat().st_size: result['exactSize']=new.stat().st_size
+        return result
     return {'kind':'bytes','ranges':ranges(old,new)}
 
 
@@ -246,12 +277,51 @@ def lookup(value,path):
     return True,value
 
 
+def validate_state(value):
+    if not isinstance(value,dict): raise ValueError('invalid operation state')
+    kind=value.get('kind')
+    fields={'missing':{'kind'},'file':{'kind','mode','uid','gid','sha256'},
+            'symlink':{'kind','mode','uid','gid','link'},
+            'directory':{'kind','mode','uid','gid'}}
+    if not isinstance(kind,str) or kind not in fields: raise ValueError('unknown operation state')
+    wanted=fields[kind]|({'children'} if kind=='directory' and 'children' in value else set())
+    if set(value)!=wanted: raise ValueError('invalid operation state fields')
+    if kind!='missing' and any(type(value[k]) is not int or value[k]<0 for k in ('mode','uid','gid')):
+        raise ValueError('invalid operation metadata')
+    if kind=='file' and (not isinstance(value['sha256'],str) or len(value['sha256'])!=64 or any(c not in '0123456789abcdef' for c in value['sha256'])):
+        raise ValueError('invalid operation digest')
+    if kind=='symlink' and not isinstance(value['link'],str): raise ValueError('invalid operation link')
+    if 'children' in value:
+        if not isinstance(value['children'],dict): raise ValueError('invalid operation children')
+        for name,child in value['children'].items():
+            if not isinstance(name,str) or not name or name in ('.','..') or '/' in name: raise ValueError('invalid child name')
+            validate_state(child)
+
+
+def validate_proof(proof):
+    if not isinstance(proof,dict) or type(proof.get('schemaVersion')) is not int or proof['schemaVersion']!=1:
+        raise ValueError('unknown operation proof')
+    if proof.get('operation') not in ('copy','change'): raise ValueError('unknown operation')
+    for field in ('before','after'): validate_state(proof.get(field))
+    projected=proof.get('projection')
+    if not isinstance(projected,dict): raise ValueError('missing operation projection')
+    if proof['operation']=='copy':
+        validate_state(proof.get('source'))
+        if projected!={'kind':'copy'}: raise ValueError('unknown copy projection')
+    elif proof['before']['kind']=='file' and proof['after']['kind']=='file':
+        if projected.get('kind') not in ('plist','bytes','macho'): raise ValueError('unknown file projection')
+    else:
+        after=proof['after']
+        kind='materialized-file' if after['kind']=='file' else 'directory' if after['kind']=='directory' and 'children' not in after else 'state'
+        if projected!={'kind':kind}: raise ValueError('incompatible operation projection')
+
+
 def verify(proofs,path,store):
     if not proofs: raise ValueError('missing operation effects')
+    for proof in proofs: validate_proof(proof)
     recursive=any('children' in p['after'] for p in proofs)
     final=state(path,recursive);previous=None
     for index,proof in enumerate(proofs):
-        if proof.get('schemaVersion')!=1: raise ValueError('unknown operation proof')
         before,after=proof['before'],proof['after']
         if previous is not None and before!=previous and not (proof['operation']=='copy' and proof.get('source')==previous): raise ValueError('operation inputs are not the preceding output')
         previous=after
@@ -266,7 +336,7 @@ def verify(proofs,path,store):
         if before['kind']=='file' and after['kind']=='file':
             old,new=blob(store,before['sha256']),blob(store,after['sha256'])
             expected=file_projection(old,new)
-            if proof['projection']!=expected: raise ValueError('operation projection differs from preserved source/output')
+            if canonical(proof['projection'])!=canonical(expected): raise ValueError('operation projection differs from preserved source/output')
         if kind=='plist':
             actual=plist(Path(path))
             if actual is None: raise ValueError('final target is not the required plist')
@@ -276,8 +346,20 @@ def verify(proofs,path,store):
                     if found: raise ValueError('required plist deletion was reversed')
                 elif not found or encode_value(value)!=change['value']: raise ValueError('required plist effect was overwritten')
         elif kind=='macho':
-            actual=libraries(Path(path))
-            if actual is None or any(entry not in actual for entry in proof['projection']['entries']) or any(entry in actual for entry in proof['projection']['removed']): raise ValueError('required Mach-O loader entry missing')
+            layout=macho_layout(Path(path))
+            if layout is None or any(entry not in layout['entries'] for entry in proof['projection']['entries']) or any(entry in layout['entries'] for entry in proof['projection']['removed']): raise ValueError('required Mach-O loader entry missing')
+            ordered=[list(key) for key in layout['order'] if list(key) in proof['projection']['order']]
+            if ordered!=proof['projection']['order']: raise ValueError('required load command order differs')
+            if 'exactSize' in proof['projection'] and Path(path).stat().st_size!=proof['projection']['exactSize']:
+                raise ValueError('Mach-O size differs')
+            for change in proof['projection']['commands']:
+                actual=layout['groups'].get(change['command'],[])
+                if 'exact' in change:
+                    if [base64.b64encode(c).decode() for c in actual]!=change['exact']: raise ValueError('required load command structure differs')
+                else:
+                    if len(actual)!=change['count'] or len(actual[change['index']])!=change['size']: raise ValueError('required load command identity differs')
+                    command=actual[change['index']]
+                    if any(command[e['offset']]!=e['value'] for e in change['edits']): raise ValueError('required load command effect was overwritten')
         if kind in ('bytes','macho'):
             expected=blob(store,after['sha256'])
             with regular(path) as actual,regular(expected) as wanted:
@@ -318,6 +400,7 @@ def verify_rows(plan,rows,roots,store):
         gate.authorize(plan,row['declarationID'],row['target'])
         proof=row.get('effect')
         if proof is None: raise ValueError('legacy operation has no final effect proof')
+        validate_proof(proof)
         # A2 supplies the explicit transport/consumption graph. Capturing these
         # rows remains enabled, but a partial validator cannot accept them.
         if proof.get('command') in ('mv','rm','tar','gtar'):
