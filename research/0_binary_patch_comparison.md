@@ -1343,3 +1343,10 @@ less 的发布读回通过实际 CLI、Python proof 验证和同一事务锁执�
 generated Restore/AVP 输出不更新已安装 VM origins。供 Task6C 使用的内部 hook 要求活跃的来源资格回调、精确目标及 proof 关联，并在元数据 rename 前和 committed 日志前复验；B 未提供生产 installed-component adapter。A2 的一般 CFW 最终验证仍位于 cleanup/snapshot 之前，不构成永久发布后授权。
 
 较早受影响 Swift 132 项、16 套通过，DeviceTree 真实固件 parity 选择器关闭；Python 36 项通过。最后的 origin 资格窗口修正后，直接受影响 Swift 48 项、4 套通过。原始日志、gzip、命令、退出码及最终源码摘要见 `research/evidence/2026-10-13-task6b/manifest.json`。本轮只使用安全合成字节、目录和故障注入；未执行真实镜像挂载、VM、sudo、AMFI/TCC 或系统安装。Task6B 待独立审查，Task6C 和 Task12 验收尚未完成。
+
+
+### Task6B 审查修正 1
+
+最终 callbacks 和效果读回结束后、写入 committed journal 前，重新比较全部输出根与 journal 摘要，覆盖未列入 component receipt 的保留文件、新增成员和未变化的根。启动 worker 后发生 I/O 故障时，父进程先处理输出并等待 worker，再离开共享锁作用域；pipe 描述符由运行函数明确拥有，FileHandle 包装不重复关闭。真实 subprocess 故障测试中，工具存活期间的实际 recovery 被拒绝，stdout/stderr 共 4 MiB 输出完成后才返回原 I/O 错误。
+
+两项审查问题均有实际 RED/GREEN；最终受影响 Swift 50 项、4 套和 Python worker 8 项通过。证据与最终源码摘要见 `research/evidence/2026-10-13-task6b-fix1/manifest.json`。C 生产来源资格和 legacy import 仍属下一步骤，真实固件/VM 与全标准验收仍属 Task12。本次未新增二进制补丁或执行真实挂载和 VM 操作。

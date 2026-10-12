@@ -281,3 +281,114 @@ extension FirmwareReceiptPublicationTests {
         #expect(FileManager.default.fileExists(atPath: t.root.path))
     }
 }
+
+
+extension FirmwareReceiptPublicationTests {
+    @Test(arguments: ["preserved-file", "new-member", "unchanged-root"])
+    func finalWindowMutationOfJournalRootCannotCommit(_ fault: String) throws {
+        let f = try FirmwareComponentReceiptTests.Fixture()
+        let restore = try #require(f.generation.content.originals.first { $0.name.contains("Restore") }?.name)
+        let target = f.vm.appendingPathComponent(restore + (fault == "preserved-file" ? "/Firmware/test.im4p" : "/external/member"))
+        let altered = Data("unknown final-window bytes".utf8)
+        let mutate: (FirmwareTransaction.Event) throws -> Void = { event in
+            if event == .beforeCommitted {
+                try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try altered.write(to: target)
+            }
+        }
+        let t: FirmwareTransaction
+        if fault == "unchanged-root" {
+            // A historical/manual transaction can have an unchanged entire root.
+            // Its output digest still constrains the final commit window.
+            t = try FirmwareTransaction(vmDirectory: f.vm, inputs: [f.vm.appendingPathComponent(restore)],
+                options: [:], inject: mutate, mounts: { _, _ in })
+        } else {
+            t = try begin(f, inject: mutate)
+            try prepare(f, t)
+        }
+        #expect(throws: (any Error).self) { try t.commit() }
+        #expect(t.journalSnapshot.phase == .publishing)
+        #expect(throws: (any Error).self) { try FirmwareTransaction.recover(vmDirectory: f.vm, mounts: { _, _ in }) }
+        #expect(try Data(contentsOf: target) == altered)
+        #expect(FileManager.default.fileExists(atPath: t.root.appendingPathComponent("journal.json").path))
+        let journal = try FirmwareTransaction.readJournal(at: t.root.appendingPathComponent("journal.json"))
+        #expect(journal.phase == .publishing)
+        if fault == "unchanged-root" {
+            #expect(journal.entries[0].output == journal.entries[0].original)
+        }
+    }
+}
+
+
+extension FirmwareReceiptPublicationTests {
+    @Test(arguments: [false, true])
+    func startedWorkerIOFailureWaitsAndDrainsBeforeUnlock(_ fileOutput: Bool) throws {
+        let f = try FirmwareComponentReceiptTests.Fixture()
+        let markers = f.generationFixture.root.appendingPathComponent("worker-io")
+        try FileManager.default.createDirectory(at: markers, withIntermediateDirectories: false)
+        let started = markers.appendingPathComponent("started")
+        let done = markers.appendingPathComponent("done")
+        let probe = markers.appendingPathComponent("recovery")
+        let output = markers.appendingPathComponent("output")
+        if fileOutput { try Data().write(to: output) }
+        let vm = f.vm
+        let observer = DispatchGroup()
+        let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let python = repo.appendingPathComponent(".venv/bin/python3").path
+        let program = #"""
+        import os,sys,signal,time
+        from pathlib import Path
+        signal.alarm(15)
+        root=Path(sys.argv[1]);(root/'started').write_text('running')
+        while not (root/'recovery').exists(): time.sleep(0.01)
+        total=0
+        try:
+            for fd in (1,2):
+                chunk=b'x'*65536
+                for i in range(32):
+                    view=memoryview(chunk)
+                    while view:
+                        n=os.write(fd,view);total+=n;view=view[n:]
+        except OSError: pass
+        (root/'done').write_text(str(total))
+        """#
+        var transaction: FirmwareTransaction?
+        let t = try begin(f) { event in
+            if event == .beforeCommitted, let transaction {
+                _ = try transaction.runTool(python, ["-c", program, markers.path], output: fileOutput ? output : nil)
+            }
+            if event == .afterToolStart {
+                let deadline = Date().addingTimeInterval(10)
+                while !FileManager.default.fileExists(atPath: started.path), Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+                guard FileManager.default.fileExists(atPath: started.path) else { throw POSIXError(.ETIMEDOUT) }
+                observer.enter()
+                DispatchQueue.global().async {
+                    defer { observer.leave() }
+                    // Give the erroneous early-return path time to unlock. The
+                    // child waits for this actual recovery attempt before output.
+                    Thread.sleep(forTimeInterval: 0.3)
+                    let result: String
+                    do { _ = try FirmwareTransaction.recover(vmDirectory: vm, mounts: { _, _ in }); result = "allowed" }
+                    catch { result = error.localizedDescription }
+                    try? Data(result.utf8).write(to: probe)
+                }
+                throw POSIXError(.EIO)
+            }
+        }
+        transaction = t
+        try prepare(f, t)
+        do { _ = try t.commit(); Issue.record("I/O fault unexpectedly committed") }
+        catch { #expect((error as? POSIXError)?.code == .EIO) }
+        let finishedAtReturn = FileManager.default.fileExists(atPath: done.path)
+        // Bound RED cleanup as well: the fixture must not vanish under a child.
+        #expect(observer.wait(timeout: .now() + 10) == .success)
+        let deadline = Date().addingTimeInterval(16)
+        while !FileManager.default.fileExists(atPath: done.path), Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(finishedAtReturn)
+        #expect(try String(contentsOf: probe, encoding: .utf8).contains("Firmware tool is still running"))
+        #expect(try String(contentsOf: done, encoding: .utf8) == "4194304")
+        if fileOutput { #expect(try Data(contentsOf: output).count == 4 * 1024 * 1024) }
+        #expect(t.journalSnapshot.phase == .publishing)
+        #expect(try FirmwareTransaction.recover(vmDirectory: f.vm, mounts: { _, _ in }) != nil)
+    }
+}

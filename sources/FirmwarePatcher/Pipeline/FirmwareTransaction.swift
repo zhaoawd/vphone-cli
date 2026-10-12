@@ -69,6 +69,7 @@ final class FirmwareTransaction {
         case beforeCopy(String), beforeReady, beforeBackup(String), afterBackup(String)
         case afterPublish(String), afterRestore(String), beforeArchive
         case beforeMetadataWrite(String), beforeMetadataSync(String), beforeCommitted, beforeJournalSync(Phase)
+        case afterToolStart
     }
     /// C constructs this only inside its live trusted-source callback. It is
     /// deliberately non-Codable; its verifier must requalify actual installed
@@ -583,6 +584,14 @@ final class FirmwareTransaction {
                     throw Self.error("Final metadata differs")
                 }
             }
+            // Callbacks and final effect readers may run after the earlier root
+            // check. Bind every member, including unchanged/unreceipted files,
+            // to the output digest immediately before committing the journal.
+            for entry in journal.entries {
+                guard try Self.digest(vmDirectory.appendingPathComponent(entry.name), sync: true) == entry.output else {
+                    throw Self.error("Final firmware root differs from journal: \(entry.name)")
+                }
+            }
             journal.phase = .committed
             do { try saveJournal() }
             catch {
@@ -754,9 +763,10 @@ final class FirmwareTransaction {
             // every tool argument remains a positional argument, never shell code.
             return try Self.run("/bin/sh", ["-c", "exec 3<&0; exec 0</dev/null; exec \"$@\"", "firmware-worker",
                 python.path, worker.path, workerRoot, "--lock-fd", "3", executable] + arguments,
-                output: output, lockInput: workerLockFD)
+                output: output, lockInput: workerLockFD, afterStart: { try self.inject(.afterToolStart) })
         }
-        return try Self.run(python.path, [worker.path, workerRoot, executable] + arguments, output: output)
+        return try Self.run(python.path, [worker.path, workerRoot, executable] + arguments, output: output,
+                            afterStart: { try self.inject(.afterToolStart) })
     }
 
     private func saveJournal() throws {
@@ -850,20 +860,54 @@ final class FirmwareTransaction {
         try syncDirectory(destination.deletingLastPathComponent())
     }
 
-    static func run(_ executable: String, _ arguments: [String], output: URL? = nil, lockInput: Int32? = nil) throws -> Data {
+    static func run(_ executable: String, _ arguments: [String], output: URL? = nil, lockInput: Int32? = nil,
+                    afterStart: () throws -> Void = {}) throws -> Data {
         let process = Process(); process.executableURL = URL(fileURLWithPath: executable); process.arguments = arguments
-        let pipe = Pipe()
+        // Own pipe descriptors explicitly: Foundation's throwing close after
+        // spawn must not bypass wait or leave our writer holding the reader open.
+        var descriptors: [Int32] = [-1, -1]
+        guard Darwin.pipe(&descriptors) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        defer { for fd in descriptors where fd >= 0 { close(fd) } }
+        for fd in descriptors {
+            guard fcntl(fd, F_SETFD, FD_CLOEXEC) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        }
+        let writer = FileHandle(fileDescriptor: descriptors[1], closeOnDealloc: false)
         var file: FileHandle?
         if let output { file = try FileHandle(forWritingTo: output) }
         defer { try? file?.close() }
         if let lockInput { process.standardInput = FileHandle(fileDescriptor: lockInput, closeOnDealloc: false) }
-        process.standardOutput = file ?? pipe.fileHandleForWriting
-        process.standardError = file ?? pipe.fileHandleForWriting
+        process.standardOutput = file ?? writer
+        process.standardError = file ?? writer
         try process.run()
-        if file == nil { try pipe.fileHandleForWriting.close() }
-        // Drain while the child runs; waiting first can deadlock on a full pipe.
-        let data = file == nil ? pipe.fileHandleForReading.readDataToEndOfFile() : Data()
+        // Never leave the shared-lock scope while a started worker can still
+        // write. Retain an I/O failure until output handling and wait complete.
+        defer { process.waitUntilExit() }
+        var ioFailure: Error?
+        do { try afterStart() } catch { ioFailure = error }
+        if close(descriptors[1]) != 0 {
+            if ioFailure == nil { ioFailure = POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+            // If parent-writer closure is uncertain, EOF is not a safe wait
+            // condition. Close the reader so the child cannot block on a full pipe.
+            close(descriptors[0]); descriptors[0] = -1
+        }
+        descriptors[1] = -1
+        var data = Data()
+        if file == nil, descriptors[0] >= 0 {
+            var buffer = [UInt8](repeating: 0, count: 64 * 1024)
+            while true {
+                let count = Darwin.read(descriptors[0], &buffer, buffer.count)
+                if count == 0 { break }
+                if count < 0 {
+                    if errno == EINTR { continue }
+                    if ioFailure == nil { ioFailure = POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+                    close(descriptors[0]); descriptors[0] = -1
+                    break
+                }
+                data.append(contentsOf: buffer.prefix(count))
+            }
+        }
         process.waitUntilExit()
+        if let ioFailure { throw ioFailure }
         guard process.terminationStatus == 0 else {
             throw ProcessError.failed(process.terminationStatus, String(decoding: data, as: UTF8.self))
         }
