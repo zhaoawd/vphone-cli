@@ -161,14 +161,16 @@ def macho_layout(path):
             result.append({'command':cmd,'name':raw.split(b'\0',1)[0].decode(),
                            'timestamp':timestamp,'currentVersion':current_version,'compatibilityVersion':compatibility,
                            'raw':base64.b64encode(commands[offset:offset+length]).decode()})
-            order.append(('dylib',canonical(result[-1]).decode()))
+            # The unique dependency path identifies its position; mutable
+            # command fields remain independently required by entry effects.
+            order.append(('dylib',result[-1]['name']))
         else:
             group=groups.setdefault(str(cmd),[])
             order.append((str(cmd),len(group)))
             group.append(commands[offset:offset+length])
         offset+=length
     if offset!=len(commands): raise ValueError('load command size differs')
-    if len({canonical(entry) for entry in result})!=len(result):
+    if len({entry['name'] for entry in result})!=len(result):
         raise ValueError('ambiguous duplicate dylib command')
     return {'entries':result,'groups':groups,'order':order,'size':size}
 
@@ -178,7 +180,7 @@ def libraries(path):
     return None if layout is None else layout['entries']
 
 
-def command_projection(first,last):
+def command_projection(first,last,scalar_fields=()):
     changes=[]
     for cmd in sorted(set(first)|set(last)):
         old,new=first.get(cmd,[]),last.get(cmd,[])
@@ -187,9 +189,26 @@ def command_projection(first,last):
             changes.append({'command':cmd,'exact':[base64.b64encode(c).decode() for c in new]})
         else:
             for index,(a,b) in enumerate(zip(old,new)):
-                edits=[{'offset':i,'value':value} for i,value in enumerate(b) if a[i]!=value]
+                changed={i for i,value in enumerate(b) if a[i]!=value}
+                # A changed dylib uint32 field requires its complete value,
+                # including unchanged bytes within that same field.
+                for offset in scalar_fields:
+                    field=range(offset,offset+4)
+                    if any(i in changed for i in field): changed.update(field)
+                edits=[{'offset':i,'value':b[i]} for i in sorted(changed)]
                 if edits: changes.append({'command':cmd,'count':len(new),'index':index,'size':len(b),'edits':edits})
     return changes
+
+
+def verify_command_changes(changes,groups):
+    for change in changes:
+        actual=groups.get(change['command'],[])
+        if 'exact' in change:
+            if [base64.b64encode(c).decode() for c in actual]!=change['exact']: raise ValueError('required load command structure differs')
+        else:
+            if len(actual)!=change['count'] or len(actual[change['index']])!=change['size']: raise ValueError('required load command identity differs')
+            command=actual[change['index']]
+            if any(command[e['offset']]!=e['value'] for e in change['edits']): raise ValueError('required load command effect was overwritten')
 
 
 def file_projection(old,new):
@@ -197,8 +216,8 @@ def file_projection(old,new):
     if first is not None and last is not None:
         return {'kind':'plist','changes':projection(first,last)}
     first,last=macho_layout(old),macho_layout(new)
-    added=[] if first is None or last is None else [entry for entry in last['entries'] if entry not in first['entries']]
-    if added:
+    changed_entries=[] if first is None or last is None else [entry for entry in last['entries'] if entry not in first['entries']]
+    if changed_entries:
         common=set(first['order']) & set(last['order'])
         if [key for key in first['order'] if key in common]!=[key for key in last['order'] if key in common]:
             # Reordering existing commands has no supported semantic identity
@@ -213,8 +232,16 @@ def file_projection(old,new):
                 padding=stream.read(last['size']-first['size'])
             if len(padding)!=last['size']-first['size'] or any(padding):
                 raise ValueError('load command growth consumes non-padding bytes')
-        result={'kind':'macho','entries':added,'order':[list(key) for key in last['order']],
-                'removed':[entry for entry in first['entries'] if entry not in last['entries']],
+        old_entries={entry['name']:entry for entry in first['entries']}
+        new_entries={entry['name']:entry for entry in last['entries']}
+        matched=old_entries.keys() & new_entries.keys()
+        result={'kind':'macho','entries':[entry for entry in changed_entries if entry['name'] not in old_entries],
+                'order':[list(key) for key in last['order']],
+                'removed':[entry for entry in first['entries'] if entry['name'] not in new_entries],
+                'dylibChanges':command_projection(
+                    {name:[base64.b64decode(old_entries[name]['raw'])] for name in matched},
+                    {name:[base64.b64decode(new_entries[name]['raw'])] for name in matched},
+                    scalar_fields=(0,4,8,12,16,20)),
                 'commands':command_projection(first['groups'],last['groups']),
                 'ranges':ranges(old,new,[(16,24),(32,32+max(first['size'],last['size']))])}
         if old.stat().st_size!=new.stat().st_size: result['exactSize']=new.stat().st_size
@@ -347,19 +374,14 @@ def verify(proofs,path,store):
                 elif not found or encode_value(value)!=change['value']: raise ValueError('required plist effect was overwritten')
         elif kind=='macho':
             layout=macho_layout(Path(path))
-            if layout is None or any(entry not in layout['entries'] for entry in proof['projection']['entries']) or any(entry in layout['entries'] for entry in proof['projection']['removed']): raise ValueError('required Mach-O loader entry missing')
+            if layout is None or any(entry not in layout['entries'] for entry in proof['projection']['entries']) or any(entry['name']==actual['name'] for entry in proof['projection']['removed'] for actual in layout['entries']): raise ValueError('required Mach-O loader entry missing')
             ordered=[list(key) for key in layout['order'] if list(key) in proof['projection']['order']]
             if ordered!=proof['projection']['order']: raise ValueError('required load command order differs')
             if 'exactSize' in proof['projection'] and Path(path).stat().st_size!=proof['projection']['exactSize']:
                 raise ValueError('Mach-O size differs')
-            for change in proof['projection']['commands']:
-                actual=layout['groups'].get(change['command'],[])
-                if 'exact' in change:
-                    if [base64.b64encode(c).decode() for c in actual]!=change['exact']: raise ValueError('required load command structure differs')
-                else:
-                    if len(actual)!=change['count'] or len(actual[change['index']])!=change['size']: raise ValueError('required load command identity differs')
-                    command=actual[change['index']]
-                    if any(command[e['offset']]!=e['value'] for e in change['edits']): raise ValueError('required load command effect was overwritten')
+            verify_command_changes(proof['projection']['commands'],layout['groups'])
+            verify_command_changes(proof['projection']['dylibChanges'],
+                {entry['name']:[base64.b64decode(entry['raw'])] for entry in layout['entries']})
         if kind in ('bytes','macho'):
             expected=blob(store,after['sha256'])
             with regular(path) as actual,regular(expected) as wanted:

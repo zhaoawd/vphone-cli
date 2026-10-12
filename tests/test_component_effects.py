@@ -362,3 +362,71 @@ class EffectsReviewRegressionTests(unittest.TestCase):
             before=effects.capture_input(path,store)
             path.write_bytes(self.macho(['/b','/a','/vh']));second=effects.capture_change(before,path,store)
             with self.assertRaises(ValueError): effects.verify([first,second],path,store)
+
+    def test_existing_dylib_fields_can_change_without_changing_order_identity(self):
+        import struct
+        for field,offset,value in [('timestamp',12,1),('currentVersion',16,1),
+                                   ('compatibilityVersion',20,1),('command',0,0xc),('padding',31,1)]:
+            with self.subTest(field=field),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+                path.write_bytes(self.macho(['/a']));before=effects.capture_input(path,store)
+                path.write_bytes(self.macho(['/a','/b']));first=effects.capture_change(before,path,store)
+                before=effects.capture_input(path,store)
+                modified=bytearray(self.macho(['/a','/b','/vh']))
+                if field=='padding': modified[32+offset]=value
+                else: struct.pack_into('<I',modified,32+offset,value)
+                path.write_bytes(modified);second=effects.capture_change(before,path,store)
+                effects.verify([first,second],path,store)
+                self.assertEqual([entry['name'] for entry in effects.libraries(path)],['/a','/b','/vh'])
+                before=effects.capture_input(path,store)
+                path.write_bytes(self.macho(['/a','/b','/vh']))
+                reversed_field=effects.capture_change(before,path,store)
+                with self.assertRaises(ValueError): effects.verify([first,second,reversed_field],path,store)
+
+    def test_duplicate_dylib_order_identity_is_rejected_even_when_fields_differ(self):
+        import struct
+        for difference in ('none','version','command'):
+            with self.subTest(difference=difference),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+                path.write_bytes(self.macho(['/a']));before=effects.capture_input(path,store)
+                duplicated=bytearray(self.macho(['/a','/a','/b']))
+                if difference=='version': struct.pack_into('<I',duplicated,64+16,1)
+                if difference=='command': struct.pack_into('<I',duplicated,64,0xc)
+                path.write_bytes(duplicated)
+                with self.assertRaisesRegex(ValueError,'ambiguous duplicate dylib'):
+                    effects.capture_change(before,path,store)
+
+    def test_disjoint_existing_dylib_fields_compose_but_earlier_field_cannot_revert(self):
+        import struct
+        for first_offset,first_value,second_offset in [(16,1,20),(0,0xc,12)]:
+            with self.subTest(first_offset=first_offset),tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+                path.write_bytes(self.macho(['/a']));before=effects.capture_input(path,store)
+                first_bytes=bytearray(self.macho(['/a','/b']))
+                struct.pack_into('<I',first_bytes,32+first_offset,first_value)
+                path.write_bytes(first_bytes);first=effects.capture_change(before,path,store)
+                before=effects.capture_input(path,store)
+                second_bytes=bytearray(self.macho(['/a','/b','/vh']))
+                struct.pack_into('<I',second_bytes,32+first_offset,first_value)
+                struct.pack_into('<I',second_bytes,32+second_offset,1)
+                path.write_bytes(second_bytes);second=effects.capture_change(before,path,store)
+                effects.verify([first,second],path,store)
+                before=effects.capture_input(path,store)
+                reverted=bytearray(self.macho(['/a','/b','/vh']))
+                struct.pack_into('<I',reverted,32+second_offset,1)
+                path.write_bytes(reverted);third=effects.capture_change(before,path,store)
+                with self.assertRaises(ValueError): effects.verify([first,second,third],path,store)
+
+    def test_existing_dylib_numeric_field_preserves_its_entire_value(self):
+        import struct
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'macho';store=Path(tmp)/'proofs'
+            path.write_bytes(self.macho(['/a']));before=effects.capture_input(path,store)
+            first_bytes=bytearray(self.macho(['/a','/b']))
+            struct.pack_into('<I',first_bytes,48,1)
+            path.write_bytes(first_bytes);first=effects.capture_change(before,path,store)
+            before=effects.capture_input(path,store)
+            modified=bytearray(self.macho(['/a','/b','/vh']))
+            struct.pack_into('<I',modified,48,257)
+            path.write_bytes(modified);second=effects.capture_change(before,path,store)
+            with self.assertRaises(ValueError): effects.verify([first,second],path,store)
