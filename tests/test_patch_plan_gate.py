@@ -438,21 +438,87 @@ class FrozenGateTests(unittest.TestCase):
         rows[1]['effect']['entitlementsSource']['path']=str(self.stage/'unrelated')
         with self.assertRaises(ValueError): effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
 
+    def staged_signing_transaction(self, name='initial'):
+        import cfw_disk_txn
+        gate.require_write_context(self.load())
+        original=self.vm/'Disk.img'
+        if not original.exists(): original.write_bytes(b'original synthetic disk')
+        staged=self.evidence.parent/'Disk.img';staged.write_bytes(b'staged synthetic disk')
+        record={'version':1,'id':name,'status':'staged','vm':str(self.vm),
+                'original':cfw_disk_txn.identity(original.stat()),'staged':cfw_disk_txn.identity(staged.stat())}
+        (self.evidence.parent/'transaction.json').write_text(json.dumps(record))
+        return name
+
+    @contextlib.contextmanager
+    def handed_back_staging_owner(self):
+        # Safe ownership seam: hand_back_artifacts returns .cfw_temp to the
+        # invoker; the next producer has a different effective uid. Host shell
+        # hand-back selection itself runs in test_cfw_host_isolation.
+        real=Path.lstat;stage=self.stage;foreign=os.geteuid()+1
+        def observed(path,*args,**kwargs):
+            info=real(path,*args,**kwargs)
+            if path==stage:
+                values=list(info);values[4]=foreign;return os.stat_result(values)
+            return info
+        with patch.object(Path,'lstat',observed): yield
+
+    def test_v2_signature_after_host_handoff_and_failed_attempt_retry(self):
+        from tests.test_component_signatures import signed_macho
+        from patchers import component_effects as effects
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        plan=self.load();self.staged_signing_transaction()
+        target=self.mount/'mnt1/sbin/launchd';target.parent.mkdir();target.write_bytes(signed_macho())
+        original=target.read_bytes()
+        with self.handed_back_staging_owner():
+            for attempt in ('initial','retry'):
+                with self.subTest(attempt=attempt):
+                    try:
+                        with guest_write.signing_directory(plan,transaction_id=json.loads((self.evidence.parent/'transaction.json').read_text())['id']) as directory:
+                            source=directory/'launchd'
+                            guest_write.run(plan,['cp',str(target),str(source)])
+                            guest_write.inject_v2(plan,source)
+                            def signer(argv):
+                                if attempt=='initial': raise subprocess.CalledProcessError(9,argv)
+                                import struct
+                                body=bytearray(source.read_bytes()[:4096]);body.extend(b'\0'*(4096-len(body)))
+                                count,size=struct.unpack_from('<II',body,16)
+                                struct.pack_into('<II',body,16,count+1,size+16)
+                                tail=signed_macho()[4096:]
+                                struct.pack_into('<IIII',body,32+size,0x1d,16,4096,len(tail))
+                                data=body+tail;data[4168:4200]=hashlib.sha256(data[:4096]).digest();source.write_bytes(data)
+                            if attempt=='initial':
+                                with self.assertRaises(subprocess.CalledProcessError):
+                                    guest_write.sign(plan,['ldid','-S',str(source)],execute=signer)
+                            else:
+                                guest_write.sign(plan,['ldid','-S',str(source)],execute=signer)
+                                guest_write.run(plan,['cp',str(source),str(target)])
+                    except ValueError as error:
+                        self.fail('normal handed-back staging blocked v2 producer: '+str(error))
+                    if attempt=='initial': self.assertEqual(target.read_bytes(),original)
+                    else: self.assertIn(b'/vh',target.read_bytes())
+                if attempt=='initial':
+                    # A host retry gets a fresh staged transaction and evidence.
+                    self.evidence=self.vm/'.cfw_disk.retry/guest-changes.jsonl'
+                    os.environ['VPHONE_GUEST_EVIDENCE']=str(self.evidence)
+                    self.staged_signing_transaction('retry')
+        rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+        effects.verify_rows(plan,rows,{'system':self.mount/'mnt1'},self.evidence.parent/'effect-blobs')
+
     def test_v2_signing_uses_registered_private_directory(self):
         from tests.test_component_signatures import signed_macho
         self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
-        plan=self.load();gate.require_write_context(plan)
+        plan=self.load();self.staged_signing_transaction()
         signer=self.root/'ldid';signer.write_text('#!/bin/sh\nexit 0\n');signer.chmod(0o755)
-        with guest_write.signing_directory(plan) as directory:
+        with guest_write.signing_directory(plan,transaction_id=json.loads((self.evidence.parent/'transaction.json').read_text())['id']) as directory:
             source=directory/'launchd';source.write_bytes(signed_macho())
             guest_write.sign(plan,[str(signer),'-S',str(source)])
             for mode in [0o770,0o777]:
                 directory.chmod(mode)
                 with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
             directory.chmod(0o700)
-            self.stage.chmod(0o777)
+            self.evidence.parent.chmod(0o777)
             with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
-            self.stage.chmod(0o755)
+            self.evidence.parent.chmod(0o700)
             with patch.object(os,'geteuid',return_value=os.geteuid()+1):
                 with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
             nested=directory/'nested';nested.mkdir();(nested/'launchd').write_bytes(signed_macho())
@@ -462,9 +528,83 @@ class FrozenGateTests(unittest.TestCase):
             source.unlink();source.write_bytes(external.read_bytes())
             wrong=directory/'seputil';wrong.write_bytes(signed_macho())
             with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(wrong)])
-        fake=self.stage/'.vphone-launchd-abcdefgh';fake.mkdir(mode=0o700)
+        fake=self.evidence.parent/'.vphone-launchd-abcdefgh';fake.mkdir(mode=0o700)
         source=fake/'launchd';source.write_bytes(signed_macho())
         with self.assertRaises(ValueError): guest_write.sign(plan,[str(signer),'-S',str(source)])
+
+    def test_v2_signer_cannot_switch_work_root_during_execution(self):
+        from tests.test_component_signatures import signed_macho
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        plan=self.load();transaction_id=self.staged_signing_transaction()
+        other=self.vm/'.cfw_disk.other';other.mkdir(mode=0o700)
+        with guest_write.signing_directory(plan,transaction_id=transaction_id) as directory:
+            source=directory/'launchd';source.write_bytes(signed_macho())
+            def signer(_): os.environ['VPHONE_GUEST_EVIDENCE']=str(other/'guest-changes.jsonl')
+            with self.assertRaises(ValueError): guest_write.sign(plan,['ldid','-S',str(source)],execute=signer)
+        self.assertFalse((other/'guest-changes.jsonl').exists())
+
+    def test_v2_registration_requires_current_staged_transaction_and_private_work_root(self):
+        import cfw_disk_txn
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        plan=self.load();transaction_id=self.staged_signing_transaction()
+        record_path=self.evidence.parent/'transaction.json';original=record_path.read_bytes()
+        record=json.loads(original)
+        cases=[dict(record,status='published'),dict(record,id='another'),dict(record,vm=str(self.root)),
+               dict(record,staged=dict(record['staged'],ino=record['staged']['ino']+1)),
+               dict(record,original=dict(record['original'],ino=record['original']['ino']+1))]
+        for value in cases:
+            with self.subTest(record=value):
+                record_path.write_text(json.dumps(value))
+                with self.assertRaises((ValueError,cfw_disk_txn.Refused)):
+                    with guest_write.signing_directory(plan,transaction_id=transaction_id): self.fail('unqualified transaction admitted')
+        record_path.write_bytes(original)
+        with self.assertRaises(ValueError):
+            with guest_write.signing_directory(plan): self.fail('missing transaction ID admitted')
+        work=self.evidence.parent
+        for mode in (0o755,0o770,0o777):
+            work.chmod(mode)
+            with self.assertRaises(ValueError):
+                with guest_write.signing_directory(plan,transaction_id=transaction_id): self.fail('nonprivate work admitted')
+        work.chmod(0o700)
+        with patch.object(os,'geteuid',return_value=os.geteuid()+1):
+            with self.assertRaises(ValueError):
+                with guest_write.signing_directory(plan,transaction_id=transaction_id): self.fail('foreign work admitted')
+        actual=self.vm/'.cfw_disk.actual';work.rename(actual);work.symlink_to(actual,target_is_directory=True)
+        try:
+            with self.assertRaises(ValueError):
+                with guest_write.signing_directory(plan,transaction_id=transaction_id): self.fail('linked work admitted')
+        finally: work.unlink();actual.rename(work)
+        with patch.dict(os.environ,{'VPHONE_GUEST_EVIDENCE':str(self.stage/'guest-changes.jsonl')}):
+            with self.assertRaises(ValueError):
+                with guest_write.signing_directory(plan,transaction_id=transaction_id): self.fail('old staging root admitted')
+
+    def test_v2_registered_source_rechecks_transaction_and_directory_before_injection(self):
+        from tests.test_component_signatures import signed_macho
+        self.plan['gates']['guestEnvironmentV2']=True;self.context['guestEnvironment']='v2';self.publish()
+        plan=self.load();transaction_id=self.staged_signing_transaction()
+        record_path=self.evidence.parent/'transaction.json';original=record_path.read_bytes()
+        with guest_write.signing_directory(plan,transaction_id=transaction_id) as directory:
+            source=directory/'launchd';source.write_bytes(signed_macho());before=source.read_bytes()
+            record=json.loads(original);record['status']='aborted';record_path.write_text(json.dumps(record))
+            with self.assertRaises(ValueError): guest_write.inject_v2(plan,source)
+            record_path.write_bytes(original)
+            with patch.object(os,'geteuid',return_value=os.geteuid()+1):
+                with self.assertRaises(ValueError): guest_write.inject_v2(plan,source)
+            directory.chmod(0o777)
+            with self.assertRaises(ValueError): guest_write.inject_v2(plan,source)
+            directory.chmod(0o700)
+            self.assertEqual(source.read_bytes(),before)
+            renamed=directory.with_name(directory.name+'-original');directory.rename(renamed)
+            directory.mkdir(mode=0o700);(directory/'launchd').write_bytes(before)
+            try:
+                with self.assertRaises(ValueError): guest_write.inject_v2(plan,source)
+                self.assertEqual(source.read_bytes(),before)
+            finally:
+                (directory/'launchd').unlink();directory.rmdir();renamed.rename(directory)
+        for parent in (self.stage,self.evidence.parent):
+            fake=parent/'.vphone-launchd-abcdefgh';fake.mkdir(mode=0o700);source=fake/'launchd';source.write_bytes(before)
+            with self.assertRaises(ValueError): guest_write.inject_v2(plan,source)
+            self.assertEqual(source.read_bytes(),before)
 
     def test_v2_reinstallation_writes_have_final_effects(self):
         from tests.test_cfw_env_install import InstallTests
@@ -477,7 +617,7 @@ class FrozenGateTests(unittest.TestCase):
         shutil.copytree(fixture.vm/'.create-checkpoint',self.vm/'.create-checkpoint')
         system=self.mount/'mnt1'
         shutil.copytree(fixture.system,system,dirs_exist_ok=True,symlinks=True)
-        shutil.copytree(fixture.vm/'cfw_input',self.vm/'cfw_input')
+        shutil.copytree(fixture.vm/'cfw_input',self.vm/'cfw_input',dirs_exist_ok=True)
         plan=self.load();gate.require_write_context(plan)
         code=fixture.installer.install_mounted(system,self.vm,fixture.stage,fixture.daemon,self.root/'v2-report.json',
              variant='regular',owner=(os.getuid(),os.getgid()),runner=fixture.runner,frozen_plan=plan)
@@ -664,6 +804,17 @@ class FrozenGateTests(unittest.TestCase):
 
     def test_v2_initial_install_actual_loader_producer_and_controlled_signer(self):
         from tests.test_cfw_env_install import InstallTests
+        from tests.test_cfw_host_isolation import HostIsolationTests
+        # Execute the actual host cleanup/hand-back shell against command
+        # doubles on this same disposable VM before the v2 ownership seam.
+        host=HostIsolationTests();host.setUp();self.addCleanup(host.doCleanups)
+        fcntl.flock(self.lock_fd,fcntl.LOCK_UN)
+        try:
+            _vm,process=host.start(str(self.vm),variant='regular',**host.sudo_invoker())
+            status,output=host.finish(process)
+            self.assertEqual(status,0,output)
+            self.assertIn(str(self.stage.resolve()),host.chowned_paths())
+        finally: fcntl.flock(self.lock_fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
         from tests.test_component_signatures import signed_macho
         from patchers import component_effects as effects, component_signatures as signatures
         import shutil
@@ -673,14 +824,12 @@ class FrozenGateTests(unittest.TestCase):
         os.environ.update(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))
         shutil.copytree(fixture.vm/'.create-checkpoint',self.vm/'.create-checkpoint')
         system=self.mount/'mnt1';shutil.copytree(fixture.system,system,dirs_exist_ok=True,symlinks=True)
-        shutil.copytree(fixture.vm/'cfw_input',self.vm/'cfw_input')
+        shutil.copytree(fixture.vm/'cfw_input',self.vm/'cfw_input',dirs_exist_ok=True)
         launchd=system/'sbin/launchd';launchd.write_bytes(signed_macho(entitlements={'original-entitlement':True}))
         def runner(args):
             args=list(map(str,args))
-            if 'inject-dylib' in args:
-                with patch.object(sys,'argv',args[1:]):
-                    try: cfw.main()
-                    except SystemExit as result: self.assertEqual(result.code,0)
+            if Path(args[0]).name=='insert_dylib':
+                return subprocess.run(args,capture_output=True,check=True)
             elif '-e' in args:
                 return subprocess.CompletedProcess(args,0,plistlib.dumps(signatures.entitlements(args[-1])[0]),b'')
             else:
@@ -697,8 +846,10 @@ class FrozenGateTests(unittest.TestCase):
         value=plistlib.loads(boot_plist.read_bytes());value['LaunchDaemons']['preserved-boot-job']={'Label':'preserved-boot-job'}
         boot_plist.write_bytes(plistlib.dumps(value))
         gate.append_evidence(plan,'system-launchdaemons-boot-install','system:/System/Library/xpc/launchd.plist',boot_plist,old,gate.snapshot(boot_plist),effect=effects.capture_change(before,boot_plist,store))
-        code=fixture.installer.install_mounted(system,self.vm,fixture.stage,fixture.daemon,self.root/'v2-initial-report.json',
-             variant='regular',owner=(os.getuid(),os.getgid()),runner=runner,frozen_plan=plan)
+        transaction_id=self.staged_signing_transaction()
+        with self.handed_back_staging_owner():
+            code=fixture.installer.install_mounted(system,self.vm,fixture.stage,fixture.daemon,self.root/'v2-initial-report.json',
+                 variant='regular',owner=(os.getuid(),os.getgid()),runner=runner,transaction_id=transaction_id,frozen_plan=plan)
         self.assertEqual(code,0,(self.root/'v2-initial-report.json').read_text())
         rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
         effects.verify_rows(plan,rows,{'system':system},self.evidence.parent/'effect-blobs')

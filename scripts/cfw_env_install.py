@@ -191,7 +191,7 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
             if not os.path.lexists(backup):
                 write(manifest['launchd'] + '.bak', launchd.read_bytes(), 0o755, launchd)
             from patchers import guest_write
-            directory=guest_write.signing_directory(frozen_plan) if frozen_plan is not None else tempfile.TemporaryDirectory(prefix='.vphone-launchd-', dir=vm / '.cfw_temp')
+            directory=guest_write.signing_directory(frozen_plan,transaction_id=transaction_id) if frozen_plan is not None else tempfile.TemporaryDirectory(prefix='.vphone-launchd-', dir=vm / '.cfw_temp')
             with directory as temp:
                 patched = Path(temp) / 'launchd'
                 if frozen_plan is None: patched.write_bytes(launchd.read_bytes())
@@ -199,7 +199,9 @@ def install_mounted(root, vm, components, daemon, report_path, *, variant='regul
                 patched.chmod(0o755)
                 ents = Path(temp) / 'entitlements.plist'
                 ents.write_bytes(entitlements)
-                command(runner, [sys.executable, SCRIPT_DIR / 'patchers/cfw.py', 'inject-dylib', patched, '/vh'])
+                if frozen_plan is None:
+                    command(runner, [sys.executable, SCRIPT_DIR / 'patchers/cfw.py', 'inject-dylib', patched, '/vh'])
+                else: guest_write.inject_v2(frozen_plan,patched,execute=lambda args: command(runner,args))
                 signing_args=['ldid', '-S' + str(ents), '-M', '-K' + str(certificate), str(patched)]
                 if frozen_plan is not None:
                     guest_write.sign(frozen_plan,signing_args,execute=lambda args: command(runner,args))

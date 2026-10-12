@@ -346,7 +346,8 @@ def sign(plan, argv, *, execute=None):
     if execute is None: subprocess.run(argv,check=True)
     else: execute(argv)
     gate.private_path(plan,source) if plan.context['variant']!='less' else less_target(plan,source)
-    if is_v2: v2_signing_rule(plan,source)
+    if is_v2 and v2_signing_rule(plan,source) is None:
+        raise ValueError('signing source lost registered work root')
     after=effects.capture_input(source,store)
     signatures.verify_signing(effects.blob(store,before['sha256']),source)
     if ent_paths:
@@ -389,35 +390,92 @@ def less_metadata(plan,argv):
 
 _signing_directories={}
 
-@contextlib.contextmanager
-def signing_directory(plan):
-    """Register only this producer's live tempfile directory; never deserialize it."""
+
+def signing_transaction(plan, transaction_id):
+    """Recheck this invocation's existing staged disk transaction."""
+    import cfw_disk_txn as transaction
     gate.require_write_context(plan)
+    work=gate.private_path(plan,Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent)
+    raw=gate.strict_bytes(work/'transaction.json');record=json.loads(raw)
+    if (not isinstance(transaction_id,str) or not transaction_id or record.get('id')!=transaction_id
+            or record.get('version')!=1 or record.get('status')!='staged'
+            or record.get('vm')!=plan.context['vmDirectory']):
+        raise ValueError('signing requires the current staged transaction')
+    fd=os.open(Path(plan.context['vmDirectory'])/'Disk.img',os.O_RDONLY|os.O_NOFOLLOW)
+    try: transaction.require_original(fd,Path(plan.context['vmDirectory']),record['original'])
+    finally: os.close(fd)
+    transaction.require_staged(work,record['staged'])
+    return work,raw
+
+
+def private_directory(path,fd,original):
+    for info in (os.fstat(fd),path.lstat()):
+        if (not stat.S_ISDIR(info.st_mode) or (info.st_dev,info.st_ino)!=(original.st_dev,original.st_ino)
+                or info.st_uid!=os.geteuid() or stat.S_IMODE(info.st_mode)!=0o700):
+            raise ValueError('signing private directory identity/owner/mode changed')
+
+
+@contextlib.contextmanager
+def signing_directory(plan, *, transaction_id=None):
+    """Register a live producer directory below this qualified transaction."""
     if plan.context['variant']!='regular' or plan.context['guestEnvironment']!='v2':
         raise ValueError('private signing directory requires regular/v2')
-    parent=gate.private_path(plan,Path(plan.context['vmDirectory'])/'.cfw_temp')
-    with tempfile.TemporaryDirectory(prefix='.vphone-launchd-',dir=parent) as temporary:
-        path=Path(temporary);fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
-        _signing_directories[path]=(fd,os.fstat(fd),plan.raw_sha256)
-        try: yield path
-        finally:
-            _signing_directories.pop(path,None);os.close(fd)
+    parent,record=signing_transaction(plan,transaction_id)
+    parent_fd=os.open(parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    try:
+        parent_info=os.fstat(parent_fd);private_directory(parent,parent_fd,parent_info)
+        with tempfile.TemporaryDirectory(prefix='.vphone-launchd-',dir=parent) as temporary:
+            path=Path(temporary);fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+            _signing_directories[path]={'fd':fd,'original':os.fstat(fd),'desired':plan.raw_sha256,
+                'context':plan.context_json,'parent':parent,'parentFD':parent_fd,'parentInfo':parent_info,
+                'transactionID':transaction_id,'transaction':record}
+            try:
+                if v2_signing_rule(plan,path/'launchd') is None:
+                    raise ValueError('producer directory differs from generated signing slot')
+                yield path
+            finally:
+                _signing_directories.pop(path,None);os.close(fd)
+    finally: os.close(parent_fd)
 
 
 def v2_signing_rule(plan,source):
     rule=target_table()[0]['v2Signing']
-    relative=str(source.relative_to(Path(plan.context['vmDirectory'])))
+    if rule.get('root')!='hostTransactionWork': raise ValueError('unknown v2 signing root policy')
+    work=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent
+    if work not in source.parents: return None
+    relative=str(source.relative_to(work))
     if re.fullmatch(rule['relativePattern'],relative) is None: return None
     if plan.context['variant']!='regular' or plan.context['guestEnvironment']!='v2':
         raise ValueError('signing source differs from v2 context')
-    parent=source.parent.parent.lstat()
-    if not stat.S_ISDIR(parent.st_mode) or parent.st_uid!=os.geteuid() or stat.S_IMODE(parent.st_mode)&0o022:
-        raise ValueError('signing directory parent is not private to the producer')
     registered=_signing_directories.get(source.parent)
     if registered is None: raise ValueError('signing source has no live producer directory')
-    fd,original,desired=registered;actual=os.fstat(fd);named=source.parent.lstat()
-    if desired!=plan.raw_sha256 or any((info.st_dev,info.st_ino)!=(original.st_dev,original.st_ino)
-                                     or info.st_uid!=os.geteuid() or stat.S_IMODE(info.st_mode)!=0o700
-                                     for info in (actual,named)):
-        raise ValueError('signing source private directory identity/owner/mode changed')
+    if registered['desired']!=plan.raw_sha256 or registered['context']!=plan.context_json or registered['parent']!=work:
+        raise ValueError('signing source differs from registered context/work root')
+    gate.private_path(plan,source)
+    private_directory(work,registered['parentFD'],registered['parentInfo'])
+    private_directory(source.parent,registered['fd'],registered['original'])
+    actual,record=signing_transaction(plan,registered['transactionID'])
+    if actual!=work or record!=registered['transaction']:
+        raise ValueError('signing staged transaction changed')
     return rule
+
+
+def inject_v2(plan, source, *, execute=None):
+    """Observe the exact /vh injection in this registered launchd producer."""
+    from . import component_effects as effects
+    from .cfw import dylib_command
+    source=Path(source)
+    rule=v2_signing_rule(plan,source)
+    if rule is None: raise ValueError('v2 injection has no registered source')
+    gate.authorize(plan,rule['declaration'],rule['target'])
+    store=Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent/'effect-blobs'
+    before=effects.capture_input(source,store);snapshot=gate.snapshot(source)
+    try:
+        argv=dylib_command(source,'/vh')
+        if execute is None: subprocess.run(argv,check=True)
+        else: execute(argv)
+    finally:
+        if v2_signing_rule(plan,source) is None:
+            raise ValueError('v2 injection source lost registered work root')
+        proof=effects.capture_change(before,source,store)
+        gate.append_evidence(plan,rule['declaration'],rule['target'],source,snapshot,gate.snapshot(source),effect=proof)

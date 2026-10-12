@@ -109,7 +109,7 @@ def render():
         ('system:/System/Cryptexes/App','mnt_appos','CryptexAppOS.dmg')]}
     less_commands={'patch-mobileactivationd':'system:/usr/libexec/mobileactivationd','patch-launchd-cache-loader':'system:/usr/libexec/launchd_cache_loader','inject-daemons':'system:/System/Library/xpc/launchd.plist'}
     sequence=tempfile._RandomNameSequence()
-    v2_signing={'relativePattern':r'\.cfw_temp/\.vphone-launchd-['+re.escape(sequence.characters)+']{'+str(len(next(sequence)))+r'}/launchd',
+    v2_signing={'root':'hostTransactionWork','relativePattern':r'\.vphone-launchd-['+re.escape(sequence.characters)+']{'+str(len(next(sequence)))+r'}/launchd',
                 'declaration':'system-launchdaemons-boot-environment','target':'system:/sbin/launchd'}
     targets = json.dumps({'schemaVersion':1,'owners':owners,'signing':signing,'v2Signing':v2_signing,'moves':moves,'consumedDirectories':['preboot:/<boot-hash>/jb-vphone/procursus/jb'],'archives':archives,'lessCommands':less_commands,'commands':commands,'dscCommands':dsc_commands,'slots':slots,'treeTargets':tree_targets},sort_keys=True,separators=(',',':')).encode()
     digest=hashlib.sha256(targets).hexdigest()

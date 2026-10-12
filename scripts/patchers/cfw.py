@@ -309,20 +309,8 @@ def _dispatch(*, dry_run=False):
         if len(sys.argv) < 4:
             print("Usage: patch_cfw.py inject-dylib <binary> <dylib_path>")
             sys.exit(1)
-        import subprocess, shutil
-        insert_dylib_bin = shutil.which("insert_dylib")
-        if not insert_dylib_bin:
-            # Check .tools/bin/ relative to project root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            candidate = os.path.join(project_root, ".tools", "bin", "insert_dylib")
-            if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
-                insert_dylib_bin = candidate
-        if not insert_dylib_bin:
-            print("[-] insert_dylib not found. Run: make setup_tools")
-            sys.exit(1)
-        rc = subprocess.run(
-            [insert_dylib_bin, "--weak", "--inplace", "--all-yes", sys.argv[3], sys.argv[2]],
-        ).returncode
+        import subprocess
+        rc = subprocess.run(dylib_command(sys.argv[2], sys.argv[3])).returncode
         if rc != 0:
             sys.exit(rc)
 
@@ -342,6 +330,21 @@ def _dispatch(*, dry_run=False):
         print("          patch-hv-vmm-dsc, patch-iomfb-swapend, patch-iomfb-force-kern, patch-dsc-maxslide, patch-lsd-embedded-reg, patch-xpc-lwcr, patch-lockdown-mode, patch-watchdogd,")
         print("          patch-diskimagesiod, inject-daemons, inject-daemon, patch-dropbear-plist, inject-dylib")
         sys.exit(1)
+
+
+def dylib_command(binary, dylib):
+    """Resolve the existing native injector and preserve its command options."""
+    import shutil
+    insert_dylib_bin = shutil.which("insert_dylib")
+    if not insert_dylib_bin:
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        candidate = os.path.join(project_root, ".tools", "bin", "insert_dylib")
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            insert_dylib_bin = candidate
+    if not insert_dylib_bin:
+        print("[-] insert_dylib not found. Run: make setup_tools")
+        sys.exit(1)
+    return [insert_dylib_bin, "--weak", "--inplace", "--all-yes", str(dylib), str(binary)]
 
 
 def main():
