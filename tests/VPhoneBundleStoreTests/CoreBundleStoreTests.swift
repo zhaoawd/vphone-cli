@@ -442,3 +442,33 @@ struct CoreBundleStoreTests {
         #expect(throws: (any Error).self) { try VPhoneArchiveReader.entries(of: fixture.archive, maximumEntries: 1) }
     }
 }
+
+extension CoreBundleStoreTests {
+    @Test func revalidationUsesLiveStoreAndExpiresWithCallback() throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        var escaped: (() throws -> Void)?
+        try fixture.store.withRevalidatedExecutable(version: "2.2.3-local", executable: .cli) { _, recheck in
+            escaped = recheck
+            try recheck()
+            try Data("changed resource".utf8).write(to: fixture.installed.appendingPathComponent("VPhone.bundle/Contents/Resources/data"))
+            #expect(throws: (any Error).self) { try recheck() }
+        }
+        #expect(throws: (any Error).self) { try escaped?() }
+    }
+
+    @Test(arguments: ["missing", "corrupt", "old", "wrong-version"])
+    func revalidationRefusesInvalidStoreReceipt(_ fault: String) throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        let receipt = fixture.installed.appendingPathComponent("receipt.json")
+        if fault == "missing" { try FileManager.default.removeItem(at: receipt) }
+        if fault == "corrupt" { try Data("invalid".utf8).write(to: receipt) }
+        if fault == "old" { try Data(#"{"version":"2.2.3-local"}"#.utf8).write(to: receipt) }
+        var called = false
+        #expect(throws: (any Error).self) {
+            try fixture.store.withRevalidatedExecutable(version: fault == "wrong-version" ? "2.6.9" : "2.2.3-local", executable: .cli) { _, _ in called = true }
+        }
+        #expect(!called)
+    }
+}

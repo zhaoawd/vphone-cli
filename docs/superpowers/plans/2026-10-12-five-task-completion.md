@@ -123,6 +123,10 @@
 - [ ] 运行 receipt、transaction、binding 故障测试，覆盖部分失败、坏 receipt、写入拒绝及 fsync 失败。
 - [ ] 提交为 `feat: publish verified component receipts and origins`。
 
+#### 执行依赖修订（2026-10-13，Ruling21）
+
+Task6C 分为 C1 和 C2，原验收范围保持不变。C1 完成来源读取、legacy 导入、二进制实际 producer 与已安装目标证明，以及 guest 效果和来源只读核验。一般 CFW 的生产捕获涉及 sudo 后 VM 锁及 Disk.img 交换；C2 与 Task10 的磁盘身份交接和同 journal 来源发布一并实现，随后独立审查。C1 审查通过后可推进 Task7 的独立在线事务协调；Task6 整体须等 C2 完成，guest 来源及四层矩阵不能由 C1 局部测试代替。
+
 ### Task 7：T17 在线安装、激活、回退与 Stop 协调
 
 **Files:** 修改 `VPhoneGuestEnvironment.swift`、`EnvironmentTransaction.swift` 及其 daemon 调用方；扩展 `tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift`、`tests/VPhoneDaemonWireTests/EnvironmentTransactionTests.swift`。

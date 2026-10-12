@@ -273,7 +273,7 @@ public enum PatchSelectionFileMigration {
 
 /// PropertyListSerialization accepts repeated XML keys by keeping one value.
 /// Reject that ambiguity and custom entities before decoding the reviewed shape.
-private final class SelectionXMLValidator: NSObject, XMLParserDelegate {
+final class SelectionXMLValidator: NSObject, XMLParserDelegate {
     var valid = true
     var dictionaries: [Set<String>] = []
     var key: String?

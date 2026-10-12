@@ -1,0 +1,331 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/13] Compiling FirmwarePatcher FirmwareInstalledOrigin.swift
+[6/13] Compiling FirmwarePatcher FirmwareInstalledReadback.swift
+[7/13] Emitting module FirmwarePatcher
+[8/13] Compiling FirmwarePatcher FirmwarePipeline.swift
+[9/19] Compiling FirmwarePatcher FirmwareDesiredPlanStore.swift
+[10/19] Compiling FirmwarePatcher FirmwarePlanBinding.swift
+[11/19] Compiling FirmwarePatcher PatchExperimentRecorder.swift
+[12/19] Compiling FirmwarePatcher FirmwareComponentReceipt.swift
+[13/19] Compiling FirmwarePatcher VariantPlanResolver.swift
+[14/19] Compiling FirmwarePatcher PatchExperimentRecord.swift
+/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[15/109] Compiling FirmwareIntegrationTests StructuredDeclarationGateTests.swift
+[16/109] Compiling FirmwareIntegrationTests VerboseJBDebug.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwareIntegrationTests/VerboseJBDebug.swift:12:9: warning: no calls to throwing functions occur within 'try' expression
+10 | 
+11 |         // Initialize patcher state (same as findAll() but without running patches)
+12 |         try patcher.parseMachO()
+   |         `- warning: no calls to throwing functions occur within 'try' expression
+13 |         patcher.buildADRPIndex()
+14 |         patcher.buildBLIndex()
+[17/109] Compiling FirmwareIntegrationTests IM4PPayloadParityTests.swift
+[18/109] Emitting module FirmwareIntegrationTests
+[19/109] Compiling FirmwareIntegrationTests PatchComparisonTests.swift
+[20/110] Compiling vphone_cli VPhoneHostScreenAdapter.swift
+[21/110] Compiling vphone_cli VPhoneMenuConnect.swift
+[22/110] Compiling vphone_cli VPhoneNativeFirmwarePreparer.swift
+[23/110] Compiling vphone_cli VPhoneNativeRestoreWorker.swift
+[24/110] Compiling vphone_cli VPhoneProgressBar.swift
+[25/110] Compiling vphone_cli VPhoneQuickLookController.swift
+[26/116] Compiling vphone_cli VPhoneHostCommandService.swift
+[27/116] Compiling vphone_cli VPhoneHostControl.swift
+[28/116] Compiling vphone_cli VPhoneHostRPC.swift
+[29/116] Compiling vphone_cli VPhoneAppDelegate.swift
+[30/116] Compiling vphone_cli VPhoneArchiveCLI.swift
+[31/121] Compiling vphone_cli VPhoneResourcesCLI.swift
+[32/121] Compiling vphone_cli VPhoneRestoreCLI.swift
+[33/121] Compiling vphone_cli VPhoneRestoreInspectCLI.swift
+[34/121] Compiling FirmwarePatcherTests RequiredDeclarationEvidenceTests.swift
+[35/121] Compiling FirmwarePatcherTests TargetCatalogTests.swift
+[36/121] Compiling FirmwarePatcherTests VariantPlanSerializationTests.swift
+[37/121] Compiling vphone_cli VPhoneHostAPICommands.swift
+[38/121] Compiling vphone_cli VPhoneHostCapabilities.swift
+[39/121] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[43/121] Compiling vphone_cli VPhoneCreateOrchestrator.swift
+[44/121] Compiling vphone_cli VPhoneDoctorCLI.swift
+[48/121] Compiling vphone_cli VPhoneFWCLI.swift
+[49/121] Compiling vphone_cli VPhoneFWCacheCLI.swift
+[50/121] Compiling vphone_cli VPhoneFWInspectCLI.swift
+[51/121] Compiling vphone_cli VPhoneFWSelectionMigrateCLI.swift
+[52/121] Compiling vphone_cli VPhoneFWSelectionPreviewCLI.swift
+[53/121] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[54/121] Compiling vphone_cli VPhoneFileBrowserView.swift
+[55/121] Compiling vphone_cli VPhoneClipboardShortcutSync.swift
+[56/121] Compiling vphone_cli VPhoneControl.swift
+[57/121] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[58/121] Compiling vphone_cli VPhoneCoreBundleCLI.swift
+[59/121] Compiling vphone_cli VPhoneCreateLiveStages.swift
+[62/121] Compiling vphone_cli VPhoneFirmwareSelection.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[63/121] Compiling vphone_cli VPhoneFrameProducer.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[64/121] Compiling vphone_cli VPhoneGuestCLI.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[65/121] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[66/121] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[67/121] Compiling vphone_cli VPhoneHelperCLI.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneFrameProducer.swift:158:33: warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+156 | 
+157 |     private func restartReader() throws {
+158 |         guard let track = asset.tracks(withMediaType: .video).first else {
+    |                                 `- warning: 'tracks(withMediaType:)' was deprecated in macOS 13.0: Use loadTracks(withMediaType:) instead [#DeprecatedDeclaration]
+159 |             throw NSError(
+160 |                 domain: "VPhoneVideoFileProducer", code: 1,
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+49 |         // The real producer must parse and patch this synthetic non-kernel
+50 |         // input; a matching saved report is insufficient to manufacture proof.
+51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+52 |             effectiveExecutable: executable, recheck: {}) { session in
+53 |             #expect(throws: (any Error).self) {
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+49 |         // The real producer must parse and patch this synthetic non-kernel
+50 |         // input; a matching saved report is insufficient to manufacture proof.
+51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+52 |             effectiveExecutable: executable, recheck: {}) { session in
+53 |             #expect(throws: (any Error).self) {
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+49 |         // The real producer must parse and patch this synthetic non-kernel
+50 |         // input; a matching saved report is insufficient to manufacture proof.
+51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+52 |             effectiveExecutable: executable, recheck: {}) { session in
+53 |             #expect(throws: (any Error).self) {
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+49 |         // The real producer must parse and patch this synthetic non-kernel
+50 |         // input; a matching saved report is insufficient to manufacture proof.
+51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+52 |             effectiveExecutable: executable, recheck: {}) { session in
+53 |             #expect(throws: (any Error).self) {
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+49 |         // The real producer must parse and patch this synthetic non-kernel
+50 |         // input; a matching saved report is insufficient to manufacture proof.
+51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+52 |             effectiveExecutable: executable, recheck: {}) { session in
+53 |             #expect(throws: (any Error).self) {
+[73/121] Compiling vphone_cli VPhoneVMCreateCLI.swift
+[74/121] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[75/121] Compiling vphone_cli VPhoneVMSelection.swift
+[76/121] Compiling vphone_cli VPhoneVMTransferCLI.swift
+[77/121] Compiling vphone_cli VPhoneVirtualMachine.swift
+[78/121] Compiling vphone_cli VPhoneWindowController.swift
+[79/121] Compiling vphone_cli VPhoneCFWEnvironmentCLI.swift
+[80/121] Compiling vphone_cli VPhoneCLI.swift
+[81/121] Compiling vphone_cli VPhoneCameraServer.swift
+[82/121] Compiling vphone_cli VPhoneClipboardFocusSync.swift
+[83/121] Compiling vphone_cli VPhoneClipboardMacWriter.swift
+[84/121] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[91/121] Write Objects.LinkFileList
+[102/121] Compiling FirmwarePatcherTests VariantPlanTests.swift
+[103/121] Compiling FirmwarePatcherTests VersionKnowledgePlanTests.swift
+[103/121] Linking vphone-cli
+[104/121] Linking vphone-vm
+[105/121] Applying vphone-cli
+[106/121] Applying vphone-vm
+[119/121] Emitting module FirmwarePatcherTests
+[119/121] Write Objects.LinkFileList
+[120/121] Linking vphone-cliPackageTests
+Build complete! (17.53s)
+Test Suite 'Selected tests' started at 2026-10-13 04:57:02.195.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 04:57:02.195.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 04:57:02.195.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 04:57:02.195.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareInstalledOriginTests started.
+◇ Suite FirmwareInstalledReadbackTests started.
+◇ Test installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test differentOrChangedEffectiveExecutableCannotQualify() started.
+◇ Test decodedRecordsCannotReplaceActualProducer() started.
+◇ Test expiredStoreCallbackCannotAuthorizeOrigin() started.
+◇ Test case passing 1 argument fault → "success" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "writable" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "wrong-image" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "changed-image" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "detach" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "wrong-root" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+✔ Test differentOrChangedEffectiveExecutableCannotQualify() passed after 0.010 seconds.
+✔ Test expiredStoreCallbackCannotAuthorizeOrigin() passed after 0.010 seconds.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test decodedRecordsCannotReplaceActualProducer() passed after 0.457 seconds.
+✔ Suite FirmwareInstalledOriginTests passed after 0.458 seconds.
+✔ Test installedDiskRequiresLiveReadonlyAssociation(_:) with 6 test cases passed after 0.506 seconds.
+✔ Suite FirmwareInstalledReadbackTests passed after 0.506 seconds.
+✔ Test run with 4 tests in 2 suites passed after 0.507 seconds.

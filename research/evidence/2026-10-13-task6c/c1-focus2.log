@@ -1,0 +1,111 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/18] Write sources
+[4/18] Write swift-version--58304C5D6DBC2206.txt
+[6/12] Emitting module FirmwarePatcher
+[7/12] Compiling FirmwarePatcher FirmwareInstalledOrigin.swift
+[7/15] Write Objects.LinkFileList
+[10/17] Compiling FirmwarePatcherTests FirmwareInstalledOriginTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+ 49 |         // The real producer must parse and patch this synthetic non-kernel
+ 50 |         // input; a matching saved report is insufficient to manufacture proof.
+ 51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+    |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+ 52 |             effectiveExecutable: executable, recheck: {}) { session in
+ 53 |             #expect(throws: (any Error).self) {
+[10/17] Linking vphone-cli
+[11/17] Linking vphone-vm
+[12/17] Applying vphone-cli
+[14/17] Emitting module FirmwarePatcherTests
+[14/17] Applying vphone-vm
+[15/17] Write Objects.LinkFileList
+[16/17] Linking vphone-cliPackageTests
+Build complete! (7.41s)
+Test Suite 'Selected tests' started at 2026-10-13 05:04:03.713.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:04:03.714.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:04:03.714.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:04:03.714.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareInstalledOriginTests started.
+◇ Suite MachineBindingTests started.
+◇ Suite FirmwareInstalledReadbackTests started.
+◇ Suite FirmwareLegacyReceiptTests started.
+◇ Test qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test missingCorruptUnsupportedAndLinkedBindingsAreDistinctAndNeverRewritten() started.
+◇ Test installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test targetFeatureMinimumAndSameSeriesAreSeparateFromLegacyStore() started.
+◇ Test legacyThreeLayerBindingKeepsKernelUnknownAndHostChangesPreserveOtherLayers() started.
+◇ Test differentOrChangedEffectiveExecutableCannotQualify() started.
+◇ Test case passing 1 argument fault → "success" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test expiredStoreCallbackCannotAuthorizeOrigin() started.
+◇ Test decodedRecordsCannotReplaceActualProducer() started.
+◇ Test case passing 1 argument fault → "source" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "output" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test pendingOriginBytesAreNotCommittedBindings() started.
+◇ Test case passing 1 argument fault → "success" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+◇ Test case passing 1 argument fault → "write" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "binding" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "fsync" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "wrong-image" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument fault → "after-origin" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument fault → "writable" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument fault → "wrong-root" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument fault → "changed-image" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test case passing 1 argument fault → "detach" to installedDiskRequiresLiveReadonlyAssociation(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+◇ Test missingCorruptUnsupportedAndAmbiguousRemainDistinct() started.
+◇ Test legacyPlanEnabledIsSelectionDataOnly() started.
+◇ Test exactLegacyFieldsRemainUnverifiedAndPreserveBytes() started.
+✔ Test missingCorruptUnsupportedAndLinkedBindingsAreDistinctAndNeverRewritten() passed after 1.681 seconds.
+◇ Test preparedReceiptIsUnreadableUntilItsJournalCommits() started.
+✔ Test targetFeatureMinimumAndSameSeriesAreSeparateFromLegacyStore() passed after 1.681 seconds.
+✔ Test legacyThreeLayerBindingKeepsKernelUnknownAndHostChangesPreserveOtherLayers() passed after 1.681 seconds.
+✔ Test differentOrChangedEffectiveExecutableCannotQualify() passed after 1.681 seconds.
+✔ Test pendingOriginBytesAreNotCommittedBindings() passed after 1.681 seconds.
+✔ Test expiredStoreCallbackCannotAuthorizeOrigin() passed after 1.681 seconds.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test missingCorruptUnsupportedAndAmbiguousRemainDistinct() passed after 0.046 seconds.
+✔ Test legacyPlanEnabledIsSelectionDataOnly() passed after 0.044 seconds.
+✔ Test exactLegacyFieldsRemainUnverifiedAndPreserveBytes() passed after 0.044 seconds.
+✔ Suite MachineBindingTests passed after 1.726 seconds.
+✔ Test decodedRecordsCannotReplaceActualProducer() passed after 1.943 seconds.
+✔ Test installedDiskRequiresLiveReadonlyAssociation(_:) with 6 test cases passed after 1.968 seconds.
+✔ Suite FirmwareInstalledReadbackTests passed after 1.968 seconds.
+✔ Test qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) with 7 test cases passed after 3.812 seconds.
+✔ Suite FirmwareInstalledOriginTests passed after 3.812 seconds.
+✔ Test preparedReceiptIsUnreadableUntilItsJournalCommits() passed after 2.533 seconds.
+✔ Suite FirmwareLegacyReceiptTests passed after 4.215 seconds.
+✔ Test run with 13 tests in 4 suites passed after 4.215 seconds.

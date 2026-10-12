@@ -689,6 +689,29 @@ public final class FirmwarePipeline {
         return (currentData, reports)
     }
 
+    /// Recompute one installed component from verified generation originals.
+    /// This invokes the real current Bundle producer and never replays a decoded
+    /// report. No output is written by this operation.
+    func reproduceInstalledComponent(_ name: String, input: Data,
+                                     plan: VariantPlanResolver.VariantPlan) throws -> (Data, [PatchRecord]) {
+        guard plan.variant == variant.rawValue else { throw FirmwareGeneration.fail("Installed producer variant differs") }
+        iosBaseIs18 = plan.gates.iosBaseIs18
+        iosBaseIs27 = plan.gates.iosBaseIs27
+        cloudOSIsFridaCapable = plan.gates.cloudOSIsFridaCapable
+        guestEnvironmentV2 = plan.gates.guestEnvironmentV2 == true
+        guard gateSnapshot == plan.gates,
+              let component = buildComponentList().first(where: { $0.name.lowercased() == name.lowercased() }),
+              !["filesystem", "manifest", "avpbooter"].contains(name.lowercased()) else {
+            throw FirmwareGeneration.fail("Unsupported installed binary producer")
+        }
+        let (output, reports) = try patchDataStructured(input, componentName: component.name,
+            patcherFactories: component.patcherFactories, gates: plan.gates, ablate: [], enabledSteps: plan.enabledStepIDs)
+        guard !reports.isEmpty, reports.allSatisfy({ !$0.hasRequiredFailure }) else {
+            throw FirmwareGeneration.fail("Installed binary producer failed required effects")
+        }
+        return (output, reports.flatMap(\.records))
+    }
+
     // MARK: - Component List Builder
 
     /// Build the ordered component list based on the variant.

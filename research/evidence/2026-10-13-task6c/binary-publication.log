@@ -1,0 +1,618 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/9] Compiling FirmwarePatcherTests FirmwareComponentReceiptTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:41:57: error: constant 'self.generation' captured by a closure before being initialized
+ 39 |                 try kernelInput.write(to: generationFixture.vm.appendingPathComponent(restore.name + "/kernelcache.research.vphone600"))
+ 40 |                 let synthetic = FirmwareGeneration.Source(provenance: source.provenance,
+ 41 |                     originals: try source.originals.map { .init(name: $0.name, sha256: try FirmwareGeneration.treeDigest(generationFixture.vm.appendingPathComponent($0.name))) },
+    |                                                         `- error: constant 'self.generation' captured by a closure before being initialized
+ 42 |                     directory: generationFixture.vm)
+ 43 |                 generation = try FirmwareGeneration.publish(generationFixture.prepare(synthetic), planSHA256: generationFixture.planA)
+
+macro expansion @Suite:17:26: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:25:2: note: expanded code originates here
+  5 | @testable import FirmwarePatcher
+  6 | 
+  7 | @Suite struct FirmwareComponentReceiptTests {
+    | `- note: in expansion of macro 'Suite' on struct 'FirmwareComponentReceiptTests' here
+  8 |     @Test func kernelReceiptDoesNotAdvanceBootChain() throws {
+  9 |         let binding = try VPhoneMachineBinding(bundle: "2.6.1", guestEnvironment: "2.6.0", bootChain: "2.5.0")
+    :
+ 23 |         #expect(next.bundle == "2.6.1")
+ 24 |     }
+ 25 | }
+    +--- macro expansion @Suite ----------------------------------------
+    |15 | @used
+    |16 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |17 | private nonisolated  let $s20FirmwarePatcherTests0a16ComponentReceiptC05SuitefMp_17testContentRecordfMu_: Testing.__TestContentRecord = (
+    |   |                          `- error: '@const' value should be initialized with a compile-time value
+    |18 |   0x74657374, /* 'test' */
+    |19 |   0,
+    +-------------------------------------------------------------------
+ 26 | 
+ 27 | extension FirmwareComponentReceiptTests {
+
+macro expansion @Test:30:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:15:6: note: expanded code originates here
+  6 | 
+  7 | @Suite struct FirmwareComponentReceiptTests {
+  8 |     @Test func kernelReceiptDoesNotAdvanceBootChain() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'kernelReceiptDoesNotAdvanceBootChain()' here
+  9 |         let binding = try VPhoneMachineBinding(bundle: "2.6.1", guestEnvironment: "2.6.0", bootChain: "2.5.0")
+ 10 |         let next = try binding.replacingOrigin(.kernel, with: "2.6.2")
+    :
+ 13 |         #expect(next.guestEnvironment == "2.6.0")
+ 14 |         #expect(next.bundle == "2.6.1")
+ 15 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |28 | @used
+    |29 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |30 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V06kernelE23DoesNotAdvanceBootChain4TestfMp_33testContentRecordd3b147c1e5295836fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |31 |   0x74657374, /* 'test' */
+    |32 |   0,
+    +-------------------------------------------------------------------
+ 16 | 
+ 17 |     @Test func guestReceiptDoesNotAdvanceKernel() throws {
+
+macro expansion @Test:30:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:24:6: note: expanded code originates here
+ 15 |     }
+ 16 | 
+ 17 |     @Test func guestReceiptDoesNotAdvanceKernel() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'guestReceiptDoesNotAdvanceKernel()' here
+ 18 |         let binding = try VPhoneMachineBinding(bundle: "2.6.1", kernel: "2.5.0")
+ 19 |         let next = try binding.replacingOrigin(.guestEnvironment, with: "2.6.2")
+    :
+ 22 |         #expect(next.bootChain == nil)
+ 23 |         #expect(next.bundle == "2.6.1")
+ 24 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |28 | @used
+    |29 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |30 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V05guestE20DoesNotAdvanceKernel4TestfMp_33testContentRecord3176314280161849fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |31 |   0x74657374, /* 'test' */
+    |32 |   0,
+    +-------------------------------------------------------------------
+ 25 | }
+ 26 | 
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:67:6: note: expanded code originates here
+ 58 |         }
+ 59 |     }
+ 60 |     @Test func actualPublishedBytesAreReadBack() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'actualPublishedBytesAreReadBack()' here
+ 61 |         let f = try Fixture()
+ 62 |         try Data([0, 42, 0]).write(to: f.file)
+    :
+ 65 |         try Data([0, 0, 0]).write(to: f.file)
+ 66 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verify(receipt, in: f.vm) }
+ 67 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V31actualPublishedBytesAreReadBack4TestfMp_33testContentRecord43ecbb64c67a7353fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 68 |     @Test func receiptReadsDecodedIM4PPayload() throws {
+ 69 |         let f = try Fixture()
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:75:6: note: expanded code originates here
+ 66 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verify(receipt, in: f.vm) }
+ 67 |     }
+ 68 |     @Test func receiptReadsDecodedIM4PPayload() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'receiptReadsDecodedIM4PPayload()' here
+ 69 |         let f = try Fixture()
+ 70 |         try IM4P(fourcc: "illb", description: "synthetic", payload: Data([0, 42, 0])).data.write(to: f.file)
+    :
+ 73 |         try IM4P(fourcc: "illb", description: "synthetic", payload: Data([0, 0, 0])).data.write(to: f.file)
+ 74 |         #expect(throws: (any Error).self) { try f.capture([f.patch]) }
+ 75 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V30receiptReadsDecodedIM4PPayload4TestfMp_33testContentRecord8db3f09304375c68fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 76 |     @Test func missingRecordCannotPublishReceipt() throws {
+ 77 |         let f = try Fixture()
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:80:6: note: expanded code originates here
+ 74 |         #expect(throws: (any Error).self) { try f.capture([f.patch]) }
+ 75 |     }
+ 76 |     @Test func missingRecordCannotPublishReceipt() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'missingRecordCannotPublishReceipt()' here
+ 77 |         let f = try Fixture()
+ 78 |         try Data([0, 42, 0]).write(to: f.file)
+ 79 |         #expect(throws: (any Error).self) { try f.capture([]) }
+ 80 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V026missingRecordCannotPublishE04TestfMp_33testContentRecordc839c83f630e59a3fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 81 |     @Test func laterWriterCannotEraseEarlierRequiredEffect() throws {
+ 82 |         let f = try Fixture()
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:87:6: note: expanded code originates here
+ 79 |         #expect(throws: (any Error).self) { try f.capture([]) }
+ 80 |     }
+ 81 |     @Test func laterWriterCannotEraseEarlierRequiredEffect() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'laterWriterCannotEraseEarlierRequiredEffect()' here
+ 82 |         let f = try Fixture()
+ 83 |         try Data([0, 43, 0]).write(to: f.file)
+    :
+ 85 |             originalBytes: Data([42]), patchedBytes: Data([43]), description: "overwritten effect")
+ 86 |         #expect(throws: (any Error).self) { try f.capture([f.patch, later]) }
+ 87 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V43laterWriterCannotEraseEarlierRequiredEffect4TestfMp_33testContentRecord9e1e37d3c07295e7fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 88 | }
+ 89 | 
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:106:6: note: expanded code originates here
+ 89 | 
+ 90 | extension FirmwareComponentReceiptTests {
+ 91 |     @Test func manifestPathAndDigestEffectsSurviveReserialization() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'manifestPathAndDigestEffectsSurviveReserialization()' here
+ 92 |         func plist(_ value: [String: Any], _ format: PropertyListSerialization.PropertyListFormat = .xml) throws -> Data {
+ 93 |             try PropertyListSerialization.data(fromPropertyList: value, format: format, options: 0)
+    :
+104 |         let lost = try plist(["OS": ["Path": "old.aea", "Digest": Data([1])]])
+105 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verifyEffect(path, payload: lost) }
+106 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V50manifestPathAndDigestEffectsSurviveReserialization4TestfMp_33testContentRecord318b96acc609d7a6fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+107 | }
+108 | 
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:141:6: note: expanded code originates here
+108 | 
+109 | extension FirmwareComponentReceiptTests {
+110 |     @Test func qualifiedFinalFilesystemReaderReadsCandidateAndDetaches() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'qualifiedFinalFilesystemReaderReadsCandidateAndDetaches()' here
+111 |         let f = try Fixture()
+112 |         let desired = try #require(try FirmwareDesiredPlanStore.read(in: f.vm).readyRecord)
+    :
+139 |         }
+140 |         #expect(detachCount == 1)
+141 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V55qualifiedFinalFilesystemReaderReadsCandidateAndDetaches4TestfMp_33testContentRecord691bc4a01736591cfMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+142 | }
+143 | 
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:167:6: note: expanded code originates here
+150 | 
+151 | extension FirmwareComponentReceiptTests {
+152 |     @Test func finalEncryptedImageIncludesLastPlaintextMutation() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'finalEncryptedImageIncludesLastPlaintextMutation()' here
+153 |         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+154 |         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+    :
+165 |             #expect(actual == Data("after cleanup and seal".utf8))
+166 |         })
+167 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V48finalEncryptedImageIncludesLastPlaintextMutation4TestfMp_33testContentRecord75b882abb2c261e5fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+168 | }
+169 | 
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:206:6: note: expanded code originates here
+169 | 
+170 | extension FirmwareComponentReceiptTests {
+171 |     @Test(arguments: ["readonly", "image", "mount", "detach", "body", "replacement", "desired", "disk"])
+    |     `- note: in expansion of macro 'Test' on instance method 'finalFilesystemReaderRefusesFaults' here
+172 |     func finalFilesystemReaderRefusesFaults(_ fault: String) throws {
+173 |         let f = try Fixture()
+    :
+204 |         #expect(detached == (refusedBeforeDecrypt ? 0 : 1))
+205 |         #expect(FileManager.default.fileExists(atPath: decrypted.path) == !refusedBeforeDecrypt)
+206 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V34finalFilesystemReaderRefusesFaults4TestfMp_33testContentRecord86a1b42128acdc9afMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+207 | 
+208 |     @Test func mountAssociationMustBeUniqueAndExact() throws {
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:220:6: note: expanded code originates here
+206 |     }
+207 | 
+208 |     @Test func mountAssociationMustBeUniqueAndExact() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'mountAssociationMustBeUniqueAndExact()' here
+209 |         let attachment = FirmwareFilesystemReadback.Attachment(image: URL(fileURLWithPath: "/private/expected.dmg"),
+210 |             device: "/dev/disk999s1", mount: URL(fileURLWithPath: "/private/owned/mount"), readOnly: true)
+    :
+218 |         var wrong = entry; wrong["image-path"] = "/private/other.dmg"
+219 |         #expect(throws: (any Error).self) { try FirmwareFilesystemReadback.verifyAssociation(attachment, info: data([wrong])) }
+220 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V36mountAssociationMustBeUniqueAndExact4TestfMp_33testContentRecordb464c34da4a04565fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+221 | }
+222 | 
+
+macro expansion @Test:32:32: error: '@const' value should be initialized with a compile-time value
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:264:6: note: expanded code originates here
+223 | 
+224 | extension FirmwareComponentReceiptTests {
+225 |     @Test func deviceTreeEffectsUseDeclaredPropertyIdentityAfterReserialization() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'deviceTreeEffectsUseDeclaredPropertyIdentityAfterReserialization()' here
+226 |         func node(_ name: String, _ properties: [(String, Data)], children: [Data] = []) -> Data {
+227 |             var result = Data()
+    :
+262 |         // Incomplete node evidence cannot acquire proof from a declared identity.
+263 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verifyEffect(addition, payload: final) }
+264 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V64deviceTreeEffectsUseDeclaredPropertyIdentityAfterReserialization4TestfMp_33testContentRecordec408b0c194f535dfMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: '@const' value should be initialized with a compile-time value
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+265 | }
+266 | 
+
+macro expansion @Suite:17:26: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:25:2: note: expanded code originates here
+  5 | @testable import FirmwarePatcher
+  6 | 
+  7 | @Suite struct FirmwareComponentReceiptTests {
+    | `- note: in expansion of macro 'Suite' on struct 'FirmwareComponentReceiptTests' here
+  8 |     @Test func kernelReceiptDoesNotAdvanceBootChain() throws {
+  9 |         let binding = try VPhoneMachineBinding(bundle: "2.6.1", guestEnvironment: "2.6.0", bootChain: "2.5.0")
+    :
+ 23 |         #expect(next.bundle == "2.6.1")
+ 24 |     }
+ 25 | }
+    +--- macro expansion @Suite ----------------------------------------
+    |15 | @used
+    |16 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |17 | private nonisolated  let $s20FirmwarePatcherTests0a16ComponentReceiptC05SuitefMp_17testContentRecordfMu_: Testing.__TestContentRecord = (
+    |   |                          `- error: global variable must be a compile-time constant to use @section attribute
+    |18 |   0x74657374, /* 'test' */
+    |19 |   0,
+    +-------------------------------------------------------------------
+ 26 | 
+ 27 | extension FirmwareComponentReceiptTests {
+
+macro expansion @Test:30:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:15:6: note: expanded code originates here
+  6 | 
+  7 | @Suite struct FirmwareComponentReceiptTests {
+  8 |     @Test func kernelReceiptDoesNotAdvanceBootChain() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'kernelReceiptDoesNotAdvanceBootChain()' here
+  9 |         let binding = try VPhoneMachineBinding(bundle: "2.6.1", guestEnvironment: "2.6.0", bootChain: "2.5.0")
+ 10 |         let next = try binding.replacingOrigin(.kernel, with: "2.6.2")
+    :
+ 13 |         #expect(next.guestEnvironment == "2.6.0")
+ 14 |         #expect(next.bundle == "2.6.1")
+ 15 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |28 | @used
+    |29 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |30 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V06kernelE23DoesNotAdvanceBootChain4TestfMp_33testContentRecordd3b147c1e5295836fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |31 |   0x74657374, /* 'test' */
+    |32 |   0,
+    +-------------------------------------------------------------------
+ 16 | 
+ 17 |     @Test func guestReceiptDoesNotAdvanceKernel() throws {
+
+macro expansion @Test:30:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:24:6: note: expanded code originates here
+ 15 |     }
+ 16 | 
+ 17 |     @Test func guestReceiptDoesNotAdvanceKernel() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'guestReceiptDoesNotAdvanceKernel()' here
+ 18 |         let binding = try VPhoneMachineBinding(bundle: "2.6.1", kernel: "2.5.0")
+ 19 |         let next = try binding.replacingOrigin(.guestEnvironment, with: "2.6.2")
+    :
+ 22 |         #expect(next.bootChain == nil)
+ 23 |         #expect(next.bundle == "2.6.1")
+ 24 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |28 | @used
+    |29 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |30 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V05guestE20DoesNotAdvanceKernel4TestfMp_33testContentRecord3176314280161849fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |31 |   0x74657374, /* 'test' */
+    |32 |   0,
+    +-------------------------------------------------------------------
+ 25 | }
+ 26 | 
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:67:6: note: expanded code originates here
+ 58 |         }
+ 59 |     }
+ 60 |     @Test func actualPublishedBytesAreReadBack() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'actualPublishedBytesAreReadBack()' here
+ 61 |         let f = try Fixture()
+ 62 |         try Data([0, 42, 0]).write(to: f.file)
+    :
+ 65 |         try Data([0, 0, 0]).write(to: f.file)
+ 66 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verify(receipt, in: f.vm) }
+ 67 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V31actualPublishedBytesAreReadBack4TestfMp_33testContentRecord43ecbb64c67a7353fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 68 |     @Test func receiptReadsDecodedIM4PPayload() throws {
+ 69 |         let f = try Fixture()
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:75:6: note: expanded code originates here
+ 66 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verify(receipt, in: f.vm) }
+ 67 |     }
+ 68 |     @Test func receiptReadsDecodedIM4PPayload() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'receiptReadsDecodedIM4PPayload()' here
+ 69 |         let f = try Fixture()
+ 70 |         try IM4P(fourcc: "illb", description: "synthetic", payload: Data([0, 42, 0])).data.write(to: f.file)
+    :
+ 73 |         try IM4P(fourcc: "illb", description: "synthetic", payload: Data([0, 0, 0])).data.write(to: f.file)
+ 74 |         #expect(throws: (any Error).self) { try f.capture([f.patch]) }
+ 75 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V30receiptReadsDecodedIM4PPayload4TestfMp_33testContentRecord8db3f09304375c68fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 76 |     @Test func missingRecordCannotPublishReceipt() throws {
+ 77 |         let f = try Fixture()
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:80:6: note: expanded code originates here
+ 74 |         #expect(throws: (any Error).self) { try f.capture([f.patch]) }
+ 75 |     }
+ 76 |     @Test func missingRecordCannotPublishReceipt() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'missingRecordCannotPublishReceipt()' here
+ 77 |         let f = try Fixture()
+ 78 |         try Data([0, 42, 0]).write(to: f.file)
+ 79 |         #expect(throws: (any Error).self) { try f.capture([]) }
+ 80 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V026missingRecordCannotPublishE04TestfMp_33testContentRecordc839c83f630e59a3fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 81 |     @Test func laterWriterCannotEraseEarlierRequiredEffect() throws {
+ 82 |         let f = try Fixture()
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:87:6: note: expanded code originates here
+ 79 |         #expect(throws: (any Error).self) { try f.capture([]) }
+ 80 |     }
+ 81 |     @Test func laterWriterCannotEraseEarlierRequiredEffect() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'laterWriterCannotEraseEarlierRequiredEffect()' here
+ 82 |         let f = try Fixture()
+ 83 |         try Data([0, 43, 0]).write(to: f.file)
+    :
+ 85 |             originalBytes: Data([42]), patchedBytes: Data([43]), description: "overwritten effect")
+ 86 |         #expect(throws: (any Error).self) { try f.capture([f.patch, later]) }
+ 87 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V43laterWriterCannotEraseEarlierRequiredEffect4TestfMp_33testContentRecord9e1e37d3c07295e7fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+ 88 | }
+ 89 | 
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:106:6: note: expanded code originates here
+ 89 | 
+ 90 | extension FirmwareComponentReceiptTests {
+ 91 |     @Test func manifestPathAndDigestEffectsSurviveReserialization() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'manifestPathAndDigestEffectsSurviveReserialization()' here
+ 92 |         func plist(_ value: [String: Any], _ format: PropertyListSerialization.PropertyListFormat = .xml) throws -> Data {
+ 93 |             try PropertyListSerialization.data(fromPropertyList: value, format: format, options: 0)
+    :
+104 |         let lost = try plist(["OS": ["Path": "old.aea", "Digest": Data([1])]])
+105 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verifyEffect(path, payload: lost) }
+106 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V50manifestPathAndDigestEffectsSurviveReserialization4TestfMp_33testContentRecord318b96acc609d7a6fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+107 | }
+108 | 
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:141:6: note: expanded code originates here
+108 | 
+109 | extension FirmwareComponentReceiptTests {
+110 |     @Test func qualifiedFinalFilesystemReaderReadsCandidateAndDetaches() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'qualifiedFinalFilesystemReaderReadsCandidateAndDetaches()' here
+111 |         let f = try Fixture()
+112 |         let desired = try #require(try FirmwareDesiredPlanStore.read(in: f.vm).readyRecord)
+    :
+139 |         }
+140 |         #expect(detachCount == 1)
+141 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V55qualifiedFinalFilesystemReaderReadsCandidateAndDetaches4TestfMp_33testContentRecord691bc4a01736591cfMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+142 | }
+143 | 
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:167:6: note: expanded code originates here
+150 | 
+151 | extension FirmwareComponentReceiptTests {
+152 |     @Test func finalEncryptedImageIncludesLastPlaintextMutation() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'finalEncryptedImageIncludesLastPlaintextMutation()' here
+153 |         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+154 |         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+    :
+165 |             #expect(actual == Data("after cleanup and seal".utf8))
+166 |         })
+167 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V48finalEncryptedImageIncludesLastPlaintextMutation4TestfMp_33testContentRecord75b882abb2c261e5fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+168 | }
+169 | 
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:206:6: note: expanded code originates here
+169 | 
+170 | extension FirmwareComponentReceiptTests {
+171 |     @Test(arguments: ["readonly", "image", "mount", "detach", "body", "replacement", "desired", "disk"])
+    |     `- note: in expansion of macro 'Test' on instance method 'finalFilesystemReaderRefusesFaults' here
+172 |     func finalFilesystemReaderRefusesFaults(_ fault: String) throws {
+173 |         let f = try Fixture()
+    :
+204 |         #expect(detached == (refusedBeforeDecrypt ? 0 : 1))
+205 |         #expect(FileManager.default.fileExists(atPath: decrypted.path) == !refusedBeforeDecrypt)
+206 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V34finalFilesystemReaderRefusesFaults4TestfMp_33testContentRecord86a1b42128acdc9afMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+207 | 
+208 |     @Test func mountAssociationMustBeUniqueAndExact() throws {
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:220:6: note: expanded code originates here
+206 |     }
+207 | 
+208 |     @Test func mountAssociationMustBeUniqueAndExact() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'mountAssociationMustBeUniqueAndExact()' here
+209 |         let attachment = FirmwareFilesystemReadback.Attachment(image: URL(fileURLWithPath: "/private/expected.dmg"),
+210 |             device: "/dev/disk999s1", mount: URL(fileURLWithPath: "/private/owned/mount"), readOnly: true)
+    :
+218 |         var wrong = entry; wrong["image-path"] = "/private/other.dmg"
+219 |         #expect(throws: (any Error).self) { try FirmwareFilesystemReadback.verifyAssociation(attachment, info: data([wrong])) }
+220 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V36mountAssociationMustBeUniqueAndExact4TestfMp_33testContentRecordb464c34da4a04565fMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+221 | }
+222 | 
+
+macro expansion @Test:32:32: error: global variable must be a compile-time constant to use @section attribute
+`- /Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift:264:6: note: expanded code originates here
+223 | 
+224 | extension FirmwareComponentReceiptTests {
+225 |     @Test func deviceTreeEffectsUseDeclaredPropertyIdentityAfterReserialization() throws {
+    |     `- note: in expansion of macro 'Test' on instance method 'deviceTreeEffectsUseDeclaredPropertyIdentityAfterReserialization()' here
+226 |         func node(_ name: String, _ properties: [(String, Data)], children: [Data] = []) -> Data {
+227 |             var result = Data()
+    :
+262 |         // Incomplete node evidence cannot acquire proof from a declared identity.
+263 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.verifyEffect(addition, payload: final) }
+264 |     }
+    +--- macro expansion @Test -----------------------------------------
+    |30 | @used
+    |31 | @available(*, deprecated, message: "This property is an implementation detail of the testing library. Do not use it directly.")
+    |32 | private nonisolated static let $s20FirmwarePatcherTests0a16ComponentReceiptC0V64deviceTreeEffectsUseDeclaredPropertyIdentityAfterReserialization4TestfMp_33testContentRecordec408b0c194f535dfMu_: Testing.__TestContentRecord = (
+    |   |                                `- error: global variable must be a compile-time constant to use @section attribute
+    |33 |   0x74657374, /* 'test' */
+    |34 |   0,
+    +-------------------------------------------------------------------
+265 | }
+266 | 
+[6/9] Compiling FirmwarePatcherTests FirmwareInstalledOriginTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+ 49 |         // The real producer must parse and patch this synthetic non-kernel
+ 50 |         // input; a matching saved report is insufficient to manufacture proof.
+ 51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+    |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+ 52 |             effectiveExecutable: executable, recheck: {}) { session in
+ 53 |             #expect(throws: (any Error).self) {
+[7/9] Compiling FirmwarePatcherTests FirmwareInstalledReadbackTests.swift
+[8/9] Emitting module FirmwarePatcherTests
+error: fatalError

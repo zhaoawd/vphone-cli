@@ -165,7 +165,7 @@ final class FirmwareTransaction {
                 throw Self.error("VM origin backup changed during publication")
             }
         } else {
-            let binding = try VPhoneMachineBinding.snapshot(vmDirectory)
+            let binding = try VPhoneMachineBinding.transactionSnapshot(vmDirectory)
             guard bindingPublished ? binding?.binding == origin.binding : binding == origin.expected else {
                 throw Self.error("VM origin binding changed during publication")
             }

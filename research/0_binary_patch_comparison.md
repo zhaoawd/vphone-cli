@@ -1350,3 +1350,12 @@ generated Restore/AVP 输出不更新已安装 VM origins。供 Task6C 使用的
 最终 callbacks 和效果读回结束后、写入 committed journal 前，重新比较全部输出根与 journal 摘要，覆盖未列入 component receipt 的保留文件、新增成员和未变化的根。启动 worker 后发生 I/O 故障时，父进程先处理输出并等待 worker，再离开共享锁作用域；pipe 描述符由运行函数明确拥有，FileHandle 包装不重复关闭。真实 subprocess 故障测试中，工具存活期间的实际 recovery 被拒绝，stdout/stderr 共 4 MiB 输出完成后才返回原 I/O 错误。
 
 两项审查问题均有实际 RED/GREEN；最终受影响 Swift 50 项、4 套和 Python worker 8 项通过。证据与最终源码摘要见 `research/evidence/2026-10-13-task6b-fix1/manifest.json`。C 生产来源资格和 legacy import 仍属下一步骤，真实固件/VM 与全标准验收仍属 Task12。本次未新增二进制补丁或执行真实挂载和 VM 操作。
+
+
+## 2026-10-13：Task 6C1 来源资格、已安装读回与旧格式导入
+
+C1 新增实际 Store 回调内的 kernelcache 来源适配器。当前有效 Bundle 可执行文件从 generation pristine 输入调用实际 Swift producer 重算，关联完整输入、输出及逐项记录；只读 Disk.img 的唯一 Preboot 目标须与完整重算 payload 一致。实际 B 事务日志同时提交 kernel 来源及 receipt，保留 host、guestEnvironment、bootChain。单个 bootChain 组件拒绝层来源晋升。没有新增二进制补丁或改变现有补丁算法。
+
+外部 binding/receipt 读取拒绝 pending 事务及读期间目录变化；B 仅在事务内部读取过渡 binding。fixed 2d21d21 的 PatchReceipt.plist/原 PatchPlan.plist 以实际字段导入，保留原始字节、缺失、损坏、不支持及未知 part；导入不产生 applied 或 origin 资格。guest 最终效果和 live Bundle source 检查只返回 inspected-unqualified-producer。
+
+Ruling21 将真实 CFW producer 捕获、sudo/VM 锁交接、Disk.img 身份转换、发布后 guest 资格及完整四层路由保留为 C2，并与 Task10 集成；C1 不构成 Task6 或原五项完成。最终 affected Swift 122 项/15 套通过；自审后仅补充测试并重跑直接受影响 10 项/2 套通过。Python 74 项在普通工具提权下通过；首次沙箱执行的合成 CFW 克隆 EPERM 失败日志保留。全部命令、原始/gzip 日志、源码摘要见 research/evidence/2026-10-13-task6c/manifest.json。未执行真实 VM、挂载、sudo、AMFI/TCC 或系统安装；实际固件、固定上游 producer 和完整标准验收仍属 Task12。

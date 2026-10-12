@@ -1,0 +1,72 @@
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/35] Compiling ftab.c
+[4/35] Compiling mbn.c
+[6/35] Compiling log.c
+[6/35] Compiling locking.c
+[6/35] Compiling fls.c
+[9/37] Compiling fdr.c
+[10/37] Compiling asr.c
+[11/37] Compiling download.c
+[12/37] Compiling recovery.c
+[13/37] Compiling idevicerestore.c
+[14/37] Compiling ipsw.c
+[15/37] Compiling restore.c
+[16/37] Compiling normal.c
+[17/37] Compiling limera1n.c
+[18/37] Compiling dfu.c
+[19/37] Compiling img4.c
+[20/37] Compiling img3.c
+[21/37] Compiling ace3.c
+[22/37] Compiling deviceinterfaced.c
+[23/37] Compiling vphone_zip_stub.c
+[24/37] Compiling common.c
+[25/37] Compiling vphone_restore_bridge.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/37] Compiling FirmwarePatcherTests FirmwareInstalledOriginTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:13:22: error: cannot find type 'FirmwareInstalledOrigin' in scope
+11 |         let executable = directory.appendingPathComponent("vphone-cli")
+12 |         try Data("trusted executable".utf8).write(to: executable)
+13 |         var escaped: FirmwareInstalledOrigin.Session?
+   |                      `- error: cannot find type 'FirmwareInstalledOrigin' in scope
+14 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+15 |             effectiveExecutable: executable, recheck: {}) { session in
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:14:13: error: cannot find 'FirmwareInstalledOrigin' in scope
+12 |         try Data("trusted executable".utf8).write(to: executable)
+13 |         var escaped: FirmwareInstalledOrigin.Session?
+14 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |             `- error: cannot find 'FirmwareInstalledOrigin' in scope
+15 |             effectiveExecutable: executable, recheck: {}) { session in
+16 |             try session.recheck()
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:30:17: error: cannot find 'FirmwareInstalledOrigin' in scope
+28 |         try Data("trusted executable".utf8).write(to: other)
+29 |         #expect(throws: (any Error).self) {
+30 |             try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |                 `- error: cannot find 'FirmwareInstalledOrigin' in scope
+31 |                 effectiveExecutable: other, recheck: {}) { _ in }
+32 |         }
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:33:13: error: cannot find 'FirmwareInstalledOrigin' in scope
+31 |                 effectiveExecutable: other, recheck: {}) { _ in }
+32 |         }
+33 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+   |             `- error: cannot find 'FirmwareInstalledOrigin' in scope
+34 |             effectiveExecutable: executable, recheck: {}) { session in
+35 |             try Data("changed executable".utf8).write(to: executable)
+[29/38] Emitting module FirmwarePatcherTests
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+error: fatalError

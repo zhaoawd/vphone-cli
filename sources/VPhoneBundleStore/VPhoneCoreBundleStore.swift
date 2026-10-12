@@ -106,6 +106,20 @@ public struct VPhoneCoreBundleStore: Sendable {
         }
     }
 
+    /// Package consumers can revalidate within the existing shared lock. The
+    /// callback must finish its complete operation here; retained closures expire.
+    package func withRevalidatedExecutable<T>(version: String, executable: VPhoneBundleExecutable,
+        body: (URL, @escaping () throws -> Void) throws -> T) throws -> T {
+        try withVerifiedExecutable(version: version, executable: executable) { url in
+            var active = true
+            defer { active = false }
+            return try body(url, {
+                guard active else { throw VPhoneBundleStoreError("Core Bundle verification callback expired") }
+                _ = try verifiedReceipt(version)
+            })
+        }
+    }
+
     private func unavailableExecutable(version: String, cause: any Error) -> VPhoneBundleStoreError {
         VPhoneBundleStoreError("Core Bundle \(version) is unavailable or failed verification. \(cause.localizedDescription) "
             + "Restore this exact verified version with bundle install, or explicitly select another verified version with vm bind-core-bundle. "

@@ -53,3 +53,32 @@ struct MachineBindingTests {
         #expect(try Data(contentsOf: target) == bytes)
     }
 }
+
+extension MachineBindingTests {
+    @Test func pendingOriginBytesAreNotCommittedBindings() throws {
+        let temp = try LaunchpadTemporaryDirectory()
+        let machine = VPhoneLaunchpadMachinePath(libraryRoot: temp.url.path, name: "vm")
+        try FileManager.default.createDirectory(at: machine.url, withIntermediateDirectories: true)
+        try Data(#"{"bundle":"2.6.1","kernel":"2.6.2"}"#.utf8).write(to: machine.url.appendingPathComponent("launchpad.json"))
+        let before = try #require(try VPhoneLaunchpadMachineBinding.snapshot(machine))
+        let pending = machine.url.appendingPathComponent(".firmware-transaction")
+        try FileManager.default.createDirectory(at: pending, withIntermediateDirectories: false)
+        #expect(throws: (any Error).self) { try VPhoneLaunchpadMachineBinding.snapshot(machine) }
+        #expect(!before.matches(machine))
+        guard case .invalid = VPhoneLaunchpadMachineBinding.load(machine) else {
+            Issue.record("pending origin exposed"); return
+        }
+        try FileManager.default.removeItem(at: pending)
+        #expect(throws: (any Error).self) {
+            try VPhoneLaunchpadMachineBinding.snapshot(machine, afterRead: {
+                try FileManager.default.createDirectory(at: pending, withIntermediateDirectories: false)
+                try FileManager.default.removeItem(at: pending)
+            })
+        }
+        #expect(throws: (any Error).self) {
+            try VPhoneLaunchpadMachineBinding.snapshot(machine, afterRead: {
+                try FileManager.default.createSymbolicLink(at: pending, withDestinationURL: temp.url)
+            })
+        }
+    }
+}

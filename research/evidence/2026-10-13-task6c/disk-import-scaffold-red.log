@@ -1,0 +1,47 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Emitting module FirmwarePatcherTests
+[6/7] Compiling FirmwarePatcherTests FirmwareLegacyReceiptTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:76:43: error: type 'FirmwareLegacyReceipt' has no member 'readReceipt'
+74 |         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+75 |         defer { try? FileManager.default.removeItem(at: root) }
+76 |         #expect(try FirmwareLegacyReceipt.readReceipt(in: root).status == .missing)
+   |                                           `- error: type 'FirmwareLegacyReceipt' has no member 'readReceipt'
+77 |         let bytes = Data("corrupt original".utf8)
+78 |         let file = root.appendingPathComponent("PatchReceipt.plist")
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:76:76: error: cannot infer contextual base in reference to member 'missing'
+74 |         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+75 |         defer { try? FileManager.default.removeItem(at: root) }
+76 |         #expect(try FirmwareLegacyReceipt.readReceipt(in: root).status == .missing)
+   |                                                                            `- error: cannot infer contextual base in reference to member 'missing'
+77 |         let bytes = Data("corrupt original".utf8)
+78 |         let file = root.appendingPathComponent("PatchReceipt.plist")
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:80:50: error: type 'FirmwareLegacyReceipt' has no member 'readReceipt'
+78 |         let file = root.appendingPathComponent("PatchReceipt.plist")
+79 |         try bytes.write(to: file)
+80 |         let imported = try FirmwareLegacyReceipt.readReceipt(in: root)
+   |                                                  `- error: type 'FirmwareLegacyReceipt' has no member 'readReceipt'
+81 |         #expect(imported.status == .corrupt && imported.raw == bytes)
+82 |         #expect(try Data(contentsOf: file) == bytes)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:81:37: error: cannot infer contextual base in reference to member 'corrupt'
+79 |         try bytes.write(to: file)
+80 |         let imported = try FirmwareLegacyReceipt.readReceipt(in: root)
+81 |         #expect(imported.status == .corrupt && imported.raw == bytes)
+   |                                     `- error: cannot infer contextual base in reference to member 'corrupt'
+82 |         #expect(try Data(contentsOf: file) == bytes)
+83 |         try FileManager.default.removeItem(at: file)
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:85:71: error: type 'FirmwareLegacyReceipt' has no member 'readReceipt'
+83 |         try FileManager.default.removeItem(at: file)
+84 |         try FileManager.default.createSymbolicLink(at: file, withDestinationURL: root.appendingPathComponent("absent"))
+85 |         #expect(throws: (any Error).self) { try FirmwareLegacyReceipt.readReceipt(in: root) }
+   |                                                                       `- error: type 'FirmwareLegacyReceipt' has no member 'readReceipt'
+86 |     }
+87 | }
+error: fatalError

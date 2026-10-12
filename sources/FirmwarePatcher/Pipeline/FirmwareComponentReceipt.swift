@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import VPhoneCore
 
 /// Per-record output evidence. Selection, generated artifacts and installed
@@ -100,6 +101,49 @@ public enum FirmwareComponentReceipt {
                                   records: record.effects.map(\.record), outputs: outputs, root: root, machine: machine)
         rebuilt.state = record.state
         guard rebuilt == record else { throw failure("receipt effect or ownership differs") }
+    }
+
+    /// Committed history is the sole publication authority. Returned records
+    /// remain data, not permission to install, activate, or change origins.
+    public static func readCommitted(in directory: URL) throws -> [Record]? {
+        try VPhoneMachineBinding.withCommittedOriginsRead(directory) {
+            let file = directory.appendingPathComponent(FirmwareTransaction.ComponentPublication.filename)
+            var info = stat()
+            if lstat(file.path, &info) != 0 {
+                if errno == ENOENT { return nil }
+                throw failure("receipt is unreadable")
+            }
+            let bytes = try VPhoneCreateDigest.strictFileData(file, maximumBytes: 64 << 20)
+            let publication = try JSONDecoder().decode(FirmwareTransaction.ComponentPublication.self, from: bytes)
+            guard publication.schemaVersion == 1, UUID(uuidString: publication.transactionID) != nil else { throw failure("unsupported publication") }
+            let history = directory.appendingPathComponent(".firmware-history")
+            try FirmwareGeneration.ensureDirectory(history, create: false)
+            let archive = history.appendingPathComponent(publication.transactionID)
+            try FirmwareGeneration.ensureDirectory(archive, create: false)
+            let journal = try FirmwareTransaction.readJournal(at: archive.appendingPathComponent("journal.json"))
+            let digest = VPhoneCreateDigest.sha256(bytes)
+            guard journal.id == publication.transactionID, journal.phase == .committed,
+                  journal.componentReceiptsSHA256 == digest,
+                  journal.metadata?.first(where: { $0.name == FirmwareTransaction.ComponentPublication.filename })?.output == digest,
+                  try FirmwareGeneration.fileSHA256(archive.appendingPathComponent("component-receipts.json")) == digest else {
+                throw failure("receipt has no matching committed journal")
+            }
+            for record in publication.records { try verify(record, in: directory) }
+            if let installed = publication.installed {
+                guard installed.scope == .installedComponent, installed.state == .committed,
+                      let proof = publication.originProofSHA256, publication.originLayer != nil,
+                      try FirmwareGeneration.fileSHA256(archive.appendingPathComponent("installed-component-proof.json")) == proof else {
+                    throw failure("installed receipt has no committed proof")
+                }
+                for output in installed.outputs {
+                    let url = directory.appendingPathComponent(output.path)
+                    guard try relative(url, in: directory) == output.path,
+                          try FirmwareGeneration.fileSHA256(url) == output.sha256 else { throw failure("installed receipt output differs") }
+                }
+            }
+            guard try FirmwareGeneration.fileSHA256(file) == digest else { throw failure("receipt changed during read") }
+            return publication.records + (publication.installed.map { [$0] } ?? [])
+        }
     }
 
     static func verifyEffect(_ record: PatchRecord, payload: Data) throws {

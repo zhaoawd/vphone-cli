@@ -79,6 +79,39 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
 
     // Deterministic test seam: a real same-size in-place write between read and fstat.
     package static func snapshot(_ machine: URL, afterRead: () throws -> Void) throws -> Snapshot? {
+        try withCommittedOriginsRead(machine) { try transactionSnapshot(machine, afterRead: afterRead) }
+    }
+
+    /// Read-only package consumers share the same pending publication boundary.
+    package static func withCommittedOriginsRead<T>(_ machine: URL, body: () throws -> T) throws -> T {
+        let before = try committedDirectoryRevision(machine)
+        let result = try body()
+        let after = try committedDirectoryRevision(machine)
+        guard sameRevision(before, after) else {
+            throw VPhoneMachineBindingError("VM directory changed while reading origins")
+        }
+        return result
+    }
+
+    /// Only the transaction implementation may inspect transitional metadata.
+    /// This raw snapshot carries no committed-state or source qualification.
+    package static func transactionSnapshot(_ machine: URL) throws -> Snapshot? {
+        try transactionSnapshot(machine, afterRead: {})
+    }
+
+    private static func committedDirectoryRevision(_ machine: URL) throws -> stat {
+        var directory = stat(), pending = stat()
+        guard lstat(machine.path, &directory) == 0, directory.st_mode & S_IFMT == S_IFDIR else {
+            throw VPhoneMachineBindingError("Cannot inspect VM directory for committed origins")
+        }
+        guard lstat(machine.appendingPathComponent(".firmware-transaction").path, &pending) != 0,
+              errno == ENOENT else {
+            throw VPhoneMachineBindingError("Pending firmware transaction; component origins are unavailable until recovery")
+        }
+        return directory
+    }
+
+    private static func transactionSnapshot(_ machine: URL, afterRead: () throws -> Void) throws -> Snapshot? {
         let url = machine.appendingPathComponent("launchpad.json")
         let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
         guard fd >= 0 else {

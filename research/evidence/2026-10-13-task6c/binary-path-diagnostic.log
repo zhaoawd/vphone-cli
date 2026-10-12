@@ -1,0 +1,50 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/11] Emitting module FirmwarePatcher
+[6/11] Compiling FirmwarePatcher FirmwareComponentReceipt.swift
+[6/14] Write Objects.LinkFileList
+[9/14] Linking vphone-cli
+[10/14] Linking vphone-vm
+[11/14] Applying vphone-cli
+[11/14] Applying vphone-vm
+[13/14] Linking vphone-cliPackageTests
+Build complete! (6.15s)
+Test Suite 'Selected tests' started at 2026-10-13 05:00:01.957.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:00:01.958.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:00:01.958.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:00:01.958.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareInstalledOriginTests started.
+◇ Test qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "success" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "source" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "output" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "binding" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "fsync" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "write" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+◇ Test case passing 1 argument fault → "after-origin" to qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+✘ Test qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) recorded an issue with 1 argument fault → "success" at FirmwareInstalledOriginTests.swift:61:6: Caught error: Failure(message: "Component receipt: output escapes publication root: /private/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-7A009255-C483-4AD5-AD10-62AFF0DAF213/vm/.firmware-transaction/work/preboot/kernelcache in /var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/generation-7A009255-C483-4AD5-AD10-62AFF0DAF213/vm/.firmware-transaction/work/preboot")
+✘ Test qualifiedKernelCommitPreservesOtherLayersAndRestoresMetadata(_:) with 7 test cases failed after 1.384 seconds with 1 issue.
+✘ Suite FirmwareInstalledOriginTests failed after 1.384 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 1.384 seconds with 1 issue.

@@ -1,0 +1,106 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/19] Write sources
+[5/19] Write swift-version--58304C5D6DBC2206.txt
+[7/19] Emitting module VPhoneCore
+[8/19] Compiling VPhoneCore VPhoneMachineBinding.swift
+[9/21] Compiling VPhoneCore VPhoneIPSWCacheAdoption.swift
+[10/21] Compiling VPhoneCore VPhoneMachineBindingPersistence.swift
+[10/24] Write Objects.LinkFileList
+[12/35] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineOrigins.swift
+[12/35] Linking vphone-helper
+[14/35] Compiling VPhoneLaunchpadKit VPhoneLaunchpadCommandLine.swift
+[15/35] Compiling VPhoneLaunchpadKit VPhoneLaunchpadMachineBinding.swift
+[16/35] Compiling VPhoneLaunchpadKit VPhoneLaunchpadLaunchRoute.swift
+[16/35] Applying vphone-helper
+[18/35] Emitting module VPhoneLaunchpadKit
+[18/35] Write Objects.LinkFileList
+[20/44] Compiling VPhoneLaunchpadKitTests MachineOriginsTests.swift
+[20/44] Linking vphone-launchpad-launcher
+[22/44] Compiling VPhoneLaunchpadKitTests MachineBindingTests.swift
+[23/44] Compiling VPhoneLaunchpadKitTests BindingSnapshotTests.swift
+[24/44] Compiling VPhoneLaunchpadKitTests BindingPersistenceTests.swift
+[25/44] Compiling VPhoneLaunchpadKitTests LaunchRouteTests.swift
+[25/44] Applying vphone-launchpad-launcher
+[27/44] Compiling FirmwarePatcher FirmwareLegacyReceipt.swift
+[28/44] Compiling FirmwarePatcher FirmwareInstalledOrigin.swift
+[29/44] Compiling FirmwarePatcher FirmwareComponentReceipt.swift
+[30/44] Compiling FirmwarePatcher FirmwareInstalledReadback.swift
+[31/44] Emitting module FirmwarePatcher
+[32/44] Compiling FirmwarePatcher FirmwareTransaction.swift
+[33/52] Compiling VPhoneLaunchpad VPhoneLaunchpadMachineInspector.swift
+[34/56] Emitting module VPhoneLaunchpadKitTests
+[35/56] Emitting module VPhoneLaunchpad
+[36/56] Compiling VPhoneLaunchpad VPhoneLaunchpadMachinesView.swift
+[36/56] Write Objects.LinkFileList
+[38/56] Compiling FirmwarePatcherTests FirmwareComponentReceiptTests.swift
+[38/56] Linking vphone-launchpad
+[40/56] Compiling FirmwarePatcherTests FirmwareInstalledOriginTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareInstalledOriginTests.swift:51:37: warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+ 49 |         // The real producer must parse and patch this synthetic non-kernel
+ 50 |         // input; a matching saved report is insufficient to manufacture proof.
+ 51 |         try FirmwareInstalledOrigin.withVerifiedSource(version: "2.6.2", executable: executable,
+    |                                     `- warning: result of call to 'withVerifiedSource(version:executable:effectiveExecutable:recheck:body:)' is unused [#no-usage]
+ 52 |             effectiveExecutable: executable, recheck: {}) { session in
+ 53 |             #expect(throws: (any Error).self) {
+[41/56] Compiling FirmwarePatcherTests FirmwareReceiptPublicationTests.swift
+[42/56] Compiling FirmwarePatcherTests FirmwareLegacyReceiptTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:58:74: error: type 'FirmwareComponentReceipt' has no member 'readCommitted'
+56 |         // A prepared state of .committed is not a committed transaction.
+57 |         try prepared.write(to: f.vm.appendingPathComponent(".firmware-component-receipts.json"))
+58 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.readCommitted(in: f.vm) }
+   |                                                                          `- error: type 'FirmwareComponentReceipt' has no member 'readCommitted'
+59 |         try FileManager.default.removeItem(at: f.vm.appendingPathComponent(".firmware-component-receipts.json"))
+60 |         _ = try t.commit()
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:61:65: error: type 'FirmwareComponentReceipt' has no member 'readCommitted'
+59 |         try FileManager.default.removeItem(at: f.vm.appendingPathComponent(".firmware-component-receipts.json"))
+60 |         _ = try t.commit()
+61 |         let records = try #require(try FirmwareComponentReceipt.readCommitted(in: f.vm))
+   |                                                                 `- error: type 'FirmwareComponentReceipt' has no member 'readCommitted'
+62 |         #expect(!records.isEmpty)
+63 |         #expect(records.allSatisfy { $0.scope == .generatedFirmware })
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:63:51: error: cannot infer contextual base in reference to member 'generatedFirmware'
+61 |         let records = try #require(try FirmwareComponentReceipt.readCommitted(in: f.vm))
+62 |         #expect(!records.isEmpty)
+63 |         #expect(records.allSatisfy { $0.scope == .generatedFirmware })
+   |                                                   `- error: cannot infer contextual base in reference to member 'generatedFirmware'
+64 |         var object = try #require(JSONSerialization.jsonObject(with: prepared) as? [String: Any])
+65 |         object["transactionID"] = UUID().uuidString
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:67:74: error: type 'FirmwareComponentReceipt' has no member 'readCommitted'
+65 |         object["transactionID"] = UUID().uuidString
+66 |         try JSONSerialization.data(withJSONObject: object).write(to: f.vm.appendingPathComponent(".firmware-component-receipts.json"))
+67 |         #expect(throws: (any Error).self) { try FirmwareComponentReceipt.readCommitted(in: f.vm) }
+   |                                                                          `- error: type 'FirmwareComponentReceipt' has no member 'readCommitted'
+68 |     }
+69 | }
+
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareLegacyReceiptTests.swift:61:23: warning: no calls to throwing functions occur within 'try' expression
+59 |         try FileManager.default.removeItem(at: f.vm.appendingPathComponent(".firmware-component-receipts.json"))
+60 |         _ = try t.commit()
+61 |         let records = try #require(try FirmwareComponentReceipt.readCommitted(in: f.vm))
+   |                       `- warning: no calls to throwing functions occur within 'try' expression
+62 |         #expect(!records.isEmpty)
+63 |         #expect(records.allSatisfy { $0.scope == .generatedFirmware })
+[42/56] Applying vphone-launchpad
+[44/56] Emitting module FirmwarePatcherTests
+[45/56] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+error: fatalError

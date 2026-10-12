@@ -1,0 +1,84 @@
+warning: 'machokit': /Users/qcz3840/github/vphone-cli/vendor/MachOKit/Package.swift:120:1: warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+118 | }
+119 | 
+120 | extension SwiftSetting: CaseIterable {
+    | |- warning: extension declares a conformance of imported type 'SwiftSetting' to imported protocol 'CaseIterable'; this will not behave correctly if the owners of 'PackageDescription' introduce this conformance in the future
+    | `- note: add '@retroactive' to silence this warning
+121 |     public static var allCases: [Self] {
+122 |         [
+warning: 'vphone-cli': dependency 'openssl-spm' is not used by any target
+[0/1] Planning build
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/41] Write sources
+[3/41] Write swift-version--58304C5D6DBC2206.txt
+[4/37] Compiling log.c
+[4/37] Compiling asr.c
+[5/37] Compiling locking.c
+[5/37] Compiling download.c
+[8/37] Compiling fdr.c
+[9/37] Compiling ipsw.c
+[10/37] Compiling limera1n.c
+[11/37] Compiling img3.c
+[12/37] Compiling normal.c
+[13/37] Compiling dfu.c
+[14/37] Compiling recovery.c
+[15/37] Compiling img4.c
+[16/37] Compiling restore.c
+[17/37] Compiling ace3.c
+[18/37] Compiling mbn.c
+[19/37] Compiling ftab.c
+[20/37] Compiling deviceinterfaced.c
+[21/37] Compiling fls.c
+[22/37] Compiling common.c
+[23/37] Compiling vphone_zip_stub.c
+[24/37] Compiling vphone_restore_bridge.c
+[25/37] Compiling idevicerestore.c
+[26/37] Compiling MobileRecoveryCore libirecovery.c
+[28/38] Compiling VPhoneLaunchpadKitTests MachineBindingTests.swift
+[29/38] Emitting module VPhoneLaunchpadKitTests
+[30/38] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[30/38] Write Objects.LinkFileList
+[33/40] Compiling VPhoneCLITests CFWFrozenPlanTests.swift
+[34/40] Emitting module VPhoneCLITests
+[34/40] Write Objects.LinkFileList
+[35/40] Linking vphone-vm
+[36/40] Linking vphone-cli
+[37/40] Applying vphone-vm
+[38/40] Applying vphone-cli
+[39/40] Linking vphone-cliPackageTests
+Build complete! (12.88s)
+Test Suite 'Selected tests' started at 2026-10-13 04:44:49.169.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 04:44:49.171.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 04:44:49.171.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 04:44:49.171.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite MachineBindingTests started.
+◇ Test pendingOriginBytesAreNotCommittedBindings() started.
+✘ Test pendingOriginBytesAreNotCommittedBindings() recorded an issue at MachineBindingTests.swift:66:9: Expectation failed: an error was expected but none was thrown and "Optional(VPhoneCore.VPhoneMachineBinding.Snapshot(binding: VPhoneCore.VPhoneMachineBinding(bundle: "2.6.1", guestEnvironment: nil, kernel: Optional("2.6.2"), bootChain: nil), sha256: "2d935a8d0d784c0660c5fa1604a6c764674c3a81eed7acdc3999cda2cca13d4d", device: 16777233, inode: 588748037, modifiedSeconds: 1791837889, modifiedNanoseconds: 302935111, changedSeconds: 1791837889, changedNanoseconds: 302935111))" was returned
+✘ Test pendingOriginBytesAreNotCommittedBindings() recorded an issue at MachineBindingTests.swift:67:9: Expectation failed: !((before → Snapshot(binding: VPhoneCore.VPhoneMachineBinding(bundle: "2.6.1", guestEnvironment: nil, kernel: Optional("2.6.2"), bootChain: nil), sha256: "2d935a8d0d784c0660c5fa1604a6c764674c3a81eed7acdc3999cda2cca13d4d", device: 16777233, inode: 588748037, modifiedSeconds: 1791837889, modifiedNanoseconds: 302935111, changedSeconds: 1791837889, changedNanoseconds: 302935111)).matches(machine → VPhoneLaunchpadMachinePath(libraryRoot: "/var/folders/z5/cfnr0ygx7lz57bsxqb5kcgbxwnjtq0/T/launchpad-kit-F3218D05-4E4A-428B-BDCC-42F58699282F", name: "vm")) → true)
+✘ Test pendingOriginBytesAreNotCommittedBindings() recorded an issue at MachineBindingTests.swift:69:25: Issue recorded
+↳ pending origin exposed
+✘ Test pendingOriginBytesAreNotCommittedBindings() failed after 0.004 seconds with 3 issues.
+✘ Suite MachineBindingTests failed after 0.004 seconds with 3 issues.
+✘ Test run with 1 test in 1 suite failed after 0.004 seconds with 3 issues.

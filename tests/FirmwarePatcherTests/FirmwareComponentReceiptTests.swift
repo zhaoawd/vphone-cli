@@ -31,9 +31,20 @@ extension FirmwareComponentReceiptTests {
         let plan: VariantPlanResolver.VariantPlan
         var vm: URL { generationFixture.vm }
         var file: URL { vm.appendingPathComponent("AVPBooter.vresearch1.bin") }
-        init(variant: FirmwarePipeline.Variant = .regular) throws {
+        init(variant: FirmwarePipeline.Variant = .regular, kernelInput: Data? = nil) throws {
             generationFixture = try FirmwareGenerationTests.Fixture()
-            generation = try generationFixture.publish()
+            if let kernelInput {
+                let source = try generationFixture.source()
+                let restore = try #require(source.originals.first { $0.name.contains("Restore") })
+                try kernelInput.write(to: generationFixture.vm.appendingPathComponent(restore.name + "/kernelcache.research.vphone600"))
+                let machine = generationFixture.vm
+                let synthetic = FirmwareGeneration.Source(provenance: source.provenance,
+                    originals: try source.originals.map { .init(name: $0.name, sha256: try FirmwareGeneration.treeDigest(machine.appendingPathComponent($0.name))) },
+                    directory: generationFixture.vm)
+                generation = try FirmwareGeneration.publish(generationFixture.prepare(synthetic), planSHA256: generationFixture.planA)
+            } else {
+                generation = try generationFixture.publish()
+            }
             plan = try FirmwarePipeline(vmDirectory: generationFixture.vm, variant: variant, verbose: false).resolvedPlan()
             let desired = try FirmwareDesiredPlanStore.prepare(in: generationFixture.vm, plan: plan, generation: generation)
             _ = try FirmwareDesiredPlanStore.publish(desired, expectedSHA256: nil)
