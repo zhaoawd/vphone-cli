@@ -1,10 +1,11 @@
 import ArgumentParser
 import Darwin
-import FirmwarePatcher
+@testable import FirmwarePatcher
 import Foundation
 import Testing
 import VPhoneArchiveKit
 import VPhoneCore
+import Virtualization
 @testable import vphone_cli
 
 @Suite(.serialized)
@@ -597,4 +598,39 @@ private final class NativePrepareCheckpointStages: VPhoneCreateStageExecutor, VP
         live.verify(stage, context: context, evidence: evidence)
     }
     func probe(_ stage: VPhoneCreateStage, context: VPhoneCreateStageContext) -> VPhoneCreateProbeResult { .idle(evidence: "synthetic test") }
+}
+
+extension NativeFirmwarePrepareTests {
+    @Test func liveCreatePreparePublishesAndVerifiesGeneration() throws {
+        let f = try CreateResourceFreezeTests.Fixture()
+        defer { f.cleanup() }
+        let runner = try f.runner()
+        let stages = try #require(runner.executor as? VPhoneCreateLiveStages)
+        let vm = f.root.appendingPathComponent("generation-vm")
+        try FileManager.default.createDirectory(at: vm, withIntermediateDirectories: false)
+        try Data("temporary disk fixture".utf8).write(to: vm.appendingPathComponent("Disk.img"))
+        try VPhoneVirtualMachineManifest(machineIdentifier: VZMacMachineIdentifier().dataRepresentation,
+            cpuCount: 2, memorySize: 1 << 30, romImages: nil).write(to: vm.appendingPathComponent("config.plist"))
+        let phone = try archive(f.root, cloud: false), cloud = try archive(f.root, cloud: true)
+        let options = VPhoneCreateEffectiveOptions(variant: "regular", iphoneSource: phone.path,
+            cloudosSource: cloud.path, spoofBuild: nil, forceDscMaxSlide: false, enableFrida: false,
+            cpuCount: 2, memoryMb: 1024, diskSizeGb: 0, prepareBackend: .native)
+        let checkpoint = VPhoneCreateCheckpoint(identity: .init(name: "generation-vm", path: vm.path, directoryId: "fixture"),
+            options: options, tool: .init(executableSha256: nil, stageContractVersion: 1), now: Date())
+        let context = VPhoneCreateStageContext(bundleURL: vm, bundleName: "generation-vm", options: options,
+            iphoneSource: phone.path, cloudosSource: cloud.path, checkpoint: checkpoint)
+        let evidence = try stages.execute(.prepare, context: context)
+        let id = try #require(evidence["firmware_generation_id"])
+        let generation = try FirmwareGeneration.loadVerified(in: vm, id: id)
+        #expect(generation.content.originals.count == 2)
+        if case .verified = stages.verify(.prepare, context: context, evidence: evidence) {} else {
+            Issue.record("live prepare generation should verify")
+        }
+        try Data("corrupt".utf8).write(to: vm.appendingPathComponent(".firmware-generations/\(id)/originals/AVPBooter.vresearch1.bin"))
+        if case .rejected = stages.verify(.prepare, context: context, evidence: evidence) {} else {
+            Issue.record("changed generation original must reject prepare resume")
+        }
+        // A legacy checkpoint cannot execute a new patch without fresh prepare evidence.
+        #expect(throws: (any Error).self) { try stages.execute(.patch, context: context) }
+    }
 }

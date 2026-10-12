@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+import Virtualization
 @testable import FirmwarePatcher
 
 @Suite struct FirmwarePlanBindingTests {
@@ -11,7 +12,8 @@ import Testing
         init() throws {
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
             try Data("original".utf8).write(to: file)
-            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": Data("machine-a".utf8)], format: .xml, options: 0)
+            try Data("disk".utf8).write(to: root.appendingPathComponent("Disk.img"))
+            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation, "diskImage": "Disk.img"], format: .xml, options: 0)
                 .write(to: root.appendingPathComponent("config.plist"))
         }
         deinit { try? FileManager.default.removeItem(at: root) }
@@ -32,14 +34,14 @@ import Testing
         let object = try f.object()
         #expect(object["version"] as? Int == 2)
         let binding = try #require(object["planBinding"] as? [String: Any])
-        #expect(binding["schemaVersion"] as? Int == 1)
+        #expect(binding["schemaVersion"] as? Int == 2)
         #expect((binding["planSHA256"] as? String)?.count == 64)
         #expect((binding["contextSHA256"] as? String)?.count == 64)
         let payload = try #require(binding["payload"] as? [String: Any])
         #expect(payload["upstreamTarget"] as? String == "2d21d21fbdd4f51f013616273ceda9b35a3e0789")
         #expect((payload["catalogSHA256"] as? String)?.count == 64)
-        #expect((payload["vmDirectoryId"] as? String)?.isEmpty == false)
-        #expect((payload["configSHA256"] as? String)?.count == 64)
+        #expect(payload["stableIdentity"] != nil)
+        #expect(payload["configSHA256"] == nil)
         #expect(try f.recover() != nil)
     }
 
@@ -126,4 +128,36 @@ import Testing
         #expect(try Data(contentsOf: f.file) == Data("original".utf8))
     }
 
+}
+
+extension FirmwarePlanBindingTests {
+    @Test func schemaOneBindingRetainsRecoveryOnlySemantics() throws {
+        let f = try Fixture(); _ = try f.begin()
+        var object = try f.object()
+        var binding = try #require(object["planBinding"] as? [String: Any])
+        var payload = try #require(binding["payload"] as? [String: Any])
+        payload.removeValue(forKey: "stableIdentity")
+        payload.removeValue(forKey: "generationID")
+        var info = stat()
+        #expect(lstat(f.root.path, &info) == 0)
+        payload["vmDirectoryId"] = "\(info.st_dev):\(info.st_ino)"
+        payload["configSHA256"] = DeclarationExecutionEvidence.digest(try Data(contentsOf: f.root.appendingPathComponent("config.plist")))
+        binding["schemaVersion"] = 1
+        binding["payload"] = payload
+        let decoded = try JSONDecoder().decode(FirmwarePlanBinding.Payload.self, from: JSONSerialization.data(withJSONObject: payload))
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        binding["contextSHA256"] = DeclarationExecutionEvidence.digest(try encoder.encode(decoded))
+        object["planBinding"] = binding
+        try f.write(object)
+        let journal = try FirmwareTransaction.readJournal(at: f.journal)
+        try journal.planBinding?.validate(journal: journal, directory: f.root, currentCatalog: false)
+        #expect(throws: (any Error).self) {
+            try journal.planBinding?.validate(journal: journal, directory: f.root, currentCatalog: true)
+        }
+        let archived = try #require(try f.recover())
+        let recovered = try FirmwareTransaction.readJournal(at: archived.appendingPathComponent("journal.json"))
+        #expect(recovered.planBinding?.schemaVersion == 1)
+        #expect(recovered.planBinding?.payload.stableIdentity == nil)
+        #expect(recovered.planBinding?.contextSHA256 == binding["contextSHA256"] as? String)
+    }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import Virtualization
 @testable import FirmwarePatcher
 
 struct ArtifactStructuredTests {
@@ -102,6 +103,9 @@ struct ArtifactStructuredTests {
     @Test func failedComponentStopsBeforeLaterInputsAndDevGateStaysActive() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: dir.appendingPathComponent("FixtureRestore"), withIntermediateDirectories: true)
+        try Data("disk".utf8).write(to: dir.appendingPathComponent("Disk.img"))
+        try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
+                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: dir.appendingPathComponent("config.plist"))
         defer { try? FileManager.default.removeItem(at: dir) }
         let bytes = Data(repeating: 0, count: 0x400)
         let input = dir.appendingPathComponent("AVPBooter.fixture.bin")
@@ -128,6 +132,9 @@ struct ArtifactStructuredTests {
             let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
             let restore = dir.appendingPathComponent("FixtureRestore")
             try FileManager.default.createDirectory(at: restore, withIntermediateDirectories: true)
+            try Data("disk".utf8).write(to: dir.appendingPathComponent("Disk.img"))
+            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
+                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: dir.appendingPathComponent("config.plist"))
             defer { try? FileManager.default.removeItem(at: dir) }
             let manifest = try PropertyListSerialization.data(
                 fromPropertyList: ["ProductVersion": ios18 ? "18.6.2" : "26.1"],

@@ -157,17 +157,32 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
         switch stage {
         case .prepare:
             try orchestrator.refreshBootROM(bundleURL: bundleURL)
-            try orchestrator.runFWPrepare(
+            let source = try orchestrator.runFWPrepare(
                 iphoneSource: context.iphoneSource, cloudosSource: context.cloudosSource, isLess: isLess,
                 keepArtifacts: runtime.keepArtifacts, bundleURL: bundleURL, verbosity: v,
                 backend: options.effectivePrepareBackend,
-                preserveExistingRestore: !context.checkpoint.record(.prepare).history.isEmpty)
-            return ["fw_prepare_exit": "0", "prepare_backend": options.effectivePrepareBackend.rawValue]
+                preserveExistingRestore: !context.checkpoint.record(.prepare).history.isEmpty, captureGeneration: true)
+            guard let source else { throw FirmwareGeneration.Failure(message: "Prepare produced no verified generation source") }
+            return try VPhoneBundleGuard.withBundleLock(directory: bundleURL, operation: VPhoneVMOperation.fwPrepare) { _ in
+                let prepared = try FirmwareGeneration.prepare(in: bundleURL,
+                    inputs: source.originals.map { bundleURL.appendingPathComponent($0.name) }, source: source)
+                defer { try? FirmwareGeneration.discard(prepared) }
+                let plan = try FirmwarePipeline(vmDirectory: bundleURL, variant: variant.pipelineVariant,
+                    verbose: false, enableFrida: options.enableFrida,
+                    experimentalV2RootRemount: options.experimentalV2RootRemount == true).resolvedPlan()
+                let generation = try FirmwareGeneration.publish(prepared, planSHA256: FirmwareGeneration.planDigest(plan))
+                return ["fw_prepare_exit": "0", "prepare_backend": options.effectivePrepareBackend.rawValue,
+                        "firmware_generation_id": generation.id]
+            }
         case .patch:
+            guard let generationID = context.checkpoint.record(.prepare).evidence["firmware_generation_id"] else {
+                throw FirmwareGeneration.Failure(message: "Prepare has no verified generation; restart from prepare")
+            }
+            _ = try FirmwareGeneration.loadVerified(in: bundleURL, id: generationID)
             let before = Self.historyEntries(bundleURL)
             let count = try orchestrator.runFWPatch(
                 variant: variant, isLess: isLess, enableFrida: options.enableFrida,
-                experimentalV2RootRemount: options.experimentalV2RootRemount == true, bundleURL: bundleURL, verbosity: v)
+                experimentalV2RootRemount: options.experimentalV2RootRemount == true, generationID: generationID, bundleURL: bundleURL, verbosity: v)
             let new = Self.historyEntries(bundleURL).subtracting(before).sorted()
             var evidence = ["patch_records": "\(count)", "firmware_transaction_archives": new.joined(separator: ",")]
             // The verifier rejects any other archive count; without exactly one there is no selection to name.
@@ -252,6 +267,10 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             // Historical prepare evidence did not name the script backend.
             guard (evidence["prepare_backend"] ?? "script") == context.options.effectivePrepareBackend.rawValue else {
                 return .rejected("prepare evidence backend does not match checkpoint options")
+            }
+            if let id = evidence["firmware_generation_id"] {
+                do { _ = try FirmwareGeneration.loadVerified(in: bundleURL, id: id) }
+                catch { return .rejected("prepare generation verification failed: \(error)") }
             }
             if treeRemoved { return .verified(artifacts: [], evidence: ["restore_tree": "removed by cleanup"]) }
             guard let tree = Self.restoreTree(bundleURL) else {

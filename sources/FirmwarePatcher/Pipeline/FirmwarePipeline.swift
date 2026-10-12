@@ -84,6 +84,7 @@ public final class FirmwarePipeline {
     let forceExcGuard: Bool
     let enableFrida: Bool
     let experimentalV2RootRemount: Bool
+    let generationID: String?
     let loader: any FirmwareLoader
     private var transaction: FirmwareTransaction?
     private var executionPlan: VariantPlanResolver.VariantPlan?
@@ -118,6 +119,7 @@ public final class FirmwarePipeline {
         forceExcGuard: Bool = false,
         enableFrida: Bool = false,
         experimentalV2RootRemount: Bool = false,
+        generationID: String? = nil,
         loader: (any FirmwareLoader)? = nil
     ) {
         self.vmDirectory = vmDirectory
@@ -128,6 +130,7 @@ public final class FirmwarePipeline {
         self.forceExcGuard = forceExcGuard
         self.enableFrida = enableFrida
         self.experimentalV2RootRemount = experimentalV2RootRemount
+        self.generationID = generationID
         self.loader = loader ?? ContainerFirmwareLoader()
     }
 
@@ -151,8 +154,14 @@ public final class FirmwarePipeline {
         return report.allRecords
     }
 
-    /// Read the manifests, set the gate flags, log the run header, and return the
-    /// restore directory plus the gate snapshot used for necessity-rule evaluation.
+    /// Resolve the same gates and declarations used by the transaction preflight.
+    public func resolvedPlan() throws -> VariantPlanResolver.VariantPlan {
+        let (_, gates) = try prepare()
+        return try VariantPlanResolver.resolve(variant: variant, gates: gates,
+            baseVersionKnown: baseVersionKnown, cloudOSVersionKnown: versionInputs?.cloudOSVersion != nil)
+    }
+
+    /// Read manifests and compute the gate snapshot used for necessity rules.
     private func prepare() throws -> (restoreDir: URL, gates: PatchGateSnapshot) {
         if experimentalV2RootRemount, variant != .regular {
             throw PatcherError.invalidFormat("experimental v2 root remount requires variant regular")
@@ -268,6 +277,7 @@ public final class FirmwarePipeline {
             "ablate": ablateValues.joined(separator: ","),
         ]
         if experimentalV2RootRemount { transactionOptions["experimentalV2RootRemount"] = "true" }
+        if let generationID { transactionOptions["generationID"] = generationID }
         let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots,
             options: transactionOptions, plan: plan, versionInputs: versionInputs)
         trace.transaction = transaction

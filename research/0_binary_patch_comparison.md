@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-12 稳定身份与可信 generation（T11/T12）
+
+新增严格 machineIdentifier 与磁盘文件身份、新 schema 的改名恢复、由已验证 prepare 产生的完整原件 generation，以及 create prepare/patch 接入。generation 内容身份不包含计划摘要；计划关联单独记录为 prepared。native 和真实 script/less 小型档案来源验证通过，430 项相关 Swift 回归与 20 项 prepare Python 回归通过。未改变补丁算法、写入字节或五模式声明成员；真实固件及 VM 行为未验证。来源边界、旧 schema、完整首批测试的环境失败及后续生命周期要求见 [generation 记录](upstream_integration_2026-10-06/T11_T12_firmware_generation_2026-10-12.md)。
+
 ## 2026-10-12 逐声明执行证据门（T10）
 
 发布门新增冻结声明的显式记录归属、完整必需声明检查及 alreadyApplied 当前载荷读回证据。缺单项或缺整个组件均拒绝提交，全组件 ablation 保留只读报告。未改变补丁算法或字节。独立 scratch 的 FirmwarePatcherTests 与完整历史固件对照共 313 个测试通过；五模式完整证据及缺单项不改变原固件的故障测试通过。证据、接口边界和未验证行为见 [执行证据记录](upstream_integration_2026-10-06/T10_execution_evidence_2026-10-12.md)。这些结果不建立固定上游字节等价或 VM 验收。

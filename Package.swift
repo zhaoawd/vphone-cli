@@ -85,7 +85,7 @@ let package = Package(
                 .product(name: "Capstone", package: "libcapstone-spm"),
                 .product(name: "Img4tool", package: "libimg4-spm"),
                 .product(name: "MachOKit", package: "MachOKit"),
-                "VPhoneCore",
+                "VPhoneCore", "VPhoneArchiveKit",
             ],
             path: "sources/FirmwarePatcher"
         ),

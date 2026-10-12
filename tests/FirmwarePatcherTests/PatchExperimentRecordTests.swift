@@ -1,6 +1,7 @@
 import Darwin
 import Foundation
 import Testing
+import Virtualization
 @testable import FirmwarePatcher
 
 /// C5 no-VM record tests: synthetic VM directories, a pass-through loader and injected
@@ -31,6 +32,8 @@ import Testing
                 try Data(repeating: 0x41, count: 256).write(to: url)
             }
             try Data(repeating: 0x42, count: 128).write(to: vm.appendingPathComponent("AVPBooter.vresearch1.bin"))
+            try Data("disk".utf8).write(to: vm.appendingPathComponent("Disk.img"))
+            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation, "diskImage": "Disk.img"], format: .xml, options: 0).write(to: vm.appendingPathComponent("config.plist"))
             try manifest(["ProductVersion": "26.1", "ProductBuildVersion": "23B85"], "iPhone-BuildManifest.plist")
             try manifest(["ProductVersion": "26.1", "ProductBuildVersion": "23B5046f"], "BuildManifest.plist")
         }

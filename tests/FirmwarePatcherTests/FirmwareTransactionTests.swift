@@ -3,6 +3,7 @@ import Darwin
 import Foundation
 import Img4tool
 import Testing
+import Virtualization
 @testable import FirmwarePatcher
 
 @Suite struct FirmwareTransactionTests {
@@ -18,6 +19,8 @@ import Testing
             try Data("original manifest".utf8).write(to: restore.appendingPathComponent("BuildManifest.plist"))
             // VM runtime data is deliberately outside the transaction.
             try Data("VM disk".utf8).write(to: root.appendingPathComponent("Disk.img"))
+            try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
+                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: root.appendingPathComponent("config.plist"))
         }
         deinit { try? fm.removeItem(at: root) }
         func begin(inject: @escaping (FirmwareTransaction.Event) throws -> Void = { _ in },

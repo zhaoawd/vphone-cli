@@ -2,6 +2,7 @@ import ArgumentParser
 import FirmwarePatcher
 import Foundation
 import Testing
+import Virtualization
 import VPhoneCore
 @testable import vphone_cli
 
@@ -41,6 +42,9 @@ struct DoctorCLITests {
         let restore = dir.appendingPathComponent("vm/iPhone17,3_26.1_23B85_Restore")
         try FileManager.default.createDirectory(at: restore, withIntermediateDirectories: true)
         try Data(repeating: 0, count: 64).write(to: dir.appendingPathComponent("vm/AVPBooter.vresearch1.bin"))
+        try Data("disk".utf8).write(to: dir.appendingPathComponent("vm/Disk.img"))
+        try PropertyListSerialization.data(fromPropertyList: ["machineIdentifier": VZMacMachineIdentifier().dataRepresentation,
+                "diskImage": "Disk.img"], format: .xml, options: 0).write(to: dir.appendingPathComponent("vm").appendingPathComponent("config.plist"))
         for name in ["iPhone-BuildManifest.plist", "BuildManifest.plist"] {
             try PropertyListSerialization.data(
                 fromPropertyList: ["ProductVersion": "26.1", "ProductBuildVersion": "23B85"], format: .xml, options: 0)

@@ -127,7 +127,7 @@ final class FirmwareTransaction {
         try Self.requireRegularFile(url)
         journal = try Self.readJournal(at: url)
         try journal.planBinding?.validate(journal: journal, directory: self.vmDirectory, currentCatalog: false)
-        guard (journal.version == 1 || journal.version == 2), journal.vmPath == self.vmDirectory.path,
+        guard (journal.version == 1 || journal.version == 2), (journal.planBinding?.schemaVersion == 2 || journal.vmPath == self.vmDirectory.path),
               UUID(uuidString: journal.id) != nil, !journal.entries.isEmpty,
               Set(journal.entries.map(\.name)).count == journal.entries.count else {
             throw Self.error("Invalid firmware transaction journal")

@@ -670,19 +670,27 @@ public struct VPhoneCreateOrchestrator {
         }
     }
 
+    @discardableResult
     func runFWPrepare(
         iphoneSource: String?, cloudosSource: String?, isLess: Bool, keepArtifacts: Bool,
         bundleURL: URL, verbosity v: VPhoneVerbosity,
-        backend: VPhonePrepareBackend = .script, preserveExistingRestore: Bool = false
-    ) throws {
+        backend: VPhonePrepareBackend = .script, preserveExistingRestore: Bool = false,
+        captureGeneration: Bool = false
+    ) throws -> FirmwareGeneration.Source? {
         if backend == .native {
             let sources = try VPhoneNativeFirmwarePreparer.localSources(
                 iphoneSource: iphoneSource, cloudosSource: cloudosSource, isLess: isLess)
+            if captureGeneration {
+                guard let resourceSnapshot else { throw VPhoneMachineBindingError("Generation requires captured ROM resources") }
+                return try FirmwarePreparation.prepareWithSource(iPhone: sources.iphone, cloudOS: sources.cloudos,
+                    bundle: bundleURL, bootROMSource: resourceSnapshot.romSource,
+                    preserveExistingRestore: preserveExistingRestore).source
+            }
             let tree = try VPhoneNativeFirmwarePreparer.prepare(
                 iPhone: sources.iphone, cloudOS: sources.cloudos, bundle: bundleURL,
                 preserveExistingRestore: preserveExistingRestore)
             print("[+] Classic restore tree ready: \(tree.path)")
-            return
+            return nil
         }
         try FileManager.default.createDirectory(at: resources.ipswCacheDir, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: resources.sealVolumeCacheDir, withIntermediateDirectories: true)
@@ -705,12 +713,23 @@ public struct VPhoneCreateOrchestrator {
             echo: true)
         guard code == 0 else { throw VPhoneCreateError.fwPrepareFailed(code) }
         print("[+] Firmware prepared (iPhone + cloudOS merged into bundle).")
+        guard captureGeneration else { return nil }
+        guard let resourceSnapshot else { throw VPhoneMachineBindingError("Generation requires captured ROM resources") }
+        struct Sources: Decodable { let schemaVersion: Int; let iPhoneArchive: String; let cloudOSArchive: String }
+        let record = try JSONDecoder().decode(Sources.self, from: VPhoneCreateDigest.strictFileData(
+            bundleURL.appendingPathComponent(".firmware-prepare-sources.json"), maximumBytes: 1 << 20))
+        guard record.schemaVersion == 1, record.iPhoneArchive.hasPrefix("/"), record.cloudOSArchive.hasPrefix("/") else {
+            throw VPhoneMachineBindingError("Prepare did not record explicit local IPSW sources")
+        }
+        return try FirmwarePreparation.verifyPreparedSource(iPhone: URL(fileURLWithPath: record.iPhoneArchive),
+            cloudOS: URL(fileURLWithPath: record.cloudOSArchive), bundle: bundleURL,
+            bootROMSource: resourceSnapshot.romSource)
     }
 
     @discardableResult
     func runFWPatch(
         variant: PatchFirmwareCLI.VariantOption, isLess: Bool, enableFrida: Bool,
-        experimentalV2RootRemount: Bool = false,
+        experimentalV2RootRemount: Bool = false, generationID: String? = nil,
         bundleURL: URL, verbosity v: VPhoneVerbosity
     ) throws -> Int {
         let lock = try VPhoneVMLock(directory: bundleURL, operation: "fw-patch")
@@ -731,7 +750,7 @@ public struct VPhoneCreateOrchestrator {
         let pipeline = FirmwarePipeline(
             vmDirectory: bundleURL, variant: variant.pipelineVariant, verbose: v.showsToolDetail,
             noBinpack: false, noVphoned: false, forceExcGuard: false,
-            enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount)
+            enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, generationID: generationID)
         let records = try pipeline.patchAll()
         print("[fw patch] applied \(records.count) patches for \(variant.rawValue)")
         return records.count

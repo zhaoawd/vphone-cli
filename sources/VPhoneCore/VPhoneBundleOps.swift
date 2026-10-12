@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import Virtualization
 import VPhoneArchiveKit
 
 public enum VPhoneBundleOpsError: Error, Equatable {
@@ -115,6 +116,7 @@ public enum VPhoneBundleOps {
 
                 // Manifest.
                 let manifest = VPhoneVirtualMachineManifest(
+                    machineIdentifier: VZMacMachineIdentifier().dataRepresentation,
                     cpuCount: spec.cpuCount,
                     memorySize: spec.memoryMB * 1024 * 1024,
                     romImages: .init(avpBooter: "AVPBooter.vresearch1.bin",
