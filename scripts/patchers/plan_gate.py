@@ -267,9 +267,10 @@ def snapshot(path):
     raise ValueError('unsupported guest target file type: ' + str(path))
 
 
-def append_evidence(plan, declaration, target, path, before, after, source_image=None):
+def append_evidence(plan, declaration, target, path, before, after, source_image=None, effect=None):
     record = record_change(plan, declaration, target, before, after)
     record['path'] = str(Path(path).absolute())
+    if effect is not None: record['effect'] = effect
     if isinstance(before, FileSnapshot): record['beforeMetadata'] = before.metadata
     if isinstance(after, FileSnapshot): record['afterMetadata'] = after.metadata
     from .guest_write import logical

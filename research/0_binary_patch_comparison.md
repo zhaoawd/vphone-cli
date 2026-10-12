@@ -1308,3 +1308,14 @@ Cryptex OS/App 分别作为两个精确完整目录树目标：原始镜像绑�
 修正 build-version 的参数解析：缺少 build 参数时拒绝，合法 `--dry-run` 使用同一解析结果决定只读分派。DSC 写入前拒绝末级符号链接、非普通文件和底层枚举器可能接受的未声明同前缀成员。bootstrap 成员转换现在将 `var` 精确映射为 `procursus`，保留第二次 `procursus/jb/*` 移动所需的目录目标；未增加任意后代授权。目标表新 SHA256 为 `b8ec0af0c1628ac963a0aaa39429e097985c09c6e11af83840972d7ac38fad0c`，旧摘要对应计划不能取得新规则资格。
 
 失败回归实际复现了未授权 plist 修改、DSC 外部链接目标修改和 JB/EXP 根目录移动拒绝。修正后 Python 54 项通过；Swift catalog/计划序列化/CFW 集成等 76 项、7套通过，三个生成器检查和六个 zsh 检查通过。JB/EXP 测试使用内置真实归档的 apt 文件字节及目录结构，执行各安装脚本的两条移动命令；未挂载镜像或执行完整安装。原始失败和成功日志及摘要见 `research/evidence/2026-10-13-task5-fix1/manifest.json`。
+
+
+## 2026-10-13：Task 6A1 最终效果证据与 less 加密顺序
+
+`CryptexFilesystemPatcher` 原先在 `mergeFilesystems` 内加密，随后 `apply` 才删除指定系统文件并生成 mtree、DigestDB 和封印。本次将加密移到这些最终明文修改之后，并在事务模式下解密最终 AEA，以只读挂载回调核验 producer 目录树及嵌套操作效果。安全文件替身回归复现了原顺序输出缺少最终修改；修正后的顺序为 prepare → encrypt → verify。该修改未新增二进制补丁规则或改变 variant 选择。
+
+操作证据在现有 Task5 JSONL 中增加可选 `effect`，保留 generation、desired 原始摘要、plan 摘要及声明归属。证据保存实际前后状态和按 SHA256 寻址的流式文件快照。新增读回比较字节范围、plist 修改键与删除、Mach-O 新增加载项和非结构字节，以及 DeviceTree 声明中的节点/属性身份。Manifest 读回复用现有 `patchIm4pTypeTag` 摘要语义及引用工件验证。IM4P payload 先转成零起点 Data，避免容器切片索引被当成 payload 偏移。
+
+6A1 的初始 receipt 仅表示 generated/committed 工件证据模型；本次未接入事务发布或 origin 写入。签名结构与 CodeDirectory 解析器仅为后续组合验证提供基础。shell 签名调用、Campo 嵌入 entitlement、DSC 同页摘要及 archive/move/消费关系由 6A2 接续。未完成的消费验证不会被调用来阻断现有受控写入；显式请求最终验证时，缺少上述关系的记录拒绝证明。Task6A 及 Task6 整体仍未完成。
+
+最终聚焦测试命令、结果、源文件 SHA256 和全部 RED/GREEN 日志的原始/gzip 摘要见 `research/evidence/2026-10-13-task6a1/manifest.json`。本轮只使用安全合成文件、目录和命令替身；没有执行真实 mount、VM、sudo、AMFI/TCC 或系统安装。真实加密工具、挂载和 OS 签名接受行为仍需 Task12 验证。

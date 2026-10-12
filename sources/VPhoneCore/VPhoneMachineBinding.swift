@@ -11,6 +11,17 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
     public let kernel: String?
     public let bootChain: String?
 
+    public enum Layer: String, Codable, CaseIterable, Sendable {
+        case host, guestEnvironment, kernel, bootChain
+    }
+
+    public func replacingOrigin(_ layer: Layer, with version: String) throws -> Self {
+        try Self(bundle: layer == .host ? version : bundle,
+                 guestEnvironment: layer == .guestEnvironment ? version : guestEnvironment,
+                 kernel: layer == .kernel ? version : kernel,
+                 bootChain: layer == .bootChain ? version : bootChain)
+    }
+
     public enum Read: Equatable, Sendable {
         case missing
         case invalid(String)
@@ -30,7 +41,7 @@ public struct VPhoneMachineBinding: Codable, Equatable, Sendable {
     /// Changes only the recorded host selection. It performs no file write,
     /// executable selection, kernel update or guest environment replacement.
     public func replacingHost(with bundle: String) throws -> Self {
-        try Self(bundle: bundle, guestEnvironment: guestEnvironment, kernel: kernel, bootChain: bootChain)
+        try replacingOrigin(.host, with: bundle)
     }
 
     /// One validated file read. Consumers can freeze a selection before work,

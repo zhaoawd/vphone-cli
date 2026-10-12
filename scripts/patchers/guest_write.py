@@ -172,6 +172,7 @@ def run(plan, argv):
         for source in operands[:-1]:
             if not logical(source): gate.private_path(plan, source)
     targets = []
+    copy_sources = {}
     cryptex_copies = []
     if command in {'cp','mv'} and len(operands)>=2:
         destination=operands[-1]
@@ -189,7 +190,13 @@ def run(plan, argv):
                     for member in walk(source):
                         if not (member.is_file() or member.is_dir() or member.is_symlink()): raise ValueError('unsupported Cryptex member')
                     targets.append(Path(destination))
-                else: targets += copy_targets(source,destination)
+                    copy_sources[Path(destination)] = Path(source)
+                else:
+                    copied = copy_targets(source,destination)
+                    targets += copied
+                    source_path = Path(source)
+                    source_items = list(walk(source_path)) if source_path.is_dir() and not source_path.is_symlink() else [source_path]
+                    copy_sources.update(zip(copied,source_items))
             if command=='mv' and logical(source): targets += list(walk(source))
     elif command in {'chmod','chown'}:
         for path in operands[1:]:
@@ -214,6 +221,39 @@ def run(plan, argv):
     targets=list(dict.fromkeys(targets))
     if command == 'mkdir' and '-p' in args:
         targets=[p for p in targets if logical(p) not in {'system:/','preboot:/','hardware:/'}]
+    from . import component_effects
+    effect_store = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent / 'effect-blobs'
+    effect_store.mkdir(mode=0o700,exist_ok=True)
+    if effect_store.is_symlink(): raise ValueError('linked effect store')
+    source_states = {target: component_effects.capture_input(source,effect_store,
+        logical(target) in {'system:/System/Cryptexes/OS','system:/System/Cryptexes/App'})
+        for target,source in copy_sources.items()}
+    archive_associations = {}
+    if command in {'tar','gtar'} and targets:
+        flag=next(i for i,a in enumerate(args) if a in ('-xf','-f'))
+        archive_path=Path(args[flag+1]);archive_digest=component_effects.digest(archive_path)
+        destination=Path(args[args.index('-C')+1])
+        with tarfile.open(archive_path) as archive:
+            for member in archive:
+                name=str(PurePosixPath(member.name))
+                if name=='.': continue
+                target=destination/name
+                source_state={'mode':member.mode,'uid':member.uid,'gid':member.gid}
+                if member.isfile():
+                    import tempfile
+                    fd,temporary=tempfile.mkstemp(prefix='.archive-member-',dir=effect_store)
+                    try:
+                        with os.fdopen(fd,'wb') as out,archive.extractfile(member) as source:
+                            while block:=source.read(1<<20): out.write(block)
+                        key=component_effects.persist(temporary,effect_store)
+                    finally: os.unlink(temporary)
+                    source_state.update(kind='file',sha256=key)
+                elif member.issym(): source_state.update(kind='symlink',link=member.linkname)
+                elif member.isdir(): source_state.update(kind='directory')
+                else: raise ValueError('unsupported archive effect member')
+                source_states[target]=source_state
+                archive_associations[target]={'archiveSHA256':archive_digest,'member':name}
+        if component_effects.digest(archive_path)!=archive_digest: raise ValueError('archive changed during source capture')
     observations=[]
     for path in targets:
         if logical(path) in {'system:/System/Cryptexes/OS','system:/System/Cryptexes/App'}:
@@ -226,13 +266,21 @@ def run(plan, argv):
             raise ValueError('guest operation follows target symlink')
         if path.exists() and path.is_file() and path.stat().st_nlink != 1:
             raise ValueError('hard-linked guest target')
-        observations.append((path,target,declaration,state(path)))
+        recursive = target in {'system:/System/Cryptexes/OS','system:/System/Cryptexes/App'}
+        observations.append((path,target,declaration,state(path),component_effects.capture_input(path,effect_store,recursive),recursive))
     gate.recheck(plan)
     binaries={'cp':'/bin/cp','mv':'/bin/mv','rm':'/bin/rm','mkdir':'/bin/mkdir','chmod':'/bin/chmod','chown':'/usr/sbin/chown','ln':'/bin/ln','find':'/usr/bin/find','tar':'/usr/bin/tar','gtar':'/opt/homebrew/bin/gtar'}
     result=subprocess.run([binaries[command]]+args,check=False)
     for destination,expected in cryptex_copies:
         from .cryptex_source import tree
         if tree(destination)!=expected: raise ValueError('Cryptex copied member readback differs')
-    for path,target,declaration,before in observations:
-        gate.append_evidence(plan,declaration,target,path,before,state(path))
+    for path,target,declaration,before,effect_input,recursive in observations:
+        if path in source_states:
+            effect=component_effects.capture_copy(source_states[path],path,effect_store,before=effect_input,recursive=recursive)
+            if path in copy_sources: effect['sourcePath']=str(copy_sources[path])
+            if path in archive_associations: effect['sourceArchive']=archive_associations[path]
+        else:
+            effect=component_effects.capture_change(effect_input,path,effect_store,recursive)
+        effect['command']=command
+        gate.append_evidence(plan,declaration,target,path,before,state(path),effect=effect)
     if result.returncode: raise SystemExit(result.returncode)

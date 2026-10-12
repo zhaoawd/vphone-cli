@@ -686,6 +686,60 @@ public final class DeviceTreePatcher: StructuredPatcher {
         self.includeIdentityPatches = includeIdentityPatches
     }
 
+    /// Verifies rebuilt output by the same declared node/property identities
+    /// used by the producer. Original offsets are diagnostic after serialization.
+    static func verifyEffect(_ record: PatchRecord, payload: Data) throws {
+        let parser = DeviceTreePatcher(data: payload, verbose: false)
+        let root = try parser.parsePayload(payload)
+        func unique(_ node: DTNode) throws {
+            guard Set(node.properties.map(\.name)).count == node.properties.count,
+                  Set(node.children.map { parser.nodeName($0) }).count == node.children.count else {
+                throw PatcherError.invalidFormat("DeviceTree: ambiguous final property/node identity")
+            }
+            for child in node.children { try unique(child) }
+        }
+        try unique(root)
+        func value(_ value: PropertyValue, length: Int) throws -> Data {
+            switch value {
+            case .string(let text): return encodeFixedString(text, length: length)
+            case .integer(let integer): return try encodeInteger(integer, length: length)
+            case .bytes(let bytes): return encodeFixedBytes(bytes, length: length)
+            }
+        }
+        if let spec = (basePropertyPatches + identityPropertyPatches).first(where: { $0.patchID == record.patchID }) {
+            let node = try parser.resolveNodeForPatch(root, patch: spec)
+            let prop = try parser.findProperty(node, name: spec.property)
+            let expected = try value(spec.value, length: spec.length)
+            guard record.patchedBytes == expected, prop.value == expected,
+                  prop.length == spec.length, prop.flags == spec.flags else {
+                throw PatcherError.invalidFormat("DeviceTree: required property effect differs")
+            }
+        } else if let spec = experimentalNodeAdditions.first(where: { $0.patchID == record.patchID }) {
+            let added = try parser.parsePayload(record.patchedBytes)
+            try unique(added)
+            let actual = try parser.resolveNode(root, path: spec.parentPath + [spec.nodeName])
+            guard parser.nodeName(added) == spec.nodeName, added.children.isEmpty,
+                  added.properties.count == spec.properties.count + 1 else {
+                throw PatcherError.invalidFormat("DeviceTree: node evidence differs from declaration")
+            }
+            for expectedNode in [added, actual] {
+                let name = try parser.findProperty(expectedNode, name: "name")
+                guard name.value == encodeFixedString(spec.nodeName, length: spec.nodeName.utf8.count + 1), name.flags == 0 else {
+                    throw PatcherError.invalidFormat("DeviceTree: required node name differs")
+                }
+                for property in spec.properties {
+                    let prop = try parser.findProperty(expectedNode, name: property.name)
+                    guard prop.value == (try value(property.value, length: property.length)),
+                          prop.length == property.length, prop.flags == property.flags else {
+                        throw PatcherError.invalidFormat("DeviceTree: required added property differs")
+                    }
+                }
+            }
+        } else {
+            throw PatcherError.invalidFormat("DeviceTree: unknown effect identity")
+        }
+    }
+
     // MARK: - Patcher
 
     public func findAll() throws -> [PatchRecord] {

@@ -81,6 +81,16 @@ private final class CFWFrozenTestBundle: NSObject {}
             "$PYTHON3" "$SCRIPT_DIR/patchers/cfw.py" patch-dropbear-plist "$TEST_SOURCE"
         fi
         cfw_guest_write /bin/cp "$TEST_SOURCE" "$TEST_TARGET"
+        "$PYTHON3" - <<'PYVERIFY'
+        import os, sys, json
+        from pathlib import Path
+        sys.path.insert(0, os.environ['SCRIPT_DIR'])
+        from patchers import component_effects, plan_gate
+        plan = plan_gate.from_environment()
+        evidence = Path(os.environ['VPHONE_GUEST_EVIDENCE'])
+        rows = [json.loads(line) for line in evidence.read_bytes().splitlines()]
+        component_effects.verify_rows(plan, rows, {'system': Path(os.environ['CFW_HOST_MNT'])/'mnt1'}, evidence.parent/'effect-blobs')
+        PYVERIFY
         """#
         let process = Process(); process.executableURL = root.appendingPathComponent(".venv/bin/python3")
         process.arguments = [root.appendingPathComponent("scripts/vm_lock.py").path, vm.path, "cfw-test", "--", "/bin/zsh", "-c", body]

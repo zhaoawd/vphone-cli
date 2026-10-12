@@ -87,28 +87,47 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         )]
     }
     
+    static func finalizeImage(prepare: () throws -> Void, encrypt: () throws -> Void, verify: () throws -> Void) throws {
+        try prepare()
+        try encrypt()
+        try verify()
+    }
+
     @discardableResult
     public func apply() throws -> Int {
         print("Merging Filesystems")
         let (unencryptedImage, aeaImage) = try mergeFilesystems()
-        defer { try? FileManager.default.removeItem(at: unencryptedImage) }
         
-        print("Creating Trustcache")
-        let trustcachePath = try createTrustcache(filesystem: unencryptedImage)
-        
-        print("Creating mtree")
-        let didEdit = try removeSpecificSystemFiles(filesystem: unencryptedImage)
-        let mtreePath = try createMtree(filesystem: unencryptedImage)
-        
-        print("Creating DigestDB and Root Hash")
-        let (digestDbPath, rootHashPath) = try createDigestAndHash(filesystem: unencryptedImage, mtree: mtreePath, remap: didEdit)
-        let metadataPath = try compressCanonicalMetadata(mtree: mtreePath, digestDb: digestDbPath)
-        let rootHashContainer = try wrapRootHash(rootHashPath)
-        
+        var artifacts: (trustcache: URL, metadata: URL, rootHash: URL)?
+        try Self.finalizeImage(prepare: {
+            let didEdit = try removeSpecificSystemFiles(filesystem: unencryptedImage)
+            let trustcache = try createTrustcache(filesystem: unencryptedImage)
+            let mtree = try createMtree(filesystem: unencryptedImage)
+            let (digestDb, rootHash) = try createDigestAndHash(filesystem: unencryptedImage, mtree: mtree, remap: didEdit)
+            artifacts = (trustcache, try compressCanonicalMetadata(mtree: mtree, digestDb: digestDb), try wrapRootHash(rootHash))
+            if transaction != nil { try captureFilesystemProof(plaintext: unencryptedImage) }
+        }, encrypt: {
+            let original = restoreDir.appending(path: try getOSFilesystemPath())
+            let metadata = try getAeaMetadata(original)
+            let key = try getAeaKey(original, metadata: metadata)
+            try encryptAeaFile(unencryptedImage, output: aeaImage, key: key, metadata: metadata)
+            try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: aeaImage.path)
+        }, verify: {
+            if let transaction {
+                let evidence = try FirmwareFilesystemEvidence.capture(image: aeaImage, transaction: transaction)
+                try evidence.verify(image: aeaImage, transaction: transaction, environment: guestWriteEnvironment)
+                try evidence.persist(in: transaction)
+            }
+        })
+        guard let artifacts else { throw PatcherError.invalidFormat("Missing finalized filesystem artifacts") }
+        let (trustcachePath, metadataPath, rootHashContainer) = artifacts
+
         // update trustcache, metadata, root_hash path
         let updatedManifest = try setUpdatedComponentsInManifest(filesystem: aeaImage, trustcache: trustcachePath, metadata: metadataPath, rootHash: rootHashContainer)
         rebuiltData = try serializePayload(updatedManifest)
-        
+        if let transaction { try FirmwareTransaction.checkMounts(transaction.root, detach: false) }
+        // Failed readback or detach retains the plaintext and transaction work.
+        try FileManager.default.removeItem(at: unencryptedImage)
         return 1
     }
     
@@ -194,18 +213,27 @@ public final class CryptexFilesystemPatcher: StructuredPatcher {
         try shrinkImage(dmg: targetImagePath)
         try convertToUDRWImage(input: targetImagePath, output: newDmgPath)
         try FileManager.default.removeItem(at: targetImagePath)
-        let metadata = try getAeaMetadata(self.restoreDir.appending(path: osPath))
-        let key = try getAeaKey(self.restoreDir.appending(path: osPath), metadata: metadata)
         let finalFile = newDmgPath.appendingPathExtension("aea")
         let finalDestination = self.restoreDir.appending(path: finalFile.lastPathComponent)
         if FileManager.default.fileExists(atPath: finalDestination.path) {
             try FileManager.default.removeItem(at: finalDestination)
         }
-        try encryptAeaFile(newDmgPath, output: finalFile, key: key, metadata: metadata)
-        try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: finalDestination.path)
         return (newDmgPath, finalDestination)
     }
     
+    private func captureFilesystemProof(plaintext: URL) throws {
+        guard let transaction else { throw PatcherError.invalidFormat("Missing filesystem proof transaction") }
+        let (device, mount) = try attachImage(path: plaintext, readonly: true)
+        do {
+            try FirmwareFilesystemEvidence.runProof("capture", mount: URL(fileURLWithPath: mount),
+                transaction: transaction, environment: guestWriteEnvironment)
+        } catch {
+            try detachImage(deviceNode: device)
+            throw error
+        }
+        try detachImage(deviceNode: device)
+    }
+
     func patchLaunchdCacheLoader(targetMount: String, cfwInput: URL) throws {
         let target = URL.init(filePath: targetMount)
         let launchdCacheLoaderPath = target.appending(path: "/usr/libexec/launchd_cache_loader")

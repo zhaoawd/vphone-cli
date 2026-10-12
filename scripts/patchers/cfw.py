@@ -372,6 +372,8 @@ def main():
     if len(sys.argv) < 3: raise ValueError("guest patch target missing")
     path = Path(os.path.abspath(sys.argv[2]))
     observations = []
+    from patchers import component_effects
+    effect_store = Path(os.environ['VPHONE_GUEST_EVIDENCE']).parent / 'effect-blobs'
     source_image = None
     if plan.context['variant'] == 'less':
         from patchers.guest_write import target_table
@@ -388,7 +390,7 @@ def main():
             current = current.parent
         if command != 'inject-daemons' and not str(path).endswith(target.removeprefix('system:')):
             raise ValueError('less filesystem target suffix differs')
-        observations.append((path, target, gate.snapshot(path)))
+        observations.append((path, target, gate.snapshot(path), component_effects.capture_input(path, effect_store)))
     elif command in dsc:
         declaration = dsc[command]
         mount = Path(os.environ['CFW_HOST_MNT'])
@@ -406,7 +408,7 @@ def main():
                 target = "dsc:/" + item.name
                 gate.authorize(plan, declaration, target)
                 no_link_parents(item)
-                observations.append((item, target, gate.snapshot(item)))
+                observations.append((item, target, gate.snapshot(item), component_effects.capture_input(item, effect_store)))
         if not observations: raise ValueError("no declared DSC targets")
     else:
         if command == "inject-dylib":
@@ -424,13 +426,14 @@ def main():
         if not in_stage and logical(path) != target: raise ValueError("patch target differs from declared guest path/staging")
         if not in_stage: no_link_parents(path)
         if path.is_symlink(): raise ValueError("linked guest patch target")
-        observations.append((path, target, gate.snapshot(path)))
+        observations.append((path, target, gate.snapshot(path), component_effects.capture_input(path, effect_store)))
     gate.recheck(plan)
     try:
         return _dispatch()
     finally:
-        for item, target, before in observations:
-            gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image)
+        for item, target, before, effect_input in observations:
+            effect = component_effects.capture_change(effect_input, item, effect_store)
+            gate.append_evidence(plan, declaration, target, item, before, gate.snapshot(item), source_image=source_image, effect=effect)
 
 
 if __name__ == "__main__":
