@@ -153,7 +153,7 @@ else:
     from .cfw_daemons import parse_cryptex_paths, inject_daemons, inject_daemon, patch_dropbear_plist
 
 
-def _dispatch():
+def _dispatch(*, dry_run=False):
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
@@ -200,7 +200,6 @@ def _dispatch():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-hv-vmm-dsc <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         results = patch_hv_vmm_in_dsc(sys.argv[2], dry_run=dry_run)
         sys.exit(0)
 
@@ -209,7 +208,6 @@ def _dispatch():
             print("Usage: patch_cfw.py patch-iomfb-swapend <chunks_dir> "
                   "[--target-size <hex|int>] [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         kwargs = {}
         if "--target-size" in sys.argv:
             i = sys.argv.index("--target-size")
@@ -225,7 +223,6 @@ def _dispatch():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-iomfb-force-kern <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         try:
             patch_iomfb_force_kern(sys.argv[2], dry_run=dry_run)
         except ValueError as e:
@@ -237,7 +234,6 @@ def _dispatch():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-dsc-maxslide <chunks_dir> [--dry-run] [--force]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         force = "--force" in sys.argv[3:]
         patch_dsc_maxslide(sys.argv[2], dry_run=dry_run, force=force)
         sys.exit(0)
@@ -246,7 +242,6 @@ def _dispatch():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-lsd-embedded-reg <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         patch_lsd_embedded_reg(sys.argv[2], dry_run=dry_run)
         sys.exit(0)
 
@@ -254,14 +249,12 @@ def _dispatch():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-xpc-lwcr <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         patch_xpc_lwcr(sys.argv[2], dry_run=dry_run)
 
     elif cmd == "patch-lockdown-mode":
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-lockdown-mode <chunks_dir> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         patch_lockdown_mode(sys.argv[2], dry_run=dry_run)
         sys.exit(0)
 
@@ -269,7 +262,6 @@ def _dispatch():
         if len(sys.argv) < 4:
             print("Usage: patch_cfw.py patch-camera-dsc <chunks_dir> <dsc_header> [--dry-run] [--force]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[4:]
         force   = "--force"   in sys.argv[4:]
         apply_all_camera_patches(sys.argv[2], sys.argv[3], dry_run=dry_run, force=force)
         sys.exit(0)
@@ -278,7 +270,6 @@ def _dispatch():
         if len(sys.argv) < 3:
             print("Usage: patch_cfw.py patch-watchdogd <binary> [--dry-run]")
             sys.exit(1)
-        dry_run = "--dry-run" in sys.argv[3:]
         try:
             n = patch_watchdogd(sys.argv[2], dry_run=dry_run)
         except ValueError as e:
@@ -356,11 +347,16 @@ def _dispatch():
 def main():
     if len(sys.argv) < 2 or sys.argv[1] == "cryptex-paths":
         return _dispatch()
+    if sys.argv[1] == 'patch-build-version':
+        from .cfw_patch_build_version import parse_arguments
+        args = parse_arguments(sys.argv[2:])
+        sys.argv = [sys.argv[0], sys.argv[1], args.path, args.target] + (['--dry-run'] if args.dry_run else [])
     dry_commands = {"patch-hv-vmm-dsc", "patch-iomfb-swapend", "patch-iomfb-force-kern",
         "patch-dsc-maxslide", "patch-lsd-embedded-reg", "patch-xpc-lwcr", "patch-lockdown-mode",
         "patch-camera-dsc", "patch-watchdogd", "patch-post-restore-dt", "patch-build-version"}
-    if sys.argv[1] in dry_commands and "--dry-run" in sys.argv[2:]:
-        return _dispatch()
+    option_start = 4 if sys.argv[1] in {'patch-build-version', 'patch-camera-dsc'} else 3
+    if sys.argv[1] in dry_commands and "--dry-run" in sys.argv[option_start:]:
+        return _dispatch(dry_run=True)
     from patchers import plan_gate as gate
     from patchers.guest_write import logical, no_link_parents
     from pathlib import Path
@@ -402,7 +398,11 @@ def main():
             from patchers.cryptex_source import mounted
             source_image = mounted(plan, mount / 'mnt_sysos_hv_vmm')
         for item in sorted(path.iterdir()):
+            if item.name.startswith('dyld_shared_cache_arm64e') and not item.name.endswith('.map') and not re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
+                raise ValueError("undeclared DSC write member: " + item.name)
             if re.fullmatch(r"dyld_shared_cache_arm64e(?:\.[0-9]{1,2}|\.symbols)?", item.name):
+                if item.is_symlink() or not item.is_file():
+                    raise ValueError("DSC write target must be a non-linked regular file")
                 target = "dsc:/" + item.name
                 gate.authorize(plan, declaration, target)
                 no_link_parents(item)

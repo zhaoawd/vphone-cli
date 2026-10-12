@@ -63,7 +63,8 @@ def render():
                 if name.startswith('/') or '..' in PurePosixPath(name).parts: raise ValueError('unsafe bundled member')
                 table[name] = {'type': member.type.decode(), 'link': member.linkname}
                 if compressed:
-                    for sub in [name, 'procursus/'+name.removeprefix('var/'), 'procursus/'+name.removeprefix('var/jb/')]:
+                    for sub in [name, str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var')),
+                                str(PurePosixPath('procursus') / PurePosixPath(name).relative_to('var/jb')) if name == 'var/jb' or name.startswith('var/jb/') else name]:
                         add(declaration, prefix+sub)
                 else: add(declaration,prefix+name)
         archives[Path(inner).name.removesuffix('.zst')] = table

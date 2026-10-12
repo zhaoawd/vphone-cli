@@ -289,3 +289,85 @@ class FrozenGateTests(unittest.TestCase):
                 self.assertEqual(row['beforeSHA256'],hashlib.sha256(original).hexdigest())
                 self.assertEqual(row['afterSHA256'],hashlib.sha256(after).hexdigest())
                 self.assertEqual(row['planDigest'],self.record['planSHA256'])
+
+    def test_build_version_missing_build_cannot_turn_option_into_write(self):
+        target=self.root/'SystemVersion.plist'
+        original=plistlib.dumps({'ProductBuildVersion':'23B85'})
+        for arguments in [[str(target),'--dry-run'],['--dry-run',str(target)],
+                          [str(target),'23F77','--dry-run'],['--dry-run',str(target),'23F77']]:
+            with self.subTest(arguments=arguments):
+                target.write_bytes(original)
+                with patch.dict(os.environ,{},clear=True):
+                    result=subprocess.run([sys.executable,str(ROOT/'scripts/patchers/cfw.py'),'patch-build-version',*arguments],capture_output=True)
+                self.assertEqual(target.read_bytes(),original,result.stderr)
+                self.assertEqual(result.returncode==0,'23F77' in arguments,result.stderr)
+
+    def test_dsc_final_symlink_preserves_external_cache(self):
+        from tests.test_dsc_maxslide import build_cache
+        _,digest=guest_write.target_table()
+        self.entries.append(dict(id='dyld-boot-maxslide',disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':dyld-boot-maxslide',hexadecimalOffsetSuffix=False)]))
+        self.publish()
+        outside=self.root/'external-cache';original=build_cache(size=0x17D504000,max_slide=0x20000000)
+        outside.write_bytes(original)
+        directory=self.mount/'mnt1/dsc';directory.mkdir()
+        (directory/'dyld_shared_cache_arm64e').symlink_to(outside)
+        with patch.dict(os.environ,dict(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))), \
+             patch.object(sys,'argv',['cfw.py','patch-dsc-maxslide',str(directory)]),contextlib.redirect_stdout(io.StringIO()):
+            try: cfw.main()
+            except (SystemExit,ValueError): pass
+        self.assertEqual(outside.read_bytes(),original)
+        self.assertEqual(self.evidence.read_bytes(),b'')
+
+    def test_jb_exp_archive_root_and_content_moves_use_frozen_rules(self):
+        # Use actual shipped archive member bytes and each installer's two move lines.
+        import tarfile
+        import io
+        raw=subprocess.check_output(['/usr/bin/tar','-xOf',str(ROOT/'scripts/resources/cfw_jb_input.tar.zst'),
+                                     'cfw_jb_input/jb/bootstrap-iphoneos-arm64.tar.zst'])
+        raw=subprocess.check_output(['zstd','-dc'],input=raw)
+        with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+            member=next(item for item in archive if str(Path(item.name))=='var/jb/usr/bin/apt')
+            payload=archive.extractfile(member).read()
+        _,digest=guest_write.target_table()
+        self.entries.append(dict(id='preboot-jb-bootstrap-install',disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':preboot-jb-bootstrap-install',hexadecimalOffsetSuffix=False)]))
+        for variant in ('jb','exp'):
+            with self.subTest(variant=variant):
+                self.plan['variant']=variant;self.plan['gates']['variant']=variant;self.context['variant']=variant;self.publish()
+                boot_hash=('A' if variant=='jb' else 'B')*96
+                base=self.mount/'mnt5'/boot_hash/'jb-vphone'
+                source=base/'var/jb/usr/bin/apt';source.parent.mkdir(parents=True);source.write_bytes(payload)
+                lines=(ROOT/f'scripts/cfw_install_{variant}.sh').read_text().splitlines()
+                moves=[line for line in lines if 'cfw_guest_write' in line and 'mv ' in line and '/procursus' in line]
+                self.assertEqual(len(moves),2)
+                # Do not mask a failure from the second actual installer command.
+                body='\n'.join(line.removesuffix(' 2>/dev/null || true') for line in moves)
+                env=dict(os.environ,VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context),
+                         VPHONE_CFW_VARIANT=variant,PYTHON3=sys.executable,SCRIPT_DIR=str(ROOT/'scripts'),
+                         MNT5=str(self.mount/'mnt5'),BOOT_HASH=boot_hash,JB_DIR_NAME='jb-vphone')
+                result=subprocess.run(['/bin/zsh','-c','set -euo pipefail\nsource "$SCRIPT_DIR/lib/cfw_common.sh"\n'+body],
+                                      env=env,pass_fds=(self.lock_fd,),capture_output=True,text=True)
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual((base/'procursus/usr/bin/apt').read_bytes(),payload)
+                self.assertFalse(source.exists())
+                rows=[json.loads(line) for line in self.evidence.read_text().splitlines()]
+                self.assertTrue(any(row['target'].endswith('/procursus') and row['planDigest']==self.record['planSHA256'] for row in rows))
+
+    def test_unlisted_dsc_member_cannot_reach_writer(self):
+        from tests.test_dsc_maxslide import build_cache
+        _,digest=guest_write.target_table()
+        self.entries.append(dict(id='dyld-boot-maxslide',disposition='guestUncovered',
+            recordRules=[dict(literal='guest-target-map-v1:'+digest+':dyld-boot-maxslide',hexadecimalOffsetSuffix=False)]))
+        self.publish()
+        directory=self.mount/'mnt1/dsc';directory.mkdir()
+        original=build_cache(size=0x17D504000,max_slide=0x20000000)
+        (directory/'dyld_shared_cache_arm64e').write_bytes(original)
+        outside=self.root/'external-cache';outside.write_bytes(original)
+        (directory/'dyld_shared_cache_arm64e.unlisted').symlink_to(outside)
+        with patch.dict(os.environ,dict(VPHONE_FROZEN_PLAN_SHA256=self.digest,VPHONE_FROZEN_CONTEXT=json.dumps(self.context))), \
+             patch.object(sys,'argv',['cfw.py','patch-dsc-maxslide',str(directory)]),contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(ValueError):cfw.main()
+        self.assertEqual(outside.read_bytes(),original)
+        self.assertEqual((directory/'dyld_shared_cache_arm64e').read_bytes(),original)
+        self.assertEqual(self.evidence.read_bytes(),b'')

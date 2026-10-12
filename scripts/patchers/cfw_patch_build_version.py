@@ -26,6 +26,7 @@ The change DOES NOT affect:
 Idempotent: a re-run on an already-patched plist exits without rewriting.
 """
 
+import argparse
 import plistlib
 import sys
 
@@ -80,15 +81,17 @@ def patch_plist(path: str, target: str, *, dry_run: bool = False) -> bool:
     return True
 
 
+def parse_arguments(argv):
+    parser = argparse.ArgumentParser(description="Rewrite ProductBuildVersion")
+    parser.add_argument("path")
+    parser.add_argument("target")
+    parser.add_argument("--dry-run", action="store_true")
+    return parser.parse_args(argv)
+
+
 def _main(argv):
-    if len(argv) < 3:
-        print(
-            "Usage: cfw_patch_build_version.py <plist> <new_build_version> [--dry-run]",
-            file=sys.stderr,
-        )
-        return 2
-    path, target = argv[1], argv[2]
-    dry_run = "--dry-run" in argv[3:]
+    args = parse_arguments(argv[1:])
+    path, target, dry_run = args.path, args.target, args.dry_run
     try:
         patch_plist(path, target, dry_run=dry_run)
     except Exception as e:
