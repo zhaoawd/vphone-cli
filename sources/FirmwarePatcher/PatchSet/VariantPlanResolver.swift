@@ -153,7 +153,7 @@ public enum VariantPlanResolver {
             switch declaration.coverage {
             case .notImplemented:
                 notImplemented.append(entry(declaration, .notImplemented,
-                    "not implemented locally (T18 libmisfix scope)"))
+                    declaration.implementationNote ?? "not implemented locally"))
                 continue
             case .guestStep:
                 if select.contains(declaration.id)

@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import sys
 
+from generate_target_patch_catalog import fixed_sources, reviewed_declarations
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "sources/FirmwarePatcher/PatchSet/PatchSelectionMigrationData.swift"
 
@@ -13,7 +15,6 @@ OUTPUT = ROOT / "sources/FirmwarePatcher/PatchSet/PatchSelectionMigrationData.sw
 def render():
     mapping = json.loads((ROOT / "research/t09_patch_id_mapping_2026-10-01.json").read_text())
     delta = json.loads((ROOT / "research/upstream_integration_2026-10-06/T09_declaration_delta.json").read_text())
-    local = json.loads((ROOT / "research/t10_patch_declarations_2026-10-01.json").read_text())
     if delta["target"] != "2d21d21fbdd4f51f013616273ceda9b35a3e0789":
         raise ValueError("This migration revision requires the fixed 2d21d21 target")
     rows = [(p["old_id"], p["id"]) for p in mapping["patches"]]
@@ -24,8 +25,10 @@ def render():
     if rename["old_id"] in aliases:
         raise ValueError("Intermediate alias duplicates an old dotted ID")
     aliases[rename["old_id"]] = rename["new_id"]
-    target = {r["id"] for r in delta["rows"]}
-    local_ids = {r["id"] for r in local["declarations"]}
+    target = set(fixed_sources())
+    if target != {r["id"] for r in delta["rows"]}:
+        raise ValueError("Migration delta differs from the verified fixed source snapshot")
+    local_ids = {r["id"] for r in reviewed_declarations()}
     known = target | local_ids
     if len(target) != 141 or len(known) != 143 or not set(aliases.values()) <= target:
         raise ValueError("Migration vocabulary differs from reviewed target/local IDs")
@@ -34,7 +37,8 @@ def render():
     lines = ["// Generated from the source-backed T09 maps. ID recognition does not authorize execution.",
              "// Sources: research/t09_patch_id_mapping_2026-10-01.json and",
              "// research/upstream_integration_2026-10-06/T09_declaration_delta.json.",
-             "// The two less IDs remain local. This table does not alter PatchDeclarationCatalog.",
+             "// Canonical IDs also require reviewed T09_target_applicability.json decisions.",
+             "// The two less IDs remain local. Recognition alone never enables execution.",
              "", "extension PatchSelectionMigration {", "    static let aliases: [String: String] = ["]
     lines += [f"        {json.dumps(k)}: {json.dumps(v)}," for k, v in sorted(aliases.items())]
     lines += ["    ]", "", "    static let knownIDs: Set<String> = ["]

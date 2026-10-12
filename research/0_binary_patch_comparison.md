@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-12 固定上游声明目录（T09）
+
+声明目录现对应固定上游 `2d21d21fbdd4f51f013616273ceda9b35a3e0789` 的全部 141 个 ID，并保留 2 个本地 less ID。原有 119 个声明的执行步骤、模式成员、版本规则和显式选项保持原值；24 个新增目标 ID 均标记 `notImplemented`，各自记录原因，显式选择时拒绝。决定及五模式版本矩阵见 [T09_target_applicability.json](upstream_integration_2026-10-06/T09_target_applicability.json)。本轮未新增二进制补丁或修改匹配及写入逻辑。声明身份和步骤成员关系不建立上游字节等价；真实固件、恢复和 VM 启动行为未验证。
+
 ## 2026-10-02 regular-v2 MAC mount 实验候选
 
 用户批准独立对照实验。显式 `vm create --guest-environment v2 --experimental-v2-root-remount` 仅为 regular 追加现有 `kernel-boot-mac_mount`，不采用其他 JB 步骤。23B85 原始 vphone600 的内存输出比较通过：默认 regular 的 28 项内核记录逐项相同，实验候选额外两项 4 字节写入，完整输出与预期一致。匹配沿用当前映像语义锚点与 ARM64Encoder，不使用固定地址。默认 regular/classic 选择保持原范围；真实重挂、在线更新及回退尚未验证。详见 [实验记录](t17_mount_rejection_diagnosis_2026-10-02.md)。

@@ -1,7 +1,8 @@
 // Generated from the source-backed T09 maps. ID recognition does not authorize execution.
 // Sources: research/t09_patch_id_mapping_2026-10-01.json and
 // research/upstream_integration_2026-10-06/T09_declaration_delta.json.
-// The two less IDs remain local. This table does not alter PatchDeclarationCatalog.
+// Canonical IDs also require reviewed T09_target_applicability.json decisions.
+// The two less IDs remain local. Recognition alone never enables execution.
 
 extension PatchSelectionMigration {
     static let aliases: [String: String] = [

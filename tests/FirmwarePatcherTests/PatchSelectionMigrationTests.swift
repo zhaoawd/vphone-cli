@@ -15,7 +15,8 @@ import Testing
     @Test func intermediateParavirtDisableSurvivesDefaultChange() throws {
         let result = try PatchSelectionMigration.preview(select: [], block: ["kernel-exp-paravirt_user_clients"])
         #expect(result.blocked == ["kernel-cfw-paravirt_user_clients"])
-        #expect(result.notDeclaredLocally == ["kernel-cfw-paravirt_user_clients"])
+        #expect(result.notDeclaredLocally.isEmpty)
+        #expect(PatchDeclarationCatalog.byID["kernel-cfw-paravirt_user_clients"]?.coverage == .notImplemented)
         #expect(result.selected.isEmpty)
     }
 
@@ -74,8 +75,8 @@ import Testing
 
     @Test func newDeclarationDoesNotGainLocalExecutionCoverage() throws {
         let result = try PatchSelectionMigration.preview(select: ["kernel-boot-shared_region_size"], block: [])
-        #expect(result.notDeclaredLocally == ["kernel-boot-shared_region_size"])
-        #expect(PatchDeclarationCatalog.byID["kernel-boot-shared_region_size"] == nil)
+        #expect(result.notDeclaredLocally.isEmpty)
+        #expect(PatchDeclarationCatalog.byID["kernel-boot-shared_region_size"]?.coverage == .notImplemented)
     }
 
     @Test func bundledExtendedPresetMigratesWithoutRewritingModes() throws {

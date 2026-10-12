@@ -1,8 +1,8 @@
 // PatchDeclaration.swift — Declaration-layer model for the five-variant plan (T10/T11).
 //
 // A declaration is the stable selection unit that sits on top of a local firmware
-// variant. Its `id` is the upstream 2.2.3 declaration id where one exists (from the
-// T09 mapping), or a `{component}-{effect}-{name}` local id where the local step has
+// variant. Its `id` is the fixed upstream target's declaration id where one exists,
+// or a `{component}-{effect}-{name}` local id where the local step has
 // no upstream declaration. The local `PatchRule` version conditions stay authoritative
 // (design decision 2); `upstreamApplicability` is recorded for cross-reference only.
 //
@@ -12,8 +12,8 @@
 //   - `.guestStep` — a guest-side Python/zsh CFW step (dyld-* / system-* / preboot-*).
 //                 Declaration-only this round: listed and consistency-checked, but its
 //                 execution path is not gated (design decision 5).
-//   - `.notImplemented` — declared upstream but with no local implementation
-//                 (`dyld-exp-mis_trust_auth`; libmisfix is T18). Selecting it is refused
+//   - `.notImplemented` — declared upstream but with no local implementation.
+//                 The reviewed per-ID reason is in `implementationNote`. Selection is refused
 //                 (design decision 4).
 
 import Foundation
@@ -71,6 +71,9 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
     public let conflicts: [String]
     /// Declarations that must resolve before this one (empty in the real catalog).
     public let after: [String]
+    /// Reviewed implementation limitation, especially why an upstream ID cannot run.
+    /// Optional so historical encoded declarations remain readable.
+    public let implementationNote: String?
 
     public init(
         id: String,
@@ -85,7 +88,8 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
         upstreamApplicability: String,
         requires: [String],
         conflicts: [String],
-        after: [String]
+        after: [String],
+        implementationNote: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -100,5 +104,6 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
         self.requires = requires
         self.conflicts = conflicts
         self.after = after
+        self.implementationNote = implementationNote
     }
 }
