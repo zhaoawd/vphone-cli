@@ -1,0 +1,108 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/11] Emitting module FirmwarePatcher
+[6/11] Compiling FirmwarePatcher FirmwareTransaction.swift
+[7/21] Compiling FirmwarePatcher FirmwareFilesystemReadback.swift
+[8/21] Compiling FirmwarePatcher VariantPlanResolver.swift
+[9/21] Compiling FirmwarePatcher FirmwareComponentReceipt.swift
+[10/21] Compiling FirmwarePatcher PatchExperimentRecord.swift
+/Users/qcz3840/github/vphone-cli/sources/FirmwarePatcher/Pipeline/PatchExperimentRecord.swift:48:24: warning: no calls to throwing functions occur within 'try' expression
+ 46 |     init(from decoder: any Decoder) throws {
+ 47 |         let container = try decoder.singleValueContainer()
+ 48 |         wrappedValue = try container.decodeNil() ? nil : try container.decode(Value.self)
+    |                        `- warning: no calls to throwing functions occur within 'try' expression
+ 49 |     }
+ 50 |     func encode(to encoder: any Encoder) throws {
+[11/21] Compiling FirmwarePatcher FirmwarePipeline.swift
+[12/21] Compiling FirmwarePatcher PatchExperimentRecorder.swift
+[13/21] Compiling FirmwarePatcher CryptexFilesystemPatcher.swift
+[14/21] Compiling FirmwarePatcher FirmwareFilesystemEvidence.swift
+[15/21] Compiling FirmwarePatcher FirmwareDesiredPlanStore.swift
+[16/21] Compiling FirmwarePatcher FirmwarePlanBinding.swift
+[17/37] Emitting module FirmwareIntegrationTests
+[18/38] Compiling FirmwarePatcherTests FrozenPipelinePlanTests.swift
+[19/39] Compiling FirmwarePatcherTests VariantPlanSerializationTests.swift
+[20/39] Compiling FirmwarePatcherTests RequiredDeclarationEvidenceTests.swift
+[21/39] Compiling FirmwarePatcherTests PatchExperimentRecordTests.swift
+[22/39] Compiling FirmwarePatcherTests FirmwarePlanBindingTests.swift
+[23/39] Compiling FirmwarePatcherTests FirmwareReceiptPublicationTests.swift
+[24/39] Compiling FirmwarePatcherTests FirmwareTransactionAcceptanceTests.swift
+[25/39] Compiling FirmwarePatcherTests FirmwareTransactionTests.swift
+[26/39] Compiling FirmwarePatcherTests FirmwareDesiredPlanStoreTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[27/39] Compiling FirmwarePatcherTests FirmwareGenerationTests.swift
+/Users/qcz3840/github/vphone-cli/tests/FirmwarePatcherTests/FirmwareDesiredPlanStoreTests.swift:148:9: warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+146 |         let pipeline = FirmwarePipeline(vmDirectory: f.vm, verbose: false)
+147 |         let lock = try VPhoneVMLock(directory: f.vm, operation: VPhoneVMOperation.fwPatch)
+148 |         withExtendedLifetime(lock) {
+    |         `- warning: result of call to 'withExtendedLifetime' is unused [#no-usage]
+149 |             #expect(throws: (any Error).self) {
+150 |                 try pipeline.saveDesiredPlan(generationID: p.record.generationID, apply: true, expectedSHA256: nil)
+[28/39] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[28/39] Write Objects.LinkFileList
+[31/39] Emitting module FirmwarePatcherTests
+[32/39] Compiling FirmwarePatcherTests DeclarationGateTests.swift
+[33/39] Compiling FirmwarePatcherTests FirmwareComponentReceiptTests.swift
+[33/39] Write Objects.LinkFileList
+[34/39] Linking vphone-cli
+[35/39] Linking vphone-vm
+[36/39] Applying vphone-cli
+[37/39] Applying vphone-vm
+[38/39] Linking vphone-cliPackageTests
+Build complete! (10.73s)
+Test Suite 'Selected tests' started at 2026-10-13 04:04:06.614.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 04:04:06.615.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 04:04:06.615.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 04:04:06.615.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite FirmwareReceiptPublicationTests started.
+◇ Test installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "success" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "stale-binding" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "generated" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "wrong-transaction" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "lost-qualification" to installedOriginHookRequiresLiveTargetProof(_:) started.
+◇ Test case passing 1 argument fault → "rollback" to installedOriginHookRequiresLiveTargetProof(_:) started.
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local iPhone IPSW...
+[*] Extracting local cloudOS IPSW...
+[*] Extracting local cloudOS IPSW...
+✔ Test installedOriginHookRequiresLiveTargetProof(_:) with 6 test cases passed after 2.798 seconds.
+✔ Suite FirmwareReceiptPublicationTests passed after 2.798 seconds.
+✔ Test run with 1 test in 1 suite passed after 2.799 seconds.

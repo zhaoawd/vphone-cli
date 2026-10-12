@@ -29,7 +29,8 @@ struct FirmwareFilesystemEvidence: Codable, Equatable {
             operationsSHA256: try FirmwareGeneration.fileSHA256(transaction.root.appendingPathComponent("guest-changes.jsonl")))
     }
 
-    func verify(image: URL, transaction: FirmwareTransaction, environment: [String: String]?) throws {
+    func verify(image: URL, transaction: FirmwareTransaction, environment: [String: String]?,
+                operations: FirmwareFilesystemReadback.Operations? = nil) throws {
         let journal = transaction.journalSnapshot
         guard schemaVersion == 1, journal.options["generationID"] == generationID,
               journal.options["desiredSHA256"] == desiredSHA256,
@@ -40,8 +41,13 @@ struct FirmwareFilesystemEvidence: Codable, Equatable {
             throw FirmwareGeneration.fail("Filesystem producer evidence differs")
         }
         let reader = try FirmwareFilesystemReadback(image: image, expectedSHA256: imageSHA256, transaction: transaction)
-        try reader.withReadOnlyFilesystem(at: image, transaction: transaction) { mount in
+        let verify: (URL) throws -> Void = { mount in
             try Self.runProof("verify", mount: mount, transaction: transaction, environment: environment)
+        }
+        if let operations {
+            try reader.withReadOnlyFilesystem(at: image, transaction: transaction, operations: operations, body: verify)
+        } else {
+            try reader.withReadOnlyFilesystem(at: image, transaction: transaction, body: verify)
         }
     }
 

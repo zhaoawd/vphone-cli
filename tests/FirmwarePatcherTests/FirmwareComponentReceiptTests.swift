@@ -31,10 +31,10 @@ extension FirmwareComponentReceiptTests {
         let plan: VariantPlanResolver.VariantPlan
         var vm: URL { generationFixture.vm }
         var file: URL { vm.appendingPathComponent("AVPBooter.vresearch1.bin") }
-        init() throws {
+        init(variant: FirmwarePipeline.Variant = .regular) throws {
             generationFixture = try FirmwareGenerationTests.Fixture()
             generation = try generationFixture.publish()
-            plan = try FirmwarePipeline(vmDirectory: generationFixture.vm, verbose: false).resolvedPlan()
+            plan = try FirmwarePipeline(vmDirectory: generationFixture.vm, variant: variant, verbose: false).resolvedPlan()
             let desired = try FirmwareDesiredPlanStore.prepare(in: generationFixture.vm, plan: plan, generation: generation)
             _ = try FirmwareDesiredPlanStore.publish(desired, expectedSHA256: nil)
         }

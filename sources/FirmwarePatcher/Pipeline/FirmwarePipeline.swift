@@ -94,6 +94,7 @@ public final class FirmwarePipeline {
     private var guestWriteEnvironment: [String: String]?
     private var versionInputs: FirmwareVersionInputs?
     private var baseVersionKnown = false
+    private var componentOutputs: [String: URL] = [:]
 
     /// Progress of the most recent run (C5). Shared with the staged pipeline so a
     /// failure keeps the stage, completed component reports and transaction.
@@ -373,6 +374,7 @@ public final class FirmwarePipeline {
             // records the failure like any other pre-commit error).
             try PatchDeclarationGate.enforce(report: report, plan: plan)
             if variant == .less { try Self.validateManifest(in: staged.findRestoreDirectory()) }
+            try transaction.prepareComponentReceipts(report: report, outputs: staged.componentOutputs)
             trace.stage = .commit
             let archive = try transaction.commit()
             log("[+] Firmware transaction committed; receipt and backups: \(archive.path)")
@@ -527,6 +529,7 @@ public final class FirmwarePipeline {
                 log("  [.] ablation dry-run — not saved")
             } else {
                 try loader.save(currentData, to: fileURL)
+                componentOutputs[component.name.lowercased()] = fileURL
                 log("  [+] saved")
             }
             trace.record(component.name, reports)

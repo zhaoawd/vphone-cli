@@ -1,0 +1,799 @@
+{
+  "schemaVersion": 1,
+  "task": "6B",
+  "date": "2026-10-13",
+  "base": "871ef0ca8863a4f6c92928267512c8f335e9bc34",
+  "branch": "codex/upstream-2d21d21-integration",
+  "targetRulesSHA256": "5f259f42583bb7b1f1426b986a86801fc421e17921fc157fe4a74bd596771213",
+  "environment": {
+    "cwd": "/Users/qcz3840/github/vphone-cli",
+    "python": ".venv/bin/python3",
+    "swiftScratch": "/private/tmp/vphone-five-tasks-swift-20261012",
+    "clearedPrefixes": [
+      "VPHONE_TEST_",
+      "VPHONE_LESS_",
+      "VPHONE_C4_"
+    ],
+    "realMountOrVM": false
+  },
+  "finalSources": [
+    {
+      "path": "scripts/firmware_worker.py",
+      "sha256": "1681d2bc50a61545849e29fb418bc28ba07d8fbfce0f42ee8a943d5fd97fcba0",
+      "bytes": 3626
+    },
+    {
+      "path": "sources/FirmwarePatcher/Filesystem/FirmwareFilesystemEvidence.swift",
+      "sha256": "96c0e95d40d708975d6f722e24b0b278121ded63b042d5a5f74249b79a68c29f",
+      "bytes": 4215
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwarePipeline.swift",
+      "sha256": "74de5432d299634f497dc570d522990aecebe74e506336c1ce4dc5c41f2e0128",
+      "bytes": 52498
+    },
+    {
+      "path": "sources/FirmwarePatcher/Pipeline/FirmwareTransaction.swift",
+      "sha256": "1138e1e47e60c90c1cf51aa1c6be0004051f811f9ddb78d099e541886378f0c1",
+      "bytes": 55259
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareComponentReceiptTests.swift",
+      "sha256": "30100f5d558d6f9094d6cc0dda5c74edeea30c2b8d6b8f30a2055e06fba0d371",
+      "bytes": 15270
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareFilesystemPublicationTests.swift",
+      "sha256": "ba29701cd936762c970390cc5ea5202c94a2fc4fd60aecfb189e7d67810470d3",
+      "bytes": 7596
+    },
+    {
+      "path": "tests/FirmwarePatcherTests/FirmwareReceiptPublicationTests.swift",
+      "sha256": "4908b867e3e6de56605379a97748863f91c9f859e170656639ced3c5762ab20e",
+      "bytes": 17038
+    },
+    {
+      "path": "tests/test_firmware_worker.py",
+      "sha256": "934f3eaa8a6535729bb30360a79a267e3d04a389a586590ebe1c39b7a764f99f",
+      "bytes": 11690
+    },
+    {
+      "path": "research/0_binary_patch_comparison.md",
+      "sha256": "04e97a9ccbcf36570ffa63a55d7d5817d4a99e8244063bd0df18e09ad4784055",
+      "bytes": 179543
+    }
+  ],
+  "logs": [
+    {
+      "name": "final-diff-after-focus",
+      "raw": {
+        "path": "final-diff-after-focus.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "gzip": {
+        "path": "final-diff-after-focus.log.gz",
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "bytes": 20
+      },
+      "command": "final-diff-after-focus.command.json",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "seconds": 0.1512770652770996,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "final-diff",
+      "raw": {
+        "path": "final-diff.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "gzip": {
+        "path": "final-diff.log.gz",
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "bytes": 20
+      },
+      "command": "final-diff.command.json",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "seconds": 0.15863609313964844,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "final-publication-focus",
+      "raw": {
+        "path": "final-publication-focus.log",
+        "sha256": "22dd12162d1e6359306e9e92f3d36c2800a48350642834c315881740bce97d22",
+        "bytes": 19748
+      },
+      "gzip": {
+        "path": "final-publication-focus.log.gz",
+        "sha256": "fd72ae817fadc2417d5b61d5e94a04483269cd2648224fba1fddddd60cbcc8d0",
+        "bytes": 3641
+      },
+      "command": "final-publication-focus.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests|FirmwareFilesystemPublicationTests|FirmwareTransactionTests|FirmwarePlanBindingTests"
+      ],
+      "seconds": 34.197041034698486,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "final-python",
+      "raw": {
+        "path": "final-python.log",
+        "sha256": "49be5af8773fa53874aafd3ad4f05aa3d9ba3436106d85f1cc4dc2883cf2d5f2",
+        "bytes": 6599
+      },
+      "gzip": {
+        "path": "final-python.log.gz",
+        "sha256": "ce07ef3dc36037b5aecaa351d04595950f059b81ab8c1799efbc69ff981e9e7f",
+        "bytes": 1268
+      },
+      "command": "final-python.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_firmware_worker",
+        "tests.test_component_effects"
+      ],
+      "seconds": 10.81140923500061,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "final-swift",
+      "raw": {
+        "path": "final-swift.log",
+        "sha256": "983cfb7d5927ca2a130efa19192ddf2914a324573e76bdf4afde36b341a02ed4",
+        "bytes": 42220
+      },
+      "gzip": {
+        "path": "final-swift.log.gz",
+        "sha256": "7cb9b5abd0a5ef7090fb850d0919f0d55d723983bf436ece88deab91c11d0272",
+        "bytes": 6033
+      },
+      "command": "final-swift.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests|FirmwareFilesystemPublicationTests|FirmwareComponentReceiptTests|FirmwareTransactionTests|FirmwarePlanBindingTests|RequiredDeclarationEvidenceTests|FrozenDeclarationGateTests|FrozenPipelinePlanTests|FirmwareGenerationTests|FirmwareDesiredPlanStoreTests|CFWFrozenPlanTests|ArtifactStructuredTests|MachineBindingTests|FirmwareCatalogReportTests|VariantPlanSerializationTests"
+      ],
+      "seconds": 35.62455701828003,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "less-publication-green",
+      "raw": {
+        "path": "less-publication-green.log",
+        "sha256": "e0ec6a4115169a0e69c14f769860581be49888b5edfa472792bbfe287bb5e8f9",
+        "bytes": 6996
+      },
+      "gzip": {
+        "path": "less-publication-green.log.gz",
+        "sha256": "448735fff3a4f2f9652a682efe1353af7a407310455231e612e0e5adfc2d91fa",
+        "bytes": 1844
+      },
+      "command": "less-publication-green.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareFilesystemPublicationTests|FirmwareReceiptPublicationTests.oldCommittedGenerationJournalRemainsRecoveryOnlyReadable"
+      ],
+      "seconds": 24.974771976470947,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "less-publication-red-fixed",
+      "raw": {
+        "path": "less-publication-red-fixed.log",
+        "sha256": "38a09bb92ccb4982caced2510bb6ee784b1267191f09c80548831597e5cd6fb2",
+        "bytes": 3290
+      },
+      "gzip": {
+        "path": "less-publication-red-fixed.log.gz",
+        "sha256": "4f55eff6ed52f6f215c301e88d287e50038af191b90bb1ab2b1004118842c536",
+        "bytes": 875
+      },
+      "command": "less-publication-red-fixed.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareFilesystemPublicationTests|FirmwareReceiptPublicationTests.oldCommittedGenerationJournalRemainsRecoveryOnlyReadable"
+      ],
+      "seconds": 11.139014959335327,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "less-publication-red",
+      "raw": {
+        "path": "less-publication-red.log",
+        "sha256": "620e794d5927f5a3719ade1c2d5048b4032bf0dd109ce27a4f46c088c1f9b15d",
+        "bytes": 9218
+      },
+      "gzip": {
+        "path": "less-publication-red.log.gz",
+        "sha256": "cc148deba7a6c114dcf9a5c68475e7ea72dfd69a09e7525b4eb38b1967e69ac8",
+        "bytes": 2423
+      },
+      "command": "less-publication-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareFilesystemPublicationTests"
+      ],
+      "seconds": 16.07978916168213,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "metadata-refusal-red",
+      "raw": {
+        "path": "metadata-refusal-red.log",
+        "sha256": "8c74d0a8fe9cea35d73a03fba9a7a9b3d7065914cd5a5aec1124ad5a82af015a",
+        "bytes": 1578
+      },
+      "gzip": {
+        "path": "metadata-refusal-red.log.gz",
+        "sha256": "b9ea0a43eac4b4b46c1f6e7dad311f3601c3756c10d1259ed4c23228a0cfa14a",
+        "bytes": 653
+      },
+      "command": "metadata-refusal-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.receiptMetadataRefusalKeepsRecoverableJournal"
+      ],
+      "seconds": 7.792471885681152,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "missing-red-escalated",
+      "raw": {
+        "path": "missing-red-escalated.log",
+        "sha256": "ff762992ad6b1e0213d470f4ca972f17fad411a6970898cd7cd7ac9b62f2767c",
+        "bytes": 4692
+      },
+      "gzip": {
+        "path": "missing-red-escalated.log.gz",
+        "sha256": "ab025ed1df79cb7fffd47d7f082435309eb73e097273eca4c22d81c46a0db731",
+        "bytes": 1757
+      },
+      "command": "missing-red-escalated.command.json",
+      "argv": null,
+      "knownInvocation": "swift test --scratch-path /private/tmp/vphone-five-tasks-swift-20261012 --force-resolved-versions --filter FirmwareReceiptPublicationTests (exact original filter spelling not retained)",
+      "provenance": "initial logs predate command harness; exit and test selection recorded from original execution; exact argv unavailable",
+      "exitCode": 1
+    },
+    {
+      "name": "missing-red",
+      "raw": {
+        "path": "missing-red.log",
+        "sha256": "2d7ecb6ab5712c80ebf715465b9c7212ba3898efc9e5b094d8934be2123fa366",
+        "bytes": 4122
+      },
+      "gzip": {
+        "path": "missing-red.log.gz",
+        "sha256": "4cd643c5c8dab4e66787d9d51fdb31c27094da474dc835fc085a108b7b29701b",
+        "bytes": 748
+      },
+      "command": "missing-red.command.json",
+      "argv": null,
+      "knownInvocation": "swift test --scratch-path /private/tmp/vphone-five-tasks-swift-20261012 --force-resolved-versions --filter FirmwareReceiptPublicationTests (exact original filter spelling not retained)",
+      "provenance": "initial logs predate command harness; exit and test selection recorded from original execution; exact argv unavailable",
+      "exitCode": 1
+    },
+    {
+      "name": "origin-hook-green",
+      "raw": {
+        "path": "origin-hook-green.log",
+        "sha256": "98ed4ccabf89a02f06c75677be4c6db842a2e8686fd43f99b81c05319499d9f6",
+        "bytes": 7150
+      },
+      "gzip": {
+        "path": "origin-hook-green.log.gz",
+        "sha256": "90f081955ba6ddfd92712948344b23a050e45d7d20cccb2e211bbe8f0056c750",
+        "bytes": 1825
+      },
+      "command": "origin-hook-green.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.installedOriginHookRequiresLiveTargetProof"
+      ],
+      "seconds": 15.31894564628601,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "origin-hook-red-fixed",
+      "raw": {
+        "path": "origin-hook-red-fixed.log",
+        "sha256": "c454dd71246ae4e2b100c627f4c76e3903a7472c10f6362ecfdda60789481363",
+        "bytes": 4436
+      },
+      "gzip": {
+        "path": "origin-hook-red-fixed.log.gz",
+        "sha256": "c3e8870cd464993bbb89a01298c6325d368ed348884af134cd8dfabe33f472de",
+        "bytes": 1389
+      },
+      "command": "origin-hook-red-fixed.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.installedOriginHookRequiresLiveTargetProof"
+      ],
+      "seconds": 9.027674198150635,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "origin-hook-red",
+      "raw": {
+        "path": "origin-hook-red.log",
+        "sha256": "685e64d31466ffb25cdac94269023269d039aa2757361a8d8b58798d4e5279cd",
+        "bytes": 9618
+      },
+      "gzip": {
+        "path": "origin-hook-red.log.gz",
+        "sha256": "e15b0333fa6f4e7219c68830936239f58d3f6f6fc92e8cb6994541b7a8b50680",
+        "bytes": 1836
+      },
+      "command": "origin-hook-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.installedOriginHookRequiresLiveTargetProof"
+      ],
+      "seconds": 7.642141819000244,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "origin-rename-window-red",
+      "raw": {
+        "path": "origin-rename-window-red.log",
+        "sha256": "e198f44ab476423ce5315feeef2883bcc44cf418696297d0867bdf60604c9c36",
+        "bytes": 3084
+      },
+      "gzip": {
+        "path": "origin-rename-window-red.log.gz",
+        "sha256": "a17f78ff2f5b4fe9ff202e9bb1e9d83b25fe7db4d80349c310e806541a6a31a4",
+        "bytes": 784
+      },
+      "command": "origin-rename-window-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.installedOriginHookRequiresLiveTargetProof"
+      ],
+      "seconds": 11.127532005310059,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "publication-green1",
+      "raw": {
+        "path": "publication-green1.log",
+        "sha256": "265f278e0eadb7840a3d0f1a575835e8cefcabb57092308e88a359596da0eb97",
+        "bytes": 8594
+      },
+      "gzip": {
+        "path": "publication-green1.log.gz",
+        "sha256": "c3cef23aa8048d18da8e2b63d5cf6ba92fd5edb190b9890bcfa60dc41f633e7c",
+        "bytes": 2067
+      },
+      "command": "publication-green1.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests"
+      ],
+      "seconds": 20.94715976715088,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "publication-lock-green",
+      "raw": {
+        "path": "publication-lock-green.log",
+        "sha256": "c8de306f772d5cf55e94555dd72c19437ba48e7bbbeec1cc392747ab81151337",
+        "bytes": 1451
+      },
+      "gzip": {
+        "path": "publication-lock-green.log.gz",
+        "sha256": "e947b0894ed44f04cf3f7fd02a2f45c238528dd5db99dcbd91f4f9a75746566f",
+        "bytes": 616
+      },
+      "command": "publication-lock-green.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.publicationReadbackToolRunsUnderTheExistingTransactionLock"
+      ],
+      "seconds": 9.565215826034546,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "publication-red-fixed",
+      "raw": {
+        "path": "publication-red-fixed.log",
+        "sha256": "dc2400198adaed80724e52274979a725fc37b5a185d847650005bdaab61cbd1f",
+        "bytes": 3517
+      },
+      "gzip": {
+        "path": "publication-red-fixed.log.gz",
+        "sha256": "8a1e64c71f39448444ea7b2cbbd0264c569f902b3394c1189dc4e3531a97ce35",
+        "bytes": 1068
+      },
+      "command": "publication-red-fixed.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests"
+      ],
+      "seconds": 8.648905277252197,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "publication-red",
+      "raw": {
+        "path": "publication-red.log",
+        "sha256": "dc6472cd434c8bf76f70df66b1973dd20c6df38c7370a0ad36b3815748ff7d8f",
+        "bytes": 7811
+      },
+      "gzip": {
+        "path": "publication-red.log.gz",
+        "sha256": "e753e88247a4bbff193ebe10a920417df6b17a17bf01e61c5c725522c8aed325",
+        "bytes": 1815
+      },
+      "command": "publication-red.command.json",
+      "argv": null,
+      "knownInvocation": "swift test --scratch-path /private/tmp/vphone-five-tasks-swift-20261012 --force-resolved-versions --filter FirmwareReceiptPublicationTests (exact original filter spelling not retained)",
+      "provenance": "initial logs predate command harness; exit and test selection recorded from original execution; exact argv unavailable",
+      "exitCode": 1
+    },
+    {
+      "name": "self-review-green",
+      "raw": {
+        "path": "self-review-green.log",
+        "sha256": "9f1da07a956c441d57720260877062b2128e8c0a1ebb195d4f543e5c8cf93f29",
+        "bytes": 11341
+      },
+      "gzip": {
+        "path": "self-review-green.log.gz",
+        "sha256": "b069287789d623dd5118b9b020e6ead79403d5a9c4e2814513762c274b742954",
+        "bytes": 2274
+      },
+      "command": "self-review-green.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests"
+      ],
+      "seconds": 21.383655071258545,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "self-review-red",
+      "raw": {
+        "path": "self-review-red.log",
+        "sha256": "9ee42f0ba15eb4ee2d7357f64ae9458033edc075569f0be66362d35cb066fac8",
+        "bytes": 9339
+      },
+      "gzip": {
+        "path": "self-review-red.log.gz",
+        "sha256": "80c7ec88998080e395529e1a4ef56eb9a4ffb3227087a3aa78432dcd11cd580a",
+        "bytes": 2202
+      },
+      "command": "self-review-red.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests.committedJournalFsyncFailureRetainsRecovery|FirmwareReceiptPublicationTests.receiptMustCoverTheExactSavedReportRecords|FirmwareReceiptPublicationTests.installedOriginHookRequiresLiveTargetProof"
+      ],
+      "seconds": 17.60453510284424,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "transaction-faults1",
+      "raw": {
+        "path": "transaction-faults1.log",
+        "sha256": "43b8ee28da62cc4c143f63e6a6daa590592d89caff9c87958455ce5e5579252b",
+        "bytes": 18769
+      },
+      "gzip": {
+        "path": "transaction-faults1.log.gz",
+        "sha256": "f4b825e3c14f7b61abfcd3aa0e90fc7c583df24e5aa9bc04307362831ae9ac3b",
+        "bytes": 3703
+      },
+      "command": "transaction-faults1.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests|FirmwareTransactionTests|FirmwarePlanBindingTests|RequiredDeclarationEvidenceTests"
+      ],
+      "seconds": 19.29494309425354,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "transaction-faults2",
+      "raw": {
+        "path": "transaction-faults2.log",
+        "sha256": "b51c91193300f3ee825b8225207c0019468963f2482524b71270c4b14d78323a",
+        "bytes": 4739
+      },
+      "gzip": {
+        "path": "transaction-faults2.log.gz",
+        "sha256": "a4b5d7e756039ceee073fdf913bc0c31713dd3dbc6b1e1f4ca7e7528d1fe2c3d",
+        "bytes": 1080
+      },
+      "command": "transaction-faults2.command.json",
+      "argv": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/private/tmp/vphone-five-tasks-swift-20261012",
+        "--force-resolved-versions",
+        "--filter",
+        "FirmwareReceiptPublicationTests"
+      ],
+      "seconds": 13.352742910385132,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "unlocked-worker-red",
+      "raw": {
+        "path": "unlocked-worker-red.log",
+        "sha256": "474821d32b3ff4b86bc76a0eda5915bfa9fff9bc3fce46500a24c6b9269de99b",
+        "bytes": 742
+      },
+      "gzip": {
+        "path": "unlocked-worker-red.log.gz",
+        "sha256": "882dad8fe17ac158610ee51fbd72a50689091cc58814cb9c890f694a765b7cfc",
+        "bytes": 302
+      },
+      "command": "unlocked-worker-red.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "tests.test_firmware_worker.FirmwareWorkerTests.test_unlocked_descriptor_cannot_claim_inherited_publication_lock"
+      ],
+      "seconds": 0.1898057460784912,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "worker-bootstrap-green",
+      "raw": {
+        "path": "worker-bootstrap-green.log",
+        "sha256": "6714fbbcd920f16eb88471147e43a3a97d28bdf6be49c262ad74443413aa87a8",
+        "bytes": 2994
+      },
+      "gzip": {
+        "path": "worker-bootstrap-green.log.gz",
+        "sha256": "3a2d8950e3e3a50180f3f37ad7757c5378e941b700f70b2005005faf067afc26",
+        "bytes": 536
+      },
+      "command": "worker-bootstrap-green.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_firmware_worker"
+      ],
+      "seconds": 20.686471939086914,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "worker-bootstrap-green2",
+      "raw": {
+        "path": "worker-bootstrap-green2.log",
+        "sha256": "e882a5b3d395fc8a9fc9546cfa60d90ff3e09621079232b8873cd36e188d66fa",
+        "bytes": 1068
+      },
+      "gzip": {
+        "path": "worker-bootstrap-green2.log.gz",
+        "sha256": "5cc9be65603e44186d9cb4a24bb914d8d714a6a8c4a448beebc33a0552eb2913",
+        "bytes": 289
+      },
+      "command": "worker-bootstrap-green2.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_firmware_worker"
+      ],
+      "seconds": 0.8469281196594238,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "worker-final-focus",
+      "raw": {
+        "path": "worker-final-focus.log",
+        "sha256": "f0ac6bce58bf254c7d654b5aa1e9b3621a6fbec4af0b77f5f4c3b9a4c1f4645a",
+        "bytes": 1426
+      },
+      "gzip": {
+        "path": "worker-final-focus.log.gz",
+        "sha256": "591604d2abccb6e65ef59f7223771afb7640f0cbf05c3bcbb77dbba3bccbf82d",
+        "bytes": 339
+      },
+      "command": "worker-final-focus.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_firmware_worker"
+      ],
+      "seconds": 1.1240720748901367,
+      "provenance": "captured by run.py",
+      "exitCode": 0
+    },
+    {
+      "name": "worker-green",
+      "raw": {
+        "path": "worker-green.log",
+        "sha256": "c604acbae0ec6ae929640e01c5b69163d45594665d0b659aaaa7efecdec49216",
+        "bytes": 1859
+      },
+      "gzip": {
+        "path": "worker-green.log.gz",
+        "sha256": "1ab5b79830f96c55a8b08570ff0f4322bd55c21bc61046025bc41d34362e5462",
+        "bytes": 491
+      },
+      "command": "worker-green.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_firmware_worker"
+      ],
+      "seconds": 0.7481589317321777,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    },
+    {
+      "name": "worker-red",
+      "raw": {
+        "path": "worker-red.log",
+        "sha256": "1e4e49a5afea83066ef6a2ed7a1f4c79cd23ac8f2c29fe33dd59344d3143a6e1",
+        "bytes": 887
+      },
+      "gzip": {
+        "path": "worker-red.log.gz",
+        "sha256": "f775419924048b9635bbbfef5efcf899640e536510cd2a8c48b3e49a444d3ea3",
+        "bytes": 332
+      },
+      "command": "worker-red.command.json",
+      "argv": [
+        ".venv/bin/python3",
+        "-m",
+        "unittest",
+        "tests.test_firmware_worker.FirmwareWorkerTests.test_publication_worker_inherits_the_live_lock_and_retains_it"
+      ],
+      "seconds": 0.13327670097351074,
+      "provenance": "captured by run.py",
+      "exitCode": 1
+    }
+  ],
+  "finalValidation": {
+    "broadSwift": {
+      "log": "final-swift",
+      "passed": 132,
+      "suites": 16,
+      "note": "Before final origin backup-to-rename qualifier fix and added unknown receipt test. DeviceTreeStructuredParityTests/ originalDeviceTreeParity disabled by absent real-firmware selectors."
+    },
+    "python": {
+      "log": "final-python",
+      "passed": 36
+    },
+    "afterFinalSourceChange": {
+      "log": "final-publication-focus",
+      "passed": 48,
+      "suites": 4
+    },
+    "diff": "final-diff-after-focus"
+  },
+  "limitations": [
+    "Safe synthetic bytes and fault injection only; no real firmware, mount, restore, boot or system acceptance.",
+    "First three raw logs predate command capture; exact historical filter argv not retained. Later commands are exact.",
+    "Early compile/scaffold/environment failures are preserved; they are not all behavioral RED evidence.",
+    "The installed origin adapter and live trusted Store integration belong to C; B supplies only an internal scoped seam."
+  ]
+}

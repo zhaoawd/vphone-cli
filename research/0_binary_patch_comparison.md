@@ -1332,3 +1332,14 @@ Cryptex OS/App 分别作为两个精确完整目录树目标：原始镜像绑�
 归档、复制、两段 bootstrap 移动及删除容器通过实际来源成员和操作标识组合。EXP 在源 Cryptex 挂载上的 DSC 修改记录镜像身份、前后摘要、原始成员清单和操作行摘要；只读重挂载核验成员后，复制到最终 System 根。JB/EXP 的两个 LaunchDaemon plist 注入复用已有算法并增加显式效果记录。正常安装在 installer/v2 结束后、cleanup 前，只读挂载同一 staged Disk.img 并验证最终目标；该阶段早于后续 `apfs_snap_rename.py` 和 Disk.img 发布。此证据不能作为发布后磁盘摘要、receipt、origin 或启动验收。
 
 最终受影响测试和失败日志、源码 SHA256、原始及 gzip 日志 SHA256 见本轮 `research/evidence/2026-10-13-task6a2/manifest.json`。本轮没有执行真实挂载、VM、sudo 系统安装或 AMFI/TCC 修改。Task6B/C 及真实系统验收仍由后续任务完成。
+
+
+## 2026-10-13：Task 6B 同一事务日志发布 component receipt
+
+FirmwarePipeline 将实际组件输出和完整 PatchRecord 集合交给最终效果验证。现有 FirmwareTransaction 日志同时管理输出目录、`.firmware-component-receipts.json` 和受限的 `launchpad.json` 元数据；发布后重新读取实际字节，核验通过后才写入 committed 日志。可选元数据保留原始字节或真实缺失状态，恢复过程拒绝覆盖未知字节。旧 nil 字段和旧日志恢复兼容；旧记录不因此获得新执行资格。未新增二进制补丁或改变既有算法。
+
+less 的发布读回通过实际 CLI、Python proof 验证和同一事务锁执行；writer 仍限 building 阶段。测试替换解密及只读挂载操作，验证最终目录效果丢失或 detach 失败时拒绝提交。锁描述符继承保留同一 open-file-description，并核对事务目录身份；父进程退出后，worker/tool 在结束前保留恢复排他锁。
+
+generated Restore/AVP 输出不更新已安装 VM origins。供 Task6C 使用的内部 hook 要求活跃的来源资格回调、精确目标及 proof 关联，并在元数据 rename 前和 committed 日志前复验；B 未提供生产 installed-component adapter。A2 的一般 CFW 最终验证仍位于 cleanup/snapshot 之前，不构成永久发布后授权。
+
+较早受影响 Swift 132 项、16 套通过，DeviceTree 真实固件 parity 选择器关闭；Python 36 项通过。最后的 origin 资格窗口修正后，直接受影响 Swift 48 项、4 套通过。原始日志、gzip、命令、退出码及最终源码摘要见 `research/evidence/2026-10-13-task6b/manifest.json`。本轮只使用安全合成字节、目录和故障注入；未执行真实镜像挂载、VM、sudo、AMFI/TCC 或系统安装。Task6B 待独立审查，Task6C 和 Task12 验收尚未完成。

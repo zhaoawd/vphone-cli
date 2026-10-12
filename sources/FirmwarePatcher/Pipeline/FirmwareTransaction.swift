@@ -12,6 +12,24 @@ final class FirmwareTransaction {
         let original: String
         var output: String?
     }
+    /// Exact optional metadata targets. nil original means observed ENOENT,
+    /// never an unreadable file. The old bytes remain in the same backup tree.
+    struct MetadataEntry: Codable, Equatable {
+        let name: String
+        let original: String?
+        let output: String
+    }
+    struct ComponentPublication: Codable, Equatable {
+        static let filename = ".firmware-component-receipts.json"
+        let schemaVersion: Int
+        let transactionID: String
+        let records: [FirmwareComponentReceipt.Record]
+        let filesystem: FirmwareFilesystemEvidence?
+        let filesystemProofSHA256: String?
+        var installed: FirmwareComponentReceipt.Record? = nil
+        var originLayer: VPhoneMachineBinding.Layer? = nil
+        var originProofSHA256: String? = nil
+    }
     struct Journal: Codable, Equatable {
         var version = 1
         let id: String
@@ -23,6 +41,8 @@ final class FirmwareTransaction {
         let planBinding: FirmwarePlanBinding?
         /// Exact saved run report bytes; absent in historical/manual transactions.
         var reportSHA256: String? = nil
+        var componentReceiptsSHA256: String? = nil
+        var metadata: [MetadataEntry]? = nil
         var phase: Phase = .building
         var entries: [Entry]
         var failure: String?
@@ -48,7 +68,114 @@ final class FirmwareTransaction {
     enum Event: Equatable {
         case beforeCopy(String), beforeReady, beforeBackup(String), afterBackup(String)
         case afterPublish(String), afterRestore(String), beforeArchive
+        case beforeMetadataWrite(String), beforeMetadataSync(String), beforeCommitted, beforeJournalSync(Phase)
     }
+    /// C constructs this only inside its live trusted-source callback. It is
+    /// deliberately non-Codable; its verifier must requalify actual installed
+    /// bytes and source association on every call, including after publication.
+    struct InstalledOrigin {
+        enum Point { case candidate, published }
+        let transactionID: String
+        let layer: VPhoneMachineBinding.Layer
+        let expected: VPhoneMachineBinding.Snapshot
+        let binding: VPhoneMachineBinding
+        let receipt: FirmwareComponentReceipt.Record
+        let proof: Data
+        let recheck: (Point) throws -> Void
+    }
+
+    /// Internal C seam. The caller must keep the trusted-store qualification
+    /// scope live for this entire synchronous call. No public version setter or
+    /// decoded receipt enters this path; C supplies the actual installed adapter.
+    func commit(origin: InstalledOrigin) throws -> URL {
+        try verifyOrigin(origin, point: .candidate, bindingPublished: false, prepared: false)
+        guard journal.phase == .building, var publication = try readPublication(), publication.installed == nil else {
+            throw Self.error("Installed origin requires this transaction's prepared receipts")
+        }
+        publication.installed = origin.receipt
+        publication.originLayer = origin.layer
+        publication.originProofSHA256 = Self.sha256(origin.proof)
+        try Self.writeDurably(origin.proof, to: root.appendingPathComponent("installed-component-proof.json"))
+        let bytes = try Self.encoder.encode(publication)
+        try Self.writeDurably(bytes, to: root.appendingPathComponent("component-receipts.json"))
+        journal.componentReceiptsSHA256 = Self.sha256(bytes)
+        guard let index = journal.metadata?.firstIndex(where: { $0.name == ComponentPublication.filename }),
+              let original = journal.metadata?[index] else { throw Self.error("Missing receipt metadata entry") }
+        journal.metadata?[index] = MetadataEntry(name: original.name, original: original.original, output: Self.sha256(bytes))
+        try saveJournal()
+        try Self.writeDurably(bytes, to: stage.appendingPathComponent(ComponentPublication.filename))
+        try prepareMetadata(name: "launchpad.json", bytes: Self.encoder.encode(origin.binding))
+        return try commit(qualifiedOrigin: origin)
+    }
+
+    private func verifyOrigin(_ origin: InstalledOrigin, point: InstalledOrigin.Point,
+                              bindingPublished: Bool, bindingBackedUp: Bool = false, prepared: Bool = true) throws {
+        let receipt = origin.receipt
+        guard origin.transactionID == journal.id, origin.layer != .host,
+              receipt.schemaVersion == 1, receipt.scope == .installedComponent, receipt.state == .committed,
+              receipt.generationID == journal.options["generationID"],
+              receipt.planSHA256 == journal.planBinding?.planSHA256,
+              receipt.desiredSHA256 == journal.options["desiredSHA256"],
+              !receipt.outputs.isEmpty, !receipt.effects.isEmpty, !origin.proof.isEmpty else {
+            throw Self.error("Missing live installed-component origin qualification")
+        }
+        // Generated Restore/AVP outputs cannot become installed evidence by
+        // changing a Codable scope value. C must identify a separate real target.
+        for output in receipt.outputs {
+            let file = vmDirectory.appendingPathComponent(output.path)
+            guard try FirmwareComponentReceipt.relative(file, in: vmDirectory) == output.path,
+                  !journal.entries.contains(where: { $0.name == output.path.split(separator: "/").first.map(String.init) }),
+                  try FirmwareGeneration.fileSHA256(file) == output.sha256 else { throw Self.error("Installed origin target differs") }
+        }
+        let paths = Set(receipt.outputs.map(\.path))
+        guard receipt.effects.allSatisfy({ paths.contains($0.outputPath) }),
+              Set(receipt.outputs.map(\.path)).count == receipt.outputs.count else { throw Self.error("Installed proof target association differs") }
+        let version: String?
+        let components: Set<String>
+        switch origin.layer {
+        case .kernel: version = origin.binding.kernel; components = ["kernelcache"]
+        case .guestEnvironment: version = origin.binding.guestEnvironment; components = ["guestenvironment"]
+        case .bootChain: version = origin.binding.bootChain; components = ["bootchain", "ibss", "ibec", "llb", "txm", "avpbooter", "devicetree"]
+        case .host: version = nil; components = []
+        }
+        guard components.contains(receipt.component.lowercased()) else { throw Self.error("Installed receipt layer differs") }
+        guard let version, try origin.expected.binding.replacingOrigin(origin.layer, with: version) == origin.binding else {
+            throw Self.error("Origin publication would change unrelated layers")
+        }
+        if prepared {
+            guard let publication = try readPublication(), publication.installed == receipt,
+                  publication.originLayer == origin.layer,
+                  publication.originProofSHA256 == Self.sha256(origin.proof),
+                  try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == publication.originProofSHA256 else {
+                throw Self.error("Installed proof differs from this journal")
+            }
+        }
+        try origin.recheck(point)
+        if prepared {
+            guard try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == Self.sha256(origin.proof) else {
+                throw Self.error("Installed proof changed during qualification")
+            }
+        }
+        try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
+        try validateReport(forCommit: true)
+        if bindingBackedUp {
+            guard try Self.metadataDigest(vmDirectory.appendingPathComponent("launchpad.json")) == nil,
+                  try Self.metadataDigest(backup.appendingPathComponent("launchpad.json")) == origin.expected.sha256 else {
+                throw Self.error("VM origin backup changed during publication")
+            }
+        } else {
+            let binding = try VPhoneMachineBinding.snapshot(vmDirectory)
+            guard bindingPublished ? binding?.binding == origin.binding : binding == origin.expected else {
+                throw Self.error("VM origin binding changed during publication")
+            }
+        }
+        for output in receipt.outputs {
+            guard try FirmwareGeneration.fileSHA256(vmDirectory.appendingPathComponent(output.path)) == output.sha256 else {
+                throw Self.error("Installed target changed during qualification")
+            }
+        }
+    }
+
     struct TransactionError: Error, LocalizedError {
         let message: String
         var errorDescription: String? { message }
@@ -65,17 +192,23 @@ final class FirmwareTransaction {
     private(set) var archiveURL: URL?
     private let inject: (Event) throws -> Void
     private let mounts: (URL, Bool) throws -> Void
+    private let filesystemReadback: (FirmwareFilesystemEvidence, URL, FirmwareTransaction, [String: String]) throws -> Void
     private let fm = FileManager.default
+    private var workerLockFD: Int32?
 
     init(vmDirectory: URL, inputs: [URL], options: [String: String],
          plan: VariantPlanResolver.VariantPlan? = nil,
          versionInputs: FirmwareVersionInputs? = nil,
          inject: @escaping (Event) throws -> Void = { _ in },
-         mounts: @escaping (URL, Bool) throws -> Void = FirmwareTransaction.checkMounts) throws {
+         mounts: @escaping (URL, Bool) throws -> Void = FirmwareTransaction.checkMounts,
+         filesystemReadback: @escaping (FirmwareFilesystemEvidence, URL, FirmwareTransaction, [String: String]) throws -> Void = {
+             try $0.verify(image: $1, transaction: $2, environment: $3)
+         }) throws {
         self.vmDirectory = vmDirectory.standardizedFileURL.resolvingSymlinksInPath()
         root = self.vmDirectory.appendingPathComponent(".firmware-transaction")
         self.inject = inject
         self.mounts = mounts
+        self.filesystemReadback = filesystemReadback
         guard !Self.exists(root) else { throw Self.error("Pending firmware transaction; run patch-firmware --recover first") }
         var entries: [Entry] = []
         for input in inputs {
@@ -122,6 +255,7 @@ final class FirmwareTransaction {
         root = self.vmDirectory.appendingPathComponent(".firmware-transaction")
         self.inject = inject
         self.mounts = mounts
+        self.filesystemReadback = { try $0.verify(image: $1, transaction: $2, environment: $3) }
         try Self.requireDirectory(root)
         let url = root.appendingPathComponent("journal.json")
         try Self.requireRegularFile(url)
@@ -133,6 +267,7 @@ final class FirmwareTransaction {
             throw Self.error("Invalid firmware transaction journal")
         }
         for entry in journal.entries { try Self.validateName(entry.name) }
+        try validateMetadataNames()
         for directory in [stage, backup, work] where Self.exists(directory) { try Self.requireDirectory(directory) }
     }
 
@@ -209,12 +344,171 @@ final class FirmwareTransaction {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
+    /// Collects actual records only after all writers have finished. Neither a
+    /// decoded report nor an enabled declaration substitutes for final readback.
+    func prepareComponentReceipts(report: PatchRunReport, outputs: [String: URL]) throws {
+        guard journal.phase == .building, journal.componentReceiptsSHA256 == nil,
+              let plan = journal.plan, let id = journal.options["generationID"],
+              let reportSHA = journal.reportSHA256,
+              try Self.sha256(Self.encoder.encode(report)) == reportSHA else {
+            throw Self.error("Component publication requires the saved bound report")
+        }
+        try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
+        try PatchDeclarationGate.enforce(report: report, plan: plan)
+        let generation = try FirmwareGeneration.loadVerified(in: vmDirectory, id: id)
+        let groups = Dictionary(grouping: report.allRecords, by: { $0.component.lowercased() })
+        guard !groups.isEmpty else { throw Self.error("Missing component records") }
+        var records: [FirmwareComponentReceipt.Record] = []
+        for component in groups.keys.sorted() {
+            guard let output = outputs[component] else { throw Self.error("Missing output for \(component)") }
+            let path = try FirmwareComponentReceipt.relative(output, in: stage)
+            guard journal.entries.contains(where: { $0.name == path.split(separator: "/").first.map(String.init) }) else {
+                throw Self.error("Component output is outside published roots")
+            }
+            var record = try FirmwareComponentReceipt.capture(component: component, plan: plan,
+                generation: generation, records: groups[component]!, outputs: [output], root: stage, machine: vmDirectory)
+            // This is the prepared publication state; only the enclosing
+            // committed journal authorizes consumers to regard it as committed.
+            record.state = .committed
+            records.append(record)
+        }
+        let filesystem: FirmwareFilesystemEvidence?
+        let filesystemSHA: String?
+        if groups["filesystem"] != nil {
+            let proof = root.appendingPathComponent(FirmwareFilesystemEvidence.filename)
+            filesystemSHA = try FirmwareGeneration.fileSHA256(proof)
+            let proofBytes = try Self.readBytes(proof)
+            guard Self.sha256(proofBytes) == filesystemSHA else { throw Self.error("Filesystem proof changed during capture") }
+            filesystem = try JSONDecoder().decode(FirmwareFilesystemEvidence.self, from: proofBytes)
+        } else { filesystem = nil; filesystemSHA = nil }
+        let publication = ComponentPublication(schemaVersion: 1, transactionID: journal.id, records: records,
+            filesystem: filesystem, filesystemProofSHA256: filesystemSHA)
+        try verifyPublication(publication, in: stage)
+        let bytes = try Self.encoder.encode(publication)
+        try Self.writeDurably(bytes, to: root.appendingPathComponent("component-receipts.json"))
+        try prepareMetadata(name: ComponentPublication.filename, bytes: bytes)
+    }
+
+    private func prepareMetadata(name: String, bytes: Data) throws {
+        guard journal.phase == .building,
+              !(journal.metadata ?? []).contains(where: { $0.name == name }),
+              [ComponentPublication.filename, "launchpad.json"].contains(name) else {
+            throw Self.error("Invalid or repeated publication metadata")
+        }
+        let destination = vmDirectory.appendingPathComponent(name)
+        let original = try Self.metadataDigest(destination)
+        journal.metadata = (journal.metadata ?? []) + [MetadataEntry(name: name, original: original,
+            output: Self.sha256(bytes))]
+        if name == ComponentPublication.filename { journal.componentReceiptsSHA256 = Self.sha256(bytes) }
+        try saveJournal()
+        try inject(.beforeMetadataWrite(name))
+        try Self.writeDurably(bytes, to: stage.appendingPathComponent(name), beforeSync: {
+            try self.inject(.beforeMetadataSync(name))
+        })
+    }
+
+    private func validateMetadataNames() throws {
+        let entries = journal.metadata ?? []
+        guard Set(entries.map(\.name)).count == entries.count,
+              entries.allSatisfy({ [ComponentPublication.filename, "launchpad.json"].contains($0.name) }),
+              (journal.componentReceiptsSHA256 != nil) == entries.contains(where: { $0.name == ComponentPublication.filename }) else {
+            throw Self.error("Invalid publication metadata journal")
+        }
+    }
+
+    private func readPublication(required: Bool = true) throws -> ComponentPublication? {
+        guard let expected = journal.componentReceiptsSHA256 else {
+            guard !required || journal.options["generationID"] == nil else { throw Self.error("Missing required component receipts") }
+            return nil
+        }
+        let file = root.appendingPathComponent("component-receipts.json")
+        let bytes = try Self.readBytes(file)
+        guard Self.sha256(bytes) == expected else { throw Self.error("Component receipts differ from journal") }
+        let publication = try JSONDecoder().decode(ComponentPublication.self, from: bytes)
+        guard publication.schemaVersion == 1, publication.transactionID == journal.id,
+              !publication.records.isEmpty,
+              Set(publication.records.map { $0.component.lowercased() }).count == publication.records.count,
+              journal.metadata?.first(where: { $0.name == ComponentPublication.filename })?.output == expected else {
+            throw Self.error("Invalid component receipt publication")
+        }
+        guard let reportSHA = journal.reportSHA256 else { throw Self.error("Component receipts have no saved report") }
+        let reportBytes = try Self.readBytes(root.appendingPathComponent("report.json"))
+        guard Self.sha256(reportBytes) == reportSHA else { throw Self.error("Receipt report differs from journal") }
+        let report = try JSONDecoder().decode(PatchRunReport.self, from: reportBytes)
+        let groups = Dictionary(grouping: report.allRecords, by: { $0.component.lowercased() })
+        guard groups == Dictionary(uniqueKeysWithValues: publication.records.map { ($0.component.lowercased(), $0.effects.map(\.record)) }),
+              (publication.filesystem != nil) == publication.records.contains(where: { $0.component.lowercased() == "filesystem" }),
+              (publication.filesystem != nil) == (publication.filesystemProofSHA256 != nil),
+              (publication.installed != nil) == (publication.originLayer != nil),
+              (publication.installed != nil) == (publication.originProofSHA256 != nil) else {
+            throw Self.error("Component receipts do not cover the exact saved records")
+        }
+        return publication
+    }
+
+    private static func readBytes(_ file: URL) throws -> Data {
+        var bytes = Data()
+        try FirmwareGeneration.readFile(file) { chunk in
+            guard bytes.count + chunk.count <= 64 << 20 else { throw Self.error("Publication evidence exceeds 64 MiB") }
+            bytes.append(chunk)
+        }
+        return bytes
+    }
+
+    private func verifyPublication(_ publication: ComponentPublication, in directory: URL, rootName: String? = nil) throws {
+        for record in publication.records where rootName == nil || record.outputs.contains(where: { $0.path.split(separator: "/").first.map(String.init) == rootName }) {
+            try FirmwareComponentReceipt.verify(record, root: directory, machine: vmDirectory)
+        }
+        if let evidence = publication.filesystem,
+           rootName == nil || evidence.imagePath.split(separator: "/").first.map(String.init) == rootName {
+            guard try FirmwareGeneration.fileSHA256(root.appendingPathComponent(FirmwareFilesystemEvidence.filename)) == publication.filesystemProofSHA256,
+                  case .ready(let desired) = try FirmwareDesiredPlanStore.read(in: vmDirectory) else {
+                throw Self.error("Filesystem proof differs from journal")
+            }
+            let environment = try FirmwareGuestWriteContext.environment(record: desired, directory: vmDirectory, transaction: root)
+            try filesystemReadback(evidence, directory.appendingPathComponent(evidence.imagePath), self, environment)
+        }
+    }
+
+    /// Reads exactly a regular metadata file, preserving missing vs unreadable.
+    private static func metadataDigest(_ url: URL, sync: Bool = false) throws -> String? {
+        var value = stat()
+        if lstat(url.path, &value) != 0 {
+            guard errno == ENOENT else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+            return nil
+        }
+        let digest = try FirmwareGeneration.fileSHA256(url)
+        if sync {
+            let fd = open(url.path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC)
+            guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+            defer { close(fd) }
+            guard fsync(fd) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        }
+        return digest
+    }
+
     @discardableResult
-    func commit() throws -> URL {
+    func commit() throws -> URL { try commit(qualifiedOrigin: nil) }
+
+    private func commit(qualifiedOrigin: InstalledOrigin?) throws -> URL {
         try withWorkerLock {
             try mounts(root, false)
             try inject(.beforeReady)
             try validateReport(forCommit: true)
+            try validateMetadataNames()
+            let publication = try readPublication()
+            guard (publication?.installed != nil) == (qualifiedOrigin != nil),
+                  !(journal.metadata ?? []).contains(where: { $0.name == "launchpad.json" }) || qualifiedOrigin != nil else {
+                throw Self.error("Origin publication requires its live qualifier")
+            }
+            if let qualifiedOrigin { try verifyOrigin(qualifiedOrigin, point: .candidate, bindingPublished: false) }
+            if let publication { try verifyPublication(publication, in: stage) }
+            for entry in journal.metadata ?? [] {
+                guard try Self.metadataDigest(vmDirectory.appendingPathComponent(entry.name)) == entry.original,
+                      try Self.metadataDigest(stage.appendingPathComponent(entry.name), sync: true) == entry.output else {
+                    throw Self.error("Publication metadata changed before commit")
+                }
+            }
             try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
             for index in journal.entries.indices {
                 let entry = journal.entries[index]
@@ -245,6 +539,8 @@ final class FirmwareTransaction {
                 }
                 try Self.move(staged, to: destination)
                 try inject(.afterPublish(entry.name))
+                guard try Self.digest(destination, sync: true) == entry.output else { throw Self.error("Published root differs") }
+                if let publication { try verifyPublication(publication, in: vmDirectory, rootName: entry.name) }
             }
             // Include unchanged entries: a no-op is evidence only after readback.
             for entry in journal.entries {
@@ -255,8 +551,46 @@ final class FirmwareTransaction {
             try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
             try mounts(root, false)
             try validateReport(forCommit: true)
+            if let publication { try verifyPublication(publication, in: vmDirectory) }
+            for entry in journal.metadata ?? [] {
+                try inject(.beforeBackup(entry.name))
+                if let qualifiedOrigin { try verifyOrigin(qualifiedOrigin, point: .published, bindingPublished: false) }
+                try validateReport(forCommit: true)
+                try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
+                let destination = vmDirectory.appendingPathComponent(entry.name)
+                let staged = stage.appendingPathComponent(entry.name)
+                guard try Self.metadataDigest(destination) == entry.original,
+                      try Self.metadataDigest(staged) == entry.output else { throw Self.error("Metadata changed during publication") }
+                if entry.original != nil { try Self.move(destination, to: backup.appendingPathComponent(entry.name)) }
+                try inject(.afterBackup(entry.name))
+                guard try Self.metadataDigest(destination) == nil,
+                      try Self.metadataDigest(staged) == entry.output else { throw Self.error("Metadata changed after backup") }
+                if let qualifiedOrigin {
+                    try verifyOrigin(qualifiedOrigin, point: .published, bindingPublished: false,
+                                     bindingBackedUp: entry.name == "launchpad.json")
+                }
+                try Self.move(staged, to: destination)
+                try inject(.afterPublish(entry.name))
+                guard try Self.metadataDigest(destination, sync: true) == entry.output else { throw Self.error("Published metadata differs") }
+            }
+            try inject(.beforeCommitted)
+            if let qualifiedOrigin { try verifyOrigin(qualifiedOrigin, point: .published, bindingPublished: true) }
+            try validateReport(forCommit: true)
+            try journal.planBinding?.validate(journal: journal, directory: vmDirectory, currentCatalog: true)
+            if let publication = try readPublication() { try verifyPublication(publication, in: vmDirectory) }
+            for entry in journal.metadata ?? [] {
+                guard try Self.metadataDigest(vmDirectory.appendingPathComponent(entry.name), sync: true) == entry.output else {
+                    throw Self.error("Final metadata differs")
+                }
+            }
             journal.phase = .committed
-            try saveJournal()
+            do { try saveJournal() }
+            catch {
+                // The caller observes uncertainty, never a successful commit.
+                // Recovery inspects the durable journal and actual files.
+                journal.phase = .publishing
+                throw error
+            }
             return try archive()
         }
     }
@@ -285,7 +619,7 @@ final class FirmwareTransaction {
         let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inject: inject, mounts: mounts)
         return try transaction.withWorkerLock {
             try mounts(transaction.root, true)
-            try transaction.validateReport(forCommit: false)
+            if transaction.journal.phase == .committed { try transaction.validateReport(forCommit: false) }
             try transaction.restoreOrVerify()
             return try transaction.archive()
         }
@@ -315,9 +649,56 @@ final class FirmwareTransaction {
                 }
             }
         }
-        guard journal.phase != .committed else { return }
+        for entry in journal.metadata ?? [] {
+            let actual = try Self.metadataDigest(vmDirectory.appendingPathComponent(entry.name))
+            let saved = try Self.metadataDigest(backup.appendingPathComponent(entry.name))
+            if journal.phase == .committed {
+                guard actual == entry.output else { throw Self.error("Committed metadata differs: \(entry.name)") }
+            } else if let saved {
+                guard saved == entry.original, journal.phase == .publishing || journal.phase == .rollingBack,
+                      actual == nil || actual == entry.output else { throw Self.error("Unknown metadata during recovery") }
+            } else if entry.original == nil {
+                guard actual == nil || ((journal.phase == .publishing || journal.phase == .rollingBack) && actual == entry.output) else {
+                    throw Self.error("Unknown newly published metadata")
+                }
+            } else {
+                guard actual == entry.original else { throw Self.error("Original metadata unavailable") }
+            }
+        }
+        if journal.phase == .committed {
+            if let publication = try readPublication(required: false) {
+                if let proof = publication.originProofSHA256 {
+                    guard try FirmwareGeneration.fileSHA256(root.appendingPathComponent("installed-component-proof.json")) == proof else {
+                        throw Self.error("Committed installed proof differs")
+                    }
+                }
+                for record in publication.records + (publication.installed.map { [$0] } ?? []) {
+                    for output in record.outputs {
+                        let file = vmDirectory.appendingPathComponent(output.path)
+                        _ = try FirmwareComponentReceipt.relative(file, in: vmDirectory)
+                        guard try FirmwareGeneration.fileSHA256(file) == output.sha256 else { throw Self.error("Committed receipt output differs") }
+                    }
+                }
+            }
+            return
+        }
         journal.phase = .rollingBack
         try saveJournal()
+        // Restore metadata first; the same journal remains noncommitted until all
+        // original roots and metadata have been restored and archived.
+        for entry in (journal.metadata ?? []).reversed() {
+            let destination = vmDirectory.appendingPathComponent(entry.name)
+            let saved = backup.appendingPathComponent(entry.name)
+            if try Self.metadataDigest(saved) != nil || entry.original == nil {
+                if Self.exists(destination) {
+                    let staged = stage.appendingPathComponent(entry.name)
+                    guard !Self.exists(staged) else { throw Self.error("Ambiguous metadata rollback staging") }
+                    try Self.move(destination, to: staged)
+                }
+                if Self.exists(saved) { try Self.move(saved, to: destination) }
+                try inject(.afterRestore(entry.name))
+            }
+        }
         for entry in journal.entries {
             let saved = backup.appendingPathComponent(entry.name)
             guard Self.exists(saved) else { continue }
@@ -346,7 +727,8 @@ final class FirmwareTransaction {
         guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         defer { close(fd) }
         guard flock(fd, LOCK_EX | LOCK_NB) == 0 else { throw Self.error("Firmware tool is still running; retry recovery after it exits") }
-        defer { flock(fd, LOCK_UN) }
+        workerLockFD = fd
+        defer { workerLockFD = nil; flock(fd, LOCK_UN) }
         return try body()
     }
 
@@ -360,11 +742,27 @@ final class FirmwareTransaction {
         let resources = VPhoneResources.resolve()
         let python = try resources.pythonExecutable()
         let worker = resources.scriptsDir.appendingPathComponent("firmware_worker.py")
-        return try Self.run(python.path, [worker.path, root.path, executable] + arguments, output: output)
+        try Self.requireDirectory(root)
+        // Foundation may retain the system /var alias in a file URL. Pass the
+        // actual canonical pathname so the worker can reject every symlink.
+        guard let resolved = realpath(root.path, nil) else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        defer { free(resolved) }
+        let workerRoot = String(cString: resolved)
+        if let workerLockFD {
+            // Python rejects a directory stdin before its script starts. A fixed
+            // shell bootstrap duplicates the same open description onto fd 3;
+            // every tool argument remains a positional argument, never shell code.
+            return try Self.run("/bin/sh", ["-c", "exec 3<&0; exec 0</dev/null; exec \"$@\"", "firmware-worker",
+                python.path, worker.path, workerRoot, "--lock-fd", "3", executable] + arguments,
+                output: output, lockInput: workerLockFD)
+        }
+        return try Self.run(python.path, [worker.path, workerRoot, executable] + arguments, output: output)
     }
 
     private func saveJournal() throws {
-        try Self.writeDurably(try Self.encoder.encode(journal), to: root.appendingPathComponent("journal.json"))
+        try Self.writeDurably(try Self.encoder.encode(journal), to: root.appendingPathComponent("journal.json"), beforeSync: {
+            try self.inject(.beforeJournalSync(self.journal.phase))
+        })
     }
 
     private static var encoder: JSONEncoder {
@@ -428,12 +826,13 @@ final class FirmwareTransaction {
         }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
-    private static func writeDurably(_ data: Data, to url: URL) throws {
+    private static func writeDurably(_ data: Data, to url: URL, beforeSync: () throws -> Void = {}) throws {
         let temporary = url.deletingLastPathComponent().appendingPathComponent(".write-" + UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: temporary) }
         try data.write(to: temporary, options: .withoutOverwriting)
         let handle = try FileHandle(forWritingTo: temporary)
         defer { try? handle.close() }
+        try beforeSync()
         try handle.synchronize()
         guard rename(temporary.path, url.path) == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         try syncDirectory(url.deletingLastPathComponent())
@@ -451,12 +850,13 @@ final class FirmwareTransaction {
         try syncDirectory(destination.deletingLastPathComponent())
     }
 
-    static func run(_ executable: String, _ arguments: [String], output: URL? = nil) throws -> Data {
+    static func run(_ executable: String, _ arguments: [String], output: URL? = nil, lockInput: Int32? = nil) throws -> Data {
         let process = Process(); process.executableURL = URL(fileURLWithPath: executable); process.arguments = arguments
         let pipe = Pipe()
         var file: FileHandle?
         if let output { file = try FileHandle(forWritingTo: output) }
         defer { try? file?.close() }
+        if let lockInput { process.standardInput = FileHandle(fileDescriptor: lockInput, closeOnDealloc: false) }
         process.standardOutput = file ?? pipe.fileHandleForWriting
         process.standardError = file ?? pipe.fileHandleForWriting
         try process.run()
