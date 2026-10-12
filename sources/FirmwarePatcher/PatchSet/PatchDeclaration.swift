@@ -34,6 +34,8 @@ public struct PatchDeclaration: Sendable, Hashable, Codable {
         case none
         /// Requires the `--frida` opt-in in addition to variant and version.
         case frida
+        /// Requires the v2 guest environment profile; does not enable kernel patches.
+        case guestEnvironmentV2
     }
 
     /// Stable declaration id (upstream id, or `{component}-{effect}-{name}` local id).

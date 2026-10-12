@@ -53,7 +53,47 @@
     "load_command": "/b",
     "note": "jb/exp BaseBin launchdhook alias (scripts/cfw_install_jb.sh, scripts/cfw_install_exp.sh)"
   },
-  "classic_variants": ["regular", "dev", "jb", "exp"],
-  "not_applicable_variants": ["less"],
-  "candidate_stage": ".build/guest-components-v2/stage"
+  "classic_variants": [
+    "regular",
+    "dev",
+    "jb",
+    "exp"
+  ],
+  "not_applicable_variants": [
+    "less"
+  ],
+  "candidate_stage": ".build/guest-components-v2/stage",
+  "profiles": {
+    "v2": {
+      "variants": [
+        "regular"
+      ],
+      "api_daemon": {
+        "label": "com.vphone.vphoned.api",
+        "program": "/usr/bin/vphoned-api",
+        "plist": "/System/Library/LaunchDaemons/vphoned-api.plist",
+        "launchd_key": "/System/Library/LaunchDaemons/vphoned-api.plist",
+        "cache": "/var/root/Library/Caches/vphoned-api",
+        "marker": "/var/root/Library/Caches/vphoned.api-v2",
+        "pending": "/var/root/Library/Caches/vphoned.api-v2.pending",
+        "vcam": "off",
+        "log": "/var/log/vphoned-api.log"
+      },
+      "reserved": [
+        {
+          "name": "libmisfix.dylib",
+          "guest": "usr/lib/libmisfix.dylib",
+          "mode": "0755",
+          "task": "T18"
+        },
+        {
+          "name": "libmisfix.plist",
+          "guest": "usr/lib/libmisfix.plist",
+          "mode": "0644",
+          "preserve_existing": true,
+          "task": "T18"
+        }
+      ]
+    }
+  }
 }

@@ -135,6 +135,7 @@ public struct PatchExperimentRecord: Codable, Equatable {
         var frida: Bool
         var noBinpack: Bool
         var noVphoned: Bool
+        var experimentalV2RootRemount: Bool? = nil
         /// Requested ablation values, trimmed, de-duplicated and sorted.
         var ablate: [String]
         var allowAblationOutput: Bool

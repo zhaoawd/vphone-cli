@@ -220,16 +220,25 @@ def candidates(stage, manifest):
     return result
 
 
-def variant_records(vm):
+def option_records(vm, field):
     records = {'restore_info': None, 'checkpoint': None}
     for key, relative in (('restore_info', 'restore-info.json'), ('checkpoint', '.create-checkpoint/checkpoint.json')):
         try:
-            value = json.loads((Path(vm) / relative).read_text()).get('variant')
+            record = json.loads((Path(vm) / relative).read_text())
+            if key == 'checkpoint':
+                record = record.get('effective_options', {})
+            value = record.get(field)
         except (OSError, ValueError, AttributeError):
             continue
         records[key] = value if isinstance(value, str) else None
     return records
 
+
+def variant_records(vm):
+    return option_records(vm, 'variant')
+
+def guest_environment_records(vm):
+    return option_records(vm, 'guest_environment')
 
 def bundle_identity(vm):
     """SHA-256 of the files that hold the VM configuration, identity and variant."""
@@ -260,11 +269,13 @@ def assess(root, vm, components, manifest=None):
     root, vm = Path(root), Path(vm)
     reasons, notes = [], []
     records = variant_records(vm)
+    environments = guest_environment_records(vm)
+    recorded_environments = {value for value in environments.values() if value}
     recorded = {value for value in records.values() if value}
     report = {
         'schema': SCHEMA, 'checked_at': now(), 'vm': str(vm),
         'manifest': {'path': str(MANIFEST), 'sha256': sha256_path(MANIFEST)},
-        'variant_records': records, 'classification': None, 'reasons': reasons, 'notes': notes,
+        'variant_records': records, 'guest_environment_records': environments, 'classification': None, 'reasons': reasons, 'notes': notes,
         'replace': [], 'libraries': [], 'load_paths': [],
     }
     try:
@@ -273,6 +284,20 @@ def assess(root, vm, components, manifest=None):
     except Refused as error:
         expected = None
         report['candidates'] = {'stage': str(components), 'available': False, 'error': str(error)}
+
+    daemon = manifest.get('profiles', {}).get('v2', {}).get('api_daemon')
+    if daemon:
+        program = root / daemon['program'].lstrip('/')
+        digest = sha256_path(program) if program.is_file() and not program.is_symlink() else None
+        try:
+            launchd_plist = plistlib.loads((root / 'System/Library/xpc/launchd.plist').read_bytes())
+            key_present = daemon['launchd_key'] in launchd_plist.get('LaunchDaemons', {})
+        except (OSError, ValueError, AttributeError, plistlib.InvalidFileException):
+            key_present = False
+        report['daemon'] = {'path': daemon['program'], 'sha256': digest,
+                            'launchd_key': daemon['launchd_key'], 'launchd_key_present': key_present}
+        if digest is None or not key_present:
+            notes.append('API daemon binary or launchd.plist entry is missing; library replacement does not install it')
 
     # Libraries
     missing = []
@@ -363,9 +388,13 @@ def assess(root, vm, components, manifest=None):
                        f'the local environment loads launchdhook-vphone through {alias["load_command"]}')
     elif kind == 'none':
         reasons.append('launchd has no environment load command (classic install without the v2 environment)')
+    if 'v2' in recorded_environments and kind != 'v2':
+        reasons.append(f'recorded guest environment v2 does not match disk bootstrap {kind}')
+    if len(recorded_environments) > 1:
+        reasons.append('guest environment records disagree: ' + ', '.join(sorted(recorded_environments)))
     if kind == 'v2':
         classic_records = sorted(recorded & set(manifest['classic_variants']))
-        if classic_records:
+        if classic_records and recorded_environments != {'v2'}:
             reasons.append(f'recorded variant {", ".join(classic_records)} is a classic install; '
                            'the v2 environment on the disk does not match it')
     if kind in ('v2', 'unknown'):
@@ -382,9 +411,8 @@ def assess(root, vm, components, manifest=None):
     if reasons:
         report['classification'] = 'full_migration_required'
         report['migration'] = ('A stopped-VM replacement only swaps libraries that already exist. Create a new VM '
-                               'whose CFW install places every environment library in /usr/lib, the /vh alias and '
-                               'the launchd /vh load command, and validate it as a separate copy; this VM is left '
-                               'unchanged.')
+                               'with vm create <name> --variant regular --guest-environment v2 and validate it as a '
+                               'separate copy; this VM is left unchanged.')
         return report
     if expected is None:
         raise Refused(report['candidates']['error'])

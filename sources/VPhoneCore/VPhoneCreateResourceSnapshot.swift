@@ -100,7 +100,7 @@ public final class VPhoneCreateResourceSnapshot {
             roots += [(cli, "VPhone.bundle/Contents/MacOS/vphone-cli"),
                       (VPhoneResources.vmExecutable(executable: cli), "VPhone.bundle/Contents/MacOS/vphone-vm")]
             for name in ["scripts", "dependencies", "requirements.txt", "debs.list", "README.md", ".tools/bin",
-                         "tools/apfs_snap_rename.py", ".build/guest-components-v2/stage", "build-dependencies.json"] {
+                         "tools/apfs_snap_rename.py", "build-dependencies.json"] {
                 let url = source.base.appendingPathComponent(name)
                 if exists(url) { roots.append((url, "VPhone.bundle/Contents/Resources/" + name)) }
             }
@@ -110,6 +110,12 @@ public final class VPhoneCreateResourceSnapshot {
                 where url.pathExtension == "dylib" || url.pathExtension == "bundle" {
                 roots.append((url, "VPhone.bundle/Contents/MacOS/" + url.lastPathComponent))
             }
+        }
+        // Materialize selected v2 inputs outside the signed bundle, including
+        // environment overrides, so the attempt never reads live candidates.
+        for (url, name) in [(source.guestComponentsStage, "components"), (source.daemonAPICandidate, "daemon-api")]
+            where exists(url) {
+            roots.append((url, "GuestInputs/" + name))
         }
         // Keep external ROM copies beside the sealed bundle so its signatures remain valid.
         roots += [(romSource, "ROMs/AVPBooter.vresearch1.bin"),
@@ -171,15 +177,19 @@ public final class VPhoneCreateResourceSnapshot {
     private init(directory: URL, source: VPhoneResources, manifest: Manifest) {
         self.directory = directory
         self.manifest = manifest
-        resources = source.rebasedForCreate(at: directory.appendingPathComponent("VPhone.bundle/Contents/Resources"))
+        resources = source.rebasedForCreate(at: directory.appendingPathComponent("VPhone.bundle/Contents/Resources"),
+            guestInputs: directory.appendingPathComponent("GuestInputs"))
         executable = directory.appendingPathComponent("VPhone.bundle/Contents/MacOS/vphone-cli")
     }
 
     deinit { if !retained { Self.removeCopy(directory) } }
 
     private static func snapshotRoots(_ directory: URL) -> [(URL, String)] {
-        [(directory.appendingPathComponent("VPhone.bundle"), "VPhone.bundle"),
-         (directory.appendingPathComponent("ROMs"), "ROMs")]
+        var roots = [(directory.appendingPathComponent("VPhone.bundle"), "VPhone.bundle"),
+                     (directory.appendingPathComponent("ROMs"), "ROMs")]
+        let guestInputs = directory.appendingPathComponent("GuestInputs")
+        if exists(guestInputs) { roots.append((guestInputs, "GuestInputs")) }
+        return roots
     }
 
     public func fingerprint() throws -> String {

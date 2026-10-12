@@ -288,6 +288,26 @@ import Testing
         }
     }
 
+    @Test func stagedPipelineRetainsMountExperimentGate() throws {
+        let f = try Fixture()
+        let manifest = try PropertyListSerialization.data(fromPropertyList: ["ProductVersion": "26.1"],
+            format: .binary, options: 0)
+        for name in ["BuildManifest.plist", "iPhone-BuildManifest.plist"] {
+            try manifest.write(to: f.restore.appendingPathComponent(name))
+        }
+        let pipeline = FirmwarePipeline(vmDirectory: f.root, verbose: false,
+            experimentalV2RootRemount: true, loader: FailingLoader(failRead: true))
+        #expect(throws: (any Error).self) { try pipeline.patchAllStructured() }
+        #expect(pipeline.trace.gates?.experimentalV2RootRemount == true)
+        let journal = try JSONDecoder().decode(FirmwareTransaction.Journal.self,
+            from: Data(contentsOf: f.root.appendingPathComponent(".firmware-transaction/journal.json")))
+        #expect(journal.options["experimentalV2RootRemount"] == "true")
+        #expect(journal.plan?.gates.experimentalV2RootRemount == true)
+        #expect(journal.versionInputs != nil)
+        #expect(journal.planBinding != nil)
+        try f.original()
+    }
+
     @Test(arguments: [true, false]) func pipelineReadAndPartialSaveFailuresRemainRecoverable(_ failRead: Bool) throws {
         let f = try Fixture()
         // This test exercises loader I/O after valid preflight, not malformed metadata.

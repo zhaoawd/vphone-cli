@@ -10,6 +10,7 @@ enum VPhoneCreateArtifact {
     static let config = "config"
     static let diskImage = "disk_image"
     static let restoreInfo = "restore_info"
+    static let guestEnvironmentReport = "guest_environment_report"
 
     /// Consumers of the restore tree (patch, restore, cfw) plus the stages whose
     /// failure may require a new restore (first_boot, verification).
@@ -66,6 +67,41 @@ enum VPhoneCreatePatchSelection {
             + "gates=\(gates)\n"
             + "declarations=\(plan.selected.map(\.id).sorted().joined(separator: ","))\n"
             + "steps=\(plan.enabledSteps.sorted().joined(separator: ","))\n"
+    }
+}
+
+// MARK: - Guest environment installation evidence
+
+enum VPhoneGuestEnvironmentInstallEvidence {
+    struct InvalidReport: Error {}
+
+    static func history(_ bundle: URL) -> Set<String> {
+        Set((try? FileManager.default.contentsOfDirectory(atPath: bundle.appendingPathComponent(".cfw-history").path)) ?? [])
+    }
+
+    static func validate(_ bundle: URL, variant: String, evidence: [String: String]) throws -> String {
+        guard let id = evidence["cfw_transaction_id"], !id.isEmpty, !id.hasPrefix("."), !id.contains("/"),
+              let path = evidence["guest_environment_report"], path == ".cfw-history/\(id)/guest-environment-install.json"
+        else { throw InvalidReport() }
+        let canonical = bundle.resolvingSymlinksInPath()
+        func read(_ relative: String) throws -> Data {
+            let url = canonical.appendingPathComponent(relative)
+            guard url.resolvingSymlinksInPath().path == url.path,
+                  try url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true
+            else { throw InvalidReport() }
+            return try Data(contentsOf: url)
+        }
+        let bytes = try read(path)
+        guard evidence["guest_environment_report_sha256"] == VPhoneCreateDigest.sha256(bytes),
+              let report = try JSONSerialization.jsonObject(with: bytes) as? [String: Any],
+              report["schema"] as? String == "vphone.guest-environment-install/1",
+              report["profile"] as? String == "v2", report["variant"] as? String == variant,
+              report["transaction_id"] as? String == id, report["result"] as? String == "installed",
+              (report["assessment_after"] as? [String: Any])?["classification"] as? String == "already_current",
+              let transaction = try JSONSerialization.jsonObject(with: read(".cfw-history/\(id)/transaction.json")) as? [String: Any],
+              transaction["id"] as? String == id, transaction["status"] as? String == "published"
+        else { throw InvalidReport() }
+        return path
     }
 }
 
@@ -130,7 +166,8 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
         case .patch:
             let before = Self.historyEntries(bundleURL)
             let count = try orchestrator.runFWPatch(
-                variant: variant, isLess: isLess, enableFrida: options.enableFrida, bundleURL: bundleURL, verbosity: v)
+                variant: variant, isLess: isLess, enableFrida: options.enableFrida,
+                experimentalV2RootRemount: options.experimentalV2RootRemount == true, bundleURL: bundleURL, verbosity: v)
             let new = Self.historyEntries(bundleURL).subtracting(before).sorted()
             var evidence = ["patch_records": "\(count)", "firmware_transaction_archives": new.joined(separator: ",")]
             // The verifier rejects any other archive count; without exactly one there is no selection to name.
@@ -147,8 +184,20 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             } else {
                 Thread.sleep(forTimeInterval: 5)
             }
+            let before = VPhoneGuestEnvironmentInstallEvidence.history(bundleURL)
             try orchestrator.runCFWInstall(options: options, runtime: runtime, bundleURL: bundleURL)
-            return ["cfw_install_exit": "0"]
+            var evidence = ["cfw_install_exit": "0"]
+            if options.effectiveGuestEnvironment == .v2 {
+                let new = VPhoneGuestEnvironmentInstallEvidence.history(bundleURL).subtracting(before)
+                guard new.count == 1, let id = new.first else {
+                    throw VPhoneGuestEnvironmentInstallEvidence.InvalidReport()
+                }
+                evidence["cfw_transaction_id"] = id
+                let path = ".cfw-history/\(id)/guest-environment-install.json"
+                evidence["guest_environment_report"] = path
+                evidence["guest_environment_report_sha256"] = VPhoneCreateDigest.sha256(try Data(contentsOf: bundleURL.appendingPathComponent(path)))
+            }
+            return evidence
         case .firstBoot:
             return try orchestrator.runFirstBoot(
                 isLess: isLess, interactive: runtime.interactive, bundleURL: bundleURL, verbosity: v)
@@ -174,7 +223,7 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
         // A restore erases the disk and a DFU boot writes the machine identifier.
         case .restore: [VPhoneCreateArtifact.diskImage, VPhoneCreateArtifact.config, VPhoneCreateArtifact.restoreInfo]
         // D3: CFW installation can be repeated on the same restored disk.
-        case .cfw: [VPhoneCreateArtifact.diskImage, VPhoneCreateArtifact.restoreInfo]
+        case .cfw: [VPhoneCreateArtifact.diskImage, VPhoneCreateArtifact.restoreInfo, VPhoneCreateArtifact.guestEnvironmentReport]
         case .firstBoot, .verification: [VPhoneCreateArtifact.diskImage]
         // Patch publishes only through a C4 transaction; a changed tree is refused.
         case .patch, .jbFinalize: []
@@ -236,6 +285,16 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             guard (object["options"] as? [String: String])?["variant"] == context.options.variant else {
                 return .rejected("firmware transaction \(archive) was made for another variant")
             }
+            if context.options.experimentalV2RootRemount == true || evidence[VPhoneCreatePatchSelection.evidenceKey] != nil {
+                do {
+                    let header = try VPhoneCreatePatchSelection.reportHeader(bundleURL: bundleURL, archive: archive)
+                    guard (header.gates.experimentalV2RootRemount == true) == (context.options.experimentalV2RootRemount == true) else {
+                        return .rejected("firmware transaction \(archive) has another experimental v2 root remount setting")
+                    }
+                } catch {
+                    return .rejected("firmware transaction \(archive) report is unreadable: \(error)")
+                }
+            }
             // T12: evidence written before the selection identity existed is not compared.
             if let recorded = evidence[VPhoneCreatePatchSelection.evidenceKey] {
                 let current: String
@@ -291,7 +350,17 @@ struct VPhoneCreateLiveStages: VPhoneCreateStageExecutor, VPhoneCreateStageVerif
             let leftovers = ((try? FileManager.default.contentsOfDirectory(atPath: bundleURL.path)) ?? [])
                 .filter { $0.hasPrefix(".cfw_mount.") || $0.hasPrefix(".cfw_disk.") }
             guard leftovers.isEmpty else { return .rejected("CFW mount or disk staging directories remain: \(leftovers.joined(separator: ", "))") }
-            return .verified(artifacts: Self.diskArtifacts(bundleURL, includeRestoreInfo: true), evidence: [:])
+            var artifacts = Self.diskArtifacts(bundleURL, includeRestoreInfo: true)
+            if context.options.effectiveGuestEnvironment == .v2 {
+                guard VPhoneRestoreInfo.load(fromBundle: bundle)?.effectiveGuestEnvironment == .v2 else {
+                    return .rejected("restore-info.json does not record guest environment v2")
+                }
+                do {
+                    let path = try VPhoneGuestEnvironmentInstallEvidence.validate(bundleURL, variant: context.options.variant, evidence: evidence)
+                    artifacts.append(.init(name: VPhoneCreateArtifact.guestEnvironmentReport, relativePath: path, kind: .sha256File))
+                } catch { return .rejected("invalid v2 installation evidence: \(error)") }
+            }
+            return .verified(artifacts: artifacts, evidence: [:])
 
         case .firstBoot:
             guard evidence["boot_exit"] != nil else { return .rejected("no first-boot exit status") }

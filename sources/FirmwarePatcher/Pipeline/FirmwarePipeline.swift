@@ -83,6 +83,7 @@ public final class FirmwarePipeline {
     let noVphoned: Bool
     let forceExcGuard: Bool
     let enableFrida: Bool
+    let experimentalV2RootRemount: Bool
     let loader: any FirmwareLoader
     private var transaction: FirmwareTransaction?
     private var executionPlan: VariantPlanResolver.VariantPlan?
@@ -116,6 +117,7 @@ public final class FirmwarePipeline {
         noVphoned: Bool = false,
         forceExcGuard: Bool = false,
         enableFrida: Bool = false,
+        experimentalV2RootRemount: Bool = false,
         loader: (any FirmwareLoader)? = nil
     ) {
         self.vmDirectory = vmDirectory
@@ -125,6 +127,7 @@ public final class FirmwarePipeline {
         self.noVphoned = noVphoned
         self.forceExcGuard = forceExcGuard
         self.enableFrida = enableFrida
+        self.experimentalV2RootRemount = experimentalV2RootRemount
         self.loader = loader ?? ContainerFirmwareLoader()
     }
 
@@ -151,6 +154,9 @@ public final class FirmwarePipeline {
     /// Read the manifests, set the gate flags, log the run header, and return the
     /// restore directory plus the gate snapshot used for necessity-rule evaluation.
     private func prepare() throws -> (restoreDir: URL, gates: PatchGateSnapshot) {
+        if experimentalV2RootRemount, variant != .regular {
+            throw PatcherError.invalidFormat("experimental v2 root remount requires variant regular")
+        }
         let restoreDir = try findRestoreDirectory()
         if let plan = executionPlan {
             guard let versionInputs else {
@@ -207,7 +213,8 @@ public final class FirmwarePipeline {
             enableFrida: enableFrida,
             excGuardActive: variant == .dev || iosBaseIs18 || forceExcGuard,
             applyIOS27: iosBaseIs27,
-            applyFrida: enableFrida && cloudOSIsFridaCapable
+            applyFrida: enableFrida && cloudOSIsFridaCapable,
+            experimentalV2RootRemount: experimentalV2RootRemount
         )
     }
 
@@ -254,16 +261,19 @@ public final class FirmwarePipeline {
         executionPlan = plan
         let roots = try transactionRoots()
         trace.stage = .stageInputs
-        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots, options: [
+        var transactionOptions = [
             "variant": variant.rawValue, "noBinpack": String(noBinpack), "noVphoned": String(noVphoned),
             "forceExcGuard": String(forceExcGuard), "frida": String(enableFrida),
             "ablate": ablateValues.joined(separator: ","),
-        ], plan: plan, versionInputs: versionInputs)
+        ]
+        if experimentalV2RootRemount { transactionOptions["experimentalV2RootRemount"] = "true" }
+        let transaction = try FirmwareTransaction(vmDirectory: vmDirectory, inputs: roots,
+            options: transactionOptions, plan: plan, versionInputs: versionInputs)
         trace.transaction = transaction
         do {
             let staged = FirmwarePipeline(vmDirectory: transaction.stage, variant: variant, verbose: verbose,
                 noBinpack: noBinpack, noVphoned: noVphoned, forceExcGuard: forceExcGuard,
-                enableFrida: enableFrida, loader: loader)
+                enableFrida: enableFrida, experimentalV2RootRemount: experimentalV2RootRemount, loader: loader)
             staged.transaction = transaction
             staged.executionPlan = plan
             staged.versionInputs = versionInputs
@@ -625,6 +635,7 @@ public final class FirmwarePipeline {
 
         // Opt-in Frida Stalker kernel relaxations (--frida), gated to cloudOS 26.4+.
         let applyFrida = enableFrida && cloudOSIsFridaCapable
+        let experimentalV2RootRemount = experimentalV2RootRemount
 
         // iOS 18 bases: disable the skywalk flowswitch netagents via boot-arg so
         // Network.framework uses the BSD path (the 26.1-kernel skywalk
@@ -732,9 +743,19 @@ public final class FirmwarePipeline {
                 case .less:
                     []
                 case .regular:
-                    [{ data, verbose in
-                        KernelPatcher(data: data, verbose: verbose, isDev: false, applyExcGuard: applyExcGuard)
-                    }]
+                    { () -> [(Data, Bool) -> any Patcher] in
+                        var factories: [(Data, Bool) -> any Patcher] = [{ data, verbose in
+                            KernelPatcher(data: data, verbose: verbose, isDev: false, applyExcGuard: applyExcGuard)
+                        }]
+                        if experimentalV2RootRemount {
+                            factories.append { data, verbose in
+                                let patcher = KernelJBPatcher(data: data, verbose: verbose)
+                                patcher.mountOnly = true
+                                return patcher
+                            }
+                        }
+                        return factories
+                    }()
                 case .dev:
                     [{ data, verbose in
                         KernelPatcher(data: data, verbose: verbose, isDev: true)

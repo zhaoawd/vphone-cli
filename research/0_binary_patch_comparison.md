@@ -1,5 +1,9 @@
 # Patch Comparison: Regular / Development / Jailbreak / Experimental
 
+## 2026-10-02 regular-v2 MAC mount 实验候选
+
+用户批准独立对照实验。显式 `vm create --guest-environment v2 --experimental-v2-root-remount` 仅为 regular 追加现有 `kernel-boot-mac_mount`，不采用其他 JB 步骤。23B85 原始 vphone600 的内存输出比较通过：默认 regular 的 28 项内核记录逐项相同，实验候选额外两项 4 字节写入，完整输出与预期一致。匹配沿用当前映像语义锚点与 ARM64Encoder，不使用固定地址。默认 regular/classic 选择保持原范围；真实重挂、在线更新及回退尚未验证。详见 [实验记录](t17_mount_rejection_diagnosis_2026-10-02.md)。
+
 ## 2026-10-01 DSC maxSlide 选项层对齐（T13a）
 
 `FORCE_DSC_MAXSLIDE=1` 与 `vm create`、`cfw install` 的 `--force-dsc-maxslide` 已删除，与上游 `d930e50` 一致。`cfw_install.sh` 只在 `27.*` 基线调用 `patch-dsc-maxslide`，且不传 `--force`；是否清零由补丁器按缓存头判断（`sharedRegionSize + maxSlide > 0x180000000` 时清零，已为 0 或可容纳时不写）。补丁器增加与上游 `DyldSharedCacheMaxSlidePatcher.swift` 等价的缓存头校验（0x100 字节头部、`mappingOffset` 覆盖 `maxSlide`、主分块存在文件偏移 0 的映射、`sharedRegionStart` 等于最低映射地址、`sharedRegionSize` 覆盖映射跨度、64 位求和不溢出），校验失败时报错且不写入。`cfw_install_host.sh` 对所有变体识别到旧环境变量时打印已移除提示，并且不再转发。清零写入的字段、字节和写入方式不变；独立命令 `cfw.py patch-dsc-maxslide --force` 保留供手动使用。记录见 `research/t13a_dsc_maxslide_option_2026-10-01.md`。本轮未新增二进制补丁，本文既有计数不变；真实 iOS 27 缓存与启动未验证。
@@ -1248,3 +1252,29 @@ B30单entitlement候选在实际RootHide完成24组方向观测，14成功、10�
 ## 2026-10-11：T08 独立 API 的默认 CFW 安装
 
 B38 保留 classic `/usr/bin/vphoned`、1337 控制和 256 字节相机头。新增 `/usr/libexec/vphoned-api` 和 `com.vphone.vphoned-api`；API 的缓存为 `/var/root/Library/Caches/vphoned-api`，launchd 环境关闭 API 相机发布，RootHide 启动恢复继续执行。regular/dev/jb/exp 安装将其 plist 写入 System LaunchDaemons 及合并 launchd.plist 的 LaunchDaemons 字典；less 不安装该 API。没有新增内核或 Mach-O 指令替换，classic `/b` 环境保持。固定 7 项依赖、当前源码构建及默认 Bundle 校验通过；研究副本两次冷启动的 API 摘要与默认载荷一致，RootHide 服务自动加载，classic 缓存保持。106 项定向回归和组件 124 项检查通过；完整现代环境/相机迁移不在本次 T08 验收内。证据见 `research/upstream_integration_2026-10-06/evidence/B38/T08/REPORT.md`。
+
+## 2026-10-02 — v2 环境 B3 的 launchd 修改范围
+
+新增离线 v2 profile 安装器，仅接受 regular。首次安装对暂存 System 卷的 `/sbin/launchd` 添加 `LC_LOAD_WEAK_DYLIB /vh`，保留原 entitlements 后用已有 ldid/证书流程重签；重装已有加载命令时不重复注入。库、别名和 API 守护进程属于用户态安装范围，regular 的内核、TXM、DSC、设备树补丁集合未改变。
+
+合成目录树安装后判定 already_current；真实 insert_dylib 对 clang 编译的 macOS 合成文件添加弱加载命令的测试通过。这些证据不建立真实 iOS launchd 可启动或 regular 内核可加载该库的结论；R4 与 D6 仍待用户授权后的真实验收。拒绝条件、写入范围和验证限制见 [B3 记录](v2_guest_environment_b3_2026-10-02.md)。
+
+### 2026-10-02 v2 regular 真实验收 R1–R4
+
+独立签名产物在测试 VM `lp-v2-accept-20261002` 完成创建、恢复、CFW、首次启动和启动验证。launchd 的 /vh 弱加载命令经离线安装后可启动；R2 只读判定 already_current、bootstrap.kind v2、disk.unchanged true。R3 经典/API daemon 并行连接，API device.info 成功。R4 扫描 282 个进程、无 uninspected，pid 1 映射当前 launchdhook，SystemHook 在所有扫描进程中 not_mapped；运行中的 cameracaptured 未映射它。注入失败原因未查明，不能据此确定 regular 内核补丁不足。按 D6 停止后续验收，未新增任何内核、TXM 或 DSC 补丁。详见 `v2_guest_environment_real_acceptance_2026-10-02.md`。
+
+### 2026-10-02 R4 用户态注入修正候选（未安装）
+
+实际 launchd 的反汇编包含 posix_spawnp 调用，本地 launchdhook 的 interpose 表未覆盖该入口。直接 cameracaptured 路径也不符合既有目标筛选。真实源码和插桩表边界测试修改前两项失败；修正增加 posix_spawnp 插桩及精确相机路径，两种 spawn 共用环境逻辑。Python 590 项通过，iOS 候选检查通过；仅 launchdhook 库摘要变化为 `157beaed8168fa53df58cdcf2d6181152bb4a5409a7ec1b093af21c394073027`，其余四个库不变。未新增 kernel、TXM、DSC 或 MIS 补丁；候选尚未写入客户机，真实因果验证等待批准。后续诊断发现 App 扩展已有 SystemHook 映射，早期无映射结果仅适用于原扫描时刻。详见 `v2_injection_diagnosis_2026-10-02.md`。
+
+### 2026-10-02 launchdhook 修正的真实复核
+
+用户批准后，T16 事务 `20261002T064301Z-rFaRcKXJ` 仅替换 launchdhook，旧盘保留，七项身份摘要在重启前核对一致。重启后原失败反馈两次通过，pid 1 映射新 launchdhook；cameracaptured 的 SystemHook 与 libvcamcaptured 均 current，App 与扩展亦有映射。日志显示相机服务经 xpcproxy 注入。没有增加 kernel/TXM/DSC/MIS 补丁。本次 regular 26.1 组合的 R4 加载复核通过，不证明功能验收或其他组合支持。详见 `v2_injection_diagnosis_2026-10-02.md`。
+
+## 2026-10-12：handoff 合入固定上游开发线
+
+以 `2c119ae6` 为基线合入 `959acfc0`。保留 B38 默认 classic 1337/1338 与固定依赖现代 API 1339；显式 regular-v2 使用单独 plist 候选、相机关闭配置及 handoff 用户态安装流程。API 更新标记保持最新实现。创建流程冻结两类 v2 输入，安装前核对固定 pins、overlay 声明与二进制 marker。
+
+root-remount 仅在显式 regular-v2 实验路径启用，默认关闭，调用已有 `KernelJBPatcher.mountOnly` 路径。固件事务同时记录实验选项、冻结 plan、versionInputs 和 planBinding；未改写既有内核补丁算法。旧检查点省略新增可选字段时保持摘要兼容。
+
+本轮 `make test_python`（679 项、无跳过）、`make test_swift`、现代组件构建及完整签名 app 构建通过；完整夹具下的 `make test_firmware` 共 15 项、12 个 suite 通过；不能据此确定恢复、启动、重挂或应用功能。Python 最终复跑与签名构建结果记录在 `research/handoff_merge_2026-10-12.md`。本轮未部署候选或启动 VM，历史验收保留原日期和组合范围。

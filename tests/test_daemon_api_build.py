@@ -5,6 +5,9 @@ from pathlib import Path
 import plistlib
 import sys
 import unittest
+from unittest.mock import patch
+import tempfile
+import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('daemon_api_build', ROOT / 'scripts/check_daemon_api.py')
@@ -82,3 +85,58 @@ class DaemonAPIBuildTests(unittest.TestCase):
             'StandardOutPath': '/var/log/vphoned-api.log', 'StandardErrorPath': '/var/log/vphoned-api.log',
             'EnvironmentVariables': {'VPHONE_DISABLE_CAMERA': '1'},
         })
+
+    def test_parallel_api_identity_matches_environment_manifest(self):
+        profile = json.loads((ROOT / 'scripts/guest_environment.json').read_text())['profiles']['v2']['api_daemon']
+        plist = plistlib.loads((module.PROJECT / 'Configuration/vphoned-api.plist').read_bytes())
+        self.assertEqual(plist['Label'], profile['label'])
+        self.assertEqual(plist['ProgramArguments'], [profile['program']])
+        self.assertEqual(plist['EnvironmentVariables']['VPHONED_VCAM'], profile['vcam'])
+        self.assertEqual(plist['StandardOutPath'], profile['log'])
+        self.assertEqual(plist['StandardErrorPath'], profile['log'])
+        self.assertTrue(plist['KeepAlive'])
+        self.assertEqual(plist['ThrottleInterval'], 1)
+        native = (module.PROJECT / 'Native/vphoned_native.m').read_text()
+        proxy = (module.PROJECT / 'Native/vphoned_proxy.c').read_text()
+        api = (module.PROJECT / 'Daemon/GuestAPI.swift').read_text()
+        for key in ('cache', 'marker', 'pending'):
+            self.assertIn('"' + profile[key] + '"', native)
+        self.assertIn('"' + profile['pending'] + '"', proxy)
+        self.assertIn('vp_native_api_cache_path()', api)
+        self.assertIn('"' + profile['marker'] + '"', api)
+        self.assertNotEqual(profile['cache'], '/var/root/Library/Caches/vphoned')
+
+    def test_candidate_records_parallel_plist_and_rejects_changed_identity(self):
+        from daemon_api_overlays import marker
+        for plist_name in ('vphoned.plist', 'vphoned-api.plist'):
+            with self.subTest(plist=plist_name):
+                self.check_candidate_identity(plist_name, marker(module.declarations()).encode())
+
+    def check_candidate_identity(self, plist_name, marker):
+        with tempfile.TemporaryDirectory() as tmp:
+            stage = Path(tmp)
+            (stage / 'vphoned').write_bytes(b'candidate\0' + marker + b'\0')
+            (stage / 'vphoned').chmod(0o755)
+            for source, name in ((plist_name, plist_name),
+                                 ('VPhoneDaemon.entitlements', 'vphoned.entitlements.plist')):
+                shutil.copyfile(module.PROJECT / 'Configuration' / source, stage / name)
+            policy = (stage / 'vphoned.entitlements.plist').read_bytes()
+            def output(*args):
+                return {'/usr/bin/lipo': 'arm64', '/usr/bin/xcrun': ' platform IOS\n minos 15.0\n',
+                        '/usr/bin/nm': '_malloc', '/usr/bin/otool': 'candidate:\n /usr/lib/libSystem.B.dylib (x)'}[args[0]]
+            with patch.object(module, 'output', side_effect=output), \
+                    patch.object(module.subprocess, 'check_output', return_value=policy):
+                result = module.inspect_candidate(stage, 'ldid', self.pins)
+                self.assertIn(plist_name, result['files_sha256'])
+                self.assertEqual(len(result['files_sha256']), 3)
+                (stage / plist_name).write_bytes(plistlib.dumps({'Label': 'classic'}))
+                with self.assertRaisesRegex(ValueError, 'launchd plist'):
+                    module.inspect_candidate(stage, 'ldid', self.pins)
+
+    def test_candidate_rejects_ambiguous_profile_plists(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stage = Path(tmp)
+            for name in ('vphoned.plist', 'vphoned-api.plist'):
+                shutil.copyfile(module.PROJECT / 'Configuration' / name, stage / name)
+            with self.assertRaisesRegex(ValueError, 'exactly one'):
+                module.inspect_candidate(stage, 'ldid', self.pins)

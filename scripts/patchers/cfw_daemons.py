@@ -44,6 +44,19 @@ def parse_cryptex_paths(manifest_path):
 # ══════════════════════════════════════════════════════════════════
 
 
+def inject_daemon(plist_path, daemon_path, key):
+    """Add one LaunchDaemon to the current plist, preserving all other entries."""
+    if not key.startswith('/System/Library/LaunchDaemons/') or '..' in key.split('/'):
+        raise ValueError('invalid LaunchDaemon key')
+    with open(plist_path, 'rb') as stream:
+        target = plistlib.load(stream)
+    with open(daemon_path, 'rb') as stream:
+        daemon = plistlib.load(stream)
+    target.setdefault('LaunchDaemons', {})[key] = daemon
+    with open(plist_path, 'wb') as stream:
+        plistlib.dump(target, stream, sort_keys=False)
+
+
 def inject_daemons(plist_path, daemon_dir):
     """Inject bash/dropbear/trollvnc entries into launchd.plist."""
     # Convert to XML first (macOS binary plist -> XML)

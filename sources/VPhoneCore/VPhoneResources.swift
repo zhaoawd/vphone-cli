@@ -22,14 +22,16 @@ public struct VPhoneResources: Sendable {
 
     private let environmentOverride: [String: String]?
     private var createPythonCandidates: [(source: PythonSource, url: URL)]? = nil
+    private var createGuestInputs: URL? = nil
 
     /// Captured for a create resource copy; secrets are never persisted in its manifest.
     public var processEnvironment: [String: String] { environment }
 
-    public func rebasedForCreate(at base: URL) -> Self {
+    public func rebasedForCreate(at base: URL, guestInputs: URL? = nil) -> Self {
         var env = environment
         env["PYTHONDONTWRITEBYTECODE"] = "1"
         var copy = Self(base: base, environment: env)
+        copy.createGuestInputs = guestInputs
         // Retain the source venv interpretation: rebasing must not select a
         // different managed environment merely because .venv was not copied.
         copy.createPythonCandidates = pythonCandidates.map { candidate in
@@ -103,7 +105,16 @@ public struct VPhoneResources: Sendable {
     /// T16 stopped-VM environment eligibility and replacement.
     public var cfwEnvUpdateScript: URL { scriptsDir.appendingPathComponent("cfw_env_update.py") }
     /// Signed guest environment candidates (`make guest_components_build`).
-    public var guestComponentsStage: URL { base.appendingPathComponent(".build/guest-components-v2/stage") }
+    public var daemonAPICandidate: URL {
+        if let createGuestInputs { return createGuestInputs.appendingPathComponent("daemon-api") }
+        return environment["VPHONE_API_DAEMON"].map { URL(fileURLWithPath: $0) }
+            ?? base.appendingPathComponent(".build/daemon-api-v2/candidate-v2")
+    }
+    public var guestComponentsStage: URL {
+        if let createGuestInputs { return createGuestInputs.appendingPathComponent("components") }
+        return environment["VPHONE_GUEST_COMPONENTS"].map { URL(fileURLWithPath: $0) }
+            ?? base.appendingPathComponent(".build/guest-components-v2/stage")
+    }
     public var preflightScript: URL { scriptsDir.appendingPathComponent("boot_host_preflight.sh") }
     public var pmd3Bridge: URL { scriptsDir.appendingPathComponent("pymobiledevice3_bridge.py") }
     public var cfwPy: URL { patchersDir.appendingPathComponent("cfw.py") }

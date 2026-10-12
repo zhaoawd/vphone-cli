@@ -20,11 +20,18 @@ xcodebuild -project "$project" -scheme vphoned -configuration Release \
   -jobs 4 CODE_SIGNING_ALLOWED=NO \
   "GCC_PREPROCESSOR_DEFINITIONS=\$(inherited) VP_DAEMON_OVERLAY_SHA=\\\"${overlay_sha}\\\"" build
 python3 "$SCRIPT_DIR/check_daemon_api.py" --checkouts "$output/Xcode/SourcePackages/checkouts"
-stage="$output/candidate"
-mkdir -p "$stage"
-cp "$output/Xcode/Build/Products/Release-iphoneos/vphoned" "$stage/vphoned"
-cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/vphoned.plist" "$stage/vphoned.plist"
-cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements" "$stage/vphoned.entitlements.plist"
-ldid -S"$stage/vphoned.entitlements.plist" -M "-K$SCRIPT_DIR/vphoned/signcert.p12" "$stage/vphoned"
-python3 "$SCRIPT_DIR/check_daemon_api.py" --candidate "$stage" --record
-print -r -- "Candidate only: $stage (not installed or activated)"
+for profile in classic v2; do
+  stage="$output/candidate"
+  plist=vphoned.plist
+  if [[ "$profile" == v2 ]]; then
+    stage="$output/candidate-v2"
+    plist=vphoned-api.plist
+  fi
+  mkdir -p "$stage"
+  cp "$output/Xcode/Build/Products/Release-iphoneos/vphoned" "$stage/vphoned"
+  cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/$plist" "$stage/$plist"
+  cp "$PROJECT_ROOT/sources/VPhoneDaemon/Configuration/VPhoneDaemon.entitlements" "$stage/vphoned.entitlements.plist"
+  ldid -S"$stage/vphoned.entitlements.plist" -M "-K$SCRIPT_DIR/vphoned/signcert.p12" "$stage/vphoned"
+  python3 "$SCRIPT_DIR/check_daemon_api.py" --candidate "$stage" --record
+  print -r -- "Candidate only: $stage (not installed or activated)"
+done

@@ -8,5 +8,6 @@ struct GuestDaemonMode {
     init(environment: [String: String]) {
         apiOnly = environment["VPHONE_API_ONLY"] == "1"
         cameraEnabled = !apiOnly && environment["VPHONE_DISABLE_CAMERA"] != "1"
+            && environment["VPHONED_VCAM"] != "off"
     }
 }

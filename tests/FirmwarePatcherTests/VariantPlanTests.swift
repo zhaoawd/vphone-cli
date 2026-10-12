@@ -9,6 +9,39 @@ import Testing
 @testable import FirmwarePatcher
 
 @Suite struct VariantPlanTests {
+    @Test func experimentalRegularMountAddsOnlyMountStep() throws {
+        let baseline = Self.snapshots(.regular)[0]
+        let experimental = PatchGateSnapshot(
+            variant: "regular", iosBaseIs18: false, iosBaseIs27: false,
+            cloudOSIsFridaCapable: true, forceExcGuard: false, enableFrida: false,
+            excGuardActive: false, applyIOS27: false, applyFrida: false,
+            experimentalV2RootRemount: true)
+        let normal = try VariantPlanResolver.resolve(variant: .regular, gates: baseline)
+        let candidate = try VariantPlanResolver.resolve(variant: .regular, gates: experimental)
+        let mountStep = "kernelcache.KernelJBPatcher.patchMacMount"
+        #expect(candidate.enabledSteps.subtracting(normal.enabledSteps) == [mountStep])
+        #expect(normal.enabledSteps.subtracting(candidate.enabledSteps).isEmpty)
+        #expect(candidate.selected.contains { $0.id == "kernel-boot-mac_mount" })
+        #expect(PatchDeclarationCatalog.isStepEnabled(mountStep, variant: "regular", gates: experimental))
+        #expect(!PatchDeclarationCatalog.isStepEnabled(mountStep, variant: "regular", gates: baseline))
+    }
+
+    @Test func guestEnvironmentDeclarationRequiresOptInAndKeepsFirmwareSteps() throws {
+        let id = "system-launchdaemons-boot-environment"
+        let declaration = try #require(PatchDeclarationCatalog.byID[id])
+        #expect(declaration.variants == ["regular"])
+        #expect(declaration.optIn == .guestEnvironmentV2)
+        #expect(declaration.coverage == .guestStep)
+        let gates = Self.snapshots(.regular)[0]
+        let classic = try VariantPlanResolver.resolve(variant: .regular, gates: gates)
+        let v2 = try VariantPlanResolver.resolve(variant: .regular, gates: gates, guestEnvironmentV2: true)
+        #expect(classic.excludedByOptIn.contains { $0.id == id })
+        #expect(v2.guestUncovered.contains { $0.id == id })
+        #expect(classic.enabledSteps == v2.enabledSteps)
+        let dev = try VariantPlanResolver.resolve(variant: .dev, gates: Self.snapshots(.dev)[0], guestEnvironmentV2: true)
+        #expect(!dev.guestUncovered.contains { $0.id == id })
+    }
+
     static let allVariants: [FirmwarePipeline.Variant] = [.regular, .dev, .jb, .exp, .less]
 
     /// Gate snapshots to exercise conditional classification (version + opt-in + exc-guard).

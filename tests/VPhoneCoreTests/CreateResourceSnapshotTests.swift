@@ -62,6 +62,33 @@ struct CreateResourceSnapshotTests {
               enableFrida: false, cpuCount: 2, memoryMb: 1024, diskSizeGb: 0)
     }
 
+    @Test(arguments: [false, true])
+    func v2InputsAreFrozenIncludingEnvironmentOverrides(external: Bool) throws {
+        let f = try Fixture(); defer { f.cleanup() }
+        let components = external ? f.root.appendingPathComponent("external-components") : f.source.guestComponentsStage
+        let daemon = external ? f.root.appendingPathComponent("external-api") : f.source.daemonAPICandidate
+        for directory in [components, daemon] {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try Data("candidate-A".utf8).write(to: directory.appendingPathComponent("manifest.json"))
+        }
+        let source = external ? VPhoneResources(base: f.source.base, environment: [
+            "VPHONE_GUEST_COMPONENTS": components.path, "VPHONE_API_DAEMON": daemon.path]) : f.source
+        let snapshot = try VPhoneCreateResourceSnapshot.capture(resources: source, executable: f.cli,
+            storage: f.storage, romSource: f.rom, sepromSource: f.seprom, availableBytes: { _ in Int64.max })
+        let fingerprint = try snapshot.fingerprint()
+        for (original, frozen) in [(components, snapshot.resources.guestComponentsStage),
+                                   (daemon, snapshot.resources.daemonAPICandidate)] {
+            #expect(frozen.path.hasPrefix(snapshot.directory.path + "/"))
+            #expect(try String(contentsOf: frozen.appendingPathComponent("manifest.json"), encoding: .utf8) == "candidate-A")
+            try Data("candidate-B".utf8).write(to: original.appendingPathComponent("manifest.json"))
+            #expect(try String(contentsOf: frozen.appendingPathComponent("manifest.json"), encoding: .utf8) == "candidate-A")
+        }
+        #expect(try snapshot.fingerprint() == fingerprint)
+        let next = try VPhoneCreateResourceSnapshot.capture(resources: source, executable: f.cli,
+            storage: f.storage, romSource: f.rom, sepromSource: f.seprom, availableBytes: { _ in Int64.max })
+        #expect(next.manifest.sha256 != fingerprint)
+    }
+
     // Catch omitting either live framework ROM from the captured bytes and identity.
     @Test func romCopiesAreManifestedAndIsolatedFromLiveReplacement() throws {
         let f = try Fixture(); defer { f.cleanup() }
