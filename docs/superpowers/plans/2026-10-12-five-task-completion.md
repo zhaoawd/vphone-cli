@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-12-five-task-completion-design.md`
 
-**Status:** 设计已批准；本实施计划待用户审阅并选择执行方式。
+**Status:** 用户已批准计划，选择“逐项子代理实施和审查”。执行中。
 
 ## Global Constraints
 
@@ -193,4 +193,4 @@
 
 T09 对应 Task 1；T10 对应 Task 2、5；T11 对应 Task 3、4；T24 对应 Task 11；T40 对应 Task 6–10、12。generation、receipt、在线激活和 kernel 更新作为五项完成所需的实现步骤保留。Task 3 先定义输入内容身份，Task 4 再绑定计划，Task 6 记录应用结果，避免 generation/plan 摘要循环。Task 11 的系统授权只在最终工件冻结后提出。
 
-建议采用 Native：这些任务共享声明、generation、计划和 receipt 接口，由本会话顺序实施并在末尾进行一次独立审查，减少重复上下文。选择执行方式不扩大系统操作授权。
+执行方式：用户已选择逐项子代理实施和审查。每个任务使用独立实施子代理，完成后由独立子代理审查需求符合性及代码质量，末尾再进行全分支审查。选择执行方式不扩大系统操作授权。
