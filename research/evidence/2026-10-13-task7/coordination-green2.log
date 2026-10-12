@@ -1,0 +1,86 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/39] Write sources
+[3/39] Write swift-version--58304C5D6DBC2206.txt
+[5/13] Compiling vphone_cli VPhoneAppDelegate.swift
+[6/13] Compiling vphone_cli VPhoneGuestWriteCoordinator.swift
+[7/13] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[8/32] Compiling vphone_cli VPhoneMenuLocation.swift
+[9/32] Compiling vphone_cli VPhoneTouchIDMonitor.swift
+[10/32] Compiling vphone_cli VPhoneLocationProvider.swift
+[11/32] Compiling vphone_cli VPhoneMenuApps.swift
+[12/34] Compiling vphone_cli VPhoneHostAPICommands.swift
+[13/34] Compiling vphone_cli VPhoneHostCapabilities.swift
+[14/34] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[15/34] Compiling vphone_cli VPhoneEntry.swift
+[16/34] Compiling vphone_cli VPhoneAppBrowserModel.swift
+[17/34] Compiling vphone_cli VPhoneAppBrowserView.swift
+[18/34] Compiling vphone_cli VPhoneControl.swift
+[19/34] Compiling vphone_cli VPhoneControlLocationAdapter.swift
+[20/34] Compiling vphone_cli VPhoneFileBrowserModel.swift
+[21/34] Compiling vphone_cli VPhoneFileBrowserView.swift
+[22/34] Compiling vphone_cli VPhoneMenuBattery.swift
+[23/34] Compiling vphone_cli VPhoneMenuConnect.swift
+[24/34] Compiling vphone_cli VPhoneKeyHelper.swift
+[25/34] Compiling vphone_cli VPhoneKeychainBrowserModel.swift
+[26/34] Compiling vphone_cli VPhoneKeychainBrowserView.swift
+[27/34] Compiling vphone_cli VPhoneVirtualMachineView.swift
+[28/34] Compiling vphone_cli VPhoneWindowController.swift
+[28/36] Write Objects.LinkFileList
+[31/45] Compiling VPhoneCLITests HelperCLITests.swift
+[32/46] Compiling VPhoneCLITests LocationValidationTests.swift
+[33/46] Compiling VPhoneCLITests ClipboardFocusTests.swift
+[34/46] Compiling VPhoneCLITests ClipboardShortcutTests.swift
+[35/46] Compiling VPhoneCLITests HostCommandExecutorTests.swift
+[36/46] Compiling VPhoneCLITests HostAPICommandTests.swift
+[37/46] Emitting module VPhoneCLITests
+[38/46] Compiling VPhoneCLITests GuestTransportTests.swift
+[39/46] Compiling VPhoneCLITests GuestWriteCoordinationTests.swift
+[40/46] Compiling VPhoneCLITests HardwareKeyboardCLITests.swift
+[40/46] Write Objects.LinkFileList
+[41/46] Linking vphone-cli
+[42/46] Linking vphone-vm
+[43/46] Applying vphone-cli
+[44/46] Applying vphone-vm
+[45/46] Linking vphone-cliPackageTests
+Build complete! (11.25s)
+Test Suite 'Selected tests' started at 2026-10-13 05:36:30.897.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:36:30.898.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 05:36:30.898.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testConcurrentEnvironmentUpdatesShareOneWriter]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testConcurrentEnvironmentUpdatesShareOneWriter]' passed (0.016 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' passed at 2026-10-13 05:36:30.914.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.016 (0.016) seconds
+Test Suite 'GuestWriteCoordinationTests' started at 2026-10-13 05:36:30.914.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testIndependentVMWriterDoesNotWaitForOtherVM]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testIndependentVMWriterDoesNotWaitForOtherVM]' passed (0.000 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testOnlineLockExcludesStopWithoutSignalling]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testOnlineLockExcludesStopWithoutSignalling]' passed (0.001 seconds).
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testStopSealsQueuedWritersAndWaitsForActiveWriter]' started.
+Test Case '-[VPhoneCLITests.GuestWriteCoordinationTests testStopSealsQueuedWritersAndWaitsForActiveWriter]' passed (0.001 seconds).
+Test Suite 'GuestWriteCoordinationTests' passed at 2026-10-13 05:36:30.916.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:36:30.916.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.018 (0.018) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:36:30.916.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.018 (0.019) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

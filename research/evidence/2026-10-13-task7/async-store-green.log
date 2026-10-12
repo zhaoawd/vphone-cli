@@ -1,0 +1,85 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/17] Compiling VPhoneBundleStore VPhoneCoreBundleStore.swift
+/Users/qcz3840/github/vphone-cli/sources/VPhoneBundleStore/VPhoneCoreBundleStore.swift:133:9: warning: 'active' mutated after capture by sendable closure
+130 |         let descriptor = try acquireLock(exclusive: false)
+131 |         defer { flock(descriptor, LOCK_UN); close(descriptor) }
+132 |         var active = true
+    |             `- note: variable defined here
+133 |         defer { active = false }
+    |         `- warning: 'active' mutated after capture by sendable closure
+134 |         let recheck: @MainActor () throws -> Void = {
+    |                                                     `- note: variable captured by sendable closure
+135 |             try Task.checkCancellation()
+136 |             guard active else { throw VPhoneBundleStoreError("Core Bundle verification callback expired") }
+    |                   `- note: capturing use
+137 |             _ = try verifiedReceipt(version)
+138 |         }
+[6/17] Emitting module VPhoneBundleStore
+[7/18] Compiling VPhoneBundleStore VPhoneLaunchpadLauncherRequest.swift
+[8/29] Emitting module VPhoneHelperKit
+[9/29] Compiling VPhoneHelperKit VPhoneHelperService.swift
+[9/29] Write Objects.LinkFileList
+[11/29] Compiling VPhoneLaunchpadKit VPhoneLaunchpadLaunchRoute.swift
+[12/29] Emitting module VPhoneLaunchpadKit
+[12/29] Write Objects.LinkFileList
+[13/29] Linking vphone-helper
+[14/29] Applying vphone-helper
+[16/33] Compiling VPhoneLaunchpadLauncherEntry VPhoneLaunchpadLauncherProcess.swift
+[17/33] Emitting module VPhoneLaunchpadLauncherEntry
+[17/33] Write Objects.LinkFileList
+[18/33] Linking vphone-launchpad
+[20/33] Compiling FirmwarePatcher FirmwareInstalledOrigin.swift
+[21/33] Emitting module FirmwarePatcher
+[22/33] Emitting module VPhoneBundleStoreTests
+[23/33] Compiling VPhoneBundleStoreTests CoreBundleStoreTests.swift
+[23/33] Applying vphone-launchpad
+[24/35] Linking vphone-launchpad-launcher
+[25/35] Applying vphone-launchpad-launcher
+[27/39] Emitting module VPhoneLaunchpadKitTests
+[28/39] Compiling VPhoneLaunchpadKitTests CoreBundleTests.swift
+[29/39] Compiling vphone_cli VPhoneVMBindingCLI.swift
+[30/39] Compiling vphone_cli VPhoneCoreBundleCLI.swift
+[31/39] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[32/39] Compiling vphone_cli VPhoneVMLaunchCLI.swift
+[32/39] Write Objects.LinkFileList
+[35/40] Linking vphone-cli
+[36/40] Linking vphone-vm
+[37/40] Applying vphone-cli
+[38/40] Applying vphone-vm
+[39/40] Linking vphone-cliPackageTests
+Build complete! (9.45s)
+Test Suite 'Selected tests' started at 2026-10-13 05:38:00.260.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:38:00.261.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:38:00.261.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:38:00.261.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CoreBundleStoreTests started.
+◇ Test asyncVerificationKeepsLockAndExpiresRecheck() started.
+✔ Test asyncVerificationKeepsLockAndExpiresRecheck() passed after 0.595 seconds.
+◇ Test asyncVerificationRejectsSourceMutationBeforeReturn() started.
+✔ Test asyncVerificationRejectsSourceMutationBeforeReturn() passed after 0.540 seconds.
+✔ Suite CoreBundleStoreTests passed after 1.135 seconds.
+✔ Test run with 2 tests in 1 suite passed after 1.136 seconds.

@@ -27,6 +27,8 @@ enum VPhoneExitStatus {
 
 class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     private var vmLock: VPhoneVMLock?
+    private var guestWrites = VPhoneGuestWriteCoordinator()
+    private var stopWaitingForWriter = false
     private let cli: VPhoneBootCLI
     private var vm: VPhoneVirtualMachine?
     private var control: VPhoneControl?
@@ -91,6 +93,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                 throw VPhoneMachineBindingError("VM binding differs from the launch selection; no VM was started")
             }
         }
+        guestWrites = VPhoneGuestWriteCoordinator(directory: cli.config.resolvingSymlinksInPath().deletingLastPathComponent())
         FileHandle.standardOutput.write(Data("[vphone] VM lock acquired\n".utf8))
         let options = try cli.resolveOptions()
 
@@ -133,6 +136,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
 
         let control = VPhoneControl(variant: options.variant)
         self.control = control
+        control.guestWrites = guestWrites
         if !cli.dfu {
             if let vphonedURL = cli.autoUpdateGuestBinaryURL, FileManager.default.fileExists(atPath: vphonedURL.path) {
                 control.guestBinaryURL = vphonedURL
@@ -168,7 +172,10 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
                             return try result.get()
                         }
                         startupUnlock = unlock
-                        session.onSnapshotChange = { [weak unlock] snapshot in unlock?.observe(snapshot) }
+                        session.onSnapshotChange = { [weak unlock, weak session, weak self] snapshot in
+                            unlock?.observe(snapshot)
+                            if snapshot.state == .ready { Task { await self?.guestWrites.reconcile(session) } }
+                        }
                         session.start()
                     }
                     print("[api] proxy listening on \(url.absoluteString); guest VSOCK 1339; token from VPHONE_API_TOKEN")
@@ -225,7 +232,8 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
             }
             if let session = apiSession {
                 let unlock = startupUnlock
-                session.onSnapshotChange = { [weak mc, weak unlock] snapshot in
+                session.onSnapshotChange = { [weak mc, weak unlock, weak session, weak self] snapshot in
+                    if snapshot.state == .ready { Task { await self?.guestWrites.reconcile(session) } }
                     unlock?.observe(snapshot)
                     mc?.manualUnlockItem?.isEnabled = snapshot.state == .ready && snapshot.health?.capabilities.contains("screen_unlock") == true
                 }
@@ -341,7 +349,7 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
         let executor = VPhoneHostCommandExecutor(
             control: control, camera: cameraServer, location: locationProvider,
             screen: hostScreen, apiSession: apiSession, bootMode: cli.dfu ? .dfu : .normal,
-            target: vmLock.map { VPhoneHostTarget(lock: $0.state) }, inputQueue: hostInputQueue)
+            target: vmLock.map { VPhoneHostTarget(lock: $0.state) }, inputQueue: hostInputQueue, guestWrites: guestWrites, runtime: vmLock)
         let hc = VPhoneHostControl(
             socketPath: options.configURL.deletingLastPathComponent()
                 .appendingPathComponent("vphone.sock").path,
@@ -398,6 +406,18 @@ class VPhoneAppDelegate: NSObject, NSApplicationDelegate {
     /// teardown is the framework's and not this process dying.
     @MainActor
     private func handleInterrupt() {
+        guard !stopWaitingForWriter else { return }
+        stopWaitingForWriter = true
+        if guestWrites.pendingRecovery { print("[vphone] Stop waits for pending guest recovery; query guest env status to reconcile") }
+        Task { @MainActor in
+            await guestWrites.sealAndWait()
+            stopWaitingForWriter = false
+            handleDrainedInterrupt()
+        }
+    }
+
+    @MainActor
+    private func handleDrainedInterrupt() {
         startupUnlock?.stop()
         guard let vm else {
             NSApp.terminate(nil)

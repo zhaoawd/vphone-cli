@@ -1,0 +1,120 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/19] Write sources
+[5/19] Write swift-version--58304C5D6DBC2206.txt
+[7/15] Emitting module VPhoneDaemonWire
+[8/15] Compiling VPhoneDaemonWire EnvironmentTransaction.swift
+[9/16] Compiling vphone_cli VPhoneGuestEnvironment.swift
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+[10/18] Emitting module vphone_cli
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneGuestEnvironment.swift:46:9: warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 44 |     let code: String
+ 45 |     let message: String
+ 46 |     var fields: [String: Any] = [:]
+    |         `- warning: stored property 'fields' of 'Sendable'-conforming struct 'VPhoneGuestEnvironmentRefusal' contains non-Sendable type 'Any'
+ 47 | 
+ 48 |     init(_ code: String, _ message: String, _ fields: [String: Any] = [:]) {
+
+/Users/qcz3840/github/vphone-cli/sources/vphone-cli/VPhoneMenuRecord.swift:110:13: warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+108 |         panel.contentView?.addSubview(ok)
+109 | 
+110 |         var shouldReveal = false
+    |             `- warning: initialization of variable 'shouldReveal' was never used; consider replacing with assignment to '_' or removing it [#no-usage]
+111 |         reveal.target = nil
+112 |         reveal.action = nil
+[11/18] Compiling vphone_cli VPhoneGuestEnvironmentCLI.swift
+[12/18] Compiling vphone_cli VPhoneHostCommandExecutor.swift
+[12/20] Write Objects.LinkFileList
+[15/22] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+[16/22] Emitting module VPhoneCLITests
+[16/22] Write Objects.LinkFileList
+[17/22] Linking vphone-vm
+[17/22] Linking vphone-cli
+[19/22] Applying vphone-cli
+[20/22] Applying vphone-vm
+[21/22] Linking vphone-cliPackageTests
+Build complete! (8.08s)
+Test Suite 'Selected tests' started at 2026-10-13 05:27:42.700.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:27:42.700.
+Test Suite 'GuestEnvironmentUpdateTests' started at 2026-10-13 05:27:42.700.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testAllCurrentUploadsAndInstallsNothing]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testAllCurrentUploadsAndInstallsNothing]' passed (0.008 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCandidateStageIsVerifiedBeforeGuestContact]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCandidateStageIsVerifiedBeforeGuestContact]' passed (0.007 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCapabilityGates]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCapabilityGates]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCLIRequestsAndRestartValidation]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testCLIRequestsAndRestartValidation]' passed (0.037 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testFailedReplacementReturnsRecoveryRecordAndNoOverallSuccess]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testFailedReplacementReturnsRecoveryRecordAndNoOverallSuccess]' passed (0.008 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstalledReadbackMismatchDoesNotReachActivation]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testInstalledReadbackMismatchDoesNotReachActivation]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMalformedInstallResponsesHaveUnknownOutcomeAndNeverRestart]' passed (0.028 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMissingGuestLibraryOrAliasNeedsFullMigration]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testMissingGuestLibraryOrAliasNeedsFullMigration]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testNonObjectInstallReplyRetainsUnknownSideEffect]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testNonObjectInstallReplyRetainsUnknownSideEffect]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testOnlyDifferingLibrariesAreUploadedVerifiedAndReplaced]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testOnlyDifferingLibrariesAreUploadedVerifiedAndReplaced]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRebootRequiredFalseIsNotReportedAsLoaded]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRebootRequiredFalseIsNotReportedAsLoaded]' passed (0.005 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRespringIsReportedButNeverPerformed]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRespringIsReportedButNeverPerformed]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestartOutsideTheWhitelistIsRefusedBeforeGuestContact]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRestartOutsideTheWhitelistIsRefusedBeforeGuestContact]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackMissingComponentEvidenceIsRefused]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackNamesTheTransaction]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackNamesTheTransaction]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackRejectsDuplicateMissingAndWrongHashComponents]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRollbackRejectsDuplicateMissingAndWrongHashComponents]' passed (0.008 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRPCStillRefusesGuestLibraryReplacement]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testRPCStillRefusesGuestLibraryReplacement]' passed (0.003 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStagedDigestMismatchIsRefusedBeforeInstall]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStagedDigestMismatchIsRefusedBeforeInstall]' passed (0.006 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStatusWithoutComponentsReportsGuestDigestsOnly]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testStatusWithoutComponentsReportsGuestDigestsOnly]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testSummaryNamesRequiredActionsAndRecovery]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testSummaryNamesRequiredActionsAndRecovery]' passed (0.009 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUninspectedProcessesMakeLoadStatePartial]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUninspectedProcessesMakeLoadStatePartial]' passed (0.004 seconds).
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownLoadStateFallsBackToManifestActions]' started.
+Test Case '-[VPhoneCLITests.GuestEnvironmentUpdateTests testUnknownLoadStateFallsBackToManifestActions]' passed (0.006 seconds).
+Test Suite 'GuestEnvironmentUpdateTests' passed at 2026-10-13 05:27:42.880.
+	 Executed 22 tests, with 0 failures (0 unexpected) in 0.177 (0.179) seconds
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:27:42.880.
+	 Executed 22 tests, with 0 failures (0 unexpected) in 0.177 (0.179) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:27:42.880.
+	 Executed 22 tests, with 0 failures (0 unexpected) in 0.177 (0.180) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite EnvironmentTransactionTests started.
+◇ Test restoreJournalSaveFailureStopsBeforeNextReplacement() started.
+◇ Test validationRejectsBeforeAnyWrite() started.
+◇ Test restoreRefusesAFileChangedAfterTheTransaction() started.
+◇ Test mappingsAreCurrentOrStaleByFileIdentity() started.
+◇ Test statusReportsInstalledAndStagedDigests() started.
+◇ Test completeInstallKeepsBackupsAndJournal() started.
+◇ Test journalSaveFailureStopsBeforeNextReplacement() started.
+◇ Test failedReplacementStopsAndRecordsRecovery() started.
+◇ Test retentionKeepsIncompleteTransactions() started.
+✔ Test validationRejectsBeforeAnyWrite() passed after 0.011 seconds.
+✔ Test statusReportsInstalledAndStagedDigests() passed after 0.011 seconds.
+✔ Test journalSaveFailureStopsBeforeNextReplacement() passed after 0.018 seconds.
+✔ Test mappingsAreCurrentOrStaleByFileIdentity() passed after 0.018 seconds.
+✔ Test restoreRefusesAFileChangedAfterTheTransaction() passed after 0.019 seconds.
+✔ Test restoreJournalSaveFailureStopsBeforeNextReplacement() passed after 0.020 seconds.
+✔ Test completeInstallKeepsBackupsAndJournal() passed after 0.021 seconds.
+✔ Test failedReplacementStopsAndRecordsRecovery() passed after 0.022 seconds.
+✔ Test retentionKeepsIncompleteTransactions() passed after 0.030 seconds.
+✔ Suite EnvironmentTransactionTests passed after 0.030 seconds.
+✔ Test run with 9 tests in 1 suite passed after 0.030 seconds.

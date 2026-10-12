@@ -96,6 +96,49 @@ private final class BundleFixture {
 
 @Suite(.serialized)
 struct CoreBundleStoreTests {
+    @Test @MainActor func asyncVerificationKeepsLockAndExpiresRecheck() async throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        var retained: (() throws -> Void)?
+        try await fixture.store.withRevalidatedExecutableAsync(version: "2.2.3-local", executable: .vm) { executable, recheck in
+            #expect(executable.lastPathComponent == "vphone-vm")
+            retained = recheck
+            await Task.yield()
+            let descriptor = open(fixture.store.root.appendingPathComponent(".store.lock").path, O_RDWR)
+            defer { close(descriptor) }
+            #expect(flock(descriptor, LOCK_EX | LOCK_NB) != 0)
+            try recheck()
+        }
+        #expect(throws: Error.self) { try retained?() }
+    }
+
+    @Test @MainActor func asyncVerificationCancellationInvalidatesAndReleasesStore() async throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        let operation = Task { @MainActor in
+            try await fixture.store.withRevalidatedExecutableAsync(version: "2.2.3-local", executable: .vm) { _, recheck in
+                withUnsafeCurrentTask { $0?.cancel() }
+                #expect(throws: Error.self) { try recheck() }
+            }
+        }
+        do { try await operation.value; Issue.record("cancelled source returned normally") } catch {}
+        let fd = open(fixture.store.root.appendingPathComponent(".store.lock").path, O_RDWR)
+        defer { flock(fd, LOCK_UN); close(fd) }
+        #expect(flock(fd, LOCK_EX | LOCK_NB) == 0)
+    }
+
+    @Test @MainActor func asyncVerificationRejectsSourceMutationBeforeReturn() async throws {
+        let fixture = try BundleFixture()
+        try fixture.install()
+        do {
+            try await fixture.store.withRevalidatedExecutableAsync(version: "2.2.3-local", executable: .vm) { _, _ in
+                try Data("changed".utf8).write(to: fixture.installed.appendingPathComponent("VPhone.bundle/Contents/Resources/data"))
+                await Task.yield()
+            }
+            Issue.record("changed source escaped verification")
+        } catch {}
+    }
+
     @Test func unavailableExecutableExplainsExplicitRecoveryWithoutRunningOrCreatingStore() throws {
         let fixture = try BundleFixture()
         var invoked = false

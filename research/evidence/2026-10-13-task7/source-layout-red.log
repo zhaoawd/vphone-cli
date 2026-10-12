@@ -1,0 +1,36 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Compiling VPhoneCLITests GuestEnvironmentSourceTests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentSourceTests.swift:91:52: warning: result of call to 'withVerifiedInput(runtime:version:executable:effectiveExecutable:requestedStage:verifyBundle:body:)' is unused [#no-usage]
+ 89 |         } catch {}
+ 90 |         do {
+ 91 |             try await VPhoneGuestEnvironmentSource.withVerifiedInput(runtime: fixture.runtime, version: fixture.version,
+    |                                                    `- warning: result of call to 'withVerifiedInput(runtime:version:executable:effectiveExecutable:requestedStage:verifyBundle:body:)' is unused [#no-usage]
+ 92 |                 executable: fixture.executable, effectiveExecutable: fixture.executable, requestedStage: "/tmp/untrusted",
+ 93 |                 verifyBundle: {}) { _ in Issue.record("untrusted stage accepted") }
+[6/7] Emitting module VPhoneCLITests
+[6/8] Write Objects.LinkFileList
+[7/8] Linking vphone-cliPackageTests
+Build complete! (4.77s)
+Test Suite 'Selected tests' started at 2026-10-13 05:47:34.145.
+Test Suite 'vphone-cliPackageTests.xctest' started at 2026-10-13 05:47:34.146.
+Test Suite 'vphone-cliPackageTests.xctest' passed at 2026-10-13 05:47:34.146.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-13 05:47:34.146.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1743
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite GuestEnvironmentSourceTests started.
+◇ Test liveSourceRequiresActualRuntimePlanAndFilesAndExpires() started.
+◇ Test liveSourceRejectsMutationAndOutsideStage() started.
+◇ Test sourceCannotSurviveFrozenPlanOrDaemonMutation() started.
+✘ Test liveSourceRequiresActualRuntimePlanAndFilesAndExpires() recorded an issue at GuestEnvironmentSourceTests.swift:69:6: Caught error: VPhoneGuestEnvironmentRefusal(code: "source_unqualified", message: "Current Bundle source is absent or linked", fields: [:])
+✘ Test liveSourceRequiresActualRuntimePlanAndFilesAndExpires() failed after 0.107 seconds with 1 issue.
+✔ Test liveSourceRejectsMutationAndOutsideStage() passed after 0.217 seconds.
+✔ Test sourceCannotSurviveFrozenPlanOrDaemonMutation() passed after 0.411 seconds.
+✘ Suite GuestEnvironmentSourceTests failed after 0.411 seconds with 1 issue.
+✘ Test run with 3 tests in 1 suite failed after 0.411 seconds with 1 issue.

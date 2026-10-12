@@ -1,0 +1,32 @@
+[1/1] Compiling plugin GenerateManual
+[2/2] Compiling plugin GenerateDoccReference
+Building for debugging...
+[2/17] Write sources
+[3/17] Write swift-version--58304C5D6DBC2206.txt
+[5/7] Emitting module VPhoneCLITests
+[6/7] Compiling VPhoneCLITests GuestEnvironmentUpdateTests.swift
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:514:84: error: expected member name or initializer call after type name
+512 |         XCTAssertEqual(recovery["transaction"] as? String, "T1")
+513 |         XCTAssertEqual(recovery["journal"] as? String,
+514 |                        "/var/root/Library/Caches/vphone-environment/transactions/\(id)/journal.json")
+    |                                                                                    |- error: expected member name or initializer call after type name
+    |                                                                                    `- note: use '.self' to reference the type object
+515 |         let replaced = try XCTUnwrap(recovery["replaced"] as? [[String: Any]])
+516 |         XCTAssertEqual(replaced.map { $0["name"] as? String }, ["SystemHook-vphone.dylib"])
+
+/Users/qcz3840/github/vphone-cli/tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift:514:84: error: 'id' is unavailable in Swift: 'id' is not available in Swift; use 'Any'
+512 |         XCTAssertEqual(recovery["transaction"] as? String, "T1")
+513 |         XCTAssertEqual(recovery["journal"] as? String,
+514 |                        "/var/root/Library/Caches/vphone-environment/transactions/\(id)/journal.json")
+    |                                                                                    `- error: 'id' is unavailable in Swift: 'id' is not available in Swift; use 'Any'
+515 |         let replaced = try XCTUnwrap(recovery["replaced"] as? [[String: Any]])
+516 |         XCTAssertEqual(replaced.map { $0["name"] as? String }, ["SystemHook-vphone.dylib"])
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk/usr/include/objc/objc.h:46:29: note: 'id' has been explicitly marked unavailable here
+ 44 | 
+ 45 | /// A pointer to an instance of a class.
+ 46 | typedef struct objc_object *id;
+    |                             `- note: 'id' has been explicitly marked unavailable here
+ 47 | #endif
+ 48 | 
+error: fatalError

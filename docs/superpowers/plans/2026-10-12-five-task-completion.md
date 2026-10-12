@@ -127,6 +127,8 @@
 
 Task6C 分为 C1 和 C2，原验收范围保持不变。C1 完成来源读取、legacy 导入、二进制实际 producer 与已安装目标证明，以及 guest 效果和来源只读核验。一般 CFW 的生产捕获涉及 sudo 后 VM 锁及 Disk.img 交换；C2 与 Task10 的磁盘身份交接和同 journal 来源发布一并实现，随后独立审查。C1 审查通过后可推进 Task7 的独立在线事务协调；Task6 整体须等 C2 完成，guest 来源及四层矩阵不能由 C1 局部测试代替。
 
+运行实例的在线更新使用实际 `.vm` Bundle 核验、daemon 事务及每 VM 操作协调；已有 VM 锁内的 Store 获取必须非阻塞，不能复用 C1 离线挂载资格。Task7 覆盖现有 classic vphoned 自动更新、bootstrap、手动更新/回退及 shutdown/Stop，不新增环境库自动升级。Task7 完成真实来源/上传/读回链及协议协调；在线 guest 的同 journal 来源发布与恢复仍必需，由 C2/Task10 实现并独立审查，不以 decoded 回报或独立 sidecar 提升来源（Ruling22、23）。
+
 ### Task 7：T17 在线安装、激活、回退与 Stop 协调
 
 **Files:** 修改 `VPhoneGuestEnvironment.swift`、`EnvironmentTransaction.swift` 及其 daemon 调用方；扩展 `tests/VPhoneCLITests/GuestEnvironmentUpdateTests.swift`、`tests/VPhoneDaemonWireTests/EnvironmentTransactionTests.swift`。
