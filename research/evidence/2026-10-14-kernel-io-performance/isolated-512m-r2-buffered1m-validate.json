@@ -1,0 +1,29 @@
+{
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+    "-XCTest",
+    "FirmwarePatcherTests.FirmwareKernelIOBenchmarkTests/testValidate",
+    "/private/tmp/vphone-kernel-io-optimization-20261014/.build/arm64-apple-macosx/release/vphone-cliPackageTests.xctest"
+  ],
+  "environment_overrides": {
+    "VPHONE_KERNEL_IO_BENCHMARK": "1",
+    "VPHONE_KERNEL_IO_BENCHMARK_OPERATION": "validate",
+    "VPHONE_KERNEL_IO_BENCHMARK_LABEL": "isolated-512m-r2-buffered1m-validate",
+    "VPHONE_KERNEL_IO_BENCHMARK_BYTES": "536870915",
+    "VPHONE_KERNEL_IO_BENCHMARK_READ_BYTES": "1048576",
+    "VPHONE_KERNEL_IO_TRACE": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/isolated-512m-r2-buffered1m-validate"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 1.8146336249774322,
+  "log": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/isolated-512m-r2-buffered1m-validate.log",
+  "acceptance_directory_lock_held": true,
+  "artifact_directory_lock_held": null,
+  "child_pid": 64063,
+  "child_start_new_session": true,
+  "timeout_seconds": 120.0,
+  "timed_out": false,
+  "interrupted": null,
+  "cleanup_signals_to_owned_child_group": [],
+  "cleanup_complete": true,
+  "cleanup_error": null
+}

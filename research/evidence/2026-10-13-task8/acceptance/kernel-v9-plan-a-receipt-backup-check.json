@@ -1,0 +1,44 @@
+{
+  "transaction_id": "c0a0a7a8-3677-4a44-aa36-f370bb67b5ca",
+  "phase": "publishing",
+  "metadata": [
+    {
+      "name": ".firmware-component-receipts.json",
+      "original": "266ba0ad4589044c4f736ed2911267db03c22658c8f756fab453bb5e6b855cfb",
+      "output": "e59819c579c3f958227a76c5d7fa5397134e01fb95937ea17a330c23bbc47169"
+    },
+    {
+      "name": "launchpad.json",
+      "original": "211d294a81951424537cd68fc02064a40d4b00bea819ed34e093e7d241024076",
+      "output": "4f9207114d69ab7ba993b962ee7d01ba3043e742ca2722118d3294953aaa3f99"
+    }
+  ],
+  "files": {
+    "backup": {
+      ".firmware-component-receipts.json": {
+        "sha256": "266ba0ad4589044c4f736ed2911267db03c22658c8f756fab453bb5e6b855cfb",
+        "size": 68631
+      },
+      "launchpad.json": null
+    },
+    "stage": {
+      ".firmware-component-receipts.json": {
+        "sha256": "e59819c579c3f958227a76c5d7fa5397134e01fb95937ea17a330c23bbc47169",
+        "size": 68631
+      },
+      "launchpad.json": {
+        "sha256": "4f9207114d69ab7ba993b962ee7d01ba3043e742ca2722118d3294953aaa3f99",
+        "size": 72
+      }
+    },
+    "live": {
+      ".firmware-component-receipts.json": null,
+      "launchpad.json": {
+        "sha256": "211d294a81951424537cd68fc02064a40d4b00bea819ed34e093e7d241024076",
+        "size": 61
+      }
+    }
+  },
+  "receipt_backup_matches_journal": true,
+  "receipt_output_matches_live_or_stage": true
+}

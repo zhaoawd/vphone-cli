@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "scope": "Read-only source review and eight pure-function/small ordinary-file reproductions; no main/controller/benchmark/build/VM/AMFI/mount/process inspection executed",
+  "sources_sha256": {
+    "run-recorded.py": "59ee2f335705343ef13d1719abf06f3835b4a3bfd6c3e54b59e68309d26dc2bd",
+    "run-benchmarks.py": "1499eed7bbe37c4bf5a194ed9d571e8732d26f4d5de230a24842c29badb43804",
+    "prepare-test-manifest.py": "d9fe848ec94b8d0c877aeab1be8bef5dc99ecaf52b1caf922e5793b2360754b6",
+    "test-benchmark-controller-review.py": "6f9fb225a5076f8342127a8f41b18dad57520030a65487616f156738478bd16e"
+  },
+  "pure_tests": 8,
+  "pure_test_exit_code": 0,
+  "test_semantics": "InitialBoundaryReproductions intentionally confirms malformed inputs accepted; not acceptance success. Invert regressions after fixes.",
+  "blockers": [
+    {
+      "id": "B1",
+      "object": "run-recorded.py:53 / run-benchmarks.py:122",
+      "issue": "No process timeout or own-group cleanup/reap; hang can retain Task8 directory lock and omit failure record"
+    },
+    {
+      "id": "B2",
+      "object": "run-benchmarks.py:58-75",
+      "issue": "elapsed_seconds NaN/negative/inconsistent accepted; exact types, finite duration, ns correspondence, independently expected offsets and RSS schema required"
+    },
+    {
+      "id": "B3",
+      "object": "run-benchmarks.py:39-48",
+      "issue": "Comparison need not descend from measured helper; SHA role distribution and comparison call-count/readsize relation not validated"
+    },
+    {
+      "id": "B4",
+      "object": "run-benchmarks.py:89-97,124",
+      "issue": "Variant names/binary SHA do not enforce common actual test source/build flags or trace/readsize matrix; wrapper command/env/guard/timeout/child PID relation not validated"
+    },
+    {
+      "id": "B5",
+      "object": "run-recorded.py:35-48 / prepare-test-manifest.py:35-68",
+      "issue": "No isolated artifact root lock, VM /tmp argv alias missing; Package writing follows symlink/hardlink and occurs before metadata output reservation"
+    }
+  ],
+  "positive_findings": [
+    "Fresh per-label trace prefix and exact trace/sample PID are checked",
+    "analyze-trace validates terminal completeness and parent/thread intervals",
+    "SHA actual bytes and comparison logical bytes/blocks are checked",
+    "Warmup rows are excluded and first three measured rounds use Latin rotation",
+    "Summary uses measured helper elapsed seconds and comparison spans; no inclusive CLI total invented",
+    "Benchmark source dd17 ends helper clock before result checks, and uses synthetic materialized files only"
+  ]
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "name": "capture-probe",
+    "command": [
+      "/usr/bin/xcrun",
+      "xctest",
+      "-XCTest",
+      "FirmwarePatcherTests.FirmwareKernelIOBenchmarkTests/testCapture",
+      "/Users/qcz3840/github/vphone-cli/.build/arm64-apple-macosx/debug/vphone-cliPackageTests.xctest"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.36106650007423013,
+    "scope": "synthetic ordinary files; counters only, not comparative timing"
+  },
+  {
+    "name": "lifecycle-probe",
+    "command": [
+      "swift",
+      "test",
+      "--skip-build",
+      "--disable-sandbox",
+      "--cache-path",
+      ".build/test-cache",
+      "--filter",
+      "differentPlanRollbackPreservesPostBootDataAndLiveDesired"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 14.265578833059408,
+    "scope": "synthetic ordinary files; counters only, not comparative timing"
+  }
+]

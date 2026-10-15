@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "checks": {
+    "capture": {
+      "trace": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/stage1-smoke-capture.94468.jsonl",
+      "sha_calls_within_helper": 5,
+      "sha_bytes_within_helper": 5242895,
+      "comparison": {
+        "blocks": 257,
+        "changed_blocks": 4,
+        "logical_bytes": 1048579,
+        "new_bytes": 1048579,
+        "new_read_calls": 258,
+        "old_bytes": 1048579,
+        "old_read_calls": 258
+      },
+      "full_helper_ns": 8265708,
+      "comparison_ns": 2594709
+    },
+    "validate": {
+      "trace": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/stage1-smoke-validate.96165.jsonl",
+      "sha_calls_within_helper": 2,
+      "sha_bytes_within_helper": 2097158,
+      "comparison": {
+        "blocks": 257,
+        "disk_bytes": 1048579,
+        "disk_read_calls": 258,
+        "logical_bytes": 1048579,
+        "new_bytes": 1048579,
+        "new_read_calls": 257,
+        "old_bytes": 1048579,
+        "old_read_calls": 257
+      },
+      "full_helper_ns": 3985500,
+      "comparison_ns": 1409875
+    },
+    "production_probe": {
+      "trace_files": [
+        "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/stage1-production-probes.847.jsonl",
+        "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/stage1-production-probes.849.jsonl"
+      ],
+      "partial_read_error_bytes": 1048576,
+      "partial_read_calls": 1,
+      "required_phases_present": true,
+      "phase_event_counts": {
+        "FirmwareDesiredPlanStore.fsync": 36,
+        "FirmwareTransaction.fileHandleSynchronize": 96,
+        "FirmwareTransaction.fsync": 177,
+        "VPhoneCoreBundleStore.fileHandleSynchronize": 1,
+        "generation.fileHandleSynchronize": 148,
+        "generation.fileSHA256": 330,
+        "generation.fsync": 105,
+        "generation.loadVerified": 291,
+        "generation.readFile": 5116,
+        "generation.treeDigest": 7020,
+        "generation.verifyOriginals": 311,
+        "kernelDisk.capture": 6,
+        "kernelDisk.capture.compare": 6,
+        "kernelDisk.fsync": 18,
+        "kernelDisk.publish": 6,
+        "kernelDisk.reverse": 4,
+        "kernelDisk.validate": 17,
+        "kernelDisk.validate.compare": 17,
+        "security.SecCodeCopySigningInformation": 6,
+        "security.SecStaticCodeCheckValidityWithErrors": 9,
+        "security.cdhash": 6,
+        "security.staticCode": 15,
+        "security.verify": 9,
+        "store.receiptReadDecode": 2,
+        "store.requireBundleLayout": 2,
+        "store.secureTree": 2,
+        "store.verifiedReceipt": 2,
+        "transaction.journal.encode": 54,
+        "transaction.saveJournal": 54,
+        "transaction.writeDurably": 96
+      }
+    }
+  },
+  "scope": "synthetic production helpers; not full CLI attribution"
+}

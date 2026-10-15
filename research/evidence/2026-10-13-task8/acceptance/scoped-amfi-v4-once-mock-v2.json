@@ -1,0 +1,236 @@
+{
+  "passed": true,
+  "scope": "pure mocks only",
+  "cases": [
+    {
+      "order": [
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ],
+        [
+          "isApple",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": false,
+      "bad_state": false,
+      "incomplete": false,
+      "passed": true
+    },
+    {
+      "order": [
+        [
+          "isApple",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ],
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": false,
+      "bad_state": false,
+      "incomplete": false,
+      "passed": true
+    },
+    {
+      "order": [
+        [
+          "validate",
+          "0000000000000000000000000000000000000000"
+        ],
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ],
+        [
+          "isApple",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": false,
+      "bad_state": false,
+      "incomplete": false,
+      "passed": true
+    },
+    {
+      "order": [
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": true,
+      "bad_state": false,
+      "incomplete": false,
+      "passed": true
+    },
+    {
+      "order": [
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": false,
+      "bad_state": true,
+      "incomplete": false,
+      "passed": true
+    },
+    {
+      "order": [
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": false,
+      "bad_state": false,
+      "incomplete": true,
+      "passed": true
+    },
+    {
+      "order": [
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ],
+        [
+          "validate",
+          "43c00d51b4c7f07a5feba006f3c244edbac39cea"
+        ]
+      ],
+      "bad_return": false,
+      "bad_state": false,
+      "incomplete": true,
+      "passed": true
+    }
+  ],
+  "cleanup_cases": [
+    {
+      "state": 2,
+      "deleted": true,
+      "detach_success": true,
+      "deletion_raises": false,
+      "calls": [
+        "DeleteAllBreakpoints",
+        "Detach(false)",
+        "Destroy"
+      ],
+      "result": {
+        "state": 2,
+        "safe_destroy": true,
+        "error": null
+      },
+      "passed": true
+    },
+    {
+      "state": 2,
+      "deleted": false,
+      "detach_success": true,
+      "deletion_raises": false,
+      "calls": [
+        "DeleteAllBreakpoints",
+        "Detach(false)",
+        "Destroy"
+      ],
+      "result": {
+        "state": 2,
+        "safe_destroy": true,
+        "error": "DeleteAllBreakpoints failed; inferior detached"
+      },
+      "passed": true
+    },
+    {
+      "state": 2,
+      "deleted": true,
+      "detach_success": false,
+      "deletion_raises": false,
+      "calls": [
+        "DeleteAllBreakpoints",
+        "Detach(false)"
+      ],
+      "result": {
+        "state": 2,
+        "safe_destroy": false,
+        "error": "detach failed: namespace(Success=<function cleanup_case.<locals>.detach.<locals>.<lambda> at 0x10a25acf0>, Fail=<function cleanup_case.<locals>.detach.<locals>.<lambda> at 0x10a25ada0>)"
+      },
+      "passed": true
+    },
+    {
+      "state": 2,
+      "deleted": true,
+      "detach_success": true,
+      "deletion_raises": true,
+      "calls": [
+        "DeleteAllBreakpoints",
+        "Detach(false)",
+        "Destroy"
+      ],
+      "result": {
+        "state": 2,
+        "safe_destroy": true,
+        "error": "DeleteAllBreakpoints failed; inferior detached"
+      },
+      "passed": true
+    },
+    {
+      "state": 1,
+      "deleted": true,
+      "detach_success": true,
+      "deletion_raises": false,
+      "calls": [],
+      "result": {
+        "state": 1,
+        "safe_destroy": false,
+        "error": "Cleanup requires an existing stopped state; no new pause is authorized"
+      },
+      "passed": true
+    },
+    {
+      "state": 3,
+      "deleted": true,
+      "detach_success": true,
+      "deletion_raises": false,
+      "calls": [
+        "Destroy"
+      ],
+      "result": {
+        "state": 3,
+        "safe_destroy": true,
+        "error": null
+      },
+      "passed": true
+    },
+    {
+      "state": 4,
+      "deleted": true,
+      "detach_success": true,
+      "deletion_raises": false,
+      "calls": [
+        "Destroy"
+      ],
+      "result": {
+        "state": 4,
+        "safe_destroy": true,
+        "error": null
+      },
+      "passed": true
+    },
+    {
+      "state": 0,
+      "deleted": true,
+      "detach_success": true,
+      "deletion_raises": false,
+      "calls": [],
+      "result": {
+        "state": 0,
+        "safe_destroy": false,
+        "error": "Cleanup requires an existing stopped state; no new pause is authorized"
+      },
+      "passed": true
+    }
+  ],
+  "limitation": "Missing hook can leave real synchronous Continue blocked; successful launch path only."
+}

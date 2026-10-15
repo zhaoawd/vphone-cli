@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "frozenAtUTC": "2026-10-14T09:01:27.404115+00:00",
+  "scope": "new external Task8 marker v2 tool and pure mocks only",
+  "productionModified": false,
+  "oldToolModified": false,
+  "fixedDriverModified": false,
+  "amfidHelperModified": false,
+  "realGuestOrVMOrProcessOrAMFIOperated": false,
+  "files": [
+    {
+      "path": "guest-rollback-marker-v2.py",
+      "size": 19615,
+      "sha256": "d9d7a5c37dede5acc212a85581686601fd92b0513e527caf212bd0472a83013b"
+    },
+    {
+      "path": "guest-rollback-marker-v2-mock.py",
+      "size": 15646,
+      "sha256": "d963ef54774c435caee48a066f118e60fad0937a5f14667ef7eaf2e67b81ddaa"
+    },
+    {
+      "path": "guest-rollback-marker-v2.md",
+      "size": 4741,
+      "sha256": "49a09f364e028393dfd671b328f9ede1bfb64a6fca664f2bfabb752d0b9c1cca"
+    },
+    {
+      "path": "guest-rollback-marker-v2-mock-01.log",
+      "size": 1549,
+      "sha256": "d2ea71b3bf58a4cecff1c2087ef8e2a80a999063779f8bed4dc11ad6c9b85e8e"
+    },
+    {
+      "path": "guest-rollback-marker-v2-mock-02.log",
+      "size": 1549,
+      "sha256": "db8446d14d28db8cdfb5d21250fb80a05c47e3cbfcd45c4cf75b0132b13c7d83"
+    },
+    {
+      "path": "guest-rollback-marker-v2-mutant-red.log",
+      "size": 9384,
+      "sha256": "3c933bcc7d4b77c3a6bfd4cb71792b3336cf2181f53468dc141a39c732c4c267"
+    },
+    {
+      "path": "guest-rollback-marker-v2-mock-final.log",
+      "size": 1549,
+      "sha256": "8e884c92f23725b515cbd750e3f16de72b7f018d16b83cedaffaec321ce63251"
+    }
+  ],
+  "oldToolReference": {
+    "path": "guest-rollback-marker.py",
+    "sha256": "8b7a83d20221c8d358dc2cdca4faa163aff8d8113b8e752d15a474b0a9203322"
+  },
+  "validation": {
+    "pureMockFunctions": 11,
+    "finalExitCode": 0,
+    "finalElapsedSeconds": 0.037,
+    "controlledMutantExitCode": 1,
+    "controlledMutantFailures": 6,
+    "realAcceptancePassed": false
+  },
+  "oldMarkerMissingCause": "原因未查明"
+}

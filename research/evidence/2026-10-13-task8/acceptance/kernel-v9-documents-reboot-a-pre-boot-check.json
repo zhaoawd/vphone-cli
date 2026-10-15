@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "label": "kernel-v9-documents-reboot-a",
+  "expected": {
+    "binding": {
+      "bundle": "2.6.20261016-local",
+      "kernel": "2.6.20261021-local"
+    },
+    "binding_sha256": "dc0875196f34361bec07f278cded496c32d14f2cb60419044aafc5dfc5fb555d",
+    "receipt_sha256": "110c2bb690d282f645a7c94fbe1bcb5a382c1e2fc4958093b73ac1055e4b3a49",
+    "desired_sha256": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+    "transaction_id": "58597f0a-e94c-4f69-86af-b0fdfa9fd3f3",
+    "payload_sha256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb"
+  },
+  "old_marker_failure_sha256": "af26e5130253333e99034296d5e31c055bf4e13d0d2e43a56222f447fcc05835",
+  "persistent_create_sha256": "2f8a003bfc48b3f0dd64beaafb5ee679a6208304a7669530336cead0358c61d0",
+  "amfid_observation": [
+    {
+      "flags": 2688565296,
+      "bsd_state": 2,
+      "xstatus": 0,
+      "pid": 69981,
+      "ppid": 1,
+      "uid": 0,
+      "start_seconds": 1791971060,
+      "start_microseconds": 726214,
+      "path": "/usr/libexec/amfid"
+    }
+  ],
+  "signals_sent": [],
+  "task8_processes": [],
+  "task8_attachments": [],
+  "pending": false,
+  "frozen_source16": true,
+  "frozen_v9_cli": true,
+  "frozen_v4_cli_vm": true,
+  "limitation": "No disk-content hash or marker observation; restart read is still pending"
+}

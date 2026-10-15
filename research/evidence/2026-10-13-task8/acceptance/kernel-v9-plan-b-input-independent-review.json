@@ -1,0 +1,246 @@
+{
+  "reviewed_at": "2026-10-14T05:17:08.417612+00:00",
+  "status": "restore-input-materialization-and-public-B-desired-preview-apply-accepted; B-kernel-publication-not-yet-accepted",
+  "scope": "Read-only frozen E-file and production-source review, AST parsing only. No live VM reads, VM/guest/mount/AMFI/process actions or production edits.",
+  "evidence_sha256": {
+    "prepare-acceptance-restore-input.py": "99391fd45f35763deb2a88254e307bdda3e56809dcd5ad1b900daa126277914e",
+    "prepared-generation-manifest.json": "462c40b3102f315898dafc483983952920c53be38bd6f2b3152bf3fc46344d56",
+    "kernel-v9-plan-b-restore-input-check.json": "b023350c388ac7d901ddf1b13389dd1a71b543b7f1f661bdeb1bbcf201670979",
+    "kernel-v9-plan-b-desired-preview.json": "6785113dfb5aef4490b8797d18709e521989ffc6ff8f98b34990e6821cd14429",
+    "kernel-v9-plan-b-desired-preview.log": "d4c6363129acfa2edd8d83d7953f08b097824bcc4e5dec7a2607578853f9e3d1",
+    "kernel-v9-plan-b-desired-preview-restored.json": "c197af8e6b57e89bc0121fdc6fbf3b26bc82f9326e4e31ac21e226e218a3e449",
+    "kernel-v9-plan-b-desired-preview-restored.log": "a9e312f88ceb58d7e02c9791ca3f208772b69d387ff5cede86f96d252d167f01",
+    "kernel-v9-plan-b-desired-preview-check.json": "4031c1a1e4e093a7d85464f784c9d40c57727cefb79b01b05b93123e84277949",
+    "kernel-v9-plan-b-desired-apply.json": "fcdeb2d0896072135a5f07745d01d8174f1dda18c3e9b36ac3bd7e2a5716644d",
+    "kernel-v9-plan-b-desired-apply.log": "bd0818b753bef3710c162964202a119866b0c950a44e78cb982f9556333d4867",
+    "kernel-v9-plan-b-desired-apply-check.json": "b7316da786e57a520f838ce379421be49f1c2400af17d920bd5d6877041f4125",
+    "kernel-v9-plan-b-applied-desired.json": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+    "kernel-v9-plan-b-operation-expectations.json": "3fc4f1a89b278b454ac41d228f7777054e2471814b2b4c9bff3d221bff3f5cc6"
+  },
+  "restore_input": {
+    "passed": true,
+    "source": "/private/tmp/vphone-task8-acceptance-vms/task8-copy/.firmware-generations/d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62/originals/iPhone17,3_26.1_23B85_Restore",
+    "target": "/private/tmp/vphone-task8-acceptance-vms/task8-copy/iPhone17,3_26.1_23B85_Restore",
+    "generation": "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+    "expected_tree_sha256": "a3712fa7d96ebe8c2899af2c728e30d6f50543e3b8cec3af23a60cee7196b03a",
+    "before": {
+      "files": {
+        "Disk.img": {
+          "st_dev": 16777233,
+          "st_ino": 589096904,
+          "st_size": 68719476736,
+          "st_mtime_ns": 1791954295363162089,
+          "st_ctime_ns": 1791954295363162089
+        },
+        "nvram.bin": {
+          "st_dev": 16777233,
+          "st_ino": 589096999,
+          "st_size": 33570816,
+          "st_mtime_ns": 1791954295385996312,
+          "st_ctime_ns": 1791954295385996312
+        },
+        "SEPStorage": {
+          "st_dev": 16777233,
+          "st_ino": 589096997,
+          "st_size": 524288,
+          "st_mtime_ns": 1791954294874145563,
+          "st_ctime_ns": 1791954294874145563
+        },
+        "config.plist": {
+          "st_dev": 16777233,
+          "st_ino": 589096998,
+          "st_size": 1166,
+          "st_mtime_ns": 1791393399067155235,
+          "st_ctime_ns": 1791899693282259508
+        },
+        "AVPBooter.vresearch1.bin": {
+          "st_dev": 16777233,
+          "st_ino": 589096918,
+          "st_size": 335688,
+          "st_mtime_ns": 1790726340257467464,
+          "st_ctime_ns": 1791899693163019272
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "st_dev": 16777233,
+          "st_ino": 589097000,
+          "st_size": 167936,
+          "st_mtime_ns": 1788431650000000000,
+          "st_ctime_ns": 1791899693285245031
+        }
+      },
+      "generation_manifest_sha256": "462c40b3102f315898dafc483983952920c53be38bd6f2b3152bf3fc46344d56",
+      "metadata_sha256": {
+        "launchpad.json": "43ac7f814c6ff8e30c1362c7182433f0da31ca5304f40b107136a99d2a55df95",
+        ".firmware-component-receipts.json": "e59819c579c3f958227a76c5d7fa5397134e01fb95937ea17a330c23bbc47169",
+        ".firmware-desired-plan.json": "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34"
+      }
+    },
+    "source_before_tree_sha256": "a3712fa7d96ebe8c2899af2c728e30d6f50543e3b8cec3af23a60cee7196b03a",
+    "copy_command": [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/vphone-task8-acceptance-vms/task8-copy/.firmware-generations/d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62/originals/iPhone17,3_26.1_23B85_Restore",
+      "/private/tmp/vphone-task8-acceptance-vms/task8-copy/.task8-restore-input-3cdb50e6-17d2-4a61-8e00-90d0169045ed"
+    ],
+    "candidate_tree_sha256": "a3712fa7d96ebe8c2899af2c728e30d6f50543e3b8cec3af23a60cee7196b03a",
+    "version_manifests_sha256": {
+      "iPhone-BuildManifest.plist": "00316e31d8439a6ef89b74932ca1521b760b6e0761ab06bc679ef23c903c5c87",
+      "BuildManifest.plist": "96a6fc9e7f279d591f23ba3385c12194c6d9bdcab71d45f07e6a963ccb04a2e5"
+    },
+    "source_after_tree_sha256": "a3712fa7d96ebe8c2899af2c728e30d6f50543e3b8cec3af23a60cee7196b03a",
+    "after": {
+      "files": {
+        "Disk.img": {
+          "st_dev": 16777233,
+          "st_ino": 589096904,
+          "st_size": 68719476736,
+          "st_mtime_ns": 1791954295363162089,
+          "st_ctime_ns": 1791954295363162089
+        },
+        "nvram.bin": {
+          "st_dev": 16777233,
+          "st_ino": 589096999,
+          "st_size": 33570816,
+          "st_mtime_ns": 1791954295385996312,
+          "st_ctime_ns": 1791954295385996312
+        },
+        "SEPStorage": {
+          "st_dev": 16777233,
+          "st_ino": 589096997,
+          "st_size": 524288,
+          "st_mtime_ns": 1791954294874145563,
+          "st_ctime_ns": 1791954294874145563
+        },
+        "config.plist": {
+          "st_dev": 16777233,
+          "st_ino": 589096998,
+          "st_size": 1166,
+          "st_mtime_ns": 1791393399067155235,
+          "st_ctime_ns": 1791899693282259508
+        },
+        "AVPBooter.vresearch1.bin": {
+          "st_dev": 16777233,
+          "st_ino": 589096918,
+          "st_size": 335688,
+          "st_mtime_ns": 1790726340257467464,
+          "st_ctime_ns": 1791899693163019272
+        },
+        "AVPSEPBooter.vresearch1.bin": {
+          "st_dev": 16777233,
+          "st_ino": 589097000,
+          "st_size": 167936,
+          "st_mtime_ns": 1788431650000000000,
+          "st_ctime_ns": 1791899693285245031
+        }
+      },
+      "generation_manifest_sha256": "462c40b3102f315898dafc483983952920c53be38bd6f2b3152bf3fc46344d56",
+      "metadata_sha256": {
+        "launchpad.json": "43ac7f814c6ff8e30c1362c7182433f0da31ca5304f40b107136a99d2a55df95",
+        ".firmware-component-receipts.json": "e59819c579c3f958227a76c5d7fa5397134e01fb95937ea17a330c23bbc47169",
+        ".firmware-desired-plan.json": "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34"
+      }
+    }
+  },
+  "preview_command": {
+    "command": [
+      "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261021-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+      "fw",
+      "desired-plan",
+      "task8-copy",
+      "--library-root",
+      "/private/tmp/vphone-task8-acceptance-vms",
+      "--generation",
+      "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+      "-V",
+      "exp",
+      "--force-exc-guard"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 52.41327381134033,
+    "log": "kernel-v9-plan-b-desired-preview-restored.log"
+  },
+  "apply_command": {
+    "command": [
+      "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261021-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+      "fw",
+      "desired-plan",
+      "task8-copy",
+      "--library-root",
+      "/private/tmp/vphone-task8-acceptance-vms",
+      "--generation",
+      "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+      "-V",
+      "exp",
+      "--force-exc-guard",
+      "--apply",
+      "--expected-sha256",
+      "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 101.96836304664612,
+    "log": "kernel-v9-plan-b-desired-apply.log"
+  },
+  "applied_desired_raw_sha256": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+  "applied_plan_sha256": "bb37c956b2bce344b65c6ca3fdea77065d9713f539f4a761823c2c8e5369e96c",
+  "expected_previous_desired_sha256": "ea1f464ba1ffb63737082879323cdac4a1efc8b40aa30e7ee7e505606a7fac34",
+  "non_kernel_equality": {
+    "selected": true,
+    "excludedByVersion": true,
+    "excludedByOptIn": true,
+    "excludedByVariant": true,
+    "guestUncovered": true,
+    "notImplemented": true,
+    "enabledSteps": true
+  },
+  "gate_changes": {
+    "forceExcGuard": [
+      false,
+      true
+    ],
+    "excGuardActive": [
+      false,
+      true
+    ]
+  },
+  "confirmed_checks": [
+    "The helper confines its target to task8-copy and exact generation/original Restore name; generation manifest matches frozen prepared manifest.",
+    "Helper treeDigest algorithm matches production directory/file markers, sorted names, recursive hashes and byte streaming; ordinary files reject symlinks/extra hardlinks and compare opened/named identity/time/size.",
+    "The sole generation Restore original digest a3712... equals source_before, candidate and source_after. Candidate is exclusively staged, verified, then renamed into previously absent root Restore; no competing Restore root is accepted.",
+    "Both actual version manifests SHA match between source and candidate; full tree digest additionally binds all content and relative names.",
+    "The helper before/after observations match exactly: six dev/inode/size/mtime/ctime, generation-manifest rawSHA, binding/receipt/currentdesired rawSHA. It holds the VM directory lock and refuses active transaction, desired pending and task8 attachments before copying.",
+    "Public desired-plan adapter resolves gates through pipeline.prepare(), which needs root Restore; it separately verifies generation and desired validation. Installed producer still loads generation.originalURLs rather than selecting the new root as its authority.",
+    "The restored preview command is fixed V9 fw desired-plan, exact VM/library/generation, exp --force-exc-guard, with no apply; output appliedfalse and expected currentSHA ea1f....",
+    "Formal apply repeats the same command and adds --apply --expected-sha256 ea1f...; exits0 in101.968363s. apply record == preview record == actual desired bytes decoded object; rawSHA3ad404... matches check and frozen operation expectations.",
+    "B retains A generation/stable identity/catalog/upstream context/variant and all non-kernel selected/excluded/notImplemented/enabledSteps. Only forceExcGuard/excGuardActive gate values differ; B planSHA matches the separately actual-produced true pair.",
+    "Receipt rawSHA e59819... and binding rawSHA43ac7... remain unchanged in apply-check. Desired publication is separate from kernel installation; installed receipt remains A until formal B update."
+  ],
+  "retained_failure": {
+    "wrapper": {
+      "command": [
+        "/Library/Application Support/vphone-launchpad/Bundles/2.6.20261021-local/VPhone.bundle/Contents/MacOS/vphone-cli",
+        "fw",
+        "desired-plan",
+        "task8-copy",
+        "--library-root",
+        "/private/tmp/vphone-task8-acceptance-vms",
+        "--generation",
+        "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+        "-V",
+        "exp",
+        "--force-exc-guard"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 19.866801977157593,
+      "log": "kernel-v9-plan-b-desired-preview.log"
+    },
+    "log": "Error: File not found: No *Restore* directory found in /private/tmp/vphone-task8-acceptance-vms/task8-copy. Run prepare_firmware first.\n",
+    "meaning": "Initial public preview failed because no root Restore directory. Failure is retained and not counted as producer or compatibility failure."
+  },
+  "limitations": [
+    "The helper is one-off input materialization, not a generic transaction: a failure can retain the stage or published root, and its exclusive output prevents silent reuse. Actual run passed and completed rename.",
+    "Six file observations around materialization are metadata only, not six new complete content hashes.",
+    "No source VM tree was copied or mounted. Materialized bytes came from already verified generation originals inside the target copy.",
+    "This does not change production code or bypass desired/generation qualification. The actual B kernel update, physical readback, different-payload boot, public rollback and marker preservation remain outstanding.",
+    "The reviewer did not recalculate the Restore tree from current live VM; conclusions use the frozen helper record and its reviewed algorithm."
+  ]
+}

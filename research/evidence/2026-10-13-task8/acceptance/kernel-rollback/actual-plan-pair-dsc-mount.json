@@ -1,0 +1,189 @@
+{
+  "passed": false,
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "/usr/bin/hdiutil",
+        "attach",
+        "-readonly",
+        "-nomount",
+        "-nobrowse",
+        "-plist",
+        "/private/tmp/vphone-task8-acceptance-vms/task8-copy/Disk.img"
+      ],
+      "exit_code": 0,
+      "stderr": "hdiutil: WARNING: 'hdiutil attach -readonly -nomount -nobrowse ...' is deprecated. Please use 'diskutil image attach --readOnly --noMount --mountOptions nobrowse ...' instead.\n"
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "apfs",
+        "list",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "/sbin/mount_apfs",
+        "-o",
+        "rdonly",
+        "/dev/disk12s1",
+        "/private/tmp/task8-plan-pair-dsc-mhuxyaur/system"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/diskutil",
+        "info",
+        "-plist",
+        "/dev/disk12s1"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/bin/sudo",
+        "-n",
+        "/usr/bin/hdiutil",
+        "detach",
+        "/dev/disk10"
+      ],
+      "exit_code": 0,
+      "stderr": "hdiutil: WARNING: 'hdiutil detach ...' is deprecated. Please use 'diskutil eject ...' instead.\n"
+    },
+    {
+      "command": [
+        "/usr/bin/hdiutil",
+        "info",
+        "-plist"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "vm": "/private/tmp/vphone-task8-acceptance-vms/task8-copy",
+  "scope": "Readonly test-copy System mount and actual EXP two-plan producer/DSC test; no VM boot or source VM mount",
+  "disk_metadata_before": {
+    "st_dev": 16777233,
+    "st_ino": 589096904,
+    "st_size": 68719476736,
+    "st_mtime_ns": 1791945744927731089,
+    "st_ctime_ns": 1791945744927731089
+  },
+  "system_info": {
+    "APFSContainerFree": 39585234944,
+    "APFSContainerReference": "disk12",
+    "APFSContainerSize": 68231806976,
+    "APFSPhysicalStores": [
+      {
+        "APFSPhysicalStore": "disk10s1"
+      }
+    ],
+    "APFSSnapshot": false,
+    "Bootable": true,
+    "BooterDeviceIdentifier": "disk12s5",
+    "BusProtocol": "Disk Image",
+    "CanBeMadeBootable": false,
+    "CanBeMadeBootableRequiresDestroy": false,
+    "CapacityInUse": 14063955968,
+    "Content": "41504653-0000-11AA-AA11-00306543ECAC",
+    "DeviceBlockSize": 4096,
+    "DeviceIdentifier": "disk12s1",
+    "DeviceNode": "/dev/disk12s1",
+    "DeviceTreePath": "IODeviceTree:/",
+    "DiskUUID": "61706673-7575-6964-0001-766F6C756E00",
+    "Ejectable": true,
+    "EjectableMediaAutomaticUnderSoftwareControl": true,
+    "EjectableOnly": true,
+    "Encryption": false,
+    "EncryptionThisVolumeProper": false,
+    "FileVault": false,
+    "FilesystemName": "Case-sensitive APFS",
+    "FilesystemType": "apfs",
+    "FilesystemUserVisibleName": "APFS (Case-sensitive)",
+    "FreeSpace": 0,
+    "GlobalPermissionsEnabled": true,
+    "IOKitSize": 68231806976,
+    "IORegistryEntryName": "System",
+    "Internal": false,
+    "Locked": false,
+    "MediaName": "",
+    "MediaType": "\u901a\u7528",
+    "MountPoint": "/private/tmp/task8-plan-pair-dsc-mhuxyaur/system",
+    "OSInternalMedia": false,
+    "ParentWholeDisk": "disk12",
+    "PartitionMapPartition": false,
+    "RAIDMaster": false,
+    "RAIDSlice": false,
+    "Removable": true,
+    "RemovableMedia": true,
+    "RemovableMediaOrExternalDevice": true,
+    "SMARTDeviceSpecificKeysMayVaryNotGuaranteed": {},
+    "SMARTStatus": "Not Supported",
+    "Sealed": "Broken",
+    "Size": 68231806976,
+    "SupportsGlobalPermissionsDisable": true,
+    "SystemImage": false,
+    "TotalSize": 62013661184,
+    "VolumeAllocationBlockSize": 4096,
+    "VolumeName": "System",
+    "VolumeSize": 0,
+    "VolumeUUID": "61706673-7575-6964-0001-766F6C756E00",
+    "WholeDisk": false,
+    "Writable": false,
+    "WritableMedia": false,
+    "WritableVolume": false
+  },
+  "test": {
+    "command": [
+      "/usr/bin/swift",
+      "test",
+      "--disable-sandbox",
+      "--scratch-path",
+      "/private/tmp/vphone-five-tasks-swift-20261012",
+      "--cache-path",
+      "/Users/qcz3840/github/vphone-cli/.build/test-cache",
+      "--force-resolved-versions",
+      "--no-parallel",
+      "--filter",
+      "actualPublicForceExcGuardPlansProduceDifferentPayloads"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 60.9711720419582,
+    "environment": {
+      "VPHONE_TEST_ROLLBACK_PRISTINE": "/private/tmp/task8-pristine-kernel.im4p",
+      "VPHONE_TEST_ROLLBACK_INPUT_SHA256": "b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac",
+      "VPHONE_TEST_ROLLBACK_DSC_SYSTEM": "/private/tmp/task8-plan-pair-dsc-mhuxyaur/system",
+      "VPHONE_TEST_ROLLBACK_PAIR_OUT": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-13-task8/acceptance/kernel-rollback/actual-plan-pair-dsc.json",
+      "CLANG_MODULE_CACHE_PATH": "/Users/qcz3840/github/vphone-cli/.build/test-module-cache",
+      "SWIFT_MODULECACHE_PATH": "/Users/qcz3840/github/vphone-cli/.build/test-module-cache"
+    }
+  },
+  "error": "AssertionError()",
+  "remaining_attachments": [],
+  "disk_metadata_after": {
+    "st_dev": 16777233,
+    "st_ino": 589096904,
+    "st_size": 68719476736,
+    "st_mtime_ns": 1791945744927731089,
+    "st_ctime_ns": 1791945744927731089
+  }
+}

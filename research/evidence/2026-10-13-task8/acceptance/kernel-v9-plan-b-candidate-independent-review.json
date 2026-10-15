@@ -1,0 +1,75 @@
+{
+  "reviewed_at": "2026-10-14T05:44:41.524577+00:00",
+  "status": "candidate-files-consistent; no-installed-commit-or-boot-conclusion",
+  "scope": "Independent pure frozen E files and exported pristine IM4P only. No live VM/Disk reads, VM, mount, guest, AMFI, process or build/test actions.",
+  "evidence_sha256": {
+    "kernel-v9-plan-b-candidate-journal.json": "4f11a42cf5a2b1c16ccbbb9f964bb47fc33eaccd79d8b84f0281bfd6e3d3a857",
+    "kernel-v9-plan-b-candidate-report.json": "db32883b6117a767a2b0d53e96116d606c77f411a6963a7bda32b7cca5b7a3ce",
+    "kernel-v9-plan-b-candidate-component-receipts.json": "518a87862d31de453dd4fd6875f3dc29342f11452e30c8cc38b94ccc05f2ecb0",
+    "kernel-v9-plan-b-candidate-installed-component-proof.json": "7fac9525c945e31e5f90175db74608e34e8ea88243459754f597c1a57501915a",
+    "kernel-v9-plan-b-candidate-installed-kernel.im4p": "ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98",
+    "kernel-v9-plan-b-candidate-snapshot-check.json": "015af935acdcaeb1f90329f6eca684f24e4db201d938465406318b266c5937e2",
+    "kernel-v9-plan-b-operation-expectations.json": "3fc4f1a89b278b454ac41d228f7777054e2471814b2b4c9bff3d221bff3f5cc6",
+    "kernel-v9-plan-b-before.json": "4d4d233f8cd808296be76a41b288faa60822e67dfd4ad0dabb8e8e6a8126acb4",
+    "kernel-v9-plan-a-readback.json": "24f571935712b9b2a03e531c30857a8c529c9d985cc9ca2fb51ca60534fb4e47",
+    "kernel-rollback/actual-plan-pair-dsc-v2.json": "d3370f2eebf5b69416a16e849c617050a43120f4656134487b0dc65856fb3950"
+  },
+  "snapshot_scope": "Candidate file snapshots during live publication; not installed readback or commit proof; per-file stable reads, not atomic journal snapshot",
+  "transaction_id": "2901d975-2379-4b50-9340-8580786aacc1",
+  "journal_phase": "publishing",
+  "journal_version": 3,
+  "record_count": 120,
+  "proof": {
+    "containerEnvelopeSHA256": "32670de0eb0e52a18645867eaa681af0c130cece11fcad590f755bdd80135c88",
+    "executableSHA256": "e1c6ca75c19966ec8bcada05ca235c1e5019c572570b64e8ebed041f0d14da76",
+    "im4pSHA256": "ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98",
+    "imageSHA256": "df1f5f4f8dc909d62b5c1585f2a369c415b3243d54cffa62054d7a26593f5bd1",
+    "inputSHA256": "b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac",
+    "payloadSHA256": "a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0",
+    "producer": "current-bundle-kernel-update",
+    "rollbackProtocol": "vphone.kernel-rollback.v1",
+    "schemaVersion": 1,
+    "transactionID": "2901d975-2379-4b50-9340-8580786aacc1",
+    "version": "2.6.20261021-local"
+  },
+  "candidate_artifact": {
+    "raw_im4p_sha256": "ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98",
+    "raw_payload_sha256": "a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0",
+    "size_bytes": 43991410,
+    "decoded_payload_size": 43991040,
+    "description": "KernelManagement_host-487.0.4",
+    "PAYP_sha256": "92c4c621253f5ecd211e5e6f0d6d5164688575a7395988fbf29142509a8a9b93",
+    "raw_description_and_PAYP_equal_pristine": true,
+    "uncompressed_raw_krnl": true
+  },
+  "independent_checks": [
+    "All five snapshot file sizes/SHA256 match candidate-snapshot-check and raw report/receipt/proof hashes match journal/publication references.",
+    "Journal/publication/proof share canonical UUID2901d975-2379-4b50-9340-8580786aacc1; schema3/kernelOnly/publishing/forward49of49/pendingfalse, matching snapshot before/after phase and cursor.",
+    "Frozen B expected plan and before desired match journal plan/options and receipt generation/desired/plan. B has forceExcGuard/excGuardActive true, variant exp and no ablation.",
+    "Actual IM4P has exactly magic/fourcc/description/payload/PAYP fields; magicIM4P/fourcckrnl, first three raw TLVs and raw PAYP exactly equal trusted pristine source. Raw payload contains no recognized LZFSE/LZSS envelope and hashes to proofa89e2e78....",
+    "Reviewer decodes the source whose full SHA is b7fa45..., applies every120 ordered report record with exact original bytes, integer offsets, equal nonempty lengths and bounds, then compares the complete reconstructed bytes to actual candidate artifact payload. All final effects remain present.",
+    "Receipt effects exactly equal the120 report records in order, solely Disk.img output. Candidate imageSHA matches journal candidate and receipt output; codeversion/sourceCLI digest equal frozen V9 expectations.",
+    "Actual candidate payload/IM4P/plan/input match separately passed true-plan current-System DSC fixture and differ from accepted A payload/IM4P.",
+    "proof.containerEnvelopeSHA256 equals accepted A envelope32670d...; this snapshot contains no full candidate IMG4 and does not independently read its envelope bytes."
+  ],
+  "publication_relationships": {
+    "candidate_image_sha256_claim": "df1f5f4f8dc909d62b5c1585f2a369c415b3243d54cffa62054d7a26593f5bd1",
+    "original_disk_sha256_claim": "d5e5d1163260d7d774da5069f1b3ea697a309e44e609011b667a092d13351355",
+    "cursor": 49,
+    "offset_count": 49,
+    "receipt_state_field": "committed",
+    "receipt_scope_field": "installedComponent",
+    "receipt_raw_sha256": "518a87862d31de453dd4fd6875f3dc29342f11452e30c8cc38b94ccc05f2ecb0",
+    "report_raw_sha256": "db32883b6117a767a2b0d53e96116d606c77f411a6963a7bda32b7cca5b7a3ce",
+    "current_desired_B_sha256": "3ad404b6361d1989bda18be961ce72d1415f6e84025138ec6623bc0578aad949",
+    "plan_B_sha256": "bb37c956b2bce344b65c6ca3fdea77065d9713f539f4a761823c2c8e5369e96c"
+  },
+  "limitations": [
+    "Per-file stable snapshots are not an atomic journal snapshot. Internal cross-file consistency is verified only for these frozen bytes.",
+    "49of49/pendingfalse and receipt state=committed do not establish durable journal commit. Frozen journal remains publishing.",
+    "Artifact filename installed-kernel.im4p and receipt scope=installedComponent are preparation fields; they do not prove current configured Disk/Preboot contains those bytes.",
+    "Candidate imageSHA/envelopeSHA are associated proof/journal claims here. No complete candidate image or configured Disk was hashed/read by the reviewer.",
+    "Known DSC match establishes association with the prior independently reviewed actual pure producer/current-System DSC test. This review did not rerun DSC or establish formal B post-publication DSC completion.",
+    "Await formal commit exit0, archived committed chain, physical readonly generic readback, then actual V4 B boot and marker capture."
+  ]
+}

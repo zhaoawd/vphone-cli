@@ -1,0 +1,42 @@
+{
+  "scope": "Pure exported-file verification; no VM, mount or AMFI operation.",
+  "source": {
+    "export": "/private/tmp/task8-pristine-kernel.im4p",
+    "sha256": "b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac",
+    "bytes": 14367658,
+    "proof_input_sha_matches": true,
+    "description": "KernelManagement_host-487.0.4",
+    "compression": "LZFSE",
+    "decoded_bytes": 43991040,
+    "decoded_sha256": "b6846048f3a60eab5f360fcc0f3dcb5198aa0476c86fb06eb42f6267cdbfcae0",
+    "payp": [
+      {
+        "tag": "a0",
+        "tag_class": 2,
+        "tag_number": 0,
+        "constructed": true,
+        "type_name": "PAYP",
+        "offset": 14367343,
+        "size": 315,
+        "value_size": 311,
+        "sha256": "92c4c621253f5ecd211e5e6f0d6d5164688575a7395988fbf29142509a8a9b93",
+        "value_sha256": "3f54ada581d67801f416bd3e1a64748a76bf87e0afb76756732ef58576721dbe",
+        "value_prefix_hex": "3082013316045041595031820129ff86db8dc4660e300c16046b636266020402",
+        "contains_PAYP_marker": true
+      }
+    ],
+    "description_matches_baseline": true,
+    "payp_matches_baseline": true
+  },
+  "repaired": {
+    "path": "/private/tmp/task8-container-repaired-v8.img4",
+    "sha256": "5b90c5a0ee87bf810c7e90795d537265f39774fbf85c430263fd2f61fc41ce7a",
+    "bytes": 43997230,
+    "exact_baseline_bytes": true,
+    "decoded_sha256": "d2b90150a12e1b5685b91a6b85e59f71cbff4896c49abc3b1c24fd386bd697fb"
+  },
+  "generation_id": "d8d780c97a23b5ea398df872a73ad7aead24af90a08e35cea39c08524e927d62",
+  "source_origin_reported_by_exporter": "originals/iPhone17,3_26.1_23B85_Restore/kernelcache.research.vphone600",
+  "passed": true,
+  "limitation": "Exact file reconstruction does not establish VM boot success or the cause of the earlier boot failure."
+}

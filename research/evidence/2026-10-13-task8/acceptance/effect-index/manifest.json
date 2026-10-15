@@ -1,0 +1,57 @@
+{
+  "frozen_at": "2026-10-14T00:53:55.925012+08:00",
+  "sources": {
+    "sources/FirmwarePatcher/Pipeline/FirmwareComponentReceipt.swift": {
+      "sha256": "420344494a44d4e7db56f376d98540a55c578471fa724a8d40685471dcba2bbd",
+      "bytes": 13552
+    },
+    "tests/FirmwarePatcherTests/FirmwareComponentEffectIndexTests.swift": {
+      "sha256": "e5ffed66c996bf842bedd2d6a8188c4e05a0cb14dfb631738f269b00b31ea9c1",
+      "bytes": 2858
+    }
+  },
+  "evidence": {
+    "commands.json": {
+      "sha256": "d27286e979f51badb6f95227e646bf3efda44ed8064b18a5be9298deb2e7a27b",
+      "bytes": 1337
+    },
+    "diagnosis.json": {
+      "sha256": "b4fdc8f18fb4b8c6b23d5059e18985979dab4dc52925af5b7d8352d56c0c375a",
+      "bytes": 2385
+    },
+    "fix.diff": {
+      "sha256": "a84d1fcaacae51ba468ba290db12b427b034fd5f62a606be93a0fcea152fffad",
+      "bytes": 1395
+    },
+    "green.log": {
+      "sha256": "78d4e65d0a7e07d75a2ccc4c53c378eb609da5d9fc45b562af291271f3b4a05c",
+      "bytes": 9648
+    },
+    "red-repeat.log": {
+      "sha256": "de86c72b101f958490486eebb10c0e91ab3e52236ac7122314340ba6cbbcb030",
+      "bytes": 2648
+    },
+    "red.log": {
+      "sha256": "906cdd2193382025edc61fa50c747bd6ebde4e3ef2f3b339a84cd3b6297dff51",
+      "bytes": 5023
+    },
+    "task8-targeted-green.log": {
+      "sha256": "a659f9568cee89c0a04f670348c02cefe682302af1001fc748bfc5d234e16abc",
+      "bytes": 42232
+    }
+  },
+  "related_evidence": {
+    "kernel-v6-effect-rejected-journal.json": {
+      "sha256": "d175a305f9df10ab5d8180e7348556b6a997796b0857a8d01467299d00a529bc",
+      "bytes": 397170
+    },
+    "kernel-v6-effect-rejected-report.json": {
+      "sha256": "94dc7a38765e98689456d5c3905b766f51dd6d4690044267cdd529fe50d65d29",
+      "bytes": 116657
+    },
+    "kernel-v6-effect-rejected.log": {
+      "sha256": "b342a751df5312cc89d0365cc3a7ae8d08656aef6e4e4ed166fcc8fea43e28a3",
+      "bytes": 94
+    }
+  }
+}

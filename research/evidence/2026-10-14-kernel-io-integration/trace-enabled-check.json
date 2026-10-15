@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "checks": {
+    "all_required_phases": true,
+    "partial_error_actual_bytes": true,
+    "comparisons_present": true,
+    "native_pread_labels": true
+  },
+  "traces": [
+    {
+      "trace": "research/evidence/2026-10-14-kernel-io-integration/traces/production-probes.52236.jsonl",
+      "sha256": "7cd38cfa2714b6756f46c65852283ef71120f157216b5c4a776afd847f4f01d5",
+      "events": 1,
+      "complete": true
+    },
+    {
+      "trace": "research/evidence/2026-10-14-kernel-io-integration/traces/production-probes.52238.jsonl",
+      "sha256": "05675015930a3af7328209c28f288def96af3935d027a72f7c264a4e2997aaac",
+      "events": 13961,
+      "complete": true
+    }
+  ],
+  "events": 13962,
+  "phase_counts": {
+    "FirmwareDesiredPlanStore.fsync": 36,
+    "FirmwareTransaction.fileHandleSynchronize": 96,
+    "FirmwareTransaction.fsync": 177,
+    "VPhoneCoreBundleStore.fileHandleSynchronize": 1,
+    "generation.fileHandleSynchronize": 148,
+    "generation.fileSHA256": 330,
+    "generation.fsync": 105,
+    "generation.loadVerified": 291,
+    "generation.readFile": 5116,
+    "generation.treeDigest": 7020,
+    "generation.verifyOriginals": 311,
+    "kernelDisk.capture": 6,
+    "kernelDisk.capture.compare": 6,
+    "kernelDisk.fsync": 18,
+    "kernelDisk.publish": 6,
+    "kernelDisk.reverse": 4,
+    "kernelDisk.validate": 17,
+    "kernelDisk.validate.compare": 17,
+    "security.SecCodeCopySigningInformation": 6,
+    "security.SecStaticCodeCheckValidityWithErrors": 9,
+    "security.cdhash": 6,
+    "security.staticCode": 15,
+    "security.verify": 9,
+    "store.receiptReadDecode": 2,
+    "store.requireBundleLayout": 2,
+    "store.secureTree": 2,
+    "store.verifiedReceipt": 2,
+    "transaction.journal.encode": 54,
+    "transaction.saveJournal": 54,
+    "transaction.writeDurably": 96
+  },
+  "scope": "Actual integrated debug test binary and synthetic production helpers; not a timing benchmark or full CLI attribution"
+}

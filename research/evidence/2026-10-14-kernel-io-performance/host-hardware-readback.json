@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/usr/sbin/sysctl",
+    "hw.model",
+    "hw.memsize",
+    "hw.ncpu",
+    "machdep.cpu.brand_string"
+  ],
+  "exit_code": 0,
+  "sandbox_override": "require_escalated read-only",
+  "values": {
+    "hw.model": "MacBookPro17,1",
+    "hw.memsize": 17179869184,
+    "hw.ncpu": 8,
+    "machdep.cpu.brand_string": "Apple M1"
+  },
+  "note": "Prior restricted sysctl failure remains in host-environment.json."
+}

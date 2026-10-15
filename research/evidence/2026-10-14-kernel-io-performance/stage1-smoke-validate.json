@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/usr/bin/xcrun",
+    "xctest",
+    "-XCTest",
+    "FirmwarePatcherTests.FirmwareKernelIOBenchmarkTests/testValidate",
+    "/private/tmp/vphone-kernel-io-optimization-20261014/.build/arm64-apple-macosx/release/vphone-cliPackageTests.xctest"
+  ],
+  "environment_overrides": {
+    "VPHONE_KERNEL_IO_TRACE": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/traces/stage1-smoke-validate",
+    "VPHONE_KERNEL_IO_BENCHMARK": "1",
+    "VPHONE_KERNEL_IO_BENCHMARK_OPERATION": "validate",
+    "VPHONE_KERNEL_IO_BENCHMARK_LABEL": "stage1-smoke-validate",
+    "VPHONE_KERNEL_IO_BENCHMARK_BYTES": "1048579"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 0.16417499992530793,
+  "log": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-performance/stage1-smoke-validate.log",
+  "acceptance_directory_lock_held": true
+}

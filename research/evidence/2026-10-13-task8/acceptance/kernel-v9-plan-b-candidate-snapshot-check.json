@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "scope": "Candidate file snapshots during live publication; not installed readback or commit proof; per-file stable reads, not atomic journal snapshot",
+  "transaction_id": "2901d975-2379-4b50-9340-8580786aacc1",
+  "before_phase": "publishing",
+  "before_cursor": 49,
+  "after_phase": "publishing",
+  "after_cursor": 49,
+  "files": [
+    {
+      "source": "journal.json",
+      "evidence": "kernel-v9-plan-b-candidate-journal.json",
+      "sha256": "4f11a42cf5a2b1c16ccbbb9f964bb47fc33eaccd79d8b84f0281bfd6e3d3a857",
+      "size": 225480
+    },
+    {
+      "source": "report.json",
+      "evidence": "kernel-v9-plan-b-candidate-report.json",
+      "sha256": "db32883b6117a767a2b0d53e96116d606c77f411a6963a7bda32b7cca5b7a3ce",
+      "size": 117121
+    },
+    {
+      "source": "component-receipts.json",
+      "evidence": "kernel-v9-plan-b-candidate-component-receipts.json",
+      "sha256": "518a87862d31de453dd4fd6875f3dc29342f11452e30c8cc38b94ccc05f2ecb0",
+      "size": 69192
+    },
+    {
+      "source": "installed-component-proof.json",
+      "evidence": "kernel-v9-plan-b-candidate-installed-component-proof.json",
+      "sha256": "7fac9525c945e31e5f90175db74608e34e8ea88243459754f597c1a57501915a",
+      "size": 698
+    },
+    {
+      "source": "installed-kernel.im4p",
+      "evidence": "kernel-v9-plan-b-candidate-installed-kernel.im4p",
+      "sha256": "ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98",
+      "size": 43991410
+    }
+  ],
+  "proof": {
+    "containerEnvelopeSHA256": "32670de0eb0e52a18645867eaa681af0c130cece11fcad590f755bdd80135c88",
+    "executableSHA256": "e1c6ca75c19966ec8bcada05ca235c1e5019c572570b64e8ebed041f0d14da76",
+    "im4pSHA256": "ecbea551116fbb2d10b0196d72ecd7f52f8f145b5ecd7632159c0025fb78bf98",
+    "imageSHA256": "df1f5f4f8dc909d62b5c1585f2a369c415b3243d54cffa62054d7a26593f5bd1",
+    "inputSHA256": "b7fa45e93debe4d27cd3b59d74823223864fd15b1f7eb460eb0d9f709109edac",
+    "payloadSHA256": "a89e2e786dc61d93b14ea129072bc762594ca4cd1f54719810ea1cbf99c0e2c0",
+    "producer": "current-bundle-kernel-update",
+    "rollbackProtocol": "vphone.kernel-rollback.v1",
+    "schemaVersion": 1,
+    "transactionID": "2901d975-2379-4b50-9340-8580786aacc1",
+    "version": "2.6.20261021-local"
+  }
+}

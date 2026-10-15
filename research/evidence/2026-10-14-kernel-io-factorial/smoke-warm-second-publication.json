@@ -1,0 +1,27 @@
+{
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+    "-XCTest",
+    "FirmwarePatcherTests.FirmwareKernelIOFactorialBenchmarkTests/testPublication",
+    "/private/tmp/vphone-kernel-io-factorial-second-20261014/.build/arm64-apple-macosx/release/vphone-cliPackageTests.xctest"
+  ],
+  "environment_overrides": {
+    "VPHONE_KERNEL_IO_TRACE": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-factorial/traces/smoke-warm-second-publication",
+    "VPHONE_KERNEL_IO_BENCHMARK_BYTES": "2097155",
+    "VPHONE_KERNEL_IO_BENCHMARK_LABEL": "smoke-warm-second-publication",
+    "VPHONE_KERNEL_IO_FACTORIAL": "1"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 1.3400583749171346,
+  "log": "/Users/qcz3840/github/vphone-cli/research/evidence/2026-10-14-kernel-io-factorial/smoke-warm-second-publication.log",
+  "acceptance_directory_lock_held": true,
+  "artifact_directory_lock_held": null,
+  "child_pid": 11341,
+  "child_start_new_session": true,
+  "timeout_seconds": 180.0,
+  "timed_out": false,
+  "interrupted": null,
+  "cleanup_signals_to_owned_child_group": [],
+  "cleanup_complete": true,
+  "cleanup_error": null
+}

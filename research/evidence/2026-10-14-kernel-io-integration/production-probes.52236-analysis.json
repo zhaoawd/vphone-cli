@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "pid": 52236,
+  "events": 1,
+  "limitations": [
+    "Inclusive measurements overlap; do not sum across phases.",
+    "Consumer and child stream bytes may describe the same reads.",
+    "Logical bytes are returned user-space bytes, not physical disk I/O.",
+    "Aggregate child counters are summaries, not additional independent work."
+  ],
+  "roots": [
+    "885425db-16d7-4f48-84d6-419f0c0478a9"
+  ],
+  "groups": [
+    {
+      "phase": "generation.readFile",
+      "caller_file": "FirmwarePatcherTests/FirmwareKernelIOTimingTests.swift",
+      "caller_line": 14,
+      "caller_function": "testPartialConsumerFailurePreservesErrorAndActualReadBytes()",
+      "role": "file",
+      "byte_semantics": "stream_read_actual",
+      "calls": 1,
+      "success": 0,
+      "error": 1,
+      "cumulative_inclusive_ns": 1631333,
+      "counts": {
+        "bytes": 1048576,
+        "read_calls": 1
+      },
+      "overlapping_spans_same_thread": false,
+      "interval_union_ns_by_thread": {
+        "259": 1631333
+      }
+    }
+  ]
+}
